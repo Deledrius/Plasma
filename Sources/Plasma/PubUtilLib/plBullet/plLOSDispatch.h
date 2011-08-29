@@ -39,20 +39,29 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
       Mead, WA   99021
 
 *==LICENSE==*/
+#include "pnKeyedObject/hsKeyedObject.h"
 
-#include "plPXConvert.h"
+class plLOSRequestMsg;
+struct hsMatrix44;
 
-#define CHECK_OFFSET(NxCls, NxMem, hsCls, hsMem) \
-    static_assert(offsetof(NxCls, NxMem) == offsetof(hsCls, hsMem), \
-    "PhysX Conversion Failure: "#NxCls " and " #hsCls " offsets do not match for " #NxMem "!");
+/** \class plLOSDispatch
+    Line-of-sight requests are sent to this guy, who then hands them
+    to the appropriate solvers, which can vary depending on such
+    criteria as which subworld the player is currently in.
+    Eventually we will have more variants of requests, such as 
+    "search all subworlds," etc.  */
+class plLOSDispatch : public hsKeyedObject
+{
+public:
+    plLOSDispatch();
+    ~plLOSDispatch();
 
-CHECK_OFFSET(NxVec3, x, hsScalarTriple, fX);
-CHECK_OFFSET(NxVec3, y, hsScalarTriple, fY);
-CHECK_OFFSET(NxVec3, z, hsScalarTriple, fZ);
+    CLASSNAME_REGISTER(plLOSDispatch);
+    GETINTERFACE_ANY(plLOSDispatch, hsKeyedObject);
+    
+    virtual hsBool MsgReceive(plMessage* msg);
 
-CHECK_OFFSET(NxQuat, x, hsQuat, fX);
-CHECK_OFFSET(NxQuat, y, hsQuat, fY);
-CHECK_OFFSET(NxQuat, z, hsQuat, fZ);
-CHECK_OFFSET(NxQuat, w, hsQuat, fW);
-#undef CHECK_OFFSET
-
+protected:
+    plMessage* ICreateHitMsg(plLOSRequestMsg* requestMsg, hsMatrix44& l2w);
+    plMessage* ICreateMissMsg(plLOSRequestMsg* requestMsg);
+};
