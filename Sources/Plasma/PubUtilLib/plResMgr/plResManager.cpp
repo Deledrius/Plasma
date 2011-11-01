@@ -603,6 +603,17 @@ void plResManager::GetLocationStrings(const plLocation& loc, plString* ageBuffer
         *pageBuffer = info.GetPage();
 }
 
+short plResManager::GetKeyVersion(const plKey& key) const
+{
+    plRegistryPageNode* page = FindPage(key->GetUoid().GetLocation());
+    const plPageInfo::ClassVerVec versions = page->GetPageInfo().GetClassVersions();
+    for(size_t i = 0; i < versions.size(); ++i) {
+        if(versions[i].Class == key->GetUoid().GetClassType())
+        return versions[i].Version;
+    }
+    return 0;
+}
+
 bool plResManager::AddViaNotify(plRefMsg* msg, plRefFlags::Type flags)
 {
     hsAssert(msg && msg->GetRef() && msg->GetRef()->GetKey(), "Improperly filled out ref message");

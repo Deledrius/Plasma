@@ -70,7 +70,12 @@ public:
     //---------------------------
     //  Finding Functions
     //---------------------------
-    virtual plKey FindKey(const plUoid& uoid)=0;    
+    virtual plKey FindKey(const plUoid& uoid)=0;
+
+	//---------------------------
+	// Query stored version for this object
+	//---------------------------
+	virtual short GetKeyVersion(const plKey& key) const =0;
 
     //---------------------------
     //  Establish reference linkage 

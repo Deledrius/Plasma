@@ -92,6 +92,11 @@ public:
     void                GetLocationStrings(const plLocation& loc, plString* ageBuffer, plString* pageBuffer) const;
 
     //---------------------------
+    // Query stored version for this object
+    //---------------------------
+    virtual short GetKeyVersion(const plKey& key) const;
+
+    //---------------------------
     //  Establish reference linkage 
     //---------------------------
     virtual bool   AddViaNotify(const plKey& key, plRefMsg* msg, plRefFlags::Type flags);
