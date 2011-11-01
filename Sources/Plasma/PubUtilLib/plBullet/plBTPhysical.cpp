@@ -119,11 +119,8 @@ PhysRecipe::PhysRecipe()
     , objectKey(nil)
     , sceneNode(nil)
     , worldKey(nil)
-    //, convexMesh(nil)
-    //, triMesh(nil)
     , radius(0.f)
     , offset(0.f, 0.f, 0.f)
-    , meshStream(nil)
 {
     l2s.Reset();
 }
@@ -225,19 +222,19 @@ hsBool plBTPhysical::Init(PhysRecipe& recipe)
 //
 /////////////////////////////////////////////////////////////////////
 
-void plBTPhysical::Read(hsStream* stream, hsResMgr* mgr)
+PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
 {
     plPhysical::Read(stream, mgr);  
     ClearMatrix(fCachedLocal2World);
 
     PhysRecipe recipe;
-    recipe.mass = stream->ReadSwapScalar();
-    recipe.friction = stream->ReadSwapScalar();
-    recipe.restitution = stream->ReadSwapScalar();
+    recipe.mass = stream->ReadLEScalar();
+    recipe.friction = stream->ReadLEScalar();
+    recipe.restitution = stream->ReadLEScalar();
     recipe.bounds = (plSimDefs::Bounds)stream->ReadByte();
     recipe.group = (plSimDefs::Group)stream->ReadByte();
-    recipe.reportsOn = stream->ReadSwap32();
-    fLOSDBs = stream->ReadSwap16();
+    recipe.reportsOn = stream->ReadLE32();
+    fLOSDBs = stream->ReadLE16();
     //hack for swim regions currently they are labeled as static av blockers
     if(fLOSDBs==plSimDefs::kLOSDBSwimRegion)
     {
@@ -261,7 +258,7 @@ void plBTPhysical::Read(hsStream* stream, hsResMgr* mgr)
 
     if (recipe.bounds == plSimDefs::kSphereBounds)
     {
-        recipe.radius = stream->ReadSwapScalar();
+        recipe.radius = stream->ReadLEScalar();
         recipe.offset.Read(stream);
     }
     else if (recipe.bounds == plSimDefs::kBoxBounds)
@@ -279,7 +276,26 @@ void plBTPhysical::Read(hsStream* stream, hsResMgr* mgr)
             recipe.triMesh = plSimulationMgr::GetInstance()->GetSDK()->createTriangleMesh(pxs);
             */
     }
+	return recipe;
+}
 
+PhysRecipe plBTPhysical::IReadV3(hsStream* stream, hsResMgr* mgr)
+{
+    PhysRecipe recipe;
+    return recipe;
+}
+
+void plBTPhysical::Read(hsStream* stream, hsResMgr* mgr)
+{
+    PhysRecipe recipe;
+    switch(mgr->GetKeyVersion(GetKey())) {
+    case 0:
+        recipe = IReadV0(stream, mgr);
+        break;
+    case 3:
+        recipe = IReadV3(stream, mgr);
+    break;
+    };
     Init(recipe);
 
     hsAssert(!fProxyGen, "Already have proxy gen, double read?");
@@ -718,6 +734,7 @@ void plBTPhysical::SetSyncState(hsPoint3* pos, hsQuat* rot, hsVector3* linV, hsV
     // If the physical has fallen out of the sim, and this is initial age state, and we're
     // the first person in, reset it to the original position.  (ie, prop the default state
     // we've got right now)
+    // This hack is bad, and I should feel bad for leaving it in.
     if (pos && pos->fZ < kMaxNegativeZPos && initialSync)
     {
         SimLog("Physical %s loaded out of range state.  Forcing initial state to server.", GetKeyName());

@@ -64,9 +64,8 @@ class plGenRefMsg;
 class plSceneObject;
 class hsVectorStream;
 
-class PhysRecipe
+struct PhysRecipe
 {
-public:
     PhysRecipe();
 
     hsScalar mass;
@@ -82,8 +81,9 @@ public:
     // The local to subworld matrix (or local to world if worldKey is nil)
     hsMatrix44 l2s;
 
-    //NxConvexMesh* convexMesh;
-    //NxTriangleMesh* triMesh;
+    // The arrays of data for convex/trimesh objects
+    std::vector<short> indices;
+    std::vector<hsPoint3> vertices;
 
     // For spheres only
     hsScalar radius;
@@ -92,9 +92,6 @@ public:
     // For Boxes
     hsPoint3 bDimensions;
     hsPoint3 bOffset;
-
-    // For export time only.  The original data used to create the mesh
-    hsVectorStream* meshStream;
 };
 
 class plBTPhysical : public plPhysical {
@@ -184,6 +181,10 @@ public:
     virtual hsScalar GetMass() {return fMass;}
 protected:
     hsBool HandleRefMsg(plGenRefMsg * refM);
+
+    // versioned readers
+    PhysRecipe IReadV0(hsStream* s, hsResMgr* mgr);
+    PhysRecipe IReadV3(hsStream* s, hsResMgr* mgr);
 
     void IGetPositionSim(hsPoint3& pos) const;
     void IGetRotationSim(hsQuat& rot) const;

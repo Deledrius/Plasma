@@ -39,8 +39,33 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
       Mead, WA   99021
 
 *==COPYING==*/
+#include "plProfile.h"
 #include "plSimulationMgr.h"
 #include "plStatusLog/plStatusLog.h"
+
+// 
+// Alloc all the sim timers here so they make a nice pretty display
+//
+plProfile_CreateTimer(  "Step", "Simulation", Step);
+plProfile_CreateCounter("  Awake", "Simulation", Awake);
+plProfile_CreateCounter("  Contacts", "Simulation", Contacts);
+plProfile_CreateCounter("  DynActors", "Simulation", DynActors);
+plProfile_CreateCounter("  DynShapes", "Simulation", DynShapes);
+plProfile_CreateCounter("  StaticShapes", "Simulation", StaticShapes);
+plProfile_CreateCounter("  Actors", "Simulation", Actors);
+plProfile_CreateCounter("  PhyScenes", "Simulation", Scenes);
+
+plProfile_CreateTimer(  "LineOfSight", "Simulation", LineOfSight);
+plProfile_CreateTimer(  "ProcessSyncs", "Simulation", ProcessSyncs);
+plProfile_CreateTimer(  "UpdateContexts", "Simulation", UpdateContexts);
+plProfile_CreateCounter("  MaySendLocation", "Simulation", MaySendLocation);
+plProfile_CreateCounter("  LocationsSent", "Simulation", LocationsSent);
+plProfile_CreateTimer(  "  PhysicsUpdates","Simulation",PhysicsUpdates);
+plProfile_CreateCounter("SetTransforms Accepted", "Simulation", SetTransforms);
+plProfile_CreateCounter("AnimatedPhysicals", "Simulation", AnimatedPhysicals);
+plProfile_CreateCounter("AnimatedActivators", "Simulation", AnimatedActivators);
+plProfile_CreateCounter("Controllers", "Simulation", Controllers);
+plProfile_CreateCounter("StepLength", "Simulation", StepLen);
 
 static plSimulationMgr* gTheInstance = NULL;
 bool plSimulationMgr::fExtraProfile = false;
