@@ -95,7 +95,10 @@ plSimulationMgr::plSimulationMgr()
     , fLOSDispatch(TRACKED_NEW plLOSDispatch())
     , fSoundMgr(new plPhysicsSoundMgr)
     , fLog(nil)
-{}
+{
+	fLog = plStatusLogMgr::GetInstance().CreateStatusLog(40, "Simulation.log", plStatusLog::kFilledBackground | plStatusLog::kAlignToTop);
+    fLog->AddLine("Initialized simulation mgr");
+}
 
 void plSimulationMgr::Advance(float delSecs)
 {
@@ -116,6 +119,7 @@ BtScene* plSimulationMgr::GetScene(plKey world)
 		world = GetKey();
 	BtScene* scene = fScenes[world];
 	if(!scene) {
+		scene = new BtScene;
 		scene->broadphase = new btDbvtBroadphase;
 		scene->config = new btDefaultCollisionConfiguration;
 		scene->dispatch = new btCollisionDispatcher(scene->config);

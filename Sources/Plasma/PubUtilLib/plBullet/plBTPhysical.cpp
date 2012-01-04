@@ -321,7 +321,8 @@ hsBool plBTPhysical::Init(PhysRecipe& recipe)
 
 PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
 {
-    plPhysical::Read(stream, mgr);  
+	plSimulationMgr *simmgr = plSimulationMgr::GetInstance();
+	simmgr->Log("Beginning compat read from PhysX data\n");
     ClearMatrix(fCachedLocal2World);
 
     PhysRecipe recipe;
@@ -372,7 +373,8 @@ PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
 		//
 		// They read more data than is actually needed, and simply discard it. If and when we figure out what more of it all
 		// means, we can (possibly) use it to avoid some runtime processing by bullet.
-        if (recipe.bounds == plSimDefs::kHullBounds) {
+		if (recipe.bounds == plSimDefs::kHullBounds) {
+			simmgr->Log("Reading convex hull data from PhysX\n");
 			char tag[4];
 			stream->Read(4, tag);
 			stream->Read(4, tag);
@@ -414,6 +416,7 @@ PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
 				}
 			}
 		} else {
+			simmgr->Log("Reading trimesh data from PhysX\n");
 			char tag[4];
 			stream->Read(4, tag);
 			stream->Read(4, tag);
@@ -522,6 +525,7 @@ PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
 			}
 		}
     }
+	simmgr->Log("Compat read complete!\n");
 	return recipe;
 }
 
@@ -534,6 +538,7 @@ PhysRecipe plBTPhysical::IReadV3(hsStream* stream, hsResMgr* mgr)
 
 void plBTPhysical::Read(hsStream* stream, hsResMgr* mgr)
 {
+	plPhysical::Read(stream, mgr); 
     PhysRecipe recipe;
     switch(mgr->GetKeyVersion(GetKey())) {
     case 0:
@@ -596,6 +601,7 @@ void plBTPhysical::Read(hsStream* stream, hsResMgr* mgr)
 
     fProxyGen = TRACKED_NEW plPhysicalProxy(hsColorRGBA().Set(0,0,0,1.f), physColor, opac);
     fProxyGen->Init(this);
+	plSimulationMgr::GetInstance()->Log("Finished reading and initting BTPhysical\n");
 }
 
 void plBTPhysical::Write(hsStream* stream, hsResMgr* mgr)
