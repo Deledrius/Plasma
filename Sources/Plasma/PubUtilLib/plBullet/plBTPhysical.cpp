@@ -69,12 +69,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plStatusLog/plStatusLog.h"
 #include "plBTPhysicalControllerCore.h"
 
+#include <btBulletDynamicsCommon.h>
+
 #define LogActivate(func) if (fActor->isSleeping()) SimLog("%s activated by %s", GetKeyName(), func);
 #define kMaxNegativeZPos -2000.f
 
 plProfile_Extern(MaySendLocation);
 plProfile_Extern(LocationsSent);
 plProfile_Extern(PhysicsUpdates);
+plProfile_Extern(SetTransforms);
 
 bool CompareMatrices(const hsMatrix44 &matA, const hsMatrix44 &matB, float tolerance)
 {
@@ -107,6 +110,42 @@ static void ClearMatrix(hsMatrix44 &m)
     m.fMap[2][0] = 0.0f; m.fMap[2][1] = 0.0f; m.fMap[2][2] = 0.0f; m.fMap[2][3]  = 0.0f;
     m.fMap[3][0] = 0.0f; m.fMap[3][1] = 0.0f; m.fMap[3][2] = 0.0f; m.fMap[3][3]  = 0.0f;
     m.NotIdentity();
+}
+
+btVector3 toBullet(const hsVector3& vec) {
+	return btVector3 (vec.fX, vec.fY, vec.fZ);
+}
+
+btVector3 toBullet(const hsPoint3& vec) {
+	return btVector3 (vec.fX, vec.fY, vec.fZ);
+}
+
+btQuaternion toBullet(const hsQuat& quat) {
+	return btQuaternion(quat.fX, quat.fY, quat.fZ, quat.fW);
+}
+
+btTransform toBullet(const hsMatrix44& mat) {
+	hsMatrix44 ogl;
+	mat.GetTranspose(&ogl);
+	btTransform t;
+	t.setFromOpenGLMatrix((const btScalar*)ogl.fMap);
+	return t;
+}
+
+template<class T>
+T toPlasma(const btVector3& vec) {
+	return T(vec.x(), vec.y(), vec.z());
+}
+
+hsQuat toPlasma(const btQuaternion& quat) {
+	return hsQuat(quat.x(), quat.y(), quat.z(), quat.w());
+}
+
+hsMatrix44 toPlasma(const btTransform& trans) {
+	hsMatrix44 ogl, result;
+	trans.getOpenGLMatrix((btScalar*)ogl.fMap);
+	ogl.GetTranspose(&result);
+	return result;
 }
 
 PhysRecipe::PhysRecipe()
@@ -151,42 +190,18 @@ plBTPhysical::~plBTPhysical()
 {
     plSimulationMgr::Log("Destroying physical %s", GetKeyName());
 
-/*    if (fActor)
-    {
-        // Grab any mesh we may have (they need to be released manually)
-        NxConvexMesh* convexMesh = nil;
-        NxTriangleMesh* triMesh = nil;
-        NxShape* shape = fActor->getShapes()[0];
-        if (NxConvexShape* convexShape = shape->isConvexMesh())
-            convexMesh = &convexShape->getConvexMesh();
-        else if (NxTriangleMeshShape* trimeshShape = shape->isTriangleMesh())
-            triMesh = &trimeshShape->getTriangleMesh();
-
-        if (!fActor->isDynamic())
-            plPXPhysicalControllerCore::RebuildCache();
-
-        if (fActor->isDynamic() && fActor->readBodyFlag(NX_BF_KINEMATIC))
-        {
-            if (fGroup == plSimDefs::kGroupDynamic)
-                fNumberAnimatedPhysicals--;
-            else
-                fNumberAnimatedActivators--;
-        }
-
-        // Release the actor
-        NxScene* scene = plSimulationMgr::GetInstance()->GetScene(fWorldKey);
-        scene->releaseActor(*fActor);
-        fActor = nil;
-
-        // Now that the actor is freed, release the mesh
-        if (convexMesh)
-            plSimulationMgr::GetInstance()->GetSDK()->releaseConvexMesh(*convexMesh);
-        if (triMesh)
-            plSimulationMgr::GetInstance()->GetSDK()->releaseTriangleMesh(*triMesh);
-
-        // Release the scene, so it can be cleaned up if no one else is using it
-        plSimulationMgr::GetInstance()->ReleaseScene(fWorldKey);
-    } */
+	if (fBody)
+	{
+		BtScene* scene = plSimulationMgr::GetInstance()->GetScene(fWorldKey);
+		scene->world->removeRigidBody(fBody);
+		delete fBody->getMotionState();
+		btCollisionShape *shape = fBody->getCollisionShape();
+		if(fBoundsType == plSimDefs::kProxyBounds || fBoundsType == plSimDefs::kExplicitBounds)
+			delete static_cast<btBvhTriangleMeshShape*>(shape)->getMeshInterface();
+		delete shape;
+		delete fBody;
+		plSimulationMgr::GetInstance()->ReleaseScene(fWorldKey);
+	}
 
     if (fWorldHull)
         delete [] fWorldHull;
@@ -212,7 +227,89 @@ hsBool plBTPhysical::Init(PhysRecipe& recipe)
     fObjectKey = recipe.objectKey;
     fSceneNode = recipe.sceneNode;
     fWorldKey = recipe.worldKey;
+	fMass = recipe.mass;
 
+	btCollisionShape* shape;
+	switch(fBoundsType) {
+	case plSimDefs::kSphereBounds:
+		shape = new btSphereShape(recipe.radius);
+		break;
+	case plSimDefs::kHullBounds:
+		shape = new btConvexHullShape;
+		for (size_t i = 0; i < recipe.vertices.size(); i++) {
+			static_cast<btConvexHullShape*>(shape)->addPoint(toBullet(recipe.vertices[i]));
+		}
+		break;
+	case plSimDefs::kBoxBounds:
+		shape = new btBoxShape(toBullet(recipe.bDimensions)/2);
+		break;
+	case plSimDefs::kExplicitBounds:
+	case plSimDefs::kProxyBounds:
+		{
+			// Bullet does not support animated trimesh objects
+			fMass = 0.0f;
+			fGroup = plSimDefs::kGroupStatic;
+			btTriangleMesh *mesh = new btTriangleMesh;
+			for(size_t i = 0; i < recipe.vertices.size(); i++)
+				mesh->findOrAddVertex(toBullet(recipe.vertices[i]), false);
+			for(size_t i = 0; i < recipe.indices.size(); i++)
+				mesh->addIndex(recipe.indices[i]);
+			shape = new btBvhTriangleMeshShape(mesh, true);
+		}
+		break;
+	}
+
+	btVector3 inertia;
+	if (fMass != 0.0f)
+		shape->calculateLocalInertia(fMass, inertia);
+
+	btRigidBody::btRigidBodyConstructionInfo cinfo(fMass, new btDefaultMotionState, shape, inertia);
+	cinfo.m_friction = recipe.friction;
+	cinfo.m_restitution = recipe.restitution;
+
+	fBody = new btRigidBody(cinfo);
+	fBody->setUserPointer(this);
+
+	BtScene *scene = plSimulationMgr::GetInstance()->GetScene(fWorldKey);
+	short colgroups = 0;
+	switch (fGroup) {
+	case plSimDefs::kGroupAvatar:
+		colgroups |= 1 << plSimDefs::kGroupAvatarBlocker;
+		colgroups |= 1 << plSimDefs::kGroupDetector;
+		colgroups |= 1 << plSimDefs::kGroupDynamic;
+		colgroups |= 1 << plSimDefs::kGroupStatic;
+		break;
+	case plSimDefs::kGroupAvatarBlocker:
+		colgroups |= 1 << plSimDefs::kGroupAvatar;
+		break;
+	case plSimDefs::kGroupDetector:
+		colgroups |= 1 << plSimDefs::kGroupAvatar;
+		colgroups |= 1 << plSimDefs::kGroupDynamic;
+	case plSimDefs::kGroupDynamic:
+		colgroups |= 1 << plSimDefs::kGroupAvatar;
+		colgroups |= 1 << plSimDefs::kGroupDetector;
+		colgroups |= 1 << plSimDefs::kGroupDynamicBlocker;
+		colgroups |= 1 << plSimDefs::kGroupDynamic;
+		colgroups |= 1 << plSimDefs::kGroupStatic;
+		break;
+	case plSimDefs::kGroupDynamicBlocker:
+		colgroups |= 1 << plSimDefs::kGroupDynamic;
+		break;
+	case plSimDefs::kGroupStatic:
+		colgroups |= 1 << plSimDefs::kGroupAvatar;
+		colgroups |= 1 << plSimDefs::kGroupDynamic;
+		break;
+	default:
+		// All other types don't do normal collisions
+		break;
+	}
+
+	if(fGroup == plSimDefs::kGroupStatic)
+		fBody->setCollisionFlags(fBody->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+	if(fGroup == plSimDefs::kGroupDetector)
+		fBody->setCollisionFlags(fBody->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+
+	scene->world->addRigidBody(fBody, 1 << fGroup, colgroups);
     return true;
 }
 
@@ -268,13 +365,162 @@ PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
     }
     else
     {
-/*        // Read in the cooked mesh
-        plPXStream pxs(stream);
-        if (recipe.bounds == plSimDefs::kHullBounds)
-            recipe.convexMesh = plSimulationMgr::GetInstance()->GetSDK()->createConvexMesh(pxs);
-        else
-            recipe.triMesh = plSimulationMgr::GetInstance()->GetSDK()->createTriangleMesh(pxs);
-            */
+		// These are reverse-engineered readers for PhysX-formatted data. They exist in order to keep things nicely backwards
+		// compatible with Cyan's data.
+		//
+		// They are probably incomplete, but they seem to work. For now, at least.
+		//
+		// They read more data than is actually needed, and simply discard it. If and when we figure out what more of it all
+		// means, we can (possibly) use it to avoid some runtime processing by bullet.
+        if (recipe.bounds == plSimDefs::kHullBounds) {
+			char tag[4];
+			stream->Read(4, tag);
+			stream->Read(4, tag);
+			stream->ReadLE32();
+			stream->ReadLE32();
+
+			stream->Read(4, tag);
+			stream->Read(4, tag);
+			stream->ReadLE32();
+
+			stream->Read(4, tag);
+			stream->Read(4, tag);
+
+			stream->ReadLE32();
+			recipe.vertices.resize(stream->ReadLE32());
+			recipe.indices.resize(stream->ReadLE32() * 3);
+			stream->ReadLE32();
+			stream->ReadLE32();
+			stream->ReadLE32();
+			stream->ReadLE32();
+
+			for (size_t i=0; i<recipe.vertices.size(); i++)
+				recipe.vertices[i].Read(stream);
+			stream->ReadLE32();
+
+			for (size_t i=0; i<recipe.indices.size(); i += 3) {
+				if (recipe.indices.size() < 256) {
+					recipe.indices[i+0] = stream->ReadByte();
+					recipe.indices[i+1] = stream->ReadByte();
+					recipe.indices[i+2] = stream->ReadByte();
+				} else if (recipe.indices.size() < 65536) {
+					recipe.indices[i+0] = stream->ReadLE16();
+					recipe.indices[i+1] = stream->ReadLE16();
+					recipe.indices[i+2] = stream->ReadLE16();
+				} else {
+					recipe.indices[i+0] = stream->ReadLE16();
+					recipe.indices[i+1] = stream->ReadLE16();
+					recipe.indices[i+2] = stream->ReadLE16();
+				}
+			}
+		} else {
+			char tag[4];
+			stream->Read(4, tag);
+			stream->Read(4, tag);
+			stream->ReadLE32();
+
+			unsigned int nxFlags = stream->ReadLE32();
+			stream->ReadLEFloat();
+			stream->ReadLE32();
+			stream->ReadLEFloat();
+			unsigned int nxNumVerts = stream->ReadLE32();
+			unsigned int nxNumTris = stream->ReadLE32();
+
+			hsVector3* nxVerts = new hsVector3[nxNumVerts];
+			for (size_t i = 0; i < nxNumVerts; i++) {
+				recipe.vertices[i].Read(stream);
+			}
+
+			recipe.indices.resize(nxNumTris*3);
+			for (size_t i = 0; i < nxNumTris * 3; i += 3) {
+				if (nxFlags & 0x8) {
+					recipe.indices[i+0] = stream->ReadByte();
+					recipe.indices[i+1] = stream->ReadByte();
+					recipe.indices[i+2] = stream->ReadByte();
+				} else if (nxFlags & 0x10) {
+					recipe.indices[i+0] = stream->ReadLE16();
+					recipe.indices[i+1] = stream->ReadLE16();
+					recipe.indices[i+2] = stream->ReadLE16();
+				} else {
+					recipe.indices[i+0] = stream->ReadLE32();
+					recipe.indices[i+0] = stream->ReadLE32();
+					recipe.indices[i+0] = stream->ReadLE32();
+				}
+			}
+
+			if (nxFlags & 1) {
+				for (unsigned int i = 0; i < nxNumTris; i++) {
+					stream->ReadLE16();
+				}
+			}
+
+			if (nxFlags & 2) {
+				unsigned int max = stream->ReadLE32();
+				for (unsigned int i = 0; i < nxNumTris; i++) {
+					if (max > 0xFFFF) {
+						stream->ReadLE32();
+					} else if (max > 0xFF) {
+						stream->ReadLE16();
+					} else {
+						stream->ReadByte();
+					}
+				}
+			}
+
+			unsigned int nxNumConvexParts = stream->ReadLE32();
+			unsigned int nxNumFlatParts = stream->ReadLE32();
+
+			if (nxNumConvexParts) {
+				for (unsigned int i = 0; i < nxNumTris; i++) {
+					stream->ReadLE16();
+				}
+			}
+
+			if (nxNumFlatParts) {
+				unsigned char *nxFlatParts = new unsigned char[(nxNumFlatParts >= 0x100) ? 2*nxNumTris : nxNumTris];
+				stream->Read((nxNumFlatParts >= 0x100) ? 2*nxNumTris : nxNumTris, nxFlatParts);
+				delete[] nxFlatParts;
+			}
+
+			unsigned int size = stream->ReadLE32();
+			unsigned char* dat = new unsigned char[size];
+			stream->Read(size, dat);
+			delete[] dat;
+
+			stream->ReadLEFloat();
+			stream->ReadLEFloat();
+			stream->ReadLEFloat();
+			stream->ReadLEFloat();
+			stream->ReadLEFloat();
+			stream->ReadLEFloat();
+			stream->ReadLEFloat();
+			stream->ReadLEFloat();
+			stream->ReadLEFloat();
+			stream->ReadLEFloat();
+			stream->ReadLEFloat();
+
+			float nxVolume = stream->ReadLEFloat();
+			if (nxVolume > -1.0) {
+				stream->ReadLEFloat();
+				stream->ReadLEFloat();
+				stream->ReadLEFloat();
+				stream->ReadLEFloat();
+				stream->ReadLEFloat();
+				stream->ReadLEFloat();
+				stream->ReadLEFloat();
+				stream->ReadLEFloat();
+				stream->ReadLEFloat();
+				stream->ReadLEFloat();
+				stream->ReadLEFloat();
+				stream->ReadLEFloat();
+			}
+
+			if (stream->ReadLE32()) {
+				unsigned char* nxConvexParts = new unsigned char[nxNumTris];
+				stream->Read(nxNumTris, nxConvexParts);
+				delete[] nxConvexParts;
+			}
+		}
     }
 	return recipe;
 }
@@ -282,6 +528,7 @@ PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
 PhysRecipe plBTPhysical::IReadV3(hsStream* stream, hsResMgr* mgr)
 {
     PhysRecipe recipe;
+	// BULLET STUB
     return recipe;
 }
 
@@ -355,6 +602,7 @@ void plBTPhysical::Write(hsStream* stream, hsResMgr* mgr)
 {
     plPhysical::Write(stream, mgr);
     hsAssert(0, "plBTPhysical can't be written yet.");
+	// BULLET STUB
     /*
     hsAssert(fActor, "nil actor");  
     hsAssert(fActor->getNbShapes() == 1, "Can only write actors with one shape. Writing first only.");
@@ -537,23 +785,24 @@ plPhysical& plBTPhysical::SetProperty(int prop, hsBool status)
         break;
 
     case plSimulationInterface::kPinned:
-/*        if (fActor->isDynamic())
+		if (! fBody->isStaticObject())
         {
             // if the body is already unpinned and you unpin it again,
             // you'll wipe out its velocity. hence the check.
-            hsBool current = fActor->readBodyFlag(NX_BF_FROZEN);
+			// Is this also true for Bullet?
+            hsBool current = fBody->getLinearFactor().x() == 0;
             if (status != current)
             {
-                if (status)
-                    fActor->raiseBodyFlag(NX_BF_FROZEN);
-                else
-                {
-                    fActor->clearBodyFlag(NX_BF_FROZEN);
-                    LogActivate("SetProperty");
-                    fActor->wakeUp();
-                }
+                if (status) {
+                    fBody->setLinearFactor(btVector3(0, 0, 0));
+					fBody->setAngularFactor(btVector3(0, 0, 0));
+				} else {
+                    fBody->setLinearFactor(btVector3(1, 1, 1));
+					fBody->setAngularFactor(btVector3(1, 1, 1));
+					fBody->activate();
+				}
             }
-        }*/
+        }
         break;
     }
 
@@ -582,31 +831,29 @@ void plBTPhysical::SetSceneNode(plKey newNode)
 
 hsBool plBTPhysical::GetLinearVelocitySim(hsVector3& vel) const
 {
-    vel = hsVector3(0.f, 0.f, 0.f);
-    return false;
-    // BULLET STUB
+    vel = toPlasma<hsVector3>(fBody->getLinearVelocity());
+    return true;
 }
 
 void plBTPhysical::SetLinearVelocitySim(const hsVector3& vel)
 {
-  // BULLET STUB
+  fBody->setLinearVelocity(toBullet(vel));
 }
 
 void plBTPhysical::ClearLinearVelocity()
 {
-  // BULLET STUB
+  fBody->setLinearVelocity(btVector3(0, 0, 0));
 }
 
 hsBool plBTPhysical::GetAngularVelocitySim(hsVector3& vel) const
 {
-    vel = hsVector3(0.f, 0.f, 0.f);
-    return false;
-    // BULLET STUB
+    vel = toPlasma<hsVector3>(fBody->getAngularVelocity());
+    return true;
 }
 
 void plBTPhysical::SetAngularVelocitySim(const hsVector3& vel)
 {
-    // BULLET STUB
+    fBody->setAngularVelocity(toBullet(vel));
 }
 
 void plBTPhysical::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, hsBool force)
@@ -614,14 +861,14 @@ void plBTPhysical::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, hs
     // make sure the physical is dynamic.
     //  also make sure there is some difference between the matrices...
     // ... but not when a subworld... because the subworld maybe animating and if the object is still then it is actually moving within the subworld
-    if (force /*|| (fActor->isDynamic() && (fWorldKey || !CompareMatrices(l2w, fCachedLocal2World, .0001f))) */)
+    if (force || (!(fBody->isStaticObject()) && (fWorldKey || !CompareMatrices(l2w, fCachedLocal2World, .0001f))))
     {
         ISetTransformGlobal(l2w);
-//        plProfile_Inc(SetTransforms);
+        plProfile_Inc(SetTransforms);
     }
     else
     {
-        /*if (!fActor->isDynamic()  && plSimulationMgr::fExtraProfile) */
+        if (fBody->isStaticObject()  && plSimulationMgr::fExtraProfile)
             SimLog("Setting transform on non-dynamic: %s.", GetKeyName());
     }
 }
@@ -634,14 +881,24 @@ void plBTPhysical::GetTransform(hsMatrix44& l2w, hsMatrix44& w2l)
 
 hsBool plBTPhysical::Should_I_Trigger(hsBool enter, hsPoint3& pos)
 {
-    return false;
-    // BULLET STUB
+    bool trigger;
+	bool inside = IsObjectInsideHull(pos);
+	if (!inside) {
+		trigger = true;
+		fInsideConvexHull = enter;
+	} else {
+		if ( enter && !fInsideConvexHull) {
+			trigger = true;
+			fInsideConvexHull = enter;
+		}
+	}
+	return trigger;
 }
 
 hsBool plBTPhysical::IsObjectInsideHull(const hsPoint3& pos)
 {
+	// BULLET STUB ???
     return false;
-    // BULLET STUB
 }
 
 void plBTPhysical::SendNewLocation(hsBool synchTransform, hsBool isSynchUpdate)
@@ -696,7 +953,10 @@ void plBTPhysical::SendNewLocation(hsBool synchTransform, hsBool isSynchUpdate)
 
 void plBTPhysical::ApplyHitForce()
 {
-    // BULLET STUB
+	if(fBody && fWeWereHit) {
+		fBody->applyForce(toBullet(fHitForce), toBullet(fHitPos));
+		fWeWereHit = false;
+	}
 }
 
 //
@@ -768,37 +1028,86 @@ plDrawableSpans* plBTPhysical::CreateProxy(hsGMaterial* mat, hsTArray<UInt32>& i
 
 void plBTPhysical::IEnable(hsBool enable)
 {
-  //BULLET STUB
+	if(enable == fEnabled)
+		return;
+	fEnabled = enable;
+	fProps.SetBit(plSimulationInterface::kDisable, !enable);
+	if(!enable) {
+		BtScene *scene = plSimulationMgr::GetInstance()->GetScene(fWorldKey);
+		scene->world->removeRigidBody(fBody);
+	} else {
+		BtScene *scene = plSimulationMgr::GetInstance()->GetScene(fWorldKey);
+		scene->world->addRigidBody(fBody);
+	}
 }
 
 void plBTPhysical::IGetRotationSim(hsQuat& quat) const
 {
-    quat = hsQuat(0.f, 0.f, 0.f, 1.f);
-    // BULLET STUB
+	quat = toPlasma(fBody->getWorldTransform().getRotation());
 }
 
 void plBTPhysical::IGetPositionSim(hsPoint3& point) const
 {
-  point = hsPoint3(0.f, 0.f, 0.f);
-  // BULLET STUB
+	point = toPlasma<hsPoint3>(fBody->getWorldTransform().getOrigin());
 }
 
-void plBTPhysical::ISetRotationSim(const hsQuat&)
+void plBTPhysical::ISetRotationSim(const hsQuat& quat)
 {
-  // BULLET STUB
+  fBody->getWorldTransform().setRotation(toBullet(quat));
 }
 
-void plBTPhysical::ISetPositionSim(const hsPoint3&)
+void plBTPhysical::ISetPositionSim(const hsPoint3& point)
 {
-  // BULLET STUB
+  fBody->getWorldTransform().setOrigin(toBullet(point));
 }
 
 void plBTPhysical::IGetTransformGlobal(hsMatrix44 &l2w) const
 {
-    l2w = hsMatrix44::IdentityMatrix();
-    // BULLET STUB
+    l2w = toPlasma(fBody->getWorldTransform());
+    if (fWorldKey)
+    {
+        plSceneObject* so = plSceneObject::ConvertNoRef(fWorldKey->ObjectIsLoaded());
+        hsAssert(so, "Scene object not loaded while accessing subworld.");
+        // We'll hit this at export time, when the ci isn't ready yet, so do a check
+        if (so->GetCoordinateInterface())
+        {
+            const hsMatrix44& s2w = so->GetCoordinateInterface()->GetLocalToWorld();
+            l2w = s2w * l2w;
+        }
+    }
 }
 
 void plBTPhysical::ISetTransformGlobal(const hsMatrix44& l2w)
 {
+	hsAssert(! fBody->isStaticObject(), "Shouldn't move a static actor");
+
+    btTransform trans;
+
+    if (fWorldKey)
+    {
+        plSceneObject* so = plSceneObject::ConvertNoRef(fWorldKey->ObjectIsLoaded());
+        hsAssert(so, "Scene object not loaded while accessing subworld.");
+        // physical to subworld (simulation space)
+        hsMatrix44 p2s = so->GetCoordinateInterface()->GetWorldToLocal() * l2w;
+        trans = toBullet(p2s);
+        if (fProxyGen)
+        {
+            hsMatrix44 w2l;
+            p2s.GetInverse(&w2l);
+            fProxyGen->SetTransform(p2s, w2l);
+        }
+    }
+    // No need to localize
+    else
+    {
+        trans = toBullet(l2w);
+        if (fProxyGen)
+        {
+            hsMatrix44 w2l;
+            l2w.GetInverse(&w2l);
+            fProxyGen->SetTransform(l2w, w2l);
+        }
+    }
+
+    fBody->setWorldTransform(trans);
 }

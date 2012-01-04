@@ -64,6 +64,8 @@ class plGenRefMsg;
 class plSceneObject;
 class hsVectorStream;
 
+class btRigidBody;
+
 struct PhysRecipe
 {
     PhysRecipe();
@@ -82,7 +84,7 @@ struct PhysRecipe
     hsMatrix44 l2s;
 
     // The arrays of data for convex/trimesh objects
-    std::vector<short> indices;
+    std::vector<int> indices;
     std::vector<hsPoint3> vertices;
 
     // For spheres only
@@ -210,7 +212,10 @@ protected:
     // Enable/disable collisions and dynamic movement
     void IEnable(hsBool enable);
 
+	btRigidBody* fBody;
     plKey fWorldKey;    // either a subworld or nil
+
+	hsBool fEnabled;
 
     plSimDefs::Bounds fBoundsType;
     plSimDefs::Group fGroup;

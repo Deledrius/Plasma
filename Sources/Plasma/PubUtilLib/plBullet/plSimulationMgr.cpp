@@ -41,7 +41,20 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *==COPYING==*/
 #include "plProfile.h"
 #include "plSimulationMgr.h"
+#include "plLOSDispatch.h"
+#include "plPhysical/plPhysicsSoundMgr.h"
 #include "plStatusLog/plStatusLog.h"
+
+#include <btBulletDynamicsCommon.h>
+
+/////////////////////////////////////////////////////////////////
+//
+// DEFAULTS
+//
+/////////////////////////////////////////////////////////////////
+
+#define kDefaultMaxDelta    0.1         // if the step is greater than .1 seconds, clamp to that
+#define kDefaultStepSize    1.f / 60.f  // default simulation freqency is 60hz
 
 // 
 // Alloc all the sim timers here so they make a nice pretty display
@@ -77,64 +90,60 @@ bool plSimulationMgr::fDoClampingOnStep = true;
 
 plSimulationMgr::plSimulationMgr()
     : fSuspended(true)
-/*    , fMaxDelta(kDefaultMaxDelta)
+    , fMaxDelta(kDefaultMaxDelta)
     , fStepSize(kDefaultStepSize)
     , fLOSDispatch(TRACKED_NEW plLOSDispatch())
     , fSoundMgr(new plPhysicsSoundMgr)
     , fLog(nil)
-*/
-{
+{}
 
+void plSimulationMgr::Advance(float delSecs)
+{
+	for(SceneMap::iterator it = fScenes.begin(); it != fScenes.end(); ++it) {
+		it->second->world->stepSimulation(delSecs, 5);
+	}
 }
 
-bool plSimulationMgr::InitSimulation()
+hsBool plSimulationMgr::MsgReceive(plMessage* msg)
 {
-    fLog = plStatusLogMgr::GetInstance().CreateStatusLog(40, "Simulation.log", plStatusLog::kFilledBackground | plStatusLog::kAlignToTop);
-    fLog->AddLine("Initialized simulation mgr");
-    return true;
+	// BULLET STUB
+	return hsKeyedObject::MsgReceive(msg);
 }
 
-void plSimulationMgr::Init()
+BtScene* plSimulationMgr::GetScene(plKey world)
 {
-    hsAssert(!gTheInstance, "Initializing the sim when it's already been done");
-    gTheInstance = TRACKED_NEW plSimulationMgr();
-    if (gTheInstance->InitSimulation())
+	if(!world)
+		world = GetKey();
+	BtScene* scene = fScenes[world];
+	if(!scene) {
+		scene->broadphase = new btDbvtBroadphase;
+		scene->config = new btDefaultCollisionConfiguration;
+		scene->dispatch = new btCollisionDispatcher(scene->config);
+		scene->solver = new btSequentialImpulseConstraintSolver;
+		scene->world = new btDiscreteDynamicsWorld(scene->dispatch, scene->broadphase, scene->solver, scene->config);
+		scene->world->setGravity(btVector3(0, 0, -32.174049f));
+		fScenes[world] = scene;
+	}
+	return scene;
+}
+
+void plSimulationMgr::ReleaseScene(plKey world)
+{
+	if(!world)
+		world = GetKey();
+	SceneMap::iterator it = fScenes.find(world);
+    hsAssert(it != fScenes.end(), "Unknown scene");
+    if (it != fScenes.end())
     {
-        gTheInstance->RegisterAs(kSimulationMgr_KEY);
-        gTheInstance->GetKey()->RefObject();
+        BtScene* scene = it->second;
+        if (scene->world->getNumCollisionObjects() == 0) {
+			delete scene->world;
+			delete scene->solver;
+			delete scene->dispatch;
+			delete scene->config;
+			delete scene->broadphase;
+		}
     }
-    else
-    {
-        // There was an error when creating the Bullet simulation
-        // ...then get rid of the simulation instance
-        DEL(gTheInstance); // clean up the memory we allocated
-        gTheInstance = nil;
-    }
-}
-
-// when the app is going away completely
-void plSimulationMgr::Shutdown()
-{
-    hsAssert(gTheInstance, "Simulation manager missing during shutdown.");
-    if (gTheInstance)
-    {
-        gTheInstance->UnRegister();     // this will destroy the instance
-        gTheInstance = nil;
-    }
-}
-
-plSimulationMgr* plSimulationMgr::GetInstance()
-{
-    return gTheInstance;
-}
-
-hsBool plSimulationMgr::MsgReceive(plMessage *msg)
-{
-    return hsKeyedObject::MsgReceive(msg);
-}
-
-void plSimulationMgr::Advance(float)
-{
 }
 
 void plSimulationMgr::Log(const char * fmt, ...)
@@ -173,5 +182,29 @@ void plSimulationMgr::ClearLog()
         {
             log->Clear();
         }
+    }
+}
+
+plSimulationMgr* plSimulationMgr::GetInstance()
+{
+    return gTheInstance;
+}
+
+void plSimulationMgr::Init()
+{
+    hsAssert(!gTheInstance, "Initializing the sim when it's already been done");
+    gTheInstance = TRACKED_NEW plSimulationMgr();
+    gTheInstance->RegisterAs(kSimulationMgr_KEY);
+    gTheInstance->GetKey()->RefObject();
+}
+
+// when the app is going away completely
+void plSimulationMgr::Shutdown()
+{
+    hsAssert(gTheInstance, "Simulation manager missing during shutdown.");
+    if (gTheInstance)
+    {
+        gTheInstance->UnRegister();     // this will destroy the instance
+        gTheInstance = nil;
     }
 }
