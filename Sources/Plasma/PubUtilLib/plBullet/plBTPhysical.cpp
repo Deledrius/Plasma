@@ -55,6 +55,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnSceneObject/plSimulationInterface.h"
 #include "pnSceneObject/plCoordinateInterface.h"
 
+#include "plSurface/hsGMaterial.h"
+#include "plSurface/plLayerInterface.h"
+
 #include "pnKeyedObject/plKey.h"
 #include "pnMessage/plCorrectionMsg.h"
 #include "pnMessage/plNodeRefMsg.h"
@@ -176,7 +179,6 @@ plBTPhysical::plBTPhysical()
     , fWorldKey(nil)
     , fSndGroup(nil)
     , fWorldHull(nil)
-    , fSaveTriangles(nil)
     , fHullNumberPlanes(0)
     , fMass(0.f)
     , fWeWereHit(false)
@@ -205,8 +207,6 @@ plBTPhysical::~plBTPhysical()
 
     if (fWorldHull)
         delete [] fWorldHull;
-    if (fSaveTriangles)
-        delete [] fSaveTriangles;
 
     delete fProxyGen;
 
@@ -228,6 +228,13 @@ hsBool plBTPhysical::Init(PhysRecipe& recipe)
     fSceneNode = recipe.sceneNode;
     fWorldKey = recipe.worldKey;
 	fMass = recipe.mass;
+	fSavedPositions = recipe.vertices;
+	fSavedIndices = recipe.indices;
+
+	for(size_t i = 0; i < fSavedIndices.size(); i++) {
+		if(fSavedIndices[i] >= fSavedPositions.size())
+			MessageBox(NULL, "Error in indices: too large", "Error", 0);
+	}
 
 	btCollisionShape* shape;
 	switch(fBoundsType) {
@@ -319,13 +326,12 @@ hsBool plBTPhysical::Init(PhysRecipe& recipe)
 //
 /////////////////////////////////////////////////////////////////////
 
-PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
+void plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr, PhysRecipe& recipe)
 {
 	plSimulationMgr *simmgr = plSimulationMgr::GetInstance();
 	simmgr->Log("Beginning compat read from PhysX data\n");
     ClearMatrix(fCachedLocal2World);
 
-    PhysRecipe recipe;
     recipe.mass = stream->ReadLEScalar();
     recipe.friction = stream->ReadLEScalar();
     recipe.restitution = stream->ReadLEScalar();
@@ -367,12 +373,9 @@ PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
     else
     {
 		// These are reverse-engineered readers for PhysX-formatted data. They exist in order to keep things nicely backwards
-		// compatible with Cyan's data.
+		// compatible with Cyan's PRPs.
 		//
-		// They are probably incomplete, but they seem to work. For now, at least.
-		//
-		// They read more data than is actually needed, and simply discard it. If and when we figure out what more of it all
-		// means, we can (possibly) use it to avoid some runtime processing by bullet.
+		// They read the minimum data we need to make the physical in Bullet. They leave extra crap on the stream, but so be it.
 		if (recipe.bounds == plSimDefs::kHullBounds) {
 			simmgr->Log("Reading convex hull data from PhysX\n");
 			char tag[4];
@@ -401,18 +404,18 @@ PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
 			stream->ReadLE32();
 
 			for (size_t i=0; i<recipe.indices.size(); i += 3) {
-				if (recipe.indices.size() < 256) {
+				if (recipe.vertices.size() < 256) {
 					recipe.indices[i+0] = stream->ReadByte();
 					recipe.indices[i+1] = stream->ReadByte();
 					recipe.indices[i+2] = stream->ReadByte();
-				} else if (recipe.indices.size() < 65536) {
+				} else if (recipe.vertices.size() < 65536) {
 					recipe.indices[i+0] = stream->ReadLE16();
 					recipe.indices[i+1] = stream->ReadLE16();
 					recipe.indices[i+2] = stream->ReadLE16();
 				} else {
-					recipe.indices[i+0] = stream->ReadLE16();
-					recipe.indices[i+1] = stream->ReadLE16();
-					recipe.indices[i+2] = stream->ReadLE16();
+					recipe.indices[i+0] = stream->ReadLE32();
+					recipe.indices[i+1] = stream->ReadLE32();
+					recipe.indices[i+2] = stream->ReadLE32();
 				}
 			}
 		} else {
@@ -429,7 +432,7 @@ PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
 			unsigned int nxNumVerts = stream->ReadLE32();
 			unsigned int nxNumTris = stream->ReadLE32();
 
-			hsVector3* nxVerts = new hsVector3[nxNumVerts];
+			recipe.vertices.resize(nxNumVerts);
 			for (size_t i = 0; i < nxNumVerts; i++) {
 				recipe.vertices[i].Read(stream);
 			}
@@ -446,107 +449,31 @@ PhysRecipe plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr)
 					recipe.indices[i+2] = stream->ReadLE16();
 				} else {
 					recipe.indices[i+0] = stream->ReadLE32();
-					recipe.indices[i+0] = stream->ReadLE32();
-					recipe.indices[i+0] = stream->ReadLE32();
+					recipe.indices[i+1] = stream->ReadLE32();
+					recipe.indices[i+2] = stream->ReadLE32();
 				}
-			}
-
-			if (nxFlags & 1) {
-				for (unsigned int i = 0; i < nxNumTris; i++) {
-					stream->ReadLE16();
-				}
-			}
-
-			if (nxFlags & 2) {
-				unsigned int max = stream->ReadLE32();
-				for (unsigned int i = 0; i < nxNumTris; i++) {
-					if (max > 0xFFFF) {
-						stream->ReadLE32();
-					} else if (max > 0xFF) {
-						stream->ReadLE16();
-					} else {
-						stream->ReadByte();
-					}
-				}
-			}
-
-			unsigned int nxNumConvexParts = stream->ReadLE32();
-			unsigned int nxNumFlatParts = stream->ReadLE32();
-
-			if (nxNumConvexParts) {
-				for (unsigned int i = 0; i < nxNumTris; i++) {
-					stream->ReadLE16();
-				}
-			}
-
-			if (nxNumFlatParts) {
-				unsigned char *nxFlatParts = new unsigned char[(nxNumFlatParts >= 0x100) ? 2*nxNumTris : nxNumTris];
-				stream->Read((nxNumFlatParts >= 0x100) ? 2*nxNumTris : nxNumTris, nxFlatParts);
-				delete[] nxFlatParts;
-			}
-
-			unsigned int size = stream->ReadLE32();
-			unsigned char* dat = new unsigned char[size];
-			stream->Read(size, dat);
-			delete[] dat;
-
-			stream->ReadLEFloat();
-			stream->ReadLEFloat();
-			stream->ReadLEFloat();
-			stream->ReadLEFloat();
-			stream->ReadLEFloat();
-			stream->ReadLEFloat();
-			stream->ReadLEFloat();
-			stream->ReadLEFloat();
-			stream->ReadLEFloat();
-			stream->ReadLEFloat();
-			stream->ReadLEFloat();
-
-			float nxVolume = stream->ReadLEFloat();
-			if (nxVolume > -1.0) {
-				stream->ReadLEFloat();
-				stream->ReadLEFloat();
-				stream->ReadLEFloat();
-				stream->ReadLEFloat();
-				stream->ReadLEFloat();
-				stream->ReadLEFloat();
-				stream->ReadLEFloat();
-				stream->ReadLEFloat();
-				stream->ReadLEFloat();
-				stream->ReadLEFloat();
-				stream->ReadLEFloat();
-				stream->ReadLEFloat();
-			}
-
-			if (stream->ReadLE32()) {
-				unsigned char* nxConvexParts = new unsigned char[nxNumTris];
-				stream->Read(nxNumTris, nxConvexParts);
-				delete[] nxConvexParts;
 			}
 		}
     }
 	simmgr->Log("Compat read complete!\n");
-	return recipe;
 }
 
-PhysRecipe plBTPhysical::IReadV3(hsStream* stream, hsResMgr* mgr)
+void plBTPhysical::IReadV3(hsStream* stream, hsResMgr* mgr, PhysRecipe& recipe)
 {
-    PhysRecipe recipe;
 	// BULLET STUB
-    return recipe;
 }
 
 void plBTPhysical::Read(hsStream* stream, hsResMgr* mgr)
 {
+	PhysRecipe recipe;
 	plPhysical::Read(stream, mgr); 
-    PhysRecipe recipe;
     switch(mgr->GetKeyVersion(GetKey())) {
     case 0:
-        recipe = IReadV0(stream, mgr);
+        IReadV0(stream, mgr, recipe);
         break;
     case 3:
-        recipe = IReadV3(stream, mgr);
-    break;
+        IReadV3(stream, mgr, recipe);
+	    break;
     };
     Init(recipe);
 
@@ -1028,8 +955,53 @@ void plBTPhysical::ExcludeRegionHack(hsBool cleared)
 
 plDrawableSpans* plBTPhysical::CreateProxy(hsGMaterial* mat, hsTArray<UInt32>& idx, plDrawableSpans* addTo)
 {
+	hsMatrix44 l2w, dummy;
+	GetTransform(l2w, dummy);
+
+	hsBool blended = ((mat->GetLayer(0)->GetBlendFlags() & hsGMatState::kBlendMask));
+
+	switch(fBoundsType) {
+	case plSimDefs::kSphereBounds:
+		{
+			float radius = static_cast<btSphereShape*>(fBody->getCollisionShape())->getRadius();
+			addTo = plDrawableGenerator::GenerateSphericalDrawable(hsPoint3(), radius,
+				mat, l2w, blended,
+				nil, &idx, addTo);
+		}
+		break;
+	case plSimDefs::kBoxBounds:
+		{
+			hsPoint3 dim = toPlasma<hsPoint3>(static_cast<btBoxShape*>(fBody->getCollisionShape())->getImplicitShapeDimensions());
+			addTo = plDrawableGenerator::GenerateBoxDrawable(dim.fX*2.f, dim.fY*2.f, dim.fZ*2.f,
+				mat,l2w,blended,
+				nil,&idx,addTo);
+		}
+		break;
+	case plSimDefs::kHullBounds:
+	case plSimDefs::kProxyBounds:
+	case plSimDefs::kExplicitBounds:
+		{
+			addTo = plDrawableGenerator::GenerateDrawable(fSavedPositions.size(), 
+				&(fSavedPositions[0]),
+				nil,    // normals - def to avg (smooth) norm
+				nil,    // uvws
+				0,      // uvws per vertex
+				nil,    // colors - def to white
+				true,   // do a quick fake shade
+				nil,    // optional color modulation
+				fSavedIndices.size(),
+				&(fSavedIndices[0]),
+				mat,
+				l2w,
+				blended,
+				&idx,
+				addTo);
+		}
+		break;
+	default:
+		break;
+	}
     return addTo;
-    // BULLET STUB
 }
 
 void plBTPhysical::IEnable(hsBool enable)

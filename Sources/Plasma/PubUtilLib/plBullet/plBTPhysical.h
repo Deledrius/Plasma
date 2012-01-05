@@ -84,7 +84,7 @@ struct PhysRecipe
     hsMatrix44 l2s;
 
     // The arrays of data for convex/trimesh objects
-    std::vector<int> indices;
+    std::vector<unsigned short> indices;
     std::vector<hsPoint3> vertices;
 
     // For spheres only
@@ -149,7 +149,7 @@ public:
     virtual UInt16  GetAllLOSDBs() { return fLOSDBs; }
     virtual hsBool  IsInLOSDB(UInt16 flag) { return hsCheckBits(fLOSDBs, flag); }
 
-    virtual hsBool    DoDetectorHullWorkaround() { return fSaveTriangles ? true : false;    }
+    virtual hsBool    DoDetectorHullWorkaround() { return false; /* BULLET STUB ??? */  }
     virtual hsBool  Should_I_Trigger(hsBool enter, hsPoint3& pos);
     virtual hsBool  IsObjectInsideHull(const hsPoint3& pos);
     virtual void    SetInsideConvexHull(hsBool inside) { fInsideConvexHull = inside;    }
@@ -185,8 +185,8 @@ protected:
     hsBool HandleRefMsg(plGenRefMsg * refM);
 
     // versioned readers
-    PhysRecipe IReadV0(hsStream* s, hsResMgr* mgr);
-    PhysRecipe IReadV3(hsStream* s, hsResMgr* mgr);
+    void IReadV0(hsStream* s, hsResMgr* mgr, PhysRecipe& recipe);
+    void IReadV3(hsStream* s, hsResMgr* mgr, PhysRecipe& recipe);
 
     void IGetPositionSim(hsPoint3& pos) const;
     void IGetRotationSim(hsQuat& rot) const;
@@ -229,7 +229,6 @@ protected:
 
     hsPlane3* fWorldHull;
     UInt32    fHullNumberPlanes;
-    hsPoint3* fSaveTriangles;
     hsBool      fInsideConvexHull;
 
     // we need to remember the last matrices we sent to the coordinate interface
@@ -248,6 +247,9 @@ protected:
     hsPoint3    fHitPos;
 
     plPhysicalProxy* fProxyGen;             // visual proxy for debugging
+
+	std::vector<hsPoint3> fSavedPositions;
+	std::vector<unsigned short> fSavedIndices;
 
     static int  fNumberAnimatedPhysicals;
     static int  fNumberAnimatedActivators;

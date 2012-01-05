@@ -96,7 +96,7 @@ plSimulationMgr::plSimulationMgr()
     , fSoundMgr(new plPhysicsSoundMgr)
     , fLog(nil)
 {
-	fLog = plStatusLogMgr::GetInstance().CreateStatusLog(40, "Simulation.log", plStatusLog::kFilledBackground | plStatusLog::kAlignToTop);
+    fLog = plStatusLogMgr::GetInstance().CreateStatusLog(40, "Simulation.log", plStatusLog::kFilledBackground | plStatusLog::kAlignToTop);
     fLog->AddLine("Initialized simulation mgr");
 }
 
@@ -109,13 +109,12 @@ void plSimulationMgr::Advance(float delSecs)
 
 hsBool plSimulationMgr::MsgReceive(plMessage* msg)
 {
-	// BULLET STUB
 	return hsKeyedObject::MsgReceive(msg);
 }
 
 BtScene* plSimulationMgr::GetScene(plKey world)
 {
-	if(!world)
+    if(!world)
 		world = GetKey();
 	BtScene* scene = fScenes[world];
 	if(!scene) {
@@ -146,6 +145,7 @@ void plSimulationMgr::ReleaseScene(plKey world)
 			delete scene->dispatch;
 			delete scene->config;
 			delete scene->broadphase;
+			fScenes.erase(it);
 		}
     }
 }
