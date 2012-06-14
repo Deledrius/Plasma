@@ -262,6 +262,7 @@ hsBool plBTPhysical::Init(PhysRecipe& recipe)
 			for(size_t i = 0; i < recipe.indices.size(); i+=3) {
 				mesh->addTriangle(toBullet(recipe.vertices[recipe.indices[i]]), toBullet(recipe.vertices[recipe.indices[i+1]]), toBullet(recipe.vertices[recipe.indices[i+2]]), true);
 			}
+            shape = new btBvhTriangleMeshShape(mesh, true);
 		}
 		break;
 	}
