@@ -44,8 +44,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "hsStream.h"
 #include "hsResMgr.h"
-#include "plGImage/plJPEG.h"
+#include "plString.h"
+#include "plFileSystem.h"
 #include "plGImage/plPNG.h"
+#include "plGImage/plJPEG.h"
+#include "plGImage/plTGAWriter.h"
 #include "plGImage/plMipmap.h"
 
 #include "plClientResMgr.h"
@@ -61,15 +64,13 @@ plClientResMgr& plClientResMgr::Instance(void)
 
 plClientResMgr::plClientResMgr()
 {
-    this->ClientResources = new std::map<std::string, plMipmap*>;
+    this->ClientResources = new std::map<plString, plMipmap*>;
 }
 
 plClientResMgr::~plClientResMgr()
 {
     if (this->ClientResources) {
-        std::map<std::string, plMipmap*>::iterator it;
-
-        for (it = this->ClientResources->begin(); it != this->ClientResources->end(); ++it) {
+        for (auto it = this->ClientResources->begin(); it != this->ClientResources->end(); ++it) {
             if (it->second)
                 it->second->UnRef();
         }
@@ -78,11 +79,10 @@ plClientResMgr::~plClientResMgr()
     }
 }
 
-void plClientResMgr::ILoadResources(const char* resfile)
+void plClientResMgr::LoadResources(const plFileName& resfile)
 {
-    if (!resfile) {
+    if (!resfile.IsValid())
         return;
-    }
 
     hsUNIXStream in;
 
@@ -92,37 +92,34 @@ void plClientResMgr::ILoadResources(const char* resfile)
         uint32_t num_resources = 0;
 
         switch (version) {
-            case 1:
+            case kPlasma21Format:
                 num_resources = in.ReadLE32();
 
                 for (int i = 0; i < num_resources; i++) {
-                    plMipmap* res_data = NULL;
+                    plMipmap* res_data = nullptr;
                     uint32_t res_size = 0;
-                    char* tmp_name = in.ReadSafeStringLong();
-                    std::string res_name = std::string(tmp_name);
-                    std::string res_type = res_name.substr(res_name.length() - 4, 4);
-                    delete tmp_name;
+                    plFileName res_name(in.ReadSafeStringLong_TEMP());
 
-                    // Version 1 doesn't encode format, so we'll try some simple
-                    // extension sniffing
-                    if (res_type == ".png") {
+                    // Plasma 2.1+ format doesn't encode filetypes, so we'll try some simple
+                    // extension sniffing.
+                    if (res_name.GetFileExt() == "png") {
                         // Read resource stream size, but the PNG has that info in the header
-                        // so it's not needed
+                        // so it's not needed.
                         res_size = in.ReadLE32();
                         res_data = plPNG::Instance().ReadFromStream(&in);
-                    } else if (res_type == ".jpg") {
-                        // Don't read resource stream size, as plJPEG's reader will need it
+                    } else if (res_name.GetFileExt() == "jpg") {
+                        // Don't read resource stream size, as plJPEG's reader will need it.
                         res_data = plJPEG::Instance().ReadFromStream(&in);
                     } else {
-                        // Original Myst5 format only is known to support Targa,
-                        // so default fallback is targa
+                        // Original Myst 5 format only is known to support Targa,
+                        // so default fallback is Targa.
                         // TODO - Add plTarga::ReadFromStream()
-                        // for now, just skip the unknown resource and put NULL into the map
+                        // for now, just skip the unknown resource and put NULL into the map.
                         res_size = in.ReadLE32();
                         in.Skip(res_size);
                     }
 
-                    (*this->ClientResources)[res_name] = res_data;
+                    (*this->ClientResources)[res_name.GetFileName()] = res_data;
                 }
 
                 break;
@@ -134,16 +131,110 @@ void plClientResMgr::ILoadResources(const char* resfile)
     }
 }
 
-plMipmap* plClientResMgr::getResource(const char* resname)
+void plClientResMgr::SaveResources(const plFileName& resfile, const uint32_t version)
 {
-    plMipmap* resmipmap = NULL;
-    std::map<std::string, plMipmap*>::iterator it = this->ClientResources->find(resname);
+    if (!resfile.IsValid())
+        return;
 
-    if (it != this->ClientResources->end()) {
-        resmipmap = it->second;
-    } else {
-        hsAssert(resmipmap, "Unknown client resource requested.");
+    hsUNIXStream out;
+    hsRAMStream tempStream;
+
+    if (out.Open(resfile, "wb")) {
+        switch (version) {
+            case kPlasma21Format:
+                out.WriteLE32(0xcbbcf00d);
+                out.WriteLE32(kPlasma21Format);
+                out.WriteLE32(this->ClientResources->size());
+
+                for (auto it = this->ClientResources->begin(); it != this->ClientResources->end(); it++) {
+                    tempStream.Reset();
+                    plFileName res_name = it->first;
+
+                    // Plasma 2.1+ format doesn't encode filetypes, just filenames.
+                    out.WriteSafeStringLong(res_name.GetFileName());
+
+                    if (it->second) {
+                        if (res_name.GetFileExt() == "png") {
+                            plPNG::Instance().WriteToStream(&tempStream, it->second);
+                            out.WriteLE32(tempStream.GetPosition());
+                            plPNG::Instance().WriteToStream(&out, it->second);
+                        } else if (res_name.GetFileExt() == "jpg") {
+                            plJPEG::Instance().WriteToStream(&tempStream, it->second);
+                            out.WriteLE32(tempStream.GetPosition());
+                            plJPEG::Instance().WriteToStream(&out, it->second);
+                        } else {
+                            // Original Myst 5 format only is known to support Targa,
+                            // so default is assumed to be Targa.
+                            plTGAWriter::Instance().WriteToStream(&tempStream, it->second);
+                            out.WriteLE32(tempStream.GetPosition());
+                            plTGAWriter::Instance().WriteToStream(&out, it->second);
+                        }
+                    } else {
+                        // We've gotten an invalid resource somehow, so to keep
+                        // the number of entries correct, we'll write out an
+                        // empty entry.
+                        out.WriteLE32(0);
+                    }
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        out.Close();
+    }
+}
+
+plMipmap* plClientResMgr::getResource(const plString& resname)
+{
+    // Attempt to find the named resource.
+    auto it = this->ClientResources->find(resname);
+
+    // Return the resource if we've got it.
+    if (it != this->ClientResources->end())
+        return it->second;
+
+    // Return nullptr as the resource could not be found.
+    hsAssert(0, "Unknown client resource requested.");
+    return nullptr;
+}
+
+void plClientResMgr::addResource(const plString& resname, plMipmap* resource)
+{
+    if (!resname.IsEmpty() && resource) {
+        // Test if the resource already exists by that name.
+        auto it = this->ClientResources->find(resname);
+
+        if (it != this->ClientResources->end()) {
+            // Remove the old resource by this name so we can
+            // replace it with the new resource.
+            if (it->second)
+                it->second->UnRef();
+            this->ClientResources->erase(it);
+        }
+
+        // Insert the new resource.
+        resource->Ref();
+        (*this->ClientResources)[resname] = resource;
+    }
+}
+
+bool plClientResMgr::removeResource(const plString& resname)
+{
+    if (!resname.IsEmpty()) {
+        // Test if a resource exists by that name.
+        auto it = this->ClientResources->find(resname);
+
+        if (it != this->ClientResources->end()) {
+            // Remove the old resource by this name so we can
+            // replace it with the new resource.
+            if (it->second)
+                it->second->UnRef();
+            this->ClientResources->erase(it);
+            return true;
+        }
     }
 
-    return resmipmap;
+    return false;
 }

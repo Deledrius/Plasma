@@ -545,7 +545,7 @@ bool    InitClient( HWND hWnd )
         hsMessageBox("Required file 'resource.dat' not found.", "Error", hsMessageBoxNormal);
         return false;
     }
-    plClientResMgr::Instance().ILoadResources("resource.dat");
+    plClientResMgr::Instance().LoadResources("resource.dat");
 
     gClient = new plClient;
     if( gClient == nil )

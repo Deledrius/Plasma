@@ -44,21 +44,26 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define _plClientResMgr_h
 
 #include <map>
-#include <string>
 
 class plMipmap;
+class plString;
 
 class plClientResMgr {
 protected:
-    std::map<std::string, plMipmap*>* ClientResources;
+    std::map<plString, plMipmap*>* ClientResources;
 
-public:
     plClientResMgr();
     ~plClientResMgr();
 
-    void ILoadResources(const char* resfile);
+public:
+    enum {kPlasma21Format = 1};
 
-    plMipmap* getResource(const char* resname);
+    void LoadResources(const plFileName& resfile);
+    void SaveResources(const plFileName& resfile, const uint32_t version=kPlasma21Format);
+
+    plMipmap* getResource(const plString& resname);
+    void addResource(const plString& resname, plMipmap* resource);
+    bool removeResource(const plString& resname);
 
     static plClientResMgr& Instance(void);
 };
