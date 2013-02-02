@@ -155,7 +155,7 @@ PF_CONSOLE_CMD( Game, TakeScreenshot, "...", "Takes a shot of the current frame 
         char    str[ 512 ];
 
 
-        plTGAWriter::Instance().WriteMipmap( fileName, &myMipmap );
+        plTGAWriter::Instance().WriteToFile(fileName, &myMipmap);
         sprintf( str, "Screenshot written to '%s'.", fileName );
         PrintString( str );
     }

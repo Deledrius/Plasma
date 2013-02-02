@@ -52,61 +52,75 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "HeadSpin.h"
-#include "plTGAWriter.h"
 #include "hsColorRGBA.h"
 #include "plMipmap.h"
 #include "hsStream.h"
 
+#include "plTGAWriter.h"
 
 //// Class Statics ////////////////////////////////////////////////////////////
 
 plTGAWriter plTGAWriter::fInstance;
 
+//// IWrite ///////////////////////////////////////////////////////////////////
 
-//// WriteMipmap //////////////////////////////////////////////////////////////
-
-void    plTGAWriter::WriteMipmap( const char *fileName, plMipmap *mipmap )
+bool plTGAWriter::IWrite(const plMipmap* source, hsStream* outStream)
 {
-    hsUNIXStream    stream;
-    int             x, y;
-    hsRGBAColor32   pixel;
+    bool result = true;
 
+    try {
+        int x, y;
+        hsRGBAColor32 pixel;
 
-    stream.Open( fileName, "wb" );
+        /// Write header
+        outStream->WriteByte(0);  // Size of ID field
+        outStream->WriteByte(0);  // Map type
+        outStream->WriteByte(2);  // Type 2 image - Unmapped RGB
 
-    /// Write header
-    stream.WriteByte( 0 );  // Size of ID field
-    stream.WriteByte( 0 );  // Map type
-    stream.WriteByte( 2 );  // Type 2 image - Unmapped RGB
+        outStream->WriteByte(0);  // Color map spec
+        outStream->WriteByte(0);  // Color map spec
+        outStream->WriteByte(0);  // Color map spec
+        outStream->WriteByte(0);  // Color map spec
+        outStream->WriteByte(0);  // Color map spec
 
-    stream.WriteByte( 0 );  // Color map spec
-    stream.WriteByte( 0 );  // Color map spec
-    stream.WriteByte( 0 );  // Color map spec
-    stream.WriteByte( 0 );  // Color map spec
-    stream.WriteByte( 0 );  // Color map spec
+        outStream->WriteLE16(0);  // xOrigin
+        outStream->WriteLE16(0);  // yOrigin
 
-    stream.WriteLE16( 0 );    // xOrigin
-    stream.WriteLE16( 0 );    // yOrigin
+        outStream->WriteLE16((uint16_t)source->GetWidth());
+        outStream->WriteLE16((uint16_t)source->GetHeight());
 
-    stream.WriteLE16( (uint16_t)mipmap->GetWidth() );
-    stream.WriteLE16( (uint16_t)mipmap->GetHeight() );
+        outStream->WriteByte(24);
+        outStream->WriteByte(0);
 
-    stream.WriteByte( 24 );
-    stream.WriteByte( 0 );
-
-    /// Write image data (gotta do inversed, stupid TGAs...)
-    for( y = mipmap->GetHeight() - 1; y >= 0; y-- )
-    {
-        for( x = 0; x < mipmap->GetWidth(); x++ )
+        /// Write image data (gotta do inverted, stupid TGAs...)
+        for(y = source->GetHeight() - 1; y >= 0; y--)
         {
-            pixel = *( (hsRGBAColor32 *)mipmap->GetAddr32( x, y ) );
-            stream.WriteByte( pixel.b );
-            stream.WriteByte( pixel.g );
-            stream.WriteByte( pixel.r );
+            for(x = 0; x < source->GetWidth(); x++)
+            {
+                pixel = *((hsRGBAColor32 *)source->GetAddr32(x, y));
+                outStream->WriteByte(pixel.b);
+                outStream->WriteByte(pixel.g);
+                outStream->WriteByte(pixel.r);
+            }
         }
+    } catch (...) {
+        result = false;
     }
 
-    /// All done!
-    stream.Close();
+    return result;
 }
 
+//// WriteToFile //////////////////////////////////////////////////////////////
+
+bool plTGAWriter::WriteToFile(const plFileName& fileName, const plMipmap* sourceData)
+{
+    hsUNIXStream out;
+
+    if (!out.Open(fileName, "wb")) {
+        return false;
+    }
+
+    bool ret = IWrite(sourceData, &out);
+    out.Close();
+    return ret;
+}

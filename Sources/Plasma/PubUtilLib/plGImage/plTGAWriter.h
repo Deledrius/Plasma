@@ -53,12 +53,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef _plTGAWriter_h
 #define _plTGAWriter_h
 
-#include "HeadSpin.h"
-
-class plMipmap;
-
 
 //// Class Definition /////////////////////////////////////////////////////////
+
+class plMipmap;
+class hsStream;
 
 class plTGAWriter
 {
@@ -67,12 +66,15 @@ class plTGAWriter
         static plTGAWriter  fInstance;
 
         plTGAWriter() {}
+
+        bool IWrite(const plMipmap* source, hsStream* outStream);
         
     public:
 
         static plTGAWriter  &Instance( void ) { return fInstance; }
 
-        void    WriteMipmap( const char *fileName, plMipmap *mipmap );
+        bool WriteToStream(hsStream* outStream, plMipmap* sourceData) { return IWrite(sourceData, outStream); }
+        bool WriteToFile(const plFileName& fileName, const plMipmap* sourceData);
 
 };
 
