@@ -39,9 +39,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
       Mead, WA   99021
 
 *==LICENSE==*/
+
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           //
-//  plTGAWriter Class Header                                                 //
+//  plTGA Class Header                                                       //
 //  Cyan, Inc.                                                               //
 //                                                                           //
 //// Version History //////////////////////////////////////////////////////////
@@ -56,26 +57,59 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Class Definition /////////////////////////////////////////////////////////
 
-class plMipmap;
-class hsStream;
-
 class plTGA
 {
-    private:
+private:
 
-        static plTGA  fInstance;
+    plMipmap* IRead(hsStream* inStream);
+    bool IWrite(const plMipmap* source, hsStream* outStream);
 
-        plTGA() {}
+public:
 
-        bool IWrite(const plMipmap* source, hsStream* outStream);
+    plMipmap* ReadFromStream(hsStream* inStream) { return IRead(inStream); }
+    plMipmap* ReadFromFile(const plFileName& fileName);
 
-    public:
+    bool WriteToStream(hsStream* outStream, plMipmap* sourceData) { return IWrite(sourceData, outStream); }
+    bool WriteToFile(const plFileName& fileName, const plMipmap* sourceData);
 
-        static plTGA  &Instance( void ) { return fInstance; }
+    static plTGA& Instance(void);
 
-        bool WriteToStream(hsStream* outStream, plMipmap* sourceData) { return IWrite(sourceData, outStream); }
-        bool WriteToFile(const plFileName& fileName, const plMipmap* sourceData);
+    struct plTargaImage {
+        uint8_t idLength;
+        uint8_t mapType;
+        uint8_t imageType;
 
+        uint16_t colorMapStartOffset;
+        uint16_t colorMapNumEntries;
+        uint8_t colorMapEntrySize;
+
+        uint16_t xOrigin;
+        uint16_t yOrigin;
+        uint16_t imageWidth;
+        uint16_t imageHeight;
+        uint8_t bpp;
+        uint8_t alphaChannelDepth;
+        uint8_t imageDirection;
+    };
+
+    enum ColorMapType {
+        kNoColorMap = 0,
+        kGeneric    = 1
+    };
+
+    enum ImageType {
+        kNoImage                =  0,
+        kUncompressedIndexed    =  1,
+        kUncompressedTrueColor  =  2,
+        kUncompressedGreyScale  =  3,
+        kRLEIndexed             =  9,
+        kRLETrueColor           = 10,
+        kRLEGreyScale           = 11
+    };
+
+private:
+
+    plMipmap* IReadUTCFromStream(hsStream* inStream, plTargaImage* newImage);
 };
 
 #endif // _plTGA_h

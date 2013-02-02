@@ -55,12 +55,97 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsColorRGBA.h"
 #include "plMipmap.h"
 #include "hsStream.h"
+#include "plFileSystem.h"
 
 #include "plTGA.h"
 
-//// Class Statics ////////////////////////////////////////////////////////////
 
-plTGA plTGA::fInstance;
+//// Singleton Instance ///////////////////////////////////////////////////////
+
+plTGA& plTGA::Instance(void)
+{
+    static plTGA theInstance;
+    return theInstance;
+}
+
+//// IRead ////////////////////////////////////////////////////////////////////
+
+plMipmap* plTGA::IRead(hsStream* inStream)
+{
+    plMipmap* newMipmap = nullptr;
+
+    try {
+        plTargaImage newImage;
+
+        /// Read header data
+        newImage.idLength = inStream->ReadByte();
+        newImage.mapType = inStream->ReadByte();
+        newImage.imageType = inStream->ReadByte();
+
+        newImage.colorMapStartOffset = inStream->ReadLE16();
+        newImage.colorMapNumEntries = inStream->ReadLE16();
+        newImage.colorMapEntrySize = inStream->ReadByte();
+
+        newImage.xOrigin = inStream->ReadLE16();
+        newImage.yOrigin = inStream->ReadLE16();
+        newImage.imageWidth = inStream->ReadLE16();
+        newImage.imageHeight = inStream->ReadLE16();
+        newImage.bpp = inStream->ReadByte();
+        uint8_t descriptor = inStream->ReadByte();
+        newImage.alphaChannelDepth = descriptor & 0xf;
+        newImage.imageDirection = (descriptor & 0x30) >> 4;
+
+        /// Read image data
+        // Read ID block
+        inStream->Skip(static_cast<uint32_t>(newImage.idLength));
+
+        // Read color map
+        switch (newImage.mapType) {
+        case kNoColorMap:
+                break;
+            default:
+                hsAssert(0, "Targa color map present but unsupported.");
+                break;
+        }
+
+        // Read image data
+        switch (newImage.imageType) {
+            case kNoImage:
+                newMipmap = new plMipmap(newImage.imageWidth, newImage.imageHeight, newImage.bpp, 1, plMipmap::kUncompressed);
+                break;
+            case kUncompressedTrueColor:
+                newMipmap = IReadUTCFromStream(inStream, &newImage);
+                break;
+            default:
+                hsAssert(0, plString::Format("Targa image format %d unsupported.", newImage.imageType).c_str());
+                break;
+        }
+
+        // TODO: Read optional extra data block
+
+    } catch (...) {
+        if (newMipmap) {
+            delete newMipmap;
+            newMipmap = nullptr;
+        }
+    }
+
+    return newMipmap;
+}
+
+//// ReadFromFile /////////////////////////////////////////////////////////////
+
+plMipmap* plTGA::ReadFromFile(const plFileName& fileName)
+{
+    hsUNIXStream in;
+
+    if (!in.Open(fileName, "rb"))
+        return nullptr;
+
+    plMipmap* ret = IRead(&in);
+    in.Close();
+    return ret;
+}
 
 //// IWrite ///////////////////////////////////////////////////////////////////
 
@@ -73,9 +158,9 @@ bool plTGA::IWrite(const plMipmap* source, hsStream* outStream)
         hsRGBAColor32 pixel;
 
         /// Write header
-        outStream->WriteByte(0);  // Size of ID field
-        outStream->WriteByte(0);  // Map type
-        outStream->WriteByte(2);  // Type 2 image - Unmapped RGB
+        outStream->WriteByte(0);                         // Size of ID field
+        outStream->WriteByte(kNoColorMap);               // Map type
+        outStream->WriteByte(kUncompressedTrueColor);    // Type 2 image - Unmapped RGB
 
         outStream->WriteByte(0);  // Color map spec
         outStream->WriteByte(0);  // Color map spec
@@ -116,11 +201,34 @@ bool plTGA::WriteToFile(const plFileName& fileName, const plMipmap* sourceData)
 {
     hsUNIXStream out;
 
-    if (!out.Open(fileName, "wb")) {
+    if (!out.Open(fileName, "wb"))
         return false;
-    }
 
     bool ret = IWrite(sourceData, &out);
     out.Close();
     return ret;
+}
+
+//// IReadImageDataFromStream /////////////////////////////////////////////////
+
+plMipmap* plTGA::IReadUTCFromStream(hsStream* inStream, plTGA::plTargaImage* newImage)
+{
+    plMipmap* newMipmap = new plMipmap(newImage->imageWidth, newImage->imageHeight, newImage->bpp, 1, plMipmap::kUncompressed);
+    hsRGBAColor32* pixel;
+
+    for(int y = newImage->imageHeight - 1; y >= 0; y--)
+    {
+        for(int x = 0; x < newImage->imageWidth; x++)
+        {
+            pixel = reinterpret_cast<hsRGBAColor32 *>(newMipmap->GetAddr32(x, y));
+
+            pixel->b = inStream->ReadByte();
+            pixel->g = inStream->ReadByte();
+            pixel->r = inStream->ReadByte();
+            if (newImage->alphaChannelDepth)
+                pixel->a = inStream->ReadByte();
+        }
+    }
+
+    return newMipmap;
 }
