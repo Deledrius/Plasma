@@ -48,7 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plFileSystem.h"
 #include "plGImage/plPNG.h"
 #include "plGImage/plJPEG.h"
-#include "plGImage/plTGAWriter.h"
+#include "plGImage/plTGA.h"
 #include "plGImage/plMipmap.h"
 
 #include "plClientResMgr.h"
@@ -165,9 +165,9 @@ void plClientResMgr::SaveResources(const plFileName& resfile, const uint32_t ver
                         } else {
                             // Original Myst 5 format only is known to support Targa,
                             // so default is assumed to be Targa.
-                            plTGAWriter::Instance().WriteToStream(&tempStream, it->second);
+                            plTGA::Instance().WriteToStream(&tempStream, it->second);
                             out.WriteLE32(tempStream.GetPosition());
-                            plTGAWriter::Instance().WriteToStream(&out, it->second);
+                            plTGA::Instance().WriteToStream(&out, it->second);
                         }
                     } else {
                         // We've gotten an invalid resource somehow, so to keep

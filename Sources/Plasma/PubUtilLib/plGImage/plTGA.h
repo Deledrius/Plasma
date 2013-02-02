@@ -50,8 +50,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef _plTGAWriter_h
-#define _plTGAWriter_h
+#ifndef _plTGA_h
+#define _plTGA_h
 
 
 //// Class Definition /////////////////////////////////////////////////////////
@@ -59,23 +59,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plMipmap;
 class hsStream;
 
-class plTGAWriter
+class plTGA
 {
     private:
 
-        static plTGAWriter  fInstance;
+        static plTGA  fInstance;
 
-        plTGAWriter() {}
+        plTGA() {}
 
         bool IWrite(const plMipmap* source, hsStream* outStream);
-        
+
     public:
 
-        static plTGAWriter  &Instance( void ) { return fInstance; }
+        static plTGA  &Instance( void ) { return fInstance; }
 
         bool WriteToStream(hsStream* outStream, plMipmap* sourceData) { return IWrite(sourceData, outStream); }
         bool WriteToFile(const plFileName& fileName, const plMipmap* sourceData);
 
 };
 
-#endif // _plTGAWriter_h
+#endif // _plTGA_h

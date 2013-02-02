@@ -25,7 +25,7 @@ set(plGImage_SOURCES
     plLODMipmap.cpp
     plMipmap.cpp
     plPNG.cpp
-    plTGAWriter.cpp
+    plTGA.cpp
     plWinFontCache.cpp
 )
 
@@ -46,7 +46,7 @@ set(plGImage_HEADERS
     plLODMipmap.h
     plMipmap.h
     plPNG.h
-    plTGAWriter.h
+    plTGA.h
     plWinFontCache.h
 )
 

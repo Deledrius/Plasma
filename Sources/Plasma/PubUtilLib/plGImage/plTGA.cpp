@@ -56,15 +56,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMipmap.h"
 #include "hsStream.h"
 
-#include "plTGAWriter.h"
+#include "plTGA.h"
 
 //// Class Statics ////////////////////////////////////////////////////////////
 
-plTGAWriter plTGAWriter::fInstance;
+plTGA plTGA::fInstance;
 
 //// IWrite ///////////////////////////////////////////////////////////////////
 
-bool plTGAWriter::IWrite(const plMipmap* source, hsStream* outStream)
+bool plTGA::IWrite(const plMipmap* source, hsStream* outStream)
 {
     bool result = true;
 
@@ -112,7 +112,7 @@ bool plTGAWriter::IWrite(const plMipmap* source, hsStream* outStream)
 
 //// WriteToFile //////////////////////////////////////////////////////////////
 
-bool plTGAWriter::WriteToFile(const plFileName& fileName, const plMipmap* sourceData)
+bool plTGA::WriteToFile(const plFileName& fileName, const plMipmap* sourceData)
 {
     hsUNIXStream out;
 

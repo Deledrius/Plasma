@@ -144,7 +144,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plDrawable/plDynaBulletMgr.h"
 
 #include "plGImage/plMipmap.h"
-#include "plGImage/plTGAWriter.h"
+#include "plGImage/plTGA.h"
 
 #include "plGLight/plShadowCaster.h"
 #include "plGLight/plShadowMaster.h"
@@ -1565,7 +1565,7 @@ PF_CONSOLE_CMD( Graphics_Renderer, TakeScreenshot, "...", "Takes a shot of the c
     {
         char    str[ 512 ];
 
-        plTGAWriter::Instance().WriteToFile(fileName, &myMipmap);
+        plTGA::Instance().WriteToFile(fileName, &myMipmap);
         sprintf( str, "Screenshot written to '%s'.", fileName );
         PrintString( str );
     }
