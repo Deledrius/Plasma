@@ -113,11 +113,17 @@ void plClientResMgr::LoadResources(const plFileName& resfile)
                     } else if (res_name.GetFileExt() == "jpg") {
                         // Don't read resource stream size, as plJPEG's reader will need it.
                         res_data = plJPEG::Instance().ReadFromStream(&in);
+                    } else if (res_name.GetFileExt() == "tga") {
+                        // The Targa reader won't necessarily consume the entire
+                        // resource from the stream, so we'll save the position
+                        // and forward to the end of the resource after we've 
+                        // read what we need.
+                        res_size = in.ReadLE32();
+                        uint32_t pos = in.GetPosition();
+                        res_data = plTGA::Instance().ReadFromStream(&in);
+                        in.SetPosition(pos + res_size);
                     } else {
-                        // Original Myst 5 format only is known to support Targa,
-                        // so default fallback is Targa.
-                        // TODO - Add plTarga::ReadFromStream()
-                        // for now, just skip the unknown resource and put NULL into the map.
+                        // We don't know what this is, so let's skip it.
                         res_size = in.ReadLE32();
                         in.Skip(res_size);
                     }
@@ -168,12 +174,14 @@ void plClientResMgr::SaveResources(const plFileName& resfile, const uint32_t ver
                             plJPEG::Instance().WriteToStream(&tempStream, it->second);
                             out.WriteLE32(tempStream.GetPosition());
                             plJPEG::Instance().WriteToStream(&out, it->second);
-                        } else {
-                            // Original Myst 5 format only is known to support Targa,
-                            // so default is assumed to be Targa.
+                        } else if (res_name.GetFileExt() == "tga") {
                             plTGA::Instance().WriteToStream(&tempStream, it->second);
                             out.WriteLE32(tempStream.GetPosition());
                             plTGA::Instance().WriteToStream(&out, it->second);
+                        } else {
+                            // We don't have a writer for whatever this is, 
+                            // so write out an empty entry.
+                            out.WriteLE32(0);
                         }
                     } else {
                         // We've gotten an invalid resource somehow, so to keep
