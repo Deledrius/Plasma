@@ -98,6 +98,9 @@ void plClientResMgr::LoadResources(const plFileName& resfile)
                 for (int i = 0; i < num_resources; i++) {
                     plMipmap* res_data = nullptr;
                     uint32_t res_size = 0;
+                    // Note: This isn't technically a SafeString, but for reading
+                    // it's effectively a non-encoded SafeString, so let's save
+                    // some code.
                     plFileName res_name(in.ReadSafeStringLong_TEMP());
 
                     // Plasma 2.1+ format doesn't encode filetypes, so we'll try some simple
@@ -151,7 +154,10 @@ void plClientResMgr::SaveResources(const plFileName& resfile, const uint32_t ver
                     plFileName res_name = it->first;
 
                     // Plasma 2.1+ format doesn't encode filetypes, just filenames.
-                    out.WriteSafeStringLong(res_name.GetFileName());
+                    // Note: These aren't actually SafeStrings, so we need to write the size
+                    // first and the string without SafeString encoding.
+                    out.WriteLE32(res_name.GetFileName().GetSize());
+                    out.WriteString(res_name.GetFileName());
 
                     if (it->second) {
                         if (res_name.GetFileExt() == "png") {
