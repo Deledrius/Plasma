@@ -51,32 +51,35 @@ class hsStream;
 class hsResMgr;
 
 
-class plSpawnModMsg : public plMessage
-{
+class plSpawnModMsg : public plMessage {
 
 public:
-    plSpawnModMsg(){;}
-    plSpawnModMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t){;}
-    ~plSpawnModMsg(){;}
+    plSpawnModMsg() {
+        ;
+    }
+    plSpawnModMsg(const plKey& s,
+                  const plKey& r,
+                  const double* t) {
+        ;
+    }
+    ~plSpawnModMsg() {
+        ;
+    }
 
-    CLASSNAME_REGISTER( plSpawnModMsg );
-    GETINTERFACE_ANY( plSpawnModMsg, plMessage );
-    
+    CLASSNAME_REGISTER(plSpawnModMsg);
+    GETINTERFACE_ANY(plSpawnModMsg, plMessage);
+
     hsPoint3    fPos;
     plUoid      fObj;
 
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fPos.Read(stream);
         fObj.Read(stream);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         fPos.Write(stream);
         fObj.Write(stream);

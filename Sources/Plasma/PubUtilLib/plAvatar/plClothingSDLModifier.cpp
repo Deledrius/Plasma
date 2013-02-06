@@ -50,15 +50,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plKeyImp.h"
 
 // static vars
-char plClothingSDLModifier::kStrItem[]="item";
-char plClothingSDLModifier::kStrTint[]="tint";
-char plClothingSDLModifier::kStrTint2[]="tint2";
-char plClothingSDLModifier::kStrWardrobe[]="wardrobe";
-char plClothingSDLModifier::kStrSkinTint[]="skinTint";
-char plClothingSDLModifier::kStrFaceBlends[]="faceBlends";
-char plClothingSDLModifier::kStrAppearance[]="appearance";
-char plClothingSDLModifier::kStrClothingDescName[]="clothingItem";
-char plClothingSDLModifier::kStrAppearanceDescName[]="appearanceOptions";
+char plClothingSDLModifier::kStrItem[] = "item";
+char plClothingSDLModifier::kStrTint[] = "tint";
+char plClothingSDLModifier::kStrTint2[] = "tint2";
+char plClothingSDLModifier::kStrWardrobe[] = "wardrobe";
+char plClothingSDLModifier::kStrSkinTint[] = "skinTint";
+char plClothingSDLModifier::kStrFaceBlends[] = "faceBlends";
+char plClothingSDLModifier::kStrAppearance[] = "appearance";
+char plClothingSDLModifier::kStrClothingDescName[] = "clothingItem";
+char plClothingSDLModifier::kStrAppearanceDescName[] = "appearanceOptions";
 char plClothingSDLModifier::kStrLinkInAnim[] = "linkInAnim";
 
 //
@@ -70,22 +70,23 @@ plClothingSDLModifier::plClothingSDLModifier() :
 }
 
 //
-// find armature mod and cache it's clothingOutfit  
+// find armature mod and cache it's clothingOutfit
 //
 plClothingOutfit* plClothingSDLModifier::GetClothingOutfit()
 {
-    if (fClothingOutfit)
+    if (fClothingOutfit) {
         return fClothingOutfit;
+    }
 
     int i;
     plSceneObject* target = GetTarget();
     hsAssert(target, "plClothingSDLModifier: nil target");
-    for (i=0;i<target->GetNumModifiers();i++)
-    {
+
+    for (i = 0; i < target->GetNumModifiers(); i++) {
         const plArmatureMod* am = plArmatureMod::ConvertNoRef(target->GetModifier(i));
-        if (am)
-        {
-            fClothingOutfit=am->GetClothingOutfit();
+
+        if (am) {
+            fClothingOutfit = am->GetClothingOutfit();
             break;
         }
     }
@@ -103,28 +104,29 @@ void plClothingSDLModifier::PutCurrentStateIn(plStateDataRecord* dstState)
 //
 void plClothingSDLModifier::IPutCurrentStateIn(plStateDataRecord* dstState)
 {
-    plSceneObject* sobj=GetTarget();
+    plSceneObject* sobj = GetTarget();
     hsAssert(sobj, "plClothingSDLModifier, nil target");
-    
+
     plClothingOutfit* clothing = GetClothingOutfit();
     hsAssert(clothing, "nil clothingOutfit");
-    
+
     hsTArray<plStateDataRecord*> SDRs;
-    hsTArray<plClothingItem*> items=clothing->GetItemList();
-    hsTArray<plClothingItemOptions*> options=clothing->GetOptionList();
-    
+    hsTArray<plClothingItem*> items = clothing->GetItemList();
+    hsTArray<plClothingItemOptions*> options = clothing->GetOptionList();
+
     plSDStateVariable* clothesStateDesc = dstState->FindSDVar(kStrWardrobe);    // find clothes list
-    int itemCount=items.GetCount();
+    int itemCount = items.GetCount();
     int optionsCount = options.GetCount();
-    hsAssert(optionsCount==itemCount, "number of items should match number of options according to clothing.sdl"); 
-    
-    if (clothesStateDesc->GetCount() != itemCount)
-        clothesStateDesc->Alloc(itemCount);     // set appropriate list size
+    hsAssert(optionsCount == itemCount, "number of items should match number of options according to clothing.sdl");
+
+    if (clothesStateDesc->GetCount() != itemCount) {
+        clothesStateDesc->Alloc(itemCount);    // set appropriate list size
+    }
 
     int lowerCount = (itemCount <= optionsCount ? itemCount : optionsCount);
     int i;
-    for(i = 0; i < lowerCount; i++)
-    {
+
+    for (i = 0; i < lowerCount; i++) {
         plClosetItem closetItem;
         closetItem.fItem = items[i];
         closetItem.fOptions = *options[i];
@@ -143,25 +145,31 @@ void plClothingSDLModifier::IPutCurrentStateIn(plStateDataRecord* dstState)
 
     plSimpleStateVariable* faceBlends = appearanceStateDesc->GetStateDataRecord(0)->FindVar(kStrFaceBlends);
     int numBlends = plClothingElement::kLayerSkinLast - plClothingElement::kLayerSkinFirst;
-    if (faceBlends->GetCount() != numBlends)
+
+    if (faceBlends->GetCount() != numBlends) {
         faceBlends->Alloc(numBlends);
-    for(i = 0; i < numBlends; i++)
+    }
+
+    for (i = 0; i < numBlends; i++) {
         faceBlends->Set((uint8_t)(clothing->fSkinBlends[i] * 255), i);
+    }
 
     SDRs.Append(appearanceStateDesc->GetStateDataRecord(0));
 
     // This logically belongs in the avatar.sdl file, but clothing.sdl is already broadcast to
     // other players when you join an age, and I don't want to broadcast all of avatar.sdl for
     // just this one value.
-    plSimpleStateVariable *var = dstState->FindVar(kStrLinkInAnim);
-    if (var)
-        var->Set(clothing->fAvatar->fLinkInAnimKey);    
+    plSimpleStateVariable* var = dstState->FindVar(kStrLinkInAnim);
+
+    if (var) {
+        var->Set(clothing->fAvatar->fLinkInAnimKey);
+    }
 }
 
-void plClothingSDLModifier::PutSingleItemIntoSDR(plClosetItem *item, plStateDataRecord *sdr)
+void plClothingSDLModifier::PutSingleItemIntoSDR(plClosetItem* item, plStateDataRecord* sdr)
 {
     plKey key = item->fItem->GetKey();
-    sdr->FindVar(kStrItem)->Set(key);           
+    sdr->FindVar(kStrItem)->Set(key);
 
     //hsColorRGBA c = item->fOptions.fTint1;
     //hsColorRGBA c2 = item->fOptions.fTint2;
@@ -173,7 +181,7 @@ void plClothingSDLModifier::PutSingleItemIntoSDR(plClosetItem *item, plStateData
     c2[0] = (uint8_t)(item->fOptions.fTint2.r * 255);
     c2[1] = (uint8_t)(item->fOptions.fTint2.g * 255);
     c2[2] = (uint8_t)(item->fOptions.fTint2.b * 255);
-    
+
     sdr->FindVar(kStrTint)->Set(c);
     sdr->FindVar(kStrTint2)->Set(c2);
 }
@@ -183,19 +191,19 @@ void plClothingSDLModifier::PutSingleItemIntoSDR(plClosetItem *item, plStateData
 //
 void plClothingSDLModifier::ISetCurrentStateFrom(const plStateDataRecord* srcState)
 {
-    plSceneObject* sobj=GetTarget();
+    plSceneObject* sobj = GetTarget();
     hsAssert(sobj, "plClothingSDLModifier, nil target");
 
     plClothingOutfit* clothing = GetClothingOutfit();
-    if( clothing == nil )
-    {
+
+    if (clothing == nil) {
         hsAssert(clothing, "nil clothingOutfit");
         return;
     }
 
     plSDStateVariable* clothesStateDesc = srcState->FindSDVar(kStrWardrobe);    // find clothes list
-    int num=clothesStateDesc->GetCount();   // size of clothes list
-    bool update=true;
+    int num = clothesStateDesc->GetCount(); // size of clothes list
+    bool update = true;
 
     // We just remove the accessories. Any regular items will be replaced
     // when we try to wear something else in the same category. (And in
@@ -203,10 +211,10 @@ void plClothingSDLModifier::ISetCurrentStateFrom(const plStateDataRecord* srcSta
     clothing->StripAccessories();
 
     int i;
-    for(i=0;i<num;i++)
-    {
+
+    for (i = 0; i < num; i++) {
         // get clothes item from clothes list
-        plStateDataRecord* clothingItemState=clothesStateDesc->GetStateDataRecord(i);
+        plStateDataRecord* clothingItemState = clothesStateDesc->GetStateDataRecord(i);
         HandleSingleSDR(clothingItemState, clothing);
     }
 
@@ -214,111 +222,125 @@ void plClothingSDLModifier::ISetCurrentStateFrom(const plStateDataRecord* srcSta
     plStateDataRecord* appearanceState = appearanceStateDesc->GetStateDataRecord(0);
     HandleSingleSDR(appearanceState, clothing);
 
-    if (update)
+    if (update) {
         clothing->ForceUpdate(true /* retry */);
+    }
 
-    plSimpleStateVariable *var;
+    plSimpleStateVariable* var;
     var = srcState->FindVar(kStrLinkInAnim);
-    if (var)
-        var->Get(&clothing->fAvatar->fLinkInAnimKey);   
+
+    if (var) {
+        var->Get(&clothing->fAvatar->fLinkInAnimKey);
+    }
 }
 
-void plClothingSDLModifier::HandleSingleSDR(const plStateDataRecord *sdr, plClothingOutfit *clothing /* = nil */, plClosetItem *closetItem /* = nil */)
+void plClothingSDLModifier::HandleSingleSDR(const plStateDataRecord* sdr, plClothingOutfit* clothing /* = nil */, plClosetItem* closetItem /* = nil */)
 {
-    if (sdr == nil)
+    if (sdr == nil) {
         return;
+    }
 
     int i;
     uint8_t tint[3];
     float tintScalar[3];
-    if (sdr->GetDescriptor()->GetName() == kStrClothingDescName)
-    {
+
+    if (sdr->GetDescriptor()->GetName() == kStrClothingDescName) {
         // get item from clothesItem
         plSimpleStateVariable* itemVar = sdr->FindVar(kStrItem);
         plClothingItem* clothingItem = nil; // clothing->GetItemList()[i];
-        if (itemVar->IsUsed())
-        {
+
+        if (itemVar->IsUsed()) {
             plKey key;
             itemVar->Get(&key);
             clothingItem = plClothingItem::ConvertNoRef(key ? key->GetObjectPtr() : nil);
-            if (clothingItem)
-            {
-                if (clothing)
-                    clothing->AddItem(clothingItem, false, false /*bcast */); 
-                if (closetItem)
+
+            if (clothingItem) {
+                if (clothing) {
+                    clothing->AddItem(clothingItem, false, false /*bcast */);
+                }
+
+                if (closetItem) {
                     closetItem->fItem = clothingItem;
+                }
             }
         }
 
         // tints
-        if (clothingItem)
-        {
+        if (clothingItem) {
             // get item from clothesItem
             plSimpleStateVariable* tintVar = sdr->FindVar(kStrTint);
-            if (tintVar->IsUsed())
-            {
+
+            if (tintVar->IsUsed()) {
                 tintVar->Get(tint);
                 tintScalar[0] = tint[0] / 255.f;
                 tintScalar[1] = tint[1] / 255.f;
                 tintScalar[2] = tint[2] / 255.f;
+
                 if (clothing)
                     clothing->TintItem(clothingItem, tintScalar[0], tintScalar[1], tintScalar[2],
                                        false /*update*/, false /*broadcast*/, false /*netForce*/, true, plClothingElement::kLayerTint1);
-                if (closetItem)
+
+                if (closetItem) {
                     closetItem->fOptions.fTint1.Set(tintScalar[0], tintScalar[1], tintScalar[2], 1.f);
+                }
             }
 
-            tintVar=sdr->FindVar(kStrTint2);
-            if (tintVar->IsUsed())
-            {
+            tintVar = sdr->FindVar(kStrTint2);
+
+            if (tintVar->IsUsed()) {
                 tintVar->Get(tint);
                 tintScalar[0] = tint[0] / 255.f;
                 tintScalar[1] = tint[1] / 255.f;
                 tintScalar[2] = tint[2] / 255.f;
-                
+
                 if (clothing)
                     clothing->TintItem(clothingItem, tintScalar[0], tintScalar[1], tintScalar[2],
                                        false /*update*/, false /*broadcast*/, false /*netForce*/, true, plClothingElement::kLayerTint2);
-                if (closetItem)
+
+                if (closetItem) {
                     closetItem->fOptions.fTint2.Set(tintScalar[0], tintScalar[1], tintScalar[2], 1.f);
+                }
             }
         }
-    }
-    else if (sdr->GetDescriptor()->GetName() == kStrAppearanceDescName)
-    {
+    } else if (sdr->GetDescriptor()->GetName() == kStrAppearanceDescName) {
         // skin tints
         plSimpleStateVariable* skinVar = sdr->FindVar(kStrSkinTint);
-        if (skinVar->IsUsed())
-        {
+
+        if (skinVar->IsUsed()) {
             skinVar->Get(tint);
-            if (clothing)
+
+            if (clothing) {
                 clothing->TintSkin(tint[0] / 255.f, tint[1] / 255.f, tint[2] / 255.f, false /* update */, false /*broadcast*/);
+            }
         }
+
         plSimpleStateVariable* faceBlends = sdr->FindVar(kStrFaceBlends);
-        if (faceBlends->IsUsed())
-        {
+
+        if (faceBlends->IsUsed()) {
             int numBlends = plClothingElement::kLayerSkinLast - plClothingElement::kLayerSkinFirst;
-            for(i = 0; i < numBlends && i < faceBlends->GetCount(); i++)
-            {
+
+            for (i = 0; i < numBlends && i < faceBlends->GetCount(); i++) {
                 uint8_t blend;
                 faceBlends->Get(&blend, i);
                 clothing->fSkinBlends[i] = (float)blend / 255;
             }
-        }       
+        }
     }
 }
 
 // FINDARMATUREMOD
-const plClothingSDLModifier *plClothingSDLModifier::FindClothingSDLModifier(const plSceneObject *obj)
+const plClothingSDLModifier* plClothingSDLModifier::FindClothingSDLModifier(const plSceneObject* obj)
 {
     int count = obj->GetNumModifiers();
 
-    for (int i = 0; i < count; i++)
-    {
-        const plModifier *mod = obj->GetModifier(i);
-        const plClothingSDLModifier *sdlMod = plClothingSDLModifier::ConvertNoRef(mod);
-        if(sdlMod)
+    for (int i = 0; i < count; i++) {
+        const plModifier* mod = obj->GetModifier(i);
+        const plClothingSDLModifier* sdlMod = plClothingSDLModifier::ConvertNoRef(mod);
+
+        if (sdlMod) {
             return sdlMod;
+        }
     }
+
     return nil;
 }

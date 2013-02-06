@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsWindows.h"
 #include "plString.h"
 
-class plAddElementDlg
-{
+class plAddElementDlg {
 protected:
     static BOOL CALLBACK IDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -61,11 +60,12 @@ public:
     plAddElementDlg(plString parentPath);
 
     bool DoPick(HWND parent); // returns true if [Ok] clicked, false otherwise.
-    plString GetValue() {return plString::Format("%s.%s.%s", fAgeName.c_str(), fSetName.c_str(), fElementName.c_str());}
+    plString GetValue() {
+        return plString::Format("%s.%s.%s", fAgeName.c_str(), fSetName.c_str(), fElementName.c_str());
+    }
 };
 
-class plAddLocalizationDlg
-{
+class plAddLocalizationDlg {
 protected:
     static BOOL CALLBACK IDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -77,7 +77,9 @@ public:
     plAddLocalizationDlg(plString parentPath);
 
     bool DoPick(HWND parent); // returns true if [Ok] clicked, false otherwise.
-    plString GetValue() {return fLanguageName;}
+    plString GetValue() {
+        return fLanguageName;
+    }
 };
 
 #endif

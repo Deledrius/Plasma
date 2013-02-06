@@ -52,11 +52,9 @@ class plPipeline;
 class plKey;
 class plCameraBrain1;
 class plCameraMsg;
-struct CamTrans
-{
+struct CamTrans {
     // used when creating default track transitions at runtime
-    CamTrans(plKey to)
-    {
+    CamTrans(plKey to) {
         fTransTo = to;
 
         fAccel = 60.0f;
@@ -84,10 +82,8 @@ struct CamTrans
 
 };
 
-class plCameraModifier1 : public plSingleModifier
-{
-    enum
-    {
+class plCameraModifier1 : public plSingleModifier {
+    enum {
         kRefBrain,
         kRefCut,
         kRefTrack,
@@ -96,15 +92,17 @@ class plCameraModifier1 : public plSingleModifier
 protected:
 
     void Output();
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return true; }
-        
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return true;
+    }
+
 public:
-    
+
     plCameraModifier1();
     virtual ~plCameraModifier1();
 
-    CLASSNAME_REGISTER( plCameraModifier1 );
-    GETINTERFACE_ANY( plCameraModifier1, plSingleModifier );
+    CLASSNAME_REGISTER(plCameraModifier1);
+    GETINTERFACE_ANY(plCameraModifier1, plSingleModifier);
 
     virtual bool MsgReceive(plMessage* msg);
 
@@ -113,43 +111,83 @@ public:
 
     virtual void AddTarget(plSceneObject* so);
 
-    void    SetBrain(plCameraBrain1* brain) { fBrain = brain; }
+    void    SetBrain(plCameraBrain1* brain) {
+        fBrain = brain;
+    }
 
-    plCameraBrain1* GetBrain()      { return fBrain;}
+    plCameraBrain1* GetBrain()      {
+        return fBrain;
+    }
 
-    hsPoint3        GetTargetPos() { return fFrom; }    
-    hsPoint3        GetTargetPOA() { return fAt; }  
-    hsPoint3        GetSubworldPos() { return fLastSubPos; }    
-    hsPoint3        GetSubworldPOA() { return fLastSubPOA; }    
+    hsPoint3        GetTargetPos() {
+        return fFrom;
+    }
+    hsPoint3        GetTargetPOA() {
+        return fAt;
+    }
+    hsPoint3        GetSubworldPos() {
+        return fLastSubPos;
+    }
+    hsPoint3        GetSubworldPOA() {
+        return fLastSubPOA;
+    }
 
-    
+
     void            SetTransform(hsPoint3 at);
-    void            SetTargetPos(hsPoint3 pos) { fFrom = pos; }
-    void            SetTargetPOA(hsPoint3 pos) { fAt = pos; }
-    void            SetSubworldPos(hsPoint3 pos) { fLastSubPos = pos; }
-    void            SetSubworldPOA(hsPoint3 pos) { fLastSubPOA = pos; }
-    float        GetFOVw() { return fFOVw; }
-    float        GetFOVh() { return fFOVh; }
-    void            SetFOVw(float f, bool fUpdateVCam = true); 
-    void            SetFOVh(float f, bool fUpdateVCam = true); 
-    bool            GetInSubworld() { return fInSubLastUpdate; }
-    void            InSubworld(bool b) { fInSubLastUpdate = b; }
+    void            SetTargetPos(hsPoint3 pos) {
+        fFrom = pos;
+    }
+    void            SetTargetPOA(hsPoint3 pos) {
+        fAt = pos;
+    }
+    void            SetSubworldPos(hsPoint3 pos) {
+        fLastSubPos = pos;
+    }
+    void            SetSubworldPOA(hsPoint3 pos) {
+        fLastSubPOA = pos;
+    }
+    float        GetFOVw() {
+        return fFOVw;
+    }
+    float        GetFOVh() {
+        return fFOVh;
+    }
+    void            SetFOVw(float f, bool fUpdateVCam = true);
+    void            SetFOVh(float f, bool fUpdateVCam = true);
+    bool            GetInSubworld() {
+        return fInSubLastUpdate;
+    }
+    void            InSubworld(bool b) {
+        fInSubLastUpdate = b;
+    }
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
-    void AddTrans(CamTrans* t) { fTrans.Append(t); }
-    int  GetNumTrans() { return fTrans.Count(); }
-    CamTrans* GetTrans(int i) { return fTrans[i]; }
-    void SetSubject(plSceneObject* pObj); 
+    void AddTrans(CamTrans* t) {
+        fTrans.Append(t);
+    }
+    int  GetNumTrans() {
+        return fTrans.Count();
+    }
+    CamTrans* GetTrans(int i) {
+        return fTrans[i];
+    }
+    void SetSubject(plSceneObject* pObj);
     plSceneObject* GetSubject();
 
-    virtual void Push(bool recenter = true); 
-    virtual void Pop(); 
+    virtual void Push(bool recenter = true);
+    virtual void Pop();
 
     virtual bool    GetFaded();
     virtual bool    SetFaded(bool b);
 
-    bool    IsAnimated() { return fAnimated; }
-    void SetAnimCommands(bool a, bool b, bool c)  { fStartAnimOnPush = a; fStopAnimOnPop = b; fResetAnimOnPop = c; }
+    bool    IsAnimated() {
+        return fAnimated;
+    }
+    void SetAnimCommands(bool a, bool b, bool c)  {
+        fStartAnimOnPush = a;
+        fStopAnimOnPop = b;
+        fResetAnimOnPop = c;
+    }
 
 private:
     hsPoint3                fFrom;

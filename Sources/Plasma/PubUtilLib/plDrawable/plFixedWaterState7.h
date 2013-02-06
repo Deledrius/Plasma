@@ -49,11 +49,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsStream;
 
-class plFixedWaterState7
-{
+class plFixedWaterState7 {
 public:
-    class WaveState
-    {
+    class WaveState {
     public:
         plTimedSimple<float>     fMaxLength;
         plTimedSimple<float>     fMinLength;

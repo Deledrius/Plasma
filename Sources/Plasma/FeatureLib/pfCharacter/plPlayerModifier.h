@@ -56,7 +56,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //class plPlayerModifier : public plSingleModifier
 //{
 //protected:
-//  
+//
 //  enum
 //  {
 //      kWantsToSpawn = 0,
@@ -90,12 +90,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 //  float            fRotationScalar;
 //  hsTArray<spawnPt*>  fSpawnPoints;
-//  
-//  void IAdjustVelocity(float adjAccelRate, 
-//                       float adjDecelRate, 
-//                       hsVector3* dir, 
-//                       hsVector3* vel, 
-//                       float maxSpeed, 
+//
+//  void IAdjustVelocity(float adjAccelRate,
+//                       float adjDecelRate,
+//                       hsVector3* dir,
+//                       hsVector3* vel,
+//                       float maxSpeed,
 //                       float distToGoal,
 //                       double elapsedTime);
 //
@@ -143,7 +143,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  static void SetDeceleration(float f) {fDeceleration = f;}
 //  static void SetVelocity(float f)     {fMaxVelocity = f;}
 //
-//  
+//
 //};
 //
 //#endif plPlayerModifier_inc

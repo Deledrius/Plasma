@@ -60,42 +60,45 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Wee Little Control Proc for our buttons /////////////////////////////////
 
-class pfUpDownBtnProc : public pfGUICtrlProcObject
-{
-    protected:
+class pfUpDownBtnProc : public pfGUICtrlProcObject {
+protected:
 
-        pfGUIButtonMod      *fUp, *fDown;
-        pfGUIUpDownPairMod  *fParent;
+    pfGUIButtonMod*      fUp, *fDown;
+    pfGUIUpDownPairMod*  fParent;
 
-    public:
+public:
 
-        pfUpDownBtnProc( pfGUIButtonMod *up, pfGUIButtonMod *down, pfGUIUpDownPairMod *parent )
-        {
-            fUp = up;
-            fDown = down;
-            fParent = parent;
+    pfUpDownBtnProc(pfGUIButtonMod* up, pfGUIButtonMod* down, pfGUIUpDownPairMod* parent) {
+        fUp = up;
+        fDown = down;
+        fParent = parent;
+    }
+
+    void    SetUp(pfGUIButtonMod* up) {
+        fUp = up;
+    }
+    void    SetDown(pfGUIButtonMod* down) {
+        fDown = down;
+    }
+
+    virtual void    DoSomething(pfGUIControlMod* ctrl) {
+        if ((pfGUIButtonMod*)ctrl == fUp) {
+            fParent->fValue += fParent->fStep;
+
+            if (fParent->fValue > fParent->fMax) {
+                fParent->fValue = fParent->fMax;
+            }
+        } else {
+            fParent->fValue -= fParent->fStep;
+
+            if (fParent->fValue < fParent->fMin) {
+                fParent->fValue = fParent->fMin;
+            }
         }
 
-        void    SetUp( pfGUIButtonMod *up ) { fUp = up; }
-        void    SetDown( pfGUIButtonMod *down ) { fDown = down; }
-
-        virtual void    DoSomething( pfGUIControlMod *ctrl )
-        {
-            if( (pfGUIButtonMod *)ctrl == fUp )
-            {
-                fParent->fValue += fParent->fStep;
-                if( fParent->fValue > fParent->fMax )
-                    fParent->fValue = fParent->fMax;
-            }
-            else
-            {
-                fParent->fValue -= fParent->fStep;
-                if( fParent->fValue < fParent->fMin )
-                    fParent->fValue = fParent->fMin;
-            }
-            fParent->Update();
-            fParent->DoSomething();
-        }
+        fParent->Update();
+        fParent->DoSomething();
+    }
 };
 
 //// Constructor/Destructor //////////////////////////////////////////////////
@@ -106,136 +109,128 @@ pfGUIUpDownPairMod::pfGUIUpDownPairMod()
     fDownControl = nil;
     fValue = fMin = fMax = fStep = 0.f;
 
-    fButtonProc = new pfUpDownBtnProc( nil, nil, this );
+    fButtonProc = new pfUpDownBtnProc(nil, nil, this);
     fButtonProc->IncRef();
-    SetFlag( kIntangible );
+    SetFlag(kIntangible);
 }
 
 pfGUIUpDownPairMod::~pfGUIUpDownPairMod()
 {
-    if( fButtonProc->DecRef() )
+    if (fButtonProc->DecRef()) {
         delete fButtonProc;
+    }
 }
 
 //// IEval ///////////////////////////////////////////////////////////////////
 
-bool    pfGUIUpDownPairMod::IEval( double secs, float del, uint32_t dirty )
+bool    pfGUIUpDownPairMod::IEval(double secs, float del, uint32_t dirty)
 {
-    return pfGUIValueCtrl::IEval( secs, del, dirty );
+    return pfGUIValueCtrl::IEval(secs, del, dirty);
 }
 
-void    pfGUIUpDownPairMod::IUpdate( void )
+void    pfGUIUpDownPairMod::IUpdate(void)
 {
-    if (fEnabled)
-    {
-        if (fUpControl)
-        {
-            if ( fValue >= fMax)
+    if (fEnabled) {
+        if (fUpControl) {
+            if (fValue >= fMax) {
                 fUpControl->SetVisible(false);
-            else
+            } else {
                 fUpControl->SetVisible(true);
+            }
         }
-        if (fDownControl)
-        {
-            if ( fValue <= fMin )
+
+        if (fDownControl) {
+            if (fValue <= fMin) {
                 fDownControl->SetVisible(false);
-            else
+            } else {
                 fDownControl->SetVisible(true);
+            }
         }
-    }
-    else
-    {
+    } else {
         fUpControl->SetVisible(false);
         fDownControl->SetVisible(false);
     }
 }
 
-void    pfGUIUpDownPairMod::Update( void )
+void    pfGUIUpDownPairMod::Update(void)
 {
     IUpdate();
 }
 
 //// MsgReceive //////////////////////////////////////////////////////////////
 
-bool    pfGUIUpDownPairMod::MsgReceive( plMessage *msg )
+bool    pfGUIUpDownPairMod::MsgReceive(plMessage* msg)
 {
-    plGenRefMsg *refMsg = plGenRefMsg::ConvertNoRef( msg );
-    if( refMsg != nil )
-    {
-        if( refMsg->fType == kRefUpControl )
-        {
-            if( refMsg->GetContext() & ( plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace ) )
-            {
-                fUpControl = pfGUIButtonMod::ConvertNoRef( refMsg->GetRef() );
-                fUpControl->SetHandler( fButtonProc );
-                fButtonProc->SetUp( fUpControl );
-            }
-            else
-            {
+    plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
+
+    if (refMsg != nil) {
+        if (refMsg->fType == kRefUpControl) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+                fUpControl = pfGUIButtonMod::ConvertNoRef(refMsg->GetRef());
+                fUpControl->SetHandler(fButtonProc);
+                fButtonProc->SetUp(fUpControl);
+            } else {
                 fUpControl = nil;
-                fButtonProc->SetUp( nil );
+                fButtonProc->SetUp(nil);
             }
+
             return true;
-        }
-        else if( refMsg->fType == kRefDownControl )
-        {
-            if( refMsg->GetContext() & ( plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace ) )
-            {
-                fDownControl = pfGUIButtonMod::ConvertNoRef( refMsg->GetRef() );
-                fDownControl->SetHandler( fButtonProc );
-                fButtonProc->SetDown( fDownControl );
-            }
-            else
-            {
+        } else if (refMsg->fType == kRefDownControl) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+                fDownControl = pfGUIButtonMod::ConvertNoRef(refMsg->GetRef());
+                fDownControl->SetHandler(fButtonProc);
+                fButtonProc->SetDown(fDownControl);
+            } else {
                 fDownControl = nil;
-                fButtonProc->SetDown( nil );
+                fButtonProc->SetDown(nil);
             }
+
             return true;
         }
     }
 
-    return pfGUIValueCtrl::MsgReceive( msg );
+    return pfGUIValueCtrl::MsgReceive(msg);
 }
 
 //// Read/Write //////////////////////////////////////////////////////////////
 
-void    pfGUIUpDownPairMod::Read( hsStream *s, hsResMgr *mgr )
+void    pfGUIUpDownPairMod::Read(hsStream* s, hsResMgr* mgr)
 {
     pfGUIValueCtrl::Read(s, mgr);
 
     fUpControl = nil;
     fDownControl = nil;
-    mgr->ReadKeyNotifyMe( s, new plGenRefMsg( GetKey(), plRefMsg::kOnCreate, -1, kRefUpControl ), plRefFlags::kActiveRef );
-    mgr->ReadKeyNotifyMe( s, new plGenRefMsg( GetKey(), plRefMsg::kOnCreate, -1, kRefDownControl ), plRefFlags::kActiveRef );
+    mgr->ReadKeyNotifyMe(s, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, kRefUpControl), plRefFlags::kActiveRef);
+    mgr->ReadKeyNotifyMe(s, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, kRefDownControl), plRefFlags::kActiveRef);
 
-    s->ReadLE( &fMin );
-    s->ReadLE( &fMax );
-    s->ReadLE( &fStep );
+    s->ReadLE(&fMin);
+    s->ReadLE(&fMax);
+    s->ReadLE(&fStep);
 
     fValue = fMin;
 }
 
-void    pfGUIUpDownPairMod::Write( hsStream *s, hsResMgr *mgr )
+void    pfGUIUpDownPairMod::Write(hsStream* s, hsResMgr* mgr)
 {
-    pfGUIValueCtrl::Write( s, mgr );
+    pfGUIValueCtrl::Write(s, mgr);
 
-    mgr->WriteKey( s, fUpControl->GetKey() );
-    mgr->WriteKey( s, fDownControl->GetKey() );
+    mgr->WriteKey(s, fUpControl->GetKey());
+    mgr->WriteKey(s, fDownControl->GetKey());
 
-    s->WriteLE( fMin );
-    s->WriteLE( fMax );
-    s->WriteLE( fStep );
+    s->WriteLE(fMin);
+    s->WriteLE(fMax);
+    s->WriteLE(fStep);
 }
 
 
-void    pfGUIUpDownPairMod::SetRange( float min, float max )
+void    pfGUIUpDownPairMod::SetRange(float min, float max)
 {
-    pfGUIValueCtrl::SetRange( min, max );
+    pfGUIValueCtrl::SetRange(min, max);
     IUpdate();
 }
 
-void    pfGUIUpDownPairMod::SetCurrValue( float v )
+void    pfGUIUpDownPairMod::SetCurrValue(float v)
 {
-    pfGUIValueCtrl::SetCurrValue( v );
+    pfGUIValueCtrl::SetCurrValue(v);
     IUpdate();
 }

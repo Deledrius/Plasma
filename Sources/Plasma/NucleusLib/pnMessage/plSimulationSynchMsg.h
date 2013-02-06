@@ -48,29 +48,28 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // periodically sent from one simulated object to another to ensure consistent state
 // this is a completely virtual message type
 // more meaningful sub-classes are created by specific physics systems
-class plSimulationSynchMsg : public plMessage
-{
+class plSimulationSynchMsg : public plMessage {
 public:
 
     // ???
     // This message is not really creatable: it's abstract. It's designed to sneak
     // havok-specific data through the generalized simulation logic
-    CLASSNAME_REGISTER( plSimulationSynchMsg );
-    GETINTERFACE_ANY( plSimulationSynchMsg, plMessage );
+    CLASSNAME_REGISTER(plSimulationSynchMsg);
+    GETINTERFACE_ANY(plSimulationSynchMsg, plMessage);
 
     // Don't be fooled: this class is *not* to be instantiated.
 
-    void Read(hsStream *stream, hsResMgr *mgr);
-    void Write(hsStream *stream, hsResMgr *mgr);
+    void Read(hsStream* stream, hsResMgr* mgr);
+    void Write(hsStream* stream, hsResMgr* mgr);
 };
 
 
-inline void plSimulationSynchMsg::Read(hsStream *s, hsResMgr *mgr)
+inline void plSimulationSynchMsg::Read(hsStream* s, hsResMgr* mgr)
 {
     hsAssert(false, "plSimulationSynchMsg should never be instantiated directly");
 }
 
-inline void plSimulationSynchMsg::Write(hsStream *s, hsResMgr *mgr)
+inline void plSimulationSynchMsg::Write(hsStream* s, hsResMgr* mgr)
 {
     hsAssert(false, "plSimulationSynchMsg should never be instantiated directly");
 }

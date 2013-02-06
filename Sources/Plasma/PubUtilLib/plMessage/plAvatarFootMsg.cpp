@@ -46,14 +46,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsStream.h"
 
 plAvatarFootMsg::plAvatarFootMsg()
-:   fArmature(nil),
-    fIsLeft(false);
+    :   fArmature(nil),
+        fIsLeft(false);
 {
 }
 
-plAvatarFootMsg::plAvatarFootMsg(const plKey& s, plArmatureMod *armature, plAvBrain *brain, bool isLocal, bool isLeft)
-:   plArmatureUpdateMsg(s, isLocal, true, armature, brain),
-    fIsLeft(isLeft)
+plAvatarFootMsg::plAvatarFootMsg(const plKey& s, plArmatureMod* armature, plAvBrain* brain, bool isLocal, bool isLeft)
+    :   plArmatureUpdateMsg(s, isLocal, true, armature, brain),
+        fIsLeft(isLeft)
 {
     SetBCastFlag(plMessage::kBCastByExactType);
 }

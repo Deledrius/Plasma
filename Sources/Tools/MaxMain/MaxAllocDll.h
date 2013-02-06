@@ -45,5 +45,5 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // library we want and still being able to allocate memory and give it to Max
 // to free.
 //
-void *plMaxMalloc(size_t size);
-void plMaxFree(void *memblock);
+void* plMaxMalloc(size_t size);
+void plMaxFree(void* memblock);

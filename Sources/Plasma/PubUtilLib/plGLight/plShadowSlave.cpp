@@ -75,7 +75,7 @@ bool plShadowSlave::ISetupOrthoViewTransform()
     proj.NotIdentity();
 
     // First the LightToTexture, which uses the above pretty much as is.
-    // Note the remapping to range [0.5..width-0.5] etc. 
+    // Note the remapping to range [0.5..width-0.5] etc.
     // About this kAdjustBias. According to the docs, it should be 0.5,
     // and on the perspective projection 0.5 works great. But on the
     // directional (ortho) projection, it just makes the mapping wrong,
@@ -93,7 +93,7 @@ bool plShadowSlave::ISetupOrthoViewTransform()
     fWorldToTexture = proj * fWorldToLight;
 
     // Now the LightToNDC. This one's a little trickier, because we want to compensate for
-    // having brought in the viewport to keep our border constant, so we can clamp the 
+    // having brought in the viewport to keep our border constant, so we can clamp the
     // projected texture and not have the edges smear off to infinity.
     // Like the adjust bias above, this part is correct in theory, but only
     // screws things up (increases Z-acne).
@@ -104,7 +104,7 @@ bool plShadowSlave::ISetupOrthoViewTransform()
     float delY = maxY - minY;
     minY += delY / (fHeight * 0.5f);
     maxY -= delY / (fHeight * 0.5f);
-#endif 
+#endif
 
 
     fView.SetView(hsPoint3(minX, minY, minZ), hsPoint3(maxX, maxY, maxZ));
@@ -116,7 +116,7 @@ bool plShadowSlave::ISetupOrthoViewTransform()
     fLightDir = fLightToWorld.GetAxis(hsMatrix44::kUp);
     SetFlag(kPositional, false);
     SetFlag(kReverseCull, true);
-    
+
     return true;
 }
 
@@ -129,38 +129,37 @@ bool plShadowSlave::ISetupPerspViewTransform()
     float minZ = bnd.GetMins().fZ;
     float maxZ = bnd.GetCenter().fZ + fAttenDist;
 
-    if( minZ < kMinMinZ )
+    if (minZ < kMinMinZ) {
         minZ = kMinMinZ;
+    }
 
     // EAP
     // This is my hack to get the Nexus age working.  The real problem
     // is probably data-side.  I take full responsibility for this
     // hack-around breaking the entire system, loosing data, causing
-    // unauthorized credit card transactions, etc.      
-    if (isnan(bnd.GetMins().fX) || isnan(bnd.GetMins().fY))
+    // unauthorized credit card transactions, etc.
+    if (isnan(bnd.GetMins().fX) || isnan(bnd.GetMins().fY)) {
         return false;
-    if (isnan(bnd.GetMaxs().fX) || isnan(bnd.GetMaxs().fY))
+    }
+
+    if (isnan(bnd.GetMaxs().fX) || isnan(bnd.GetMaxs().fY)) {
         return false;
+    }
 
     float cotX, cotY;
-    if( -bnd.GetMins().fX > bnd.GetMaxs().fX )
-    {
+
+    if (-bnd.GetMins().fX > bnd.GetMaxs().fX) {
         hsAssert(bnd.GetMins().fX < 0, "Empty shadow caster bounds?");
         cotX = -minZ / bnd.GetMins().fX;
-    }
-    else
-    {
+    } else {
         hsAssert(bnd.GetMaxs().fX > 0, "Empty shadow caster bounds?");
         cotX = minZ / bnd.GetMaxs().fX;
     }
 
-    if( -bnd.GetMins().fY > bnd.GetMaxs().fY )
-    {
+    if (-bnd.GetMins().fY > bnd.GetMaxs().fY) {
         hsAssert(bnd.GetMins().fY < 0, "Empty shadow caster bounds?");
         cotY = -minZ / bnd.GetMins().fY;
-    }
-    else
-    {
+    } else {
         hsAssert(bnd.GetMaxs().fY > 0, "Empty shadow caster bounds?");
         cotY = minZ / bnd.GetMaxs().fY;
     }
@@ -176,16 +175,16 @@ bool plShadowSlave::ISetupPerspViewTransform()
     // This also means that our translate goes into [i][2] instead of [i][3].
 #if 0
     proj.fMap[0][0] = cotX * 0.5f;
-    proj.fMap[0][2] = -0.5f * (1.f + 0.5f/fWidth);
+    proj.fMap[0][2] = -0.5f * (1.f + 0.5f / fWidth);
     proj.fMap[1][1] = cotY * 0.5f;
-    proj.fMap[1][2] = -0.5f * (1.f + 0.5f/fHeight);
+    proj.fMap[1][2] = -0.5f * (1.f + 0.5f / fHeight);
 #else
     plConst(float) kBiasScale(1.f);
     plConst(float) kBiasTrans(1.f);
-    proj.fMap[0][0] = cotX * 0.5f * ( float(fWidth-2.f) / float(fWidth) ) * kBiasScale;
-    proj.fMap[0][2] = 0.5f * (1.f - kBiasTrans * 0.5f/fWidth);
-    proj.fMap[1][1] = -cotY * 0.5f * ( float(fHeight-2.f) / float(fHeight) ) * kBiasScale;
-    proj.fMap[1][2] = 0.5f * (1.f - kBiasTrans * 0.5f/fHeight);
+    proj.fMap[0][0] = cotX * 0.5f * (float(fWidth - 2.f) / float(fWidth)) * kBiasScale;
+    proj.fMap[0][2] = 0.5f * (1.f - kBiasTrans * 0.5f / fWidth);
+    proj.fMap[1][1] = -cotY * 0.5f * (float(fHeight - 2.f) / float(fHeight)) * kBiasScale;
+    proj.fMap[1][2] = 0.5f * (1.f - kBiasTrans * 0.5f / fHeight);
 #endif
 
 #if 0 // This computes correct Z, but we really just want W in 3rd component. HACKFISH
@@ -201,7 +200,7 @@ bool plShadowSlave::ISetupPerspViewTransform()
     fWorldToTexture = proj * fWorldToLight;
 
     // Now the LightToNDC. This one's a little trickier, because we want to compensate for
-    // having brought in the viewport to keep our border constant, so we can clamp the 
+    // having brought in the viewport to keep our border constant, so we can clamp the
     // projected texture and not have the edges smear off to infinity.
     cotX -= cotX / (fWidth * 0.5f);
     cotY -= cotY / (fHeight * 0.5f);

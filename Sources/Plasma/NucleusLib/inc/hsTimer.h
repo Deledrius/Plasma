@@ -44,8 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "hsWide.h"
 
-class plTimerShare
-{
+class plTimerShare {
 protected:
     mutable bool        fFirstTime;
     mutable hsWide      fRawTimeZero;
@@ -77,22 +76,42 @@ protected:
     double              RawTicksToDSeconds(const hsWide& ticks);
     hsWide              DSecondsToRawTicks(double secs);
 
-    float               GetDelSysSeconds() const { return fDelSysSeconds; }
-    double              GetSysSeconds() const { return fSysSeconds; }
+    float               GetDelSysSeconds() const {
+        return fDelSysSeconds;
+    }
+    double              GetSysSeconds() const {
+        return fSysSeconds;
+    }
     double              IncSysSeconds();
 
     void                SetRealTime(bool realTime);
-    bool                IsRealTime() const { return !fRunningFrameTime; }
+    bool                IsRealTime() const {
+        return !fRunningFrameTime;
+    }
 
-    void                SetFrameTimeInc(float inc) { fFrameTimeInc = inc; }
+    void                SetFrameTimeInc(float inc) {
+        fFrameTimeInc = inc;
+    }
 
-    void                SetTimeScale(float s) { fSysTimeScale = s; }
-    float               GetTimeScale() const { return fSysTimeScale; }
+    void                SetTimeScale(float s) {
+        fSysTimeScale = s;
+    }
+    float               GetTimeScale() const {
+        return fSysTimeScale;
+    }
 
-    void                SetTimeClamp(float secs) { fTimeClampSecs = secs; }
-    void                SetSmoothingCap(float secs) { fSmoothingClampSecs = secs; }
-    float               GetTimeClamp() const { return fTimeClampSecs; }
-    bool                IsClamping() const { return fClamping; }
+    void                SetTimeClamp(float secs) {
+        fTimeClampSecs = secs;
+    }
+    void                SetSmoothingCap(float secs) {
+        fSmoothingClampSecs = secs;
+    }
+    float               GetTimeClamp() const {
+        return fTimeClampSecs;
+    }
+    bool                IsClamping() const {
+        return fClamping;
+    }
 
     friend class hsTimer;
 public:
@@ -100,45 +119,82 @@ public:
     ~plTimerShare();
 };
 
-class hsTimer 
-{
+class hsTimer {
 protected:
     static const double             fPrecTicksPerSec;
     static const hsWide             fRawBase;
 
     static  hsWide                  IInitRawBase();
-    
+
     static plTimerShare*            fTimer;
 public:
 
-    static bool          VerifyRawBase() { return fRawBase == IInitRawBase(); }
-    static const hsWide& GetRawBase() { return fRawBase; }
+    static bool          VerifyRawBase() {
+        return fRawBase == IInitRawBase();
+    }
+    static const hsWide& GetRawBase() {
+        return fRawBase;
+    }
 
-    static  hsWide*      GetRawTicks(hsWide* ticks) { return fTimer->GetRawTicks(ticks); }
+    static  hsWide*      GetRawTicks(hsWide* ticks) {
+        return fTimer->GetRawTicks(ticks);
+    }
 
-    static  double      GetSeconds() { return fTimer->GetSeconds(); }
-    static  double      GetMilliSeconds() { return fTimer->GetMilliSeconds(); }
+    static  double      GetSeconds() {
+        return fTimer->GetSeconds();
+    }
+    static  double      GetMilliSeconds() {
+        return fTimer->GetMilliSeconds();
+    }
 
-    static double       RawTicksToDSeconds(const hsWide& ticks) { return fTimer->RawTicksToDSeconds(ticks); }
-    static hsWide       DSecondsToRawTicks(double secs) { return fTimer->DSecondsToRawTicks(secs); }
+    static double       RawTicksToDSeconds(const hsWide& ticks) {
+        return fTimer->RawTicksToDSeconds(ticks);
+    }
+    static hsWide       DSecondsToRawTicks(double secs) {
+        return fTimer->DSecondsToRawTicks(secs);
+    }
 
-    static float        GetDelSysSeconds() { return fTimer->GetDelSysSeconds(); }
-    static double       GetSysSeconds() { return fTimer->GetSysSeconds(); }
+    static float        GetDelSysSeconds() {
+        return fTimer->GetDelSysSeconds();
+    }
+    static double       GetSysSeconds() {
+        return fTimer->GetSysSeconds();
+    }
 
-    static double       IncSysSeconds() { return fTimer->IncSysSeconds(); }
+    static double       IncSysSeconds() {
+        return fTimer->IncSysSeconds();
+    }
 
-    static void         SetRealTime(bool realTime) { fTimer->SetRealTime(realTime); }
-    static bool         IsRealTime() { return fTimer->IsRealTime(); }
+    static void         SetRealTime(bool realTime) {
+        fTimer->SetRealTime(realTime);
+    }
+    static bool         IsRealTime() {
+        return fTimer->IsRealTime();
+    }
 
-    static void         SetFrameTimeInc(float inc) { fTimer->SetFrameTimeInc(inc); }
+    static void         SetFrameTimeInc(float inc) {
+        fTimer->SetFrameTimeInc(inc);
+    }
 
-    static void         SetTimeScale(float s) { fTimer->SetTimeScale(s); }
-    static float        GetTimeScale() { return fTimer->GetTimeScale(); }
+    static void         SetTimeScale(float s) {
+        fTimer->SetTimeScale(s);
+    }
+    static float        GetTimeScale() {
+        return fTimer->GetTimeScale();
+    }
 
-    static void         SetTimeClamp(float secs) { fTimer->SetTimeClamp(secs); }
-    static void         SetTimeSmoothingClamp(float secs) { fTimer->SetSmoothingCap(secs); }
-    static float        GetTimeClamp() { return fTimer->GetTimeClamp(); }
-    static bool         IsClamping() { return fTimer->IsClamping(); }
+    static void         SetTimeClamp(float secs) {
+        fTimer->SetTimeClamp(secs);
+    }
+    static void         SetTimeSmoothingClamp(float secs) {
+        fTimer->SetSmoothingCap(secs);
+    }
+    static float        GetTimeClamp() {
+        return fTimer->GetTimeClamp();
+    }
+    static bool         IsClamping() {
+        return fTimer->IsClamping();
+    }
 
     ///////////////////////////
     // Precision timer routines - these are stateless and implemented as statics.
@@ -157,7 +213,9 @@ public:
     //
     // Pass GetTheTimer() into other process space, and then call SetTheTimer() on it.
     static void             SetTheTimer(plTimerShare* timer);
-    static plTimerShare*    GetTheTimer() { return fTimer; }
+    static plTimerShare*    GetTheTimer() {
+        return fTimer;
+    }
 };
 
 

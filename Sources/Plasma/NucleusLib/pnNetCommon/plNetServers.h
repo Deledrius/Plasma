@@ -55,11 +55,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define PARABLE_PLS_WINCLASSNAME    "ParableServer_PLS"
 
 
-class plNetServerConstants
-{
+class plNetServerConstants {
 public:
-    enum ServerTypes  // Changing the order WILL affect Data including Databases!!!
-    {               
+    enum ServerTypes { // Changing the order WILL affect Data including Databases!!!
         kInvalidLo,
         kAgent,
         kLobby,
@@ -77,87 +75,141 @@ private:
     static const char* ServerPrograms[];
 
 public:
-    static const char* GetServerExe(int type) { return (type > kInvalidLo && type < kInvalidHi)?ServerPrograms[type-1]:nil; }
+    static const char* GetServerExe(int type) {
+        return (type > kInvalidLo && type < kInvalidHi) ? ServerPrograms[type - 1] : nil;
+    }
     static const char* GetServerName(int type);
     static uint16_t GetPort(int type);
-    static const char* GetServerTypeStr(int type)
-    {
-        switch(type)
-        {
-        case kAgent:    return "kAgent";
-        case kLobby:    return "kLobby";
-        case kGame:     return "kGame";
-        case kVault:    return "kVault";
-        case kAuth:     return "kAuth";
-        case kAdmin:    return "kAdmin";
-        case kLookup:   return "kLookup";
-        case kClient:   return "kClient";
-        default: return "???";
+    static const char* GetServerTypeStr(int type) {
+        switch (type) {
+        case kAgent:
+            return "kAgent";
+
+        case kLobby:
+            return "kLobby";
+
+        case kGame:
+            return "kGame";
+
+        case kVault:
+            return "kVault";
+
+        case kAuth:
+            return "kAuth";
+
+        case kAdmin:
+            return "kAdmin";
+
+        case kLookup:
+            return "kLookup";
+
+        case kClient:
+            return "kClient";
+
+        default:
+            return "???";
         }
     }
 };
 
 
-class plNetServerAgentConstants
-{
+class plNetServerAgentConstants {
 public:
-    static const char* GetName() { return "Server_Agent"; }
-    static uint16_t GetPort() { return 4800; }
-    static plNetServerConstants::ServerTypes GetType() { return plNetServerConstants::kAgent; }
+    static const char* GetName() {
+        return "Server_Agent";
+    }
+    static uint16_t GetPort() {
+        return 4800;
+    }
+    static plNetServerConstants::ServerTypes GetType() {
+        return plNetServerConstants::kAgent;
+    }
 };
 
 
-class plNetLookupServerConstants
-{
+class plNetLookupServerConstants {
 public:
-    static const char* GetName() { return "Lookup_Server"; }
-    static uint16_t GetPort() { return 2000; }
-    static plNetServerConstants::ServerTypes GetType() { return plNetServerConstants::kLookup; }
+    static const char* GetName() {
+        return "Lookup_Server";
+    }
+    static uint16_t GetPort() {
+        return 2000;
+    }
+    static plNetServerConstants::ServerTypes GetType() {
+        return plNetServerConstants::kLookup;
+    }
 };
 
 
-class plNetLobbyServerConstants
-{
+class plNetLobbyServerConstants {
 public:
-    static const char* GetName() { return "Generated_Lobby"; }
-    static uint16_t GetPort() { return 5000; }
-    static plNetServerConstants::ServerTypes GetType() { return plNetServerConstants::kLobby; }
+    static const char* GetName() {
+        return "Generated_Lobby";
+    }
+    static uint16_t GetPort() {
+        return 5000;
+    }
+    static plNetServerConstants::ServerTypes GetType() {
+        return plNetServerConstants::kLobby;
+    }
 };
 
 
-class plNetVaultServerConstants
-{
+class plNetVaultServerConstants {
 public:
-    static const char* GetName() { return "Vault_Server"; }
-    static uint16_t GetPort() { return 2001; }
-    static plNetServerConstants::ServerTypes GetType() { return plNetServerConstants::kVault; }
+    static const char* GetName() {
+        return "Vault_Server";
+    }
+    static uint16_t GetPort() {
+        return 2001;
+    }
+    static plNetServerConstants::ServerTypes GetType() {
+        return plNetServerConstants::kVault;
+    }
 };
 
 
-class plNetAuthServerConstants
-{
+class plNetAuthServerConstants {
 public:
-    static const char* GetName() { return "Auth_Server"; }
-    static uint16_t GetPort() { return 2002; }
-    static plNetServerConstants::ServerTypes GetType() { return plNetServerConstants::kAuth; }
+    static const char* GetName() {
+        return "Auth_Server";
+    }
+    static uint16_t GetPort() {
+        return 2002;
+    }
+    static plNetServerConstants::ServerTypes GetType() {
+        return plNetServerConstants::kAuth;
+    }
 };
 
 
-class plNetAdminServerConstants
-{
+class plNetAdminServerConstants {
 public:
-    static const char* GetName() { return "Admin_Server"; }
-    static uint16_t GetPort() { return 2003; }
-    static plNetServerConstants::ServerTypes GetType() { return plNetServerConstants::kAdmin; }
+    static const char* GetName() {
+        return "Admin_Server";
+    }
+    static uint16_t GetPort() {
+        return 2003;
+    }
+    static plNetServerConstants::ServerTypes GetType() {
+        return plNetServerConstants::kAdmin;
+    }
 };
 
-class plNetGameServerConstants
-{
+class plNetGameServerConstants {
 public:
-    static const char* GetName() { return "Game_Server"; }
-    static uint16_t GetLowPort() { return 5001;}
-    static uint16_t GetHighPort() { return 6001;}
-    static plNetServerConstants::ServerTypes GetType() { return plNetServerConstants::kGame; }
+    static const char* GetName() {
+        return "Game_Server";
+    }
+    static uint16_t GetLowPort() {
+        return 5001;
+    }
+    static uint16_t GetHighPort() {
+        return 6001;
+    }
+    static plNetServerConstants::ServerTypes GetType() {
+        return plNetServerConstants::kGame;
+    }
 };
 
 

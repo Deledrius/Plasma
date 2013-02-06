@@ -61,11 +61,12 @@ PYTHON_INIT_DEFINITION(ptVaultPlayerInfoNode, args, keywords)
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoNode, playerSetID, args)
 {
     unsigned long playerID;
-    if (!PyArg_ParseTuple(args, "l", &playerID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &playerID)) {
         PyErr_SetString(PyExc_TypeError, "playerSetID expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Player_SetPlayerID(playerID);
     PYTHON_RETURN_NONE;
 }
@@ -78,11 +79,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultPlayerInfoNode, playerGetID)
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoNode, playerSetName, args)
 {
     char* name;
-    if (!PyArg_ParseTuple(args, "s", &name))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &name)) {
         PyErr_SetString(PyExc_TypeError, "playerSetName expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Player_SetPlayerName(name);
     PYTHON_RETURN_NONE;
 }
@@ -95,11 +97,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultPlayerInfoNode, playerGetName)
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoNode, playerSetAgeInstanceName, args)
 {
     char* name;
-    if (!PyArg_ParseTuple(args, "s", &name))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &name)) {
         PyErr_SetString(PyExc_TypeError, "playerSetAgeInstanceName expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Player_SetAgeInstanceName(name);
     PYTHON_RETURN_NONE;
 }
@@ -112,11 +115,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultPlayerInfoNode, playerGetAgeInstanceName)
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoNode, playerSetAgeGuid, args)
 {
     char* guid;
-    if (!PyArg_ParseTuple(args, "s", &guid))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &guid)) {
         PyErr_SetString(PyExc_TypeError, "playerSetAgeGuid expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Player_SetAgeGuid(guid);
     PYTHON_RETURN_NONE;
 }
@@ -129,11 +133,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultPlayerInfoNode, playerGetAgeGuid)
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoNode, playerSetOnline, args)
 {
     char stateFlag;
-    if (!PyArg_ParseTuple(args, "b", &stateFlag))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &stateFlag)) {
         PyErr_SetString(PyExc_TypeError, "playerSetOnline expects a boolean");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Player_SetOnline(stateFlag != 0);
     PYTHON_RETURN_NONE;
 }
@@ -149,18 +154,18 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultPlayerInfoNode, playerGetCCRLevel)
 }
 
 PYTHON_START_METHODS_TABLE(ptVaultPlayerInfoNode)
-    PYTHON_METHOD(ptVaultPlayerInfoNode, playerSetID, "Params: playerID\nNot sure this should be used. Sets the playerID for this player info node."),
-    PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerGetID, "Returns the player ID for this player info node."),
-    PYTHON_METHOD(ptVaultPlayerInfoNode, playerSetName, "Params: name\nNot sure this should be used. Sets the player name of this player info node."),
-    PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerGetName, "Returns the player name of this player info node."),
-    PYTHON_METHOD(ptVaultPlayerInfoNode, playerSetAgeInstanceName, "Params: name\nNot sure this should be used. Sets the name of the age where the player is for this player info node."),
-    PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerGetAgeInstanceName, "Returns the name of the Age where the player is for this player info node."),
-    PYTHON_METHOD(ptVaultPlayerInfoNode, playerSetAgeGuid, "Params: guidString\nNot sure this should be used. Sets the guid for this player info node."),
-    PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerGetAgeGuid, "Returns the guid as a string of where the player is for this player info node."),
-    PYTHON_METHOD(ptVaultPlayerInfoNode, playerSetOnline, "Params: state\nNot sure this should be used. Sets the state of the player online status for this player info node."),
-    PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerIsOnline, "Returns the online status of the player for this player info node."),
-    PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerGetCCRLevel, "Returns the ccr level of the player for this player info node."),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptVaultPlayerInfoNode, playerSetID, "Params: playerID\nNot sure this should be used. Sets the playerID for this player info node."),
+              PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerGetID, "Returns the player ID for this player info node."),
+              PYTHON_METHOD(ptVaultPlayerInfoNode, playerSetName, "Params: name\nNot sure this should be used. Sets the player name of this player info node."),
+              PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerGetName, "Returns the player name of this player info node."),
+              PYTHON_METHOD(ptVaultPlayerInfoNode, playerSetAgeInstanceName, "Params: name\nNot sure this should be used. Sets the name of the age where the player is for this player info node."),
+              PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerGetAgeInstanceName, "Returns the name of the Age where the player is for this player info node."),
+              PYTHON_METHOD(ptVaultPlayerInfoNode, playerSetAgeGuid, "Params: guidString\nNot sure this should be used. Sets the guid for this player info node."),
+              PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerGetAgeGuid, "Returns the guid as a string of where the player is for this player info node."),
+              PYTHON_METHOD(ptVaultPlayerInfoNode, playerSetOnline, "Params: state\nNot sure this should be used. Sets the state of the player online status for this player info node."),
+              PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerIsOnline, "Returns the online status of the player for this player info node."),
+              PYTHON_METHOD_NOARGS(ptVaultPlayerInfoNode, playerGetCCRLevel, "Returns the ccr level of the player for this player info node."),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVaultPlayerInfoNode, pyVaultNode, "Plasma vault folder node");
@@ -168,14 +173,20 @@ PLASMA_DEFAULT_TYPE_WBASE(ptVaultPlayerInfoNode, pyVaultNode, "Plasma vault fold
 // required functions for PyObject interoperability
 PYTHON_CLASS_NEW_IMPL(ptVaultPlayerInfoNode, pyVaultPlayerInfoNode)
 
-PyObject *pyVaultPlayerInfoNode::New(RelVaultNode* nfsNode)
+PyObject* pyVaultPlayerInfoNode::New(RelVaultNode* nfsNode)
 {
-    ptVaultPlayerInfoNode *newObj = (ptVaultPlayerInfoNode*)ptVaultPlayerInfoNode_type.tp_new(&ptVaultPlayerInfoNode_type, NULL, NULL);
-    if (newObj->fThis->fNode)
+    ptVaultPlayerInfoNode* newObj = (ptVaultPlayerInfoNode*)ptVaultPlayerInfoNode_type.tp_new(&ptVaultPlayerInfoNode_type, NULL, NULL);
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->DecRef();
+    }
+
     newObj->fThis->fNode = nfsNode;
-    if (newObj->fThis->fNode)
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->IncRef();
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -186,7 +197,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptVaultPlayerInfoNode, pyVaultPlayerInfoNode)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyVaultPlayerInfoNode::AddPlasmaClasses(PyObject *m)
+void pyVaultPlayerInfoNode::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptVaultPlayerInfoNode);

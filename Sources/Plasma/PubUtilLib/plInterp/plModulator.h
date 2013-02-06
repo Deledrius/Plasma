@@ -50,8 +50,7 @@ struct hsPoint3;
 class plVolumeIsect;
 class hsBounds3Ext;
 
-class plModulator : public plCreatable
-{
+class plModulator : public plCreatable {
 protected:
     plVolumeIsect*          fVolume;
     float                fSoftDist;
@@ -60,10 +59,12 @@ public:
     plModulator();
     virtual ~plModulator();
 
-    CLASSNAME_REGISTER( plModulator );
-    GETINTERFACE_ANY( plModulator, plCreatable );
+    CLASSNAME_REGISTER(plModulator);
+    GETINTERFACE_ANY(plModulator, plCreatable);
 
-    const plVolumeIsect*    GetVolume() const { return fVolume; }
+    const plVolumeIsect*    GetVolume() const {
+        return fVolume;
+    }
     void                    SetVolume(plVolumeIsect* vol); // Takes ownership, so don't delete after handing it in.
 
     float                Modulation(const hsPoint3& pos) const;
@@ -71,8 +72,12 @@ public:
 
     void                    SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);
 
-    float                GetSoftDist() const { return fSoftDist; }
-    void                    SetSoftDist(float s) { fSoftDist = s; }
+    float                GetSoftDist() const {
+        return fSoftDist;
+    }
+    void                    SetSoftDist(float s) {
+        fSoftDist = s;
+    }
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);

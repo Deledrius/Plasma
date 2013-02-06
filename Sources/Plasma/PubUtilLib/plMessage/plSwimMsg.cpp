@@ -49,16 +49,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // ctor default ------
 // -------------
 plSwimMsg::plSwimMsg()
-: fIsEntering(false),
-  fSwimRegionKey(nil)
+    : fIsEntering(false),
+      fSwimRegionKey(nil)
 {
 }
 
 // ctor sender receiver entering ----------------------------------------------
 // ------------------------------
-plSwimMsg::plSwimMsg(const plKey &sender, const plKey &receiver, bool entering, plKey regionKey)
-: plMessage(sender, receiver, nil),
-  fIsEntering(entering)
+plSwimMsg::plSwimMsg(const plKey& sender, const plKey& receiver, bool entering, plKey regionKey)
+    : plMessage(sender, receiver, nil),
+      fIsEntering(entering)
 {
     fSwimRegionKey = regionKey;
 }
@@ -79,7 +79,7 @@ bool plSwimMsg::GetIsLeaving()
 
 // Read ---------------------------------------------
 // -----
-void plSwimMsg::Read(hsStream *stream, hsResMgr *mgr)
+void plSwimMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
 
@@ -89,7 +89,7 @@ void plSwimMsg::Read(hsStream *stream, hsResMgr *mgr)
 
 // Write ---------------------------------------------
 // ------
-void plSwimMsg::Write(hsStream *stream, hsResMgr *mgr)
+void plSwimMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(stream, mgr);
 

@@ -64,14 +64,13 @@ plGetLocationDlg& plGetLocationDlg::Instance()
     return theInstance;
 }
 
-bool plGetLocationDlg::GetLocation(plMaxNode *node, plErrorMsg *errMsg)
+bool plGetLocationDlg::GetLocation(plMaxNode* node, plErrorMsg* errMsg)
 {
     fNode = node;
     fErrMsg = errMsg;
 
     // If an XRef doesn't have a location, tell the user and stop the export
-    if (node->IsXRef())
-    {
+    if (node->IsXRef()) {
         char buf[256];
         sprintf(buf, "XRef object \"%s\" does not have a location", node->GetName());
         fErrMsg->Set(true, "Convert Error", buf).Show();
@@ -79,15 +78,13 @@ bool plGetLocationDlg::GetLocation(plMaxNode *node, plErrorMsg *errMsg)
     }
 
     // If we have a default location, use it and exit
-    if (fDefaultLocation)
-    {
+    if (fDefaultLocation) {
         ISetLocation(fDefaultLocation);
         return true;
     }
 
     // If we're not showing prompts, just fail if there isn't a location
-    if (hsMessageBox_SuppressPrompts)
-    {
+    if (hsMessageBox_SuppressPrompts) {
         fErrMsg->Set(true, "Convert Error", "Object %s doesn't have a location component", node->GetName());
         fErrMsg->Show();
         return false;
@@ -106,38 +103,40 @@ void plGetLocationDlg::ResetDefaultLocation()
     fDefaultLocation = nil;
 }
 
-void plGetLocationDlg::IListRooms(plMaxNode *node, HWND hList)
+void plGetLocationDlg::IListRooms(plMaxNode* node, HWND hList)
 {
     // If node is a room component, add it's name to the list
-    plComponentBase *comp = node->ConvertToComponent();
-    if(comp && (comp->ClassID() == ROOM_CID || comp->ClassID() == PAGEINFO_CID))
-    {
+    plComponentBase* comp = node->ConvertToComponent();
+
+    if (comp && (comp->ClassID() == ROOM_CID || comp->ClassID() == PAGEINFO_CID)) {
         int idx = SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)node->GetName());
         SendMessage(hList, LB_SETITEMDATA, idx, (LPARAM)node);
     }
 
     // Recursively add all the nodes children
-    for (int i = 0; i < node->NumberOfChildren(); i++)
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
         IListRooms((plMaxNode*)node->GetChildNode(i), hList);
+    }
 }
 
 void plGetLocationDlg::IAddSelection(HWND hList, bool setDefault)
 {
     int sel = SendMessage(hList, LB_GETCURSEL, 0, 0);
-    if (sel != LB_ERR)
-    {
+
+    if (sel != LB_ERR) {
         // Get the node and component for the selected room component
-        plMaxNode *node = (plMaxNode*)SendMessage(hList, LB_GETITEMDATA, sel, 0);
+        plMaxNode* node = (plMaxNode*)SendMessage(hList, LB_GETITEMDATA, sel, 0);
         ISetLocation(node);
 
-        if (setDefault)
+        if (setDefault) {
             fDefaultLocation = node;
+        }
     }
 }
 
-void plGetLocationDlg::ISetLocation(plMaxNode *locNode)
+void plGetLocationDlg::ISetLocation(plMaxNode* locNode)
 {
-    plComponent *comp = (plComponent*)locNode->ConvertToComponent();
+    plComponent* comp = (plComponent*)locNode->ConvertToComponent();
 
     // Add the roomless node to the target list and run the convert pass that gives it a room
     comp->AddTarget(fNode);         // Might want to fix this...
@@ -151,10 +150,8 @@ INT_PTR plGetLocationDlg::ForwardDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPA
 
 INT_PTR plGetLocationDlg::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
-    case WM_INITDIALOG:
-        {
+    switch (msg) {
+    case WM_INITDIALOG: {
             HWND hList = GetDlgItem(hDlg, IDC_LIST_LOC);
             SendMessage(hList, LB_RESETCONTENT, 0, 0);
             IListRooms((plMaxNode*)GetCOREInterface()->GetRootNode(), hList);
@@ -165,27 +162,27 @@ INT_PTR plGetLocationDlg::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPa
             SetDlgItemText(hDlg, IDC_PROMPT, buf);
 
             // No room components found.  Tell user to create one and cancel convert.
-            if (SendMessage(hList, LB_GETCOUNT, 0, 0) == 0)
-            {
+            if (SendMessage(hList, LB_GETCOUNT, 0, 0) == 0) {
                 fErrMsg->Set(true, "Convert Error", "No location component found.  Create one and convert again.");
                 fErrMsg->Show();
                 EndDialog(hDlg, 0);
             }
             // Else set the first room as the current selection
-            else
+            else {
                 SendMessage(hList, LB_SETCURSEL, 0, 0);
+            }
         }
+
         return TRUE;
 
     case WM_COMMAND:
-        switch (LOWORD(wParam))
-        {
-        case IDOK:
-            {
-            bool setDefault = (IsDlgButtonChecked(hDlg, IDC_CHECK_DEFAULT) == BST_CHECKED);
-            IAddSelection(GetDlgItem(hDlg, IDC_LIST_LOC), setDefault);
-            EndDialog(hDlg, 1);
+        switch (LOWORD(wParam)) {
+        case IDOK: {
+                bool setDefault = (IsDlgButtonChecked(hDlg, IDC_CHECK_DEFAULT) == BST_CHECKED);
+                IAddSelection(GetDlgItem(hDlg, IDC_LIST_LOC), setDefault);
+                EndDialog(hDlg, 1);
             }
+
             return TRUE;
 
         case IDCANCEL:
@@ -194,6 +191,7 @@ INT_PTR plGetLocationDlg::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPa
             EndDialog(hDlg, 0);
             return TRUE;
         }
+
         break;
     }
 

@@ -54,32 +54,31 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 struct RelVaultNode;
 
-    
-class pyVaultAgeInfoListNode : public pyVaultFolderNode
-{
+
+class pyVaultAgeInfoListNode : public pyVaultFolderNode {
 protected:
     // should only be created from C++ side
     pyVaultAgeInfoListNode(RelVaultNode* nfsNode);
 
     // python-side ctor
-    pyVaultAgeInfoListNode(int n=0);
+    pyVaultAgeInfoListNode(int n = 0);
 public:
-    
+
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptVaultAgeInfoListNode);
-    static PyObject *New(RelVaultNode* nfsNode);
-    static PyObject *New(int n=0);
+    static PyObject* New(RelVaultNode* nfsNode);
+    static PyObject* New(int n = 0);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyVaultAgeInfoListNode object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyVaultAgeInfoListNode); // converts a PyObject to a pyVaultAgeInfoListNode (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
 //==================================================================
 // class RelVaultNode : public plVaultFolderNode
 //
-    bool  HasAge( uint32_t ageID );
-    bool  AddAge( uint32_t ageID );
-    void  RemoveAge( uint32_t ageID );
+    bool  HasAge(uint32_t ageID);
+    bool  AddAge(uint32_t ageID);
+    void  RemoveAge(uint32_t ageID);
 };
 
 #endif // _pyVaultAgeInfoListNode_h_

@@ -47,47 +47,52 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsStream.h"
 #include "pnMessage/plMessageWithCallbacks.h"
 
-class plTransitionMsg : public plMessageWithCallbacks
-{
+class plTransitionMsg : public plMessageWithCallbacks {
 protected:
 
     uint32_t    fEffect;
     float       fLengthInSecs;
     bool        fHoldUntilNext;
 public:
-    enum 
-    {
+    enum {
         kFadeIn,
         kFadeOut,
         kFadeInNoSound,
         kFadeOutNoSound
     };
 
-    plTransitionMsg() : plMessageWithCallbacks(nil, nil, nil), fEffect( 0 ) { SetBCastFlag(kBCastByExactType);  }
-    plTransitionMsg( uint32_t type, float lengthInSecs, bool holdUntilNext = false ) : 
-                plMessageWithCallbacks(nil, nil, nil), fEffect( type ), fLengthInSecs( lengthInSecs ), fHoldUntilNext( holdUntilNext )
-                { SetBCastFlag( kBCastByExactType );  }
-    
+    plTransitionMsg() : plMessageWithCallbacks(nil, nil, nil), fEffect(0) {
+        SetBCastFlag(kBCastByExactType);
+    }
+    plTransitionMsg(uint32_t type, float lengthInSecs, bool holdUntilNext = false) :
+        plMessageWithCallbacks(nil, nil, nil), fEffect(type), fLengthInSecs(lengthInSecs), fHoldUntilNext(holdUntilNext) {
+        SetBCastFlag(kBCastByExactType);
+    }
+
     ~plTransitionMsg();
 
-    CLASSNAME_REGISTER( plTransitionMsg );
-    GETINTERFACE_ANY( plTransitionMsg, plMessageWithCallbacks );
+    CLASSNAME_REGISTER(plTransitionMsg);
+    GETINTERFACE_ANY(plTransitionMsg, plMessageWithCallbacks);
 
-    uint32_t GetEffect( void ) const { return fEffect; }
-    float    GetLengthInSecs( void ) const { return fLengthInSecs; }
-    bool     GetHoldState( void ) const { return fHoldUntilNext; }
+    uint32_t GetEffect(void) const {
+        return fEffect;
+    }
+    float    GetLengthInSecs(void) const {
+        return fLengthInSecs;
+    }
+    bool     GetHoldState(void) const {
+        return fHoldUntilNext;
+    }
 
-    virtual void Read(hsStream* s, hsResMgr* mgr) 
-    { 
-        plMessageWithCallbacks::Read(s, mgr); 
+    virtual void Read(hsStream* s, hsResMgr* mgr) {
+        plMessageWithCallbacks::Read(s, mgr);
         s->ReadLE(&fEffect);
         s->ReadLE(&fLengthInSecs);
         fHoldUntilNext = s->ReadBOOL();
     }
-    
-    virtual void Write(hsStream* s, hsResMgr* mgr) 
-    { 
-        plMessageWithCallbacks::Write(s, mgr); 
+
+    virtual void Write(hsStream* s, hsResMgr* mgr) {
+        plMessageWithCallbacks::Write(s, mgr);
         s->WriteLE(fEffect);
         s->WriteLE(fLengthInSecs);
         s->WriteBOOL(fHoldUntilNext);

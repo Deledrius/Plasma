@@ -45,108 +45,115 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 // String Tokenizer routines
-hsStringTokenizer::hsStringTokenizer(const char *string, const char *seps) :
-fQAsTok(true),
-fInQuote(false),
-fString(nil),
-fSeps(nil),
-fLastTerminator(nil)
+hsStringTokenizer::hsStringTokenizer(const char* string, const char* seps) :
+    fQAsTok(true),
+    fInQuote(false),
+    fString(nil),
+    fSeps(nil),
+    fLastTerminator(nil)
 {
-    Reset(string,seps);
+    Reset(string, seps);
 }
 
-hsStringTokenizer::~hsStringTokenizer() 
+hsStringTokenizer::~hsStringTokenizer()
 {
     delete[] fString;
     delete[] fSeps;
 }
 
-bool hsStringTokenizer::HasMoreTokens() 
+bool hsStringTokenizer::HasMoreTokens()
 {
     return (*fTok != 0);
 }
 
-inline bool hsStringTokenizer::IsSep(char c) 
+inline bool hsStringTokenizer::IsSep(char c)
 {
-    if (!fQAsTok || !fInQuote) 
-    {
-        if ( fCheckAlphaNum || !isalnum(c) )
-        {
-            for (int32_t i=0; i<fNumSeps; i++) 
-            {
-                if (fSeps[i] == c) 
+    if (!fQAsTok || !fInQuote) {
+        if (fCheckAlphaNum || !isalnum(c)) {
+            for (int32_t i = 0; i < fNumSeps; i++) {
+                if (fSeps[i] == c) {
                     return true;
+                }
             }
         }
     }
-    if (fQAsTok && c=='\"') 
-    {
+
+    if (fQAsTok && c == '\"') {
         fInQuote = !fInQuote;
         return true;
     }
+
     return false;
 }
 
-char *hsStringTokenizer::next() 
+char* hsStringTokenizer::next()
 {
-    if (*fTok == 0) 
+    if (*fTok == 0) {
         return nil;
+    }
 
-    char *cur = fTok;
-    while (*fTok != 0 && !IsSep(*fTok)) 
+    char* cur = fTok;
+
+    while (*fTok != 0 && !IsSep(*fTok)) {
         fTok++;
+    }
 
-    if (*fTok != 0) 
-    {
+    if (*fTok != 0) {
         fLastRep = *fTok;
         fLastTerminator = fTok;
 
         *fTok = 0;
         fTok++;
     }
-    while (*fTok != 0 && IsSep(*fTok)) 
+
+    while (*fTok != 0 && IsSep(*fTok)) {
         fTok++;
+    }
 
     return cur;
 }
 
 // Slightly more loop-friendly version of next
-bool  hsStringTokenizer::Next( char *token, uint32_t maxTokLen )
+bool  hsStringTokenizer::Next(char* token, uint32_t maxTokLen)
 {
-    char *t = next();
-    if( t == nil )
-        return false;
+    char* t = next();
 
-    hsStrncpy( token, t, maxTokLen );
+    if (t == nil) {
+        return false;
+    }
+
+    hsStrncpy(token, t, maxTokLen);
     return true;
 }
 
 // Restores the last character replaced to generate a terminator
-void    hsStringTokenizer::RestoreLastTerminator( void )
+void    hsStringTokenizer::RestoreLastTerminator(void)
 {
-    if( fLastTerminator != nil )
-    {
+    if (fLastTerminator != nil) {
         *fLastTerminator = fLastRep;
         fLastTerminator = nil;
     }
 }
 
-void hsStringTokenizer::Reset(const char *string, const char *seps) 
+void hsStringTokenizer::Reset(const char* string, const char* seps)
 {
-    if (fString)
+    if (fString) {
         delete[] fString;
+    }
+
     fString = string ? hsStrcpy(string) : nil;
 
-    if (fSeps)
+    if (fSeps) {
         delete[] fSeps;
+    }
+
     fSeps = seps ? hsStrcpy(seps) : nil;
     fNumSeps = fSeps ? strlen(fSeps) : 0;
     fCheckAlphaNum = false;
-    for (int32_t i=0; i<fNumSeps; i++)
-    {
-        if (isalnum(fSeps[i]))
-        {
-            fCheckAlphaNum=true;
+
+    for (int32_t i = 0; i < fNumSeps; i++) {
+        if (isalnum(fSeps[i])) {
+            fCheckAlphaNum = true;
             break;
         }
     }
@@ -169,126 +176,131 @@ void hsStringTokenizer::ParseQuotes(bool qAsTok)
 ///////////////////////////////////////////////////////////////////////////////
 
 // String Tokenizer routines
-hsWStringTokenizer::hsWStringTokenizer(const wchar_t *string, const wchar_t *seps) :
+hsWStringTokenizer::hsWStringTokenizer(const wchar_t* string, const wchar_t* seps) :
     fQAsTok(true),
     fInQuote(false),
     fString(nil),
     fSeps(nil),
     fLastTerminator(nil)
 {
-    Reset(string,seps);
+    Reset(string, seps);
 }
 
-hsWStringTokenizer::~hsWStringTokenizer() 
+hsWStringTokenizer::~hsWStringTokenizer()
 {
     delete[] fString;
     delete[] fSeps;
 }
 
-bool hsWStringTokenizer::HasMoreTokens() 
+bool hsWStringTokenizer::HasMoreTokens()
 {
     return (*fTok != L'\0');
 }
 
-inline bool hsWStringTokenizer::IsSep(wchar_t c) 
+inline bool hsWStringTokenizer::IsSep(wchar_t c)
 {
-    if (!fQAsTok || !fInQuote) 
-    {
-        if ( fCheckAlphaNum || !iswalnum(c) )
-        {
-            for (int32_t i=0; i<fNumSeps; i++) 
-            {
-                if (fSeps[i] == c) 
+    if (!fQAsTok || !fInQuote) {
+        if (fCheckAlphaNum || !iswalnum(c)) {
+            for (int32_t i = 0; i < fNumSeps; i++) {
+                if (fSeps[i] == c) {
                     return true;
+                }
             }
         }
     }
-    if (fQAsTok && c==L'\"') 
-    {
+
+    if (fQAsTok && c == L'\"') {
         fInQuote = !fInQuote;
         return true;
     }
+
     return false;
 }
 
-wchar_t *hsWStringTokenizer::next() 
+wchar_t* hsWStringTokenizer::next()
 {
-    if (*fTok == L'\0') 
+    if (*fTok == L'\0') {
         return nil;
+    }
 
-    wchar_t *cur = fTok;
-    while (*fTok != L'\0' && !IsSep(*fTok)) 
+    wchar_t* cur = fTok;
+
+    while (*fTok != L'\0' && !IsSep(*fTok)) {
         fTok++;
+    }
 
-    if (*fTok != L'\0') 
-    {
+    if (*fTok != L'\0') {
         fLastRep = *fTok;
         fLastTerminator = fTok;
 
         *fTok = L'\0';
         fTok++;
     }
-    while (*fTok != L'\0' && IsSep(*fTok)) 
+
+    while (*fTok != L'\0' && IsSep(*fTok)) {
         fTok++;
+    }
 
     return cur;
 }
 
 // Slightly more loop-friendly version of next
-bool  hsWStringTokenizer::Next( wchar_t *token, uint32_t maxTokLen )
+bool  hsWStringTokenizer::Next(wchar_t* token, uint32_t maxTokLen)
 {
-    wchar_t *t = next();
-    if( t == nil )
-        return false;
+    wchar_t* t = next();
 
-    wcsncpy( token, t, maxTokLen - 1 );
+    if (t == nil) {
+        return false;
+    }
+
+    wcsncpy(token, t, maxTokLen - 1);
     token[maxTokLen - 1] = L'\0';
     return true;
 }
 
 // Restores the last character replaced to generate a terminator
-void    hsWStringTokenizer::RestoreLastTerminator( void )
+void    hsWStringTokenizer::RestoreLastTerminator(void)
 {
-    if( fLastTerminator != nil )
-    {
+    if (fLastTerminator != nil) {
         *fLastTerminator = fLastRep;
         fLastTerminator = nil;
     }
 }
 
-void hsWStringTokenizer::Reset(const wchar_t *string, const wchar_t *seps) 
+void hsWStringTokenizer::Reset(const wchar_t* string, const wchar_t* seps)
 {
-    if (fString)
+    if (fString) {
         delete[] fString;
-    if (string)
-    {
+    }
+
+    if (string) {
         int count = wcslen(string);
         fString = new wchar_t[count + 1];
         wcscpy(fString, string);
         fString[count] = L'\0';
-    }
-    else
+    } else {
         fString = nil;
+    }
 
-    if (fSeps)
+    if (fSeps) {
         delete[] fSeps;
-    if (seps)
-    {
+    }
+
+    if (seps) {
         int count = wcslen(seps);
         fSeps = new wchar_t[count + 1];
         wcscpy(fSeps, seps);
         fSeps[count] = L'\0';
-    }
-    else
+    } else {
         fSeps = nil;
+    }
 
     fNumSeps = fSeps ? wcslen(fSeps) : 0;
     fCheckAlphaNum = false;
-    for (int32_t i=0; i<fNumSeps; i++)
-    {
-        if (iswalnum(fSeps[i]))
-        {
-            fCheckAlphaNum=true;
+
+    for (int32_t i = 0; i < fNumSeps; i++) {
+        if (iswalnum(fSeps[i])) {
+            fCheckAlphaNum = true;
             break;
         }
     }

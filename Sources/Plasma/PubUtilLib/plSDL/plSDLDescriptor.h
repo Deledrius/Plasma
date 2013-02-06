@@ -58,11 +58,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class plSimpleVarDescriptor;
 class plSDVarDescriptor;
-class plVarDescriptor
-{
+class plVarDescriptor {
 public:
-    enum Type
-    {
+    enum Type {
         kNone   = -1,
 
         // atomic types
@@ -78,9 +76,9 @@ public:
         kByte,
         kShort,
         kAgeTimeOfDay,  // float which is automatically set to the current age time of day (0-1)
-        
+
         // the following are a vector of floats
-        kVector3=50,// atomicCount=3
+        kVector3 = 50, // atomicCount=3
         kPoint3,    // atomicCount=3
         kRGB,       // atomicCount=3
         kRGBA,      // atomicCount=4
@@ -89,9 +87,8 @@ public:
         kRGBA8,     // atomicCount=4
     };
     typedef char String32[32];
-    
-    enum Flags
-    {
+
+    enum Flags {
         kInternal   = 0x1,      // Don't allow access to this var in Vault Mgr
         kAlwaysNew  = 0x2,      // Treat this var as always having the latest timestamp when FlaggingNewerState
         kVariableLength = 0x4   // Var is defined as int foo[], so it's length is variable, starting at 0
@@ -108,9 +105,9 @@ protected:
 public:
     plVarDescriptor() : fCount(1), fType(kNone), fFlags(0) { }
     virtual ~plVarDescriptor() { }
-    
+
     virtual void CopyFrom(const plVarDescriptor* v);
-    
+
     // conversion ops
     virtual plSimpleVarDescriptor*  GetAsSimpleVarDescriptor() = 0;
     virtual plSDVarDescriptor* GetAsSDVarDescriptor() = 0;
@@ -118,66 +115,129 @@ public:
     virtual const plSDVarDescriptor* GetAsSDVarDescriptor() const = 0;
 
     // getters
-    plString GetDefault()    const   { return fDefault; }
-    plString GetName()   const       { return fName; }
-    Type    GetType() const          { return fType; }
-    plString GetTypeString() const   { return fTypeString; }
-    int     GetCount() const         { return fCount; }
-    bool    IsInternal() const       { return (fFlags & kInternal) != 0; }
-    bool    IsAlwaysNew() const      { return (fFlags & kAlwaysNew) != 0; }
-    bool    IsVariableLength() const { return (fFlags & kVariableLength) != 0; }
-    plString GetDisplayOptions() const { return fDisplayOptions; }
-    
+    plString GetDefault()    const   {
+        return fDefault;
+    }
+    plString GetName()   const       {
+        return fName;
+    }
+    Type    GetType() const          {
+        return fType;
+    }
+    plString GetTypeString() const   {
+        return fTypeString;
+    }
+    int     GetCount() const         {
+        return fCount;
+    }
+    bool    IsInternal() const       {
+        return (fFlags & kInternal) != 0;
+    }
+    bool    IsAlwaysNew() const      {
+        return (fFlags & kAlwaysNew) != 0;
+    }
+    bool    IsVariableLength() const {
+        return (fFlags & kVariableLength) != 0;
+    }
+    plString GetDisplayOptions() const {
+        return fDisplayOptions;
+    }
+
     // setters
-    void    SetDefault(const plString& n)  { fDefault = n; }
-    void    SetName(const plString& n)  { fName = n; }
-    void    SetCount(int c)             { fCount=c; }
+    void    SetDefault(const plString& n)  {
+        fDefault = n;
+    }
+    void    SetName(const plString& n)  {
+        fName = n;
+    }
+    void    SetCount(int c)             {
+        fCount = c;
+    }
     virtual bool SetType(const plString& type);
-    void    SetType(Type t)             { fType=t; }
-    void    SetInternal(bool d)         { if (d) fFlags |= kInternal; else fFlags &= ~kInternal; }
-    void    SetAlwaysNew(bool d)        { if (d) fFlags |= kAlwaysNew; else fFlags &= ~kAlwaysNew; }
-    void    SetVariableLength(bool d)   { if (d) fFlags |= kVariableLength; else fFlags &= ~kVariableLength; }
-    void    SetDisplayOptions(const plString& s) { fDisplayOptions=s;   }
+    void    SetType(Type t)             {
+        fType = t;
+    }
+    void    SetInternal(bool d)         {
+        if (d) {
+            fFlags |= kInternal;
+        } else {
+            fFlags &= ~kInternal;
+        }
+    }
+    void    SetAlwaysNew(bool d)        {
+        if (d) {
+            fFlags |= kAlwaysNew;
+        } else {
+            fFlags &= ~kAlwaysNew;
+        }
+    }
+    void    SetVariableLength(bool d)   {
+        if (d) {
+            fFlags |= kVariableLength;
+        } else {
+            fFlags &= ~kVariableLength;
+        }
+    }
+    void    SetDisplayOptions(const plString& s) {
+        fDisplayOptions = s;
+    }
 
     // IO
-    virtual bool    Read(hsStream* s);  
+    virtual bool    Read(hsStream* s);
     virtual void    Write(hsStream* s) const;
 };
 
 //
-// Simple, non-nested var descriptors.  These are comprised of single types, as opposed to 
+// Simple, non-nested var descriptors.  These are comprised of single types, as opposed to
 // referring to another state descriptor.
 //
-class plSimpleVarDescriptor : public plVarDescriptor
-{
+class plSimpleVarDescriptor : public plVarDescriptor {
 protected:
     Type    fAtomicType;            // base type (it. quaternion == kFloat)
     int     fAtomicCount;           // computed from type in .sdl (ie. quaternion == 4)
 public:
     plSimpleVarDescriptor();
     virtual ~plSimpleVarDescriptor() {  }
-        
-    plSimpleVarDescriptor*  GetAsSimpleVarDescriptor() { return this; }
-    plSDVarDescriptor* GetAsSDVarDescriptor() { return nil; }
-    const plSimpleVarDescriptor*    GetAsSimpleVarDescriptor() const { return this; }
-    const plSDVarDescriptor* GetAsSDVarDescriptor() const { return nil; }
+
+    plSimpleVarDescriptor*  GetAsSimpleVarDescriptor() {
+        return this;
+    }
+    plSDVarDescriptor* GetAsSDVarDescriptor() {
+        return nil;
+    }
+    const plSimpleVarDescriptor*    GetAsSimpleVarDescriptor() const {
+        return this;
+    }
+    const plSDVarDescriptor* GetAsSDVarDescriptor() const {
+        return nil;
+    }
 
     void CopyFrom(const plSimpleVarDescriptor* v);
-    void CopyFrom(const plVarDescriptor* v) { plVarDescriptor::CopyFrom(v); }   // lame compiler
+    void CopyFrom(const plVarDescriptor* v) {
+        plVarDescriptor::CopyFrom(v);    // lame compiler
+    }
 
     // getters
     int     GetSize() const;
     int     GetAtomicSize() const;      // size of one item in bytes (regardless of count)
-    Type    GetAtomicType() const       { return fAtomicType; }
-    int     GetAtomicCount() const      { return fAtomicCount; }    
-    
+    Type    GetAtomicType() const       {
+        return fAtomicType;
+    }
+    int     GetAtomicCount() const      {
+        return fAtomicCount;
+    }
+
     // setters
     bool    SetType(const plString& type);
-    void    SetType(Type t) { plVarDescriptor::SetType(t); }    // for lame compiler
-    void    SetAtomicType(Type t) { fAtomicType=t; }    
+    void    SetType(Type t) {
+        plVarDescriptor::SetType(t);    // for lame compiler
+    }
+    void    SetAtomicType(Type t) {
+        fAtomicType = t;
+    }
 
     // IO
-    virtual bool    Read(hsStream* s);  
+    virtual bool    Read(hsStream* s);
     virtual void    Write(hsStream* s) const;
 };
 
@@ -185,29 +245,42 @@ public:
 // A var descriptor which references another state descriptor.
 //
 class plStateDescriptor;
-class plSDVarDescriptor : public plVarDescriptor
-{
+class plSDVarDescriptor : public plVarDescriptor {
 protected:
-    plStateDescriptor* fStateDesc;      
+    plStateDescriptor* fStateDesc;
 public:
-    plSDVarDescriptor(plStateDescriptor* sd=nil) : fStateDesc(sd) { }
+    plSDVarDescriptor(plStateDescriptor* sd = nil) : fStateDesc(sd) { }
 
-    plSimpleVarDescriptor*  GetAsSimpleVarDescriptor() { return nil; }
-    plSDVarDescriptor* GetAsSDVarDescriptor() { return this; }
-    const plSimpleVarDescriptor*    GetAsSimpleVarDescriptor() const { return nil; }
-    const plSDVarDescriptor* GetAsSDVarDescriptor() const { return this; }
+    plSimpleVarDescriptor*  GetAsSimpleVarDescriptor() {
+        return nil;
+    }
+    plSDVarDescriptor* GetAsSDVarDescriptor() {
+        return this;
+    }
+    const plSimpleVarDescriptor*    GetAsSimpleVarDescriptor() const {
+        return nil;
+    }
+    const plSDVarDescriptor* GetAsSDVarDescriptor() const {
+        return this;
+    }
 
     // getters
-    plStateDescriptor* GetStateDescriptor() const { return fStateDesc; }
+    plStateDescriptor* GetStateDescriptor() const {
+        return fStateDesc;
+    }
 
     // setters
-    void SetStateDesc(plStateDescriptor* sd) { fStateDesc=sd; }
+    void SetStateDesc(plStateDescriptor* sd) {
+        fStateDesc = sd;
+    }
 
     void CopyFrom(const plSDVarDescriptor* v);
-    void CopyFrom(const plVarDescriptor* v) { plVarDescriptor::CopyFrom(v); }   // lame compiler
+    void CopyFrom(const plVarDescriptor* v) {
+        plVarDescriptor::CopyFrom(v);    // lame compiler
+    }
 
     // IO
-    bool    Read(hsStream* s);  
+    bool    Read(hsStream* s);
     void    Write(hsStream* s) const;
 };
 
@@ -217,11 +290,10 @@ public:
 // These descriptors are defined in a user-created .sdl file.
 //
 class plKey;
-class plStateDescriptor
-{
+class plStateDescriptor {
 private:
     static const uint8_t kVersion;        // for Read/Write format
-    typedef std::vector<plVarDescriptor*> VarsList; 
+    typedef std::vector<plVarDescriptor*> VarsList;
     VarsList fVarsList;
     int fVersion;
     plString fName;
@@ -230,25 +302,43 @@ private:
     void IDeInit();
 public:
     plStateDescriptor() : fVersion(-1) {}
-    ~plStateDescriptor(); 
+    ~plStateDescriptor();
 
     // getters
-    plString GetName() const { return fName; }
-    int GetNumVars() const { return fVarsList.size(); }
-    plVarDescriptor* GetVar(int i) const { return fVarsList[i]; }
-    int GetVersion() const { return fVersion; }
-    plFileName GetFilename() const { return fFilename; }
+    plString GetName() const {
+        return fName;
+    }
+    int GetNumVars() const {
+        return fVarsList.size();
+    }
+    plVarDescriptor* GetVar(int i) const {
+        return fVarsList[i];
+    }
+    int GetVersion() const {
+        return fVersion;
+    }
+    plFileName GetFilename() const {
+        return fFilename;
+    }
 
     // setters
-    void SetVersion(int v) { fVersion=v; }
-    void SetName(const plString& n) { fName=n; }
-    void AddVar(plVarDescriptor* v) { fVarsList.push_back(v); }
-    void SetFilename(const plFileName& n) { fFilename=n;}
+    void SetVersion(int v) {
+        fVersion = v;
+    }
+    void SetName(const plString& n) {
+        fName = n;
+    }
+    void AddVar(plVarDescriptor* v) {
+        fVarsList.push_back(v);
+    }
+    void SetFilename(const plFileName& n) {
+        fFilename = n;
+    }
 
-    plVarDescriptor* FindVar(const plString& name, int* idx=nil) const;
+    plVarDescriptor* FindVar(const plString& name, int* idx = nil) const;
 
     // IO
-    bool Read(hsStream* s); 
+    bool Read(hsStream* s);
     void Write(hsStream* s) const;
 };
 

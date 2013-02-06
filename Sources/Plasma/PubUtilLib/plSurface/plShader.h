@@ -55,29 +55,24 @@ class hsMatrix;
 struct hsColorRGBA;
 class hsGDeviceRef;
 
-class plFloat4
-{
+class plFloat4 {
 public:
     float   f[4];
 };
 
-class plFloat44
-{
+class plFloat44 {
 public:
     float   m[4][4];
 };
 
-class plFloat34
-{
+class plFloat34 {
 public:
     float   m[3][4];
 };
 
-class plShaderConst
-{
+class plShaderConst {
 public:
-    union
-    {
+    union {
         struct {
             float       r;
             float       g;
@@ -98,8 +93,10 @@ public:
         };
         float           fArray[4];
     };
-    
-    float& operator[](int i) { return fArray[i]; }
+
+    float& operator[](int i) {
+        return fArray[i];
+    }
 
     void Read(hsStream* s);
     void Write(hsStream* s);
@@ -107,11 +104,9 @@ public:
 
 class plShaderDecl;
 
-class plPipeConst
-{
+class plPipeConst {
 public:
-    enum Type
-    {
+    enum Type {
         kLocalToNDC,            // 4x4
         kCameraToNDC,           // 4x4
         kWorldToNDC,            // 4x4
@@ -175,8 +170,7 @@ public:
 
 typedef plPipeConst::Type plPipeConstType;
 
-class plShader : public hsKeyedObject
-{
+class plShader : public hsKeyedObject {
 public:
     enum {
         kValidated          = 0x1,
@@ -204,18 +198,28 @@ public:
     plShader();
     virtual ~plShader();
 
-    CLASSNAME_REGISTER( plShader );
-    GETINTERFACE_ANY( plShader, hsKeyedObject );
+    CLASSNAME_REGISTER(plShader);
+    GETINTERFACE_ANY(plShader, hsKeyedObject);
 
     // Read and write
     virtual void            Read(hsStream* s, hsResMgr* mgr);
     virtual void            Write(hsStream* s, hsResMgr* mgr);
 
-    void                    SetNumConsts(int cnt) { fConsts.SetCount(cnt); }
-    uint32_t                  GetNumConsts() const { return fConsts.GetCount(); }
-    plShaderConst&          GetConst(int i) { return fConsts[i]; }
-    const plShaderConst&    GetConst(int i) const { return fConsts[i]; }
-    void                    SetConst(int i, const plShaderConst& c) { fConsts[i] = c; }
+    void                    SetNumConsts(int cnt) {
+        fConsts.SetCount(cnt);
+    }
+    uint32_t                  GetNumConsts() const {
+        return fConsts.GetCount();
+    }
+    plShaderConst&          GetConst(int i) {
+        return fConsts[i];
+    }
+    const plShaderConst&    GetConst(int i) const {
+        return fConsts[i];
+    }
+    void                    SetConst(int i, const plShaderConst& c) {
+        fConsts[i] = c;
+    }
 
     plFloat44               GetMatrix(int i) const; // Will untranspose
     plFloat44               GetMatrix3(int i) const; // Will untranspose
@@ -236,47 +240,96 @@ public:
     void                    SetMatrix24(int i, const hsMatrix44& xfm);
     void                    SetColor(int i, const hsColorRGBA& col);
     void                    SetVector(int i, const hsScalarTriple& vec); /* Doesn't touch .fW */
-    void                    SetVectorW(int i, const hsScalarTriple& vec, float w=1.f) { SetVector(i, vec.fX, vec.fY, vec.fZ, w); }
+    void                    SetVectorW(int i, const hsScalarTriple& vec, float w = 1.f) {
+        SetVector(i, vec.fX, vec.fY, vec.fZ, w);
+    }
     void                    SetVector(int i, float x, float y, float z, float w);
     void                    SetFloat(int i, int chan, float v);
     void                    SetFloat4(int i, const float* const f);
 
-    const plShaderDecl*     GetDecl() const { return fDecl; }
+    const plShaderDecl*     GetDecl() const {
+        return fDecl;
+    }
 
     void                    SetDecl(const plShaderDecl* p); // will reference (pointer copy)
     void                    SetDecl(plShaderID::ID id);
 
-    bool                    IsValid() const { return !(fFlags & kInvalid); }
-    void                    Invalidate() const { fFlags |= kInvalid; }
+    bool                    IsValid() const {
+        return !(fFlags & kInvalid);
+    }
+    void                    Invalidate() const {
+        fFlags |= kInvalid;
+    }
 
-    bool                    IsPixelShader() const { return 0 != (fFlags & kIsPixel); }
-    bool                    IsVertexShader() const { return !IsPixelShader(); }
-    void                    SetIsPixelShader(bool on) { if(on)fFlags |= kIsPixel; else fFlags &= ~kIsPixel; }
+    bool                    IsPixelShader() const {
+        return 0 != (fFlags & kIsPixel);
+    }
+    bool                    IsVertexShader() const {
+        return !IsPixelShader();
+    }
+    void                    SetIsPixelShader(bool on) {
+        if (on) {
+            fFlags |= kIsPixel;
+        } else {
+            fFlags &= ~kIsPixel;
+        }
+    }
 
     // These are only for use by the pipeline.
-    hsGDeviceRef*           GetDeviceRef() const { return fDeviceRef; }
+    hsGDeviceRef*           GetDeviceRef() const {
+        return fDeviceRef;
+    }
     void                    SetDeviceRef(hsGDeviceRef* ref) const;
 
-    void*                   GetConstBasePtr() const { return fConsts.GetCount() ? &fConsts[0] : nil; }
+    void*                   GetConstBasePtr() const {
+        return fConsts.GetCount() ? &fConsts[0] : nil;
+    }
 
-    void                    CopyConsts(const plShader* src) { fConsts = src->fConsts; }
+    void                    CopyConsts(const plShader* src) {
+        fConsts = src->fConsts;
+    }
 
-    void                    SetInputFormat(uint8_t format) { fInput = format; }
-    void                    SetOutputFormat(uint8_t format) { fOutput = format; }
+    void                    SetInputFormat(uint8_t format) {
+        fInput = format;
+    }
+    void                    SetOutputFormat(uint8_t format) {
+        fOutput = format;
+    }
 
-    uint8_t                   GetInputFormat() const { return fInput; }
-    uint8_t                   GetOutputFormat() const { return fOutput; }
+    uint8_t                   GetInputFormat() const {
+        return fInput;
+    }
+    uint8_t                   GetOutputFormat() const {
+        return fOutput;
+    }
 
-    uint32_t                  GetNumPipeConsts() const { return fPipeConsts.GetCount(); }
-    const plPipeConst&      GetPipeConst(int i) const { return fPipeConsts[i]; }
-    plPipeConst::Type       GetPipeConstType(int i) const { return fPipeConsts[i].fType; }
-    uint16_t                  GetPipeConstReg(int i) const { return fPipeConsts[i].fReg; }
+    uint32_t                  GetNumPipeConsts() const {
+        return fPipeConsts.GetCount();
+    }
+    const plPipeConst&      GetPipeConst(int i) const {
+        return fPipeConsts[i];
+    }
+    plPipeConst::Type       GetPipeConstType(int i) const {
+        return fPipeConsts[i].fType;
+    }
+    uint16_t                  GetPipeConstReg(int i) const {
+        return fPipeConsts[i].fReg;
+    }
 
     void                    SetNumPipeConsts(int n);
-    void                    SetPipeConst(int i, const plPipeConst& c) { fPipeConsts[i] = c; }
-    void                    SetPipeConst(int i, plPipeConstType t, uint16_t r) { fPipeConsts[i].fType = t; fPipeConsts[i].fReg = r; }
-    void                    SetPipeConstType(int i, plPipeConstType t) { fPipeConsts[i].fType = t; }
-    void                    SetPipeConstReg(int i, uint16_t r) { fPipeConsts[i].fReg = r; }
+    void                    SetPipeConst(int i, const plPipeConst& c) {
+        fPipeConsts[i] = c;
+    }
+    void                    SetPipeConst(int i, plPipeConstType t, uint16_t r) {
+        fPipeConsts[i].fType = t;
+        fPipeConsts[i].fReg = r;
+    }
+    void                    SetPipeConstType(int i, plPipeConstType t) {
+        fPipeConsts[i].fType = t;
+    }
+    void                    SetPipeConstReg(int i, uint16_t r) {
+        fPipeConsts[i].fReg = r;
+    }
 };
 
 #endif // plShader_inc

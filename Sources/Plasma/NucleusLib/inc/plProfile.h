@@ -135,11 +135,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plProfileLaps;
 
-class plProfileBase
-{
+class plProfileBase {
 public:
-    enum
-    {
+    enum {
         kDisplayCount           = 0x1,
         kDisplayTime            = 0x2,
         kDisplayMem             = 0x4,
@@ -181,26 +179,39 @@ public:
 
     uint32_t GetValue();
 
-    void PrintValue(char* buf, bool printType=true);
-    void PrintAvg(char* buf, bool printType=true);
-    void PrintMax(char* buf, bool printType=true);
+    void PrintValue(char* buf, bool printType = true);
+    void PrintAvg(char* buf, bool printType = true);
+    void PrintMax(char* buf, bool printType = true);
 
-    uint32_t GetTimerSamples() const { return fTimerSamples; }
+    uint32_t GetTimerSamples() const {
+        return fTimerSamples;
+    }
 
-    const char* GetName() { return fName; }
+    const char* GetName() {
+        return fName;
+    }
 
-    void SetActive(bool s) { fActive = s; }
+    void SetActive(bool s) {
+        fActive = s;
+    }
 
-    void Stop() { fRunning = false; }
-    void Start() { fRunning = true; }
+    void Stop() {
+        fRunning = false;
+    }
+    void Start() {
+        fRunning = true;
+    }
 
-    uint8_t GetDisplayFlags() const { return fDisplayFlags; }
+    uint8_t GetDisplayFlags() const {
+        return fDisplayFlags;
+    }
 
-    void ResetMax() { fMax = 0; }
+    void ResetMax() {
+        fMax = 0;
+    }
 };
 
-class plProfileVar : public plProfileBase
-{
+class plProfileVar : public plProfileBase {
 protected:
     const char* fGroup;
     plProfileLaps* fLaps;
@@ -210,43 +221,75 @@ protected:
 
     void IBeginTiming();
     void IEndTiming();
-    
-    void IBeginLap(const char* lapName); 
+
+    void IBeginLap(const char* lapName);
     void IEndLap(const char* lapName);
 
 public:
     // Name is the timer name. Each timer group gets its own plStatusLog
-    plProfileVar(const char *name, const char* group, uint8_t flags);
+    plProfileVar(const char* name, const char* group, uint8_t flags);
     ~plProfileVar();
 
     // For timing
-    void BeginTiming() { if (fActive && fRunning) IBeginTiming(); }
-    void EndTiming() { if (fActive && fRunning) IEndTiming(); }
+    void BeginTiming() {
+        if (fActive && fRunning) {
+            IBeginTiming();
+        }
+    }
+    void EndTiming() {
+        if (fActive && fRunning) {
+            IEndTiming();
+        }
+    }
 
-    void NewMem(uint32_t memAmount) { fValue += memAmount; }
-    void DelMem(uint32_t memAmount) { fValue -= memAmount; }
+    void NewMem(uint32_t memAmount) {
+        fValue += memAmount;
+    }
+    void DelMem(uint32_t memAmount) {
+        fValue -= memAmount;
+    }
 
     // For Counting
-    void Inc(int i = 1) { fValue += i;}
-    void Dec(int i = 1) { fValue -= i;}
+    void Inc(int i = 1) {
+        fValue += i;
+    }
+    void Dec(int i = 1) {
+        fValue -= i;
+    }
 
-    void Set(uint32_t value) { fValue = value; }
+    void Set(uint32_t value) {
+        fValue = value;
+    }
 
-    // 
+    //
     // For multiple timings per frame of the same thing ie. Each particle system
     //
     // Will output to log like
     // Timername : lapCnt: (lapName) : 3.22 msec
     //
-    void BeginLap(const char* lapName) { if(fActive && fRunning) IBeginLap(lapName); }
-    void EndLap(const char* lapName) { if(fActive && fRunning) IEndLap(lapName); }
-    
-    const char* GetGroup() { return fGroup; }
+    void BeginLap(const char* lapName) {
+        if (fActive && fRunning) {
+            IBeginLap(lapName);
+        }
+    }
+    void EndLap(const char* lapName) {
+        if (fActive && fRunning) {
+            IEndLap(lapName);
+        }
+    }
 
-    plProfileLaps* GetLaps() { return fLaps; }
+    const char* GetGroup() {
+        return fGroup;
+    }
+
+    plProfileLaps* GetLaps() {
+        return fLaps;
+    }
 
     // Enable Lap Sampling
-    void SetLapsActive(bool s) { fLapsActive = s; }
+    void SetLapsActive(bool s) {
+        fLapsActive = s;
+    }
 };
 
 #endif // plProfile_h_inc

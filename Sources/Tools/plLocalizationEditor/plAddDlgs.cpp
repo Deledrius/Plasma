@@ -55,8 +55,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 extern HINSTANCE gInstance;
 
 // very simple subclass for edit controls (and combo boxes) so that they only accept alphanumeric values
-class AlphaNumericEditCtrl
-{
+class AlphaNumericEditCtrl {
     int fCtrlID;
     HWND fOwner, fEditBox;
     LONG_PTR fPrevProc;
@@ -78,15 +77,14 @@ void AlphaNumericEditCtrl::Setup(int ctrlID, HWND owner, bool comboBox)
     fOwner = owner;
 
     // if we're a combo box, we need to subclass the edit control, not the combo box
-    if (comboBox)
-    {
+    if (comboBox) {
         COMBOBOXINFO cbinfo;
         cbinfo.cbSize = sizeof(COMBOBOXINFO);
         GetComboBoxInfo(GetDlgItem(fOwner, fCtrlID), &cbinfo);
         fEditBox = cbinfo.hwndItem;
-    }
-    else
+    } else {
         fEditBox = GetDlgItem(fOwner, fCtrlID);
+    }
 
     // subclass the edit box so we can filter input (don't ask me why we have to double cast the
     // function pointer to get rid of the compiler warning)
@@ -99,23 +97,24 @@ void AlphaNumericEditCtrl::Setup(int ctrlID, HWND owner, bool comboBox)
 LRESULT CALLBACK AlphaNumericEditCtrl::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     int ctrlID = GetDlgCtrlID(hWnd);
-    if (editBoxMap.find(ctrlID) == editBoxMap.end()) // control ID doesn't exist, so it's probably a combo boxes' edit ctrl
-        ctrlID = GetDlgCtrlID(GetParent(hWnd)); // so grab the parent's ID number instead
-    switch (message)
-    {
-    case WM_CHAR:
-        {
+
+    if (editBoxMap.find(ctrlID) == editBoxMap.end()) { // control ID doesn't exist, so it's probably a combo boxes' edit ctrl
+        ctrlID = GetDlgCtrlID(GetParent(hWnd));    // so grab the parent's ID number instead
+    }
+
+    switch (message) {
+    case WM_CHAR: {
             AlphaNumericEditCtrl editBox = editBoxMap[ctrlID];
             char theChar = (char)wParam;
 
             // we only accept 0-9, a-z, A-Z, or backspace
-            if ((theChar < '0' || theChar > '9') && (theChar < 'a' || theChar > 'z') && (theChar < 'A' || theChar >'Z') && !(theChar == VK_BACK))
-            {
+            if ((theChar < '0' || theChar > '9') && (theChar < 'a' || theChar > 'z') && (theChar < 'A' || theChar > 'Z') && !(theChar == VK_BACK)) {
                 MessageBeep(-1); // alert the user
                 return FALSE; // and make sure the default handler doesn't get it
             }
         }
     }
+
     // Any messages we don't process must be passed onto the original window function
     return CallWindowProc((WNDPROC)editBoxMap[ctrlID].fPrevProc, hWnd, message, wParam, lParam);
 }
@@ -125,27 +124,24 @@ BOOL CALLBACK plAddElementDlg::IDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 {
     static plAddElementDlg* pthis = NULL;
 
-    switch (msg)
-    {
+    switch (msg) {
     case WM_INITDIALOG:
         pthis = (plAddElementDlg*)lParam;
-        if (!pthis->IInitDlg(hDlg))
+
+        if (!pthis->IInitDlg(hDlg)) {
             EndDialog(hDlg, 0);
+        }
+
         return FALSE;
 
     case WM_COMMAND:
-        if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDOK)
-        {
+        if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDOK) {
             EndDialog(hDlg, 1);
             return TRUE;
-        }
-        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDCANCEL)
-        {
+        } else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDCANCEL) {
             EndDialog(hDlg, 0);
             return TRUE;
-        }
-        else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_PARENTAGE)
-        {
+        } else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_PARENTAGE) {
             wchar_t buff[256];
             // we do this whole get sel, get item because get text won't return the updated text
             int index = (int)SendMessage(GetDlgItem(hDlg, IDC_PARENTAGE), CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
@@ -154,18 +150,14 @@ BOOL CALLBACK plAddElementDlg::IDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPAR
             pthis->fAgeName = plString::FromWchar(buff);
             pthis->fAgeChanged = true;
             pthis->IUpdateDlg(hDlg);
-        }
-        else if (HIWORD(wParam) == CBN_EDITCHANGE && LOWORD(wParam) == IDC_PARENTAGE)
-        {
+        } else if (HIWORD(wParam) == CBN_EDITCHANGE && LOWORD(wParam) == IDC_PARENTAGE) {
             wchar_t buff[256];
             GetDlgItemTextW(hDlg, IDC_PARENTAGE, buff, 256);
 
             pthis->fAgeName = plString::FromWchar(buff);
             pthis->fAgeChanged = true;
             pthis->IUpdateDlg(hDlg, false);
-        }
-        else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_PARENTSET)
-        {
+        } else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_PARENTSET) {
             wchar_t buff[256];
             // we do this whole get sel, get item because get text won't return the updated text
             int index = (int)SendMessage(GetDlgItem(hDlg, IDC_PARENTSET), CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
@@ -173,34 +165,32 @@ BOOL CALLBACK plAddElementDlg::IDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 
             pthis->fSetName = plString::FromWchar(buff);
             pthis->IUpdateDlg(hDlg);
-        }
-        else if (HIWORD(wParam) == CBN_EDITCHANGE && LOWORD(wParam) == IDC_PARENTSET)
-        {
+        } else if (HIWORD(wParam) == CBN_EDITCHANGE && LOWORD(wParam) == IDC_PARENTSET) {
             wchar_t buff[256];
             GetDlgItemTextW(hDlg, IDC_PARENTSET, buff, 256);
 
             pthis->fSetName = plString::FromWchar(buff);
             pthis->IUpdateDlg(hDlg, false);
-        }
-        else if (HIWORD(wParam) == EN_UPDATE && LOWORD(wParam) == IDC_ELEMENTNAME)
-        {
+        } else if (HIWORD(wParam) == EN_UPDATE && LOWORD(wParam) == IDC_ELEMENTNAME) {
             wchar_t buff[256];
             GetDlgItemTextW(hDlg, IDC_ELEMENTNAME, buff, 256);
             pthis->fElementName = plString::FromWchar(buff);
 
             pthis->IUpdateDlg(hDlg);
         }
+
         break;
 
     case WM_SYSCOMMAND:
-        switch (wParam)
-        {
+        switch (wParam) {
         case SC_CLOSE:
             EndDialog(hDlg, 0);
             return TRUE;
         }
+
         break;
     }
+
     return FALSE;
 }
 
@@ -210,11 +200,12 @@ bool plAddElementDlg::IInitDlg(HWND hDlg)
     std::vector<plString> ageNames = pfLocalizationDataMgr::Instance().GetAgeList();
 
     // add the age names to the list
-    for (int i = 0; i < ageNames.size(); i++)
+    for (int i = 0; i < ageNames.size(); i++) {
         SendMessage(listCtrl, CB_ADDSTRING, (WPARAM)0, (LPARAM)ageNames[i].c_str());
+    }
 
     // select the age we were given
-    SendMessage(listCtrl, CB_SELECTSTRING, (WPARAM)-1, (LPARAM)fAgeName.c_str());
+    SendMessage(listCtrl, CB_SELECTSTRING, (WPARAM) - 1, (LPARAM)fAgeName.c_str());
 
     AlphaNumericEditCtrl ageCtrl, setCtrl, subCtrl;
     ageCtrl.Setup(IDC_PARENTAGE, hDlg, true);
@@ -232,32 +223,36 @@ void plAddElementDlg::IUpdateDlg(HWND hDlg, bool setFocus)
     plString pathStr = plString::Format("Path: %s.%s.%s", fAgeName.c_str(), fSetName.c_str(), fElementName.c_str());
     SetDlgItemTextW(hDlg, IDC_PATH, pathStr.ToWchar());
 
-    if (fAgeChanged) // we only update this if the age changed (saves time and prevents weird bugs, like typing backwards)
-    {
+    if (fAgeChanged) { // we only update this if the age changed (saves time and prevents weird bugs, like typing backwards)
         // now add the sets
         HWND listCtrl = GetDlgItem(hDlg, IDC_PARENTSET);
         SendMessage(listCtrl, CB_RESETCONTENT, (WPARAM)0, (LPARAM)0);
         std::vector<plString> setNames = pfLocalizationDataMgr::Instance().GetSetList(fAgeName);
 
         // add the set names to the list
-        for (int i = 0; i < setNames.size(); i++)
+        for (int i = 0; i < setNames.size(); i++) {
             SendMessage(listCtrl, CB_ADDSTRING, (WPARAM)0, (LPARAM)setNames[i].c_str());
+        }
 
         // select the set we currently have
-        int ret = (int)SendMessage(listCtrl, CB_SELECTSTRING, (WPARAM)-1, (LPARAM)fSetName.c_str());
-        if (ret == CB_ERR) // couldn't find the string, so just set it as the current string in the edit box
+        int ret = (int)SendMessage(listCtrl, CB_SELECTSTRING, (WPARAM) - 1, (LPARAM)fSetName.c_str());
+
+        if (ret == CB_ERR) { // couldn't find the string, so just set it as the current string in the edit box
             SetDlgItemTextW(hDlg, IDC_PARENTSET, fSetName.ToWchar());
+        }
 
         fAgeChanged = false;
     }
 
-    if (!fSetName.IsEmpty() && setFocus)
+    if (!fSetName.IsEmpty() && setFocus) {
         SetFocus(GetDlgItem(hDlg, IDC_ELEMENTNAME));
+    }
 
-    if (!fSetName.IsEmpty() && fElementName.IsEmpty())
+    if (!fSetName.IsEmpty() && fElementName.IsEmpty()) {
         EnableWindow(GetDlgItem(hDlg, IDOK), TRUE);
-    else
+    } else {
         EnableWindow(GetDlgItem(hDlg, IDOK), FALSE);
+    }
 }
 
 plAddElementDlg::plAddElementDlg(plString parentPath)
@@ -271,7 +266,7 @@ plAddElementDlg::plAddElementDlg(plString parentPath)
 bool plAddElementDlg::DoPick(HWND parent)
 {
     INT_PTR ret = DialogBoxParam(gInstance, MAKEINTRESOURCE(IDD_ADDELEMENT),
-        parent, IDlgProc, (LPARAM)this);
+                                 parent, IDlgProc, (LPARAM)this);
 
     editBoxMap.clear();
 
@@ -283,27 +278,24 @@ BOOL CALLBACK plAddLocalizationDlg::IDlgProc(HWND hDlg, UINT msg, WPARAM wParam,
 {
     static plAddLocalizationDlg* pthis = NULL;
 
-    switch (msg)
-    {
+    switch (msg) {
     case WM_INITDIALOG:
         pthis = (plAddLocalizationDlg*)lParam;
-        if (!pthis->IInitDlg(hDlg))
+
+        if (!pthis->IInitDlg(hDlg)) {
             EndDialog(hDlg, 0);
+        }
+
         return FALSE;
 
     case WM_COMMAND:
-        if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDOK)
-        {
+        if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDOK) {
             EndDialog(hDlg, 1);
             return TRUE;
-        }
-        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDCANCEL)
-        {
+        } else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDCANCEL) {
             EndDialog(hDlg, 0);
             return TRUE;
-        }
-        else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_LANGUAGE)
-        {
+        } else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_LANGUAGE) {
             wchar_t buff[256];
             // we do this whole get sel, get item because get text won't return the updated text
             int index = (int)SendMessage(GetDlgItem(hDlg, IDC_LANGUAGE), CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
@@ -312,17 +304,19 @@ BOOL CALLBACK plAddLocalizationDlg::IDlgProc(HWND hDlg, UINT msg, WPARAM wParam,
             pthis->fLanguageName = plString::FromWchar(buff);
             pthis->IUpdateDlg(hDlg);
         }
+
         break;
 
     case WM_SYSCOMMAND:
-        switch (wParam)
-        {
+        switch (wParam) {
         case SC_CLOSE:
             EndDialog(hDlg, 0);
             return TRUE;
         }
+
         break;
     }
+
     return FALSE;
 }
 
@@ -331,10 +325,9 @@ std::vector<plString> IGetAllLanguageNames()
     int numLocales = plLocalization::GetNumLocales();
     std::vector<plString> retVal;
 
-    for (int curLocale = 0; curLocale <= numLocales; curLocale++)
-    {
-        const char *name = plLocalization::GetLanguageName((plLocalization::Language)curLocale);
-        wchar_t *wName = hsStringToWString(name);
+    for (int curLocale = 0; curLocale <= numLocales; curLocale++) {
+        const char* name = plLocalization::GetLanguageName((plLocalization::Language)curLocale);
+        wchar_t* wName = hsStringToWString(name);
         retVal.push_back(plString::FromWchar(wName));
         delete [] wName;
     }
@@ -351,12 +344,10 @@ bool plAddLocalizationDlg::IInitDlg(HWND hDlg)
     existingLanguages = pfLocalizationDataMgr::Instance().GetLanguages(fAgeName, fSetName, fElementName);
 
     std::vector<plString> missingLanguages = IGetAllLanguageNames();
-    for (int i = 0; i < existingLanguages.size(); i++) // remove all languages we already have
-    {
-        for (int j = 0; j < missingLanguages.size(); j++)
-        {
-            if (missingLanguages[j] == existingLanguages[i])
-            {
+
+    for (int i = 0; i < existingLanguages.size(); i++) { // remove all languages we already have
+        for (int j = 0; j < missingLanguages.size(); j++) {
+            if (missingLanguages[j] == existingLanguages[i]) {
                 missingLanguages.erase(missingLanguages.begin() + j);
                 j--;
             }
@@ -364,9 +355,9 @@ bool plAddLocalizationDlg::IInitDlg(HWND hDlg)
     }
 
     HWND listCtrl = GetDlgItem(hDlg, IDC_LANGUAGE);
+
     // see if any languages are missing
-    if (missingLanguages.size() == 0)
-    {
+    if (missingLanguages.size() == 0) {
         // none are missing, so disable the control
         EnableWindow(listCtrl, FALSE);
         IUpdateDlg(hDlg);
@@ -374,8 +365,9 @@ bool plAddLocalizationDlg::IInitDlg(HWND hDlg)
     }
 
     // add the missing languages to the list
-    for (int i = 0; i < missingLanguages.size(); i++)
+    for (int i = 0; i < missingLanguages.size(); i++) {
         SendMessage(listCtrl, CB_ADDSTRING, (WPARAM)0, (LPARAM)missingLanguages[i].c_str());
+    }
 
     // select the first language in the list
     SendMessage(listCtrl, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
@@ -390,10 +382,11 @@ bool plAddLocalizationDlg::IInitDlg(HWND hDlg)
 
 void plAddLocalizationDlg::IUpdateDlg(HWND hDlg)
 {
-    if (!fLanguageName.IsEmpty())
+    if (!fLanguageName.IsEmpty()) {
         EnableWindow(GetDlgItem(hDlg, IDOK), TRUE);
-    else
+    } else {
         EnableWindow(GetDlgItem(hDlg, IDOK), FALSE);
+    }
 }
 
 plAddLocalizationDlg::plAddLocalizationDlg(plString parentPath)
@@ -407,7 +400,7 @@ plAddLocalizationDlg::plAddLocalizationDlg(plString parentPath)
 bool plAddLocalizationDlg::DoPick(HWND parent)
 {
     INT_PTR ret = DialogBoxParam(gInstance, MAKEINTRESOURCE(IDD_ADDLOCALIZATION),
-        parent, IDlgProc, (LPARAM)this);
+                                 parent, IDlgProc, (LPARAM)this);
 
     return (ret != 0);
 }

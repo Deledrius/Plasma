@@ -48,7 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 // Quaternion class.
 // For conversion to and from euler angles, see hsEuler.cpp,h.
-// 
+//
 
 //
 // Construct quat from angle (in radians) and axis of rotation
@@ -57,18 +57,18 @@ hsQuat::hsQuat(float rad, const hsVector3* axis)
 {
     // hsAssert(rad >= -M_PI && rad <= M_PI, "Quat: Angle should be between -PI and PI");
 
-    fW = cos(rad*0.5f);
+    fW = cos(rad * 0.5f);
 
-    float s = sin(rad*0.5f);
-    fX = axis->fX*s;
-    fY = axis->fY*s;
-    fZ = axis->fZ*s;
+    float s = sin(rad * 0.5f);
+    fX = axis->fX * s;
+    fY = axis->fY * s;
+    fZ = axis->fZ * s;
 }
 
 hsQuat hsQuat::Inverse() const
 {
     hsQuat q2 = Conjugate();
-    float msInv = 1.0f/q2.MagnitudeSquared();
+    float msInv = 1.0f / q2.MagnitudeSquared();
     return (q2 * msInv);
 }
 
@@ -82,33 +82,33 @@ hsPoint3 hsQuat::Rotate(const hsScalarTriple* v) const
     return hsPoint3(res.fX, res.fY, res.fZ);
 }
 
-void hsQuat::SetAngleAxis(const float rad, const hsVector3 &axis)
+void hsQuat::SetAngleAxis(const float rad, const hsVector3& axis)
 {
-    fW = cos(rad*0.5f);
+    fW = cos(rad * 0.5f);
 
-    float s = sin(rad*0.5f);
-    fX = axis.fX*s;
-    fY = axis.fY*s;
-    fZ = axis.fZ*s; 
+    float s = sin(rad * 0.5f);
+    fX = axis.fX * s;
+    fY = axis.fY * s;
+    fZ = axis.fZ * s;
 }
 
 //
 // Might want to Normalize before calling this
 //
-void hsQuat::GetAngleAxis(float *rad, hsVector3 *axis) const
+void hsQuat::GetAngleAxis(float* rad, hsVector3* axis) const
 {
     hsAssert((fW >= -1) && (fW <= 1), "Invalid acos argument");
     float ac = acos(fW);
     *rad = 2.0f * ac;
 
     float s = sin(ac);
-    if (s != 0.0f)
-    {
-        float invS = 1.0f/s;
-        axis->Set(fX*invS, fY*invS, fZ*invS);
+
+    if (s != 0.0f) {
+        float invS = 1.0f / s;
+        axis->Set(fX * invS, fY * invS, fZ * invS);
+    } else {
+        axis->Set(0, 0, 0);
     }
-    else
-        axis->Set(0,0,0);
 }
 
 //
@@ -116,7 +116,7 @@ void hsQuat::GetAngleAxis(float *rad, hsVector3 *axis) const
 //
 float hsQuat::MagnitudeSquared()
 {
-    return (fX*fX + fY*fY + fZ*fZ + fW*fW);
+    return (fX * fX + fY * fY + fZ * fZ + fW * fW);
 }
 
 //
@@ -132,7 +132,7 @@ float hsQuat::Magnitude()
 //
 void hsQuat::Normalize()
 {
-    float invMag = 1.0f/Magnitude();
+    float invMag = 1.0f / Magnitude();
     fX *= invMag;
     fY *= invMag;
     fZ *= invMag;
@@ -146,10 +146,12 @@ void hsQuat::NormalizeIfNeeded()
 {
 
     float magSquared = MagnitudeSquared();
-    if (magSquared == 1.0f)
-        return;
 
-    float invMag = 1.0f/sqrt(magSquared);
+    if (magSquared == 1.0f) {
+        return;
+    }
+
+    float invMag = 1.0f / sqrt(magSquared);
     fX *= invMag;
     fY *= invMag;
     fZ *= invMag;
@@ -159,66 +161,66 @@ void hsQuat::NormalizeIfNeeded()
 //
 // This is for a RHS.
 // The quat should be normalized first.
-// 
-void hsQuat::MakeMatrix(hsMatrix44 *mat) const
+//
+void hsQuat::MakeMatrix(hsMatrix44* mat) const
 {
     // mf horse - this is transpose of both what
     // Gems says and what i'm expecting to come
     // out of it, so i'm flipping it.
-    mat->fMap[0][0] = 1.0f - 2.0f*fY*fY - 2.0f*fZ*fZ;
-    mat->fMap[0][1] = 2.0f*fX*fY - 2.0f*fW*fZ;
-    mat->fMap[0][2] = 2.0f*fX*fZ + 2.0f*fW*fY;
+    mat->fMap[0][0] = 1.0f - 2.0f * fY * fY - 2.0f * fZ * fZ;
+    mat->fMap[0][1] = 2.0f * fX * fY - 2.0f * fW * fZ;
+    mat->fMap[0][2] = 2.0f * fX * fZ + 2.0f * fW * fY;
     mat->fMap[0][3] = 0.0f;
 
-    mat->fMap[1][0] = 2.0f*fX*fY + 2.0f*fW*fZ;
-    mat->fMap[1][1] = 1.0f - 2.0f*fX*fX - 2.0f*fZ*fZ;
-    mat->fMap[1][2] = 2.0f*fY*fZ - 2.0f*fW*fX;
+    mat->fMap[1][0] = 2.0f * fX * fY + 2.0f * fW * fZ;
+    mat->fMap[1][1] = 1.0f - 2.0f * fX * fX - 2.0f * fZ * fZ;
+    mat->fMap[1][2] = 2.0f * fY * fZ - 2.0f * fW * fX;
     mat->fMap[1][3] = 0.0f;
 
-    mat->fMap[2][0] = 2.0f*fX*fZ - 2.0f*fW*fY;
-    mat->fMap[2][1] = 2.0f*fY*fZ + 2.0f*fW*fX;
-    mat->fMap[2][2] = 1.0f - 2.0f*fX*fX - 2.0f*fY*fY;
+    mat->fMap[2][0] = 2.0f * fX * fZ - 2.0f * fW * fY;
+    mat->fMap[2][1] = 2.0f * fY * fZ + 2.0f * fW * fX;
+    mat->fMap[2][2] = 1.0f - 2.0f * fX * fX - 2.0f * fY * fY;
     mat->fMap[2][3] = 0.0f;
 
     mat->fMap[3][0] = 0.0f;
     mat->fMap[3][1] = 0.0f;
     mat->fMap[3][2] = 0.0f;
     mat->fMap[3][3] = 1.0f;
- 
+
 #if 0
-    mat->fMap[0][0] = fW*fW + fX*fX - fY*fY - fZ*fZ;
-    mat->fMap[1][0] = 2.0f*fX*fY - 2.0f*fW*fZ;
-    mat->fMap[2][0] = 2.0f*fX*fZ + 2.0f*fW*fY;
+    mat->fMap[0][0] = fW * fW + fX * fX - fY * fY - fZ * fZ;
+    mat->fMap[1][0] = 2.0f * fX * fY - 2.0f * fW * fZ;
+    mat->fMap[2][0] = 2.0f * fX * fZ + 2.0f * fW * fY;
     mat->fMap[3][0] = 0.0f;
 
-    mat->fMap[0][1] = 2.0f*fX*fY + 2.0f*fW*fZ;
-    mat->fMap[1][1] = fW*fW - fX*fX + fY*fY - fZ*fZ;
-    mat->fMap[2][1] = 2.0f*fY*fZ - 2.0f*fW*fX;
+    mat->fMap[0][1] = 2.0f * fX * fY + 2.0f * fW * fZ;
+    mat->fMap[1][1] = fW * fW - fX * fX + fY * fY - fZ * fZ;
+    mat->fMap[2][1] = 2.0f * fY * fZ - 2.0f * fW * fX;
     mat->fMap[3][1] = 0.0f;
 
-    mat->fMap[0][2] = 2.0f*fX*fZ - 2.0f*fW*fY;
-    mat->fMap[1][2] = 2.0f*fY*fZ + 2.0f*fW*fX;
-    mat->fMap[2][2] = fW*fW - fX*fX - fY*fY + fZ*fZ;
+    mat->fMap[0][2] = 2.0f * fX * fZ - 2.0f * fW * fY;
+    mat->fMap[1][2] = 2.0f * fY * fZ + 2.0f * fW * fX;
+    mat->fMap[2][2] = fW * fW - fX * fX - fY * fY + fZ * fZ;
     mat->fMap[3][2] = 0.0f;
 
     mat->fMap[0][3] = 0.0f;
     mat->fMap[1][3] = 0.0f;
     mat->fMap[2][3] = 0.0f;
-    mat->fMap[3][3] = fW*fW + fX*fX + fY*fY + fZ*fZ;
+    mat->fMap[3][3] = fW * fW + fX * fX + fY * fY + fZ * fZ;
 #endif
 
     mat->NotIdentity();
 }
 
 // Binary operators
-hsQuat hsQuat::operator-(const hsQuat &in) const
+hsQuat hsQuat::operator-(const hsQuat& in) const
 {
-    return hsQuat(fX-in.fX, fY-in.fY, fZ-in.fZ, fW-in.fW);
+    return hsQuat(fX - in.fX, fY - in.fY, fZ - in.fZ, fW - in.fW);
 }
 
-hsQuat hsQuat::operator+(const hsQuat &in) const
+hsQuat hsQuat::operator+(const hsQuat& in) const
 {
-    return hsQuat(fX+in.fX, fY+in.fY, fZ+in.fZ, fW+in.fW);
+    return hsQuat(fX + in.fX, fY + in.fY, fZ + in.fZ, fW + in.fW);
 }
 
 //
@@ -226,32 +228,32 @@ hsQuat hsQuat::operator+(const hsQuat &in) const
 // To combine rotations, use the product (qSecond * qFirst),
 // which gives the effect of rotating by qFirst then qSecond.
 //
-hsQuat hsQuat::operator*(const hsQuat &in) const
+hsQuat hsQuat::operator*(const hsQuat& in) const
 {
     hsQuat ret;
-    ret.fW = (fW*in.fW - fX*in.fX - fY*in.fY - fZ*in.fZ);
-    ret.fX = (fY*in.fZ - in.fY*fZ + fW*in.fX + in.fW*fX);
-    ret.fY = (fZ*in.fX - in.fZ*fX + fW*in.fY + in.fW*fY);
-    ret.fZ = (fX*in.fY - in.fX*fY + fW*in.fZ + in.fW*fZ);
+    ret.fW = (fW * in.fW - fX * in.fX - fY * in.fY - fZ * in.fZ);
+    ret.fX = (fY * in.fZ - in.fY * fZ + fW * in.fX + in.fW * fX);
+    ret.fY = (fZ * in.fX - in.fZ * fX + fW * in.fY + in.fW * fY);
+    ret.fZ = (fX * in.fY - in.fX * fY + fW * in.fZ + in.fW * fZ);
     return ret;
 }
 
 
 // I/O
-void hsQuat::Read(hsStream *stream)
+void hsQuat::Read(hsStream* stream)
 {
-     fX = stream->ReadLEFloat();
-     fY = stream->ReadLEFloat();
-     fZ = stream->ReadLEFloat();
-     fW = stream->ReadLEFloat();
+    fX = stream->ReadLEFloat();
+    fY = stream->ReadLEFloat();
+    fZ = stream->ReadLEFloat();
+    fW = stream->ReadLEFloat();
 }
 
-void hsQuat::Write(hsStream *stream)
+void hsQuat::Write(hsStream* stream)
 {
-     stream->WriteLEFloat(fX);
-     stream->WriteLEFloat(fY);
-     stream->WriteLEFloat(fZ);
-     stream->WriteLEFloat(fW);
+    stream->WriteLEFloat(fX);
+    stream->WriteLEFloat(fY);
+    stream->WriteLEFloat(fZ);
+    stream->WriteLEFloat(fW);
 }
 
 
@@ -259,17 +261,17 @@ void hsQuat::Write(hsStream *stream)
 //
 // Interpolate on a sphere.
 //
-void hsQuat::SetFromSlerp(hsQuat *q1, hsQuat *q2, float t)
+void hsQuat::SetFromSlerp(hsQuat* q1, hsQuat* q2, float t)
 {
-    hsAssert(t>=0.0 && t<= 1.0, "Quat slerp param must be between 0 an 1");
+    hsAssert(t >= 0.0 && t <= 1.0, "Quat slerp param must be between 0 an 1");
     float theta = acos(q1->Dot(*q2));
 
     float st = sin(theta);
     assert(st != 0.0);
 
-    float s1 = sin(1.0-t)*theta / st;
+    float s1 = sin(1.0 - t) * theta / st;
 
-    float s2 = sin(t)*theta / st;
+    float s2 = sin(t) * theta / st;
 
     *this = (*q1) * s1 + (*q2) * s2;
 }
@@ -280,7 +282,7 @@ void hsQuat::SetFromSlerp(hsQuat *q1, hsQuat *q2, float t)
 
 #define EPSILON 1.0E-6          /* a tiny number */
 
-void hsQuat::SetFromSlerp(const hsQuat &a, const hsQuat &b, float alpha, int spin)
+void hsQuat::SetFromSlerp(const hsQuat& a, const hsQuat& b, float alpha, int spin)
 //  double alpha;           /* interpolation parameter (0 to 1) */
 //  Quaternion *a, *b;      /* start and end unit quaternions */
 //  int spin;           /* number of extra spin rotations */
@@ -295,40 +297,39 @@ void hsQuat::SetFromSlerp(const hsQuat &a, const hsQuat &b, float alpha, int spi
     cos_t = a.Dot(b);
 
     /* if B is on opposite hemisphere from A, use -B instead */
-    if (cos_t < 0.0)
-    {
+    if (cos_t < 0.0) {
         cos_t = -cos_t;
         bflip = true;
-    } 
-    else
+    } else {
         bflip = false;
+    }
 
     /* if B is (within precision limits) the same as A,
      * just linear interpolate between A and B.
      * Can't do spins, since we don't know what direction to spin.
      */
-    if (1.0 - cos_t < EPSILON) 
-    {
+    if (1.0 - cos_t < EPSILON) {
         beta = 1.0f - alpha;
-    } else 
-    {               /* normal case */
+    } else {
+        /* normal case */
 //      hsAssert((cos_t >= -1) && (cos_t <= 1), "Invalid acos argument");
         theta   = acos(cos_t);
         phi     = theta + spin * M_PI;
         sin_t   = sin(theta);
         hsAssert(sin_t != 0.0, "Invalid sin value in quat slerp");
-        beta    = sin(theta - alpha*phi) / sin_t;
-        alpha   = sin(alpha*phi) / sin_t;
+        beta    = sin(theta - alpha * phi) / sin_t;
+        alpha   = sin(alpha * phi) / sin_t;
     }
 
-    if (bflip)
+    if (bflip) {
         alpha = -alpha;
+    }
 
     /* interpolate */
-    fX = beta*a.fX + alpha*b.fX;
-    fY = beta*a.fY + alpha*b.fY;
-    fZ = beta*a.fZ + alpha*b.fZ;
-    fW = beta*a.fW + alpha*b.fW;
+    fX = beta * a.fX + alpha * b.fX;
+    fY = beta * a.fY + alpha * b.fY;
+    fZ = beta * a.fZ + alpha * b.fZ;
+    fW = beta * a.fW + alpha * b.fW;
 }
 #endif
 
@@ -337,11 +338,11 @@ void hsQuat::SetFromSlerp(const hsQuat &a, const hsQuat &b, float alpha, int spi
 //
 void hsQuat::SetFromMatrix(const hsMatrix44* mat)
 {
-    float wSq = 0.25f*(1 + mat->fMap[0][0] + mat->fMap[1][1] + mat->fMap[2][2]);
-    if (wSq > EPSILON)
-    {
+    float wSq = 0.25f * (1 + mat->fMap[0][0] + mat->fMap[1][1] + mat->fMap[2][2]);
+
+    if (wSq > EPSILON) {
         fW = sqrt(wSq);
-        float iw4 = 1.0f/(4.0f*fW);
+        float iw4 = 1.0f / (4.0f * fW);
         fX = (mat->fMap[2][1] - mat->fMap[1][2]) * iw4;
         fY = (mat->fMap[0][2] - mat->fMap[2][0]) * iw4;
         fZ = (mat->fMap[1][0] - mat->fMap[0][1]) * iw4;
@@ -349,11 +350,11 @@ void hsQuat::SetFromMatrix(const hsMatrix44* mat)
     }
 
     fW = 0;
-    float xSq = -0.5f*(mat->fMap[1][1] + mat->fMap[2][2]);
-    if (xSq > EPSILON)
-    {
+    float xSq = -0.5f * (mat->fMap[1][1] + mat->fMap[2][2]);
+
+    if (xSq > EPSILON) {
         fX = sqrt(xSq);
-        float ix2 = 1.0f/(2.0f*fX);
+        float ix2 = 1.0f / (2.0f * fX);
         fY = mat->fMap[1][0] * ix2;
         fZ = mat->fMap[2][0] * ix2;
         return;
@@ -361,10 +362,10 @@ void hsQuat::SetFromMatrix(const hsMatrix44* mat)
 
     fX = 0;
     float ySq = 0.5f * (1 - mat->fMap[2][2]);
-    if (ySq > EPSILON)
-    {
+
+    if (ySq > EPSILON) {
         fY = sqrt(ySq);
-        fZ = mat->fMap[2][1] / (2.0f*fY);
+        fZ = mat->fMap[2][1] / (2.0f * fY);
         return;
     }
 
@@ -389,7 +390,8 @@ hsQuat hsQuat::QuatFromMatrix44(const hsMatrix44& mat)
     const int Y = 1;
     const int Z = 2;
     const int W = 3;
-    tr = mat.fMap[X][X] + mat.fMap[Y][Y]+ mat.fMap[Z][Z];
+    tr = mat.fMap[X][X] + mat.fMap[Y][Y] + mat.fMap[Z][Z];
+
     if (tr >= 0.0) {
         s = float(sqrt(tr + 1.f));
         qu.fW = 0.5f * s;
@@ -399,10 +401,15 @@ hsQuat hsQuat::QuatFromMatrix44(const hsMatrix44& mat)
         qu.fZ = (mat.fMap[Y][X] - mat.fMap[X][Y]) * s;
     } else {
         int h = X;
-        if (mat.fMap[Y][Y] > mat.fMap[X][X]) 
+
+        if (mat.fMap[Y][Y] > mat.fMap[X][X]) {
             h = Y;
-        if (mat.fMap[Z][Z] > mat.fMap[h][h]) 
+        }
+
+        if (mat.fMap[Z][Z] > mat.fMap[h][h]) {
             h = Z;
+        }
+
         switch (h) {
 #define caseMacro(i,j,k,I,J,K) \
         case I:\
@@ -413,11 +420,12 @@ hsQuat hsQuat::QuatFromMatrix44(const hsMatrix44& mat)
         qu.k = (mat.fMap[K][I] + mat.fMap[I][K]) * s; \
         qu.fW = (mat.fMap[K][J] - mat.fMap[J][K]) * s; \
         break
-        caseMacro(fX,fY,fZ,X,Y,Z);
-        caseMacro(fY,fZ,fX,Y,Z,X);
-        caseMacro(fZ,fX,fY,Z,X,Y);
+            caseMacro(fX, fY, fZ, X, Y, Z);
+            caseMacro(fY, fZ, fX, Y, Z, X);
+            caseMacro(fZ, fX, fY, Z, X, Y);
         }
     }
+
     return (qu);
 }
 

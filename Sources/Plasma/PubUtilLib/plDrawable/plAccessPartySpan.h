@@ -45,11 +45,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plAccessVtxSpan.h"
 
-class plAccessPartySpan : public plAccessVtxSpan
-{
+class plAccessPartySpan : public plAccessVtxSpan {
 public:
 
-    
+
 };
 
 #endif // plAccessPartySpan_inc

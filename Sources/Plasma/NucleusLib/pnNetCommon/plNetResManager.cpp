@@ -66,7 +66,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/hsKeyedObject.h"
 #include "pnFactory/plCreatable.h"
 #include "pnNetCommon/plNetApp.h"
-#include "hsStream.h" 
+#include "hsStream.h"
 
 plNetResManager::plNetResManager()
 {
@@ -79,11 +79,13 @@ plNetResManager::~plNetResManager()
 plCreatable* plNetResManager::IReadCreatable(hsStream* s) const
 {
     uint16_t hClass = s->ReadLE16();
-    if (plFactory::CanCreate(hClass))
-    {
-        plCreatable *pCre = plFactory::Create(hClass);
-        if (!pCre)
-            hsAssert( hClass == 0x8000, "Invalid creatable index" );
+
+    if (plFactory::CanCreate(hClass)) {
+        plCreatable* pCre = plFactory::Create(hClass);
+
+        if (!pCre) {
+            hsAssert(hClass == 0x8000, "Invalid creatable index");
+        }
 
         return pCre;
     }
@@ -92,11 +94,11 @@ plCreatable* plNetResManager::IReadCreatable(hsStream* s) const
     return nil;
 }
 
-void plNetResManager::IKeyReffed(plKeyImp* key) 
+void plNetResManager::IKeyReffed(plKeyImp* key)
 {
 }
 
-void plNetResManager::IKeyUnreffed(plKeyImp* key) 
-{ 
-    delete key; 
+void plNetResManager::IKeyUnreffed(plKeyImp* key)
+{
+    delete key;
 }

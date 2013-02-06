@@ -48,7 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plSDL/plSDL.h"
 #include "pyEnum.h"
 
-void pySDL::AddPlasmaConstantsClasses(PyObject *m)
+void pySDL::AddPlasmaConstantsClasses(PyObject* m)
 {
     PYTHON_ENUM_START(PtSDLReadWriteOptions);
     PYTHON_ENUM_ELEMENT(PtSDLReadWriteOptions, kDirtyOnly,              plSDL::kDirtyOnly);
@@ -58,7 +58,7 @@ void pySDL::AddPlasmaConstantsClasses(PyObject *m)
     PYTHON_ENUM_ELEMENT(PtSDLReadWriteOptions, kTimeStampOnRead,        plSDL::kTimeStampOnRead);
     //PYTHON_ENUM_ELEMENT(PtSDLReadWriteOptions, kTimeStampDirtyOnRead, plSDL::kTimeStampDirtyOnRead);
     PYTHON_ENUM_END(m, PtSDLReadWriteOptions);
-    
+
     PYTHON_ENUM_START(PtSDLVarType);
     PYTHON_ENUM_ELEMENT(PtSDLVarType, kNone,            plVarDescriptor::kNone);
     PYTHON_ENUM_ELEMENT(PtSDLVarType, kInt,             plVarDescriptor::kInt);
@@ -94,11 +94,12 @@ PYTHON_INIT_DEFINITION(ptSDLStateDataRecord, args, keywords)
 PYTHON_METHOD_DEFINITION(ptSDLStateDataRecord, findVar, args)
 {
     char* name;
-    if (!PyArg_ParseTuple(args, "s", &name))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &name)) {
         PyErr_SetString(PyExc_TypeError, "findVar expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     return self->fThis->FindVar(name);
 }
 
@@ -111,29 +112,33 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptSDLStateDataRecord, getVarList)
 {
     std::vector<plString> vars = self->fThis->GetVarList();
     PyObject* varList = PyList_New(vars.size());
-    for (int i = 0; i < vars.size(); i++)
+
+    for (int i = 0; i < vars.size(); i++) {
         PyList_SetItem(varList, i, PyString_FromString(vars[i].c_str()));
+    }
+
     return varList;
 }
 
 PYTHON_METHOD_DEFINITION(ptSDLStateDataRecord, setFromDefaults, args)
 {
     char timeStampNow;
-    if (!PyArg_ParseTuple(args, "b", &timeStampNow))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &timeStampNow)) {
         PyErr_SetString(PyExc_TypeError, "setFromDefaults expects a boolean");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetFromDefaults(timeStampNow != 0);
     PYTHON_RETURN_NONE;
 }
 
 PYTHON_START_METHODS_TABLE(ptSDLStateDataRecord)
-    PYTHON_METHOD(ptSDLStateDataRecord, findVar, "Params: name\nFinds and returns the specified ptSimpleStateVariable"),
-    PYTHON_METHOD_NOARGS(ptSDLStateDataRecord, getName, "Returns our record's name"),
-    PYTHON_METHOD_NOARGS(ptSDLStateDataRecord, getVarList, "Returns the names of the vars we hold as a list of strings"),
-    PYTHON_METHOD(ptSDLStateDataRecord, setFromDefaults, "Params: timeStampNow\nSets all our vars to their defaults"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptSDLStateDataRecord, findVar, "Params: name\nFinds and returns the specified ptSimpleStateVariable"),
+              PYTHON_METHOD_NOARGS(ptSDLStateDataRecord, getName, "Returns our record's name"),
+              PYTHON_METHOD_NOARGS(ptSDLStateDataRecord, getVarList, "Returns the names of the vars we hold as a list of strings"),
+              PYTHON_METHOD(ptSDLStateDataRecord, setFromDefaults, "Params: timeStampNow\nSets all our vars to their defaults"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptSDLStateDataRecord, "Basic SDL state data record class");
@@ -141,7 +146,7 @@ PLASMA_DEFAULT_TYPE(ptSDLStateDataRecord, "Basic SDL state data record class");
 // required functions for PyObject interoperability
 PYTHON_CLASS_NEW_IMPL(ptSDLStateDataRecord, pySDLStateDataRecord)
 
-PyObject *pySDLStateDataRecord::New(plStateDataRecord* rec)
+PyObject* pySDLStateDataRecord::New(plStateDataRecord* rec)
 {
     ptSDLStateDataRecord* newObj = (ptSDLStateDataRecord*)ptSDLStateDataRecord_type.tp_new(&ptSDLStateDataRecord_type, NULL, NULL);
     newObj->fThis->fRec = rec;
@@ -155,7 +160,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptSDLStateDataRecord, pySDLStateDataRecord)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pySDLStateDataRecord::AddPlasmaClasses(PyObject *m)
+void pySDLStateDataRecord::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptSDLStateDataRecord);
@@ -211,11 +216,12 @@ PYTHON_METHOD_DEFINITION(ptSimpleStateVariable, setBool, args)
 {
     char val;
     int idx = 0;
-    if (!PyArg_ParseTuple(args, "b|i", &val, &idx))
-    {
+
+    if (!PyArg_ParseTuple(args, "b|i", &val, &idx)) {
         PyErr_SetString(PyExc_TypeError, "setBool expects a boolean and an optional int");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_BOOL(self->fThis->SetBool(val != 0, idx));
 }
 
@@ -231,11 +237,12 @@ STATEVAR_GET(getKey, GetKey, pyKey::New)
 PYTHON_METHOD_DEFINITION(ptSimpleStateVariable, getBool, args)
 {
     int idx = 0;
-    if (!PyArg_ParseTuple(args, "|i", &idx))
-    {
+
+    if (!PyArg_ParseTuple(args, "|i", &idx)) {
         PyErr_SetString(PyExc_TypeError, "getBool expects an optional int");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_BOOL(self->fThis->GetBool(idx));
 }
 
@@ -270,28 +277,28 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptSimpleStateVariable, isUsed)
 }
 
 PYTHON_START_METHODS_TABLE(ptSimpleStateVariable)
-    PYTHON_METHOD(ptSimpleStateVariable, setByte, "Params: val,idx=0\nSets a byte variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, setShort, "Params: val,idx=0\nSets a short variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, setFloat, "Params: val,idx=0\nSets a float variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, setDouble, "Params: val,idx=0\nSets a double variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, setInt, "Params: val,idx=0\nSets an int variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, setString, "Params: val,idx=0\nSets a string variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, setBool, "Params: val,idx=0\nSets a boolean variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, getByte, "Params: idx=0\nReturns a byte variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, getShort, "Params: idx=0\nReturns a short variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, getInt, "Params: idx=0\nReturns an int variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, getFloat, "Params: idx=0\nReturns a float variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, getDouble, "Params: idx=0\nReturns a double variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, getString, "Params: idx=0\nReturns a string variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, getKey, "Params: idx=0\nReturns a plKey variable's value"),
-    PYTHON_METHOD(ptSimpleStateVariable, getBool, "Params: idx=0\nReturns a boolean variable's value"),
-    PYTHON_METHOD_NOARGS(ptSimpleStateVariable, getType, "Returns the variable's type"),
-    PYTHON_METHOD_NOARGS(ptSimpleStateVariable, getDisplayOptions, "Returns the variable's display options"),
-    PYTHON_METHOD_NOARGS(ptSimpleStateVariable, getDefault, "Returns the variable's default"),
-    PYTHON_METHOD_NOARGS(ptSimpleStateVariable, isAlwaysNew, "Is this variable always new?"),
-    PYTHON_METHOD_NOARGS(ptSimpleStateVariable, isInternal, "Is this an internal variable?"),
-    PYTHON_METHOD_NOARGS(ptSimpleStateVariable, isUsed, "Is this variable used?"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptSimpleStateVariable, setByte, "Params: val,idx=0\nSets a byte variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, setShort, "Params: val,idx=0\nSets a short variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, setFloat, "Params: val,idx=0\nSets a float variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, setDouble, "Params: val,idx=0\nSets a double variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, setInt, "Params: val,idx=0\nSets an int variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, setString, "Params: val,idx=0\nSets a string variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, setBool, "Params: val,idx=0\nSets a boolean variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, getByte, "Params: idx=0\nReturns a byte variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, getShort, "Params: idx=0\nReturns a short variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, getInt, "Params: idx=0\nReturns an int variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, getFloat, "Params: idx=0\nReturns a float variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, getDouble, "Params: idx=0\nReturns a double variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, getString, "Params: idx=0\nReturns a string variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, getKey, "Params: idx=0\nReturns a plKey variable's value"),
+              PYTHON_METHOD(ptSimpleStateVariable, getBool, "Params: idx=0\nReturns a boolean variable's value"),
+              PYTHON_METHOD_NOARGS(ptSimpleStateVariable, getType, "Returns the variable's type"),
+              PYTHON_METHOD_NOARGS(ptSimpleStateVariable, getDisplayOptions, "Returns the variable's display options"),
+              PYTHON_METHOD_NOARGS(ptSimpleStateVariable, getDefault, "Returns the variable's default"),
+              PYTHON_METHOD_NOARGS(ptSimpleStateVariable, isAlwaysNew, "Is this variable always new?"),
+              PYTHON_METHOD_NOARGS(ptSimpleStateVariable, isInternal, "Is this an internal variable?"),
+              PYTHON_METHOD_NOARGS(ptSimpleStateVariable, isUsed, "Is this variable used?"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptSimpleStateVariable, "Basic SDL state data record class");
@@ -299,7 +306,7 @@ PLASMA_DEFAULT_TYPE(ptSimpleStateVariable, "Basic SDL state data record class");
 // required functions for PyObject interoperability
 PYTHON_CLASS_NEW_IMPL(ptSimpleStateVariable, pySimpleStateVariable)
 
-PyObject *pySimpleStateVariable::New(plSimpleStateVariable* var)
+PyObject* pySimpleStateVariable::New(plSimpleStateVariable* var)
 {
     ptSimpleStateVariable* newObj = (ptSimpleStateVariable*)ptSimpleStateVariable_type.tp_new(&ptSimpleStateVariable_type, NULL, NULL);
     newObj->fThis->fVar = var;
@@ -313,7 +320,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptSimpleStateVariable, pySimpleStateVariable)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pySimpleStateVariable::AddPlasmaClasses(PyObject *m)
+void pySimpleStateVariable::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptSimpleStateVariable);

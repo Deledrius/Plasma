@@ -58,22 +58,19 @@ class plSwimRegionInterface;
 
 #define kSlopeLimit (cosf(hsDegreesToRadians(55.f)))
 
-enum plControllerCollisionFlags
-{
+enum plControllerCollisionFlags {
     kSides = 1,
     kTop = (1 << 1),
     kBottom = (1 << 2)
 };
 
-struct plControllerSweepRecord
-{
-    plPhysical *ObjHit;
+struct plControllerSweepRecord {
+    plPhysical* ObjHit;
     hsPoint3 Point;
     hsVector3 Normal;
 };
 
-class plPhysicalControllerCore
-{
+class plPhysicalControllerCore {
 public:
     plPhysicalControllerCore(plKey ownerSceneObject, float height, float radius);
     virtual ~plPhysicalControllerCore() { }
@@ -81,10 +78,14 @@ public:
     // An ArmatureMod has its own idea about when physics should be enabled/disabled.
     // Use plArmatureModBase::EnablePhysics() instead.
     virtual void Enable(bool enable) = 0;
-    virtual bool IsEnabled() { return fEnabled; }
+    virtual bool IsEnabled() {
+        return fEnabled;
+    }
 
     // Subworld
-    virtual plKey GetSubworld() { return fWorldKey; }
+    virtual plKey GetSubworld() {
+        return fWorldKey;
+    }
     virtual void SetSubworld(plKey world) = 0;
     virtual const plCoordinateInterface* GetSubworldCI();
 
@@ -93,61 +94,97 @@ public:
     virtual void SetState(const hsPoint3& pos, float zRot) = 0;
 
     // The LOS DB this avatar is in (only one)
-    virtual plSimDefs::plLOSDB GetLOSDB() { return fLOSDB; }
-    virtual void SetLOSDB(plSimDefs::plLOSDB losDB) { fLOSDB = losDB; }
+    virtual plSimDefs::plLOSDB GetLOSDB() {
+        return fLOSDB;
+    }
+    virtual void SetLOSDB(plSimDefs::plLOSDB losDB) {
+        fLOSDB = losDB;
+    }
 
     // Movement strategy
     virtual void SetMovementStrategy(plMovementStrategy* strategy) = 0;
 
     // Global location
-    virtual const hsMatrix44& GetLastGlobalLoc() { return fLastGlobalLoc; }
+    virtual const hsMatrix44& GetLastGlobalLoc() {
+        return fLastGlobalLoc;
+    }
     virtual void SetGlobalLoc(const hsMatrix44& l2w) = 0;
 
     // Local sim position
     virtual void GetPositionSim(hsPoint3& pos) = 0;
 
     // Move kinematic controller
-    virtual void Move(hsVector3 displacement, unsigned int collideWith, unsigned int &collisionResults) = 0;
+    virtual void Move(hsVector3 displacement, unsigned int collideWith, unsigned int& collisionResults) = 0;
 
     // Set linear velocity on dynamic controller
     virtual void SetLinearVelocitySim(const hsVector3& linearVel) = 0;
 
     // Sweep the controller path from startPos through endPos
-    virtual int SweepControllerPath(const hsPoint3& startPos,const hsPoint3& endPos, bool vsDynamics, bool vsStatics,
-        uint32_t& vsSimGroups, std::vector<plControllerSweepRecord>& hits) = 0;
+    virtual int SweepControllerPath(const hsPoint3& startPos, const hsPoint3& endPos, bool vsDynamics, bool vsStatics,
+                                    uint32_t& vsSimGroups, std::vector<plControllerSweepRecord>& hits) = 0;
 
     // any clean up for the controller should go here
     virtual void LeaveAge() = 0;
 
     // Local rotation
-    const hsQuat& GetLocalRotation() const { return fLocalRotation; }
+    const hsQuat& GetLocalRotation() const {
+        return fLocalRotation;
+    }
     void IncrementAngle(float deltaAngle);
 
     // Linear velocity
-    void SetLinearVelocity(const hsVector3& linearVel) { fLinearVelocity = linearVel; }
-    const hsVector3& GetLinearVelocity() const { return fLinearVelocity; }
+    void SetLinearVelocity(const hsVector3& linearVel) {
+        fLinearVelocity = linearVel;
+    }
+    const hsVector3& GetLinearVelocity() const {
+        return fLinearVelocity;
+    }
 
     // Acheived linear velocity
-    const hsVector3& GetAchievedLinearVelocity() const { return fAchievedLinearVelocity; }
-    void OverrideAchievedLinearVelocity(const hsVector3& linearVel) { fAchievedLinearVelocity = linearVel; }
-    void ResetAchievedLinearVelocity() { fAchievedLinearVelocity.Set(0.f, 0.f, 0.f); }
+    const hsVector3& GetAchievedLinearVelocity() const {
+        return fAchievedLinearVelocity;
+    }
+    void OverrideAchievedLinearVelocity(const hsVector3& linearVel) {
+        fAchievedLinearVelocity = linearVel;
+    }
+    void ResetAchievedLinearVelocity() {
+        fAchievedLinearVelocity.Set(0.f, 0.f, 0.f);
+    }
 
     // SceneObject
-    plKey GetOwner() { return fOwner; }
+    plKey GetOwner() {
+        return fOwner;
+    }
 
     // When seeking no longer want to interact with exclude regions
-    void SetSeek(bool seek) { fSeeking = seek; }
-    bool IsSeeking() const { return fSeeking; }
+    void SetSeek(bool seek) {
+        fSeeking = seek;
+    }
+    bool IsSeeking() const {
+        return fSeeking;
+    }
 
     // Pushing physical
-    plPhysical* GetPushingPhysical() const { return fPushingPhysical; }
-    void SetPushingPhysical(plPhysical* phys) { fPushingPhysical = phys; }
-    bool GetFacingPushingPhysical() const { return fFacingPushingPhysical; }
-    void SetFacingPushingPhysical(bool facing) { fFacingPushingPhysical = facing; }
+    plPhysical* GetPushingPhysical() const {
+        return fPushingPhysical;
+    }
+    void SetPushingPhysical(plPhysical* phys) {
+        fPushingPhysical = phys;
+    }
+    bool GetFacingPushingPhysical() const {
+        return fFacingPushingPhysical;
+    }
+    void SetFacingPushingPhysical(bool facing) {
+        fFacingPushingPhysical = facing;
+    }
 
     // Controller dimensions
-    float GetRadius() const { return fRadius; }
-    float GetHeight() const { return fHeight; }
+    float GetRadius() const {
+        return fRadius;
+    }
+    float GetHeight() const {
+        return fHeight;
+    }
 
     // Create a new controller instance - Implemented in the physics system
     static plPhysicalControllerCore* Create(plKey ownerSO, float height, float radius, bool human);
@@ -191,8 +228,7 @@ protected:
     bool fEnableChanged;
 };
 
-class plMovementStrategy
-{
+class plMovementStrategy {
 public:
     plMovementStrategy(plPhysicalControllerCore* controller);
     virtual ~plMovementStrategy() { }
@@ -202,34 +238,38 @@ public:
 
     virtual void AddContactNormals(hsVector3& vec) { }
     virtual void Reset(bool newAge);
-    virtual bool IsKinematic() { return true; }
+    virtual bool IsKinematic() {
+        return true;
+    }
 
 protected:
     plPhysicalControllerCore* fController;
 };
 
-class plAnimatedMovementStrategy : public plMovementStrategy
-{
+class plAnimatedMovementStrategy : public plMovementStrategy {
 public:
     plAnimatedMovementStrategy(plAGApplicator* rootApp, plPhysicalControllerCore* controller);
     virtual ~plAnimatedMovementStrategy() { }
 
     virtual void RecalcVelocity(double timeNow, float elapsed, bool useAnim = true);
-    void SetTurnStrength(float val) { fTurnStr = val; }
-    float GetTurnStrength() const { return fTurnStr; }
+    void SetTurnStrength(float val) {
+        fTurnStr = val;
+    }
+    float GetTurnStrength() const {
+        return fTurnStr;
+    }
 
 private:
-    void IRecalcLinearVelocity(float elapsed, hsMatrix44 &prevMat, hsMatrix44 &curMat);
-    void IRecalcAngularVelocity(float elapsed, hsMatrix44 &prevMat, hsMatrix44 &curMat);
+    void IRecalcLinearVelocity(float elapsed, hsMatrix44& prevMat, hsMatrix44& curMat);
+    void IRecalcAngularVelocity(float elapsed, hsMatrix44& prevMat, hsMatrix44& curMat);
 
     plAGApplicator* fRootApp;
-    hsVector3	fAnimLinearVel;
-    float	fAnimAngularVel;
-    float	fTurnStr;
+    hsVector3   fAnimLinearVel;
+    float   fAnimAngularVel;
+    float   fTurnStr;
 };
 
-class plWalkingStrategy : public plAnimatedMovementStrategy
-{
+class plWalkingStrategy : public plAnimatedMovementStrategy {
 public:
     plWalkingStrategy(plAGApplicator* rootApp, plPhysicalControllerCore* controller);
     virtual ~plWalkingStrategy() { }
@@ -242,17 +282,31 @@ public:
 
     virtual void RecalcVelocity(double timeNow, float elapsed, bool useAnim = true);
 
-    bool HitGroundInThisAge() const { return fHitGroundInThisAge; }
-    bool IsOnGround() const { return fTimeInAir < kAirTimeThreshold || fFalseGround; }
+    bool HitGroundInThisAge() const {
+        return fHitGroundInThisAge;
+    }
+    bool IsOnGround() const {
+        return fTimeInAir < kAirTimeThreshold || fFalseGround;
+    }
 
-    float GetAirTime() const { return fTimeInAir; }
-    void ResetAirTime() { fTimeInAir = 0.0f; }
+    float GetAirTime() const {
+        return fTimeInAir;
+    }
+    void ResetAirTime() {
+        fTimeInAir = 0.0f;
+    }
 
-    float GetImpactTime() const { return fImpactTime; }
-    const hsVector3& GetImpactVelocity() const { return fImpactVelocity; }
+    float GetImpactTime() const {
+        return fImpactTime;
+    }
+    const hsVector3& GetImpactVelocity() const {
+        return fImpactVelocity;
+    }
 
     bool EnableControlledFlight(bool status);
-    bool IsControlledFlight() const { return fControlledFlight != 0; }
+    bool IsControlledFlight() const {
+        return fControlledFlight != 0;
+    }
 
     plPhysical* GetPushingPhysical() const;
     bool GetFacingPushingPhysical() const;
@@ -280,8 +334,7 @@ protected:
     bool fHitGroundInThisAge;
 };
 
-class plSwimStrategy : public plAnimatedMovementStrategy
-{
+class plSwimStrategy : public plAnimatedMovementStrategy {
 public:
     plSwimStrategy(plAGApplicator* rootApp, plPhysicalControllerCore* controller);
     virtual ~plSwimStrategy() { }
@@ -292,9 +345,15 @@ public:
 
     void SetSurface(plSwimRegionInterface* region, float surfaceHeight);
 
-    float GetBuoyancy() const { return fBuoyancy; }
-    bool IsOnGround() const { return fOnGround; }
-    bool HadContacts() const { return fHadContacts; }
+    float GetBuoyancy() const {
+        return fBuoyancy;
+    }
+    bool IsOnGround() const {
+        return fOnGround;
+    }
+    bool HadContacts() const {
+        return fHadContacts;
+    }
 
 protected:
     void IAdjustBuoyancy();
@@ -302,21 +361,22 @@ protected:
     float fBuoyancy;
     float fSurfaceHeight;
 
-    plSwimRegionInterface *fCurrentRegion;
+    plSwimRegionInterface* fCurrentRegion;
 
     bool fOnGround;
     bool fHadContacts;
 };
 
-class plDynamicWalkingStrategy : public plWalkingStrategy
-{
+class plDynamicWalkingStrategy : public plWalkingStrategy {
 public:
     plDynamicWalkingStrategy(plAGApplicator* rootApp, plPhysicalControllerCore* controller);
     virtual ~plDynamicWalkingStrategy() { }
 
     virtual void Apply(float delSecs);
 
-    virtual bool IsKinematic() { return false; }
+    virtual bool IsKinematic() {
+        return false;
+    }
 
 protected:
     bool ICheckForGround(float& zVelocity);

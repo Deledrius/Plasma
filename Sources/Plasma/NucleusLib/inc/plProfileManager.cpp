@@ -66,13 +66,13 @@ forceinline uint32_t GetPentiumCounter()
 {
 #ifdef _MSC_VER
     __asm {
-        xor   eax,eax       // VC won't realize that eax is modified w/out this
-                            //   instruction to modify the val.
-                            //   Problem shows up in release mode builds
+        xor   eax, eax      // VC won't realize that eax is modified w/out this
+        //   instruction to modify the val.
+        //   Problem shows up in release mode builds
         _emit 0x0F          // Pentium high-freq counter to edx;eax
         _emit 0x31          // only care about low 32 bits in eax
-        
-        xor   edx,edx       // so VC gets that edx is modified
+
+        xor   edx, edx      // so VC gets that edx is modified
     }
 #endif
 }
@@ -83,8 +83,7 @@ forceinline uint32_t GetPentiumCounter()
 
 static uint32_t GetProcSpeed()
 {
-    const char* keypath[] =
-    {
+    const char* keypath[] = {
         "HARDWARE",
         "DESCRIPTION",
         "System",
@@ -95,23 +94,24 @@ static uint32_t GetProcSpeed()
     HKEY hKey = HKEY_LOCAL_MACHINE;
 
     int numKeys = sizeof(keypath) / sizeof(char*);
-    for (int i = 0; i < numKeys; i++)
-    {
-        HKEY thisKey = NULL;    
+
+    for (int i = 0; i < numKeys; i++) {
+        HKEY thisKey = NULL;
         bool success = (RegOpenKeyEx(hKey, keypath[i], 0, KEY_READ, &thisKey) == ERROR_SUCCESS);
 
         RegCloseKey(hKey);
         hKey = thisKey;
 
-        if (!success)
+        if (!success) {
             return 0;
+        }
     }
 
-    DWORD value=0, size=sizeof(DWORD);
+    DWORD value = 0, size = sizeof(DWORD);
     bool success = (RegQueryValueEx(hKey, "~MHz", 0, NULL, (BYTE*)&value, &size) == ERROR_SUCCESS);
     RegCloseKey(hKey);
 
-    return value*1000000;
+    return value * 1000000;
 }
 
 uint32_t GetProcSpeedAlt()
@@ -164,9 +164,11 @@ plProfileManager::plProfileManager() : fLastAvgTime(0), fProcessorSpeed(0)
 {
 #ifdef USE_FAST_TIMER
     fProcessorSpeed = GetProcSpeed();
+
     // Registry stuff only works on NT OS's, have to calc it otherwise
-    if (fProcessorSpeed == 0)
+    if (fProcessorSpeed == 0) {
         fProcessorSpeed = GetProcSpeedAlt();
+    }
 
     gCyclesPerMS = fProcessorSpeed / 1000;
 #else
@@ -200,11 +202,12 @@ static plProfileVar gVarEFPS("EFPS", "General", plProfileVar::kDisplayTime | plP
 
 void plProfileManager::BeginFrame()
 {
-    for (int i = 0; i < fVars.size(); i++)
-    {
+    for (int i = 0; i < fVars.size(); i++) {
         fVars[i]->BeginFrame();
-        if (fVars[i]->GetLaps())
+
+        if (fVars[i]->GetLaps()) {
             fVars[i]->GetLaps()->BeginFrame();
+        }
     }
 
     gVarEFPS.BeginTiming();
@@ -218,8 +221,8 @@ void plProfileManager::EndFrame()
 
     // If enough time has passed, update the averages
     double curTime = hsTimer::GetMilliSeconds();
-    if (curTime - fLastAvgTime > kAvgMilliseconds)
-    {
+
+    if (curTime - fLastAvgTime > kAvgMilliseconds) {
         fLastAvgTime = curTime;
         updateAvgs = true;
     }
@@ -229,25 +232,25 @@ void plProfileManager::EndFrame()
     //
     // Update all the variables
     //
-    for (i = 0; i < fVars.size(); i++)
-    {
+    for (i = 0; i < fVars.size(); i++) {
         plProfileVar* var = fVars[i];
 
-        if (updateAvgs)
-        {
+        if (updateAvgs) {
             // Timers that reset at every BeginTiming() call don't want to average over frames
-            if (!hsCheckBits(var->GetDisplayFlags(), plProfileBase::kDisplayResetEveryBegin))
-            {
+            if (!hsCheckBits(var->GetDisplayFlags(), plProfileBase::kDisplayResetEveryBegin)) {
                 var->UpdateAvg();
-                if (var->GetLaps())
+
+                if (var->GetLaps()) {
                     var->GetLaps()->UpdateAvgs();
+                }
             }
         }
 
         var->EndFrame();
 
-        if (var->GetLaps())
+        if (var->GetLaps()) {
             var->GetLaps()->EndFrame();
+        }
     }
 }
 
@@ -259,16 +262,16 @@ uint32_t plProfileManager::GetTime()
 ///////////////////////////////////////////////////////////////////////////////
 
 plProfileBase::plProfileBase() :
-    fName(nil),
-    fDisplayFlags(0),
-    fValue(0),
-    fTimerSamples(0),
-    fAvgCount(0),
-    fAvgTotal(0),
-    fLastAvg(0),
-    fMax(0),
-    fActive(false),
-    fRunning(true)
+fName(nil),
+      fDisplayFlags(0),
+      fValue(0),
+      fTimerSamples(0),
+      fAvgCount(0),
+      fAvgTotal(0),
+      fLastAvg(0),
+      fMax(0),
+      fActive(false),
+      fRunning(true)
 {
 }
 
@@ -278,8 +281,10 @@ plProfileBase::~plProfileBase()
 
 void plProfileBase::BeginFrame()
 {
-    if (!hsCheckBits(fDisplayFlags, kDisplayNoReset))
+    if (!hsCheckBits(fDisplayFlags, kDisplayNoReset)) {
         fValue = 0;
+    }
+
     fTimerSamples = 0;
 }
 
@@ -292,8 +297,7 @@ void plProfileBase::EndFrame()
 
 void plProfileBase::UpdateAvg()
 {
-    if (fAvgCount > 0)
-    {
+    if (fAvgCount > 0) {
         fLastAvg = (uint32_t)(fAvgTotal / fAvgCount);
         fAvgCount = 0;
         fAvgTotal = 0;
@@ -302,32 +306,33 @@ void plProfileBase::UpdateAvg()
 
 uint32_t plProfileBase::GetValue()
 {
-    if (hsCheckBits(fDisplayFlags, kDisplayTime))
+    if (hsCheckBits(fDisplayFlags, kDisplayTime)) {
         return (uint32_t)TicksToMSec(fValue);
-    else
+    } else {
         return fValue;
+    }
 }
 
 // Stolen from plMemTracker.cpp
-static  const char  *insertCommas(unsigned int value)
+static  const char*  insertCommas(unsigned int value)
 {
     static char str[30];
     memset(str, 0, sizeof(str));
 
     sprintf(str, "%u", value);
-    if (strlen(str) > 3)
-    {
-        memmove(&str[strlen(str)-3], &str[strlen(str)-4], 4);
+
+    if (strlen(str) > 3) {
+        memmove(&str[strlen(str) - 3], &str[strlen(str) - 4], 4);
         str[strlen(str) - 4] = ',';
     }
-    if (strlen(str) > 7)
-    {
-        memmove(&str[strlen(str)-7], &str[strlen(str)-8], 8);
+
+    if (strlen(str) > 7) {
+        memmove(&str[strlen(str) - 7], &str[strlen(str) - 8], 8);
         str[strlen(str) - 8] = ',';
     }
-    if (strlen(str) > 11)
-    {
-        memmove(&str[strlen(str)-11], &str[strlen(str)-12], 12);
+
+    if (strlen(str) > 11) {
+        memmove(&str[strlen(str) - 11], &str[strlen(str) - 12], 12);
         str[strlen(str) - 12] = ',';
     }
 
@@ -336,39 +341,33 @@ static  const char  *insertCommas(unsigned int value)
 
 void plProfileBase::IPrintValue(uint32_t value, char* buf, bool printType)
 {
-    if (hsCheckBits(fDisplayFlags, kDisplayCount))
-    {
-        if (printType)
-        {
+    if (hsCheckBits(fDisplayFlags, kDisplayCount)) {
+        if (printType) {
             const char* valueStr = insertCommas(value);
             strcpy(buf, valueStr);
-        }
-        else
+        } else {
             sprintf(buf, "%u", value);
-    }
-    else if (hsCheckBits(fDisplayFlags, kDisplayFPS))
-    {
+        }
+    } else if (hsCheckBits(fDisplayFlags, kDisplayFPS)) {
         sprintf(buf, "%.1f", 1000.0f / TicksToMSec(value));
-    }
-    else if (hsCheckBits(fDisplayFlags, kDisplayTime))
-    {
+    } else if (hsCheckBits(fDisplayFlags, kDisplayTime)) {
         sprintf(buf, "%.1f", TicksToMSec(value));
-        if (printType)
+
+        if (printType) {
             strcat(buf, " ms");
-    }
-    else if (hsCheckBits(fDisplayFlags, kDisplayMem))
-    {
-        if (printType)
-        {
-            if (value > (1024*1000))
-                sprintf(buf, "%.1f MB", float(value) / (1024.f * 1024.f));
-            else if (value > 1024)
-                sprintf(buf, "%d KB", value / 1024);
-            else
-                sprintf(buf, "%d b", value);
         }
-        else
+    } else if (hsCheckBits(fDisplayFlags, kDisplayMem)) {
+        if (printType) {
+            if (value > (1024 * 1000)) {
+                sprintf(buf, "%.1f MB", float(value) / (1024.f * 1024.f));
+            } else if (value > 1024) {
+                sprintf(buf, "%d KB", value / 1024);
+            } else {
+                sprintf(buf, "%d b", value);
+            }
+        } else {
             sprintf(buf, "%u", value);
+        }
     }
 }
 
@@ -395,37 +394,38 @@ plProfileLaps::LapInfo* plProfileLaps::IFindLap(const char* lapName)
     static int lastSearch = 0;
 
     int i;
-    for (i = lastSearch; i < fLapTimes.size(); i++)
-    {
-        if(fLapTimes[i].GetName() == lapName)
-        {
+
+    for (i = lastSearch; i < fLapTimes.size(); i++) {
+        if (fLapTimes[i].GetName() == lapName) {
             lastSearch = i;
             return &fLapTimes[i];
         }
     }
 
-    if(lastSearch > fLapTimes.size()) lastSearch = fLapTimes.size();
-    for (i = 0; i < lastSearch; i++)
-    {
-        if(fLapTimes[i].GetName() == lapName)
-        {
+    if (lastSearch > fLapTimes.size()) {
+        lastSearch = fLapTimes.size();
+    }
+
+    for (i = 0; i < lastSearch; i++) {
+        if (fLapTimes[i].GetName() == lapName) {
             lastSearch = i;
             return &fLapTimes[i];
         }
     }
+
     return nil;
 }
 
 void plProfileLaps::BeginLap(uint32_t curValue, const char* name)
 {
     LapInfo* lap = IFindLap(name);
-    if (!lap)
-    {
+
+    if (!lap) {
         // Technically we shouldn't hold on to this pointer.  However, I think
         // it will be ok in all cases, so I'll wait until this blows up
         LapInfo info(name);
         fLapTimes.push_back(info);
-        lap = &(*(fLapTimes.end()-1));
+        lap = &(*(fLapTimes.end() - 1));
     }
 
     lap->fUsedThisFrame = true;
@@ -439,14 +439,14 @@ void plProfileLaps::EndLap(uint32_t curValue, const char* name)
     // There's a lap timer around the input code. You display it with "Stats.ShowLaps Update Input"
     // Since the command activates the timer INSIDE the lap, the first call to this function fails to
     // find it. (the timer wasn't active when BeginLap was called)
-    if (lap)
+    if (lap) {
         lap->EndTiming(curValue);
+    }
 }
 
 void plProfileLaps::BeginFrame()
 {
-    for (int i = 0; i < fLapTimes.size(); i++)
-    {
+    for (int i = 0; i < fLapTimes.size(); i++) {
         fLapTimes[i].BeginFrame();
         fLapTimes[i].fUsedThisFrame = false;
     }
@@ -454,15 +454,14 @@ void plProfileLaps::BeginFrame()
 
 void plProfileLaps::EndFrame()
 {
-    for (int i = 0; i < fLapTimes.size(); i++)
-    {
+    for (int i = 0; i < fLapTimes.size(); i++) {
         fLapTimes[i].EndFrame();
-        if (!fLapTimes[i].fUsedThisFrame)
-        {
+
+        if (!fLapTimes[i].fUsedThisFrame) {
             char buf[200];
             sprintf(buf, "Dropping unused lap %s", fLapTimes[i].GetName());
             hsStatusMessage(buf);
-            fLapTimes.erase(fLapTimes.begin()+i);
+            fLapTimes.erase(fLapTimes.begin() + i);
             i--;
         }
     }
@@ -470,8 +469,9 @@ void plProfileLaps::EndFrame()
 
 void plProfileLaps::UpdateAvgs()
 {
-    for (int i = 0; i < fLapTimes.size(); i++)
+    for (int i = 0; i < fLapTimes.size(); i++) {
         fLapTimes[i].UpdateAvg();
+    }
 }
 
 int plProfileLaps::GetNumLaps()
@@ -489,9 +489,9 @@ plProfileBase* plProfileLaps::GetLap(int i)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-plProfileVar::plProfileVar(const char *name, const char* group, uint8_t flags) :
-    fGroup(group),
-    fLaps(nil)
+plProfileVar::plProfileVar(const char* name, const char* group, uint8_t flags) :
+fGroup(group),
+fLaps(nil)
 {
     fName = name;
     fDisplayFlags = flags;
@@ -506,25 +506,33 @@ plProfileVar::~plProfileVar()
 
 void plProfileVar::IBeginLap(const char* lapName)
 {
-    if (!fLaps)
+    if (!fLaps) {
         fLaps = new plProfileLaps;
+    }
+
     fDisplayFlags |= kDisplayLaps;
-    if(fLapsActive)
+
+    if (fLapsActive) {
         fLaps->BeginLap(fValue, lapName);
+    }
+
     BeginTiming();
 }
 
 void plProfileVar::IEndLap(const char* lapName)
 {
     EndTiming();
-    if(fLapsActive)
+
+    if (fLapsActive) {
         fLaps->EndLap(fValue, lapName);
+    }
 }
 
 void plProfileVar::IBeginTiming()
 {
-    if( hsCheckBits( fDisplayFlags, kDisplayResetEveryBegin ) )
+    if (hsCheckBits(fDisplayFlags, kDisplayResetEveryBegin)) {
         fValue = 0;
+    }
 
     fValue -= GetProfileTicks();
 }
@@ -537,6 +545,7 @@ void plProfileVar::IEndTiming()
 
     // If we reset every BeginTiming(), then we want to average all the timing calls
     // independent of framerate
-    if (hsCheckBits(fDisplayFlags, plProfileBase::kDisplayResetEveryBegin))
+    if (hsCheckBits(fDisplayFlags, plProfileBase::kDisplayResetEveryBegin)) {
         UpdateAvg();
+    }
 }

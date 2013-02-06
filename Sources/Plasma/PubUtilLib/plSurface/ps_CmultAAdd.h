@@ -62,7 +62,7 @@ static const uint8_t ps_CmultAAddCodes[] = {
     0x0,    0x0,    0xe4,   0x80,
     0x0,    0x0,    0xe4,   0x90,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl ps_CmultAAddDecl("sha/ps_CmultAAdd.inl", ps_CmultAAdd, ps_CmultAAddbyteLen, ps_CmultAAddCodes);
 

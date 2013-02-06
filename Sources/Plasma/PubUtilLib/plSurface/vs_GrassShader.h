@@ -169,7 +169,7 @@ static const uint8_t vs_GrassShaderCodes[] = {
     0x0,    0x0,    0xf,    0xe0,
     0x7,    0x0,    0xe4,   0x90,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl vs_GrassShaderDecl("sha/vs_GrassShader.inl", vs_GrassShader, vs_GrassShaderbyteLen, vs_GrassShaderCodes);
 

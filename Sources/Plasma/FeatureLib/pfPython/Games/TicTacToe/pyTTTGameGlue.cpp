@@ -63,21 +63,18 @@ PYTHON_NO_INIT_DEFINITION(ptTTTGame)
 PYTHON_GLOBAL_METHOD_DEFINITION(PtIsTTTGame, args, "Params: typeID\nReturns true if the specifed typeID (guid as a string) is a TicTacToe game")
 {
     PyObject* textObj;
-    if (!PyArg_ParseTuple(args, "O", &textObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &textObj)) {
         PyErr_SetString(PyExc_TypeError, "PtIsTTTGame expects a string");
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyString_CheckEx(textObj))
-    {
+    if (PyString_CheckEx(textObj)) {
         plString text = PyString_AsStringEx(textObj);
 
         bool retVal = pyTTTGame::IsTTTGame(text);
         PYTHON_RETURN_BOOL(retVal);
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtIsTTTGame expects a string");
         PYTHON_RETURN_ERROR;
     }
@@ -87,16 +84,17 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtCreateTTTGame, args, "Params: callbackKey, num
 {
     PyObject* callbackObj = NULL;
     int numPlayers = 0;
-    if (!PyArg_ParseTuple(args, "Oi", &callbackObj, &numPlayers))
-    {
+
+    if (!PyArg_ParseTuple(args, "Oi", &callbackObj, &numPlayers)) {
         PyErr_SetString(PyExc_TypeError, "PtCreateTTTGame expects a ptKey and an integer");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(callbackObj))
-    {
+
+    if (!pyKey::Check(callbackObj)) {
         PyErr_SetString(PyExc_TypeError, "PtCreateTTTGame expects a ptKey and an integer");
         PYTHON_RETURN_ERROR;
     }
+
     pyKey* key = pyKey::ConvertFrom(callbackObj);
     pyTTTGame::CreateTTTGame(*key, numPlayers);
     PYTHON_RETURN_NONE;
@@ -106,16 +104,17 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtJoinCommonTTTGame, args, "Params: callbackKey,
 {
     PyObject* callbackObj = NULL;
     int gameID = 0, numPlayers = 0;
-    if (!PyArg_ParseTuple(args, "Oii", &callbackObj, &gameID, &numPlayers))
-    {
+
+    if (!PyArg_ParseTuple(args, "Oii", &callbackObj, &gameID, &numPlayers)) {
         PyErr_SetString(PyExc_TypeError, "PtJoinCommonTTTGame expects a ptKey and two integers");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(callbackObj))
-    {
+
+    if (!pyKey::Check(callbackObj)) {
         PyErr_SetString(PyExc_TypeError, "PtJoinCommonTTTGame expects a ptKey and two integers");
         PYTHON_RETURN_ERROR;
     }
+
     pyKey* key = pyKey::ConvertFrom(callbackObj);
     pyTTTGame::JoinCommonTTTGame(*key, gameID, numPlayers);
     PYTHON_RETURN_NONE;
@@ -124,11 +123,12 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtJoinCommonTTTGame, args, "Params: callbackKey,
 PYTHON_METHOD_DEFINITION(ptTTTGame, makeMove, args)
 {
     int row = 0, col = 0;
-    if (!PyArg_ParseTuple(args, "ii", &row, &col))
-    {
+
+    if (!PyArg_ParseTuple(args, "ii", &row, &col)) {
         PyErr_SetString(PyExc_TypeError, "makeMove expects two integers");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->MakeMove(row, col);
     PYTHON_RETURN_NONE;
 }
@@ -136,9 +136,9 @@ PYTHON_METHOD_DEFINITION(ptTTTGame, makeMove, args)
 PYTHON_BASIC_METHOD_DEFINITION(ptTTTGame, showBoard, ShowBoard)
 
 PYTHON_START_METHODS_TABLE(ptTTTGame)
-    PYTHON_METHOD(ptTTTGame, makeMove, "Params: row, col\nMakes a move in the specified spot"),
-    PYTHON_BASIC_METHOD(ptTTTGame, showBoard, "Prints the current board layout to the console"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptTTTGame, makeMove, "Params: row, col\nMakes a move in the specified spot"),
+              PYTHON_BASIC_METHOD(ptTTTGame, showBoard, "Prints the current board layout to the console"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptTTTGame, pyGameCli, "Game client for the TicTacToe game");
@@ -146,9 +146,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptTTTGame, pyGameCli, "Game client for the TicTacToe g
 // required functions for PyObject interoperability
 PyObject* pyTTTGame::New(pfGameCli* client)
 {
-    ptTTTGame *newObj = (ptTTTGame*)ptTTTGame_type.tp_new(&ptTTTGame_type, NULL, NULL);
-    if (client && (client->GetGameTypeId() == kGameTypeId_TicTacToe))
+    ptTTTGame* newObj = (ptTTTGame*)ptTTTGame_type.tp_new(&ptTTTGame_type, NULL, NULL);
+
+    if (client && (client->GetGameTypeId() == kGameTypeId_TicTacToe)) {
         newObj->fThis->gameClient = client;
+    }
+
     return (PyObject*)newObj;
 }
 

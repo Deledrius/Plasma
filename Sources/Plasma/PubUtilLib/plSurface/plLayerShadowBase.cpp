@@ -45,20 +45,20 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 ///////////////////////////////////////////////////////////////////////////
 plLayerLightBase::plLayerLightBase()
-:   fDirty(true)
+    :   fDirty(true)
 {
     fOwnedChannels = kState
-                | kAmbientColor
-                | kPreshadeColor;
+                     | kAmbientColor
+                     | kPreshadeColor;
 
     fState = new hsGMatState;
     fState->Reset();
-    
+
     fAmbientColor = new hsColorRGBA;
-    fAmbientColor->Set(0,0,0,1.f);
+    fAmbientColor->Set(0, 0, 0, 1.f);
 
     fPreshadeColor = new hsColorRGBA;
-    fPreshadeColor->Set(0,0,0,1.f);
+    fPreshadeColor->Set(0, 0, 0, 1.f);
 }
 
 plLayerLightBase::~plLayerLightBase()
@@ -74,21 +74,20 @@ plLayerInterface* plLayerLightBase::Attach(plLayerInterface* prev)
 uint32_t plLayerLightBase::Eval(double secs, uint32_t frame, uint32_t ignore)
 {
     uint32_t ret = plLayerInterface::Eval(secs, frame, ignore);
-    if( fUnderLay )
-    {
-        if( fDirty || (ret & kState) )
-        {
+
+    if (fUnderLay) {
+        if (fDirty || (ret & kState)) {
             *fState = fUnderLay->GetState();
 
             uint32_t blend = fState->fBlendFlags;
 
             fState->fBlendFlags &= ~hsGMatState::kBlendMask;
 
-            switch( blend )
-            {
+            switch (blend) {
             case hsGMatState::kBlendAlpha:
                 fState->fBlendFlags |= hsGMatState::kBlendAddColorTimesAlpha;
                 break;
+
             default:
                 fState->fBlendFlags |= hsGMatState::kBlendAdd;
                 break;
@@ -103,25 +102,26 @@ uint32_t plLayerLightBase::Eval(double secs, uint32_t frame, uint32_t ignore)
             fDirty = false;
         }
     }
+
     return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 plLayerShadowBase::plLayerShadowBase()
-:   fDirty(true)
+    :   fDirty(true)
 {
     fOwnedChannels = kState
-                | kAmbientColor
-                | kPreshadeColor;
+                     | kAmbientColor
+                     | kPreshadeColor;
 
     fState = new hsGMatState;
     fState->Reset();
-    
+
     fAmbientColor = new hsColorRGBA;
-    fAmbientColor->Set(0,0,0,1.f);
+    fAmbientColor->Set(0, 0, 0, 1.f);
 
     fPreshadeColor = new hsColorRGBA;
-    fPreshadeColor->Set(0,0,0,1.f);
+    fPreshadeColor->Set(0, 0, 0, 1.f);
 }
 
 plLayerShadowBase::~plLayerShadowBase()
@@ -137,10 +137,9 @@ plLayerInterface* plLayerShadowBase::Attach(plLayerInterface* prev)
 uint32_t plLayerShadowBase::Eval(double secs, uint32_t frame, uint32_t ignore)
 {
     uint32_t ret = plLayerInterface::Eval(secs, frame, ignore);
-    if( fUnderLay )
-    {
-        if( fDirty || (ret & kState) )
-        {
+
+    if (fUnderLay) {
+        if (fDirty || (ret & kState)) {
             *fState = fUnderLay->GetState();
             fState->fBlendFlags &= ~hsGMatState::kBlendMask;
             //WHITE

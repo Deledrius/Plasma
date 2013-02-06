@@ -53,8 +53,8 @@ const uint32_t UserPropMgr::kQuickSize = 150001;//199999;
 
 UserPropMgr gUserPropMgr(GetCOREInterface());
 
-UserPropMgr::UserPropMgr(Interface *ip) : 
-nm(0)
+UserPropMgr::UserPropMgr(Interface* ip) :
+    nm(0)
 {
     this->ip = ip;
 
@@ -69,97 +69,123 @@ UserPropMgr::~UserPropMgr()
     CloseQuickTable();
 }
 
-void UserPropMgr::SetUserPropFlag(INode *node, const char *name, const bool setFlag, const int32_t hFlag) 
+void UserPropMgr::SetUserPropFlag(INode* node, const char* name, const bool setFlag, const int32_t hFlag)
 {
-    if (setFlag) SetUserProp(node,name,NULL,hFlag);
-    else ClearUserProp(node,name,hFlag);
-}
-
-void UserPropMgr::ClearUserPropALL(const char *name, const int32_t hFlag) 
-{
-    for (int i=0; i<GetSelNodeCount(); i++) 
-    {
-        ClearUserProp(GetSelNode(i),name,hFlag);
+    if (setFlag) {
+        SetUserProp(node, name, NULL, hFlag);
+    } else {
+        ClearUserProp(node, name, hFlag);
     }
 }
 
-void UserPropMgr::SelectUserPropFlagALL(INode *node, const char *name, const bool flag) {
-    if (node) 
-    {
-        if (UserPropExists(node,name) == flag) ip->SelectNode(node,false);
-    } else node = ip->GetRootNode();
+void UserPropMgr::ClearUserPropALL(const char* name, const int32_t hFlag)
+{
+    for (int i = 0; i < GetSelNodeCount(); i++) {
+        ClearUserProp(GetSelNode(i), name, hFlag);
+    }
+}
 
-    for (int i=0; i<node->NumberOfChildren(); i++) {
-        SelectUserPropFlagALL(node->GetChildNode(i),name,flag);
+void UserPropMgr::SelectUserPropFlagALL(INode* node, const char* name, const bool flag)
+{
+    if (node) {
+        if (UserPropExists(node, name) == flag) {
+            ip->SelectNode(node, false);
+        }
+    } else {
+        node = ip->GetRootNode();
+    }
+
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
+        SelectUserPropFlagALL(node->GetChildNode(i), name, flag);
     }
 }
 
 
-void UserPropMgr::DeSelectWithOut(const char *name, const char *value) {
+void UserPropMgr::DeSelectWithOut(const char* name, const char* value)
+{
     bool oldProps = vProps;
-    vProps=false;
+    vProps = false;
     TSTR val;
-    INode *nodes[1];
+    INode* nodes[1];
     INodeTab nodeTab;
-    for (int i=0; i<GetSelNodeCount(); i++) {
+
+    for (int i = 0; i < GetSelNodeCount(); i++) {
         if (value) {
-            if (!(GetUserProp(GetSelNode(i),name,val) && !stricmp(val,value))) {
+            if (!(GetUserProp(GetSelNode(i), name, val) && !stricmp(val, value))) {
                 nodes[0] = GetSelNode(i);
-                nodeTab.Append(1,nodes);
+                nodeTab.Append(1, nodes);
             }
-        } else if (!UserPropExists(GetSelNode(i),name)) {
+        } else if (!UserPropExists(GetSelNode(i), name)) {
             nodes[0] = GetSelNode(i);
-            nodeTab.Append(1,nodes);
+            nodeTab.Append(1, nodes);
         }
     }
-    vProps=oldProps;
-    if (nodeTab.Count() > 0) ip->SelectNodeTab(nodeTab,false,false);
-    
+
+    vProps = oldProps;
+
+    if (nodeTab.Count() > 0) {
+        ip->SelectNodeTab(nodeTab, false, false);
+    }
+
 }
 
-void UserPropMgr::RecursiveSelectAll(INode *node) {
+void UserPropMgr::RecursiveSelectAll(INode* node)
+{
     if (node) {
-        if (!node->Selected()) ip->SelectNode(node,false);
-    } else node = ip->GetRootNode();
+        if (!node->Selected()) {
+            ip->SelectNode(node, false);
+        }
+    } else {
+        node = ip->GetRootNode();
+    }
 
-    for (int i=0; i<node->NumberOfChildren(); i++) {
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
         RecursiveSelectAll(node->GetChildNode(i));
     }
 }
 
 
-void UserPropMgr::DeSelectUnAlike(INode *node) {
-theHold.Begin();
+void UserPropMgr::DeSelectUnAlike(INode* node)
+{
+    theHold.Begin();
 
-ip->ThawSelection();
+    ip->ThawSelection();
 
     RecursiveSelectAll();
 
     TSTR buf;
-    GetUserPropBuffer(node,buf);
+    GetUserPropBuffer(node, buf);
 
-    hsStringTokenizer toker(buf," \r\n");
+    hsStringTokenizer toker(buf, " \r\n");
     toker.ParseQuotes(TRUE);
-    char *tok;
+    char* tok;
     TSTR name;
     bool isName = true;
-    while (tok=toker.next()) {
+
+    while (tok = toker.next()) {
         if (isName) {
             if (*tok != '=') {
                 name = tok;
                 tok = toker.next();
+
                 if (tok && *tok == '=') {
                     tok = toker.next();
-                } else tok = NULL;
-                DeSelectWithOut(name,tok);
-            } else isName = false;
+                } else {
+                    tok = NULL;
+                }
+
+                DeSelectWithOut(name, tok);
+            } else {
+                isName = false;
+            }
         } else {
             isName = true;
         }
     }
 
 
-    TSTR undostr; undostr.printf("Select");
+    TSTR undostr;
+    undostr.printf("Select");
     theHold.Accept(undostr);
 
     ip->FreezeSelection();
@@ -169,108 +195,159 @@ ip->ThawSelection();
 
 
 
-int UserPropMgr::RecursiveCountAlike(INode *node, bool MatchAll) {
-    int count=0;
-    if (node) {
-        if (!node->IsNodeHidden() && !node->IsFrozen() && IsAlike(node,MatchAll)) count++;
-    } else node = ip->GetRootNode();
+int UserPropMgr::RecursiveCountAlike(INode* node, bool MatchAll)
+{
+    int count = 0;
 
-    for (int i=0; i<node->NumberOfChildren(); i++) {
-        count += RecursiveCountAlike(node->GetChildNode(i),MatchAll);
+    if (node) {
+        if (!node->IsNodeHidden() && !node->IsFrozen() && IsAlike(node, MatchAll)) {
+            count++;
+        }
+    } else {
+        node = ip->GetRootNode();
     }
+
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
+        count += RecursiveCountAlike(node->GetChildNode(i), MatchAll);
+    }
+
     return count;
 }
 
 
-int UserPropMgr::CountAlike(bool MatchAll) {
+int UserPropMgr::CountAlike(bool MatchAll)
+{
     return RecursiveCountAlike(NULL, MatchAll);
 }
 
-bool UserPropMgr::IsMatch(const char *val1, const char *val2) {
-    if (!stricmp(val1,val2)) return true;
-    hsStringTokenizer toker(val1," ,@");
-    char *tok;
+bool UserPropMgr::IsMatch(const char* val1, const char* val2)
+{
+    if (!stricmp(val1, val2)) {
+        return true;
+    }
 
-    while (tok=toker.next()) {
-        hsStringTokenizer toker2(val2," ,@");
+    hsStringTokenizer toker(val1, " ,@");
+    char* tok;
+
+    while (tok = toker.next()) {
+        hsStringTokenizer toker2(val2, " ,@");
         bool found = false;
-        char *tok2;
-        while ((tok2=toker2.next()) && !found) {
+        char* tok2;
+
+        while ((tok2 = toker2.next()) && !found) {
             if (tok[0] >= '1' && tok[0] <= '0') {
-                if (!stricmp(tok,tok2)) found = true;
+                if (!stricmp(tok, tok2)) {
+                    found = true;
+                }
             } else if (toker.HasMoreTokens()) {
-                if (!stricmp(tok,tok2)) found = true;if (!stricmp(tok,tok2)) found = true;
+                if (!stricmp(tok, tok2)) {
+                    found = true;
+                }
+
+                if (!stricmp(tok, tok2)) {
+                    found = true;
+                }
             } else {
-                if (!strnicmp(tok,tok2,strlen(tok))) found = true;
+                if (!strnicmp(tok, tok2, strlen(tok))) {
+                    found = true;
+                }
             }
         }
-        if (!found) return false;
+
+        if (!found) {
+            return false;
+        }
     }
+
     return true;
 }
 
 
-bool UserPropMgr::IsAlike(INode *node, bool MatchAll) {
+bool UserPropMgr::IsAlike(INode* node, bool MatchAll)
+{
     TSTR buf;
-    GetUserPropBuffer(node,buf);
+    GetUserPropBuffer(node, buf);
 
     bool oldProps = vProps;
-    vProps=false;
+    vProps = false;
 
-    hsStringTokenizer toker(buf," \r\n");
+    hsStringTokenizer toker(buf, " \r\n");
     toker.ParseQuotes(TRUE);
-    char *tok;
+    char* tok;
     TSTR name;
     TSTR value;
     TSTR tval;
     bool match = MatchAll;
     bool isName = true;
     tok = toker.next();
-    while (tok && (match==MatchAll)) {
+
+    while (tok && (match == MatchAll)) {
         if (isName) {
             if (*tok != '=') {
                 name = tok;
                 tok = toker.next();
+
                 if (tok && *tok == '=') {
                     tok = toker.next();
-                    if (tok) value = tok;
-                    else value = "";
+
+                    if (tok) {
+                        value = tok;
+                    } else {
+                        value = "";
+                    }
+
                     tok = toker.next();
-                } else value = "";
-                if (GetUserProp(node,name,tval)) match = IsMatch(value,tval);
-                else match = false;
+                } else {
+                    value = "";
+                }
+
+                if (GetUserProp(node, name, tval)) {
+                    match = IsMatch(value, tval);
+                } else {
+                    match = false;
+                }
+
                 continue;
-            } else isName = false;
+            } else {
+                isName = false;
+            }
         } else {
             isName = true;
         }
-        tok=toker.next();
+
+        tok = toker.next();
     }
 
-    if (match==MatchAll) {
-        if (!vname.isNull()) match = IsMatch(vname,node->GetName());
+    if (match == MatchAll) {
+        if (!vname.isNull()) {
+            match = IsMatch(vname, node->GetName());
+        }
     }
 
     vProps = oldProps;
     return match;
 }
 
-int UserPropMgr::GetUserPropCount(INode *node) {
+int UserPropMgr::GetUserPropCount(INode* node)
+{
     TSTR buf;
 
-    GetUserPropBuffer(node,buf);
+    GetUserPropBuffer(node, buf);
 
     int numProps = 0;
 
-    hsStringTokenizer toker(buf," \r\n");
+    hsStringTokenizer toker(buf, " \r\n");
     toker.ParseQuotes(TRUE);
-    char *tok;
+    char* tok;
     bool isName = true;
-    while (tok=toker.next()) {
+
+    while (tok = toker.next()) {
         if (isName) {
             if (*tok != '=') {
                 numProps++;
-            } else isName = false;
+            } else {
+                isName = false;
+            }
         } else {
             isName = true;
         }
@@ -279,507 +356,527 @@ int UserPropMgr::GetUserPropCount(INode *node) {
     return numProps;
 }
 
-void UserPropMgr::GetUserPropBuffer(INode *node, TSTR &buf) {
-    if (vProps) buf = vbuf;
-    else if (node) node->GetUserPropBuffer(buf);
-    else buf = "";
+void UserPropMgr::GetUserPropBuffer(INode* node, TSTR& buf)
+{
+    if (vProps) {
+        buf = vbuf;
+    } else if (node) {
+        node->GetUserPropBuffer(buf);
+    } else {
+        buf = "";
+    }
 }
 
-void UserPropMgr::SetUserPropBuffer(INode *node, const TSTR &buf) 
+void UserPropMgr::SetUserPropBuffer(INode* node, const TSTR& buf)
 {
     // QuickTable invalidate
-    if (node && node == fQuickNode)
-    {
+    if (node && node == fQuickNode) {
         fQuickNode = nil;
     }
 
-    if (vProps)
-    {
+    if (vProps) {
         vbuf = buf;
-    }
-    else if (node)
-    {
+    } else if (node) {
         node->SetUserPropBuffer(buf);
         node->NotifyDependents(FOREVER, PART_ALL, REFMSG_USERPROP);
     }
 }
 
-void UserPropMgr::SetUserPropFlagALL(const char *name, const bool setFlag, const int32_t hFlag) 
+void UserPropMgr::SetUserPropFlagALL(const char* name, const bool setFlag, const int32_t hFlag)
 {
-    for (int i=0; i<GetSelNodeCount();i++) 
-    {
-        SetUserPropFlag(GetSelNode(i),name,setFlag,hFlag);
+    for (int i = 0; i < GetSelNodeCount(); i++) {
+        SetUserPropFlag(GetSelNode(i), name, setFlag, hFlag);
     }
 }
-bool UserPropMgr::GetUserPropFlagALL(const char *name, bool &isSet, const int32_t hFlag)
- {
-    isSet = UserPropMgr::UserPropExists(GetSelNode(0),name,hFlag);
+bool UserPropMgr::GetUserPropFlagALL(const char* name, bool& isSet, const int32_t hFlag)
+{
+    isSet = UserPropMgr::UserPropExists(GetSelNode(0), name, hFlag);
 
-    for (int i=0; i<GetSelNodeCount(); i++) {
-        if (isSet != UserPropMgr::UserPropExists(GetSelNode(i),name,hFlag)) return FALSE;
+    for (int i = 0; i < GetSelNodeCount(); i++) {
+        if (isSet != UserPropMgr::UserPropExists(GetSelNode(i), name, hFlag)) {
+            return FALSE;
+        }
     }
+
     return TRUE;
 }
 
 INode* UserPropMgr::GetAncestorIfNeeded(INode* node, const int32_t hFlag)
 {
-    if (hFlag == kParent)
-    {
-        if (!(node->IsRootNode() || node->GetParentNode()->IsRootNode()))
+    if (hFlag == kParent) {
+        if (!(node->IsRootNode() || node->GetParentNode()->IsRootNode())) {
             node = node->GetParentNode();
-    }
-    else
-    if (hFlag == kRoot)
-    {
-        while (!(node->IsRootNode() || node->GetParentNode()->IsRootNode()))
+        }
+    } else if (hFlag == kRoot) {
+        while (!(node->IsRootNode() || node->GetParentNode()->IsRootNode())) {
             node = node->GetParentNode();
+        }
     }
+
     return node;
 }
 
 
-void UserPropMgr::ClearUserProp(INode *node, const char *name, const int32_t hFlag) 
+void UserPropMgr::ClearUserProp(INode* node, const char* name, const int32_t hFlag)
 {
-    node = GetAncestorIfNeeded(node,hFlag);
+    node = GetAncestorIfNeeded(node, hFlag);
 
     // QuickTable invalidate
-    if (node && node == fQuickNode)
-    {
+    if (node && node == fQuickNode) {
         fQuickNode = nil;
     }
 
     TSTR buf;
-    GetUserPropBuffer(node,buf);
+    GetUserPropBuffer(node, buf);
 
-    hsStringTokenizer toker(buf," \r\n");
+    hsStringTokenizer toker(buf, " \r\n");
     toker.ParseQuotes(TRUE);
-    char *tok;
+    char* tok;
     bool isName = true;
-    while (tok=toker.next()) 
-    {
-        if (isName) 
-        {
-            if (*tok != '=') 
-            {
-                if (!stricmp(tok,name)) 
-                {
-                    char *tok2 = toker.next();
-                    if (tok2) 
-                    {
-                        if (*tok2 == '=')
-                        {
+
+    while (tok = toker.next()) {
+        if (isName) {
+            if (*tok != '=') {
+                if (!stricmp(tok, name)) {
+                    char* tok2 = toker.next();
+
+                    if (tok2) {
+                        if (*tok2 == '=') {
                             tok2 = toker.next();
-                            if (tok2)
-                            {
+
+                            if (tok2) {
                                 tok2 = toker.next();
-                                if (tok2)
-                                {
-                                    buf.remove(tok-toker.fString,tok2-tok);
+
+                                if (tok2) {
+                                    buf.remove(tok - toker.fString, tok2 - tok);
+                                } else {
+                                    buf.remove(tok - toker.fString);
                                 }
-                                else
-                                {
-                                    buf.remove(tok-toker.fString);
-                                }
+                            } else {
+                                buf.remove(tok - toker.fString);
                             }
-                            else
-                            {
-                                buf.remove(tok-toker.fString);
-                            }
+                        } else {
+                            buf.remove(tok - toker.fString, tok2 - tok);
                         }
-                        else 
-                        {
-                            buf.remove(tok-toker.fString,tok2-tok);
-                        }
-                    } 
-                    else
-                    {
-                        buf.remove(tok-toker.fString);
+                    } else {
+                        buf.remove(tok - toker.fString);
                     }
+
                     break;
                 }
-            } 
-            else
-            {
+            } else {
                 isName = false;
             }
-        }
-        else
-        {
+        } else {
             isName = true;
         }
     }
-    if (vProps) 
-    {
+
+    if (vProps) {
         vbuf = buf;
-    }
-    else 
-    {
+    } else {
         node->SetUserPropBuffer(buf);
         node->NotifyDependents(FOREVER, PART_ALL, REFMSG_USERPROP);
     }
 };
 
-bool UserPropMgr::GetUserProp(INode *node, const char *name, TSTR &value, const int32_t hFlag)
+bool UserPropMgr::GetUserProp(INode* node, const char* name, TSTR& value, const int32_t hFlag)
 {
-    node = GetAncestorIfNeeded(node,hFlag);
+    node = GetAncestorIfNeeded(node, hFlag);
 
     // QuickTable lookup
-    if (node && fQuickTable)
-    {
-        if (node != fQuickNode)
+    if (node && fQuickTable) {
+        if (node != fQuickNode) {
             IBuildQuickTable(node);
-        return ICheckQuickEntry(name,value);
+        }
+
+        return ICheckQuickEntry(name, value);
     }
 
     TSTR buf;
-    GetUserPropBuffer(node,buf);
+    GetUserPropBuffer(node, buf);
 
-    hsStringTokenizer toker(buf," \r\n");
+    hsStringTokenizer toker(buf, " \r\n");
     toker.ParseQuotes(TRUE);
-    char *tok;
+    char* tok;
     bool isName = true;
-    while (tok=toker.next()) 
-    {
-        if (isName)
-        {
-            if (*tok != '=')
-            {
-                if (!stricmp(tok,name))
-                {
+
+    while (tok = toker.next()) {
+        if (isName) {
+            if (*tok != '=') {
+                if (!stricmp(tok, name)) {
                     tok = toker.next();
-                    if (tok && *tok == '=')
-                    {
+
+                    if (tok && *tok == '=') {
                         tok = toker.next();
-                        if (tok) value = tok;
-                        else value = "";
+
+                        if (tok) {
+                            value = tok;
+                        } else {
+                            value = "";
+                        }
+
                         return true;
-                    }
-                    else 
-                    {
+                    } else {
                         value = "";
                         return true;
                     }
                 }
-            } 
-            else 
+            } else {
                 isName = false;
-        } 
-        else
-        {
+            }
+        } else {
             isName = true;
         }
     }
+
     return false;
 }
 
-void UserPropMgr::SetUserProp(INode *node, const char *name, const char *value, const int32_t hFlag) 
+void UserPropMgr::SetUserProp(INode* node, const char* name, const char* value, const int32_t hFlag)
 {
-    node = GetAncestorIfNeeded(node,hFlag);
+    node = GetAncestorIfNeeded(node, hFlag);
 
     // QuickTable invalidate
-    if (node && node == fQuickNode)
-    {
+    if (node && node == fQuickNode) {
         fQuickNode = nil;
     }
 
     TSTR buf;
-    GetUserPropBuffer(node,buf);
+    GetUserPropBuffer(node, buf);
 
-    hsStringTokenizer toker(buf," \r\n");
+    hsStringTokenizer toker(buf, " \r\n");
     toker.ParseQuotes(TRUE);
-    char *tok;
+    char* tok;
     bool isName = true;
-    while (tok=toker.next())
-    {
-        if (isName) 
-        {
-            if (*tok != '=') 
-            {
-                if (!stricmp(tok,name)) 
-                {
-                    char *tok2 = toker.next();
-                    if (tok2)
-                    {
-                        if (*tok2 == '=')
-                        {
+
+    while (tok = toker.next()) {
+        if (isName) {
+            if (*tok != '=') {
+                if (!stricmp(tok, name)) {
+                    char* tok2 = toker.next();
+
+                    if (tok2) {
+                        if (*tok2 == '=') {
                             tok2 = toker.next();
-                            if (tok2) 
-                            {
+
+                            if (tok2) {
                                 tok2 = toker.next();
-                                if (tok2)
-                                {
-                                    buf.remove(tok-toker.fString,tok2-tok);
-                                } 
-                                else
-                                {
-                                    buf.remove(tok-toker.fString);
+
+                                if (tok2) {
+                                    buf.remove(tok - toker.fString, tok2 - tok);
+                                } else {
+                                    buf.remove(tok - toker.fString);
                                 }
-                            } 
-                            else
-                            {
-                                buf.remove(tok-toker.fString);
+                            } else {
+                                buf.remove(tok - toker.fString);
                             }
-                        } 
-                        else
-                        {
-                            buf.remove(tok-toker.fString,tok2-tok);
+                        } else {
+                            buf.remove(tok - toker.fString, tok2 - tok);
                         }
-                    } 
-                    else
-                    {
-                        buf.remove(tok-toker.fString);
+                    } else {
+                        buf.remove(tok - toker.fString);
                     }
+
                     break;
                 }
-            } 
-            else 
-            {
+            } else {
                 isName = false;
             }
-        } 
-        else
-        {
+        } else {
             isName = true;
         }
     }
-    if (buf.last('\n') < buf.length()-1)
-    {
+
+    if (buf.last('\n') < buf.length() - 1) {
         // better start with a separator
         buf += "\r\n";
     }
+
     buf += name;
-    if (value && *value)
-    {
+
+    if (value && *value) {
         buf += " = ";
-        if (strchr(value,' '))
-        {
+
+        if (strchr(value, ' ')) {
             buf += "\"";
             buf += value;
             buf += "\"";
-        }
-        else
-        {
+        } else {
             buf += value;
         }
     }
+
     buf += "\r\n";
-    if (vProps)
-    {
+
+    if (vProps) {
         vbuf = buf;
-    }
-    else
-    {
+    } else {
         node->SetUserPropBuffer(buf);
         node->NotifyDependents(FOREVER, PART_ALL, REFMSG_USERPROP);
     }
 }
 
 
-bool UserPropMgr::GetUserPropString(INode *node, const char *name, TSTR &value, const int32_t hFlag)
+bool UserPropMgr::GetUserPropString(INode* node, const char* name, TSTR& value, const int32_t hFlag)
 {
-     return GetUserProp(node,name,value,hFlag);
+    return GetUserProp(node, name, value, hFlag);
 }
-void UserPropMgr::SetUserPropString(INode *node, const char *name, const char *value, const int32_t hFlag) 
+void UserPropMgr::SetUserPropString(INode* node, const char* name, const char* value, const int32_t hFlag)
 {
-    SetUserProp(node,name,value,hFlag);
+    SetUserProp(node, name, value, hFlag);
 }
-bool UserPropMgr::GetUserPropFloat(INode *node, const char *name, float &value, const int32_t hFlag)
+bool UserPropMgr::GetUserPropFloat(INode* node, const char* name, float& value, const int32_t hFlag)
 {
     TSTR valStr;
-    if (GetUserProp(node,name,valStr,hFlag)) 
-    {
+
+    if (GetUserProp(node, name, valStr, hFlag)) {
         value = (float)atof(valStr);
         return TRUE;
     }
+
     return FALSE;
 }
-void UserPropMgr::SetUserPropFloat(INode *node, const char *name, const float value, const int32_t hFlag) 
+void UserPropMgr::SetUserPropFloat(INode* node, const char* name, const float value, const int32_t hFlag)
 {
     char valStr[50];
-    if (sprintf(valStr,"%g",value)) SetUserProp(node,name,valStr,hFlag);
+
+    if (sprintf(valStr, "%g", value)) {
+        SetUserProp(node, name, valStr, hFlag);
+    }
 }
-bool UserPropMgr::GetUserPropInt(INode *node, const char *name, int &value, const int32_t hFlag)
+bool UserPropMgr::GetUserPropInt(INode* node, const char* name, int& value, const int32_t hFlag)
 {
     TSTR valStr;
-    if (GetUserProp(node,name,valStr,hFlag)) {
+
+    if (GetUserProp(node, name, valStr, hFlag)) {
         value = atoi(valStr);
         return TRUE;
     }
+
     return FALSE;
 }
-void UserPropMgr::SetUserPropInt(INode *node, const char *name, const int value, const int32_t hFlag) 
+void UserPropMgr::SetUserPropInt(INode* node, const char* name, const int value, const int32_t hFlag)
 {
     char valStr[50];
-    if (sprintf(valStr,"%d",value)) SetUserProp(node,name,valStr,hFlag);
+
+    if (sprintf(valStr, "%d", value)) {
+        SetUserProp(node, name, valStr, hFlag);
+    }
 }
 
-bool UserPropMgr::UserPropExists(INode *node, const char *name, const int32_t hFlag) 
+bool UserPropMgr::UserPropExists(INode* node, const char* name, const int32_t hFlag)
 {
     TSTR value;
-    return GetUserProp(node,name,value,hFlag);
+    return GetUserProp(node, name, value, hFlag);
 }
 
-bool UserPropMgr::GetUserPropStringList(INode *node, const char *name, int &num, TSTR list[]) {
+bool UserPropMgr::GetUserPropStringList(INode* node, const char* name, int& num, TSTR list[])
+{
     TSTR sdata;
-    if (UserPropMgr::GetUserPropString(node,name,sdata)) {
-        num=0;
-        hsStringTokenizer toker(sdata,", ");
-        char *tok;
-        while ( tok = toker.next() ) {
+
+    if (UserPropMgr::GetUserPropString(node, name, sdata)) {
+        num = 0;
+        hsStringTokenizer toker(sdata, ", ");
+        char* tok;
+
+        while (tok = toker.next()) {
             list[num] = tok;
             num++;
         }
+
         return true;
-    } else return false;
+    } else {
+        return false;
+    }
 }
 
-bool UserPropMgr::GetUserPropIntList(INode *node, const char *name, int &num, int list[]) {
+bool UserPropMgr::GetUserPropIntList(INode* node, const char* name, int& num, int list[])
+{
     TSTR sdata;
-    if (UserPropMgr::GetUserPropString(node,name,sdata)) {
-        num=0;
-        hsStringTokenizer toker(sdata,", ");
-        char *tok;
-        while ( tok = toker.next() ) {
+
+    if (UserPropMgr::GetUserPropString(node, name, sdata)) {
+        num = 0;
+        hsStringTokenizer toker(sdata, ", ");
+        char* tok;
+
+        while (tok = toker.next()) {
             list[num] = atoi(tok);
             num++;
         }
+
         return true;
-    } else return false;
+    } else {
+        return false;
+    }
 }
 
-bool UserPropMgr::GetUserPropFloatList(INode *node, const char *name, int &num, float list[]) {
+bool UserPropMgr::GetUserPropFloatList(INode* node, const char* name, int& num, float list[])
+{
     TSTR sdata;
-    if (UserPropMgr::GetUserPropString(node,name,sdata)) {
-        num=0;
-        hsStringTokenizer toker(sdata,", ");
-        char *tok;
-        while ( tok = toker.next() ) {
+
+    if (UserPropMgr::GetUserPropString(node, name, sdata)) {
+        num = 0;
+        hsStringTokenizer toker(sdata, ", ");
+        char* tok;
+
+        while (tok = toker.next()) {
             list[num] = (float)atof(tok);
             num++;
         }
+
         return true;
-    } else return false;
+    } else {
+        return false;
+    }
 }
 
-bool UserPropMgr::GetUserPropStringALL(const char *name, TSTR &value, const int32_t hFlag)
+bool UserPropMgr::GetUserPropStringALL(const char* name, TSTR& value, const int32_t hFlag)
 {
-    bool propSet  = UserPropMgr::GetUserPropString(GetSelNode(0),name,value,hFlag);
+    bool propSet  = UserPropMgr::GetUserPropString(GetSelNode(0), name, value, hFlag);
 
     TSTR tvalue;
-    int i=1;
+    int i = 1;
     bool propMixed = FALSE;
+
     while (i < GetSelNodeCount() && !propMixed) {
-        if (propSet ^ UserPropMgr::GetUserPropString(GetSelNode(i),name,tvalue,hFlag)) propMixed = TRUE;
+        if (propSet ^ UserPropMgr::GetUserPropString(GetSelNode(i), name, tvalue, hFlag)) {
+            propMixed = TRUE;
+        }
+
         propMixed = (!(value == tvalue));
         i++;
     }
 
     return (!propMixed);
 }
-void UserPropMgr::SetUserPropStringALL(const char *name, const char *value, const int32_t hFlag) 
+void UserPropMgr::SetUserPropStringALL(const char* name, const char* value, const int32_t hFlag)
 {
-    for (int i=0; i<GetSelNodeCount(); i++) {
-        UserPropMgr::SetUserPropString(GetSelNode(i),name,value,hFlag);
+    for (int i = 0; i < GetSelNodeCount(); i++) {
+        UserPropMgr::SetUserPropString(GetSelNode(i), name, value, hFlag);
     }
 }
 
-bool UserPropMgr::GetUserPropStringListALL(const char *name, int &num, TSTR list[]) {
+bool UserPropMgr::GetUserPropStringListALL(const char* name, int& num, TSTR list[])
+{
     TSTR val;
-    GetUserPropStringList(GetSelNode(0),name,num,list);
-    return GetUserPropStringALL(name,val);
+    GetUserPropStringList(GetSelNode(0), name, num, list);
+    return GetUserPropStringALL(name, val);
 }
 
-bool UserPropMgr::GetUserPropIntListALL(const char *name, int &num, int *list) {
+bool UserPropMgr::GetUserPropIntListALL(const char* name, int& num, int* list)
+{
     TSTR val;
-    GetUserPropIntList(GetSelNode(0),name,num,list);
-    return GetUserPropStringALL(name,val);
+    GetUserPropIntList(GetSelNode(0), name, num, list);
+    return GetUserPropStringALL(name, val);
 }
 
-bool UserPropMgr::GetUserPropFloatListALL(const char *name, int &num, float *list) {
+bool UserPropMgr::GetUserPropFloatListALL(const char* name, int& num, float* list)
+{
     TSTR val;
-    GetUserPropFloatList(GetSelNode(0),name,num,list);
-    return GetUserPropStringALL(name,val);
+    GetUserPropFloatList(GetSelNode(0), name, num, list);
+    return GetUserPropStringALL(name, val);
 }
 
-bool UserPropMgr::GetNodeNameALL(TSTR &name) {
-    if (vProps) name = vname;
-    else if (ip->GetSelNodeCount() == 1) name = ip->GetSelNode(0)->GetName();
-    else return false;
+bool UserPropMgr::GetNodeNameALL(TSTR& name)
+{
+    if (vProps) {
+        name = vname;
+    } else if (ip->GetSelNodeCount() == 1) {
+        name = ip->GetSelNode(0)->GetName();
+    } else {
+        return false;
+    }
 
     return true;
 }
 
-void UserPropMgr::SetNodeNameALL(const char *name) {
+void UserPropMgr::SetNodeNameALL(const char* name)
+{
     if (vProps) {
         vname = name;
     } else {
         if (ip->GetSelNodeCount() > 1) {
             TSTR uName;
-            for (int i=0; i<ip->GetSelNodeCount(); i++) {
+
+            for (int i = 0; i < ip->GetSelNodeCount(); i++) {
                 uName = name;
                 ip->MakeNameUnique(uName);
                 ip->GetSelNode(i)->SetName(uName);
             }
-        } else ip->GetSelNode(0)->SetName((char*)name);
+        } else {
+            ip->GetSelNode(0)->SetName((char*)name);
+        }
     }
 }
 
 
-void UserPropMgr::LoadVirtualProps(bool reset) {
-    if (reset)
-    {
+void UserPropMgr::LoadVirtualProps(bool reset)
+{
+    if (reset) {
         vbuf = "";
         vname = "";
     }
+
     vProps = true;
 }
-void UserPropMgr::DestroyVirtualProps() {
+void UserPropMgr::DestroyVirtualProps()
+{
     vProps = false;
 }
-bool UserPropMgr::IsVirtual() {
+bool UserPropMgr::IsVirtual()
+{
     return vProps;
 }
 
-int UserPropMgr::GetSelNodeCount() {
-    if (vProps) return 1;
-    else return ip->GetSelNodeCount();
+int UserPropMgr::GetSelNodeCount()
+{
+    if (vProps) {
+        return 1;
+    } else {
+        return ip->GetSelNodeCount();
+    }
 }
-INode *UserPropMgr::GetSelNode(int i) {
-    if (vProps) return NULL;
-    else return ip->GetSelNode(i);
+INode* UserPropMgr::GetSelNode(int i)
+{
+    if (vProps) {
+        return NULL;
+    } else {
+        return ip->GetSelNode(i);
+    }
 }
 
 
 void UserPropMgr::OpenQuickTable()
 {
-        if (!fQuickTable)
-        {
+    if (!fQuickTable) {
         fQuickTable = new hsHashTable<QuickPair>(kQuickSize);
-        }
+    }
+
     fQuickNode = nil;
 }
 
 void UserPropMgr::CloseQuickTable()
-        {
+{
 #ifdef HS_DEBUGGING
-    if (fQuickNode && fQuickTable)
-            {
+
+    if (fQuickNode && fQuickTable) {
         char str[256];
-        sprintf(str,"%d Hash Collisions reported\n",fQuickTable->CollisionCount());
+        sprintf(str, "%d Hash Collisions reported\n", fQuickTable->CollisionCount());
         hsStatusMessage(str);
-            }
+    }
+
 #endif
 
     delete fQuickTable;
     fQuickTable = nil;
     fQuickNode = nil;
     QuickPair::SetBuffer(nil);
-        }
+}
 
 void UserPropMgr::IBuildQuickTable(INode* node)
 {
-    if (fQuickTable && fQuickNode != node)
-    {
+    if (fQuickTable && fQuickNode != node) {
         fQuickNode = node;
 
         // clear old QuickTable
@@ -787,46 +884,38 @@ void UserPropMgr::IBuildQuickTable(INode* node)
 
         // build new one
         TSTR buf;
-        GetUserPropBuffer(node,buf);
+        GetUserPropBuffer(node, buf);
 
-        hsStringTokenizer toker(buf," \r\n");
+        hsStringTokenizer toker(buf, " \r\n");
         toker.ParseQuotes(TRUE);
 
-        char *tok;
+        char* tok;
         bool inName = false;
         bool isName = true;
-        while ( inName || (tok=toker.next()) ) 
-        {
-            if (isName) 
-            {
-                if (*tok != '=') 
-                {
+
+        while (inName || (tok = toker.next())) {
+            if (isName) {
+                if (*tok != '=') {
                     QuickPair qPair;
                     qPair.SetKey(tok);
-                
+
                     tok = toker.next();
-                    if (tok && *tok == '=') 
-                    {
+
+                    if (tok && *tok == '=') {
                         tok = toker.next();
                         qPair.SetVal(tok);
 
                         inName = false;
-                    }
-                    else 
-                    {
+                    } else {
                         qPair.SetVal(nil);
                         inName = (tok != 0);
                     }
 
                     fQuickTable->insert(qPair);
-                } 
-                else 
-                {
+                } else {
                     isName = false;
                 }
-            } 
-            else 
-            {
+            } else {
                 isName = true;
             }
         }
@@ -837,13 +926,13 @@ void UserPropMgr::IBuildQuickTable(INode* node)
     }
 }
 
-bool UserPropMgr::ICheckQuickEntry(const char *key, TSTR &value)
+bool UserPropMgr::ICheckQuickEntry(const char* key, TSTR& value)
 {
     QuickPair q;
     q.SetKey(key);
     hsHashTableIterator<QuickPair> it = fQuickTable->find(q);
     return it->GetVal(value);
-    }
+}
 
 
 char* UserPropMgr::QuickPair::fBuffer = nil;
@@ -852,34 +941,32 @@ void UserPropMgr::QuickPair::SetBuffer(char* buf)
 {
     delete [] fBuffer;
     fBuffer = buf;
-    }
+}
 
 uint32_t UserPropMgr::QuickPair::GetHash() const
 {
-    const char * k = fKey;
+    const char* k = fKey;
     int len = k ? strlen(k) : 0;
     int h;
-    for (h=len; len--;) 
-    {
-        h = ((h<<5)^(h>>27))^tolower(*k++);
+
+    for (h = len; len--;) {
+        h = ((h << 5) ^ (h >> 27)) ^ tolower(*k++);
     }
+
     return h;
 }
 
 bool UserPropMgr::QuickPair::GetVal(TSTR& value)
-    {
-    if (fKey)
-        {
+{
+    if (fKey) {
         value = fVal ? fVal : "";
         return true;
-        }
-            else
-            {
+    } else {
         return false;
-        }
     }
+}
 
 bool UserPropMgr::QuickPair::operator==(const QuickPair& other) const
 {
-    return !_stricmp(fKey,other.fKey);
+    return !_stricmp(fKey, other.fKey);
 }

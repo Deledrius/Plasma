@@ -44,11 +44,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "hsStream.h"
 
-class plGeneric
-{
+class plGeneric {
 public:
-    enum GenericType
-    {
+    enum GenericType {
         kNull,
         kBool,
         kInt,
@@ -72,7 +70,9 @@ public:
     plGeneric(const double& val);
     plGeneric(const plString& val);
 
-    void SetToNull() {IReset();}
+    void SetToNull() {
+        IReset();
+    }
     plGeneric& operator=(const bool& val);
     plGeneric& operator=(const int& val);
     plGeneric& operator=(const double& val);
@@ -80,11 +80,21 @@ public:
 
     // the cast functions will NOT cast from one type to another, use
     // GetType() to determine the type of parameter, then cast it to that type
-    GenericType GetType() const {return fType;}
-    operator bool() const {return fBoolVal;}
-    operator int() const {return fIntVal;}
-    operator double() const {return fFloatVal;}
-    operator plString() const {return fStringVal;}
+    GenericType GetType() const {
+        return fType;
+    }
+    operator bool() const {
+        return fBoolVal;
+    }
+    operator int() const {
+        return fIntVal;
+    }
+    operator double() const {
+        return fFloatVal;
+    }
+    operator plString() const {
+        return fStringVal;
+    }
 
     int Write(hsStream* stream);
     int Read(hsStream* stream);

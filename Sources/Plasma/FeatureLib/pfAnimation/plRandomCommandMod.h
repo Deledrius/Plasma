@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnModifier/plSingleModifier.h"
 #include "hsTemplates.h"
 
-class plRandomCommandMod : public plSingleModifier
-{
+class plRandomCommandMod : public plSingleModifier {
 public:
     enum {
         kNormal             = 0x0,  // randomly select the next
@@ -75,51 +74,71 @@ protected:
 
     float                        fMinDelay;
     float                        fMaxDelay;
-    
+
     void            IStart();
     virtual void    IStop();
-    bool            IStopped() const { return hsCheckBits(fState, kStopped); }
+    bool            IStopped() const {
+        return hsCheckBits(fState, kStopped);
+    }
     void            IRetry(float secs);
     virtual void    IPlayNextIfMaster();
 
     void            IReset();
-    
-    float        IGetDelay(float len) const;      
-    
+
+    float        IGetDelay(float len) const;
+
     int             IExcludeSelections(int ncmds);
     bool            ISelectNext(int nAnim); // return false if we should stop, else set fCurrent to next index
 
-    // Once fCurrent is set to the next animation index to play, 
+    // Once fCurrent is set to the next animation index to play,
     // IPlayNext() does whatever it takes to actually play it.
     virtual void        IPlayNext() = 0;
 
     // We only act in response to messages.
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return false; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return false;
+    }
 
 public:
     plRandomCommandMod();
     ~plRandomCommandMod();
 
-    CLASSNAME_REGISTER( plRandomCommandMod );
-    GETINTERFACE_ANY( plRandomCommandMod, plSingleModifier );
+    CLASSNAME_REGISTER(plRandomCommandMod);
+    GETINTERFACE_ANY(plRandomCommandMod, plSingleModifier);
 
     virtual bool MsgReceive(plMessage* pMsg);
-    
+
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);
 
     // Export only
-    void    SetMode(uint8_t m) { fMode = m; }
-    uint8_t GetMode() const { return fMode; }
+    void    SetMode(uint8_t m) {
+        fMode = m;
+    }
+    uint8_t GetMode() const {
+        return fMode;
+    }
 
-    void    SetState(uint8_t s) { fState = s; }
-    uint8_t GetState() const { return fState; }
+    void    SetState(uint8_t s) {
+        fState = s;
+    }
+    uint8_t GetState() const {
+        return fState;
+    }
 
-    void    SetMinDelay(float f) { fMinDelay = f; }
-    float   GetMinDelay() const { return fMinDelay; }
+    void    SetMinDelay(float f) {
+        fMinDelay = f;
+    }
+    float   GetMinDelay() const {
+        return fMinDelay;
+    }
 
-    void    SetMaxDelay(float f) { fMaxDelay = f; }
-    float   GetMaxDelay() const { return fMaxDelay; }
+    void    SetMaxDelay(float f) {
+        fMaxDelay = f;
+    }
+    float   GetMaxDelay() const {
+        return fMaxDelay;
+    }
 };
 
 

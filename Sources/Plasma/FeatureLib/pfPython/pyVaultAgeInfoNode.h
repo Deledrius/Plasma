@@ -59,8 +59,7 @@ class pyAgeInfoStruct;
 class plUUID;
 
 
-class pyVaultAgeInfoNode : public pyVaultNode
-{
+class pyVaultAgeInfoNode : public pyVaultNode {
 private:
     mutable std::string fAgeFilename;
     mutable std::string fAgeInstName;
@@ -73,60 +72,60 @@ protected:
     pyVaultAgeInfoNode(RelVaultNode* vaultNode);
 
     //create from the Python side
-    pyVaultAgeInfoNode(int n=0);
+    pyVaultAgeInfoNode(int n = 0);
 
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptVaultAgeInfoNode);
-    static PyObject *New(RelVaultNode* vaultNode);
-    static PyObject *New(int n=0);
+    static PyObject* New(RelVaultNode* vaultNode);
+    static PyObject* New(int n = 0);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyVaultAgeInfoNode object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyVaultAgeInfoNode); // converts a PyObject to a pyVaultAgeInfoNode (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
 //==================================================================
 // class RelVaultNode : public plVaultNode
 //
-    PyObject *  GetCanVisitFolder() const; // returns pyVaultPlayerInfoListNode
-    PyObject * GetAgeOwnersFolder() const; // returns pyVaultPlayerInfoListNode
-    PyObject* GetChildAgesFolder( void ); // returns pyVaultFolderNode
-    PyObject *  GetAgeSDL() const; // returns pyVaultSDLNode
-    PyObject * GetCzar() const; // returns pyVaultPlayerInfoNode
+    PyObject*   GetCanVisitFolder() const; // returns pyVaultPlayerInfoListNode
+    PyObject* GetAgeOwnersFolder() const;  // returns pyVaultPlayerInfoListNode
+    PyObject* GetChildAgesFolder(void);   // returns pyVaultFolderNode
+    PyObject*   GetAgeSDL() const; // returns pyVaultSDLNode
+    PyObject* GetCzar() const;  // returns pyVaultPlayerInfoNode
 
-    PyObject * GetParentAgeLink () const;   // returns pyVaultAgeLinkNode, or None if not a child age.
+    PyObject* GetParentAgeLink() const;     // returns pyVaultAgeLinkNode, or None if not a child age.
 
-    const char * GetAgeFilename() const;
-    void    SetAgeFilename( const char * v );
+    const char* GetAgeFilename() const;
+    void    SetAgeFilename(const char* v);
 
-    const char * GetAgeInstanceName() const;
-    void    SetAgeInstanceName( const char * v );
+    const char* GetAgeInstanceName() const;
+    void    SetAgeInstanceName(const char* v);
 
-    const char * GetAgeUserDefinedName() const;
-    void    SetAgeUserDefinedName( const char * v );
+    const char* GetAgeUserDefinedName() const;
+    void    SetAgeUserDefinedName(const char* v);
 
     plUUID  GetAgeInstanceGuid() const;
-    void    SetAgeInstanceGuid( const char * guid );
+    void    SetAgeInstanceGuid(const char* guid);
 
-    const char * GetAgeDescription() const;
-    void    SetAgeDescription( const char * v );
+    const char* GetAgeDescription() const;
+    void    SetAgeDescription(const char* v);
 
     int32_t   GetSequenceNumber() const;
-    void    SetSequenceNumber( int32_t v );
-    
+    void    SetSequenceNumber(int32_t v);
+
     int32_t   GetAgeLanguage() const;
-    void    SetAgeLanguage( int32_t v );
+    void    SetAgeLanguage(int32_t v);
 
     uint32_t  GetAgeID() const;
-    void    SetAgeID( uint32_t v );
+    void    SetAgeID(uint32_t v);
 
     uint32_t  GetCzarID() const;
 
     bool    IsPublic() const;
 
-    const char * GetDisplayName() const;
+    const char* GetDisplayName() const;
 
-    PyObject * AsAgeInfoStruct() const; // returns pyAgeInfoStruct
+    PyObject* AsAgeInfoStruct() const;  // returns pyAgeInfoStruct
 };
 
 #endif // _pyVaultAgeInfoNode_h_

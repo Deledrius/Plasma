@@ -49,8 +49,7 @@ struct hsColor32 {
 
     uint8_t   b, g, r, a;
 
-    inline void SetARGB(uint8_t aa, uint8_t rr, uint8_t gg, uint8_t bb)
-    {
+    inline void SetARGB(uint8_t aa, uint8_t rr, uint8_t gg, uint8_t bb) {
         this->a = aa;
         this->r = rr;
         this->g = gg;
@@ -58,45 +57,54 @@ struct hsColor32 {
     }
 
     //  Compatibility inlines, should be depricated
-    inline void Set(uint8_t rr, uint8_t gg, uint8_t bb)
-    {
+    inline void Set(uint8_t rr, uint8_t gg, uint8_t bb) {
         this->r = rr;
         this->g = gg;
         this->b = bb;
     }
-    inline void Set(uint8_t aa, uint8_t rr, uint8_t gg, uint8_t bb)
-    {
+    inline void Set(uint8_t aa, uint8_t rr, uint8_t gg, uint8_t bb) {
         this->SetARGB(aa, rr, gg, bb);
     }
 
-    int operator==(const hsColor32& aa) const
-    {
-            return *(uint32_t*)&aa == *(uint32_t*)this;
+    int operator==(const hsColor32& aa) const {
+        return *(uint32_t*)&aa == *(uint32_t*)this;
     }
-    int operator!=(const hsColor32& aa) { return !(aa == *this); }
+    int operator!=(const hsColor32& aa) {
+        return !(aa == *this);
+    }
 };
 hsCTypeDefStruct(hsColor32)
 typedef hsColor32 hsRGBAColor32;
 
 struct hsColorRGBA {
-    float        r,g,b,a;
-    
+    float        r, g, b, a;
+
     hsRGBAColor32 ToRGBA32() const;
 
-    hsColorRGBA& Set(float red, float grn, float blu, float alp) { r = red; g = grn; b = blu; a = alp; return *this; }
+    hsColorRGBA& Set(float red, float grn, float blu, float alp) {
+        r = red;
+        g = grn;
+        b = blu;
+        a = alp;
+        return *this;
+    }
 
-    bool operator==(const hsColorRGBA&c) const { return (r==c.r)&&(g==c.g)&&(b==c.b)&&(a==c.a); }
-    bool operator!=(const hsColorRGBA&c) const { return !(c == *this); }
+    bool operator==(const hsColorRGBA& c) const {
+        return (r == c.r) && (g == c.g) && (b == c.b) && (a == c.a);
+    }
+    bool operator!=(const hsColorRGBA& c) const {
+        return !(c == *this);
+    }
 
     friend inline hsColorRGBA operator+(const hsColorRGBA& s, const hsColorRGBA& t);
     hsColorRGBA& operator+=(const hsColorRGBA& s);
-    
+
     friend inline hsColorRGBA operator*(const hsColorRGBA& s, const hsColorRGBA& t);
     hsColorRGBA& operator*=(const hsColorRGBA& s);
-    
+
     friend inline hsColorRGBA operator-(const hsColorRGBA& s, const hsColorRGBA& t);
     hsColorRGBA& operator-=(const hsColorRGBA& s);
-    
+
     friend inline hsColorRGBA operator*(const hsColorRGBA& c, const float s);
     friend inline hsColorRGBA operator*(const float s, const hsColorRGBA& c);
     hsColorRGBA& operator*=(const float s);
@@ -104,18 +112,18 @@ struct hsColorRGBA {
     hsColorRGBA&    FromARGB32(uint32_t c);
     uint32_t          ToARGB32() const;
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream) const;
+    void Read(hsStream* stream);
+    void Write(hsStream* stream) const;
 };
 
-inline void hsColorRGBA::Read(hsStream *s)
+inline void hsColorRGBA::Read(hsStream* s)
 {
     r = s->ReadLEScalar();
     g = s->ReadLEScalar();
     b = s->ReadLEScalar();
     a = s->ReadLEScalar();
 }
-inline void hsColorRGBA::Write(hsStream *s) const
+inline void hsColorRGBA::Write(hsStream* s) const
 {
     s->WriteLEScalar(r);
     s->WriteLEScalar(g);
@@ -136,9 +144,9 @@ inline hsColorRGBA& hsColorRGBA::FromARGB32(uint32_t c)
 inline uint32_t hsColorRGBA::ToARGB32() const
 {
     return (uint32_t(a * 255.99f) << 24)
-        | (uint32_t(r * 255.99f) << 16)
-        | (uint32_t(g * 255.99f) << 8)
-        | (uint32_t(b * 255.99f) << 0);
+           | (uint32_t(r * 255.99f) << 16)
+           | (uint32_t(g * 255.99f) << 8)
+           | (uint32_t(b * 255.99f) << 0);
 }
 
 inline hsColorRGBA operator+(const hsColorRGBA& s, const hsColorRGBA& t)
@@ -188,7 +196,7 @@ inline hsColorRGBA operator*(const hsColorRGBA& t, const float s)
     hsColorRGBA res;
     return res.Set(s * t.r, s * t.g, s * t.b, s * t.a);
 }
-inline hsColorRGBA operator*(const float s, const hsColorRGBA&t)
+inline hsColorRGBA operator*(const float s, const hsColorRGBA& t)
 {
     return t * s;
 }
@@ -201,8 +209,7 @@ inline hsColorRGBA& hsColorRGBA::operator*=(const float s)
     return *this;
 }
 
-class hsColorOverride
-{
+class hsColorOverride {
 public:
     enum {
         kNone,

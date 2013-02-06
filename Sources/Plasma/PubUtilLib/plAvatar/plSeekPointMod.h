@@ -49,30 +49,35 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // This modifier is something the avatar knows how to go to. (you know, seek)
 // It's kind of like a magnet that, when activated, draws the avatar...
 // Seen another way, it's a point with a name and a type....
-class plSeekPointMod : public plMultiModifier
-{
+class plSeekPointMod : public plMultiModifier {
 protected:
-    virtual bool IEval(double secs, float del, uint32_t dirty) {return true;}
-    char * fName;                                       // public because you can't change it
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return true;
+    }
+    char* fName;                                        // public because you can't change it
 
 public:
 
     plSeekPointMod();
-    plSeekPointMod(char *name);
+    plSeekPointMod(char* name);
     virtual ~plSeekPointMod();
 
-    const char * GetName() { return fName; };
-    void SetName(char * name) { fName = name; };
+    const char* GetName() {
+        return fName;
+    };
+    void SetName(char* name) {
+        fName = name;
+    };
 
-    CLASSNAME_REGISTER( plSeekPointMod );
-    GETINTERFACE_ANY( plSeekPointMod, plMultiModifier );
-    
+    CLASSNAME_REGISTER(plSeekPointMod);
+    GETINTERFACE_ANY(plSeekPointMod, plMultiModifier);
+
     virtual void AddTarget(plSceneObject* so);
 
     bool MsgReceive(plMessage* msg);
 
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 };
 
 #endif

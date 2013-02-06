@@ -53,11 +53,9 @@ class plVisRegion;
 class plMessage;
 struct hsPoint3;
 
-class plVisMgr : public hsKeyedObject
-{
+class plVisMgr : public hsKeyedObject {
 public:
-    enum RsvBits
-    {
+    enum RsvBits {
         kNormal,
         kCharacter,
 
@@ -90,8 +88,8 @@ public:
     plVisMgr();
     virtual ~plVisMgr();
 
-    CLASSNAME_REGISTER( plVisMgr );
-    GETINTERFACE_ANY( plVisMgr, hsKeyedObject );
+    CLASSNAME_REGISTER(plVisMgr);
+    GETINTERFACE_ANY(plVisMgr, hsKeyedObject);
 
     virtual bool MsgReceive(plMessage* msg);
 
@@ -103,8 +101,12 @@ public:
 
     void Eval(const hsPoint3& pos);
 
-    const hsBitVector& GetVisSet() const { return fVisSet; }
-    const hsBitVector& GetVisNot() const { return fVisNot; }
+    const hsBitVector& GetVisSet() const {
+        return fVisSet;
+    }
+    const hsBitVector& GetVisNot() const {
+        return fVisNot;
+    }
 
     // All the following persist only through the next Eval. So a normal
     // use would be to call DisableNormal() in your RenderRequest's Render method,
@@ -124,12 +126,13 @@ public:
     void    ForceVisSets(const hsBitVector& enabled, bool isNot = false);
 };
 
-class plGlobalVisMgr
-{
+class plGlobalVisMgr {
 protected:
     static plVisMgr*        fInstance;
 public:
-    static plVisMgr* Instance() { return fInstance; }
+    static plVisMgr* Instance() {
+        return fInstance;
+    }
 
     static void Init();
     static void DeInit();

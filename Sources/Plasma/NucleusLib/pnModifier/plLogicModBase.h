@@ -51,11 +51,9 @@ class plConditionalObject;
 class plSceneObject;
 class plNotifyMsg;
 class plVolumeSensorConditionalObjectNoArbitration;
-class plLogicModBase : public plSingleModifier
-{
+class plLogicModBase : public plSingleModifier {
 public:
-    enum Flags
-    {
+    enum Flags {
         kLocalElement   = 0,
         kReset,
         kTriggered,
@@ -75,46 +73,72 @@ protected:
     plNotifyMsg*                    fNotify;
     bool                            fDisabled;
 
-    virtual bool IEval(double secs, float del, uint32_t dirty) {return false;}
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return false;
+    }
     void IUpdateSharedState(bool triggered) const;
     bool IEvalCounter();
     virtual void PreTrigger(bool netRequest);
     virtual void Trigger(bool netRequest);
     virtual void UnTrigger();
-    
+
     void CreateNotifyMsg();
-    
+
 public:
     friend class plVolumeSensorConditionalObjectNoArbitration;
     plLogicModBase();
     ~plLogicModBase();
-    CLASSNAME_REGISTER( plLogicModBase );
-    GETINTERFACE_ANY( plLogicModBase, plSingleModifier );
+    CLASSNAME_REGISTER(plLogicModBase);
+    GETINTERFACE_ANY(plLogicModBase, plSingleModifier);
 
     void AddTarget(plSceneObject* so);
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     virtual bool MsgReceive(plMessage* msg);
-    virtual bool VerifyConditions(plMessage* msg) { return true;}
+    virtual bool VerifyConditions(plMessage* msg) {
+        return true;
+    }
 
     virtual void Reset(bool bCounterReset);
 
-    void SetDisabled(bool disabled) { fDisabled = disabled; }
-    bool Disabled() { return fDisabled; }
+    void SetDisabled(bool disabled) {
+        fDisabled = disabled;
+    }
+    bool Disabled() {
+        return fDisabled;
+    }
 
-    plNotifyMsg* GetNotify() { return fNotify; }
+    plNotifyMsg* GetNotify() {
+        return fNotify;
+    }
 
-    void AddCommand(plMessage* msg) { fCommandList.Append(msg); }
-    void SetOneShot(bool b) { if (b) SetFlag(kOneShot); else ClearFlag(kOneShot); }
+    void AddCommand(plMessage* msg) {
+        fCommandList.Append(msg);
+    }
+    void SetOneShot(bool b) {
+        if (b) {
+            SetFlag(kOneShot);
+        } else {
+            ClearFlag(kOneShot);
+        }
+    }
     void RegisterForMessageType(uint16_t hClass);
 
-    virtual void RequestTrigger(bool netRequest=false);
-    virtual void RequestUnTrigger() { UnTrigger(); }
+    virtual void RequestTrigger(bool netRequest = false);
+    virtual void RequestUnTrigger() {
+        UnTrigger();
+    }
 
-    bool    HasFlag(int f) const { return fFlags.IsBitSet(f); }
-    void    SetFlag(int f) { fFlags.SetBit(f); }
-    void    ClearFlag(int which) { fFlags.ClearBit(which); }
+    bool    HasFlag(int f) const {
+        return fFlags.IsBitSet(f);
+    }
+    void    SetFlag(int f) {
+        fFlags.SetBit(f);
+    }
+    void    ClearFlag(int which) {
+        fFlags.ClearBit(which);
+    }
 
     void AddNotifyReceiver(plKey receiver);
 

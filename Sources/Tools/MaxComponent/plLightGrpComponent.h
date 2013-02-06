@@ -51,8 +51,7 @@ class plErrorMsg;
 class plDrawableSpans;
 
 //Class that accesses the paramblock below.
-class plLightGrpComponent : public plComponent
-{
+class plLightGrpComponent : public plComponent {
 private:
     bool            fValid;
 
@@ -68,7 +67,7 @@ public:
 
     bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
     bool PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
     const hsTArray<plLightInfo*>& GetLightInfos();
 

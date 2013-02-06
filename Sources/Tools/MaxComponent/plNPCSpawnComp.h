@@ -46,4 +46,4 @@ class plMaxNodeBase;
 
 #define NPC_SPAWN_CLASS_ID Class_ID(0x784e3345, 0x2ed0288c)
 
-plKey GetNPCSpawnModKey(plComponentBase *npcSpawnComp, plMaxNodeBase *target);
+plKey GetNPCSpawnModKey(plComponentBase* npcSpawnComp, plMaxNodeBase* target);

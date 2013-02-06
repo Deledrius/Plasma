@@ -45,24 +45,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plMessage.h"
 
 plNetSharedState::plNetSharedState(const char* name) : fServerMayDelete(false)
-{ 
+{
     SetName(name);
 }
 
-plNetSharedState::~plNetSharedState() 
-{ 
+plNetSharedState::~plNetSharedState()
+{
     Reset();
 }
 
 void plNetSharedState::Reset()
 {
     int i;
-    for(i=0;i<fVars.size();i++)
+
+    for (i = 0; i < fVars.size(); i++) {
         delete fVars[i];
+    }
+
     fVars.clear();
 }
 
-void plNetSharedState::Copy(plNetSharedState *ss)
+void plNetSharedState::Copy(plNetSharedState* ss)
 {
     Reset();
 
@@ -73,8 +76,8 @@ void plNetSharedState::Copy(plNetSharedState *ss)
 
     // copy vars
     int i;
-    for(i=0;i<ss->GetNumVars();i++)
-    {
+
+    for (i = 0; i < ss->GetNumVars(); i++) {
         plGenericVar* sv = new plGenericVar;
         *sv = *(ss->GetVar(i));
         AddVar(sv);
@@ -82,17 +85,17 @@ void plNetSharedState::Copy(plNetSharedState *ss)
 }
 
 void plNetSharedState::Read(hsStream* stream)
-{   
+{
     Reset();
 
     plMsgStdStringHelper::Peek(fName, stream);
-    int32_t num=stream->ReadLE32();
+    int32_t num = stream->ReadLE32();
     fServerMayDelete = stream->ReadBool();
-    
+
     fVars.reserve(num);
     int i;
-    for(i=0;i<num;i++)
-    {
+
+    for (i = 0; i < num; i++) {
         plGenericVar* v = new plGenericVar;
         v->Read(stream);
         AddVar(v);
@@ -100,15 +103,15 @@ void plNetSharedState::Read(hsStream* stream)
 }
 
 void plNetSharedState::Write(hsStream* stream)
-{   
+{
     plMsgStdStringHelper::Poke(fName, stream);
-    int32_t num=GetNumVars();
+    int32_t num = GetNumVars();
     stream->WriteLE32(num);
-    
+
     stream->WriteBool(fServerMayDelete);
     int i;
-    for(i=0;i<num;i++)
-    {
+
+    for (i = 0; i < num; i++) {
         fVars[i]->Write(stream);
     }
 }

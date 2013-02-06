@@ -56,37 +56,52 @@ class plMessage;
 struct plMouseInfo;
 class plPipeline;
 
-class plInputDevice 
-{
+class plInputDevice {
 public:
-    enum Flags
-    {
+    enum Flags {
         kDisabled    = 0x1
     };
 protected:
     uint32_t fFlags;
 public:
-    
-    plInputDevice() {;}
-    virtual ~plInputDevice() {;}
+
+    plInputDevice() {
+        ;
+    }
+    virtual ~plInputDevice() {
+        ;
+    }
 
     virtual const char* GetInputName() = 0;
 
-    uint32_t GetFlags() { return fFlags; }
-    void SetFlags(uint32_t f) { fFlags = f; }
-    virtual void HandleKeyEvent(plOSMsg message, plKeyDef key, bool bKeyDown, bool bKeyRepeat, wchar_t c = 0) {;}
-    virtual void HandleMouseEvent(plOSMsg message, plMouseState state)  {;}
-    virtual void HandleWindowActivate(bool bActive, hsWindowHndl hWnd) {;}
-    virtual bool MsgReceive(plMessage* msg) {return false;}
-    virtual void Shutdown() {;}
+    uint32_t GetFlags() {
+        return fFlags;
+    }
+    void SetFlags(uint32_t f) {
+        fFlags = f;
+    }
+    virtual void HandleKeyEvent(plOSMsg message, plKeyDef key, bool bKeyDown, bool bKeyRepeat, wchar_t c = 0) {
+        ;
+    }
+    virtual void HandleMouseEvent(plOSMsg message, plMouseState state)  {
+        ;
+    }
+    virtual void HandleWindowActivate(bool bActive, hsWindowHndl hWnd) {
+        ;
+    }
+    virtual bool MsgReceive(plMessage* msg) {
+        return false;
+    }
+    virtual void Shutdown() {
+        ;
+    }
 
 
 };
 
 class plKeyEventMsg;
 
-class plKeyboardDevice : public plInputDevice
-{
+class plKeyboardDevice : public plInputDevice {
     bool    fAltKeyDown;
     bool    fShiftKeyDown;
     bool    fCtrlKeyDown;
@@ -104,8 +119,7 @@ class plKeyboardDevice : public plInputDevice
     void ReleaseAllKeys();
 
 public:
-    enum
-    {
+    enum {
         CONSOLE_MODE = 0,
         CONSOLE_FULL,
         STANDARD_MODE,
@@ -113,18 +127,28 @@ public:
     plKeyboardDevice();
     ~plKeyboardDevice();
 
-    void SetControlMode(int i) { fControlMode = i; }
+    void SetControlMode(int i) {
+        fControlMode = i;
+    }
 
-    const char* GetInputName() { return "keyboard"; }
+    const char* GetInputName() {
+        return "keyboard";
+    }
     void HandleKeyEvent(plOSMsg message, plKeyDef key, bool bKeyDown, bool bKeyRepeat, wchar_t c = 0);
     virtual void HandleWindowActivate(bool bActive, hsWindowHndl hWnd);
     virtual bool IsCapsLockKeyOn();
     virtual void Shutdown();
 
-    static bool     IgnoreCapsLock() { return fIgnoreCapsLock; }
-    static void     IgnoreCapsLock(bool ignore) { fIgnoreCapsLock = ignore; }
-    
-    static plKeyboardDevice* GetInstance() { return fInstance; }
+    static bool     IgnoreCapsLock() {
+        return fIgnoreCapsLock;
+    }
+    static void     IgnoreCapsLock(bool ignore) {
+        fIgnoreCapsLock = ignore;
+    }
+
+    static plKeyboardDevice* GetInstance() {
+        return fInstance;
+    }
 };
 
 class plPlate;
@@ -153,44 +177,66 @@ class plPlate;
 
 class plInputEventMsg;
 
-class plMouseDevice : public plInputDevice
-{
+class plMouseDevice : public plInputDevice {
 public:
     plMouseDevice();
     ~plMouseDevice();
 
-    const char* GetInputName() { return "mouse"; }
-
-    bool    HasControlFlag(int f) const { return fControlFlags.IsBitSet(f); }
-    void    SetControlFlag(int f) 
-    { 
-        fControlFlags.SetBit(f); 
+    const char* GetInputName() {
+        return "mouse";
     }
-    void    ClearControlFlag(int which) { fControlFlags.ClearBit( which ); }
+
+    bool    HasControlFlag(int f) const {
+        return fControlFlags.IsBitSet(f);
+    }
+    void    SetControlFlag(int f) {
+        fControlFlags.SetBit(f);
+    }
+    void    ClearControlFlag(int which) {
+        fControlFlags.ClearBit(which);
+    }
     void    SetCursorX(float x);
     void    SetCursorY(float y);
-    float GetCursorX() { return fXPos; }
-    float GetCursorY() { return fYPos; }
-    uint32_t  GetButtonState() { return fButtonState; }
-    float GetCursorOpacity() { return fOpacity; }
+    float GetCursorX() {
+        return fXPos;
+    }
+    float GetCursorY() {
+        return fYPos;
+    }
+    uint32_t  GetButtonState() {
+        return fButtonState;
+    }
+    float GetCursorOpacity() {
+        return fOpacity;
+    }
     void SetDisplayResolution(float Width, float Height);
-    
+
     virtual bool MsgReceive(plMessage* msg);
-    
-    static plMouseDevice* Instance() { return plMouseDevice::fInstance; }
-    
-    static void SetMsgAlways(bool b) { plMouseDevice::bMsgAlways = b; }
+
+    static plMouseDevice* Instance() {
+        return plMouseDevice::fInstance;
+    }
+
+    static void SetMsgAlways(bool b) {
+        plMouseDevice::bMsgAlways = b;
+    }
     static void ShowCursor(bool override = false);
     static void NewCursor(char* cursor);
     static void HideCursor(bool override = false);
-    static bool GetHideCursor() { return plMouseDevice::bCursorHidden; }
-    static void SetCursorOpacity( float opacity = 1.f );
-    static bool GetInverted() { return plMouseDevice::bInverted; }
-    static void SetInverted(bool inverted) { plMouseDevice::bInverted = inverted; }
+    static bool GetHideCursor() {
+        return plMouseDevice::bCursorHidden;
+    }
+    static void SetCursorOpacity(float opacity = 1.f);
+    static bool GetInverted() {
+        return plMouseDevice::bInverted;
+    }
+    static void SetInverted(bool inverted) {
+        plMouseDevice::bInverted = inverted;
+    }
     static void AddNameToCursor(const plString& name);
     static void AddIDNumToCursor(uint32_t idNum);
     static void AddCCRToCursor();
-    
+
 protected:
     plInputEventMsg*    fXMsg;
     plInputEventMsg*    fYMsg;
@@ -208,14 +254,14 @@ protected:
     uint32_t   fButtonState;
     float fOpacity;
     hsBitVector     fControlFlags;
-    
-    
-    plPlate *fCursor;
+
+
+    plPlate* fCursor;
     char*    fCursorID;
 
     static plMouseDevice* fInstance;
     static plMouseInfo  fDefaultMouseControlMap[];
-    void    CreateCursor( char* cursor );
+    void    CreateCursor(char* cursor);
     void IUpdateCursorSize();
     static bool bMsgAlways;
     static bool bCursorHidden;

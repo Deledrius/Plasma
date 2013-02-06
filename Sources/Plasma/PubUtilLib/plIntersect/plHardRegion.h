@@ -50,16 +50,14 @@ class hsStream;
 class hsResMgr;
 class plMessage;
 
-class plHardRegion : public plRegionBase
-{
+class plHardRegion : public plRegionBase {
 public:
     enum RefTypes {
         kSubRegion
     };
 
 protected:
-    enum
-    {
+    enum {
         kDirty,
         kCamInside
     };
@@ -73,15 +71,19 @@ public:
     plHardRegion();
     virtual ~plHardRegion();
 
-    CLASSNAME_REGISTER( plHardRegion );
-    GETINTERFACE_ANY( plHardRegion, plRegionBase );
+    CLASSNAME_REGISTER(plHardRegion);
+    GETINTERFACE_ANY(plHardRegion, plRegionBase);
 
-    virtual bool IsInside(const hsPoint3& pos) const { return IIsInside(pos); }
+    virtual bool IsInside(const hsPoint3& pos) const {
+        return IIsInside(pos);
+    }
     virtual bool CameraInside() const;
 
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l) = 0;
 
-    virtual int32_t   GetNumProperties() const { return 1; } // This is stupid.
+    virtual int32_t   GetNumProperties() const {
+        return 1;    // This is stupid.
+    }
 
 
     virtual bool MsgReceive(plMessage* msg);

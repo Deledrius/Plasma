@@ -46,11 +46,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plMessage.h"
 #include "hsGeometry3.h"
 
-class plBulletMsg : public plMessage
-{
+class plBulletMsg : public plMessage {
 public:
-    enum Cmd
-    {
+    enum Cmd {
         kStop,
         kShot,
         kSpray
@@ -64,34 +62,58 @@ protected:
     float    fRadius;
     float    fPartyTime;
 public:
-    plBulletMsg() { SetBCastFlag(kNetPropagate | kBCastByType, true); }
-    plBulletMsg(const plKey &s,
-                const plKey &r,
-                const double* t) : plMessage(s, r, t) { SetBCastFlag(kNetPropagate | kBCastByType, true); }
+    plBulletMsg() {
+        SetBCastFlag(kNetPropagate | kBCastByType, true);
+    }
+    plBulletMsg(const plKey& s,
+                const plKey& r,
+                const double* t) : plMessage(s, r, t) {
+        SetBCastFlag(kNetPropagate | kBCastByType, true);
+    }
 
     ~plBulletMsg() {}
-    
-    CLASSNAME_REGISTER( plBulletMsg );
-    GETINTERFACE_ANY( plBulletMsg, plMessage );
+
+    CLASSNAME_REGISTER(plBulletMsg);
+    GETINTERFACE_ANY(plBulletMsg, plMessage);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    bool Shot() const { return fCmd == kShot; }
-    bool Spray() const { return fCmd == kSpray; }
-    bool Stop() const { return fCmd == kStop; }
+    bool Shot() const {
+        return fCmd == kShot;
+    }
+    bool Spray() const {
+        return fCmd == kSpray;
+    }
+    bool Stop() const {
+        return fCmd == kStop;
+    }
 
-    void FireShot(const hsPoint3& from, const hsVector3& dir, float radius, float range, float psecs=-1.f);
-    void FireShot(const hsPoint3& from, const hsPoint3& at, float radius, float psecs=-1.f);
+    void FireShot(const hsPoint3& from, const hsVector3& dir, float radius, float range, float psecs = -1.f);
+    void FireShot(const hsPoint3& from, const hsPoint3& at, float radius, float psecs = -1.f);
 
-    Cmd GetCmd() const { return fCmd; }
-    void SetCmd(Cmd c) { fCmd = c; }
+    Cmd GetCmd() const {
+        return fCmd;
+    }
+    void SetCmd(Cmd c) {
+        fCmd = c;
+    }
 
-    const hsPoint3& From() const { return fFrom; }
-    const hsVector3& Dir() const { return fDir; }
-    float Range() const { return fRange; }
-    float Radius() const { return fRadius; }
-    float PartyTime() const { return fPartyTime; }
+    const hsPoint3& From() const {
+        return fFrom;
+    }
+    const hsVector3& Dir() const {
+        return fDir;
+    }
+    float Range() const {
+        return fRange;
+    }
+    float Radius() const {
+        return fRadius;
+    }
+    float PartyTime() const {
+        return fPartyTime;
+    }
 };
 
 #endif // plBulletMsg_inc

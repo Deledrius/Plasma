@@ -47,28 +47,35 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnInputCore/plKeyDef.h"
 
 
-class plKeyPressConditionalObject : public plConditionalObject
-{
+class plKeyPressConditionalObject : public plConditionalObject {
 protected:
 
     plKeyDef fKeyEvent;
 
 public:
-    
+
     plKeyPressConditionalObject();
-    ~plKeyPressConditionalObject(){;}
-    
-    CLASSNAME_REGISTER( plKeyPressConditionalObject );
-    GETINTERFACE_ANY( plKeyPressConditionalObject, plConditionalObject );
-    
+    ~plKeyPressConditionalObject() {
+        ;
+    }
+
+    CLASSNAME_REGISTER(plKeyPressConditionalObject);
+    GETINTERFACE_ANY(plKeyPressConditionalObject, plConditionalObject);
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     bool MsgReceive(plMessage* msg);
-    
-    void Evaluate(){;}
-    void Reset() { SetSatisfied(false); }
-    void SetKeyEvent(const plKeyDef k ) { fKeyEvent = k; }
+
+    void Evaluate() {
+        ;
+    }
+    void Reset() {
+        SetSatisfied(false);
+    }
+    void SetKeyEvent(const plKeyDef k) {
+        fKeyEvent = k;
+    }
 
 };
 

@@ -67,23 +67,23 @@ void DummyCodeIncludeFuncMorph()
 {
 }
 
-class plMorphLayComp : public plComponent
-{
+class plMorphLayComp : public plComponent {
 protected:
 public:
-    enum 
-    {
+    enum {
         kDeltas
     };
-    
+
     plMorphLayComp();
-    void DeleteThis() { delete this; }
-    
+    void DeleteThis() {
+        delete this;
+    }
+
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
     bool SetupLayer(plMorphArray& morphArr, plMaxNode* baseNode, hsTArray<plGeometrySpan*>* baseSpans, plErrorMsg* pErrMsg);
 };
@@ -91,15 +91,15 @@ public:
 CLASS_DESC(plMorphLayComp, gMorphLayCompDesc, "Morph Layer",  "MorphLay", COMP_TYPE_AVATAR, MORPHLAY_COMP_CID)
 
 ParamBlockDesc2 gMorphLayBk
-(   
+(
     plComponent::kBlkComp, _T("MorphLay"), 0, &gMorphLayCompDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_MORPHLAY, IDS_COMP_MORPHLAY, 0, 0, nil,
 
     plMorphLayComp::kDeltas,    _T("Deltas"),   TYPE_INODE_TAB, 0,      P_CAN_CONVERT, 0,
-        p_ui,           TYPE_NODELISTBOX, IDC_LIST_TARGS, IDC_ADD_TARGS, 0, IDC_DEL_TARGS,
-        p_classID,      triObjectClassID,
-        end,
+    p_ui,           TYPE_NODELISTBOX, IDC_LIST_TARGS, IDC_ADD_TARGS, 0, IDC_DEL_TARGS,
+    p_classID,      triObjectClassID,
+    end,
 
     end
 );
@@ -111,19 +111,21 @@ plMorphLayComp::plMorphLayComp()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plMorphLayComp::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plMorphLayComp::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     const int num = fCompPB->Count(kDeltas);
     int i;
-    for( i = 0; i < num; i++ )
-    {
+
+    for (i = 0; i < num; i++) {
         plMaxNode* deltaNode = (plMaxNode*)fCompPB->GetINode(kDeltas, TimeValue(0), i);
-        if( deltaNode )
-        {
+
+        if (deltaNode) {
             const char* deltaName = deltaNode->GetName();
-            
-            if( !deltaNode->GetSwappableGeom() )
+
+            if (!deltaNode->GetSwappableGeom()) {
                 deltaNode->SetSwappableGeom(new plSharedMesh);
+            }
+
 //          deltaNode->SetForceLocal(true);
         }
     }
@@ -131,12 +133,12 @@ bool plMorphLayComp::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
     return true;
 }
 
-bool plMorphLayComp::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plMorphLayComp::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
-bool plMorphLayComp::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plMorphLayComp::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
@@ -145,12 +147,15 @@ bool plMorphLayComp::SetupLayer(plMorphArray& morphArr, plMaxNode* baseNode, hsT
 {
     const int num = fCompPB->Count(kDeltas);
     int i;
+
     // For each delta
-    for( i = 0; i < num; i++ )
-    {
+    for (i = 0; i < num; i++) {
         plMaxNode* deltaNode = (plMaxNode*)fCompPB->GetINode(kDeltas, TimeValue(0), i);
-        if( !deltaNode )
+
+        if (!deltaNode) {
             continue;
+        }
+
         const char* dbgNodeName = deltaNode->GetName();
 
         // Get the GeometrySpans. We ensured they would
@@ -161,7 +166,7 @@ bool plMorphLayComp::SetupLayer(plMorphArray& morphArr, plMaxNode* baseNode, hsT
         // We want to move the deltas into the same space as the base mesh verts.
         // So the first question is, which space do we want to move them from?
         // Answer is, we want to take the deltas from where they are relative to their OTM (pivot point),
-        // and move them into base node's local space. 
+        // and move them into base node's local space.
         // The idea is that we want to assume the pivot points of the two objects are aligned, even though
         // we don't require that they are. So we transform delta verts to their pivot space, pretend that is the
         // same space as baseNode's pivot space, and transform from that to baseNode's local space.
@@ -178,9 +183,9 @@ bool plMorphLayComp::SetupLayer(plMorphArray& morphArr, plMaxNode* baseNode, hsT
         hsMatrix44 d2bTInv;
         d2b.GetInverse(&d2bTInv);
         d2bTInv.GetTranspose(&d2bTInv);
+
         // Error check - movedSpans->GetCount() == baseSpans->GetCount();
-        if( movedSpans->GetCount() != baseSpans->GetCount() )
-        {
+        if (movedSpans->GetCount() != baseSpans->GetCount()) {
             pErrMsg->Set(true, deltaNode->GetName(), "Delta mesh mismatch with base").CheckAndAsk();
             pErrMsg->Set(false);
             continue;
@@ -196,56 +201,53 @@ bool plMorphLayComp::SetupLayer(plMorphArray& morphArr, plMaxNode* baseNode, hsT
 
 
 
-class plMorphSeqComp : public plComponent
-{
+class plMorphSeqComp : public plComponent {
 protected:
     plMorphLayComp*             IGetLayerComp(int i);
 
 public:
-    enum 
-    {
+    enum {
         kLayers,
         kBaseNode
     };
-    
+
     plMorphSeqComp();
-    void DeleteThis() { delete this; }
-    
+    void DeleteThis() {
+        delete this;
+    }
+
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool DeInit(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool DeInit(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 
 CLASS_DESC(plMorphSeqComp, gMorphSeqCompDesc, "Morph Sequence",  "MorphSeq", COMP_TYPE_AVATAR, MORPHSEQ_COMP_CID)
 
 
-class plMorphSeqProc : public ParamMap2UserDlgProc
-{
+class plMorphSeqProc : public ParamMap2UserDlgProc {
 public:
-    BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (msg)
-        {
-        case WM_INITDIALOG:
-            {
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        switch (msg) {
+        case WM_INITDIALOG: {
             }
+
             return true;
 
         case WM_COMMAND:
-            if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_ADD_TARGS)
-            {
+            if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_ADD_TARGS) {
                 std::vector<Class_ID> cids;
                 cids.push_back(MORPHLAY_COMP_CID);
-                IParamBlock2 *pb = map->GetParamBlock();
+                IParamBlock2* pb = map->GetParamBlock();
                 plPick::Node(pb, plMorphSeqComp::kLayers, &cids, false, false);
 
                 map->Invalidate(plMorphSeqComp::kLayers);
                 return TRUE;
             }
+
             break;
         }
 
@@ -259,20 +261,20 @@ static plMorphSeqProc gMorphSeqProc;
 
 
 ParamBlockDesc2 gMorphSeqBk
-(   
+(
     plComponent::kBlkComp, _T("MorphSeq"), 0, &gMorphSeqCompDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_MORPHSEQ, IDS_COMP_MORPHSEQ, 0, 0, &gMorphSeqProc,
 
     plMorphSeqComp::kLayers,    _T("Layers"),   TYPE_INODE_TAB, 0,      0, 0,
-        p_ui,           TYPE_NODELISTBOX, IDC_LIST_TARGS, 0, 0, IDC_DEL_TARGS,
-        end,
+    p_ui,           TYPE_NODELISTBOX, IDC_LIST_TARGS, 0, 0, IDC_DEL_TARGS,
+    end,
 
     plMorphSeqComp::kBaseNode, _T("BaseNode"),  TYPE_INODE,     0, 0,
-        p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_CHOOSE_OBJECT,
-        p_sclassID, GEOMOBJECT_CLASS_ID,
-        p_prompt, IDS_COMP_CHOSE_OBJECT,
-        end,
+    p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_CHOOSE_OBJECT,
+    p_sclassID, GEOMOBJECT_CLASS_ID,
+    p_prompt, IDS_COMP_CHOSE_OBJECT,
+    end,
 
     end
 );
@@ -280,14 +282,17 @@ ParamBlockDesc2 gMorphSeqBk
 bool plMorphSeqComp::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plMaxNode* baseNode = (plMaxNode*)fCompPB->GetINode(kBaseNode);
-    if( !baseNode )
-    {
+
+    if (!baseNode) {
         pErrMsg->Set(true, node->GetName(), "Missing base (neutral) geometry node").CheckAndAsk();
         pErrMsg->Set(false);
         return true;
     }
-    if( !baseNode->GetSwappableGeom() )
+
+    if (!baseNode->GetSwappableGeom()) {
         baseNode->SetSwappableGeom(new plSharedMesh);
+    }
+
 //  baseNode->SetForceLocal(true);
 
     return true;
@@ -298,18 +303,18 @@ bool plMorphSeqComp::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
     return true;
 }
 
-bool plMorphSeqComp::Convert(plMaxNode* node, plErrorMsg* pErrMsg) 
-{ 
+bool plMorphSeqComp::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
+{
     const char* dbgNodeName = node->GetName();
 
     // Make our plMorphSequence modifier
-    plMorphSequence* morphSeq = const_cast<plMorphSequence *>(plMorphSequence::ConvertNoRef(node->GetSceneObject()->GetModifierByType(plMorphSequence::Index())));
-    if (!morphSeq)
-    {
+    plMorphSequence* morphSeq = const_cast<plMorphSequence*>(plMorphSequence::ConvertNoRef(node->GetSceneObject()->GetModifierByType(plMorphSequence::Index())));
+
+    if (!morphSeq) {
         morphSeq = new plMorphSequence;
         node->AddModifier(morphSeq, IGetUniqueName(node));
     }
-    
+
     // Get our base geometry.
     plMaxNode* baseNode = (plMaxNode*)fCompPB->GetINode(kBaseNode);
     plSharedMesh* mesh = baseNode->GetSwappableGeom();
@@ -318,25 +323,26 @@ bool plMorphSeqComp::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 
     // Error check we have some base geometry.
 
-    plMorphDataSet *set = new plMorphDataSet;
+    plMorphDataSet* set = new plMorphDataSet;
     hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), set, node->GetLocation());
     hsgResMgr::ResMgr()->AddViaNotify(set->GetKey(), new plGenRefMsg(mesh->GetKey(), plRefMsg::kOnCreate, -1, -1), plRefFlags::kActiveRef);
 
     const int num = fCompPB->Count(kLayers);
     int i;
+
     // For each layer that we have
-    for( i = 0; i < num; i++ )
-    {
+    for (i = 0; i < num; i++) {
         plMorphLayComp* layComp = IGetLayerComp(i);
-        if( !layComp )
+
+        if (!layComp) {
             continue;
+        }
 
         // Layer is a sequence of geometry deltas. A layer will
         // become a plMorphArray.
         plMorphArray morphArr;
 
-        if( layComp->SetupLayer(morphArr, baseNode, baseSpans, pErrMsg) )
-        {
+        if (layComp->SetupLayer(morphArr, baseNode, baseSpans, pErrMsg)) {
             //morphSeq->AddLayer(morphArr);
             set->fMorphs.Append(morphArr);
         }
@@ -345,10 +351,10 @@ bool plMorphSeqComp::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
     // Error check - should make sure we wound up with something valid,
     // as opposed to a million empty deltas or something.
 
-    return true; 
+    return true;
 }
 
-bool plMorphSeqComp::DeInit(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plMorphSeqComp::DeInit(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
@@ -356,15 +362,18 @@ bool plMorphSeqComp::DeInit(plMaxNode *node, plErrorMsg *pErrMsg)
 plMorphLayComp* plMorphSeqComp::IGetLayerComp(int i)
 {
     plMaxNode* node = (plMaxNode*)fCompPB->GetINode(kLayers, TimeValue(0), i);
-    if( !node )
-        return nil;
 
-    plComponentBase *comp = ((plMaxNodeBase*)node)->ConvertToComponent();
-    if( !comp )
+    if (!node) {
         return nil;
+    }
 
-    if( comp->ClassID() == MORPHLAY_COMP_CID )
-    {
+    plComponentBase* comp = ((plMaxNodeBase*)node)->ConvertToComponent();
+
+    if (!comp) {
+        return nil;
+    }
+
+    if (comp->ClassID() == MORPHLAY_COMP_CID) {
         return (plMorphLayComp*)comp;
     }
 

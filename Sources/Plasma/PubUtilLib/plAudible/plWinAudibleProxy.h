@@ -46,17 +46,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plWinAudible;
 
-class plWinAudibleProxy : public plProxyGen
-{
+class plWinAudibleProxy : public plProxyGen {
 public:
     plWinAudibleProxy();
     virtual ~plWinAudibleProxy();
 
     bool    Init(plWinAudible* aud);
-    
+
 protected:
     plWinAudible*           fOwner;
-    virtual plDrawableSpans*    ICreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo=nil);
+    virtual plDrawableSpans*    ICreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo = nil);
     virtual plKey               IGetNode() const;
 };
 

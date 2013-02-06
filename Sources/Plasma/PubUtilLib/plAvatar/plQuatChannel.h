@@ -50,8 +50,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // PLQUATCHANNEL
 /////////////
 // A source of animated hsQuat data
-class plQuatChannel : public plAGChannel
-{
+class plQuatChannel : public plAGChannel {
 protected:
     hsQuat fResult;
 
@@ -60,45 +59,46 @@ public:
     virtual ~plQuatChannel();
 
     // AG PROTOCOL
-    virtual const hsQuat & Value(double time);
-    virtual void Value(hsQuat &quaternion, double time);
+    virtual const hsQuat& Value(double time);
+    virtual void Value(hsQuat& quaternion, double time);
 
     // can this channel combine with the given channel?
-    virtual bool CanCombine(plAGChannel * channelB);
+    virtual bool CanCombine(plAGChannel* channelB);
     // combine it (allocates combine object)
-    virtual plAGChannel * MakeCombine(plAGChannel * channelB);
+    virtual plAGChannel* MakeCombine(plAGChannel* channelB);
 
     // const eval at time zero
-    virtual plAGChannel * MakeZeroState();
+    virtual plAGChannel* MakeZeroState();
     // make a timeScale instance
-    virtual plAGChannel * MakeTimeScale(plScalarChannel *timeSource);
+    virtual plAGChannel* MakeTimeScale(plScalarChannel* timeSource);
 
     // blend it (allocates blend object)
-    virtual plAGChannel * MakeBlend(plAGChannel * channelB, plScalarChannel * channelBias, int blendPriority);
+    virtual plAGChannel* MakeBlend(plAGChannel* channelB, plScalarChannel* channelBias, int blendPriority);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plQuatChannel );
-    GETINTERFACE_ANY( plQuatChannel, plAGChannel );
+    CLASSNAME_REGISTER(plQuatChannel);
+    GETINTERFACE_ANY(plQuatChannel, plAGChannel);
 };
 
 // PLQUATCONSTANT
 ////////////
 // A quat channel that just keeps handing out the same quaternion
-class plQuatConstant : public plQuatChannel
-{
+class plQuatConstant : public plQuatChannel {
 public:
     plQuatConstant();
-    plQuatConstant(const hsQuat &quaternion);
+    plQuatConstant(const hsQuat& quaternion);
     virtual ~plQuatConstant();
 
-    void Set(const hsQuat &the_Quat) { fResult = the_Quat; }
+    void Set(const hsQuat& the_Quat) {
+        fResult = the_Quat;
+    }
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plQuatConstant );
-    GETINTERFACE_ANY( plQuatConstant, plQuatChannel );
+    CLASSNAME_REGISTER(plQuatConstant);
+    GETINTERFACE_ANY(plQuatConstant, plQuatChannel);
 
-    void Read(hsStream *stream, hsResMgr *mgr);
-    void Write(hsStream *stream, hsResMgr *mgr);
+    void Read(hsStream* stream, hsResMgr* mgr);
+    void Write(hsStream* stream, hsResMgr* mgr);
 };
 
 ////////////////////
@@ -106,81 +106,90 @@ public:
 ////////////////////
 // Adapts the time scale before passing it to the next channel in line.
 // Use to instance animations while allowing each instance to run at different speeds.
-class plQuatTimeScale : public plQuatChannel
-{
+class plQuatTimeScale : public plQuatChannel {
 protected:
-    plScalarChannel *fTimeSource;
-    plQuatChannel *fChannelIn;
+    plScalarChannel* fTimeSource;
+    plQuatChannel* fChannelIn;
 
 public:
     plQuatTimeScale();
-    plQuatTimeScale(plQuatChannel *channel, plScalarChannel *timeSource);
+    plQuatTimeScale(plQuatChannel* channel, plScalarChannel* timeSource);
     virtual ~plQuatTimeScale();
 
     virtual bool IsStoppedAt(double time);
-    virtual const hsQuat & Value(double time);
+    virtual const hsQuat& Value(double time);
 
-    virtual plAGChannel * Detach(plAGChannel * channel);
+    virtual plAGChannel* Detach(plAGChannel* channel);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plQuatTimeScale );
-    GETINTERFACE_ANY( plQuatTimeScale, plQuatChannel );
+    CLASSNAME_REGISTER(plQuatTimeScale);
+    GETINTERFACE_ANY(plQuatTimeScale, plQuatChannel);
 };
 
 // PLQUATBLEND
 //////////////
 // Combines two quaternion sources into one
-class plQuatBlend : public plQuatChannel
-{
+class plQuatBlend : public plQuatChannel {
 public:
     plQuatBlend();
-    plQuatBlend(plQuatChannel *channelA, plQuatChannel *channelB, plScalarChannel *channelBias);
+    plQuatBlend(plQuatChannel* channelA, plQuatChannel* channelB, plScalarChannel* channelBias);
     virtual ~plQuatBlend();
 
     // GETTERS AND SETTERS FOR CHANNELS
-    const plQuatChannel * GetQuatA() const { return fQuatA; }
-    void SetQuatA(plQuatChannel *the_QuatA) { fQuatA = the_QuatA; }
+    const plQuatChannel* GetQuatA() const {
+        return fQuatA;
+    }
+    void SetQuatA(plQuatChannel* the_QuatA) {
+        fQuatA = the_QuatA;
+    }
 
-    const plQuatChannel * GetQuatB() const { return fQuatB; }
-    void SetQuatB(plQuatChannel *the_QuatB) { fQuatB = the_QuatB; }
+    const plQuatChannel* GetQuatB() const {
+        return fQuatB;
+    }
+    void SetQuatB(plQuatChannel* the_QuatB) {
+        fQuatB = the_QuatB;
+    }
 
-    const plScalarChannel * GetChannelBias() const { return fChannelBias; }
-    void SetChannelBias(plScalarChannel *channel) { fChannelBias = channel; }
+    const plScalarChannel* GetChannelBias() const {
+        return fChannelBias;
+    }
+    void SetChannelBias(plScalarChannel* channel) {
+        fChannelBias = channel;
+    }
 
     //float GetBlend() const { return fBlend; }
     //void SetBlend(float the_blend) { fBlend = the_blend; }
     virtual bool IsStoppedAt(double time);
 
     // AG PROTOCOL
-    virtual const hsQuat &Value(double time);
+    virtual const hsQuat& Value(double time);
 
     // remove the specified channel from our graph
-    virtual plAGChannel * Detach(plAGChannel * channel);
+    virtual plAGChannel* Detach(plAGChannel* channel);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plQuatBlend );
-    GETINTERFACE_ANY( plQuatBlend, plQuatChannel );
+    CLASSNAME_REGISTER(plQuatBlend);
+    GETINTERFACE_ANY(plQuatBlend, plQuatChannel);
 
 protected:
-    plQuatChannel *fQuatA;
-    plQuatChannel *fQuatB;
-    plScalarChannel *fChannelBias;
+    plQuatChannel* fQuatA;
+    plQuatChannel* fQuatB;
+    plScalarChannel* fChannelBias;
 
 };
 
 
 ////////////////////////////
-// 
+//
 // Channel Applicator classes
 
-class plQuatChannelApplicator : public plAGApplicator
-{
+class plQuatChannelApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plQuatChannelApplicator );
-    GETINTERFACE_ANY( plQuatChannelApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plQuatChannelApplicator);
+    GETINTERFACE_ANY(plQuatChannelApplicator, plAGApplicator);
 };
 
 

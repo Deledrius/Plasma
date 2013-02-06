@@ -87,13 +87,13 @@ const float kDefFadeUp(5.f);
 const float kDefFadeDown(1.f);
 
 plFadeOpacityMod::plFadeOpacityMod()
-:   fFadeUp(kDefFadeUp),
-    fFadeDown(kDefFadeDown),
-    fOpCurrent(1.f),
-    fStart(0),
-    fFade(kImmediate),
-    fLastEye(0.f, 0.f, 0.f),
-    fSetup(false)
+    :   fFadeUp(kDefFadeUp),
+        fFadeDown(kDefFadeDown),
+        fOpCurrent(1.f),
+        fStart(0),
+        fFade(kImmediate),
+        fLastEye(0.f, 0.f, 0.f),
+        fSetup(false)
 {
 }
 
@@ -104,19 +104,20 @@ plFadeOpacityMod::~plFadeOpacityMod()
 bool plFadeOpacityMod::MsgReceive(plMessage* msg)
 {
     plRenderMsg* rend = plRenderMsg::ConvertNoRef(msg);
-    if( rend )
-    {
+
+    if (rend) {
         IOnRenderMsg(rend);
         return true;
     }
+
     return plSingleModifier::MsgReceive(msg);
 }
 
 void plFadeOpacityMod::SetKey(plKey k)
 {
     hsKeyedObject::SetKey(k);
-    if( k )
-    {
+
+    if (k) {
         plgDispatch::Dispatch()->RegisterForExactType(plRenderMsg::Index(), GetKey());
     }
 }
@@ -147,8 +148,9 @@ void plFadeOpacityMod::SetTarget(plSceneObject* so)
 
 bool plFadeOpacityMod::IShouldCheck(plPipeline* pipe)
 {
-    if (pipe->TestVisibleWorld(GetTarget()))
+    if (pipe->TestVisibleWorld(GetTarget())) {
         return true;
+    }
 
     fFade = kImmediate;
 
@@ -158,30 +160,33 @@ bool plFadeOpacityMod::IShouldCheck(plPipeline* pipe)
 void plFadeOpacityMod::IOnRenderMsg(plRenderMsg* rend)
 {
     // Okay, are we set up enough to proceed?
-    if( !IReady() )
+    if (!IReady()) {
         return;
+    }
 
     // Okay, we're going to check.
 
     bool hit = false;
 
-    if( !fLOSCheckDisabled )
-    {
+    if (!fLOSCheckDisabled) {
         // Should we check to see if we're visible before anything else?
-        if( !IShouldCheck(rend->Pipeline()) )
+        if (!IShouldCheck(rend->Pipeline())) {
             return;
+        }
 
         hsPoint3 eyePos = rend->Pipeline()->GetViewPositionWorld();
         hsPoint3 ourPos = IGetOurPos();
 
-        if( fFade != kImmediate )
-        {
-            // If we've moved more than 3 feet in a frame, we'll consider this a 
+        if (fFade != kImmediate) {
+            // If we've moved more than 3 feet in a frame, we'll consider this a
             // camera cut. In that case, don't fade up or down, just go there.
             const float kCutMagSquared = 3.f * 3.f;
-            if( hsVector3(&eyePos, &fLastEye).MagnitudeSquared() > kCutMagSquared )
+
+            if (hsVector3(&eyePos, &fLastEye).MagnitudeSquared() > kCutMagSquared) {
                 fFade = kImmediate;
+            }
         }
+
         fLastEye = eyePos;
 
         // Cast the ray from eye to us.
@@ -191,10 +196,11 @@ void plFadeOpacityMod::IOnRenderMsg(plRenderMsg* rend)
 
     // If the ray made it, fade us up
     // Else fade us down.
-    if( !hit )
+    if (!hit) {
         IFadeUp();
-    else
+    } else {
         IFadeDown();
+    }
 
     ISetOpacity();
 }
@@ -202,17 +208,22 @@ void plFadeOpacityMod::IOnRenderMsg(plRenderMsg* rend)
 bool plFadeOpacityMod::IReady()
 {
     plSceneObject* so = GetTarget();
-    if( !so )
-        return false;
 
-    if( !so->GetDrawInterface() )
+    if (!so) {
         return false;
+    }
 
-    if( !fSetup )
+    if (!so->GetDrawInterface()) {
+        return false;
+    }
+
+    if (!fSetup) {
         ISetup(so);
+    }
 
-    if( !fFadeLays.GetCount() )
+    if (!fFadeLays.GetCount()) {
         return false;
+    }
 
     return true;
 }
@@ -221,12 +232,9 @@ hsPoint3 plFadeOpacityMod::IGetOurPos()
 {
     hsAssert(GetTarget(), "Weed out target-less earlier");
 
-    if( HasFlag(kBoundsCenter) )
-    {
+    if (HasFlag(kBoundsCenter)) {
         return GetTarget()->GetDrawInterface()->GetWorldBounds().GetCenter();
-    }
-    else
-    {
+    } else {
         return GetTarget()->GetLocalToWorld().GetTranslate();
     }
 }
@@ -234,35 +242,36 @@ hsPoint3 plFadeOpacityMod::IGetOurPos()
 void plFadeOpacityMod::ICalcOpacity()
 {
     double t = hsTimer::GetSysSeconds();
-    switch( fFade )
-    {
+
+    switch (fFade) {
     case kFadeUp:
         fOpCurrent = (float)(t - fStart);
-        if( fOpCurrent > fFadeUp )
-        {
+
+        if (fOpCurrent > fFadeUp) {
             fOpCurrent = 1.f;
             fFade = kUp;
-        }
-        else
-        {
+        } else {
             fOpCurrent /= fFadeUp;
         }
+
         break;
+
     case kFadeDown:
         fOpCurrent = (float)(t - fStart);
-        if( fOpCurrent > fFadeDown )
-        {
+
+        if (fOpCurrent > fFadeDown) {
             fOpCurrent = 0.f;
             fFade = kDown;
-        }
-        else
-        {
+        } else {
             fOpCurrent = 1.f - fOpCurrent / fFadeDown;
         }
+
         break;
+
     case kUp:
     case kDown:
         break;
+
     case kImmediate:
     default:
         hsAssert(false, "Invalid state");
@@ -276,35 +285,39 @@ void plFadeOpacityMod::ISetOpacity()
 
     const int num = fFadeLays.GetCount();
     int i;
-    for( i = 0; i < num; i++ )
-        fFadeLays[i]->SetOpacity(fOpCurrent);   
+
+    for (i = 0; i < num; i++) {
+        fFadeLays[i]->SetOpacity(fOpCurrent);
+    }
 }
 
 void plFadeOpacityMod::IFadeUp()
 {
     const double t = hsTimer::GetSysSeconds();
-    switch( fFade )
-    {
+
+    switch (fFade) {
     case kImmediate:
         fOpCurrent = 1.f;
         fFade = kUp;
         break;
-    case kFadeDown:
-        {
+
+    case kFadeDown: {
             fStart = t - fOpCurrent * fFadeUp;
 
             fFade = kFadeUp;
         }
         break;
-    case kDown:
-        {
+
+    case kDown: {
             fStart = t;
             fFade = kFadeUp;
         }
         break;
+
     case kUp:
     case kFadeUp:
         break;
+
     default:
         hsAssert(false, "Bad State");
         break;
@@ -314,27 +327,29 @@ void plFadeOpacityMod::IFadeUp()
 void plFadeOpacityMod::IFadeDown()
 {
     const double t = hsTimer::GetSysSeconds();
-    switch( fFade )
-    {
+
+    switch (fFade) {
     case kImmediate:
         fOpCurrent = 0.f;
         fFade = kDown;
         break;
-    case kFadeUp:
-        {
+
+    case kFadeUp: {
             fStart = t - (1.f - fOpCurrent) * fFadeDown;
 
             fFade = kFadeDown;
         }
         break;
-    case kUp:
-        {
+
+    case kUp: {
             fStart = t;
             fFade = kFadeDown;
         }
+
     case kFadeDown:
     case kDown:
         break;
+
     default:
         hsAssert(false, "Bad State");
         break;
@@ -344,28 +359,31 @@ void plFadeOpacityMod::IFadeDown()
 void plFadeOpacityMod::ISetup(plSceneObject* so)
 {
     fFadeLays.Reset();
-    
-    if( !so )
+
+    if (!so) {
         return;
+    }
 
     const plDrawInterface* di = so->GetDrawInterface();
-    if( !di )
+
+    if (!di) {
         return;
+    }
 
     hsTArray<plAccessSpan> src;
     plAccessGeometry::Instance()->OpenRO(di, src, false);
 
     int i;
-    for( i = 0; i < src.GetCount(); i++ )
-    {
+
+    for (i = 0; i < src.GetCount(); i++) {
         hsGMaterial* mat = src[i].GetMaterial();
 
         int j;
-        for( j = 0; j < mat->GetNumLayers(); j++ )
-        {
+
+        for (j = 0; j < mat->GetNumLayers(); j++) {
             plLayerInterface* lay = mat->GetLayer(j);
-            if( !j || !(lay->GetZFlags() & hsGMatState::kZNoZWrite) || (lay->GetMiscFlags() & hsGMatState::kMiscRestartPassHere) )
-            {
+
+            if (!j || !(lay->GetZFlags() & hsGMatState::kZNoZWrite) || (lay->GetMiscFlags() & hsGMatState::kMiscRestartPassHere)) {
                 plFadeOpacityLay* fade = new plFadeOpacityLay();
 
                 hsgResMgr::ResMgr()->NewKey(lay->GetKey()->GetName(), fade, lay->GetKey()->GetUoid().GetLocation());

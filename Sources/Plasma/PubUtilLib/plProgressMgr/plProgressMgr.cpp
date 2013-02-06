@@ -60,7 +60,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //// plProgressMgr Functions /////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-plProgressMgr   *plProgressMgr::fManager = nil;
+plProgressMgr*   plProgressMgr::fManager = nil;
 
 #define LOADING_RES         "xLoading_Linking.%02d.png"
 #define LOADING_RES_COUNT   18
@@ -82,8 +82,7 @@ plProgressMgr::plProgressMgr()
     fCurrentStaticText = kNone;
 
     // Fill array with pre-computed loading frame IDs
-    for (int i=0; i < LOADING_RES_COUNT; i++)
-    {
+    for (int i = 0; i < LOADING_RES_COUNT; i++) {
         char* frameID = new char[128];
         sprintf(frameID, LOADING_RES, i);
         fImageRotation[i] = frameID;
@@ -92,55 +91,60 @@ plProgressMgr::plProgressMgr()
 
 plProgressMgr::~plProgressMgr()
 {
-    for (int i=0; i < LOADING_RES_COUNT; i++)
-    {
+    for (int i = 0; i < LOADING_RES_COUNT; i++) {
         delete fImageRotation[i];
     }
 
-    while( fOperations != nil )
+    while (fOperations != nil) {
         delete fOperations;
+    }
+
     fManager = nil;
 }
 
 //// RegisterOperation ///////////////////////////////////////////////////////
 
-plOperationProgress* plProgressMgr::RegisterOperation(float length, const char *title, StaticText staticTextType, bool isRetry, bool alwaysDrawText)
+plOperationProgress* plProgressMgr::RegisterOperation(float length, const char* title, StaticText staticTextType, bool isRetry, bool alwaysDrawText)
 {
     return IRegisterOperation(length, title, staticTextType, isRetry, false, alwaysDrawText);
 }
 
-plOperationProgress* plProgressMgr::RegisterOverallOperation(float length, const char *title, StaticText staticTextType, bool alwaysDrawText)
+plOperationProgress* plProgressMgr::RegisterOverallOperation(float length, const char* title, StaticText staticTextType, bool alwaysDrawText)
 {
     return IRegisterOperation(length, title, staticTextType, false, true, alwaysDrawText);
 }
 
-plOperationProgress* plProgressMgr::IRegisterOperation(float length, const char *title, StaticText staticTextType, bool isRetry, bool isOverall, bool alwaysDrawText)
+plOperationProgress* plProgressMgr::IRegisterOperation(float length, const char* title, StaticText staticTextType, bool isRetry, bool isOverall, bool alwaysDrawText)
 {
-    if (fOperations == nil)
-    {
+    if (fOperations == nil) {
         fCurrentStaticText = staticTextType;
         Activate();
     }
 
-    plOperationProgress *op = new plOperationProgress( length );
+    plOperationProgress* op = new plOperationProgress(length);
 
-    op->SetTitle( title );
+    op->SetTitle(title);
 
-    if (fOperations)
-    {
+    if (fOperations) {
         fOperations->fBack = op;
         op->fNext = fOperations;
     }
+
     fOperations = op;
 
-    if (isRetry)
+    if (isRetry) {
         hsSetBits(op->fFlags, plOperationProgress::kRetry);
-    if (isOverall)
-        hsSetBits(op->fFlags, plOperationProgress::kOverall);
-    if (alwaysDrawText)
-        hsSetBits(op->fFlags, plOperationProgress::kAlwaysDrawText);
+    }
 
-    IUpdateCallbackProc( op );
+    if (isOverall) {
+        hsSetBits(op->fFlags, plOperationProgress::kOverall);
+    }
+
+    if (alwaysDrawText) {
+        hsSetBits(op->fFlags, plOperationProgress::kAlwaysDrawText);
+    }
+
+    IUpdateCallbackProc(op);
 
     return op;
 }
@@ -150,17 +154,17 @@ void plProgressMgr::IUnregisterOperation(plOperationProgress* op)
     plOperationProgress* last = nil;
     plOperationProgress* cur = fOperations;
 
-    while (cur)
-    {
-        if (cur == op)
-        {
-            if (cur->fNext)
+    while (cur) {
+        if (cur == op) {
+            if (cur->fNext) {
                 cur->fNext->fBack = last;
+            }
 
-            if (last)
+            if (last) {
                 last->fNext = cur->fNext;
-            else
+            } else {
                 fOperations = cur->fNext;
+            }
 
             break;
         }
@@ -169,8 +173,7 @@ void plProgressMgr::IUnregisterOperation(plOperationProgress* op)
         cur = cur->fNext;
     }
 
-    if (fOperations == nil)
-    {
+    if (fOperations == nil) {
         fCurrentStaticText = kNone;
         Deactivate();
     }
@@ -181,36 +184,38 @@ void plProgressMgr::IUnregisterOperation(plOperationProgress* op)
 void plProgressMgr::IUpdateFlags(plOperationProgress* progress)
 {
     // Init update is done, clear it and set first update
-    if (hsCheckBits(progress->fFlags, plOperationProgress::kInitUpdate))
-    {
+    if (hsCheckBits(progress->fFlags, plOperationProgress::kInitUpdate)) {
         hsClearBits(progress->fFlags, plOperationProgress::kInitUpdate);
         hsSetBits(progress->fFlags, plOperationProgress::kFirstUpdate);
     }
     // First update is done, clear it
-    else if (hsCheckBits(progress->fFlags, plOperationProgress::kFirstUpdate))
+    else if (hsCheckBits(progress->fFlags, plOperationProgress::kFirstUpdate)) {
         hsClearBits(progress->fFlags, plOperationProgress::kFirstUpdate);
+    }
 }
 
 void plProgressMgr::IUpdateCallbackProc(plOperationProgress* progress)
 {
     // Update the parent, if necessary
     plOperationProgress* parentProgress = progress->GetNext();
-    while (parentProgress && parentProgress->IsOverallProgress())
-    {
+
+    while (parentProgress && parentProgress->IsOverallProgress()) {
         parentProgress->IChildUpdateBegin(progress);
         parentProgress = parentProgress->GetNext();
     }
 
     // Update everyone who wants to know about progress
     IDerivedCallbackProc(progress);
-    if (fCallbackProc != nil)
+
+    if (fCallbackProc != nil) {
         fCallbackProc(progress);
+    }
 
     IUpdateFlags(progress);
 
     parentProgress = progress->GetNext();
-    while (parentProgress && parentProgress->IsOverallProgress())
-    {
+
+    while (parentProgress && parentProgress->IsOverallProgress()) {
         parentProgress->IChildUpdateEnd(progress);
         parentProgress = parentProgress->GetNext();
     }
@@ -218,7 +223,7 @@ void plProgressMgr::IUpdateCallbackProc(plOperationProgress* progress)
 
 //// SetCallbackProc /////////////////////////////////////////////////////////
 
-plProgressMgrCallbackProc plProgressMgr::SetCallbackProc( plProgressMgrCallbackProc proc )
+plProgressMgrCallbackProc plProgressMgr::SetCallbackProc(plProgressMgrCallbackProc proc)
 {
     plProgressMgrCallbackProc old = fCallbackProc;
     fCallbackProc = proc;
@@ -227,23 +232,25 @@ plProgressMgrCallbackProc plProgressMgr::SetCallbackProc( plProgressMgrCallbackP
 
 //// CancelAllOps ////////////////////////////////////////////////////////////
 
-void    plProgressMgr::CancelAllOps( void )
+void    plProgressMgr::CancelAllOps(void)
 {
-    plOperationProgress *op;
+    plOperationProgress* op;
 
 
-    for( op = fOperations; op != nil; op = op->GetNext() )
-        op->SetCancelFlag( true );
+    for (op = fOperations; op != nil; op = op->GetNext()) {
+        op->SetCancelFlag(true);
+    }
 
     fCurrentStaticText = kNone;
 }
 
 char*   plProgressMgr::GetLoadingFrameID(int index)
 {
-    if (index < LOADING_RES_COUNT)
+    if (index < LOADING_RES_COUNT) {
         return fImageRotation[index];
-    else
+    } else {
         return fImageRotation[0];
+    }
 }
 
 const char*   plProgressMgr::GetStaticTextID(StaticText staticTextType)
@@ -256,7 +263,7 @@ const char*   plProgressMgr::GetStaticTextID(StaticText staticTextType)
 //// plOperationProgress ////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-plOperationProgress::plOperationProgress( float length ) :
+plOperationProgress::plOperationProgress(float length) :
     fMax(length),
     fValue(0),
     fNext(nil),
@@ -268,15 +275,18 @@ plOperationProgress::plOperationProgress( float length ) :
     fRemainingSecs(0),
     fAmtPerSec(0.f)
 {
-    memset( fStatusText, 0, sizeof( fStatusText ) );
-    memset( fTitle, 0, sizeof( fTitle ) );
+    memset(fStatusText, 0, sizeof(fStatusText));
+    memset(fTitle, 0, sizeof(fTitle));
 }
 
 plOperationProgress::~plOperationProgress()
 {
     hsSetBits(fFlags, kLastUpdate);
-    if (!IsOverallProgress())
+
+    if (!IsOverallProgress()) {
         plProgressMgr::GetInstance()->IUpdateCallbackProc(this);
+    }
+
     plProgressMgr::GetInstance()->IUnregisterOperation(this);
 }
 
@@ -284,31 +294,37 @@ void plOperationProgress::IUpdateStats()
 {
     double curTime = hsTimer::GetSeconds();
     double elapsed = 0;
-    if (curTime > fStartTime)
+
+    if (curTime > fStartTime) {
         elapsed = curTime - fStartTime;
-    else
+    } else {
         elapsed = fStartTime - curTime;
+    }
 
     float progress = GetProgress();
 
-    if (elapsed > 0)
+    if (elapsed > 0) {
         fAmtPerSec = progress / float(elapsed);
-    else
+    } else {
         fAmtPerSec = 0;
+    }
+
     fElapsedSecs = (uint32_t)elapsed;
-    if (progress < fMax)
+
+    if (progress < fMax) {
         fRemainingSecs = (uint32_t)((fMax - progress) / fAmtPerSec);
-    else
+    } else {
         fRemainingSecs = 0;
+    }
 }
 
 void plOperationProgress::IChildUpdateBegin(plOperationProgress* child)
 {
-    if (child->IsFirstUpdate() && child->IsRetry())
-    {
+    if (child->IsFirstUpdate() && child->IsRetry()) {
         // We're retrying this file, so update the overall stats to reflect the additional download
         fMax += child->GetMax();
     }
+
     fValue += child->GetProgress();
 
     IUpdateStats();
@@ -317,68 +333,78 @@ void plOperationProgress::IChildUpdateBegin(plOperationProgress* child)
 void plOperationProgress::IChildUpdateEnd(plOperationProgress* child)
 {
     // If we're aborting, modify the total bytes to reflect any data we didn't download
-    if (hsCheckBits(child->fFlags, plOperationProgress::kAborting))
+    if (hsCheckBits(child->fFlags, plOperationProgress::kAborting)) {
         fMax += child->GetProgress() - child->GetMax();
-    else if (!child->IsLastUpdate())
+    } else if (!child->IsLastUpdate()) {
         fValue -= child->GetProgress();
+    }
 }
 
 //// Increment ///////////////////////////////////////////////////////////////
 
-void    plOperationProgress::Increment( float byHowMuch )
+void    plOperationProgress::Increment(float byHowMuch)
 {
     fValue += byHowMuch;
-    if( fValue > fMax )
+
+    if (fValue > fMax) {
         fValue = fMax;
+    }
+
     IUpdateStats();
 
-    plProgressMgr::GetInstance()->IUpdateCallbackProc( this );
+    plProgressMgr::GetInstance()->IUpdateCallbackProc(this);
 }
 
 //// SetHowMuch //////////////////////////////////////////////////////////////
 
-void    plOperationProgress::SetHowMuch( float howMuch )
+void    plOperationProgress::SetHowMuch(float howMuch)
 {
     fValue = howMuch;
-    if( fValue > fMax )
+
+    if (fValue > fMax) {
         fValue = fMax;
+    }
+
     IUpdateStats();
 
-    plProgressMgr::GetInstance()->IUpdateCallbackProc( this );
+    plProgressMgr::GetInstance()->IUpdateCallbackProc(this);
 }
 
 //// SetStatusText ///////////////////////////////////////////////////////////
 
-void    plOperationProgress::SetStatusText( const char *text )
+void    plOperationProgress::SetStatusText(const char* text)
 {
-    if( text != nil )
-        strncpy( fStatusText, text, sizeof( fStatusText ) );
-    else
+    if (text != nil) {
+        strncpy(fStatusText, text, sizeof(fStatusText));
+    } else {
         fStatusText[ 0 ] = 0;
+    }
 }
 
 //// SetTitle ////////////////////////////////////////////////////////////////
 
-void    plOperationProgress::SetTitle( const char *text )
+void    plOperationProgress::SetTitle(const char* text)
 {
-    if (text != nil)
-    {
+    if (text != nil) {
         strncpy(fTitle, text, sizeof(fTitle));
-    }
-    else
+    } else {
         fTitle[0] = 0;
+    }
 }
 
 //// SetLength ///////////////////////////////////////////////////////////////
 
-void    plOperationProgress::SetLength( float length )
+void    plOperationProgress::SetLength(float length)
 {
     fMax = length;
-    if( fValue > fMax )
+
+    if (fValue > fMax) {
         fValue = fMax;
+    }
+
     IUpdateStats();
 
-    plProgressMgr::GetInstance()->IUpdateCallbackProc( this );
+    plProgressMgr::GetInstance()->IUpdateCallbackProc(this);
 }
 
 void plOperationProgress::SetAborting()

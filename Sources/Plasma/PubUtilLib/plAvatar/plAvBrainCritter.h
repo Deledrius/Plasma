@@ -51,19 +51,16 @@ class plArmatureMod;
 class plWalkingStrategy;
 class plAIMsg;
 
-class plAvBrainCritter : public plArmatureBrain
-{
+class plAvBrainCritter : public plArmatureBrain {
 public:
-    enum CritterMode
-    {
+    enum CritterMode {
         kIdle = 0,
         kRun,
         kNumDefaultModes
         // anything >= kNumDefaultModes is user
     };
 
-    enum Anims
-    {
+    enum Anims {
         kIdleAnim = 0,
         kRunAnim,
         kNumDefaultAnims
@@ -95,32 +92,54 @@ public:
     plSceneObject* GetTarget() const;
 
     void AddBehavior(const std::string& animationName, const std::string& behaviorName, bool loop = true, bool randomStartPos = true,
-        float fadeInLen = 2.f, float fadeOutLen = 2.f);
+                     float fadeInLen = 2.f, float fadeOutLen = 2.f);
     void StartBehavior(const std::string& behaviorName, bool fade = true);
     bool RunningBehavior(const std::string& behaviorName) const;
 
     std::string BehaviorName(int behavior) const;
     plString AnimationName(int behavior) const;
-    int CurBehavior() const {return fCurMode;}
-    int NextBehavior() const {return fNextMode;}
+    int CurBehavior() const {
+        return fCurMode;
+    }
+    int NextBehavior() const {
+        return fNextMode;
+    }
 
     std::string IdleBehaviorName() const;
     std::string RunBehaviorName() const;
 
     void GoToGoal(hsPoint3 newGoal, bool avoidingAvatars = false);
-    hsPoint3 CurrentGoal() const {return fFinalGoalPos;}
-    bool AvoidingAvatars() const {return fAvoidingAvatars;}
+    hsPoint3 CurrentGoal() const {
+        return fFinalGoalPos;
+    }
+    bool AvoidingAvatars() const {
+        return fAvoidingAvatars;
+    }
     bool AtGoal() const;
 
-    void StopDistance(float stopDistance) {fStopDistance = stopDistance; fStopDistanceSquared = fStopDistance * fStopDistance;}
-    float StopDistance() const {return fStopDistance;}
+    void StopDistance(float stopDistance) {
+        fStopDistance = stopDistance;
+        fStopDistanceSquared = fStopDistance * fStopDistance;
+    }
+    float StopDistance() const {
+        return fStopDistance;
+    }
 
     void SightCone(float coneRad);
-    float SightCone() const {return fSightConeAngle;}
-    void SightDistance(float sightDis) {fSightDistance = sightDis; fSightDistanceSquared = fSightDistance * fSightDistance;}
-    float SightDistance() const {return fSightDistance;}
+    float SightCone() const {
+        return fSightConeAngle;
+    }
+    void SightDistance(float sightDis) {
+        fSightDistance = sightDis;
+        fSightDistanceSquared = fSightDistance * fSightDistance;
+    }
+    float SightDistance() const {
+        return fSightDistance;
+    }
     void HearingDistance(float hearDis);
-    float HearingDistance() const {return fHearingDistance;}
+    float HearingDistance() const {
+        return fHearingDistance;
+    }
 
     bool CanSeeAvatar(unsigned long id) const;
     bool CanHearAvatar(unsigned long id) const;

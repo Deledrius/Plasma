@@ -60,11 +60,12 @@ PYTHON_INIT_DEFINITION(ptVaultTextNoteNode, args, keywords)
 PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, noteSetTitle, args)
 {
     char* title;
-    if (!PyArg_ParseTuple(args, "s", &title))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &title)) {
         PyErr_SetString(PyExc_TypeError, "noteSetTitle expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Note_SetTitle(title);
     PYTHON_RETURN_NONE;
 }
@@ -77,11 +78,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultTextNoteNode, noteGetTitle)
 PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, noteSetText, args)
 {
     char* text;
-    if (!PyArg_ParseTuple(args, "s", &text))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &text)) {
         PyErr_SetString(PyExc_TypeError, "noteSetText expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Note_SetText(text);
     PYTHON_RETURN_NONE;
 }
@@ -94,11 +96,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultTextNoteNode, noteGetText)
 PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, noteSetType, args)
 {
     long nodeType;
-    if (!PyArg_ParseTuple(args, "l", &nodeType))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &nodeType)) {
         PyErr_SetString(PyExc_TypeError, "noteSetType expects a long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Note_SetType(nodeType);
     PYTHON_RETURN_NONE;
 }
@@ -111,11 +114,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultTextNoteNode, noteGetType)
 PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, noteSetSubType, args)
 {
     long nodeType;
-    if (!PyArg_ParseTuple(args, "l", &nodeType))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &nodeType)) {
         PyErr_SetString(PyExc_TypeError, "noteSetSubType expects a long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Note_SetSubType(nodeType);
     PYTHON_RETURN_NONE;
 }
@@ -128,11 +132,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultTextNoteNode, noteGetSubType)
 PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setTitle, args)
 {
     char* title;
-    if (!PyArg_ParseTuple(args, "s", &title))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &title)) {
         PyErr_SetString(PyExc_TypeError, "setTitle expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Note_SetTitle(title);
     PYTHON_RETURN_NONE;
 }
@@ -140,13 +145,13 @@ PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setTitle, args)
 PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setTitleW, args)
 {
     PyObject* textObj;
-    if (!PyArg_ParseTuple(args, "O", &textObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &textObj)) {
         PyErr_SetString(PyExc_TypeError, "setTitleW expects a unicode string");
         PYTHON_RETURN_ERROR;
     }
-    if (PyUnicode_Check(textObj))
-    {
+
+    if (PyUnicode_Check(textObj)) {
         int strLen = PyUnicode_GetSize(textObj);
         wchar_t* title = new wchar_t[strLen + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)textObj, title, strLen);
@@ -154,14 +159,13 @@ PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setTitleW, args)
         self->fThis->Note_SetTitleW(title);
         delete [] title;
         PYTHON_RETURN_NONE;
-    }
-    else if (PyString_Check(textObj))
-    {
+    } else if (PyString_Check(textObj)) {
         // we'll allow this, just in case something goes weird
         char* title = PyString_AsString(textObj);
         self->fThis->Note_SetTitle(title);
         PYTHON_RETURN_NONE;
     }
+
     PyErr_SetString(PyExc_TypeError, "setTitleW expects a unicode string");
     PYTHON_RETURN_ERROR;
 }
@@ -180,11 +184,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultTextNoteNode, getTitleW)
 PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setText, args)
 {
     char* text;
-    if (!PyArg_ParseTuple(args, "s", &text))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &text)) {
         PyErr_SetString(PyExc_TypeError, "setText expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Note_SetText(text);
     PYTHON_RETURN_NONE;
 }
@@ -192,13 +197,13 @@ PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setText, args)
 PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setTextW, args)
 {
     PyObject* textObj;
-    if (!PyArg_ParseTuple(args, "O", &textObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &textObj)) {
         PyErr_SetString(PyExc_TypeError, "setTextW expects a unicode string");
         PYTHON_RETURN_ERROR;
     }
-    if (PyUnicode_Check(textObj))
-    {
+
+    if (PyUnicode_Check(textObj)) {
         int strLen = PyUnicode_GetSize(textObj);
         wchar_t* text = new wchar_t[strLen + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)textObj, text, strLen);
@@ -206,14 +211,13 @@ PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setTextW, args)
         self->fThis->Note_SetTextW(text);
         delete [] text;
         PYTHON_RETURN_NONE;
-    }
-    else if (PyString_Check(textObj))
-    {
+    } else if (PyString_Check(textObj)) {
         // we'll allow this, just in case something goes weird
         char* text = PyString_AsString(textObj);
         self->fThis->Note_SetText(text);
         PYTHON_RETURN_NONE;
     }
+
     PyErr_SetString(PyExc_TypeError, "setTextW expects a unicode string");
     PYTHON_RETURN_ERROR;
 }
@@ -232,11 +236,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultTextNoteNode, getTextW)
 PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setType, args)
 {
     long nodeType;
-    if (!PyArg_ParseTuple(args, "l", &nodeType))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &nodeType)) {
         PyErr_SetString(PyExc_TypeError, "setType expects a long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Note_SetType(nodeType);
     PYTHON_RETURN_NONE;
 }
@@ -249,11 +254,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultTextNoteNode, getType)
 PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setSubType, args)
 {
     long nodeType;
-    if (!PyArg_ParseTuple(args, "l", &nodeType))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &nodeType)) {
         PyErr_SetString(PyExc_TypeError, "setSubType expects a long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Note_SetSubType(nodeType);
     PYTHON_RETURN_NONE;
 }
@@ -265,14 +271,15 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultTextNoteNode, getSubType)
 
 PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setDeviceInbox, args)
 {
-    char* inboxName; 
+    char* inboxName;
     PyObject* cb = NULL;
     unsigned long context = 0;
-    if (!PyArg_ParseTuple(args, "s|Ol", &inboxName, &cb, &context))
-    {
+
+    if (!PyArg_ParseTuple(args, "s|Ol", &inboxName, &cb, &context)) {
         PyErr_SetString(PyExc_TypeError, "setDeviceInbox expects a string, an optional object, and an optional unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetDeviceInbox(inboxName, cb, context);
     PYTHON_RETURN_NONE;
 }
@@ -283,31 +290,31 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultTextNoteNode, getDeviceInbox)
 }
 
 PYTHON_START_METHODS_TABLE(ptVaultTextNoteNode)
-    // legacy glue
-    PYTHON_METHOD(ptVaultTextNoteNode, noteSetTitle, "Params: title\nLEGACY\nSets the title of this text note node."),
-    PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, noteGetTitle, "LEGACY\nReturns the title of this text note node."),
-    PYTHON_METHOD(ptVaultTextNoteNode, noteSetText, "Params: text\nLEGACY\nSets text of the this text note node."),
-    PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, noteGetText, "LEGACY\nReturns the text of this text note node."),
-    PYTHON_METHOD(ptVaultTextNoteNode, noteSetType, "Params: type\nLEGACY\nSets the type of text note for this text note node."),
-    PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, noteGetType, "LEGACY\nReturns the type of text note for this text note node."),
-    PYTHON_METHOD(ptVaultTextNoteNode, noteSetSubType, "Params: subType\nLEGACY\nSets the subtype of the this text note node."),
-    PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, noteGetSubType, "LEGACY\nReturns the subtype of this text note node."),
-    // new glue
-    PYTHON_METHOD(ptVaultTextNoteNode, setTitle, "Params: title\nSets the title of this text note node."),
-    PYTHON_METHOD(ptVaultTextNoteNode, setTitleW, "Params: title\nUnicode version of setTitle"),
-    PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getTitle, "Returns the title of this text note node."),
-    PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getTitleW, "Unicode version of getTitle"),
-    PYTHON_METHOD(ptVaultTextNoteNode, setText, "Params: text\nSets text of the this text note node."),
-    PYTHON_METHOD(ptVaultTextNoteNode, setTextW, "Params: text\nUnicode version of setText"),
-    PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getText, "Returns the text of this text note node."),
-    PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getTextW, "Unicode version of getText."),
-    PYTHON_METHOD(ptVaultTextNoteNode, setType, "Params: type\nSets the type of text note for this text note node."),
-    PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getType, "Returns the type of text note for this text note node."),
-    PYTHON_METHOD(ptVaultTextNoteNode, setSubType, "Params: subType\nSets the subtype of the this text note node."),
-    PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getSubType, "Returns the subtype of this text note node."),
-    PYTHON_METHOD(ptVaultTextNoteNode, setDeviceInbox, "Params: inboxName,cb=None,cbContext=0\nSets the device inbox"),
-    PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getDeviceInbox, "Returns a ptVaultFolderNode"),
-PYTHON_END_METHODS_TABLE;
+// legacy glue
+PYTHON_METHOD(ptVaultTextNoteNode, noteSetTitle, "Params: title\nLEGACY\nSets the title of this text note node."),
+              PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, noteGetTitle, "LEGACY\nReturns the title of this text note node."),
+              PYTHON_METHOD(ptVaultTextNoteNode, noteSetText, "Params: text\nLEGACY\nSets text of the this text note node."),
+              PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, noteGetText, "LEGACY\nReturns the text of this text note node."),
+              PYTHON_METHOD(ptVaultTextNoteNode, noteSetType, "Params: type\nLEGACY\nSets the type of text note for this text note node."),
+              PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, noteGetType, "LEGACY\nReturns the type of text note for this text note node."),
+              PYTHON_METHOD(ptVaultTextNoteNode, noteSetSubType, "Params: subType\nLEGACY\nSets the subtype of the this text note node."),
+              PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, noteGetSubType, "LEGACY\nReturns the subtype of this text note node."),
+              // new glue
+              PYTHON_METHOD(ptVaultTextNoteNode, setTitle, "Params: title\nSets the title of this text note node."),
+              PYTHON_METHOD(ptVaultTextNoteNode, setTitleW, "Params: title\nUnicode version of setTitle"),
+              PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getTitle, "Returns the title of this text note node."),
+              PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getTitleW, "Unicode version of getTitle"),
+              PYTHON_METHOD(ptVaultTextNoteNode, setText, "Params: text\nSets text of the this text note node."),
+              PYTHON_METHOD(ptVaultTextNoteNode, setTextW, "Params: text\nUnicode version of setText"),
+              PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getText, "Returns the text of this text note node."),
+              PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getTextW, "Unicode version of getText."),
+              PYTHON_METHOD(ptVaultTextNoteNode, setType, "Params: type\nSets the type of text note for this text note node."),
+              PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getType, "Returns the type of text note for this text note node."),
+              PYTHON_METHOD(ptVaultTextNoteNode, setSubType, "Params: subType\nSets the subtype of the this text note node."),
+              PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getSubType, "Returns the subtype of this text note node."),
+              PYTHON_METHOD(ptVaultTextNoteNode, setDeviceInbox, "Params: inboxName,cb=None,cbContext=0\nSets the device inbox"),
+              PYTHON_METHOD_NOARGS(ptVaultTextNoteNode, getDeviceInbox, "Returns a ptVaultFolderNode"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVaultTextNoteNode, pyVaultNode, "Plasma vault text note node");
@@ -315,14 +322,20 @@ PLASMA_DEFAULT_TYPE_WBASE(ptVaultTextNoteNode, pyVaultNode, "Plasma vault text n
 // required functions for PyObject interoperability
 PYTHON_CLASS_NEW_IMPL(ptVaultTextNoteNode, pyVaultTextNoteNode)
 
-PyObject *pyVaultTextNoteNode::New(RelVaultNode* nfsNode)
+PyObject* pyVaultTextNoteNode::New(RelVaultNode* nfsNode)
 {
-    ptVaultTextNoteNode *newObj = (ptVaultTextNoteNode*)ptVaultTextNoteNode_type.tp_new(&ptVaultTextNoteNode_type, NULL, NULL);
-    if (newObj->fThis->fNode)
+    ptVaultTextNoteNode* newObj = (ptVaultTextNoteNode*)ptVaultTextNoteNode_type.tp_new(&ptVaultTextNoteNode_type, NULL, NULL);
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->DecRef();
+    }
+
     newObj->fThis->fNode = nfsNode;
-    if (newObj->fThis->fNode)
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->IncRef();
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -333,7 +346,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptVaultTextNoteNode, pyVaultTextNoteNode)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyVaultTextNoteNode::AddPlasmaClasses(PyObject *m)
+void pyVaultTextNoteNode::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptVaultTextNoteNode);

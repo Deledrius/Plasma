@@ -77,8 +77,7 @@ class plRipVSConsts;
 class plStatusLog;
 class plGraphPlate;
 
-class plWorldWaveData7
-{
+class plWorldWaveData7 {
 public:
     hsPoint3        fDir;
     float        fLength;
@@ -88,16 +87,14 @@ public:
     float        fAmplitude;
 };
 
-class plWorldWave7 : public plWorldWaveData7
-{
+class plWorldWave7 : public plWorldWaveData7 {
 public:
 
     inline void Accumulate(hsPoint3& accumPos, hsVector3& accumNorm) const;
 };
 
 
-class plWaveSet7 : public plWaveSetBase
-{
+class plWaveSet7 : public plWaveSetBase {
 public:
     // Props inc by 1 (bit shift in bitvector).
     enum plDrawProperties {
@@ -196,7 +193,7 @@ protected:
     float        fTransCountDown;
     int             fTransistor;
     float        fTransDel;
-    
+
     float        fTexTransCountDown;
     int             fTexTrans;
     float        fTexTransDel;
@@ -211,7 +208,7 @@ protected:
 
     hsTArray<plDynaDecalMgr*>       fDecalMgrs;
 
-    hsTArray<plSceneObject*>        fBuoys; 
+    hsTArray<plSceneObject*>        fBuoys;
     hsTArray<plSceneObject*>        fShores;
     hsTArray<plSceneObject*>        fDecals;
     plSceneObject*                  fRefObj;
@@ -252,7 +249,7 @@ protected:
         kDecalV2Lay11,
         kDecalV2Lay12,
         kDecalVEnv,
-        
+
         kNumDecalVShaders
     };
     enum DecalPType {
@@ -288,8 +285,7 @@ protected:
     plShader*                       fGraphVShader[kGraphShorePasses];
     plShader*                       fGraphPShader[kGraphShorePasses];
 
-    class GraphState
-    {
+    class GraphState {
     public:
         float       fAge;
         float       fInvLife;
@@ -302,12 +298,11 @@ protected:
 
     GraphState                      fGraphState[kGraphShorePasses];
 
-    class WaveK
-    {
+    class WaveK {
     public:
         // fK is the number of times the sine wave repeats across the texture. Must be an integer
         // fS/fK is the base X component of the direction of the wave, with Y = 1.f - X. Note that X^2 + Y^2 != 1.
-        // fD allows the wave to get more off the Y direction 
+        // fD allows the wave to get more off the Y direction
         // So the X component will be Int(fS + fD*dispersion) / fK, because it must be an integer ratio to
         // preserve tiling. Also, (fS + fD) must be <= fK (for the Y normalization).
         // See the notes.
@@ -318,8 +313,7 @@ protected:
 
     WaveK           fWaveKs[kNumTexWaves];
 
-    class TexWaveDesc
-    {
+    class TexWaveDesc {
     public:
         float    fPhase;
         float    fAmp;
@@ -332,8 +326,7 @@ protected:
     };
     TexWaveDesc     fTexWaves[kNumTexWaves];
 
-    class TexWaveWindDep
-    {
+    class TexWaveWindDep {
     public:
         float        fWindSpeed;
 
@@ -387,13 +380,13 @@ protected:
 
     void                IUpdateLayers(float dt);
     void                IUpdateBumpLayers(float dt);
-    
+
     plRenderRequest*    ICreateRenderRequest(plRenderTarget* rt, plDrawableSpans* draw, float pri);
     void                ISubmitRenderRequests();
 
     plRenderTarget*     ICreateTransferRenderTarget(const char* name, int size);
     plDrawableSpans*    ICreateClearDrawable(plDrawableSpans* drawable, hsGMaterial* mat);
-    
+
     void                IAddBumpBiasShaders(plLayer* layer);
     plMipmap*           ICreateBiasNoiseMap();
     void                IAddBumpBiasLayer(hsGMaterial* mat);
@@ -478,11 +471,15 @@ protected:
     void                IUpdateDecVShader(int t, plPipeline* pipe);
     void                IUpdateDecVShaders(plPipeline* pipe, const hsMatrix44& l2w, const hsMatrix44& w2l);
 
-    virtual int IShoreRef() const { return kRefShore; }
-    virtual int IDecalRef() const { return kRefDecal; }
+    virtual int IShoreRef() const {
+        return kRefShore;
+    }
+    virtual int IDecalRef() const {
+        return kRefDecal;
+    }
 
-    inline void LogF(const char *format, ...) const;
-    inline void LogF(uint32_t color, const char *format, ...) const;
+    inline void LogF(const char* format, ...) const;
+    inline void LogF(uint32_t color, const char* format, ...) const;
     inline void IRestartLog() const;
     inline void GraphLen(float len) const;
     inline void IRestartGraph() const;
@@ -491,14 +488,18 @@ public:
     plWaveSet7();
     virtual ~plWaveSet7();
 
-    CLASSNAME_REGISTER( plWaveSet7 );
-    GETINTERFACE_ANY( plWaveSet7, plWaveSetBase );
+    CLASSNAME_REGISTER(plWaveSet7);
+    GETINTERFACE_ANY(plWaveSet7, plWaveSetBase);
 
     virtual bool MsgReceive(plMessage* msg);
 
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return false; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return false;
+    }
 
-    int32_t       GetNumProperties() const { return kNumProps; }
+    int32_t       GetNumProperties() const {
+        return kNumProps;
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -512,112 +513,285 @@ public:
     //
     // Geometric wave parameters. These are all safe to twiddle at any time or speed.
     // The new settings take effect as new waves are spawned.
-    void SetGeoMaxLength(float s, float secs=0) { fState.fGeoState.fMaxLength.Set(s, secs); }
-    void SetGeoMinLength(float s, float secs=0) { fState.fGeoState.fMinLength.Set(s, secs); }
-    void SetGeoAmpOverLen(float s, float secs=0) { fState.fGeoState.fAmpOverLen.Set(s, secs); }
-    void SetGeoChop(float s, float secs=0) { fState.fGeoState.fChop.Set(s, secs); }
-    void SetGeoAngleDev(float s, float secs=0) { fState.fGeoState.fAngleDev.Set(s, secs); }
+    void SetGeoMaxLength(float s, float secs = 0) {
+        fState.fGeoState.fMaxLength.Set(s, secs);
+    }
+    void SetGeoMinLength(float s, float secs = 0) {
+        fState.fGeoState.fMinLength.Set(s, secs);
+    }
+    void SetGeoAmpOverLen(float s, float secs = 0) {
+        fState.fGeoState.fAmpOverLen.Set(s, secs);
+    }
+    void SetGeoChop(float s, float secs = 0) {
+        fState.fGeoState.fChop.Set(s, secs);
+    }
+    void SetGeoAngleDev(float s, float secs = 0) {
+        fState.fGeoState.fAngleDev.Set(s, secs);
+    }
 
     // Texture wave parameters. Safe to twiddle any time or speed.
     // The new settings take effect as new waves are spawned.
-    void SetTexMaxLength(float s, float secs=0) { fState.fTexState.fMaxLength.Set(s, secs); }
-    void SetTexMinLength(float s, float secs=0) { fState.fTexState.fMinLength.Set(s, secs); }
-    void SetTexAmpOverLen(float s, float secs=0) { fState.fTexState.fAmpOverLen.Set(s, secs); }
-    void SetTexChop(float s, float secs=0) { fState.fTexState.fChop.Set(s, secs); }
-    void SetTexAngleDev(float s, float secs=0) { fState.fTexState.fAngleDev.Set(s, secs); }
+    void SetTexMaxLength(float s, float secs = 0) {
+        fState.fTexState.fMaxLength.Set(s, secs);
+    }
+    void SetTexMinLength(float s, float secs = 0) {
+        fState.fTexState.fMinLength.Set(s, secs);
+    }
+    void SetTexAmpOverLen(float s, float secs = 0) {
+        fState.fTexState.fAmpOverLen.Set(s, secs);
+    }
+    void SetTexChop(float s, float secs = 0) {
+        fState.fTexState.fChop.Set(s, secs);
+    }
+    void SetTexAngleDev(float s, float secs = 0) {
+        fState.fTexState.fAngleDev.Set(s, secs);
+    }
 
-    // The size in feet of one tile of the ripple texture. If you change this (I don't 
+    // The size in feet of one tile of the ripple texture. If you change this (I don't
     // recommend it), you need to change it very slowly or it will look very stupid.
-    void SetRippleScale(float s, float secs=0) { fState.fRippleScale.Set(s, secs); }
+    void SetRippleScale(float s, float secs = 0) {
+        fState.fRippleScale.Set(s, secs);
+    }
 
     // The direction the wind is blowing (waves will be more or less perpindicular to wind dir).
     // Change somewhat slowly, like over 30 seconds.
-    void SetWindDir(const hsVector3& s, float secs=0) { fState.fWindDir.Set(s, secs); }
+    void SetWindDir(const hsVector3& s, float secs = 0) {
+        fState.fWindDir.Set(s, secs);
+    }
 
     // Change these gently, effect is immediate.
-    void SetSpecularNoise(float s, float secs=0) { hsVector3 spec = fState.fSpecVec; spec[plFixedWaterState7::kNoise] = s; fState.fSpecVec.Set(spec, secs); }
-    void SetSpecularStart(float s, float secs=0) { hsVector3 spec = fState.fSpecVec; spec[plFixedWaterState7::kSpecStart] = s; fState.fSpecVec.Set(spec, secs); }
-    void SetSpecularEnd(float s, float secs=0) { hsVector3 spec = fState.fSpecVec; spec[plFixedWaterState7::kSpecEnd] = s; fState.fSpecVec.Set(spec, secs); }
+    void SetSpecularNoise(float s, float secs = 0) {
+        hsVector3 spec = fState.fSpecVec;
+        spec[plFixedWaterState7::kNoise] = s;
+        fState.fSpecVec.Set(spec, secs);
+    }
+    void SetSpecularStart(float s, float secs = 0) {
+        hsVector3 spec = fState.fSpecVec;
+        spec[plFixedWaterState7::kSpecStart] = s;
+        fState.fSpecVec.Set(spec, secs);
+    }
+    void SetSpecularEnd(float s, float secs = 0) {
+        hsVector3 spec = fState.fSpecVec;
+        spec[plFixedWaterState7::kSpecEnd] = s;
+        fState.fSpecVec.Set(spec, secs);
+    }
 
     // Water Height is overriden if the ref object is animated.
-    void SetWaterHeight(float s, float secs=0) { fState.fWaterHeight.Set(s, secs); }
+    void SetWaterHeight(float s, float secs = 0) {
+        fState.fWaterHeight.Set(s, secs);
+    }
 
     // Water Offset and DepthFalloff are complicated, and not immediately interesting to animate.
-    void SetWaterOffset(const hsVector3& s, float secs=0) { fState.fWaterOffset.Set(s, secs); }
-        void SetOpacOffset(float s, float secs=0) { hsVector3 off = fState.fWaterOffset; off.fX = s; fState.fWaterOffset.Set(off, secs); }
-        void SetReflOffset(float s, float secs=0) { hsVector3 off = fState.fWaterOffset; off.fY = s; fState.fWaterOffset.Set(off, secs); }
-        void SetWaveOffset(float s, float secs=0) { hsVector3 off = fState.fWaterOffset; off.fZ = s; fState.fWaterOffset.Set(off, secs); }
-    void SetDepthFalloff(const hsVector3& s, float secs=0) { fState.fDepthFalloff.Set(s, secs); }
-        void SetOpacFalloff(float s, float secs=0) { hsVector3 off = fState.fDepthFalloff; off.fX = s; fState.fDepthFalloff.Set(off, secs); }
-        void SetReflFalloff(float s, float secs=0) { hsVector3 off = fState.fDepthFalloff; off.fY = s; fState.fDepthFalloff.Set(off, secs); }
-        void SetWaveFalloff(float s, float secs=0) { hsVector3 off = fState.fDepthFalloff; off.fZ = s; fState.fDepthFalloff.Set(off, secs); }
+    void SetWaterOffset(const hsVector3& s, float secs = 0) {
+        fState.fWaterOffset.Set(s, secs);
+    }
+    void SetOpacOffset(float s, float secs = 0) {
+        hsVector3 off = fState.fWaterOffset;
+        off.fX = s;
+        fState.fWaterOffset.Set(off, secs);
+    }
+    void SetReflOffset(float s, float secs = 0) {
+        hsVector3 off = fState.fWaterOffset;
+        off.fY = s;
+        fState.fWaterOffset.Set(off, secs);
+    }
+    void SetWaveOffset(float s, float secs = 0) {
+        hsVector3 off = fState.fWaterOffset;
+        off.fZ = s;
+        fState.fWaterOffset.Set(off, secs);
+    }
+    void SetDepthFalloff(const hsVector3& s, float secs = 0) {
+        fState.fDepthFalloff.Set(s, secs);
+    }
+    void SetOpacFalloff(float s, float secs = 0) {
+        hsVector3 off = fState.fDepthFalloff;
+        off.fX = s;
+        fState.fDepthFalloff.Set(off, secs);
+    }
+    void SetReflFalloff(float s, float secs = 0) {
+        hsVector3 off = fState.fDepthFalloff;
+        off.fY = s;
+        fState.fDepthFalloff.Set(off, secs);
+    }
+    void SetWaveFalloff(float s, float secs = 0) {
+        hsVector3 off = fState.fDepthFalloff;
+        off.fZ = s;
+        fState.fDepthFalloff.Set(off, secs);
+    }
 
     // Max and Min Atten aren't very interesting, and will probably go away.
-    void SetMaxAtten(const hsVector3& s, float secs=0) { fState.fMaxAtten.Set(s, secs); }
-    void SetMinAtten(const hsVector3& s, float secs=0) { fState.fMinAtten.Set(s, secs); }
+    void SetMaxAtten(const hsVector3& s, float secs = 0) {
+        fState.fMaxAtten.Set(s, secs);
+    }
+    void SetMinAtten(const hsVector3& s, float secs = 0) {
+        fState.fMinAtten.Set(s, secs);
+    }
 
     // Skipping the shore parameters, because they are never used.
 
     // Water colors, adjust slowly, effect is immediate.
-    void SetWaterTint(const hsColorRGBA& s, float secs=0) { fState.fWaterTint.Set(s, secs); }
-        void SetWaterRGB(const hsVector3& col, float secs=0) { hsColorRGBA rgb; rgb.Set(col.fX, col.fY, col.fZ, GetWaterOpacity()); SetWaterTint(rgb, secs); }
-        void SetWaterOpacity(float s, float secs=0) { hsColorRGBA col = GetWaterTint(); col.a = s; SetWaterTint(col, secs); }
-    void SetSpecularTint(const hsColorRGBA& s, float secs=0) { fState.fSpecularTint.Set(s, secs); }
-        void SetSpecularRGB(const hsVector3& col, float secs=0) { hsColorRGBA rgb; rgb.Set(col.fX, col.fY, col.fZ, GetSpecularMute()); SetSpecularTint(rgb, secs); }
-        void SetSpecularMute(float s, float secs=0) { hsColorRGBA col = GetSpecularTint(); col.a = s; SetSpecularTint(col, secs); }
+    void SetWaterTint(const hsColorRGBA& s, float secs = 0) {
+        fState.fWaterTint.Set(s, secs);
+    }
+    void SetWaterRGB(const hsVector3& col, float secs = 0) {
+        hsColorRGBA rgb;
+        rgb.Set(col.fX, col.fY, col.fZ, GetWaterOpacity());
+        SetWaterTint(rgb, secs);
+    }
+    void SetWaterOpacity(float s, float secs = 0) {
+        hsColorRGBA col = GetWaterTint();
+        col.a = s;
+        SetWaterTint(col, secs);
+    }
+    void SetSpecularTint(const hsColorRGBA& s, float secs = 0) {
+        fState.fSpecularTint.Set(s, secs);
+    }
+    void SetSpecularRGB(const hsVector3& col, float secs = 0) {
+        hsColorRGBA rgb;
+        rgb.Set(col.fX, col.fY, col.fZ, GetSpecularMute());
+        SetSpecularTint(rgb, secs);
+    }
+    void SetSpecularMute(float s, float secs = 0) {
+        hsColorRGBA col = GetSpecularTint();
+        col.a = s;
+        SetSpecularTint(col, secs);
+    }
 
     // The environment map is essentially projected onto a sphere. Moving the center of
     // the sphere north will move the reflections north, changing the radius of the
     // sphere effects parallax in the obvious way.
-    void SetEnvCenter(const hsPoint3& s, float secs=0) { fState.fEnvCenter.Set(s, secs); }
-    void SetEnvRadius(float s, float secs=0) { fState.fEnvRadius.Set(s, secs); }
+    void SetEnvCenter(const hsPoint3& s, float secs = 0) {
+        fState.fEnvCenter.Set(s, secs);
+    }
+    void SetEnvRadius(float s, float secs = 0) {
+        fState.fEnvRadius.Set(s, secs);
+    }
 
     // Now a way to get current values. See the accompanying Setter for notes on
     // what the parameter means.
     //
-    float GetGeoMaxLength() const { return fState.fGeoState.fMaxLength; }
-    float GetGeoMinLength() const { return fState.fGeoState.fMinLength; }
-    float GetGeoAmpOverLen() const { return fState.fGeoState.fAmpOverLen; }
-    float GetGeoChop() const { return fState.fGeoState.fChop; }
-    float GetGeoAngleDev() const { return fState.fGeoState.fAngleDev; }
+    float GetGeoMaxLength() const {
+        return fState.fGeoState.fMaxLength;
+    }
+    float GetGeoMinLength() const {
+        return fState.fGeoState.fMinLength;
+    }
+    float GetGeoAmpOverLen() const {
+        return fState.fGeoState.fAmpOverLen;
+    }
+    float GetGeoChop() const {
+        return fState.fGeoState.fChop;
+    }
+    float GetGeoAngleDev() const {
+        return fState.fGeoState.fAngleDev;
+    }
 
-    float GetTexMaxLength() const { return fState.fTexState.fMaxLength; }
-    float GetTexMinLength() const { return fState.fTexState.fMinLength; }
-    float GetTexAmpOverLen() const { return fState.fTexState.fAmpOverLen; }
-    float GetTexChop() const { return fState.fTexState.fChop; }
-    float GetTexAngleDev() const { return fState.fTexState.fAngleDev; }
+    float GetTexMaxLength() const {
+        return fState.fTexState.fMaxLength;
+    }
+    float GetTexMinLength() const {
+        return fState.fTexState.fMinLength;
+    }
+    float GetTexAmpOverLen() const {
+        return fState.fTexState.fAmpOverLen;
+    }
+    float GetTexChop() const {
+        return fState.fTexState.fChop;
+    }
+    float GetTexAngleDev() const {
+        return fState.fTexState.fAngleDev;
+    }
 
-    float GetRippleScale() const { return fState.fRippleScale; }
+    float GetRippleScale() const {
+        return fState.fRippleScale;
+    }
 
-    hsVector3 GetWindDir() const { return fState.fWindDir; }
+    hsVector3 GetWindDir() const {
+        return fState.fWindDir;
+    }
 
-    float GetSpecularNoise() const { hsVector3 spec = fState.fSpecVec; return spec[plFixedWaterState7::kNoise]; }
-    float GetSpecularStart() const { hsVector3 spec = fState.fSpecVec; return spec[plFixedWaterState7::kSpecStart]; }
-    float GetSpecularEnd() const { hsVector3 spec = fState.fSpecVec; return spec[plFixedWaterState7::kSpecEnd]; }
+    float GetSpecularNoise() const {
+        hsVector3 spec = fState.fSpecVec;
+        return spec[plFixedWaterState7::kNoise];
+    }
+    float GetSpecularStart() const {
+        hsVector3 spec = fState.fSpecVec;
+        return spec[plFixedWaterState7::kSpecStart];
+    }
+    float GetSpecularEnd() const {
+        hsVector3 spec = fState.fSpecVec;
+        return spec[plFixedWaterState7::kSpecEnd];
+    }
 
-    float GetWaterHeight() const { return fState.fWaterHeight; }
+    float GetWaterHeight() const {
+        return fState.fWaterHeight;
+    }
 
-    hsVector3 GetWaterOffset() const { return fState.fWaterOffset; }
-        float GetOpacOffset() const { hsVector3 off = fState.fWaterOffset; return off.fX; }
-        float GetReflOffset() const { hsVector3 off = fState.fWaterOffset; return off.fY; }
-        float GetWaveOffset() const { hsVector3 off = fState.fWaterOffset; return off.fZ; }
-    hsVector3 GetDepthFalloff() const { return fState.fDepthFalloff; }
-        float GetOpacFalloff() const { hsVector3 off = fState.fDepthFalloff; return off.fX; }
-        float GetReflFalloff() const { hsVector3 off = fState.fDepthFalloff; return off.fY; }
-        float GetWaveFalloff() const { hsVector3 off = fState.fDepthFalloff; return off.fZ; }
+    hsVector3 GetWaterOffset() const {
+        return fState.fWaterOffset;
+    }
+    float GetOpacOffset() const {
+        hsVector3 off = fState.fWaterOffset;
+        return off.fX;
+    }
+    float GetReflOffset() const {
+        hsVector3 off = fState.fWaterOffset;
+        return off.fY;
+    }
+    float GetWaveOffset() const {
+        hsVector3 off = fState.fWaterOffset;
+        return off.fZ;
+    }
+    hsVector3 GetDepthFalloff() const {
+        return fState.fDepthFalloff;
+    }
+    float GetOpacFalloff() const {
+        hsVector3 off = fState.fDepthFalloff;
+        return off.fX;
+    }
+    float GetReflFalloff() const {
+        hsVector3 off = fState.fDepthFalloff;
+        return off.fY;
+    }
+    float GetWaveFalloff() const {
+        hsVector3 off = fState.fDepthFalloff;
+        return off.fZ;
+    }
 
-    hsVector3 GetMaxAtten() const { return fState.fMaxAtten; }
-    hsVector3 GetMinAtten() const { return fState.fMinAtten; }
+    hsVector3 GetMaxAtten() const {
+        return fState.fMaxAtten;
+    }
+    hsVector3 GetMinAtten() const {
+        return fState.fMinAtten;
+    }
 
-    hsColorRGBA GetWaterTint() const { return fState.fWaterTint; }
-        hsVector3 GetWaterRGB() const { hsColorRGBA col = GetWaterTint(); return hsVector3(col.r, col.g, col.b); }
-        float GetWaterOpacity() const { return GetWaterTint().a; }
-    hsColorRGBA GetSpecularTint() const { return fState.fSpecularTint; }
-        hsVector3 GetSpecularRGB() const { hsColorRGBA col = GetSpecularTint(); return hsVector3(col.r, col.g, col.b); }
-        float GetSpecularMute() const { return GetSpecularTint().a; }
+    hsColorRGBA GetWaterTint() const {
+        return fState.fWaterTint;
+    }
+    hsVector3 GetWaterRGB() const {
+        hsColorRGBA col = GetWaterTint();
+        return hsVector3(col.r, col.g, col.b);
+    }
+    float GetWaterOpacity() const {
+        return GetWaterTint().a;
+    }
+    hsColorRGBA GetSpecularTint() const {
+        return fState.fSpecularTint;
+    }
+    hsVector3 GetSpecularRGB() const {
+        hsColorRGBA col = GetSpecularTint();
+        return hsVector3(col.r, col.g, col.b);
+    }
+    float GetSpecularMute() const {
+        return GetSpecularTint().a;
+    }
 
-    hsPoint3 GetEnvCenter() const { return fState.fEnvCenter; }
-    float GetEnvRadius() const { return fState.fEnvRadius; }
+    hsPoint3 GetEnvCenter() const {
+        return fState.fEnvCenter;
+    }
+    float GetEnvRadius() const {
+        return fState.fEnvRadius;
+    }
 
     // Export/debugging functions. For runtime, use message interface (plGenRefMsg, plWaveMsg).
     void        AddTarget(const plKey& key);
@@ -627,7 +801,9 @@ public:
     void        SetRefObject(plSceneObject* refObj);
 
     void            SetSceneNode(const plKey& key);
-    plKey           GetSceneNode() const { return fSceneNode; }
+    plKey           GetSceneNode() const {
+        return fSceneNode;
+    }
 
     void            AddDynaDecalMgr(plKey& key);
     void            RemoveDynaDecalMgr(plKey& key);
@@ -637,22 +813,38 @@ public:
 
     virtual bool            SetupRippleMat(hsGMaterial* mat, const plRipVSConsts& ripConsts);
 
-    virtual float        GetHeight() const { return State().fWaterHeight; }
+    virtual float        GetHeight() const {
+        return State().fWaterHeight;
+    }
 
-    const plFixedWaterState7::WaveState& GeoState() const { return State().fGeoState; }
-    const plFixedWaterState7::WaveState& TexState() const { return State().fTexState; }
-    const plFixedWaterState7& State() const { return fState; }
+    const plFixedWaterState7::WaveState& GeoState() const {
+        return State().fGeoState;
+    }
+    const plFixedWaterState7::WaveState& TexState() const {
+        return State().fTexState;
+    }
+    const plFixedWaterState7& State() const {
+        return fState;
+    }
     void            SetState(const plFixedWaterState7& state, float dur);
 
-    void            SetEnvSize(uint32_t s) { fEnvSize = s; }
-    uint32_t          GetEnvSize() const { return fEnvSize; }
+    void            SetEnvSize(uint32_t s) {
+        fEnvSize = s;
+    }
+    uint32_t          GetEnvSize() const {
+        return fEnvSize;
+    }
 
     void StopLog();
     void StartLog();
-    bool Logging() const { return fStatusLog != nil; }
+    bool Logging() const {
+        return fStatusLog != nil;
+    }
     void StartGraph();
     void StopGraph();
-    bool Graphing() const { return fStatusGraph != nil; }
+    bool Graphing() const {
+        return fStatusGraph != nil;
+    }
 };
 
 #endif // plWaveSet7_inc

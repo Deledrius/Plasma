@@ -48,10 +48,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 plRenderRequestMsg::plRenderRequestMsg(plKey sender, plRenderRequestBase* req)
-:   plMessage(sender, nil, nil),
-    fReq(req)
+    :   plMessage(sender, nil, nil),
+        fReq(req)
 {
-    plUoid oid( kClient_KEY );      // from plFixedKey.h
+    plUoid oid(kClient_KEY);        // from plFixedKey.h
     plKey key = hsgResMgr::ResMgr()->FindKey(oid);
     AddReceiver(key);
 
@@ -89,8 +89,8 @@ plRenderRequestAck::plRenderRequestAck()
 }
 
 plRenderRequestAck::plRenderRequestAck(plKey r, uint32_t userData)
-:   plMessage(nil, r, nil),
-    fUserData(userData)
+    :   plMessage(nil, r, nil),
+        fUserData(userData)
 {
 }
 

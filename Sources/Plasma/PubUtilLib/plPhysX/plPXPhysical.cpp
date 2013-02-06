@@ -78,11 +78,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 #if 0
-    #define SpamMsg(x) x
+#define SpamMsg(x) x
 #else
-    #define SpamMsg(x)
+#define SpamMsg(x)
 #endif
-              
+
 #define LogActivate(func) if (fActor->isSleeping()) SimLog("%s activated by %s", GetKeyName().c_str(), func);
 
 PhysRecipe::PhysRecipe()
@@ -108,12 +108,24 @@ plProfile_Extern(MaySendLocation);
 plProfile_Extern(LocationsSent);
 plProfile_Extern(PhysicsUpdates);
 
-static void ClearMatrix(hsMatrix44 &m)
+static void ClearMatrix(hsMatrix44& m)
 {
-    m.fMap[0][0] = 0.0f; m.fMap[0][1] = 0.0f; m.fMap[0][2] = 0.0f; m.fMap[0][3]  = 0.0f;
-    m.fMap[1][0] = 0.0f; m.fMap[1][1] = 0.0f; m.fMap[1][2] = 0.0f; m.fMap[1][3]  = 0.0f;
-    m.fMap[2][0] = 0.0f; m.fMap[2][1] = 0.0f; m.fMap[2][2] = 0.0f; m.fMap[2][3]  = 0.0f;
-    m.fMap[3][0] = 0.0f; m.fMap[3][1] = 0.0f; m.fMap[3][2] = 0.0f; m.fMap[3][3]  = 0.0f;
+    m.fMap[0][0] = 0.0f;
+    m.fMap[0][1] = 0.0f;
+    m.fMap[0][2] = 0.0f;
+    m.fMap[0][3]  = 0.0f;
+    m.fMap[1][0] = 0.0f;
+    m.fMap[1][1] = 0.0f;
+    m.fMap[1][2] = 0.0f;
+    m.fMap[1][3]  = 0.0f;
+    m.fMap[2][0] = 0.0f;
+    m.fMap[2][1] = 0.0f;
+    m.fMap[2][2] = 0.0f;
+    m.fMap[2][3]  = 0.0f;
+    m.fMap[3][0] = 0.0f;
+    m.fMap[3][1] = 0.0f;
+    m.fMap[3][2] = 0.0f;
+    m.fMap[3][3]  = 0.0f;
     m.NotIdentity();
 }
 
@@ -140,8 +152,8 @@ plPXPhysical::plPXPhysical()
     , fSndGroup(nil)
     , fMass(0.f)
     , fWeWereHit(false)
-    , fHitForce(0,0,0)
-    , fHitPos(0,0,0)
+    , fHitForce(0, 0, 0)
+    , fHitPos(0, 0, 0)
 {
 }
 
@@ -149,26 +161,28 @@ plPXPhysical::~plPXPhysical()
 {
     SpamMsg(plSimulationMgr::Log("Destroying physical %s", GetKeyName().c_str()));
 
-    if (fActor)
-    {
+    if (fActor) {
         // Grab any mesh we may have (they need to be released manually)
         NxConvexMesh* convexMesh = nil;
         NxTriangleMesh* triMesh = nil;
         NxShape* shape = fActor->getShapes()[0];
-        if (NxConvexShape* convexShape = shape->isConvexMesh())
+
+        if (NxConvexShape* convexShape = shape->isConvexMesh()) {
             convexMesh = &convexShape->getConvexMesh();
-        else if (NxTriangleMeshShape* trimeshShape = shape->isTriangleMesh())
+        } else if (NxTriangleMeshShape* trimeshShape = shape->isTriangleMesh()) {
             triMesh = &trimeshShape->getTriangleMesh();
+        }
 
-        if (!fActor->isDynamic())
+        if (!fActor->isDynamic()) {
             plPXPhysicalControllerCore::RebuildCache();
+        }
 
-        if (fActor->isDynamic() && fActor->readBodyFlag(NX_BF_KINEMATIC))
-        {
-            if (fGroup == plSimDefs::kGroupDynamic)
+        if (fActor->isDynamic() && fActor->readBodyFlag(NX_BF_KINEMATIC)) {
+            if (fGroup == plSimDefs::kGroupDynamic) {
                 fNumberAnimatedPhysicals--;
-            else
+            } else {
                 fNumberAnimatedActivators--;
+            }
         }
 
         // Release the actor
@@ -177,10 +191,13 @@ plPXPhysical::~plPXPhysical()
         fActor = nil;
 
         // Now that the actor is freed, release the mesh
-        if (convexMesh)
+        if (convexMesh) {
             plSimulationMgr::GetInstance()->GetSDK()->releaseConvexMesh(*convexMesh);
-        if (triMesh)
+        }
+
+        if (triMesh) {
             plSimulationMgr::GetInstance()->GetSDK()->releaseTriangleMesh(*triMesh);
+        }
 
         // Release the scene, so it can be cleaned up if no one else is using it
         plSimulationMgr::GetInstance()->ReleaseScene(fWorldKey);
@@ -190,10 +207,11 @@ plPXPhysical::~plPXPhysical()
 
     // remove sdl modifier
     plSceneObject* sceneObj = plSceneObject::ConvertNoRef(fObjectKey->ObjectIsLoaded());
-    if (sceneObj && fSDLMod)
-    {
+
+    if (sceneObj && fSDLMod) {
         sceneObj->RemoveModifier(fSDLMod);
     }
+
     delete fSDLMod;
 }
 
@@ -215,10 +233,8 @@ bool plPXPhysical::Init(PhysRecipe& recipe)
 
     plPXConvert::Matrix(recipe.l2s, actorDesc.globalPose);
 
-    switch (fBoundsType)
-    {
-    case plSimDefs::kSphereBounds:
-        {
+    switch (fBoundsType) {
+    case plSimDefs::kSphereBounds: {
             hsMatrix44 sphereL2W;
             sphereL2W.Reset();
             sphereL2W.SetTranslate(&recipe.offset);
@@ -229,16 +245,16 @@ bool plPXPhysical::Init(PhysRecipe& recipe)
             actorDesc.shapes.pushBack(&sphereDesc);
         }
         break;
-    case plSimDefs::kHullBounds:
-        {
+
+    case plSimDefs::kHullBounds: {
             convexShapeDesc.meshData = recipe.convexMesh;
             convexShapeDesc.userData = recipe.meshStream;
             convexShapeDesc.group = fGroup;
             actorDesc.shapes.pushBack(&convexShapeDesc);
         }
         break;
-    case plSimDefs::kBoxBounds:
-        {
+
+    case plSimDefs::kBoxBounds: {
             boxDesc.dimensions = plPXConvert::Point(recipe.bDimensions);
 
             hsMatrix44 boxL2W;
@@ -250,17 +266,19 @@ bool plPXPhysical::Init(PhysRecipe& recipe)
             actorDesc.shapes.push_back(&boxDesc);
         }
         break;
+
     case plSimDefs::kExplicitBounds:
     case plSimDefs::kProxyBounds:
-        if (fGroup == plSimDefs::kGroupDetector)
-        {
+        if (fGroup == plSimDefs::kGroupDetector) {
             SimLog("Someone using an Exact on a detector region: %s", GetKeyName().c_str());
         }
+
         trimeshShapeDesc.meshData = recipe.triMesh;
         trimeshShapeDesc.userData = recipe.meshStream;
         trimeshShapeDesc.group = fGroup;
         actorDesc.shapes.pushBack(&trimeshShapeDesc);
         break;
+
     default:
         hsAssert(false, "Unknown geometry type during read.");
         return false;
@@ -270,44 +288,38 @@ bool plPXPhysical::Init(PhysRecipe& recipe)
     //  Now fill out the body, or dynamic part of the physical
     NxBodyDesc bodyDesc;
     fMass = recipe.mass;
-    if (recipe.mass != 0)
-    {
+
+    if (recipe.mass != 0) {
         bodyDesc.mass = recipe.mass;
         actorDesc.body = &bodyDesc;
 
-        if (GetProperty(plSimulationInterface::kPinned))
-        {
+        if (GetProperty(plSimulationInterface::kPinned)) {
             bodyDesc.flags |= NX_BF_FROZEN;
             startAsleep = true;             // put it to sleep if they are going to be frozen
         }
 
-        if (fGroup != plSimDefs::kGroupDynamic || GetProperty(plSimulationInterface::kPhysAnim))
-        {
+        if (fGroup != plSimDefs::kGroupDynamic || GetProperty(plSimulationInterface::kPhysAnim)) {
             SetProperty(plSimulationInterface::kPassive, true);
 
             // Even though the code for animated physicals and animated activators are the same
             // keep these code snippets separated for fine tuning. Thanks.
-            if (fGroup == plSimDefs::kGroupDynamic)
-            {
+            if (fGroup == plSimDefs::kGroupDynamic) {
                 // handle the animated physicals.... make kinematic for now.
                 fNumberAnimatedPhysicals++;
                 bodyDesc.flags |= NX_BF_KINEMATIC;
                 startAsleep = true;
-            }
-            else
-            {
-                // handle the animated activators.... 
+            } else {
+                // handle the animated activators....
                 fNumberAnimatedActivators++;
                 bodyDesc.flags |= NX_BF_KINEMATIC;
                 startAsleep = true;
             }
 
         }
-    }
-    else
-    {
-        if ( GetProperty(plSimulationInterface::kPhysAnim) )
+    } else {
+        if (GetProperty(plSimulationInterface::kPhysAnim)) {
             SimLog("An animated physical that has no mass: %s", GetKeyName().c_str());
+        }
     }
 
     actorDesc.userData = this;
@@ -315,21 +327,24 @@ bool plPXPhysical::Init(PhysRecipe& recipe)
 
     // Put the dynamics into actor group 1.  The actor groups are only used for
     // deciding who we get contact reports for.
-    if (fGroup == plSimDefs::kGroupDynamic)
+    if (fGroup == plSimDefs::kGroupDynamic) {
         actorDesc.group = 1;
+    }
 
     NxScene* scene = plSimulationMgr::GetInstance()->GetScene(fWorldKey);
-    try
-    {
+
+    try {
         fActor = scene->createActor(actorDesc);
-    } catch (...)
-    {
+    } catch (...) {
         hsAssert(false, "Actor creation crashed");
         return false;
     }
+
     hsAssert(fActor, "Actor creation failed");
-    if (!fActor)
+
+    if (!fActor) {
         return false;
+    }
 
     NxShape* shape = fActor->getShapes()[0];
     shape->setMaterial(plSimulationMgr::GetInstance()->GetMaterialIdx(scene, recipe.friction, recipe.restitution));
@@ -343,39 +358,39 @@ bool plPXPhysical::Init(PhysRecipe& recipe)
     // problems trying to calculate an intertial tensor.  By letting it be
     // created as a normal dynamic first, then setting the flags, we work around
     // that problem.
-    if (fGroup == plSimDefs::kGroupDetector)
-    {
+    if (fGroup == plSimDefs::kGroupDetector) {
         shape->setFlag(NX_TRIGGER_ON_ENTER, true);
         shape->setFlag(NX_TRIGGER_ON_LEAVE, true);
     }
 
-    if (GetProperty(plSimulationInterface::kStartInactive) || startAsleep)
-    {
-        if (!fActor->isSleeping())
-        {
-            if (plSimulationMgr::fExtraProfile)
+    if (GetProperty(plSimulationInterface::kStartInactive) || startAsleep) {
+        if (!fActor->isSleeping()) {
+            if (plSimulationMgr::fExtraProfile) {
                 SimLog("Deactivating %s in SetPositionAndRotationSim", GetKeyName().c_str());
+            }
+
             fActor->putToSleep();
         }
     }
 
-    if (GetProperty(plSimulationInterface::kDisable))
+    if (GetProperty(plSimulationInterface::kDisable)) {
         IEnable(false);
-    if (GetProperty(plSimulationInterface::kSuppressed_DEAD))
-        IEnable(false);
+    }
 
-    plNodeRefMsg* refMsg = new plNodeRefMsg(fSceneNode, plRefMsg::kOnCreate, -1, plNodeRefMsg::kPhysical); 
+    if (GetProperty(plSimulationInterface::kSuppressed_DEAD)) {
+        IEnable(false);
+    }
+
+    plNodeRefMsg* refMsg = new plNodeRefMsg(fSceneNode, plRefMsg::kOnCreate, -1, plNodeRefMsg::kPhysical);
     hsgResMgr::ResMgr()->AddViaNotify(GetKey(), refMsg, plRefFlags::kActiveRef);
 
-    if (fWorldKey)
-    {
+    if (fWorldKey) {
         plGenRefMsg* ref = new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, kPhysRefWorld);
         hsgResMgr::ResMgr()->AddViaNotify(fWorldKey, ref, plRefFlags::kActiveRef);
     }
 
     // only dynamic physicals without noSync need SDLs
-    if ( fGroup == plSimDefs::kGroupDynamic && !fProps.IsBitSet(plSimulationInterface::kNoSynchronize) )
-    {
+    if (fGroup == plSimDefs::kGroupDynamic && !fProps.IsBitSet(plSimulationInterface::kNoSynchronize)) {
         // add SDL modifier
         plSceneObject* sceneObj = plSceneObject::ConvertNoRef(fObjectKey->ObjectIsLoaded());
         hsAssert(sceneObj, "nil sceneObject, failed to create and attach SDL modifier");
@@ -395,33 +410,32 @@ bool plPXPhysical::Init(PhysRecipe& recipe)
 /////////////////////////////////////////////////////////////////
 
 // MSGRECEIVE
-bool plPXPhysical::MsgReceive( plMessage* msg )
+bool plPXPhysical::MsgReceive(plMessage* msg)
 {
-    if(plGenRefMsg *refM = plGenRefMsg::ConvertNoRef(msg))
-    {
+    if (plGenRefMsg* refM = plGenRefMsg::ConvertNoRef(msg)) {
         return HandleRefMsg(refM);
-    }
-    else if(plSimulationMsg *simM = plSimulationMsg::ConvertNoRef(msg))
-    {
+    } else if (plSimulationMsg* simM = plSimulationMsg::ConvertNoRef(msg)) {
         plLinearVelocityMsg* velMsg = plLinearVelocityMsg::ConvertNoRef(msg);
-        if(velMsg)
-        {
+
+        if (velMsg) {
             SetLinearVelocitySim(velMsg->Velocity());
             return true;
         }
+
         plAngularVelocityMsg* angvelMsg = plAngularVelocityMsg::ConvertNoRef(msg);
-        if(angvelMsg)
-        {
+
+        if (angvelMsg) {
             SetAngularVelocitySim(angvelMsg->AngularVelocity());
             return true;
         }
 
-        
+
         return false;
     }
     // couldn't find a local handler: pass to the base
-    else
+    else {
         return plPhysical::MsgReceive(msg);
+    }
 }
 
 // IHANDLEREFMSG
@@ -437,36 +451,29 @@ bool plPXPhysical::HandleRefMsg(plGenRefMsg* refMsg)
 
     plString refKeyName = refKey ? refKey->GetName() : "MISSING";
 
-    if (refType == kPhysRefWorld)
-    {
-        if (refCtxt == plRefMsg::kOnCreate || refCtxt == plRefMsg::kOnRequest)
-        {
+    if (refType == kPhysRefWorld) {
+        if (refCtxt == plRefMsg::kOnCreate || refCtxt == plRefMsg::kOnRequest) {
             // Cache the initial transform, since we assume the sceneobject already knows
             // that and doesn't need to be told again
             IGetTransformGlobal(fCachedLocal2World);
         }
-        if (refCtxt == plRefMsg::kOnDestroy)
-        {
+
+        if (refCtxt == plRefMsg::kOnDestroy) {
             // our world was deleted out from under us: move to the main world
 //          hsAssert(0, "Lost world");
         }
-    }
-    else if (refType == kPhysRefSndGroup)
-    {
-        switch (refCtxt)
-        {
+    } else if (refType == kPhysRefSndGroup) {
+        switch (refCtxt) {
         case plRefMsg::kOnCreate:
         case plRefMsg::kOnRequest:
-            fSndGroup = plPhysicalSndGroup::ConvertNoRef( refMsg->GetRef() );
+            fSndGroup = plPhysicalSndGroup::ConvertNoRef(refMsg->GetRef());
             break;
 
         case plRefMsg::kOnDestroy:
             fSndGroup = nil;
             break;
         }
-    }
-    else
-    {
+    } else {
         hsAssert(0, "Unknown ref type, who sent us this?");
     }
 
@@ -476,71 +483,90 @@ bool plPXPhysical::HandleRefMsg(plGenRefMsg* refMsg)
 void plPXPhysical::IEnable(bool enable)
 {
     fProps.SetBit(plSimulationInterface::kDisable, !enable);
-    if (!enable)
-    {
+
+    if (!enable) {
         fActor->raiseActorFlag(NX_AF_DISABLE_COLLISION);
-        if (fActor->isDynamic())
+
+        if (fActor->isDynamic()) {
             fActor->raiseBodyFlag(NX_BF_FROZEN);
-        else
+        } else {
             plPXPhysicalControllerCore::RebuildCache();
-    }
-    else
-    {
+        }
+    } else {
         fActor->clearActorFlag(NX_AF_DISABLE_COLLISION);
 
-        if (fActor->isDynamic())
+        if (fActor->isDynamic()) {
             fActor->clearBodyFlag(NX_BF_FROZEN);
-        else
+        } else {
             plPXPhysicalControllerCore::RebuildCache();
+        }
     }
 }
 
 plPhysical& plPXPhysical::SetProperty(int prop, bool status)
 {
-    if (GetProperty(prop) == status)
-    {
+    if (GetProperty(prop) == status) {
         const char* propName = "(unknown)";
-        switch (prop)
-        {
-        case plSimulationInterface::kDisable:           propName = "kDisable";              break;
-        case plSimulationInterface::kPinned:            propName = "kPinned";               break;
-        case plSimulationInterface::kPassive:           propName = "kPassive";              break;
-        case plSimulationInterface::kPhysAnim:          propName = "kPhysAnim";             break;
-        case plSimulationInterface::kStartInactive:     propName = "kStartInactive";        break;
-        case plSimulationInterface::kNoSynchronize:     propName = "kNoSynchronize";        break;
+
+        switch (prop) {
+        case plSimulationInterface::kDisable:
+            propName = "kDisable";
+            break;
+
+        case plSimulationInterface::kPinned:
+            propName = "kPinned";
+            break;
+
+        case plSimulationInterface::kPassive:
+            propName = "kPassive";
+            break;
+
+        case plSimulationInterface::kPhysAnim:
+            propName = "kPhysAnim";
+            break;
+
+        case plSimulationInterface::kStartInactive:
+            propName = "kStartInactive";
+            break;
+
+        case plSimulationInterface::kNoSynchronize:
+            propName = "kNoSynchronize";
+            break;
         }
 
         plString name = "(unknown)";
-        if (GetKey())
+
+        if (GetKey()) {
             name = GetKeyName();
-        if (plSimulationMgr::fExtraProfile)
+        }
+
+        if (plSimulationMgr::fExtraProfile) {
             plSimulationMgr::Log("Warning: Redundant physical property set (property %s, value %s) on %s", propName, status ? "true" : "false", name.c_str());
+        }
     }
 
-    switch (prop)
-    {
+    switch (prop) {
     case plSimulationInterface::kDisable:
         IEnable(!status);
         break;
 
     case plSimulationInterface::kPinned:
-        if (fActor->isDynamic())
-        {
+        if (fActor->isDynamic()) {
             // if the body is already unpinned and you unpin it again,
             // you'll wipe out its velocity. hence the check.
             bool current = fActor->readBodyFlag(NX_BF_FROZEN);
-            if (status != current)
-            {
-                if (status)
+
+            if (status != current) {
+                if (status) {
                     fActor->raiseBodyFlag(NX_BF_FROZEN);
-                else
-                {
+                } else {
                     fActor->clearBodyFlag(NX_BF_FROZEN);
                     LogActivate("SetProperty");
                     fActor->wakeUp();
                 }
             }
         }
+
         break;
     }
 
@@ -553,9 +579,9 @@ plProfile_Extern(SetTransforms);
 
 #define kMaxNegativeZPos -2000.f
 
-bool CompareMatrices(const hsMatrix44 &matA, const hsMatrix44 &matB, float tolerance)
+bool CompareMatrices(const hsMatrix44& matA, const hsMatrix44& matB, float tolerance)
 {
-    return 
+    return
         (fabs(matA.fMap[0][0] - matB.fMap[0][0]) < tolerance) &&
         (fabs(matA.fMap[0][1] - matB.fMap[0][1]) < tolerance) &&
         (fabs(matA.fMap[0][2] - matB.fMap[0][2]) < tolerance) &&
@@ -587,19 +613,16 @@ void plPXPhysical::SendNewLocation(bool synchTransform, bool isSynchUpdate)
     // - the physical is not passive
     bool bodyActive = !fActor->isSleeping();
     bool dynamic = fActor->isDynamic();
-    
-    if ((bodyActive || isSynchUpdate) && dynamic)// && fInitialTransform)
-    {
+
+    if ((bodyActive || isSynchUpdate) && dynamic) { // && fInitialTransform)
         plProfile_Inc(MaySendLocation);
 
-        if (!GetProperty(plSimulationInterface::kPassive))
-        {
+        if (!GetProperty(plSimulationInterface::kPassive)) {
             hsMatrix44 curl2w = fCachedLocal2World;
             // we're going to cache the transform before sending so we can recognize if it comes back
             IGetTransformGlobal(fCachedLocal2World);
 
-            if (!CompareMatrices(curl2w, fCachedLocal2World, .0001f))
-            {
+            if (!CompareMatrices(curl2w, fCachedLocal2World, .0001f)) {
                 plProfile_Inc(LocationsSent);
                 plProfile_BeginLap(PhysicsUpdates, GetKeyName().c_str());
 
@@ -608,8 +631,7 @@ void plPXPhysical::SendNewLocation(bool synchTransform, bool isSynchUpdate)
 //                       real_finite(fCachedLocal2World.fMap[1][3]) &&
 //                       real_finite(fCachedLocal2World.fMap[2][3]), "Bad transform outgoing");
 
-                if (fCachedLocal2World.GetTranslate().fZ < kMaxNegativeZPos)
-                {
+                if (fCachedLocal2World.GetTranslate().fZ < kMaxNegativeZPos) {
                     SimLog("Physical %s fell to %.1f (%.1f is the max).  Suppressing.", GetKeyName().c_str(), fCachedLocal2World.GetTranslate().fZ, kMaxNegativeZPos);
                     // Since this has probably been falling for a while, and thus not getting any syncs,
                     // make sure to save it's current pos so we'll know to reset it later
@@ -619,10 +641,13 @@ void plPXPhysical::SendNewLocation(bool synchTransform, bool isSynchUpdate)
 
                 hsMatrix44 w2l;
                 fCachedLocal2World.GetInverse(&w2l);
-                plCorrectionMsg *pCorrMsg = new plCorrectionMsg(GetObjectKey(), fCachedLocal2World, w2l, synchTransform);
+                plCorrectionMsg* pCorrMsg = new plCorrectionMsg(GetObjectKey(), fCachedLocal2World, w2l, synchTransform);
                 pCorrMsg->Send();
-                if (fProxyGen)
+
+                if (fProxyGen) {
                     fProxyGen->SetTransform(fCachedLocal2World, w2l);
+                }
+
                 plProfile_EndLap(PhysicsUpdates, GetKeyName().c_str());
             }
         }
@@ -631,8 +656,7 @@ void plPXPhysical::SendNewLocation(bool synchTransform, bool isSynchUpdate)
 
 void plPXPhysical::ApplyHitForce()
 {
-    if (fActor && fWeWereHit)
-    {
+    if (fActor && fWeWereHit) {
         fActor->addForceAtPos(plPXConvert::Vector(fHitForce), plPXConvert::Point(fHitPos), NX_FORCE);
         fWeWereHit = false;
     }
@@ -646,31 +670,30 @@ void plPXPhysical::ISetTransformGlobal(const hsMatrix44& l2w)
     // If we wake up normal dynamic actors, they might explode.
     // However, kinematics won't update if they are asleep. Thankfully, kinematics don't
     //          explode, move, or cause spontaneous nuclear warfare.
-    if (fActor->readBodyFlag(NX_BF_KINEMATIC))
+    if (fActor->readBodyFlag(NX_BF_KINEMATIC)) {
         fActor->wakeUp();
+    }
 
     NxMat34 mat;
 
-    if (fWorldKey)
-    {
+    if (fWorldKey) {
         plSceneObject* so = plSceneObject::ConvertNoRef(fWorldKey->ObjectIsLoaded());
         hsAssert(so, "Scene object not loaded while accessing subworld.");
         // physical to subworld (simulation space)
         hsMatrix44 p2s = so->GetCoordinateInterface()->GetWorldToLocal() * l2w;
         plPXConvert::Matrix(p2s, mat);
-        if (fProxyGen)
-        {
+
+        if (fProxyGen) {
             hsMatrix44 w2l;
             p2s.GetInverse(&w2l);
             fProxyGen->SetTransform(p2s, w2l);
         }
     }
     // No need to localize
-    else
-    {
+    else {
         plPXConvert::Matrix(l2w, mat);
-        if (fProxyGen)
-        {
+
+        if (fProxyGen) {
             hsMatrix44 w2l;
             l2w.GetInverse(&w2l);
             fProxyGen->SetTransform(l2w, w2l);
@@ -679,30 +702,30 @@ void plPXPhysical::ISetTransformGlobal(const hsMatrix44& l2w)
 
     // This used to check for the kPhysAnim flag, however animated detectors
     // are also kinematic but not kPhysAnim, therefore, this would break on PhysX
-    // SDKs (yes, I'm looking at you, 2.6.4) that actually obey the ***GlobalPose 
+    // SDKs (yes, I'm looking at you, 2.6.4) that actually obey the ***GlobalPose
     // rules set forth in the SDK documentation.
-    if (fActor->readBodyFlag(NX_BF_KINEMATIC))
+    if (fActor->readBodyFlag(NX_BF_KINEMATIC)) {
         fActor->moveGlobalPose(mat);
-    else
+    } else {
         fActor->setGlobalPose(mat);
+    }
 }
 
 // the physical may have several parents between it and the subworld object,
 // but the *havok* transform is only one level away from the subworld.
-// to avoid any confusion about this difference, we avoid referring to the 
+// to avoid any confusion about this difference, we avoid referring to the
 // subworld as "parent" and use, for example, "l2s" (local-to-sub) instead
 // of the canonical plasma "l2p" (local-to-parent)
 void plPXPhysical::IGetTransformGlobal(hsMatrix44& l2w) const
 {
     plPXConvert::Matrix(fActor->getGlobalPose(), l2w);
 
-    if (fWorldKey)
-    {
+    if (fWorldKey) {
         plSceneObject* so = plSceneObject::ConvertNoRef(fWorldKey->ObjectIsLoaded());
         hsAssert(so, "Scene object not loaded while accessing subworld.");
+
         // We'll hit this at export time, when the ci isn't ready yet, so do a check
-        if (so->GetCoordinateInterface())
-        {
+        if (so->GetCoordinateInterface()) {
             const hsMatrix44& s2w = so->GetCoordinateInterface()->GetLocalToWorld();
             l2w = s2w * l2w;
         }
@@ -720,18 +743,20 @@ void plPXPhysical::IGetRotationSim(hsQuat& rot) const
 }
 void plPXPhysical::ISetPositionSim(const hsPoint3& pos)
 {
-    if (GetProperty(plSimulationInterface::kPhysAnim))
+    if (GetProperty(plSimulationInterface::kPhysAnim)) {
         fActor->moveGlobalPosition(plPXConvert::Point(pos));
-    else
+    } else {
         fActor->setGlobalPosition(plPXConvert::Point(pos));
+    }
 }
 
 void plPXPhysical::ISetRotationSim(const hsQuat& rot)
 {
-    if (GetProperty(plSimulationInterface::kPhysAnim))
+    if (GetProperty(plSimulationInterface::kPhysAnim)) {
         fActor->moveGlobalOrientation(plPXConvert::Quat(rot));
-    else
+    } else {
         fActor->setGlobalOrientation(plPXConvert::Quat(rot));
+    }
 }
 
 // This form is assumed by convention to be global.
@@ -743,15 +768,13 @@ void plPXPhysical::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, bo
     // make sure the physical is dynamic.
     //  also make sure there is some difference between the matrices...
     // ... but not when a subworld... because the subworld maybe animating and if the object is still then it is actually moving within the subworld
-    if (force || (fActor->isDynamic() && (fWorldKey || !CompareMatrices(l2w, fCachedLocal2World, .0001f))) )
-    {
+    if (force || (fActor->isDynamic() && (fWorldKey || !CompareMatrices(l2w, fCachedLocal2World, .0001f)))) {
         ISetTransformGlobal(l2w);
         plProfile_Inc(SetTransforms);
-    }
-    else
-    {
-        if ( !fActor->isDynamic()  && plSimulationMgr::fExtraProfile)
+    } else {
+        if (!fActor->isDynamic()  && plSimulationMgr::fExtraProfile) {
             SimLog("Setting transform on non-dynamic: %s.", GetKeyName().c_str());
+        }
     }
 }
 
@@ -766,21 +789,21 @@ bool plPXPhysical::GetLinearVelocitySim(hsVector3& vel) const
 {
     bool result = false;
 
-    if (fActor->isDynamic())
-    {
+    if (fActor->isDynamic()) {
         vel = plPXConvert::Vector(fActor->getLinearVelocity());
         result = true;
-    }
-    else
+    } else {
         vel.Set(0, 0, 0);
+    }
 
     return result;
 }
 
 void plPXPhysical::SetLinearVelocitySim(const hsVector3& vel)
 {
-    if (fActor->isDynamic())
+    if (fActor->isDynamic()) {
         fActor->setLinearVelocity(plPXConvert::Vector(vel));
+    }
 }
 
 void plPXPhysical::ClearLinearVelocity()
@@ -791,21 +814,22 @@ void plPXPhysical::ClearLinearVelocity()
 bool plPXPhysical::GetAngularVelocitySim(hsVector3& vel) const
 {
     bool result = false;
-    if (fActor->isDynamic())
-    {
+
+    if (fActor->isDynamic()) {
         vel = plPXConvert::Vector(fActor->getAngularVelocity());
         result = true;
-    }
-    else
+    } else {
         vel.Set(0, 0, 0);
+    }
 
     return result;
 }
 
 void plPXPhysical::SetAngularVelocitySim(const hsVector3& vel)
 {
-    if (fActor->isDynamic())
+    if (fActor->isDynamic()) {
         fActor->setAngularVelocity(plPXConvert::Vector(vel));
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -834,7 +858,7 @@ void plPXPhysical::SetSceneNode(plKey newNode)
 
 void plPXPhysical::Read(hsStream* stream, hsResMgr* mgr)
 {
-    plPhysical::Read(stream, mgr);  
+    plPhysical::Read(stream, mgr);
     ClearMatrix(fCachedLocal2World);
 
     PhysRecipe recipe;
@@ -845,11 +869,12 @@ void plPXPhysical::Read(hsStream* stream, hsResMgr* mgr)
     recipe.group = (plSimDefs::Group)stream->ReadByte();
     recipe.reportsOn = stream->ReadLE32();
     fLOSDBs = stream->ReadLE16();
+
     //hack for swim regions currently they are labeled as static av blockers
-    if(fLOSDBs==plSimDefs::kLOSDBSwimRegion)
-    {
-        recipe.group=plSimDefs::kGroupMax;
+    if (fLOSDBs == plSimDefs::kLOSDBSwimRegion) {
+        recipe.group = plSimDefs::kGroupMax;
     }
+
     //
     recipe.objectKey = mgr->ReadKey(stream);
     recipe.sceneNode = mgr->ReadKey(stream);
@@ -866,24 +891,21 @@ void plPXPhysical::Read(hsStream* stream, hsResMgr* mgr)
 
     fProps.Read(stream);
 
-    if (recipe.bounds == plSimDefs::kSphereBounds)
-    {
+    if (recipe.bounds == plSimDefs::kSphereBounds) {
         recipe.radius = stream->ReadLEScalar();
         recipe.offset.Read(stream);
-    }
-    else if (recipe.bounds == plSimDefs::kBoxBounds)
-    {
+    } else if (recipe.bounds == plSimDefs::kBoxBounds) {
         recipe.bDimensions.Read(stream);
         recipe.bOffset.Read(stream);
-    }
-    else
-    {
+    } else {
         // Read in the cooked mesh
         plPXStream pxs(stream);
-        if (recipe.bounds == plSimDefs::kHullBounds)
+
+        if (recipe.bounds == plSimDefs::kHullBounds) {
             recipe.convexMesh = plSimulationMgr::GetInstance()->GetSDK()->createConvexMesh(pxs);
-        else
+        } else {
             recipe.triMesh = plSimulationMgr::GetInstance()->GetSDK()->createTriangleMesh(pxs);
+        }
     }
 
     Init(recipe);
@@ -893,51 +915,44 @@ void plPXPhysical::Read(hsStream* stream, hsResMgr* mgr)
     hsColorRGBA physColor;
     float opac = 1.0f;
 
-    if (fGroup == plSimDefs::kGroupAvatar)
-    {
+    if (fGroup == plSimDefs::kGroupAvatar) {
         // local avatar is light purple and transparent
         physColor.Set(.2f, .1f, .2f, 1.f);
         opac = 0.4f;
-    }
-    else if (fGroup == plSimDefs::kGroupDynamic)
-    {
+    } else if (fGroup == plSimDefs::kGroupDynamic) {
         // Dynamics are red
-        physColor.Set(1.f,0.f,0.f,1.f);
-    }
-    else if (fGroup == plSimDefs::kGroupDetector)
-    {
-        if(!fWorldKey)
-        {
+        physColor.Set(1.f, 0.f, 0.f, 1.f);
+    } else if (fGroup == plSimDefs::kGroupDetector) {
+        if (!fWorldKey) {
             // Detectors are blue, and transparent
-            physColor.Set(0.f,0.f,1.f,1.f);
+            physColor.Set(0.f, 0.f, 1.f, 1.f);
             opac = 0.3f;
-        }
-        else
-        {
+        } else {
             // subworld Detectors are green
-            physColor.Set(0.f,1.f,0.f,1.f);
+            physColor.Set(0.f, 1.f, 0.f, 1.f);
             opac = 0.3f;
         }
-    }
-    else if (fGroup == plSimDefs::kGroupStatic)
-    {
+    } else if (fGroup == plSimDefs::kGroupStatic) {
         if (GetProperty(plSimulationInterface::kPhysAnim))
             // Statics that are animated are more reddish?
-            physColor.Set(1.f,0.6f,0.2f,1.f);
-        else
+        {
+            physColor.Set(1.f, 0.6f, 0.2f, 1.f);
+        } else
             // Statics are yellow
-            physColor.Set(1.f,0.8f,0.2f,1.f);
+        {
+            physColor.Set(1.f, 0.8f, 0.2f, 1.f);
+        }
+
         // if in a subworld... slightly transparent
-        if(fWorldKey)
+        if (fWorldKey) {
             opac = 0.6f;
-    }
-    else
-    {
+        }
+    } else {
         // don't knows are grey
-        physColor.Set(0.6f,0.6f,0.6f,1.f);
+        physColor.Set(0.6f, 0.6f, 0.6f, 1.f);
     }
 
-    fProxyGen = new plPhysicalProxy(hsColorRGBA().Set(0,0,0,1.f), physColor, opac);
+    fProxyGen = new plPhysicalProxy(hsColorRGBA().Set(0, 0, 0, 1.f), physColor, opac);
     fProxyGen->Init(this);
 }
 
@@ -945,7 +960,7 @@ void plPXPhysical::Write(hsStream* stream, hsResMgr* mgr)
 {
     plPhysical::Write(stream, mgr);
 
-    hsAssert(fActor, "nil actor");  
+    hsAssert(fActor, "nil actor");
     hsAssert(fActor->getNbShapes() == 1, "Can only write actors with one shape. Writing first only.");
     NxShape* shape = fActor->getShapes()[0];
 
@@ -976,27 +991,23 @@ void plPXPhysical::Write(hsStream* stream, hsResMgr* mgr)
 
     fProps.Write(stream);
 
-    if (fBoundsType == plSimDefs::kSphereBounds)
-    {
+    if (fBoundsType == plSimDefs::kSphereBounds) {
         const NxSphereShape* sphereShape = shape->isSphere();
         stream->WriteLEScalar(sphereShape->getRadius());
         hsPoint3 localPos = plPXConvert::Point(sphereShape->getLocalPosition());
         localPos.Write(stream);
-    }
-    else if (fBoundsType == plSimDefs::kBoxBounds)
-    {
+    } else if (fBoundsType == plSimDefs::kBoxBounds) {
         const NxBoxShape* boxShape = shape->isBox();
         hsPoint3 dim = plPXConvert::Point(boxShape->getDimensions());
         dim.Write(stream);
         hsPoint3 localPos = plPXConvert::Point(boxShape->getLocalPosition());
         localPos.Write(stream);
-    }
-    else
-    {
-        if (fBoundsType == plSimDefs::kHullBounds)
+    } else {
+        if (fBoundsType == plSimDefs::kHullBounds) {
             hsAssert(shape->isConvexMesh(), "Hull shape isn't a convex mesh");
-        else
+        } else {
             hsAssert(shape->isTriangleMesh(), "Exact shape isn't a trimesh");
+        }
 
         // We hide the stream we used to create this mesh away in the shape user data.
         // Pull it out and write it to disk.
@@ -1010,13 +1021,12 @@ void plPXPhysical::Write(hsStream* stream, hsResMgr* mgr)
 // TESTING SDL
 // Send phys sendState msg to object's plPhysicalSDLModifier
 //
-bool plPXPhysical::DirtySynchState(const char* SDLStateName, uint32_t synchFlags )
+bool plPXPhysical::DirtySynchState(const char* SDLStateName, uint32_t synchFlags)
 {
-    if (GetObjectKey())
-    {
-        plSynchedObject* so=plSynchedObject::ConvertNoRef(GetObjectKey()->ObjectIsLoaded());
-        if (so)
-        {
+    if (GetObjectKey()) {
+        plSynchedObject* so = plSynchedObject::ConvertNoRef(GetObjectKey()->ObjectIsLoaded());
+
+        if (so) {
             fLastSyncTime = hsTimer::GetSysSeconds();
             return so->DirtySynchState(SDLStateName, synchFlags);
         }
@@ -1042,27 +1052,33 @@ void plPXPhysical::SetSyncState(hsPoint3* pos, hsQuat* rot, hsVector3* linV, hsV
     // If the physical has fallen out of the sim, and this is initial age state, and we're
     // the first person in, reset it to the original position.  (ie, prop the default state
     // we've got right now)
-    if (pos && pos->fZ < kMaxNegativeZPos && initialSync)
-    {
+    if (pos && pos->fZ < kMaxNegativeZPos && initialSync) {
         SimLog("Physical %s loaded out of range state.  Forcing initial state to server.", GetKeyName().c_str());
         DirtySynchState(kSDLPhysical, plSynchedObject::kBCastToClients);
         return;
     }
 
-    if (pos)
+    if (pos) {
         ISetPositionSim(*pos);
-    if (rot)
-        ISetRotationSim(*rot);
+    }
 
-    if (linV)
+    if (rot) {
+        ISetRotationSim(*rot);
+    }
+
+    if (linV) {
         SetLinearVelocitySim(*linV);
-    if (angV)
+    }
+
+    if (angV) {
         SetAngularVelocitySim(*angV);
+    }
 
     // If we're loading the age, then we should ensure the objects
     // stay asleep if they're supposed to be asleep.
-    if (isLoading && GetProperty(plSimulationInterface::kStartInactive) && !fActor->readBodyFlag(NX_BF_KINEMATIC))
+    if (isLoading && GetProperty(plSimulationInterface::kStartInactive) && !fActor->readBodyFlag(NX_BF_KINEMATIC)) {
         fActor->putToSleep();
+    }
 
     SendNewLocation(false, true);
 }
@@ -1089,27 +1105,24 @@ bool plPXPhysical::OverlapWithCapsule(NxCapsule& cap)
 bool plPXPhysical::IsDynamic() const
 {
     return fGroup == plSimDefs::kGroupDynamic &&
-        !GetProperty(plSimulationInterface::kPhysAnim);
+           !GetProperty(plSimulationInterface::kPhysAnim);
 }
 
 // Some helper functions for pulling info out of a PhysX trimesh description
 inline hsPoint3& GetTrimeshVert(NxTriangleMeshDesc& desc, int idx)
 {
-    return *((hsPoint3*)(((char*)desc.points)+desc.pointStrideBytes*idx));
+    return *((hsPoint3*)(((char*)desc.points) + desc.pointStrideBytes * idx));
 }
 
 void GetTrimeshTri(NxTriangleMeshDesc& desc, int idx, uint16_t* out)
 {
-    if (hsCheckBits(desc.flags, NX_MF_16_BIT_INDICES))
-    {
-        uint16_t* descTris = ((uint16_t*)(((char*)desc.triangles)+desc.pointStrideBytes*idx));
+    if (hsCheckBits(desc.flags, NX_MF_16_BIT_INDICES)) {
+        uint16_t* descTris = ((uint16_t*)(((char*)desc.triangles) + desc.pointStrideBytes * idx));
         out[0] = descTris[0];
         out[1] = descTris[1];
         out[2] = descTris[2];
-    }
-    else
-    {
-        uint32_t* descTris = ((uint32_t*)(((char*)desc.triangles)+desc.pointStrideBytes*idx));
+    } else {
+        uint32_t* descTris = ((uint32_t*)(((char*)desc.triangles) + desc.pointStrideBytes * idx));
         out[0] = (uint16_t)descTris[0];
         out[1] = (uint16_t)descTris[1];
         out[2] = (uint16_t)descTris[2];
@@ -1119,21 +1132,18 @@ void GetTrimeshTri(NxTriangleMeshDesc& desc, int idx, uint16_t* out)
 // Some helper functions for pulling info out of a PhysX trimesh description
 inline hsPoint3& GetConvexVert(NxConvexMeshDesc& desc, int idx)
 {
-    return *((hsPoint3*)(((char*)desc.points)+desc.pointStrideBytes*idx));
+    return *((hsPoint3*)(((char*)desc.points) + desc.pointStrideBytes * idx));
 }
 
 void GetConvexTri(NxConvexMeshDesc& desc, int idx, uint16_t* out)
 {
-    if (hsCheckBits(desc.flags, NX_MF_16_BIT_INDICES))
-    {
-        uint16_t* descTris = ((uint16_t*)(((char*)desc.triangles)+desc.pointStrideBytes*idx));
+    if (hsCheckBits(desc.flags, NX_MF_16_BIT_INDICES)) {
+        uint16_t* descTris = ((uint16_t*)(((char*)desc.triangles) + desc.pointStrideBytes * idx));
         out[0] = descTris[0];
         out[1] = descTris[1];
         out[2] = descTris[2];
-    }
-    else
-    {
-        uint32_t* descTris = ((uint32_t*)(((char*)desc.triangles)+desc.pointStrideBytes*idx));
+    } else {
+        uint32_t* descTris = ((uint32_t*)(((char*)desc.triangles) + desc.pointStrideBytes * idx));
         out[0] = (uint16_t)descTris[0];
         out[1] = (uint16_t)descTris[1];
         out[2] = (uint16_t)descTris[2];
@@ -1146,14 +1156,14 @@ plDrawableSpans* plPXPhysical::CreateProxy(hsGMaterial* mat, hsTArray<uint32_t>&
     plDrawableSpans* myDraw = addTo;
     hsMatrix44 l2w, unused;
     GetTransform(l2w, unused);
-    
+
     bool blended = ((mat->GetLayer(0)->GetBlendFlags() & hsGMatState::kBlendMask));
 
     NxShape* shape = fActor->getShapes()[0];
 
     NxTriangleMeshShape* trimeshShape = shape->isTriangleMesh();
-    if (trimeshShape)
-    {
+
+    if (trimeshShape) {
         NxTriangleMeshDesc desc;
         trimeshShape->getTriangleMesh().saveToDesc(desc);
 
@@ -1162,77 +1172,77 @@ plDrawableSpans* plPXPhysical::CreateProxy(hsGMaterial* mat, hsTArray<uint32_t>&
 
         const int kMaxTris = 10000;
         const int kMaxVerts = 32000;
-        if ((desc.numVertices < kMaxVerts) && (desc.numTriangles < kMaxTris))
-        {
+
+        if ((desc.numVertices < kMaxVerts) && (desc.numTriangles < kMaxTris)) {
             pos.SetCount(desc.numVertices);
             tris.SetCount(desc.numTriangles * 3);
 
-            for (int i = 0; i < desc.numVertices; i++ )
+            for (int i = 0; i < desc.numVertices; i++) {
                 pos[i] = GetTrimeshVert(desc, i);
+            }
 
-            for (int i = 0; i < desc.numTriangles; i++)
-                GetTrimeshTri(desc, i, &tris[i*3]);
+            for (int i = 0; i < desc.numTriangles; i++) {
+                GetTrimeshTri(desc, i, &tris[i * 3]);
+            }
 
-            myDraw = plDrawableGenerator::GenerateDrawable(pos.GetCount(), 
-                                            pos.AcquireArray(),
-                                            nil,    // normals - def to avg (smooth) norm
-                                            nil,    // uvws
-                                            0,      // uvws per vertex
-                                            nil,    // colors - def to white
-                                            true,   // do a quick fake shade
-                                            nil,    // optional color modulation
-                                            tris.GetCount(),
-                                            tris.AcquireArray(),
-                                            mat,
-                                            l2w,
-                                            blended,
-                                            &idx,
-                                            myDraw);
-        }
-        else
-        {
+            myDraw = plDrawableGenerator::GenerateDrawable(pos.GetCount(),
+                     pos.AcquireArray(),
+                     nil,    // normals - def to avg (smooth) norm
+                     nil,    // uvws
+                     0,      // uvws per vertex
+                     nil,    // colors - def to white
+                     true,   // do a quick fake shade
+                     nil,    // optional color modulation
+                     tris.GetCount(),
+                     tris.AcquireArray(),
+                     mat,
+                     l2w,
+                     blended,
+                     &idx,
+                     myDraw);
+        } else {
             int curTri = 0;
             int trisToDo = desc.numTriangles;
-            while (trisToDo > 0)
-            {
+
+            while (trisToDo > 0) {
                 int trisThisRound = trisToDo > kMaxTris ? kMaxTris : trisToDo;
-                
+
                 trisToDo -= trisThisRound;
 
                 pos.SetCount(trisThisRound * 3);
                 tris.SetCount(trisThisRound * 3);
 
-                for (int i = 0; i < trisThisRound; i++)
-                {
-                    GetTrimeshTri(desc, curTri, &tris[i*3]);
-                    pos[i*3 + 0] = GetTrimeshVert(desc, tris[i*3+0]);
-                    pos[i*3 + 1] = GetTrimeshVert(desc, tris[i*3+1]);
-                    pos[i*3 + 2] = GetTrimeshVert(desc, tris[i*3+2]);
+                for (int i = 0; i < trisThisRound; i++) {
+                    GetTrimeshTri(desc, curTri, &tris[i * 3]);
+                    pos[i * 3 + 0] = GetTrimeshVert(desc, tris[i * 3 + 0]);
+                    pos[i * 3 + 1] = GetTrimeshVert(desc, tris[i * 3 + 1]);
+                    pos[i * 3 + 2] = GetTrimeshVert(desc, tris[i * 3 + 2]);
 
                     curTri++;
                 }
-                myDraw = plDrawableGenerator::GenerateDrawable(pos.GetCount(), 
-                                                pos.AcquireArray(),
-                                                nil,    // normals - def to avg (smooth) norm
-                                                nil,    // uvws
-                                                0,      // uvws per vertex
-                                                nil,    // colors - def to white
-                                                true,   // do a quick fake shade
-                                                nil,    // optional color modulation
-                                                tris.GetCount(),
-                                                tris.AcquireArray(),
-                                                mat,
-                                                l2w,
-                                                blended,
-                                                &idx,
-                                                myDraw);
+
+                myDraw = plDrawableGenerator::GenerateDrawable(pos.GetCount(),
+                         pos.AcquireArray(),
+                         nil,    // normals - def to avg (smooth) norm
+                         nil,    // uvws
+                         0,      // uvws per vertex
+                         nil,    // colors - def to white
+                         true,   // do a quick fake shade
+                         nil,    // optional color modulation
+                         tris.GetCount(),
+                         tris.AcquireArray(),
+                         mat,
+                         l2w,
+                         blended,
+                         &idx,
+                         myDraw);
             }
         }
     }
 
     NxConvexShape* convexShape = shape->isConvexMesh();
-    if (convexShape)
-    {
+
+    if (convexShape) {
         NxConvexMeshDesc desc;
         convexShape->getConvexMesh().saveToDesc(desc);
 
@@ -1242,46 +1252,49 @@ plDrawableSpans* plPXPhysical::CreateProxy(hsGMaterial* mat, hsTArray<uint32_t>&
         pos.SetCount(desc.numVertices);
         tris.SetCount(desc.numTriangles * 3);
 
-        for (int i = 0; i < desc.numVertices; i++ )
+        for (int i = 0; i < desc.numVertices; i++) {
             pos[i] = GetConvexVert(desc, i);
+        }
 
-        for (int i = 0; i < desc.numTriangles; i++)
-            GetConvexTri(desc, i, &tris[i*3]);
+        for (int i = 0; i < desc.numTriangles; i++) {
+            GetConvexTri(desc, i, &tris[i * 3]);
+        }
 
-        myDraw = plDrawableGenerator::GenerateDrawable(pos.GetCount(), 
-            pos.AcquireArray(),
-            nil,    // normals - def to avg (smooth) norm
-            nil,    // uvws
-            0,      // uvws per vertex
-            nil,    // colors - def to white
-            true,   // do a quick fake shade
-            nil,    // optional color modulation
-            tris.GetCount(),
-            tris.AcquireArray(),
-            mat,
-            l2w,
-            blended,
-            &idx,
-            myDraw);
+        myDraw = plDrawableGenerator::GenerateDrawable(pos.GetCount(),
+                 pos.AcquireArray(),
+                 nil,    // normals - def to avg (smooth) norm
+                 nil,    // uvws
+                 0,      // uvws per vertex
+                 nil,    // colors - def to white
+                 true,   // do a quick fake shade
+                 nil,    // optional color modulation
+                 tris.GetCount(),
+                 tris.AcquireArray(),
+                 mat,
+                 l2w,
+                 blended,
+                 &idx,
+                 myDraw);
     }
 
     NxSphereShape* sphere = shape->isSphere();
-    if (sphere)
-    {
+
+    if (sphere) {
         float radius = sphere->getRadius();
         hsPoint3 offset = plPXConvert::Point(sphere->getLocalPosition());
         myDraw = plDrawableGenerator::GenerateSphericalDrawable(offset, radius,
-            mat, l2w, blended,
-            nil, &idx, myDraw);
+                 mat, l2w, blended,
+                 nil, &idx, myDraw);
     }
 
     NxBoxShape* box = shape->isBox();
-    if (box)
-    {
+
+    if (box) {
         hsPoint3 dim = plPXConvert::Point(box->getDimensions());
-        myDraw = plDrawableGenerator::GenerateBoxDrawable(dim.fX*2.f, dim.fY*2.f, dim.fZ*2.f,
-            mat,l2w,blended,
-            nil,&idx,myDraw);
+        myDraw = plDrawableGenerator::GenerateBoxDrawable(dim.fX * 2.f, dim.fY * 2.f, dim.fZ * 2.f,
+                 mat, l2w, blended,
+                 nil, &idx, myDraw);
     }
+
     return myDraw;
 }

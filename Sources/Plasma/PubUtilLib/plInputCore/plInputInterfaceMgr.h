@@ -71,113 +71,128 @@ class plKeyCombo;
 class plDefaultKeyCatcher;
 class plKeyBinding;
 
-class plInputInterfaceMgr : public plSingleModifier
-{
-    protected:
+class plInputInterfaceMgr : public plSingleModifier {
+protected:
 
-        static plInputInterfaceMgr  *fInstance;
+    static plInputInterfaceMgr*  fInstance;
 
-        hsTArray<plInputInterface *>    fInterfaces;
-        hsTArray<plCtrlCmd *>           fMessageQueue;
-        hsTArray<plKey>                 fReceivers;
+    hsTArray<plInputInterface*>    fInterfaces;
+    hsTArray<plCtrlCmd*>           fMessageQueue;
+    hsTArray<plKey>                 fReceivers;
 
 #ifdef MCN_DISABLE_OLD_WITH_NEW_HACK
-        hsTArray<ControlEventCode>      fDisabledCodes;
-        hsTArray<uint32_t>                fDisabledKeys;
+    hsTArray<ControlEventCode>      fDisabledCodes;
+    hsTArray<uint32_t>                fDisabledKeys;
 #endif
 
-        bool        fClickEnabled;
-        int32_t       fCurrentCursor;
-        float    fCursorOpacity;
-        bool        fForceCursorHidden;
-        int32_t       fForceCursorHiddenCount;
-        plInputInterface        *fCurrentFocus;
-        plDefaultKeyCatcher     *fDefaultCatcher;
+    bool        fClickEnabled;
+    int32_t       fCurrentCursor;
+    float    fCursorOpacity;
+    bool        fForceCursorHidden;
+    int32_t       fForceCursorHiddenCount;
+    plInputInterface*        fCurrentFocus;
+    plDefaultKeyCatcher*     fDefaultCatcher;
 
-        
-        virtual bool IEval( double secs, float del, uint32_t dirty );
 
-        void    IAddInterface( plInputInterface *iface );
-        void    IRemoveInterface( plInputInterface *iface );
+    virtual bool IEval(double secs, float del, uint32_t dirty);
 
-        void    IUpdateCursor( int32_t newCursor );
-        bool    ICheckCursor(plInputInterface *iFace); // returns true if the iface changed cursor settings
-            
-        void    IWriteConsoleCmdKeys( plKeyMap *keyMap, FILE *keyFile );
-        void    IWriteNonConsoleCmdKeys( plKeyMap *keyMap, FILE *keyFile );
+    void    IAddInterface(plInputInterface* iface);
+    void    IRemoveInterface(plInputInterface* iface);
 
-        plKeyMap    *IGetRoutedKeyMap( ControlEventCode code ); // Null for console commands
-        void        IUnbind( const plKeyCombo &key );
+    void    IUpdateCursor(int32_t newCursor);
+    bool    ICheckCursor(plInputInterface* iFace); // returns true if the iface changed cursor settings
 
-        const char  *IKeyComboToString( const plKeyCombo &combo );
-        
-    public:
+    void    IWriteConsoleCmdKeys(plKeyMap* keyMap, FILE* keyFile);
+    void    IWriteNonConsoleCmdKeys(plKeyMap* keyMap, FILE* keyFile);
 
-        plInputInterfaceMgr();
-        virtual ~plInputInterfaceMgr();
+    plKeyMap*    IGetRoutedKeyMap(ControlEventCode code);   // Null for console commands
+    void        IUnbind(const plKeyCombo& key);
 
-        CLASSNAME_REGISTER( plInputInterfaceMgr );
-        GETINTERFACE_ANY( plInputInterfaceMgr, plSingleModifier );
+    const char*  IKeyComboToString(const plKeyCombo& combo);
 
-        virtual bool    MsgReceive( plMessage *msg );
-        virtual void    Read( hsStream* s, hsResMgr* mgr );
-        virtual void    Write( hsStream* s, hsResMgr* mgr );
+public:
 
-        void    Init( void );
-        void    Shutdown( void );
+    plInputInterfaceMgr();
+    virtual ~plInputInterfaceMgr();
 
-        void        InitDefaultKeyMap( void );
-        void        WriteKeyMap( void );
-        void        RefreshInterfaceKeyMaps( void );
+    CLASSNAME_REGISTER(plInputInterfaceMgr);
+    GETINTERFACE_ANY(plInputInterfaceMgr, plSingleModifier);
 
-        void    SetCurrentFocus(plInputInterface *focus);
-        void    ReleaseCurrentFocus(plInputInterface *focus);
-        void    SetDefaultKeyCatcher( plDefaultKeyCatcher *c ) { fDefaultCatcher = c; }
+    virtual bool    MsgReceive(plMessage* msg);
+    virtual void    Read(hsStream* s, hsResMgr* mgr);
+    virtual void    Write(hsStream* s, hsResMgr* mgr);
 
-        bool    IsClickEnabled() { return fClickEnabled; }
+    void    Init(void);
+    void    Shutdown(void);
 
-        void    ForceCursorHidden( bool requestedState );
+    void        InitDefaultKeyMap(void);
+    void        WriteKeyMap(void);
+    void        RefreshInterfaceKeyMaps(void);
 
-        // Binding routers
-        void    BindAction( const plKeyCombo &key, ControlEventCode code );
-        void    BindAction( const plKeyCombo &key1, const plKeyCombo &key2, ControlEventCode code );
-        void    BindConsoleCmd( const plKeyCombo &key, const char *cmd, plKeyMap::BindPref pref = plKeyMap::kNoPreference );
+    void    SetCurrentFocus(plInputInterface* focus);
+    void    ReleaseCurrentFocus(plInputInterface* focus);
+    void    SetDefaultKeyCatcher(plDefaultKeyCatcher* c) {
+        fDefaultCatcher = c;
+    }
 
-        const plKeyBinding* FindBinding( ControlEventCode code );
-        const plKeyBinding* FindBindingByConsoleCmd( const char *cmd );
+    bool    IsClickEnabled() {
+        return fClickEnabled;
+    }
 
-        void    ClearAllKeyMaps();
-        void    ResetClickableState();
-        static plInputInterfaceMgr  *GetInstance( void ) { return fInstance; }
+    void    ForceCursorHidden(bool requestedState);
+
+    // Binding routers
+    void    BindAction(const plKeyCombo& key, ControlEventCode code);
+    void    BindAction(const plKeyCombo& key1, const plKeyCombo& key2, ControlEventCode code);
+    void    BindConsoleCmd(const plKeyCombo& key, const char* cmd, plKeyMap::BindPref pref = plKeyMap::kNoPreference);
+
+    const plKeyBinding* FindBinding(ControlEventCode code);
+    const plKeyBinding* FindBindingByConsoleCmd(const char* cmd);
+
+    void    ClearAllKeyMaps();
+    void    ResetClickableState();
+    static plInputInterfaceMgr*  GetInstance(void) {
+        return fInstance;
+    }
 };
 
 //// plCtrlCmd ///////////////////////////////////////////////////////////////
 //  Networkable helper class that represents a single control statement
 
-class plCtrlCmd
-{
-    private:
-        char*               fCmd;
-        plInputInterface    *fSource;
+class plCtrlCmd {
+private:
+    char*               fCmd;
+    plInputInterface*    fSource;
 
-    public:
-        plCtrlCmd( plInputInterface *source ) : fCmd(nil),fPct(1.0f), fSource(source) {;}
-        ~plCtrlCmd() { delete [] fCmd; }
+public:
+    plCtrlCmd(plInputInterface* source) : fCmd(nil), fPct(1.0f), fSource(source) {
+        ;
+    }
+    ~plCtrlCmd() {
+        delete [] fCmd;
+    }
 
-        const char* GetCmdString()          { return fCmd; }
-        void SetCmdString(const char* cs)   { delete [] fCmd; fCmd=hsStrcpy(cs); }
+    const char* GetCmdString()          {
+        return fCmd;
+    }
+    void SetCmdString(const char* cs)   {
+        delete [] fCmd;
+        fCmd = hsStrcpy(cs);
+    }
 
-        ControlEventCode    fControlCode;
-        bool                fControlActivated;
-        hsPoint3            fPt;
-        float            fPct;
+    ControlEventCode    fControlCode;
+    bool                fControlActivated;
+    hsPoint3            fPt;
+    float            fPct;
 
-        bool                fNetPropagateToPlayers;
+    bool                fNetPropagateToPlayers;
 
-        void Read( hsStream* s, hsResMgr* mgr );
-        void Write( hsStream* s, hsResMgr* mgr );
+    void Read(hsStream* s, hsResMgr* mgr);
+    void Write(hsStream* s, hsResMgr* mgr);
 
-        plInputInterface    *GetSource( void ) const { return fSource; }
+    plInputInterface*    GetSource(void) const {
+        return fSource;
+    }
 };
 
 //// Tiny Virtual Class For The Default Key Processor ////////////////////////
@@ -191,11 +206,10 @@ class plCtrlCmd
 //  this; create your own plInputInterface instead.
 
 class plKeyEventMsg;
-class plDefaultKeyCatcher
-{
-    public:
-        virtual ~plDefaultKeyCatcher();
-        virtual void    HandleKeyEvent( plKeyEventMsg *eventMsg ) = 0;
+class plDefaultKeyCatcher {
+public:
+    virtual ~plDefaultKeyCatcher();
+    virtual void    HandleKeyEvent(plKeyEventMsg* eventMsg) = 0;
 };
 
 

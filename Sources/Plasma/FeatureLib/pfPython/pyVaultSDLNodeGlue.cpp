@@ -66,11 +66,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultSDLNode, getIdent)
 PYTHON_METHOD_DEFINITION(ptVaultSDLNode, setIdent, args)
 {
     int v;
-    if (!PyArg_ParseTuple(args, "i", &v))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &v)) {
         PyErr_SetString(PyExc_TypeError, "setIdent expects an integer");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetIdent(v);
     PYTHON_RETURN_NONE;
 }
@@ -79,11 +80,12 @@ PYTHON_METHOD_DEFINITION(ptVaultSDLNode, initStateDataRecord, args)
 {
     char* fileName;
     int flags;
-    if (!PyArg_ParseTuple(args, "si", &fileName, &flags))
-    {
+
+    if (!PyArg_ParseTuple(args, "si", &fileName, &flags)) {
         PyErr_SetString(PyExc_TypeError, "initStateDataRecord expects a string and an int");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->InitStateDataRecord(fileName, flags);
     PYTHON_RETURN_NONE;
 }
@@ -97,28 +99,29 @@ PYTHON_METHOD_DEFINITION(ptVaultSDLNode, setStateDataRecord, args)
 {
     PyObject* recObj = NULL;
     int writeOptions = 0;
-    if (!PyArg_ParseTuple(args, "O|i", &recObj, &writeOptions))
-    {
+
+    if (!PyArg_ParseTuple(args, "O|i", &recObj, &writeOptions)) {
         PyErr_SetString(PyExc_TypeError, "setStateDataRecord expects a ptSDLStateDataRecord and an optional int");
         PYTHON_RETURN_ERROR;
     }
-    if (!pySDLStateDataRecord::Check(recObj))
-    {
+
+    if (!pySDLStateDataRecord::Check(recObj)) {
         PyErr_SetString(PyExc_TypeError, "setStateDataRecord expects a ptSDLStateDataRecord and an optional int");
         PYTHON_RETURN_ERROR;
     }
+
     pySDLStateDataRecord* rec = pySDLStateDataRecord::ConvertFrom(recObj);
     self->fThis->SetStateDataRecord(*rec, writeOptions);
     PYTHON_RETURN_NONE;
 }
 
 PYTHON_START_METHODS_TABLE(ptVaultSDLNode)
-    PYTHON_METHOD_NOARGS(ptVaultSDLNode, getIdent, "UNKNOWN"),
-    PYTHON_METHOD(ptVaultSDLNode, setIdent, "Params: v\nUNKNOWN"),
-    PYTHON_METHOD(ptVaultSDLNode, initStateDataRecord, "Params: filename,flags\nRead the SDL Rec from File if needed"),
-    PYTHON_METHOD_NOARGS(ptVaultSDLNode, getStateDataRecord, "Returns the ptSDLStateDataRecord associated with this node"),
-    PYTHON_METHOD(ptVaultSDLNode, setStateDataRecord, "Params: rec,writeOptions=0\nSets the ptSDLStateDataRecord"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptVaultSDLNode, getIdent, "UNKNOWN"),
+                     PYTHON_METHOD(ptVaultSDLNode, setIdent, "Params: v\nUNKNOWN"),
+                     PYTHON_METHOD(ptVaultSDLNode, initStateDataRecord, "Params: filename,flags\nRead the SDL Rec from File if needed"),
+                     PYTHON_METHOD_NOARGS(ptVaultSDLNode, getStateDataRecord, "Returns the ptSDLStateDataRecord associated with this node"),
+                     PYTHON_METHOD(ptVaultSDLNode, setStateDataRecord, "Params: rec,writeOptions=0\nSets the ptSDLStateDataRecord"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVaultSDLNode, pyVaultNode, "Plasma vault SDL node");
@@ -126,14 +129,20 @@ PLASMA_DEFAULT_TYPE_WBASE(ptVaultSDLNode, pyVaultNode, "Plasma vault SDL node");
 // required functions for PyObject interoperability
 PYTHON_CLASS_NEW_IMPL(ptVaultSDLNode, pyVaultSDLNode)
 
-PyObject *pyVaultSDLNode::New(RelVaultNode* nfsNode)
+PyObject* pyVaultSDLNode::New(RelVaultNode* nfsNode)
 {
-    ptVaultSDLNode *newObj = (ptVaultSDLNode*)ptVaultSDLNode_type.tp_new(&ptVaultSDLNode_type, NULL, NULL);
-    if (newObj->fThis->fNode)
+    ptVaultSDLNode* newObj = (ptVaultSDLNode*)ptVaultSDLNode_type.tp_new(&ptVaultSDLNode_type, NULL, NULL);
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->DecRef();
+    }
+
     newObj->fThis->fNode = nfsNode;
-    if (newObj->fThis->fNode)
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->IncRef();
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -144,7 +153,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptVaultSDLNode, pyVaultSDLNode)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyVaultSDLNode::AddPlasmaClasses(PyObject *m)
+void pyVaultSDLNode::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptVaultSDLNode);

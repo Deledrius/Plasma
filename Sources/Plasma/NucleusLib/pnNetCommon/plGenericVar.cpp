@@ -48,125 +48,125 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //////////////////////////////////////////////////////
 
 // reset runtime state, not inherent state
-void plGenericType::Reset() 
-{ 
-    fI=0;
+void plGenericType::Reset()
+{
+    fI = 0;
 }
 
 void plGenericType::CopyFrom(const plGenericType& c)
 {
     IDeallocString();
     fType = c.fType;
-    if (fType==kString || fType==kAny)
-    {
-        fS=hsStrcpy(c.fS);
-    }
-    else
-    {
+
+    if (fType == kString || fType == kAny) {
+        fS = hsStrcpy(c.fS);
+    } else {
         HSMemory::BlockMove((void*)&c.fI, (void*)&fI, 4);
     }
 }
 
 //// Conversion Functions ////////////////////////////////////////////////////
 
-const int32_t &   plGenericType::IToInt( void ) const
+const int32_t&    plGenericType::IToInt(void) const
 {
-    hsAssert( fType == kInt || fType == kAny, "Trying to use a non-int parameter as an int!" );
+    hsAssert(fType == kInt || fType == kAny, "Trying to use a non-int parameter as an int!");
 
     static int32_t i;
-    if( fType == kAny )
-    {
-        hsAssert( fS != nil, "Weird parameter during conversion" );
-        i = atoi( fS );
+
+    if (fType == kAny) {
+        hsAssert(fS != nil, "Weird parameter during conversion");
+        i = atoi(fS);
         return i;
     }
-    
+
     return fI;
 }
 
-const uint32_t &  plGenericType::IToUInt( void ) const
+const uint32_t&   plGenericType::IToUInt(void) const
 {
-    hsAssert( fType == kUInt || fType == kAny, "Trying to use a non-int parameter as an int!" );
+    hsAssert(fType == kUInt || fType == kAny, "Trying to use a non-int parameter as an int!");
 
     static uint32_t i;
-    if( fType == kAny )
-    {
-        hsAssert( fS != nil, "Weird parameter during conversion" );
-        i = atoi( fS );
+
+    if (fType == kAny) {
+        hsAssert(fS != nil, "Weird parameter during conversion");
+        i = atoi(fS);
         return i;
     }
-    
+
     return fU;
 }
 
-const double &  plGenericType::IToDouble( void ) const
+const double&   plGenericType::IToDouble(void) const
 {
-    hsAssert( fType == kDouble || fType == kAny, "Trying to use a non-float parameter as a Double!" );
+    hsAssert(fType == kDouble || fType == kAny, "Trying to use a non-float parameter as a Double!");
 
     static double d;
-    if( fType == kAny )
-    {
-        hsAssert( fS != nil, "Weird parameter during conversion" );
-        d = atof( fS );
+
+    if (fType == kAny) {
+        hsAssert(fS != nil, "Weird parameter during conversion");
+        d = atof(fS);
         return d;
     }
-    
+
     return fD;
 }
 
-const float &   plGenericType::IToFloat( void ) const
+const float&    plGenericType::IToFloat(void) const
 {
-    hsAssert( fType == kFloat || fType == kAny, "Trying to use a non-float parameter as a float!" );
+    hsAssert(fType == kFloat || fType == kAny, "Trying to use a non-float parameter as a float!");
 
     static float f;
-    if( fType == kAny )
-    {
-        hsAssert( fS != nil, "Weird parameter during conversion" );
-        f = (float)atof( fS );
+
+    if (fType == kAny) {
+        hsAssert(fS != nil, "Weird parameter during conversion");
+        f = (float)atof(fS);
         return f;
     }
-    
+
     return fF;
 }
 
-const bool &    plGenericType::IToBool( void ) const
+const bool&     plGenericType::IToBool(void) const
 {
-    hsAssert( fType == kBool || fType == kAny, "Trying to use a non-bool parameter as a bool!" );
+    hsAssert(fType == kBool || fType == kAny, "Trying to use a non-bool parameter as a bool!");
 
     static bool b;
-    if( fType == kAny )
-    {
-        hsAssert( fS != nil, "Weird parameter during conversion" );
-        if( atoi( fS ) > 0 || stricmp( fS, "true" ) == 0 )
+
+    if (fType == kAny) {
+        hsAssert(fS != nil, "Weird parameter during conversion");
+
+        if (atoi(fS) > 0 || stricmp(fS, "true") == 0) {
             b = true;
-        else
+        } else {
             b = false;
+        }
 
         return b;
     }
-    
+
     return fB;
 }
 
-const plGenericType::CharPtr &  plGenericType::IToString( void ) const
+const plGenericType::CharPtr&   plGenericType::IToString(void) const
 {
-    hsAssert( fType == kString || fType == kAny, "Trying to use a non-string parameter as a string!" );
+    hsAssert(fType == kString || fType == kAny, "Trying to use a non-string parameter as a string!");
 
     return fS;
 }
 
-const char &    plGenericType::IToChar( void ) const
+const char&     plGenericType::IToChar(void) const
 {
-    hsAssert( fType == kChar || fType == kAny, "Trying to use a non-char parameter as a char!" );
+    hsAssert(fType == kChar || fType == kAny, "Trying to use a non-char parameter as a char!");
 
     static char     c;
-    if( fType == kAny )
-    {
-        hsAssert( fS != nil, "Weird parameter during conversion" );
+
+    if (fType == kAny) {
+        hsAssert(fS != nil, "Weird parameter during conversion");
         c = fS[ 0 ];
         return c;
     }
-    
+
     return fC;
 }
 
@@ -175,32 +175,39 @@ void    plGenericType::Read(hsStream* s)
     IDeallocString();
     s->ReadLE(&fType);
 
-    switch ( fType )
-    {
+    switch (fType) {
     case kString:
     case kAny:
-        fS=s->ReadSafeString();
+        fS = s->ReadSafeString();
         break;
-    case kBool:
-        {int8_t b;
-        s->ReadLE( &b );
-        fB = b?true:false;}
+
+    case kBool: {
+            int8_t b;
+            s->ReadLE(&b);
+            fB = b ? true : false;
+        }
         break;
+
     case kChar:
-        s->ReadLE( &fC );
+        s->ReadLE(&fC);
         break;
+
     case kInt   :
-        s->ReadLE( &fI );
+        s->ReadLE(&fI);
         break;
+
     case kUInt:
-        s->ReadLE( &fU );
+        s->ReadLE(&fU);
         break;
+
     case kFloat:
-        s->ReadLE( &fF );
+        s->ReadLE(&fF);
         break;
+
     case kDouble:
-        s->ReadLE( &fD );
+        s->ReadLE(&fD);
         break;
+
     case kNone :
         break;
     }
@@ -210,31 +217,38 @@ void    plGenericType::Write(hsStream* s)
 {
     s->WriteLE(fType);
 
-    switch ( fType )
-    {
+    switch (fType) {
     case kString:
     case kAny:
         s->WriteSafeString(fS);
         break;
-    case kBool:
-        {int8_t b = fB?1:0;
-        s->WriteLE( b );}
+
+    case kBool: {
+            int8_t b = fB ? 1 : 0;
+            s->WriteLE(b);
+        }
         break;
+
     case kChar:
-        s->WriteLE( fC );
+        s->WriteLE(fC);
         break;
+
     case kInt   :
-        s->WriteLE( fI );
+        s->WriteLE(fI);
         break;
+
     case kUInt:
-        s->WriteLE( fU );
+        s->WriteLE(fU);
         break;
+
     case kFloat:
-        s->WriteLE( fF );
+        s->WriteLE(fF);
         break;
+
     case kDouble:
-        s->WriteLE( fD );
+        s->WriteLE(fD);
         break;
+
     case kNone :
         break;
     }
@@ -262,81 +276,86 @@ void plGenericType::SetVar(Types t, unsigned int size, void* val)
 {
     fType = t;
 
-    switch (t)
-    {
-    case kInt :
-        {
+    switch (t) {
+    case kInt : {
             hsAssert(size <= sizeof(fI), "plGenericType::SetVar size too large for int");
             memcpy(&fI, val, size);
             break;
         }
-    case kUInt :
-        {
+
+    case kUInt : {
             hsAssert(size <= sizeof(fU), "plGenericType::SetVar size too large for unsigned int");
             memcpy(&fU, val, size);
             break;
         }
-    case kFloat :
-        {
+
+    case kFloat : {
             hsAssert(size <= sizeof(fF), "plGenericType::SetVar size too large for float");
             memcpy(&fF, val, size);
             break;
         }
-    case kDouble :
-        {
+
+    case kDouble : {
             hsAssert(size <= sizeof(fD), "plGenericType::SetVar size too large for double");
             memcpy(&fD, val, size);
             break;
         }
-    case kBool :
-        {
+
+    case kBool : {
             hsAssert(size <= sizeof(fB), "plGenericType::SetVar size too large for bool");
             memcpy(&fB, val, size);
             break;
         }
-    case kChar :
-        {
+
+    case kChar : {
             hsAssert(size <= sizeof(fC), "plGenericType::SetVar size too large for char");
             memcpy(&fC, val, size);
             break;
         }
-    case kString :
-        {
+
+    case kString : {
             delete [] fS;
-            fS = new char[size+1];
-            memcpy(fS,val,size);
+            fS = new char[size + 1];
+            memcpy(fS, val, size);
             fS[size] = 0;
             break;
         }
+
     case kNone :
         break;
+
     default:
-        hsAssert(false,"plGenericType::SetVar unknown type");
+        hsAssert(false, "plGenericType::SetVar unknown type");
     }
 }
 
 
 plString plGenericType::GetAsString() const
 {
-    switch (fType)
-    {
+    switch (fType) {
     case kInt :
         return plString::Format("%d", fI);
+
     case kBool :
     case kUInt :
-        return plString::Format("%u", fType==kBool?fB:fU);
+        return plString::Format("%u", fType == kBool ? fB : fU);
+
     case kFloat :
     case kDouble :
-        return plString::Format("%f", fType==kDouble?fD:fF);
+        return plString::Format("%f", fType == kDouble ? fD : fF);
+
     case kChar :
         return plString::Format("%c", fC);
+
     case kAny :
     case kString :
         return fS;
+
     case kNone :
         break;
+
     default:
-        hsAssert(false,"plGenericType::GetAsStdString unknown type");
+        hsAssert(false, "plGenericType::GetAsStdString unknown type");
     }
 
     return plString::Null;

@@ -51,22 +51,18 @@ class plMessage;
 class hsStream;
 class hsResMgr;
 
-class plFollowMod : public plSingleModifier
-{
+class plFollowMod : public plSingleModifier {
 public:
-    enum FollowRefs
-    {
+    enum FollowRefs {
         kRefLeader
     };
-    enum FollowLeaderType
-    {
+    enum FollowLeaderType {
         kLocalPlayer,
         kObject,
         kCamera,
         kListener
     };
-    enum FollowModMode
-    {
+    enum FollowModMode {
         kPositionX  = 0x1,
         kPositionY  = 0x2,
         kPositionZ  = 0x4,
@@ -93,8 +89,8 @@ public:
     plFollowMod();
     ~plFollowMod();
 
-    CLASSNAME_REGISTER( plFollowMod );
-    GETINTERFACE_ANY( plFollowMod, plSingleModifier );
+    CLASSNAME_REGISTER(plFollowMod);
+    GETINTERFACE_ANY(plFollowMod, plSingleModifier);
 
     virtual bool MsgReceive(plMessage* msg);
 
@@ -103,11 +99,19 @@ public:
 
     virtual void SetTarget(plSceneObject* so);
 
-    void SetType(FollowLeaderType t) { fLeaderType = t; }
-    FollowLeaderType GetType() const { return fLeaderType; }
+    void SetType(FollowLeaderType t) {
+        fLeaderType = t;
+    }
+    FollowLeaderType GetType() const {
+        return fLeaderType;
+    }
 
-    void SetMode(uint8_t m) { fMode = m; }
-    uint8_t GetMode() const { return fMode; }
+    void SetMode(uint8_t m) {
+        fMode = m;
+    }
+    uint8_t GetMode() const {
+        return fMode;
+    }
 
     void Activate();
     void Deactivate();

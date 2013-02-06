@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 int main(int argc, char* argv[])
 {
-    if (argc != 2)
-    {
+    if (argc != 2) {
         puts("plPageOptimizer: wrong number of arguments");
         return 1;
     }
@@ -56,6 +55,7 @@ int main(int argc, char* argv[])
     printf("Optimizing %s...", filename.GetFileName().c_str());
 
 #ifndef _DEBUG
+
     try {
 #endif
         plResManager* resMgr = new plResManager;
@@ -65,23 +65,28 @@ int main(int argc, char* argv[])
         puts(" ***crashed on init");
         return 2;
     }
+
 #endif
 
 #ifndef _DEBUG
+
     try
 #endif
     {
         plPageOptimizer optimizer(argv[1]);
         optimizer.Optimize();
     }
+
 #ifndef _DEBUG
     catch (...) {
         puts(" ***crashed on optimizing");
         return 2;
     }
+
 #endif
 
 #ifndef _DEBUG
+
     try {
 #endif
         // Reading in objects may have generated dirty state which we're obviously
@@ -96,6 +101,7 @@ int main(int argc, char* argv[])
         puts(" ***crashed on shutdown");
         return 2;
     }
+
 #endif
 
     return 0;

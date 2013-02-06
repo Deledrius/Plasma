@@ -45,13 +45,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // Silly little header so that both export and runtime code can use these
 // constants without including tons of unneccessary stuff
 
-namespace plAnimEaseTypes
-{
-    enum {
-        kNoEase,
-        kConstAccel,
-        kSpline,
-    };  
+namespace plAnimEaseTypes {
+enum {
+    kNoEase,
+    kConstAccel,
+    kSpline,
+};
 };
 
 #define ENTIRE_ANIMATION_NAME   "(Entire Animation)"

@@ -45,11 +45,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plShadowSlave.h"
 
-class plPerspDirSlave : public plShadowSlave
-{
+class plPerspDirSlave : public plShadowSlave {
 protected:
     hsBounds3Ext        IGetPerspCasterBound(const hsMatrix44& world2NDC) const;
-    hsPoint3            IProject(const hsMatrix44& world2NDC, const hsPoint3& pos, float w=1.f) const;
+    hsPoint3            IProject(const hsMatrix44& world2NDC, const hsPoint3& pos, float w = 1.f) const;
     void                IComputeCamNDCToLight(const hsPoint3& from, const hsPoint3& at, hsMatrix44& camNDC2Li, hsMatrix44& li2CamNDC);
 
 public:

@@ -67,11 +67,9 @@ class plArmatureMod;
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-class plSittingModifier : public plSingleModifier
-{
-public: 
-    enum
-    {
+class plSittingModifier : public plSingleModifier {
+public:
+    enum {
         kApproachFront  = 0x01,
         kApproachLeft   = 0x02,
         kApproachRight  = 0x04,
@@ -79,41 +77,45 @@ public:
         kApproachMask   = kApproachFront | kApproachLeft | kApproachRight | kApproachRear,
         kDisableForward = 0x10,
     };
-    
-    uint8_t fMiscFlags;   
+
+    uint8_t fMiscFlags;
 
     plSittingModifier();
     plSittingModifier(bool hasFront, bool hasLeft, bool hasRight);
     virtual ~plSittingModifier();
 
-    CLASSNAME_REGISTER( plSittingModifier );
-    GETINTERFACE_ANY( plSittingModifier, plSingleModifier );
+    CLASSNAME_REGISTER(plSittingModifier);
+    GETINTERFACE_ANY(plSittingModifier, plSingleModifier);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    virtual bool MsgReceive(plMessage *msg);
+    virtual bool MsgReceive(plMessage* msg);
 
-    void AddNotifyKey(plKey key) { fNotifyKeys.Append(key); }
+    void AddNotifyKey(plKey key) {
+        fNotifyKeys.Append(key);
+    }
 
-    virtual void Trigger(const plArmatureMod *avMod, plNotifyMsg *enterNotify, plNotifyMsg *exitNotify);
+    virtual void Trigger(const plArmatureMod* avMod, plNotifyMsg* enterNotify, plNotifyMsg* exitNotify);
     virtual void UnTrigger();
 
 protected:
-    /** We've been triggered: go ahead and send the seek and brain tasks to the 
+    /** We've been triggered: go ahead and send the seek and brain tasks to the
         triggering avatar. */
-    bool IEmitCommand(plKey playerKey, plMessage *enterCallback, plMessage *exitCallback);
+    bool IEmitCommand(plKey playerKey, plMessage* enterCallback, plMessage* exitCallback);
 
-    /** Set up generic notification messages which were passed in by the responder / 
+    /** Set up generic notification messages which were passed in by the responder /
         max authoring stuff. */
-    void ISetupNotify(plNotifyMsg *notifyMsg, plNotifyMsg *originalNotify);
+    void ISetupNotify(plNotifyMsg* notifyMsg, plNotifyMsg* originalNotify);
 
     /** Figure out which approach we should use to the sit target, and add the relevant
         stages to the brain. */
-    plAvBrainGeneric * IBuildSitBrain(plKey avModKey, plKey seekKey, const char **pAnimName, plNotifyMsg *enterNotify, plNotifyMsg *exitNotify);
+    plAvBrainGeneric* IBuildSitBrain(plKey avModKey, plKey seekKey, const char** pAnimName, plNotifyMsg* enterNotify, plNotifyMsg* exitNotify);
 
     /** Unused. */
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return true; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return true;
+    }
 
     /** An array of keys to objects that are interested in receiving our sit messages. */
     hsTArray<plKey> fNotifyKeys;

@@ -40,8 +40,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 *==LICENSE==*/
 
-class plTextureSearch
-{
+class plTextureSearch {
 protected:
     HWND fDlg;
     char fFileName[MAX_PATH];
@@ -53,7 +52,7 @@ public:
     void Toggle();
 
 protected:
-    enum Update { kUpdateLoadList, kUpdateReplace, kUpdateSetSize };        
+    enum Update { kUpdateLoadList, kUpdateReplace, kUpdateSetSize };
     void IUpdateTextures(Update update);
     void IPickReplaceTexture();
 

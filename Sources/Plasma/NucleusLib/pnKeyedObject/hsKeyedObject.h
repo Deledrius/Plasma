@@ -52,8 +52,7 @@ class hsStream;
 class plRefMsg;
 class plUoid;
 
-class hsKeyedObject : public plReceiver
-{
+class hsKeyedObject : public plReceiver {
 public:
     hsKeyedObject() : fpKey(nil) {}
     virtual ~hsKeyedObject();
@@ -61,11 +60,15 @@ public:
     CLASSNAME_REGISTER(hsKeyedObject);
     GETINTERFACE_ANY(hsKeyedObject, plReceiver);
 
-    const plKey&    GetKey() const { return fpKey; }
+    const plKey&    GetKey() const {
+        return fpKey;
+    }
     plString        GetKeyName() const;
 
     virtual void Validate();
-    virtual bool IsFinal() { return true; };     // experimental; currently "is ready to process Loads"
+    virtual bool IsFinal() {
+        return true;
+    };     // experimental; currently "is ready to process Loads"
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);
@@ -90,7 +93,9 @@ public:
 
     // If you want clone keys to share a type of object, override this function for it.
     // (You can also return a new object that shares only some of the original's data)
-    virtual hsKeyedObject* GetSharedObject() { return nil; }
+    virtual hsKeyedObject* GetSharedObject() {
+        return nil;
+    }
 
 protected:
     friend class plResManager;

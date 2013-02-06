@@ -88,8 +88,10 @@ pyGUIDialog::pyGUIDialog()
 
 bool pyGUIDialog::IsGUIDialog(pyKey& gckey)
 {
-    if ( gckey.getKey() && pfGUIDialogMod::ConvertNoRef(gckey.getKey()->GetObjectPtr()) )
+    if (gckey.getKey() && pfGUIDialogMod::ConvertNoRef(gckey.getKey()->GetObjectPtr())) {
         return true;
+    }
+
     return false;
 }
 
@@ -97,53 +99,55 @@ bool pyGUIDialog::IsGUIDialog(pyKey& gckey)
 uint32_t pyGUIDialog::WhatControlType(pyKey& gckey)
 {
     // Do the pop-up menu test first, since it's derived from dialog
-    if ( pyGUIPopUpMenu::IsGUIPopUpMenu(gckey) )
+    if (pyGUIPopUpMenu::IsGUIPopUpMenu(gckey)) {
         return kPopUpMenu;
-    else if ( pyGUIDialog::IsGUIDialog(gckey) )
+    } else if (pyGUIDialog::IsGUIDialog(gckey)) {
         return kDialog;
-    else if ( pyGUIControlButton::IsGUIControlButton(gckey) )
+    } else if (pyGUIControlButton::IsGUIControlButton(gckey)) {
         return kButton;
-    else if ( pyGUIControlCheckBox::IsGUIControlCheckBox(gckey) )
+    } else if (pyGUIControlCheckBox::IsGUIControlCheckBox(gckey)) {
         return kCheckBox;
-    else if ( pyGUIControlEditBox::IsGUIControlEditBox(gckey) )
+    } else if (pyGUIControlEditBox::IsGUIControlEditBox(gckey)) {
         return kEditBox;
-    else if ( pyGUIControlListBox::IsGUIControlListBox(gckey) )
+    } else if (pyGUIControlListBox::IsGUIControlListBox(gckey)) {
         return kListBox;
-    else if ( pyGUIControlRadioGroup::IsGUIControlRadioGroup(gckey) )
+    } else if (pyGUIControlRadioGroup::IsGUIControlRadioGroup(gckey)) {
         return kRadioGroup;
-    else if ( pyGUIControlTextBox::IsGUIControlTextBox(gckey) )
+    } else if (pyGUIControlTextBox::IsGUIControlTextBox(gckey)) {
         return kTextBox;
-    else if ( pyGUIControlValue::IsGUIControlValue(gckey) )
-    {
+    } else if (pyGUIControlValue::IsGUIControlValue(gckey)) {
         // then see what kind of value control it is
-        if ( pfGUIKnobCtrl::ConvertNoRef(gckey.getKey()->GetObjectPtr()) )
+        if (pfGUIKnobCtrl::ConvertNoRef(gckey.getKey()->GetObjectPtr())) {
             return kKnob;
-        else if ( pfGUIUpDownPairMod::ConvertNoRef(gckey.getKey()->GetObjectPtr()) )
+        } else if (pfGUIUpDownPairMod::ConvertNoRef(gckey.getKey()->GetObjectPtr())) {
             return kUpDownPair;
-        else
+        } else {
             return 0;
-    }
-    else if ( pyGUIControlDynamicText::IsGUIControlDynamicText( gckey ) )
+        }
+    } else if (pyGUIControlDynamicText::IsGUIControlDynamicText(gckey)) {
         return kDynamicText;
-    else if ( pyGUIControlMultiLineEdit::IsGUIControlMultiLineEdit( gckey ) )
+    } else if (pyGUIControlMultiLineEdit::IsGUIControlMultiLineEdit(gckey)) {
         return kMultiLineEdit;
-    else if ( pyGUIControlClickMap::IsGUIControlClickMap( gckey ) )
+    } else if (pyGUIControlClickMap::IsGUIControlClickMap(gckey)) {
         return kClickMap;
-    else
+    } else {
         return 0;
+    }
 }
 
 
 // override the equals to operator
-bool pyGUIDialog::operator==(const pyGUIDialog &gcobj) const
+bool pyGUIDialog::operator==(const pyGUIDialog& gcobj) const
 {
     plKey theirs = ((pyGUIDialog&)gcobj).getObjKey();
-    if ( fGCkey == nil && theirs == nil )
+
+    if (fGCkey == nil && theirs == nil) {
         return true;
-    else if ( fGCkey != nil && theirs != nil )
-        return (fGCkey->GetUoid()==theirs->GetUoid());
-    else
+    } else if (fGCkey != nil && theirs != nil) {
+        return (fGCkey->GetUoid() == theirs->GetUoid());
+    } else {
         return false;
+    }
 }
 
 
@@ -164,309 +168,352 @@ PyObject* pyGUIDialog::getObjPyKey()
 // interface functions
 uint32_t  pyGUIDialog::GetTagID()
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
+
+        if (pdmod) {
             return pdmod->GetTagID();
+        }
     }
+
     return 0;
 }
 
 
-void pyGUIDialog::SetEnabled( bool e )
+void pyGUIDialog::SetEnabled(bool e)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
+
+        if (pdmod) {
             pdmod->SetEnabled(e);
+        }
     }
 }
 
-bool pyGUIDialog::IsEnabled( void )
+bool pyGUIDialog::IsEnabled(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
+
+        if (pdmod) {
             return pdmod->IsEnabled();
+        }
     }
+
     return false;
 }
 
-const char* pyGUIDialog::GetName( void )
+const char* pyGUIDialog::GetName(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
+
+        if (pdmod) {
             return pdmod->GetName();
+        }
     }
+
     return "";
 }
 
 
 uint32_t pyGUIDialog::GetVersion(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
+
+        if (pdmod) {
             return pdmod->GetVersion();
+        }
     }
+
     return 0;
 }
 
 
-uint32_t pyGUIDialog::GetNumControls( void )
+uint32_t pyGUIDialog::GetNumControls(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
+
+        if (pdmod) {
             return pdmod->GetNumControls();
+        }
     }
+
     return 0;
 }
 
-PyObject* pyGUIDialog::GetControl( uint32_t idx )
+PyObject* pyGUIDialog::GetControl(uint32_t idx)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIControlMod* pcontrolmod = pdmod->GetControl(idx);
-            if ( pcontrolmod )
+
+            if (pcontrolmod) {
                 return pyKey::New(pcontrolmod->GetKey());
+            }
         }
     }
 
     // if we got here then there must have been an error
     char errmsg[256];
-    sprintf(errmsg,"Index %d not found in GUIDialog %s",idx,GetName());
+    sprintf(errmsg, "Index %d not found in GUIDialog %s", idx, GetName());
     PyErr_SetString(PyExc_KeyError, errmsg);
     PYTHON_RETURN_ERROR;
 }
 
-void pyGUIDialog::SetFocus( pyKey& gcKey )
+void pyGUIDialog::SetFocus(pyKey& gcKey)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIControlMod* pcontrolmod = pfGUIControlMod::ConvertNoRef(gcKey.getKey()->ObjectIsLoaded());
-            if ( pcontrolmod )
+
+            if (pcontrolmod) {
                 pdmod->SetFocus(pcontrolmod);
+            }
         }
     }
 }
 
-void pyGUIDialog::Show( void )
+void pyGUIDialog::Show(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pdmod->Show();
             pdmod->RefreshAllControls();
         }
     }
 }
 
-void pyGUIDialog::ShowNoReset( void )
+void pyGUIDialog::ShowNoReset(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
+
+        if (pdmod) {
             pdmod->ShowNoReset();
+        }
     }
 }
 
-void pyGUIDialog::Hide( void )
+void pyGUIDialog::Hide(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
+
+        if (pdmod) {
             pdmod->Hide();
+        }
     }
 }
 
-PyObject* pyGUIDialog::GetControlFromTag( uint32_t tagID )
+PyObject* pyGUIDialog::GetControlFromTag(uint32_t tagID)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIControlMod* pcontrolmod = pdmod->GetControlFromTag(tagID);
-            if ( pcontrolmod )
+
+            if (pcontrolmod) {
                 return pyKey::New(pcontrolmod->GetKey());
+            }
         }
     }
 
     // if we got here then there must have been an error
     char errmsg[256];
-    sprintf(errmsg,"TagID %d not found in GUIDialog %s",tagID,GetName());
+    sprintf(errmsg, "TagID %d not found in GUIDialog %s", tagID, GetName());
     PyErr_SetString(PyExc_KeyError, errmsg);
     PYTHON_RETURN_ERROR;
 }
 
-    // get color schemes
+// get color schemes
 PyObject* pyGUIDialog::GetForeColor()
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIColorScheme* color = pdmod->GetColorScheme();
-            return pyColor::New(color->fForeColor.r,color->fForeColor.g,color->fForeColor.b,color->fForeColor.a);
+            return pyColor::New(color->fForeColor.r, color->fForeColor.g, color->fForeColor.b, color->fForeColor.a);
         }
     }
+
     PYTHON_RETURN_NONE;
 }
 
 PyObject* pyGUIDialog::GetSelColor()
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIColorScheme* color = pdmod->GetColorScheme();
-            return pyColor::New(color->fSelForeColor.r,color->fSelForeColor.g,color->fSelForeColor.b,color->fSelForeColor.a);
+            return pyColor::New(color->fSelForeColor.r, color->fSelForeColor.g, color->fSelForeColor.b, color->fSelForeColor.a);
         }
     }
+
     PYTHON_RETURN_NONE;
 }
 
 PyObject* pyGUIDialog::GetBackColor()
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIColorScheme* color = pdmod->GetColorScheme();
-            return pyColor::New(color->fBackColor.r,color->fBackColor.g,color->fBackColor.b,color->fBackColor.a);
+            return pyColor::New(color->fBackColor.r, color->fBackColor.g, color->fBackColor.b, color->fBackColor.a);
         }
     }
+
     PYTHON_RETURN_NONE;
 }
 
 PyObject* pyGUIDialog::GetBackSelColor()
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIColorScheme* color = pdmod->GetColorScheme();
-            return pyColor::New(color->fSelBackColor.r,color->fSelBackColor.g,color->fSelBackColor.b,color->fSelBackColor.a);
+            return pyColor::New(color->fSelBackColor.r, color->fSelBackColor.g, color->fSelBackColor.b, color->fSelBackColor.a);
         }
     }
+
     PYTHON_RETURN_NONE;
 }
 
 uint32_t pyGUIDialog::GetFontSize()
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIColorScheme* color = pdmod->GetColorScheme();
             return color->fFontSize;
         }
     }
+
     // create a pyColor that will be managed by Python
     return 0;
 }
 
 
-    // set color scheme
-void pyGUIDialog::SetForeColor( float r, float g, float b, float a )
+// set color scheme
+void pyGUIDialog::SetForeColor(float r, float g, float b, float a)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIColorScheme* color = pdmod->GetColorScheme();
-            if ( r >= 0.0 && r <= 1.0 )
+
+            if (r >= 0.0 && r <= 1.0) {
                 color->fForeColor.r = r;
-            if ( g >= 0.0 && g <= 1.0 )
+            }
+
+            if (g >= 0.0 && g <= 1.0) {
                 color->fForeColor.g = g;
-            if ( b >= 0.0 && g <= 1.0 )
+            }
+
+            if (b >= 0.0 && g <= 1.0) {
                 color->fForeColor.b = b;
-            if ( a >= 0.0 && g <= 1.0 )
+            }
+
+            if (a >= 0.0 && g <= 1.0) {
                 color->fForeColor.a = a;
+            }
         }
     }
 }
 
-void pyGUIDialog::SetSelColor( float r, float g, float b, float a )
+void pyGUIDialog::SetSelColor(float r, float g, float b, float a)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIColorScheme* color = pdmod->GetColorScheme();
-            if ( r >= 0.0 && r <= 1.0 )
+
+            if (r >= 0.0 && r <= 1.0) {
                 color->fSelForeColor.r = r;
-            if ( g >= 0.0 && g <= 1.0 )
+            }
+
+            if (g >= 0.0 && g <= 1.0) {
                 color->fSelForeColor.g = g;
-            if ( b >= 0.0 && g <= 1.0 )
+            }
+
+            if (b >= 0.0 && g <= 1.0) {
                 color->fSelForeColor.b = b;
-            if ( a >= 0.0 && g <= 1.0 )
+            }
+
+            if (a >= 0.0 && g <= 1.0) {
                 color->fSelForeColor.a = a;
+            }
         }
     }
 }
 
-void pyGUIDialog::SetBackColor( float r, float g, float b, float a )
+void pyGUIDialog::SetBackColor(float r, float g, float b, float a)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIColorScheme* color = pdmod->GetColorScheme();
-            if ( r >= 0.0 && r <= 1.0 )
+
+            if (r >= 0.0 && r <= 1.0) {
                 color->fBackColor.r = r;
-            if ( g >= 0.0 && g <= 1.0 )
+            }
+
+            if (g >= 0.0 && g <= 1.0) {
                 color->fBackColor.g = g;
-            if ( b >= 0.0 && g <= 1.0 )
+            }
+
+            if (b >= 0.0 && g <= 1.0) {
                 color->fBackColor.b = b;
-            if ( a >= 0.0 && g <= 1.0 )
+            }
+
+            if (a >= 0.0 && g <= 1.0) {
                 color->fBackColor.a = a;
+            }
         }
     }
 }
 
-void pyGUIDialog::SetBackSelColor( float r, float g, float b, float a )
+void pyGUIDialog::SetBackSelColor(float r, float g, float b, float a)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIColorScheme* color = pdmod->GetColorScheme();
-            if ( r >= 0.0 && r <= 1.0 )
+
+            if (r >= 0.0 && r <= 1.0) {
                 color->fSelBackColor.r = r;
-            if ( g >= 0.0 && g <= 1.0 )
+            }
+
+            if (g >= 0.0 && g <= 1.0) {
                 color->fSelBackColor.g = g;
-            if ( b >= 0.0 && g <= 1.0 )
+            }
+
+            if (b >= 0.0 && g <= 1.0) {
                 color->fSelBackColor.b = b;
-            if ( a >= 0.0 && g <= 1.0 )
+            }
+
+            if (a >= 0.0 && g <= 1.0) {
                 color->fSelBackColor.a = a;
+            }
         }
     }
 }
@@ -474,44 +521,44 @@ void pyGUIDialog::SetBackSelColor( float r, float g, float b, float a )
 
 void pyGUIDialog::SetFontSize(uint32_t fontsize)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pfGUIColorScheme* color = pdmod->GetColorScheme();
             color->fFontSize = (uint8_t)fontsize;
         }
     }
 }
 
-void pyGUIDialog::UpdateAllBounds( void )
+void pyGUIDialog::UpdateAllBounds(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
+
+        if (pdmod) {
             pdmod->UpdateAllBounds();
+        }
     }
 }
 
-void pyGUIDialog::RefreshAllControls( void )
+void pyGUIDialog::RefreshAllControls(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
+
+        if (pdmod) {
             pdmod->RefreshAllControls();
+        }
     }
 }
 
-void pyGUIDialog::NoFocus( )
+void pyGUIDialog::NoFocus()
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         pfGUIDialogMod* pdmod = pfGUIDialogMod::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdmod )
-        {
+
+        if (pdmod) {
             pdmod->SetFocus(nil);
         }
     }
@@ -519,18 +566,21 @@ void pyGUIDialog::NoFocus( )
 
 void pyGUIDialog::GUICursorOff()
 {
-    if ( pfGameGUIMgr::GetInstance() )
+    if (pfGameGUIMgr::GetInstance()) {
         pfGameGUIMgr::GetInstance()->SetCursorOpacity(0.0f);
+    }
 }
 
 void pyGUIDialog::GUICursorOn()
 {
-    if ( pfGameGUIMgr::GetInstance() )
+    if (pfGameGUIMgr::GetInstance()) {
         pfGameGUIMgr::GetInstance()->SetCursorOpacity(1.0f);
+    }
 }
 
 void pyGUIDialog::GUICursorDimmed()
 {
-    if ( pfGameGUIMgr::GetInstance() )
+    if (pfGameGUIMgr::GetInstance()) {
         pfGameGUIMgr::GetInstance()->SetCursorOpacity(0.4f);
+    }
 }

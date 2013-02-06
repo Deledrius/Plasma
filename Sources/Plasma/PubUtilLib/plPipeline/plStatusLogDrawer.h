@@ -54,19 +54,18 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //// plStatusLogDrawer Class Definition ////////////////////////////////////////////
 
 class plPipeline;
-class plStatusLogDrawer : public plStatusLogDrawerStub
-{
-    protected:
-        plPipeline  *fPipeline;
+class plStatusLogDrawer : public plStatusLogDrawerStub {
+protected:
+    plPipeline*  fPipeline;
 
-        void IDrawLogNames(plStatusLog* curLog, plStatusLog* firstLog);
+    void IDrawLogNames(plStatusLog* curLog, plStatusLog* firstLog);
 
-    public:
+public:
 
-        plStatusLogDrawer( plPipeline *pipe ) : fPipeline( pipe ) {}
-        virtual ~plStatusLogDrawer() {}
+    plStatusLogDrawer(plPipeline* pipe) : fPipeline(pipe) {}
+    virtual ~plStatusLogDrawer() {}
 
-        virtual void    Draw(plStatusLog* curLog, plStatusLog* firstLog);
+    virtual void    Draw(plStatusLog* curLog, plStatusLog* firstLog);
 };
 
 

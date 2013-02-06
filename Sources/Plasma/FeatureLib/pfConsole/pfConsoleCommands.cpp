@@ -207,9 +207,9 @@ PF_CONSOLE_FILE_DUMMY(Main)
 //        isn't used, but will be used in the future when implementing help
 //        (could you have guessed it? :) Please fill it in when the function
 //        name isn't obvious (i.e. SetFogColor doesn't really need one)
-//  
+//
 //  The actual C code prototype looks like:
-//      void    pfConsoleCmd_groupName_functionName( uint32_t numParams, pfConsoleCmdParam *params, 
+//      void    pfConsoleCmd_groupName_functionName( uint32_t numParams, pfConsoleCmdParam *params,
 //                                                      void (*PrintString)( char * ) );
 //
 //  numParams is exactly what it sounds like. params is an array of console
@@ -254,7 +254,7 @@ PF_CONSOLE_FILE_DUMMY(Main)
 //
 //  to create the Graphics_Render_Drawing subgroup. All groups must be
 //  defined before any commands that are in that group. Note that although
-//  the 
+//  the
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -262,11 +262,11 @@ PF_CONSOLE_FILE_DUMMY(Main)
 // utility functions
 //
 //////////////////////////////////////////////////////////////////////////////
-plKey FindSceneObjectByName(const plString& name, const plString& ageName, char* statusStr, bool subString=false);
-plKey FindObjectByName(const plString& name, int type, const plString& ageName, char* statusStr, bool subString=false);
+plKey FindSceneObjectByName(const plString& name, const plString& ageName, char* statusStr, bool subString = false);
+plKey FindObjectByName(const plString& name, int type, const plString& ageName, char* statusStr, bool subString = false);
 plKey FindObjectByNameAndType(const plString& name, const char* typeName, const plString& ageName,
-                               char* statusStr, bool subString=false);
-void PrintStringF(void pfun(const char *),const char * fmt, ...);
+                              char* statusStr, bool subString = false);
+void PrintStringF(void pfun(const char*), const char* fmt, ...);
 
 //
 // Find an object from name, type (int), and optionally age.
@@ -274,56 +274,63 @@ void PrintStringF(void pfun(const char *),const char * fmt, ...);
 //
 plKey FindObjectByName(const plString& name, int type, const plString& ageName, char* statusStr, bool subString)
 {
-    if (name.IsNull())
-    {
-        if (statusStr)
+    if (name.IsNull()) {
+        if (statusStr) {
             sprintf(statusStr, "Object name is nil");
-        return nil;
-    }
-    
-    if (type<0 || type>=plFactory::GetNumClasses())
-    {
-        if (statusStr)
-            sprintf(statusStr, "Illegal class type val");
+        }
+
         return nil;
     }
 
-    plKey key=nil;
+    if (type < 0 || type >= plFactory::GetNumClasses()) {
+        if (statusStr) {
+            sprintf(statusStr, "Illegal class type val");
+        }
+
+        return nil;
+    }
+
+    plKey key = nil;
+
     // Try restricted to our age first, if we're not given an age name. This works
     // around most of the problems associated with unused keys in pages causing the pages to be marked
     // as not loaded and thus screwing up our searches
-    if (ageName.IsNull() && plNetClientMgr::GetInstance() != nil)
-    {
+    if (ageName.IsNull() && plNetClientMgr::GetInstance() != nil) {
         plString thisAge = plAgeLoader::GetInstance()->GetCurrAgeDesc().GetAgeName();
-        if (!thisAge.IsNull())
-        {
+
+        if (!thisAge.IsNull()) {
             key = plKeyFinder::Instance().StupidSearch(thisAge, "", type, name, subString);
-            if (key != nil)
-            {
-                if (statusStr)
+
+            if (key != nil) {
+                if (statusStr) {
                     sprintf(statusStr, "Found Object");
+                }
+
                 return key;
             }
         }
     }
+
     // Fallback
     key = plKeyFinder::Instance().StupidSearch(ageName, "", type, name, subString);
 
-    if (!key)
-    {
-        if (statusStr)
+    if (!key) {
+        if (statusStr) {
             sprintf(statusStr, "Can't find object");
+        }
+
         return nil;
     }
-    
-    if (!key->ObjectIsLoaded())
-    {
-        if (statusStr)
+
+    if (!key->ObjectIsLoaded()) {
+        if (statusStr) {
             sprintf(statusStr, "Object is not loaded");
+        }
     }
 
-    if (statusStr)  
+    if (statusStr) {
         sprintf(statusStr, "Found Object");
+    }
 
     return key;
 }
@@ -335,12 +342,13 @@ plKey FindObjectByName(const plString& name, int type, const plString& ageName, 
 //
 plKey FindSceneObjectByName(const plString& name, const plString& ageName, char* statusStr, bool subString)
 {
-    plKey key=FindObjectByName(name, plSceneObject::Index(), ageName, statusStr, subString);
+    plKey key = FindObjectByName(name, plSceneObject::Index(), ageName, statusStr, subString);
 
-    if (!plSceneObject::ConvertNoRef(key ? key->ObjectIsLoaded() : nil))
-    {
-        if (statusStr)
+    if (!plSceneObject::ConvertNoRef(key ? key->ObjectIsLoaded() : nil)) {
+        if (statusStr) {
             sprintf(statusStr, "Can't find SceneObject");
+        }
+
         return nil;
     }
 
@@ -352,28 +360,30 @@ plKey FindSceneObjectByName(const plString& name, const plString& ageName, char*
 // Name can be an alias specified by saying $foo
 //
 plKey FindObjectByNameAndType(const plString& name, const char* typeName, const plString& ageName,
-                               char* statusStr, bool subString)
+                              char* statusStr, bool subString)
 {
-    if (!typeName)
-    {
-        if (statusStr)
+    if (!typeName) {
+        if (statusStr) {
             sprintf(statusStr, "TypeName is nil");
+        }
+
         return nil;
     }
-    
+
     return FindObjectByName(name, plFactory::FindClassIndex(typeName), ageName, statusStr, subString);
 }
 
 //// plDoesFileExist //////////////////////////////////////////////////////////
 //  Utility function to determine whether the given file exists
 
-static bool     plDoesFileExist( const char *path )
+static bool     plDoesFileExist(const char* path)
 {
     hsUNIXStream    stream;
 
 
-    if( !stream.Open( path, "rb" ) )
+    if (!stream.Open(path, "rb")) {
         return false;
+    }
 
     stream.Close();
     return true;
@@ -386,13 +396,13 @@ static bool     plDoesFileExist( const char *path )
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_BASE_CMD( SampleCmd1, "", "Sample command #1" )
+PF_CONSOLE_BASE_CMD(SampleCmd1, "", "Sample command #1")
 {
     // No parameters, enforced (i.e. this function won't get called unless
     // the calling line has no parameters)
 }
 
-PF_CONSOLE_BASE_CMD( SampleCmd2, "int myValue", "Sample command #2" )
+PF_CONSOLE_BASE_CMD(SampleCmd2, "int myValue", "Sample command #2")
 {
     // One parameter, which is an int. Note that because of the console
     // engine, we no longer have to test for the number of parameters.
@@ -407,7 +417,7 @@ PF_CONSOLE_BASE_CMD( SampleCmd2, "int myValue", "Sample command #2" )
     int     test = params[ 1 ];
 }
 
-PF_CONSOLE_BASE_CMD( SampleCmd3, "int, ...", "Sample command #3" )
+PF_CONSOLE_BASE_CMD(SampleCmd3, "int, ...", "Sample command #3")
 {
     // One parameter, which is an int, plus zero or more paramters.
 
@@ -417,10 +427,9 @@ PF_CONSOLE_BASE_CMD( SampleCmd3, "int, ...", "Sample command #3" )
     // Note: we have to test numParams here because ... allows no extra
     // params, so we have to make sure we have one. Note: numParams
     // INCLUDES all parameters, in this case our int.
-    if( numParams > 1 )
-    {
+    if (numParams > 1) {
         // This is okay--any parameters via ... are strings
-        char    *str = params[ 1 ];
+        char*    str = params[ 1 ];
 
         // This is also okay, since ... allows the params to be cast
         // to any valid type. Note that if the parameter isn't actually
@@ -436,51 +445,51 @@ PF_CONSOLE_BASE_CMD( SampleCmd3, "int, ...", "Sample command #3" )
 
 #include "plMessage/plTransitionMsg.h"
 
-PF_CONSOLE_BASE_CMD( FadeIn, "float len, bool hold", "Sample command #1" )
+PF_CONSOLE_BASE_CMD(FadeIn, "float len, bool hold", "Sample command #1")
 {
-    plTransitionMsg *msg = new plTransitionMsg( plTransitionMsg::kFadeIn, (float)params[ 0 ], (bool)params[ 1 ] );
-    plgDispatch::MsgSend( msg );
+    plTransitionMsg* msg = new plTransitionMsg(plTransitionMsg::kFadeIn, (float)params[ 0 ], (bool)params[ 1 ]);
+    plgDispatch::MsgSend(msg);
 }
 
-PF_CONSOLE_BASE_CMD( FadeOut, "float len, bool hold", "Sample command #1" )
+PF_CONSOLE_BASE_CMD(FadeOut, "float len, bool hold", "Sample command #1")
 {
-    plTransitionMsg *msg = new plTransitionMsg( plTransitionMsg::kFadeOut, (float)params[ 0 ], (bool)params[ 1 ] );
-    plgDispatch::MsgSend( msg );
+    plTransitionMsg* msg = new plTransitionMsg(plTransitionMsg::kFadeOut, (float)params[ 0 ], (bool)params[ 1 ]);
+    plgDispatch::MsgSend(msg);
 }
 
-PF_CONSOLE_BASE_CMD( NextStatusLog, "", "Cycles through the status logs" )
+PF_CONSOLE_BASE_CMD(NextStatusLog, "", "Cycles through the status logs")
 {
     plStatusLogMgr::GetInstance().NextStatusLog();
 }
 
-PF_CONSOLE_BASE_CMD( PrevStatusLog, "", "Cycles backwards through the status logs" )
+PF_CONSOLE_BASE_CMD(PrevStatusLog, "", "Cycles backwards through the status logs")
 {
     plStatusLogMgr::GetInstance().PrevStatusLog();
 }
 
 
-PF_CONSOLE_BASE_CMD( ShowStatusLog, "string logName", "Advances the status log display to the given log" )
+PF_CONSOLE_BASE_CMD(ShowStatusLog, "string logName", "Advances the status log display to the given log")
 {
-    plStatusLogMgr::GetInstance().SetCurrStatusLog(static_cast<const char *>(params[0]));
+    plStatusLogMgr::GetInstance().SetCurrStatusLog(static_cast<const char*>(params[0]));
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
 
-PF_CONSOLE_BASE_CMD( DisableLogging, "", "Turns off logging" )
+PF_CONSOLE_BASE_CMD(DisableLogging, "", "Turns off logging")
 {
     plStatusLog::fLoggingOff = true;
 }
 
 
-PF_CONSOLE_BASE_CMD( EnableLogging, "", "Turns on logging" )
+PF_CONSOLE_BASE_CMD(EnableLogging, "", "Turns on logging")
 {
     plStatusLog::fLoggingOff = false;
 }
 
-PF_CONSOLE_BASE_CMD( DumpLogs, "string folderName", "Dumps all current logs to the folder specified, relative to the log folder" )
+PF_CONSOLE_BASE_CMD(DumpLogs, "string folderName", "Dumps all current logs to the folder specified, relative to the log folder")
 {
-    plStatusLogMgr::GetInstance().DumpLogs(static_cast<const char *>(params[0]));
+    plStatusLogMgr::GetInstance().DumpLogs(static_cast<const char*>(params[0]));
 }
 
 
@@ -491,28 +500,31 @@ PF_CONSOLE_BASE_CMD( DumpLogs, "string folderName", "Dumps all current logs to t
 #ifndef LIMIT_CONSOLE_COMMANDS
 
 
-PF_CONSOLE_GROUP( Stats )
+PF_CONSOLE_GROUP(Stats)
 
 #include "plStatGather/plProfileManagerFull.h"
 
-PF_CONSOLE_CMD( Stats, Show,    // Group name, Function name
-                "...",          // Params
-                "Shows or hides a given category of statistics.\n"
-                "List the valid categories using Stats.ListGroups")
+PF_CONSOLE_CMD(Stats, Show,     // Group name, Function name
+               "...",          // Params
+               "Shows or hides a given category of statistics.\n"
+               "List the valid categories using Stats.ListGroups")
 {
     const char* group = nil;
-    if (numParams > 0)
-        group = params[0];
 
-    if(numParams > 1)
+    if (numParams > 0) {
+        group = params[0];
+    }
+
+    if (numParams > 1) {
         plProfileManagerFull::Instance().ShowLaps(params[0], params[1]);
-    else
+    } else {
         plProfileManagerFull::Instance().ShowGroup(group);
+    }
 }
 
 PF_CONSOLE_CMD(Stats, ResetMax, // Group name, Function name
-                "",         // Params
-                "Resets the max value for all stats")
+               "",         // Params
+               "Resets the max value for all stats")
 {
     plProfileManagerFull::Instance().ResetMax();
 }
@@ -523,8 +535,8 @@ PF_CONSOLE_CMD(Stats, ShowNext, "", "Shows the next group of stats")
 }
 
 PF_CONSOLE_CMD(Stats, ShowLaps,
-                "string group, string stat",
-                "")
+               "string group, string stat",
+               "")
 {
     plProfileManagerFull::Instance().ShowLaps(params[0], params[1]);
 }
@@ -535,8 +547,10 @@ PF_CONSOLE_CMD(Stats, ListGroups, "", "Prints the names of all the stat groups t
     plProfileManagerFull::Instance().GetGroups(groups);
 
     plProfileManagerFull::GroupSet::iterator it;
-    for (it = groups.begin(); it != groups.end(); it++)
+
+    for (it = groups.begin(); it != groups.end(); it++) {
         PrintString(it->c_str());
+    }
 }
 
 PF_CONSOLE_CMD(Stats, ListLaps, "", "Prints the names of all the stats with laps to the console")
@@ -544,8 +558,7 @@ PF_CONSOLE_CMD(Stats, ListLaps, "", "Prints the names of all the stats with laps
     plProfileManagerFull::LapNames laps;
     plProfileManagerFull::Instance().GetLaps(laps);
 
-    for (int i = 0; i < laps.size(); i++)
-    {
+    for (int i = 0; i < laps.size(); i++) {
         char buf[256];
         sprintf(buf, "%s - %s", laps[i].group, laps[i].varName);
         PrintString(buf);
@@ -600,10 +613,10 @@ PF_CONSOLE_CMD(Stats, AddDetailVar, "string stat", "Adds the specified var to th
 }
 
 PF_CONSOLE_CMD(Stats, AddDetailVarWithOffset, "string stat, int offset", "Adds the specified var to the detail graph with a offset and default range\n"
-                                              "of 0->(100-offset)")
+               "of 0->(100-offset)")
 {
     int offset = (int)params[1];
-    plProfileManagerFull::Instance().AddDetailVar(params[0], -offset, 100-offset);
+    plProfileManagerFull::Instance().AddDetailVar(params[0], -offset, 100 - offset);
 }
 
 PF_CONSOLE_CMD(Stats, AddDetailVarWithRange, "string stat, int min, int max", "Adds the specified var to the detail graph")
@@ -612,10 +625,10 @@ PF_CONSOLE_CMD(Stats, AddDetailVarWithRange, "string stat, int min, int max", "A
 }
 
 PF_CONSOLE_CMD(Stats, AddDetailVarWithOffsetAndRange, "string stat, int offset, int min, int max", "Adds the specified var to the detail graph with an\n"
-                                                      "offset and a range of min->(max-offset)")
+               "offset and a range of min->(max-offset)")
 {
     int offset = (int)params[1];
-    plProfileManagerFull::Instance().AddDetailVar(params[0], (int)params[2]-offset, (int)params[3]-offset);
+    plProfileManagerFull::Instance().AddDetailVar(params[0], (int)params[2] - offset, (int)params[3] - offset);
 }
 
 PF_CONSOLE_CMD(Stats, RemoveDetailVar, "string stat", "Removes the specified var from the detail graph")
@@ -628,8 +641,10 @@ PF_CONSOLE_CMD(Stats, RemoveDetailVar, "string stat", "Removes the specified var
 PF_CONSOLE_CMD(Stats, AutoProfile, "...", "Performs an automated profile in all the ages. Optional: Specify an age name to do just that age")
 {
     const char* ageName = nil;
-    if (numParams > 0)
+
+    if (numParams > 0) {
         ageName = params[0];
+    }
 
     plAutoProfile::Instance()->StartProfile(ageName);
 }
@@ -650,89 +665,88 @@ PF_CONSOLE_CMD(Stats, ProfileAllAgeLoads, "", "Turns on Registry.LogReadTimes an
 #ifndef LIMIT_CONSOLE_COMMANDS
 
 
-PF_CONSOLE_GROUP( Console )
+PF_CONSOLE_GROUP(Console)
 
-PF_CONSOLE_CMD( Console, Clear, "", "Clears the console" )
+PF_CONSOLE_CMD(Console, Clear, "", "Clears the console")
 {
     pfConsole::Clear();
 }
 
-PF_CONSOLE_CMD( Console, EnableFX, "bool enable", "Enables flashy console effects" )
+PF_CONSOLE_CMD(Console, EnableFX, "bool enable", "Enables flashy console effects")
 {
-    pfConsole::EnableEffects( (bool)(bool)params[ 0 ] );
-    if( pfConsole::AreEffectsEnabled() )
-        PrintString( "Console effects enabled" );
-    else
-        PrintString( "Console effects disabled" );
+    pfConsole::EnableEffects((bool)(bool)params[ 0 ]);
+
+    if (pfConsole::AreEffectsEnabled()) {
+        PrintString("Console effects enabled");
+    } else {
+        PrintString("Console effects disabled");
+    }
 }
 
-PF_CONSOLE_CMD( Console, SetTextColor, "int r, int g, int b", 
-                "Sets the color of normal console text" )
+PF_CONSOLE_CMD(Console, SetTextColor, "int r, int g, int b",
+               "Sets the color of normal console text")
 {
-    uint32_t      color = 0xff000000 | ( (int)params[ 0 ] << 16 ) | ( (int)params[ 1 ] << 8 ) | ( (int)params[ 2 ] );
+    uint32_t      color = 0xff000000 | ((int)params[ 0 ] << 16) | ((int)params[ 1 ] << 8) | ((int)params[ 2 ]);
 
-    pfConsole::SetTextColor( color );
+    pfConsole::SetTextColor(color);
 }
 
-class DocGenIterator : public pfConsoleCmdIterator
-{
-    FILE *fFile;    
+class DocGenIterator : public pfConsoleCmdIterator {
+    FILE* fFile;
 
 public:
-    DocGenIterator(FILE *f) { fFile = f; }
-    virtual void ProcessCmd(pfConsoleCmd* c, int depth) 
-    {
+    DocGenIterator(FILE* f) {
+        fFile = f;
+    }
+    virtual void ProcessCmd(pfConsoleCmd* c, int depth) {
 
-        if(strncmp("SampleCmd",c->GetName(), 9) != 0)
-        {
-            fprintf(fFile, "<p><em>%s </em><br />%s </p>\n",c->GetSignature(),
+        if (strncmp("SampleCmd", c->GetName(), 9) != 0) {
+            fprintf(fFile, "<p><em>%s </em><br />%s </p>\n", c->GetSignature(),
                     c->GetHelp());
         }
     }
-    virtual bool ProcessGroup(pfConsoleCmdGroup *g, int depth) 
-    {
-    //  if(g->GetFirstCommand() != nil)
+    virtual bool ProcessGroup(pfConsoleCmdGroup* g, int depth) {
+        //  if(g->GetFirstCommand() != nil)
         {
             fprintf(fFile, "<p><strong><h%s>Command %sGroup %s </strong></h%s></p>\n",
-                (depth > 0) ? "3" : "2",
-                (depth > 0) ? "Sub" :"" ,
-                g->GetName(),
-				(depth > 0) ? "3" : "2");
+                    (depth > 0) ? "3" : "2",
+                    (depth > 0) ? "Sub" : "" ,
+                    g->GetName(),
+                    (depth > 0) ? "3" : "2");
         }
         return true;
     }
 };
 
-class BriefDocGenIterator : public pfConsoleCmdIterator
-{
-    FILE *fFile;    
+class BriefDocGenIterator : public pfConsoleCmdIterator {
+    FILE* fFile;
     char fGrpName[200];
 
 public:
-    BriefDocGenIterator(FILE *f) { fFile = f; strcpy(fGrpName,"");}
-    virtual void ProcessCmd(pfConsoleCmd* c, int depth) 
-    {
+    BriefDocGenIterator(FILE* f) {
+        fFile = f;
+        strcpy(fGrpName, "");
+    }
+    virtual void ProcessCmd(pfConsoleCmd* c, int depth) {
 
-        if(strncmp("SampleCmd",c->GetName(), 9) != 0)
-        {
-                fprintf(fFile, "<em>%s.%s </em> - %s <br />\n",fGrpName,c->GetSignature(),
-                        c->GetHelp());
+        if (strncmp("SampleCmd", c->GetName(), 9) != 0) {
+            fprintf(fFile, "<em>%s.%s </em> - %s <br />\n", fGrpName, c->GetSignature(),
+                    c->GetHelp());
         }
     }
-    virtual bool ProcessGroup(pfConsoleCmdGroup *g, int depth) 
-    {
-    //  if(g->GetFirstCommand() != nil)
+    virtual bool ProcessGroup(pfConsoleCmdGroup* g, int depth) {
+        //  if(g->GetFirstCommand() != nil)
         {
             fprintf(fFile, "<br />\n");
-            if(depth <1)
+
+            if (depth < 1) {
                 strcpy(fGrpName, g->GetName());
-            else 
-            {
-                pfConsoleCmdGroup *parentGrp;
-                parentGrp = g->GetParent();	
+            } else {
+                pfConsoleCmdGroup* parentGrp;
+                parentGrp = g->GetParent();
                 strcpy(fGrpName, parentGrp->GetName());
-                strcat(fGrpName,".");
-                strcat(fGrpName,g->GetName());
+                strcat(fGrpName, ".");
+                strcat(fGrpName, g->GetName());
             }
 
         }
@@ -740,120 +754,120 @@ public:
     }
 };
 
-PF_CONSOLE_CMD( Console, CreateDocumentation, "string fileName", 
-                "Writes HTML documentation for the current console commands" )
+PF_CONSOLE_CMD(Console, CreateDocumentation, "string fileName",
+               "Writes HTML documentation for the current console commands")
 {
 
     PrintString((char*)params[0]);
 
 
-    pfConsoleCmdGroup   *group;
-    FILE *f;
+    pfConsoleCmdGroup*   group;
+    FILE* f;
 
 
-    f = fopen(params[0],"wt");
-    if(f == nil)
-    {
+    f = fopen(params[0], "wt");
+
+    if (f == nil) {
         PrintString("Couldn't Open File");
         return;
     }
-    
 
-    fprintf(f, "<span style=\"text-align: center;\"> <h2> Console Commands for Plasma 2.0 Client </h2> <em>Built %s on %s.</em></span><br />", 
-        pnBuildDates::fBuildTime, pnBuildDates::fBuildDate );
+
+    fprintf(f, "<span style=\"text-align: center;\"> <h2> Console Commands for Plasma 2.0 Client </h2> <em>Built %s on %s.</em></span><br />",
+            pnBuildDates::fBuildTime, pnBuildDates::fBuildDate);
 
     DocGenIterator iter(f);
     group = pfConsoleCmdGroup::GetBaseGroup();
     group->IterateCommands(&iter);
 
     fclose(f);
-    
+
 }
 
 
-PF_CONSOLE_CMD( Console, CreateBriefDocumentation, "string fileName", 
-                "Writes brief HTML documentation for the current console commands" )
+PF_CONSOLE_CMD(Console, CreateBriefDocumentation, "string fileName",
+               "Writes brief HTML documentation for the current console commands")
 {
 
     PrintString((char*)params[0]);
 
 
-    pfConsoleCmdGroup   *group;
-    FILE *f;
+    pfConsoleCmdGroup*   group;
+    FILE* f;
 
 
-    f = fopen(params[0],"wt");
-    if(f == nil)
-    {
+    f = fopen(params[0], "wt");
+
+    if (f == nil) {
         PrintString("Couldn't Open File");
         return;
     }
 
-    fprintf(f, "<span style=\"text-align: center;\"> <h3> Console Commands for Plasma 2.0 Client </h3> <em>Built %s on %s.</em></span><br />", 
-        pnBuildDates::fBuildTime, pnBuildDates::fBuildDate );
+    fprintf(f, "<span style=\"text-align: center;\"> <h3> Console Commands for Plasma 2.0 Client </h3> <em>Built %s on %s.</em></span><br />",
+            pnBuildDates::fBuildTime, pnBuildDates::fBuildDate);
     BriefDocGenIterator iter(f);
     group = pfConsoleCmdGroup::GetBaseGroup();
     group->IterateCommands(&iter);
 
     fclose(f);
-    
+
 }
 
-PF_CONSOLE_CMD( Console, SetVar, "string name, string value", 
-                "Sets the value of a given global console variable" )
+PF_CONSOLE_CMD(Console, SetVar, "string name, string value",
+               "Sets the value of a given global console variable")
 {
-    pfConsoleContext &ctx = pfConsoleContext::GetRootContext();
+    pfConsoleContext& ctx = pfConsoleContext::GetRootContext();
 
 
     bool oldF = ctx.GetAddWhenNotFound();
-    ctx.SetAddWhenNotFound( true );
-    ctx.SetVar((char*)params[ 0 ], (char*)params[ 1 ] );
-    ctx.SetAddWhenNotFound( oldF );
+    ctx.SetAddWhenNotFound(true);
+    ctx.SetVar((char*)params[ 0 ], (char*)params[ 1 ]);
+    ctx.SetAddWhenNotFound(oldF);
 }
 
-PF_CONSOLE_CMD( Console, PrintVar, "string name", "Prints the value of a given global console variable" )
+PF_CONSOLE_CMD(Console, PrintVar, "string name", "Prints the value of a given global console variable")
 {
-    pfConsoleContext &ctx = pfConsoleContext::GetRootContext();
+    pfConsoleContext& ctx = pfConsoleContext::GetRootContext();
 
-    int32_t idx = ctx.FindVar( params[ 0 ] );
-    if( idx == -1 )
-        PrintString( "Variable not found" );
-    else
-    {
-        PrintStringF( PrintString, "The value of %s is %s", (const char *)params[ 0 ], (const char *)ctx.GetVarValue( idx ) );
+    int32_t idx = ctx.FindVar(params[ 0 ]);
+
+    if (idx == -1) {
+        PrintString("Variable not found");
+    } else {
+        PrintStringF(PrintString, "The value of %s is %s", (const char*)params[ 0 ], (const char*)ctx.GetVarValue(idx));
     }
 }
 
-PF_CONSOLE_CMD( Console, PrintAllVars, "", "Prints the values of all global console variables" )
+PF_CONSOLE_CMD(Console, PrintAllVars, "", "Prints the values of all global console variables")
 {
-    pfConsoleContext &ctx = pfConsoleContext::GetRootContext();
+    pfConsoleContext& ctx = pfConsoleContext::GetRootContext();
 
     uint32_t  i;
 
-    PrintString( "Global console variables:" );
-    for( i = 0; i < ctx.GetNumVars(); i++ )
-    {
-        PrintStringF( PrintString, "  %s: %s", (const char *)ctx.GetVarName( i ), (const char *)ctx.GetVarValue( i ) );
+    PrintString("Global console variables:");
+
+    for (i = 0; i < ctx.GetNumVars(); i++) {
+        PrintStringF(PrintString, "  %s: %s", (const char*)ctx.GetVarName(i), (const char*)ctx.GetVarValue(i));
     }
 }
 
-PF_CONSOLE_CMD( Console, ClearAllVars, "", "Wipes the global console variable context" )
+PF_CONSOLE_CMD(Console, ClearAllVars, "", "Wipes the global console variable context")
 {
-    pfConsoleContext &ctx = pfConsoleContext::GetRootContext();
+    pfConsoleContext& ctx = pfConsoleContext::GetRootContext();
     ctx.Clear();
-    PrintString( "Global context wiped" );
+    PrintString("Global context wiped");
 }
 
-PF_CONSOLE_CMD( Console, ExecuteFile, "string filename", "Runs the given file as if it were an .ini or .fni file" )
+PF_CONSOLE_CMD(Console, ExecuteFile, "string filename", "Runs the given file as if it were an .ini or .fni file")
 {
-    plConsoleMsg *cMsg = new plConsoleMsg( plConsoleMsg::kExecuteFile, params[ 0 ] );
+    plConsoleMsg* cMsg = new plConsoleMsg(plConsoleMsg::kExecuteFile, params[ 0 ]);
     cMsg->Send();
 }
 
-PF_CONSOLE_CMD( Console, ExecuteFileDelayed, "string filename, float timeInSecs", "Runs the given file as if it were an .ini or .fni file, but at some given point in the future" )
+PF_CONSOLE_CMD(Console, ExecuteFileDelayed, "string filename, float timeInSecs", "Runs the given file as if it were an .ini or .fni file, but at some given point in the future")
 {
-    plConsoleMsg *cMsg = new plConsoleMsg( plConsoleMsg::kExecuteFile, params[ 0 ] );
-    cMsg->SetTimeStamp( hsTimer::GetSysSeconds() + (float)params[ 1 ] );
+    plConsoleMsg* cMsg = new plConsoleMsg(plConsoleMsg::kExecuteFile, params[ 0 ]);
+    cMsg->SetTimeStamp(hsTimer::GetSysSeconds() + (float)params[ 1 ]);
     cMsg->Send();
 }
 
@@ -864,7 +878,7 @@ PF_CONSOLE_CMD( Console, ExecuteFileDelayed, "string filename, float timeInSecs"
 //// Graphics Group Commands /////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-PF_CONSOLE_GROUP( Graphics ) // Defines a main command group
+PF_CONSOLE_GROUP(Graphics)   // Defines a main command group
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
@@ -880,10 +894,10 @@ PF_CONSOLE_GROUP( Graphics ) // Defines a main command group
 // tend to get reused more than subjects, start commands with the noun instead
 // of the verb. E.g. "showBufferData" and "showNormals" can be more easily distinguished
 // as bufferDataShow and normalsShow.
-PF_CONSOLE_CMD( Graphics,           // Group name
-                SetDebugFlag,               // Function name
-                "string flag, ...",     // Params
-                "Sets or toggles a pipeline debug flag.\nValid flags are:\n\
+PF_CONSOLE_CMD(Graphics,            // Group name
+               SetDebugFlag,               // Function name
+               "string flag, ...",     // Params
+               "Sets or toggles a pipeline debug flag.\nValid flags are:\n\
 \tbufferDataShow - Shows vertex/index buffer stats\n\
 \tnoMultiTexture - Disables multitexturing\n\
 \tnoLightMaps - Disables lightmaps\n\
@@ -906,147 +920,143 @@ PF_CONSOLE_CMD( Graphics,           // Group name
 \treShaders - reload all shaders\n\
 \treTex - reload all textures from sysmem\n\
 \tonlyProjLights - Turns off runtime non-projected lights\n\
-\tnoFog - Disable all fog" )    // Help string
+\tnoFog - Disable all fog")     // Help string
 {
     uint32_t      flag;
     bool        on;
     char        string[ 128 ], name[ 64 ];
     int         i;
 
-    struct 
-    { 
-        char name[ 64 ]; uint32_t flag; 
+    struct {
+        char name[ 64 ];
+        uint32_t flag;
     } flags[] = { { "reloadTextures", plPipeDbg::kFlagReload },
-                    { "noPreShade", plPipeDbg::kFlagNoPreShade},
-                    { "noMultitexture", plPipeDbg::kFlagNoMultitexture },
-                    { "noLightMaps", plPipeDbg::kFlagNoLightmaps },
-                    { "noRTLights", plPipeDbg::kFlagNoRuntimeLights },
-                    { "noAlphaBlending", plPipeDbg::kFlagNoAlphaBlending },
-                    { "noDecals", plPipeDbg::kFlagNoDecals },
-                    { "noFaceSort", plPipeDbg::kFlagDontSortFaces },
-                    { "noSpecular", plPipeDbg::kFlagDisableSpecular },
-                    { "normalShow", plPipeDbg::kFlagShowNormals },
-                    { "mipmapColorize", plPipeDbg::kFlagColorizeMipmaps },
-                    { "noShadows", plPipeDbg::kFlagNoShadows },
-                    { "noUpper", plPipeDbg::kFlagNoUpperLayers },
-                    { "noRender", plPipeDbg::kFlagNoRender },
-                    { "noLODPop", plPipeDbg::kFlagSkipVisDist },
-                    { "noPlates", plPipeDbg::kFlagNoPlates },
-                    { "noBump", plPipeDbg::kFlagNoBump },
-                    { "noAnisotropy", plPipeDbg::kFlagNoAnisotropy },
-                    { "allBright", plPipeDbg::kFlagAllBright },
-                    { "noProjLights", plPipeDbg::kFlagNoApplyProjLights },
-                    { "oneMaterial", plPipeDbg::kFlagSingleMat},
-                    { "onlyProjLights", plPipeDbg::kFlagOnlyApplyProjLights },
-                    { "noFog", plPipeDbg::kFlagNoFog }
+        { "noPreShade", plPipeDbg::kFlagNoPreShade},
+        { "noMultitexture", plPipeDbg::kFlagNoMultitexture },
+        { "noLightMaps", plPipeDbg::kFlagNoLightmaps },
+        { "noRTLights", plPipeDbg::kFlagNoRuntimeLights },
+        { "noAlphaBlending", plPipeDbg::kFlagNoAlphaBlending },
+        { "noDecals", plPipeDbg::kFlagNoDecals },
+        { "noFaceSort", plPipeDbg::kFlagDontSortFaces },
+        { "noSpecular", plPipeDbg::kFlagDisableSpecular },
+        { "normalShow", plPipeDbg::kFlagShowNormals },
+        { "mipmapColorize", plPipeDbg::kFlagColorizeMipmaps },
+        { "noShadows", plPipeDbg::kFlagNoShadows },
+        { "noUpper", plPipeDbg::kFlagNoUpperLayers },
+        { "noRender", plPipeDbg::kFlagNoRender },
+        { "noLODPop", plPipeDbg::kFlagSkipVisDist },
+        { "noPlates", plPipeDbg::kFlagNoPlates },
+        { "noBump", plPipeDbg::kFlagNoBump },
+        { "noAnisotropy", plPipeDbg::kFlagNoAnisotropy },
+        { "allBright", plPipeDbg::kFlagAllBright },
+        { "noProjLights", plPipeDbg::kFlagNoApplyProjLights },
+        { "oneMaterial", plPipeDbg::kFlagSingleMat},
+        { "onlyProjLights", plPipeDbg::kFlagOnlyApplyProjLights },
+        { "noFog", plPipeDbg::kFlagNoFog }
     };
-    int     numDebugFlags = sizeof( flags ) / sizeof( flags[ 0 ] );
+    int     numDebugFlags = sizeof(flags) / sizeof(flags[ 0 ]);
 
 
-    if( numParams > 2 )
-    {
-        PrintString( "Invalid parameters. Use 'SetDebugFlag flag [, true|flase]'." );
+    if (numParams > 2) {
+        PrintString("Invalid parameters. Use 'SetDebugFlag flag [, true|flase]'.");
         return;
     }
 
-    for( i = 0; i < numDebugFlags; i++ )
-    {
-        if( strnicmp( params[ 0 ], flags[ i ].name, strlen(params[0]) ) == 0 )
-        {
+    for (i = 0; i < numDebugFlags; i++) {
+        if (strnicmp(params[ 0 ], flags[ i ].name, strlen(params[0])) == 0) {
             flag = flags[ i ].flag;
-            strcpy( name, flags[ i ].name );
+            strcpy(name, flags[ i ].name);
             break;
         }
     }
-    if( i == numDebugFlags )
-    {
-        flag = atoi( params[ 0 ] );
+
+    if (i == numDebugFlags) {
+        flag = atoi(params[ 0 ]);
 #ifndef HS_DEBUGGING
-        if( flag < 1 || flag > flags[ numDebugFlags ].flag )
-        {
-            PrintString( "Invalid Flag. Check help for valid flags." );
+
+        if (flag < 1 || flag > flags[ numDebugFlags ].flag) {
+            PrintString("Invalid Flag. Check help for valid flags.");
             return;
         }
+
 #endif
-        sprintf( name, "Flag %d", flag );
+        sprintf(name, "Flag %d", flag);
     }
 
-    if( numParams == 1 )
-        on = !pfConsole::GetPipeline()->IsDebugFlagSet( flag );
-    else
+    if (numParams == 1) {
+        on = !pfConsole::GetPipeline()->IsDebugFlagSet(flag);
+    } else {
         on = params[ 1 ];
+    }
 
-    pfConsole::GetPipeline()->SetDebugFlag( flag, on );
+    pfConsole::GetPipeline()->SetDebugFlag(flag, on);
 
-    sprintf( string, "%s is now %s", name, on ? "enabled" : "disabled" );
-    PrintString( string );
+    sprintf(string, "%s is now %s", name, on ? "enabled" : "disabled");
+    PrintString(string);
 }
 
 
 
-PF_CONSOLE_SUBGROUP( Graphics, VisSet )     // Creates a sub-group under a given group
+PF_CONSOLE_SUBGROUP(Graphics, VisSet)       // Creates a sub-group under a given group
 
-PF_CONSOLE_CMD( Graphics_VisSet, Toggle, "", "Toggle using VisSets" )
+PF_CONSOLE_CMD(Graphics_VisSet, Toggle, "", "Toggle using VisSets")
 {
     bool turnOn = !plPageTreeMgr::VisMgrEnabled();
     plPageTreeMgr::EnableVisMgr(turnOn);
 
-    PrintStringF( PrintString, "Visibility Sets %s", turnOn ? "Enabled" : "Disabled" );
+    PrintStringF(PrintString, "Visibility Sets %s", turnOn ? "Enabled" : "Disabled");
 }
 
-PF_CONSOLE_CMD( Graphics, BumpNormal, "", "Set bump mapping method to default for your hardware." )
+PF_CONSOLE_CMD(Graphics, BumpNormal, "", "Set bump mapping method to default for your hardware.")
 {
-    PF_SANITY_CHECK( pfConsole::GetPipeline(), "This command MUST be used in an .fni file (after pipeline initialization)" );
+    PF_SANITY_CHECK(pfConsole::GetPipeline(), "This command MUST be used in an .fni file (after pipeline initialization)");
 
-    if( pfConsole::GetPipeline()->GetMaxLayersAtOnce() > 3 )
-    {
+    if (pfConsole::GetPipeline()->GetMaxLayersAtOnce() > 3) {
         pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagBumpUV, false);
         pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagBumpW, false);
-    }
-    else
-    {
+    } else {
         pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagBumpUV, true);
         pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagBumpW, false);
     }
 }
 
-PF_CONSOLE_CMD( Graphics, BumpUV, "", "Set bump mapping method to GeForce2 compatible." )
+PF_CONSOLE_CMD(Graphics, BumpUV, "", "Set bump mapping method to GeForce2 compatible.")
 {
-    PF_SANITY_CHECK( pfConsole::GetPipeline(), "This command MUST be used in an .fni file (after pipeline initialization)" );
+    PF_SANITY_CHECK(pfConsole::GetPipeline(), "This command MUST be used in an .fni file (after pipeline initialization)");
 
     pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagBumpUV, true);
     pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagBumpW, false);
 }
 
-PF_CONSOLE_CMD( Graphics, BumpW, "", "Set bump mapping method to cheapest available." )
+PF_CONSOLE_CMD(Graphics, BumpW, "", "Set bump mapping method to cheapest available.")
 {
-    PF_SANITY_CHECK( pfConsole::GetPipeline(), "This command MUST be used in an .fni file (after pipeline initialization)" );
+    PF_SANITY_CHECK(pfConsole::GetPipeline(), "This command MUST be used in an .fni file (after pipeline initialization)");
 
     pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagBumpUV, false);
     pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagBumpW, true);
 }
 
 
-PF_CONSOLE_CMD( Graphics, AllowWBuffering, "", "Enables the use of w-buffering\n(w-buffering is disabled by default)." )
+PF_CONSOLE_CMD(Graphics, AllowWBuffering, "", "Enables the use of w-buffering\n(w-buffering is disabled by default).")
 {
-    PF_SANITY_CHECK( pfConsole::GetPipeline() == nil, "This command MUST be used in an .ini file (before pipeline initialization)" );
+    PF_SANITY_CHECK(pfConsole::GetPipeline() == nil, "This command MUST be used in an .ini file (before pipeline initialization)");
 
     extern uint32_t fDbgSetupInitFlags;
 
 
     fDbgSetupInitFlags |= 0x00000001;
-    PrintString( "W-buffering enabled." );
+    PrintString("W-buffering enabled.");
 }
 
-PF_CONSOLE_CMD( Graphics, ForceGeForce2Quality, "", "Forces higher-level hardware down to roughly the capabilities of a GeForce 2." )
+PF_CONSOLE_CMD(Graphics, ForceGeForce2Quality, "", "Forces higher-level hardware down to roughly the capabilities of a GeForce 2.")
 {
-    PF_SANITY_CHECK( pfConsole::GetPipeline() == nil, "This command MUST be used in an .ini file (before pipeline initialization)" );
+    PF_SANITY_CHECK(pfConsole::GetPipeline() == nil, "This command MUST be used in an .ini file (before pipeline initialization)");
 
     extern uint32_t fDbgSetupInitFlags;
 
 
     fDbgSetupInitFlags |= 0x00000004;
-    PrintString( "Hardware caps forced down to GeForce 2 level." );
+    PrintString("Hardware caps forced down to GeForce 2 level.");
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
@@ -1054,147 +1064,140 @@ PF_CONSOLE_CMD( Graphics, ForceGeForce2Quality, "", "Forces higher-level hardwar
 
 
 //// Graphics.Shadow SubGroup /////////////////////////////////////////////
-PF_CONSOLE_SUBGROUP( Graphics, Shadow )     // Creates a sub-group under a given group
+PF_CONSOLE_SUBGROUP(Graphics, Shadow)       // Creates a sub-group under a given group
 
-PF_CONSOLE_CMD( Graphics_Shadow,
+PF_CONSOLE_CMD(Graphics_Shadow,
                Enable,
                "bool enable",
-               "Enable shadows." )
+               "Enable shadows.")
 {
     bool enable = (bool)params[0];
 
-    if (enable)
-    {
+    if (enable) {
         plShadowCaster::EnableShadowCast();
         PrintString("Shadows Enabled");
-    }
-    else
-    {
+    } else {
         plShadowCaster::DisableShadowCast();
         PrintString("Shadows Disabled");
     }
 }
 
-PF_CONSOLE_CMD( Graphics_Shadow, 
+PF_CONSOLE_CMD(Graphics_Shadow,
                Disable,
-               "", 
-               "Disable shadows." )
+               "",
+               "Disable shadows.")
 {
     plShadowCaster::DisableShadowCast();
     PrintString("Shadows Disabled");
 }
 
-PF_CONSOLE_CMD( Graphics_Shadow, 
+PF_CONSOLE_CMD(Graphics_Shadow,
                Toggle,
-               "", 
-               "Toggle shadows." )
+               "",
+               "Toggle shadows.")
 {
     plShadowCaster::ToggleShadowCast();
     PrintString(plShadowCaster::ShadowCastDisabled() ? "Shadows Disabled" : "Shadows Enabled");
 }
 
-PF_CONSOLE_CMD( Graphics_Shadow, 
+PF_CONSOLE_CMD(Graphics_Shadow,
                Show,
-               "", 
-               "Show shadows." )
+               "",
+               "Show shadows.")
 {
     bool on = !pfConsole::GetPipeline()->IsDebugFlagSet(plPipeDbg::kFlagShowShadowBounds);
-    pfConsole::GetPipeline()->SetDebugFlag( plPipeDbg::kFlagShowShadowBounds, on );
+    pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagShowShadowBounds, on);
 
     char    str[ 256 ];
-    sprintf( str, "Shadow bounds now %s", on ? "visible" : "invisible" );
-    PrintString( str );
+    sprintf(str, "Shadow bounds now %s", on ? "visible" : "invisible");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Shadow, 
+PF_CONSOLE_CMD(Graphics_Shadow,
                Apply,
-               "", 
-               "Toggles applying shadows (they are still computed)." )
+               "",
+               "Toggles applying shadows (they are still computed).")
 {
     bool on = !pfConsole::GetPipeline()->IsDebugFlagSet(plPipeDbg::kFlagNoShadowApply);
-    pfConsole::GetPipeline()->SetDebugFlag( plPipeDbg::kFlagNoShadowApply, on );
+    pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagNoShadowApply, on);
 
     char    str[ 256 ];
-    sprintf( str, "Shadow apply now %s", on ? "disabled" : "enabled" );
-    PrintString( str );
+    sprintf(str, "Shadow apply now %s", on ? "disabled" : "enabled");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Shadow, 
+PF_CONSOLE_CMD(Graphics_Shadow,
                MaxSize,
-               "...", 
-               "Max shadowmap size." )
+               "...",
+               "Max shadowmap size.")
 {
     int size;
-    if( numParams > 0 )
-    {
-        size = atoi( params[ 0 ] );
+
+    if (numParams > 0) {
+        size = atoi(params[ 0 ]);
 
         plShadowMaster::SetGlobalMaxSize(size);
-    }
-    else
-    {
+    } else {
         size = plShadowMaster::GetGlobalMaxSize();
     }
+
     char str[256];
     sprintf(str, "Max shadowmap size %d", size);
     PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Shadow, 
+PF_CONSOLE_CMD(Graphics_Shadow,
                MaxDist,
-               "...", 
-               "Max shadowmap vis distance." )
+               "...",
+               "Max shadowmap vis distance.")
 {
     float dist;
-    if( numParams > 0 )
-    {
-        dist = (float)atof( params[ 0 ] );
+
+    if (numParams > 0) {
+        dist = (float)atof(params[ 0 ]);
 
         plShadowMaster::SetGlobalMaxDist(dist);
-    }
-    else
-    {
+    } else {
         dist = plShadowMaster::GetGlobalMaxDist();
     }
+
     char str[256];
     sprintf(str, "Max shadowmap vis dist %f", dist);
     PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Shadow, 
+PF_CONSOLE_CMD(Graphics_Shadow,
                VisibleDistance,
-               "...", 
-               "Shadow quality (0 to 1)." )
+               "...",
+               "Shadow quality (0 to 1).")
 {
     float parm;
-    if( numParams > 0 )
-    {
-        parm = (float)atof( params[ 0 ] );
+
+    if (numParams > 0) {
+        parm = (float)atof(params[ 0 ]);
 
         plShadowMaster::SetGlobalShadowQuality(parm);
-    }
-    else
-    {
+    } else {
         parm = plShadowMaster::GetGlobalShadowQuality();
     }
+
     char str[256];
     sprintf(str, "Shadow quality %f", parm);
     PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Shadow, 
+PF_CONSOLE_CMD(Graphics_Shadow,
                Blur,
-               "...", 
-               "Max shadowmap blur size." )
+               "...",
+               "Max shadowmap blur size.")
 {
     extern float blurScale;
-    if( numParams > 0 )
-    {
-        blurScale = (float)atof( params[ 0 ] );
+
+    if (numParams > 0) {
+        blurScale = (float)atof(params[ 0 ]);
+    } else {
     }
-    else
-    {
-    }
+
     char str[256];
     sprintf(str, "Max shadowmap Blur %f", blurScale);
     PrintString(str);
@@ -1205,86 +1208,85 @@ PF_CONSOLE_CMD( Graphics_Shadow,
 #ifndef LIMIT_CONSOLE_COMMANDS
 
 
-PF_CONSOLE_SUBGROUP( Graphics, DebugText )      // Creates a sub-group under a given group
+PF_CONSOLE_SUBGROUP(Graphics, DebugText)        // Creates a sub-group under a given group
 
-PF_CONSOLE_CMD( Graphics_DebugText,         // Group name
-                SetFont,                    // Function name
-                "string face, int size",    // Params
-                "Sets the font face and size used for drawing debug text" ) // Help string
+PF_CONSOLE_CMD(Graphics_DebugText,          // Group name
+               SetFont,                    // Function name
+               "string face, int size",    // Params
+               "Sets the font face and size used for drawing debug text")  // Help string
 {
-    plDebugText::Instance().SetFont( params[ 0 ], (uint16_t)(int)params[ 1 ] );
+    plDebugText::Instance().SetFont(params[ 0 ], (uint16_t)(int)params[ 1 ]);
 }
 
-PF_CONSOLE_CMD( Graphics_DebugText,         // Group name
-                Enable,                     // Function name
-                "",                         // Params
-                "Enables debug text drawing" )  // Help string
+PF_CONSOLE_CMD(Graphics_DebugText,          // Group name
+               Enable,                     // Function name
+               "",                         // Params
+               "Enables debug text drawing")   // Help string
 {
-    plDebugText::Instance().SetEnable( true );
+    plDebugText::Instance().SetEnable(true);
 }
 
-PF_CONSOLE_CMD( Graphics_DebugText,         // Group name
-                Disable,                    // Function name
-                "",                         // Params
-                "Disables debug text drawing" ) // Help string
+PF_CONSOLE_CMD(Graphics_DebugText,          // Group name
+               Disable,                    // Function name
+               "",                         // Params
+               "Disables debug text drawing")  // Help string
 {
-    plDebugText::Instance().SetEnable( false );
+    plDebugText::Instance().SetEnable(false);
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
-    
 
-PF_CONSOLE_SUBGROUP( Graphics, Renderer )       // Creates a sub-group under a given group
 
-PF_CONSOLE_CMD( Graphics_Renderer, SetClearColor, "float r, float g, float b", "Sets the global clear color" )
+PF_CONSOLE_SUBGROUP(Graphics, Renderer)         // Creates a sub-group under a given group
+
+PF_CONSOLE_CMD(Graphics_Renderer, SetClearColor, "float r, float g, float b", "Sets the global clear color")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     hsColorRGBA     c;
 
-    c.Set( params[ 0 ], params[ 1 ], params[ 2 ], 1.0f );
-    plClient::GetInstance()->SetClearColor( c );
+    c.Set(params[ 0 ], params[ 1 ], params[ 2 ], 1.0f);
+    plClient::GetInstance()->SetClearColor(c);
 }
 
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
 
-PF_CONSOLE_CMD( Graphics_Renderer, mfTest, "int mfDbgTest", "Reserved for internal testing" )
+PF_CONSOLE_CMD(Graphics_Renderer, mfTest, "int mfDbgTest", "Reserved for internal testing")
 {
     extern int mfCurrentTest;
 
     mfCurrentTest = (int) params[0];
 
     char    str[ 256 ];
-    sprintf( str, "Current test %d.", mfCurrentTest );
-    PrintString( str );
+    sprintf(str, "Current test %d.", mfCurrentTest);
+    PrintString(str);
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Graphics_Renderer, Gamma, "float g, ...", "Set gamma value (g or (r,g,b))" )
+PF_CONSOLE_CMD(Graphics_Renderer, Gamma, "float g, ...", "Set gamma value (g or (r,g,b))")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     float g = params[0];
 
-    if( numParams == 1 )
-    {
+    if (numParams == 1) {
         pfConsole::GetPipeline()->SetGamma(g);
 
 //      char    str[ 256 ];
 //      sprintf(str, "Gamma set to %g.", g);
 //      PrintString(str);
-    }
-    else
-    {
+    } else {
         float eR = g;
         float eG = g;
         float eB = g;
 
-        if( numParams > 2 )
+        if (numParams > 2) {
             eB = params[2];
+        }
+
         eG = params[1];
 
         pfConsole::GetPipeline()->SetGamma(eR, eG, eB);
@@ -1295,9 +1297,9 @@ PF_CONSOLE_CMD( Graphics_Renderer, Gamma, "float g, ...", "Set gamma value (g or
     }
 }
 
-PF_CONSOLE_CMD( Graphics_Renderer, Gamma2, "float g", "Set gamma value (alternative ramp)" )
+PF_CONSOLE_CMD(Graphics_Renderer, Gamma2, "float g", "Set gamma value (alternative ramp)")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     hsTArray<uint16_t> ramp;
     ramp.SetCount(256);
@@ -1305,16 +1307,18 @@ PF_CONSOLE_CMD( Graphics_Renderer, Gamma2, "float g", "Set gamma value (alternat
     float g = params[0];
 
     int i;
-    for( i = 0; i < 256; i++ )
-    {
+
+    for (i = 0; i < 256; i++) {
         float t = float(i) / 255.f;
         float sinT = sin(t * M_PI / 2.f);
 
         float remap = t + (sinT - t) * g;
-        if( remap < 0 )
+
+        if (remap < 0) {
             remap = 0;
-        else if( remap > 1.f )
+        } else if (remap > 1.f) {
             remap = 1.f;
+        }
 
         ramp[i] = uint16_t(remap * float(uint16_t(-1)) + 0.5f);
     }
@@ -1328,187 +1332,185 @@ PF_CONSOLE_CMD( Graphics_Renderer, Gamma2, "float g", "Set gamma value (alternat
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Graphics_Renderer, MaxCullNodes, "...", "Limit occluder processing" )
+PF_CONSOLE_CMD(Graphics_Renderer, MaxCullNodes, "...", "Limit occluder processing")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     int maxCullNodes;
-    if( numParams > 0 )
-    {
+
+    if (numParams > 0) {
         maxCullNodes = (int) params[0];
         pfConsole::GetPipeline()->SetMaxCullNodes(maxCullNodes);
-    }
-    else
-    {
+    } else {
         maxCullNodes = pfConsole::GetPipeline()->GetMaxCullNodes();
     }
 
     char    str[ 256 ];
-    sprintf( str, "Max Cull Nodes now %d.", maxCullNodes );
-    PrintString( str );
+    sprintf(str, "Max Cull Nodes now %d.", maxCullNodes);
+    PrintString(str);
 }
 
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Graphics_Renderer, SetYon, "float yon, ...", "Sets the view yon" )
+PF_CONSOLE_CMD(Graphics_Renderer, SetYon, "float yon, ...", "Sets the view yon")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     float        hither, yon;
 
 
-    pfConsole::GetPipeline()->GetDepth( hither, yon );
+    pfConsole::GetPipeline()->GetDepth(hither, yon);
 
-    pfConsole::GetPipeline()->SetDepth( hither, (float)params[ 0 ] );
+    pfConsole::GetPipeline()->SetDepth(hither, (float)params[ 0 ]);
     pfConsole::GetPipeline()->RefreshMatrices();
-    
+
     char    str[ 256 ];
-    sprintf( str, "Yon set to %4.1f.", (float)params[ 0 ] );
-    PrintString( str );
+    sprintf(str, "Yon set to %4.1f.", (float)params[ 0 ]);
+    PrintString(str);
 }
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Graphics_Renderer, TweakZBiasScale, "float deltaScale", "Adjusts the device-dependent scale value for upper-layer z biasing" )
+PF_CONSOLE_CMD(Graphics_Renderer, TweakZBiasScale, "float deltaScale", "Adjusts the device-dependent scale value for upper-layer z biasing")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     float        scale;
 
     scale = pfConsole::GetPipeline()->GetZBiasScale();
     scale += (float)params[ 0 ];
-    pfConsole::GetPipeline()->SetZBiasScale( scale );
-    
+    pfConsole::GetPipeline()->SetZBiasScale(scale);
+
     char    str[ 256 ];
-    sprintf( str, "Z bias scale now set to %4.2f.", (float)scale );
-    PrintString( str );
+    sprintf(str, "Z bias scale now set to %4.2f.", (float)scale);
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Renderer, SetZBiasScale, "float scale", "Sets the device-dependent scale value for upper-layer z biasing" )
+PF_CONSOLE_CMD(Graphics_Renderer, SetZBiasScale, "float scale", "Sets the device-dependent scale value for upper-layer z biasing")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
-    pfConsole::GetPipeline()->SetZBiasScale( (float)params[ 0 ] );
-    
+    pfConsole::GetPipeline()->SetZBiasScale((float)params[ 0 ]);
+
     char    str[ 256 ];
-    sprintf( str, "Z bias scale now set to %4.2f.", (float)params[ 0 ] );
-    PrintString( str );
+    sprintf(str, "Z bias scale now set to %4.2f.", (float)params[ 0 ]);
+    PrintString(str);
 }
 
 
 
-PF_CONSOLE_CMD( Graphics_Renderer, Overwire, "...", "Turn on (off) overlay wire rendering" )
+PF_CONSOLE_CMD(Graphics_Renderer, Overwire, "...", "Turn on (off) overlay wire rendering")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     bool on = false;
     uint32_t flag = plPipeDbg::kFlagOverlayWire;
-    if( !numParams )
-        on = !pfConsole::GetPipeline()->IsDebugFlagSet( flag );
-    else
-        on = (bool)params[ 0 ];
 
-    pfConsole::GetPipeline()->SetDebugFlag( flag, on );
+    if (!numParams) {
+        on = !pfConsole::GetPipeline()->IsDebugFlagSet(flag);
+    } else {
+        on = (bool)params[ 0 ];
+    }
+
+    pfConsole::GetPipeline()->SetDebugFlag(flag, on);
 
     char str[256];
-    sprintf( str, "OverlayWire is now %s", on ? "enabled" : "disabled" );
-    PrintString( str );
+    sprintf(str, "OverlayWire is now %s", on ? "enabled" : "disabled");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Renderer, Overdraw, "bool on", "Turn on (off) overdraw rendering" )
+PF_CONSOLE_CMD(Graphics_Renderer, Overdraw, "bool on", "Turn on (off) overdraw rendering")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     static plLayerDepth ld;
     static bool ldOn = false;
-    if( (bool)params[0] )
-    {
-        if( !ldOn )
-        {
-            pfConsole::GetPipeline()->AppendLayerInterface( &ld, true );
+
+    if ((bool)params[0]) {
+        if (!ldOn) {
+            pfConsole::GetPipeline()->AppendLayerInterface(&ld, true);
             pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagNoLightmaps, true);
             ldOn = true;
         }
-    }
-    else
-    {
-        if( ldOn )
-        {
-            pfConsole::GetPipeline()->RemoveLayerInterface( &ld, true );
-            pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagNoLightmaps, false   );
+    } else {
+        if (ldOn) {
+            pfConsole::GetPipeline()->RemoveLayerInterface(&ld, true);
+            pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagNoLightmaps, false);
             ldOn = false;
         }
     }
 }
 
-PF_CONSOLE_CMD( Graphics_Renderer, Wireframe, "...", "Toggle or set wireframe view mode." )
+PF_CONSOLE_CMD(Graphics_Renderer, Wireframe, "...", "Toggle or set wireframe view mode.")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     static bool         wireOn = false;
     static plLayerOr    wireLayer;
 
 
-    if( numParams > 1 )
-    {
-        PrintString( "Invalid parameters. Use 'Wireframe [true|false]'." );
+    if (numParams > 1) {
+        PrintString("Invalid parameters. Use 'Wireframe [true|false]'.");
         return;
     }
 
-    wireLayer.SetMiscFlags( hsGMatState::kMiscWireFrame );
+    wireLayer.SetMiscFlags(hsGMatState::kMiscWireFrame);
 
-    if( numParams == 0 )
+    if (numParams == 0) {
         wireOn = !wireOn;
-    else if( wireOn == (bool)params[ 0 ] )
+    } else if (wireOn == (bool)params[ 0 ]) {
         return;
-    else
+    } else {
         wireOn = (bool)params[ 0 ];
+    }
 
-    if( wireOn )
-        pfConsole::GetPipeline()->AppendLayerInterface( &wireLayer );
-    else
-        pfConsole::GetPipeline()->RemoveLayerInterface( &wireLayer );
+    if (wireOn) {
+        pfConsole::GetPipeline()->AppendLayerInterface(&wireLayer);
+    } else {
+        pfConsole::GetPipeline()->RemoveLayerInterface(&wireLayer);
+    }
 
     char    str[ 256 ];
-    sprintf( str, "Wireframe view mode is now %s.", wireOn ? "enabled" : "disabled" );
-    PrintString( str );
+    sprintf(str, "Wireframe view mode is now %s.", wireOn ? "enabled" : "disabled");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Renderer, TwoSided, "...", "Toggle or set force two-sided." )
+PF_CONSOLE_CMD(Graphics_Renderer, TwoSided, "...", "Toggle or set force two-sided.")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     static bool         twoSideOn = false;
     static plLayerOr    twoSideLayer;
 
 
-    if( numParams > 1 )
-    {
-        PrintString( "Invalid parameters. Use 'TwoSided [true|false]'." );
+    if (numParams > 1) {
+        PrintString("Invalid parameters. Use 'TwoSided [true|false]'.");
         return;
     }
 
-    twoSideLayer.SetMiscFlags( hsGMatState::kMiscTwoSided );
+    twoSideLayer.SetMiscFlags(hsGMatState::kMiscTwoSided);
 
-    if( numParams == 0 )
+    if (numParams == 0) {
         twoSideOn = !twoSideOn;
-    else if( twoSideOn == (bool)params[ 0 ] )
+    } else if (twoSideOn == (bool)params[ 0 ]) {
         return;
-    else
+    } else {
         twoSideOn = (bool)params[ 0 ];
+    }
 
-    if( twoSideOn )
-        pfConsole::GetPipeline()->AppendLayerInterface( &twoSideLayer );
-    else
-        pfConsole::GetPipeline()->RemoveLayerInterface( &twoSideLayer );
+    if (twoSideOn) {
+        pfConsole::GetPipeline()->AppendLayerInterface(&twoSideLayer);
+    } else {
+        pfConsole::GetPipeline()->RemoveLayerInterface(&twoSideLayer);
+    }
 
     char    str[ 256 ];
-    sprintf( str, "Two-sided mode is now %s.", twoSideOn ? "enabled" : "disabled" );
-    PrintString( str );
+    sprintf(str, "Two-sided mode is now %s.", twoSideOn ? "enabled" : "disabled");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Renderer, ResetDevice,
+PF_CONSOLE_CMD(Graphics_Renderer, ResetDevice,
                "int width, int height, int colordepth, bool Windowed, int numAASamples, int MaxAnisotropicSamples",
                "Reset Display Device")
 {
@@ -1519,12 +1521,12 @@ PF_CONSOLE_CMD( Graphics_Renderer, ResetDevice,
 
 static bool MakeUniqueFileName(const char* prefix, const char* ext, char* fileName)
 {
-    for (uint32_t uniqueNumber = 1; uniqueNumber < 1000; uniqueNumber++)
-    {
+    for (uint32_t uniqueNumber = 1; uniqueNumber < 1000; uniqueNumber++) {
         sprintf(fileName, "%s%03d.%s", prefix, uniqueNumber, ext);
 
-        if (!plDoesFileExist(fileName))
+        if (!plDoesFileExist(fileName)) {
             return true;
+        }
     }
 
     return false;
@@ -1534,58 +1536,58 @@ static bool MakeUniqueFileName(const char* prefix, const char* ext, char* fileNa
 #ifndef LIMIT_CONSOLE_COMMANDS
 
 
-PF_CONSOLE_CMD( Graphics_Renderer, TakeScreenshot, "...", "Takes a shot of the current frame and saves it to the given file" )
+PF_CONSOLE_CMD(Graphics_Renderer, TakeScreenshot, "...", "Takes a shot of the current frame and saves it to the given file")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     plMipmap        myMipmap;
     char            fileName[ 512 ];
 
 
-    if( numParams > 1 )
-    {
-        PrintString( "Too many parameters to TakeScreenshot" );
+    if (numParams > 1) {
+        PrintString("Too many parameters to TakeScreenshot");
         return;
-    }
-    else if( numParams == 1 )
-        strcpy( fileName, (char *)params[ 0 ] );
-    else
-    {
+    } else if (numParams == 1) {
+        strcpy(fileName, (char*)params[ 0 ]);
+    } else {
         // Think up a filename
-        if (!MakeUniqueFileName("screen", "tga", fileName))
-        {
-            PrintString( "Out of filenames for TakeScreenshot" );
+        if (!MakeUniqueFileName("screen", "tga", fileName)) {
+            PrintString("Out of filenames for TakeScreenshot");
             return;
         }
     }
 
-    if( !pfConsole::GetPipeline()->CaptureScreen( &myMipmap ) )
-        PrintString( "Error capturing screenshot" );
-    else
-    {
+    if (!pfConsole::GetPipeline()->CaptureScreen(&myMipmap)) {
+        PrintString("Error capturing screenshot");
+    } else {
         char    str[ 512 ];
 
-        plTGAWriter::Instance().WriteMipmap( fileName, &myMipmap );
-        sprintf( str, "Screenshot written to '%s'.", fileName );
-        PrintString( str );
+        plTGAWriter::Instance().WriteMipmap(fileName, &myMipmap);
+        sprintf(str, "Screenshot written to '%s'.", fileName);
+        PrintString(str);
     }
 }
 
 #include "pfSurface/plGrabCubeMap.h"
 
-PF_CONSOLE_CMD( Graphics_Renderer, GrabCubeMap, 
-               "string sceneObject, string prefix", 
+PF_CONSOLE_CMD(Graphics_Renderer, GrabCubeMap,
+               "string sceneObject, string prefix",
                "Take cubemap from sceneObject's position and name it prefix_XX.jpg")
 {
     char str[512];
-    plString objName = static_cast<const char *>(params[0]);
+    plString objName = static_cast<const char*>(params[0]);
     plKey key = FindSceneObjectByName(objName, "", str);
-    PrintString( str );
-    if( !key )
+    PrintString(str);
+
+    if (!key) {
         return;
-    plSceneObject *obj = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-    if( !obj )
+    }
+
+    plSceneObject* obj = plSceneObject::ConvertNoRef(key->GetObjectPtr());
+
+    if (!obj) {
         return;
+    }
 
     hsColorRGBA clearColor = plClient::GetInstance()->GetClearColor();
     const char* pref = params[1];
@@ -1593,8 +1595,8 @@ PF_CONSOLE_CMD( Graphics_Renderer, GrabCubeMap,
     grabCube.GrabCube(pfConsole::GetPipeline(), obj, pref, clearColor);
 }
 
-PF_CONSOLE_CMD( Graphics_Renderer, GrabCubeCam, 
-               "string prefix", 
+PF_CONSOLE_CMD(Graphics_Renderer, GrabCubeCam,
+               "string prefix",
                "Take cubemap from camera's position and name it prefix_XX.jpg")
 {
     hsPoint3 pos = pfConsole::GetPipeline()->GetViewPositionWorld();
@@ -1607,81 +1609,74 @@ PF_CONSOLE_CMD( Graphics_Renderer, GrabCubeCam,
 
 #include "plGImage/plJPEG.h"
 
-PF_CONSOLE_CMD( Graphics_Renderer, TakeJPEGScreenshot, "...", "Takes a shot of the current frame and saves it to the given file" )
+PF_CONSOLE_CMD(Graphics_Renderer, TakeJPEGScreenshot, "...", "Takes a shot of the current frame and saves it to the given file")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     plMipmap        myMipmap;
     char            fileName[ 512 ];
 
 
-    if( numParams > 2 )
-    {
-        PrintString( "Too many parameters to TakeScreenshot" );
+    if (numParams > 2) {
+        PrintString("Too many parameters to TakeScreenshot");
         return;
-    }
-    else if( numParams > 0 )
-        strcpy( fileName, (char *)params[ 0 ] );
-    else
-    {
+    } else if (numParams > 0) {
+        strcpy(fileName, (char*)params[ 0 ]);
+    } else {
         // Think up a filename
-        if (!MakeUniqueFileName("screen", "jpg", fileName))
-        {
-            PrintString( "Out of filenames for TakeScreenshot" );
+        if (!MakeUniqueFileName("screen", "jpg", fileName)) {
+            PrintString("Out of filenames for TakeScreenshot");
             return;
         }
     }
 
-    if( !pfConsole::GetPipeline()->CaptureScreen( &myMipmap ) )
-        PrintString( "Error capturing screenshot" );
-    else
-    {
+    if (!pfConsole::GetPipeline()->CaptureScreen(&myMipmap)) {
+        PrintString("Error capturing screenshot");
+    } else {
         char    str[ 512 ];
         uint8_t   quality = 75;
 
 
-        if( numParams == 2 )
+        if (numParams == 2) {
             quality = (int)params[ 1 ];
-
-        plJPEG::Instance().SetWriteQuality( quality );
-
-        if( !plJPEG::Instance().WriteToFile( fileName, &myMipmap ) )
-        {
-            sprintf( str, "JPEG write failed (%s).", plJPEG::Instance().GetLastError() );
         }
-        else
-            sprintf( str, "Screenshot written to '%s', quality of %d%%.", fileName, quality );
-        PrintString( str );
+
+        plJPEG::Instance().SetWriteQuality(quality);
+
+        if (!plJPEG::Instance().WriteToFile(fileName, &myMipmap)) {
+            sprintf(str, "JPEG write failed (%s).", plJPEG::Instance().GetLastError());
+        } else {
+            sprintf(str, "Screenshot written to '%s', quality of %d%%.", fileName, quality);
+        }
+
+        PrintString(str);
     }
 }
 
 #include "plGImage/plAVIWriter.h"
 
-PF_CONSOLE_CMD( Graphics_Renderer, AVIWrite, "...", "Saves each frame to an AVI file" )
+PF_CONSOLE_CMD(Graphics_Renderer, AVIWrite, "...", "Saves each frame to an AVI file")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
     char fileName[ 512 ];
 
-    if( numParams > 2 )
-    {
-        PrintString( "Too many parameters to AVIWrite" );
+    if (numParams > 2) {
+        PrintString("Too many parameters to AVIWrite");
         return;
-    }
-    else if( numParams > 0 )
-        strcpy( fileName, (char *)params[ 0 ] );
-    else
-    {
+    } else if (numParams > 0) {
+        strcpy(fileName, (char*)params[ 0 ]);
+    } else {
         // Think up a filename
-        if (!MakeUniqueFileName("movie", "avi", fileName))
-        {
-            PrintString( "Out of filenames for AVIWrite" );
+        if (!MakeUniqueFileName("movie", "avi", fileName)) {
+            PrintString("Out of filenames for AVIWrite");
             return;
         }
     }
 
-    if (!plAVIWriter::Instance().Open(fileName, pfConsole::GetPipeline()))
-        PrintString( "AVI file create failed");
+    if (!plAVIWriter::Instance().Open(fileName, pfConsole::GetPipeline())) {
+        PrintString("AVI file create failed");
+    }
 }
 
 PF_CONSOLE_CMD(Graphics_Renderer, AVIClose, "", "Stops the current AVI recording")
@@ -1696,7 +1691,7 @@ PF_CONSOLE_CMD( Graphics_Renderer, GenerateReflectMaps, "string baseObject, stri
     hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
 
     // First, create the renderTarget for the renderRequests
-    plRenderTarget *target = new plRenderTarget( plRenderTarget::kIsProjected | plRenderTarget::kIsTexture, 
+    plRenderTarget *target = new plRenderTarget( plRenderTarget::kIsProjected | plRenderTarget::kIsTexture,
                                                 params[ 2 ], params[ 2 ], 32, 24, 0 );
 
 //  plMipmap *newMip = new plMipmap( size, size, plMipmap::kARGB32Config, 1 );
@@ -1707,43 +1702,35 @@ PF_CONSOLE_CMD( Graphics_Renderer, GenerateReflectMaps, "string baseObject, stri
 }
 */
 
-PF_CONSOLE_CMD( Graphics_Renderer, ToggleScene, "", "Toggles main scene drawing" )
+PF_CONSOLE_CMD(Graphics_Renderer, ToggleScene, "", "Toggles main scene drawing")
 {
-    if( plClient::GetInstance() == nil )
-    {
-        PrintString( "Command invalid before client init" );
+    if (plClient::GetInstance() == nil) {
+        PrintString("Command invalid before client init");
         return;
     }
 
-    if( plClient::GetInstance()->HasFlag( plClient::kFlagDBGDisableRender ) )
-    {
-        plClient::GetInstance()->SetFlag( plClient::kFlagDBGDisableRender, false );
-        PrintString( "Scene rendering enabled" );
-    }
-    else
-    {
-        plClient::GetInstance()->SetFlag( plClient::kFlagDBGDisableRender, true );
-        PrintString( "Scene rendering disabled" );
+    if (plClient::GetInstance()->HasFlag(plClient::kFlagDBGDisableRender)) {
+        plClient::GetInstance()->SetFlag(plClient::kFlagDBGDisableRender, false);
+        PrintString("Scene rendering enabled");
+    } else {
+        plClient::GetInstance()->SetFlag(plClient::kFlagDBGDisableRender, true);
+        PrintString("Scene rendering disabled");
     }
 }
 
-PF_CONSOLE_CMD( Graphics_Renderer, ToggleRenderRequests, "", "Toggles processing of pre- and post-render requests" )
+PF_CONSOLE_CMD(Graphics_Renderer, ToggleRenderRequests, "", "Toggles processing of pre- and post-render requests")
 {
-    if( plClient::GetInstance() == nil )
-    {
-        PrintString( "Command invalid before client init" );
+    if (plClient::GetInstance() == nil) {
+        PrintString("Command invalid before client init");
         return;
     }
 
-    if( plClient::GetInstance()->HasFlag( plClient::kFlagDBGDisableRRequests ) )
-    {
-        plClient::GetInstance()->SetFlag( plClient::kFlagDBGDisableRRequests, false );
-        PrintString( "Render requests enabled" );
-    }
-    else
-    {
-        plClient::GetInstance()->SetFlag( plClient::kFlagDBGDisableRRequests, true );
-        PrintString( "Render requests disabled" );
+    if (plClient::GetInstance()->HasFlag(plClient::kFlagDBGDisableRRequests)) {
+        plClient::GetInstance()->SetFlag(plClient::kFlagDBGDisableRRequests, false);
+        PrintString("Render requests enabled");
+    } else {
+        plClient::GetInstance()->SetFlag(plClient::kFlagDBGDisableRRequests, true);
+        PrintString("Render requests disabled");
     }
 }
 
@@ -1751,56 +1738,56 @@ PF_CONSOLE_CMD( Graphics_Renderer, ToggleRenderRequests, "", "Toggles processing
 
 //// Graphics.Renderer.Fog Subgroup //////////////////////////////////////////
 
-PF_CONSOLE_SUBGROUP( Graphics_Renderer, Fog )
+PF_CONSOLE_SUBGROUP(Graphics_Renderer, Fog)
 
-PF_CONSOLE_CMD( Graphics_Renderer_Fog, SetDefColor, "float r, float g, float b", "Sets the default fog color" )
+PF_CONSOLE_CMD(Graphics_Renderer_Fog, SetDefColor, "float r, float g, float b", "Sets the default fog color")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
 
     plFogEnvironment    env;
     hsColorRGBA         color;
 
-    color.Set( params[ 0 ], params[ 1 ], params[ 2 ], 1.0f );
+    color.Set(params[ 0 ], params[ 1 ], params[ 2 ], 1.0f);
     env = pfConsole::GetPipeline()->GetDefaultFogEnviron();
-    env.SetColor( color );
-    pfConsole::GetPipeline()->SetDefaultFogEnviron( &env );
+    env.SetColor(color);
+    pfConsole::GetPipeline()->SetDefaultFogEnviron(&env);
 }
 
-PF_CONSOLE_CMD( Graphics_Renderer_Fog, SetDefLinear, "float start, float end, float density", "Sets the default fog to linear" )
+PF_CONSOLE_CMD(Graphics_Renderer_Fog, SetDefLinear, "float start, float end, float density", "Sets the default fog to linear")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
 
     plFogEnvironment    env;
 
     env = pfConsole::GetPipeline()->GetDefaultFogEnviron();
-    env.Set( params[ 0 ], params[ 1 ], params[ 2 ] ); 
-    pfConsole::GetPipeline()->SetDefaultFogEnviron( &env );
+    env.Set(params[ 0 ], params[ 1 ], params[ 2 ]);
+    pfConsole::GetPipeline()->SetDefaultFogEnviron(&env);
 }
 
-PF_CONSOLE_CMD( Graphics_Renderer_Fog, SetDefExp, "float end, float density", "Sets the default fog to linear" )
+PF_CONSOLE_CMD(Graphics_Renderer_Fog, SetDefExp, "float end, float density", "Sets the default fog to linear")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
 
     plFogEnvironment    env;
 
     env = pfConsole::GetPipeline()->GetDefaultFogEnviron();
-    env.SetExp( plFogEnvironment::kExpFog, params[ 0 ], params[ 1 ] ); 
-    pfConsole::GetPipeline()->SetDefaultFogEnviron( &env );
+    env.SetExp(plFogEnvironment::kExpFog, params[ 0 ], params[ 1 ]);
+    pfConsole::GetPipeline()->SetDefaultFogEnviron(&env);
 }
 
-PF_CONSOLE_CMD( Graphics_Renderer_Fog, SetDefExp2, "float end, float density", "Sets the default fog to exp^2" )
+PF_CONSOLE_CMD(Graphics_Renderer_Fog, SetDefExp2, "float end, float density", "Sets the default fog to exp^2")
 {
-    hsAssert( pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization" );
+    hsAssert(pfConsole::GetPipeline() != nil, "Cannot use this command before pipeline initialization");
 
 
     plFogEnvironment    env;
 
     env = pfConsole::GetPipeline()->GetDefaultFogEnviron();
-    env.SetExp( plFogEnvironment::kExp2Fog, params[ 0 ], params[ 1 ] ); 
-    pfConsole::GetPipeline()->SetDefaultFogEnviron( &env );
+    env.SetExp(plFogEnvironment::kExp2Fog, params[ 0 ], params[ 1 ]);
+    pfConsole::GetPipeline()->SetDefaultFogEnviron(&env);
 }
 
 //// Graphics.Show Subgroups //////////////////////////////////////////
@@ -1808,313 +1795,323 @@ PF_CONSOLE_CMD( Graphics_Renderer_Fog, SetDefExp2, "float end, float density", "
 #ifndef LIMIT_CONSOLE_COMMANDS
 
 
-PF_CONSOLE_SUBGROUP( Graphics, Show );
+PF_CONSOLE_SUBGROUP(Graphics, Show);
 
-PF_CONSOLE_CMD( Graphics_Show, Bounds, "", "Toggle object bounds display")
+PF_CONSOLE_CMD(Graphics_Show, Bounds, "", "Toggle object bounds display")
 {
-    bool on = !pfConsole::GetPipeline()->IsDebugFlagSet( plPipeDbg::kFlagShowAllBounds );
-    pfConsole::GetPipeline()->SetDebugFlag( plPipeDbg::kFlagShowAllBounds, on );
+    bool on = !pfConsole::GetPipeline()->IsDebugFlagSet(plPipeDbg::kFlagShowAllBounds);
+    pfConsole::GetPipeline()->SetDebugFlag(plPipeDbg::kFlagShowAllBounds, on);
 
     char    str[ 256 ];
-    sprintf( str, "Bounds now %s", on ? "visible" : "invisible" );
-    PrintString( str );
+    sprintf(str, "Bounds now %s", on ? "visible" : "invisible");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, Sound, "", "Toggle sound fields visible")
+PF_CONSOLE_CMD(Graphics_Show, Sound, "", "Toggle sound fields visible")
 {
     static bool on = false;
     plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kAudible | ((on = !on) ? plProxyDrawMsg::kCreate : plProxyDrawMsg::kDestroy));
     plgDispatch::MsgSend(msg);
-    if( on )
+
+    if (on) {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() | plDrawableSpans::kAudibleProxy);
-    else
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() & ~plDrawableSpans::kAudibleProxy);
+    }
 
     char    str[ 256 ];
-    sprintf( str, "Sounds now %s", on ? "visible" : "invisible" );
-    PrintString( str );
+    sprintf(str, "Sounds now %s", on ? "visible" : "invisible");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, SingleSound,
-                "string sceneObject", "Toggles the proxy fields for a single sound object" )
+PF_CONSOLE_CMD(Graphics_Show, SingleSound,
+               "string sceneObject", "Toggles the proxy fields for a single sound object")
 {
     char    str[ 512 ];
 
     plString ageName = plAgeLoader::GetInstance()->GetCurrAgeDesc().GetAgeName();
 
-    plKey key = FindSceneObjectByName( plString::FromUtf8( params[ 0 ] ), ageName, str, true );
-    plSceneObject *obj = ( key != nil ) ? plSceneObject::ConvertNoRef( key->GetObjectPtr() ) : nil;
-    if( !obj )
-    {
-        sprintf( str, "Cannot find sceneObject %s", (char *)params[ 0 ] );
-        PrintString( str );
+    plKey key = FindSceneObjectByName(plString::FromUtf8(params[ 0 ]), ageName, str, true);
+    plSceneObject* obj = (key != nil) ? plSceneObject::ConvertNoRef(key->GetObjectPtr()) : nil;
+
+    if (!obj) {
+        sprintf(str, "Cannot find sceneObject %s", (char*)params[ 0 ]);
+        PrintString(str);
         return;
     }
 
-    const plAudioInterface  *ai = obj->GetAudioInterface();
-    if( ai == nil )
-    {
-        sprintf( str, "sceneObject %s has no audio interface", (char *)params[ 0 ] );
-        PrintString( str );
+    const plAudioInterface*  ai = obj->GetAudioInterface();
+
+    if (ai == nil) {
+        sprintf(str, "sceneObject %s has no audio interface", (char*)params[ 0 ]);
+        PrintString(str);
         return;
     }
+
     plKey   aiKey = ai->GetKey();
 
-    plProxyDrawMsg* msg = new plProxyDrawMsg( plProxyDrawMsg::kAudible | plProxyDrawMsg::kToggle );
-    msg->SetBCastFlag( plMessage::kBCastByExactType, false );
-    msg->AddReceiver( aiKey );
-    plgDispatch::MsgSend( msg );
+    plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kAudible | plProxyDrawMsg::kToggle);
+    msg->SetBCastFlag(plMessage::kBCastByExactType, false);
+    msg->AddReceiver(aiKey);
+    plgDispatch::MsgSend(msg);
 
     // Just in case we need to show them. Since we're toggling, we don't even know if it's being hidden and
     // thus we should turn this off. Since this is purely for debugging, the slight performance hit on this
     // is, imho, acceptable.
-    pfConsole::GetPipeline()->SetDrawableTypeMask( pfConsole::GetPipeline()->GetDrawableTypeMask() | plDrawableSpans::kAudibleProxy );
+    pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() | plDrawableSpans::kAudibleProxy);
 
     char str2[ 256 ];
-    sprintf( str2, "Toggling proxies on sceneObject %s", (char *)params[ 0 ] );
-    PrintString( str2 );
+    sprintf(str2, "Toggling proxies on sceneObject %s", (char*)params[ 0 ]);
+    PrintString(str2);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, SoundOnly, "", "Toggle only sound fields visible")
+PF_CONSOLE_CMD(Graphics_Show, SoundOnly, "", "Toggle only sound fields visible")
 {
     static bool on = false;
     plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kAudible | ((on = !on) ? plProxyDrawMsg::kCreate : plProxyDrawMsg::kDestroy));
     plgDispatch::MsgSend(msg);
     static uint32_t oldMask = plDrawableSpans::kNormal;
-    if( on )
-    {
+
+    if (on) {
         oldMask = pfConsole::GetPipeline()->GetDrawableTypeMask();
         pfConsole::GetPipeline()->SetDrawableTypeMask(plDrawableSpans::kAudibleProxy);
-    }
-    else
-    {
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(oldMask);
     }
+
     char    str[ 256 ];
-    sprintf( str, on ? "Now showing only sound proxies" : "Restoring previous render state" );
-    PrintString( str );
+    sprintf(str, on ? "Now showing only sound proxies" : "Restoring previous render state");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, OccSnap, "", "Take snapshot of current occlusion and render (or toggle)")
+PF_CONSOLE_CMD(Graphics_Show, OccSnap, "", "Take snapshot of current occlusion and render (or toggle)")
 {
     uint32_t flag = plPipeDbg::kFlagOcclusionSnap;
     bool on = !pfConsole::GetPipeline()->IsDebugFlagSet(flag);
 
-    pfConsole::GetPipeline()->SetDebugFlag( flag, on );
-    if( on )
+    pfConsole::GetPipeline()->SetDebugFlag(flag, on);
+
+    if (on) {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() | plDrawableSpans::kOccSnapProxy);
-    else
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() & ~plDrawableSpans::kOccSnapProxy);
+    }
 
     char    str[ 256 ];
-    sprintf( str, "Active Occluders now %s", on ? "visible" : "invisible" );
-    PrintString( str );
+    sprintf(str, "Active Occluders now %s", on ? "visible" : "invisible");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, OccSnapOnly, "", "Take snapshot of current occlusion and render (or toggle)")
+PF_CONSOLE_CMD(Graphics_Show, OccSnapOnly, "", "Take snapshot of current occlusion and render (or toggle)")
 {
     uint32_t flag = plPipeDbg::kFlagOcclusionSnap;
     bool on = !pfConsole::GetPipeline()->IsDebugFlagSet(flag);
 
     static uint32_t oldMask = pfConsole::GetPipeline()->GetDrawableTypeMask();
 
-    pfConsole::GetPipeline()->SetDebugFlag( flag, on );
-    if( on )
+    pfConsole::GetPipeline()->SetDebugFlag(flag, on);
+
+    if (on) {
         pfConsole::GetPipeline()->SetDrawableTypeMask(plDrawableSpans::kOccSnapProxy);
-    else
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(oldMask);
+    }
 
     char    str[ 256 ];
-    sprintf( str, "Active Occluders now %s", on ? "visible" : "invisible" );
-    PrintString( str );
+    sprintf(str, "Active Occluders now %s", on ? "visible" : "invisible");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, Occluders, "", "Toggle occluder geometry visible")
+PF_CONSOLE_CMD(Graphics_Show, Occluders, "", "Toggle occluder geometry visible")
 {
     static bool on = false;
     plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kOccluder | ((on = !on) ? plProxyDrawMsg::kCreate : plProxyDrawMsg::kDestroy));
     plgDispatch::MsgSend(msg);
 
-    if( on )
+    if (on) {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() | plDrawableSpans::kOccluderProxy);
-    else
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() & ~plDrawableSpans::kOccluderProxy);
+    }
 
     char    str[ 256 ];
-    sprintf( str, "Occluders now %s", on ? "visible" : "invisible" );
-    PrintString( str );
+    sprintf(str, "Occluders now %s", on ? "visible" : "invisible");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, OccludersOnly, "", "Toggle only occluder geometry visible")
+PF_CONSOLE_CMD(Graphics_Show, OccludersOnly, "", "Toggle only occluder geometry visible")
 {
     static bool on = false;
     plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kOccluder | ((on = !on) ? plProxyDrawMsg::kCreate : plProxyDrawMsg::kDestroy));
     plgDispatch::MsgSend(msg);
     static uint32_t oldMask = plDrawableSpans::kNormal;
-    if( on )
-    {
+
+    if (on) {
         oldMask = pfConsole::GetPipeline()->GetDrawableTypeMask();
         pfConsole::GetPipeline()->SetDrawableTypeMask(plDrawableSpans::kOccluderProxy);
-    }
-    else
-    {
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(oldMask);
     }
+
     char    str[ 256 ];
-    sprintf( str, on ? "Now showing only occluder proxies" : "Restoring previous render state" );
-    PrintString( str );
+    sprintf(str, on ? "Now showing only occluder proxies" : "Restoring previous render state");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, Physicals, "", "Toggle Physical geometry visible")
+PF_CONSOLE_CMD(Graphics_Show, Physicals, "", "Toggle Physical geometry visible")
 {
     static bool on = false;
     plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kPhysical | ((on = !on) ? plProxyDrawMsg::kCreate : plProxyDrawMsg::kDestroy));
     plgDispatch::MsgSend(msg);
-    if( on )
+
+    if (on) {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() | plDrawableSpans::kPhysicalProxy);
-    else
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() & ~plDrawableSpans::kPhysicalProxy);
+    }
 
     char    str[ 256 ];
-    sprintf( str, "Physicals now %s", on ? "visible" : "invisible" );
-    PrintString( str );
+    sprintf(str, "Physicals now %s", on ? "visible" : "invisible");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, PhysicalsOnly, "", "Toggle only Physical geometry visible")
+PF_CONSOLE_CMD(Graphics_Show, PhysicalsOnly, "", "Toggle only Physical geometry visible")
 {
     static bool on = false;
     plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kPhysical | ((on = !on) ? plProxyDrawMsg::kCreate : plProxyDrawMsg::kDestroy));
     plgDispatch::MsgSend(msg);
     static uint32_t oldMask = plDrawableSpans::kNormal;
-    if( on )
-    {
+
+    if (on) {
         oldMask = pfConsole::GetPipeline()->GetDrawableTypeMask();
         pfConsole::GetPipeline()->SetDrawableTypeMask(plDrawableSpans::kPhysicalProxy);
-    }
-    else
-    {
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(oldMask);
     }
+
     char    str[ 256 ];
-    sprintf( str, on ? "Now showing only physics proxies" : "Restoring previous render state" );
-    PrintString( str );
+    sprintf(str, on ? "Now showing only physics proxies" : "Restoring previous render state");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, Normal, "", "Toggle normal geometry visible")
+PF_CONSOLE_CMD(Graphics_Show, Normal, "", "Toggle normal geometry visible")
 {
     static bool on = true;
-    if( on = !on )
+
+    if (on = !on) {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() | plDrawableSpans::kNormal);
-    else
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() & ~plDrawableSpans::kNormal);
+    }
 
     char    str[ 256 ];
-    sprintf( str, "Normal geometry now %s", on ? "visible" : "invisible" );
-    PrintString( str );
+    sprintf(str, "Normal geometry now %s", on ? "visible" : "invisible");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, NormalOnly, "", "Toggle only normal geometry visible")
+PF_CONSOLE_CMD(Graphics_Show, NormalOnly, "", "Toggle only normal geometry visible")
 {
     static bool on = false;
     static uint32_t oldMask = plDrawableSpans::kNormal;
-    if( on = !on )
-    {
+
+    if (on = !on) {
         oldMask = pfConsole::GetPipeline()->GetDrawableTypeMask();
         pfConsole::GetPipeline()->SetDrawableTypeMask(plDrawableSpans::kNormal);
-    }
-    else
-    {
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(oldMask);
     }
+
     char    str[ 256 ];
-    sprintf( str, on ? "Now showing only normal geometry" : "Restoring previous render state" );
-    PrintString( str );
+    sprintf(str, on ? "Now showing only normal geometry" : "Restoring previous render state");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, Lights, "", "Toggle visible proxies for lights")
+PF_CONSOLE_CMD(Graphics_Show, Lights, "", "Toggle visible proxies for lights")
 {
     static bool on = false;
     plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kLight | ((on = !on) ? plProxyDrawMsg::kCreate : plProxyDrawMsg::kDestroy));
     plgDispatch::MsgSend(msg);
-    if( on )
+
+    if (on) {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() | plDrawableSpans::kLightProxy);
-    else
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() & ~plDrawableSpans::kLightProxy);
+    }
 
     char    str[ 256 ];
-    sprintf( str, "Lights now %s", on ? "visible" : "invisible" );
-    PrintString( str );
+    sprintf(str, "Lights now %s", on ? "visible" : "invisible");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, LightsOnly, "", "Toggle visible proxies for lights and everything else invisible")
+PF_CONSOLE_CMD(Graphics_Show, LightsOnly, "", "Toggle visible proxies for lights and everything else invisible")
 {
     static bool on = false;
     plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kLight | ((on = !on) ? plProxyDrawMsg::kCreate : plProxyDrawMsg::kDestroy));
     plgDispatch::MsgSend(msg);
     static uint32_t oldMask = plDrawableSpans::kNormal;
-    if( on )
-    {
+
+    if (on) {
         oldMask = pfConsole::GetPipeline()->GetDrawableTypeMask();
         pfConsole::GetPipeline()->SetDrawableTypeMask(plDrawableSpans::kLightProxy);
-    }
-    else
-    {
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(oldMask);
     }
+
     char    str[ 256 ];
-    sprintf( str, on ? "Now showing only light proxies" : "Restoring previous render state" );
-    PrintString( str );
+    sprintf(str, on ? "Now showing only light proxies" : "Restoring previous render state");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics_Show, Clicks, "", "Toggle visible proxies for clicks")
+PF_CONSOLE_CMD(Graphics_Show, Clicks, "", "Toggle visible proxies for clicks")
 {
     static bool on = false;
     plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kCamera | ((on = !on) ? plProxyDrawMsg::kCreate : plProxyDrawMsg::kDestroy));
     plgDispatch::MsgSend(msg);
-    if( on )
+
+    if (on) {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() | plDrawableSpans::kCameraProxy);
-    else
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(pfConsole::GetPipeline()->GetDrawableTypeMask() & ~plDrawableSpans::kCameraProxy);
+    }
 
     char    str[ 256 ];
-    sprintf( str, "Clicks now %s", on ? "visible" : "invisible" );
-    PrintString( str );
+    sprintf(str, "Clicks now %s", on ? "visible" : "invisible");
+    PrintString(str);
 }
 
 
-PF_CONSOLE_CMD( Graphics_Show, ClickOnly, "", "Toggle visible proxies for click points")
+PF_CONSOLE_CMD(Graphics_Show, ClickOnly, "", "Toggle visible proxies for click points")
 {
     static bool on = false;
     plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kCamera | ((on = !on) ? plProxyDrawMsg::kCreate : plProxyDrawMsg::kDestroy));
     plgDispatch::MsgSend(msg);
     static uint32_t oldMask = plDrawableSpans::kNormal;
-    if( on )
-    {
+
+    if (on) {
         oldMask = pfConsole::GetPipeline()->GetDrawableTypeMask();
         pfConsole::GetPipeline()->SetDrawableTypeMask(plDrawableSpans::kCameraProxy);
-    }
-    else
-    {
+    } else {
         pfConsole::GetPipeline()->SetDrawableTypeMask(oldMask);
     }
+
     char    str[ 256 ];
-    sprintf( str, on ? "Now showing only camera proxies" : "Restoring previous render state" );
-    PrintString( str );
+    sprintf(str, on ? "Now showing only camera proxies" : "Restoring previous render state");
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( Graphics, ForceSecondMonitor, "bool v", "Run the game on the second monitor" )
+PF_CONSOLE_CMD(Graphics, ForceSecondMonitor, "bool v", "Run the game on the second monitor")
 {
     plPipeline::fInitialPipeParams.ForceSecondMonitor = (bool) params[0];
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Graphics, Width, "int w", "Initializes width" )
+PF_CONSOLE_CMD(Graphics, Width, "int w", "Initializes width")
 {
     plPipeline::fInitialPipeParams.Width = (int) params[0];
 }
 
-PF_CONSOLE_CMD( Graphics, Height, "int h", "Initializes height" )
+PF_CONSOLE_CMD(Graphics, Height, "int h", "Initializes height")
 {
     plPipeline::fInitialPipeParams.Height = (int) params[0];
 }
@@ -2123,38 +2120,40 @@ PF_CONSOLE_CMD(Graphics, ColorDepth, "int colordepth", "Initializes color depth"
     plPipeline::fInitialPipeParams.ColorDepth = (int) params[0];
 }
 
-PF_CONSOLE_CMD( Graphics, Windowed, "bool w", "Initialize Windowed Mode")
+PF_CONSOLE_CMD(Graphics, Windowed, "bool w", "Initialize Windowed Mode")
 {
     plPipeline::fInitialPipeParams.Windowed = (bool) params[0];
 }
 
-PF_CONSOLE_CMD( Graphics, TextureQuality, "int quality", "Initialize texture quality")
+PF_CONSOLE_CMD(Graphics, TextureQuality, "int quality", "Initialize texture quality")
 {
     int texqual = (int)params[0];
-    if (texqual < 0)
+
+    if (texqual < 0) {
         texqual = 0;
-    else if (texqual > 2)
+    } else if (texqual > 2) {
         texqual = 2;
+    }
 
     plPipeline::fInitialPipeParams.TextureQuality = texqual;
 }
 
-PF_CONSOLE_CMD( Graphics, AntiAliasAmount, "int aa", "Init AA Level")
+PF_CONSOLE_CMD(Graphics, AntiAliasAmount, "int aa", "Init AA Level")
 {
     plPipeline::fInitialPipeParams.AntiAliasingAmount = (int) params[0];
 }
 
-PF_CONSOLE_CMD( Graphics, AnisotropicLevel, "int l", "Init Aniso Level" )
+PF_CONSOLE_CMD(Graphics, AnisotropicLevel, "int l", "Init Aniso Level")
 {
     plPipeline::fInitialPipeParams.AnisotropicLevel = (int) params[0];
 }
 
-PF_CONSOLE_CMD( Graphics, EnableVSync, "bool b", "Init VerticalSync" )
+PF_CONSOLE_CMD(Graphics, EnableVSync, "bool b", "Init VerticalSync")
 {
     plPipeline::fInitialPipeParams.VSync = (bool) params[0];
 }
 
-PF_CONSOLE_CMD( Graphics, EnablePlanarReflections, "bool", "Enable the draw and update of planar reflections" )
+PF_CONSOLE_CMD(Graphics, EnablePlanarReflections, "bool", "Enable the draw and update of planar reflections")
 {
     bool enable = (bool)params[0];
     plDynamicCamMap::SetEnabled(enable);
@@ -2163,21 +2162,21 @@ PF_CONSOLE_CMD( Graphics, EnablePlanarReflections, "bool", "Enable the draw and 
 //////////////////////////////////////////////////////////////////////////////
 //// App Group Commands //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-PF_CONSOLE_GROUP( App )     // Defines a main command group
+PF_CONSOLE_GROUP(App)       // Defines a main command group
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( App,
-                Event,
-                "string obj, string evType, float s, int reps",
-                "string obj, string evType, float s, int reps" )
+PF_CONSOLE_CMD(App,
+               Event,
+               "string obj, string evType, float s, int reps",
+               "string obj, string evType, float s, int reps")
 {
 
     char str[256];
     plKey key = FindSceneObjectByName(plString::FromUtf8(params[0]), "", str);
     plSceneObject* obj = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-    if( !obj )
-    {
+
+    if (!obj) {
         strcat(str, " - Not Found!");
         PrintString(str);
         return;
@@ -2187,16 +2186,15 @@ PF_CONSOLE_CMD( App,
     PrintString(str);
 
     int i;
-    for( i = 0; i < obj->GetNumModifiers(); i++ )
-    {
-        if( plSimpleModifier::ConvertNoRef(obj->GetModifier(i)) )
-        {
+
+    for (i = 0; i < obj->GetNumModifiers(); i++) {
+        if (plSimpleModifier::ConvertNoRef(obj->GetModifier(i))) {
             receiver = obj->GetModifier(i)->GetKey();
             break;
         }
     }
-    if( !receiver )
-    {
+
+    if (!receiver) {
         strcat(str, " - Modifier Not Found!");
         PrintString(str);
         return;
@@ -2217,25 +2215,20 @@ PF_CONSOLE_CMD( App,
 
     char* eventStr = params[1];
     CallbackEvent event;
-    if( !stricmp(eventStr, "Start") )
-    {
+
+    if (!stricmp(eventStr, "Start")) {
         event = kStart;
-    }
-    else
-    if( !stricmp(eventStr, "Stop") )
-    {
+    } else if (!stricmp(eventStr, "Stop")) {
         event = kStop;
-    }
-    else
-    if( !stricmp(eventStr, "Time") )
-    {
+    } else if (!stricmp(eventStr, "Time")) {
         event = kTime;
         secs = params[2];
     }
-    if( numParams > 3 )
-    {
+
+    if (numParams > 3) {
         reps = params[3];
     }
+
     reps--;
 
     plEventCallbackMsg* callback = new plEventCallbackMsg(plClient::GetInstance()->GetKey(), event, 0, secs, reps);
@@ -2244,17 +2237,17 @@ PF_CONSOLE_CMD( App,
     plgDispatch::MsgSend(cmd);
 }
 
-PF_CONSOLE_CMD( App,
-                Sound,
-                "string obj, string evType, float s, int reps",
-                "string obj, string evType, float s, int reps" )
+PF_CONSOLE_CMD(App,
+               Sound,
+               "string obj, string evType, float s, int reps",
+               "string obj, string evType, float s, int reps")
 {
 
     char str[256];
     plKey key = FindSceneObjectByName(plString::FromUtf8(params[0]), "", str);
     plSceneObject* obj = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-    if( !obj )
-    {
+
+    if (!obj) {
         strcat(str, " - Not Found!");
         PrintString(str);
         return;
@@ -2272,25 +2265,20 @@ PF_CONSOLE_CMD( App,
 
     char* eventStr = params[1];
     CallbackEvent event;
-    if( !stricmp(eventStr, "Start") )
-    {
+
+    if (!stricmp(eventStr, "Start")) {
         event = kStart;
-    }
-    else
-    if( !stricmp(eventStr, "Stop") )
-    {
+    } else if (!stricmp(eventStr, "Stop")) {
         event = kStop;
-    }
-    else
-    if( !stricmp(eventStr, "Time") )
-    {
+    } else if (!stricmp(eventStr, "Time")) {
         event = kTime;
         secs = params[2];
     }
-    if( numParams > 3 )
-    {
+
+    if (numParams > 3) {
         reps = params[3];
     }
+
     reps--;
 
     plEventCallbackMsg* callback = new plEventCallbackMsg(plClient::GetInstance()->GetKey(), event, 0, secs, reps);
@@ -2299,173 +2287,171 @@ PF_CONSOLE_CMD( App,
     plgDispatch::MsgSend(cmd);
 }
 
-PF_CONSOLE_CMD( App,
-                Overlay,
-                "string name, ...", // paramList
-                "Enable/Disable/Toggle display of named CamView object" )
+PF_CONSOLE_CMD(App,
+               Overlay,
+               "string name, ...", // paramList
+               "Enable/Disable/Toggle display of named CamView object")
 {
     char str[256];
     plString name = plString::FromUtf8(params[0]);
     plKey key = FindSceneObjectByName(name, "", str);
-    if( !key )
-    {
+
+    if (!key) {
         sprintf(str, "%s - Not Found!", name.c_str());
         PrintString(str);
         return;
     }
+
     plSceneObject* obj = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-    if( !obj )
-    {
+
+    if (!obj) {
         sprintf(str, "%s - Not Found!", name.c_str());
         PrintString(str);
         return;
     }
 
     int i;
-    for( i = 0; i < obj->GetNumModifiers(); i++ )
-    {
-        if( plPostEffectMod::ConvertNoRef(obj->GetModifier(i)) )
+
+    for (i = 0; i < obj->GetNumModifiers(); i++) {
+        if (plPostEffectMod::ConvertNoRef(obj->GetModifier(i))) {
             break;
+        }
     }
-    if( i >= obj->GetNumModifiers() )
-    {
+
+    if (i >= obj->GetNumModifiers()) {
         sprintf(str, "%s - No CamView Modifier found!", name.c_str());
         PrintString(str);
         return;
     }
+
     strcpy(str, name.c_str());
 
     plAnimCmdMsg* cmd = new plAnimCmdMsg(nil, obj->GetModifier(i)->GetKey(), nil);
 
-    if( numParams > 1 )
-    {
+    if (numParams > 1) {
         bool on = bool(params[1]);
-        if( on )
-        {
+
+        if (on) {
             cmd->SetCmd(plAnimCmdMsg::kContinue);
             strcat(str, " - Enabled");
-        }
-        else
-        {
+        } else {
             cmd->SetCmd(plAnimCmdMsg::kStop);
             strcat(str, " - Disabled");
         }
-    }
-    else
-    {
+    } else {
         cmd->SetCmd(plAnimCmdMsg::kToggleState);
         strcat(str, " - Toggled");
     }
+
     plgDispatch::MsgSend(cmd);
     PrintString(str);
 }
 
-PF_CONSOLE_CMD( App,        // groupName
+PF_CONSOLE_CMD(App,         // groupName
                TimeClamp,       // fxnName
                "float maxSecsPerFrame", // paramList
-               "Clamp elapsed game time per frame (b4 scale)" ) // helpString
+               "Clamp elapsed game time per frame (b4 scale)")  // helpString
 {
     float s = params[0];
-    hsTimer::SetTimeClamp( s );
+    hsTimer::SetTimeClamp(s);
 
     char str[256];
     sprintf(str, "Time clamped to %f secs", s);
-    PrintString( str );
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( App,        // groupName
+PF_CONSOLE_CMD(App,         // groupName
                TimeSmoothingClamp,      // fxnName
                "float maxSecsPerFrame", // paramList
-               "Clamp max elapsed time that we'll smooth frame deltas" )    // helpString
+               "Clamp max elapsed time that we'll smooth frame deltas")     // helpString
 {
     float s = params[0];
-    hsTimer::SetTimeSmoothingClamp( s );
+    hsTimer::SetTimeSmoothingClamp(s);
 
     char str[256];
     sprintf(str, "Time smoothing clamped to %f secs", s);
-    PrintString( str );
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( App,        // groupName
+PF_CONSOLE_CMD(App,         // groupName
                FrameInc,        // fxnName
                "float msPerFrame", // paramList
-               "Advance exactly msPerFrame milliseconds each frame" )   // helpString
+               "Advance exactly msPerFrame milliseconds each frame")    // helpString
 {
     float s = params[0];
     s *= 1.e-3f;
-    hsTimer::SetFrameTimeInc( s );
+    hsTimer::SetFrameTimeInc(s);
 
     char str[256];
-    sprintf(str, "Frame advancing %f per frame (in frame time)", s * 1.e3f );
-    PrintString( str );
+    sprintf(str, "Frame advancing %f per frame (in frame time)", s * 1.e3f);
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( App,        // groupName
+PF_CONSOLE_CMD(App,         // groupName
                RealTime,        // fxnName
                "", // paramList
-               "Run in realtime" )  // helpString
+               "Run in realtime")   // helpString
 {
-    hsTimer::SetRealTime( true );
+    hsTimer::SetRealTime(true);
 
     char str[256];
     sprintf(str, "Now running real time");
-    PrintString( str );
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( App,        // groupName
+PF_CONSOLE_CMD(App,         // groupName
                FrameTime,       // fxnName
                "", // paramList
-               "Run in frametime" ) // helpString
+               "Run in frametime")  // helpString
 {
-    hsTimer::SetRealTime( false );
+    hsTimer::SetRealTime(false);
 
     char str[256];
     sprintf(str, "Now running frame time");
-    PrintString( str );
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( App,        // groupName
+PF_CONSOLE_CMD(App,         // groupName
                ScaleTime,       // fxnName
                "float s", // paramList
-               "Scale factor for time (e.g. ScaleTime 2 doubles speed of game)" )   // helpString
+               "Scale factor for time (e.g. ScaleTime 2 doubles speed of game)")    // helpString
 {
     float s = params[0];
-    hsTimer::SetTimeScale( s );
+    hsTimer::SetTimeScale(s);
 
     char str[256];
-    sprintf(str, "Time scaled to %4.4f percent", s * 100.f );
-    PrintString( str );
+    sprintf(str, "Time scaled to %4.4f percent", s * 100.f);
+    PrintString(str);
 }
 
 #include "plInputCore/plSceneInputInterface.h"
 
-PF_CONSOLE_CMD( App,        // groupName
+PF_CONSOLE_CMD(App,         // groupName
                ShowLOS,     // fxnName
                "", // paramList
-               "Show object LOS hits" ) // helpString
+               "Show object LOS hits")  // helpString
 {
     char str[256];
-    if (plSceneInputInterface::fShowLOS)
-    {
+
+    if (plSceneInputInterface::fShowLOS) {
         plSceneInputInterface::fShowLOS = false;
         sprintf(str, "Stop displaying LOS hits");
-    }
-    else
-    {
+    } else {
         plSceneInputInterface::fShowLOS = true;
         sprintf(str, "Start showing LOS hits");
     }
-    PrintString( str );
+
+    PrintString(str);
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( App,            // groupName
+PF_CONSOLE_CMD(App,             // groupName
                Quit,            // fxnName
                "",              // paramList
-               "Quit the client app" ) // helpString
+               "Quit the client app")  // helpString
 {
-    if( plClient::GetInstance() ) {
+    if (plClient::GetInstance()) {
         plClientMsg* msg = new plClientMsg(plClientMsg::kQuit);
         msg->Send(hsgResMgr::ResMgr()->FindKey(kClient_KEY));
     }
@@ -2478,29 +2464,30 @@ PF_CONSOLE_CMD(App,
                "string pathName",
                "Set an auxiliary init directory to read")
 {
-    if( plClient::GetInstance() )   
+    if (plClient::GetInstance()) {
         plClient::GetInstance()->SetAuxInitDir(params[0]);
+    }
 }
 
 
-PF_CONSOLE_CMD( App,        // groupName
+PF_CONSOLE_CMD(App,         // groupName
                GetBuildDate,        // fxnName
                "", // paramList
-               "Prints the date and time this build was created" )  // helpString
+               "Prints the date and time this build was created")   // helpString
 {
     char str[256];
-    sprintf(str, "This Plasma 2.0 client built at %s on %s.", pnBuildDates::fBuildTime, pnBuildDates::fBuildDate );
-    PrintString( str );
+    sprintf(str, "This Plasma 2.0 client built at %s on %s.", pnBuildDates::fBuildTime, pnBuildDates::fBuildDate);
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD( App,        // groupName
+PF_CONSOLE_CMD(App,         // groupName
                GetBranchDate,       // fxnName
                "", // paramList
-               "Prints the date of the branch this code was produced from, or \"Pre-release\" if it is from the main code" )    // helpString
+               "Prints the date of the branch this code was produced from, or \"Pre-release\" if it is from the main code")     // helpString
 {
     char str[256];
-    sprintf(str, "The branch date for this Plasma 2.0 client is: %s.", pnBuildDates::fBranchDate );
-    PrintString( str );
+    sprintf(str, "The branch date for this Plasma 2.0 client is: %s.", pnBuildDates::fBranchDate);
+    PrintString(str);
 }
 
 PF_CONSOLE_CMD(App,
@@ -2509,8 +2496,8 @@ PF_CONSOLE_CMD(App,
                "Set low priority for this process")
 {
 #if HS_BUILD_FOR_WIN32
-    SetPriorityClass( GetCurrentProcess(), IDLE_PRIORITY_CLASS );
-    PrintString( "Set process priority to lowest setting" );
+    SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
+    PrintString("Set process priority to lowest setting");
 #else
     PrintString("Not implemented on your platform!");
 #endif
@@ -2539,24 +2526,24 @@ PF_CONSOLE_CMD(App,
                "string language",
                "Set the language (English, French, German, Spanish, Italian, or Japanese)")
 {
-    if (pfConsole::GetPipeline())
-    {
+    if (pfConsole::GetPipeline()) {
         PrintString("This command must be used in an .ini file");
         return;
     }
 
-    if (stricmp(params[0], "english") == 0)
+    if (stricmp(params[0], "english") == 0) {
         plLocalization::SetLanguage(plLocalization::kEnglish);
-    else if (stricmp(params[0], "french") == 0)
+    } else if (stricmp(params[0], "french") == 0) {
         plLocalization::SetLanguage(plLocalization::kFrench);
-    else if (stricmp(params[0], "german") == 0)
+    } else if (stricmp(params[0], "german") == 0) {
         plLocalization::SetLanguage(plLocalization::kGerman);
-    else if (stricmp(params[0], "spanish") == 0)
+    } else if (stricmp(params[0], "spanish") == 0) {
         plLocalization::SetLanguage(plLocalization::kSpanish);
-    else if (stricmp(params[0], "italian") == 0)
+    } else if (stricmp(params[0], "italian") == 0) {
         plLocalization::SetLanguage(plLocalization::kItalian);
-    else if (stricmp(params[0], "japanese") == 0)
+    } else if (stricmp(params[0], "japanese") == 0) {
         plLocalization::SetLanguage(plLocalization::kJapanese);
+    }
 
 }
 
@@ -2565,8 +2552,7 @@ PF_CONSOLE_CMD(App,
                "",
                "Set the app to demo mode")
 {
-    if (pfConsole::GetPipeline())
-    {
+    if (pfConsole::GetPipeline()) {
         PrintString("This command must be used in an .ini file");
         return;
     }
@@ -2590,67 +2576,67 @@ PF_CONSOLE_CMD(App,
 
 #include "pfDispatchLog.h"
 
-PF_CONSOLE_GROUP( Dispatch )        // Defines a main command group
-PF_CONSOLE_SUBGROUP( Dispatch, Log )        // Creates a sub-group under a given group
+PF_CONSOLE_GROUP(Dispatch)          // Defines a main command group
+PF_CONSOLE_SUBGROUP(Dispatch, Log)          // Creates a sub-group under a given group
 
-PF_CONSOLE_CMD( Dispatch_Log,       // groupName
+PF_CONSOLE_CMD(Dispatch_Log,        // groupName
                LongReceives,        // fxnName
                "", // paramList
-               "Log long msg receives (over 50 ms)" )   // helpString
+               "Log long msg receives (over 50 ms)")    // helpString
 {
     plDispatchLog::InitInstance();
     plDispatchLog::GetInstance()->SetFlags(plDispatchLog::GetInstance()->GetFlags() | plDispatchLog::kLogLongReceives);
 }
 
-PF_CONSOLE_CMD( Dispatch_Log,       // groupName
+PF_CONSOLE_CMD(Dispatch_Log,        // groupName
                AddFilterType,       // fxnName
                "string className", // paramList
-               "Adds a type filter to the Dispatch Logger" )    // helpString
+               "Adds a type filter to the Dispatch Logger")     // helpString
 {
     plDispatchLog::InitInstance();
     plDispatchLog::GetInstance()->AddFilterType(plFactory::FindClassIndex(params[0]));
 }
 
-PF_CONSOLE_CMD( Dispatch_Log,       // groupName
+PF_CONSOLE_CMD(Dispatch_Log,        // groupName
                AddFilterExactType,      // fxnName
                "string className", // paramList
-               "Adds an exact type filter to the Dispatch Logger" ) // helpString
+               "Adds an exact type filter to the Dispatch Logger")  // helpString
 {
     plDispatchLog::InitInstance();
     plDispatchLog::GetInstance()->AddFilterExactType(plFactory::FindClassIndex(params[0]));
 }
 
-PF_CONSOLE_CMD( Dispatch_Log,       // groupName
+PF_CONSOLE_CMD(Dispatch_Log,        // groupName
                RemoveFilterType,        // fxnName
                "string className", // paramList
-               "Removes a type filter to the Dispatch Logger" ) // helpString
+               "Removes a type filter to the Dispatch Logger")  // helpString
 {
     plDispatchLog::InitInstance();
     plDispatchLog::GetInstance()->RemoveFilterType(plFactory::FindClassIndex(params[0]));
 }
 
-PF_CONSOLE_CMD( Dispatch_Log,       // groupName
+PF_CONSOLE_CMD(Dispatch_Log,        // groupName
                RemoveFilterExactType,       // fxnName
                "string className", // paramList
-               "Removes an exact type filter to the Dispatch Logger" )  // helpString
+               "Removes an exact type filter to the Dispatch Logger")   // helpString
 {
     plDispatchLog::InitInstance();
     plDispatchLog::GetInstance()->RemoveFilterExactType(plFactory::FindClassIndex(params[0]));
 }
 
-PF_CONSOLE_CMD( Dispatch_Log,       // groupName
+PF_CONSOLE_CMD(Dispatch_Log,        // groupName
                Include,     // fxnName
                "", // paramList
-               "Sets Dispatch Log filters to be treated as an include list" )   // helpString
+               "Sets Dispatch Log filters to be treated as an include list")    // helpString
 {
     plDispatchLog::InitInstance();
     plDispatchLog::GetInstance()->SetFlags(plDispatchLog::GetInstance()->GetFlags() | plDispatchLog::kInclude);
 }
 
-PF_CONSOLE_CMD( Dispatch_Log,       // groupName
+PF_CONSOLE_CMD(Dispatch_Log,        // groupName
                Exclude,     // fxnName
                "", // paramList
-               "Sets Dispatch Log filters to be treated as an exclude list" )   // helpString
+               "Sets Dispatch Log filters to be treated as an exclude list")    // helpString
 {
     plDispatchLog::InitInstance();
     plDispatchLog::GetInstance()->SetFlags(plDispatchLog::GetInstance()->GetFlags() & ~plDispatchLog::kInclude);
@@ -2664,99 +2650,98 @@ PF_CONSOLE_CMD( Dispatch_Log,       // groupName
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_GROUP( Registry )        // Defines a main command group
+PF_CONSOLE_GROUP(Registry)          // Defines a main command group
 
-PF_CONSOLE_CMD( Registry, ToggleDebugStats, "", "Toggles the debug statistics screen for the registry" )
+PF_CONSOLE_CMD(Registry, ToggleDebugStats, "", "Toggles the debug statistics screen for the registry")
 {
-    plResManagerHelper *helper = plResManagerHelper::GetInstance();
-    if( helper == nil )
-    {
-        PrintString( "ERROR: ResManager helper object not initialized." );
+    plResManagerHelper* helper = plResManagerHelper::GetInstance();
+
+    if (helper == nil) {
+        PrintString("ERROR: ResManager helper object not initialized.");
         return;
     }
 
     static bool on = false;
-    if( on )
-    {
-        helper->EnableDebugScreen( false );
-        PrintString( "ResManager debug stats disabled" );
-    }
-    else
-    {
-        helper->EnableDebugScreen( true );
-        plStatusLogMgr::GetInstance().SetCurrStatusLog( "ResManager Status" );
-        PrintString( "ResManager debug stats enabled" );
+
+    if (on) {
+        helper->EnableDebugScreen(false);
+        PrintString("ResManager debug stats disabled");
+    } else {
+        helper->EnableDebugScreen(true);
+        plStatusLogMgr::GetInstance().SetCurrStatusLog("ResManager Status");
+        PrintString("ResManager debug stats enabled");
     }
 }
 
-PF_CONSOLE_CMD( Registry, SetLoggingLevel, "int level", "Sets the logging level for the registry. 0 is no logging, 3 is max detail." )
+PF_CONSOLE_CMD(Registry, SetLoggingLevel, "int level", "Sets the logging level for the registry. 0 is no logging, 3 is max detail.")
 {
     int newLevel = params[ 0 ];
 
-    if( newLevel < 0 || newLevel > 4 )
-    {
-        PrintString( "ERROR: Invalid level specified. Valid levels are 0-3." );
+    if (newLevel < 0 || newLevel > 4) {
+        PrintString("ERROR: Invalid level specified. Valid levels are 0-3.");
         return;
     }
 
-    plResMgrSettings::Get().SetLoggingLevel( (uint8_t)newLevel );
+    plResMgrSettings::Get().SetLoggingLevel((uint8_t)newLevel);
     {
         char msg[ 128 ];
-        sprintf( msg, "Registry logging set to %s", ( newLevel == 0 ) ? "none" : ( newLevel == 1 ) ? "basic" : 
-                                                        ( newLevel == 2 ) ? "detailed" : ( newLevel == 3 ) ? "object-level" 
-                                                            : "object-read-level" );
-        PrintString( msg );
+        sprintf(msg, "Registry logging set to %s", (newLevel == 0) ? "none" : (newLevel == 1) ? "basic" :
+                (newLevel == 2) ? "detailed" : (newLevel == 3) ? "object-level"
+                : "object-read-level");
+        PrintString(msg);
     }
 }
 
-class plActiveRefPeekerKey : public plKeyImp
-{
-    public:
-        uint16_t      PeekNumNotifies() { return GetNumNotifyCreated(); }
-        plRefMsg*   PeekNotifyCreated(int i) { return GetNotifyCreated(i); }
-        bool        PeekIsActiveRef(int i) const { return IsActiveRef(i); }
+class plActiveRefPeekerKey : public plKeyImp {
+public:
+    uint16_t      PeekNumNotifies() {
+        return GetNumNotifyCreated();
+    }
+    plRefMsg*   PeekNotifyCreated(int i) {
+        return GetNotifyCreated(i);
+    }
+    bool        PeekIsActiveRef(int i) const {
+        return IsActiveRef(i);
+    }
 };
 
 // Not static so others can call it - making it even handier
-void    MyHandyPrintFunction( const plKey &obj, void (*PrintString)( const char * ) )
+void    MyHandyPrintFunction(const plKey& obj, void (*PrintString)(const char*))
 {
-    plActiveRefPeekerKey *peeker = (plActiveRefPeekerKey *)(plKeyImp *)obj;
+    plActiveRefPeekerKey* peeker = (plActiveRefPeekerKey*)(plKeyImp*)obj;
 
-    if( peeker->GetUoid().IsClone() )
-        PrintStringF( PrintString, "%d refs on %s, clone %d:%d: loaded=%d", 
-            peeker->PeekNumNotifies(), obj->GetUoid().GetObjectName().c_str(), 
-            peeker->GetUoid().GetCloneID(), peeker->GetUoid().GetClonePlayerID(),
-            obj->ObjectIsLoaded() ? 1 : 0);
+    if (peeker->GetUoid().IsClone())
+        PrintStringF(PrintString, "%d refs on %s, clone %d:%d: loaded=%d",
+                     peeker->PeekNumNotifies(), obj->GetUoid().GetObjectName().c_str(),
+                     peeker->GetUoid().GetCloneID(), peeker->GetUoid().GetClonePlayerID(),
+                     obj->ObjectIsLoaded() ? 1 : 0);
     else
-        PrintStringF( PrintString, "%d refs on %s: loaded=%d", 
-            peeker->PeekNumNotifies(), obj->GetUoid().GetObjectName().c_str(), obj->ObjectIsLoaded() ? 1 : 0 );
+        PrintStringF(PrintString, "%d refs on %s: loaded=%d",
+                     peeker->PeekNumNotifies(), obj->GetUoid().GetObjectName().c_str(), obj->ObjectIsLoaded() ? 1 : 0);
 
-    if( peeker->PeekNumNotifies() == 0 )
+    if (peeker->PeekNumNotifies() == 0) {
         return;
+    }
 
     uint32_t a, i, j, limit = 30, count = 0;
-    for( a = 0; a < 2; a++ )
-    {
-        PrintString( ( a == 0 ) ? "  Active:" : "  Passive:" );
 
-        for( i = 0; i < peeker->PeekNumNotifies(); i++ )
-        {
-            if( ( a == 0 && peeker->PeekIsActiveRef( i ) ) || ( a == 1 && !peeker->PeekIsActiveRef( i ) ) )
-            {
-                plRefMsg *msg = peeker->PeekNotifyCreated( i );
-                if( msg != nil )
-                {
-                    for( j = 0; j < msg->GetNumReceivers(); j++ )
-                    {
-                        if( limit == 0 )
+    for (a = 0; a < 2; a++) {
+        PrintString((a == 0) ? "  Active:" : "  Passive:");
+
+        for (i = 0; i < peeker->PeekNumNotifies(); i++) {
+            if ((a == 0 && peeker->PeekIsActiveRef(i)) || (a == 1 && !peeker->PeekIsActiveRef(i))) {
+                plRefMsg* msg = peeker->PeekNotifyCreated(i);
+
+                if (msg != nil) {
+                    for (j = 0; j < msg->GetNumReceivers(); j++) {
+                        if (limit == 0) {
                             count++;
-                        else
-                        {
+                        } else {
                             limit--;
 
-                            const plKey rcvr = msg->GetReceiver( j );
-                            PrintStringF( PrintString, "    %s:%s", plFactory::GetNameOfClass( rcvr->GetUoid().GetClassType() ),
-                                          rcvr->GetUoid().GetObjectName().c_str() );
+                            const plKey rcvr = msg->GetReceiver(j);
+                            PrintStringF(PrintString, "    %s:%s", plFactory::GetNameOfClass(rcvr->GetUoid().GetClassType()),
+                                         rcvr->GetUoid().GetObjectName().c_str());
                         }
                     }
                 }
@@ -2764,30 +2749,31 @@ void    MyHandyPrintFunction( const plKey &obj, void (*PrintString)( const char 
         }
     }
 
-    if( count > 0 )
-        PrintStringF( PrintString, "...and %d others", count );
+    if (count > 0) {
+        PrintStringF(PrintString, "...and %d others", count);
+    }
 }
 
-PF_CONSOLE_CMD( Registry, ListRefs, "string keyType, string keyName", "For the given key (referenced by type and name), lists all of "
-               "the objects who currently have active refs on it." )
+PF_CONSOLE_CMD(Registry, ListRefs, "string keyType, string keyName", "For the given key (referenced by type and name), lists all of "
+               "the objects who currently have active refs on it.")
 {
     char result[ 256 ];
-    plKey obj = FindObjectByNameAndType( plString::FromUtf8( params[ 1 ] ), params[ 0 ], "", result);
-    if( obj == nil )
-    {
-        PrintString( result );
+    plKey obj = FindObjectByNameAndType(plString::FromUtf8(params[ 1 ]), params[ 0 ], "", result);
+
+    if (obj == nil) {
+        PrintString(result);
         return;
     }
 
-    MyHandyPrintFunction( obj, PrintString );
-    
-    plActiveRefPeekerKey *peeker = (plActiveRefPeekerKey *)(plKeyImp *)obj;
-    if( peeker->GetNumClones() > 0 )
-    {
+    MyHandyPrintFunction(obj, PrintString);
+
+    plActiveRefPeekerKey* peeker = (plActiveRefPeekerKey*)(plKeyImp*)obj;
+
+    if (peeker->GetNumClones() > 0) {
         uint32_t i;
-        for( i = 0; i < peeker->GetNumClones(); i++ )
-        {
-            MyHandyPrintFunction( peeker->GetCloneByIdx( i ), PrintString );
+
+        for (i = 0; i < peeker->GetNumClones(); i++) {
+            MyHandyPrintFunction(peeker->GetCloneByIdx(i), PrintString);
         }
     }
 }
@@ -2803,157 +2789,158 @@ PF_CONSOLE_CMD(Registry, LogReadTimes, "", "Dumps the time for each object read 
 //////////////////////////////////////////////////////////////////////////////
 //// Camera Group Commands ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-PF_CONSOLE_GROUP( Camera )      // Defines a main command group
+PF_CONSOLE_GROUP(Camera)        // Defines a main command group
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
 
-PF_CONSOLE_CMD( Camera, AvatarVisible1stPerson, "bool b", "turn avatar visibility in 1st person on or off")
+PF_CONSOLE_CMD(Camera, AvatarVisible1stPerson, "bool b", "turn avatar visibility in 1st person on or off")
 {
     bool b = params[0];
     plCameraBrain1_FirstPerson::fDontFade = b;
 }
 
-PF_CONSOLE_CMD( Camera, FallTimerDelay, "float b", "fall timer delay")
+PF_CONSOLE_CMD(Camera, FallTimerDelay, "float b", "fall timer delay")
 {
     float f = params[0];
     plVirtualCam1::fFallTimerDelay = f;
 }
 
 
-PF_CONSOLE_CMD( Camera, Force3rdPersonOneshots, "bool b", "force camera to 3rd person for oneshots on or off")
+PF_CONSOLE_CMD(Camera, Force3rdPersonOneshots, "bool b", "force camera to 3rd person for oneshots on or off")
 {
     bool b = params[0];
     plAvOneShotTask::fForce3rdPerson = b;
 }
 
-PF_CONSOLE_CMD( Camera, Force3rdPersonMultistage, "bool b", "force camera to 3rd person for multistage on or off")
+PF_CONSOLE_CMD(Camera, Force3rdPersonMultistage, "bool b", "force camera to 3rd person for multistage on or off")
 {
     bool b = params[0];
     plAvBrainGeneric::fForce3rdPerson = b;
 }
 
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                Next,        // fxnName
                "", // paramList
-               "Set the virtual camera to go to the next camera in the scene" ) // helpString
+               "Set the virtual camera to go to the next camera in the scene")  // helpString
 {
-    plUoid pU1( kVirtualCamera1_KEY );
-    plKey fLOS1 = hsgResMgr::ResMgr()->FindKey( pU1 );
-    if (fLOS1)
-    {
+    plUoid pU1(kVirtualCamera1_KEY);
+    plKey fLOS1 = hsgResMgr::ResMgr()->FindKey(pU1);
+
+    if (fLOS1) {
         plVirtualCam1::ConvertNoRef(fLOS1->GetObjectPtr())->Next();
         return;
     }
-    
+
 }
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                IgnoreRegions,       // fxnName
                "bool b", // paramList
-               "Switch on / off camera regions" )   // helpString
+               "Switch on / off camera regions")    // helpString
 {
     bool b = params[0];
-    
-    plUoid pU1( kVirtualCamera1_KEY );
-    plKey fLOS1 = hsgResMgr::ResMgr()->FindKey( pU1 );
-    if (fLOS1)
-    {
+
+    plUoid pU1(kVirtualCamera1_KEY);
+    plKey fLOS1 = hsgResMgr::ResMgr()->FindKey(pU1);
+
+    if (fLOS1) {
         plVirtualCam1::ConvertNoRef(fLOS1->GetObjectPtr())->CameraRegions(b);
         return;
     }
-    
+
 }
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                LogFOV,      // fxnName
                "bool b", // paramList
-               "Switch on / off verbose camera FOV change logging" )    // helpString
+               "Switch on / off verbose camera FOV change logging")     // helpString
 {
     bool b = params[0];
-    
-    plUoid pU1( kVirtualCamera1_KEY );
-    plKey fLOS1 = hsgResMgr::ResMgr()->FindKey( pU1 );
-    if (fLOS1)
-    {
+
+    plUoid pU1(kVirtualCamera1_KEY);
+    plKey fLOS1 = hsgResMgr::ResMgr()->FindKey(pU1);
+
+    if (fLOS1) {
         plVirtualCam1::ConvertNoRef(fLOS1->GetObjectPtr())->LogFOV(b);
         return;
     }
-    
+
 }
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                Prev,        // fxnName
                "", // paramList
-               "Set the virtual camera to go to the prev camera in the scene" ) // helpString
+               "Set the virtual camera to go to the prev camera in the scene")  // helpString
 {
-    plUoid pU1( kVirtualCamera1_KEY );
-    plKey fLOS1 = hsgResMgr::ResMgr()->FindKey( pU1 );
-    if (fLOS1)
-    {
+    plUoid pU1(kVirtualCamera1_KEY);
+    plKey fLOS1 = hsgResMgr::ResMgr()->FindKey(pU1);
+
+    if (fLOS1) {
         plVirtualCam1::ConvertNoRef(fLOS1->GetObjectPtr())->Prev();
         return;
     }
 
 }
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                SetFOV,      // fxnName
                "float x, float y", // paramList
-               "Set the field of view for all cameras" )    // helpString
+               "Set the field of view for all cameras")     // helpString
 {
     float x = params[0];
     float y = params[1];
-    plUoid pU1( kVirtualCamera1_KEY );
-    plKey fLOS1 = hsgResMgr::ResMgr()->FindKey( pU1 );
-    if (fLOS1)
-    {
-        plVirtualCam1::SetFOV(x,y);
+    plUoid pU1(kVirtualCamera1_KEY);
+    plKey fLOS1 = hsgResMgr::ResMgr()->FindKey(pU1);
+
+    if (fLOS1) {
+        plVirtualCam1::SetFOV(x, y);
         return;
     }
 }
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                Drive,       // fxnName
                "", // paramList
-               "Toggle drive mode" )    // helpString
+               "Toggle drive mode")     // helpString
 {
     plVirtualCam1::Instance()->Drive();
 }
 
 
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                IncreaseDriveTurnRate,       // fxnName
                "", // paramList
-               "increase drive turn rate" ) // helpString
+               "increase drive turn rate")  // helpString
 {
     plCameraBrain1_Drive::fTurnRate += 20.0f;
 
 }
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                DecreaseDriveTurnRate,       // fxnName
                "", // paramList
-               "decrease drive turn rate" ) // helpString
+               "decrease drive turn rate")  // helpString
 {
     plCameraBrain1_Drive::fTurnRate -= 20.0f;
-    if (plCameraBrain1_Drive::fTurnRate < 0.0)
+
+    if (plCameraBrain1_Drive::fTurnRate < 0.0) {
         plCameraBrain1_Drive::fTurnRate = 20.0f;
+    }
 
 }
 
 
-PF_CONSOLE_CMD( Camera, SwitchTo, "string cameraName", "Switch to the named camera")
+PF_CONSOLE_CMD(Camera, SwitchTo, "string cameraName", "Switch to the named camera")
 {
     char str[256];
     plString foo = plString::Format("%s_", (char*)params[0]);
     plKey key = FindObjectByNameAndType(foo, "plCameraModifier1", "", str, true);
     PrintString(str);
 
-    if (key)
-    {
+    if (key) {
         plCameraMsg* pMsg = new plCameraMsg;
         pMsg->SetCmd(plCameraMsg::kResponderTrigger);
         pMsg->SetCmd(plCameraMsg::kRegionPushCamera);
@@ -2965,10 +2952,10 @@ PF_CONSOLE_CMD( Camera, SwitchTo, "string cameraName", "Switch to the named came
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                SetFallSpeeds,       // fxnName
                "float accel, float vel, float decel", // paramList
-               "Set camera fall speeds" )   // helpString
+               "Set camera fall speeds")    // helpString
 {
     float a = params[0];
     float v = params[1];
@@ -2978,10 +2965,10 @@ PF_CONSOLE_CMD( Camera,     // groupName
     plCameraBrain1::fFallDecel = d;
 }
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                SetFallPOASpeeds,        // fxnName
                "float accel, float vel, float decel", // paramList
-               "Set camera fall speeds" )   // helpString
+               "Set camera fall speeds")    // helpString
 {
     float a = params[0];
     float v = params[1];
@@ -2992,49 +2979,49 @@ PF_CONSOLE_CMD( Camera,     // groupName
 }
 
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                SetGlobalAccel,      // fxnName
                "float x", // paramList
-               "Set global camera acceleration - must set Camera.UseSpeedOverrides to TRUE to see effect" ) // helpString
+               "Set global camera acceleration - must set Camera.UseSpeedOverrides to TRUE to see effect")  // helpString
 {
     float f = params[0];
     plVirtualCam1::Instance()->fAccel = f;
 }
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                SetGlobalDecel,      // fxnName
                "float x", // paramList
-               "Set global camera deceleration - must set Camera.UseSpeedOverrides to TRUE to see effect" ) // helpString
+               "Set global camera deceleration - must set Camera.UseSpeedOverrides to TRUE to see effect")  // helpString
 {
     float f = params[0];
     plVirtualCam1::Instance()->fDecel = f;
 }
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                SetGlobalVelocity,       // fxnName
                "float x", // paramList
-               "Set global camera velocity - must set Camera.UseSpeedOverrides to TRUE to see effect" ) // helpString
+               "Set global camera velocity - must set Camera.UseSpeedOverrides to TRUE to see effect")  // helpString
 {
     float f = params[0];
     plVirtualCam1::Instance()->fVel = f;
 }
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                UseSpeedOverrides,       // fxnName
                "bool b", // paramList
-               "Use console overrides for accel / decel" )  // helpString
+               "Use console overrides for accel / decel")   // helpString
 {
     bool b = params[0];
     plVirtualCam1::Instance()->fUseAccelOverride = b;
 }
 
-PF_CONSOLE_CMD( Camera, VerticalPanAlways, "bool b", "turn vertical panning on always when walking")
+PF_CONSOLE_CMD(Camera, VerticalPanAlways, "bool b", "turn vertical panning on always when walking")
 {
     bool b = params[0];
     plVirtualCam1::WalkPan3rdPerson = b;
 }
 
-PF_CONSOLE_CMD( Camera, FirstPersonAlways, "bool b", "always in first person")
+PF_CONSOLE_CMD(Camera, FirstPersonAlways, "bool b", "always in first person")
 {
     bool b = params[0];
     plVirtualCam1::StayInFirstPersonForever = b;
@@ -3044,19 +3031,19 @@ PF_CONSOLE_CMD( Camera, FirstPersonAlways, "bool b", "always in first person")
 #ifndef LIMIT_CONSOLE_COMMANDS
 
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                Freeze,      // fxnName
                "bool b", // paramList
-               "freeze the camera system" ) // helpString
+               "freeze the camera system")  // helpString
 {
     bool b = params[0];
     plVirtualCam1::Instance()->freeze = b;
 }
 
-PF_CONSOLE_CMD( Camera,     // groupName
+PF_CONSOLE_CMD(Camera,      // groupName
                AlwaysCut,       // fxnName
                "bool b", // paramList
-               "Forces camera transitions to always cut" )  // helpString
+               "Forces camera transitions to always cut")   // helpString
 {
     bool b = params[0];
     plVirtualCam1::Instance()->alwaysCutForColin = b;
@@ -3070,49 +3057,54 @@ PF_CONSOLE_CMD( Camera,     // groupName
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_GROUP( Logic )
+PF_CONSOLE_GROUP(Logic)
 
-static plLogicModBase *FindLogicMod(const plString &name)
+static plLogicModBase* FindLogicMod(const plString& name)
 {
     char str[256];
     plKey key = FindObjectByNameAndType(name, "plLogicModifier", "", str, true);
     pfConsole::AddLine(str);
 
-    if (key)
+    if (key) {
         return plLogicModBase::ConvertNoRef(key->GetObjectPtr());
+    }
 
     return nil;
 }
 
-PF_CONSOLE_CMD( Logic, TriggerDetectorNum, "int detectorNum", "Triggers the detector with this number (from ListDetectors)")
+PF_CONSOLE_CMD(Logic, TriggerDetectorNum, "int detectorNum", "Triggers the detector with this number (from ListDetectors)")
 {
     std::vector<plString> activatorNames;
     plKeyFinder::Instance().GetActivatorNames(activatorNames);
 
     int activatorNum = params[0];
-    if (activatorNum < 1 || activatorNum > activatorNames.size())
-    {
+
+    if (activatorNum < 1 || activatorNum > activatorNames.size()) {
         PrintString("Detector number out of range");
         return;
     }
 
-    plLogicModBase *mod = FindLogicMod(activatorNames[activatorNum-1]);
-    if (mod)
+    plLogicModBase* mod = FindLogicMod(activatorNames[activatorNum - 1]);
+
+    if (mod) {
         mod->ConsoleTrigger(plNetClientMgr::GetInstance()->GetLocalPlayerKey());
+    }
 }
 
-PF_CONSOLE_CMD( Logic, TriggerDetector, "string detectorComp", "Triggers the named detector component")
+PF_CONSOLE_CMD(Logic, TriggerDetector, "string detectorComp", "Triggers the named detector component")
 {
-    plLogicModBase *mod = FindLogicMod(plString::FromUtf8(params[0]));
-    if (mod)
+    plLogicModBase* mod = FindLogicMod(plString::FromUtf8(params[0]));
+
+    if (mod) {
         mod->ConsoleTrigger(plNetClientMgr::GetInstance()->GetLocalPlayerKey());
+    }
 }
 
 PF_CONSOLE_CMD(Logic, EnableDetector, "string detectorComp, bool enable", "Enables/disables the named detector component")
 {
-    plLogicModBase *mod = FindLogicMod(plString::FromUtf8(params[0]));
-    if (mod)
-    {
+    plLogicModBase* mod = FindLogicMod(plString::FromUtf8(params[0]));
+
+    if (mod) {
         plEnableMsg* enableMsg = new plEnableMsg;
         enableMsg->SetCmd(params[1] ? plEnableMsg::kEnable : plEnableMsg::kDisable);
         enableMsg->SetCmd(plEnableMsg::kAll);
@@ -3122,14 +3114,11 @@ PF_CONSOLE_CMD(Logic, EnableDetector, "string detectorComp, bool enable", "Enabl
 
 static void ResponderSendTrigger(plKey responderKey, int responderState, bool fastForward = false)
 {
-    plNotifyMsg *msg = new plNotifyMsg;
+    plNotifyMsg* msg = new plNotifyMsg;
 
-    if (fastForward)
-    {
+    if (fastForward) {
         msg->fType = plNotifyMsg::kResponderFF;
-    }
-    else
-    {
+    } else {
         msg->fType = plNotifyMsg::kActivator;
     }
 
@@ -3137,20 +3126,20 @@ static void ResponderSendTrigger(plKey responderKey, int responderState, bool fa
 
     // Setup the event data in case this is a OneShot responder that needs it
     plKey playerKey = plNetClientMgr::GetInstance()->GetLocalPlayerKey();
-    msg->AddPickEvent(playerKey, nil, true, hsPoint3(0,0,0) );
+    msg->AddPickEvent(playerKey, nil, true, hsPoint3(0, 0, 0));
 
-    if (responderState != -1)
+    if (responderState != -1) {
         msg->AddResponderStateEvent(responderState);
-    
+    }
+
     // Send it to the responder modifier
     msg->AddReceiver(responderKey);
     plgDispatch::MsgSend(msg);
 }
 
-PF_CONSOLE_CMD( Logic, TriggerResponderNum, "int responderNum, ...", "Triggers the responder with this number (from ListResponders). (Optional: number of the state to switch to)")
+PF_CONSOLE_CMD(Logic, TriggerResponderNum, "int responderNum, ...", "Triggers the responder with this number (from ListResponders). (Optional: number of the state to switch to)")
 {
-    if (numParams > 2)
-    {
+    if (numParams > 2) {
         PrintString("Too many parameters");
         return;
     }
@@ -3159,68 +3148,69 @@ PF_CONSOLE_CMD( Logic, TriggerResponderNum, "int responderNum, ...", "Triggers t
     plKeyFinder::Instance().GetResponderNames(responderNames);
 
     int responderNum = params[0];
-    if (responderNum < 1 || responderNum > responderNames.size())
-    {
+
+    if (responderNum < 1 || responderNum > responderNames.size()) {
         PrintString("Responder number out of range");
         return;
     }
 
     int responderState = -1;
-    if (numParams == 2)
-    {
+
+    if (numParams == 2) {
         responderState = params[1];
     }
 
     char str[256];
-    plKey key = FindObjectByNameAndType(responderNames[responderNum-1], "plResponderModifier", "", str, true);
+    plKey key = FindObjectByNameAndType(responderNames[responderNum - 1], "plResponderModifier", "", str, true);
     PrintString(str);
 
-    if (key)
+    if (key) {
         ResponderSendTrigger(key, responderState);
+    }
 }
 
-PF_CONSOLE_CMD( Logic, TriggerResponder, "string responderComp, ...", "Triggers the named responder component. (Optional: number of the state to switch to)")
+PF_CONSOLE_CMD(Logic, TriggerResponder, "string responderComp, ...", "Triggers the named responder component. (Optional: number of the state to switch to)")
 {
-    if (numParams > 2)
-    {
+    if (numParams > 2) {
         PrintString("Too many parameters");
         return;
     }
-    
+
     char str[256];
     plKey key = FindObjectByNameAndType(plString::FromUtf8(params[0]), "plResponderModifier", "", str, true);
     PrintString(str);
 
     int responderState = -1;
-    if (numParams == 2)
-    {
+
+    if (numParams == 2) {
         responderState = params[1];
     }
 
-    if (key)
+    if (key) {
         ResponderSendTrigger(key, responderState);
+    }
 }
 
-PF_CONSOLE_CMD( Logic, FastForwardResponder, "string responderComp, ...", "Fastforwards the named responder component. (Optional: number of the state to switch to)")
+PF_CONSOLE_CMD(Logic, FastForwardResponder, "string responderComp, ...", "Fastforwards the named responder component. (Optional: number of the state to switch to)")
 {
-    if (numParams > 2)
-    {
+    if (numParams > 2) {
         PrintString("Too many parameters");
         return;
     }
-    
+
     char str[256];
     plKey key = FindObjectByNameAndType(plString::FromUtf8(params[0]), "plResponderModifier", "", str, true);
     PrintString(str);
 
     int responderState = -1;
-    if (numParams == 2)
-    {
+
+    if (numParams == 2) {
         responderState = params[1];
     }
 
-    if (key)
+    if (key) {
         ResponderSendTrigger(key, responderState, true);
+    }
 }
 
 PF_CONSOLE_CMD(Logic, ListDetectors, "", "Prints the names of the loaded detectors to the console")
@@ -3228,10 +3218,9 @@ PF_CONSOLE_CMD(Logic, ListDetectors, "", "Prints the names of the loaded detecto
     std::vector<plString> activatorNames;
     plKeyFinder::Instance().GetActivatorNames(activatorNames);
 
-    for (int i = 0; i < activatorNames.size(); i++)
-    {
+    for (int i = 0; i < activatorNames.size(); i++) {
         char buf[256];
-        sprintf(buf, "%d. %s", i+1, activatorNames[i].c_str());
+        sprintf(buf, "%d. %s", i + 1, activatorNames[i].c_str());
         PrintString(buf);
     }
 }
@@ -3241,10 +3230,9 @@ PF_CONSOLE_CMD(Logic, ListResponders, "", "Prints the names of the loaded respon
     std::vector<plString> responderNames;
     plKeyFinder::Instance().GetResponderNames(responderNames);
 
-    for (int i = 0; i < responderNames.size(); i++)
-    {
+    for (int i = 0; i < responderNames.size(); i++) {
         char buf[256];
-        sprintf(buf, "%d. %s", i+1, responderNames[i].c_str());
+        sprintf(buf, "%d. %s", i + 1, responderNames[i].c_str());
         PrintString(buf);
     }
 }
@@ -3253,10 +3241,11 @@ PF_CONSOLE_CMD(Logic, ListResponders, "", "Prints the names of the loaded respon
 
 PF_CONSOLE_CMD(Logic, ResponderAnimCue, "", "Toggle box being drawn on screen when a responder starts an anim")
 {
-    if (plResponderModifier::ToggleDebugAnimBox())
+    if (plResponderModifier::ToggleDebugAnimBox()) {
         PrintString("Responder Anim Cue On");
-    else
+    } else {
         PrintString("Responder Anim Cue Off");
+    }
 }
 
 PF_CONSOLE_CMD(Logic, ResponderNoLog, "string prefix", "Don't log responders that begin with the specified string")
@@ -3275,161 +3264,180 @@ PF_CONSOLE_CMD(Logic, WriteDetectorLog, "", "Write detector log to logfile")
 ////////////////////////////////////////////////////////////////////////
 //// Audio System Group Commands ///////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
-PF_CONSOLE_GROUP( Audio )
+PF_CONSOLE_GROUP(Audio)
 
-PF_CONSOLE_CMD( Audio, Enable, "bool on", "Switch DirectX Audio on or off at runtime")
+PF_CONSOLE_CMD(Audio, Enable, "bool on", "Switch DirectX Audio on or off at runtime")
 {
     bool on = params[0];
-    plgAudioSys::Activate( on );
+    plgAudioSys::Activate(on);
 }
 
-PF_CONSOLE_CMD( Audio, UseHardware, "bool on", "Enable audio hardware acceleration")
+PF_CONSOLE_CMD(Audio, UseHardware, "bool on", "Enable audio hardware acceleration")
 {
     bool on = params[0];
-    plgAudioSys::SetUseHardware( on );
+    plgAudioSys::SetUseHardware(on);
 }
 
-PF_CONSOLE_CMD( Audio, UseEAX, "bool on", "Enable EAX sound acceleration (requires hardware acceleration)")
+PF_CONSOLE_CMD(Audio, UseEAX, "bool on", "Enable EAX sound acceleration (requires hardware acceleration)")
 {
     bool on = params[0];
-    plgAudioSys::EnableEAX( on );
+    plgAudioSys::EnableEAX(on);
 }
 
-PF_CONSOLE_CMD( Audio, Initialize, "bool on", "Set to false to completely disable audio playback in plasma")
-{ 
+PF_CONSOLE_CMD(Audio, Initialize, "bool on", "Set to false to completely disable audio playback in plasma")
+{
     bool on = params[0];
     plgAudioSys::SetActive(on);
 }
 
-PF_CONSOLE_CMD( Audio, Restart, "", "Restarts the audio system" )
-{ 
+PF_CONSOLE_CMD(Audio, Restart, "", "Restarts the audio system")
+{
     plgAudioSys::Restart();
 }
 
-PF_CONSOLE_CMD( Audio, MuteAll, "bool on", "Mute or unmute all sounds")
+PF_CONSOLE_CMD(Audio, MuteAll, "bool on", "Mute or unmute all sounds")
 {
-    plgAudioSys::SetMuted( (bool)params[ 0 ] );
+    plgAudioSys::SetMuted((bool)params[ 0 ]);
 }
 
-PF_CONSOLE_CMD( Audio, SetDistanceModel, "int type", "Sets the distance model for all 3d sounds")
+PF_CONSOLE_CMD(Audio, SetDistanceModel, "int type", "Sets the distance model for all 3d sounds")
 {
-    if(plgAudioSys::Sys())
-    {
+    if (plgAudioSys::Sys()) {
         plgAudioSys::Sys()->SetDistanceModel((int) params[0]);
     }
 }
 
-PF_CONSOLE_CMD( Audio, LogStreamingUpdates, "bool on", "Logs every buffer fill for streaming sounds")
+PF_CONSOLE_CMD(Audio, LogStreamingUpdates, "bool on", "Logs every buffer fill for streaming sounds")
 {
     plgAudioSys::SetLogStreamingUpdates((bool) params[0]);
 }
 
-PF_CONSOLE_CMD( Audio, SetAllChannelVolumes, "float soundFX, float music, float ambience, float voice, float gui", "Sets the master volume of all the given audio channels.")
+PF_CONSOLE_CMD(Audio, SetAllChannelVolumes, "float soundFX, float music, float ambience, float voice, float gui", "Sets the master volume of all the given audio channels.")
 {
     plgAudioSys::ASChannel  chans[ 6 ] = { plgAudioSys::kSoundFX, plgAudioSys::kBgndMusic, plgAudioSys::kAmbience, plgAudioSys::kVoice, plgAudioSys::kGUI, plgAudioSys::kNPCVoice };
 
 
     int i;
 
-    for( i = 0; i < 5; i++ )
-    {
+    for (i = 0; i < 5; i++) {
         float    vol = (float)(float)params[ i ];
-        if( vol > 1.f )
-            vol = 1.f;
-        else if( vol < 0.f )
-            vol = 0.f;
 
-        plgAudioSys::SetChannelVolume( chans[ i ], vol );
+        if (vol > 1.f) {
+            vol = 1.f;
+        } else if (vol < 0.f) {
+            vol = 0.f;
+        }
+
+        plgAudioSys::SetChannelVolume(chans[ i ], vol);
     }
 }
 
-PF_CONSOLE_CMD( Audio, SetChannelVolume, "string channel, float percentage", "Sets the master volume of a given audio channel\n\
+PF_CONSOLE_CMD(Audio, SetChannelVolume, "string channel, float percentage", "Sets the master volume of a given audio channel\n\
 Valid channels are: SoundFX, BgndMusic, Voice, GUI, NPCVoice and Ambience.")
 {
     plgAudioSys::ASChannel  chan;
 
 
-    if( stricmp( params[ 0 ], "SoundFX" ) == 0 )
+    if (stricmp(params[ 0 ], "SoundFX") == 0) {
         chan = plgAudioSys::kSoundFX;
-    else if( stricmp( params[ 0 ], "BgndMusic" ) == 0 )
+    } else if (stricmp(params[ 0 ], "BgndMusic") == 0) {
         chan = plgAudioSys::kBgndMusic;
-    else if( stricmp( params[ 0 ], "Voice" ) == 0 )
+    } else if (stricmp(params[ 0 ], "Voice") == 0) {
         chan = plgAudioSys::kVoice;
-    else if( stricmp( params[ 0 ], "Ambience" ) == 0 )
+    } else if (stricmp(params[ 0 ], "Ambience") == 0) {
         chan = plgAudioSys::kAmbience;
-    else if( stricmp( params[ 0 ], "GUI" ) == 0 )
+    } else if (stricmp(params[ 0 ], "GUI") == 0) {
         chan = plgAudioSys::kGUI;
-    else if( stricmp( params[ 0 ], "NPCVoice" ) == 0 )
+    } else if (stricmp(params[ 0 ], "NPCVoice") == 0) {
         chan = plgAudioSys::kNPCVoice;
-    else
-    {
-        PrintString( "Invalid channel specified. Use SoundFX, BgndMusic, Voice, Ambience or GUI." );
+    } else {
+        PrintString("Invalid channel specified. Use SoundFX, BgndMusic, Voice, Ambience or GUI.");
         return;
     }
 
     float    vol = (float)(float)params[ 1 ];
-    if( vol > 1.f )
-        vol = 1.f;
-    else if( vol < 0.f )
-        vol = 0.f;
 
-    plgAudioSys::SetChannelVolume( chan, vol );
+    if (vol > 1.f) {
+        vol = 1.f;
+    } else if (vol < 0.f) {
+        vol = 0.f;
+    }
+
+    plgAudioSys::SetChannelVolume(chan, vol);
 
     char    msg[ 128 ];
-    switch( chan )
-    {
-        case plgAudioSys::kSoundFX:     sprintf( msg, "Setting SoundFX master volume to %4.2f", vol ); break;
-        case plgAudioSys::kBgndMusic:   sprintf( msg, "Setting BgndMusic master volume to %4.2f", vol ); break;
-        case plgAudioSys::kVoice:       sprintf( msg, "Setting Voice master volume to %4.2f", vol ); break;
-        case plgAudioSys::kAmbience:    sprintf( msg, "Setting Ambience master volume to %4.2f", vol ); break;
-        case plgAudioSys::kGUI:         sprintf( msg, "Setting GUI master volume to %4.2f", vol ); break;
-        case plgAudioSys::kNPCVoice:    sprintf( msg, "Setting NPC Voice master volume to %4.2f", vol ); break;
+
+    switch (chan) {
+    case plgAudioSys::kSoundFX:
+        sprintf(msg, "Setting SoundFX master volume to %4.2f", vol);
+        break;
+
+    case plgAudioSys::kBgndMusic:
+        sprintf(msg, "Setting BgndMusic master volume to %4.2f", vol);
+        break;
+
+    case plgAudioSys::kVoice:
+        sprintf(msg, "Setting Voice master volume to %4.2f", vol);
+        break;
+
+    case plgAudioSys::kAmbience:
+        sprintf(msg, "Setting Ambience master volume to %4.2f", vol);
+        break;
+
+    case plgAudioSys::kGUI:
+        sprintf(msg, "Setting GUI master volume to %4.2f", vol);
+        break;
+
+    case plgAudioSys::kNPCVoice:
+        sprintf(msg, "Setting NPC Voice master volume to %4.2f", vol);
+        break;
     }
-    PrintString( msg );
+
+    PrintString(msg);
 }
 
-PF_CONSOLE_CMD( Audio, Set2D3DBias, "float bias", "Sets the 2D/3D bias when not using hardware acceleration.")
+PF_CONSOLE_CMD(Audio, Set2D3DBias, "float bias", "Sets the 2D/3D bias when not using hardware acceleration.")
 {
 
     float    bias = (float)(float)params[ 0 ];
-    plgAudioSys::Set2D3DBias( bias );
+    plgAudioSys::Set2D3DBias(bias);
 
 }
 
-PF_CONSOLE_CMD( Audio, ShowNumActiveBuffers, "bool b", "Shows the number of Direct sounds buffers in use")
+PF_CONSOLE_CMD(Audio, ShowNumActiveBuffers, "bool b", "Shows the number of Direct sounds buffers in use")
 {
     plgAudioSys::ShowNumBuffers((bool)params[0]);
 }
 
-PF_CONSOLE_CMD( Audio, SetDeviceName, "string deviceName", "Meant for plClient init only")
+PF_CONSOLE_CMD(Audio, SetDeviceName, "string deviceName", "Meant for plClient init only")
 {
     plgAudioSys::SetDeviceName(params[0]);      // this will set the name of the audio system device without actually reseting it
 }
 
-PF_CONSOLE_CMD( Audio,      // groupName
+PF_CONSOLE_CMD(Audio,       // groupName
                EnableVoiceCompression,      // fxnName
                "bool b", // paramList
-               "turn voice compression on and off" )    // helpString
+               "turn voice compression on and off")     // helpString
 {
     bool b = params[0];
     plVoiceRecorder::EnableCompression(b);
 
 }
 
-PF_CONSOLE_CMD( Audio,      // groupName
+PF_CONSOLE_CMD(Audio,       // groupName
                ShowIcons,       // fxnName
                "bool b", // paramList
-               "turn voice recording icons on and off" )    // helpString
+               "turn voice recording icons on and off")     // helpString
 {
     bool b = params[0];
     plVoiceRecorder::EnableIcons(b);
 
 }
 
-PF_CONSOLE_CMD( Audio,      // groupName
+PF_CONSOLE_CMD(Audio,       // groupName
                SquelchLevel,        // fxnName
                "float f", // paramList
-               "Set the squelch level" )    // helpString
+               "Set the squelch level")     // helpString
 {
     float f = params[0];
     plVoiceRecorder::SetSquelch(f);
@@ -3437,59 +3445,59 @@ PF_CONSOLE_CMD( Audio,      // groupName
 }
 
 
-PF_CONSOLE_CMD( Audio,      // groupName
+PF_CONSOLE_CMD(Audio,       // groupName
                PushToTalk,      // fxnName
                "bool b", // paramList
-               "turn push-to-talk on or off" )  // helpString
+               "turn push-to-talk on or off")   // helpString
 {
     bool b = params[0];
     plVoiceRecorder::EnablePushToTalk(b);
 
 }
 
-PF_CONSOLE_CMD( Audio,      // groupName
+PF_CONSOLE_CMD(Audio,       // groupName
                EnableVoiceNetBroadcast,     // fxnName
                "bool b", // paramList
-               "turn voice-over-net on and off" )   // helpString
+               "turn voice-over-net on and off")    // helpString
 {
     bool b = params[0];
     plVoiceRecorder::EnableNetVoice(b);
 
 }
 
-PF_CONSOLE_CMD( Audio,                              // groupName
+PF_CONSOLE_CMD(Audio,                               // groupName
                SetVoiceQuality,                     // fxnName
                "int q",                             // paramList
-               "Set quality of voice encoding" )    // helpString
+               "Set quality of voice encoding")     // helpString
 {
     int q = params[0];
     plVoiceRecorder::SetQuality(q);
 }
 
 
-PF_CONSOLE_CMD( Audio,      // groupName
+PF_CONSOLE_CMD(Audio,       // groupName
                SetVBR,      // fxnName
                "bool q",    // paramList
-               "Toggle variable bit rate" ) // helpString
+               "Toggle variable bit rate")  // helpString
 {
     bool q = params[0];
     plVoiceRecorder::SetVBR(q);
 }
 
-PF_CONSOLE_CMD( Audio,      // groupName
+PF_CONSOLE_CMD(Audio,       // groupName
                EnableVoiceRecording,        // fxnName
                "bool b", // paramList
-               "turn voice recording on or off" )   // helpString
+               "turn voice recording on or off")    // helpString
 {
     bool b = params[0];
     plVoiceRecorder::EnableRecording(b);
 
 }
 
-PF_CONSOLE_CMD( Audio,
-                EnableVoiceChat,
-                "bool b",
-                "Enable Voice chat" )
+PF_CONSOLE_CMD(Audio,
+               EnableVoiceChat,
+               "bool b",
+               "Enable Voice chat")
 {
     plVoicePlayer::Enable((bool) params[0]);
     plVoiceRecorder::EnableRecording((bool) params[0]);
@@ -3497,279 +3505,273 @@ PF_CONSOLE_CMD( Audio,
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Audio, NextDebugPlate, "", "Cycles through the volume displays for all registered sounds" )
+PF_CONSOLE_CMD(Audio, NextDebugPlate, "", "Cycles through the volume displays for all registered sounds")
 {
     plgAudioSys::NextDebugSound();
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Audio, SetLoadOnDemand, "bool on", "Enable or disable load-on-demand for sounds")
+PF_CONSOLE_CMD(Audio, SetLoadOnDemand, "bool on", "Enable or disable load-on-demand for sounds")
 {
-    plSound::SetLoadOnDemand( (bool)params[ 0 ] );
+    plSound::SetLoadOnDemand((bool)params[ 0 ]);
 }
 
-PF_CONSOLE_CMD( Audio, SetTwoStageLOD, "bool on", "Enables or disables two-stage LOD, where sounds can be loaded into RAM but not into sound buffers. Less of a performance hit, harder on memory.")
+PF_CONSOLE_CMD(Audio, SetTwoStageLOD, "bool on", "Enables or disables two-stage LOD, where sounds can be loaded into RAM but not into sound buffers. Less of a performance hit, harder on memory.")
 {
     // For two-stage LOD, we want to disable LoadFromDiskOnDemand, so that we'll load into RAM at startup but not
     // into sound buffers until demanded to do so. Enabling LoadFromDiskOnDemand basically conserves as much memory
     // as possible
-    plSound::SetLoadFromDiskOnDemand( !(bool)params[ 0 ] );
+    plSound::SetLoadFromDiskOnDemand(!(bool)params[ 0 ]);
 }
 
-PF_CONSOLE_CMD( Audio, SetVolume,
-                "string obj, float vol", "Sets the volume on a given object. 1 is max volume, 0 is silence" )
+PF_CONSOLE_CMD(Audio, SetVolume,
+               "string obj, float vol", "Sets the volume on a given object. 1 is max volume, 0 is silence")
 {
     char    str[ 256 ];
     plKey key = FindSceneObjectByName(plString::FromUtf8(params[ 0 ]), "", str);
-    if( key == nil )
+
+    if (key == nil) {
         return;
+    }
 
     plSceneObject* obj = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-    if( !obj )
-        return;
 
-    const plAudioInterface  *ai = obj->GetAudioInterface();
+    if (!obj) {
+        return;
+    }
+
+    const plAudioInterface*  ai = obj->GetAudioInterface();
     plKey   aiKey = ai->GetKey();
 
     plSoundMsg* cmd = new plSoundMsg;
-    cmd->SetSender( plClient::GetInstance()->GetKey() );
-    cmd->SetCmd( plSoundMsg::kSetVolume );
+    cmd->SetSender(plClient::GetInstance()->GetKey());
+    cmd->SetCmd(plSoundMsg::kSetVolume);
     cmd->fVolume = params[ 1 ];
-    cmd->AddReceiver( key );
+    cmd->AddReceiver(key);
     plgDispatch::MsgSend(cmd);
 }
 
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Audio, IsolateSound,
-                "string soundComponentName", "Mutes all sounds except the given sound. Use Audio.MuteAll false to remove the isolation." )
+PF_CONSOLE_CMD(Audio, IsolateSound,
+               "string soundComponentName", "Mutes all sounds except the given sound. Use Audio.MuteAll false to remove the isolation.")
 {
     char            str[ 512 ];
     plKey           key;
-    plAudioSysMsg   *asMsg;
+    plAudioSysMsg*   asMsg;
 
-    key = FindSceneObjectByName( plString::FromUtf8( params[ 0 ] ), "", str );
-    if( key == nil )
-    {
-        sprintf( str, "Cannot find sound %s", (char *)params[ 0 ] );
-        PrintString( str );
+    key = FindSceneObjectByName(plString::FromUtf8(params[ 0 ]), "", str);
+
+    if (key == nil) {
+        sprintf(str, "Cannot find sound %s", (char*)params[ 0 ]);
+        PrintString(str);
         return;
     }
 
-    plSceneObject *obj = plSceneObject::ConvertNoRef( key->GetObjectPtr() );
-    if( !obj )
-    {
-        sprintf( str, "Cannot get sceneObject %s", (char *)params[ 0 ] );
-        PrintString( str );
+    plSceneObject* obj = plSceneObject::ConvertNoRef(key->GetObjectPtr());
+
+    if (!obj) {
+        sprintf(str, "Cannot get sceneObject %s", (char*)params[ 0 ]);
+        PrintString(str);
         return;
     }
 
-    const plAudioInterface  *ai = obj->GetAudioInterface();
-    if( ai == nil )
-    {
-        sprintf( str, "sceneObject %s has no audio interface", (char *)params[ 0 ] );
-        PrintString( str );
+    const plAudioInterface*  ai = obj->GetAudioInterface();
+
+    if (ai == nil) {
+        sprintf(str, "sceneObject %s has no audio interface", (char*)params[ 0 ]);
+        PrintString(str);
         return;
     }
 
-    asMsg = new plAudioSysMsg( plAudioSysMsg::kMuteAll );
-    plgDispatch::MsgSend( asMsg );
+    asMsg = new plAudioSysMsg(plAudioSysMsg::kMuteAll);
+    plgDispatch::MsgSend(asMsg);
 
-    asMsg = new plAudioSysMsg( plAudioSysMsg::kUnmuteAll );
-    asMsg->AddReceiver( ai->GetKey() );
-    asMsg->SetBCastFlag( plMessage::kBCastByExactType, false );
-    plgDispatch::MsgSend( asMsg );
+    asMsg = new plAudioSysMsg(plAudioSysMsg::kUnmuteAll);
+    asMsg->AddReceiver(ai->GetKey());
+    asMsg->SetBCastFlag(plMessage::kBCastByExactType, false);
+    plgDispatch::MsgSend(asMsg);
 
 
     char str2[ 256 ];
-    sprintf( str2, "Sounds on sceneObject %s isolated.", (char *)params[ 0 ] );
-    PrintString( str2 );
+    sprintf(str2, "Sounds on sceneObject %s isolated.", (char*)params[ 0 ]);
+    PrintString(str2);
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Audio, SetMicVolume, "float volume", "Sets the microphone volume, in the range of 0 to 1" )
+PF_CONSOLE_CMD(Audio, SetMicVolume, "float volume", "Sets the microphone volume, in the range of 0 to 1")
 {
-    if( !plWinMicLevel::CanSetLevel() )
-        PrintString( "Unable to set microphone level" );
-    else
-    {
-        plWinMicLevel::SetLevel( (float)params[ 0 ] );
+    if (!plWinMicLevel::CanSetLevel()) {
+        PrintString("Unable to set microphone level");
+    } else {
+        plWinMicLevel::SetLevel((float)params[ 0 ]);
     }
 }
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Audio, MCNTest, "int which", "" )
+PF_CONSOLE_CMD(Audio, MCNTest, "int which", "")
 {
-    if( (int)params[ 0 ] == 0 )
+    if ((int)params[ 0 ] == 0) {
         plgAudioSys::ClearDebugFlags();
-    else if( (int)params[ 0 ] == 1 )
-        plgAudioSys::SetDebugFlag( plgAudioSys::kDisableRightSelect );
-    else if( (int)params[ 0 ] == 2 )
-        plgAudioSys::SetDebugFlag( plgAudioSys::kDisableLeftSelect );
+    } else if ((int)params[ 0 ] == 1) {
+        plgAudioSys::SetDebugFlag(plgAudioSys::kDisableRightSelect);
+    } else if ((int)params[ 0 ] == 2) {
+        plgAudioSys::SetDebugFlag(plgAudioSys::kDisableLeftSelect);
+    }
 }
 
-PF_CONSOLE_CMD( Audio, Mark, "", "" )
+PF_CONSOLE_CMD(Audio, Mark, "", "")
 {
     static int markNum = 0;
-    plStatusLog::AddLineS( "threadfun.log", "******* Mark #%d *******", markNum++ );
+    plStatusLog::AddLineS("threadfun.log", "******* Mark #%d *******", markNum++);
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Audio, SetStreamingBufferSize, "float sizeInSecs", "Sets the size of the streaming buffer for each streaming sound." )
+PF_CONSOLE_CMD(Audio, SetStreamingBufferSize, "float sizeInSecs", "Sets the size of the streaming buffer for each streaming sound.")
 {
-    plgAudioSys::SetStreamingBufferSize( (float)params[ 0 ] );
-    PrintString( "Changes won't take effect until you restart the audio system." );
+    plgAudioSys::SetStreamingBufferSize((float)params[ 0 ]);
+    PrintString("Changes won't take effect until you restart the audio system.");
 }
 
-PF_CONSOLE_CMD( Audio, SetStreamFromRAMCutoff, "float cutoffInSecs", "Sets the cutoff between streaming from RAM and streaming directly from disk." )
+PF_CONSOLE_CMD(Audio, SetStreamFromRAMCutoff, "float cutoffInSecs", "Sets the cutoff between streaming from RAM and streaming directly from disk.")
 {
-    plgAudioSys::SetStreamFromRAMCutoff( (float)params[ 0 ] );
-    PrintString( "Changes won't take effect until you restart the audio system." );
+    plgAudioSys::SetStreamFromRAMCutoff((float)params[ 0 ]);
+    PrintString("Changes won't take effect until you restart the audio system.");
 }
 
-PF_CONSOLE_CMD( Audio, SetPriorityCutoff, "int cutoff", "Stops sounds from loading whose priority is greater than this cutoff." )
+PF_CONSOLE_CMD(Audio, SetPriorityCutoff, "int cutoff", "Stops sounds from loading whose priority is greater than this cutoff.")
 {
-    plgAudioSys::SetPriorityCutoff( (int)params[ 0 ] );
+    plgAudioSys::SetPriorityCutoff((int)params[ 0 ]);
 }
 
-PF_CONSOLE_CMD( Audio, EnableExtendedLogs, "bool enable", "Enables or disables the extended audio logs." )
+PF_CONSOLE_CMD(Audio, EnableExtendedLogs, "bool enable", "Enables or disables the extended audio logs.")
 {
-    plgAudioSys::EnableExtendedLogs( (bool)params[ 0 ] );
+    plgAudioSys::EnableExtendedLogs((bool)params[ 0 ]);
 }
 
-PF_CONSOLE_GROUP( Listener )
+PF_CONSOLE_GROUP(Listener)
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Listener, ShowDebugInfo, "bool show", "Shows or hides debugging info")
+PF_CONSOLE_CMD(Listener, ShowDebugInfo, "bool show", "Shows or hides debugging info")
 {
-    plListener::ShowDebugInfo( (bool)params[ 0 ] );
+    plListener::ShowDebugInfo((bool)params[ 0 ]);
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Listener, UseCameraOrientation, "", "Use the camera's orientation to orient the listener")
+PF_CONSOLE_CMD(Listener, UseCameraOrientation, "", "Use the camera's orientation to orient the listener")
 {
-    plSetListenerMsg *set = new plSetListenerMsg( plSetListenerMsg::kVCam | plSetListenerMsg::kFacing, nil, true );
+    plSetListenerMsg* set = new plSetListenerMsg(plSetListenerMsg::kVCam | plSetListenerMsg::kFacing, nil, true);
     set->Send();
 }
 
-PF_CONSOLE_CMD( Listener, UseCameraPosition, "", "Use the canera's position to position the listener")
+PF_CONSOLE_CMD(Listener, UseCameraPosition, "", "Use the canera's position to position the listener")
 {
-    plSetListenerMsg *set = new plSetListenerMsg( plSetListenerMsg::kVCam | plSetListenerMsg::kPosition, nil, true );
+    plSetListenerMsg* set = new plSetListenerMsg(plSetListenerMsg::kVCam | plSetListenerMsg::kPosition, nil, true);
     set->Send();
 }
 
-PF_CONSOLE_CMD( Listener, UseCameraVelocity, "", "Use the camera's velocity to set the listener velocity")
+PF_CONSOLE_CMD(Listener, UseCameraVelocity, "", "Use the camera's velocity to set the listener velocity")
 {
-    plSetListenerMsg *set = new plSetListenerMsg( plSetListenerMsg::kVCam | plSetListenerMsg::kVelocity, nil, true );
+    plSetListenerMsg* set = new plSetListenerMsg(plSetListenerMsg::kVCam | plSetListenerMsg::kVelocity, nil, true);
     set->Send();
 }
 
-PF_CONSOLE_CMD( Listener, UsePlayerOrientation, "", "Use the player's orientation to orient the listener")
+PF_CONSOLE_CMD(Listener, UsePlayerOrientation, "", "Use the player's orientation to orient the listener")
 {
     plKey pKey = plNetClientMgr::GetInstance()->GetLocalPlayerKey();
-    if( pKey )
-    {
-        plSetListenerMsg *set = new plSetListenerMsg( plSetListenerMsg::kFacing, pKey, true );
+
+    if (pKey) {
+        plSetListenerMsg* set = new plSetListenerMsg(plSetListenerMsg::kFacing, pKey, true);
         set->Send();
     }
 }
-PF_CONSOLE_CMD( Listener, UsePlayerPosition, "", "Use the player's position to position the listener")
+PF_CONSOLE_CMD(Listener, UsePlayerPosition, "", "Use the player's position to position the listener")
 {
     plKey pKey = plNetClientMgr::GetInstance()->GetLocalPlayerKey();
-    if (pKey)
-    {
-        plSetListenerMsg *set = new plSetListenerMsg( plSetListenerMsg::kPosition, pKey, true );
-        set->Send();
-    }
-}
 
-PF_CONSOLE_CMD( Listener, UsePlayerVelocity, "", "Use the player's velocity to set the listener velocity")
-{
-    plKey pKey = plNetClientMgr::GetInstance()->GetLocalPlayerKey();
-    if (pKey)
-    {
-        plSetListenerMsg *set = new plSetListenerMsg( plSetListenerMsg::kVelocity, pKey, true );
+    if (pKey) {
+        plSetListenerMsg* set = new plSetListenerMsg(plSetListenerMsg::kPosition, pKey, true);
         set->Send();
     }
 }
 
-PF_CONSOLE_CMD( Listener, XMode, "bool b", "Sets velocity and position to avatar, and orientation to camera")
+PF_CONSOLE_CMD(Listener, UsePlayerVelocity, "", "Use the player's velocity to set the listener velocity")
+{
+    plKey pKey = plNetClientMgr::GetInstance()->GetLocalPlayerKey();
+
+    if (pKey) {
+        plSetListenerMsg* set = new plSetListenerMsg(plSetListenerMsg::kVelocity, pKey, true);
+        set->Send();
+    }
+}
+
+PF_CONSOLE_CMD(Listener, XMode, "bool b", "Sets velocity and position to avatar, and orientation to camera")
 {
     static uint32_t oldPosType = 0, oldFacingType = 0, oldVelType = 0;
-    
-    plSetListenerMsg *set = nil;
+
+    plSetListenerMsg* set = nil;
     plKey pKey = plNetClientMgr::GetInstance()->GetLocalPlayerKey();
     plListener* pListener;
 
-    if( (bool)params[ 0 ] )
-    {
+    if ((bool)params[ 0 ]) {
         // Get the listener object
         plUoid lu(kListenerMod_KEY);
         plKey pLKey = hsgResMgr::ResMgr()->FindKey(lu);
-        if (pLKey)
-        {   
+
+        if (pLKey) {
             pListener = plListener::ConvertNoRef(pLKey->GetObjectPtr());
         }
 
-        if(pListener)
-        {
+        if (pListener) {
             // Save old types
             oldPosType = pListener->GetAttachedPosType();
             oldFacingType = pListener->GetAttachedFacingType();
             oldVelType = pListener->GetAttachedVelType();
         }
-        
+
         plStatusLog::AddLineS("audio.log", "XMode on");
-        
-        plSetListenerMsg *set = new plSetListenerMsg( plSetListenerMsg::kVCam | plSetListenerMsg::kFacing, nil, true );
+
+        plSetListenerMsg* set = new plSetListenerMsg(plSetListenerMsg::kVCam | plSetListenerMsg::kFacing, nil, true);
         set->Send();
-        if (pKey)
-        {
-            set = new plSetListenerMsg( plSetListenerMsg::kVelocity, pKey, true );
+
+        if (pKey) {
+            set = new plSetListenerMsg(plSetListenerMsg::kVelocity, pKey, true);
             set->Send();
-            set = new plSetListenerMsg( plSetListenerMsg::kPosition, pKey, true );
-            set->Send();
-        }
-    }
-    else 
-    {
-        if(oldPosType == plListener::kCamera)
-        {
-            plSetListenerMsg *set = new plSetListenerMsg( plSetListenerMsg::kVCam | plSetListenerMsg::kPosition, nil, true );
+            set = new plSetListenerMsg(plSetListenerMsg::kPosition, pKey, true);
             set->Send();
         }
-        else
-        {
-            set = new plSetListenerMsg( plSetListenerMsg::kPosition, pKey, true );
+    } else {
+        if (oldPosType == plListener::kCamera) {
+            plSetListenerMsg* set = new plSetListenerMsg(plSetListenerMsg::kVCam | plSetListenerMsg::kPosition, nil, true);
+            set->Send();
+        } else {
+            set = new plSetListenerMsg(plSetListenerMsg::kPosition, pKey, true);
             set->Send();
         }
-        if(oldFacingType == plListener::kCamera)
-        {
-            set = new plSetListenerMsg( plSetListenerMsg::kVCam | plSetListenerMsg::kFacing, nil, true );
+
+        if (oldFacingType == plListener::kCamera) {
+            set = new plSetListenerMsg(plSetListenerMsg::kVCam | plSetListenerMsg::kFacing, nil, true);
+            set->Send();
+        } else {
+            set = new plSetListenerMsg(plSetListenerMsg::kFacing, pKey, true);
             set->Send();
         }
-        else
-        {
-            set = new plSetListenerMsg( plSetListenerMsg::kFacing, pKey, true );
+
+        if (oldVelType == plListener::kCamera) {
+            set = new plSetListenerMsg(plSetListenerMsg::kVCam | plSetListenerMsg::kVelocity, nil, true);
+            set->Send();
+        } else {
+            set = new plSetListenerMsg(plSetListenerMsg::kVelocity, pKey, true);
             set->Send();
         }
-        if(oldVelType == plListener::kCamera)
-        {
-            set = new plSetListenerMsg( plSetListenerMsg::kVCam | plSetListenerMsg::kVelocity, nil, true );
-            set->Send();
-        }
-        else
-        {
-            set = new plSetListenerMsg( plSetListenerMsg::kVelocity, pKey, true );
-            set->Send();
-        }
+
         plStatusLog::AddLineS("audio.log", "%s, %d, %d, %d", "XMode off", oldPosType, oldFacingType, oldVelType);
     }
 }
@@ -3782,21 +3784,21 @@ PF_CONSOLE_CMD( Listener, XMode, "bool b", "Sets velocity and position to avatar
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_GROUP( DInput )
+PF_CONSOLE_GROUP(DInput)
 
-PF_CONSOLE_CMD( DInput, UseDInput, "bool on", "Turns off DirectInput")
+PF_CONSOLE_CMD(DInput, UseDInput, "bool on", "Turns off DirectInput")
 {
     bool on = params[0];
     plInputManager::UseDInput(on);
 }
 
 
-PF_CONSOLE_CMD( DInput, Config, "", "Launch DInput configuration screen")
+PF_CONSOLE_CMD(DInput, Config, "", "Launch DInput configuration screen")
 {
     plgAudioSys::Activate(false);
     plInputEventMsg* pMsg = new plInputEventMsg;
     pMsg->fEvent = plInputEventMsg::kConfigure;
-    pMsg->AddReceiver( plInputManager::GetInstance()->GetKey() );
+    pMsg->AddReceiver(plInputManager::GetInstance()->GetKey());
     pMsg->SetBCastFlag(plMessage::kBCastByType, false);
     plgDispatch::MsgSend(pMsg);
 }
@@ -3808,26 +3810,28 @@ PF_CONSOLE_CMD( DInput, Config, "", "Launch DInput configuration screen")
 //// Keyboard Remapping Group Commands ///////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-PF_CONSOLE_GROUP( Keyboard )        // Defines a main command group
+PF_CONSOLE_GROUP(Keyboard)          // Defines a main command group
 
-PF_CONSOLE_CMD( Keyboard, ResetBindings, "", "Resets the keyboard bindings to their defaults" )
+PF_CONSOLE_CMD(Keyboard, ResetBindings, "", "Resets the keyboard bindings to their defaults")
 {
-    if( plInputInterfaceMgr::GetInstance() != nil )
+    if (plInputInterfaceMgr::GetInstance() != nil) {
         plInputInterfaceMgr::GetInstance()->InitDefaultKeyMap();
+    }
 
-    PrintString( "Keyboard bindings reset" );
+    PrintString("Keyboard bindings reset");
 }
 
 
-PF_CONSOLE_CMD( Keyboard, ClearBindings, "", "Resets the keyboard bindings to empty" )
+PF_CONSOLE_CMD(Keyboard, ClearBindings, "", "Resets the keyboard bindings to empty")
 {
-    if( plInputInterfaceMgr::GetInstance() != nil )
+    if (plInputInterfaceMgr::GetInstance() != nil) {
         plInputInterfaceMgr::GetInstance()->ClearAllKeyMaps();
+    }
 
-    PrintString( "Keyboard bindings destroyed" );
+    PrintString("Keyboard bindings destroyed");
 }
 
-static plKeyCombo   IBindKeyToVKey( const char *string )
+static plKeyCombo   IBindKeyToVKey(const char* string)
 {
     char    str[ 16 ];
     int     i;
@@ -3835,82 +3839,88 @@ static plKeyCombo   IBindKeyToVKey( const char *string )
     plKeyCombo  combo;
 
 
-    strcpy( str, string );
+    strcpy(str, string);
 
     // Find modifiers to set flags with
     combo.fFlags = 0;
-    if( strstr( str, "_S" ) || strstr( str, "_s" ) )
+
+    if (strstr(str, "_S") || strstr(str, "_s")) {
         combo.fFlags |= plKeyCombo::kShift;
-    if( strstr( str, "_C" ) || strstr( str, "_c" ) )
+    }
+
+    if (strstr(str, "_C") || strstr(str, "_c")) {
         combo.fFlags |= plKeyCombo::kCtrl;
-    
+    }
+
     // Get rid of modififers
-    for( i = 0; str[ i ] != 0 && str[ i ] != '_'; i++ );
+    for (i = 0; str[ i ] != 0 && str[ i ] != '_'; i++);
+
     str[ i ] = 0;
 
     // Convert raw key
-    combo.fKey = plKeyMap::ConvertCharToVKey( str );
-    if( combo.fKey == KEY_UNMAPPED )
+    combo.fKey = plKeyMap::ConvertCharToVKey(str);
+
+    if (combo.fKey == KEY_UNMAPPED) {
         combo = plKeyCombo::kUnmapped;
+    }
 
     // And return!
     return combo;
 
 }
 
-static ControlEventCode IBindStringToCmdCode( const char *string )
+static ControlEventCode IBindStringToCmdCode(const char* string)
 {
-    return plKeyMap::ConvertCharToControlCode( string );
+    return plKeyMap::ConvertCharToControlCode(string);
 }
 
-PF_CONSOLE_CMD( Keyboard,       // groupName
+PF_CONSOLE_CMD(Keyboard,        // groupName
                BindKey,     // fxnName
                "string key1, string action", // paramList
-               "Binds the given single key combo to the given action" ) // helpString
+               "Binds the given single key combo to the given action")  // helpString
 {
-    ControlEventCode code = IBindStringToCmdCode( params[ 1 ] );
-    if( code == END_CONTROLS )
-    {
-        PrintString( "ERROR: Invalid command name" );
+    ControlEventCode code = IBindStringToCmdCode(params[ 1 ]);
+
+    if (code == END_CONTROLS) {
+        PrintString("ERROR: Invalid command name");
         return;
     }
 
-    if( plInputInterfaceMgr::GetInstance() != nil )
-    {
-        plKeyCombo key1 = IBindKeyToVKey( params[ 0 ] );
-        plInputInterfaceMgr::GetInstance()->BindAction( key1, code );
+    if (plInputInterfaceMgr::GetInstance() != nil) {
+        plKeyCombo key1 = IBindKeyToVKey(params[ 0 ]);
+        plInputInterfaceMgr::GetInstance()->BindAction(key1, code);
     }
 }
 
-PF_CONSOLE_CMD( Keyboard,       // groupName
+PF_CONSOLE_CMD(Keyboard,        // groupName
                BindAction,      // fxnName
                "string key1, string key2, string action", // paramList
-               "Binds the given two keys to the given action (you can specify 'UNDEFINED' for either key if you wish)" )    // helpString
+               "Binds the given two keys to the given action (you can specify 'UNDEFINED' for either key if you wish)")     // helpString
 {
-    ControlEventCode code = IBindStringToCmdCode( params[ 2 ] );
-    if( code == END_CONTROLS )
-    {
-        PrintString( "ERROR: Invalid command name" );
+    ControlEventCode code = IBindStringToCmdCode(params[ 2 ]);
+
+    if (code == END_CONTROLS) {
+        PrintString("ERROR: Invalid command name");
         return;
     }
 
-    if( plInputInterfaceMgr::GetInstance() != nil )
-    {
-        plKeyCombo key1 = IBindKeyToVKey( params[ 0 ] );
-        plKeyCombo key2 = IBindKeyToVKey( params[ 1 ] );
-        plInputInterfaceMgr::GetInstance()->BindAction( key1, key2, code );
+    if (plInputInterfaceMgr::GetInstance() != nil) {
+        plKeyCombo key1 = IBindKeyToVKey(params[ 0 ]);
+        plKeyCombo key2 = IBindKeyToVKey(params[ 1 ]);
+        plInputInterfaceMgr::GetInstance()->BindAction(key1, key2, code);
     }
 }
 
-PF_CONSOLE_CMD( Keyboard,       // groupName
+PF_CONSOLE_CMD(Keyboard,        // groupName
                BindConsoleCmd,      // fxnName
                "string key, string command", // paramList
-               "Bind console command to key" )  // helpString
+               "Bind console command to key")   // helpString
 {
-    plKeyCombo key = IBindKeyToVKey( params[ 0 ] );
+    plKeyCombo key = IBindKeyToVKey(params[ 0 ]);
 
-    if( plInputInterfaceMgr::GetInstance() != nil )
-        plInputInterfaceMgr::GetInstance()->BindConsoleCmd( key, params[ 1 ], plKeyMap::kFirstAlways );
+    if (plInputInterfaceMgr::GetInstance() != nil) {
+        plInputInterfaceMgr::GetInstance()->BindConsoleCmd(key, params[ 1 ], plKeyMap::kFirstAlways);
+    }
 }
 
 
@@ -3918,36 +3928,36 @@ PF_CONSOLE_CMD( Keyboard,       // groupName
 //// Stat Gather Commands ////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-PF_CONSOLE_GROUP( Nav )
+PF_CONSOLE_GROUP(Nav)
 
-PF_CONSOLE_CMD( Nav, PageInNode,    // Group name, Function name
-                "string roomName",          // Params
-                "Pages in a scene node." )  // Help string
+PF_CONSOLE_CMD(Nav, PageInNode,     // Group name, Function name
+               "string roomName",          // Params
+               "Pages in a scene node.")   // Help string
 {
     plSynchEnabler ps(false);   // disable dirty tracking while paging in
     plClientMsg* pMsg1 = new plClientMsg(plClientMsg::kLoadRoom);
-    pMsg1->AddReceiver( plClient::GetInstance()->GetKey() );
-    pMsg1->AddRoomLoc(plKeyFinder::Instance().FindLocation("", static_cast<const char *>(params[0])));
+    pMsg1->AddReceiver(plClient::GetInstance()->GetKey());
+    pMsg1->AddRoomLoc(plKeyFinder::Instance().FindLocation("", static_cast<const char*>(params[0])));
     plgDispatch::MsgSend(pMsg1);
 }
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
 
-PF_CONSOLE_CMD( Nav, PageOutNode,   // Group name, Function name
-                "string roomName",          // Params
-                "pages out a scene node." ) // Help string
+PF_CONSOLE_CMD(Nav, PageOutNode,    // Group name, Function name
+               "string roomName",          // Params
+               "pages out a scene node.")  // Help string
 {
     plSynchEnabler ps(false);   // disable dirty tracking while paging out
     plClientMsg* pMsg1 = new plClientMsg(plClientMsg::kUnloadRoom);
-    pMsg1->AddReceiver( plClient::GetInstance()->GetKey() );
-    pMsg1->AddRoomLoc(plKeyFinder::Instance().FindLocation("", static_cast<const char *>(params[0])));
+    pMsg1->AddReceiver(plClient::GetInstance()->GetKey());
+    pMsg1->AddRoomLoc(plKeyFinder::Instance().FindLocation("", static_cast<const char*>(params[0])));
     plgDispatch::MsgSend(pMsg1);
 }
 
-PF_CONSOLE_CMD( Nav, UnloadPlayer,  // Group name, Function name
-                "string objName",           // Params
-                "unloads a named player" )  // Help string
+PF_CONSOLE_CMD(Nav, UnloadPlayer,   // Group name, Function name
+               "string objName",           // Params
+               "unloads a named player")   // Help string
 {
     char str[256];
     plKey key = FindSceneObjectByName(plString::FromUtf8(params[0]), "", str);
@@ -3955,28 +3965,32 @@ PF_CONSOLE_CMD( Nav, UnloadPlayer,  // Group name, Function name
     // plNetClientMgr::UnloadPlayer(key);
 }
 
-PF_CONSOLE_CMD( Nav, UnloadSceneObject, // Group name, Function name
-                "string objName",           // Params
-                "unloads a named scene object" )    // Help string
+PF_CONSOLE_CMD(Nav, UnloadSceneObject,  // Group name, Function name
+               "string objName",           // Params
+               "unloads a named scene object")     // Help string
 {
 
     PrintString("OBSOLETE");
 }
 
-PF_CONSOLE_CMD( Nav, MovePlayer,    // Group name, Function name
-                "string playerName, string destPage",           // Params
-                "moves a player from one paging unit to another" )  // Help string
+PF_CONSOLE_CMD(Nav, MovePlayer,     // Group name, Function name
+               "string playerName, string destPage",           // Params
+               "moves a player from one paging unit to another")   // Help string
 {
     char str[256];
-    plKey playerKey = FindSceneObjectByName(static_cast<const char *>(params[0]), "", str);
+    plKey playerKey = FindSceneObjectByName(static_cast<const char*>(params[0]), "", str);
     PrintString(str);
-    if( !playerKey )
-        return;
 
-    plKey nodeKey = FindObjectByName(static_cast<const char *>(params[1]), plSceneNode::Index(), "", str);
-    PrintString(str);
-    if( !nodeKey )
+    if (!playerKey) {
         return;
+    }
+
+    plKey nodeKey = FindObjectByName(static_cast<const char*>(params[1]), plSceneNode::Index(), "", str);
+    PrintString(str);
+
+    if (!nodeKey) {
+        return;
+    }
 
     plNodeChangeMsg* msg = new plNodeChangeMsg(nil, playerKey, nodeKey);
     plgDispatch::MsgSend(msg);
@@ -3984,33 +3998,33 @@ PF_CONSOLE_CMD( Nav, MovePlayer,    // Group name, Function name
     PrintString(str);
 }
 
-PF_CONSOLE_CMD( Nav, ExcludePage, "string pageName", "Excludes the given page from ever being loaded. Useful for debugging." )
+PF_CONSOLE_CMD(Nav, ExcludePage, "string pageName", "Excludes the given page from ever being loaded. Useful for debugging.")
 {
-    if( plNetClientMgr::GetInstance() == nil )
-        PrintString( "Unable to exclude page--NetClientMgr not loaded" );
-    else
-    {
+    if (plNetClientMgr::GetInstance() == nil) {
+        PrintString("Unable to exclude page--NetClientMgr not loaded");
+    } else {
         char    str[ 256 ];
-        sprintf( str, "Page %s excluded from load", (char *)params[ 0 ] );
-        plAgeLoader::GetInstance()->AddExcludedPage( params[ 0 ] );
-        PrintString( str );
+        sprintf(str, "Page %s excluded from load", (char*)params[ 0 ]);
+        plAgeLoader::GetInstance()->AddExcludedPage(params[ 0 ]);
+        PrintString(str);
     }
 }
 
-PF_CONSOLE_CMD( Nav, ClearExcludeList, "", "Clears the list of pages to exclude from loading." )
+PF_CONSOLE_CMD(Nav, ClearExcludeList, "", "Clears the list of pages to exclude from loading.")
 {
-    if( plAgeLoader::GetInstance() != nil )
+    if (plAgeLoader::GetInstance() != nil) {
         plAgeLoader::GetInstance()->ClearPageExcludeList();
+    }
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_GROUP( Movie ) // Defines a main command group
+PF_CONSOLE_GROUP(Movie)   // Defines a main command group
 
-PF_CONSOLE_CMD( Movie,
-                    Start,
-                   "string filename",
-                   "Start of movie with this filename" )
+PF_CONSOLE_CMD(Movie,
+               Start,
+               "string filename",
+               "Start of movie with this filename")
 {
     char* filename = params[0];
     plMovieMsg* mov = new plMovieMsg(filename, plMovieMsg::kStart);
@@ -4027,10 +4041,10 @@ PF_CONSOLE_CMD( Movie,
     PrintStringF(PrintString, "%s now playing", filename);
 }
 
-PF_CONSOLE_CMD( Movie,
-                    Stop,
-                   "string filename",
-                   "Stop movie with this filename" )
+PF_CONSOLE_CMD(Movie,
+               Stop,
+               "string filename",
+               "Stop movie with this filename")
 {
     char* filename = params[0];
     plMovieMsg* mov = new plMovieMsg(filename, plMovieMsg::kStop);
@@ -4039,10 +4053,10 @@ PF_CONSOLE_CMD( Movie,
     PrintStringF(PrintString, "%s now stopping", filename);
 }
 
-PF_CONSOLE_CMD( Movie,
-                    Pause,
-                   "string filename",
-                   "Pause movie with this filename" )
+PF_CONSOLE_CMD(Movie,
+               Pause,
+               "string filename",
+               "Pause movie with this filename")
 {
     char* filename = params[0];
     plMovieMsg* mov = new plMovieMsg(filename, plMovieMsg::kPause);
@@ -4051,10 +4065,10 @@ PF_CONSOLE_CMD( Movie,
     PrintStringF(PrintString, "%s now pausing", filename);
 }
 
-PF_CONSOLE_CMD( Movie,
-                    Resume,
-                   "string filename",
-                   "Resume movie with this filename" )
+PF_CONSOLE_CMD(Movie,
+               Resume,
+               "string filename",
+               "Resume movie with this filename")
 {
     char* filename = params[0];
     plMovieMsg* mov = new plMovieMsg(filename, plMovieMsg::kResume);
@@ -4063,10 +4077,10 @@ PF_CONSOLE_CMD( Movie,
     PrintStringF(PrintString, "%s now resuming", filename);
 }
 
-PF_CONSOLE_CMD( Movie,
-                    Move,
-                   "string filename, float x, float y",
-                   "Move center of movie with this filename to x,y" )
+PF_CONSOLE_CMD(Movie,
+               Move,
+               "string filename, float x, float y",
+               "Move center of movie with this filename to x,y")
 {
     char* filename = params[0];
     plMovieMsg* mov = new plMovieMsg(filename, plMovieMsg::kMove);
@@ -4078,10 +4092,10 @@ PF_CONSOLE_CMD( Movie,
     PrintStringF(PrintString, "%s now at %g,%g", filename, x, y);
 }
 
-PF_CONSOLE_CMD( Movie,
-                    Scale,
-                   "string filename, float x, float y",
-                   "Scale movie with this filename by x,y" )
+PF_CONSOLE_CMD(Movie,
+               Scale,
+               "string filename, float x, float y",
+               "Scale movie with this filename by x,y")
 {
     char* filename = params[0];
     plMovieMsg* mov = new plMovieMsg(filename, plMovieMsg::kScale);
@@ -4093,10 +4107,10 @@ PF_CONSOLE_CMD( Movie,
     PrintStringF(PrintString, "%s now scaled to %g,%g", filename, x, y);
 }
 
-PF_CONSOLE_CMD( Movie,
-                    Alpha,
-                   "string filename, float a",
-                   "Set opacity of movie with this filename to a" )
+PF_CONSOLE_CMD(Movie,
+               Alpha,
+               "string filename, float a",
+               "Set opacity of movie with this filename to a")
 {
     char* filename = params[0];
     plMovieMsg* mov = new plMovieMsg(filename, plMovieMsg::kOpacity);
@@ -4107,10 +4121,10 @@ PF_CONSOLE_CMD( Movie,
     PrintStringF(PrintString, "%s opacity now at %g", filename, a);
 }
 
-PF_CONSOLE_CMD( Movie,
-                    Color,
-                   "string filename, float r, float g, float b",
-                   "Color movie with this filename as r,g,b" )
+PF_CONSOLE_CMD(Movie,
+               Color,
+               "string filename, float r, float g, float b",
+               "Color movie with this filename as r,g,b")
 {
     char* filename = params[0];
     plMovieMsg* mov = new plMovieMsg(filename, plMovieMsg::kColor);
@@ -4123,10 +4137,10 @@ PF_CONSOLE_CMD( Movie,
     PrintStringF(PrintString, "%s now tinted to %g,%g,%g", filename, r, g, b);
 }
 
-PF_CONSOLE_CMD( Movie,
-                    Volume,
-                   "string filename, float v",
-                   "Set volume of movie with this filename to v" )
+PF_CONSOLE_CMD(Movie,
+               Volume,
+               "string filename, float v",
+               "Set volume of movie with this filename to v")
 {
     char* filename = params[0];
     plMovieMsg* mov = new plMovieMsg(filename, plMovieMsg::kVolume);
@@ -4137,10 +4151,10 @@ PF_CONSOLE_CMD( Movie,
     PrintStringF(PrintString, "%s volume now at %g", filename, v);
 }
 
-PF_CONSOLE_CMD( Movie,
-                    FadeIn,
-                   "string filename, float secs, float r, float g, float b, float a",
-                   "Fade in movie with this filename from r,g,b,a over secs seconds" )
+PF_CONSOLE_CMD(Movie,
+               FadeIn,
+               "string filename, float secs, float r, float g, float b, float a",
+               "Fade in movie with this filename from r,g,b,a over secs seconds")
 {
     char* filename = params[0];
     plMovieMsg* mov = new plMovieMsg(filename, plMovieMsg::kFadeIn);
@@ -4156,10 +4170,10 @@ PF_CONSOLE_CMD( Movie,
     PrintStringF(PrintString, "%s now fading from %g,%g,%g,%g over %g secs", filename, r, g, b, a, secs);
 }
 
-PF_CONSOLE_CMD( Movie,
-                    FadeOut,
-                   "string filename, float secs, float r, float g, float b, float a",
-                   "Fade out movie with this filename to r,g,b,a over secs seconds" )
+PF_CONSOLE_CMD(Movie,
+               FadeOut,
+               "string filename, float secs, float r, float g, float b, float a",
+               "Fade out movie with this filename to r,g,b,a over secs seconds")
 {
     char* filename = params[0];
     plMovieMsg* mov = new plMovieMsg(filename, plMovieMsg::kFadeOut);
@@ -4180,18 +4194,21 @@ PF_CONSOLE_CMD( Movie,
 //////////////////////////////////////////////////////////////////////////////
 // Test hacks for setting overall quality and clamping board capability
 //////////////////////////////////////////////////////////////////////////////
-PF_CONSOLE_GROUP( Quality )
+PF_CONSOLE_GROUP(Quality)
 
-PF_CONSOLE_CMD( Quality,
-                    Level,
-                   "int quality",
-                   "Fake quality slider from .ini file" )
+PF_CONSOLE_CMD(Quality,
+               Level,
+               "int quality",
+               "Fake quality slider from .ini file")
 {
     int q = params[0];
-    if( q < 0 )
+
+    if (q < 0) {
         q = 0;
-    else if (q > 3)
+    } else if (q > 3) {
         q = 3;
+    }
+
     plClient::GetInstance()->SetQuality(q);
 
     char str[256];
@@ -4201,18 +4218,22 @@ PF_CONSOLE_CMD( Quality,
 
 #include "plSurface/plShaderTable.h"
 
-PF_CONSOLE_CMD( Quality,
-                    Cap,
-                   "int cap",
-                   "Limit graphics capability from .ini file" )
+PF_CONSOLE_CMD(Quality,
+               Cap,
+               "int cap",
+               "Limit graphics capability from .ini file")
 {
     int c = params[0];
-    if( c < 0 )
+
+    if (c < 0) {
         c = 0;
-    if( c == 666 )
+    }
+
+    if (c == 666) {
         plShaderTable::SetLoadFromFile(true);
-    else
+    } else {
         plClient::GetInstance()->SetClampCap(c);
+    }
 
     char str[256];
     sprintf(str, "Graphics capability clamped to %d", c);
@@ -4231,7 +4252,7 @@ PF_CONSOLE_CMD( Quality,
 #include "plDrawable/plMorphSequence.h"
 #include "plAvatar/plAvatarClothing.h"
 
-PF_CONSOLE_GROUP( Access )
+PF_CONSOLE_GROUP(Access)
 
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -4244,46 +4265,54 @@ PF_CONSOLE_GROUP( Access )
 static plMorphSequence* LocalMorphSequence()
 {
     plKey playerKey = plNetClientMgr::GetInstance()->GetLocalPlayerKey();
-    if( !playerKey )
+
+    if (!playerKey) {
         return nil;
+    }
+
     plSceneObject* playerObj = plSceneObject::ConvertNoRef(playerKey->ObjectIsLoaded());
-    if( !playerObj )
+
+    if (!playerObj) {
         return nil;
+    }
 
     const plCoordinateInterface* pci = playerObj->GetCoordinateInterface();
     const plModifier* constSeq = nil;
     int i;
-    for( i = 0; i < pci->GetNumChildren(); i++ )
-    {
+
+    for (i = 0; i < pci->GetNumChildren(); i++) {
         const plSceneObject* child = pci->GetChild(i)->GetOwner();
-        if( child )
-        {
+
+        if (child) {
             int j;
-            for( j = 0; j < child->GetNumModifiers(); j++ )
-            {
+
+            for (j = 0; j < child->GetNumModifiers(); j++) {
                 constSeq = child->GetModifier(j);
-                if( constSeq && plMorphSequence::ConvertNoRef(constSeq) )
-                {
+
+                if (constSeq && plMorphSequence::ConvertNoRef(constSeq)) {
                     return (plMorphSequence*)constSeq; // safe cast, we've already checked type (plus we're const_cast'ing).
                 }
             }
         }
     }
+
     return nil;
 }
 
-PF_CONSOLE_CMD( Access,
-                    Morph,
-                   "string morphMod, int iLay, int iDel, float wgt",
-                   "Set the weight for a morphMod" )
+PF_CONSOLE_CMD(Access,
+               Morph,
+               "string morphMod, int iLay, int iDel, float wgt",
+               "Set the weight for a morphMod")
 {
     char str[256];
     char* preFix = params[0];
     plString name = plString::Format("%s_plMorphSequence_0", preFix);
     plKey key = FindObjectByName(name, plMorphSequence::Index(), "", str);
     PrintString(str);
-    if (!key)
+
+    if (!key) {
         return;
+    }
 
     plMorphSequence* seq = plMorphSequence::ConvertNoRef(key->GetObjectPtr());
 
@@ -4297,18 +4326,20 @@ PF_CONSOLE_CMD( Access,
     PrintString(str);
 }
 
-PF_CONSOLE_CMD( Access,
-                    MoAct,
-                   "string morphMod",
-                   "Activate a morphMod" )
+PF_CONSOLE_CMD(Access,
+               MoAct,
+               "string morphMod",
+               "Activate a morphMod")
 {
     char str[256];
     char* preFix = params[0];
     plString name = plString::Format("%s_plMorphSequence_2", preFix);
     plKey key = FindObjectByName(name, plMorphSequence::Index(), "", str);
     PrintString(str);
-    if (!key)
+
+    if (!key) {
         return;
+    }
 
     plMorphSequence* seq = plMorphSequence::ConvertNoRef(key->GetObjectPtr());
 
@@ -4318,18 +4349,20 @@ PF_CONSOLE_CMD( Access,
     PrintString(str);
 }
 
-PF_CONSOLE_CMD( Access,
-                    MoDeAct,
-                   "string morphMod",
-                   "Activate a morphMod" )
+PF_CONSOLE_CMD(Access,
+               MoDeAct,
+               "string morphMod",
+               "Activate a morphMod")
 {
     char str[256];
     char* preFix = params[0];
     plString name = plString::Format("%s_plMorphSequence_2", preFix);
     plKey key = FindObjectByName(name, plMorphSequence::Index(), "", str);
     PrintString(str);
-    if (!key)
+
+    if (!key) {
         return;
+    }
 
     plMorphSequence* seq = plMorphSequence::ConvertNoRef(key->GetObjectPtr());
 
@@ -4339,14 +4372,14 @@ PF_CONSOLE_CMD( Access,
     PrintString(str);
 }
 //////////////////
-PF_CONSOLE_CMD( Access,
-                    Weight,
-                   "int iLay, int iDel, float wgt",
-                   "Set the weight for a morphMod" )
+PF_CONSOLE_CMD(Access,
+               Weight,
+               "int iLay, int iDel, float wgt",
+               "Set the weight for a morphMod")
 {
     plMorphSequence* seq = LocalMorphSequence();
-    if( !seq )
-    {
+
+    if (!seq) {
         PrintString("Sequence not found\n");
         return;
     }
@@ -4356,64 +4389,64 @@ PF_CONSOLE_CMD( Access,
     float wgt = params[2];
 
     seq->SetWeight(iLay, iDel, wgt);
-    
+
     char str[256];
     sprintf(str, "Layer[%d][%d] = %g\n", iLay, iDel, wgt);
     PrintString(str);
 }
 
 
-PF_CONSOLE_CMD( Access,
+PF_CONSOLE_CMD(Access,
                ZeroBrian,
                "int BeginLay, int EndLay",
-               "Zero the morph layers from begin to end" )
+               "Zero the morph layers from begin to end")
 {
     plMorphSequence* seq = LocalMorphSequence();
-    if( !seq )
-    {
+
+    if (!seq) {
         PrintString("Sequence not found\n");
         return;
     }
-    
+
     int i;
     int s = params[0];
     int e = params[1];
-    
-    for(i = s; i <= e; i++)
-    {
+
+    for (i = s; i <= e; i++) {
         seq->SetWeight(i, 0, 0.0);
         seq->SetWeight(i, 1, 0.0);
     }
+
     PrintString("Zeroed");
-    
+
 }
 
-char *gCurrMorph = nil;
+char* gCurrMorph = nil;
 
-PF_CONSOLE_CMD( Access,
-                SetMorphItem,
-                "string itemName",
-                "Set which clothing item we want to morph" )
+PF_CONSOLE_CMD(Access,
+               SetMorphItem,
+               "string itemName",
+               "Set which clothing item we want to morph")
 {
     delete [] gCurrMorph;
     gCurrMorph = hsStrcpy(nil, params[0]);
 }
 
-PF_CONSOLE_CMD( Access,
+PF_CONSOLE_CMD(Access,
                IncBrian,
                "int iLay, float inc",
-               "Inc the weight for a morphMod pair" )
+               "Inc the weight for a morphMod pair")
 {
     plMorphSequence* seq = LocalMorphSequence();
-    if( !seq )
-    {
+
+    if (!seq) {
         PrintString("Sequence not found\n");
         return;
     }
 
-    plClothingItem *item = plClothingMgr::GetClothingMgr()->FindItemByName(gCurrMorph);
-    if( !item )
-    {
+    plClothingItem* item = plClothingMgr::GetClothingMgr()->FindItemByName(gCurrMorph);
+
+    if (!item) {
         PrintString("Item not found");
         return;
     }
@@ -4422,32 +4455,33 @@ PF_CONSOLE_CMD( Access,
     int iLay = params[0];
     float inc = params[1];
 
-    if (iLay >= seq->GetNumLayers(meshKey))
-    {
+    if (iLay >= seq->GetNumLayers(meshKey)) {
         PrintString("Layer index too high");
         return;
-    }   
+    }
 
     float wgtPlus;
     float wgtMinus;
 
-    wgtPlus = seq->GetWeight(iLay,0,meshKey);
-    wgtMinus = seq->GetWeight(iLay,1,meshKey);
+    wgtPlus = seq->GetWeight(iLay, 0, meshKey);
+    wgtMinus = seq->GetWeight(iLay, 1, meshKey);
 
     float val = wgtPlus - wgtMinus;
 
     val += inc;
 
-    if(val > 1.0) val = 1.0;
-    if(val < -1.0) val = -1.0;
+    if (val > 1.0) {
+        val = 1.0;
+    }
 
-    if(val > 0)
-    {
+    if (val < -1.0) {
+        val = -1.0;
+    }
+
+    if (val > 0) {
         wgtPlus = val;
         wgtMinus = 0;
-    }
-    else
-    {
+    } else {
         wgtMinus = -val;
         wgtPlus = 0;
     }
@@ -4466,14 +4500,14 @@ PF_CONSOLE_CMD( Access,
 
 
 
-PF_CONSOLE_CMD( Access,
-                    FaAct,
-                   "",
-                   "Activate face morphMod" )
+PF_CONSOLE_CMD(Access,
+               FaAct,
+               "",
+               "Activate face morphMod")
 {
     plMorphSequence* seq = LocalMorphSequence();
-    if( !seq )
-    {
+
+    if (!seq) {
         PrintString("Sequence not found\n");
         return;
     }
@@ -4483,14 +4517,14 @@ PF_CONSOLE_CMD( Access,
     PrintString(plString::Format("%s Active\n", seq->GetKey()->GetName().c_str()).c_str());
 }
 
-PF_CONSOLE_CMD( Access,
-                    FaDeAct,
-                   "",
-                   "Deactivate a morphMod" )
+PF_CONSOLE_CMD(Access,
+               FaDeAct,
+               "",
+               "Deactivate a morphMod")
 {
     plMorphSequence* seq = LocalMorphSequence();
-    if( !seq )
-    {
+
+    if (!seq) {
         PrintString("Sequence not found\n");
         return;
     }
@@ -4500,35 +4534,37 @@ PF_CONSOLE_CMD( Access,
     PrintString(plString::Format("%s Unactive\n", seq->GetKey()->GetName().c_str()).c_str());
 }
 
-PF_CONSOLE_CMD( Access,
-                    Face,
-                   "string clothItem",
-                   "Set face morphMod to affect a clothing item" )
+PF_CONSOLE_CMD(Access,
+               Face,
+               "string clothItem",
+               "Set face morphMod to affect a clothing item")
 {
     plMorphSequence* seq = LocalMorphSequence();
-    if( !seq )
-    {
+
+    if (!seq) {
         PrintString("Sequence not found\n");
         return;
     }
 
-    plClothingItem *item = plClothingMgr::GetClothingMgr()->FindItemByName(params[0]);
-    if( !item )
+    plClothingItem* item = plClothingMgr::GetClothingMgr()->FindItemByName(params[0]);
+
+    if (!item) {
         return;
+    }
 
     seq->SetUseSharedMesh(true);
     seq->AddSharedMesh(item->fMeshes[plClothingItem::kLODHigh]);
 
     PrintString(plString::Format("%s on item %s\n", seq->GetKey()->GetName().c_str(),
-                                 (char *)params[0]).c_str());
+                                 (char*)params[0]).c_str());
 }
 
 #include "pfSurface/plFadeOpacityMod.h"
 
-PF_CONSOLE_CMD( Access,
-                    Fade,
-                   "",
-                   "Test fading on visibility" )
+PF_CONSOLE_CMD(Access,
+               Fade,
+               "",
+               "Test fading on visibility")
 {
     bool disabled = !plFadeOpacityMod::GetLOSCheckDisabled();
 
@@ -4539,20 +4575,24 @@ PF_CONSOLE_CMD( Access,
     PrintString(str);
 }
 
-PF_CONSOLE_CMD( Access,
-                    ObjFade,
-                   "string obj, float fadeUp, float fadeDown",
-                   "Test fading on visibility" )
+PF_CONSOLE_CMD(Access,
+               ObjFade,
+               "string obj, float fadeUp, float fadeDown",
+               "Test fading on visibility")
 {
     char str[256];
     plKey key = FindSceneObjectByName(plString::FromUtf8(params[0]), "", str);
     PrintString(str);
-    if( !key )
+
+    if (!key) {
         return;
+    }
 
     plSceneObject* obj = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-    if( !obj )
+
+    if (!obj) {
         return;
+    }
 
     float fadeUp = params[1];
     float fadeDown = params[2];
@@ -4571,59 +4611,63 @@ PF_CONSOLE_CMD( Access,
 
 static plSceneObject* losObj = nil;
 
-PF_CONSOLE_CMD( Access,
-                    Obj,
-                   "string losObj",
-                   "Set the los test marker" )
+PF_CONSOLE_CMD(Access,
+               Obj,
+               "string losObj",
+               "Set the los test marker")
 {
     char str[256];
-    plKey key = FindSceneObjectByName(static_cast<const char *>(params[0]), "", str);
+    plKey key = FindSceneObjectByName(static_cast<const char*>(params[0]), "", str);
     PrintString(str);
-    if( !key )
+
+    if (!key) {
         return;
+    }
 
     losObj = plSceneObject::ConvertNoRef(key->GetObjectPtr());
 }
 
-PF_CONSOLE_CMD( Access,
-                    HackLOS,
-                   "string marker",
-                   "Set the Los hack marker" )
+PF_CONSOLE_CMD(Access,
+               HackLOS,
+               "string marker",
+               "Set the Los hack marker")
 {
     char str[256];
-    plKey key = FindSceneObjectByName(static_cast<const char *>(params[0]), "", str);
+    plKey key = FindSceneObjectByName(static_cast<const char*>(params[0]), "", str);
     PrintString(str);
 
     plSceneObject* so = nil;
-    if( key )
-    {
+
+    if (key) {
         so = plSceneObject::ConvertNoRef(key->GetObjectPtr());
     }
 
-    extern void VisLOSHackBegin(plPipeline* p, plSceneObject* m);
+    extern void VisLOSHackBegin(plPipeline * p, plSceneObject * m);
 
     VisLOSHackBegin(pfConsole::GetPipeline(), so);
 }
 
-PF_CONSOLE_CMD( Access,
-                    HackEnd,
-                   "",
-                   "stop the hackage" )
+PF_CONSOLE_CMD(Access,
+               HackEnd,
+               "",
+               "stop the hackage")
 {
-    extern void VisLOSHackBegin(plPipeline* p, plSceneObject* m);
+    extern void VisLOSHackBegin(plPipeline * p, plSceneObject * m);
 
     VisLOSHackBegin(nil, nil);
 }
 
 
-PF_CONSOLE_CMD( Access,
-                    LOS,
-                    "...",
-                    "Fire LOS test check" )
+PF_CONSOLE_CMD(Access,
+               LOS,
+               "...",
+               "Fire LOS test check")
 {
     static float dist = 1.e5f;
-    if( numParams > 0 )
+
+    if (numParams > 0) {
         dist = params[0];
+    }
 
     hsPoint3 from = pfConsole::GetPipeline()->GetViewPositionWorld();
 
@@ -4633,14 +4677,13 @@ PF_CONSOLE_CMD( Access,
     pfConsole::GetPipeline()->ScreenToWorldPoint(1, 0, &sx, &sy, dist, 0, &targ);
 
     plVisHit hit;
-    if( plVisLOSMgr::Instance()->Check(from, targ, hit) )
-    {
+
+    if (plVisLOSMgr::Instance()->Check(from, targ, hit)) {
         char buff[256];
         sprintf(buff, "(%g, %g, %g)", hit.fPos.fX, hit.fPos.fY, hit.fPos.fZ);
         PrintString(buff);
 
-        if( losObj )
-        {
+        if (losObj) {
             hsMatrix44 l2w = losObj->GetLocalToWorld();
             l2w.fMap[0][3] = hit.fPos.fX;
             l2w.fMap[1][3] = hit.fPos.fY;
@@ -4660,37 +4703,42 @@ plSceneObject* gunObj = nil;
 float gunRadius = 1.f;
 float gunRange = 5000.f;
 
-PF_CONSOLE_CMD( Access,
-                    Gun,
-                   "string gun, float radius, ...",
-                   "Fire shot along gun's z-axis, creating decal of radius <radius>, with optional max-range (def 1000)" )
+PF_CONSOLE_CMD(Access,
+               Gun,
+               "string gun, float radius, ...",
+               "Fire shot along gun's z-axis, creating decal of radius <radius>, with optional max-range (def 1000)")
 {
     char str[256];
-    plKey key = FindSceneObjectByName(static_cast<const char *>(params[0]), "", str);
+    plKey key = FindSceneObjectByName(static_cast<const char*>(params[0]), "", str);
     PrintString(str);
-    if( !key )
+
+    if (!key) {
         return;
+    }
 
     plSceneObject* so = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-    if( !so )
+
+    if (!so) {
         return;
+    }
 
     gunObj = so;
 
     gunRadius = params[1];
 
-    if( numParams > 2 )
+    if (numParams > 2) {
         gunRange = params[2];
+    }
 }
 
-PF_CONSOLE_CMD( Access,
-                    Shot,
-                   "",
-                   "Fire shot along gun's z-axis" )
+PF_CONSOLE_CMD(Access,
+               Shot,
+               "",
+               "Fire shot along gun's z-axis")
 {
     plSceneObject* so = gunObj;
-    if( !so )
-    {
+
+    if (!so) {
         PrintString("Set gun object first");
         return;
     }
@@ -4712,14 +4760,14 @@ PF_CONSOLE_CMD( Access,
     PrintString("Shot fired!");
 }
 
-PF_CONSOLE_CMD( Access,
-                    XShot,
-                   "",
-                   "Fire shot along gun's neg x-axis" )
+PF_CONSOLE_CMD(Access,
+               XShot,
+               "",
+               "Fire shot along gun's neg x-axis")
 {
     plSceneObject* so = gunObj;
-    if( !so )
-    {
+
+    if (!so) {
         PrintString("Set gun object first");
         return;
     }
@@ -4741,26 +4789,27 @@ PF_CONSOLE_CMD( Access,
     PrintString("Shot fired!");
 }
 
-PF_CONSOLE_CMD( Access,
+PF_CONSOLE_CMD(Access,
                Party,
                "string bull, string psys",
                "Add particle system <psys> to bulletMgr <bull>")
 {
     char str[256];
-    plKey bullKey = FindObjectByName(static_cast<const char *>(params[0]), plDynaBulletMgr::Index(), "", str, false);
+    plKey bullKey = FindObjectByName(static_cast<const char*>(params[0]), plDynaBulletMgr::Index(), "", str, false);
     PrintString(str);
-    if( !(bullKey && bullKey->GetObjectPtr()) )
-    {
+
+    if (!(bullKey && bullKey->GetObjectPtr())) {
         PrintString("bullet not found");
         return;
     }
 
-    plKey sysKey = FindSceneObjectByName(static_cast<const char *>(params[1]), "", str);
-    if( !(sysKey && sysKey->GetObjectPtr()) )
-    {
+    plKey sysKey = FindSceneObjectByName(static_cast<const char*>(params[1]), "", str);
+
+    if (!(sysKey && sysKey->GetObjectPtr())) {
         PrintString("Psys not found");
         return;
     }
+
     hsgResMgr::ResMgr()->AddViaNotify(sysKey, new plGenRefMsg(bullKey, plRefMsg::kOnCreate, 0, plDynaBulletMgr::kRefPartyObject), plRefFlags::kPassiveRef);
 
     PrintString("sys added");
@@ -4776,60 +4825,72 @@ PF_CONSOLE_CMD( Access,
 
 #include "plDrawable/plWaveSet7.h"
 #include "plDrawable/plFixedWaterState7.h"
-PF_CONSOLE_GROUP( Wave )
+PF_CONSOLE_GROUP(Wave)
 
-PF_CONSOLE_SUBGROUP( Wave, Set)     // Creates a sub-group under a given group
+PF_CONSOLE_SUBGROUP(Wave, Set)      // Creates a sub-group under a given group
 
 namespace plWaveCmd {
-    enum Cmd
-    {
-        kWindDir,
+enum Cmd {
+    kWindDir,
 
-        kGeoLen,
-        kGeoChop,
-        kGeoAmp,
-        kGeoAngle,
+    kGeoLen,
+    kGeoChop,
+    kGeoAmp,
+    kGeoAngle,
 
-        kTexLen,
-        kTexChop,
-        kTexAmp,
-        kTexAngle,
+    kTexLen,
+    kTexChop,
+    kTexAmp,
+    kTexAngle,
 
-        kNoise,
+    kNoise,
 
-        kSpecAtten,
+    kSpecAtten,
 
-        kWaterTint,
-        kWaterOpacity,
-        kSpecularTint,
-        kSpecularMute,
-        kRippleScale,
-        kWaterHeight,
-        kWaterOffsetOpac,
-        kWaterOffsetRefl,
-        kWaterOffsetWave,
-        kDepthFalloffOpac,
-        kDepthFalloffRefl,
-        kDepthFalloffWave,
-        kMaxAtten,
-        kMinAtten,
-        kEnvCenter,
-        kEnvRadius,
-    };
+    kWaterTint,
+    kWaterOpacity,
+    kSpecularTint,
+    kSpecularMute,
+    kRippleScale,
+    kWaterHeight,
+    kWaterOffsetOpac,
+    kWaterOffsetRefl,
+    kWaterOffsetWave,
+    kDepthFalloffOpac,
+    kDepthFalloffRefl,
+    kDepthFalloffWave,
+    kMaxAtten,
+    kMinAtten,
+    kEnvCenter,
+    kEnvRadius,
+};
 };
 
 typedef void PrintFunk(const char* str);
 
-static inline float FracToPercent(float f) { return (float)(1.e2 * f); }
-static inline float PercentToFrac(float f) { return (float)(1.e-2 * f); }
+static inline float FracToPercent(float f)
+{
+    return (float)(1.e2 * f);
+}
+static inline float PercentToFrac(float f)
+{
+    return (float)(1.e-2 * f);
+}
 
-static inline float RadToDeg(float r) { return r * 180.f / M_PI; }
-static inline float DegToRad(float d) { return d * M_PI / 180.f; }
+static inline float RadToDeg(float r)
+{
+    return r * 180.f / M_PI;
+}
+static inline float DegToRad(float d)
+{
+    return d * M_PI / 180.f;
+}
 
 static void IDisplayWaveVal(PrintFunk PrintString, plWaveSet7* wave, plWaveCmd::Cmd cmd)
 {
-    if( !wave )
+    if (!wave) {
         return;
+    }
 
     using namespace plWaveCmd;
 
@@ -4840,17 +4901,20 @@ static void IDisplayWaveVal(PrintFunk PrintString, plWaveSet7* wave, plWaveCmd::
     hsColorRGBA col;
 
     plFixedWaterState7 state = wave->State();
-    switch( cmd )
-    {
+
+    switch (cmd) {
     case kGeoLen:
         sprintf(buff, "Min/Max Geo Wavelengths = %f/%f", wave->GetGeoMinLength(), wave->GetGeoMaxLength());
         break;
+
     case kGeoChop:
         sprintf(buff, "Geo Choppiness = %f", FracToPercent(wave->GetGeoChop()));
         break;
+
     case kGeoAmp:
         sprintf(buff, "Geo Wave Amplitude to Length Ratio (%%) = %f", FracToPercent(wave->GetGeoAmpOverLen()));
         break;
+
     case kGeoAngle:
         sprintf(buff, "Geo Spread of waves about Wind Dir = %f degrees", RadToDeg(wave->GetGeoAngleDev()));
         break;
@@ -4858,20 +4922,23 @@ static void IDisplayWaveVal(PrintFunk PrintString, plWaveSet7* wave, plWaveCmd::
     case kTexLen:
         sprintf(buff, "Min/Max Tex Wavelengths = %f/%f", wave->GetTexMinLength(), wave->GetTexMaxLength());
         break;
+
     case kTexChop:
         sprintf(buff, "Tex Choppiness = %f", FracToPercent(wave->GetTexChop()));
         break;
+
     case kTexAmp:
         sprintf(buff, "Tex Wave Amplitude to Length Ratio = %f%%", FracToPercent(wave->GetTexAmpOverLen()));
         break;
+
     case kTexAngle:
         sprintf(buff, "Tex Spread of waves about Wind Dir = %f degrees", RadToDeg(wave->GetTexAngleDev()));
         break;
-    
+
     case kNoise:
         sprintf(buff, "Noising texture ripples at %f %%", FracToPercent(wave->GetSpecularNoise()));
         break;
-    
+
     case kSpecAtten:
         sprintf(buff, "Ripples fade out from %f to %f feet", wave->GetSpecularStart(), wave->GetSpecularEnd());
         break;
@@ -4879,21 +4946,27 @@ static void IDisplayWaveVal(PrintFunk PrintString, plWaveSet7* wave, plWaveCmd::
     case kWaterOpacity:
         sprintf(buff, "WaterOpacity = %f", FracToPercent(wave->GetWaterTint().a));
         break;
+
     case kRippleScale:
         sprintf(buff, "RippleScale = %f", wave->GetRippleScale());
         break;
+
     case kWaterHeight:
         sprintf(buff, "WaterHeight = %f", wave->GetWaterHeight());
         break;
+
     case kEnvRadius:
         sprintf(buff, "EnvRadius = %f", wave->GetEnvRadius());
         break;
+
     case kWaterOffsetOpac:
         sprintf(buff, "OpacStart = %f", -wave->GetOpacOffset());
         break;
+
     case kWaterOffsetRefl:
         sprintf(buff, "ReflStart = %f", -wave->GetReflOffset());
         break;
+
     case kWaterOffsetWave:
         sprintf(buff, "WaveStart = %f", -wave->GetWaveOffset());
         break;
@@ -4901,9 +4974,11 @@ static void IDisplayWaveVal(PrintFunk PrintString, plWaveSet7* wave, plWaveCmd::
     case kDepthFalloffOpac:
         sprintf(buff, "OpacEnd = %f", wave->GetOpacFalloff());
         break;
+
     case kDepthFalloffRefl:
         sprintf(buff, "ReflEnd = %f", wave->GetReflFalloff());
         break;
+
     case kDepthFalloffWave:
         sprintf(buff, "WaveEnd = %f", wave->GetWaveFalloff());
         break;
@@ -4912,10 +4987,12 @@ static void IDisplayWaveVal(PrintFunk PrintString, plWaveSet7* wave, plWaveCmd::
         vec = wave->GetWindDir();
         sprintf(buff, "WindDir (%f, %f)", vec.fX, vec.fY);
         break;
+
     case kMinAtten:
         vec = wave->GetMinAtten();
         sprintf(buff, "MinAtten (%f, %f, %f)", vec.fX, vec.fY, vec.fZ);
         break;
+
     case kMaxAtten:
         vec = wave->GetMaxAtten();
         sprintf(buff, "MaxAtten (%f, %f, %f)", vec.fX, vec.fY, vec.fZ);
@@ -4928,18 +5005,20 @@ static void IDisplayWaveVal(PrintFunk PrintString, plWaveSet7* wave, plWaveCmd::
 
     case kWaterTint:
         col = wave->GetWaterTint();
-        sprintf(buff, "Water tint (%d, %d, %d)", 
-            int(col.r * 255.9f), 
-            int(col.g * 255.9f), 
-            int(col.b * 255.9f));
+        sprintf(buff, "Water tint (%d, %d, %d)",
+                int(col.r * 255.9f),
+                int(col.g * 255.9f),
+                int(col.b * 255.9f));
         break;
+
     case kSpecularTint:
         col = wave->GetSpecularTint();
-        sprintf(buff, "Specular tint (%d, %d, %d)", 
-            int(col.r * 255.9f), 
-            int(col.g * 255.9f), 
-            int(col.b * 255.9f));
+        sprintf(buff, "Specular tint (%d, %d, %d)",
+                int(col.r * 255.9f),
+                int(col.g * 255.9f),
+                int(col.b * 255.9f));
         break;
+
     case kSpecularMute:
         col = wave->GetSpecularTint();
         sprintf(buff, "Specular mute %f", FracToPercent(col.a));
@@ -4949,6 +5028,7 @@ static void IDisplayWaveVal(PrintFunk PrintString, plWaveSet7* wave, plWaveCmd::
         sprintf(buff, "Unknown parameter");
         break;
     }
+
     PrintString(buff);
 }
 
@@ -4957,72 +5037,77 @@ static plWaveSet7* IGetWaveSet(PrintFunk PrintString, const plString& name)
     char str[256];
     plKey waveKey = FindObjectByName(name, plWaveSet7::Index(), "", str, false);
     PrintString(str);
-    if (!waveKey)
+
+    if (!waveKey) {
         return nil;
+    }
 
     plWaveSet7* waveSet = plWaveSet7::ConvertNoRef(waveKey->ObjectIsLoaded());
-    if( !waveSet )
-    {
+
+    if (!waveSet) {
         PrintString("Found object, but it's not a Water component. Ignoring");
     }
+
     return waveSet;
 }
 
 static plWaveSet7* ICheckWaveParams(PrintFunk PrintString, const plString& name, int numParams, int n, plWaveCmd::Cmd cmd)
 {
-    if( !numParams )
-    {
+    if (!numParams) {
         PrintString("Missing name of water component");
         return nil;
     }
+
     plWaveSet7* waveSet = IGetWaveSet(PrintString, name);
-    if( waveSet && (numParams < n) )
-    {
+
+    if (waveSet && (numParams < n)) {
         IDisplayWaveVal(PrintString, waveSet, cmd);
         return nil;
     }
+
     return waveSet;
 }
 
 static float LimitVal(float val, float lo, float hi, PrintFunk PrintString)
 {
-    if( val < lo )
-    {
+    if (val < lo) {
         char buff[256];
         sprintf(buff, "%f too low, clamped to %f", val, lo);
         PrintString(buff);
         val = lo;
-    }
-    else if( val > hi )
-    {
+    } else if (val > hi) {
         char buff[256];
         sprintf(buff, "%f too high, clamped to %f", val, hi);
         PrintString(buff);
         val = hi;
     }
+
     return val;
 }
 
 static bool ISendWaveCmd1f(PrintFunk PrintString, pfConsoleCmdParam* params, int numParams, plWaveCmd::Cmd cmd)
 {
     plWaveSet7* wave = ICheckWaveParams(PrintString, plString::FromUtf8(params[0]), numParams, 2, cmd);
-    if( !wave )
+
+    if (!wave) {
         return false;
+    }
 
     using namespace plWaveCmd;
 
     float val = params[1];
 
-    float secs = ( numParams > 2 ) ? params[2] : 0.f;
+    float secs = (numParams > 2) ? params[2] : 0.f;
 
-    switch( cmd )
-    {
+    switch (cmd) {
     case kGeoChop:
         wave->SetGeoChop(PercentToFrac(val), secs);
         break;
+
     case kGeoAmp:
         wave->SetGeoAmpOverLen(PercentToFrac(val), secs);
         break;
+
     case kGeoAngle:
         wave->SetGeoAngleDev(DegToRad(val), secs);
         break;
@@ -5030,9 +5115,11 @@ static bool ISendWaveCmd1f(PrintFunk PrintString, pfConsoleCmdParam* params, int
     case kTexChop:
         wave->SetTexChop(PercentToFrac(val), secs);
         break;
+
     case kTexAmp:
         wave->SetTexAmpOverLen(PercentToFrac(val), secs);
         break;
+
     case kTexAngle:
         wave->SetTexAngleDev(DegToRad(val), secs);
         break;
@@ -5044,24 +5131,31 @@ static bool ISendWaveCmd1f(PrintFunk PrintString, pfConsoleCmdParam* params, int
     case kWaterOpacity:
         wave->SetWaterOpacity(PercentToFrac(val), secs);
         break;
+
     case kSpecularMute:
         wave->SetSpecularMute(PercentToFrac(val), secs);
         break;
+
     case kRippleScale:
         wave->SetRippleScale(val, secs);
         break;
+
     case kWaterHeight:
         wave->SetWaterHeight(val, secs);
         break;
+
     case kEnvRadius:
         wave->SetEnvRadius(val, secs);
         break;
+
     case kWaterOffsetOpac:
         wave->SetOpacOffset(-val, secs);
         break;
+
     case kWaterOffsetRefl:
         wave->SetReflOffset(-val, secs);
         break;
+
     case kWaterOffsetWave:
         wave->SetWaveOffset(-val, secs);
         break;
@@ -5069,9 +5163,11 @@ static bool ISendWaveCmd1f(PrintFunk PrintString, pfConsoleCmdParam* params, int
     case kDepthFalloffOpac:
         wave->SetOpacFalloff(val, secs);
         break;
+
     case kDepthFalloffRefl:
         wave->SetReflFalloff(val, secs);
         break;
+
     case kDepthFalloffWave:
         wave->SetWaveFalloff(val, secs);
         break;
@@ -5079,23 +5175,26 @@ static bool ISendWaveCmd1f(PrintFunk PrintString, pfConsoleCmdParam* params, int
     default:
         return false;
     }
+
     return true;
 }
 
 static bool ISendWaveCmd2f(PrintFunk PrintString, pfConsoleCmdParam* params, int numParams, plWaveCmd::Cmd cmd)
 {
     plWaveSet7* wave = ICheckWaveParams(PrintString, plString::FromUtf8(params[0]), numParams, 3, cmd);
-    if( !wave )
+
+    if (!wave) {
         return false;
+    }
 
     using namespace plWaveCmd;
 
-    float secs = ( numParams > 3 ) ? params[3] : 0.f;
+    float secs = (numParams > 3) ? params[3] : 0.f;
 
     hsVector3 vec;
     plFixedWaterState7 state = wave->State();
-    switch( cmd )
-    {
+
+    switch (cmd) {
     case kWindDir:
         vec = wave->GetWindDir();
         vec.fX = params[1];
@@ -5122,14 +5221,17 @@ static bool ISendWaveCmd2f(PrintFunk PrintString, pfConsoleCmdParam* params, int
     default:
         return false;
     }
+
     return true;
 }
 
 static bool ISendWaveCmd3f(PrintFunk PrintString, pfConsoleCmdParam* params, int numParams, plWaveCmd::Cmd cmd)
 {
     plWaveSet7* wave = ICheckWaveParams(PrintString, plString::FromUtf8(params[0]), numParams, 4, cmd);
-    if( !wave )
+
+    if (!wave) {
         return false;
+    }
 
     using namespace plWaveCmd;
 
@@ -5139,16 +5241,17 @@ static bool ISendWaveCmd3f(PrintFunk PrintString, pfConsoleCmdParam* params, int
     hsVector3 vec(x, y, z);
     hsPoint3 pos(x, y, z);
 
-    float secs = ( numParams > 4 ) ? params[4] : 0.f;
+    float secs = (numParams > 4) ? params[4] : 0.f;
 
-    switch( cmd )
-    {
+    switch (cmd) {
     case kWindDir:
         wave->SetWindDir(vec, secs);
         break;
+
     case kMinAtten:
         wave->SetMinAtten(vec, secs);
         break;
+
     case kMaxAtten:
         wave->SetMaxAtten(vec, secs);
         break;
@@ -5160,14 +5263,17 @@ static bool ISendWaveCmd3f(PrintFunk PrintString, pfConsoleCmdParam* params, int
     default:
         return false;
     }
+
     return true;
 }
 
 static bool ISendWaveCmd4c(PrintFunk PrintString, pfConsoleCmdParam* params, int numParams, plWaveCmd::Cmd cmd)
 {
     plWaveSet7* wave = ICheckWaveParams(PrintString, plString::FromUtf8(params[0]), numParams, 4, cmd);
-    if( !wave )
+
+    if (!wave) {
         return false;
+    }
 
     using namespace plWaveCmd;
 
@@ -5175,17 +5281,17 @@ static bool ISendWaveCmd4c(PrintFunk PrintString, pfConsoleCmdParam* params, int
     float g = params[2];
     float b = params[3];
 
-    float secs = ( numParams > 4 ) ? params[4] : 0.f;
+    float secs = (numParams > 4) ? params[4] : 0.f;
 
     hsColorRGBA col;
     col.Set(r / 255.f, g / 255.f, b / 255.f, 1.f);
 
-    switch( cmd )
-    {
+    switch (cmd) {
     case kWaterTint:
         col.a = wave->GetWaterOpacity();
         wave->SetWaterTint(col, secs);
         break;
+
     case kSpecularTint:
         col.a = wave->GetSpecularMute();
         wave->SetSpecularTint(col, secs);
@@ -5194,22 +5300,25 @@ static bool ISendWaveCmd4c(PrintFunk PrintString, pfConsoleCmdParam* params, int
     default:
         return false;
     }
+
     return true;
 }
 
-PF_CONSOLE_CMD( Wave, Log,  // Group name, Function name
-                "string waveSet",           // Params none
-                "Toggle logging for waves" )    // Help string
+PF_CONSOLE_CMD(Wave, Log,   // Group name, Function name
+               "string waveSet",           // Params none
+               "Toggle logging for waves")     // Help string
 {
     plString name = plString::FromUtf8(params[0]);
     plWaveSet7* waveSet = IGetWaveSet(PrintString, name);
-    if( waveSet )
-    {
+
+    if (waveSet) {
         bool logging = !waveSet->Logging();
-        if( logging )
+
+        if (logging) {
             waveSet->StartLog();
-        else
+        } else {
             waveSet->StopLog();
+        }
 
         char buff[256];
         sprintf(buff, "Logging for %s now %s", name.c_str(), logging ? "on" : "off");
@@ -5217,19 +5326,21 @@ PF_CONSOLE_CMD( Wave, Log,  // Group name, Function name
     }
 }
 
-PF_CONSOLE_CMD( Wave, Graph,    // Group name, Function name
-                "string waveSet",           // Params none
-                "Toggle graphing lens for waves" )  // Help string
+PF_CONSOLE_CMD(Wave, Graph,     // Group name, Function name
+               "string waveSet",           // Params none
+               "Toggle graphing lens for waves")   // Help string
 {
     plString name = plString::FromUtf8(params[0]);
     plWaveSet7* waveSet = IGetWaveSet(PrintString, name);
-    if( waveSet )
-    {
+
+    if (waveSet) {
         bool graphing = !waveSet->Graphing();
-        if( graphing )
+
+        if (graphing) {
             waveSet->StartGraph();
-        else
+        } else {
             waveSet->StopGraph();
+        }
 
         char buff[256];
         sprintf(buff, "Graphing for %s now %s", name.c_str(), graphing ? "on" : "off");
@@ -5237,180 +5348,180 @@ PF_CONSOLE_CMD( Wave, Graph,    // Group name, Function name
     }
 }
 
-// Geometric wave param block 
-PF_CONSOLE_CMD( Wave_Set, GeoLen,   // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set <min> and <max> geometric wavelengths in feet" )   // Help string
+// Geometric wave param block
+PF_CONSOLE_CMD(Wave_Set, GeoLen,    // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set <min> and <max> geometric wavelengths in feet")    // Help string
 {
     ISendWaveCmd2f(PrintString, params, numParams, plWaveCmd::kGeoLen);
 }
 
-PF_CONSOLE_CMD( Wave_Set, GeoAmp,   // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set geometric wave ratio of Amplitude to Wavelengths (as percentage)" )    // Help string
+PF_CONSOLE_CMD(Wave_Set, GeoAmp,    // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set geometric wave ratio of Amplitude to Wavelengths (as percentage)")     // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kGeoAmp);
 }
 
-PF_CONSOLE_CMD( Wave_Set, GeoChop,  // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current geometric wave choppiness" )   // Help string
+PF_CONSOLE_CMD(Wave_Set, GeoChop,   // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current geometric wave choppiness")    // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kGeoChop);
 }
 
-PF_CONSOLE_CMD( Wave_Set, GeoAngle, // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set geometric wave angular Spread about wind direction (in degrees)" ) // Help string
+PF_CONSOLE_CMD(Wave_Set, GeoAngle,  // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set geometric wave angular Spread about wind direction (in degrees)")  // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kGeoAngle);
 }
 
-PF_CONSOLE_CMD( Wave_Set, ReflTint, // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current reflection tint (r g b)" ) // Help string
+PF_CONSOLE_CMD(Wave_Set, ReflTint,  // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current reflection tint (r g b)")  // Help string
 {
     ISendWaveCmd4c(PrintString, params, numParams, plWaveCmd::kSpecularTint);
 }
 
-PF_CONSOLE_CMD( Wave_Set, ReflMute, // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current reflection muting f (100 % no muting, 0% all gone)" )  // Help string
+PF_CONSOLE_CMD(Wave_Set, ReflMute,  // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current reflection muting f (100 % no muting, 0% all gone)")   // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kSpecularMute);
 }
 
 // Texture wave param block
 
-PF_CONSOLE_CMD( Wave_Set, TexLen,   // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set <min> and <max> texture wavelengths in feet" ) // Help string
+PF_CONSOLE_CMD(Wave_Set, TexLen,    // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set <min> and <max> texture wavelengths in feet")  // Help string
 {
     ISendWaveCmd2f(PrintString, params, numParams, plWaveCmd::kTexLen);
 }
 
-PF_CONSOLE_CMD( Wave_Set, TexAmp,   // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set texture wave ratio of Amplitude to Wavelengths (as percentage)" )  // Help string
+PF_CONSOLE_CMD(Wave_Set, TexAmp,    // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set texture wave ratio of Amplitude to Wavelengths (as percentage)")   // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kTexAmp);
 }
 
-PF_CONSOLE_CMD( Wave_Set, TexChop,  // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current texture wave choppiness" ) // Help string
+PF_CONSOLE_CMD(Wave_Set, TexChop,   // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current texture wave choppiness")  // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kTexChop);
 }
 
-PF_CONSOLE_CMD( Wave_Set, Noise,    // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current noising of texture waves (as percentage)" )    // Help string
+PF_CONSOLE_CMD(Wave_Set, Noise,     // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current noising of texture waves (as percentage)")     // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kNoise);
 }
 
-PF_CONSOLE_CMD( Wave_Set, Scale,    // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current water ripple scale f" )    // Help string
+PF_CONSOLE_CMD(Wave_Set, Scale,     // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current water ripple scale f")     // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kRippleScale);
 }
 
-PF_CONSOLE_CMD( Wave_Set, TexAngle, // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set texture wave spread about wind dir (in degrees)" ) // Help string
+PF_CONSOLE_CMD(Wave_Set, TexAngle,  // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set texture wave spread about wind dir (in degrees)")  // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kTexAngle);
 }
 
-PF_CONSOLE_CMD( Wave_Set, SpecAtten,    // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set falloff of ripples from <start> to <end> in feet" )    // Help string
+PF_CONSOLE_CMD(Wave_Set, SpecAtten,     // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set falloff of ripples from <start> to <end> in feet")     // Help string
 {
     ISendWaveCmd2f(PrintString, params, numParams, plWaveCmd::kSpecAtten);
 }
 
 // Minor water param block
 
-PF_CONSOLE_CMD( Wave_Set, OpacStart,    // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current water opacity start f" )   // Help string
+PF_CONSOLE_CMD(Wave_Set, OpacStart,     // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current water opacity start f")    // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kWaterOffsetOpac);
 }
 
-PF_CONSOLE_CMD( Wave_Set, OpacEnd,  // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current water opacity end f" ) // Help string
+PF_CONSOLE_CMD(Wave_Set, OpacEnd,   // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current water opacity end f")  // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kDepthFalloffOpac);
 }
 
-PF_CONSOLE_CMD( Wave_Set, ReflStart,    // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current water reflection start f" )    // Help string
+PF_CONSOLE_CMD(Wave_Set, ReflStart,     // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current water reflection start f")     // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kWaterOffsetRefl);
 }
 
-PF_CONSOLE_CMD( Wave_Set, ReflEnd,  // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current water refleciton end f" )  // Help string
+PF_CONSOLE_CMD(Wave_Set, ReflEnd,   // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current water refleciton end f")   // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kDepthFalloffRefl);
 }
 
-PF_CONSOLE_CMD( Wave_Set, WaveStart,    // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current water wave start f" )  // Help string
+PF_CONSOLE_CMD(Wave_Set, WaveStart,     // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current water wave start f")   // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kWaterOffsetWave);
 }
 
-PF_CONSOLE_CMD( Wave_Set, WaveEnd,  // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current water wave end f" )    // Help string
+PF_CONSOLE_CMD(Wave_Set, WaveEnd,   // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current water wave end f")     // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kDepthFalloffWave);
 }
 
 // Reflection param block
 
-PF_CONSOLE_CMD( Wave_Set, EnvCenter,    // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current EnvMap Center (x y z)" )   // Help string
+PF_CONSOLE_CMD(Wave_Set, EnvCenter,     // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current EnvMap Center (x y z)")    // Help string
 {
     ISendWaveCmd3f(PrintString, params, numParams, plWaveCmd::kEnvCenter);
 }
 
-PF_CONSOLE_CMD( Wave_Set, Radius,   // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current envmap radius f" ) // Help string
+PF_CONSOLE_CMD(Wave_Set, Radius,    // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current envmap radius f")  // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kEnvRadius);
 }
 
 // Misc. These are normally implicit by associated data (ref object or material).
-PF_CONSOLE_CMD( Wave_Set, Direction,    // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current wind direction (x y)" )    // Help string
+PF_CONSOLE_CMD(Wave_Set, Direction,     // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current wind direction (x y)")     // Help string
 {
     ISendWaveCmd2f(PrintString, params, numParams, plWaveCmd::kWindDir);
 }
 
 
-PF_CONSOLE_CMD( Wave_Set, WaterTint,    // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current water tint (r g b)" )  // Help string
+PF_CONSOLE_CMD(Wave_Set, WaterTint,     // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current water tint (r g b)")   // Help string
 {
     ISendWaveCmd4c(PrintString, params, numParams, plWaveCmd::kWaterTint);
 }
 
 
-PF_CONSOLE_CMD( Wave_Set, Opacity,  // Group name, Function name
-                "string waveSet, ...",          // Params none
-                "Set current water max opacity f" ) // Help string
+PF_CONSOLE_CMD(Wave_Set, Opacity,   // Group name, Function name
+               "string waveSet, ...",          // Params none
+               "Set current water max opacity f")  // Help string
 {
     ISendWaveCmd1f(PrintString, params, numParams, plWaveCmd::kWaterOpacity);
 }
@@ -5426,47 +5537,51 @@ PF_CONSOLE_CMD( Wave_Set, Opacity,  // Group name, Function name
 #ifndef LIMIT_CONSOLE_COMMANDS
 
 
-PF_CONSOLE_GROUP( SceneObject )
+PF_CONSOLE_GROUP(SceneObject)
 
-PF_CONSOLE_SUBGROUP( SceneObject, SetEnable)        // Creates a sub-group under a given group
+PF_CONSOLE_SUBGROUP(SceneObject, SetEnable)         // Creates a sub-group under a given group
 
 
-PF_CONSOLE_CMD( SceneObject_SetEnable, Drawable,    // Group name, Function name
-                "string objName, bool on",          // Params none
-                "Enable or disable drawing of a sceneobject" )  // Help string
+PF_CONSOLE_CMD(SceneObject_SetEnable, Drawable,     // Group name, Function name
+               "string objName, bool on",          // Params none
+               "Enable or disable drawing of a sceneobject")   // Help string
 {
     char str[256];
-    plKey key = FindSceneObjectByName(static_cast<const char *>(params[0]), "", str);
+    plKey key = FindSceneObjectByName(static_cast<const char*>(params[0]), "", str);
     PrintString(str);
-    if (!key)
+
+    if (!key) {
         return;
+    }
 
     bool enable = params[1];
-    
+
     plEnableMsg* pEMsg = new plEnableMsg;
-    pEMsg->SetCmd( enable ? plEnableMsg::kEnable : plEnableMsg::kDisable );
-    pEMsg->SetCmd( plEnableMsg::kDrawable );
-    pEMsg->AddReceiver( key );
-    plgDispatch::MsgSend( pEMsg );
+    pEMsg->SetCmd(enable ? plEnableMsg::kEnable : plEnableMsg::kDisable);
+    pEMsg->SetCmd(plEnableMsg::kDrawable);
+    pEMsg->AddReceiver(key);
+    plgDispatch::MsgSend(pEMsg);
 }
 
-PF_CONSOLE_CMD( SceneObject_SetEnable, Physical,    // Group name, Function name
-                "string objName, bool on",          // Params none
-                "Enable or disable the physical of a sceneobject" ) // Help string
+PF_CONSOLE_CMD(SceneObject_SetEnable, Physical,     // Group name, Function name
+               "string objName, bool on",          // Params none
+               "Enable or disable the physical of a sceneobject")  // Help string
 {
     char str[256];
-    plKey key = FindSceneObjectByName(static_cast<const char *>(params[0]), "", str);
+    plKey key = FindSceneObjectByName(static_cast<const char*>(params[0]), "", str);
     PrintString(str);
-    if (!key)
+
+    if (!key) {
         return;
+    }
 
     bool enable = params[1];
-    
+
     plEnableMsg* pEMsg = new plEnableMsg;
-    pEMsg->SetCmd( enable ? plEnableMsg::kEnable : plEnableMsg::kDisable );
-    pEMsg->SetCmd( plEnableMsg::kPhysical );
-    pEMsg->AddReceiver( key );
-    plgDispatch::MsgSend( pEMsg );
+    pEMsg->SetCmd(enable ? plEnableMsg::kEnable : plEnableMsg::kDisable);
+    pEMsg->SetCmd(plEnableMsg::kPhysical);
+    pEMsg->AddReceiver(key);
+    plgDispatch::MsgSend(pEMsg);
 }
 /*
 PF_CONSOLE_CMD( SceneObject_SetEnable, PhysicalT,   // Group name, Function name
@@ -5480,7 +5595,7 @@ PF_CONSOLE_CMD( SceneObject_SetEnable, PhysicalT,   // Group name, Function name
         return;
 
     bool enable = params[1];
-    
+
     plEventGroupEnableMsg* pMsg = new plEventGroupEnableMsg;
     if( enable )
         pMsg->SetFlags(plEventGroupEnableMsg::kCollideOn | plEventGroupEnableMsg::kReportOn);
@@ -5492,70 +5607,75 @@ PF_CONSOLE_CMD( SceneObject_SetEnable, PhysicalT,   // Group name, Function name
 
 }
 */
-PF_CONSOLE_CMD( SceneObject_SetEnable, Audible,     // Group name, Function name
-                "string objName, bool on",          // Params none
-                "Enable or disable the audible of a sceneobject" )  // Help string
+PF_CONSOLE_CMD(SceneObject_SetEnable, Audible,      // Group name, Function name
+               "string objName, bool on",          // Params none
+               "Enable or disable the audible of a sceneobject")   // Help string
 {
     char str[256];
-    plKey key = FindSceneObjectByName(static_cast<const char *>(params[0]), "", str);
+    plKey key = FindSceneObjectByName(static_cast<const char*>(params[0]), "", str);
     PrintString(str);
-    if (!key)
+
+    if (!key) {
         return;
+    }
 
     bool enable = params[1];
-    
+
     plEnableMsg* pEMsg = new plEnableMsg;
-    pEMsg->SetCmd( enable ? plEnableMsg::kEnable : plEnableMsg::kDisable );
-    pEMsg->SetCmd( plEnableMsg::kAudible );
-    pEMsg->AddReceiver( key );
-    plgDispatch::MsgSend( pEMsg );
+    pEMsg->SetCmd(enable ? plEnableMsg::kEnable : plEnableMsg::kDisable);
+    pEMsg->SetCmd(plEnableMsg::kAudible);
+    pEMsg->AddReceiver(key);
+    plgDispatch::MsgSend(pEMsg);
 }
 
-PF_CONSOLE_CMD( SceneObject_SetEnable, All,         // Group name, Function name
-                "string objName, bool on",          // Params none
-                "Enable or disable all fxns of a sceneobject" ) // Help string
+PF_CONSOLE_CMD(SceneObject_SetEnable, All,          // Group name, Function name
+               "string objName, bool on",          // Params none
+               "Enable or disable all fxns of a sceneobject")  // Help string
 {
     char str[256];
-    plKey key = FindSceneObjectByName(static_cast<const char *>(params[0]), "", str);
+    plKey key = FindSceneObjectByName(static_cast<const char*>(params[0]), "", str);
     PrintString(str);
-    if (!key)
+
+    if (!key) {
         return;
+    }
 
     bool enable = params[1];
-    
+
     plEnableMsg* pEMsg = new plEnableMsg;
-    pEMsg->SetCmd( enable ? plEnableMsg::kEnable : plEnableMsg::kDisable );
-    pEMsg->SetCmd( plEnableMsg::kAll );
-    pEMsg->AddReceiver( key );
-    plgDispatch::MsgSend( pEMsg );
+    pEMsg->SetCmd(enable ? plEnableMsg::kEnable : plEnableMsg::kDisable);
+    pEMsg->SetCmd(plEnableMsg::kAll);
+    pEMsg->AddReceiver(key);
+    plgDispatch::MsgSend(pEMsg);
 }
 
-PF_CONSOLE_CMD( SceneObject, Attach,            // Group name, Function name
-                "string childName, string parentName",          // Params none
-                "Attach child to parent" )  // Help string
+PF_CONSOLE_CMD(SceneObject, Attach,             // Group name, Function name
+               "string childName, string parentName",          // Params none
+               "Attach child to parent")   // Help string
 {
     char str[256];
 
-    plString childName = static_cast<const char *>(params[0]);
-    plString parentName = static_cast<const char *>(params[1]);
+    plString childName = static_cast<const char*>(params[0]);
+    plString parentName = static_cast<const char*>(params[1]);
 
     plKey childKey = FindSceneObjectByName(childName, "", str);
-    if( !childKey )
-    {
+
+    if (!childKey) {
         PrintString(str);
         return;
     }
+
     plSceneObject* child = plSceneObject::ConvertNoRef(childKey->GetObjectPtr());
-    if( !child )
-    {
-        sprintf( str, "Child SceneObject not found");
+
+    if (!child) {
+        sprintf(str, "Child SceneObject not found");
         PrintString(str);
         return;
     }
 
     plKey parentKey = FindSceneObjectByName(parentName, "", str);
-    if( !parentKey )
-    {
+
+    if (!parentKey) {
         PrintString(str);
         return;
     }
@@ -5568,33 +5688,33 @@ PF_CONSOLE_CMD( SceneObject, Attach,            // Group name, Function name
 
 }
 
-PF_CONSOLE_CMD( SceneObject, Detach,            // Group name, Function name
-                "string childName",         // Params none
-                "Detach a child from parent (if any)" ) // Help string
+PF_CONSOLE_CMD(SceneObject, Detach,             // Group name, Function name
+               "string childName",         // Params none
+               "Detach a child from parent (if any)")  // Help string
 {
     char str[256];
 
-    plString childName = static_cast<const char *>(params[0]);
+    plString childName = static_cast<const char*>(params[0]);
 
     plKey childKey = FindSceneObjectByName(childName, "", str);
-    if( !childKey )
-    {
-        PrintString(str);
-        return;
-    }
-    plSceneObject* child = plSceneObject::ConvertNoRef(childKey->GetObjectPtr());
-    if( !child )
-    {
-        sprintf( str, "Child SceneObject not found");
+
+    if (!childKey) {
         PrintString(str);
         return;
     }
 
-    if( child 
-        && child->GetCoordinateInterface() 
-        && child->GetCoordinateInterface()->GetParent() 
-        && child->GetCoordinateInterface()->GetParent()->GetOwner() )
-    {
+    plSceneObject* child = plSceneObject::ConvertNoRef(childKey->GetObjectPtr());
+
+    if (!child) {
+        sprintf(str, "Child SceneObject not found");
+        PrintString(str);
+        return;
+    }
+
+    if (child
+            && child->GetCoordinateInterface()
+            && child->GetCoordinateInterface()->GetParent()
+            && child->GetCoordinateInterface()->GetParent()->GetOwner()) {
         plKey parentKey = child->GetCoordinateInterface()->GetParent()->GetOwner()->GetKey();
         plAttachMsg* attMsg = new plAttachMsg(parentKey, child, plRefMsg::kOnRemove, nil);
         plgDispatch::MsgSend(attMsg);
@@ -5602,9 +5722,7 @@ PF_CONSOLE_CMD( SceneObject, Detach,            // Group name, Function name
         sprintf(str, "%s detached from %s", childName.c_str(), parentKey->GetName().c_str());
         PrintString(str);
         return;
-    }
-    else
-    {
+    } else {
         sprintf(str, "%s not attached to anything", childName.c_str());
         PrintString(str);
         return;
@@ -5621,9 +5739,9 @@ PF_CONSOLE_CMD( SceneObject, Detach,            // Group name, Function name
 
 #include "plPhysX/plPXPhysicalControllerCore.h"
 
-PF_CONSOLE_GROUP( Physics )
+PF_CONSOLE_GROUP(Physics)
 
-PF_CONSOLE_CMD( Physics, Rebuild, "", "Rebuilds the avatars collision cache")
+PF_CONSOLE_CMD(Physics, Rebuild, "", "Rebuilds the avatars collision cache")
 {
     plPXPhysicalControllerCore::RebuildCache();
 }
@@ -5699,7 +5817,7 @@ PF_CONSOLE_CMD( Physics, ApplyForce, "string Object, float x, float y, float z",
 {
     plKey key = FindSceneObjectByName(params[0], nil, nil);
 
-    if(key) 
+    if(key)
     {
         hsVector3 force(params[1], params[2], params[3]);
         plForceMsg *m = new plForceMsg(nil, key, force);
@@ -5711,7 +5829,7 @@ PF_CONSOLE_CMD( Physics, ApplyForceAtPoint, "string Object, float forceX, float 
 {
     plKey key = FindSceneObjectByName(params[0], nil, nil, nil);
 
-    if(key) 
+    if(key)
     {
         hsVector3 force(params[1], params[2], params[3]);
         hsPoint3 point(params[4], params[5], params[6]);
@@ -5799,7 +5917,7 @@ PF_CONSOLE_CMD( Physics, Suppress, "string Object, int doSuppress", "Remove(true
     if(key)
     {
         int iDoSuppress = params[1];
-        
+
         bool doSuppress = iDoSuppress ? true : false;
         plSimSuppressMsg *msg = new plSimSuppressMsg(nil, key, doSuppress);
         msg->Send();
@@ -5867,62 +5985,59 @@ PF_CONSOLE_CMD(Physics, LogSDL, "int level", "Turn logging of physics SDL state 
 PF_CONSOLE_CMD(Physics, ExtraProfile, "", "Toggle extra simulation profiling")
 {
     char str[256];
-    if (plSimulationMgr::fExtraProfile)
-    {
+
+    if (plSimulationMgr::fExtraProfile) {
         plSimulationMgr::fExtraProfile = false;
         sprintf(str, "Stop extra profiling");
-    }
-    else
-    {
+    } else {
         plSimulationMgr::fExtraProfile = true;
         sprintf(str, "Start extra profiling");
     }
-    PrintString( str );
+
+    PrintString(str);
 }
 PF_CONSOLE_CMD(Physics, SubworldOptimization, "", "Toggle subworld optimization")
 {
     char str[256];
-    if (plSimulationMgr::fSubworldOptimization)
-    {
+
+    if (plSimulationMgr::fSubworldOptimization) {
         plSimulationMgr::fSubworldOptimization = false;
         sprintf(str, "Stop subworld optimization");
-    }
-    else
-    {
+    } else {
         plSimulationMgr::fSubworldOptimization = true;
         sprintf(str, "Start subworld optimization");
     }
-    PrintString( str );
+
+    PrintString(str);
 }
 PF_CONSOLE_CMD(Physics, ClampingOnStep, "", "Toggle whether to clamp the step size on advance")
 {
     char str[256];
-    if (plSimulationMgr::fDoClampingOnStep)
-    {
+
+    if (plSimulationMgr::fDoClampingOnStep) {
         plSimulationMgr::fDoClampingOnStep = false;
         sprintf(str, "Stop clamping the step size");
-    }
-    else
-    {
+    } else {
         plSimulationMgr::fDoClampingOnStep = true;
         sprintf(str, "Start clamping the step size");
     }
-    PrintString( str );
+
+    PrintString(str);
 }
 
-PF_CONSOLE_CMD(Physics, 
+PF_CONSOLE_CMD(Physics,
                ShowControllerDebugDisplay,
-               "", 
+               "",
                "Toggle the physics controller debug display")
 {
     plPXPhysicalControllerCore::fDebugDisplay = !plPXPhysicalControllerCore::fDebugDisplay;
 }
-PF_CONSOLE_CMD(Physics, 
+PF_CONSOLE_CMD(Physics,
                ListAwakeActors,
-               "", 
+               "",
                "Toggles displaying the list of awake actors")
 {
-    plSimulationMgr::fDisplayAwakeActors= !plSimulationMgr::fDisplayAwakeActors;
+    plSimulationMgr::fDisplayAwakeActors = !plSimulationMgr::fDisplayAwakeActors;
 }
 
 /*
@@ -5940,46 +6055,47 @@ PF_CONSOLE_CMD( Physics, PlayPhysicsSounds, "bool b", "Turn physics sounds on/of
 //////////////////////////////////////////////////////////////
 
 
-PF_CONSOLE_GROUP( Mouse )
+PF_CONSOLE_GROUP(Mouse)
 
-PF_CONSOLE_CMD( Mouse, Invert, nil, "invert the mouse")
+PF_CONSOLE_CMD(Mouse, Invert, nil, "invert the mouse")
 {
     plMouseDevice::SetInverted(true);
 }
 
-PF_CONSOLE_CMD( Mouse, UnInvert, nil, "un-invert the mouse")
+PF_CONSOLE_CMD(Mouse, UnInvert, nil, "un-invert the mouse")
 {
     plMouseDevice::SetInverted(false);
 }
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Mouse, SetDeadZone, "float zone", "Sets the dead zone for the mouse - range is from 0.0 to 1.0")
+PF_CONSOLE_CMD(Mouse, SetDeadZone, "float zone", "Sets the dead zone for the mouse - range is from 0.0 to 1.0")
 {
     float f = params[0];
 }
 
-PF_CONSOLE_CMD( Mouse, Enable, nil, "Enable mouse input")
+PF_CONSOLE_CMD(Mouse, Enable, nil, "Enable mouse input")
 {
 //  plCommandInterfaceModifier::GetInstance()->EnableMouseInput();
 }
-PF_CONSOLE_CMD( Mouse, Disable, nil, "Disable mouse input")
+PF_CONSOLE_CMD(Mouse, Disable, nil, "Disable mouse input")
 {
 //  plCommandInterfaceModifier::GetInstance()->DisableMouseInput();
 }
 
-PF_CONSOLE_CMD( Mouse, SetFadeDelay, "float delayInSecs", "Set how long the cursor has to not move before it fades out" )
+PF_CONSOLE_CMD(Mouse, SetFadeDelay, "float delayInSecs", "Set how long the cursor has to not move before it fades out")
 {
-    if( plAvatarInputInterface::GetInstance() != nil )
-        plAvatarInputInterface::GetInstance()->SetCursorFadeDelay( params[ 0 ] );
+    if (plAvatarInputInterface::GetInstance() != nil) {
+        plAvatarInputInterface::GetInstance()->SetCursorFadeDelay(params[ 0 ]);
+    }
 }
 
-PF_CONSOLE_CMD( Mouse, Hide, nil, "hide mouse cursor")
+PF_CONSOLE_CMD(Mouse, Hide, nil, "hide mouse cursor")
 {
     plMouseDevice::HideCursor(true);
 }
 
-PF_CONSOLE_CMD( Mouse, Show, nil, "hide mouse cursor")
+PF_CONSOLE_CMD(Mouse, Show, nil, "hide mouse cursor")
 {
     plMouseDevice::ShowCursor(true);
 }
@@ -5991,10 +6107,10 @@ PF_CONSOLE_CMD( Mouse, Show, nil, "hide mouse cursor")
 }
 */
 
-PF_CONSOLE_CMD( Mouse, ForceHide, "bool force", "Forces the mouse to be hidden (or doesn't)" )
+PF_CONSOLE_CMD(Mouse, ForceHide, "bool force", "Forces the mouse to be hidden (or doesn't)")
 {
-    plInputInterfaceMgr::GetInstance()->ForceCursorHidden( (bool)params[ 0 ] );
-    PrintStringF( PrintString, "Mouse cursor %s", params[ 0 ] ? "forced to be hidden" : "back to normal" );
+    plInputInterfaceMgr::GetInstance()->ForceCursorHidden((bool)params[ 0 ]);
+    PrintStringF(PrintString, "Mouse cursor %s", params[ 0 ] ? "forced to be hidden" : "back to normal");
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
@@ -6005,89 +6121,98 @@ PF_CONSOLE_CMD( Mouse, ForceHide, "bool force", "Forces the mouse to be hidden (
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_GROUP( Age )
+PF_CONSOLE_GROUP(Age)
 
 PF_CONSOLE_CMD(Age, ShowSDL, "", "Prints the age SDL values")
 {
-    plStateDataRecord * rec = new plStateDataRecord;
+    plStateDataRecord* rec = new plStateDataRecord;
+
     if (!VaultAgeGetAgeSDL(rec)) {
         PrintString("Age SDL not found");
         delete rec;
         return;
     }
-    
+
     plStatusLog::AddLineS("ShowSDL.log", "-----------------------------------");
+
     for (unsigned i = 0; i < rec->GetNumVars(); ++i) {
-        plStateVariable * var = rec->GetVar(i);
-        if (plSimpleStateVariable * simple = var->GetAsSimpleStateVar()) {
+        plStateVariable* var = rec->GetVar(i);
+
+        if (plSimpleStateVariable* simple = var->GetAsSimpleStateVar()) {
             plString line = var->GetName();
             line += "=";
+
             for (unsigned j = 0; j < simple->GetCount(); ++j) {
                 line += simple->GetAsString(j);
                 line += ",";
             }
+
             PrintString(line.c_str());
             plStatusLog::AddLineS("ShowSDL.log", "%s", line.c_str());
         }
-    }   
-    
+    }
+
     delete rec;
 }
 
-PF_CONSOLE_CMD( Age, GetElapsedDays, "string agedefnfile", "Gets the elapsed days and fractions" )
+PF_CONSOLE_CMD(Age, GetElapsedDays, "string agedefnfile", "Gets the elapsed days and fractions")
 {
     hsUNIXStream s;
-    if (!s.Open(static_cast<const char *>(params[0])))
-    {
+
+    if (!s.Open(static_cast<const char*>(params[0]))) {
         PrintString("Couldn't open age defn file!");
         return;
     }
 
     plAgeDescription age;
     age.Read(&s);
-    
+
     char str[256];
     plUnifiedTime current;
     current.SetToUTC();
-    sprintf(str,"ElapsedTime: %f Days",age.GetAgeElapsedDays(current));
+    sprintf(str, "ElapsedTime: %f Days", age.GetAgeElapsedDays(current));
 
     PrintString(str);
     s.Close();
 }
 
-PF_CONSOLE_CMD( Age, GetTimeOfDay, "string agedefnfile", "Gets the elapsed days and fractions" )
+PF_CONSOLE_CMD(Age, GetTimeOfDay, "string agedefnfile", "Gets the elapsed days and fractions")
 {
     hsUNIXStream s;
-    if (!s.Open(static_cast<const char *>(params[0])))
-    {
+
+    if (!s.Open(static_cast<const char*>(params[0]))) {
         PrintString("Couldn't open age defn file!");
         return;
     }
 
     plAgeDescription age;
     age.Read(&s);
-    
+
     char str[256];
     plUnifiedTime current;
     current.SetToUTC();
-    sprintf(str,"TimeOfDay: %f percent",age.GetAgeTimeOfDayPercent(current));
+    sprintf(str, "TimeOfDay: %f percent", age.GetAgeTimeOfDayPercent(current));
 
     PrintString(str);
     s.Close();
 }
 
-PF_CONSOLE_CMD( Age, SetSDLFloat, "string varName, float value, int index", "Set the value of an age global variable" )
+PF_CONSOLE_CMD(Age, SetSDLFloat, "string varName, float value, int index", "Set the value of an age global variable")
 {
     int index = (int)params[2];
 
-    extern const plPythonSDLModifier *ExternFindAgePySDL();
-    const plPythonSDLModifier *sdlMod = ExternFindAgePySDL();
-    if (!sdlMod)
-        return;
+    extern const plPythonSDLModifier* ExternFindAgePySDL();
+    const plPythonSDLModifier* sdlMod = ExternFindAgePySDL();
 
-    plSimpleStateVariable *var = sdlMod->GetStateCache()->FindVar((const char *)params[0]);
-    if (!var)
+    if (!sdlMod) {
         return;
+    }
+
+    plSimpleStateVariable* var = sdlMod->GetStateCache()->FindVar((const char*)params[0]);
+
+    if (!var) {
+        return;
+    }
 
     float v;
     var->Get(&v, index);
@@ -6096,22 +6221,28 @@ PF_CONSOLE_CMD( Age, SetSDLFloat, "string varName, float value, int index", "Set
     ((plPythonSDLModifier*)sdlMod)->SetItemFromSDLVar(var);
     // set it back to original so that its different
     plSynchedObject* p = plSynchedObject::ConvertNoRef(((plSDLModifier*)sdlMod)->GetStateOwnerKey()->GetObjectPtr());
-    if (p)
-        p->DirtySynchState(sdlMod->GetSDLName(),plSynchedObject::kSendImmediately|plSynchedObject::kSkipLocalOwnershipCheck|plSynchedObject::kForceFullSend);
+
+    if (p) {
+        p->DirtySynchState(sdlMod->GetSDLName(), plSynchedObject::kSendImmediately | plSynchedObject::kSkipLocalOwnershipCheck | plSynchedObject::kForceFullSend);
+    }
 }
 
-PF_CONSOLE_CMD( Age, SetSDLInt, "string varName, int value, int index", "Set the value of an age global variable" )
+PF_CONSOLE_CMD(Age, SetSDLInt, "string varName, int value, int index", "Set the value of an age global variable")
 {
     int index = (int)params[2];
 
-    extern const plPythonSDLModifier *ExternFindAgePySDL();
-    const plPythonSDLModifier *sdlMod = ExternFindAgePySDL();
-    if (!sdlMod)
-        return;
+    extern const plPythonSDLModifier* ExternFindAgePySDL();
+    const plPythonSDLModifier* sdlMod = ExternFindAgePySDL();
 
-    plSimpleStateVariable *var = sdlMod->GetStateCache()->FindVar((const char *)params[0]);
-    if (!var)
+    if (!sdlMod) {
         return;
+    }
+
+    plSimpleStateVariable* var = sdlMod->GetStateCache()->FindVar((const char*)params[0]);
+
+    if (!var) {
+        return;
+    }
 
     int v;
     var->Get(&v, index);
@@ -6119,22 +6250,28 @@ PF_CONSOLE_CMD( Age, SetSDLInt, "string varName, int value, int index", "Set the
     // set the variable in the pythonSDL also
     ((plPythonSDLModifier*)sdlMod)->SetItemFromSDLVar(var);
     plSynchedObject* p = plSynchedObject::ConvertNoRef(((plSDLModifier*)sdlMod)->GetStateOwnerKey()->GetObjectPtr());
-    if (p)
-        p->DirtySynchState(sdlMod->GetSDLName(),plSynchedObject::kSendImmediately|plSynchedObject::kSkipLocalOwnershipCheck|plSynchedObject::kForceFullSend);
+
+    if (p) {
+        p->DirtySynchState(sdlMod->GetSDLName(), plSynchedObject::kSendImmediately | plSynchedObject::kSkipLocalOwnershipCheck | plSynchedObject::kForceFullSend);
+    }
 }
 
-PF_CONSOLE_CMD( Age, SetSDLBool, "string varName, bool value, int index", "Set the value of an age global variable" )
+PF_CONSOLE_CMD(Age, SetSDLBool, "string varName, bool value, int index", "Set the value of an age global variable")
 {
     int index = (int)params[2];
-    
-    extern const plPythonSDLModifier *ExternFindAgePySDL();
-    const plPythonSDLModifier *sdlMod = ExternFindAgePySDL();
-    if (!sdlMod)
-        return;
 
-    plSimpleStateVariable *var = sdlMod->GetStateCache()->FindVar((const char*)params[0]);
-    if (!var)
+    extern const plPythonSDLModifier* ExternFindAgePySDL();
+    const plPythonSDLModifier* sdlMod = ExternFindAgePySDL();
+
+    if (!sdlMod) {
         return;
+    }
+
+    plSimpleStateVariable* var = sdlMod->GetStateCache()->FindVar((const char*)params[0]);
+
+    if (!var) {
+        return;
+    }
 
     bool v;
     var->Get(&v, index);
@@ -6142,8 +6279,10 @@ PF_CONSOLE_CMD( Age, SetSDLBool, "string varName, bool value, int index", "Set t
     // set the variable in the pythonSDL also
     ((plPythonSDLModifier*)sdlMod)->SetItemFromSDLVar(var);
     plSynchedObject* p = plSynchedObject::ConvertNoRef(((plSDLModifier*)sdlMod)->GetStateOwnerKey()->GetObjectPtr());
-    if (p)
-        p->DirtySynchState(sdlMod->GetSDLName(),plSynchedObject::kSendImmediately|plSynchedObject::kSkipLocalOwnershipCheck|plSynchedObject::kForceFullSend);
+
+    if (p) {
+        p->DirtySynchState(sdlMod->GetSDLName(), plSynchedObject::kSendImmediately | plSynchedObject::kSkipLocalOwnershipCheck | plSynchedObject::kForceFullSend);
+    }
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
@@ -6154,338 +6293,382 @@ PF_CONSOLE_CMD( Age, SetSDLBool, "string varName, bool value, int index", "Set t
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_GROUP( ParticleSystem ) // Defines a main command group
+PF_CONSOLE_GROUP(ParticleSystem)   // Defines a main command group
 
-void UpdateParticleParam(const plString &objName, int32_t paramID, float value, void (*PrintString)(const char *))
+void UpdateParticleParam(const plString& objName, int32_t paramID, float value, void (*PrintString)(const char*))
 {
     char str[256];
     plKey key = FindSceneObjectByName(objName, "", str);
     PrintString(str);
-    if (key == nil) return;
+
+    if (key == nil) {
+        return;
+    }
 
     plSceneObject* so = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-    if (so == nil) return;
+
+    if (so == nil) {
+        return;
+    }
 
     int i;
-    for (i = so->GetNumModifiers() - 1; i >= 0; i--)
-    {
-        const plParticleSystem *sys = plParticleSystem::ConvertNoRef(so->GetModifier(i));
-        if (sys != nil)
-        {
+
+    for (i = so->GetNumModifiers() - 1; i >= 0; i--) {
+        const plParticleSystem* sys = plParticleSystem::ConvertNoRef(so->GetModifier(i));
+
+        if (sys != nil) {
             plgDispatch::MsgSend(new plParticleUpdateMsg(nil, sys->GetKey(), nil, paramID, value));
             PrintString("Particle system successfully updated.");
             return;
         }
     }
+
     PrintString("The scene object specified has no particle system.");
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetPPS,                         // Function name
-                "string objName, float value",  // Params
-                "Set the particles-per-second generated" )  // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetPPS,                         // Function name
+               "string objName, float value",  // Params
+               "Set the particles-per-second generated")   // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamParticlesPerSecond, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetInitialPitchRange,           // Function name
-                "string objName, float value",  // Params
-                "Set the initial range of pitch of generated particles" )   // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetInitialPitchRange,           // Function name
+               "string objName, float value",  // Params
+               "Set the initial range of pitch of generated particles")    // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamInitPitchRange, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetInitialYawRange,             // Function name
-                "string objName, float value",  // Params
-                "Set the initial range of yaw of generated particles" ) // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetInitialYawRange,             // Function name
+               "string objName, float value",  // Params
+               "Set the initial range of yaw of generated particles")  // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamInitYawRange, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetInitialVelocityMin,          // Function name
-                "string objName, float value",  // Params
-                "Set the minimum initial velocity of generated particles" ) // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetInitialVelocityMin,          // Function name
+               "string objName, float value",  // Params
+               "Set the minimum initial velocity of generated particles")  // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamVelMin, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetInitialVelocityMax,      // Function name
-                "string objName, float value",  // Params
-                "Set the maximum initial velocity of generated particles" ) // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetInitialVelocityMax,      // Function name
+               "string objName, float value",  // Params
+               "Set the maximum initial velocity of generated particles")  // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamVelMax, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetWidth,                       // Function name
-                "string objName, float value",  // Params
-                "Set the width of generated particles" )    // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetWidth,                       // Function name
+               "string objName, float value",  // Params
+               "Set the width of generated particles")     // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamXSize, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetHeight,                      // Function name
-                "string objName, float value",  // Params
-                "Set the height of generated particles" )   // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetHeight,                      // Function name
+               "string objName, float value",  // Params
+               "Set the height of generated particles")    // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamYSize, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetScaleMin,                    // Function name
-                "string objName, float value",  // Params
-                "Set the minimum width/height scaling of generated particles" ) // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetScaleMin,                    // Function name
+               "string objName, float value",  // Params
+               "Set the minimum width/height scaling of generated particles")  // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamScaleMin, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetScaleMax,                    // Function name
-                "string objName, float value",  // Params
-                "Set the maximum width/height scaling of generated particles" ) // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetScaleMax,                    // Function name
+               "string objName, float value",  // Params
+               "Set the maximum width/height scaling of generated particles")  // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamScaleMax, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetGeneratorLife,               // Function name
-                "string objName, float value",  // Params
-                "Set the remaining life of the particle generator" )    // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetGeneratorLife,               // Function name
+               "string objName, float value",  // Params
+               "Set the remaining life of the particle generator")     // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamGenLife, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetParticleLifeMin,             // Function name
-                "string objName, float value",  // Params
-                "Set the minimum lifespan of generated particles (negative values make them immortal)" )    // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetParticleLifeMin,             // Function name
+               "string objName, float value",  // Params
+               "Set the minimum lifespan of generated particles (negative values make them immortal)")     // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamPartLifeMin, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,                 // Group name
-                SetParticleLifeMax,             // Function name
-                "string objName, float value",  // Params
-                "Set the max lifespan of generated particles" ) // Help string
+PF_CONSOLE_CMD(ParticleSystem,                  // Group name
+               SetParticleLifeMax,             // Function name
+               "string objName, float value",  // Params
+               "Set the max lifespan of generated particles")  // Help string
 {
     UpdateParticleParam(plString::FromUtf8(params[0]), plParticleUpdateMsg::kParamPartLifeMax, params[1], PrintString);
 }
 
-PF_CONSOLE_CMD( ParticleSystem,
+PF_CONSOLE_CMD(ParticleSystem,
                TransferParticlesToAvatar,
                "string objName, int numParticles",
-               "Creates a system (if necessary) on the avatar, and transfers particles" )
+               "Creates a system (if necessary) on the avatar, and transfers particles")
 {
     char str[256];
-    plKey key = FindSceneObjectByName(static_cast<const char *>(params[0]), "", str);
-    if (key == nil) 
+    plKey key = FindSceneObjectByName(static_cast<const char*>(params[0]), "", str);
+
+    if (key == nil) {
         return;
-    
+    }
+
     plSceneObject* so = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-    if (so == nil) 
+
+    if (so == nil) {
         return;
-    
-    plArmatureMod *avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
-    if (avMod)
+    }
+
+    plArmatureMod* avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+    if (avMod) {
         (new plParticleTransferMsg(nil, avMod->GetKey(), 0, so->GetKey(), (int)params[1]))->Send();
+    }
 }
 
-PF_CONSOLE_CMD( ParticleSystem,
+PF_CONSOLE_CMD(ParticleSystem,
                KillParticles,
                "string objName, float timeLeft, float num, bool useAsPercentage",
-               "Flag some particles for death." )
+               "Flag some particles for death.")
 {
     char str[256];
-    plKey key = FindSceneObjectByName(static_cast<const char *>(params[0]), "", str);
-    if (key == nil) 
+    plKey key = FindSceneObjectByName(static_cast<const char*>(params[0]), "", str);
+
+    if (key == nil) {
         return;
-    
+    }
+
     plSceneObject* so = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-    if (so == nil) 
+
+    if (so == nil) {
         return;
-    
-    const plParticleSystem *sys = plParticleSystem::ConvertNoRef(so->GetModifierByType(plParticleSystem::Index()));
-    if (sys != nil)
-    {
+    }
+
+    const plParticleSystem* sys = plParticleSystem::ConvertNoRef(so->GetModifierByType(plParticleSystem::Index()));
+
+    if (sys != nil) {
         uint8_t flags = (params[3] ? plParticleKillMsg::kParticleKillPercentage : 0);
         (new plParticleKillMsg(nil, sys->GetKey(), 0, params[2], params[1], flags))->Send();
     }
 }
 
 
-PF_CONSOLE_SUBGROUP( ParticleSystem, Flock )
+PF_CONSOLE_SUBGROUP(ParticleSystem, Flock)
 
-static plParticleFlockEffect *FindFlock(const plString &objName)
+static plParticleFlockEffect* FindFlock(const plString& objName)
 {
     char str[256];
     plKey key = FindSceneObjectByName(objName, "", str);
-    
-    if (key == nil)
+
+    if (key == nil) {
         return nil;
-    
-    plSceneObject *so = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-    if (so == nil) 
+    }
+
+    plSceneObject* so = plSceneObject::ConvertNoRef(key->GetObjectPtr());
+
+    if (so == nil) {
         return nil;
-    
-    const plParticleSystem *sys = plParticleSystem::ConvertNoRef(so->GetModifierByType(plParticleSystem::Index()));
-    if (sys == nil)
+    }
+
+    const plParticleSystem* sys = plParticleSystem::ConvertNoRef(so->GetModifierByType(plParticleSystem::Index()));
+
+    if (sys == nil) {
         return nil;
-    
-    plParticleFlockEffect *flock = plParticleFlockEffect::ConvertNoRef(sys->GetEffect(plParticleFlockEffect::Index()));
-    if (flock == nil)
+    }
+
+    plParticleFlockEffect* flock = plParticleFlockEffect::ConvertNoRef(sys->GetEffect(plParticleFlockEffect::Index()));
+
+    if (flock == nil) {
         return nil;
-    
+    }
+
     return flock;
 }
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetFlockOffset,
                "string objName, float x, float y, float z",
                "Set the flock's goal to be an offset from its sceneObject")
 {
-    plParticleEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
-    {
+    plParticleEffect* flock = FindFlock(plString::FromUtf8(params[0]));
+
+    if (flock) {
         (new plParticleFlockMsg(nil, flock->GetKey(), 0, plParticleFlockMsg::kFlockCmdSetOffset, params[1], params[2], params[3]))->Send();
     }
-}   
+}
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetDissentTarget,
                "string objName, float x, float y, float z",
                "Set the goal for particles that leave the flock")
 {
-    plParticleEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
-    {
+    plParticleEffect* flock = FindFlock(plString::FromUtf8(params[0]));
+
+    if (flock) {
         (new plParticleFlockMsg(nil, flock->GetKey(), 0, plParticleFlockMsg::kFlockCmdSetDissentPoint, params[1], params[2], params[3]))->Send();
     }
 }
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetConformDistance,
                "string objName, float value",
                "")
 {
-    plParticleFlockEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
-        flock->SetInfluenceAvgRadius(params[1]);
-    else
-        PrintString("Can't find flock effect");
-}   
+    plParticleFlockEffect* flock = FindFlock(plString::FromUtf8(params[0]));
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+    if (flock) {
+        flock->SetInfluenceAvgRadius(params[1]);
+    } else {
+        PrintString("Can't find flock effect");
+    }
+}
+
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetRepelDistance,
                "string objName, float value",
                "")
 {
-    plParticleFlockEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
-        flock->SetInfluenceRepelRadius(params[1]);
-    else
-        PrintString("Can't find flock effect");
-}   
+    plParticleFlockEffect* flock = FindFlock(plString::FromUtf8(params[0]));
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+    if (flock) {
+        flock->SetInfluenceRepelRadius(params[1]);
+    } else {
+        PrintString("Can't find flock effect");
+    }
+}
+
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetGoalDistance,
                "string objName, float value",
                "")
 {
-    plParticleFlockEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
-        flock->SetGoalRadius(params[1]);
-    else
-        PrintString("Can't find flock effect");
-}   
+    plParticleFlockEffect* flock = FindFlock(plString::FromUtf8(params[0]));
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+    if (flock) {
+        flock->SetGoalRadius(params[1]);
+    } else {
+        PrintString("Can't find flock effect");
+    }
+}
+
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetFullChaseDistance,
                "string objName, float value",
                "")
 {
-    plParticleFlockEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
-        flock->SetFullChaseRadius(params[1]);
-    else
-        PrintString("Can't find flock effect");
-}   
+    plParticleFlockEffect* flock = FindFlock(plString::FromUtf8(params[0]));
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+    if (flock) {
+        flock->SetFullChaseRadius(params[1]);
+    } else {
+        PrintString("Can't find flock effect");
+    }
+}
+
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetConformStr,
                "string objName, float value",
                "")
 {
-    plParticleFlockEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
-        flock->SetConformStr(params[1]);
-    else
-        PrintString("Can't find flock effect");
-}   
+    plParticleFlockEffect* flock = FindFlock(plString::FromUtf8(params[0]));
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+    if (flock) {
+        flock->SetConformStr(params[1]);
+    } else {
+        PrintString("Can't find flock effect");
+    }
+}
+
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetRepelStr,
                "string objName, float value",
                "")
 {
-    plParticleFlockEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
-        flock->SetRepelStr(params[1]);
-    else
-        PrintString("Can't find flock effect");
-}   
+    plParticleFlockEffect* flock = FindFlock(plString::FromUtf8(params[0]));
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+    if (flock) {
+        flock->SetRepelStr(params[1]);
+    } else {
+        PrintString("Can't find flock effect");
+    }
+}
+
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetGoalOrbitStr,
                "string objName, float value",
                "")
 {
-    plParticleFlockEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
-        flock->SetGoalOrbitStr(params[1]);
-    else
-        PrintString("Can't find flock effect");
-}   
+    plParticleFlockEffect* flock = FindFlock(plString::FromUtf8(params[0]));
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+    if (flock) {
+        flock->SetGoalOrbitStr(params[1]);
+    } else {
+        PrintString("Can't find flock effect");
+    }
+}
+
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetGoalChaseStr,
                "string objName, float value",
                "")
 {
-    plParticleFlockEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
-        flock->SetGoalChaseStr(params[1]);
-    else
-        PrintString("Can't find flock effect");
-}   
+    plParticleFlockEffect* flock = FindFlock(plString::FromUtf8(params[0]));
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+    if (flock) {
+        flock->SetGoalChaseStr(params[1]);
+    } else {
+        PrintString("Can't find flock effect");
+    }
+}
+
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetMaxOrbitSpeed,
                "string objName, float value",
                "")
 {
-    plParticleFlockEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
-        flock->SetMaxOrbitSpeed(params[1]);
-    else
-        PrintString("Can't find flock effect");
-}   
+    plParticleFlockEffect* flock = FindFlock(plString::FromUtf8(params[0]));
 
-PF_CONSOLE_CMD( ParticleSystem_Flock,
+    if (flock) {
+        flock->SetMaxOrbitSpeed(params[1]);
+    } else {
+        PrintString("Can't find flock effect");
+    }
+}
+
+PF_CONSOLE_CMD(ParticleSystem_Flock,
                SetMaxChaseSpeed,
                "string objName, float value",
                "")
 {
-    plParticleFlockEffect *flock = FindFlock(plString::FromUtf8(params[0]));
-    if (flock)
+    plParticleFlockEffect* flock = FindFlock(plString::FromUtf8(params[0]));
+
+    if (flock) {
         flock->SetMaxChaseSpeed(params[1]);
-    else
+    } else {
         PrintString("Can't find flock effect");
-}   
+    }
+}
 
 #endif // LIMIT_CONSOLE_COMMANDS
 
@@ -6496,52 +6679,52 @@ PF_CONSOLE_CMD( ParticleSystem_Flock,
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_GROUP( Animation ) // Defines a main command group
+PF_CONSOLE_GROUP(Animation)   // Defines a main command group
 
-void SendAnimCmdMsg(const plString &objName, plMessage *msg)
+void SendAnimCmdMsg(const plString& objName, plMessage* msg)
 {
     char str[256];
     plKey key = FindSceneObjectByName(objName, "", str);
-    if (key != nil)
-    {
+
+    if (key != nil) {
         msg->AddReceiver(key);
         plgDispatch::MsgSend(msg);
-    }
-    else // message wasn't sent
+    } else { // message wasn't sent
         delete msg;
+    }
 }
 
 
-PF_CONSOLE_CMD( Animation,                          // Group name
-                Start,                              // Function name
-                "string objName, string animName",  // Params
-                "Start the animation" )             // Help string
+PF_CONSOLE_CMD(Animation,                           // Group name
+               Start,                              // Function name
+               "string objName, string animName",  // Params
+               "Start the animation")              // Help string
 {
-    plAnimCmdMsg *msg = new plAnimCmdMsg();
+    plAnimCmdMsg* msg = new plAnimCmdMsg();
     msg->SetCmd(plAnimCmdMsg::kContinue);
     msg->SetAnimName(plString::Null);
     msg->SetBCastFlag(plMessage::kPropagateToModifiers);
     SendAnimCmdMsg(plString::FromUtf8(params[0]), msg);
 }
 
-PF_CONSOLE_CMD( Animation,                          // Group name
-                Stop,                               // Function name
-                "string objName, string animName",  // Params
-                "Stop the animation" )              // Help string
+PF_CONSOLE_CMD(Animation,                           // Group name
+               Stop,                               // Function name
+               "string objName, string animName",  // Params
+               "Stop the animation")               // Help string
 {
-    plAnimCmdMsg *msg = new plAnimCmdMsg();
+    plAnimCmdMsg* msg = new plAnimCmdMsg();
     msg->SetCmd(plAnimCmdMsg::kStop);
     msg->SetAnimName(plString::Null);
     msg->SetBCastFlag(plMessage::kPropagateToModifiers);
     SendAnimCmdMsg(plString::FromUtf8(params[0]), msg);
 }
 
-PF_CONSOLE_CMD( Animation,                          // Group name
-                SetBlend,                           // Function name
-                "string objName, string animName, float blend, float rate", // Params
-                "Set the animation's blend value and rate to change" )      // Help string
+PF_CONSOLE_CMD(Animation,                           // Group name
+               SetBlend,                           // Function name
+               "string objName, string animName, float blend, float rate", // Params
+               "Set the animation's blend value and rate to change")       // Help string
 {
-    plAGCmdMsg *msg = new plAGCmdMsg();
+    plAGCmdMsg* msg = new plAGCmdMsg();
     msg->SetCmd(plAGCmdMsg::kSetBlend);
     msg->fBlend = params[2];
     msg->fBlendRate = params[3];
@@ -6550,12 +6733,12 @@ PF_CONSOLE_CMD( Animation,                          // Group name
     SendAnimCmdMsg(plString::FromUtf8(params[0]), msg);
 }
 
-PF_CONSOLE_CMD( Animation,                          // Group name
-                SetAmp,                             // Function name
-                "string objName, string animName, float amp, float rate",   // Params
-                "Set the amplitude of this animation and rate to change" )  // Help string
+PF_CONSOLE_CMD(Animation,                           // Group name
+               SetAmp,                             // Function name
+               "string objName, string animName, float amp, float rate",   // Params
+               "Set the amplitude of this animation and rate to change")   // Help string
 {
-    plAGCmdMsg *msg = new plAGCmdMsg();
+    plAGCmdMsg* msg = new plAGCmdMsg();
     msg->SetCmd(plAGCmdMsg::kSetAmp);
     msg->fAmp = params[2];
     msg->fAmpRate = params[3];
@@ -6564,12 +6747,12 @@ PF_CONSOLE_CMD( Animation,                          // Group name
     SendAnimCmdMsg(plString::FromUtf8(params[0]), msg);
 }
 
-PF_CONSOLE_CMD( Animation,                          // Group name
-                SetSpeed,                           // Function name
-                "string objName, string animName, float speed, float rate", // Params
-                "Set the speed of this animation and rate to change" )      // Help string
+PF_CONSOLE_CMD(Animation,                           // Group name
+               SetSpeed,                           // Function name
+               "string objName, string animName, float speed, float rate", // Params
+               "Set the speed of this animation and rate to change")       // Help string
 {
-    plAnimCmdMsg *msg = new plAnimCmdMsg();
+    plAnimCmdMsg* msg = new plAnimCmdMsg();
     msg->SetCmd(plAnimCmdMsg::kSetSpeed);
     msg->fSpeed = params[2];
     msg->fSpeedChangeRate = params[3];
@@ -6578,40 +6761,46 @@ PF_CONSOLE_CMD( Animation,                          // Group name
     SendAnimCmdMsg(plString::FromUtf8(params[0]), msg);
 }
 
-PF_CONSOLE_CMD( Animation,
+PF_CONSOLE_CMD(Animation,
                AddDebugItems,
                "string name",
-               "Add keys with the given name (substrings ok) to our report list" )
+               "Add keys with the given name (substrings ok) to our report list")
 {
-    plAnimDebugList *adl = plClient::GetInstance()->fAnimDebugList;
-    if (adl) 
+    plAnimDebugList* adl = plClient::GetInstance()->fAnimDebugList;
+
+    if (adl) {
         adl->AddObjects(plString::FromUtf8(params[0]));
+    }
 }
 
-PF_CONSOLE_CMD( Animation,
+PF_CONSOLE_CMD(Animation,
                RemoveDebugItems,
                "string name",
-               "Remove keys with the given name (substrings ok) to our report list" )
+               "Remove keys with the given name (substrings ok) to our report list")
 {
-    plAnimDebugList *adl = plClient::GetInstance()->fAnimDebugList;
-    if (adl)
+    plAnimDebugList* adl = plClient::GetInstance()->fAnimDebugList;
+
+    if (adl) {
         adl->RemoveObjects(plString::FromUtf8(params[0]));
+    }
 }
 
-PF_CONSOLE_CMD( Animation,
+PF_CONSOLE_CMD(Animation,
                ShowDebugTimes,
                "",
-               "Toggle the view of our debug list." )
+               "Toggle the view of our debug list.")
 {
-    plAnimDebugList *adl = plClient::GetInstance()->fAnimDebugList;
-    if (adl)
+    plAnimDebugList* adl = plClient::GetInstance()->fAnimDebugList;
+
+    if (adl) {
         adl->fEnabled = !adl->fEnabled;
+    }
 }
 
-PF_CONSOLE_CMD( Animation,
+PF_CONSOLE_CMD(Animation,
                ToggleDelayedTransforms,
                "",
-               "Toggle the possibility of delayed transform evaluation." )
+               "Toggle the possibility of delayed transform evaluation.")
 {
     bool enabled = !plCoordinateInterface::GetDelayedTransformsEnabled();
     plCoordinateInterface::SetDelayedTransformsEnabled(enabled);
@@ -6633,12 +6822,12 @@ PF_CONSOLE_CMD( Animation,
 #include "plAvatar/plClothingLayout.h"
 #include "pfMessage/plClothingMsg.h"
 
-PF_CONSOLE_GROUP( Clothing ) // Defines a main command group
+PF_CONSOLE_GROUP(Clothing)   // Defines a main command group
 
-PF_CONSOLE_CMD( Clothing,                           // Group name
-                AddItemToCloset,                    // Function name
-                "string itemName, float r, float g, float b, float r2, float g2, float b2", // Params
-                "Add a clothing item to your closet" )      // Help string
+PF_CONSOLE_CMD(Clothing,                            // Group name
+               AddItemToCloset,                    // Function name
+               "string itemName, float r, float g, float b, float r2, float g2, float b2", // Params
+               "Add a clothing item to your closet")       // Help string
 {
     hsTArray<plClosetItem> items;
     items.SetCount(1);
@@ -6649,247 +6838,245 @@ PF_CONSOLE_CMD( Clothing,                           // Group name
     plClothingMgr::GetClothingMgr()->AddItemsToCloset(items);
 }
 
-PF_CONSOLE_CMD( Clothing,                           // Group name
-                WearItem,                           // Function name
-                "string itemName",                  // Params
-                "Has your avatar wear the item of clothing specified" )     // Help string
+PF_CONSOLE_CMD(Clothing,                            // Group name
+               WearItem,                           // Function name
+               "string itemName",                  // Params
+               "Has your avatar wear the item of clothing specified")      // Help string
 {
-    plArmatureMod *avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();    
-    plClothingItem *item = plClothingMgr::GetClothingMgr()->FindItemByName(params[0]);
+    plArmatureMod* avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
+    plClothingItem* item = plClothingMgr::GetClothingMgr()->FindItemByName(params[0]);
 
-    if (avMod && item)
-    {
+    if (avMod && item) {
         avMod->GetClothingOutfit()->AddItem(item);
     }
 }
 
-PF_CONSOLE_CMD( Clothing,                           // Group name
-                RemoveItem,                         // Function name
-                "string itemName",                  // Params
-                "Has your avatar remove the item of clothing specified" )       // Help string
+PF_CONSOLE_CMD(Clothing,                            // Group name
+               RemoveItem,                         // Function name
+               "string itemName",                  // Params
+               "Has your avatar remove the item of clothing specified")        // Help string
 {
-    plArmatureMod *avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();    
-    plClothingItem *item = plClothingMgr::GetClothingMgr()->FindItemByName(params[0]);
-    
-    if (avMod && item)
-    {
+    plArmatureMod* avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
+    plClothingItem* item = plClothingMgr::GetClothingMgr()->FindItemByName(params[0]);
+
+    if (avMod && item) {
         avMod->GetClothingOutfit()->RemoveItem(item);
     }
 }
 
-PF_CONSOLE_CMD( Clothing,                           // Group name
-                TintItem,                           // Function name
-                "string itemName, float red, float green, float blue, int layer",   // Params
-                "Change the color of an item of clothing you're wearing" )      // Help string
+PF_CONSOLE_CMD(Clothing,                            // Group name
+               TintItem,                           // Function name
+               "string itemName, float red, float green, float blue, int layer",   // Params
+               "Change the color of an item of clothing you're wearing")       // Help string
 {
-    plArmatureMod *avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();    
-    plClothingItem *item = plClothingMgr::GetClothingMgr()->FindItemByName(params[0]);
+    plArmatureMod* avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
+    plClothingItem* item = plClothingMgr::GetClothingMgr()->FindItemByName(params[0]);
     uint8_t layer;
-    if ((int)params[4] == 2)
+
+    if ((int)params[4] == 2) {
         layer = plClothingElement::kLayerTint2;
-    else
+    } else {
         layer = plClothingElement::kLayerTint1;
-    
-    if (avMod && item)
-    {
+    }
+
+    if (avMod && item) {
         avMod->GetClothingOutfit()->TintItem(item, params[1], params[2], params[3], true, true, true, true, layer);
     }
 }
 
-PF_CONSOLE_CMD( Clothing,                           // Group name
-                TintSkin,                           // Function name
-                "float red, float green, float blue",                   // Params
-                "Change your avatar's skin color" )     // Help string
+PF_CONSOLE_CMD(Clothing,                            // Group name
+               TintSkin,                           // Function name
+               "float red, float green, float blue",                   // Params
+               "Change your avatar's skin color")      // Help string
 {
-    plArmatureMod *avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();    
-    if (avMod)
-    {
+    plArmatureMod* avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+    if (avMod) {
         avMod->GetClothingOutfit()->TintSkin(params[0], params[1], params[2]);
     }
 }
 
-PF_CONSOLE_CMD( Clothing,                           // Group name
-                AgeSkin,                            // Function name
-                "float age",                    // Params
-                "Blend (0 to 1) between young and old skin." )      // Help string
+PF_CONSOLE_CMD(Clothing,                            // Group name
+               AgeSkin,                            // Function name
+               "float age",                    // Params
+               "Blend (0 to 1) between young and old skin.")       // Help string
 {
-    plArmatureMod *avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();    
-    if (avMod)
-    {
+    plArmatureMod* avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+    if (avMod) {
         avMod->GetClothingOutfit()->SetAge(params[0]);
     }
 }
 
-PF_CONSOLE_CMD( Clothing,                           // Group name
+PF_CONSOLE_CMD(Clothing,                            // Group name
                BlendSkin,                           // Function name
                "float blend, int layer",                    // Params
-               "Set the blend (0 to 1) for a specific skin layer (1 to 6)." )       // Help string
+               "Set the blend (0 to 1) for a specific skin layer (1 to 6).")        // Help string
 {
-    plArmatureMod *avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();    
-    if (avMod)
-    {
+    plArmatureMod* avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+    if (avMod) {
         avMod->GetClothingOutfit()->SetSkinBlend(params[0], (int)params[1] + plClothingElement::kLayerSkinBlend1 - 1);
     }
 }
 
-PF_CONSOLE_CMD( Clothing,
+PF_CONSOLE_CMD(Clothing,
                ChangeAvatar,
                "string name",
-               "Switch your avatar to a different gender ('Male' / 'Female')" )
+               "Switch your avatar to a different gender ('Male' / 'Female')")
 {
     plClothingMgr::ChangeAvatar(params[0]);
 }
 
-PF_CONSOLE_CMD( Clothing,                           // Group name
+PF_CONSOLE_CMD(Clothing,                            // Group name
                SaveCustomizations,                  // Function name
                "",                  // Params
-               "Save your customizations to the vault." )       // Help string
+               "Save your customizations to the vault.")        // Help string
 {
-    plArmatureMod *avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();    
-    if (avMod)
-    {
+    plArmatureMod* avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+    if (avMod) {
         avMod->GetClothingOutfit()->WriteToVault();
     }
 }
 
-static plPlate *avatarTargetTexturePlate = nil;
+static plPlate* avatarTargetTexturePlate = nil;
 
-PF_CONSOLE_CMD( Clothing,
+PF_CONSOLE_CMD(Clothing,
                ShowTargetTexture,
                "...",
-               "Show/hide the texture we use for the local avatar on a square (for debugging)." )
+               "Show/hide the texture we use for the local avatar on a square (for debugging).")
 {
-    if (avatarTargetTexturePlate == nil)
-    {
-        plArmatureMod *avMod = nil;
-        if (numParams > 0)
+    if (avatarTargetTexturePlate == nil) {
+        plArmatureMod* avMod = nil;
+
+        if (numParams > 0) {
             avMod = plAvatarMgr::GetInstance()->FindAvatarByPlayerID((int)params[0]);
-        else
-            avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();           
-        if (avMod)
-        {
-            plPlateManager::Instance().CreatePlate( &avatarTargetTexturePlate );
+        } else {
+            avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
+        }
+
+        if (avMod) {
+            plPlateManager::Instance().CreatePlate(&avatarTargetTexturePlate);
             avatarTargetTexturePlate->SetMaterial(avMod->GetClothingOutfit()->fMaterial);
-            avatarTargetTexturePlate->SetPosition(0,0);
+            avatarTargetTexturePlate->SetPosition(0, 0);
             avatarTargetTexturePlate->SetSize(1.9, 1.9);
             avatarTargetTexturePlate->SetVisible(true);
         }
-    }
-    else
-    {
+    } else {
         plPlateManager::Instance().DestroyPlate(avatarTargetTexturePlate);
     }
 }
 
-PF_CONSOLE_CMD( Clothing,
+PF_CONSOLE_CMD(Clothing,
                WearMaintainerOutfit,
                "",
-               "Wear the Maintainer outfit" )
+               "Wear the Maintainer outfit")
 {
-    plArmatureMod *avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();    
-    if (avMod)
-    {
+    plArmatureMod* avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+    if (avMod) {
         avMod->GetClothingOutfit()->WearMaintainerOutfit();
     }
 }
 
-PF_CONSOLE_CMD( Clothing,
+PF_CONSOLE_CMD(Clothing,
                RemoveMaintainerOutfit,
                "",
-               "Return to your normal outfit" )
+               "Return to your normal outfit")
 {
-    plArmatureMod *avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();    
-    if (avMod)
-    {
+    plArmatureMod* avMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+    if (avMod) {
         avMod->GetClothingOutfit()->RemoveMaintainerOutfit();
     }
 }
-    
+
 #endif // LIMIT_CONSOLE_COMMANDS
 
 //////////////////////////////////////////////////////////////////////////////
 //// KI Commands /////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-PF_CONSOLE_GROUP( KI ) // Defines a main command group
+PF_CONSOLE_GROUP(KI)   // Defines a main command group
 
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( KI,                         // Group name
-                UpgradeLevel,                   // Function name
-                "int level",                // Params
-                "Upgrade KI to new level." )    // Help string
+PF_CONSOLE_CMD(KI,                          // Group name
+               UpgradeLevel,                   // Function name
+               "int level",                // Params
+               "Upgrade KI to new level.")     // Help string
 {
     // create the mesage to send
-    pfKIMsg *msg = new pfKIMsg( pfKIMsg::kUpgradeKILevel );
+    pfKIMsg* msg = new pfKIMsg(pfKIMsg::kUpgradeKILevel);
 
     msg->SetIntValue((int) params[0]);
 
     // send it off
-    plgDispatch::MsgSend( msg );
+    plgDispatch::MsgSend(msg);
 }
 
-PF_CONSOLE_CMD( KI,                         // Group name
-                DowngradeLevel,             // Function name
-                "int level",                // Params
-                "Downgrade KI level to next lower level." ) // Help string
+PF_CONSOLE_CMD(KI,                          // Group name
+               DowngradeLevel,             // Function name
+               "int level",                // Params
+               "Downgrade KI level to next lower level.")  // Help string
 {
     // create the mesage to send
-    pfKIMsg *msg = new pfKIMsg( pfKIMsg::kDowngradeKILevel );
+    pfKIMsg* msg = new pfKIMsg(pfKIMsg::kDowngradeKILevel);
 
     msg->SetIntValue((int) params[0]);
 
     // send it off
-    plgDispatch::MsgSend( msg );
+    plgDispatch::MsgSend(msg);
 }
 
-PF_CONSOLE_CMD( KI,                             // Group name
-                AllOfThePower,                  // Function name
-                "",                             // Params
-                "All the phased functionality turned on." ) // Help string
+PF_CONSOLE_CMD(KI,                              // Group name
+               AllOfThePower,                  // Function name
+               "",                             // Params
+               "All the phased functionality turned on.")  // Help string
 {
     // create the mesage to send
-    pfKIMsg *msg = new pfKIMsg( pfKIMsg::kKIPhasedAllOn );
+    pfKIMsg* msg = new pfKIMsg(pfKIMsg::kKIPhasedAllOn);
 
     // send it off
-    plgDispatch::MsgSend( msg );
+    plgDispatch::MsgSend(msg);
 }
 
-PF_CONSOLE_CMD( KI,                             // Group name
-                NoneOfThePower,                 // Function name
-                "",                             // Params
-                "All the phased functionality turned off." )    // Help string
+PF_CONSOLE_CMD(KI,                              // Group name
+               NoneOfThePower,                 // Function name
+               "",                             // Params
+               "All the phased functionality turned off.")     // Help string
 {
     // create the mesage to send
-    pfKIMsg *msg = new pfKIMsg( pfKIMsg::kKIPhasedAllOff );
+    pfKIMsg* msg = new pfKIMsg(pfKIMsg::kKIPhasedAllOff);
 
     // send it off
-    plgDispatch::MsgSend( msg );
+    plgDispatch::MsgSend(msg);
 }
 
-PF_CONSOLE_CMD( KI,                             // Group name
-                AddJournal,                     // Function name
-                "",                             // Params
-                "Add the journal to the Blackbar." ) // Help string
+PF_CONSOLE_CMD(KI,                              // Group name
+               AddJournal,                     // Function name
+               "",                             // Params
+               "Add the journal to the Blackbar.")  // Help string
 {
     // create the message to send
-    pfKIMsg *msg = new pfKIMsg( pfKIMsg::kAddJournalBook );
+    pfKIMsg* msg = new pfKIMsg(pfKIMsg::kAddJournalBook);
 
     // send if off
-    plgDispatch::MsgSend( msg );
+    plgDispatch::MsgSend(msg);
 }
 
-PF_CONSOLE_CMD( KI,                             // Group name
-                RemoveJournal,                  // Function name
-                "",                             // Params
-                "Removes the journal from the Blackbar." ) // Help string
+PF_CONSOLE_CMD(KI,                              // Group name
+               RemoveJournal,                  // Function name
+               "",                             // Params
+               "Removes the journal from the Blackbar.")  // Help string
 {
     // create the message to send
-    pfKIMsg *msg = new pfKIMsg( pfKIMsg::kRemoveJournalBook );
+    pfKIMsg* msg = new pfKIMsg(pfKIMsg::kRemoveJournalBook);
 
     // send if off
-    plgDispatch::MsgSend( msg );
+    plgDispatch::MsgSend(msg);
 }
 
 #endif // LIMIT_CONSOLE_COMMANDS
@@ -6898,24 +7085,24 @@ PF_CONSOLE_CMD( KI,                             // Group name
 // Execute a Python file command
 ////////////////////////////////////////////////////////////////////////
 
-PF_CONSOLE_GROUP( Python ) // Defines a main command group
+PF_CONSOLE_GROUP(Python)   // Defines a main command group
 
 #include "pfPython/cyMisc.h"
 
-PF_CONSOLE_CMD( Python,                         // Group name
-                SetLoggingLevel,                // Function name
-                "int level",                    // Params
-                "Set the python logging print level (1-4)" )        // Help string
+PF_CONSOLE_CMD(Python,                          // Group name
+               SetLoggingLevel,                // Function name
+               "int level",                    // Params
+               "Set the python logging print level (1-4)")         // Help string
 {
     cyMisc::SetPythonLoggingLevel((int) params[0]);
 }
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 #ifdef HAVE_CYPYTHONIDE
-PF_CONSOLE_CMD( Python,
-                UsePythonDebugger,
-                "",
-                "Enables the python debugger (only works in an .ini file)" )
+PF_CONSOLE_CMD(Python,
+               UsePythonDebugger,
+               "",
+               "Enables the python debugger (only works in an .ini file)")
 {
     PythonInterface::UsePythonDebugger(true);
 }
@@ -6923,32 +7110,35 @@ PF_CONSOLE_CMD( Python,
 
 
 #include "pfMessage/pfBackdoorMsg.h"
-PF_CONSOLE_CMD( Python,
-                Backdoor,
-                "string target, ...",   // Params
-                "Send a debug trigger to a python file modifier" )
+PF_CONSOLE_CMD(Python,
+               Backdoor,
+               "string target, ...",   // Params
+               "Send a debug trigger to a python file modifier")
 {
     const char* extraParms = "";
-    if (numParams > 1)
+
+    if (numParams > 1) {
         extraParms = params[1];
-    pfBackdoorMsg *msg = new pfBackdoorMsg( params[0],extraParms );
+    }
+
+    pfBackdoorMsg* msg = new pfBackdoorMsg(params[0], extraParms);
     // send it off
-    plgDispatch::MsgSend( msg );
+    plgDispatch::MsgSend(msg);
 }
 
-PF_CONSOLE_CMD( Python,
-                Cheat,
-                "string functions, ...",    // Params
-                "Run a cheat command" )
+PF_CONSOLE_CMD(Python,
+               Cheat,
+               "string functions, ...",    // Params
+               "Run a cheat command")
 {
     plString args;
-    if (numParams > 1) 
-    {
+
+    if (numParams > 1) {
         const char* tmp = params[1];
         args = plString::Format("(%s,)", tmp);
-    }
-    else
+    } else {
         args = "()";
+    }
 
     PythonInterface::RunFunctionSafe("xCheat", params[0], args.c_str());
 
@@ -6958,15 +7148,15 @@ PF_CONSOLE_CMD( Python,
     PrintString(output.c_str());
 }
 
-PF_CONSOLE_CMD( Python,
-                ListCheats,
-                "",                 // Params - None
-                "Show a list of python commands" )
+PF_CONSOLE_CMD(Python,
+               ListCheats,
+               "",                 // Params - None
+               "Show a list of python commands")
 {
     // now evaluate this mess they made
     PyObject* mymod = PythonInterface::FindModule("__main__");
 
-    PythonInterface::RunString("import xCheat;xc=[x for x in dir(xCheat) if not x.startswith('_')]\nfor i in range((len(xc)/4)+1): print xc[i*4:(i*4)+4]\n",mymod);
+    PythonInterface::RunString("import xCheat;xc=[x for x in dir(xCheat) if not x.startswith('_')]\nfor i in range((len(xc)/4)+1): print xc[i*4:(i*4)+4]\n", mymod);
     std::string output;
     // get the messages
     PythonInterface::getOutputAndReset(&output);
@@ -6983,18 +7173,20 @@ PF_CONSOLE_GROUP(Demo)
 
 PF_CONSOLE_CMD(Demo, RecordNet, "string recType, string recName", "Records a network demo (must be set in an ini file)")
 {
-    if (plNetClientMgr::GetInstance()->RecordMsgs(params[0],params[1]))
+    if (plNetClientMgr::GetInstance()->RecordMsgs(params[0], params[1])) {
         PrintString("Recording Started");
-    else
+    } else {
         PrintString("Recording Failed");
+    }
 }
 
 PF_CONSOLE_CMD(Demo, PlayNet, "string recName", "Plays back a network demo")
 {
-    if (plNetClientMgr::GetInstance()->PlaybackMsgs(params[0]))
+    if (plNetClientMgr::GetInstance()->PlaybackMsgs(params[0])) {
         PrintString("Playback Started");
-    else
+    } else {
         PrintString("Playback Failed");
+    }
 }
 /*
 #include "../plHavok1/plVehicleModifier.h"

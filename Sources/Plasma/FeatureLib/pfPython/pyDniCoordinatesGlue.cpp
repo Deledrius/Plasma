@@ -78,28 +78,29 @@ PYTHON_BASIC_METHOD_DEFINITION(ptDniCoordinates, update, UpdateCoordinates)
 PYTHON_METHOD_DEFINITION(ptDniCoordinates, fromPoint, args)
 {
     PyObject* pointObj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &pointObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &pointObj)) {
         PyErr_SetString(PyExc_TypeError, "fromPoint expects a ptPoint3");
         PYTHON_RETURN_ERROR;
     }
-    if (pyPoint3::Check(pointObj))
-    {
+
+    if (pyPoint3::Check(pointObj)) {
         pyPoint3* pos = pyPoint3::ConvertFrom(pointObj);
         self->fThis->FromPoint(pos->fPoint);
         PYTHON_RETURN_NONE;
     }
+
     PyErr_SetString(PyExc_TypeError, "fromPoint expects a ptPoint3");
     PYTHON_RETURN_ERROR;
 }
 
 PYTHON_START_METHODS_TABLE(ptDniCoordinates)
-    PYTHON_METHOD_NOARGS(ptDniCoordinates, getHSpans, "Returns the HSpans component of the coordinate"),
-    PYTHON_METHOD_NOARGS(ptDniCoordinates, getVSpans, "Returns the VSpans component of the coordinate"),
-    PYTHON_METHOD_NOARGS(ptDniCoordinates, getTorans, "Returns the Torans component of the coordinate"),
-    PYTHON_BASIC_METHOD(ptDniCoordinates, update, "Update these coordinates with the players current position"),
-    PYTHON_METHOD(ptDniCoordinates, fromPoint, "Params: pt\nUpdate these coordinates with the specified ptPoint3"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptDniCoordinates, getHSpans, "Returns the HSpans component of the coordinate"),
+                     PYTHON_METHOD_NOARGS(ptDniCoordinates, getVSpans, "Returns the VSpans component of the coordinate"),
+                     PYTHON_METHOD_NOARGS(ptDniCoordinates, getTorans, "Returns the Torans component of the coordinate"),
+                     PYTHON_BASIC_METHOD(ptDniCoordinates, update, "Update these coordinates with the players current position"),
+                     PYTHON_METHOD(ptDniCoordinates, fromPoint, "Params: pt\nUpdate these coordinates with the specified ptPoint3"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptDniCoordinates, "Constructor for a D'Ni coordinate");
@@ -107,14 +108,16 @@ PLASMA_DEFAULT_TYPE(ptDniCoordinates, "Constructor for a D'Ni coordinate");
 // required functions for PyObject interoperability
 PYTHON_CLASS_NEW_IMPL(ptDniCoordinates, pyDniCoordinates)
 
-PyObject *pyDniCoordinates::New(plDniCoordinateInfo* coord)
+PyObject* pyDniCoordinates::New(plDniCoordinateInfo* coord)
 {
-    ptDniCoordinates *newObj = (ptDniCoordinates*)ptDniCoordinates_type.tp_new(&ptDniCoordinates_type, NULL, NULL);
+    ptDniCoordinates* newObj = (ptDniCoordinates*)ptDniCoordinates_type.tp_new(&ptDniCoordinates_type, NULL, NULL);
+
     if (coord) {
         newObj->fThis->fCoords->SetTorans(coord->GetTorans());
         newObj->fThis->fCoords->SetHSpans(coord->GetHSpans());
         newObj->fThis->fCoords->SetVSpans(coord->GetVSpans());
     }
+
     return (PyObject*)newObj;
 }
 
@@ -125,7 +128,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptDniCoordinates, pyDniCoordinates)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyDniCoordinates::AddPlasmaClasses(PyObject *m)
+void pyDniCoordinates::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptDniCoordinates);

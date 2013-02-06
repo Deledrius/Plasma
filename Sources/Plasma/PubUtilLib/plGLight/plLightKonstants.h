@@ -43,14 +43,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plLightKonstants_inc
 #define plLightKonstants_inc
 
-class plSillyLightKonstants
-{
+class plSillyLightKonstants {
 public:
-    static float  GetFarPowerKonst( void )
-    {
+    static float  GetFarPowerKonst(void) {
         // arbitrary const, make light drop to 1/kFarPower at attenEnd. 15 just looked good to me. mf
         // Done as a function so we don't have to worry about a separate .cpp file
-        return 15.f; 
+        return 15.f;
     }
 };
 

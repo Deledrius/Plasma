@@ -49,9 +49,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
     "mount the climbing wall with an upward/downward/leftward/rightward mount"
     "dis-/enable climbing in the up/down/left/right direction"
     "dis-/enable dismounting in the up/down/left/right direction"
-*/  
-class plClimbMsg : public plMessage
-{
+*/
+class plClimbMsg : public plMessage {
 public:
     enum Direction {
         kUp =       0x01,
@@ -72,14 +71,14 @@ public:
 
     // tors
     plClimbMsg();
-    plClimbMsg(const plKey &sender, const plKey &receiver, Command command = kNoCommand, Direction direction = kCenter, bool status = false, plKey target = nil);
+    plClimbMsg(const plKey& sender, const plKey& receiver, Command command = kNoCommand, Direction direction = kCenter, bool status = false, plKey target = nil);
 
     // plasma protocol
-    CLASSNAME_REGISTER( plClimbMsg );
-    GETINTERFACE_ANY( plClimbMsg, plMessage );
+    CLASSNAME_REGISTER(plClimbMsg);
+    GETINTERFACE_ANY(plClimbMsg, plMessage);
 
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     Command fCommand;
     Direction fDirection;

@@ -51,12 +51,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plInputEventMsg;
 
-class plInterestingModifier : public plSingleModifier
-{
+class plInterestingModifier : public plSingleModifier {
 protected:
-    
-    enum 
-    {
+
+    enum {
         kTypeInteresting = 0,
         kTypeLookAtMod,
     };
@@ -68,26 +66,44 @@ protected:
     static float fInterestWeight;
 
     virtual bool IEval(double secs, float del, uint32_t dirty);
-    
+
 public:
-    plInterestingModifier(){ fType = kTypeInteresting;}
-    virtual ~plInterestingModifier(){;}
-    
-    virtual bool MsgReceive(plMessage* msg) {return false;}
+    plInterestingModifier() {
+        fType = kTypeInteresting;
+    }
+    virtual ~plInterestingModifier() {
+        ;
+    }
 
-    CLASSNAME_REGISTER( plInterestingModifier );
-    GETINTERFACE_ANY( plInterestingModifier, plSingleModifier );
+    virtual bool MsgReceive(plMessage* msg) {
+        return false;
+    }
 
-    float GetInterestWeight() { return fInterestWeight; }
-    float GetInterestRadius() { return fInterestRadius; }
+    CLASSNAME_REGISTER(plInterestingModifier);
+    GETINTERFACE_ANY(plInterestingModifier, plSingleModifier);
 
-    void SetInterestWeight(float _InterestRadius) { fInterestWeight =_InterestRadius; }
-    void SetInterestRadius(float _InterestWeight) { fInterestRadius =_InterestWeight; }
-    
+    float GetInterestWeight() {
+        return fInterestWeight;
+    }
+    float GetInterestRadius() {
+        return fInterestRadius;
+    }
+
+    void SetInterestWeight(float _InterestRadius) {
+        fInterestWeight = _InterestRadius;
+    }
+    void SetInterestRadius(float _InterestWeight) {
+        fInterestRadius = _InterestWeight;
+    }
+
     virtual void AddTarget(plSceneObject* so);
-    
-    void    SetType(uint8_t type) { fType = type; }
-    uint8_t   GetType() { return fType; }
+
+    void    SetType(uint8_t type) {
+        fType = type;
+    }
+    uint8_t   GetType() {
+        return fType;
+    }
 };
 
 

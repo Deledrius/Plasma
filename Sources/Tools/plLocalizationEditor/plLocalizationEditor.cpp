@@ -85,16 +85,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
     MSG msg;
     HACCEL accelTable = LoadAccelerators(hInst, MAKEINTRESOURCE(IDR_ACCELERATOR1));
 
-    if (!WinInit(hInst, nCmdShow))
+    if (!WinInit(hInst, nCmdShow)) {
         return -1;
+    }
 
-    plResManager *rMgr = new plResManager;
+    plResManager* rMgr = new plResManager;
     hsgResMgr::Init(rMgr);
 
-    while (GetMessage(&msg, NULL, 0, 0))
-    {
-        if (!TranslateAccelerator(gMainWindow, accelTable, &msg))
-        {
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        if (!TranslateAccelerator(gMainWindow, accelTable, &msg)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
@@ -126,16 +125,19 @@ BOOL WinInit(HINSTANCE hInst, int nCmdShow)
     wcEx.lpszClassName = CLASSNAME;
     wcEx.hIconSm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_APPICON), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
 
-    if (!RegisterClassEx(&wcEx))
+    if (!RegisterClassEx(&wcEx)) {
         return FALSE;
+    }
 
     DWORD dwStyle = WS_POPUP | WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE;
     DWORD dwExStyle = WS_EX_CONTROLPARENT;
 
     // Create a window
     gMainWindow = CreateWindowEx(dwExStyle, CLASSNAME, WINDOWNAME, dwStyle, 10, 10, 800, 500, NULL, NULL, hInst, NULL);
-    if (gMainWindow == NULL)
+
+    if (gMainWindow == NULL) {
         return FALSE;
+    }
 
     return TRUE;
 }
@@ -143,34 +145,42 @@ BOOL WinInit(HINSTANCE hInst, int nCmdShow)
 void SetWindowTitle(HWND hWnd, std::wstring path)
 {
     std::wstring title = L"plLocalizationEditor";
-    if (path != L"")
+
+    if (path != L"") {
         title += L"-" + path;
+    }
 
     SetWindowText(hWnd, title.c_str());
 }
 
 BOOL CALLBACK AboutDialogProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    if(msg == WM_COMMAND)
+    if (msg == WM_COMMAND) {
         EndDialog(hWnd, 0);
+    }
+
     return 0;
 }
 
 void RequestSaveOnExit()
 {
-    if (gCurPath == L"") // no data open
+    if (gCurPath == L"") { // no data open
         return;
+    }
 
     static bool alreadyRequested = false; // make sure we don't ask multiple times
-    if (alreadyRequested)
+
+    if (alreadyRequested) {
         return;
+    }
+
     alreadyRequested = true;
 
     SaveLocalizationText(); // make sure any changed text is saved to the manager
 
     int res = MessageBox(NULL, L"Do you wish to save your changes?", L"Save Changes", MB_ICONQUESTION | MB_YESNO);
-    if (res == IDYES)
-    {
+
+    if (res == IDYES) {
         // save it to a new directory
         BROWSEINFO bInfo;
         LPITEMIDLIST itemList;
@@ -185,8 +195,8 @@ void RequestSaveOnExit()
         bInfo.ulFlags = BIF_EDITBOX;
 
         itemList = SHBrowseForFolder(&bInfo);
-        if (itemList != NULL)
-        {
+
+        if (itemList != NULL) {
             plWaitCursor waitCursor;
 
             SHGetPathFromIDList(itemList, path);
@@ -195,7 +205,7 @@ void RequestSaveOnExit()
             shMalloc->Release();
 
             gCurPath = path;
-            char *sPath = hsWStringToString(gCurPath.c_str());
+            char* sPath = hsWStringToString(gCurPath.c_str());
             pfLocalizationDataMgr::Instance().WriteDatabaseToDisk(sPath);
             delete [] sPath;
         }
@@ -204,14 +214,13 @@ void RequestSaveOnExit()
 
 LRESULT CALLBACK HandleCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    switch (LOWORD(wParam))
-    {
+    switch (LOWORD(wParam)) {
     case ID_FILE_EXIT:
         RequestSaveOnExit();
         PostQuitMessage(0);
         break;
-    case ID_FILE_OPENDATADIRECTORY:
-        {
+
+    case ID_FILE_OPENDATADIRECTORY: {
             BROWSEINFO bInfo;
             LPITEMIDLIST itemList;
             LPMALLOC shMalloc;
@@ -225,8 +234,8 @@ LRESULT CALLBACK HandleCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             bInfo.ulFlags = BIF_USENEWUI | BIF_VALIDATE | BIF_RETURNONLYFSDIRS | BIF_NONEWFOLDERBUTTON;
 
             itemList = SHBrowseForFolder(&bInfo);
-            if (itemList != NULL)
-            {
+
+            if (itemList != NULL) {
                 plWaitCursor waitCursor;
 
                 SHGetPathFromIDList(itemList, path);
@@ -236,7 +245,7 @@ LRESULT CALLBACK HandleCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
                 pfLocalizationMgr::Shutdown();
 
-                char *sPath = hsWStringToString(path);
+                char* sPath = hsWStringToString(path);
                 pfLocalizationMgr::Initialize(sPath);
                 delete [] sPath;
 
@@ -253,26 +262,27 @@ LRESULT CALLBACK HandleCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
-    case ID_FILE_SAVETOCUR:
-        {
+
+    case ID_FILE_SAVETOCUR: {
             SaveLocalizationText(); // make sure any changed text is saved to the manager
 
             // save it to our current directory
             int res = MessageBox(hWnd, L"Are you sure you want to save to the current directory? Current data will be overwritten!", L"Save to Current Directory", MB_ICONQUESTION | MB_YESNOCANCEL);
-            if (res == IDYES)
-            {
+
+            if (res == IDYES) {
                 plWaitCursor waitCursor;
-                char *sPath = hsWStringToString(gCurPath.c_str());
+                char* sPath = hsWStringToString(gCurPath.c_str());
                 pfLocalizationDataMgr::Instance().WriteDatabaseToDisk(sPath);
                 delete [] sPath;
-            }
-            else if (res == IDNO)
+            } else if (res == IDNO) {
                 SendMessage(hWnd, WM_COMMAND, (WPARAM)ID_FILE_SAVETONEW, (LPARAM)0);
+            }
+
             // and if it's cancel we don't do anything
         }
         break;
-    case ID_FILE_SAVETONEW:
-        {
+
+    case ID_FILE_SAVETONEW: {
             SaveLocalizationText(); // make sure any changed text is saved to the manager
 
             // save it to a new directory
@@ -289,8 +299,8 @@ LRESULT CALLBACK HandleCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             bInfo.ulFlags = BIF_EDITBOX;
 
             itemList = SHBrowseForFolder(&bInfo);
-            if (itemList != NULL)
-            {
+
+            if (itemList != NULL) {
                 plWaitCursor waitCursor;
 
                 SHGetPathFromIDList(itemList, path);
@@ -300,7 +310,7 @@ LRESULT CALLBACK HandleCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
                 gCurPath = path;
                 SetWindowTitle(hWnd, path);
-                char *sPath = hsWStringToString(gCurPath.c_str());
+                char* sPath = hsWStringToString(gCurPath.c_str());
                 pfLocalizationDataMgr::Instance().WriteDatabaseToDisk(sPath);
                 delete [] sPath;
             }
@@ -311,6 +321,7 @@ LRESULT CALLBACK HandleCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         DialogBox(gInstance, MAKEINTRESOURCE(IDD_ABOUT), hWnd, AboutDialogProc);
         break;
     }
+
     return 0;
 }
 
@@ -334,8 +345,8 @@ void InitWindowControls(HWND hWnd)
     GetClientRect(hWnd, &clientRect);
 
     gTreeView = CreateWindowEx(WS_EX_CLIENTEDGE, WC_TREEVIEW, L"Tree View", WS_VISIBLE | WS_CHILD | WS_BORDER |
-        TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWSELALWAYS,
-        0, 0, 0, 0, hWnd, (HMENU)IDC_REGTREEVIEW, gInstance, NULL);
+                               TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWSELALWAYS,
+                               0, 0, 0, 0, hWnd, (HMENU)IDC_REGTREEVIEW, gInstance, NULL);
 
     gEditDlg = CreateDialog(gInstance, MAKEINTRESOURCE(IDD_EDITDLG), hWnd, EditDlgProc);
 
@@ -344,45 +355,52 @@ void InitWindowControls(HWND hWnd)
 
 LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
+    switch (msg) {
     case WM_CREATE:
         InitCommonControls();
         InitWindowControls(hWnd);
         break;
+
     case WM_CLOSE:
         RequestSaveOnExit();
         DestroyWindow(hWnd);
         break;
+
     case WM_DESTROY:
         RequestSaveOnExit();
         plLocTreeView::ClearTreeView(gTreeView);
         PostQuitMessage(0);
         break;
+
     case WM_SIZING:
     case WM_SIZE:
         SizeControls(hWnd);
         break;
-    case WM_GETMINMAXINFO:
-        {
+
+    case WM_GETMINMAXINFO: {
             MINMAXINFO* pmmi = (MINMAXINFO*)lParam;
             pmmi->ptMinTrackSize.x = 800;
             pmmi->ptMinTrackSize.y = 500;
             return 0;
         }
+
     case WM_NOTIFY:
-        if(wParam == IDC_REGTREEVIEW)
-        {
+        if (wParam == IDC_REGTREEVIEW) {
             SaveLocalizationText(); // save any current changes to the database
 
-            NMHDR *hdr = (NMHDR*)lParam;
-            if(hdr->code == TVN_SELCHANGED)
+            NMHDR* hdr = (NMHDR*)lParam;
+
+            if (hdr->code == TVN_SELCHANGED) {
                 plLocTreeView::SelectionChanged(gTreeView);
-            else if(hdr->code == NM_DBLCLK)
+            } else if (hdr->code == NM_DBLCLK) {
                 plLocTreeView::SelectionDblClicked(gTreeView);
+            }
+
             UpdateEditDlg(plLocTreeView::GetPath());
         }
+
         break;
+
     case WM_COMMAND:
         return HandleCommand(hWnd, wParam, lParam);
     }

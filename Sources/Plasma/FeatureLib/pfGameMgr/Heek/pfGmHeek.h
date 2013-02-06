@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/FeatureLib/pfGameMgr/Heek/pfGmHeek.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_FEATURELIB_PFGAMEMGR_HEEK_PFGMHEEK_H
@@ -61,16 +61,16 @@ class pfGmHeek : public pfGameCli {
     // Encapsulate all implementation details such as member fields
     // in an opaque friend class, in this case that's IHeek.
     friend struct IHeek;
-    struct IHeek * internal;
+    struct IHeek* internal;
 
     //========================================================================
     // Required subclass methods
     //--------------------------
-    void Recv           (GameMsgHeader * msg, void * param);
-    void OnPlayerJoined (const Srv2Cli_Game_PlayerJoined & msg);
-    void OnPlayerLeft   (const Srv2Cli_Game_PlayerLeft & msg);
-    void OnInviteFailed (const Srv2Cli_Game_InviteFailed & msg);
-    void OnOwnerChange  (const Srv2Cli_Game_OwnerChange & msg);
+    void Recv(GameMsgHeader* msg, void* param);
+    void OnPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg);
+    void OnPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg);
+    void OnInviteFailed(const Srv2Cli_Game_InviteFailed& msg);
+    void OnOwnerChange(const Srv2Cli_Game_OwnerChange& msg);
     //========================================================================
 
 public:
@@ -80,15 +80,15 @@ public:
     GETINTERFACE_ANY(pfGmHeek, pfGameCli);
 #pragma warning(pop)
 
-    pfGmHeek    (unsigned gameId, plKey receiver);
-    ~pfGmHeek   ();
+    pfGmHeek(unsigned gameId, plKey receiver);
+    ~pfGmHeek();
 
     //========================================================================
     // Game methods
     //-------------
-    void PlayGame           (unsigned position, uint32_t points, const wchar_t name[]);
-    void LeaveGame          ();
-    void Choose             (EHeekChoice choice);
-    void SequenceFinished   (EHeekSeqFinished seq);
+    void PlayGame(unsigned position, uint32_t points, const wchar_t name[]);
+    void LeaveGame();
+    void Choose(EHeekChoice choice);
+    void SequenceFinished(EHeekSeqFinished seq);
     //========================================================================
 };

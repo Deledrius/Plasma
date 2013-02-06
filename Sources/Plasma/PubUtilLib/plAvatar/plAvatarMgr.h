@@ -77,13 +77,11 @@ class plStatusLog;
     This class is 100% static and must be explictly cleared when
     resetting the scene on shutdown or when rebuilding the scene for export.
 */
-class plAvatarMgr : public hsKeyedObject
-{
+class plAvatarMgr : public hsKeyedObject {
 public:
     typedef std::vector<plArmatureMod*> plArmatureModPtrVec;
 
-    enum AvatarTypeMask
-    {
+    enum AvatarTypeMask {
         Human = 1,
         Player = 2
     };
@@ -91,8 +89,8 @@ public:
     plAvatarMgr();                      // can only be constructed by itself (singleton)
     virtual ~plAvatarMgr();
 
-    CLASSNAME_REGISTER( plAvatarMgr );
-    GETINTERFACE_ANY( plAvatarMgr, hsKeyedObject );
+    CLASSNAME_REGISTER(plAvatarMgr);
+    GETINTERFACE_ANY(plAvatarMgr, hsKeyedObject);
 
     // \{
     /** Seek points are alignment points used for aligning
@@ -100,22 +98,22 @@ public:
         These are registered by name here primarily for debugging
         and ad-hoc scripting. In final releases, we'll be able to
         do away with this bookeeping entirely. */
-    void AddSeekPoint(plSeekPointMod *seekpoint);
-    void RemoveSeekPoint(plSeekPointMod *seekpoint);
-    plSeekPointMod *FindSeekPoint(const plString &name);
+    void AddSeekPoint(plSeekPointMod* seekpoint);
+    void RemoveSeekPoint(plSeekPointMod* seekpoint);
+    plSeekPointMod* FindSeekPoint(const plString& name);
     // \}
 
     // \{
     /** One shots are registered here for debugging and ad-hoc
         scripting only. */
-    void AddOneShot(plOneShotMod *oneshot);
-    void RemoveOneShot(plOneShotMod *oneshot);
-    plOneShotMod *FindOneShot(const plString &name);
+    void AddOneShot(plOneShotMod* oneshot);
+    void RemoveOneShot(plOneShotMod* oneshot);
+    plOneShotMod* FindOneShot(const plString& name);
     // \}
-    
-    plKey LoadPlayer(const char* name, const char *account);
-    plKey LoadPlayer(const char* name, const char *account, const char *linkName);
-    plKey LoadAvatar(const char *name, const char *accountName, bool isPlayer, plKey spawnPoint, plAvTask *initialTask, const char *userStr = nil);
+
+    plKey LoadPlayer(const char* name, const char* account);
+    plKey LoadPlayer(const char* name, const char* account, const char* linkName);
+    plKey LoadAvatar(const char* name, const char* accountName, bool isPlayer, plKey spawnPoint, plAvTask* initialTask, const char* userStr = nil);
 
     /**
      * Unload an avatar clone
@@ -124,7 +122,7 @@ public:
      * The avatar clone can be unloaded globally by setting netPropagate; however, this
      * is highly discouraged.
      */
-    void UnLoadAvatar(const plKey& avKey, bool isPlayer, bool netPropagate=false) const;
+    void UnLoadAvatar(const plKey& avKey, bool isPlayer, bool netPropagate = false) const;
     /** send our (already loaded) local player to newly-associated clients - used when linking */
     void PropagateLocalPlayer(int spawnPoint = -1);
     /** Unload our local player on other machines because we're leaving this age.
@@ -133,87 +131,91 @@ public:
 
     void UnLoadLocalPlayer();
 
-    void AddAvatar(plArmatureMod *avatar);
-    void RemoveAvatar(plArmatureMod *instance);
+    void AddAvatar(plArmatureMod* avatar);
+    void RemoveAvatar(plArmatureMod* instance);
 
-    plArmatureMod *GetLocalAvatar();
+    plArmatureMod* GetLocalAvatar();
     plKey GetLocalAvatarKey();
-    static plArmatureMod *FindAvatar(plKey& avatarKey); // Key of the sceneObject
-    plArmatureMod *FindAvatarByPlayerID(uint32_t pid);
-    plArmatureMod *FindAvatarByModelName(char *name); // Probably only useful for custom NPCs. All players are
-                                                      // either "Male" or "Female".
+    static plArmatureMod* FindAvatar(plKey& avatarKey); // Key of the sceneObject
+    plArmatureMod* FindAvatarByPlayerID(uint32_t pid);
+    plArmatureMod* FindAvatarByModelName(char* name); // Probably only useful for custom NPCs. All players are
+    // either "Male" or "Female".
     void FindAllAvatarsByModelName(const char* name, plArmatureModPtrVec& outVec);
-    plArmatureMod *GetFirstRemoteAvatar();
+    plArmatureMod* GetFirstRemoteAvatar();
 
     // \{
-    /** Spawn points are potential entry points for the 
+    /** Spawn points are potential entry points for the
         avatar. They're selected pretty randomly right now;
         eventually they'll be selected by script based
         on the book used to enter the scene. */
-    void AddSpawnPoint(plSpawnModifier *spawn);
-    void RemoveSpawnPoint(plSpawnModifier *spawn);
-    const plSpawnModifier *GetSpawnPoint(int index);
-    int NumSpawnPoints() { return fSpawnPoints.size(); }
-    int FindSpawnPoint( const char *name ) const;
+    void AddSpawnPoint(plSpawnModifier* spawn);
+    void RemoveSpawnPoint(plSpawnModifier* spawn);
+    const plSpawnModifier* GetSpawnPoint(int index);
+    int NumSpawnPoints() {
+        return fSpawnPoints.size();
+    }
+    int FindSpawnPoint(const char* name) const;
     // \}
     static int WarpPlayerToAnother(bool iMove, uint32_t remoteID);
     static int WarpPlayerToXYZ(float x, float y, float z);
     static int WarpPlayerToXYZ(int pid, float x, float y, float z);
 
-    static plAvatarMgr *GetInstance();
+    static plAvatarMgr* GetInstance();
     static void ShutDown();
 
 
-    bool MsgReceive(plMessage *msg);
-    bool HandleCoopMsg(plAvCoopMsg *msg);
-    bool HandleNotifyMsg(plNotifyMsg *msg);
-    bool IPassMessageToActiveCoop(plMessage *msg, uint32_t id, uint16_t serial);
+    bool MsgReceive(plMessage* msg);
+    bool HandleCoopMsg(plAvCoopMsg* msg);
+    bool HandleNotifyMsg(plNotifyMsg* msg);
+    bool IPassMessageToActiveCoop(plMessage* msg, uint32_t id, uint16_t serial);
 
-    // similar to a spawn point, maintainers markers are used 
+    // similar to a spawn point, maintainers markers are used
     // to generate your position in Dni coordinates
-    void AddMaintainersMarker(plMaintainersMarkerModifier *mm);
-    void RemoveMaintainersMarker(plMaintainersMarkerModifier *mm);
+    void AddMaintainersMarker(plMaintainersMarkerModifier* mm);
+    void RemoveMaintainersMarker(plMaintainersMarkerModifier* mm);
     void PointToDniCoordinate(hsPoint3 pt, plDniCoordinateInfo* ret);
     void GetDniCoordinate(plDniCoordinateInfo* ret);
 
-    static void OfferLinkingBook(plKey hostKey, plKey guestKey, plMessage *linkMsg, plKey replyKey);
+    static void OfferLinkingBook(plKey hostKey, plKey guestKey, plMessage* linkMsg, plKey replyKey);
 
     bool IsACoopRunning();
-    plStatusLog *GetLog() { return fLog; }
+    plStatusLog* GetLog() {
+        return fLog;
+    }
 
 protected:
     /** Dump all internal data. */
     void IReset();
-    
+
     /** Handle an incoming clone message; do any necessary post-processing
         on the avatar. */
-    void IFinishLoadingAvatar(plLoadAvatarMsg *cloneMsg);
+    void IFinishLoadingAvatar(plLoadAvatarMsg* cloneMsg);
 
     /** Handle an incoming clone message which holds an unload request.
     */
-    void IFinishUnloadingAvatar(plLoadAvatarMsg *cloneMsg);
-    
+    void IFinishUnloadingAvatar(plLoadAvatarMsg* cloneMsg);
+
     /** When an armature modifier attached to the given scene object is loaded,
         send it the given message.
-        We get notified when the avatar's scene object is loaded, but we also need to 
+        We get notified when the avatar's scene object is loaded, but we also need to
         set some information up for the avatar modifier when it comes in.
         We'll get that notification via the AddAvatar call later. In this function
         we're going to squirrel away an initialization message to pass to the armature
         modifier when it arrives. */
-    void IDeferInit(plKey playerSOKey, plMessage *initMsg);
-    
+    void IDeferInit(plKey playerSOKey, plMessage* initMsg);
+
     /** See if we have an avatar type message saved for the given avatar and send them. */
     void ISendDeferredInit(plKey playerSOKey);
 
     static plAvatarMgr* fInstance;      // the single instance of the avatar manager
 
-    typedef std::map<plString, plSeekPointMod *, plString::less_i> plSeekPointMap;
+    typedef std::map<plString, plSeekPointMod*, plString::less_i> plSeekPointMap;
     plSeekPointMap fSeekPoints;
 
-    typedef std::map<plString, plOneShotMod *, plString::less_i> plOneShotMap;
+    typedef std::map<plString, plOneShotMod*, plString::less_i> plOneShotMap;
     plOneShotMap fOneShots;
 
-    typedef std::map<plKey, plMessage *> DeferredInits;
+    typedef std::map<plKey, plMessage*> DeferredInits;
     DeferredInits fDeferredInits;
 
 //  typedef std::map<const char *, plArmatureMod *, stringISorter> plAvatarMap;
@@ -231,11 +233,11 @@ protected:
     // ID. By using a multimap, however, we can still handle a few different coops
     // for the same user by just iterating from the first match forward until
     // we run out of matches.
-    typedef std::multimap<uint32_t, plCoopCoordinator *> plCoopMap;
+    typedef std::multimap<uint32_t, plCoopCoordinator*> plCoopMap;
     plCoopMap fActiveCoops;
 
     hsTArray<plLoadCloneMsg*> fCloneMsgQueue;
-    plStatusLog *fLog;  
+    plStatusLog* fLog;
 };
 
 

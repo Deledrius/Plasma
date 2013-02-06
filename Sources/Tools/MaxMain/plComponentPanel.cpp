@@ -53,21 +53,35 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plComponentDlg.h"
 #include "plMaxAccelerators.h"
 
-extern TCHAR *GetString(int id);
+extern TCHAR* GetString(int id);
 
-class ComponentUtilClassDesc : public ClassDesc
-{
+class ComponentUtilClassDesc : public ClassDesc {
 public:
-    int             IsPublic()              { return TRUE; }
-    void*           Create(BOOL loading)    { return &plComponentUtil::Instance(); }
-    const TCHAR*    ClassName()             { return _T("Component Util"); }
-    SClass_ID       SuperClassID()          { return UTILITY_CLASS_ID; }
-    Class_ID        ClassID()               { return Class_ID(0xb220659, 0x31015552); }
-    const TCHAR*    Category()              { return _T(""); }
+    int             IsPublic()              {
+        return TRUE;
+    }
+    void*           Create(BOOL loading)    {
+        return &plComponentUtil::Instance();
+    }
+    const TCHAR*    ClassName()             {
+        return _T("Component Util");
+    }
+    SClass_ID       SuperClassID()          {
+        return UTILITY_CLASS_ID;
+    }
+    Class_ID        ClassID()               {
+        return Class_ID(0xb220659, 0x31015552);
+    }
+    const TCHAR*    Category()              {
+        return _T("");
+    }
 };
 
 static ComponentUtilClassDesc theComponentUtilCD;
-ClassDesc* GetComponentUtilDesc() { return &theComponentUtilCD; }
+ClassDesc* GetComponentUtilDesc()
+{
+    return &theComponentUtilCD;
+}
 
 plComponentUtil::plComponentUtil() : fInterface(nil), fhPanel(nil), fCurComponent(nil), fLastComponent(nil)
 {
@@ -89,68 +103,65 @@ BOOL CALLBACK plComponentUtil::ForwardDlgProc(HWND hDlg, UINT msg, WPARAM wParam
 
 BOOL plComponentUtil::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
+    switch (msg) {
     case WM_COMMAND:
+
         // Switch to next or previous target
-        if (HIWORD(wParam) == BN_CLICKED && (LOWORD(wParam) == IDC_BACK || LOWORD(wParam) == IDC_FORWARD))
-        {
+        if (HIWORD(wParam) == BN_CLICKED && (LOWORD(wParam) == IDC_BACK || LOWORD(wParam) == IDC_FORWARD)) {
             INextTarget(LOWORD(wParam) == IDC_FORWARD);
             return TRUE;
-        }
-        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_REF_BY_BUTTON)
-        {
+        } else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_REF_BY_BUTTON) {
             IShowRefdBy();
             return TRUE;
         }
+
         break;
 
-    case WM_NOTIFY:
-        {
-            NMHDR *nmhdr = (NMHDR*)lParam;
-            if (nmhdr->idFrom == IDC_COMPLIST)
-            {
-                switch (nmhdr->code)
-                {
-                // Stop Max from reading keypresses while the list has focus
+    case WM_NOTIFY: {
+            NMHDR* nmhdr = (NMHDR*)lParam;
+
+            if (nmhdr->idFrom == IDC_COMPLIST) {
+                switch (nmhdr->code) {
+                    // Stop Max from reading keypresses while the list has focus
                 case NM_SETFOCUS:
                     plMaxAccelerators::Disable();
                     return TRUE;
+
                 case NM_KILLFOCUS:
                     plMaxAccelerators::Enable();
                     return TRUE;
 
-                case LVN_KEYDOWN:
-                    {
-                        NMLVKEYDOWN *kd = (NMLVKEYDOWN*)lParam;
-                        if (kd->wVKey == VK_DELETE)
+                case LVN_KEYDOWN: {
+                        NMLVKEYDOWN* kd = (NMLVKEYDOWN*)lParam;
+
+                        if (kd->wVKey == VK_DELETE) {
                             IDeleteListSelection();
+                        }
                     }
+
                     return TRUE;
 
-                // The edit box this creates kills the focus on the listbox,
-                // so add an extra disable to ignore it
+                    // The edit box this creates kills the focus on the listbox,
+                    // so add an extra disable to ignore it
                 case LVN_BEGINLABELEDIT:
                     plMaxAccelerators::Disable();
                     return TRUE;
 
-                // Finishing changing the name of a component
-                case LVN_ENDLABELEDIT:
-                    {
-                        NMLVDISPINFO *di = (NMLVDISPINFO*)lParam;
-                        const char *name = di->item.pszText;
+                    // Finishing changing the name of a component
+                case LVN_ENDLABELEDIT: {
+                        NMLVDISPINFO* di = (NMLVDISPINFO*)lParam;
+                        const char* name = di->item.pszText;
 
                         // If the name was changed...
-                        if (name && *name != '\0')
-                        {
+                        if (name && *name != '\0') {
                             // Update the name of the node
                             plComponentBase* comp = IGetListSelection();
                             comp->GetINode()->SetName(di->item.pszText);
 
                             // Make sure the column is wide enough
-                            int width = ListView_GetStringWidth(nmhdr->hwndFrom, di->item.pszText)+10;
-                            if (width > ListView_GetColumnWidth(nmhdr->hwndFrom, 0))
-                            {
+                            int width = ListView_GetStringWidth(nmhdr->hwndFrom, di->item.pszText) + 10;
+
+                            if (width > ListView_GetColumnWidth(nmhdr->hwndFrom, 0)) {
                                 ListView_SetColumnWidth(nmhdr->hwndFrom, 0, width);
                                 InvalidateRect(nmhdr->hwndFrom, NULL, FALSE);
                             }
@@ -161,19 +172,20 @@ BOOL plComponentUtil::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
                             // Return true to keep the changes
                             SetWindowLong(hDlg, DWL_MSGRESULT, TRUE);
                         }
-                        
+
                         plMaxAccelerators::Enable();
                     }
+
                     return TRUE;
 
-                // Selected component has changed.  This notification can come
-                // more than necessary, so IAddRollups doesn't change the rollups
-                // if the "new" one is the same as the old.
-                case LVN_ITEMCHANGED:
-                    {
+                    // Selected component has changed.  This notification can come
+                    // more than necessary, so IAddRollups doesn't change the rollups
+                    // if the "new" one is the same as the old.
+                case LVN_ITEMCHANGED: {
                         plComponentBase* comp = IGetListSelection();
                         IAddRollups(comp);
                     }
+
                     return TRUE;
                 }
             }
@@ -187,13 +199,13 @@ BOOL plComponentUtil::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 void plComponentUtil::IDeleteListSelection()
 {
     plComponentBase* comp = IGetListSelection();
-    if (comp)
-    {
+
+    if (comp) {
         // Delete each of the selected nodes from this components target list
         int count = fInterface->GetSelNodeCount();
-        for (int i = 0; i < count; i++)
-        {
-            plMaxNode *curNode = (plMaxNode*)fInterface->GetSelNode(i);
+
+        for (int i = 0; i < count; i++) {
+            plMaxNode* curNode = (plMaxNode*)fInterface->GetSelNode(i);
             comp->DeleteTarget(curNode);
         }
 
@@ -206,23 +218,25 @@ plComponentBase* plComponentUtil::IGetListSelection()
     HWND hList = GetDlgItem(fhPanel, IDC_COMPLIST);
 
     int index = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
-    if (index != -1)
-    {
+
+    if (index != -1) {
         LVITEM item;
         item.mask = LVIF_PARAM;
         item.iItem = index;
         item.iSubItem = 0;
-        if (ListView_GetItem(hList, &item))
+
+        if (ListView_GetItem(hList, &item)) {
             return (plComponentBase*)item.lParam;
+        }
     }
 
     return nil;
 }
 
-void plComponentUtil::BeginEditParams(Interface *ip, IUtil *iu)
+void plComponentUtil::BeginEditParams(Interface* ip, IUtil* iu)
 {
     fInterface = ip;
-    
+
     fhPanel = fInterface->AddRollupPage(hInstance, MAKEINTRESOURCE(IDD_COMP_PANEL), ForwardDlgProc, "Components (Selected Obj)");
 
     // Add a column.  We don't use it (graphically), but it has to be there.
@@ -235,7 +249,7 @@ void plComponentUtil::BeginEditParams(Interface *ip, IUtil *iu)
     IUpdateRollups();
 }
 
-void plComponentUtil::EndEditParams(Interface *ip, IUtil *iu)
+void plComponentUtil::EndEditParams(Interface* ip, IUtil* iu)
 {
     IDestroyRollups();
 
@@ -245,16 +259,17 @@ void plComponentUtil::EndEditParams(Interface *ip, IUtil *iu)
     fInterface = nil;
 }
 
-void plComponentUtil::SelectionSetChanged(Interface *ip, IUtil *iu)
+void plComponentUtil::SelectionSetChanged(Interface* ip, IUtil* iu)
 {
     IUpdateRollups();
 }
 
 void plComponentUtil::IUpdateRollups()
 {
-    if (!fhPanel)
+    if (!fhPanel) {
         return;
-    
+    }
+
     // Destroy any current rollups
     IDestroyRollups();
 
@@ -263,8 +278,8 @@ void plComponentUtil::IUpdateRollups()
 
     // Check that something is selected.
     int nodeCount = fInterface->GetSelNodeCount();
-    if (nodeCount == 0)
-    {
+
+    if (nodeCount == 0) {
         IAddRollups(nil);
         return;
     }
@@ -273,21 +288,23 @@ void plComponentUtil::IUpdateRollups()
     int i;
     INodeTab selNodes;
     selNodes.SetCount(nodeCount);
-    for (i = 0; i < nodeCount; i++)
+
+    for (i = 0; i < nodeCount; i++) {
         selNodes[i] = fInterface->GetSelNode(i);
+    }
 
     INodeTab sharedComps;
     plSharedComponents(selNodes, sharedComps);
 
     // Add the shared components to the list
-    for (i = 0; i < sharedComps.Count(); i++)
-    {
-        plComponentBase *comp = ((plMaxNode*)sharedComps[i])->ConvertToComponent();
+    for (i = 0; i < sharedComps.Count(); i++) {
+        plComponentBase* comp = ((plMaxNode*)sharedComps[i])->ConvertToComponent();
 
-        if (plComponentDlg::Instance().IIsHidden(comp->ClassID()))
+        if (plComponentDlg::Instance().IIsHidden(comp->ClassID())) {
             continue;
+        }
 
-        IParamBlock2 *pb = comp->GetParamBlockByID(plComponent::kBlkComp);
+        IParamBlock2* pb = comp->GetParamBlockByID(plComponent::kBlkComp);
 
         LVITEM item = {0};
         item.mask = LVIF_TEXT | LVIF_PARAM;
@@ -301,20 +318,20 @@ void plComponentUtil::IUpdateRollups()
     ListView_SetColumnWidth(hList, 0, LVSCW_AUTOSIZE);
 
     // If there are rollups to show
-    if (ListView_GetItemCount(hList) > 0)
-    {
+    if (ListView_GetItemCount(hList) > 0) {
         // Try and find the last used rollup
         int idx = IFindListItem(fLastComponent);
 
         // If last one wasn't found, just use the first
-        if (idx == -1)
+        if (idx == -1) {
             idx = 0;
+        }
 
         ListView_SetItemState(hList, idx, LVIS_SELECTED, LVIS_SELECTED);
         ListView_EnsureVisible(hList, idx, FALSE);
-    }
-    else
+    } else {
         IAddRollups(nil);
+    }
 }
 
 int plComponentUtil::IFindListItem(plComponentBase* comp)
@@ -329,24 +346,28 @@ int plComponentUtil::IFindListItem(plComponentBase* comp)
 
 void plComponentUtil::IAddRollups(plComponentBase* comp)
 {
-    if (fCurComponent == comp)
+    if (fCurComponent == comp) {
         return;
+    }
 
     IDestroyRollups();
     fCurComponent = comp;
-    if (comp)
+
+    if (comp) {
         fLastComponent = comp;
+    }
 
     //
     // Update the targets dialog
     //
     uint32_t numTargs = 0;
-    if (fCurComponent)
-    {
+
+    if (fCurComponent) {
         // Only count non-nil targets
         for (uint32_t i = 0; i < fCurComponent->NumTargets(); i++)
-            if (fCurComponent->GetTarget(i))
+            if (fCurComponent->GetTarget(i)) {
                 numTargs++;
+            }
     }
 
     // Put the number of targets in the text box
@@ -362,14 +383,16 @@ void plComponentUtil::IAddRollups(plComponentBase* comp)
     //
     // Add the component rollups
     //
-    if (fCurComponent)
+    if (fCurComponent) {
         fCurComponent->CreateRollups();
+    }
 }
 
 void plComponentUtil::IDestroyRollups()
 {
-    if (fCurComponent)
+    if (fCurComponent) {
         fCurComponent->DestroyRollups();
+    }
 }
 
 void plComponentUtil::INextTarget(bool forward)
@@ -379,31 +402,29 @@ void plComponentUtil::INextTarget(bool forward)
 
     // Loop through the selected component's targets until we find the currently selected node.
     // This gives us a starting point to find the next or previous target in this component's list.
-    plMaxNode *curNode = (plMaxNode*)GetCOREInterface()->GetSelNode(0);
+    plMaxNode* curNode = (plMaxNode*)GetCOREInterface()->GetSelNode(0);
     uint32_t count = fCurComponent->NumTargets();
-    for (uint32_t i = 0; i < count; i++)
-    {
-        if (fCurComponent->GetTarget(i) == curNode)
-        {
+
+    for (uint32_t i = 0; i < count; i++) {
+        if (fCurComponent->GetTarget(i) == curNode) {
             // Got to loop until the target is non-nil here, so we skip over
             // any deleted nodes.
             uint32_t targIdx = i;
-            do
-            {
+
+            do {
                 // Figure out which target to change to
-                if (forward)
-                {
-                    if (targIdx == count-1)
+                if (forward) {
+                    if (targIdx == count - 1) {
                         targIdx = 0;
-                    else
+                    } else {
                         targIdx = targIdx + 1;
-                }
-                else
-                {
-                    if (targIdx == 0)
-                        targIdx = count-1;
-                    else
+                    }
+                } else {
+                    if (targIdx == 0) {
+                        targIdx = count - 1;
+                    } else {
                         targIdx = targIdx - 1;
+                    }
                 }
             } while (!fCurComponent->GetTarget(targIdx));
 
@@ -421,15 +442,16 @@ void plComponentUtil::INextTarget(bool forward)
     }
 }
 
-void plComponentUtil::IUpdateNodeName(plMaxNode *node)
+void plComponentUtil::IUpdateNodeName(plMaxNode* node)
 {
-    if (!fhPanel)
+    if (!fhPanel) {
         return;
+    }
 
     // Update the name in the list
     int idx = IFindListItem(node->ConvertToComponent());
-    if (idx != -1)
-    {
+
+    if (idx != -1) {
         HWND hList = GetDlgItem(fhPanel, IDC_COMPLIST);
         ListView_SetItemText(hList, idx, 0, node->GetName());
         // Make sure the column is wide enough
@@ -439,8 +461,7 @@ void plComponentUtil::IUpdateNodeName(plMaxNode *node)
 
 void plComponentUtil::IComponentPreDelete(plComponentBase* comp)
 {
-    if (fCurComponent == comp)
-    {
+    if (fCurComponent == comp) {
         IDestroyRollups();
         fCurComponent = nil;
     }
@@ -453,26 +474,22 @@ void plComponentUtil::IComponentPreDelete(plComponentBase* comp)
 void IGetReferencesRecur(plMaxNode* node, INode* target, std::vector<plMaxNode*>& nodes)
 {
     plComponentBase* comp = node->ConvertToComponent();
-    if (comp && comp->DoReferenceNode(target))
-    {
+
+    if (comp && comp->DoReferenceNode(target)) {
         const char* name = node->GetName();
         nodes.push_back(node);
     }
 
-    for (int i = 0; i < node->NumberOfChildren(); i++)
-    {
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
         IGetReferencesRecur((plMaxNode*)node->GetChildNode(i), target, nodes);
     }
 }
 
 BOOL CALLBACK RefDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
-    case WM_INITDIALOG:
-        {
-            if (GetCOREInterface()->GetSelNodeCount() > 0)
-            {
+    switch (msg) {
+    case WM_INITDIALOG: {
+            if (GetCOREInterface()->GetSelNodeCount() > 0) {
                 INode* node = GetCOREInterface()->GetSelNode(0);
 
                 char buf[256];
@@ -483,24 +500,22 @@ BOOL CALLBACK RefDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
                 IGetReferencesRecur((plMaxNode*)GetCOREInterface()->GetRootNode(), node, nodes);
 
                 HWND hList = GetDlgItem(hDlg, IDC_REF_LIST);
-                for (int i = 0; i < nodes.size(); i++)
-                {
+
+                for (int i = 0; i < nodes.size(); i++) {
                     plMaxNode* node = nodes[i];
                     int idx = ListBox_AddString(hList, node->GetName());
                     ListBox_SetItemData(hList, idx, node);
                 }
             }
         }
+
         return TRUE;
 
     case WM_COMMAND:
-        if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_CLOSE)
-        {
+        if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_CLOSE) {
             EndDialog(hDlg, 0);
             return TRUE;
-        }
-        else if (HIWORD(wParam) == LBN_DBLCLK && LOWORD(wParam) == IDC_REF_LIST)
-        {
+        } else if (HIWORD(wParam) == LBN_DBLCLK && LOWORD(wParam) == IDC_REF_LIST) {
             // If the user double clicked on a component, return it so we can
             // select the nodes it's attached to
             HWND hList = HWND(lParam);
@@ -509,6 +524,7 @@ BOOL CALLBACK RefDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
             EndDialog(hDlg, node);
             return TRUE;
         }
+
         break;
     }
 
@@ -521,8 +537,8 @@ void plComponentUtil::IShowRefdBy()
                                     MAKEINTRESOURCE(IDD_REF_BY),
                                     GetCOREInterface()->GetMAXHWnd(),
                                     RefDlgProc);
-    if (node)
-    {
+
+    if (node) {
         INodeTab nodes;
         nodes.Append(1, &node);
         plComponentDlg::Instance().SelectComponentTargs(nodes);

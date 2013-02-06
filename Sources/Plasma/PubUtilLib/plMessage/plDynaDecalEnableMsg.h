@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class hsResMgr;
 
-class plDynaDecalEnableMsg : public plMessage
-{
+class plDynaDecalEnableMsg : public plMessage {
 protected:
     enum {
         kAtEnd      = 0x1,
@@ -63,36 +62,74 @@ protected:
     uint32_t                  fID;
 public:
     plDynaDecalEnableMsg();
-    plDynaDecalEnableMsg(const plKey& r, const plKey& armOrShapeKey, double conTime, float wetLength, bool end, uint32_t id=uint32_t(-1), bool isArm=true);
+    plDynaDecalEnableMsg(const plKey& r, const plKey& armOrShapeKey, double conTime, float wetLength, bool end, uint32_t id = uint32_t(-1), bool isArm = true);
     ~plDynaDecalEnableMsg();
 
-    CLASSNAME_REGISTER( plDynaDecalEnableMsg );
-    GETINTERFACE_ANY( plDynaDecalEnableMsg, plMessage );
+    CLASSNAME_REGISTER(plDynaDecalEnableMsg);
+    GETINTERFACE_ANY(plDynaDecalEnableMsg, plMessage);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     // ArmKey undefined unless kArmature flag is set. You have to check.
-    const plKey&            GetArmKey() const { return fKey; }
-    void                    SetArmKey(const plKey& k) { fKey = k; SetArmature(true); }
+    const plKey&            GetArmKey() const {
+        return fKey;
+    }
+    void                    SetArmKey(const plKey& k) {
+        fKey = k;
+        SetArmature(true);
+    }
 
-    bool                    IsArmature() const { return 0 != (fFlags & kArmature); }
-    void                    SetArmature(bool b) { if(b)fFlags |= kArmature; else fFlags &= ~kArmature; }
+    bool                    IsArmature() const {
+        return 0 != (fFlags & kArmature);
+    }
+    void                    SetArmature(bool b) {
+        if (b) {
+            fFlags |= kArmature;
+        } else {
+            fFlags &= ~kArmature;
+        }
+    }
 
-    const plKey&            GetShapeKey() const { return fKey; }
-    void                    SetShapeKey(const plKey& k) { fKey = k; SetArmature(false); }
+    const plKey&            GetShapeKey() const {
+        return fKey;
+    }
+    void                    SetShapeKey(const plKey& k) {
+        fKey = k;
+        SetArmature(false);
+    }
 
-    double                  GetContactTime() const { return fConTime; }
-    void                    SetContactTime(double t) { fConTime = t; }
+    double                  GetContactTime() const {
+        return fConTime;
+    }
+    void                    SetContactTime(double t) {
+        fConTime = t;
+    }
 
-    float                GetWetLength() const { return fWetLength; }
-    void                    SetWetLength(float w) { fWetLength = w; }
+    float                GetWetLength() const {
+        return fWetLength;
+    }
+    void                    SetWetLength(float w) {
+        fWetLength = w;
+    }
 
-    bool                    AtEnd() const { return 0 != (fFlags & kAtEnd); }
-    void                    SetAtEnd(bool b) { if(b)fFlags |= kAtEnd; else fFlags &= ~kAtEnd; }
+    bool                    AtEnd() const {
+        return 0 != (fFlags & kAtEnd);
+    }
+    void                    SetAtEnd(bool b) {
+        if (b) {
+            fFlags |= kAtEnd;
+        } else {
+            fFlags &= ~kAtEnd;
+        }
+    }
 
-    uint32_t                  GetID() const { return fID; }
-    void                    SetID(uint32_t n) { fID = n; }
+    uint32_t                  GetID() const {
+        return fID;
+    }
+    void                    SetID(uint32_t n) {
+        fID = n;
+    }
 };
 
 #endif // plDynaDecalEnableMsg_inc

@@ -67,100 +67,120 @@ class pfConsoleEngine;
 class plKeyEventMsg;
 class pfConsoleInputInterface;
 
-class pfConsole : public hsKeyedObject 
-{
+class pfConsole : public hsKeyedObject {
     friend class pfConsoleInputInterface;
 
-    protected:
+protected:
 
-        enum Konstants 
-        {
-            kNumHistoryItems = 16,
-            kNumHistoryTypes = 2,
-            kModeHidden = 0,
-            kModeSingleLine = 1,
-            kModeFull = 2,
-            kEffectDivisions = 1000,
-            kMaxCharsWide = 80,
-            kHelpDelay = 32,
-            kCursorBlinkRate = 16,
-            kMsgHintTimeout = 64,
-            kWorkingLineSize = 256
-        };
+    enum Konstants {
+        kNumHistoryItems = 16,
+        kNumHistoryTypes = 2,
+        kModeHidden = 0,
+        kModeSingleLine = 1,
+        kModeFull = 2,
+        kEffectDivisions = 1000,
+        kMaxCharsWide = 80,
+        kHelpDelay = 32,
+        kCursorBlinkRate = 16,
+        kMsgHintTimeout = 64,
+        kWorkingLineSize = 256
+    };
 
 
-        uint32_t  fNumDisplayLines;
+    uint32_t  fNumDisplayLines;
 
-        int32_t   fEffectCounter;
-        float   fLastTime;
-        uint32_t  fHelpTimer;
-        char    fLastHelpMsg[ kWorkingLineSize ];
-        uint8_t   fMode;      // 0 - invisible, 1 - single line, 2 - full
-        bool    fInited, fHelpMode, fPythonMode, fPythonFirstTime, fFXEnabled;
-        uint32_t  fPythonMultiLines;
-        short   fCursorTicks;
-        uint32_t  fMsgTimeoutTimer;
+    int32_t   fEffectCounter;
+    float   fLastTime;
+    uint32_t  fHelpTimer;
+    char    fLastHelpMsg[ kWorkingLineSize ];
+    uint8_t   fMode;      // 0 - invisible, 1 - single line, 2 - full
+    bool    fInited, fHelpMode, fPythonMode, fPythonFirstTime, fFXEnabled;
+    uint32_t  fPythonMultiLines;
+    short   fCursorTicks;
+    uint32_t  fMsgTimeoutTimer;
 
-        struct _fHistory {
-            char fData[ kNumHistoryItems ][ kMaxCharsWide ];
-            uint32_t  fCursor, fRecallCursor;
-        } fHistory[ kNumHistoryTypes ];
-        char    *fDisplayBuffer;
-        char    fWorkingLine[ kWorkingLineSize ];
-        uint32_t  fWorkingCursor;
+    struct _fHistory {
+        char fData[ kNumHistoryItems ][ kMaxCharsWide ];
+        uint32_t  fCursor, fRecallCursor;
+    } fHistory[ kNumHistoryTypes ];
+    char*    fDisplayBuffer;
+    char    fWorkingLine[ kWorkingLineSize ];
+    uint32_t  fWorkingCursor;
 
-        pfConsoleInputInterface *fInputInterface;
+    pfConsoleInputInterface* fInputInterface;
 
-        pfConsoleEngine     *fEngine;
+    pfConsoleEngine*     fEngine;
 
-        void    IHandleKey( plKeyEventMsg *msg );
+    void    IHandleKey(plKeyEventMsg* msg);
 
-        static uint32_t       fConsoleTextColor;
-        static pfConsole    *fTheConsole;
-        static void CDECL IAddLineCallback( const char *string );
+    static uint32_t       fConsoleTextColor;
+    static pfConsole*    fTheConsole;
+    static void CDECL IAddLineCallback(const char* string);
 
-        static plPipeline   *fPipeline;
+    static plPipeline*   fPipeline;
 
-        void    IAddLine( const char *string, short leftMargin = 0 );
-        void    IAddParagraph( const char *string, short margin = 0 );
-        void    IClear( void );
+    void    IAddLine(const char* string, short leftMargin = 0);
+    void    IAddParagraph(const char* string, short margin = 0);
+    void    IClear(void);
 
-        void    ISetMode( uint8_t mode );
-        void    IEnableFX( bool e ) { fFXEnabled = e; }
-        bool    IFXEnabled( void ) { return fFXEnabled; }
+    void    ISetMode(uint8_t mode);
+    void    IEnableFX(bool e) {
+        fFXEnabled = e;
+    }
+    bool    IFXEnabled(void) {
+        return fFXEnabled;
+    }
 
-        void    IPrintSomeHelp( void );
-        void    IUpdateTooltip( void );
+    void    IPrintSomeHelp(void);
+    void    IUpdateTooltip(void);
 
-    public:
+public:
 
-        pfConsole();
-        ~pfConsole();
+    pfConsole();
+    ~pfConsole();
 
-        CLASSNAME_REGISTER( pfConsole );
-        GETINTERFACE_ANY( pfConsole, plReceiver );
-        
-        static pfConsole * GetInstance ();
+    CLASSNAME_REGISTER(pfConsole);
+    GETINTERFACE_ANY(pfConsole, plReceiver);
 
-        virtual bool    MsgReceive( plMessage *msg );
-    
-        void    Init( pfConsoleEngine *engine );
-        void    Draw( plPipeline *p );
+    static pfConsole* GetInstance();
 
-        static void AddLine( const char *string ) { fTheConsole->IAddParagraph( string ); }
-        static void AddLineF(const char * fmt, ...);
-        static void Clear( void ) { fTheConsole->IClear(); }
-        static void Hide( void ) { fTheConsole->ISetMode(kModeHidden); }
+    virtual bool    MsgReceive(plMessage* msg);
 
-        static void EnableEffects( bool enable ) { fTheConsole->IEnableFX( enable ); }
-        static bool AreEffectsEnabled( void ) { return fTheConsole->IFXEnabled(); }
-        static void SetTextColor( uint32_t color ) { fConsoleTextColor = color; }
-        static uint32_t GetTextColor() { return fConsoleTextColor; }
+    void    Init(pfConsoleEngine* engine);
+    void    Draw(plPipeline* p);
 
-        static void         SetPipeline( plPipeline *pipe ) { fPipeline = pipe; }
-        static plPipeline   *GetPipeline( void ) { return fPipeline; }
-        
-        static void RunCommandAsync (const char cmd[]);
+    static void AddLine(const char* string) {
+        fTheConsole->IAddParagraph(string);
+    }
+    static void AddLineF(const char* fmt, ...);
+    static void Clear(void) {
+        fTheConsole->IClear();
+    }
+    static void Hide(void) {
+        fTheConsole->ISetMode(kModeHidden);
+    }
+
+    static void EnableEffects(bool enable) {
+        fTheConsole->IEnableFX(enable);
+    }
+    static bool AreEffectsEnabled(void) {
+        return fTheConsole->IFXEnabled();
+    }
+    static void SetTextColor(uint32_t color) {
+        fConsoleTextColor = color;
+    }
+    static uint32_t GetTextColor() {
+        return fConsoleTextColor;
+    }
+
+    static void         SetPipeline(plPipeline* pipe) {
+        fPipeline = pipe;
+    }
+    static plPipeline*   GetPipeline(void) {
+        return fPipeline;
+    }
+
+    static void RunCommandAsync(const char cmd[]);
 };
 
 #endif //_pfConsole_h

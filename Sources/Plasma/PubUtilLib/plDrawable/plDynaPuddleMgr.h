@@ -47,16 +47,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plKey;
 
-class plDynaPuddleMgr : public plDynaRippleMgr
-{
+class plDynaPuddleMgr : public plDynaRippleMgr {
 protected:
 
 public:
     plDynaPuddleMgr();
     virtual ~plDynaPuddleMgr();
 
-    CLASSNAME_REGISTER( plDynaPuddleMgr );
-    GETINTERFACE_ANY( plDynaPuddleMgr, plDynaRippleMgr );
+    CLASSNAME_REGISTER(plDynaPuddleMgr);
+    GETINTERFACE_ANY(plDynaPuddleMgr, plDynaRippleMgr);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
 

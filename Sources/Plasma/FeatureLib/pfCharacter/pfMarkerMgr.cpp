@@ -60,8 +60,7 @@ const uint32_t pfMarkerMgr::kNoMarkerSelected = (uint32_t)(-1);
 
 pfMarkerMgr* pfMarkerMgr::Instance()
 {
-    if (!pfMarkerMgr::fInstance)
-    {
+    if (!pfMarkerMgr::fInstance) {
         pfMarkerMgr::fInstance = new pfMarkerMgr;
         pfMarkerMgr::fInstance->IInit();
     }
@@ -71,8 +70,7 @@ pfMarkerMgr* pfMarkerMgr::Instance()
 
 void pfMarkerMgr::Shutdown()
 {
-    if (pfMarkerMgr::fInstance)
-    {
+    if (pfMarkerMgr::fInstance) {
         pfMarkerMgr::fInstance->IShutdown();
         pfMarkerMgr::fInstance = nil;
     }
@@ -100,12 +98,13 @@ void pfMarkerMgr::IInit()
 void pfMarkerMgr::IShutdown()
 {
     std::map<uint32_t, pfMarkerInfo*>::iterator curMarker = fMarkers.begin();
-    while (curMarker != fMarkers.end())
-    {
+
+    while (curMarker != fMarkers.end()) {
         curMarker->second->Remove();
         delete curMarker->second;
         ++curMarker;
     }
+
     fMarkers.clear();
 
     plgDispatch::Dispatch()->UnRegisterForExactType(plEvalMsg::Index(), GetKey());
@@ -115,15 +114,16 @@ void pfMarkerMgr::IShutdown()
 pfMarkerInfo* pfMarkerMgr::IFindMarker(plKey markerKey, uint32_t& id)
 {
     std::map<uint32_t, pfMarkerInfo*>::iterator curMarker = fMarkers.begin();
-    while (curMarker != fMarkers.end())
-    {
-        if (curMarker->second->GetKey() == markerKey)
-        {
+
+    while (curMarker != fMarkers.end()) {
+        if (curMarker->second->GetKey() == markerKey) {
             id = curMarker->first;
             return curMarker->second;
         }
+
         ++curMarker;
     }
+
     id = kNoMarkerSelected;
     return nil;
 }
@@ -132,8 +132,8 @@ void pfMarkerMgr::IUpdate()
 {
     // Update all markers
     std::map<uint32_t, pfMarkerInfo*>::iterator curMarker = fMarkers.begin();
-    while (curMarker != fMarkers.end())
-    {
+
+    while (curMarker != fMarkers.end()) {
         curMarker->second->Update(hsTimer::GetSeconds());
         ++curMarker;
     }
@@ -141,16 +141,21 @@ void pfMarkerMgr::IUpdate()
 
 void pfMarkerMgr::IMarkerHit(plKey markerKey, plKey playerKey)
 {
-    if (playerKey != plNetClientMgr::GetInstance()->GetLocalPlayerKey())
-        return; // not the local player, abort
+    if (playerKey != plNetClientMgr::GetInstance()->GetLocalPlayerKey()) {
+        return;    // not the local player, abort
+    }
 
     // make sure the marker isn't frozen
     uint32_t id;
     pfMarkerInfo* hitMarker = IFindMarker(markerKey, id);
-    if (!hitMarker)
-        return; // abort, something weird is going on
-    if (hitMarker->IsFrozen())
-        return; // marker frozen, abort
+
+    if (!hitMarker) {
+        return;    // abort, something weird is going on
+    }
+
+    if (hitMarker->IsFrozen()) {
+        return;    // marker frozen, abort
+    }
 
     // tell people about it
     pfMarkerMsg* msg = new pfMarkerMsg;
@@ -161,8 +166,7 @@ void pfMarkerMgr::IMarkerHit(plKey markerKey, plKey playerKey)
 
 void pfMarkerMgr::AddMarker(double x, double y, double z, uint32_t id, bool justCreated)
 {
-    if (fMarkers.find(id) != fMarkers.end())
-    {
+    if (fMarkers.find(id) != fMarkers.end()) {
         // delete existing one if we're changing its location
         fMarkers[id]->Remove();
         delete fMarkers[id];
@@ -175,8 +179,10 @@ void pfMarkerMgr::AddMarker(double x, double y, double z, uint32_t id, bool just
 
 void pfMarkerMgr::RemoveMarker(uint32_t id)
 {
-    if (fMarkers.find(id) == fMarkers.end())
+    if (fMarkers.find(id) == fMarkers.end()) {
         return;
+    }
+
     fMarkers[id]->Remove();
     delete fMarkers[id];
     fMarkers.erase(id);
@@ -185,21 +191,23 @@ void pfMarkerMgr::RemoveMarker(uint32_t id)
 void pfMarkerMgr::RemoveAllMarkers()
 {
     std::map<uint32_t, pfMarkerInfo*>::iterator curMarker = fMarkers.begin();
-    while (curMarker != fMarkers.end())
-    {
+
+    while (curMarker != fMarkers.end()) {
         curMarker->second->Remove();
         delete curMarker->second;
         ++curMarker;
     }
+
     fMarkers.clear();
 }
 
 void pfMarkerMgr::ClearSelectedMarker()
 {
-    if (fSelectedMarker != kNoMarkerSelected)
-    {
-        if (fMarkers.find(fSelectedMarker) != fMarkers.end())
+    if (fSelectedMarker != kNoMarkerSelected) {
+        if (fMarkers.find(fSelectedMarker) != fMarkers.end()) {
             fMarkers[fSelectedMarker]->SetType(pfMarkerInfo::kMarkerOpen);
+        }
+
         fSelectedMarker = kNoMarkerSelected;
     }
 }
@@ -208,10 +216,8 @@ void pfMarkerMgr::SetSelectedMarker(uint32_t id)
 {
     ClearSelectedMarker();
 
-    if (id != kNoMarkerSelected)
-    {
-        if (fMarkers.find(id) != fMarkers.end())
-        {
+    if (id != kNoMarkerSelected) {
+        if (fMarkers.find(id) != fMarkers.end()) {
             fMarkers[id]->SetType(pfMarkerInfo::kMarkerLocalSelected);
             fSelectedMarker = id;
         }
@@ -226,13 +232,15 @@ uint32_t pfMarkerMgr::GetSelectedMarker()
 // for QUEST games (no teams)
 void pfMarkerMgr::CaptureMarker(uint32_t id, bool captured)
 {
-    if (fMarkers.find(id) == fMarkers.end())
+    if (fMarkers.find(id) == fMarkers.end()) {
         return;
+    }
 
-    if (fMarkersRespawn)
+    if (fMarkersRespawn) {
         fMarkers[id]->SetFrozen(hsTimer::GetSeconds());
-    else
+    } else {
         fMarkers[id]->Show(!captured);
+    }
 
     fMarkers[id]->PlayHitSound();
     fMarkers[id]->SetType(captured ? pfMarkerInfo::kMarkerGreen : pfMarkerInfo::kMarkerOpen);
@@ -241,37 +249,43 @@ void pfMarkerMgr::CaptureMarker(uint32_t id, bool captured)
 // for TEAM games (0 = not captured)
 void pfMarkerMgr::CaptureMarker(uint32_t id, int team)
 {
-    if (fMarkers.find(id) == fMarkers.end())
+    if (fMarkers.find(id) == fMarkers.end()) {
         return;
+    }
 
-    if (fMarkersRespawn)
+    if (fMarkersRespawn) {
         fMarkers[id]->SetFrozen(hsTimer::GetSeconds());
-    else
-        fMarkers[id]->Show(team == 0); // 0 = uncaptured
+    } else {
+        fMarkers[id]->Show(team == 0);    // 0 = uncaptured
+    }
 
     fMarkers[id]->PlayHitSound();
-    if (team == 0)
+
+    if (team == 0) {
         fMarkers[id]->SetType(pfMarkerInfo::kMarkerOpen);
-    else if (team == 1)
+    } else if (team == 1) {
         fMarkers[id]->SetType(pfMarkerInfo::kMarkerGreen);
-    else
+    } else {
         fMarkers[id]->SetType(pfMarkerInfo::kMarkerRed);
+    }
 }
 
 void pfMarkerMgr::LocalShowMarkers(bool show)
 {
     fShowingLocalMarkers = show;
-    if (show)
-    {
+
+    if (show) {
         std::map<uint32_t, pfMarkerInfo*>::iterator curMarker = fMarkers.begin();
-        while (curMarker != fMarkers.end())
+
+        while (curMarker != fMarkers.end()) {
             curMarker->second->Show(true);
-    }
-    else
-    {
+        }
+    } else {
         std::map<uint32_t, pfMarkerInfo*>::iterator curMarker = fMarkers.begin();
-        while (curMarker != fMarkers.end())
+
+        while (curMarker != fMarkers.end()) {
             curMarker->second->Show(false);
+        }
     }
 }
 
@@ -283,23 +297,23 @@ bool pfMarkerMgr::AreLocalMarkersShowing()
 bool pfMarkerMgr::MsgReceive(plMessage* msg)
 {
     plEvalMsg* evalMsg = plEvalMsg::ConvertNoRef(msg);
-    if (evalMsg)
-    {
+
+    if (evalMsg) {
         IUpdate();
         return true;
     }
 
     // Somebody hit a marker
     plNotifyMsg* notify = plNotifyMsg::ConvertNoRef(msg);
-    if (notify)
-    {
+
+    if (notify) {
         proCollisionEventData* cEvent = (proCollisionEventData*)notify->FindEventRecord(proEventData::kCollision);
-        if (cEvent)
-        {
+
+        if (cEvent) {
             plKey markerKey = cEvent->fHittee;
             plKey playerKey = cEvent->fHitter;
-            if (plNetClientMgr::GetInstance()->IsAPlayerKey(cEvent->fHittee))
-            {
+
+            if (plNetClientMgr::GetInstance()->IsAPlayerKey(cEvent->fHittee)) {
                 // swap the above, since the hittee is actually the player
                 playerKey = cEvent->fHittee;
                 markerKey = cEvent->fHitter;
@@ -312,11 +326,11 @@ bool pfMarkerMgr::MsgReceive(plMessage* msg)
     }
 
     plLoadCloneMsg* cloneMsg = plLoadCloneMsg::ConvertNoRef(msg);
-    if (cloneMsg)
-    {
+
+    if (cloneMsg) {
         plKey cloneKey = cloneMsg->GetCloneKey();
-        if (cloneMsg->GetIsLoading() && cloneKey)
-        {
+
+        if (cloneMsg->GetIsLoading() && cloneKey) {
             uint32_t id;
             pfMarkerInfo* marker = IFindMarker(cloneKey, id);
             marker->InitSpawned(cloneKey);

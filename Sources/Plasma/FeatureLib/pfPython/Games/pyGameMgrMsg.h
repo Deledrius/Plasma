@@ -56,8 +56,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class pfGameMgrMsg;
 class plUUID;
 
-class pyGameMgrMsg
-{
+class pyGameMgrMsg {
 protected:
     pfGameMgrMsg* message;
 
@@ -82,8 +81,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyGameMgrInviteReceivedMsg : public pyGameMgrMsg
-{
+class pyGameMgrInviteReceivedMsg : public pyGameMgrMsg {
 protected:
     pyGameMgrInviteReceivedMsg();
     pyGameMgrInviteReceivedMsg(pfGameMgrMsg* msg);
@@ -103,8 +101,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyGameMgrInviteRevokedMsg : public pyGameMgrMsg
-{
+class pyGameMgrInviteRevokedMsg : public pyGameMgrMsg {
 protected:
     pyGameMgrInviteRevokedMsg();
     pyGameMgrInviteRevokedMsg(pfGameMgrMsg* msg);

@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtCrypt.cpp
-*   
+*
 ***/
 
 #include "pnUtCrypt.h"
@@ -59,7 +59,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 struct CryptKey {
     ECryptAlgorithm algorithm;
-    void *          handle;
+    void*           handle;
 };
 
 
@@ -85,28 +85,30 @@ namespace Crypt {
 ***/
 
 //============================================================================
-static void Rc4Codec (
-    CryptKey *      key,
+static void Rc4Codec(
+    CryptKey*       key,
     bool            encrypt,
     ARRAY(uint8_t) *   dest,
     unsigned        sourceBytes,
-    const void *    sourceData
-) {
+    const void*     sourceData
+)
+{
     // RC4 uses the same algorithm to both encrypt and decrypt
     dest->SetCount(sourceBytes);
-    RC4((RC4_KEY *)key->handle, sourceBytes, (const unsigned char *)sourceData, dest->Ptr());
+    RC4((RC4_KEY*)key->handle, sourceBytes, (const unsigned char*)sourceData, dest->Ptr());
 }
 
 //============================================================================
-static void Rc4Codec (
-    CryptKey *      key,
+static void Rc4Codec(
+    CryptKey*       key,
     bool            encrypt,
     unsigned        bytes,
-    void *          data
-) {
+    void*           data
+)
+{
     // RC4 uses the same algorithm to both encrypt and decrypt
-    uint8_t * temp = (uint8_t *)malloc(bytes);
-    RC4((RC4_KEY *)key->handle, bytes, (const unsigned char *)data, temp);
+    uint8_t* temp = (uint8_t*)malloc(bytes);
+    RC4((RC4_KEY*)key->handle, bytes, (const unsigned char*)data, temp);
     memcpy(data, temp, bytes);
 
     free(temp);
@@ -122,23 +124,25 @@ static void Rc4Codec (
 ***/
 
 //============================================================================
-CryptKey * CryptKeyCreate (
+CryptKey* CryptKeyCreate(
     ECryptAlgorithm algorithm,
     unsigned        bytes,
-    const void *    data
-) {
-    CryptKey * key = nil;
+    const void*     data
+)
+{
+    CryptKey* key = nil;
+
     switch (algorithm) {
-        case kCryptRc4: {
-            RC4_KEY * rc4 = new RC4_KEY;
-            RC4_set_key(rc4, bytes, (const unsigned char *)data);
+    case kCryptRc4: {
+            RC4_KEY* rc4 = new RC4_KEY;
+            RC4_set_key(rc4, bytes, (const unsigned char*)data);
             key = new CryptKey;
             key->algorithm = kCryptRc4;
             key->handle = rc4;
         }
         break;
 
-        case kCryptRsa: // Not implemented; fall-thru to FATAL
+    case kCryptRsa: // Not implemented; fall-thru to FATAL
 //      break;
 
         DEFAULT_FATAL(algorithm);
@@ -148,27 +152,30 @@ CryptKey * CryptKeyCreate (
 }
 
 //============================================================================
-void CryptKeyClose (
-    CryptKey *      key
-) {
-    if (!key)
+void CryptKeyClose(
+    CryptKey*       key
+)
+{
+    if (!key) {
         return;
+    }
 
     delete key->handle;
     delete key;
 }
 
 //============================================================================
-unsigned CryptKeyGetBlockSize (
-    CryptKey *      key
-) {
+unsigned CryptKeyGetBlockSize(
+    CryptKey*       key
+)
+{
     switch (key->algorithm) {
-        case kCryptRc4: {
+    case kCryptRc4: {
             return 1;
         }
         break;
 
-        case kCryptRsa: // Not implemented; fall-thru to FATAL
+    case kCryptRsa: // Not implemented; fall-thru to FATAL
 //            return RsaGetBlockSize(key);
 
         DEFAULT_FATAL(algorithm);
@@ -176,19 +183,20 @@ unsigned CryptKeyGetBlockSize (
 }
 
 //============================================================================
-void CryptEncrypt (
-    CryptKey *      key,
+void CryptEncrypt(
+    CryptKey*       key,
     ARRAY(uint8_t) *   dest,
     unsigned        sourceBytes,
-    const void *    sourceData
-) {
+    const void*     sourceData
+)
+{
     switch (key->algorithm) {
-        case kCryptRc4: {
+    case kCryptRc4: {
             Rc4Codec(key, true, dest, sourceBytes, sourceData);
         }
         break;
 
-        case kCryptRsa: // Not implemented; fall-thru to FATAL
+    case kCryptRsa: // Not implemented; fall-thru to FATAL
 //          RsaCodec(key, true, dest, sourceBytes, sourceData);
 //      break;
 
@@ -197,20 +205,21 @@ void CryptEncrypt (
 }
 
 //============================================================================
-void CryptEncrypt (
-    CryptKey *      key,
+void CryptEncrypt(
+    CryptKey*       key,
     unsigned        bytes,
-    void *          data
-) {
+    void*           data
+)
+{
     ASSERT(1 == CryptKeyGetBlockSize(key));
 
     switch (key->algorithm) {
-        case kCryptRc4: {
+    case kCryptRc4: {
             Rc4Codec(key, true, bytes, data);
         }
         break;
 
-        case kCryptRsa: // Not implemented; fall-thru to FATAL
+    case kCryptRsa: // Not implemented; fall-thru to FATAL
 //          RsaCodec(key, true, dest, sourceBytes, sourceData);
 //      break;
 
@@ -219,19 +228,20 @@ void CryptEncrypt (
 }
 
 //============================================================================
-void CryptDecrypt (
-    CryptKey *      key,
+void CryptDecrypt(
+    CryptKey*       key,
     ARRAY(uint8_t) *   dest,
     unsigned        sourceBytes,
-    const void *    sourceData
-) {
+    const void*     sourceData
+)
+{
     switch (key->algorithm) {
-        case kCryptRc4: {
+    case kCryptRc4: {
             Rc4Codec(key, false, dest, sourceBytes, sourceData);
         }
         break;
 
-        case kCryptRsa: // Not implemented; fall-thru to FATAL
+    case kCryptRsa: // Not implemented; fall-thru to FATAL
 //          RsaCodec(key, false, dest, sourceBytes, sourceData);
 //      break;
 
@@ -240,20 +250,21 @@ void CryptDecrypt (
 }
 
 //============================================================================
-void CryptDecrypt (
-    CryptKey *      key,
+void CryptDecrypt(
+    CryptKey*       key,
     unsigned        bytes,
-    void *          data
-) {
+    void*           data
+)
+{
     ASSERT(1 == CryptKeyGetBlockSize(key));
 
     switch (key->algorithm) {
-        case kCryptRc4: {
+    case kCryptRc4: {
             Rc4Codec(key, false, bytes, data);
         }
         break;
 
-        case kCryptRsa: // Not implemented; fall-thru to FATAL
+    case kCryptRsa: // Not implemented; fall-thru to FATAL
 //          RsaCodec(key, false, dest, sourceBytes, sourceData);
 //      break;
 

@@ -51,18 +51,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnMessage/plMessage.h"
 
-class plDeviceRecreateMsg : public plMessage
-{
+class plDeviceRecreateMsg : public plMessage {
 public:
-    plDeviceRecreateMsg() : plMessage( nil, nil, nil ) { SetBCastFlag( kBCastByExactType ); }
+    plDeviceRecreateMsg() : plMessage(nil, nil, nil) {
+        SetBCastFlag(kBCastByExactType);
+    }
     ~plDeviceRecreateMsg() {}
 
-    CLASSNAME_REGISTER( plDeviceRecreateMsg );
-    GETINTERFACE_ANY( plDeviceRecreateMsg, plMessage );
+    CLASSNAME_REGISTER(plDeviceRecreateMsg);
+    GETINTERFACE_ANY(plDeviceRecreateMsg, plMessage);
 
     // IO
-    void Read(hsStream* stream, hsResMgr* mgr)  { plMessage::IMsgRead( stream, mgr ); }
-    void Write(hsStream* stream, hsResMgr* mgr) { plMessage::IMsgWrite( stream, mgr ); }
+    void Read(hsStream* stream, hsResMgr* mgr)  {
+        plMessage::IMsgRead(stream, mgr);
+    }
+    void Write(hsStream* stream, hsResMgr* mgr) {
+        plMessage::IMsgWrite(stream, mgr);
+    }
 };
 
 #endif // _plDeviceRecreateMsg_h

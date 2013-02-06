@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plDniCoordinateInfo;
 struct hsPoint3;
 
-class pyDniCoordinates
-{
+class pyDniCoordinates {
 private:
     plDniCoordinateInfo* fCoords;
 
@@ -68,11 +67,11 @@ public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptDniCoordinates);
     PYTHON_CLASS_NEW_DEFINITION;
-    static PyObject *New(plDniCoordinateInfo* coord);
+    static PyObject* New(plDniCoordinateInfo* coord);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyDniCoordinates object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyDniCoordinates); // converts a PyObject to a pyDniCoordinates (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     // python get attributes helpers
     int         GetHSpans() const;

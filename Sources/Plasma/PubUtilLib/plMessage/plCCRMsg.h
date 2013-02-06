@@ -49,41 +49,53 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // Abstract Baseclass for CCR messages.
 // All CCR messages must derive from this or the server won't be able to tell that's what they are.
 //
-class plCCRMessage : public plMessage
-{
+class plCCRMessage : public plMessage {
 public:
-    CLASSNAME_REGISTER( plCCRMessage);
-    GETINTERFACE_ANY( plCCRMessage, plMessage );    
+    CLASSNAME_REGISTER(plCCRMessage);
+    GETINTERFACE_ANY(plCCRMessage, plMessage);
 };
 
 
 //
 // Player wants to petition a CCR
 //
-class plCCRPetitionMsg : public plCCRMessage
-{
+class plCCRPetitionMsg : public plCCRMessage {
 private:
     uint8_t fPetitionType;
     std::string fNote;
     std::string fTitle;
 public:
-    plCCRPetitionMsg() : fPetitionType(plNetCommon::PetitionTypes::kGeneralHelp) { fBCastFlags |= kBCastByType; }
+    plCCRPetitionMsg() : fPetitionType(plNetCommon::PetitionTypes::kGeneralHelp) {
+        fBCastFlags |= kBCastByType;
+    }
     ~plCCRPetitionMsg() {}
 
-    CLASSNAME_REGISTER( plCCRPetitionMsg);
-    GETINTERFACE_ANY( plCCRPetitionMsg, plCCRMessage ); 
+    CLASSNAME_REGISTER(plCCRPetitionMsg);
+    GETINTERFACE_ANY(plCCRPetitionMsg, plCCRMessage);
 
     // petition text
-    void SetNote(const char* n) { fNote=n;  }
-    const char* GetNote() const { return fNote.c_str(); }
+    void SetNote(const char* n) {
+        fNote = n;
+    }
+    const char* GetNote() const {
+        return fNote.c_str();
+    }
 
     // title
-    void SetTitle(const char* n) { fTitle=n;    }
-    const char* GetTitle() const { return fTitle.c_str();   }
+    void SetTitle(const char* n) {
+        fTitle = n;
+    }
+    const char* GetTitle() const {
+        return fTitle.c_str();
+    }
 
     // petition type
-    void SetType(const uint8_t t) { fPetitionType=t;  }
-    uint8_t GetType() const { return fPetitionType;   }
+    void SetType(const uint8_t t) {
+        fPetitionType = t;
+    }
+    uint8_t GetType() const {
+        return fPetitionType;
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -92,8 +104,7 @@ public:
 //
 // A CCR has gone invisible
 //
-class plCCRInvisibleMsg : public plCCRMessage
-{
+class plCCRInvisibleMsg : public plCCRMessage {
 public:
     plKey   fAvKey;
     uint8_t   fInvisLevel;     // 0 means visible
@@ -101,8 +112,8 @@ public:
     plCCRInvisibleMsg();
     ~plCCRInvisibleMsg() {}
 
-    CLASSNAME_REGISTER( plCCRInvisibleMsg);
-    GETINTERFACE_ANY( plCCRInvisibleMsg, plCCRMessage );    
+    CLASSNAME_REGISTER(plCCRInvisibleMsg);
+    GETINTERFACE_ANY(plCCRInvisibleMsg, plCCRMessage);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -111,11 +122,9 @@ public:
 //
 // For CCR-player communication
 //
-class plCCRCommunicationMsg : public plCCRMessage
-{
+class plCCRCommunicationMsg : public plCCRMessage {
 public:
-    enum Type
-    {
+    enum Type {
         kUnInit = 0,
         kBeginCommunication,
         kChat,
@@ -129,19 +138,31 @@ public:
     plCCRCommunicationMsg();
     ~plCCRCommunicationMsg() {}
 
-    CLASSNAME_REGISTER( plCCRCommunicationMsg);
-    GETINTERFACE_ANY( plCCRCommunicationMsg, plCCRMessage );    
+    CLASSNAME_REGISTER(plCCRCommunicationMsg);
+    GETINTERFACE_ANY(plCCRCommunicationMsg, plCCRMessage);
 
     // getters and setters
-    void SetMessage(const char* n) { fString=n; }
-    const char* GetMessage() const { return fString.c_str();    }
+    void SetMessage(const char* n) {
+        fString = n;
+    }
+    const char* GetMessage() const {
+        return fString.c_str();
+    }
 
-    void SetType(Type t) { fType=t; }
-    Type GetType() const { return fType; }
-    
-    void SetCCRPlayerID(uint32_t t) { fCCRPlayerID=t; }
-    uint32_t GetCCRPlayerID() const { return fCCRPlayerID; }
-    
+    void SetType(Type t) {
+        fType = t;
+    }
+    Type GetType() const {
+        return fType;
+    }
+
+    void SetCCRPlayerID(uint32_t t) {
+        fCCRPlayerID = t;
+    }
+    uint32_t GetCCRPlayerID() const {
+        return fCCRPlayerID;
+    }
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 };
@@ -149,16 +170,15 @@ public:
 //
 // A CCR has banned a player from leaving the age
 //
-class plCCRBanLinkingMsg : public plCCRMessage
-{
+class plCCRBanLinkingMsg : public plCCRMessage {
 public:
     bool fBan;    // ban or un ban
 
     plCCRBanLinkingMsg() ;
     ~plCCRBanLinkingMsg() {}
 
-    CLASSNAME_REGISTER( plCCRBanLinkingMsg);
-    GETINTERFACE_ANY( plCCRBanLinkingMsg, plCCRMessage );   
+    CLASSNAME_REGISTER(plCCRBanLinkingMsg);
+    GETINTERFACE_ANY(plCCRBanLinkingMsg, plCCRMessage);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -167,16 +187,15 @@ public:
 //
 // A CCR has silenced a player
 //
-class plCCRSilencePlayerMsg : public plCCRMessage
-{
+class plCCRSilencePlayerMsg : public plCCRMessage {
 public:
     bool fSilence;    // ban or un ban
 
     plCCRSilencePlayerMsg() ;
     ~plCCRSilencePlayerMsg() {}
 
-    CLASSNAME_REGISTER( plCCRSilencePlayerMsg);
-    GETINTERFACE_ANY( plCCRSilencePlayerMsg, plCCRMessage );    
+    CLASSNAME_REGISTER(plCCRSilencePlayerMsg);
+    GETINTERFACE_ANY(plCCRSilencePlayerMsg, plCCRMessage);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);

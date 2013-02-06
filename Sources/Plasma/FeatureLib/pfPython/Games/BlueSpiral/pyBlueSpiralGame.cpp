@@ -55,8 +55,9 @@ pyBlueSpiralGame::pyBlueSpiralGame(): pyGameCli() {}
 
 pyBlueSpiralGame::pyBlueSpiralGame(pfGameCli* client): pyGameCli(client)
 {
-    if (client && (client->GetGameTypeId() != kGameTypeId_BlueSpiral))
-        gameClient = nil; // wrong type, just clear it out
+    if (client && (client->GetGameTypeId() != kGameTypeId_BlueSpiral)) {
+        gameClient = nil;    // wrong type, just clear it out
+    }
 }
 
 bool pyBlueSpiralGame::IsBlueSpiralGame(plString& guid)
@@ -73,8 +74,7 @@ void pyBlueSpiralGame::JoinCommonBlueSpiralGame(pyKey& callbackKey, unsigned gam
 
 void pyBlueSpiralGame::StartGame()
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmBlueSpiral* blueSpiral = pfGmBlueSpiral::ConvertNoRef(gameClient);
         blueSpiral->StartGame();
     }
@@ -82,8 +82,7 @@ void pyBlueSpiralGame::StartGame()
 
 void pyBlueSpiralGame::HitCloth(int clothNum)
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmBlueSpiral* blueSpiral = pfGmBlueSpiral::ConvertNoRef(gameClient);
         blueSpiral->HitCloth(clothNum);
     }

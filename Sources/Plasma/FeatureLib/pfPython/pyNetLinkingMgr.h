@@ -55,8 +55,7 @@ class pyAgeInfoStruct;
 class pyAgeLinkStruct;
 class pyAgeLinkStructRef;
 
-class pyNetLinkingMgr
-{
+class pyNetLinkingMgr {
 #ifndef BUILDING_PYPLASMA
 protected:
     pyNetLinkingMgr() {}
@@ -68,19 +67,19 @@ public:
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyNetLinkingMgr object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyNetLinkingMgr); // converts a PyObject to a pyNetLinkingMgr (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 #else
 public:
 #endif // BUILDING_PYPLASMA
-    static void AddPlasmaConstantsClasses(PyObject *m);
+    static void AddPlasmaConstantsClasses(PyObject* m);
 
 #ifndef BUILDING_PYPLASMA
     // enable/disable linking
-    bool IsEnabled( void ) const;
-    void SetEnabled( bool b ) const;
+    bool IsEnabled(void) const;
+    void SetEnabled(bool b) const;
 
     // Link to a public instance. PLS will load balance.
-    void LinkToAge( pyAgeLinkStruct & link, const char* linkAnim, bool linkInSfx, bool linkOutSfx );
+    void LinkToAge(pyAgeLinkStruct& link, const char* linkAnim, bool linkInSfx, bool linkOutSfx);
     // Link to my Personal Age
     void LinkToMyPersonalAge();
     // link to my personal age with the YeehsaBook
@@ -88,11 +87,11 @@ public:
     // Link to my Neighborhood Age
     void LinkToMyNeighborhoodAge();
     // Link player to my current age
-    void LinkPlayerHere( uint32_t playerID );
+    void LinkPlayerHere(uint32_t playerID);
     // Link player to specified age
-    void LinkPlayerToAge( pyAgeLinkStruct & link, uint32_t playerID );
+    void LinkPlayerToAge(pyAgeLinkStruct& link, uint32_t playerID);
     // Link to player's current age
-    void LinkToPlayersAge( uint32_t playerID );
+    void LinkToPlayersAge(uint32_t playerID);
 
     PyObject* GetCurrAgeLink(); // returns pyAgeLinkStructRef
     PyObject* GetPrevAgeLink(); // returns pyAgeLinkStructRef

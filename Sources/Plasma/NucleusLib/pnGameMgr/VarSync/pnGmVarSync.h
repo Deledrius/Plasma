@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnGameMgr/VarSync/pnGmVarSync.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNGAMEMGR_VARSYNC_PNGMVARSYNC_H
@@ -99,57 +99,57 @@ enum {
 #pragma pack(push,1)
 //============================================================================
 
-    //========================================================================
-    // Message parameters
-    //========================================================================
-    struct VarSync_CreateParam {
-    };
+//========================================================================
+// Message parameters
+//========================================================================
+struct VarSync_CreateParam {
+};
 
-    //========================================================================
-    // VarSync message structures
-    //========================================================================
+//========================================================================
+// VarSync message structures
+//========================================================================
 
-    // Cli2Srv
-    struct Cli2Srv_VarSync_SetStringVar : GameMsgHeader {
-        unsigned long   varID;
-        wchar_t           varValue[256];
-    };
-    struct Cli2Srv_VarSync_SetNumericVar : GameMsgHeader {
-        unsigned long   varID;
-        double          varValue;
-    };
-    struct Cli2Srv_VarSync_RequestAllVars : GameMsgHeader {
-    };
-    struct Cli2Srv_VarSync_CreateStringVar : GameMsgHeader {
-        wchar_t       varName[256];
-        wchar_t       varValue[256];
-    };
-    struct Cli2Srv_VarSync_CreateNumericVar : GameMsgHeader {
-        wchar_t       varName[256];
-        double      varValue;
-    };
+// Cli2Srv
+struct Cli2Srv_VarSync_SetStringVar : GameMsgHeader {
+    unsigned long   varID;
+    wchar_t           varValue[256];
+};
+struct Cli2Srv_VarSync_SetNumericVar : GameMsgHeader {
+    unsigned long   varID;
+    double          varValue;
+};
+struct Cli2Srv_VarSync_RequestAllVars : GameMsgHeader {
+};
+struct Cli2Srv_VarSync_CreateStringVar : GameMsgHeader {
+    wchar_t       varName[256];
+    wchar_t       varValue[256];
+};
+struct Cli2Srv_VarSync_CreateNumericVar : GameMsgHeader {
+    wchar_t       varName[256];
+    double      varValue;
+};
 
-    // Srv2Cli
-    struct Srv2Cli_VarSync_StringVarChanged : GameMsgHeader {
-        unsigned long   varID;
-        wchar_t           varValue[256];
-    };
-    struct Srv2Cli_VarSync_NumericVarChanged : GameMsgHeader {
-        unsigned long   varID;
-        double          varValue;
-    };
-    struct Srv2Cli_VarSync_AllVarsSent : GameMsgHeader {
-    };
-    struct Srv2Cli_VarSync_StringVarCreated : GameMsgHeader {
-        wchar_t           varName[256];
-        unsigned long   varID;
-        wchar_t           varValue[256];
-    };
-    struct Srv2Cli_VarSync_NumericVarCreated : GameMsgHeader {
-        wchar_t           varName[256];
-        unsigned long   varID;
-        double          varValue;
-    };
+// Srv2Cli
+struct Srv2Cli_VarSync_StringVarChanged : GameMsgHeader {
+    unsigned long   varID;
+    wchar_t           varValue[256];
+};
+struct Srv2Cli_VarSync_NumericVarChanged : GameMsgHeader {
+    unsigned long   varID;
+    double          varValue;
+};
+struct Srv2Cli_VarSync_AllVarsSent : GameMsgHeader {
+};
+struct Srv2Cli_VarSync_StringVarCreated : GameMsgHeader {
+    wchar_t           varName[256];
+    unsigned long   varID;
+    wchar_t           varValue[256];
+};
+struct Srv2Cli_VarSync_NumericVarCreated : GameMsgHeader {
+    wchar_t           varName[256];
+    unsigned long   varID;
+    double          varValue;
+};
 
 //============================================================================
 // End networked data structures

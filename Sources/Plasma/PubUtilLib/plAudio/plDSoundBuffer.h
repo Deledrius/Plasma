@@ -64,21 +64,22 @@ class plAudioFileReader;
 
 
 // Ported to OpenAL from DirectSound May 2006. Idealy the openal sources would be seperate from this class.
-// OpenAl sound buffer, and source. 
-class plDSoundBuffer
-{
+// OpenAl sound buffer, and source.
+class plDSoundBuffer {
 public:
-    plDSoundBuffer( uint32_t size, plWAVHeader &bufferDesc, bool enable3D, bool looping, bool tryStatic = false, bool streaming = false );
+    plDSoundBuffer(uint32_t size, plWAVHeader& bufferDesc, bool enable3D, bool looping, bool tryStatic = false, bool streaming = false);
     ~plDSoundBuffer();
 
-    void        Play( void );
-    void        Stop( void );
+    void        Play(void);
+    void        Stop(void);
     void        Rewind() ;
-    
-    uint32_t      GetLengthInBytes( void ) const;
-    void        SetScalarVolume( float volume ); // Sets the volume, but on a range from 0 to 1
 
-    unsigned    GetSource() { return source; }
+    uint32_t      GetLengthInBytes(void) const;
+    void        SetScalarVolume(float volume);   // Sets the volume, but on a range from 0 to 1
+
+    unsigned    GetSource() {
+        return source;
+    }
     void        SetPosition(float x, float y, float z);
     void        SetOrientation(float x, float y, float z);
     void        SetVelocity(float x, float y, float z);
@@ -86,39 +87,49 @@ public:
     void        SetConeOrientation(float x, float y, float z);
     void        SetConeOutsideVolume(int vol);
 
-    void        SetLooping( bool loop );
-    void        SetMinDistance( int dist);
-    void        SetMaxDistance( int dist );
+    void        SetLooping(bool loop);
+    void        SetMinDistance(int dist);
+    void        SetMaxDistance(int dist);
 
-    bool        IsValid( void ) const { return fValid; }
-    bool        IsPlaying( void );
-    bool        IsLooping( void ) const { return fLooping; }
-    bool        IsEAXAccelerated( void ) const;
+    bool        IsValid(void) const {
+        return fValid;
+    }
+    bool        IsPlaying(void);
+    bool        IsLooping(void) const {
+        return fLooping;
+    }
+    bool        IsEAXAccelerated(void) const;
 
-    bool        FillBuffer(void *data, unsigned bytes, plWAVHeader *header);
+    bool        FillBuffer(void* data, unsigned bytes, plWAVHeader* header);
 
     // Streaming support
-    bool        SetupStreamingSource(plAudioFileReader *stream);
-    bool        SetupStreamingSource(void *data, unsigned bytes);
+    bool        SetupStreamingSource(plAudioFileReader* stream);
+    bool        SetupStreamingSource(void* data, unsigned bytes);
     int         BuffersProcessed();
-    bool        StreamingFillBuffer(plAudioFileReader *stream);
+    bool        StreamingFillBuffer(plAudioFileReader* stream);
 
     bool        SetupVoiceSource();
-    bool        VoiceFillBuffer(void *data, unsigned bytes, unsigned buferId);
+    bool        VoiceFillBuffer(void* data, unsigned bytes, unsigned buferId);
     void        UnQueueVoiceBuffers();
 
-    
-    unsigned    GetByteOffset();
-    uint32_t      GetBufferBytePos( float timeInSecs ) const;
-    uint32_t      bytePosToMSecs( uint32_t bytePos ) const;
 
-    void            SetEAXSettings(  plEAXSourceSettings *settings, bool force = false );
+    unsigned    GetByteOffset();
+    uint32_t      GetBufferBytePos(float timeInSecs) const;
+    uint32_t      bytePosToMSecs(uint32_t bytePos) const;
+
+    void            SetEAXSettings(plEAXSourceSettings* settings, bool force = false);
     void            SetTimeOffsetBytes(unsigned bytes);
-    uint8_t           GetBlockAlign( void ) const;
-    static uint32_t   GetNumBuffers() { return fNumBuffers; }
-    float           GetDefaultMinDistance() { return fDefaultMinDistance; }
-    bool            GetAvailableBufferId(unsigned *bufferId);
-    unsigned        GetNumQueuedBuffers(){ return fNumQueuedBuffers;} // returns the max number of buffers queued on a source
+    uint8_t           GetBlockAlign(void) const;
+    static uint32_t   GetNumBuffers() {
+        return fNumBuffers;
+    }
+    float           GetDefaultMinDistance() {
+        return fDefaultMinDistance;
+    }
+    bool            GetAvailableBufferId(unsigned* bufferId);
+    unsigned        GetNumQueuedBuffers() {
+        return fNumQueuedBuffers;   // returns the max number of buffers queued on a source
+    }
 
     float       GetTimeOffsetSec();
     void        SetTimeOffsetSec(float seconds);
@@ -126,8 +137,7 @@ public:
 
 protected:
 
-    enum BufferType
-    {
+    enum BufferType {
         kStatic,
         kStreaming,
         kVoice,
@@ -136,8 +146,8 @@ protected:
     BufferType          fType;
     bool                fValid, fLooping;
     uint32_t              fLockLength;
-    void *              fLockPtr;
-    
+    void*               fLockPtr;
+
     hsTArray<uint32_t>    fPosNotifys;
     bool                fStreaming;
     plWAVHeader*        fBufferDesc;
@@ -145,21 +155,21 @@ protected:
 
     unsigned            buffer;                                 // used if this is not a streaming buffer
     unsigned            streamingBuffers[STREAMING_BUFFERS];    // used if this is a streaming buffer
-    std::list<unsigned> mAvailableBuffers;                      // used for doing our own buffer management. Specifically voice chat, since we dont want old buffers queued 
+    std::list<unsigned> mAvailableBuffers;                      // used for doing our own buffer management. Specifically voice chat, since we dont want old buffers queued
 
     unsigned            source;
     unsigned int        fStreamingBufferSize;
 
     plEAXSource         fEAXSource;
-    
+
     static uint32_t       fNumBuffers;
     static float        fDefaultMinDistance;
 
     unsigned            fNumQueuedBuffers;
     float            fPrevVolume;
 
-    void    IAllocate( uint32_t size, plWAVHeader &bufferDesc, bool enable3D, bool tryStatic );
-    void    IRelease( void );
+    void    IAllocate(uint32_t size, plWAVHeader& bufferDesc, bool enable3D, bool tryStatic);
+    void    IRelease(void);
     int     IGetALFormat(unsigned bitsPerSample, unsigned int numChannels);
 };
 

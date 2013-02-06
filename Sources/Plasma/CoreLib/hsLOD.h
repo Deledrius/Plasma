@@ -42,15 +42,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef hsLOD_inc
 #define hsLOD_inc
 
-namespace hsLOD
-{
-    enum
-    {
-        kLODNone            = 0x00000000,
-        kLODLow             = 0x00000001,
-        kLODHigh            = 0x00000002,
-        kLODAll             = kLODLow | kLODHigh
-    };
+namespace hsLOD {
+enum {
+    kLODNone            = 0x00000000,
+    kLODLow             = 0x00000001,
+    kLODHigh            = 0x00000002,
+    kLODAll             = kLODLow | kLODHigh
+};
 }
 
 #endif // hsLOD_inc

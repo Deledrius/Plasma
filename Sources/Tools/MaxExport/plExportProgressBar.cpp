@@ -51,10 +51,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plExportProgressBar.h"
 
 namespace {
-    DWORD WINAPI ProgressDummyFunc(LPVOID arg) 
-    {
-        return(0);
-    }
+DWORD WINAPI ProgressDummyFunc(LPVOID arg)
+{
+    return(0);
+}
 }
 
 plExportProgressBar::plExportProgressBar() :
@@ -66,56 +66,54 @@ plExportProgressBar::plExportProgressBar() :
 
 plExportProgressBar::~plExportProgressBar()
 {
-   fInterface->ProgressEnd();
+    fInterface->ProgressEnd();
 }
 
-void plExportProgressBar::Start(char *name, uint32_t steps)
+void plExportProgressBar::Start(char* name, uint32_t steps)
 {
     fTotalSteps = steps;
     fCurStep = 0;
 
     fInterface->ProgressEnd();
     fInterface->ProgressStart(name, TRUE, ProgressDummyFunc, nil);
-   
-   GUP* exportServerGup = OpenGupPlugIn(Class_ID(470000004,99));
-   if(exportServerGup && name)
-   {
-      exportServerGup->Control(-3); // means next control will be progress task
-      exportServerGup->Control((DWORD)name);
-   }   
+
+    GUP* exportServerGup = OpenGupPlugIn(Class_ID(470000004, 99));
+
+    if (exportServerGup && name) {
+        exportServerGup->Control(-3); // means next control will be progress task
+        exportServerGup->Control((DWORD)name);
+    }
 }
 
-bool plExportProgressBar::Update(char *name, uint32_t inc)
+bool plExportProgressBar::Update(char* name, uint32_t inc)
 {
     fCurStep += inc;
 
-   // Check to see if we are running an export server
-   // If so, then pass the update on to the export server
-   GUP* exportServerGup = OpenGupPlugIn(Class_ID(470000004,99));
-   if(exportServerGup)
-   {
-      exportServerGup->Control(-2);  // means next control will be progress pct
-      exportServerGup->Control((int)((fCurStep * 100) / fTotalSteps));  // send pct
-      if(name)
-      {
-         exportServerGup->Control(-4); // means next control will be progress subtask
-         exportServerGup->Control((DWORD)name);
-      }
-      exportServerGup->Control(-6); // signal that we're done sending this update sequence
-   }   
-   
-   fInterface->ProgressUpdate((int)((fCurStep * 100) / fTotalSteps), FALSE, name);
+    // Check to see if we are running an export server
+    // If so, then pass the update on to the export server
+    GUP* exportServerGup = OpenGupPlugIn(Class_ID(470000004, 99));
 
-    if (fInterface->GetCancel()) 
-    {
-        int retval = MessageBox(fInterface->GetMAXHWnd(), _T("Really Cancel?"),
-            _T("Question"), MB_ICONQUESTION | MB_YESNO);
-        if (retval == IDYES)
-        {
-            return true;
+    if (exportServerGup) {
+        exportServerGup->Control(-2);  // means next control will be progress pct
+        exportServerGup->Control((int)((fCurStep * 100) / fTotalSteps));  // send pct
+
+        if (name) {
+            exportServerGup->Control(-4); // means next control will be progress subtask
+            exportServerGup->Control((DWORD)name);
         }
-        else if (retval == IDNO)
-        {
+
+        exportServerGup->Control(-6); // signal that we're done sending this update sequence
+    }
+
+    fInterface->ProgressUpdate((int)((fCurStep * 100) / fTotalSteps), FALSE, name);
+
+    if (fInterface->GetCancel()) {
+        int retval = MessageBox(fInterface->GetMAXHWnd(), _T("Really Cancel?"),
+                                _T("Question"), MB_ICONQUESTION | MB_YESNO);
+
+        if (retval == IDYES) {
+            return true;
+        } else if (retval == IDNO) {
             fInterface->SetCancel(FALSE);
         }
     }
@@ -128,13 +126,12 @@ uint32_t plExportProgressBar::CountNodes()
     return INodeCount(GetCOREInterface()->GetRootNode());
 }
 
-uint32_t plExportProgressBar::INodeCount(INode *node)
+uint32_t plExportProgressBar::INodeCount(INode* node)
 {
     uint32_t count = 1;
 
-    for (int i = 0; i < node->NumberOfChildren(); i++)
-    {
-        INode *child = node->GetChildNode(i);
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
+        INode* child = node->GetChildNode(i);
         count += INodeCount(child);
     }
 

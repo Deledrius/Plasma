@@ -43,7 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plArmatureEffectMsg.h"
 #include "plAvatar/plArmatureEffects.h"
 
-plArmatureEffectStateMsg::plArmatureEffectStateMsg() : 
+plArmatureEffectStateMsg::plArmatureEffectStateMsg() :
     fSurface(plArmatureEffectsMgr::kFootNoSurface), fAddSurface(false) {}
 
 plArmatureEffectStateMsg::~plArmatureEffectStateMsg() {}
@@ -51,7 +51,7 @@ plArmatureEffectStateMsg::~plArmatureEffectStateMsg() {}
 void plArmatureEffectStateMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
-    
+
     fSurface = stream->ReadByte();
     fAddSurface = stream->ReadBool();
 }

@@ -46,11 +46,9 @@ enum { kPassAnimMain, kPassAnimEase };
 
 #define WM_ROLLOUT_OPEN WM_USER+1
 
-class plAnimEaseDlgProc : public ParamMap2UserDlgProc
-{
+class plAnimEaseDlgProc : public ParamMap2UserDlgProc {
 protected:
-    void EnableStopPoints(IParamMap2 *pm, bool enable)
-    {
+    void EnableStopPoints(IParamMap2* pm, bool enable) {
         pm->Enable(kPassEaseInMin, enable);
         pm->Enable(kPassEaseInMax, enable);
         pm->Enable(kPassEaseOutMin, enable);
@@ -58,44 +56,43 @@ protected:
     }
 
 public:
-    virtual BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (msg)
-        {
-        case WM_INITDIALOG:
-            {
-                IParamBlock2 *pb = map->GetParamBlock();
-                
+    virtual BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        switch (msg) {
+        case WM_INITDIALOG: {
+                IParamBlock2* pb = map->GetParamBlock();
+
                 bool stopPoints = false;
-                if (DoesHaveStopPoints(pb->GetOwner()))
-                {
+
+                if (DoesHaveStopPoints(pb->GetOwner())) {
                     stopPoints = true;
                     break;
                 }
-                
+
                 EnableStopPoints(map, stopPoints);
 
                 // If we're doing an ease, set the ease rollup to open
-        //      if (pb->GetInt(kPassEaseInType) != plAnimEaseTypes::kNoEase ||
-        //          pb->GetInt(kPassEaseOutType) != plAnimEaseTypes::kNoEase)
-        //          PostMessage(hWnd, WM_ROLLOUT_OPEN, 0, 0);
+                //      if (pb->GetInt(kPassEaseInType) != plAnimEaseTypes::kNoEase ||
+                //          pb->GetInt(kPassEaseOutType) != plAnimEaseTypes::kNoEase)
+                //          PostMessage(hWnd, WM_ROLLOUT_OPEN, 0, 0);
             }
+
             return TRUE;
 
-        // Max doesn't know about the rollup until after WM_CREATE, so we get
-        // around it by posting a message
-        //case WM_ROLLOUT_OPEN:
-        //  {
-        //      IRollupWindow *rollup = GetCOREInterface(MTLEDIT_INTERFACE)->GetCommandPanelRollup();
-        //      int idx = rollup->GetPanelIndex(hWnd);
-        //      rollup->SetPanelOpen(idx, TRUE);
-        //  }
-        //  return TRUE;
+            // Max doesn't know about the rollup until after WM_CREATE, so we get
+            // around it by posting a message
+            //case WM_ROLLOUT_OPEN:
+            //  {
+            //      IRollupWindow *rollup = GetCOREInterface(MTLEDIT_INTERFACE)->GetCommandPanelRollup();
+            //      int idx = rollup->GetPanelIndex(hWnd);
+            //      rollup->SetPanelOpen(idx, TRUE);
+            //  }
+            //  return TRUE;
         }
+
         return FALSE;
     }
 
     virtual void DeleteThis() {}
-};  
+};
 
 #endif

@@ -73,19 +73,17 @@ class plNetMessage;
 typedef std::vector<plNetMember*>       plNetMemberList;
 typedef std::vector<uint32_t>             plNetPlayerIDList;
 
-// 
+//
 // Common baseclasses for client and server net apps
 //
 
-class plNetApp : public hsKeyedObject, public plLoggable        // so it can recv messages
-{
+class plNetApp : public hsKeyedObject, public plLoggable {      // so it can recv messages
 protected:
     static plNetApp*        fInstance;
     hsBitVector fFlagsVec;
 public:
-    enum FlagBits   // common to both client and server
-    {
-        kNullSend=0,
+    enum FlagBits { // common to both client and server
+        kNullSend = 0,
         kNetCoreSingleThreaded,
         kScreenMessages,                        // filter out illegal net game messages, used by gameserver&client
 
@@ -98,13 +96,17 @@ public:
     plNetApp()  {}
     virtual ~plNetApp() {}
 
-    CLASSNAME_REGISTER( plNetApp );
-    GETINTERFACE_ANY( plNetApp, hsKeyedObject);
+    CLASSNAME_REGISTER(plNetApp);
+    GETINTERFACE_ANY(plNetApp, hsKeyedObject);
 
     virtual void Shutdown() {}
 
-    void SetFlagsBit(int b, bool on=true) { fFlagsVec.SetBit(b, on); }
-    bool GetFlagsBit(int b)     const { return fFlagsVec.IsBitSet(b) ? true : false; }
+    void SetFlagsBit(int b, bool on = true) {
+        fFlagsVec.SetBit(b, on);
+    }
+    bool GetFlagsBit(int b)     const {
+        return fFlagsVec.IsBitSet(b) ? true : false;
+    }
 
     static bool StaticWarningMsg(const char* fmt, ...);
     static bool StaticErrorMsg(const char* fmt, ...);
@@ -116,18 +118,19 @@ public:
 // base netApp class specific to client code
 //
 class plVaultPlayerNode;
-class plNetClientApp : public plNetApp
-{
+class plNetClientApp : public plNetApp {
 private:
     int fCCRLevel;  // 0 for players, 1-4 for CCRs
 
     friend class plDispatch;
 
-    virtual int ISendGameMessage(plMessage* msg) { hsAssert(false, "stub"); return hsFail; }
+    virtual int ISendGameMessage(plMessage* msg) {
+        hsAssert(false, "stub");
+        return hsFail;
+    }
 
 public:
-    enum ClientFlagBits
-    {
+    enum ClientFlagBits {
         kDeferMsgs          = FLAG_CEILING, // currently ignoring most msgs because the game is not active
         kDisabled,                          // client. networking has been disabled
         kDisableOnNextUpdate,               // client. disable networking in next update call
@@ -140,17 +143,17 @@ public:
         kAllowTimeOut,                      // allow clients to timeout and be kicked off the server
         kAllowAuthTimeOut,                  // allow clients to timeout while authenticating
         kPlayingGame,                       // set when client is actively part of an age.
-        kShowLists,                         // debug info on-screen 
-        kShowRooms,                         // debug info on-screen 
+        kShowLists,                         // debug info on-screen
+        kShowRooms,                         // debug info on-screen
         kShowAvatars,                       // Avatar position/orientation info
-        kShowRelevanceRegions,              // debug info on-screen 
+        kShowRelevanceRegions,              // debug info on-screen
         kConnectedToVault,                  // initial connection to vault achieved
         kBanLinking,                        // player is not allowed to link
         kSilencePlayer,                     // player's outbound communication is shutoff
         kConsoleOutput,                     // net log output is echoed to console
         kLoadingInitialAgeState,            // set when we first link in to an age and are recving its initial state
         kLaunchedFromSetup,                 // set if we were launched from the setup program
-        kCCRVaultConnected,                 // set if we've connected to the CCR vault 
+        kCCRVaultConnected,                 // set if we've connected to the CCR vault
         kNetClientCommInited,               // set if the netClientComm interface has been initialized
         kNeedToSendInitialAgeStateLoadedMsg,// internal use only, when we need to send plInitialAgeStateLoadedMsg
         kNeedToSendAgeLoadedMsg,
@@ -159,14 +162,18 @@ public:
         kLinkingToOfflineAge,               // set if we're linking to the startup age
     };
 
-    CLASSNAME_REGISTER( plNetClientApp );
-    GETINTERFACE_ANY( plNetClientApp, plNetApp);
+    CLASSNAME_REGISTER(plNetClientApp);
+    GETINTERFACE_ANY(plNetClientApp, plNetApp);
 
     plNetClientApp();
-    
+
     // statics
-    static plNetClientApp* GetInstance() { return plNetClientApp::ConvertNoRef(fInstance); }
-    static const plNetClientApp* GetConstInstance() { return plNetClientApp::ConvertNoRef(fInstance); }
+    static plNetClientApp* GetInstance() {
+        return plNetClientApp::ConvertNoRef(fInstance);
+    }
+    static const plNetClientApp* GetConstInstance() {
+        return plNetClientApp::ConvertNoRef(fInstance);
+    }
     static void InheritNetMsgFlags(const plMessage* parentMsg, plMessage* childMsg, bool startCascade);
     static void InheritNetMsgFlags(uint32_t parentMsgFlags, uint32_t* childMsgFlags, bool startCascade);
     static void UnInheritNetMsgFlags(plMessage* msg);
@@ -174,64 +181,120 @@ public:
     // functions that all net client apps should implement
     virtual int SendMsg(plNetMessage* msg) = 0;
     virtual uint32_t GetPlayerID() const = 0;
-    virtual plString GetPlayerName( const plKey avKey=nil ) const = 0;
+    virtual plString GetPlayerName(const plKey avKey = nil) const = 0;
 
     // commonly used net client app functions
-    virtual float GetCurrentAgeTimeOfDayPercent() const { hsAssert(false, "stub"); return 0.; }
-    virtual bool ObjectInLocalAge(const plSynchedObject* obj) const { hsAssert(false, "stub"); return false; }
-    virtual uint8_t GetJoinOrder() const { hsAssert(false, "stub"); return 0; }
-    virtual bool IsRemotePlayerKey(const plKey p, int* idx=nil) { hsAssert(false, "stub"); return false; }
-    virtual plKey GetLocalPlayerKey()   const { hsAssert(false, "stub"); return nil; }
-    virtual plSynchedObject* GetLocalPlayer(bool forceLoad=false) const { hsAssert(false, "stub"); return nil; }
-    virtual plNetGroupId SelectNetGroup(plSynchedObject* objIn, plKey groupKey) { hsAssert(false, "stub"); return plNetGroup::kNetGroupUnknown; }
-    virtual int IsLocallyOwned(const plSynchedObject* obj) const { hsAssert(false, "stub"); return 0; }
-    virtual int IsLocallyOwned(const plUoid&) const { hsAssert(false, "stub"); return 0; }  
-    virtual plNetGroupId GetEffectiveNetGroup(const plSynchedObject* obj) const { hsAssert(false, "stub"); return plNetGroup::kNetGroupUnknown; }
-    virtual int Update(double secs) { return hsOK;}
-    virtual const char* GetServerLogTimeAsString(plString& ts) const { hsAssert(false, "stub"); return nil; }
-    virtual plUoid GetAgeSDLObjectUoid(const char* ageName) const { hsAssert(false, "stub"); return plUoid(); }
+    virtual float GetCurrentAgeTimeOfDayPercent() const {
+        hsAssert(false, "stub");
+        return 0.;
+    }
+    virtual bool ObjectInLocalAge(const plSynchedObject* obj) const {
+        hsAssert(false, "stub");
+        return false;
+    }
+    virtual uint8_t GetJoinOrder() const {
+        hsAssert(false, "stub");
+        return 0;
+    }
+    virtual bool IsRemotePlayerKey(const plKey p, int* idx = nil) {
+        hsAssert(false, "stub");
+        return false;
+    }
+    virtual plKey GetLocalPlayerKey()   const {
+        hsAssert(false, "stub");
+        return nil;
+    }
+    virtual plSynchedObject* GetLocalPlayer(bool forceLoad = false) const {
+        hsAssert(false, "stub");
+        return nil;
+    }
+    virtual plNetGroupId SelectNetGroup(plSynchedObject* objIn, plKey groupKey) {
+        hsAssert(false, "stub");
+        return plNetGroup::kNetGroupUnknown;
+    }
+    virtual int IsLocallyOwned(const plSynchedObject* obj) const {
+        hsAssert(false, "stub");
+        return 0;
+    }
+    virtual int IsLocallyOwned(const plUoid&) const {
+        hsAssert(false, "stub");
+        return 0;
+    }
+    virtual plNetGroupId GetEffectiveNetGroup(const plSynchedObject* obj) const {
+        hsAssert(false, "stub");
+        return plNetGroup::kNetGroupUnknown;
+    }
+    virtual int Update(double secs) {
+        return hsOK;
+    }
+    virtual const char* GetServerLogTimeAsString(plString& ts) const {
+        hsAssert(false, "stub");
+        return nil;
+    }
+    virtual plUoid GetAgeSDLObjectUoid(const char* ageName) const {
+        hsAssert(false, "stub");
+        return plUoid();
+    }
     virtual void StayAlive(double secs) {}
-    virtual void QueueDisableNet( bool showDlg, const char msg[] ) {}
+    virtual void QueueDisableNet(bool showDlg, const char msg[]) {}
 
-    bool IsEnabled() const { return !GetFlagsBit(kDisabled); }
-    bool InDemoMode() const { return GetFlagsBit(kDemoMode); }
-    bool IsLoadingInitialAgeState() const { return GetFlagsBit(kLoadingInitialAgeState); }
-    void  SetLaunchedFromSetup(bool b) { SetFlagsBit(kLaunchedFromSetup, b);    }
-    bool GetLaunchedFromSetup() const { return GetFlagsBit(kLaunchedFromSetup); }
-    
+    bool IsEnabled() const {
+        return !GetFlagsBit(kDisabled);
+    }
+    bool InDemoMode() const {
+        return GetFlagsBit(kDemoMode);
+    }
+    bool IsLoadingInitialAgeState() const {
+        return GetFlagsBit(kLoadingInitialAgeState);
+    }
+    void  SetLaunchedFromSetup(bool b) {
+        SetFlagsBit(kLaunchedFromSetup, b);
+    }
+    bool GetLaunchedFromSetup() const {
+        return GetFlagsBit(kLaunchedFromSetup);
+    }
+
     // CCR stuff
 #ifdef PLASMA_EXTERNAL_RELEASE
     void SetCCRLevel(int level) {   }
-    int GetCCRLevel() const { return 0; }
-    bool AmCCR() const { return false; }
+    int GetCCRLevel() const {
+        return 0;
+    }
+    bool AmCCR() const {
+        return false;
+    }
 #else
-    void SetCCRLevel(int level) { fCCRLevel=level;  }
-    int GetCCRLevel() const { return fCCRLevel; }
-    bool AmCCR() const { return (fCCRLevel>0); }
+    void SetCCRLevel(int level) {
+        fCCRLevel = level;
+    }
+    int GetCCRLevel() const {
+        return fCCRLevel;
+    }
+    bool AmCCR() const {
+        return (fCCRLevel > 0);
+    }
 #endif
 };
 
 //
 // base netApp class specific to server code
 //
-class plNetServerApp : public plNetApp
-{
+class plNetServerApp : public plNetApp {
 public:
-    enum ServerFlagBits
-    {
+    enum ServerFlagBits {
         kLastFlagBitsValue  = FLAG_CEILING, // get past plNetApp flags
         kDone,                              // exit update loop.
         kDumpStats,                         // dump stats to log file
         kDisableStateLogging,               // used by gameserver
         kGameStateIsDirty,                  // used by gameserver
         kDumpConfigDoc,                     // dump config options queries to log file
-        kProtectedServer,                   // set by a protected lobby 
+        kProtectedServer,                   // set by a protected lobby
         kRequireProtectedCCRs,              // CCRS must have logged in thru a protected lobby, used by gameserver
         kProcessedPendingMsgs,              // Used by front-end server
     };
 
-    CLASSNAME_REGISTER( plNetServerApp );
-    GETINTERFACE_ANY( plNetServerApp, plNetApp);
+    CLASSNAME_REGISTER(plNetServerApp);
+    GETINTERFACE_ANY(plNetServerApp, plNetApp);
 
     virtual int SendMsg(plNetMessage* msg) = 0;
 };
@@ -239,17 +302,20 @@ public:
 //
 // abstract base class for net client object debugger
 //
-class plNetObjectDebuggerBase
-{
+class plNetObjectDebuggerBase {
 private:
     static plNetObjectDebuggerBase* fInstance;
 public:
-    static plNetObjectDebuggerBase* GetInstance() { return fInstance;   }
-    static void SetInstance(plNetObjectDebuggerBase* i) { fInstance=i;  }
+    static plNetObjectDebuggerBase* GetInstance() {
+        return fInstance;
+    }
+    static void SetInstance(plNetObjectDebuggerBase* i) {
+        fInstance = i;
+    }
     virtual bool IsDebugObject(const hsKeyedObject* obj) const = 0;
-    virtual void LogMsgIfMatch(const char* msg) const = 0;      // write to status log if there's a string match    
+    virtual void LogMsgIfMatch(const char* msg) const = 0;      // write to status log if there's a string match
     virtual void LogMsg(const char* msg) const = 0;
-    
+
     virtual bool GetDebugging() const = 0;
     virtual void SetDebugging(bool b) = 0;
 };

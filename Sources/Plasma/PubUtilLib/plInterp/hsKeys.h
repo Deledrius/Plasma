@@ -50,11 +50,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsMatrix44.h"
 
 // No virtuals. Keep these nice and lean.
-struct hsKeyFrame
-{
+struct hsKeyFrame {
     // Used by plController to specify which keys it has.
-    enum
-    {
+    enum {
         kUnknownKeyFrame,
         kPoint3KeyFrame,
         kBezPoint3KeyFrame,
@@ -74,64 +72,57 @@ struct hsKeyFrame
     static const int kMaxFrameNumber;
 };
 
-struct hsPoint3Key : public hsKeyFrame
-{
+struct hsPoint3Key : public hsKeyFrame {
     hsPoint3    fValue;
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsPoint3Key *key);
+    bool CompareValue(hsPoint3Key* key);
 };
 
-struct hsBezPoint3Key : public hsKeyFrame
-{
+struct hsBezPoint3Key : public hsKeyFrame {
     hsPoint3    fInTan;
     hsPoint3    fOutTan;
     hsPoint3    fValue;
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsBezPoint3Key *key);
+    bool CompareValue(hsBezPoint3Key* key);
 };
 
-struct hsScalarKey : public hsKeyFrame
-{
+struct hsScalarKey : public hsKeyFrame {
     float    fValue;
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsScalarKey *key);
+    bool CompareValue(hsScalarKey* key);
 };
 
-struct hsBezScalarKey : public hsKeyFrame
-{
+struct hsBezScalarKey : public hsKeyFrame {
     float    fInTan;
     float    fOutTan;
     float    fValue;
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsBezScalarKey *key);
+    bool CompareValue(hsBezScalarKey* key);
 };
 
-struct hsQuatKey : public hsKeyFrame
-{
+struct hsQuatKey : public hsKeyFrame {
     hsQuat      fValue;
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsQuatKey *key);
+    bool CompareValue(hsQuatKey* key);
 };
 
-struct hsCompressedQuatKey32 : public hsKeyFrame
-{
-    enum
-    {
+struct hsCompressedQuatKey32 : public hsKeyFrame {
+    enum {
         kCompQuatNukeX,
         kCompQuatNukeY,
         kCompQuatNukeZ,
@@ -141,22 +132,20 @@ struct hsCompressedQuatKey32 : public hsKeyFrame
     static const float kOneOverRootTwo;
     static const float k10BitScaleRange;
 
-    void SetQuat(hsQuat &q);
-    void GetQuat(hsQuat &q);
+    void SetQuat(hsQuat& q);
+    void GetQuat(hsQuat& q);
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsCompressedQuatKey32 *key);
+    bool CompareValue(hsCompressedQuatKey32* key);
 
 protected:
     uint32_t fData;
 };
 
-struct hsCompressedQuatKey64 : public hsKeyFrame
-{
-    enum
-    {
+struct hsCompressedQuatKey64 : public hsKeyFrame {
+    enum {
         kCompQuatNukeX,
         kCompQuatNukeY,
         kCompQuatNukeZ,
@@ -167,89 +156,90 @@ struct hsCompressedQuatKey64 : public hsKeyFrame
     static const float k20BitScaleRange;
     static const float k21BitScaleRange;
 
-    void SetQuat(hsQuat &q);
-    void GetQuat(hsQuat &q);
+    void SetQuat(hsQuat& q);
+    void GetQuat(hsQuat& q);
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsCompressedQuatKey64 *key);
+    bool CompareValue(hsCompressedQuatKey64* key);
 
 protected:
     uint32_t fData[2];
 };
 
-struct hsScaleValue : public hsKeyFrame
-{
+struct hsScaleValue : public hsKeyFrame {
     hsVector3   fS; /* Scale components for x,y,z */
     hsQuat      fQ; /* The axis along which the scale is applied */
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    int operator==(const hsScaleValue& a) const { return (fS == a.fS && fQ == a.fQ); }
+    int operator==(const hsScaleValue& a) const {
+        return (fS == a.fS && fQ == a.fQ);
+    }
 };
 
 //
-// 
 //
-struct hsScaleKey : public hsKeyFrame
-{
+//
+struct hsScaleKey : public hsKeyFrame {
     hsScaleValue    fValue;
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsScaleKey *key);
+    bool CompareValue(hsScaleKey* key);
 };
 
-struct hsBezScaleKey : public hsKeyFrame
-{
+struct hsBezScaleKey : public hsKeyFrame {
     hsPoint3        fInTan;
     hsPoint3        fOutTan;
     hsScaleValue    fValue;
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsBezScaleKey *key);
+    bool CompareValue(hsBezScaleKey* key);
 };
 
-struct hsG3DSMaxKeyFrame : public hsKeyFrame
-{
+struct hsG3DSMaxKeyFrame : public hsKeyFrame {
     hsAffineParts   fParts;
 
-    void Reset() { fParts.Reset(); }    // Make parts identity
+    void Reset() {
+        fParts.Reset();    // Make parts identity
+    }
 
-    void Set(hsMatrix44 *mat, uint16_t frame);
-    void Set(const hsAffineParts &parts, uint16_t frame);
+    void Set(hsMatrix44* mat, uint16_t frame);
+    void Set(const hsAffineParts& parts, uint16_t frame);
 
-    hsMatrix44* GetMatrix44(hsMatrix44 *mat) { fParts.ComposeMatrix(mat); return mat; }
+    hsMatrix44* GetMatrix44(hsMatrix44* mat) {
+        fParts.ComposeMatrix(mat);
+        return mat;
+    }
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsG3DSMaxKeyFrame *key);
+    bool CompareValue(hsG3DSMaxKeyFrame* key);
 };
 
-struct hsMatrix33Key : public hsKeyFrame
-{
+struct hsMatrix33Key : public hsKeyFrame {
     hsMatrix33  fValue;
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsMatrix33Key *key);
+    bool CompareValue(hsMatrix33Key* key);
 };
 
-struct hsMatrix44Key : public hsKeyFrame
-{
+struct hsMatrix44Key : public hsKeyFrame {
     hsMatrix44  fValue;
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
-    bool CompareValue(hsMatrix44Key *key);
+    bool CompareValue(hsMatrix44Key* key);
 };
 
 #endif

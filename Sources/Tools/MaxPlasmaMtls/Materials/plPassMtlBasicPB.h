@@ -43,8 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define PL_PASSMTLBASICPB_H
 
 // Param ID's
-enum
-{
+enum {
     kPassBasColorLock,
     kPassBasColorAmb,
     kPassBasColor,
@@ -57,7 +56,7 @@ enum
     kPassBasUseSpec,
     kPassBasShine,
     kPassBasShineStr,
-    
+
     // New color stuff
     kPassBasDiffuseLock,
     kPassBasRunColor,

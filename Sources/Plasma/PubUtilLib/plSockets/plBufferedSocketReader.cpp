@@ -45,168 +45,172 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 plBufferedSocketReader::plBufferedSocketReader(int size)
-:   plRingBuffer(size)
-{    
+    :   plRingBuffer(size)
+{
 }
 
-int plBufferedSocketReader::ReadBlock(char * buf, int buflen, plTcpSocket & sck)
+int plBufferedSocketReader::ReadBlock(char* buf, int buflen, plTcpSocket& sck)
 {
-    if(GetBlock(buf, buflen))
+    if (GetBlock(buf, buflen)) {
         return kSuccessWithData;
-    
+    }
+
     int ans = ReadFrom(sck);
-    if(ans<=0)
+
+    if (ans <= 0) {
         return ans;
-    
-    if(GetBlock(buf, buflen))
+    }
+
+    if (GetBlock(buf, buflen)) {
         return kSuccessWithData;
-    
+    }
+
     return kSuccessNoData;
 }
 
-int plBufferedSocketReader::ReadString(char * buf, int buflen, char * termChars, plTcpSocket & sck)
+int plBufferedSocketReader::ReadString(char* buf, int buflen, char* termChars, plTcpSocket& sck)
 {
-    if(GetString(buf, buflen, termChars))
+    if (GetString(buf, buflen, termChars)) {
         return kSuccessWithData;
-    
-    int ans = kSuccessNoData;
-
-    while ( ans>=0 )
-    {
-        ans = ReadFrom(sck);
-        if(ans>0)
-        {
-            if ( GetString(buf, buflen, termChars) )
-                return kSuccessWithData;
-        }
     }
-    
-    return ans;
-}
-
-int plBufferedSocketReader::ReadStringInPlace(char ** buf, char * termChars, plTcpSocket & sck)
-{
-    if(GetStringInPlace(buf, termChars))
-        return kSuccessWithData;
 
     int ans = kSuccessNoData;
 
-    while ( ans>=0 )
-    {
+    while (ans >= 0) {
         ans = ReadFrom(sck);
-        if(ans>0)
-        {
-            if ( GetStringInPlace(buf, termChars) )
+
+        if (ans > 0) {
+            if (GetString(buf, buflen, termChars)) {
                 return kSuccessWithData;
+            }
         }
     }
-    
+
     return ans;
 }
 
-void plBufferedSocketReader::Reset() 
+int plBufferedSocketReader::ReadStringInPlace(char** buf, char* termChars, plTcpSocket& sck)
+{
+    if (GetStringInPlace(buf, termChars)) {
+        return kSuccessWithData;
+    }
+
+    int ans = kSuccessNoData;
+
+    while (ans >= 0) {
+        ans = ReadFrom(sck);
+
+        if (ans > 0) {
+            if (GetStringInPlace(buf, termChars)) {
+                return kSuccessWithData;
+            }
+        }
+    }
+
+    return ans;
+}
+
+void plBufferedSocketReader::Reset()
 {
     plRingBuffer::Reset();
 }
 
-int plBufferedSocketReader::ReadFrom(plTcpSocket & sck) // this is where things get ugly.
-{        
+int plBufferedSocketReader::ReadFrom(plTcpSocket& sck)  // this is where things get ugly.
+{
     int ans = kSuccessNoData;
     int readSize = BufferAvailable();
-    
-    if(readSize < 1)
-    {
+
+    if (readSize < 1) {
         Compress();
         readSize = BufferAvailable();
     }
-    
-    if(readSize > 0)
-    {
-        char * dst = GetBufferOpen();
+
+    if (readSize > 0) {
+        char* dst = GetBufferOpen();
         int nBytesRead = sck.RecvData(dst, readSize);
-        if(nBytesRead < 0)
-        {
-            int err = plNet::GetError(); 
-            if(err != kBlockingError)
-            {
+
+        if (nBytesRead < 0) {
+            int err = plNet::GetError();
+
+            if (err != kBlockingError) {
                 ans = kFailedReadError;
             }
-        }
-        else if(nBytesRead > 0)
-        {
+        } else if (nBytesRead > 0) {
             fEndPos += nBytesRead;
             ans = kSuccessWithData;
-        }
-        else
-        {
+        } else {
             ans = kFailedSocketClosed;
         }
-    }        
-    else
-    {
+    } else {
         ans = kFailedNoBufferSpace;
     }
+
     return ans;
 }
 
 
-bool plBufferedSocketReader::GetBlock(char * buf, int buflen)
+bool plBufferedSocketReader::GetBlock(char* buf, int buflen)
 {
     int dataAvailable = FastAmountBuffered();
     int maxRead = buflen;
-    if(maxRead > dataAvailable)
-        maxRead = dataAvailable;
 
-    if (maxRead==0)
+    if (maxRead > dataAvailable) {
+        maxRead = dataAvailable;
+    }
+
+    if (maxRead == 0) {
         return false;
-    
-    char * wrk = FastGetBufferStart();
-    memcpy(buf,FastGetBufferStart(),maxRead);
+    }
+
+    char* wrk = FastGetBufferStart();
+    memcpy(buf, FastGetBufferStart(), maxRead);
 
     return true;
 }
 
-bool plBufferedSocketReader::GetString(char * buf, int buflen, char * termChars)
+bool plBufferedSocketReader::GetString(char* buf, int buflen, char* termChars)
 {
     bool ans = false;
     int dataAvailable = FastAmountBuffered();
     int maxRead = buflen;
-    if(maxRead > dataAvailable)
+
+    if (maxRead > dataAvailable) {
         maxRead = dataAvailable;
-    
-    char * wrk = FastGetBufferStart();
-    for(int i=0; i<maxRead; i++)
-    {
-        if(strchr(termChars,wrk[i])!=0)
-        {
-            memcpy(buf,wrk,i);
+    }
+
+    char* wrk = FastGetBufferStart();
+
+    for (int i = 0; i < maxRead; i++) {
+        if (strchr(termChars, wrk[i]) != 0) {
+            memcpy(buf, wrk, i);
             buf[i] = '\0';
-            fStartPos += i+1;                
+            fStartPos += i + 1;
             Compress();
             ans = true;
             break;
-        }            
+        }
     }
+
     return ans;
 }
 
-bool plBufferedSocketReader::GetStringInPlace(char ** buf, char * termChars)
+bool plBufferedSocketReader::GetStringInPlace(char** buf, char* termChars)
 {
     bool ans = false;
     int dataAvailable = FastAmountBuffered();
-    
+
     *buf = FastGetBufferStart();
-    for(int i=0; i<dataAvailable; i++)
-    {
-        if(strchr(termChars,(*buf)[i])!=0)
-        {
+
+    for (int i = 0; i < dataAvailable; i++) {
+        if (strchr(termChars, (*buf)[i]) != 0) {
             (*buf)[i] = '\0';
-            fStartPos += i+1;                
+            fStartPos += i + 1;
             Compress();
             ans = true;
             break;
-        }            
+        }
     }
+
     return ans;
 }
 

@@ -46,26 +46,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnModifier/plConditionalObject.h"
 #include "hsTemplates.h"
 
-class plORConditionalObject : public plConditionalObject
-{
+class plORConditionalObject : public plConditionalObject {
 protected:
     hsTArray<plConditionalObject*>  fChildren;
 
 public:
-    
+
     plORConditionalObject();
     ~plORConditionalObject();
-    
-    CLASSNAME_REGISTER( plORConditionalObject );
-    GETINTERFACE_ANY( plORConditionalObject, plConditionalObject );
-    
+
+    CLASSNAME_REGISTER(plORConditionalObject);
+    GETINTERFACE_ANY(plORConditionalObject, plConditionalObject);
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    virtual bool Satisfied(); 
+    virtual bool Satisfied();
 
     virtual bool MsgReceive(plMessage* msg);
-    void Evaluate(){;}
+    void Evaluate() {
+        ;
+    }
     void Reset();
 
     virtual void SetLogicMod(plLogicModBase* pMod);

@@ -43,34 +43,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plSDL.h"
 #include "pnNetCommon/plNetApp.h"
 
-const uint8_t plStateDescriptor::kVersion=1;      // for Read/Write format
+const uint8_t plStateDescriptor::kVersion = 1;    // for Read/Write format
 
 /////////////////////////////////////////////////////////////////////////////////
 // STATE DESC
 /////////////////////////////////////////////////////////////////////////////////
 
-plStateDescriptor::~plStateDescriptor() 
-{ 
+plStateDescriptor::~plStateDescriptor()
+{
     IDeInit();
 }
 
 void plStateDescriptor::IDeInit()
 {
     int i;
-    for(i=0;i<fVarsList.size();i++)
+
+    for (i = 0; i < fVarsList.size(); i++) {
         delete fVarsList[i];
+    }
+
     fVarsList.clear();
 }
 
 plVarDescriptor* plStateDescriptor::FindVar(const plString& name, int* idx) const
 {
     VarsList::const_iterator it;
-    for(it=fVarsList.begin(); it != fVarsList.end(); it++)
-    {
-        if (!(*it)->GetName().CompareI(name))
-        {
-            if (idx)
-                *idx = it-fVarsList.begin();
+
+    for (it = fVarsList.begin(); it != fVarsList.end(); it++) {
+        if (!(*it)->GetName().CompareI(name)) {
+            if (idx) {
+                *idx = it - fVarsList.begin();
+            }
+
             return *it;
         }
     }
@@ -81,13 +85,13 @@ plVarDescriptor* plStateDescriptor::FindVar(const plString& name, int* idx) cons
 
 //
 // Usage: The GameServer reads and write state descriptors along with each saved game
-// 
+//
 bool plStateDescriptor::Read(hsStream* s)
 {
     uint8_t rwVersion;
     s->ReadLE(&rwVersion);
-    if (rwVersion != kVersion)
-    {
+
+    if (rwVersion != kVersion) {
         plNetApp::StaticWarningMsg("StateDescriptor Read/Write version mismatch, mine %d, read %d", kVersion, rwVersion);
         return false;
     }
@@ -96,47 +100,52 @@ bool plStateDescriptor::Read(hsStream* s)
 
     fName = s->ReadSafeString_TEMP();
 
-    uint16_t version=s->ReadLE16();
-    fVersion=version;
+    uint16_t version = s->ReadLE16();
+    fVersion = version;
 
-    uint16_t numVars=s->ReadLE16();
+    uint16_t numVars = s->ReadLE16();
     fVarsList.reserve(numVars);
 
     int i;
-    for(i=0;i<numVars; i++)
-    {
-        uint8_t SDVar=s->ReadByte();      
+
+    for (i = 0; i < numVars; i++) {
+        uint8_t SDVar = s->ReadByte();
         plVarDescriptor* var = nil;
-        if (SDVar)
+
+        if (SDVar) {
             var = new plSDVarDescriptor;
-        else
+        } else {
             var = new plSimpleVarDescriptor;
-        if (var->Read(s))
+        }
+
+        if (var->Read(s)) {
             fVarsList.push_back(var);
-        else
+        } else {
             return false;
+        }
     }
+
     return true;
 }
 
 //
 // Usage: The GameServer reads and write state descriptors alon with each saved game
-// 
+//
 void plStateDescriptor::Write(hsStream* s) const
 {
     s->WriteLE(kVersion);
-    
+
     s->WriteSafeString(fName);
 
-    uint16_t version=fVersion;
+    uint16_t version = fVersion;
     s->WriteLE(version);
 
-    uint16_t numVars=fVarsList.size();
+    uint16_t numVars = fVarsList.size();
     s->WriteLE(numVars);
 
     VarsList::const_iterator it;
-    for(it=fVarsList.begin(); it!=fVarsList.end(); it++)
-    {
+
+    for (it = fVarsList.begin(); it != fVarsList.end(); it++) {
         uint8_t SDVar = ((*it)->GetAsSDVarDescriptor() != nil);
         s->WriteByte(SDVar);
         (*it)->Write(s);

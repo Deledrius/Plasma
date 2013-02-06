@@ -61,55 +61,54 @@ class DTLPBAccessor;
 
 ClassDesc2* GetDynamicTextLayerDesc();
 
-extern TCHAR *GetString(int id);
+extern TCHAR* GetString(int id);
 extern HINSTANCE hInstance;
 
 
 //// Class Definition /////////////////////////////////////////////////////////
 
-class plDynamicTextLayer : public plPlasmaMAXLayer
-{
+class plDynamicTextLayer : public plPlasmaMAXLayer {
 protected:
     friend class DTLPBAccessor;
 
     // Parameter block
-    IParamBlock2    *fBitmapPB;
-    UVGen           *fUVGen;
+    IParamBlock2*    fBitmapPB;
+    UVGen*           fUVGen;
 
-    IMtlParams      *fIMtlParams;
+    IMtlParams*      fIMtlParams;
 
-    TexHandle *fTexHandle;
+    TexHandle* fTexHandle;
     TimeValue fTexTime;
 
     Interval        fIValid;
-   
-    Bitmap          *fInitBitmap;
 
-    static ParamDlg *fUVGenDlg;
+    Bitmap*          fInitBitmap;
+
+    static ParamDlg* fUVGenDlg;
 
     friend class DTLBitmapDlgProc;
 
 
 public:
     // Ref nums
-    enum
-    {
+    enum {
         kRefUVGen,
         kRefBitmap,
     };
 
     // Block ID's
-    enum
-    {
+    enum {
         kBlkBitmap,
     };
 
     plDynamicTextLayer();
     ~plDynamicTextLayer();
-    void DeleteThis() { delete this; }      
+    void DeleteThis() {
+        delete this;
+    }
 
     //From MtlBase
-    ParamDlg* CreateParamDlg(HWND hwMtlEdit, IMtlParams *imp);
+    ParamDlg* CreateParamDlg(HWND hwMtlEdit, IMtlParams* imp);
     BOOL SetDlgThing(ParamDlg* dlg);
     void Update(TimeValue t, Interval& valid);
     void Reset();
@@ -122,43 +121,61 @@ public:
     Point3 EvalNormalPerturb(ShadeContext& sc);
 
     // For displaying textures in the viewport
-    BOOL SupportTexDisplay() { return TRUE; }
+    BOOL SupportTexDisplay() {
+        return TRUE;
+    }
     void ActivateTexDisplay(BOOL onoff);
-    BITMAPINFO *GetVPDisplayDIB(TimeValue t, TexHandleMaker& thmaker, Interval &valid, BOOL mono=FALSE, int forceW=0, int forceH=0);
+    BITMAPINFO* GetVPDisplayDIB(TimeValue t, TexHandleMaker& thmaker, Interval& valid, BOOL mono = FALSE, int forceW = 0, int forceH = 0);
     DWORD GetActiveTexHandle(TimeValue t, TexHandleMaker& thmaker);
 protected:
     void IChanged();
     void IDiscardTexHandle();
 
 public:
-    void GetUVTransform(Matrix3 &uvtrans) { fUVGen->GetUVTransform(uvtrans); }
-    int GetTextureTiling() { return  fUVGen->GetTextureTiling(); }
-    int GetUVWSource() { return fUVGen->GetUVWSource(); }
-    virtual int GetMapChannel () { return fUVGen->GetMapChannel(); }    // only relevant if above returns UVWSRC_EXPLICIT
-    UVGen *GetTheUVGen() { return fUVGen; }
-    
+    void GetUVTransform(Matrix3& uvtrans) {
+        fUVGen->GetUVTransform(uvtrans);
+    }
+    int GetTextureTiling() {
+        return  fUVGen->GetTextureTiling();
+    }
+    int GetUVWSource() {
+        return fUVGen->GetUVWSource();
+    }
+    virtual int GetMapChannel() {
+        return fUVGen->GetMapChannel();    // only relevant if above returns UVWSRC_EXPLICIT
+    }
+    UVGen* GetTheUVGen() {
+        return fUVGen;
+    }
+
     //TODO: Return anim index to reference index
-    int SubNumToRefNum(int subNum) { return subNum; }
-    
-    
+    int SubNumToRefNum(int subNum) {
+        return subNum;
+    }
+
+
     // Loading/Saving
-    IOResult Load(ILoad *iload);
-    IOResult Save(ISave *isave);
+    IOResult Load(ILoad* iload);
+    IOResult Save(ISave* isave);
 
     //From Animatable
-    Class_ID ClassID() { return DYN_TEXT_LAYER_CLASS_ID; }      
-    SClass_ID SuperClassID() { return TEXMAP_CLASS_ID; }
+    Class_ID ClassID() {
+        return DYN_TEXT_LAYER_CLASS_ID;
+    }
+    SClass_ID SuperClassID() {
+        return TEXMAP_CLASS_ID;
+    }
     void GetClassName(TSTR& s);
 
-    RefTargetHandle Clone( RemapDir &remap );
-    RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, 
-        PartID& partID,  RefMessage message);
+    RefTargetHandle Clone(RemapDir& remap);
+    RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
+                               PartID& partID,  RefMessage message);
 
     int NumSubs();
-    Animatable* SubAnim(int i); 
+    Animatable* SubAnim(int i);
     TSTR SubAnimName(int i);
 
-    // TODO: Maintain the number or references here 
+    // TODO: Maintain the number or references here
     int NumRefs();
     RefTargetHandle GetReference(int i);
     void SetReference(int i, RefTargetHandle rtarg);
@@ -167,21 +184,19 @@ public:
     IParamBlock2* GetParamBlock(int i); // return i'th ParamBlock
     IParamBlock2* GetParamBlockByID(BlockID id); // return id'd ParamBlock
 
-    const char *GetTextureName( int which );
+    const char* GetTextureName(int which);
     virtual Bitmap* GetBitmap(TimeValue t);
 
 
     /// ParamBlock accessors
-    enum
-    {
+    enum {
         kScalingAny,
         kScalingHalf,
         kScalingNone
     };
 
     // Param ID's
-    enum
-    {
+    enum {
         kBmpExportWidth,
         kBmpExportHeight,
         kBmpExportLastWidth,        // Annoying fields, these two, but they're necessary
@@ -210,17 +225,23 @@ public:
         kBmpIncludeAlphaChannel
     };
 
-        // Pure virtual accessors for the various bitmap related elements
-        virtual Bitmap *GetMaxBitmap(int index = 0) { return fInitBitmap; }
-        virtual PBBitmap *GetPBBitmap( int index = 0 );
-        virtual int     GetNumBitmaps( void ) { return 1; }
+    // Pure virtual accessors for the various bitmap related elements
+    virtual Bitmap* GetMaxBitmap(int index = 0) {
+        return fInitBitmap;
+    }
+    virtual PBBitmap* GetPBBitmap(int index = 0);
+    virtual int     GetNumBitmaps(void) {
+        return 1;
+    }
 
-        // Virtual function called by plBMSampler to get various things while sampling the layer's image
-        virtual bool    GetSamplerInfo( plBMSamplerData *samplerData );
+    // Virtual function called by plBMSampler to get various things while sampling the layer's image
+    virtual bool    GetSamplerInfo(plBMSamplerData* samplerData);
 
-    protected:
-        virtual void ISetMaxBitmap( Bitmap *bitmap, int index = 0 ) { fInitBitmap = bitmap; }
-        virtual void ISetPBBitmap( PBBitmap *pbbm, int index = 0 );
+protected:
+    virtual void ISetMaxBitmap(Bitmap* bitmap, int index = 0) {
+        fInitBitmap = bitmap;
+    }
+    virtual void ISetPBBitmap(PBBitmap* pbbm, int index = 0);
 };
 
 #endif // _plDynamicTextLayer_h

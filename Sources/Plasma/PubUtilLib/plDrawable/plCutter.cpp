@@ -89,8 +89,9 @@ void plCutter::Set(const hsPoint3& pos, const hsVector3& dir, const hsVector3& o
 
     fBackDir = dw;
 
-    if( flip )
+    if (flip) {
         du = -du;
+    }
 
     fDirU = du / fLengthU;
     fDirV = dv / -fLengthV;
@@ -112,13 +113,14 @@ void plCutter::Set(const hsPoint3& pos, const hsVector3& dir, const hsVector3& o
     hsMatrix44 l2w;
     l2w.NotIdentity();
     int i;
-    for( i = 0; i < 3; i++ )
-    {
+
+    for (i = 0; i < 3; i++) {
         l2w.fMap[i][0] = du[i];
         l2w.fMap[i][1] = dv[i];
         l2w.fMap[i][2] = dw[i];
         l2w.fMap[i][3] = pos[i];
     }
+
     l2w.fMap[3][0] = l2w.fMap[3][1] = l2w.fMap[3][2] = 0;
     l2w.fMap[3][3] = 1.f;
 
@@ -147,7 +149,7 @@ inline void plCutter::ISetPosNorm(float parm, const plCutoutVtx& inVtx, const pl
 }
 
 // A note on where the interpolation parameter is coming from.
-// 
+//
 // For the lower cases, we're looking for the point where Dot(pos, fDir) - fDist = 0.
 // Starting with p = outVtx + parm * (inVtx - outVtx) and Dot(p, fDir) == fDist, we get:
 // parm = (fDist - Dot(fDir,outVtx.fPos)) / (Dot(fDir, invVtx.fPos) - Dot(fDir, outVtx.fPos))
@@ -293,18 +295,18 @@ bool plCutter::IPolyClip(hsTArray<plCutoutVtx>& poly, const hsPoint3 vPos[]) con
 
     // Try an early out test.
     int i;
-    for( i = 0; i < 3; i++ )
-    {
+
+    for (i = 0; i < 3; i++) {
         int lo = 1;
         int hi = 1;
         int j;
-        for( j = 0; j < 3; j++ )
-        {
+
+        for (j = 0; j < 3; j++) {
             lo &= poly[j].fUVW[i] <= 0;
             hi &= poly[j].fUVW[i] >= 1.f;
         }
-        if( lo || hi )
-        {
+
+        if (lo || hi) {
             poly.SetCount(0);
             return false;
         }
@@ -312,208 +314,226 @@ bool plCutter::IPolyClip(hsTArray<plCutoutVtx>& poly, const hsPoint3 vPos[]) con
 
 
     // First trim to lower bounds.
-    for( i = 0; i < poly.GetCount(); i++ )
-    {
-        int j = i ? i-1 : poly.GetCount()-1;
+    for (i = 0; i < poly.GetCount(); i++) {
+        int j = i ? i - 1 : poly.GetCount() - 1;
 
         int test = ((poly[i].fUVW.fX < 0) << 1) | (poly[j].fUVW.fX < 0);
-        switch(test)
-        {
+
+        switch (test) {
         case 0:
             // Both in
             // Add this vert to outList
             accum.Append(poly[i]);
             break;
+
         case 1:
             // This in, last out
             // Add ClipVert(j, j-1) to outList
             // Add this vert to outList
             accum.Push();
-            ICutoutVtxLoU(poly[i], poly[j], accum[accum.GetCount()-1]);
+            ICutoutVtxLoU(poly[i], poly[j], accum[accum.GetCount() - 1]);
             accum.Append(poly[i]);
             break;
+
         case 2:
             // This out, last in
             // Add ClipVert(j-1, j) to outList
             accum.Push();
-            ICutoutVtxLoU(poly[j], poly[i], accum[accum.GetCount()-1]);
+            ICutoutVtxLoU(poly[j], poly[i], accum[accum.GetCount() - 1]);
             break;
+
         case 3:
             // Both out
             break;
         }
     }
+
     poly.Swap(accum);
     accum.SetCount(0);
 
-    for( i = 0; i < poly.GetCount(); i++ )
-    {
-        int j = i ? i-1 : poly.GetCount()-1;
+    for (i = 0; i < poly.GetCount(); i++) {
+        int j = i ? i - 1 : poly.GetCount() - 1;
 
         int test = ((poly[i].fUVW.fY < 0) << 1) | (poly[j].fUVW.fY < 0);
-        switch(test)
-        {
+
+        switch (test) {
         case 0:
             // Both in
             // Add this vert to outList
             accum.Append(poly[i]);
             break;
+
         case 1:
             // This in, last out
             // Add ClipVert(j, j-1) to outList
             // Add this vert to outList
             accum.Push();
-            ICutoutVtxLoV(poly[i], poly[j], accum[accum.GetCount()-1]);
+            ICutoutVtxLoV(poly[i], poly[j], accum[accum.GetCount() - 1]);
             accum.Append(poly[i]);
             break;
+
         case 2:
             // This out, last in
             // Add ClipVert(j-1, j) to outList
             accum.Push();
-            ICutoutVtxLoV(poly[j], poly[i], accum[accum.GetCount()-1]);
+            ICutoutVtxLoV(poly[j], poly[i], accum[accum.GetCount() - 1]);
             break;
+
         case 3:
             // Both out
             break;
         }
     }
+
     poly.Swap(accum);
     accum.SetCount(0);
 
-    for( i = 0; i < poly.GetCount(); i++ )
-    {
-        int j = i ? i-1 : poly.GetCount()-1;
+    for (i = 0; i < poly.GetCount(); i++) {
+        int j = i ? i - 1 : poly.GetCount() - 1;
 
         int test = ((poly[i].fUVW.fZ < 0) << 1) | (poly[j].fUVW.fZ < 0);
-        switch(test)
-        {
+
+        switch (test) {
         case 0:
             // Both in
             // Add this vert to outList
             accum.Append(poly[i]);
             break;
+
         case 1:
             // This in, last out
             // Add ClipVert(j, j-1) to outList
             // Add this vert to outList
             accum.Push();
-            ICutoutVtxLoW(poly[i], poly[j], accum[accum.GetCount()-1]);
+            ICutoutVtxLoW(poly[i], poly[j], accum[accum.GetCount() - 1]);
             accum.Append(poly[i]);
             break;
+
         case 2:
             // This out, last in
             // Add ClipVert(j-1, j) to outList
             accum.Push();
-            ICutoutVtxLoW(poly[j], poly[i], accum[accum.GetCount()-1]);
+            ICutoutVtxLoW(poly[j], poly[i], accum[accum.GetCount() - 1]);
             break;
+
         case 3:
             // Both out
             break;
         }
     }
+
     poly.Swap(accum);
     accum.SetCount(0);
 
     // Now upper bounds
-    for( i = 0; i < poly.GetCount(); i++ )
-    {
-        int j = i ? i-1 : poly.GetCount()-1;
+    for (i = 0; i < poly.GetCount(); i++) {
+        int j = i ? i - 1 : poly.GetCount() - 1;
 
         int test = ((poly[i].fUVW.fX > 1.f) << 1) | (poly[j].fUVW.fX > 1.f);
-        switch(test)
-        {
+
+        switch (test) {
         case 0:
             // Both in
             // Add this vert to outList
             accum.Append(poly[i]);
             break;
+
         case 1:
             // This in, last out
             // Add ClipVert(j, j-1) to outList
             // Add this vert to outList
             accum.Push();
-            ICutoutVtxHiU(poly[i], poly[j], accum[accum.GetCount()-1]);
+            ICutoutVtxHiU(poly[i], poly[j], accum[accum.GetCount() - 1]);
             accum.Append(poly[i]);
             break;
+
         case 2:
             // This out, last in
             // Add ClipVert(j-1, j) to outList
             accum.Push();
-            ICutoutVtxHiU(poly[j], poly[i], accum[accum.GetCount()-1]);
+            ICutoutVtxHiU(poly[j], poly[i], accum[accum.GetCount() - 1]);
             break;
+
         case 3:
             // Both out
             break;
         }
     }
+
     poly.Swap(accum);
     accum.SetCount(0);
 
-    for( i = 0; i < poly.GetCount(); i++ )
-    {
-        int j = i ? i-1 : poly.GetCount()-1;
+    for (i = 0; i < poly.GetCount(); i++) {
+        int j = i ? i - 1 : poly.GetCount() - 1;
 
         int test = ((poly[i].fUVW.fY > 1.f) << 1) | (poly[j].fUVW.fY > 1.f);
-        switch(test)
-        {
+
+        switch (test) {
         case 0:
             // Both in
             // Add this vert to outList
             accum.Append(poly[i]);
             break;
+
         case 1:
             // This in, last out
             // Add ClipVert(j, j-1) to outList
             // Add this vert to outList
             accum.Push();
-            ICutoutVtxHiV(poly[i], poly[j], accum[accum.GetCount()-1]);
+            ICutoutVtxHiV(poly[i], poly[j], accum[accum.GetCount() - 1]);
             accum.Append(poly[i]);
             break;
+
         case 2:
             // This out, last in
             // Add ClipVert(j-1, j) to outList
             accum.Push();
-            ICutoutVtxHiV(poly[j], poly[i], accum[accum.GetCount()-1]);
+            ICutoutVtxHiV(poly[j], poly[i], accum[accum.GetCount() - 1]);
             break;
+
         case 3:
             // Both out
             break;
         }
     }
+
     poly.Swap(accum);
     accum.SetCount(0);
 
-    for( i = 0; i < poly.GetCount(); i++ )
-    {
-        int j = i ? i-1 : poly.GetCount()-1;
+    for (i = 0; i < poly.GetCount(); i++) {
+        int j = i ? i - 1 : poly.GetCount() - 1;
 
         int test = ((poly[i].fUVW.fZ > 1.f) << 1) | (poly[j].fUVW.fZ > 1.f);
-        switch(test)
-        {
+
+        switch (test) {
         case 0:
             // Both in
             // Add this vert to outList
             accum.Append(poly[i]);
             break;
+
         case 1:
             // This in, last out
             // Add ClipVert(j, j-1) to outList
             // Add this vert to outList
             accum.Push();
-            ICutoutVtxHiW(poly[i], poly[j], accum[accum.GetCount()-1]);
+            ICutoutVtxHiW(poly[i], poly[j], accum[accum.GetCount() - 1]);
             accum.Append(poly[i]);
             break;
+
         case 2:
             // This out, last in
             // Add ClipVert(j-1, j) to outList
             accum.Push();
-            ICutoutVtxHiW(poly[j], poly[i], accum[accum.GetCount()-1]);
+            ICutoutVtxHiW(poly[j], poly[i], accum[accum.GetCount() - 1]);
             break;
+
         case 3:
             // Both out
             break;
         }
     }
+
     poly.Swap(accum);
     accum.SetCount(0);
 
@@ -531,135 +551,147 @@ bool plCutter::IFindHitPoint(const hsTArray<plCutoutVtx>& inPoly, plCutoutHit& h
 
     // First trim to lower bounds.
     int i;
-    for( i = 0; i < poly.GetCount(); i++ )
-    {
-        int j = i ? i-1 : poly.GetCount()-1;
+
+    for (i = 0; i < poly.GetCount(); i++) {
+        int j = i ? i - 1 : poly.GetCount() - 1;
 
         int test = ((poly[i].fUVW.fX < 0.5f) << 1) | (poly[j].fUVW.fX < 0.5f);
-        switch(test)
-        {
+
+        switch (test) {
         case 0:
             // Both in
             // Add this vert to outList
             accum.Append(poly[i]);
             break;
+
         case 1:
             // This in, last out
             // Add ClipVert(j, j-1) to outList
             // Add this vert to outList
             accum.Push();
-            ICutoutVtxMidU(poly[i], poly[j], accum[accum.GetCount()-1]);
+            ICutoutVtxMidU(poly[i], poly[j], accum[accum.GetCount() - 1]);
             accum.Append(poly[i]);
             break;
+
         case 2:
             // This out, last in
             // Add ClipVert(j-1, j) to outList
             accum.Push();
-            ICutoutVtxMidU(poly[j], poly[i], accum[accum.GetCount()-1]);
+            ICutoutVtxMidU(poly[j], poly[i], accum[accum.GetCount() - 1]);
             break;
+
         case 3:
             // Both out
             break;
         }
     }
+
     poly.Swap(accum);
     accum.SetCount(0);
 
-    for( i = 0; i < poly.GetCount(); i++ )
-    {
-        int j = i ? i-1 : poly.GetCount()-1;
+    for (i = 0; i < poly.GetCount(); i++) {
+        int j = i ? i - 1 : poly.GetCount() - 1;
 
         int test = ((poly[i].fUVW.fY < 0.5f) << 1) | (poly[j].fUVW.fY < 0.5f);
-        switch(test)
-        {
+
+        switch (test) {
         case 0:
             // Both in
             // Add this vert to outList
             accum.Append(poly[i]);
             break;
+
         case 1:
             // This in, last out
             // Add ClipVert(j, j-1) to outList
             // Add this vert to outList
             accum.Push();
-            ICutoutVtxMidV(poly[i], poly[j], accum[accum.GetCount()-1]);
+            ICutoutVtxMidV(poly[i], poly[j], accum[accum.GetCount() - 1]);
             accum.Append(poly[i]);
             break;
+
         case 2:
             // This out, last in
             // Add ClipVert(j-1, j) to outList
             accum.Push();
-            ICutoutVtxMidV(poly[j], poly[i], accum[accum.GetCount()-1]);
+            ICutoutVtxMidV(poly[j], poly[i], accum[accum.GetCount() - 1]);
             break;
+
         case 3:
             // Both out
             break;
         }
     }
+
     poly.Swap(accum);
     accum.SetCount(0);
 
     // Now upper bounds
-    for( i = 0; i < poly.GetCount(); i++ )
-    {
-        int j = i ? i-1 : poly.GetCount()-1;
+    for (i = 0; i < poly.GetCount(); i++) {
+        int j = i ? i - 1 : poly.GetCount() - 1;
 
         int test = ((poly[i].fUVW.fX > 0.5f) << 1) | (poly[j].fUVW.fX > 0.5f);
-        switch(test)
-        {
+
+        switch (test) {
         case 0:
             // Both in
             // Add this vert to outList
             accum.Append(poly[i]);
             break;
+
         case 1:
             // This in, last out
             // Add ClipVert(j, j-1) to outList
             // Add this vert to outList
             accum.Push();
-            ICutoutVtxMidU(poly[i], poly[j], accum[accum.GetCount()-1]);
+            ICutoutVtxMidU(poly[i], poly[j], accum[accum.GetCount() - 1]);
             accum.Append(poly[i]);
             break;
+
         case 2:
             // This out, last in
             // Add ClipVert(j-1, j) to outList
             accum.Push();
-            ICutoutVtxMidU(poly[j], poly[i], accum[accum.GetCount()-1]);
+            ICutoutVtxMidU(poly[j], poly[i], accum[accum.GetCount() - 1]);
             break;
+
         case 3:
             // Both out
             break;
         }
     }
+
     poly.Swap(accum);
     accum.SetCount(0);
 
-    for( i = 0; i < poly.GetCount(); i++ )
-    {
-        int j = i ? i-1 : poly.GetCount()-1;
+    for (i = 0; i < poly.GetCount(); i++) {
+        int j = i ? i - 1 : poly.GetCount() - 1;
 
         int test = ((poly[i].fUVW.fY > 0.5f) << 1) | (poly[j].fUVW.fY > 0.5f);
-        switch(test)
-        {
+
+        switch (test) {
         case 0:
             // Both in
             // Add this vert to outList
             accum.Append(poly[i]);
             break;
+
         case 1:
             // This in, last out
             // Add ClipVert(j, j-1) to outList
             // Add this vert to outList
             accum.Push();
-            ICutoutVtxMidV(poly[i], poly[j], accum[accum.GetCount()-1]);
+            ICutoutVtxMidV(poly[i], poly[j], accum[accum.GetCount() - 1]);
             accum.Append(poly[i]);
             break;
+
         case 2:
             // This out, last in
             // Add ClipVert(j-1, j) to outList
             accum.Push();
-            ICutoutVtxMidV(poly[j], poly[i], accum[accum.GetCount()-1]);
+            ICutoutVtxMidV(poly[j], poly[i], accum[accum.GetCount() - 1]);
             break;
+
         case 3:
             // Both out
             break;
@@ -669,11 +701,13 @@ bool plCutter::IFindHitPoint(const hsTArray<plCutoutVtx>& inPoly, plCutoutHit& h
     // At this point, if we hit, all verts should be identical, interpolated
     // into the center of the cutter.
     // No verts means no hit.
-    if( !accum.GetCount() )
+    if (!accum.GetCount()) {
         return false;
+    }
 
-    if( accum[0].fNorm.InnerProduct(fDirW) < 0 )
+    if (accum[0].fNorm.InnerProduct(fDirW) < 0) {
         return false;
+    }
 
     hit.fPos = accum[0].fPos;
     hit.fNorm = accum[0].fNorm;
@@ -687,8 +721,8 @@ bool plCutter::FindHitPoints(const hsTArray<plCutoutPoly>& src, hsTArray<plCutou
     hits.SetCount(0);
 
     int iPoly;
-    for( iPoly = 0; iPoly < src.GetCount(); iPoly++ )
-    {
+
+    for (iPoly = 0; iPoly < src.GetCount(); iPoly++) {
         bool loU = false;
         bool hiU = false;
         bool loV = false;
@@ -696,23 +730,29 @@ bool plCutter::FindHitPoints(const hsTArray<plCutoutPoly>& src, hsTArray<plCutou
 
         const plCutoutPoly& poly = src[iPoly];
         int iv;
-        for( iv = 0; iv < poly.fVerts.GetCount(); iv++ )
-        {
-            const hsPoint3& uvw = poly.fVerts[iv].fUVW;
-            if( uvw.fX < 0.5f )
-                loU = true;
-            else
-                hiU = true;
-            if( uvw.fY < 0.5f )
-                loV = true;
-            else
-                hiV = true;
 
-            if( loU && hiU && loV && hiV )
-            {
+        for (iv = 0; iv < poly.fVerts.GetCount(); iv++) {
+            const hsPoint3& uvw = poly.fVerts[iv].fUVW;
+
+            if (uvw.fX < 0.5f) {
+                loU = true;
+            } else {
+                hiU = true;
+            }
+
+            if (uvw.fY < 0.5f) {
+                loV = true;
+            } else {
+                hiV = true;
+            }
+
+            if (loU && hiU && loV && hiV) {
                 plCutoutHit hit;
-                if( IFindHitPoint(poly.fVerts, hit) )
+
+                if (IFindHitPoint(poly.fVerts, hit)) {
                     hits.Append(hit);
+                }
+
                 break;
             }
         }
@@ -723,12 +763,13 @@ bool plCutter::FindHitPoints(const hsTArray<plCutoutPoly>& src, hsTArray<plCutou
 
 bool plCutter::FindHitPointsConstHeight(const hsTArray<plCutoutPoly>& src, hsTArray<plCutoutHit>& hits, float height) const
 {
-    if( FindHitPoints(src, hits) )
-    {
+    if (FindHitPoints(src, hits)) {
         int i;
-        for( i = 0; i < hits.GetCount(); i++ )
+
+        for (i = 0; i < hits.GetCount(); i++) {
             hits[i].fPos.fZ = height;
-        
+        }
+
         return true;
     }
 
@@ -744,9 +785,9 @@ void plCutter::ICutoutTransformedConstHeight(plAccessSpan& src, hsTArray<plCutou
     bool baseHasAlpha = 0 != (src.GetMaterial()->GetLayer(0)->GetBlendFlags() & hsGMatState::kBlendAlpha);
 
     plAccTriIterator tri(&src.AccessTri());
+
     // For each tri
-    for( tri.Begin(); tri.More(); tri.Advance() )
-    {
+    for (tri.Begin(); tri.More(); tri.Advance()) {
         // Do a polygon clip of tri to box
         static hsTArray<plCutoutVtx> poly;
         poly.SetCount(3);
@@ -764,8 +805,7 @@ void plCutter::ICutoutTransformedConstHeight(plAccessSpan& src, hsTArray<plCutou
         poly[2].Init(l2w * hsPoint3(tri.Position(2).fX, tri.Position(2).fY, tri.Position(2).fZ), l2wNorm * up, tri.DiffuseRGBA(2));
 
         // If we got a polygon
-        if( IPolyClip(poly, vPos) )
-        {
+        if (IPolyClip(poly, vPos)) {
             // tessalate the polygon into dst
             IConstruct(dst, poly, baseHasAlpha);
         }
@@ -784,9 +824,9 @@ void plCutter::ICutoutTransformed(plAccessSpan& src, hsTArray<plCutoutPoly>& dst
     bool baseHasAlpha = 0 != (src.GetMaterial()->GetLayer(0)->GetBlendFlags() & hsGMatState::kBlendAlpha);
 
     plAccTriIterator tri(&src.AccessTri());
+
     // For each tri
-    for( tri.Begin(); tri.More(); tri.Advance() )
-    {
+    for (tri.Begin(); tri.More(); tri.Advance()) {
         // Do a polygon clip of tri to box
         static hsTArray<plCutoutVtx> poly;
         poly.SetCount(3);
@@ -801,8 +841,7 @@ void plCutter::ICutoutTransformed(plAccessSpan& src, hsTArray<plCutoutPoly>& dst
         poly[2].Init(vPos[2], l2wNorm * tri.Normal(2), tri.DiffuseRGBA(2));
 
         // If we got a polygon
-        if( IPolyClip(poly, vPos) )
-        {
+        if (IPolyClip(poly, vPos)) {
             // tessalate the polygon into dst
             IConstruct(dst, poly, baseHasAlpha);
         }
@@ -811,8 +850,7 @@ void plCutter::ICutoutTransformed(plAccessSpan& src, hsTArray<plCutoutPoly>& dst
 
 void plCutter::ICutoutConstHeight(plAccessSpan& src, hsTArray<plCutoutPoly>& dst) const
 {
-    if( !(src.GetLocalToWorld().fFlags & hsMatrix44::kIsIdent) )
-    {
+    if (!(src.GetLocalToWorld().fFlags & hsMatrix44::kIsIdent)) {
         ICutoutTransformedConstHeight(src, dst);
         return;
     }
@@ -820,9 +858,9 @@ void plCutter::ICutoutConstHeight(plAccessSpan& src, hsTArray<plCutoutPoly>& dst
     bool baseHasAlpha = 0 != (src.GetMaterial()->GetLayer(0)->GetBlendFlags() & hsGMatState::kBlendAlpha);
 
     plAccTriIterator tri(&src.AccessTri());
+
     // For each tri
-    for( tri.Begin(); tri.More(); tri.Advance() )
-    {
+    for (tri.Begin(); tri.More(); tri.Advance()) {
         // Do a polygon clip of tri to box
         static hsTArray<plCutoutVtx> poly;
         poly.SetCount(3);
@@ -839,8 +877,7 @@ void plCutter::ICutoutConstHeight(plAccessSpan& src, hsTArray<plCutoutPoly>& dst
         poly[2].Init(hsPoint3(tri.Position(2).fX, tri.Position(2).fY, tri.Position(2).fZ), up, tri.DiffuseRGBA(2));
 
         // If we got a polygon
-        if( IPolyClip(poly, vPos) )
-        {
+        if (IPolyClip(poly, vPos)) {
             // tessalate the polygon into dst
             IConstruct(dst, poly, baseHasAlpha);
         }
@@ -850,17 +887,16 @@ void plCutter::ICutoutConstHeight(plAccessSpan& src, hsTArray<plCutoutPoly>& dst
 // Cutout
 void plCutter::Cutout(plAccessSpan& src, hsTArray<plCutoutPoly>& dst) const
 {
-    if( !src.HasAccessTri() )
+    if (!src.HasAccessTri()) {
         return;
+    }
 
-    if( src.HasWaterHeight() )
-    {
+    if (src.HasWaterHeight()) {
         ICutoutConstHeight(src, dst);
         return;
     }
 
-    if( !(src.GetLocalToWorld().fFlags & hsMatrix44::kIsIdent) )
-    {
+    if (!(src.GetLocalToWorld().fFlags & hsMatrix44::kIsIdent)) {
         ICutoutTransformed(src, dst);
         return;
     }
@@ -868,9 +904,9 @@ void plCutter::Cutout(plAccessSpan& src, hsTArray<plCutoutPoly>& dst) const
     bool baseHasAlpha = 0 != (src.GetMaterial()->GetLayer(0)->GetBlendFlags() & hsGMatState::kBlendAlpha);
 
     plAccTriIterator tri(&src.AccessTri());
+
     // For each tri
-    for( tri.Begin(); tri.More(); tri.Advance() )
-    {
+    for (tri.Begin(); tri.More(); tri.Advance()) {
         // Do a polygon clip of tri to box
         static hsTArray<plCutoutVtx> poly;
         poly.SetCount(3);
@@ -885,8 +921,7 @@ void plCutter::Cutout(plAccessSpan& src, hsTArray<plCutoutPoly>& dst) const
         poly[2].Init(vPos[2], tri.Normal(2), tri.DiffuseRGBA(2));
 
         // If we got a polygon
-        if( IPolyClip(poly, vPos) )
-        {
+        if (IPolyClip(poly, vPos)) {
             // tessalate the polygon into dst
             IConstruct(dst, poly, baseHasAlpha);
         }
@@ -912,14 +947,21 @@ bool plCutter::CutoutGrid(int nWid, int nLen, plFlatGridMesh& grid) const
 
 bool plCutter::MakeGrid(int nWid, int nLen, const hsPoint3& center, const hsVector3& halfU, const hsVector3& halfV, plFlatGridMesh& grid)
 {
-    if( nWid < 3 )
+    if (nWid < 3) {
         nWid = 3;
-    if( !(nWid & 0x1) )
+    }
+
+    if (!(nWid & 0x1)) {
         nWid++;
-    if( nLen < 3 )
+    }
+
+    if (nLen < 3) {
         nLen = 3;
-    if( !(nLen & 0x1) )
+    }
+
+    if (!(nLen & 0x1)) {
         nLen++;
+    }
 
     grid.fVerts.SetCount(nWid * nLen);
 
@@ -933,8 +975,8 @@ bool plCutter::MakeGrid(int nWid, int nLen, const hsPoint3& center, const hsVect
     corner += -dux;
     corner += -dvx;
 
-    float sWid = 1.f / float(nWid-1);
-    float sLen = 1.f / float(nLen-1);
+    float sWid = 1.f / float(nWid - 1);
+    float sLen = 1.f / float(nLen - 1);
 
     dux *= 2.f * sWid;
     dvx *= 2.f * sLen;
@@ -942,11 +984,11 @@ bool plCutter::MakeGrid(int nWid, int nLen, const hsPoint3& center, const hsVect
     float du = sWid;
     float dv = sLen;
     int j;
-    for( j = 0; j < nLen; j++ )
-    {
+
+    for (j = 0; j < nLen; j++) {
         int i;
-        for( i = 0; i < nWid; i++ )
-        {
+
+        for (i = 0; i < nWid; i++) {
             plCutoutMiniVtx& vtx = grid.fVerts[j * nWid + i];
 
             vtx.fPos = corner;
@@ -960,28 +1002,28 @@ bool plCutter::MakeGrid(int nWid, int nLen, const hsPoint3& center, const hsVect
     }
 
     int idx = 0;
-    grid.fIdx.SetCount(2 * (nWid-1) * (nLen-1) * 3);
-    for( j = 1; j < nLen; )
-    {
-        int i;
-        for( i = 1; i < nWid; )
-        {
-            grid.fIdx[idx++] =  j    * nWid + (i-1);
-            grid.fIdx[idx++] =  j    * nWid + i;
-            grid.fIdx[idx++] = (j-1) * nWid + (i-1);
+    grid.fIdx.SetCount(2 * (nWid - 1) * (nLen - 1) * 3);
 
-            grid.fIdx[idx++] = (j-1) * nWid + (i-1);
+    for (j = 1; j < nLen;) {
+        int i;
+
+        for (i = 1; i < nWid;) {
+            grid.fIdx[idx++] =  j    * nWid + (i - 1);
             grid.fIdx[idx++] =  j    * nWid + i;
-            grid.fIdx[idx++] = (j-1) * nWid + i;
+            grid.fIdx[idx++] = (j - 1) * nWid + (i - 1);
+
+            grid.fIdx[idx++] = (j - 1) * nWid + (i - 1);
+            grid.fIdx[idx++] =  j    * nWid + i;
+            grid.fIdx[idx++] = (j - 1) * nWid + i;
 
             i++;
 
-            grid.fIdx[idx++] = (j-1) * nWid + (i-1);
-            grid.fIdx[idx++] =  j    * nWid + (i-1);
-            grid.fIdx[idx++] = (j-1) * nWid + i;
+            grid.fIdx[idx++] = (j - 1) * nWid + (i - 1);
+            grid.fIdx[idx++] =  j    * nWid + (i - 1);
+            grid.fIdx[idx++] = (j - 1) * nWid + i;
 
-            grid.fIdx[idx++] = (j-1) * nWid + i;
-            grid.fIdx[idx++] =  j    * nWid + (i-1);
+            grid.fIdx[idx++] = (j - 1) * nWid + i;
+            grid.fIdx[idx++] =  j    * nWid + (i - 1);
             grid.fIdx[idx++] =  j    * nWid + i;
 
             i++;
@@ -989,29 +1031,28 @@ bool plCutter::MakeGrid(int nWid, int nLen, const hsPoint3& center, const hsVect
 
         j++;
 
-        for( i = 1; i < nWid; )
-        {
-            grid.fIdx[idx++] = (j-1) * nWid + (i-1);
-            grid.fIdx[idx++] =  j    * nWid + (i-1);
-            grid.fIdx[idx++] = (j-1) * nWid + i;
+        for (i = 1; i < nWid;) {
+            grid.fIdx[idx++] = (j - 1) * nWid + (i - 1);
+            grid.fIdx[idx++] =  j    * nWid + (i - 1);
+            grid.fIdx[idx++] = (j - 1) * nWid + i;
 
-            grid.fIdx[idx++] = (j-1) * nWid + i;
-            grid.fIdx[idx++] =  j    * nWid + (i-1);
+            grid.fIdx[idx++] = (j - 1) * nWid + i;
+            grid.fIdx[idx++] =  j    * nWid + (i - 1);
             grid.fIdx[idx++] =  j    * nWid + i;
 
             i++;
 
-            grid.fIdx[idx++] =  j    * nWid + (i-1);
+            grid.fIdx[idx++] =  j    * nWid + (i - 1);
             grid.fIdx[idx++] =  j    * nWid + i;
-            grid.fIdx[idx++] = (j-1) * nWid + (i-1);
+            grid.fIdx[idx++] = (j - 1) * nWid + (i - 1);
 
-            grid.fIdx[idx++] = (j-1) * nWid + (i-1);
+            grid.fIdx[idx++] = (j - 1) * nWid + (i - 1);
             grid.fIdx[idx++] =  j    * nWid + i;
-            grid.fIdx[idx++] = (j-1) * nWid + i;
+            grid.fIdx[idx++] = (j - 1) * nWid + i;
 
             i++;
         }
-        
+
         j++;
     }
 
@@ -1033,11 +1074,16 @@ void TestCutter(const plKey& key, const hsVector3& size, const hsPoint3& pos)
     cutter.Set(pos, dir, up);
 
     plSceneObject* so = plSceneObject::ConvertNoRef(key->ObjectIsLoaded());
-    if( !so )
+
+    if (!so) {
         return;
+    }
+
     const plDrawInterface* di = so->GetDrawInterface();
-    if( !di )
+
+    if (!di) {
         return;
+    }
 
     static plDrawableSpans* drawable = nil;
     bool newDrawable = !drawable;
@@ -1047,13 +1093,14 @@ void TestCutter(const plKey& key, const hsVector3& size, const hsPoint3& pos)
 
     hsTArray<plAccessSpan> src;
     plAccessGeometry::Instance()->OpenRO(di, src);
-    
-    if( !src.GetCount() )
+
+    if (!src.GetCount()) {
         return;
+    }
 
     int i;
-    for( i = 0; i < src.GetCount(); i++ )
-    {
+
+    for (i = 0; i < src.GetCount(); i++) {
 
         static hsTArray<plCutoutPoly> dst;
         dst.SetCount(0);
@@ -1063,38 +1110,39 @@ void TestCutter(const plKey& key, const hsVector3& size, const hsPoint3& pos)
         hsPoint3 corner;
         hsVector3 ax[3];
         cutter.GetWorldBounds().GetCorner(&corner);
-        cutter.GetWorldBounds().GetAxes(ax+0, ax+1, ax+2);
+        cutter.GetWorldBounds().GetAxes(ax + 0, ax + 1, ax + 2);
         int iAx = 0;
         int jAx = 1;
         dst.SetCount(6);
         int xx;
-        for( xx = 0; xx < 3; xx++ )
-        {
+
+        for (xx = 0; xx < 3; xx++) {
             dst[xx].fVerts.SetCount(4);
-            
+
             dst[xx].fVerts[0].fPos = corner;
-            dst[xx].fVerts[0].fNorm.Set(0,0,1.f);
-            dst[xx].fVerts[0].fUVW.Set(0,0,0);
+            dst[xx].fVerts[0].fNorm.Set(0, 0, 1.f);
+            dst[xx].fVerts[0].fUVW.Set(0, 0, 0);
 
             dst[xx].fVerts[1].fPos = corner;
             dst[xx].fVerts[1].fPos += ax[iAx];
-            dst[xx].fVerts[1].fNorm.Set(0,0,1.f);
-            dst[xx].fVerts[1].fUVW.Set(1,0,0);
+            dst[xx].fVerts[1].fNorm.Set(0, 0, 1.f);
+            dst[xx].fVerts[1].fUVW.Set(1, 0, 0);
 
             dst[xx].fVerts[2].fPos = corner;
             dst[xx].fVerts[2].fPos += ax[iAx];
             dst[xx].fVerts[2].fPos += ax[jAx];
-            dst[xx].fVerts[2].fNorm.Set(0,0,1.f);
-            dst[xx].fVerts[2].fUVW.Set(1.f,1.f,0);
+            dst[xx].fVerts[2].fNorm.Set(0, 0, 1.f);
+            dst[xx].fVerts[2].fUVW.Set(1.f, 1.f, 0);
 
             dst[xx].fVerts[3].fPos = corner;
             dst[xx].fVerts[3].fPos += ax[jAx];
-            dst[xx].fVerts[3].fNorm.Set(0,0,1.f);
-            dst[xx].fVerts[3].fUVW.Set(0,1.f,0);
+            dst[xx].fVerts[3].fNorm.Set(0, 0, 1.f);
+            dst[xx].fVerts[3].fUVW.Set(0, 1.f, 0);
 
             iAx++;
-            jAx = iAx > 1 ? 0 : iAx+1;
+            jAx = iAx > 1 ? 0 : iAx + 1;
         }
+
         corner += ax[0];
         corner += ax[1];
         corner += ax[2];
@@ -1103,33 +1151,34 @@ void TestCutter(const plKey& key, const hsVector3& size, const hsPoint3& pos)
         ax[2] = -ax[2];
         iAx = 0;
         jAx = 1;
-        for( xx = 3; xx < 6; xx++ )
-        {
+
+        for (xx = 3; xx < 6; xx++) {
             dst[xx].fVerts.SetCount(4);
-            
+
             dst[xx].fVerts[0].fPos = corner;
-            dst[xx].fVerts[0].fNorm.Set(0,0,1.f);
-            dst[xx].fVerts[0].fUVW.Set(0,0,0);
+            dst[xx].fVerts[0].fNorm.Set(0, 0, 1.f);
+            dst[xx].fVerts[0].fUVW.Set(0, 0, 0);
 
             dst[xx].fVerts[3].fPos = corner;
             dst[xx].fVerts[3].fPos += ax[iAx];
-            dst[xx].fVerts[3].fNorm.Set(0,0,1.f);
-            dst[xx].fVerts[3].fUVW.Set(1.f,0,0);
+            dst[xx].fVerts[3].fNorm.Set(0, 0, 1.f);
+            dst[xx].fVerts[3].fUVW.Set(1.f, 0, 0);
 
             dst[xx].fVerts[2].fPos = corner;
             dst[xx].fVerts[2].fPos += ax[iAx];
             dst[xx].fVerts[2].fPos += ax[jAx];
-            dst[xx].fVerts[2].fNorm.Set(0,0,1.f);
-            dst[xx].fVerts[2].fUVW.Set(1.f,1.f,0);
+            dst[xx].fVerts[2].fNorm.Set(0, 0, 1.f);
+            dst[xx].fVerts[2].fUVW.Set(1.f, 1.f, 0);
 
             dst[xx].fVerts[1].fPos = corner;
             dst[xx].fVerts[1].fPos += ax[jAx];
-            dst[xx].fVerts[1].fNorm.Set(0,0,1.f);
-            dst[xx].fVerts[1].fUVW.Set(0,1.f,0);
+            dst[xx].fVerts[1].fNorm.Set(0, 0, 1.f);
+            dst[xx].fVerts[1].fUVW.Set(0, 1.f, 0);
 
             iAx++;
-            jAx = iAx > 1 ? 0 : iAx+1;
+            jAx = iAx > 1 ? 0 : iAx + 1;
         }
+
         haveNormal = false;
 #endif
 
@@ -1138,16 +1187,17 @@ void TestCutter(const plKey& key, const hsVector3& size, const hsPoint3& pos)
         int numVerts = 0;
         int numTris = 0;
         int j;
-        for( j = 0; j < dst.GetCount(); j++ )
-        {
-            if( dst[j].fVerts.GetCount() )
-            {
+
+        for (j = 0; j < dst.GetCount(); j++) {
+            if (dst[j].fVerts.GetCount()) {
                 numVerts += dst[j].fVerts.GetCount();
-                numTris += dst[j].fVerts.GetCount()-2;
+                numTris += dst[j].fVerts.GetCount() - 2;
             }
         }
-        if( !numTris )
+
+        if (!numTris) {
             continue;
+        }
 
         hsTArray<hsPoint3> pos;
         pos.SetCount(numVerts);
@@ -1161,30 +1211,32 @@ void TestCutter(const plKey& key, const hsVector3& size, const hsPoint3& pos)
         int iPoly = 0;
         int iVert = 0;
         int iv;
-        for( iv = 0; iv < numVerts; iv++ )
-        {
+
+        for (iv = 0; iv < numVerts; iv++) {
             pos[iv] = dst[iPoly].fVerts[iVert].fPos;
             norm[iv] = dst[iPoly].fVerts[iVert].fNorm;
             uvw[iv] = dst[iPoly].fVerts[iVert].fUVW;
             col[iv] = dst[iPoly].fVerts[iVert].fColor;
 
-            float opac = uvw[iv].fZ < 0.25f 
-                ? uvw[iv].fZ * 4.f
-                : uvw[iv].fZ > 0.75f
-                    ? (1.f - uvw[iv].fZ) * 4.f
-                    : 1.f;
+            float opac = uvw[iv].fZ < 0.25f
+                         ? uvw[iv].fZ * 4.f
+                         : uvw[iv].fZ > 0.75f
+                         ? (1.f - uvw[iv].fZ) * 4.f
+                         : 1.f;
 
             opac *= norm[iv].fZ;
-            if( opac < 0 )
+
+            if (opac < 0) {
                 opac = 0;
+            }
 
-            if( dst[iPoly].fBaseHasAlpha )
+            if (dst[iPoly].fBaseHasAlpha) {
                 col[iv].a *= opac;
-            else
+            } else {
                 col[iv].a = opac;
+            }
 
-            if( ++iVert >= dst[iPoly].fVerts.GetCount() )
-            {
+            if (++iVert >= dst[iPoly].fVerts.GetCount()) {
                 iVert = 0;
                 iPoly++;
             }
@@ -1193,36 +1245,38 @@ void TestCutter(const plKey& key, const hsVector3& size, const hsPoint3& pos)
         hsTArray<uint16_t> idx;
 
         uint16_t base = 0;
-        for( j = 0; j < dst.GetCount(); j++ )
-        {
-            uint16_t next = base+1;
+
+        for (j = 0; j < dst.GetCount(); j++) {
+            uint16_t next = base + 1;
             int k;
-            for( k = 2; k < dst[j].fVerts.GetCount(); k++ )
-            {
+
+            for (k = 2; k < dst[j].fVerts.GetCount(); k++) {
                 idx.Append(base);
                 idx.Append(next++);
                 idx.Append(next);
             }
+
             base = ++next;
         }
 
-        drawable = plDrawableGenerator::GenerateDrawable( numVerts, pos.AcquireArray(), 
-                                                        haveNormal ? norm.AcquireArray() : nil, 
-                                                        uvw.AcquireArray(), 1, 
-                                                        col.AcquireArray(), 
-                                                        true, 
-                                                        nil,
-                                                        idx.GetCount(), idx.AcquireArray(), 
-                                                        src[i].GetMaterial(), 
-                                                        hsMatrix44::IdentityMatrix(), 
-                                                        true,
-                                                        &retIndex, 
-                                                        drawable);
+        drawable = plDrawableGenerator::GenerateDrawable(numVerts, pos.AcquireArray(),
+                   haveNormal ? norm.AcquireArray() : nil,
+                   uvw.AcquireArray(), 1,
+                   col.AcquireArray(),
+                   true,
+                   nil,
+                   idx.GetCount(), idx.AcquireArray(),
+                   src[i].GetMaterial(),
+                   hsMatrix44::IdentityMatrix(),
+                   true,
+                   &retIndex,
+                   drawable);
 
     }
 
-    if( drawable && newDrawable )
+    if (drawable && newDrawable) {
         drawable->SetSceneNode(so->GetSceneNode());
+    }
 
 }
 
@@ -1238,12 +1292,16 @@ void TestCutter2(const plKey& key, const hsVector3& size, const hsPoint3& pos, b
     cutter.Set(pos, dir, up, flip);
 
     plSceneObject* so = plSceneObject::ConvertNoRef(key->ObjectIsLoaded());
-    if( !so )
+
+    if (!so) {
         return;
+    }
 
     plSceneNode* node = plSceneNode::ConvertNoRef(so->GetSceneNode()->ObjectIsLoaded());
-    if( !node )
+
+    if (!node) {
         return;
+    }
 
     static plDrawableSpans* drawable = nil;
     bool newDrawable = !drawable;
@@ -1253,15 +1311,19 @@ void TestCutter2(const plKey& key, const hsVector3& size, const hsPoint3& pos, b
 
     hsTArray<plDrawVisList> drawVis;
     node->Harvest(&cutter.GetIsect(), drawVis);
-    if( !drawVis.GetCount() )
+
+    if (!drawVis.GetCount()) {
         return;
+    }
 
     hsTArray<plAccessSpan> src;
 
     int numSpan = 0;
     int iDraw;
-    for( iDraw = 0; iDraw < drawVis.GetCount(); iDraw++ )
+
+    for (iDraw = 0; iDraw < drawVis.GetCount(); iDraw++) {
         numSpan += drawVis[iDraw].fVisList.GetCount();
+    }
 
     src.SetCount(numSpan);
 
@@ -1269,20 +1331,18 @@ void TestCutter2(const plKey& key, const hsVector3& size, const hsPoint3& pos, b
 
     iDraw = 0;
     int iSpan = 0;
-    for( i = 0; i < numSpan; i++ )
-    {
+
+    for (i = 0; i < numSpan; i++) {
         plAccessGeometry::Instance()->OpenRO(drawVis[iDraw].fDrawable, drawVis[iDraw].fVisList[iSpan], src[i]);
 
-        if( ++iSpan >= drawVis[iDraw].fVisList.GetCount() )
-        {
+        if (++iSpan >= drawVis[iDraw].fVisList.GetCount()) {
             iDraw++;
             iSpan = 0;
         }
     }
 
-    
-    for( i = 0; i < src.GetCount(); i++ )
-    {
+
+    for (i = 0; i < src.GetCount(); i++) {
         static hsTArray<plCutoutPoly> dst;
         dst.SetCount(0);
         cutter.Cutout(src[i], dst);
@@ -1292,16 +1352,17 @@ void TestCutter2(const plKey& key, const hsVector3& size, const hsPoint3& pos, b
         int numVerts = 0;
         int numTris = 0;
         int j;
-        for( j = 0; j < dst.GetCount(); j++ )
-        {
-            if( dst[j].fVerts.GetCount() )
-            {
+
+        for (j = 0; j < dst.GetCount(); j++) {
+            if (dst[j].fVerts.GetCount()) {
                 numVerts += dst[j].fVerts.GetCount();
-                numTris += dst[j].fVerts.GetCount()-2;
+                numTris += dst[j].fVerts.GetCount() - 2;
             }
         }
-        if( !numTris )
+
+        if (!numTris) {
             continue;
+        }
 
         hsTArray<hsPoint3> pos;
         pos.SetCount(numVerts);
@@ -1315,31 +1376,33 @@ void TestCutter2(const plKey& key, const hsVector3& size, const hsPoint3& pos, b
         int iPoly = 0;
         int iVert = 0;
         int iv;
-        for( iv = 0; iv < numVerts; iv++ )
-        {
+
+        for (iv = 0; iv < numVerts; iv++) {
             pos[iv] = dst[iPoly].fVerts[iVert].fPos;
             norm[iv] = dst[iPoly].fVerts[iVert].fNorm;
             uvw[iv] = dst[iPoly].fVerts[iVert].fUVW;
             col[iv] = dst[iPoly].fVerts[iVert].fColor;
 
-            float opac = uvw[iv].fZ < 0.25f 
-                ? uvw[iv].fZ * 4.f
-                : uvw[iv].fZ > 0.75f
-                    ? (1.f - uvw[iv].fZ) * 4.f
-                    : 1.f;
+            float opac = uvw[iv].fZ < 0.25f
+                         ? uvw[iv].fZ * 4.f
+                         : uvw[iv].fZ > 0.75f
+                         ? (1.f - uvw[iv].fZ) * 4.f
+                         : 1.f;
 
             opac *= norm[iv].fZ;
-            if( opac < 0 )
+
+            if (opac < 0) {
                 opac = 0;
+            }
 
-            if( dst[iPoly].fBaseHasAlpha )
+            if (dst[iPoly].fBaseHasAlpha) {
                 col[iv].a *= opac;
-            else
+            } else {
                 col[iv].a = opac;
+            }
 
 
-            if( ++iVert >= dst[iPoly].fVerts.GetCount() )
-            {
+            if (++iVert >= dst[iPoly].fVerts.GetCount()) {
                 iVert = 0;
                 iPoly++;
             }
@@ -1348,40 +1411,41 @@ void TestCutter2(const plKey& key, const hsVector3& size, const hsPoint3& pos, b
         hsTArray<uint16_t> idx;
 
         uint16_t base = 0;
-        for( j = 0; j < dst.GetCount(); j++ )
-        {
-            uint16_t next = base+1;
+
+        for (j = 0; j < dst.GetCount(); j++) {
+            uint16_t next = base + 1;
             int k;
-            for( k = 2; k < dst[j].fVerts.GetCount(); k++ )
-            {
+
+            for (k = 2; k < dst[j].fVerts.GetCount(); k++) {
                 idx.Append(base);
                 idx.Append(next++);
                 idx.Append(next);
             }
+
             base = ++next;
         }
 
-        drawable = plDrawableGenerator::GenerateDrawable( numVerts, pos.AcquireArray(), 
-                                                        haveNormal ? norm.AcquireArray() : nil, 
-                                                        uvw.AcquireArray(), 1, 
-                                                        col.AcquireArray(), 
-                                                        false, 
-                                                        nil,
-                                                        idx.GetCount(), idx.AcquireArray(), 
-                                                        src[i].GetMaterial(), 
-                                                        hsMatrix44::IdentityMatrix(), 
-                                                        true,
-                                                        &retIndex, 
-                                                        drawable);
+        drawable = plDrawableGenerator::GenerateDrawable(numVerts, pos.AcquireArray(),
+                   haveNormal ? norm.AcquireArray() : nil,
+                   uvw.AcquireArray(), 1,
+                   col.AcquireArray(),
+                   false,
+                   nil,
+                   idx.GetCount(), idx.AcquireArray(),
+                   src[i].GetMaterial(),
+                   hsMatrix44::IdentityMatrix(),
+                   true,
+                   &retIndex,
+                   drawable);
 
     }
 
-    for( i = 0; i < numSpan; i++ )
-    {
+    for (i = 0; i < numSpan; i++) {
         plAccessGeometry::Instance()->Close(src[i]);
     }
 
-    if( drawable && newDrawable )
+    if (drawable && newDrawable) {
         drawable->SetSceneNode(so->GetSceneNode());
+    }
 
 }

@@ -61,15 +61,13 @@ class plRegistryPageNode;
 
 //// Little Iterator Class Defs //////////////////////////////////////////////
 
-class plRegistryKeyIterator 
-{
+class plRegistryKeyIterator {
 public:
     virtual ~plRegistryKeyIterator() {}
     virtual bool EatKey(const plKey& key) = 0;
 };
 
-class plRegistryPageIterator 
-{
+class plRegistryPageIterator {
 public:
     virtual ~plRegistryPageIterator() {}
     virtual bool EatPage(plRegistryPageNode* keyNode) = 0;
@@ -78,10 +76,9 @@ public:
 
 //// plKeyCollector //////////////////////////////////////////////////////////
 //  Helper key iterator that collects the given keys into the given hsTArray
-class plKeyCollector : public plRegistryKeyIterator
-{
+class plKeyCollector : public plRegistryKeyIterator {
 protected:
-    hsTArray<plKey> &fKeys;
+    hsTArray<plKey>& fKeys;
 
 public:
     plKeyCollector(hsTArray<plKey>& keys);
@@ -89,12 +86,13 @@ public:
 };
 
 // If you loaded keys with another iterator, this will ensure that they're unloaded
-class plIndirectUnloadIterator : public plRegistryPageIterator, public plRegistryKeyIterator
-{
+class plIndirectUnloadIterator : public plRegistryPageIterator, public plRegistryKeyIterator {
 public:
     plIndirectUnloadIterator() {}
 
-    bool EatKey(const plKey& key) { return true; }
+    bool EatKey(const plKey& key) {
+        return true;
+    }
     bool EatPage(plRegistryPageNode* page);
 };
 

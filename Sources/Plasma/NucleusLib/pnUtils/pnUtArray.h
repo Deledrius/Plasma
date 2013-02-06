@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtArray.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNUTILS_PRIVATE_PNUTARRAY_H
@@ -72,49 +72,52 @@ template<class T>
 class TBuffer {
 
 protected:
-    T * m_data;
+    T* m_data;
 
 public:
-    inline TBuffer ();
-    inline TBuffer (unsigned count);
-    inline TBuffer (const void * source, unsigned count);
-    inline TBuffer (const TBuffer<T> & source);
-    inline ~TBuffer ();
-    inline TBuffer<T> & operator= (const TBuffer<T> & source);
-    inline bool operator== (const TBuffer<T> & source) const;
-    inline T & operator[] (unsigned index);
-    inline T operator[] (unsigned index) const;
-    inline void Attach (T * source, unsigned count);
-    inline unsigned Bytes () const;
-    inline void Clear ();
-    inline unsigned Count () const;
-    inline T * Detach ();
-    inline void Fill (uint8_t value);
-    inline T * Ptr ();
-    inline const T * Ptr () const;
-    inline void Set (const T * source, unsigned count);
-    inline void SetBytes (unsigned bytes);
-    inline void SetCount (unsigned count);
-    inline void Zero ();
+    inline TBuffer();
+    inline TBuffer(unsigned count);
+    inline TBuffer(const void* source, unsigned count);
+    inline TBuffer(const TBuffer<T>& source);
+    inline ~TBuffer();
+    inline TBuffer<T>& operator= (const TBuffer<T>& source);
+    inline bool operator== (const TBuffer<T>& source) const;
+    inline T& operator[](unsigned index);
+    inline T operator[](unsigned index) const;
+    inline void Attach(T* source, unsigned count);
+    inline unsigned Bytes() const;
+    inline void Clear();
+    inline unsigned Count() const;
+    inline T* Detach();
+    inline void Fill(uint8_t value);
+    inline T* Ptr();
+    inline const T* Ptr() const;
+    inline void Set(const T* source, unsigned count);
+    inline void SetBytes(unsigned bytes);
+    inline void SetCount(unsigned count);
+    inline void Zero();
 
 };
 
 //===========================================================================
 template<class T>
-TBuffer<T>::TBuffer () {
+TBuffer<T>::TBuffer()
+{
     m_data = nil;
 }
 
 //===========================================================================
 template<class T>
-TBuffer<T>::TBuffer (unsigned count) {
+TBuffer<T>::TBuffer(unsigned count)
+{
     m_data = nil;
     SetCount(count);
 }
 
 //===========================================================================
 template<class T>
-TBuffer<T>::TBuffer (const void * source, unsigned count) {
+TBuffer<T>::TBuffer(const void* source, unsigned count)
+{
     m_data = nil;
     SetCount(count);
     memcpy(m_data, source, count * sizeof(T));
@@ -122,71 +125,90 @@ TBuffer<T>::TBuffer (const void * source, unsigned count) {
 
 //===========================================================================
 template<class T>
-TBuffer<T>::TBuffer (const TBuffer<T> & source) {
+TBuffer<T>::TBuffer(const TBuffer<T>& source)
+{
     m_data = nil;
     unsigned bytes = source.Bytes();
     SetBytes(bytes);
-    if (bytes)
+
+    if (bytes) {
         memcpy(m_data, source.m_data, bytes);
+    }
 }
 
 //===========================================================================
 template<class T>
-TBuffer<T>::~TBuffer () {
-    if (m_data)
+TBuffer<T>::~TBuffer()
+{
+    if (m_data) {
         free(m_data);
+    }
 }
 
 //===========================================================================
 template<class T>
-TBuffer<T> & TBuffer<T>::operator= (const TBuffer<T> & source) {
+TBuffer<T>& TBuffer<T>::operator= (const TBuffer<T>& source)
+{
     unsigned newBytes = source.Bytes();
-    if (newBytes != Bytes())
+
+    if (newBytes != Bytes()) {
         SetBytes(newBytes);
-    if (&source != this)
+    }
+
+    if (&source != this) {
         memcpy(m_data, source.m_data, newBytes);
+    }
+
     return *this;
 }
 
 //===========================================================================
 template<class T>
-bool TBuffer<T>::operator== (const TBuffer<T> & source) const {
+bool TBuffer<T>::operator== (const TBuffer<T>& source) const
+{
     unsigned size = _m_size(m_data);
     return (size == _m_size(source.m_data)) && !memcmp(m_data, source.m_data, size);
 }
 
 //===========================================================================
 template<class T>
-T & TBuffer<T>::operator[] (unsigned index) {
+T& TBuffer<T>::operator[](unsigned index)
+{
     ASSERT(index < Count());
     return m_data[index];
 }
 
 //===========================================================================
 template<class T>
-T TBuffer<T>::operator[] (unsigned index) const {
+T TBuffer<T>::operator[](unsigned index) const
+{
     ASSERT(index < Count());
     return m_data[index];
 }
 
 //===========================================================================
 template<class T>
-void TBuffer<T>::Attach (T * source, unsigned count) {
-    if (m_data)
+void TBuffer<T>::Attach(T* source, unsigned count)
+{
+    if (m_data) {
         free(m_data);
+    }
+
     m_data = source;
     ASSERT(_m_size(source) >= count * sizeof(T));
 }
 
 //===========================================================================
 template<class T>
-unsigned TBuffer<T>::Bytes () const {
+unsigned TBuffer<T>::Bytes() const
+{
     return m_data ? _m_size(m_data) : 0;
 }
 
 //===========================================================================
 template<class T>
-void TBuffer<T>::Clear () {
+void TBuffer<T>::Clear()
+{
     if (m_data) {
         free(m_data);
         m_data = nil;
@@ -195,50 +217,58 @@ void TBuffer<T>::Clear () {
 
 //===========================================================================
 template<class T>
-unsigned TBuffer<T>::Count () const {
+unsigned TBuffer<T>::Count() const
+{
     return m_data ? (_m_size(m_data) / sizeof(T)) : 0;
 }
 
 //===========================================================================
 template<class T>
-T * TBuffer<T>::Detach () {
-    T * result = m_data;
+T* TBuffer<T>::Detach()
+{
+    T* result = m_data;
     m_data = nil;
     return result;
 }
 
 //===========================================================================
 template<class T>
-void TBuffer<T>::Fill (uint8_t value) {
-    if (m_data)
+void TBuffer<T>::Fill(uint8_t value)
+{
+    if (m_data) {
         memset(m_data, value, Bytes());
+    }
 }
 
 //===========================================================================
 template<class T>
-T * TBuffer<T>::Ptr () {
+T* TBuffer<T>::Ptr()
+{
     return m_data;
 }
 
 //===========================================================================
 template<class T>
-const T * TBuffer<T>::Ptr () const {
+const T* TBuffer<T>::Ptr() const
+{
     return m_data;
 }
 
 //===========================================================================
 template<class T>
-void TBuffer<T>::Set (const T * source, unsigned count) {
+void TBuffer<T>::Set(const T* source, unsigned count)
+{
     SetCount(count);
     memcpy(m_data, source, count * sizeof(T));
 }
 
 //===========================================================================
 template<class T>
-void TBuffer<T>::SetBytes (unsigned bytes) {
-    if (bytes)
-        m_data = (T *)realloc(m_data, bytes);
-    else if (m_data) {
+void TBuffer<T>::SetBytes(unsigned bytes)
+{
+    if (bytes) {
+        m_data = (T*)realloc(m_data, bytes);
+    } else if (m_data) {
         free(m_data);
         m_data = nil;
     }
@@ -246,15 +276,18 @@ void TBuffer<T>::SetBytes (unsigned bytes) {
 
 //===========================================================================
 template<class T>
-void TBuffer<T>::SetCount (unsigned count) {
+void TBuffer<T>::SetCount(unsigned count)
+{
     SetBytes(count * sizeof(T));
 }
 
 //===========================================================================
 template<class T>
-void TBuffer<T>::Zero () {
-    if (m_data)
+void TBuffer<T>::Zero()
+{
+    if (m_data) {
         memset(m_data, 0, Bytes());
+    }
 }
 
 typedef TBuffer<uint8_t> CBuffer;
@@ -268,8 +301,8 @@ typedef TBuffer<uint8_t> CBuffer;
 
 class CBaseArray {
 protected:
-    unsigned CalcAllocGrowth (unsigned newAlloc, unsigned oldAlloc, unsigned * chunkSize);
-    void * ReallocPtr (void * ptr, unsigned bytes);
+    unsigned CalcAllocGrowth(unsigned newAlloc, unsigned oldAlloc, unsigned* chunkSize);
+    void* ReallocPtr(void* ptr, unsigned bytes);
 };
 
 
@@ -282,30 +315,33 @@ protected:
 template<class T>
 class TArrayCopyBits {
 public:
-    inline static void Assign (T * dest, const T source[], unsigned count);
-    inline static void Construct (T * dest) { }
-    inline static void Construct (T * dest, unsigned count) { }
-    inline static void CopyConstruct (T * dest, const T & source);
-    inline static void CopyConstruct (T * dest, const T source[], unsigned count);
-    inline static void Destruct (T * dest) { }
-    inline static void Destruct (T * dest, unsigned count) { }
+    inline static void Assign(T* dest, const T source[], unsigned count);
+    inline static void Construct(T* dest) { }
+    inline static void Construct(T* dest, unsigned count) { }
+    inline static void CopyConstruct(T* dest, const T& source);
+    inline static void CopyConstruct(T* dest, const T source[], unsigned count);
+    inline static void Destruct(T* dest) { }
+    inline static void Destruct(T* dest, unsigned count) { }
 };
 
 //===========================================================================
 template<class T>
-void TArrayCopyBits<T>::Assign (T * dest, const T source[], unsigned count) {
+void TArrayCopyBits<T>::Assign(T* dest, const T source[], unsigned count)
+{
     memmove(dest, source, count * sizeof(T));
 }
 
 //===========================================================================
 template<class T>
-void TArrayCopyBits<T>::CopyConstruct (T * dest, const T & source) {
+void TArrayCopyBits<T>::CopyConstruct(T* dest, const T& source)
+{
     *dest = source;
 }
 
 //===========================================================================
 template<class T>
-void TArrayCopyBits<T>::CopyConstruct (T * dest, const T source[], unsigned count) {
+void TArrayCopyBits<T>::CopyConstruct(T* dest, const T source[], unsigned count)
+{
     ASSERT((dest + count <= source) || (source + count <= dest));
     memcpy(dest, source, count * sizeof(T));
 }
@@ -320,64 +356,77 @@ void TArrayCopyBits<T>::CopyConstruct (T * dest, const T source[], unsigned coun
 template<class T>
 class TArrayCopyObject {
 public:
-    inline static void Assign (T * dest, const T source[], unsigned count);
-    inline static void Construct (T * dest);
-    inline static void Construct (T * dest, unsigned count);
-    inline static void CopyConstruct (T * dest, const T & source);
-    inline static void CopyConstruct (T * dest, const T source[], unsigned count);
-    inline static void Destruct (T * dest);
-    inline static void Destruct (T * dest, unsigned count);
+    inline static void Assign(T* dest, const T source[], unsigned count);
+    inline static void Construct(T* dest);
+    inline static void Construct(T* dest, unsigned count);
+    inline static void CopyConstruct(T* dest, const T& source);
+    inline static void CopyConstruct(T* dest, const T source[], unsigned count);
+    inline static void Destruct(T* dest);
+    inline static void Destruct(T* dest, unsigned count);
 };
 
 //===========================================================================
 template<class T>
-void TArrayCopyObject<T>::Assign (T * dest, const T source[], unsigned count) {
+void TArrayCopyObject<T>::Assign(T* dest, const T source[], unsigned count)
+{
     if (dest > source)
-        for (unsigned loop = count; loop--; )
+        for (unsigned loop = count; loop--;) {
             dest[loop] = source[loop];
+        }
     else if (dest < source)
-        for (unsigned loop = 0; loop < count; ++loop)
+        for (unsigned loop = 0; loop < count; ++loop) {
             dest[loop] = source[loop];
+        }
 }
 
 //===========================================================================
 template<class T>
-void TArrayCopyObject<T>::Construct (T * dest) {
+void TArrayCopyObject<T>::Construct(T* dest)
+{
     new(dest) T;
 }
 
 //===========================================================================
 template<class T>
-void TArrayCopyObject<T>::Construct (T * dest, unsigned count) {
-    for (unsigned loop = 0; loop < count; ++loop)
+void TArrayCopyObject<T>::Construct(T* dest, unsigned count)
+{
+    for (unsigned loop = 0; loop < count; ++loop) {
         new(&dest[loop]) T;
+    }
 }
 
 //===========================================================================
 template<class T>
-void TArrayCopyObject<T>::CopyConstruct (T * dest, const T & source) {
+void TArrayCopyObject<T>::CopyConstruct(T* dest, const T& source)
+{
     new(dest) T(source);
 }
 
 //===========================================================================
 template<class T>
-void TArrayCopyObject<T>::CopyConstruct (T * dest, const T source[], unsigned count) {
+void TArrayCopyObject<T>::CopyConstruct(T* dest, const T source[], unsigned count)
+{
     ASSERT((dest + count <= source) || (source + count <= dest));
-    for (unsigned loop = 0; loop < count; ++loop)
+
+    for (unsigned loop = 0; loop < count; ++loop) {
         new(&dest[loop]) T(source[loop]);
+    }
 }
 
 //===========================================================================
 template<class T>
-void TArrayCopyObject<T>::Destruct (T * dest) {
+void TArrayCopyObject<T>::Destruct(T* dest)
+{
     dest->~T();
 }
 
 //===========================================================================
 template<class T>
-void TArrayCopyObject<T>::Destruct (T * dest, unsigned count) {
-    for (unsigned loop = count; loop--; )
+void TArrayCopyObject<T>::Destruct(T* dest, unsigned count)
+{
+    for (unsigned loop = count; loop--;) {
         dest[loop].~T();
+    }
 }
 
 
@@ -390,47 +439,48 @@ void TArrayCopyObject<T>::Destruct (T * dest, unsigned count) {
 template<class T, class C>
 class TFArray : protected CBaseArray {
 protected:
-    T *      m_data;
+    T*       m_data;
     unsigned m_alloc;
     unsigned m_count;
 
-    inline void AdjustSize (unsigned newAlloc, unsigned newCount);
+    inline void AdjustSize(unsigned newAlloc, unsigned newCount);
 
 public:
-    inline TFArray ();
-    inline TFArray (unsigned count);
-    inline TFArray (const T * source, unsigned count);
-    inline TFArray (const TFArray<T,C> & source);
-    inline ~TFArray ();
-    inline TFArray<T,C> & operator= (const TFArray<T,C> & source);
-    inline bool operator== (const TFArray<T,C> & source) const;
-    inline T & operator[] (unsigned index);
-    inline const T & operator[] (unsigned index) const;
-    inline void Attach (T * source, unsigned count);
-    inline void AttachTemp (T * source, unsigned count);
-    inline unsigned Bytes () const;
-    inline void Clear ();
-    inline unsigned Count () const;
-    inline T * Detach ();
-    inline void Fill (uint8_t value);
-    inline T * Ptr ();
-    inline const T * Ptr () const;
-    inline void Set (const T * source, unsigned count);
-    inline void SetArray (const TFArray<T,C> & source);
-    inline void SetCount (unsigned count);
-    inline T * Term ();
-    inline const T * Term () const;
-    inline T * Top ();
-    inline const T * Top () const;
-    inline void Zero ();
-    inline void ZeroCount ();
-    inline void ZeroRange (unsigned index, unsigned count);
+    inline TFArray();
+    inline TFArray(unsigned count);
+    inline TFArray(const T* source, unsigned count);
+    inline TFArray(const TFArray<T, C>& source);
+    inline ~TFArray();
+    inline TFArray<T, C>& operator= (const TFArray<T, C>& source);
+    inline bool operator== (const TFArray<T, C>& source) const;
+    inline T& operator[](unsigned index);
+    inline const T& operator[](unsigned index) const;
+    inline void Attach(T* source, unsigned count);
+    inline void AttachTemp(T* source, unsigned count);
+    inline unsigned Bytes() const;
+    inline void Clear();
+    inline unsigned Count() const;
+    inline T* Detach();
+    inline void Fill(uint8_t value);
+    inline T* Ptr();
+    inline const T* Ptr() const;
+    inline void Set(const T* source, unsigned count);
+    inline void SetArray(const TFArray<T, C>& source);
+    inline void SetCount(unsigned count);
+    inline T* Term();
+    inline const T* Term() const;
+    inline T* Top();
+    inline const T* Top() const;
+    inline void Zero();
+    inline void ZeroCount();
+    inline void ZeroRange(unsigned index, unsigned count);
 
 };
 
 //===========================================================================
 template<class T, class C>
-TFArray<T,C>::TFArray () {
+TFArray<T, C>::TFArray()
+{
     m_alloc = 0;
     m_count = 0;
     m_data  = nil;
@@ -438,51 +488,61 @@ TFArray<T,C>::TFArray () {
 
 //===========================================================================
 template<class T, class C>
-TFArray<T,C>::TFArray (unsigned count) {
+TFArray<T, C>::TFArray(unsigned count)
+{
     m_alloc = m_count = count;
+
     if (count) {
-        m_data = (T *)malloc(count * sizeof(T));
+        m_data = (T*)malloc(count * sizeof(T));
         C::Construct(m_data, count);
-    }
-    else
+    } else {
         m_data = nil;
+    }
 }
 
 //===========================================================================
 template<class T, class C>
-TFArray<T,C>::TFArray (const T * source, unsigned count) {
+TFArray<T, C>::TFArray(const T* source, unsigned count)
+{
     m_alloc = m_count = count;
+
     if (count) {
-        m_data = (T *)malloc(count * sizeof(T));
+        m_data = (T*)malloc(count * sizeof(T));
         C::CopyConstruct(m_data, source, count);
-    }
-    else
+    } else {
         m_data = nil;
+    }
 }
 
 //===========================================================================
 template<class T, class C>
-TFArray<T,C>::TFArray (const TFArray<T,C> & source) {
+TFArray<T, C>::TFArray(const TFArray<T, C>& source)
+{
     m_alloc = m_count = source.m_count;
+
     if (m_count) {
-        m_data = (T *)malloc(m_count * sizeof(T));
+        m_data = (T*)malloc(m_count * sizeof(T));
         C::CopyConstruct(m_data, source.m_data, m_count);
-    }
-    else
+    } else {
         m_data = nil;
+    }
 }
 
 //===========================================================================
 template<class T, class C>
-TFArray<T,C>::~TFArray () {
+TFArray<T, C>::~TFArray()
+{
     Clear();
 }
 
 //===========================================================================
 template<class T, class C>
-TFArray<T,C> & TFArray<T,C>::operator= (const TFArray<T,C> & source) {
-    if (&source == this)
+TFArray<T, C>& TFArray<T, C>::operator= (const TFArray<T, C>& source)
+{
+    if (&source == this) {
         return *this;
+    }
+
     AdjustSize(source.m_count, 0);
     C::CopyConstruct(m_data, source.m_data, source.m_count);
     m_count = source.m_count;
@@ -491,32 +551,40 @@ TFArray<T,C> & TFArray<T,C>::operator= (const TFArray<T,C> & source) {
 
 //===========================================================================
 template<class T, class C>
-inline bool TFArray<T,C>::operator== (const TFArray<T,C> & source) const {
-    if (m_count != source.m_count)
+inline bool TFArray<T, C>::operator== (const TFArray<T, C>& source) const
+{
+    if (m_count != source.m_count) {
         return false;
+    }
+
     for (unsigned index = 0; index < m_count; ++index)
-        if (!((*this)[index] == source[index]))
+        if (!((*this)[index] == source[index])) {
             return false;
+        }
+
     return true;
 }
 
 //===========================================================================
 template<class T, class C>
-T & TFArray<T,C>::operator[] (unsigned index) {
+T& TFArray<T, C>::operator[](unsigned index)
+{
     ASSERT(index < m_count);
     return m_data[index];
 }
 
 //===========================================================================
 template<class T, class C>
-const T & TFArray<T,C>::operator[] (unsigned index) const {
+const T& TFArray<T, C>::operator[](unsigned index) const
+{
     ASSERT(index < m_count);
     return m_data[index];
 }
 
 //===========================================================================
 template<class T, class C>
-void TFArray<T,C>::AdjustSize (unsigned newAlloc, unsigned newCount) {
+void TFArray<T, C>::AdjustSize(unsigned newAlloc, unsigned newCount)
+{
 
     // Destruct elements if the array is shrinking
     if (m_count > newCount) {
@@ -526,13 +594,17 @@ void TFArray<T,C>::AdjustSize (unsigned newAlloc, unsigned newCount) {
 
     // Change the memory allocation size if necessary
     if (m_alloc != newAlloc) {
-        T * newData = (T *)ReallocPtr(m_data, newAlloc * sizeof(T));
+        T* newData = (T*)ReallocPtr(m_data, newAlloc * sizeof(T));
+
         if (newData != m_data) {
             C::CopyConstruct(newData, m_data, m_count);
             C::Destruct(m_data, m_count);
-            if (m_data)
+
+            if (m_data) {
                 free(m_data);
+            }
         }
+
         m_alloc = newAlloc;
         m_data  = newData;
     }
@@ -547,10 +619,14 @@ void TFArray<T,C>::AdjustSize (unsigned newAlloc, unsigned newCount) {
 
 //===========================================================================
 template<class T, class C>
-void TFArray<T,C>::Attach (T * source, unsigned count) {
+void TFArray<T, C>::Attach(T* source, unsigned count)
+{
     C::Destruct(m_data, m_count);
-    if (m_data)
+
+    if (m_data) {
         free(m_data);
+    }
+
     m_data  = source;
     m_alloc = _m_size(source) / sizeof(T);
     m_count = count;
@@ -559,10 +635,14 @@ void TFArray<T,C>::Attach (T * source, unsigned count) {
 
 //===========================================================================
 template<class T, class C>
-void TFArray<T,C>::AttachTemp (T * source, unsigned count) {
+void TFArray<T, C>::AttachTemp(T* source, unsigned count)
+{
     C::Destruct(m_data, m_count);
-    if (m_data)
+
+    if (m_data) {
         free(m_data);
+    }
+
     m_data  = source;
     m_alloc = count;
     m_count = count;
@@ -570,30 +650,37 @@ void TFArray<T,C>::AttachTemp (T * source, unsigned count) {
 
 //===========================================================================
 template<class T, class C>
-unsigned TFArray<T,C>::Bytes () const {
+unsigned TFArray<T, C>::Bytes() const
+{
     return m_count * sizeof(T);
 }
 
 //===========================================================================
 template<class T, class C>
-void TFArray<T,C>::Clear () {
+void TFArray<T, C>::Clear()
+{
     C::Destruct(m_data, m_count);
-    if (m_data)
+
+    if (m_data) {
         free(m_data);
+    }
+
     m_data = nil;
     m_alloc = m_count = 0;
 }
 
 //===========================================================================
 template<class T, class C>
-unsigned TFArray<T,C>::Count () const {
+unsigned TFArray<T, C>::Count() const
+{
     return m_count;
 }
 
 //===========================================================================
 template<class T, class C>
-T * TFArray<T,C>::Detach () {
-    T * result = m_data;
+T* TFArray<T, C>::Detach()
+{
+    T* result = m_data;
     m_data  = nil;
     m_alloc = 0;
     m_count = 0;
@@ -602,7 +689,8 @@ T * TFArray<T,C>::Detach () {
 
 //===========================================================================
 template<class T, class C>
-void TFArray<T,C>::Fill (uint8_t value) {
+void TFArray<T, C>::Fill(uint8_t value)
+{
     C::Destruct(m_data, m_count);
     memset(m_data, value, m_count * sizeof(T));
     C::Construct(m_data, m_count);
@@ -610,19 +698,22 @@ void TFArray<T,C>::Fill (uint8_t value) {
 
 //===========================================================================
 template<class T, class C>
-T * TFArray<T,C>::Ptr () {
+T* TFArray<T, C>::Ptr()
+{
     return m_data;
 }
 
 //===========================================================================
 template<class T, class C>
-const T * TFArray<T,C>::Ptr () const {
+const T* TFArray<T, C>::Ptr() const
+{
     return m_data;
 }
 
 //===========================================================================
 template<class T, class C>
-void TFArray<T,C>::Set (const T * source, unsigned count) {
+void TFArray<T, C>::Set(const T* source, unsigned count)
+{
     AdjustSize(count, 0);
     C::CopyConstruct(m_data, source, count);
     m_count = count;
@@ -630,7 +721,8 @@ void TFArray<T,C>::Set (const T * source, unsigned count) {
 
 //===========================================================================
 template<class T, class C>
-void TFArray<T,C>::SetArray (const TFArray<T,C> & source) {
+void TFArray<T, C>::SetArray(const TFArray<T, C>& source)
+{
     AdjustSize(source.m_count, 0);
     C::CopyConstruct(m_data, source.m_data, source.m_count);
     m_count = source.m_count;
@@ -638,39 +730,45 @@ void TFArray<T,C>::SetArray (const TFArray<T,C> & source) {
 
 //===========================================================================
 template<class T, class C>
-void TFArray<T,C>::SetCount (unsigned count) {
+void TFArray<T, C>::SetCount(unsigned count)
+{
     AdjustSize(count, count);
 }
 
 //===========================================================================
 template<class T, class C>
-T * TFArray<T,C>::Term () {
+T* TFArray<T, C>::Term()
+{
     return m_data + m_count;
 }
 
 //===========================================================================
 template<class T, class C>
-const T * TFArray<T,C>::Term () const {
+const T* TFArray<T, C>::Term() const
+{
     return m_data + m_count;
 }
 
 //===========================================================================
 template<class T, class C>
-T * TFArray<T,C>::Top () {
+T* TFArray<T, C>::Top()
+{
     ASSERT(m_count);
     return m_data + m_count - 1;
 }
 
 //===========================================================================
 template<class T, class C>
-const T * TFArray<T,C>::Top () const {
+const T* TFArray<T, C>::Top() const
+{
     ASSERT(m_count);
     return m_data + m_count - 1;
 }
 
 //===========================================================================
 template<class T, class C>
-void TFArray<T,C>::Zero () {
+void TFArray<T, C>::Zero()
+{
     C::Destruct(m_data, m_count);
     memset(m_data, 0, m_count * sizeof(T));
     C::Construct(m_data, m_count);
@@ -678,14 +776,16 @@ void TFArray<T,C>::Zero () {
 
 //===========================================================================
 template<class T, class C>
-void TFArray<T,C>::ZeroCount () {
+void TFArray<T, C>::ZeroCount()
+{
     C::Destruct(m_data, m_count);
     m_count = 0;
 }
 
 //===========================================================================
 template<class T, class C>
-void TFArray<T,C>::ZeroRange (unsigned index, unsigned count) {
+void TFArray<T, C>::ZeroRange(unsigned index, unsigned count)
+{
     ASSERT(index + count <= m_count);
     C::Destruct(m_data + index, count);
     memset(m_data + index, 0, count * sizeof(T));
@@ -700,78 +800,86 @@ void TFArray<T,C>::ZeroRange (unsigned index, unsigned count) {
 ***/
 
 template<class T, class C>
-class TArray : public TFArray<T,C> {
+class TArray : public TFArray<T, C> {
 
 private:
     unsigned m_chunkSize;
 
-    inline void AdjustSizeChunked (unsigned newAlloc, unsigned newCount);
+    inline void AdjustSizeChunked(unsigned newAlloc, unsigned newCount);
 
 public:
-    inline TArray ();
-    inline TArray (const char file[], int line);
-    inline TArray (unsigned count);
-    inline TArray (const T * source, unsigned count);
-    inline TArray (const TArray<T,C> & source);
-    inline TArray<T,C> & operator= (const TArray<T,C> & source);
-    inline unsigned Add (const T & source);
-    inline unsigned Add (const T * source, unsigned count);
-    inline unsigned AddArray (const TArray<T,C> & source);
-    inline void Copy (unsigned destIndex, unsigned sourceIndex, unsigned count);
-    inline void DeleteOrdered (unsigned index);
-    inline void DeleteUnordered (unsigned index);
-    inline void GrowToCount (unsigned count, bool zero);
-    inline void GrowToFit (unsigned index, bool zero);
-    inline void ShrinkBy (unsigned count);
-    inline void Move (unsigned destIndex, unsigned sourceIndex, unsigned count);
-    inline T * New ();
-    inline T * New (unsigned count);
-    inline void Push (const T & source);
-    inline T Pop ();
-    inline void Reserve (unsigned additionalCount);
-    inline void Set (const T * source, unsigned count);
-    inline void SetChunkSize (unsigned chunkSize);
-    inline void SetCount (unsigned count);
-    inline void SetCountFewer (unsigned count);
-    inline void Trim ();
+    inline TArray();
+    inline TArray(const char file[], int line);
+    inline TArray(unsigned count);
+    inline TArray(const T* source, unsigned count);
+    inline TArray(const TArray<T, C>& source);
+    inline TArray<T, C>& operator= (const TArray<T, C>& source);
+    inline unsigned Add(const T& source);
+    inline unsigned Add(const T* source, unsigned count);
+    inline unsigned AddArray(const TArray<T, C>& source);
+    inline void Copy(unsigned destIndex, unsigned sourceIndex, unsigned count);
+    inline void DeleteOrdered(unsigned index);
+    inline void DeleteUnordered(unsigned index);
+    inline void GrowToCount(unsigned count, bool zero);
+    inline void GrowToFit(unsigned index, bool zero);
+    inline void ShrinkBy(unsigned count);
+    inline void Move(unsigned destIndex, unsigned sourceIndex, unsigned count);
+    inline T* New();
+    inline T* New(unsigned count);
+    inline void Push(const T& source);
+    inline T Pop();
+    inline void Reserve(unsigned additionalCount);
+    inline void Set(const T* source, unsigned count);
+    inline void SetChunkSize(unsigned chunkSize);
+    inline void SetCount(unsigned count);
+    inline void SetCountFewer(unsigned count);
+    inline void Trim();
 
 };
 
 //===========================================================================
 template<class T, class C>
-TArray<T,C>::TArray () : TFArray<T,C>() {
+TArray<T, C>::TArray() : TFArray<T, C>()
+{
     m_chunkSize = max(1, 256 / sizeof(T));
 }
 
 //===========================================================================
 template<class T, class C>
-TArray<T,C>::TArray (const char file[], int line) : TFArray<T,C>(file, line) {
+TArray<T, C>::TArray(const char file[], int line) : TFArray<T, C>(file, line)
+{
     m_chunkSize = max(1, 256 / sizeof(T));
 }
 
 //===========================================================================
 template<class T, class C>
-TArray<T,C>::TArray (unsigned count) : TFArray<T,C>(count) {
+TArray<T, C>::TArray(unsigned count) : TFArray<T, C>(count)
+{
     m_chunkSize = max(1, 256 / sizeof(T));
 }
 
 //===========================================================================
 template<class T, class C>
-TArray<T,C>::TArray (const T * source, unsigned count) : TFArray<T,C>(source, count) {
+TArray<T, C>::TArray(const T* source, unsigned count) : TFArray<T, C>(source, count)
+{
     m_chunkSize = max(1, 256 / sizeof(T));
 }
 
 //===========================================================================
 template<class T, class C>
-TArray<T,C>::TArray (const TArray & source) : TFArray<T,C>(source) {
+TArray<T, C>::TArray(const TArray& source) : TFArray<T, C>(source)
+{
     m_chunkSize = source.m_chunkSize;
 }
 
 //===========================================================================
 template<class T, class C>
-TArray<T,C> & TArray<T,C>::operator= (const TArray<T,C> & source) {
-    if (&source == this)
+TArray<T, C>& TArray<T, C>::operator= (const TArray<T, C>& source)
+{
+    if (&source == this) {
         return *this;
+    }
+
     m_chunkSize = source.m_chunkSize;
     AdjustSize(max(this->m_alloc, source.m_count), 0);
     C::CopyConstruct(this->m_data, source.m_data, source.m_count);
@@ -781,7 +889,8 @@ TArray<T,C> & TArray<T,C>::operator= (const TArray<T,C> & source) {
 
 //===========================================================================
 template<class T, class C>
-unsigned TArray<T,C>::Add (const T & source) {
+unsigned TArray<T, C>::Add(const T& source)
+{
     unsigned index = this->m_count;
     Push(source);
     return index;
@@ -789,7 +898,8 @@ unsigned TArray<T,C>::Add (const T & source) {
 
 //===========================================================================
 template<class T, class C>
-unsigned TArray<T,C>::Add (const T * source, unsigned count) {
+unsigned TArray<T, C>::Add(const T* source, unsigned count)
+{
     unsigned index = this->m_count;
     AdjustSizeChunked(this->m_count + count, this->m_count);
     C::CopyConstruct(&this->m_data[this->m_count], source, count);
@@ -799,7 +909,8 @@ unsigned TArray<T,C>::Add (const T * source, unsigned count) {
 
 //===========================================================================
 template<class T, class C>
-unsigned TArray<T,C>::AddArray (const TArray<T,C> & source) {
+unsigned TArray<T, C>::AddArray(const TArray<T, C>& source)
+{
     unsigned index = this->m_count;
     AdjustSizeChunked(this->m_count + source.m_count, this->m_count);
     C::CopyConstruct(&this->m_data[this->m_count], source.m_data, source.m_count);
@@ -809,15 +920,18 @@ unsigned TArray<T,C>::AddArray (const TArray<T,C> & source) {
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::AdjustSizeChunked (unsigned newAlloc, unsigned newCount) {
+void TArray<T, C>::AdjustSizeChunked(unsigned newAlloc, unsigned newCount)
+{
 
     // Disallow shrinking the allocation
-    if (newAlloc <= this->m_alloc)
+    if (newAlloc <= this->m_alloc) {
         newAlloc = this->m_alloc;
+    }
 
     // Process growing the allocation
-    else
+    else {
         newAlloc = this->CalcAllocGrowth(newAlloc, this->m_alloc, &this->m_chunkSize);
+    }
 
     // Perform the allocation
     this->AdjustSize(newAlloc, newCount);
@@ -826,7 +940,8 @@ void TArray<T,C>::AdjustSizeChunked (unsigned newAlloc, unsigned newCount) {
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::Copy (unsigned destIndex, unsigned sourceIndex, unsigned count) {
+void TArray<T, C>::Copy(unsigned destIndex, unsigned sourceIndex, unsigned count)
+{
 
     // Copy the data to the destination
     ASSERT(destIndex +   count <= m_count);
@@ -837,43 +952,59 @@ void TArray<T,C>::Copy (unsigned destIndex, unsigned sourceIndex, unsigned count
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::DeleteOrdered (unsigned index) {
+void TArray<T, C>::DeleteOrdered(unsigned index)
+{
     ASSERT(index < this->m_count);
-    if (index + 1 < this->m_count)
+
+    if (index + 1 < this->m_count) {
         C::Assign(&this->m_data[index], &this->m_data[index + 1], this->m_count - index - 1);
+    }
+
     C::Destruct(&this->m_data[--this->m_count]);
 }
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::DeleteUnordered (unsigned index) {
+void TArray<T, C>::DeleteUnordered(unsigned index)
+{
     ASSERT(index < this->m_count);
-    if (index + 1 < this->m_count)
+
+    if (index + 1 < this->m_count) {
         C::Assign(&this->m_data[index], &this->m_data[this->m_count - 1], 1);
+    }
+
     C::Destruct(&this->m_data[--this->m_count]);
 }
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::GrowToCount (unsigned count, bool zero) {
-    if (count <= this->m_count)
+void TArray<T, C>::GrowToCount(unsigned count, bool zero)
+{
+    if (count <= this->m_count) {
         return;
+    }
+
     AdjustSizeChunked(count, this->m_count);
-    if (zero)
+
+    if (zero) {
         memset(this->m_data + this->m_count, 0, (count - this->m_count) * sizeof(T));
+    }
+
     C::Construct(this->m_data + this->m_count, count - this->m_count);
     this->m_count = count;
 }
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::GrowToFit (unsigned index, bool zero) {
+void TArray<T, C>::GrowToFit(unsigned index, bool zero)
+{
     GrowToCount(index + 1, zero);
 }
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::ShrinkBy (unsigned count) {
+void TArray<T, C>::ShrinkBy(unsigned count)
+{
     ASSERT(count <= this->m_count);
     C::Destruct(this->m_data + this->m_count - count, count);
     this->m_count -= count;
@@ -881,7 +1012,8 @@ void TArray<T,C>::ShrinkBy (unsigned count) {
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::Move (unsigned destIndex, unsigned sourceIndex, unsigned count) {
+void TArray<T, C>::Move(unsigned destIndex, unsigned sourceIndex, unsigned count)
+{
 
     // Copy the data to the destination
     ASSERT(destIndex +   count <= this->m_count);
@@ -892,8 +1024,7 @@ void TArray<T,C>::Move (unsigned destIndex, unsigned sourceIndex, unsigned count
     if (destIndex >= sourceIndex) {
         C::Destruct(this->m_data + sourceIndex, min(count, destIndex - sourceIndex));
         C::Construct(this->m_data + sourceIndex, min(count, destIndex - sourceIndex));
-    }
-    else {
+    } else {
         unsigned overlap = (destIndex + count > sourceIndex) ? (destIndex + count - sourceIndex) : 0;
         ASSERT(overlap <= count);
         C::Destruct(this->m_data + sourceIndex + overlap, count - overlap);
@@ -904,21 +1035,24 @@ void TArray<T,C>::Move (unsigned destIndex, unsigned sourceIndex, unsigned count
 
 //===========================================================================
 template<class T, class C>
-T * TArray<T,C>::New () {
+T* TArray<T, C>::New()
+{
     AdjustSizeChunked(this->m_count + 1, this->m_count + 1);
     return &this->m_data[this->m_count - 1];
 }
 
 //===========================================================================
 template<class T, class C>
-T * TArray<T,C>::New (unsigned count) {
+T* TArray<T, C>::New(unsigned count)
+{
     AdjustSizeChunked(this->m_count + count, this->m_count + count);
     return &this->m_data[this->m_count - count];
 }
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::Push (const T & source) {
+void TArray<T, C>::Push(const T& source)
+{
     AdjustSizeChunked(this->m_count + 1, this->m_count);
     C::CopyConstruct(&this->m_data[this->m_count], source);
     ++this->m_count;
@@ -926,7 +1060,8 @@ void TArray<T,C>::Push (const T & source) {
 
 //===========================================================================
 template<class T, class C>
-T TArray<T,C>::Pop () {
+T TArray<T, C>::Pop()
+{
     ASSERT(this->m_count);
     T result = this->m_data[--this->m_count];
     C::Destruct(this->m_data + this->m_count);
@@ -935,13 +1070,15 @@ T TArray<T,C>::Pop () {
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::Reserve (unsigned additionalCount) {
+void TArray<T, C>::Reserve(unsigned additionalCount)
+{
     AdjustSizeChunked(max(this->m_alloc, this->m_count + additionalCount), this->m_count);
 }
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::Set (const T * source, unsigned count) {
+void TArray<T, C>::Set(const T* source, unsigned count)
+{
     AdjustSizeChunked(count, 0);
     C::CopyConstruct(this->m_data, source, count);
     this->m_count = count;
@@ -949,19 +1086,22 @@ void TArray<T,C>::Set (const T * source, unsigned count) {
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::SetChunkSize (unsigned chunkSize) {
+void TArray<T, C>::SetChunkSize(unsigned chunkSize)
+{
     this->m_chunkSize = chunkSize;
 }
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::SetCount (unsigned count) {
+void TArray<T, C>::SetCount(unsigned count)
+{
     AdjustSizeChunked(max(this->m_alloc, count), count);
 }
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::SetCountFewer (unsigned count) {
+void TArray<T, C>::SetCountFewer(unsigned count)
+{
     ASSERT(count <= this->m_count);
     C::Destruct(this->m_data + count, this->m_count - count);
     this->m_count = count;
@@ -969,7 +1109,8 @@ void TArray<T,C>::SetCountFewer (unsigned count) {
 
 //===========================================================================
 template<class T, class C>
-void TArray<T,C>::Trim () {
+void TArray<T, C>::Trim()
+{
     this->AdjustSize(this->m_count, this->m_count);
 }
 #endif

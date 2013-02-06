@@ -42,8 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef PL_DECALMTLLAYERSPB_H
 #define PL_DECALMTLLAYERSPB_H
 
-enum
-{
+enum {
     // Layers
     kDecalLayBase,
     kDecalLayOutputBlend,

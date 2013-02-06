@@ -47,15 +47,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 struct pyAlarm;
 typedef struct _object PyObject;
-class pyAlarmMgr
-{
+class pyAlarmMgr {
     typedef std::list<pyAlarm*> Alarms;
     Alarms  fAlarms;
 public:
     ~pyAlarmMgr();
-    static pyAlarmMgr * GetInstance();
-    void    Update( double secs );
-    void    SetAlarm( float secs, PyObject * cb, uint32_t cbContext );
+    static pyAlarmMgr* GetInstance();
+    void    Update(double secs);
+    void    SetAlarm(float secs, PyObject* cb, uint32_t cbContext);
     void    Clear();
 };
 

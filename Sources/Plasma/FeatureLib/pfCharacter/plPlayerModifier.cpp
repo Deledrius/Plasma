@@ -39,7 +39,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
       Mead, WA   99021
 
 *==LICENSE==*/
-//#pragma warning(disable: 4503 4786)  
+//#pragma warning(disable: 4503 4786)
 //#define HK_HARDCORE
 //
 //#include <hkmath/vector3.h>           // for havok Vector3
@@ -126,20 +126,20 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //void plPlayerModifier::AddTarget(plSceneObject* so)
 //{
 //  fTarget = so;
-//  plSimulationInterface * pSI = IGetTargetSimulationInterface(0); // so->GetSimulationInterface(); // 
-//   
+//  plSimulationInterface * pSI = IGetTargetSimulationInterface(0); // so->GetSimulationInterface(); //
+//
 //  plgDispatch::Dispatch()->RegisterForExactType(plEvalMsg::Index(), GetKey());
 //
 //  // set the desired rotation vector...
 ////    hsAssert(fTarget->GetCoordinateInterface(), "Player modifier target has no coordinate interface");
 //
 //  // These are now set in the component
-////    if(pSI) 
+////    if(pSI)
 ////    {
 ////        pSI->SetProperty(plSimulationInterface::kAffectLOS, false);
 ////        pSI->SetProperty(kUpright, true);
 ////    }
-//  
+//
 //  //
 //  // setup for local player if necessary
 //  //
@@ -147,7 +147,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  if (locallyOwned==plSynchedObject::kMaybe)      // don't know since we're still loading, defer
 //      SetFlag(kNeedsLocalSetup);
 //  else if (locallyOwned==plSynchedObject::kYes)
-//      IDoLocalSetup(so);  
+//      IDoLocalSetup(so);
 //}
 //
 //void plPlayerModifier::IDoLocalSetup(plSceneObject* so)
@@ -191,7 +191,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  plControlEventMsg* pCommandMsg = plControlEventMsg::ConvertNoRef(msg);
 //  if (pCommandMsg)
 //      return(HandleControlInput(pCommandMsg));
-//  
+//
 //  plMatrixUpdateMsg* pMMsg = plMatrixUpdateMsg::ConvertNoRef( msg );
 //  if (pMMsg && HasFlag(kHasSpawned))
 //  {
@@ -211,7 +211,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  {
 //      spawnPt* pt = new spawnPt;
 //      pt->pt = pSpawn->fPos;
-//      
+//
 //      hsVector3 temp(fTarget->GetCoordinateInterface()->GetLocalToWorld().GetTranslate() - pt->pt);
 //      pt->dist = temp.MagnitudeSquared();
 //      fSpawnPoints.Append(pt);
@@ -220,18 +220,18 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  if (pPMsg)
 //  {
 //      if (pPMsg->Cmd(plPlayerMsg::kWarpToSpawnPoint))
-//      {   
+//      {
 //          WarpToSpawnPoint();
 //          return true;
 //      }
-//  }   
+//  }
 //  return plSingleModifier::MsgReceive(msg);
 //}
 //
 //bool plPlayerModifier::HandleControlInput(plControlEventMsg* pMsg)
 //{
 //  bool ret=false;
-//  
+//
 //  if (pMsg->ControlActivated() && (pMsg->GetControlCode() == B_CONTROL_ROTATE_RIGHT || pMsg->GetControlCode() == B_CONTROL_ROTATE_LEFT || pMsg->GetControlCode() == A_CONTROL_TURN))
 //  {
 //      fRotationScalar = pMsg->GetPct();
@@ -261,12 +261,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  if (b != bMoving)
 //  {
 //      plPlayerMsg* pMsg = new plPlayerMsg;
-//      
+//
 //      if (b)
 //          pMsg->SetCmd( plPlayerMsg::kMovementStarted );
-//      else    
+//      else
 //          pMsg->SetCmd( plPlayerMsg::kMovementStopped );
-//      
+//
 //      plgDispatch::MsgSend( pMsg );
 //      bMoving = b;
 //  }
@@ -289,7 +289,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //      if (locallyOwned==plSynchedObject::kNo)
 //          ClearFlag(kNeedsLocalSetup);
 //  }
-//  
+//
 //  if (HasFlag(kWantsToSpawn))
 //  {
 //      if (fTarget->IsLocallyOwned()==plSynchedObject::kNo)
@@ -301,8 +301,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //      else
 //      if (fSpawnPoints.Count()
 //          // if MP game, make sure we're connected before spawning
-//          && (!plNetClientMgr::GetInstance()->IsEnabled() || 
-//            plNetClientMgr::GetInstance()->HasJoined()) 
+//          && (!plNetClientMgr::GetInstance()->IsEnabled() ||
+//            plNetClientMgr::GetInstance()->HasJoined())
 //          )
 //      {
 //          int i;
@@ -326,7 +326,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //          int netID = plNetClientMgr::GetInstance()->GetClientNum();
 //          if (netID==-1)
 //              netID=0;
-//          hsPoint3 warpPoint = netID>=fSpawnPoints.Count() ? 
+//          hsPoint3 warpPoint = netID>=fSpawnPoints.Count() ?
 //              fSpawnPoints[fSpawnPoints.Count()-1]->pt : fSpawnPoints[netID]->pt;
 //#endif
 //          // Send msg for net synchronization
@@ -337,8 +337,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //          plgDispatch::MsgSend( warpMsg );
 //#ifdef HS_DEBUGGING
 //          char str[256];
-//          sprintf(str, "%s has %d spawnPoints.  Using pt %f %f %f\n", 
-//              GetKeyName(), fSpawnPoints.GetCount(), 
+//          sprintf(str, "%s has %d spawnPoints.  Using pt %f %f %f\n",
+//              GetKeyName(), fSpawnPoints.GetCount(),
 //              fSpawnPoints[0]->pt.fX,fSpawnPoints[0]->pt.fY,fSpawnPoints[0]->pt.fZ);
 //          hsStatusMessage(str);
 //#endif
@@ -348,7 +348,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //          fSpawnPoints.SetCount(0);
 //          ClearFlag(kWantsToSpawn);
 //      }
-//      else 
+//      else
 //      {
 //          plSpawnRequestMsg* pMsg = new plSpawnRequestMsg;
 //          pMsg->SetSender(GetKey());
@@ -366,14 +366,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //          SetFlag(kHasSpawned);
 //      }
 //  }
-//  
+//
 //  if (!fTarget->GetCoordinateInterface())
 //      return true;
 //
 //  // update our desired position:
 ////    float eTime = secs - fLastTime;
 //  float eTime = hsTimer::GetDelSysSeconds();
-//  
+//
 //  hsPoint3    newLinearForce(0,0,0);
 //
 //  hsMatrix44 targetMatrix;
@@ -384,7 +384,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  hsPoint3 playerPos = targetMatrix.GetTranslate();
 //  hsVector3 view, up, right;
 //  targetMatrix.GetAxis(&view, &up, &right);
-//  
+//
 //  float speed = fMaxVelocity;
 //  float turn = fTurnRate;
 //
@@ -430,9 +430,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 //
 //  fDesiredPosition = playerPos;
-//  
+//
 //  // move toward our desired position...
-//  
+//
 //  hsPoint3 curPos = targetMatrix.GetTranslate();
 //  hsPoint3 newPos;
 //
@@ -441,12 +441,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 //  if (dir.MagnitudeSquared() > 0.0f)
 //      dir.Normalize();
-//  
+//
 //  hsVector3 vel( view * fCurSpeed );
 //
 //  IAdjustVelocity(fAcceleration, fDeceleration, &dir, &vel, fMaxVelocity, distToGoal, eTime);
 //  fCurSpeed = vel.Magnitude();
-//  
+//
 //  float distMoved = IClampVelocity(&vel, fMaxVelocity, eTime);
 //
 //  // compute final pos
@@ -454,27 +454,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //      newPos = fDesiredPosition;
 //  else
 //      newPos = curPos + vel;
-//  
+//
 //  // calculate rotation matrix
 //
 //  hsVector3 rotUp(0,0,1);
 //  hsVector3 rotRight(1,0,0);
 //  hsMatrix44 rot;
-//  
+//
 //  if ( HasMovementFlag( B_CONTROL_TURN_TO ) )
-//  {   
+//  {
 //      // compute view goal
-//      
+//
 //      hsVector3 fPlayerViewGoal(&fFacingTarget,&curPos);
 //      fPlayerViewGoal.fZ = 0;
 //      fPlayerViewGoal.Normalize();
 //
-//      // compute degrees needed to turn left/right        
+//      // compute degrees needed to turn left/right
 //      hsVector3 cross = fPlayerViewGoal % view;
 //      float dot = fPlayerViewGoal * view;
 //      float rad = acos(dot);
 //      fRotationScalar = 1.0f;
-//      
+//
 //      if (cross.fZ<0)
 //      {
 //          SetMovementFlag( B_CONTROL_ROTATE_LEFT );
@@ -490,14 +490,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //          ClearMovementFlag( B_CONTROL_ROTATE_LEFT );
 //      }
 //  }
-//  
+//
 //  float angle = 0;
 //
 //  if ( HasMovementFlag( B_CONTROL_ROTATE_RIGHT ) )
 //  {
 //      angle = fTurnRate * eTime * -1 * fRotationScalar;
 //  }
-//  
+//
 //  if ( HasMovementFlag( B_CONTROL_ROTATE_LEFT ) || HasMovementFlag( A_CONTROL_TURN ) )
 //  {
 //      angle = fTurnRate * eTime * fRotationScalar;
@@ -508,7 +508,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  justRot.SetTranslate(&zero);
 //
 //  if(angle) {
-//      hsQuat q(angle, &rotUp);    
+//      hsQuat q(angle, &rotUp);
 //      q.NormalizeIfNeeded();
 //      q.MakeMatrix(&rot);
 //
@@ -547,9 +547,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //      plCoordinateInterface* pCI = pCI = IGetTargetCoordinateInterface(0);
 //      pCI->SetTransform(targetMatrix, inv);
 //
-//          
+//
 //  }
-//  
+//
 //  fLastTime = secs;
 //  SetMoving(fCurSpeed);
 //
@@ -561,8 +561,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ////
 //// vector version.  dir vector should be normalized
 ////
-//void plPlayerModifier::IAdjustVelocity(float adjAccelRate, float adjDecelRate, 
-//                                     hsVector3* dir, hsVector3* vel, float maxSpeed, 
+//void plPlayerModifier::IAdjustVelocity(float adjAccelRate, float adjDecelRate,
+//                                     hsVector3* dir, hsVector3* vel, float maxSpeed,
 //                                     float distToGoal, double elapsedTime)
 //{
 //  float speed = vel->Magnitude();      // save current speed
@@ -617,10 +617,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //      return false;
 //
 //  // compute distance required to stop, given decel speed (in units/sec sq)
-//  float stopTime = curSpeed / decelSpeed;      
+//  float stopTime = curSpeed / decelSpeed;
 //  float avgSpeed = curSpeed * .5f;
 //  float stopDist = avgSpeed * stopTime;
 //
-//  return (hsABS(distToGoal) <= hsABS(stopDist));  // stopDist+avgSpeed?   
+//  return (hsABS(distToGoal) <= hsABS(stopDist));  // stopDist+avgSpeed?
 //}
 //

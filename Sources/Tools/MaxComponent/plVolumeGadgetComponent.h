@@ -44,24 +44,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #define VOLUMEGADGET_CID Class_ID(0x1f77b56, 0x209a09d8)
 
-class plVolumeGadgetComponent : public plActivatorBaseComponent
-{
+class plVolumeGadgetComponent : public plActivatorBaseComponent {
 protected:
     plActivatorBaseComponent::LogicKeys fLogicModOutKeys;
 
     void ICreateConditions(plMaxNode* node, plErrorMsg* errMsg, bool enter);
-    
+
 public:
     plVolumeGadgetComponent();
 
-    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool PreConvert(plMaxNode *node, plErrorMsg* pErrMsg);
-    bool DeInit(plMaxNode *node, plErrorMsg* pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool DeInit(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual bool HasLogicOut() { return true; }
-    
-    const LogicKeys& GetLogicOutKeys() { return fLogicModOutKeys; }
+    virtual bool HasLogicOut() {
+        return true;
+    }
+
+    const LogicKeys& GetLogicOutKeys() {
+        return fLogicModOutKeys;
+    }
     virtual plKey GetLogicOutKey(plMaxNode* node);
 
     virtual void CollectNonDrawables(INodeTab& nonDrawables);

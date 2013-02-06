@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plLayerInterface.h"
 #include "hsGMatState.h"
 
-class plLayerLightBase : public plLayerInterface
-{
+class plLayerLightBase : public plLayerInterface {
 protected:
     bool                fDirty;
 public:
@@ -55,8 +54,8 @@ public:
     plLayerLightBase();
     virtual ~plLayerLightBase();
 
-    CLASSNAME_REGISTER( plLayerLightBase );
-    GETINTERFACE_ANY( plLayerLightBase, plLayerInterface );
+    CLASSNAME_REGISTER(plLayerLightBase);
+    GETINTERFACE_ANY(plLayerLightBase, plLayerInterface);
 
 
     virtual plLayerInterface*   Attach(plLayerInterface* prev);
@@ -66,8 +65,7 @@ public:
 
 };
 
-class plLayerShadowBase : public plLayerInterface
-{
+class plLayerShadowBase : public plLayerInterface {
 protected:
     bool                fDirty;
 public:
@@ -75,8 +73,8 @@ public:
     plLayerShadowBase();
     virtual ~plLayerShadowBase();
 
-    CLASSNAME_REGISTER( plLayerShadowBase );
-    GETINTERFACE_ANY( plLayerShadowBase, plLayerInterface );
+    CLASSNAME_REGISTER(plLayerShadowBase);
+    GETINTERFACE_ANY(plLayerShadowBase, plLayerInterface);
 
 
     virtual plLayerInterface*   Attach(plLayerInterface* prev);

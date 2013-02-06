@@ -52,8 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCli.h"
 
-class pyTTTGame : public pyGameCli
-{
+class pyTTTGame : public pyGameCli {
 protected:
     pyTTTGame();
     pyTTTGame(pfGameCli* client);

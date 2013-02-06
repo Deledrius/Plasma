@@ -50,26 +50,30 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // Controller interp caching
 /////////////////////////////////////////////
 
-static const char *kInvalidInterpString = "Invalid call to plController::Interp()";
+static const char* kInvalidInterpString = "Invalid call to plController::Interp()";
 
 plControllerCacheInfo::plControllerCacheInfo() : fNumSubControllers(0), fSubControllers(nil), fKeyIndex(0), fAtc(nil) {}
 
 plControllerCacheInfo::~plControllerCacheInfo()
 {
     int i;
-    for (i = 0; i < fNumSubControllers; i++)
+
+    for (i = 0; i < fNumSubControllers; i++) {
         delete fSubControllers[i];
+    }
 
     delete [] fSubControllers;
 }
 
-void plControllerCacheInfo::SetATC(plAnimTimeConvert *atc)
+void plControllerCacheInfo::SetATC(plAnimTimeConvert* atc)
 {
     fAtc = atc;
     int i;
+
     for (i = 0; i < fNumSubControllers; i++)
-        if (fSubControllers[i])
+        if (fSubControllers[i]) {
             fSubControllers[i]->SetATC(atc);
+        }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -79,107 +83,97 @@ plLeafController::~plLeafController()
     delete[] fKeys;
 }
 
-void plLeafController::Interp(float time, float* result, plControllerCacheInfo *cache) const
+void plLeafController::Interp(float time, float* result, plControllerCacheInfo* cache) const
 {
     hsAssert(fType == hsKeyFrame::kScalarKeyFrame || fType == hsKeyFrame::kBezScalarKeyFrame, kInvalidInterpString);
-    
-    bool tryForward = (cache? cache->fAtc->IsForewards() : true);
-    if (fType == hsKeyFrame::kScalarKeyFrame)
-    {
-        hsScalarKey *k1, *k2;
+
+    bool tryForward = (cache ? cache->fAtc->IsForewards() : true);
+
+    if (fType == hsKeyFrame::kScalarKeyFrame) {
+        hsScalarKey* k1, *k2;
         float t;
-        uint32_t *idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
+        uint32_t* idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
         hsInterp::GetBoundaryKeyFrames(time, fNumKeys, fKeys, sizeof(hsScalarKey), (hsKeyFrame**)&k1, (hsKeyFrame**)&k2, idxStore, &t, tryForward);
         hsInterp::LinInterp(k1->fValue, k2->fValue, t, result);
-    }
-    else
-    {
-        hsBezScalarKey *k1, *k2;
+    } else {
+        hsBezScalarKey* k1, *k2;
         float t;
-        uint32_t *idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
+        uint32_t* idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
         hsInterp::GetBoundaryKeyFrames(time, fNumKeys, fKeys, sizeof(hsBezScalarKey), (hsKeyFrame**)&k1, (hsKeyFrame**)&k2, idxStore, &t, tryForward);
         hsInterp::BezInterp(k1, k2, t, result);
     }
 }
 
-void plLeafController::Interp(float time, hsScalarTriple* result, plControllerCacheInfo *cache) const
+void plLeafController::Interp(float time, hsScalarTriple* result, plControllerCacheInfo* cache) const
 {
     hsAssert(fType == hsKeyFrame::kPoint3KeyFrame || fType == hsKeyFrame::kBezPoint3KeyFrame, kInvalidInterpString);
 
-    bool tryForward = (cache? cache->fAtc->IsForewards() : true);
-    if (fType == hsKeyFrame::kPoint3KeyFrame)
-    {
-        hsPoint3Key *k1, *k2;
+    bool tryForward = (cache ? cache->fAtc->IsForewards() : true);
+
+    if (fType == hsKeyFrame::kPoint3KeyFrame) {
+        hsPoint3Key* k1, *k2;
         float t;
-        uint32_t *idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
+        uint32_t* idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
         hsInterp::GetBoundaryKeyFrames(time, fNumKeys, fKeys, sizeof(hsPoint3Key), (hsKeyFrame**)&k1, (hsKeyFrame**)&k2, idxStore, &t, tryForward);
         hsInterp::LinInterp(&k1->fValue, &k2->fValue, t, result);
-    }
-    else
-    {
-        hsBezPoint3Key *k1, *k2;
+    } else {
+        hsBezPoint3Key* k1, *k2;
         float t;
-        uint32_t *idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
+        uint32_t* idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
         hsInterp::GetBoundaryKeyFrames(time, fNumKeys, fKeys, sizeof(hsBezPoint3Key), (hsKeyFrame**)&k1, (hsKeyFrame**)&k2, idxStore, &t, tryForward);
         hsInterp::BezInterp(k1, k2, t, result);
     }
 }
 
-void plLeafController::Interp(float time, hsScaleValue* result, plControllerCacheInfo *cache) const
+void plLeafController::Interp(float time, hsScaleValue* result, plControllerCacheInfo* cache) const
 {
     hsAssert(fType == hsKeyFrame::kScaleKeyFrame || fType == hsKeyFrame::kBezScaleKeyFrame, kInvalidInterpString);
 
-    bool tryForward = (cache? cache->fAtc->IsForewards() : true);
-    if (fType == hsKeyFrame::kScaleKeyFrame)
-    {
-        hsScaleKey *k1, *k2;
+    bool tryForward = (cache ? cache->fAtc->IsForewards() : true);
+
+    if (fType == hsKeyFrame::kScaleKeyFrame) {
+        hsScaleKey* k1, *k2;
         float t;
-        uint32_t *idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
+        uint32_t* idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
         hsInterp::GetBoundaryKeyFrames(time, fNumKeys, fKeys, sizeof(hsScaleKey), (hsKeyFrame**)&k1, (hsKeyFrame**)&k2, idxStore, &t, tryForward);
         hsInterp::LinInterp(&k1->fValue, &k2->fValue, t, result);
-    }
-    else
-    {
-        hsBezScaleKey *k1, *k2;
+    } else {
+        hsBezScaleKey* k1, *k2;
         float t;
-        uint32_t *idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
+        uint32_t* idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
         hsInterp::GetBoundaryKeyFrames(time, fNumKeys, fKeys, sizeof(hsBezScaleKey), (hsKeyFrame**)&k1, (hsKeyFrame**)&k2, idxStore, &t, tryForward);
         hsInterp::BezInterp(k1, k2, t, result);
     }
 }
 
-void plLeafController::Interp(float time, hsQuat* result, plControllerCacheInfo *cache) const
+void plLeafController::Interp(float time, hsQuat* result, plControllerCacheInfo* cache) const
 {
-    hsAssert(fType == hsKeyFrame::kQuatKeyFrame || 
+    hsAssert(fType == hsKeyFrame::kQuatKeyFrame ||
              fType == hsKeyFrame::kCompressedQuatKeyFrame32 ||
              fType == hsKeyFrame::kCompressedQuatKeyFrame64, kInvalidInterpString);
 
-    bool tryForward = (cache? cache->fAtc->IsForewards() : true);
-    if (fType == hsKeyFrame::kQuatKeyFrame)
-    {
-        hsQuatKey *k1, *k2;
+    bool tryForward = (cache ? cache->fAtc->IsForewards() : true);
+
+    if (fType == hsKeyFrame::kQuatKeyFrame) {
+        hsQuatKey* k1, *k2;
         float t;
-        uint32_t *idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
+        uint32_t* idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
         hsInterp::GetBoundaryKeyFrames(time, fNumKeys, fKeys, sizeof(hsQuatKey), (hsKeyFrame**)&k1, (hsKeyFrame**)&k2, idxStore, &t, tryForward);
         hsInterp::LinInterp(&k1->fValue, &k2->fValue, t, result);
-    }
-    else if (fType == hsKeyFrame::kCompressedQuatKeyFrame32)
-    {
-        hsCompressedQuatKey32 *k1, *k2;
+    } else if (fType == hsKeyFrame::kCompressedQuatKeyFrame32) {
+        hsCompressedQuatKey32* k1, *k2;
         float t;
-        uint32_t *idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
+        uint32_t* idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
         hsInterp::GetBoundaryKeyFrames(time, fNumKeys, fKeys, sizeof(hsCompressedQuatKey32), (hsKeyFrame**)&k1, (hsKeyFrame**)&k2, idxStore, &t, tryForward);
 
         hsQuat q1, q2;
         k1->GetQuat(q1);
         k2->GetQuat(q2);
         hsInterp::LinInterp(&q1, &q2, t, result);
-    }
-    else // (fType == hsKeyFrame::kCompressedQuatKeyFrame64)
-    {
-        hsCompressedQuatKey64 *k1, *k2;
+    } else { // (fType == hsKeyFrame::kCompressedQuatKeyFrame64)
+        hsCompressedQuatKey64* k1, *k2;
         float t;
-        uint32_t *idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
+        uint32_t* idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
         hsInterp::GetBoundaryKeyFrames(time, fNumKeys, fKeys, sizeof(hsCompressedQuatKey64), (hsKeyFrame**)&k1, (hsKeyFrame**)&k2, idxStore, &t, tryForward);
 
         hsQuat q1, q2;
@@ -189,31 +183,31 @@ void plLeafController::Interp(float time, hsQuat* result, plControllerCacheInfo 
     }
 }
 
-void plLeafController::Interp(float time, hsMatrix33* result, plControllerCacheInfo *cache) const
+void plLeafController::Interp(float time, hsMatrix33* result, plControllerCacheInfo* cache) const
 {
     hsAssert(fType == hsKeyFrame::kMatrix33KeyFrame, kInvalidInterpString);
 
-    bool tryForward = (cache? cache->fAtc->IsForewards() : true);
-    hsMatrix33Key *k1, *k2;
+    bool tryForward = (cache ? cache->fAtc->IsForewards() : true);
+    hsMatrix33Key* k1, *k2;
     float t;
-    uint32_t *idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
+    uint32_t* idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
     hsInterp::GetBoundaryKeyFrames(time, fNumKeys, fKeys, sizeof(hsMatrix33Key), (hsKeyFrame**)&k1, (hsKeyFrame**)&k2, idxStore, &t, tryForward);
     hsInterp::LinInterp(&k1->fValue, &k2->fValue, t, result);
 }
 
-void plLeafController::Interp(float time, hsMatrix44* result, plControllerCacheInfo *cache) const
+void plLeafController::Interp(float time, hsMatrix44* result, plControllerCacheInfo* cache) const
 {
     hsAssert(fType == hsKeyFrame::kMatrix44KeyFrame, kInvalidInterpString);
 
-    bool tryForward = (cache? cache->fAtc->IsForewards() : true);
-    hsMatrix44Key *k1, *k2;
+    bool tryForward = (cache ? cache->fAtc->IsForewards() : true);
+    hsMatrix44Key* k1, *k2;
     float t;
-    uint32_t *idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
+    uint32_t* idxStore = (cache ? &cache->fKeyIndex : &fLastKeyIdx);
     hsInterp::GetBoundaryKeyFrames(time, fNumKeys, fKeys, sizeof(hsMatrix44Key), (hsKeyFrame**)&k1, (hsKeyFrame**)&k2, idxStore, &t, tryForward);
     hsInterp::LinInterp(&k1->fValue, &k2->fValue, t, result);
 }
 
-void plLeafController::Interp(float time, hsColorRGBA* result, plControllerCacheInfo *cache) const
+void plLeafController::Interp(float time, hsColorRGBA* result, plControllerCacheInfo* cache) const
 {
     hsPoint3 value;
     Interp(time, &value, cache);
@@ -222,9 +216,9 @@ void plLeafController::Interp(float time, hsColorRGBA* result, plControllerCache
     result->b = value.fZ;
 }
 
-plControllerCacheInfo *plLeafController::CreateCache() const
+plControllerCacheInfo* plLeafController::CreateCache() const
 {
-    plControllerCacheInfo *cache = new plControllerCacheInfo;
+    plControllerCacheInfo* cache = new plControllerCacheInfo;
     cache->fNumSubControllers = 0;
     return cache;
 }
@@ -232,173 +226,193 @@ plControllerCacheInfo *plLeafController::CreateCache() const
 float plLeafController::GetLength() const
 {
     uint32_t stride = GetStride();
-    if (stride == 0 || fNumKeys == 0)
-        return 0;
 
-    uint8_t *ptr = (uint8_t *)fKeys;
-    return ((hsKeyFrame *)(ptr + (fNumKeys - 1) * stride))->fFrame / MAX_FRAMES_PER_SEC; 
+    if (stride == 0 || fNumKeys == 0) {
+        return 0;
+    }
+
+    uint8_t* ptr = (uint8_t*)fKeys;
+    return ((hsKeyFrame*)(ptr + (fNumKeys - 1) * stride))->fFrame / MAX_FRAMES_PER_SEC;
 }
 
 uint32_t plLeafController::GetStride() const
 {
-    switch (fType)
-    {
+    switch (fType) {
     case hsKeyFrame::kPoint3KeyFrame:
         return sizeof(hsPoint3Key);
+
     case hsKeyFrame::kBezPoint3KeyFrame:
         return sizeof(hsBezPoint3Key);
+
     case hsKeyFrame::kScalarKeyFrame:
         return sizeof(hsScalarKey);
+
     case hsKeyFrame::kBezScalarKeyFrame:
         return sizeof(hsBezScalarKey);
+
     case hsKeyFrame::kScaleKeyFrame:
         return sizeof(hsScaleKey);
+
     case hsKeyFrame::kBezScaleKeyFrame:
         return sizeof(hsBezScaleKey);
+
     case hsKeyFrame::kQuatKeyFrame:
         return sizeof(hsQuatKey);
+
     case hsKeyFrame::kCompressedQuatKeyFrame32:
         return sizeof(hsCompressedQuatKey32);
+
     case hsKeyFrame::kCompressedQuatKeyFrame64:
         return sizeof(hsCompressedQuatKey64);
+
     case hsKeyFrame::k3dsMaxKeyFrame:
         return sizeof(hsG3DSMaxKeyFrame);
+
     case hsKeyFrame::kMatrix33KeyFrame:
         return sizeof(hsMatrix33Key);
+
     case hsKeyFrame::kMatrix44KeyFrame:
         return sizeof(hsMatrix44Key);
+
     case hsKeyFrame::kUnknownKeyFrame:
     default:
         return 0;
     }
 }
 
-hsPoint3Key *plLeafController::GetPoint3Key(uint32_t i) const
+hsPoint3Key* plLeafController::GetPoint3Key(uint32_t i) const
 {
-    if (fType != hsKeyFrame::kPoint3KeyFrame)
+    if (fType != hsKeyFrame::kPoint3KeyFrame) {
         return nil;
+    }
 
-    return (hsPoint3Key *)((uint8_t *)fKeys + i * sizeof(hsPoint3Key));
+    return (hsPoint3Key*)((uint8_t*)fKeys + i * sizeof(hsPoint3Key));
 }
 
-hsBezPoint3Key *plLeafController::GetBezPoint3Key(uint32_t i) const
+hsBezPoint3Key* plLeafController::GetBezPoint3Key(uint32_t i) const
 {
-    if (fType != hsKeyFrame::kBezPoint3KeyFrame)
+    if (fType != hsKeyFrame::kBezPoint3KeyFrame) {
         return nil;
+    }
 
-    return (hsBezPoint3Key *)((uint8_t *)fKeys + i * sizeof(hsBezPoint3Key));
+    return (hsBezPoint3Key*)((uint8_t*)fKeys + i * sizeof(hsBezPoint3Key));
 }
 
-hsScalarKey *plLeafController::GetScalarKey(uint32_t i) const
+hsScalarKey* plLeafController::GetScalarKey(uint32_t i) const
 {
-    if (fType != hsKeyFrame::kScalarKeyFrame)
+    if (fType != hsKeyFrame::kScalarKeyFrame) {
         return nil;
+    }
 
-    return (hsScalarKey *)((uint8_t *)fKeys + i * sizeof(hsScalarKey));
+    return (hsScalarKey*)((uint8_t*)fKeys + i * sizeof(hsScalarKey));
 }
 
-hsBezScalarKey *plLeafController::GetBezScalarKey(uint32_t i) const
+hsBezScalarKey* plLeafController::GetBezScalarKey(uint32_t i) const
 {
-    if (fType != hsKeyFrame::kBezScalarKeyFrame)
+    if (fType != hsKeyFrame::kBezScalarKeyFrame) {
         return nil;
+    }
 
-    return (hsBezScalarKey *)((uint8_t *)fKeys + i * sizeof(hsBezScalarKey));
+    return (hsBezScalarKey*)((uint8_t*)fKeys + i * sizeof(hsBezScalarKey));
 }
 
-hsScaleKey *plLeafController::GetScaleKey(uint32_t i) const
+hsScaleKey* plLeafController::GetScaleKey(uint32_t i) const
 {
-    if (fType != hsKeyFrame::kScaleKeyFrame)
+    if (fType != hsKeyFrame::kScaleKeyFrame) {
         return nil;
+    }
 
-    return (hsScaleKey *)((uint8_t *)fKeys + i * sizeof(hsScaleKey));
+    return (hsScaleKey*)((uint8_t*)fKeys + i * sizeof(hsScaleKey));
 }
 
-hsBezScaleKey *plLeafController::GetBezScaleKey(uint32_t i) const
+hsBezScaleKey* plLeafController::GetBezScaleKey(uint32_t i) const
 {
-    if (fType != hsKeyFrame::kBezScaleKeyFrame)
+    if (fType != hsKeyFrame::kBezScaleKeyFrame) {
         return nil;
+    }
 
-    return (hsBezScaleKey *)((uint8_t *)fKeys + i * sizeof(hsBezScaleKey));
+    return (hsBezScaleKey*)((uint8_t*)fKeys + i * sizeof(hsBezScaleKey));
 }
 
-hsQuatKey *plLeafController::GetQuatKey(uint32_t i) const
+hsQuatKey* plLeafController::GetQuatKey(uint32_t i) const
 {
-    if (fType != hsKeyFrame::kQuatKeyFrame)
+    if (fType != hsKeyFrame::kQuatKeyFrame) {
         return nil;
+    }
 
-    return (hsQuatKey *)((uint8_t *)fKeys + i * sizeof(hsQuatKey));
+    return (hsQuatKey*)((uint8_t*)fKeys + i * sizeof(hsQuatKey));
 }
 
-hsCompressedQuatKey32 *plLeafController::GetCompressedQuatKey32(uint32_t i) const
+hsCompressedQuatKey32* plLeafController::GetCompressedQuatKey32(uint32_t i) const
 {
-    if (fType != hsKeyFrame::kCompressedQuatKeyFrame32)
+    if (fType != hsKeyFrame::kCompressedQuatKeyFrame32) {
         return nil;
+    }
 
-    return (hsCompressedQuatKey32 *)((uint8_t *)fKeys + i * sizeof(hsCompressedQuatKey32));
+    return (hsCompressedQuatKey32*)((uint8_t*)fKeys + i * sizeof(hsCompressedQuatKey32));
 }
 
-hsCompressedQuatKey64 *plLeafController::GetCompressedQuatKey64(uint32_t i) const
+hsCompressedQuatKey64* plLeafController::GetCompressedQuatKey64(uint32_t i) const
 {
-    if (fType != hsKeyFrame::kCompressedQuatKeyFrame64)
+    if (fType != hsKeyFrame::kCompressedQuatKeyFrame64) {
         return nil;
+    }
 
-    return (hsCompressedQuatKey64 *)((uint8_t *)fKeys + i * sizeof(hsCompressedQuatKey64));
+    return (hsCompressedQuatKey64*)((uint8_t*)fKeys + i * sizeof(hsCompressedQuatKey64));
 }
 
-hsG3DSMaxKeyFrame *plLeafController::Get3DSMaxKey(uint32_t i) const
+hsG3DSMaxKeyFrame* plLeafController::Get3DSMaxKey(uint32_t i) const
 {
-    if (fType != hsKeyFrame::k3dsMaxKeyFrame)
+    if (fType != hsKeyFrame::k3dsMaxKeyFrame) {
         return nil;
+    }
 
-    return (hsG3DSMaxKeyFrame *)((uint8_t *)fKeys + i * sizeof(hsG3DSMaxKeyFrame));
+    return (hsG3DSMaxKeyFrame*)((uint8_t*)fKeys + i * sizeof(hsG3DSMaxKeyFrame));
 }
 
-hsMatrix33Key *plLeafController::GetMatrix33Key(uint32_t i) const
+hsMatrix33Key* plLeafController::GetMatrix33Key(uint32_t i) const
 {
-    if (fType != hsKeyFrame::kMatrix33KeyFrame)
+    if (fType != hsKeyFrame::kMatrix33KeyFrame) {
         return nil;
+    }
 
-    return (hsMatrix33Key *)((uint8_t *)fKeys + i * sizeof(hsMatrix33Key));
+    return (hsMatrix33Key*)((uint8_t*)fKeys + i * sizeof(hsMatrix33Key));
 }
 
-hsMatrix44Key *plLeafController::GetMatrix44Key(uint32_t i) const
+hsMatrix44Key* plLeafController::GetMatrix44Key(uint32_t i) const
 {
-    if (fType != hsKeyFrame::kMatrix44KeyFrame)
+    if (fType != hsKeyFrame::kMatrix44KeyFrame) {
         return nil;
+    }
 
-    return (hsMatrix44Key *)((uint8_t *)fKeys + i * sizeof(hsMatrix44Key));
+    return (hsMatrix44Key*)((uint8_t*)fKeys + i * sizeof(hsMatrix44Key));
 }
 
-void plLeafController::GetKeyTimes(hsTArray<float> &keyTimes) const
+void plLeafController::GetKeyTimes(hsTArray<float>& keyTimes) const
 {
     int cIdx;
     int kIdx;
     uint32_t stride = GetStride();
-    uint8_t *keyPtr = (uint8_t *)fKeys;
-    for (cIdx = 0, kIdx = 0; cIdx < fNumKeys, kIdx < keyTimes.GetCount();)
-    {
+    uint8_t* keyPtr = (uint8_t*)fKeys;
+
+    for (cIdx = 0, kIdx = 0; cIdx < fNumKeys, kIdx < keyTimes.GetCount();) {
         float kTime = keyTimes[kIdx];
         float cTime = ((hsKeyFrame*)(keyPtr + cIdx * stride))->fFrame / MAX_FRAMES_PER_SEC;
-        if (cTime < kTime)
-        {
+
+        if (cTime < kTime) {
             keyTimes.InsertAtIndex(kIdx, cTime);
             cIdx++;
             kIdx++;
-        }
-        else if (cTime > kTime)
-        {
+        } else if (cTime > kTime) {
             kIdx++;
-        }
-        else
-        {
+        } else {
             kIdx++;
             cIdx++;
         }
     }
 
     // All remaining times in the controller are later than the original keyTimes set
-    for (; cIdx < fNumKeys; cIdx++)
-    {
+    for (; cIdx < fNumKeys; cIdx++) {
         float cTime = ((hsKeyFrame*)(keyPtr + cIdx * stride))->fFrame / MAX_FRAMES_PER_SEC;
         keyTimes.Append(cTime);
     }
@@ -410,8 +424,7 @@ void plLeafController::AllocKeys(uint32_t numKeys, uint8_t type)
     fNumKeys = numKeys;
     fType = type;
 
-    switch (fType)
-    {
+    switch (fType) {
     case hsKeyFrame::kPoint3KeyFrame:
         fKeys = new hsPoint3Key[fNumKeys];
         break;
@@ -471,11 +484,11 @@ void plLeafController::QuickScalarController(int numKeys, float* times, float* v
 {
     AllocKeys(numKeys, hsKeyFrame::kScalarKeyFrame);
     int i;
-    for( i = 0; i < numKeys; i++ )
-    {
+
+    for (i = 0; i < numKeys; i++) {
         ((hsScalarKey*)fKeys)[i].fFrame = (uint16_t)(*times++ * MAX_FRAMES_PER_SEC);
         ((hsScalarKey*)fKeys)[i].fValue = *values;
-        values = (float *)((uint8_t *)values + valueStrides);
+        values = (float*)((uint8_t*)values + valueStrides);
     }
 }
 
@@ -484,116 +497,153 @@ void plLeafController::QuickScalarController(int numKeys, float* times, float* v
 // trying to convert character studio animations.
 bool plLeafController::AllKeysMatch() const
 {
-    if (fNumKeys <= 1)
+    if (fNumKeys <= 1) {
         return true;
+    }
 
     int idx;
-    for (idx = 1; idx < fNumKeys; idx++)
-    {
-        switch (fType)
-        {
-        case hsKeyFrame::kPoint3KeyFrame:
-            {
-                hsPoint3Key *k1 = GetPoint3Key(idx - 1);
-                hsPoint3Key *k2 = GetPoint3Key(idx);
-                if (!k1->CompareValue(k2))
+
+    for (idx = 1; idx < fNumKeys; idx++) {
+        switch (fType) {
+        case hsKeyFrame::kPoint3KeyFrame: {
+                hsPoint3Key* k1 = GetPoint3Key(idx - 1);
+                hsPoint3Key* k2 = GetPoint3Key(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
-        case hsKeyFrame::kBezPoint3KeyFrame:
-            {
-                hsBezPoint3Key *k1 = GetBezPoint3Key(idx - 1);
-                hsBezPoint3Key *k2 = GetBezPoint3Key(idx);
-                if (!k1->CompareValue(k2))
+
+        case hsKeyFrame::kBezPoint3KeyFrame: {
+                hsBezPoint3Key* k1 = GetBezPoint3Key(idx - 1);
+                hsBezPoint3Key* k2 = GetBezPoint3Key(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
-        case hsKeyFrame::kScalarKeyFrame:
-            {
-                hsScalarKey *k1 = GetScalarKey(idx - 1);
-                hsScalarKey *k2 = GetScalarKey(idx);
-                if (!k1->CompareValue(k2))
+
+        case hsKeyFrame::kScalarKeyFrame: {
+                hsScalarKey* k1 = GetScalarKey(idx - 1);
+                hsScalarKey* k2 = GetScalarKey(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
-        case hsKeyFrame::kBezScalarKeyFrame:
-            {
-                hsBezScalarKey *k1 = GetBezScalarKey(idx - 1);
-                hsBezScalarKey *k2 = GetBezScalarKey(idx);
-                if (!k1->CompareValue(k2))
+
+        case hsKeyFrame::kBezScalarKeyFrame: {
+                hsBezScalarKey* k1 = GetBezScalarKey(idx - 1);
+                hsBezScalarKey* k2 = GetBezScalarKey(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
-        case hsKeyFrame::kScaleKeyFrame:
-            {
-                hsScaleKey *k1 = GetScaleKey(idx - 1);
-                hsScaleKey *k2 = GetScaleKey(idx);
-                if (!k1->CompareValue(k2))
+
+        case hsKeyFrame::kScaleKeyFrame: {
+                hsScaleKey* k1 = GetScaleKey(idx - 1);
+                hsScaleKey* k2 = GetScaleKey(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
-        case hsKeyFrame::kBezScaleKeyFrame:
-            {
-                hsBezScaleKey *k1 = GetBezScaleKey(idx - 1);
-                hsBezScaleKey *k2 = GetBezScaleKey(idx);
-                if (!k1->CompareValue(k2))
+
+        case hsKeyFrame::kBezScaleKeyFrame: {
+                hsBezScaleKey* k1 = GetBezScaleKey(idx - 1);
+                hsBezScaleKey* k2 = GetBezScaleKey(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
-        case hsKeyFrame::kQuatKeyFrame:
-            {
-                hsQuatKey *k1 = GetQuatKey(idx - 1);
-                hsQuatKey *k2 = GetQuatKey(idx);
-                if (!k1->CompareValue(k2))
+
+        case hsKeyFrame::kQuatKeyFrame: {
+                hsQuatKey* k1 = GetQuatKey(idx - 1);
+                hsQuatKey* k2 = GetQuatKey(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
-        case hsKeyFrame::kCompressedQuatKeyFrame32:
-            {
-                hsCompressedQuatKey32 *k1 = GetCompressedQuatKey32(idx - 1);
-                hsCompressedQuatKey32 *k2 = GetCompressedQuatKey32(idx);
-                if (!k1->CompareValue(k2))
+
+        case hsKeyFrame::kCompressedQuatKeyFrame32: {
+                hsCompressedQuatKey32* k1 = GetCompressedQuatKey32(idx - 1);
+                hsCompressedQuatKey32* k2 = GetCompressedQuatKey32(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
-        case hsKeyFrame::kCompressedQuatKeyFrame64:
-            {
-                hsCompressedQuatKey64 *k1 = GetCompressedQuatKey64(idx - 1);
-                hsCompressedQuatKey64 *k2 = GetCompressedQuatKey64(idx);
-                if (!k1->CompareValue(k2))
+
+        case hsKeyFrame::kCompressedQuatKeyFrame64: {
+                hsCompressedQuatKey64* k1 = GetCompressedQuatKey64(idx - 1);
+                hsCompressedQuatKey64* k2 = GetCompressedQuatKey64(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
-        case hsKeyFrame::k3dsMaxKeyFrame:
-            {
-                hsG3DSMaxKeyFrame *k1 = Get3DSMaxKey(idx - 1);
-                hsG3DSMaxKeyFrame *k2 = Get3DSMaxKey(idx);
-                if (!k1->CompareValue(k2))
+
+        case hsKeyFrame::k3dsMaxKeyFrame: {
+                hsG3DSMaxKeyFrame* k1 = Get3DSMaxKey(idx - 1);
+                hsG3DSMaxKeyFrame* k2 = Get3DSMaxKey(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
-        case hsKeyFrame::kMatrix33KeyFrame:
-            {
-                hsMatrix33Key *k1 = GetMatrix33Key(idx - 1);
-                hsMatrix33Key *k2 = GetMatrix33Key(idx);
-                if (!k1->CompareValue(k2))
+
+        case hsKeyFrame::kMatrix33KeyFrame: {
+                hsMatrix33Key* k1 = GetMatrix33Key(idx - 1);
+                hsMatrix33Key* k2 = GetMatrix33Key(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
-        case hsKeyFrame::kMatrix44KeyFrame:
-            {
-                hsMatrix44Key *k1 = GetMatrix44Key(idx - 1);
-                hsMatrix44Key *k2 = GetMatrix44Key(idx);
-                if (!k1->CompareValue(k2))
+
+        case hsKeyFrame::kMatrix44KeyFrame: {
+                hsMatrix44Key* k1 = GetMatrix44Key(idx - 1);
+                hsMatrix44Key* k2 = GetMatrix44Key(idx);
+
+                if (!k1->CompareValue(k2)) {
                     return false;
+                }
+
                 break;
             }
+
         case hsKeyFrame::kUnknownKeyFrame:
         default:
             hsAssert(false, "Trying to compare unknown keyframe type");
             return false;
         }
     }
+
     return true;
 }
 
@@ -602,73 +652,97 @@ bool plLeafController::PurgeRedundantSubcontrollers()
     return AllKeysMatch();
 }
 
-void plLeafController::Read(hsStream* s, hsResMgr *mgr)
+void plLeafController::Read(hsStream* s, hsResMgr* mgr)
 {
     uint8_t type = s->ReadByte();
     uint32_t numKeys = s->ReadLE32();
     AllocKeys(numKeys, type);
 
     int i;
-    switch (fType)
-    {
+
+    switch (fType) {
     case hsKeyFrame::kPoint3KeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsPoint3Key *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsPoint3Key*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::kBezPoint3KeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsBezPoint3Key *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsBezPoint3Key*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::kScalarKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsScalarKey *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsScalarKey*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::kBezScalarKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsBezScalarKey *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsBezScalarKey*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::kScaleKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsScaleKey *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsScaleKey*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::kBezScaleKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsBezScaleKey *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsBezScaleKey*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::kQuatKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsQuatKey *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsQuatKey*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::kCompressedQuatKeyFrame32:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsCompressedQuatKey32 *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsCompressedQuatKey32*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::kCompressedQuatKeyFrame64:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsCompressedQuatKey64 *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsCompressedQuatKey64*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::k3dsMaxKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsG3DSMaxKeyFrame *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsG3DSMaxKeyFrame*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::kMatrix33KeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsMatrix33Key *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsMatrix33Key*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::kMatrix44KeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsMatrix44Key *)fKeys)[i].Read(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsMatrix44Key*)fKeys)[i].Read(s);
+        }
+
         break;
 
     case hsKeyFrame::kUnknownKeyFrame:
@@ -678,72 +752,96 @@ void plLeafController::Read(hsStream* s, hsResMgr *mgr)
     }
 }
 
-void plLeafController::Write(hsStream* s, hsResMgr *mgr)
+void plLeafController::Write(hsStream* s, hsResMgr* mgr)
 {
     s->WriteByte(fType);
     s->WriteLE32(fNumKeys);
 
     int i;
-    switch (fType)
-    {
+
+    switch (fType) {
     case hsKeyFrame::kPoint3KeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsPoint3Key *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsPoint3Key*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::kBezPoint3KeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsBezPoint3Key *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsBezPoint3Key*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::kScalarKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsScalarKey *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsScalarKey*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::kBezScalarKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsBezScalarKey *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsBezScalarKey*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::kScaleKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsScaleKey *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsScaleKey*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::kBezScaleKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsBezScaleKey *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsBezScaleKey*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::kQuatKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsQuatKey *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsQuatKey*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::kCompressedQuatKeyFrame32:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsCompressedQuatKey32 *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsCompressedQuatKey32*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::kCompressedQuatKeyFrame64:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsCompressedQuatKey64 *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsCompressedQuatKey64*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::k3dsMaxKeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsG3DSMaxKeyFrame *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsG3DSMaxKeyFrame*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::kMatrix33KeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsMatrix33Key *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsMatrix33Key*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::kMatrix44KeyFrame:
-        for (i = 0; i < fNumKeys; i++)
-            ((hsMatrix44Key *)fKeys)[i].Write(s);
+        for (i = 0; i < fNumKeys; i++) {
+            ((hsMatrix44Key*)fKeys)[i].Write(s);
+        }
+
         break;
 
     case hsKeyFrame::kUnknownKeyFrame:
@@ -764,19 +862,24 @@ plCompoundController::~plCompoundController()
     delete fZController;
 }
 
-void plCompoundController::Interp(float time, hsScalarTriple* result, plControllerCacheInfo *cache) const
+void plCompoundController::Interp(float time, hsScalarTriple* result, plControllerCacheInfo* cache) const
 {
-    if (fXController)
+    if (fXController) {
         fXController->Interp(time, &result->fX, (cache ? cache->fSubControllers[0] : nil));
-    if (fYController)
+    }
+
+    if (fYController) {
         fYController->Interp(time, &result->fY, (cache ? cache->fSubControllers[1] : nil));
-    if (fZController)
+    }
+
+    if (fZController) {
         fZController->Interp(time, &result->fZ, (cache ? cache->fSubControllers[2] : nil));
+    }
 }
 
-void plCompoundController::Interp(float time, hsQuat* result, plControllerCacheInfo *cache) const
+void plCompoundController::Interp(float time, hsQuat* result, plControllerCacheInfo* cache) const
 {
-    hsEuler eul(0,0,0,EulOrdXYZs);
+    hsEuler eul(0, 0, 0, EulOrdXYZs);
 
     fXController->Interp(time, &eul.fX, (cache ? cache->fSubControllers[0] : nil));
     fYController->Interp(time, &eul.fY, (cache ? cache->fSubControllers[1] : nil));
@@ -785,24 +888,26 @@ void plCompoundController::Interp(float time, hsQuat* result, plControllerCacheI
     eul.GetQuat(result);
 }
 
-void plCompoundController::Interp(float time, hsAffineParts* parts, plControllerCacheInfo *cache) const
+void plCompoundController::Interp(float time, hsAffineParts* parts, plControllerCacheInfo* cache) const
 {
-    if (fXController)
+    if (fXController) {
         fXController->Interp(time, &parts->fT, (cache ? cache->fSubControllers[0] : nil));
+    }
 
-    if (fYController)
+    if (fYController) {
         fYController->Interp(time, &parts->fQ, (cache ? cache->fSubControllers[1] : nil));
+    }
 
     hsScaleValue sv;
-    if (fZController)
-    {
+
+    if (fZController) {
         fZController->Interp(time, &sv, (cache ? cache->fSubControllers[2] : nil));
         parts->fU = sv.fQ;
         parts->fK = sv.fS;
     }
 }
 
-void plCompoundController::Interp(float time, hsColorRGBA* result, plControllerCacheInfo *cache) const
+void plCompoundController::Interp(float time, hsColorRGBA* result, plControllerCacheInfo* cache) const
 {
     fXController->Interp(time, &result->r, (cache ? cache->fSubControllers[0] : nil));
     fYController->Interp(time, &result->g, (cache ? cache->fSubControllers[1] : nil));
@@ -811,24 +916,31 @@ void plCompoundController::Interp(float time, hsColorRGBA* result, plControllerC
 
 float plCompoundController::GetLength() const
 {
-    float len=0;
+    float len = 0;
     int i;
-    for(i=0; i<3; i++)
-    {
-        if (GetController(i))
+
+    for (i = 0; i < 3; i++) {
+        if (GetController(i)) {
             len = hsMaximum(len, GetController(i)->GetLength());
+        }
     }
+
     return len;
 }
 
-void plCompoundController::GetKeyTimes(hsTArray<float> &keyTimes) const
+void plCompoundController::GetKeyTimes(hsTArray<float>& keyTimes) const
 {
-    if (fXController)
+    if (fXController) {
         fXController->GetKeyTimes(keyTimes);
-    if (fYController)
+    }
+
+    if (fYController) {
         fYController->GetKeyTimes(keyTimes);
-    if (fZController)
+    }
+
+    if (fZController) {
         fZController->GetKeyTimes(keyTimes);
+    }
 }
 
 bool plCompoundController::AllKeysMatch() const
@@ -856,20 +968,17 @@ bool plCompoundController::AllKeysMatch() const
 // recursively call purge on its subcontrollers.)
 bool plCompoundController::PurgeRedundantSubcontrollers()
 {
-    if (fXController && fXController->AllKeysMatch())
-    {
+    if (fXController && fXController->AllKeysMatch()) {
         delete fXController;
         fXController = nil;
     }
 
-    if (fYController && fYController->AllKeysMatch())
-    {
+    if (fYController && fYController->AllKeysMatch()) {
         delete fYController;
         fYController = nil;
     }
 
-    if (fZController && fZController->AllKeysMatch())
-    {
+    if (fZController && fZController->AllKeysMatch()) {
         delete fZController;
         fZController = nil;
     }
@@ -883,31 +992,33 @@ plControllerCacheInfo* plCompoundController::CreateCache() const
     cache->fNumSubControllers = 3;
     cache->fSubControllers = new plControllerCacheInfo*[cache->fNumSubControllers];
     int i;
-    for (i = 0; i < cache->fNumSubControllers; i++)
+
+    for (i = 0; i < cache->fNumSubControllers; i++) {
         cache->fSubControllers[i] = (GetController(i) ? GetController(i)->CreateCache() : nil);
+    }
 
     return cache;
 }
 
 plController* plCompoundController::GetController(int32_t i) const
-{ 
-    return (i==0 ? fXController : (i==1 ? fYController : fZController)); 
+{
+    return (i == 0 ? fXController : (i == 1 ? fYController : fZController));
 }
 
-void plCompoundController::SetController(int32_t i, plController* c) 
-{ 
-    delete GetController(i); 
-    (i==0 ? fXController : (i==1 ? fYController : fZController)) = c; 
+void plCompoundController::SetController(int32_t i, plController* c)
+{
+    delete GetController(i);
+    (i == 0 ? fXController : (i == 1 ? fYController : fZController)) = c;
 }
 
-void plCompoundController::Read(hsStream* stream, hsResMgr *mgr)
+void plCompoundController::Read(hsStream* stream, hsResMgr* mgr)
 {
     fXController = plController::ConvertNoRef(mgr->ReadCreatable(stream));
     fYController = plController::ConvertNoRef(mgr->ReadCreatable(stream));
     fZController = plController::ConvertNoRef(mgr->ReadCreatable(stream));
 }
 
-void plCompoundController::Write(hsStream* stream, hsResMgr *mgr)
+void plCompoundController::Write(hsStream* stream, hsResMgr* mgr)
 {
     mgr->WriteCreatable(stream, fXController);
     mgr->WriteCreatable(stream, fYController);

@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "HeadSpin.h"
 
-struct plCrashLink
-{
+struct plCrashLink {
 };
 
 #endif // _pnCrashCommon_h_

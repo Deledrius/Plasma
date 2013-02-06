@@ -47,11 +47,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 bool plGameMarkerModifier::MsgReceive(plMessage* msg)
 {
-    plCollideMsg *collideMsg = plCollideMsg::ConvertNoRef(msg);
-    if (collideMsg)
-    {
-        if (collideMsg->fEntering)
-        {
+    plCollideMsg* collideMsg = plCollideMsg::ConvertNoRef(msg);
+
+    if (collideMsg) {
+        if (collideMsg->fEntering) {
             plNotifyMsg* notify = new plNotifyMsg;
             notify->AddCollisionEvent(true, collideMsg->fOtherKey, GetTarget()->GetKey());
             notify->Send(hsgResMgr::ResMgr()->FindKey(kMarkerMgr_KEY));

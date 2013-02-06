@@ -106,93 +106,95 @@ void DummyCodeIncludeFuncParticles()
 //
 // stuff for plParticleComponent
 
-const char *plParticleCoreComponent::GenStrings[] = // line these up with the generation types enum.
-{
+const char* plParticleCoreComponent::GenStrings[] = { // line these up with the generation types enum.
     "Point Source",
     "Mesh",
     "One Per Vertex"
 };
 
-bool plParticleCoreComponent::IsParticleSystemComponent(plComponentBase *comp)
+bool plParticleCoreComponent::IsParticleSystemComponent(plComponentBase* comp)
 {
-    if (comp->ClassID() == PARTICLE_SYSTEM_COMPONENT_CLASS_ID)
+    if (comp->ClassID() == PARTICLE_SYSTEM_COMPONENT_CLASS_ID) {
         return true;
+    }
 
     return false;
 }
 
-bool plParticleCoreComponent::NodeHasSystem(plMaxNode *pNode)
+bool plParticleCoreComponent::NodeHasSystem(plMaxNode* pNode)
 {
     int i;
-    for (i = 0; i < pNode->NumAttachedComponents(); i++)
-    {
-        if (plParticleCoreComponent::IsParticleSystemComponent(pNode->GetAttachedComponent(i)))
+
+    for (i = 0; i < pNode->NumAttachedComponents(); i++) {
+        if (plParticleCoreComponent::IsParticleSystemComponent(pNode->GetAttachedComponent(i))) {
             return true;
+        }
     }
+
     return false;
 }
 
-bool plParticleCoreComponent::PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plParticleCoreComponent::PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
-    GetParamVals( pNode );
+    GetParamVals(pNode);
     pNode->SetForceLocal(true);
     pNode->SetDrawable(false);
     pNode->SetParticleRelated(true);
 
-    Mtl *maxMaterial = hsMaterialConverter::Instance().GetBaseMtl(pNode);
-    plConvert &convert = plConvert::Instance();
-    if (!hsMaterialConverter::IsParticleMat(maxMaterial))
-    {
+    Mtl* maxMaterial = hsMaterialConverter::Instance().GetBaseMtl(pNode);
+    plConvert& convert = plConvert::Instance();
+
+    if (!hsMaterialConverter::IsParticleMat(maxMaterial)) {
         maxMaterial = nil;
         pNode->SetMtl(NULL);
+
         if (pErrMsg->Set(!(convert.fWarned & plConvert::kWarnedBadMaterialOnParticle), pNode->GetName(),
-        "Only \"Plasma Particle\" materials (not in a multi-material) may be applied to particle system objects."
-        " Using a default material for now.").CheckAskOrCancel())
-        {
+                         "Only \"Plasma Particle\" materials (not in a multi-material) may be applied to particle system objects."
+                         " Using a default material for now.").CheckAskOrCancel()) {
             convert.fWarned |= plConvert::kWarnedBadMaterialOnParticle;
         }
+
         pErrMsg->Set(false);
     }
 
     // Moving this from Convert so the DrawInterface will appear sooner. Other components expect
     // the interfaces to be fully set up by the Convert pass.
-    plSceneNode *sNode = plSceneNode::ConvertNoRef( pNode->GetRoomKey()->GetObjectPtr() );
-    plDrawInterface *di = new plDrawInterface;
+    plSceneNode* sNode = plSceneNode::ConvertNoRef(pNode->GetRoomKey()->GetObjectPtr());
+    plDrawInterface* di = new plDrawInterface;
     hsgResMgr::ResMgr()->NewKey(IGetUniqueName(pNode), di, pNode->GetLocation(), pNode->GetLoadMask());
-    hsgResMgr::ResMgr()->AddViaNotify( di->GetKey(), new plObjRefMsg(pNode->GetSceneObject()->GetKey(), plRefMsg::kOnCreate, 0, plObjRefMsg::kInterface ), plRefFlags::kActiveRef );
+    hsgResMgr::ResMgr()->AddViaNotify(di->GetKey(), new plObjRefMsg(pNode->GetSceneObject()->GetKey(), plRefMsg::kOnCreate, 0, plObjRefMsg::kInterface), plRefFlags::kActiveRef);
     pNode->SetDISceneNodeSpans(di, true);
 
     return true;
 }
 
-bool plParticleCoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
-{   
+bool plParticleCoreComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
+{
     int32_t i, j, k;
 
     plLocation nodeLoc = node->GetKey()->GetUoid().GetLocation();
     plString objName = node->GetKey()->GetName();
 
-    plSceneObject *sObj = node->GetSceneObject();
-    plParticleSystem *sys = new plParticleSystem();
+    plSceneObject* sObj = node->GetSceneObject();
+    plParticleSystem* sys = new plParticleSystem();
 
-    hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), sys, nodeLoc, node->GetLoadMask());   
+    hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), sys, nodeLoc, node->GetLoadMask());
 
     // Add material and lifespan animated params.
-    Mtl *maxMaterial = hsMaterialConverter::Instance().GetBaseMtl(node);
-    hsTArray<hsGMaterial *> matArray;
+    Mtl* maxMaterial = hsMaterialConverter::Instance().GetBaseMtl(node);
+    hsTArray<hsGMaterial*> matArray;
     hsMaterialConverter::Instance().GetMaterialArray(maxMaterial, node, matArray);
     hsGMaterial* particleMat = matArray[0];
-    
-    plController *ambientCtl = nil;
-    plController *diffuseCtl = nil;
-    plController *opacityCtl = nil; 
-    plController *widthCtl = nil;
-    plController *heightCtl = nil;
+
+    plController* ambientCtl = nil;
+    plController* diffuseCtl = nil;
+    plController* opacityCtl = nil;
+    plController* widthCtl = nil;
+    plController* heightCtl = nil;
     hsControlConverter& cc = hsControlConverter::Instance();
 
-    if (hsMaterialConverter::IsParticleMat(maxMaterial)) // Exporter will yell if this is false, but we have to handle it
-    {
-        plParticleMtl *particleMtl = (plParticleMtl *)maxMaterial; // We check beforehand that this is ok
+    if (hsMaterialConverter::IsParticleMat(maxMaterial)) { // Exporter will yell if this is false, but we have to handle it
+        plParticleMtl* particleMtl = (plParticleMtl*)maxMaterial;  // We check beforehand that this is ok
         SetParticleStats(particleMtl);
         ambientCtl = cc.MakeColorController(particleMtl->GetAmbColorController(), node);
         diffuseCtl = cc.MakeColorController(particleMtl->GetColorController(), node);
@@ -203,10 +205,10 @@ bool plParticleCoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 
     float genLife        = -1;
     float partLifeMin, partLifeMax;
-    float pps            = fUserInput.fPPS; 
+    float pps            = fUserInput.fPPS;
     hsPoint3 pos(0, 0, 0);
     float pitch          = PI;
-    float yaw            = 0; 
+    float yaw            = 0;
     float angleRange     = fUserInput.fConeAngle * PI / 180.f;
     float velMin         = fUserInput.fVelocityMin;
     float velMax         = fUserInput.fVelocityMax;
@@ -220,67 +222,66 @@ bool plParticleCoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     float massRange      = fUserInput.fMassRange;
     float rotRange       = fUserInput.fRotRange * PI / 180.f;
 
-    uint32_t xTiles = fUserInput.fXTiles; 
-    uint32_t yTiles = fUserInput.fYTiles; 
+    uint32_t xTiles = fUserInput.fXTiles;
+    uint32_t yTiles = fUserInput.fYTiles;
     uint32_t maxEmitters = 1 + GetEmitterReserve();
-    uint32_t maxTotalParticles = 0;   
+    uint32_t maxTotalParticles = 0;
 
     // Need to do this even when immortal, so that maxTotalParticles is computed correctly.
     partLifeMin = fUserInput.fLifeMin;
     partLifeMax = fUserInput.fLifeMax;
-    plLeafController *ppsCtl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kPPS)), node);
-    if (ppsCtl != nil && ppsCtl->GetLength() > 0)
-    {
+    plLeafController* ppsCtl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kPPS)), node);
+
+    if (ppsCtl != nil && ppsCtl->GetLength() > 0) {
         // Simulate just the birth across the curve and record the max
-        float frameDelta = (1.f / MAX_FRAMES_PER_SEC); 
+        float frameDelta = (1.f / MAX_FRAMES_PER_SEC);
         float avgLife = (partLifeMax + partLifeMin) / 2;
         uint32_t count = node->NumAttachedComponents();
         uint32_t lifeTicks = avgLife / frameDelta;
-        float *birth = new float[lifeTicks];
+        float* birth = new float[lifeTicks];
 
         // Find any anim components attached to the same node.
-        for (i = 0; i < count; i++)
-        {
-            if (!plAnimComponentBase::IsAnimComponent(node->GetAttachedComponent(i)))
+        for (i = 0; i < count; i++) {
+            if (!plAnimComponentBase::IsAnimComponent(node->GetAttachedComponent(i))) {
                 continue;
+            }
 
             float maxAnimParticles = 0;
 
-            plAnimComponentBase *comp = (plAnimComponentBase *)node->GetAttachedComponent(i);
-            plATCAnim *anim = plATCAnim::ConvertNoRef(comp->fAnims[node]);
+            plAnimComponentBase* comp = (plAnimComponentBase*)node->GetAttachedComponent(i);
+            plATCAnim* anim = plATCAnim::ConvertNoRef(comp->fAnims[node]);
 
             // If it's an ATC anim, we can be aggressive in determining the max
-            if (anim)
-            {           
+            if (anim) {
                 float curAnimParticles = 0;
 
                 float loopStart, loopEnd;
 
-                for (j = -1; j < (int32_t)anim->GetNumLoops(); j++)
-                {
+                for (j = -1; j < (int32_t)anim->GetNumLoops(); j++) {
                     // Initialize our birth counters
-                    for (k = 0; k < lifeTicks; k++)
+                    for (k = 0; k < lifeTicks; k++) {
                         birth[k] = 0;
+                    }
 
-                    if (j == -1)
-                    {
+                    if (j == -1) {
                         loopStart = anim->GetStart();
                         loopEnd = anim->GetEnd();
-                    }
-                    else
+                    } else {
                         anim->GetLoop(j, loopStart, loopEnd);
+                    }
 
                     float loopLength = loopEnd - loopStart;
 
-                    if (loopLength == 0) // It's the default "(Entire Animation)"
+                    if (loopLength == 0) { // It's the default "(Entire Animation)"
                         loopLength = ppsCtl->GetLength();
+                    }
 
                     uint32_t loopTicks = loopLength * MAX_FRAMES_PER_SEC;
 
                     uint32_t startTick = loopStart * MAX_FRAMES_PER_SEC;
                     uint32_t tick;
-                    for (tick = 0; tick < loopTicks + lifeTicks; tick++)
-                    {
+
+                    for (tick = 0; tick < loopTicks + lifeTicks; tick++) {
                         curAnimParticles -= birth[tick % lifeTicks] * frameDelta;
                         float birthStart = 0.f;
                         float birthEnd = 0.f;
@@ -288,80 +289,87 @@ bool plParticleCoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
                         ppsCtl->Interp(((tick % loopTicks) + startTick + 1) * frameDelta, &birthEnd);
                         birth[tick % lifeTicks] = (birthStart + birthEnd) / 2;
                         curAnimParticles += birth[tick % lifeTicks] * frameDelta;
-                        if (curAnimParticles > maxAnimParticles)
+
+                        if (curAnimParticles > maxAnimParticles) {
                             maxAnimParticles = curAnimParticles;
+                        }
                     }
                 }
-            }
-            else // No info on the animation. Assume the worst.
-            {
+            } else { // No info on the animation. Assume the worst.
                 float maxPps = 0;
                 int i;
-                for (i = 1; i < ppsCtl->GetNumKeys(); i++)
-                {
-                    float curVal = 0;
-                    hsScalarKey *key = ppsCtl->GetScalarKey(i);
-                    if (key)
-                        curVal = key->fValue;
-                    
-                    hsBezScalarKey *bezKey = ppsCtl->GetBezScalarKey(i);
-                    if (bezKey)
-                        curVal = bezKey->fValue;
 
-                    if( curVal > maxPps )
+                for (i = 1; i < ppsCtl->GetNumKeys(); i++) {
+                    float curVal = 0;
+                    hsScalarKey* key = ppsCtl->GetScalarKey(i);
+
+                    if (key) {
+                        curVal = key->fValue;
+                    }
+
+                    hsBezScalarKey* bezKey = ppsCtl->GetBezScalarKey(i);
+
+                    if (bezKey) {
+                        curVal = bezKey->fValue;
+                    }
+
+                    if (curVal > maxPps) {
                         maxPps = curVal;
+                    }
                 }
+
                 maxAnimParticles = maxPps * (partLifeMax - (partLifeMax - partLifeMin) / 2);
             }
-            
-            if (maxTotalParticles < maxAnimParticles)
+
+            if (maxTotalParticles < maxAnimParticles) {
                 maxTotalParticles = (uint32_t)maxAnimParticles;
+            }
         }
+
         delete [] birth;
-    }
-    else
-    {
+    } else {
         maxTotalParticles = pps * (partLifeMax - (partLifeMax - partLifeMin) / 2);
     }
+
     maxTotalParticles *=  maxEmitters;
 
     delete ppsCtl;
     ppsCtl = nil;
-    
+
     uint32_t maxAllowedParticles = plGBufferGroup::kMaxNumIndicesPerBuffer / 6;
-    if (maxTotalParticles > maxAllowedParticles)
-    {
+
+    if (maxTotalParticles > maxAllowedParticles) {
         char text[512];
         sprintf(text, "This particle system requires a buffer for %d particles. "
-                      "The max allowed for a single system is %d. Capping this system "
-                      "at the max. If you need more, create a 2nd particle system "
-                      "and balance out the birthrates.", 
-                      maxTotalParticles, maxAllowedParticles);
+                "The max allowed for a single system is %d. Capping this system "
+                "at the max. If you need more, create a 2nd particle system "
+                "and balance out the birthrates.",
+                maxTotalParticles, maxAllowedParticles);
 
-        plConvert &convert = plConvert::Instance();
-        if (pErrMsg->Set(!(convert.fWarned & plConvert::kWarnedTooManyParticles), node->GetName(), text).CheckAskOrCancel())
-        {
+        plConvert& convert = plConvert::Instance();
+
+        if (pErrMsg->Set(!(convert.fWarned & plConvert::kWarnedTooManyParticles), node->GetName(), text).CheckAskOrCancel()) {
             convert.fWarned |= plConvert::kWarnedTooManyParticles;
         }
+
         pErrMsg->Set(false);
         maxTotalParticles = maxAllowedParticles;
     }
-    
-    if (fUserInput.fImmortal)
-    {
+
+    if (fUserInput.fImmortal) {
         partLifeMin     = -1.0;
         partLifeMax     = -1.0;
     }
 
     // Figure out the appropriate generator to add
-    plParticleGenerator *generator = nil;
+    plParticleGenerator* generator = nil;
     uint32_t sources;
-    float *pitchArray;
-    float *yawArray;
-    hsPoint3 *pointArray;
-    hsVector3 *dirArray;
-    if (fUserInput.fGenType == kGenPoint)
-    {
+    float* pitchArray;
+    float* yawArray;
+    hsPoint3* pointArray;
+    hsVector3* dirArray;
+
+    if (fUserInput.fGenType == kGenPoint) {
         sources = 1;
         pitchArray = new float[sources];
         yawArray = new float[sources];
@@ -369,13 +377,11 @@ bool plParticleCoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
         pitchArray[0] = pitch;
         yawArray[0] = yaw;
         pointArray[0].Set(0, 0, 0);
-        plSimpleParticleGenerator *gen = new plSimpleParticleGenerator();
-        gen->Init(genLife, partLifeMin, partLifeMax, pps, sources, pointArray, pitchArray, yawArray, angleRange, 
+        plSimpleParticleGenerator* gen = new plSimpleParticleGenerator();
+        gen->Init(genLife, partLifeMin, partLifeMax, pps, sources, pointArray, pitchArray, yawArray, angleRange,
                   velMin, velMax, xSize, ySize, scaleMin, scaleMax, massRange, rotRange);
         generator = gen;
-    }
-    else if (fUserInput.fGenType == kGenMesh)
-    {
+    } else if (fUserInput.fGenType == kGenMesh) {
         hsTArray<hsVector3> normals;
         hsTArray<hsPoint3> pos;
         plMeshConverter::Instance().StuffPositionsAndNormals(node, &pos, &normals);
@@ -384,18 +390,17 @@ bool plParticleCoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
         yawArray = new float[sources];
         pointArray = new hsPoint3[sources];
         int i;
-        for (i = 0; i < sources; i++)
-        {
+
+        for (i = 0; i < sources; i++) {
             plParticleGenerator::ComputePitchYaw(pitchArray[i], yawArray[i], normals.Get(i));
             pointArray[i] = pos.Get(i);
         }
-        plSimpleParticleGenerator *gen = new plSimpleParticleGenerator();
-        gen->Init(genLife, partLifeMin, partLifeMax, pps, sources, pointArray, pitchArray, yawArray, angleRange, 
+
+        plSimpleParticleGenerator* gen = new plSimpleParticleGenerator();
+        gen->Init(genLife, partLifeMin, partLifeMax, pps, sources, pointArray, pitchArray, yawArray, angleRange,
                   velMin, velMax, xSize, ySize, scaleMin, scaleMax, massRange, rotRange);
         generator = gen;
-    }
-    else // One per vertex
-    {
+    } else { // One per vertex
         hsTArray<hsVector3> normals;
         hsTArray<hsPoint3> pos;
         plMeshConverter::Instance().StuffPositionsAndNormals(node, &pos, &normals);
@@ -404,13 +409,13 @@ bool plParticleCoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
         pointArray = new hsPoint3[sources];
         dirArray = new hsVector3[sources];
         int i;
-        for (i = 0; i < sources; i++)
-        {
+
+        for (i = 0; i < sources; i++) {
             dirArray[i] = normals.Get(i);
             pointArray[i] = pos.Get(i);
         }
 
-        plOneTimeParticleGenerator *gen = new plOneTimeParticleGenerator();
+        plOneTimeParticleGenerator* gen = new plOneTimeParticleGenerator();
         gen->Init(sources, pointArray, dirArray, xSize, ySize, scaleMin, scaleMax, rotRange);
         generator = gen;
         maxTotalParticles = sources;
@@ -418,89 +423,99 @@ bool plParticleCoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     }
 
     // Init and attach to the scene object
-    sys->Init(xTiles, yTiles, maxTotalParticles, maxEmitters, ambientCtl, diffuseCtl, opacityCtl, 
+    sys->Init(xTiles, yTiles, maxTotalParticles, maxEmitters, ambientCtl, diffuseCtl, opacityCtl,
               widthCtl, heightCtl);
-    hsgResMgr::ResMgr()->AddViaNotify( particleMat->GetKey(), new plGenRefMsg( sys->GetKey(), plRefMsg::kOnCreate, 0, 0 ), plRefFlags::kActiveRef );
-    hsgResMgr::ResMgr()->AddViaNotify( sys->GetKey(), new plObjRefMsg( sObj->GetKey(), plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier ), plRefFlags::kActiveRef );
+    hsgResMgr::ResMgr()->AddViaNotify(particleMat->GetKey(), new plGenRefMsg(sys->GetKey(), plRefMsg::kOnCreate, 0, 0), plRefFlags::kActiveRef);
+    hsgResMgr::ResMgr()->AddViaNotify(sys->GetKey(), new plObjRefMsg(sObj->GetKey(), plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier), plRefFlags::kActiveRef);
 
     // Set up normals and orientation
     uint32_t miscFlags = 0;
-    switch(fUserInput.fNormal)
-    {
+
+    switch (fUserInput.fNormal) {
     case plParticleMtl::kNormalViewFacing:
         miscFlags |= plParticleEmitter::kNormalViewFacing;
         break;
+
     case plParticleMtl::kNormalUp:
     case plParticleMtl::kEmissive: // For emissive, we don't care about the normal. This choice makes us
-                                   // not waste time computing one.
+        // not waste time computing one.
         miscFlags |= plParticleEmitter::kNormalUp;
         break;
+
     case plParticleMtl::kNormalNearestLight:
         miscFlags |= plParticleEmitter::kNormalNearestLight;
         break;
+
     case plParticleMtl::kNormalFromCenter:
         miscFlags |= plParticleEmitter::kNormalFromCenter;
         break;
+
     case plParticleMtl::kNormalVelUpVel:
         miscFlags |= plParticleEmitter::kNormalVelUpVel;
         break;
     }
 
-    switch(fUserInput.fOrientation)
-    {
+    switch (fUserInput.fOrientation) {
     case plParticleMtl::kOrientVelocity:
         miscFlags |= plParticleEmitter::kOrientationVelocityBased;
         break;
+
     case plParticleMtl::kOrientUp:
         miscFlags |= plParticleEmitter::kOrientationUp;
         break;
+
     case plParticleMtl::kOrientVelStretch:
         miscFlags |= plParticleEmitter::kOrientationVelocityStretch;
         break;
+
     case plParticleMtl::kOrientVelFlow:
         miscFlags |= plParticleEmitter::kOrientationVelocityFlow;
         break;
     }
-    
+
     if (fUserInput.fGenType == kGenOnePerVertex &&
-        (miscFlags & plParticleEmitter::kOrientationVelocityMask))
-    {
+            (miscFlags & plParticleEmitter::kOrientationVelocityMask)) {
         char text[256];
         sprintf(text, "This particle system has an orientation that's based on velocity "
-                      "(see the Particle Material), which doesn't work with OnePerVertex "
-                      "generation. No particles from this system will be visible.");
+                "(see the Particle Material), which doesn't work with OnePerVertex "
+                "generation. No particles from this system will be visible.");
 
-        plConvert &convert = plConvert::Instance();
-        if (pErrMsg->Set(!(convert.fWarned & plConvert::kWarnedParticleVelAndOnePer), node->GetName(), text).CheckAskOrCancel())
-        {
+        plConvert& convert = plConvert::Instance();
+
+        if (pErrMsg->Set(!(convert.fWarned & plConvert::kWarnedParticleVelAndOnePer), node->GetName(), text).CheckAskOrCancel()) {
             convert.fWarned |= plConvert::kWarnedParticleVelAndOnePer;
         }
+
         pErrMsg->Set(false);
     }
-    if( maxEmitters > 1 )
-        miscFlags |= plParticleEmitter::kOnReserve;
 
-    sys->AddEmitter( maxTotalParticles, generator, miscFlags );
+    if (maxEmitters > 1) {
+        miscFlags |= plParticleEmitter::kOnReserve;
+    }
+
+    sys->AddEmitter(maxTotalParticles, generator, miscFlags);
     sys->SetGravity(gravity);
     sys->SetDrag(drag);
     sys->SetWindMult(windMult);
     sys->SetPreSim(fUserInput.fPreSim);
 
     // Finally, any attached effects.
-    for (i = 0; i < node->NumAttachedComponents(); i++)
-    {
-        plComponentBase *comp = node->GetAttachedComponent(i);
-        if (plParticleEffectComponent::IsParticleEffectComponent(comp))
-            ((plParticleEffectComponent *)comp)->AddToParticleSystem(sys, node);
-        if (comp->ClassID() == LIGHTGRP_COMP_CID)
+    for (i = 0; i < node->NumAttachedComponents(); i++) {
+        plComponentBase* comp = node->GetAttachedComponent(i);
+
+        if (plParticleEffectComponent::IsParticleEffectComponent(comp)) {
+            ((plParticleEffectComponent*)comp)->AddToParticleSystem(sys, node);
+        }
+
+        if (comp->ClassID() == LIGHTGRP_COMP_CID) {
             IHandleLights((plLightGrpComponent*)comp, sys);
+        }
     }
-    
-    if (fCompPB->GetInt(ParamID(kFollowSystem)))
-    {
-        plParticleFollowSystemEffect *effect = new plParticleFollowSystemEffect;
+
+    if (fCompPB->GetInt(ParamID(kFollowSystem))) {
+        plParticleFollowSystemEffect* effect = new plParticleFollowSystemEffect;
         hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), effect, node->GetLocation(), node->GetLoadMask());
-        hsgResMgr::ResMgr()->AddViaNotify( effect->GetKey(), new plGenRefMsg( sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectMisc ), plRefFlags::kActiveRef );
+        hsgResMgr::ResMgr()->AddViaNotify(effect->GetKey(), new plGenRefMsg(sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectMisc), plRefFlags::kActiveRef);
     }
 
     return true;
@@ -510,92 +525,89 @@ void plParticleCoreComponent::IHandleLights(plLightGrpComponent* liGrp, plPartic
 {
     const hsTArray<plLightInfo*>& liInfo = liGrp->GetLightInfos();
     int i;
-    for( i = 0; i < liInfo.GetCount(); i++ )
-    {
+
+    for (i = 0; i < liInfo.GetCount(); i++) {
         sys->AddLight(liInfo[i]->GetKey());
     }
 }
 
-bool plParticleCoreComponent::AddToAnim(plAGAnim *anim, plMaxNode *node)
+bool plParticleCoreComponent::AddToAnim(plAGAnim* anim, plMaxNode* node)
 {
     bool result = false;
-    plController *ctl;
+    plController* ctl;
     hsControlConverter& cc = hsControlConverter::Instance();
 
     float start, end;
-    if (!anim->GetName().Compare(ENTIRE_ANIMATION_NAME))
-    {
+
+    if (!anim->GetName().Compare(ENTIRE_ANIMATION_NAME)) {
         start = end = -1;
-    }
-    else
-    {
+    } else {
         start = anim->GetStart();
         end = anim->GetEnd();
     }
 
-    if (fCompPB->GetInt(kGenType) != kGenOnePerVertex)
-    {
+    if (fCompPB->GetInt(kGenType) != kGenOnePerVertex) {
         ctl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kLifeMin)), node, start, end);
-        if (ctl != nil)
-        {
-            plParticleLifeMinApplicator *app = new plParticleLifeMinApplicator();
+
+        if (ctl != nil) {
+            plParticleLifeMinApplicator* app = new plParticleLifeMinApplicator();
             app->SetChannelName(node->GetName());
             plAnimComponentBase::SetupCtl(anim, ctl, app, node);
-            result = true;      
+            result = true;
         }
 
         ctl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kLifeMax)), node, start, end);
-        if (ctl != nil)
-        {
-            plParticleLifeMaxApplicator *app = new plParticleLifeMaxApplicator();
+
+        if (ctl != nil) {
+            plParticleLifeMaxApplicator* app = new plParticleLifeMaxApplicator();
             app->SetChannelName(node->GetName());
             plAnimComponentBase::SetupCtl(anim, ctl, app, node);
-            result = true;      
+            result = true;
         }
 
         ctl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kPPS)), node, start, end);
-        if (ctl != nil)
-        {
-            plParticlePPSApplicator *app = new plParticlePPSApplicator();
+
+        if (ctl != nil) {
+            plParticlePPSApplicator* app = new plParticlePPSApplicator();
             app->SetChannelName(node->GetName());
             plAnimComponentBase::SetupCtl(anim, ctl, app, node);
-            result = true;      
+            result = true;
         }
 
         ctl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kConeAngle)), node, start, end);
-        if (ctl != nil)
-        {
-            plParticleAngleApplicator *app = new plParticleAngleApplicator();
+
+        if (ctl != nil) {
+            plParticleAngleApplicator* app = new plParticleAngleApplicator();
             app->SetChannelName(node->GetName());
             plAnimComponentBase::SetupCtl(anim, ctl, app, node);
-            result = true;      
+            result = true;
         }
 
         ctl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kVelocityMin)), node, start, end);
-        if (ctl != nil)
-        {
-            plParticleVelMinApplicator *app = new plParticleVelMinApplicator();
+
+        if (ctl != nil) {
+            plParticleVelMinApplicator* app = new plParticleVelMinApplicator();
             app->SetChannelName(node->GetName());
             plAnimComponentBase::SetupCtl(anim, ctl, app, node);
-            result = true;      
+            result = true;
         }
 
         ctl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kVelocityMax)), node, start, end);
-        if (ctl != nil)
-        {
-            plParticleVelMaxApplicator *app = new plParticleVelMaxApplicator();
+
+        if (ctl != nil) {
+            plParticleVelMaxApplicator* app = new plParticleVelMaxApplicator();
             app->SetChannelName(node->GetName());
             plAnimComponentBase::SetupCtl(anim, ctl, app, node);
-            result = true;      
+            result = true;
         }
-        
+
         /*
         ctl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kGravity)), node, start, end);
         if (ctl != nil)
         {
             plParticleGravityApplicator *app = new plParticleGravityApplicator();
             plAnimComponentBase::SetupCtl(anim, ctl, app, node);
-            result = true;      
+            result = true;
         }
 
         ctl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kDrag)), node, start, end);
@@ -603,35 +615,35 @@ bool plParticleCoreComponent::AddToAnim(plAGAnim *anim, plMaxNode *node)
         {
             plParticleDragApplicator *app = new plParticleDragApplicator();
             plAnimComponentBase::SetupCtl(anim, ctl, app, node);
-            result = true;      
+            result = true;
         }
         */
     }
 
     ctl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kScaleMin)), node, start, end);
-    if (ctl != nil)
-    {
-        plParticleScaleMinApplicator *app = new plParticleScaleMinApplicator();
+
+    if (ctl != nil) {
+        plParticleScaleMinApplicator* app = new plParticleScaleMinApplicator();
         app->SetChannelName(node->GetName());
         plAnimComponentBase::SetupCtl(anim, ctl, app, node);
-        result = true;      
+        result = true;
     }
 
     ctl = cc.MakeScalarController(GetParamBlock2Controller(fCompPB, ParamID(kScaleMax)), node, start, end);
-    if (ctl != nil)
-    {
-        plParticleScaleMaxApplicator *app = new plParticleScaleMaxApplicator();
+
+    if (ctl != nil) {
+        plParticleScaleMaxApplicator* app = new plParticleScaleMaxApplicator();
         app->SetChannelName(node->GetName());
         plAnimComponentBase::SetupCtl(anim, ctl, app, node);
-        result = true;      
+        result = true;
     }
 
     return result;
 }
 
-void plParticleCoreComponent::SetParticleStats(plParticleMtl *mtl)
+void plParticleCoreComponent::SetParticleStats(plParticleMtl* mtl)
 {
-    IParamBlock2 *pb = mtl->GetParamBlockByID(plParticleMtl::kBlkBasic);
+    IParamBlock2* pb = mtl->GetParamBlockByID(plParticleMtl::kBlkBasic);
     fUserInput.fHSize = pb->GetFloat(plParticleMtl::kWidth);
     fUserInput.fVSize = pb->GetFloat(plParticleMtl::kHeight);
     fUserInput.fXTiles = pb->GetInt(plParticleMtl::kXTiles);
@@ -640,11 +652,9 @@ void plParticleCoreComponent::SetParticleStats(plParticleMtl *mtl)
     fUserInput.fOrientation = pb->GetInt(plParticleMtl::kOrientation);
 }
 
-class ParticleCompDlgProc : public ParamMap2UserDlgProc
-{
+class ParticleCompDlgProc : public ParamMap2UserDlgProc {
 protected:
-    void EnableDynGenParams(IParamMap2 *pm, bool enabled)
-    {
+    void EnableDynGenParams(IParamMap2* pm, bool enabled) {
         pm->Enable(plParticleComponent::kConeAngle, enabled);
         pm->Enable(plParticleComponent::kVelocityMin, enabled);
         pm->Enable(plParticleComponent::kVelocityMax, enabled);
@@ -661,28 +671,39 @@ public:
     ParticleCompDlgProc() {}
     ~ParticleCompDlgProc() {}
 
-    void IValidateSpinners(TimeValue t, IParamBlock2 *pb, IParamMap2 *map, uint32_t id)
-    {
+    void IValidateSpinners(TimeValue t, IParamBlock2* pb, IParamMap2* map, uint32_t id) {
         uint32_t minIndex, maxIndex;
         bool adjustMin;
-        switch(id)
-        {
+
+        switch (id) {
         case IDC_COMP_PARTICLE_VELMIN:
         case IDC_COMP_PARTICLE_VELMIN_SPIN:
-            minIndex = plParticleCoreComponent::kVelocityMin; maxIndex = plParticleCoreComponent::kVelocityMax; adjustMin = false;
+            minIndex = plParticleCoreComponent::kVelocityMin;
+            maxIndex = plParticleCoreComponent::kVelocityMax;
+            adjustMin = false;
             break;
+
         case IDC_COMP_PARTICLE_VELMAX:
         case IDC_COMP_PARTICLE_VELMAX_SPIN:
-            minIndex = plParticleCoreComponent::kVelocityMin; maxIndex = plParticleCoreComponent::kVelocityMax; adjustMin = true;
+            minIndex = plParticleCoreComponent::kVelocityMin;
+            maxIndex = plParticleCoreComponent::kVelocityMax;
+            adjustMin = true;
             break;
+
         case IDC_COMP_PARTICLE_LIFEMIN:
         case IDC_COMP_PARTICLE_LIFEMIN_SPIN:
-            minIndex = plParticleCoreComponent::kLifeMin; maxIndex = plParticleCoreComponent::kLifeMax; adjustMin = false;
+            minIndex = plParticleCoreComponent::kLifeMin;
+            maxIndex = plParticleCoreComponent::kLifeMax;
+            adjustMin = false;
             break;
+
         case IDC_COMP_PARTICLE_LIFEMAX:
         case IDC_COMP_PARTICLE_LIFEMAX_SPIN:
-            minIndex = plParticleCoreComponent::kLifeMin; maxIndex = plParticleCoreComponent::kLifeMax; adjustMin = true;
+            minIndex = plParticleCoreComponent::kLifeMin;
+            maxIndex = plParticleCoreComponent::kLifeMax;
+            adjustMin = true;
             break;
+
         default:
             return;
         }
@@ -691,36 +712,36 @@ public:
         min = pb->GetFloat(minIndex, t);
         max = pb->GetFloat(maxIndex, t);
 
-        if (min > max)
-        {
-            if (adjustMin)
+        if (min > max) {
+            if (adjustMin) {
                 pb->SetValue(minIndex, t, max);
-            else
+            } else {
                 pb->SetValue(maxIndex, t, min);
+            }
 
             map->Invalidate(minIndex);
             map->Invalidate(maxIndex);
         }
     }
 
-    virtual BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
+    virtual BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         int id = LOWORD(wParam);
         int code = HIWORD(wParam);
 
-        IParamBlock2 *pb = map->GetParamBlock();
+        IParamBlock2* pb = map->GetParamBlock();
         HWND cbox = NULL;
 
         int selection;
-        switch (msg)
-        {
+
+        switch (msg) {
         case WM_INITDIALOG:
             int j;
-            for (j = 0; j < plParticleCoreComponent::kGenNumOptions; j++)
-            {
+
+            for (j = 0; j < plParticleCoreComponent::kGenNumOptions; j++) {
                 cbox = GetDlgItem(hWnd, IDC_GEN_TYPE);
                 SendMessage(cbox, CB_ADDSTRING, 0, (LPARAM)plParticleCoreComponent::GenStrings[j]);
             }
+
             selection = pb->GetInt(plParticleCoreComponent::kGenType);
             SendMessage(cbox, CB_SETCURSEL, selection, 0);
             EnableDynGenParams(map, selection != plParticleCoreComponent::kGenOnePerVertex);
@@ -728,36 +749,34 @@ public:
             CheckDlgButton(hWnd, IDC_TRACKVIEW_SHOW, plParticleComponent::fAllowUnhide ? BST_CHECKED : BST_UNCHECKED);
             return TRUE;
 
-        case WM_COMMAND:  
-            if (id == IDC_GEN_TYPE)
-            {
+        case WM_COMMAND:
+            if (id == IDC_GEN_TYPE) {
                 selection = SendMessage(GetDlgItem(hWnd, id), CB_GETCURSEL, 0, 0);
                 pb->SetValue(plParticleCoreComponent::kGenType, t, selection);
                 EnableDynGenParams(map, selection != plParticleCoreComponent::kGenOnePerVertex);
                 return TRUE;
-            }
-            else if (id == IDC_COMP_PARTICLE_VELMIN || id == IDC_COMP_PARTICLE_VELMAX ||
-                id == IDC_COMP_PARTICLE_LIFEMIN || id == IDC_COMP_PARTICLE_LIFEMAX)
-            {
+            } else if (id == IDC_COMP_PARTICLE_VELMIN || id == IDC_COMP_PARTICLE_VELMAX ||
+                       id == IDC_COMP_PARTICLE_LIFEMIN || id == IDC_COMP_PARTICLE_LIFEMAX) {
                 IValidateSpinners(t, pb, map, id);
                 return TRUE;
-            }
-            else if (id == IDC_TRACKVIEW_SHOW && code == BN_CLICKED)
-            {
+            } else if (id == IDC_TRACKVIEW_SHOW && code == BN_CLICKED) {
                 plParticleComponent::fAllowUnhide = (IsDlgButtonChecked(hWnd, IDC_TRACKVIEW_SHOW) == BST_CHECKED);
                 plComponentShow::Update();
                 return TRUE;
             }
+
             break;
+
         case CC_SPINNER_CHANGE:
             if (id == IDC_COMP_PARTICLE_VELMIN_SPIN || id == IDC_COMP_PARTICLE_VELMAX_SPIN ||
-                id == IDC_COMP_PARTICLE_LIFEMIN_SPIN || id == IDC_COMP_PARTICLE_LIFEMAX_SPIN)
-            {
+                    id == IDC_COMP_PARTICLE_LIFEMIN_SPIN || id == IDC_COMP_PARTICLE_LIFEMAX_SPIN) {
                 IValidateSpinners(t, pb, map, id);
                 return TRUE;
             }
+
             break;
         }
+
         return FALSE;
     }
     virtual void DeleteThis() {}
@@ -767,7 +786,7 @@ static ParticleCompDlgProc gParticleCompDlgProc;
 CLASS_DESC(plParticleComponent, gParticleDesc, "Particle System",  "ParticleSystem", COMP_TYPE_PARTICLE, PARTICLE_SYSTEM_COMPONENT_CLASS_ID)
 
 ParamBlockDesc2 gParticleBk
-(   
+(
 
     plComponent::kBlkComp, _T("Particle"), 0, &gParticleDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
@@ -777,116 +796,116 @@ ParamBlockDesc2 gParticleBk
     //Particle Properties....
 
     plParticleCoreComponent::kGenType,      _T("Generation"),   TYPE_INT, 0, 0,
-        p_default, 0,
-        end,
+    p_default, 0,
+    end,
 
-    plParticleCoreComponent::kConeAngle,        _T("ConeAngle"),    TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_CONE_ANGLE,  
-        p_default, 45.0,
-        p_range, 0.0, 180.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_CONE, IDC_COMP_PARTICLE_CONE_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kConeAngle,        _T("ConeAngle"),    TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_CONE_ANGLE,
+    p_default, 45.0,
+    p_range, 0.0, 180.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_CONE, IDC_COMP_PARTICLE_CONE_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kVelocityMin,  _T("VelocityMin"),  TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_VELOCITY_MIN,    
-        p_default, 50.0,
-        p_range, 0.0, 500.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_VELMIN, IDC_COMP_PARTICLE_VELMIN_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kVelocityMin,  _T("VelocityMin"),  TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_VELOCITY_MIN,
+    p_default, 50.0,
+    p_range, 0.0, 500.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_VELMIN, IDC_COMP_PARTICLE_VELMIN_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kVelocityMax,  _T("VelocityMax"),  TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_VELOCITY_MAX,    
-        p_default, 50.0,
-        p_range, 0.0, 500.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_VELMAX, IDC_COMP_PARTICLE_VELMAX_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kVelocityMax,  _T("VelocityMax"),  TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_VELOCITY_MAX,
+    p_default, 50.0,
+    p_range, 0.0, 500.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_VELMAX, IDC_COMP_PARTICLE_VELMAX_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kLifeMin,      _T("LifeMin"),      TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_LIFE_MIN,    
-        p_default, 10.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_LIFEMIN, IDC_COMP_PARTICLE_LIFEMIN_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kLifeMin,      _T("LifeMin"),      TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_LIFE_MIN,
+    p_default, 10.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_LIFEMIN, IDC_COMP_PARTICLE_LIFEMIN_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kLifeMax,      _T("LifeMax"),      TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_LIFE_MAX,    
-        p_default, 5.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_LIFEMAX, IDC_COMP_PARTICLE_LIFEMAX_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kLifeMax,      _T("LifeMax"),      TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_LIFE_MAX,
+    p_default, 5.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_LIFEMAX, IDC_COMP_PARTICLE_LIFEMAX_SPIN, 1.0,
+    end,
 
     plParticleCoreComponent::kImmortal, _T("Immortal"),     TYPE_BOOL,  0, 0,
-        p_default, FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_PARTICLE_NODIE,
-        end,
+    p_default, FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_PARTICLE_NODIE,
+    end,
 
-    plParticleCoreComponent::kPPS,  _T("PPS"),  TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_PPS, 
-        p_default, 20.0,
-        p_range, 0.0, 5000.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_PPS, IDC_COMP_PARTICLE_PPS_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kPPS,  _T("PPS"),  TYPE_FLOAT,     P_ANIMATABLE, IDS_PARTICLE_PPS,
+    p_default, 20.0,
+    p_range, 0.0, 5000.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_PPS, IDC_COMP_PARTICLE_PPS_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kScaleMin, _T("ScaleMin"), TYPE_INT,   P_ANIMATABLE, IDS_PARTICLE_SCALE_MIN,   
-        p_default, 100,
-        p_range, 1, 1000,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,   
-        IDC_COMP_PARTICLE_SCALEMIN, IDC_COMP_PARTICLE_SCALEMIN_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kScaleMin, _T("ScaleMin"), TYPE_INT,   P_ANIMATABLE, IDS_PARTICLE_SCALE_MIN,
+    p_default, 100,
+    p_range, 1, 1000,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,
+    IDC_COMP_PARTICLE_SCALEMIN, IDC_COMP_PARTICLE_SCALEMIN_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kScaleMax, _T("ScaleMax"), TYPE_INT,   P_ANIMATABLE, IDS_PARTICLE_SCALE_MAX,   
-        p_default, 100,
-        p_range, 1, 1000,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,   
-        IDC_COMP_PARTICLE_SCALEMAX, IDC_COMP_PARTICLE_SCALEMAX_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kScaleMax, _T("ScaleMax"), TYPE_INT,   P_ANIMATABLE, IDS_PARTICLE_SCALE_MAX,
+    p_default, 100,
+    p_range, 1, 1000,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,
+    IDC_COMP_PARTICLE_SCALEMAX, IDC_COMP_PARTICLE_SCALEMAX_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kGravity,  _T("Gravity"),  TYPE_INT,   0, 0,   
-        p_default, 100,
-        p_range, -100, 100,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_INT,   
-        IDC_COMP_PARTICLE_GRAVITY, IDC_COMP_PARTICLE_GRAVITY_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kGravity,  _T("Gravity"),  TYPE_INT,   0, 0,
+    p_default, 100,
+    p_range, -100, 100,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_INT,
+    IDC_COMP_PARTICLE_GRAVITY, IDC_COMP_PARTICLE_GRAVITY_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kDrag,     _T("Drag"),     TYPE_INT,   0, 0,   
-        p_default, 0,
-        p_range, 0, 1000,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,   
-        IDC_COMP_PARTICLE_DRAG, IDC_COMP_PARTICLE_DRAG_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kDrag,     _T("Drag"),     TYPE_INT,   0, 0,
+    p_default, 0,
+    p_range, 0, 1000,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,
+    IDC_COMP_PARTICLE_DRAG, IDC_COMP_PARTICLE_DRAG_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kPreSim,   _T("PreSim"),   TYPE_INT,   0, 0,   
-        p_default, 0,
-        p_range, 0, 100,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,   
-        IDC_COMP_PARTICLE_PRESIM, IDC_COMP_PARTICLE_PRESIM_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kPreSim,   _T("PreSim"),   TYPE_INT,   0, 0,
+    p_default, 0,
+    p_range, 0, 100,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,
+    IDC_COMP_PARTICLE_PRESIM, IDC_COMP_PARTICLE_PRESIM_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kWindMult,     _T("WindMult"),     TYPE_INT,   0, 0,   
-        p_default, 100,
-        p_range, 0, 1000,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,   
-        IDC_COMP_PARTICLE_WIND_MULT, IDC_COMP_PARTICLE_WIND_MULT_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kWindMult,     _T("WindMult"),     TYPE_INT,   0, 0,
+    p_default, 100,
+    p_range, 0, 1000,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,
+    IDC_COMP_PARTICLE_WIND_MULT, IDC_COMP_PARTICLE_WIND_MULT_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kMassRange,        _T("MassRange"),        TYPE_FLOAT,     0, 0,   
-        p_default, 0.f,
-        p_range, 0.f, 1000.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_MASS_RANGE, IDC_COMP_PARTICLE_MASS_RANGE_SPIN, 1.0,
-        end,
+    plParticleCoreComponent::kMassRange,        _T("MassRange"),        TYPE_FLOAT,     0, 0,
+    p_default, 0.f,
+    p_range, 0.f, 1000.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_MASS_RANGE, IDC_COMP_PARTICLE_MASS_RANGE_SPIN, 1.0,
+    end,
 
-    plParticleCoreComponent::kRotRange,     _T("RotRange"),     TYPE_FLOAT,     0, 0,   
-        p_default, 0.f,
-        p_range, 0.f, 180.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_ROT_RANGE, IDC_COMP_PARTICLE_ROT_RANGE_SPIN, 1.0,
-        end,
-        
-    plParticleCoreComponent::kFollowSystem, _T("FollowSystem"),     TYPE_BOOL, 0, 0, 
-        p_default, FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_PARTICLE_FOLLOW_SYSTEM,
-        end,        
+    plParticleCoreComponent::kRotRange,     _T("RotRange"),     TYPE_FLOAT,     0, 0,
+    p_default, 0.f,
+    p_range, 0.f, 180.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_ROT_RANGE, IDC_COMP_PARTICLE_ROT_RANGE_SPIN, 1.0,
+    end,
+
+    plParticleCoreComponent::kFollowSystem, _T("FollowSystem"),     TYPE_BOOL, 0, 0,
+    p_default, FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_PARTICLE_FOLLOW_SYSTEM,
+    end,
 
     end
 );
@@ -894,14 +913,14 @@ ParamBlockDesc2 gParticleBk
 bool plParticleComponent::fAllowUnhide = false;
 
 plParticleComponent::plParticleComponent()
-:   fEmitterReserve(0)
+    :   fEmitterReserve(0)
 {
     fClassDesc = &gParticleDesc;
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
 // Gets values from the ParamBlock and passes them to the Convert
-bool plParticleComponent::GetParamVals(plMaxNode *pNode)
+bool plParticleComponent::GetParamVals(plMaxNode* pNode)
 {
     fUserInput.fGenType         = fCompPB->GetInt(kGenType);
     fUserInput.fConeAngle       = fCompPB->GetFloat(kConeAngle);
@@ -929,29 +948,30 @@ bool plParticleComponent::GetParamVals(plMaxNode *pNode)
 // Particle Effects Base class
 
 // Make sure any new Effect you add is accounted for here, or it won't get converted.
-bool plParticleEffectComponent::IsParticleEffectComponent(plComponentBase *comp)
+bool plParticleEffectComponent::IsParticleEffectComponent(plComponentBase* comp)
 {
     if (comp->ClassID() == PARTICLE_FADE_COMPONENT_CLASS_ID ||
-        comp->ClassID() == PARTICLE_VOLUME_COMPONENT_CLASS_ID ||
-        comp->ClassID() == PARTICLE_WIND_COMPONENT_CLASS_ID ||
-        comp->ClassID() == PARTICLE_UNIWIND_COMPONENT_CLASS_ID ||
-        comp->ClassID() == PARTICLE_FLOCK_COMPONENT_CLASS_ID)
+            comp->ClassID() == PARTICLE_VOLUME_COMPONENT_CLASS_ID ||
+            comp->ClassID() == PARTICLE_WIND_COMPONENT_CLASS_ID ||
+            comp->ClassID() == PARTICLE_UNIWIND_COMPONENT_CLASS_ID ||
+            comp->ClassID() == PARTICLE_FLOCK_COMPONENT_CLASS_ID) {
         return true;
+    }
 
     return false;
 }
 
-bool plParticleEffectComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plParticleEffectComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fEffect = nil;
     return true;
 }
 
-bool plParticleEffectComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plParticleEffectComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     bool valid = plParticleCoreComponent::NodeHasSystem(node);
-    if (!valid)
-    {
+
+    if (!valid) {
         pErrMsg->Set(true, node->GetName(), "Node has a particle effect component, "
                      "but no particle system to apply it to. Ignoring component.").Show();
         pErrMsg->Set(false);
@@ -964,48 +984,49 @@ bool plParticleEffectComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
 //
 // plParticleFadeComponent
 
-void plParticleFadeComponent::AddToParticleSystem(plParticleSystem *sys, plMaxNode *node)
+void plParticleFadeComponent::AddToParticleSystem(plParticleSystem* sys, plMaxNode* node)
 {
-    plParticleFadeVolumeEffect *effect = nil;
-    if( !fEffect )
-    {
+    plParticleFadeVolumeEffect* effect = nil;
+
+    if (!fEffect) {
         effect = new plParticleFadeVolumeEffect();
         hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), effect, node->GetLocation(), node->GetLoadMask());
         effect->fLength = (float)fCompPB->GetInt(kFadeDistance);
-        if (fCompPB->GetInt(kFadeZ))
+
+        if (fCompPB->GetInt(kFadeZ)) {
             effect->fIgnoreZ = false;
-        
+        }
+
         fEffect = effect;
-    }
-    else
-    {
+    } else {
         effect = plParticleFadeVolumeEffect::ConvertNoRef(fEffect);
     }
+
     hsAssert(effect, "Our effect pointer was wrong type?");
-    hsgResMgr::ResMgr()->AddViaNotify( effect->GetKey(), new plGenRefMsg( sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectMisc ), plRefFlags::kActiveRef );
+    hsgResMgr::ResMgr()->AddViaNotify(effect->GetKey(), new plGenRefMsg(sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectMisc), plRefFlags::kActiveRef);
 }
 
 CLASS_DESC(plParticleFadeComponent, gParticleFadeDesc, "Fade Volume Effect",  "Fade Volume Effect", COMP_TYPE_PARTICLE, PARTICLE_FADE_COMPONENT_CLASS_ID)
 
 ParamBlockDesc2 gParticleFadeBk
-(   
+(
 
     plComponent::kBlkComp, _T("ParticleFade"), 0, &gParticleFadeDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     //Roll out
     IDD_COMP_PARTICLE_FADE, IDS_COMP_PARTICLE_FADE_ROLL, 0, 0, NULL,
 
-    plParticleFadeComponent::kFadeDistance, _T("FadeDistance"), TYPE_INT,   P_ANIMATABLE, 0,    
-        p_default, 100,
-        p_range, 0, 10000,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,   
-        IDC_COMP_PARTICLE_FADE_DIST, IDC_COMP_PARTICLE_FADE_DIST_SPIN, 1.0,
-        end,
+    plParticleFadeComponent::kFadeDistance, _T("FadeDistance"), TYPE_INT,   P_ANIMATABLE, 0,
+    p_default, 100,
+    p_range, 0, 10000,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,
+    IDC_COMP_PARTICLE_FADE_DIST, IDC_COMP_PARTICLE_FADE_DIST_SPIN, 1.0,
+    end,
 
-    plParticleFadeComponent::kFadeZ,        _T("FadeInZ"),      TYPE_BOOL,  P_ANIMATABLE, 0,    
-        p_default, FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_PARTICLE_FADEZ,
-        end,
+    plParticleFadeComponent::kFadeZ,        _T("FadeInZ"),      TYPE_BOOL,  P_ANIMATABLE, 0,
+    p_default, FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_PARTICLE_FADEZ,
+    end,
 
     end
 );
@@ -1023,20 +1044,23 @@ plParticleFadeComponent::plParticleFadeComponent()
 void plParticleVolumeComponent::CollectNonDrawables(INodeTab& nonDrawables)
 {
     INode* source = fCompPB->GetINode(kSourceNode);
-    if( source )
+
+    if (source) {
         nonDrawables.Append(1, &source);
+    }
 }
 
-bool plParticleVolumeComponent::PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plParticleVolumeComponent::PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
-    if (!plParticleEffectComponent::PreConvert(pNode, pErrMsg))
+    if (!plParticleEffectComponent::PreConvert(pNode, pErrMsg)) {
         return false;
+    }
 
     fBound = nil;
 
-    plMaxNode *source = (plMaxNode *)fCompPB->GetINode(kSourceNode);
-    if (source == nil || !source->CanConvert())
-    {
+    plMaxNode* source = (plMaxNode*)fCompPB->GetINode(kSourceNode);
+
+    if (source == nil || !source->CanConvert()) {
         pErrMsg->Set(true, pNode->GetName(), "Particle Convex Volume component has not been assigned a "
                      "node to build itself from or Volume has Ignore component on it.. Ignoring component.").Show();
         pErrMsg->Set(false);
@@ -1050,10 +1074,11 @@ bool plParticleVolumeComponent::PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg
     return true;
 }
 
-void plParticleVolumeComponent::BuildVolume(plMaxNode *node)
+void plParticleVolumeComponent::BuildVolume(plMaxNode* node)
 {
-    if (fBound != nil)
-        return; // already converted it
+    if (fBound != nil) {
+        return;    // already converted it
+    }
 
     fBound = new plBoundInterface;
     hsgResMgr::ResMgr()->NewKey(plString::FromUtf8(node->GetName()), fBound, node->GetLocation(), node->GetLoadMask());
@@ -1062,28 +1087,30 @@ void plParticleVolumeComponent::BuildVolume(plMaxNode *node)
 }
 
 
-void plParticleVolumeComponent::AddToParticleSystem(plParticleSystem *sys, plMaxNode *node)
+void plParticleVolumeComponent::AddToParticleSystem(plParticleSystem* sys, plMaxNode* node)
 {
-    plParticleCollisionEffect *effect = nil;
-    if( !fEffect )
-    {
-        plMaxNode *source = (plMaxNode *)fCompPB->GetINode(kSourceNode);
+    plParticleCollisionEffect* effect = nil;
 
-        if (source == nil || !source->CanConvert())
-            return; // No source selected, user has already been warned.
+    if (!fEffect) {
+        plMaxNode* source = (plMaxNode*)fCompPB->GetINode(kSourceNode);
+
+        if (source == nil || !source->CanConvert()) {
+            return;    // No source selected, user has already been warned.
+        }
 
         BuildVolume(source);
-        switch( fCompPB->GetInt(kOnImpact) )
-        {
+
+        switch (fCompPB->GetInt(kOnImpact)) {
         default:
         case kImpDefault:
             effect = new plParticleCollisionEffectBeat();
             break;
+
         case kImpDie:
             effect = new plParticleCollisionEffectDie();
             break;
-        case kImpBounce:
-            {
+
+        case kImpBounce: {
                 plParticleCollisionEffectBounce* bnc = new plParticleCollisionEffectBounce();
                 bnc->SetBounce(fCompPB->GetFloat(kBounceAmt) * 1.e-2f);
                 bnc->SetFriction(fCompPB->GetFloat(kFrictionAmt) * 1.e-2f);
@@ -1092,56 +1119,57 @@ void plParticleVolumeComponent::AddToParticleSystem(plParticleSystem *sys, plMax
             break;
         };
 
-        hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), effect, node->GetLocation(), node->GetLoadMask());    
-        plSceneObject *sObj = source->GetSceneObject();
-        hsgResMgr::ResMgr()->AddViaNotify( sObj->GetKey(), new plGenRefMsg( effect->GetKey(), plRefMsg::kOnCreate, 0, 0 ), plRefFlags::kPassiveRef );
+        hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), effect, node->GetLocation(), node->GetLoadMask());
+
+        plSceneObject* sObj = source->GetSceneObject();
+
+        hsgResMgr::ResMgr()->AddViaNotify(sObj->GetKey(), new plGenRefMsg(effect->GetKey(), plRefMsg::kOnCreate, 0, 0), plRefFlags::kPassiveRef);
 
         fEffect = effect;
-    }
-    else
-    {
+    } else {
         effect = plParticleCollisionEffect::ConvertNoRef(fEffect);
     }
+
     hsAssert(effect, "Our effect pointer was wrong type?");
-    hsgResMgr::ResMgr()->AddViaNotify( effect->GetKey(), new plGenRefMsg( sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectConstraint ), plRefFlags::kActiveRef );
+    hsgResMgr::ResMgr()->AddViaNotify(effect->GetKey(), new plGenRefMsg(sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectConstraint), plRefFlags::kActiveRef);
 }
 
 CLASS_DESC(plParticleVolumeComponent, gParticleVolumeDesc, "Collision Volume Effect",  "Collision Volume Effect", COMP_TYPE_PARTICLE, PARTICLE_VOLUME_COMPONENT_CLASS_ID)
 
 ParamBlockDesc2 gParticleVolumeBk
-(   
+(
     plComponent::kBlkComp, _T("ParticleVolume"), 0, &gParticleVolumeDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     //Roll out
     IDD_COMP_PARTICLE_VOLUME, IDS_COMP_PARTICLE_VOLUME_ROLL, 0, 0, NULL,
 
     plParticleVolumeComponent::kSourceNode, _T("SourceINode"),  TYPE_INODE,     0, 0,
-        p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_PARTICLE_VOLUME_NODE,
-        p_sclassID, GEOMOBJECT_CLASS_ID,
-        //p_prompt, IDS_COMP_ONESHOT_STARTS,
-        //p_accessor, &gOneShotAccessor,
-        end,
+    p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_PARTICLE_VOLUME_NODE,
+    p_sclassID, GEOMOBJECT_CLASS_ID,
+    //p_prompt, IDS_COMP_ONESHOT_STARTS,
+    //p_accessor, &gOneShotAccessor,
+    end,
 
     plParticleVolumeComponent::kOnImpact, _T("OnImpact"),       TYPE_INT,       0, 0,
-        p_ui,       TYPE_RADIO, 3,  IDC_COMP_PARTICLE_VOL_DEFAULT,                  IDC_COMP_PARTICLE_VOL_DIE,              IDC_COMP_PARTICLE_VOL_BOUNCE,   
-        p_vals,                     plParticleVolumeComponent::kImpDefault, plParticleVolumeComponent::kImpDie, plParticleVolumeComponent::kImpBounce,      
-        p_default, plParticleVolumeComponent::kImpDefault,
-        end,
+    p_ui,       TYPE_RADIO, 3,  IDC_COMP_PARTICLE_VOL_DEFAULT,                  IDC_COMP_PARTICLE_VOL_DIE,              IDC_COMP_PARTICLE_VOL_BOUNCE,
+    p_vals,                     plParticleVolumeComponent::kImpDefault, plParticleVolumeComponent::kImpDie, plParticleVolumeComponent::kImpBounce,
+    p_default, plParticleVolumeComponent::kImpDefault,
+    end,
 
-    plParticleVolumeComponent::kBounceAmt, _T("BounceAmt"), TYPE_FLOAT,     0, 0,   
-        p_default, 100.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_VOL_BOUNCEAMT, IDC_COMP_PARTICLE_VOL_BOUNCEAMT_SPIN, 1.0,
-        end,    
-    
-    plParticleVolumeComponent::kFrictionAmt, _T("FrictionAmt"), TYPE_FLOAT,     0, 0,   
-        p_default, 0.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_VOL_FRICTIONAMT, IDC_COMP_PARTICLE_VOL_FRICTIONAMT_SPIN, 1.0,
-        end,    
-    
+    plParticleVolumeComponent::kBounceAmt, _T("BounceAmt"), TYPE_FLOAT,     0, 0,
+    p_default, 100.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_VOL_BOUNCEAMT, IDC_COMP_PARTICLE_VOL_BOUNCEAMT_SPIN, 1.0,
+    end,
+
+    plParticleVolumeComponent::kFrictionAmt, _T("FrictionAmt"), TYPE_FLOAT,     0, 0,
+    p_default, 0.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_VOL_FRICTIONAMT, IDC_COMP_PARTICLE_VOL_FRICTIONAMT_SPIN, 1.0,
+    end,
+
     end
 );
 
@@ -1159,26 +1187,31 @@ static hsVector3 IGetRefDir(plMaxNode* node, INode* refNode, float clampAngDeg)
 {
     clampAngDeg *= 0.5f;
     float vecLen = 100.f;
-    if( clampAngDeg > 1.f )
-    {
+
+    if (clampAngDeg > 1.f) {
         float rads = hsDegreesToRadians(clampAngDeg);
         float sinAng = sinf(rads);
 
         hsAssert(sinAng > 0.01, "Trig confusion?");
 
-#if 0 
+#if 0
         float cosAng = cosf(rads);
-        if( cosAng < 0.01f )
+
+        if (cosAng < 0.01f) {
             vecLen = 0;
-        else
+        } else {
             vecLen = cosAng / sinAng;
+        }
+
 #else
         vecLen = 1.f / sinAng;
 #endif
 
     }
-    if( !refNode )
+
+    if (!refNode) {
         refNode = node;
+    }
 
     Matrix3 nodeTM = refNode->GetNodeTM(TimeValue(0));
     Point3 dir = nodeTM.GetRow(1);
@@ -1190,11 +1223,11 @@ static hsVector3 IGetRefDir(plMaxNode* node, INode* refNode, float clampAngDeg)
 }
 
 
-void plParticleWindComponent::AddToParticleSystem(plParticleSystem *sys, plMaxNode *node)
+void plParticleWindComponent::AddToParticleSystem(plParticleSystem* sys, plMaxNode* node)
 {
     plParticleLocalWind* effect = nil;
-    if( !fEffect )
-    {
+
+    if (!fEffect) {
         effect = new plParticleLocalWind();
         effect->SetScale(hsVector3(fCompPB->GetFloat(kScaleX), fCompPB->GetFloat(kScaleY), fCompPB->GetFloat(kScaleZ)));
         effect->SetSpeed(fCompPB->GetFloat(kSpeed));
@@ -1209,94 +1242,93 @@ void plParticleWindComponent::AddToParticleSystem(plParticleSystem *sys, plMaxNo
         effect->SetRefDirection(IGetRefDir(node, fCompPB->GetINode(kRefObject), fCompPB->GetFloat(kClampAngle)));
 
         fEffect = effect;
-    }
-    else
-    {
+    } else {
         effect = plParticleLocalWind::ConvertNoRef(fEffect);
     }
+
     hsAssert(effect, "Our effect pointer was wrong type?");
-    hsgResMgr::ResMgr()->AddViaNotify( effect->GetKey(), new plGenRefMsg( sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectForce ), plRefFlags::kActiveRef );
+    hsgResMgr::ResMgr()->AddViaNotify(effect->GetKey(), new plGenRefMsg(sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectForce), plRefFlags::kActiveRef);
 }
 
 CLASS_DESC(plParticleWindComponent, gParticleWindDesc, "Wind Effect",  "WindEffect", COMP_TYPE_PARTICLE, PARTICLE_WIND_COMPONENT_CLASS_ID)
 
 ParamBlockDesc2 gParticleWindBk
-(   
+(
 
     plComponent::kBlkComp, _T("ParticleWind"), 0, &gParticleWindDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     //Roll out
     IDD_COMP_PARTICLE_WIND, IDS_COMP_PARTICLE_WIND, 0, 0, NULL,
 
-    plParticleWindComponent::kScaleX,   _T("ScaleX"),   TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 25.f,
-        p_range, 0.f, 1000.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_SCALEX, IDC_COMP_PARTICLE_WIND_SCALEX_SPIN, 1.0,
-        end,
+    plParticleWindComponent::kScaleX,   _T("ScaleX"),   TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 25.f,
+    p_range, 0.f, 1000.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_SCALEX, IDC_COMP_PARTICLE_WIND_SCALEX_SPIN, 1.0,
+    end,
 
-    plParticleWindComponent::kScaleY,   _T("ScaleY"),   TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 25.f,
-        p_range, 0.f, 1000.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_SCALEY, IDC_COMP_PARTICLE_WIND_SCALEY_SPIN, 1.0,
-        end,
+    plParticleWindComponent::kScaleY,   _T("ScaleY"),   TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 25.f,
+    p_range, 0.f, 1000.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_SCALEY, IDC_COMP_PARTICLE_WIND_SCALEY_SPIN, 1.0,
+    end,
 
-    plParticleWindComponent::kScaleZ,   _T("ScaleZ"),   TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.f,
-        p_range, 0.f, 1000.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_SCALEZ, IDC_COMP_PARTICLE_WIND_SCALEZ_SPIN, 1.0,
-        end,
+    plParticleWindComponent::kScaleZ,   _T("ScaleZ"),   TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.f,
+    p_range, 0.f, 1000.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_SCALEZ, IDC_COMP_PARTICLE_WIND_SCALEZ_SPIN, 1.0,
+    end,
 
-    plParticleWindComponent::kSpeed,    _T("Speed"),    TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 32.f,
-        p_range, -100.f, 100.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_SPEED, IDC_COMP_PARTICLE_WIND_SPEED_SPIN, 1.0,
-        end,
+    plParticleWindComponent::kSpeed,    _T("Speed"),    TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 32.f,
+    p_range, -100.f, 100.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_FLOAT,
+    IDC_COMP_PARTICLE_WIND_SPEED, IDC_COMP_PARTICLE_WIND_SPEED_SPIN, 1.0,
+    end,
 
-    plParticleWindComponent::kStrength, _T("Strength"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 30.f,
-        p_range, 0.f, 100.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_STRENGTH, IDC_COMP_PARTICLE_WIND_STRENGTH_SPIN, 1.0,
-        end,
+    plParticleWindComponent::kStrength, _T("Strength"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 30.f,
+    p_range, 0.f, 100.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_STRENGTH, IDC_COMP_PARTICLE_WIND_STRENGTH_SPIN, 1.0,
+    end,
 
-    plParticleWindComponent::kConstancy,    _T("Constancy"),    TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.f,
-        p_range, -75.f, 300.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_CONSTANCY, IDC_COMP_PARTICLE_WIND_CONSTANCY_SPIN, 1.0,
-        end,
+    plParticleWindComponent::kConstancy,    _T("Constancy"),    TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.f,
+    p_range, -75.f, 300.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_FLOAT,
+    IDC_COMP_PARTICLE_WIND_CONSTANCY, IDC_COMP_PARTICLE_WIND_CONSTANCY_SPIN, 1.0,
+    end,
 
-    plParticleWindComponent::kSwirl,    _T("Swirl"),    TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 100.f,
-        p_range, 0.f, 100.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_SWIRL, IDC_COMP_PARTICLE_WIND_SWIRL_SPIN, 1.0,
-        end,
+    plParticleWindComponent::kSwirl,    _T("Swirl"),    TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 100.f,
+    p_range, 0.f, 100.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_SWIRL, IDC_COMP_PARTICLE_WIND_SWIRL_SPIN, 1.0,
+    end,
 
-    plParticleWindComponent::kHorizontal, _T("Horizontal"),     TYPE_BOOL, 0, 0, 
-        p_default, FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_PARTICLE_WIND_HORIZONTAL,
-        end,
+    plParticleWindComponent::kHorizontal, _T("Horizontal"),     TYPE_BOOL, 0, 0,
+    p_default, FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_PARTICLE_WIND_HORIZONTAL,
+    end,
 
-    plParticleWindComponent::kLocalize, _T("Localize"),     TYPE_BOOL, 0, 0, 
-        p_default, TRUE,
-        end,
+    plParticleWindComponent::kLocalize, _T("Localize"),     TYPE_BOOL, 0, 0,
+    p_default, TRUE,
+    end,
 
-    plParticleWindComponent::kClampAngle, _T("ClampAngle"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 180.f,
-        p_range, 0.f, 180.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_CLAMPANG, IDC_COMP_PARTICLE_WIND_CLAMPANG_SPIN, 1.0,
-        end,
+    plParticleWindComponent::kClampAngle, _T("ClampAngle"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 180.f,
+    p_range, 0.f, 180.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_CLAMPANG, IDC_COMP_PARTICLE_WIND_CLAMPANG_SPIN, 1.0,
+    end,
 
     plParticleWindComponent::kRefObject, _T("RefObject"),   TYPE_INODE,     0, 0,
-        p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_PARTICLE_WIND_REFOBJECT,
-        p_prompt, IDS_COMP_CHOOSE_OBJECT,
-        end,
+    p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_PARTICLE_WIND_REFOBJECT,
+    p_prompt, IDS_COMP_CHOOSE_OBJECT,
+    end,
 
     end
 );
@@ -1311,11 +1343,11 @@ plParticleWindComponent::plParticleWindComponent()
 //
 // plParticleUniWindComponent
 
-void plParticleUniWindComponent::AddToParticleSystem(plParticleSystem *sys, plMaxNode *node)
+void plParticleUniWindComponent::AddToParticleSystem(plParticleSystem* sys, plMaxNode* node)
 {
     plParticleUniformWind* effect = nil;
-    if( !fEffect )
-    {
+
+    if (!fEffect) {
         effect = new plParticleUniformWind();
         hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), effect, node->GetLocation(), node->GetLoadMask());
 
@@ -1330,83 +1362,82 @@ void plParticleUniWindComponent::AddToParticleSystem(plParticleSystem *sys, plMa
         effect->SetRefDirection(IGetRefDir(node, fCompPB->GetINode(kRefObject), fCompPB->GetFloat(kClampAngle)));
 
         fEffect = effect;
-    }
-    else
-    {
+    } else {
         effect = plParticleUniformWind::ConvertNoRef(fEffect);
     }
+
     hsAssert(effect, "Our effect pointer was wrong type?");
-    hsgResMgr::ResMgr()->AddViaNotify( effect->GetKey(), new plGenRefMsg( sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectForce ), plRefFlags::kActiveRef );
+    hsgResMgr::ResMgr()->AddViaNotify(effect->GetKey(), new plGenRefMsg(sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectForce), plRefFlags::kActiveRef);
 }
 
 CLASS_DESC(plParticleUniWindComponent, gParticleUniWindDesc, "Uniform Wind",  "UniWind", COMP_TYPE_PARTICLE, PARTICLE_UNIWIND_COMPONENT_CLASS_ID)
 
 ParamBlockDesc2 gParticleUniWindBk
-(   
+(
 
     plComponent::kBlkComp, _T("ParticleUniWind"), 0, &gParticleUniWindDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     //Roll out
     IDD_COMP_PARTICLE_UNIWIND, IDS_COMP_PARTICLE_UNIWIND, 0, 0, NULL,
 
-    plParticleUniWindComponent::kStrength,  _T("Strength"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 30.f,
-        p_range, 0.f, 100.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_STRENGTH, IDC_COMP_PARTICLE_WIND_STRENGTH_SPIN, 1.0,
-        end,
+    plParticleUniWindComponent::kStrength,  _T("Strength"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 30.f,
+    p_range, 0.f, 100.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_STRENGTH, IDC_COMP_PARTICLE_WIND_STRENGTH_SPIN, 1.0,
+    end,
 
-    plParticleUniWindComponent::kConstancy, _T("Constancy"),    TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.f,
-        p_range, -75.f, 300.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_CONSTANCY, IDC_COMP_PARTICLE_WIND_CONSTANCY_SPIN, 1.0,
-        end,
+    plParticleUniWindComponent::kConstancy, _T("Constancy"),    TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.f,
+    p_range, -75.f, 300.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_FLOAT,
+    IDC_COMP_PARTICLE_WIND_CONSTANCY, IDC_COMP_PARTICLE_WIND_CONSTANCY_SPIN, 1.0,
+    end,
 
-    plParticleUniWindComponent::kSwirl, _T("Swirl"),    TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 100.f,
-        p_range, 0.f, 100.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_SWIRL, IDC_COMP_PARTICLE_WIND_SWIRL_SPIN, 1.0,
-        end,
+    plParticleUniWindComponent::kSwirl, _T("Swirl"),    TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 100.f,
+    p_range, 0.f, 100.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_SWIRL, IDC_COMP_PARTICLE_WIND_SWIRL_SPIN, 1.0,
+    end,
 
-    plParticleUniWindComponent::kHorizontal, _T("Horizontal"),      TYPE_BOOL, 0, 0,  
-        p_default, FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_PARTICLE_WIND_HORIZONTAL,
-        end,
+    plParticleUniWindComponent::kHorizontal, _T("Horizontal"),      TYPE_BOOL, 0, 0,
+    p_default, FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_PARTICLE_WIND_HORIZONTAL,
+    end,
 
-    plParticleUniWindComponent::kMinSecs,   _T("MinSecs"),  TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 1.f,
-        p_range, 0.1f, 20.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_MINSECS, IDC_COMP_PARTICLE_WIND_MINSECS_SPIN, 1.0,
-        end,
+    plParticleUniWindComponent::kMinSecs,   _T("MinSecs"),  TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 1.f,
+    p_range, 0.1f, 20.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_MINSECS, IDC_COMP_PARTICLE_WIND_MINSECS_SPIN, 1.0,
+    end,
 
-    plParticleUniWindComponent::kMaxSecs,   _T("MaxSecs"),  TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 10.f,
-        p_range, 0.1f, 30.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_MAXSECS, IDC_COMP_PARTICLE_WIND_MAXSECS_SPIN, 1.0,
-        end,
+    plParticleUniWindComponent::kMaxSecs,   _T("MaxSecs"),  TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 10.f,
+    p_range, 0.1f, 30.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_MAXSECS, IDC_COMP_PARTICLE_WIND_MAXSECS_SPIN, 1.0,
+    end,
 
-    plParticleUniWindComponent::kRate,  _T("Rate"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 10.f,
-        p_range, 0.1f, 50.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_RATE, IDC_COMP_PARTICLE_WIND_RATE_SPIN, 1.0,
-        end,
+    plParticleUniWindComponent::kRate,  _T("Rate"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 10.f,
+    p_range, 0.1f, 50.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_RATE, IDC_COMP_PARTICLE_WIND_RATE_SPIN, 1.0,
+    end,
 
-    plParticleUniWindComponent::kClampAngle, _T("ClampAngle"),  TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 180.f,
-        p_range, 0.f, 180.f,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PARTICLE_WIND_CLAMPANG2, IDC_COMP_PARTICLE_WIND_CLAMPANG_SPIN2, 1.0,
-        end,
+    plParticleUniWindComponent::kClampAngle, _T("ClampAngle"),  TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 180.f,
+    p_range, 0.f, 180.f,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_PARTICLE_WIND_CLAMPANG2, IDC_COMP_PARTICLE_WIND_CLAMPANG_SPIN2, 1.0,
+    end,
 
     plParticleUniWindComponent::kRefObject, _T("RefObject"),    TYPE_INODE,     0, 0,
-        p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_PARTICLE_WIND_REFOBJECT,
-        p_prompt, IDS_COMP_CHOOSE_OBJECT,
-        end,
+    p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_PARTICLE_WIND_REFOBJECT,
+    p_prompt, IDS_COMP_CHOOSE_OBJECT,
+    end,
 
     end
 );
@@ -1421,26 +1452,30 @@ plParticleUniWindComponent::plParticleUniWindComponent()
 //
 // plParticleFlockComponent
 
-class ParticleFlockEffectDlgProc : public ParamMap2UserDlgProc
-{
+class ParticleFlockEffectDlgProc : public ParamMap2UserDlgProc {
 public:
     ParticleFlockEffectDlgProc() {}
     ~ParticleFlockEffectDlgProc() {}
 
-    void IValidateSpinners(TimeValue t, IParamBlock2 *pb, IParamMap2 *map, uint32_t id)
-    {
+    void IValidateSpinners(TimeValue t, IParamBlock2* pb, IParamMap2* map, uint32_t id) {
         uint32_t minIndex, maxIndex;
         bool adjustMin;
-        switch(id)
-        {
+
+        switch (id) {
         case IDC_FLOCK_GOAL_DIST:
         case IDC_FLOCK_GOAL_DIST_SPIN:
-            minIndex = plParticleFlockComponent::kGoalDist; maxIndex = plParticleFlockComponent::kFullChaseDist; adjustMin = false;
+            minIndex = plParticleFlockComponent::kGoalDist;
+            maxIndex = plParticleFlockComponent::kFullChaseDist;
+            adjustMin = false;
             break;
+
         case IDC_FLOCK_FULL_CHASE_DIST:
         case IDC_FLOCK_FULL_CHASE_DIST_SPIN:
-            minIndex = plParticleFlockComponent::kGoalDist; maxIndex = plParticleFlockComponent::kFullChaseDist; adjustMin = true;
+            minIndex = plParticleFlockComponent::kGoalDist;
+            maxIndex = plParticleFlockComponent::kFullChaseDist;
+            adjustMin = true;
             break;
+
         default:
             return;
         }
@@ -1449,31 +1484,30 @@ public:
         min = pb->GetFloat(minIndex, t);
         max = pb->GetFloat(maxIndex, t);
 
-        if (min > max)
-        {
-            if (adjustMin)
+        if (min > max) {
+            if (adjustMin) {
                 pb->SetValue(minIndex, t, max);
-            else
+            } else {
                 pb->SetValue(maxIndex, t, min);
+            }
 
             map->Invalidate(minIndex);
             map->Invalidate(maxIndex);
         }
     }
 
-    BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         int id = LOWORD(wParam);
 
-        IParamBlock2 *pb = map->GetParamBlock();
+        IParamBlock2* pb = map->GetParamBlock();
 
-        switch (msg)
-        {
-        case WM_COMMAND:  
+        switch (msg) {
+        case WM_COMMAND:
         case CC_SPINNER_CHANGE:
             IValidateSpinners(t, pb, map, id);
             return TRUE;
         }
+
         return FALSE;
     }
     void DeleteThis() {}
@@ -1482,11 +1516,11 @@ static ParticleFlockEffectDlgProc gParticleFlockEffectDlgProc;
 
 
 
-void plParticleFlockComponent::AddToParticleSystem(plParticleSystem *sys, plMaxNode *node)
+void plParticleFlockComponent::AddToParticleSystem(plParticleSystem* sys, plMaxNode* node)
 {
     plParticleFlockEffect* effect = nil;
-    if( !fEffect )
-    {
+
+    if (!fEffect) {
         effect = new plParticleFlockEffect();
         hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), effect, node->GetLocation(), node->GetLoadMask());
 
@@ -1498,7 +1532,7 @@ void plParticleFlockComponent::AddToParticleSystem(plParticleSystem *sys, plMaxN
         effect->SetInfluenceRepelRadius(fCompPB->GetFloat(ParamID(kInfRepDist)));
 
         float goalDist = fCompPB->GetFloat(ParamID(kGoalDist));
-        float fcDist = fCompPB->GetFloat(ParamID(kFullChaseDist));   
+        float fcDist = fCompPB->GetFloat(ParamID(kFullChaseDist));
         effect->SetGoalRadius(goalDist);
         effect->SetFullChaseRadius(goalDist > fcDist ? goalDist : fcDist); // Fix old data
 
@@ -1511,116 +1545,115 @@ void plParticleFlockComponent::AddToParticleSystem(plParticleSystem *sys, plMaxN
         effect->SetMaxParticles(sys->GetMaxTotalParticles());
 
         fEffect = effect;
-    }
-    else
-    {
+    } else {
         effect = plParticleFlockEffect::ConvertNoRef(fEffect);
     }
+
     hsAssert(effect, "Our effect pointer was wrong type?");
-    hsgResMgr::ResMgr()->AddViaNotify( effect->GetKey(), new plGenRefMsg( sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectForce ), plRefFlags::kActiveRef );
+    hsgResMgr::ResMgr()->AddViaNotify(effect->GetKey(), new plGenRefMsg(sys->GetKey(), plRefMsg::kOnCreate, 0, plParticleSystem::kEffectForce), plRefFlags::kActiveRef);
 }
 
 CLASS_DESC(plParticleFlockComponent, gParticleFlockDesc, "Particle Flock",  "Flock", COMP_TYPE_PARTICLE, PARTICLE_FLOCK_COMPONENT_CLASS_ID)
 
 ParamBlockDesc2 gParticleFlockBk
-(   
- 
+(
+
     plComponent::kBlkComp, _T("ParticleFlock"), 0, &gParticleFlockDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
-    
+
     //Roll out
     IDD_COMP_PARTICLE_FLOCK, IDS_COMP_PARTICLE_FLOCK, 0, 0, &gParticleFlockEffectDlgProc,
-    
-    plParticleFlockComponent::kOffsetX, _T("OffsetX"),  TYPE_FLOAT, 0, 0,   
-        p_default, 0.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_TARGET_OFFSETX, IDC_FLOCK_TARGET_OFFSETX_SPIN, 1.0,
-        end,
-    
-    plParticleFlockComponent::kOffsetY, _T("OffsetY"),  TYPE_FLOAT, 0, 0,   
-        p_default, 0.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_TARGET_OFFSETY, IDC_FLOCK_TARGET_OFFSETY_SPIN, 1.0,
-        end,
 
-    plParticleFlockComponent::kOffsetZ, _T("OffsetZ"),  TYPE_FLOAT, 0, 0,   
-        p_default, 0.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_TARGET_OFFSETZ, IDC_FLOCK_TARGET_OFFSETZ_SPIN, 1.0,
-        end,
+    plParticleFlockComponent::kOffsetX, _T("OffsetX"),  TYPE_FLOAT, 0, 0,
+    p_default, 0.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_TARGET_OFFSETX, IDC_FLOCK_TARGET_OFFSETX_SPIN, 1.0,
+    end,
 
-    plParticleFlockComponent::kInfAvgDist,  _T("InfAvgDist"),   TYPE_FLOAT, 0, 0,   
-        p_default, 1.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_CONFORM_DIST, IDC_FLOCK_CONFORM_DIST_SPIN, 1.0,
-        end,
+    plParticleFlockComponent::kOffsetY, _T("OffsetY"),  TYPE_FLOAT, 0, 0,
+    p_default, 0.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_TARGET_OFFSETY, IDC_FLOCK_TARGET_OFFSETY_SPIN, 1.0,
+    end,
 
-    plParticleFlockComponent::kInfRepDist,  _T("InfRepDist"),   TYPE_FLOAT, 0, 0,   
-        p_default, 1.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_REPEL_DIST, IDC_FLOCK_REPEL_DIST_SPIN, 1.0,
-        end,
+    plParticleFlockComponent::kOffsetZ, _T("OffsetZ"),  TYPE_FLOAT, 0, 0,
+    p_default, 0.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_TARGET_OFFSETZ, IDC_FLOCK_TARGET_OFFSETZ_SPIN, 1.0,
+    end,
 
-    plParticleFlockComponent::kGoalDist,    _T("GoalDist"), TYPE_FLOAT, 0, 0,   
-        p_default, 1.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_GOAL_DIST, IDC_FLOCK_GOAL_DIST_SPIN, 1.0,
-        end,
+    plParticleFlockComponent::kInfAvgDist,  _T("InfAvgDist"),   TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_CONFORM_DIST, IDC_FLOCK_CONFORM_DIST_SPIN, 1.0,
+    end,
 
-    plParticleFlockComponent::kInfAvgStr,   _T("InfAvgStr"),    TYPE_FLOAT, 0, 0,   
-        p_default, 1.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_CONFORM_STR, IDC_FLOCK_CONFORM_STR_SPIN, 1.0,
-        end,
+    plParticleFlockComponent::kInfRepDist,  _T("InfRepDist"),   TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_REPEL_DIST, IDC_FLOCK_REPEL_DIST_SPIN, 1.0,
+    end,
 
-    plParticleFlockComponent::kInfRepStr,   _T("InfRepStr"),    TYPE_FLOAT, 0, 0,   
-        p_default, 1.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_REPEL_STR, IDC_FLOCK_REPEL_STR_SPIN, 1.0,
-        end,
+    plParticleFlockComponent::kGoalDist,    _T("GoalDist"), TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_GOAL_DIST, IDC_FLOCK_GOAL_DIST_SPIN, 1.0,
+    end,
 
-    plParticleFlockComponent::kGoalOrbitStr,    _T("GoalStr"),  TYPE_FLOAT, 0, 0,   
-        p_default, 1.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_GOAL_STR, IDC_FLOCK_GOAL_STR_SPIN, 1.0,
-        end,
+    plParticleFlockComponent::kInfAvgStr,   _T("InfAvgStr"),    TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_CONFORM_STR, IDC_FLOCK_CONFORM_STR_SPIN, 1.0,
+    end,
 
-    plParticleFlockComponent::kMaxChaseSpeed, _T("MaxSpeed"),   TYPE_FLOAT, 0, 0,   
-        p_default, 100.0,
-        p_range, 0.0, 999.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_MAX_SPEED, IDC_FLOCK_MAX_SPEED_SPIN, 1.0,
-        end,        
-    
-    plParticleFlockComponent::kGoalChaseStr,    _T("GoalChaseStr"), TYPE_FLOAT, 0, 0,   
-        p_default, 1.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_GOAL_CHASE_STR, IDC_FLOCK_GOAL_CHASE_STR_SPIN, 1.0,
-        end,
-    
-    plParticleFlockComponent::kMaxOrbitSpeed, _T("MaxOrbitSpeed"),  TYPE_FLOAT, 0, 0,   
-        p_default, 20.0,
-        p_range, 0.0, 999.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_MAX_ORBIT_SPEED, IDC_FLOCK_MAX_ORBIT_SPEED_SPIN, 1.0,
-        end,        
-        
-    plParticleFlockComponent::kFullChaseDist,   _T("FullChaseDist"),    TYPE_FLOAT, 0, 0,   
-        p_default, 1.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_FLOCK_FULL_CHASE_DIST, IDC_FLOCK_FULL_CHASE_DIST_SPIN, 1.0,
-        end,
-        
+    plParticleFlockComponent::kInfRepStr,   _T("InfRepStr"),    TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_REPEL_STR, IDC_FLOCK_REPEL_STR_SPIN, 1.0,
+    end,
+
+    plParticleFlockComponent::kGoalOrbitStr,    _T("GoalStr"),  TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_GOAL_STR, IDC_FLOCK_GOAL_STR_SPIN, 1.0,
+    end,
+
+    plParticleFlockComponent::kMaxChaseSpeed, _T("MaxSpeed"),   TYPE_FLOAT, 0, 0,
+    p_default, 100.0,
+    p_range, 0.0, 999.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_MAX_SPEED, IDC_FLOCK_MAX_SPEED_SPIN, 1.0,
+    end,
+
+    plParticleFlockComponent::kGoalChaseStr,    _T("GoalChaseStr"), TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_GOAL_CHASE_STR, IDC_FLOCK_GOAL_CHASE_STR_SPIN, 1.0,
+    end,
+
+    plParticleFlockComponent::kMaxOrbitSpeed, _T("MaxOrbitSpeed"),  TYPE_FLOAT, 0, 0,
+    p_default, 20.0,
+    p_range, 0.0, 999.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_MAX_ORBIT_SPEED, IDC_FLOCK_MAX_ORBIT_SPEED_SPIN, 1.0,
+    end,
+
+    plParticleFlockComponent::kFullChaseDist,   _T("FullChaseDist"),    TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_FLOCK_FULL_CHASE_DIST, IDC_FLOCK_FULL_CHASE_DIST_SPIN, 1.0,
+    end,
+
     end
 );
 

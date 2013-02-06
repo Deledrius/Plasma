@@ -54,8 +54,7 @@ class plLightGrpComponent;
 //
 // stuff for plParticleComponent
 
-class ParticleStats
-{   
+class ParticleStats {
 
 public:
     float    fConeAngle;
@@ -80,28 +79,25 @@ public:
     uint32_t      fNormal;
     uint32_t      fOrientation;
     bool        fImmortal;
-    
-    ParticleStats() : fConeAngle(0.5), fVelocityMin(30.0), fVelocityMax(50.0), fLifeMin(5.0), fLifeMax(10.0), fPPS(20.0),
-                      fScaleMin(80), fScaleMax(120), fGravity(100), fDrag(0), fWindMult(1.f), fMassRange(0), fRotRange(0), 
-                      fPreSim(0), fGenType(0), 
-                      fXTiles(1), fYTiles(1), fHSize(1), fVSize(1), fImmortal(false) {}
-};  
 
-class plParticleCoreComponent : public plComponent
-{
+    ParticleStats() : fConeAngle(0.5), fVelocityMin(30.0), fVelocityMax(50.0), fLifeMin(5.0), fLifeMax(10.0), fPPS(20.0),
+        fScaleMin(80), fScaleMax(120), fGravity(100), fDrag(0), fWindMult(1.f), fMassRange(0), fRotRange(0),
+        fPreSim(0), fGenType(0),
+        fXTiles(1), fYTiles(1), fHSize(1), fVSize(1), fImmortal(false) {}
+};
+
+class plParticleCoreComponent : public plComponent {
 protected:
 public:
-    enum // generation types
-    {
+    enum { // generation types
         kGenPoint,
         kGenMesh,
         kGenOnePerVertex,
         kGenNumOptions
     };
-    static const char *GenStrings[];
+    static const char* GenStrings[];
 
-    enum
-    {
+    enum {
         kGenType,
         kConeAngle,
         kVelocityMin,
@@ -121,16 +117,20 @@ public:
         kFollowSystem
     };
 
-    virtual void DeleteThis() { delete this; }
-    static bool IsParticleSystemComponent(plComponentBase *comp);
-    static bool NodeHasSystem(plMaxNode *pNode);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg); 
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool AddToAnim(plAGAnim *anim, plMaxNode *node);
-    virtual bool GetParamVals(plMaxNode *pNode) = 0;
-    void SetParticleStats(plParticleMtl *mtl);
+    virtual void DeleteThis() {
+        delete this;
+    }
+    static bool IsParticleSystemComponent(plComponentBase* comp);
+    static bool NodeHasSystem(plMaxNode* pNode);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool AddToAnim(plAGAnim* anim, plMaxNode* node);
+    virtual bool GetParamVals(plMaxNode* pNode) = 0;
+    void SetParticleStats(plParticleMtl* mtl);
 
-    virtual void CollectNonDrawables(INodeTab& nonDrawables) { AddTargetsToList(nonDrawables); }
+    virtual void CollectNonDrawables(INodeTab& nonDrawables) {
+        AddTargetsToList(nonDrawables);
+    }
 
     void IHandleLights(plLightGrpComponent* liGrp, plParticleSystem* sys);
 
@@ -140,8 +140,7 @@ public:
     ParticleStats fUserInput;
 };
 
-class plParticleComponent : public plParticleCoreComponent
-{
+class plParticleComponent : public plParticleCoreComponent {
 protected:
     int fEmitterReserve;
 
@@ -150,12 +149,18 @@ public:
     static bool fAllowUnhide;
 
     plParticleComponent();
-    bool GetParamVals(plMaxNode *pNode);
+    bool GetParamVals(plMaxNode* pNode);
 
-    virtual bool AllowUnhide() { return fAllowUnhide; }
+    virtual bool AllowUnhide() {
+        return fAllowUnhide;
+    }
 
-    virtual void SetEmitterReserve(int numEmitters) { fEmitterReserve = numEmitters; }
-    virtual int GetEmitterReserve() const { return fEmitterReserve; }
+    virtual void SetEmitterReserve(int numEmitters) {
+        fEmitterReserve = numEmitters;
+    }
+    virtual int GetEmitterReserve() const {
+        return fEmitterReserve;
+    }
 };
 
 #define PARTICLE_SYSTEM_COMPONENT_CLASS_ID Class_ID(0x684c5d88, 0x536b1a29)
@@ -164,38 +169,41 @@ public:
 //
 // Particle Effects Base class
 
-class plParticleEffectComponent : public plComponent
-{
+class plParticleEffectComponent : public plComponent {
 protected:
     plParticleEffect*       fEffect;
 public:
     plParticleEffectComponent() : fEffect(nil) {}
-    virtual void DeleteThis() { delete this; }
+    virtual void DeleteThis() {
+        delete this;
+    }
 
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg); 
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg) { return TRUE; }; 
-    
-    virtual void AddToParticleSystem(plParticleSystem *sys, plMaxNode *node) = 0;
-    static bool IsParticleEffectComponent(plComponentBase *comp);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg) {
+        return TRUE;
+    };
+
+    virtual void AddToParticleSystem(plParticleSystem* sys, plMaxNode* node) = 0;
+    static bool IsParticleEffectComponent(plComponentBase* comp);
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // plParticleFadeComponent
 
-class plParticleFadeComponent : public plParticleEffectComponent
-{
+class plParticleFadeComponent : public plParticleEffectComponent {
 public:
-    enum
-    {
+    enum {
         kFadeDistance,
         kFadeZ
     };
 
     plParticleFadeComponent();
-    virtual void DeleteThis() { delete this; }
-    virtual void AddToParticleSystem(plParticleSystem *sys, plMaxNode *node);
+    virtual void DeleteThis() {
+        delete this;
+    }
+    virtual void AddToParticleSystem(plParticleSystem* sys, plMaxNode* node);
 };
 
 #define PARTICLE_FADE_COMPONENT_CLASS_ID Class_ID(0x17496d81, 0x3bb14bc4)
@@ -204,19 +212,16 @@ public:
 //
 // plParticleVolumeComponent
 
-class plParticleVolumeComponent : public plParticleEffectComponent
-{
+class plParticleVolumeComponent : public plParticleEffectComponent {
 public:
-    enum
-    {
+    enum {
         kSourceNode,
         kOnImpact,
         kBounceAmt,
         kFrictionAmt
     };
     // Things to do on impact
-    enum
-    {
+    enum {
         kImpDefault,
         kImpDie,
         kImpBounce
@@ -224,15 +229,17 @@ public:
 
 
     plParticleVolumeComponent();
-    virtual void DeleteThis() { delete this; }
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg); 
-    virtual void AddToParticleSystem(plParticleSystem *sys, plMaxNode *node);
-    void BuildVolume(plMaxNode *node);
+    virtual void DeleteThis() {
+        delete this;
+    }
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual void AddToParticleSystem(plParticleSystem* sys, plMaxNode* node);
+    void BuildVolume(plMaxNode* node);
 
     virtual void CollectNonDrawables(INodeTab& nonDrawables);
 
 protected:
-    plBoundInterface *fBound;
+    plBoundInterface* fBound;
 };
 
 #define PARTICLE_VOLUME_COMPONENT_CLASS_ID Class_ID(0x46087f90, 0x77625ce1)
@@ -242,11 +249,9 @@ protected:
 //
 // plParticleWindComponent
 
-class plParticleWindComponent : public plParticleEffectComponent
-{
+class plParticleWindComponent : public plParticleEffectComponent {
 public:
-    enum
-    {
+    enum {
         kScaleX,
         kScaleY,
         kScaleZ,
@@ -261,8 +266,10 @@ public:
     };
 
     plParticleWindComponent();
-    virtual void DeleteThis() { delete this; }
-    virtual void AddToParticleSystem(plParticleSystem *sys, plMaxNode *node);
+    virtual void DeleteThis() {
+        delete this;
+    }
+    virtual void AddToParticleSystem(plParticleSystem* sys, plMaxNode* node);
 };
 
 const Class_ID PARTICLE_WIND_COMPONENT_CLASS_ID(0x728c40b2, 0x499068b3);
@@ -271,11 +278,9 @@ const Class_ID PARTICLE_WIND_COMPONENT_CLASS_ID(0x728c40b2, 0x499068b3);
 //
 // plParticleUniWindComponent
 
-class plParticleUniWindComponent : public plParticleEffectComponent
-{
+class plParticleUniWindComponent : public plParticleEffectComponent {
 public:
-    enum
-    {
+    enum {
         kStrength,
         kConstancy,
         kSwirl,
@@ -288,8 +293,10 @@ public:
     };
 
     plParticleUniWindComponent();
-    virtual void DeleteThis() { delete this; }
-    virtual void AddToParticleSystem(plParticleSystem *sys, plMaxNode *node);
+    virtual void DeleteThis() {
+        delete this;
+    }
+    virtual void AddToParticleSystem(plParticleSystem* sys, plMaxNode* node);
 };
 
 const Class_ID PARTICLE_UNIWIND_COMPONENT_CLASS_ID(0x2e1d4e50, 0x2f925aac);
@@ -298,11 +305,9 @@ const Class_ID PARTICLE_UNIWIND_COMPONENT_CLASS_ID(0x2e1d4e50, 0x2f925aac);
 //
 // plParticleFlockComponent
 
-class plParticleFlockComponent : public plParticleEffectComponent
-{
+class plParticleFlockComponent : public plParticleEffectComponent {
 public:
-    enum
-    {
+    enum {
         kOffsetX,
         kOffsetY,
         kOffsetZ,
@@ -319,8 +324,10 @@ public:
     };
 
     plParticleFlockComponent();
-    virtual void DeleteThis() { delete this; }
-    virtual void AddToParticleSystem(plParticleSystem *sys, plMaxNode *node);
+    virtual void DeleteThis() {
+        delete this;
+    }
+    virtual void AddToParticleSystem(plParticleSystem* sys, plMaxNode* node);
 };
 
 const Class_ID PARTICLE_FLOCK_COMPONENT_CLASS_ID(0x3f522d7f, 0x409b66cc);

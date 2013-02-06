@@ -58,183 +58,228 @@ class pfConsoleCmd;
 class pfConsoleCmdIterator;
 
 
-class pfConsoleCmdGroup 
-{
-    protected:
+class pfConsoleCmdGroup {
+protected:
 
-        static pfConsoleCmdGroup    *fBaseCmdGroup;
-        static uint32_t               fBaseCmdGroupRef;
+    static pfConsoleCmdGroup*    fBaseCmdGroup;
+    static uint32_t               fBaseCmdGroupRef;
 
-        char    fName[ 128 ];
+    char    fName[ 128 ];
 
-        pfConsoleCmdGroup   *fNext;
-        pfConsoleCmdGroup   **fPrevPtr;
+    pfConsoleCmdGroup*   fNext;
+    pfConsoleCmdGroup**   fPrevPtr;
 
-        pfConsoleCmdGroup   *fSubGroups;
-        pfConsoleCmd        *fCommands;
+    pfConsoleCmdGroup*   fSubGroups;
+    pfConsoleCmd*        fCommands;
 
-        pfConsoleCmdGroup   *fParentGroup;
+    pfConsoleCmdGroup*   fParentGroup;
 
-    public:
+public:
 
-        enum FindFlags {
-            kFindPartial = 0x01
-        };
+    enum FindFlags {
+        kFindPartial = 0x01
+    };
 
-        pfConsoleCmdGroup(const char *name, const char *parent );
-        ~pfConsoleCmdGroup();
+    pfConsoleCmdGroup(const char* name, const char* parent);
+    ~pfConsoleCmdGroup();
 
-        void    AddCommand( pfConsoleCmd *cmd );
-        void    AddSubGroup( pfConsoleCmdGroup *group );
+    void    AddCommand(pfConsoleCmd* cmd);
+    void    AddSubGroup(pfConsoleCmdGroup* group);
 
-        void    Link( pfConsoleCmdGroup **prevPtr );
-        void    Unlink( void );
+    void    Link(pfConsoleCmdGroup** prevPtr);
+    void    Unlink(void);
 
-        pfConsoleCmdGroup   *GetNext( void ) { return fNext; }
-        char                *GetName( void ) { return fName; }
-        pfConsoleCmdGroup   *GetParent( void ) { return fParentGroup; }
+    pfConsoleCmdGroup*   GetNext(void) {
+        return fNext;
+    }
+    char*                GetName(void) {
+        return fName;
+    }
+    pfConsoleCmdGroup*   GetParent(void) {
+        return fParentGroup;
+    }
 
-        static pfConsoleCmdGroup    *GetBaseGroup( void );
+    static pfConsoleCmdGroup*    GetBaseGroup(void);
 
-        pfConsoleCmd        *FindCommand( char *name );
-        pfConsoleCmd        *FindCommandNoCase( char *name, uint8_t flags = 0, pfConsoleCmd *start = nil );
-        pfConsoleCmd        *FindNestedPartialCommand( char *name, uint32_t *counter );
+    pfConsoleCmd*        FindCommand(char* name);
+    pfConsoleCmd*        FindCommandNoCase(char* name, uint8_t flags = 0, pfConsoleCmd* start = nil);
+    pfConsoleCmd*        FindNestedPartialCommand(char* name, uint32_t* counter);
 
-        pfConsoleCmdGroup   *FindSubGroup( char *name );
-        pfConsoleCmdGroup   *FindSubGroupNoCase( char *name, uint8_t flags = 0, pfConsoleCmdGroup *start = nil );
+    pfConsoleCmdGroup*   FindSubGroup(char* name);
+    pfConsoleCmdGroup*   FindSubGroupNoCase(char* name, uint8_t flags = 0, pfConsoleCmdGroup* start = nil);
 
-        pfConsoleCmd        *GetFirstCommand( void ) { return fCommands; }
-        pfConsoleCmdGroup   *GetFirstSubGroup( void ) { return fSubGroups; }
+    pfConsoleCmd*        GetFirstCommand(void) {
+        return fCommands;
+    }
+    pfConsoleCmdGroup*   GetFirstSubGroup(void) {
+        return fSubGroups;
+    }
 
-        int                 IterateCommands(pfConsoleCmdIterator*, int depth=0);
+    int                 IterateCommands(pfConsoleCmdIterator*, int depth = 0);
 
-        static pfConsoleCmdGroup    *FindSubGroupRecurse( const char *name );
-        static void                 DecBaseCmdGroupRef( void );
+    static pfConsoleCmdGroup*    FindSubGroupRecurse(const char* name);
+    static void                 DecBaseCmdGroupRef(void);
 };
 
 //// pfConsoleCmdParam Class Definition //////////////////////////////////////
 
-class pfConsoleCmdParam
-{
-    protected:
+class pfConsoleCmdParam {
+protected:
 
-        uint8_t   fType;
+    uint8_t   fType;
 
-        typedef char    *CharPtr;
+    typedef char*    CharPtr;
 
-        union
-        {
-            int     i;
-            float   f;
-            bool    b;
-            CharPtr s;
-            char    c;
-        } fValue;
+    union {
+        int     i;
+        float   f;
+        bool    b;
+        CharPtr s;
+        char    c;
+    } fValue;
 
-        const int       &IToInt( void ) const;
-        const float     &IToFloat( void ) const;
-        const bool      &IToBool( void ) const;
-        const CharPtr   &IToString( void ) const;
-        const char      &IToChar( void ) const;
+    const int&       IToInt(void) const;
+    const float&     IToFloat(void) const;
+    const bool&      IToBool(void) const;
+    const CharPtr&   IToString(void) const;
+    const char&      IToChar(void) const;
 
-    public:
+public:
 
-        enum Types
-        {
-            kInt    = 0,
-            kFloat,
-            kBool,
-            kString,
-            kChar,
-            kAny,
-            kNone = 0xff
-        };
+    enum Types {
+        kInt    = 0,
+        kFloat,
+        kBool,
+        kString,
+        kChar,
+        kAny,
+        kNone = 0xff
+    };
 
-        operator int() const { return IToInt(); }
-        operator float() const { return IToFloat(); }
-        operator bool() const { return IToBool(); }
-        operator const CharPtr() const { return IToString(); }
-        operator char() const { return IToChar(); }
+    operator int() const {
+        return IToInt();
+    }
+    operator float() const {
+        return IToFloat();
+    }
+    operator bool() const {
+        return IToBool();
+    }
+    operator const CharPtr() const {
+        return IToString();
+    }
+    operator char() const {
+        return IToChar();
+    }
 
-        uint8_t   GetType( void ) { return fType; }
+    uint8_t   GetType(void) {
+        return fType;
+    }
 
-        void    SetInt( int i )         { fValue.i = i; fType = kInt; }
-        void    SetFloat( float f )     { fValue.f = f; fType = kFloat; }
-        void    SetBool( bool b )   { fValue.b = b; fType = kBool; }
-        void    SetString( CharPtr s )  { fValue.s = s; fType = kString; }
-        void    SetChar( char c )       { fValue.c = c; fType = kChar; }
-        void    SetAny( CharPtr s )     { fValue.s = s; fType = kAny; }
-        void    SetNone( void )         { fType = kNone; }
+    void    SetInt(int i)         {
+        fValue.i = i;
+        fType = kInt;
+    }
+    void    SetFloat(float f)     {
+        fValue.f = f;
+        fType = kFloat;
+    }
+    void    SetBool(bool b)   {
+        fValue.b = b;
+        fType = kBool;
+    }
+    void    SetString(CharPtr s)  {
+        fValue.s = s;
+        fType = kString;
+    }
+    void    SetChar(char c)       {
+        fValue.c = c;
+        fType = kChar;
+    }
+    void    SetAny(CharPtr s)     {
+        fValue.s = s;
+        fType = kAny;
+    }
+    void    SetNone(void)         {
+        fType = kNone;
+    }
 };
 
 //// pfConsoleCmd Class Definition ///////////////////////////////////////////
 
-typedef void (*pfConsoleCmdPtr)( int32_t numParams, pfConsoleCmdParam *params, void (*PrintString)( const char * ) );
+typedef void (*pfConsoleCmdPtr)(int32_t numParams, pfConsoleCmdParam* params, void (*PrintString)(const char*));
 
-class pfConsoleCmd
-{
-    protected:
-        char            fName[ 128 ];
-        const char*     fHelpString;
+class pfConsoleCmd {
+protected:
+    char            fName[ 128 ];
+    const char*     fHelpString;
 
-        pfConsoleCmdPtr fFunction;
-        bool            fLocalOnly;
+    pfConsoleCmdPtr fFunction;
+    bool            fLocalOnly;
 
-        pfConsoleCmd    *fNext;
-        pfConsoleCmd    **fPrevPtr;
+    pfConsoleCmd*    fNext;
+    pfConsoleCmd**    fPrevPtr;
 
-        pfConsoleCmdGroup   *fParentGroup;
+    pfConsoleCmdGroup*   fParentGroup;
 
-        hsExpander<uint8_t>   fSignature;
-        hsExpander<char *>  fSigLabels;
+    hsExpander<uint8_t>   fSignature;
+    hsExpander<char*>  fSigLabels;
 
-        void    ICreateSignature(const char *paramList );
+    void    ICreateSignature(const char* paramList);
 
-    public:
+public:
 
-        enum ParamTypes
-        {
-            kInt    = 0,
-            kFloat,
-            kBool,
-            kString,
-            kChar,
-            kAny,
-            kEtc,
-            kNumTypes,
-            kNone = 0xff
-        };
+    enum ParamTypes {
+        kInt    = 0,
+        kFloat,
+        kBool,
+        kString,
+        kChar,
+        kAny,
+        kEtc,
+        kNumTypes,
+        kNone = 0xff
+    };
 
-        static char         fSigTypes[ kNumTypes ][ 8 ];
+    static char         fSigTypes[ kNumTypes ][ 8 ];
 
 
-        pfConsoleCmd(const char *group, const char *name, const char *paramList, const char *help, pfConsoleCmdPtr func, bool localOnly = false );
-        ~pfConsoleCmd();
+    pfConsoleCmd(const char* group, const char* name, const char* paramList, const char* help, pfConsoleCmdPtr func, bool localOnly = false);
+    ~pfConsoleCmd();
 
-        void    Register(const char *group, const char *name );
-        void    Unregister();
-        void    Execute( int32_t numParams, pfConsoleCmdParam *params, void (*PrintFn)( const char * ) = nil );
+    void    Register(const char* group, const char* name);
+    void    Unregister();
+    void    Execute(int32_t numParams, pfConsoleCmdParam* params, void (*PrintFn)(const char*) = nil);
 
-        void    Link( pfConsoleCmd **prevPtr );
-        void    Unlink( void );
+    void    Link(pfConsoleCmd** prevPtr);
+    void    Unlink(void);
 
-        pfConsoleCmd    *GetNext( void ) { return fNext; }
-        char            *GetName( void ) { return fName; }
-        const char      *GetHelp( void ) { return fHelpString; }
-        const char      *GetSignature( void );
+    pfConsoleCmd*    GetNext(void) {
+        return fNext;
+    }
+    char*            GetName(void) {
+        return fName;
+    }
+    const char*      GetHelp(void) {
+        return fHelpString;
+    }
+    const char*      GetSignature(void);
 
-        pfConsoleCmdGroup   *GetParent( void ) { return fParentGroup; }
+    pfConsoleCmdGroup*   GetParent(void) {
+        return fParentGroup;
+    }
 
-        uint8_t           GetSigEntry( uint8_t i );
+    uint8_t           GetSigEntry(uint8_t i);
 };
 
 
 
-class pfConsoleCmdIterator
-{
+class pfConsoleCmdIterator {
 public:
-    virtual void ProcessCmd(pfConsoleCmd*, int ) {}
-    virtual bool ProcessGroup(pfConsoleCmdGroup *, int) {return true;}
+    virtual void ProcessCmd(pfConsoleCmd*, int) {}
+    virtual bool ProcessGroup(pfConsoleCmdGroup*, int) {
+        return true;
+    }
 };
 
 

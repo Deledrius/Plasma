@@ -68,9 +68,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsStream {
 public:
-enum {
-    kEolnCode = '\n',
-    kComment = '#'
+    enum {
+        kEolnCode = '\n',
+        kComment = '#'
     };
 protected:
     uint32_t      fBytesRead;
@@ -78,13 +78,13 @@ protected:
 
     bool      IsTokenSeparator(char c);
 public:
-                hsStream() : fBytesRead(0), fPosition(0) {}
+    hsStream() : fBytesRead(0), fPosition(0) {}
     virtual     ~hsStream() { }
 
-    virtual bool      Open(const plFileName &, const char * = "rb") = 0;
-    virtual bool      Close()=0;
+    virtual bool      Open(const plFileName&, const char * = "rb") = 0;
+    virtual bool      Close() = 0;
     virtual bool      AtEnd();
-    virtual uint32_t  Read(uint32_t byteCount, void * buffer) = 0;
+    virtual uint32_t  Read(uint32_t byteCount, void* buffer) = 0;
     virtual uint32_t  Write(uint32_t byteCount, const void* buffer) = 0;
     virtual void      Skip(uint32_t deltaByteCount) = 0;
     virtual void      Rewind() = 0;
@@ -96,12 +96,20 @@ public:
 
 #ifdef STREAM_LOGGER
     // Logging Reads & Skips
-    virtual uint32_t  LogRead(uint32_t byteCount, void * buffer, const char* desc) { return Read(byteCount,buffer); }
-    virtual char*   LogReadSafeString() { return ReadSafeString(); }
-    virtual char*   LogReadSafeStringLong() { return ReadSafeStringLong(); }
-    virtual void    LogSkip(uint32_t deltaByteCount, const char* desc) { Skip(deltaByteCount); }
+    virtual uint32_t  LogRead(uint32_t byteCount, void* buffer, const char* desc) {
+        return Read(byteCount, buffer);
+    }
+    virtual char*   LogReadSafeString() {
+        return ReadSafeString();
+    }
+    virtual char*   LogReadSafeStringLong() {
+        return ReadSafeStringLong();
+    }
+    virtual void    LogSkip(uint32_t deltaByteCount, const char* desc) {
+        Skip(deltaByteCount);
+    }
 
-    // Stream Notes for Logging 
+    // Stream Notes for Logging
     virtual void    LogStringString(const char* s) { }
     virtual void    LogSubStreamStart(const char* desc) { }
     virtual void    LogSubStreamEnd() { }
@@ -111,37 +119,41 @@ public:
 
     // Optimization for small Reads
     virtual uint8_t ReadByte();
-    virtual bool    Read4Bytes(void *buffer);   // Reads 4 bytes,  return true if success 
-    virtual bool    Read8Bytes(void *buffer);   // Reads 8 bytes,  return true if success 
-    virtual bool    Read12Bytes(void *buffer);  // Reads 12 bytes, return true if success
+    virtual bool    Read4Bytes(void* buffer);   // Reads 4 bytes,  return true if success
+    virtual bool    Read8Bytes(void* buffer);   // Reads 8 bytes,  return true if success
+    virtual bool    Read12Bytes(void* buffer);  // Reads 12 bytes, return true if success
 
     virtual uint32_t  GetEOF();
     uint32_t          GetSizeLeft();
     virtual void      CopyToMem(void* mem);
-    virtual bool      IsCompressed() { return false; }
+    virtual bool      IsCompressed() {
+        return false;
+    }
 
-    uint32_t        WriteString(const plString & string) { return Write(string.GetSize(), string.c_str()); }
-    uint32_t        WriteFmt(const char * fmt, ...);
-    uint32_t        WriteFmtV(const char * fmt, va_list av);
+    uint32_t        WriteString(const plString& string) {
+        return Write(string.GetSize(), string.c_str());
+    }
+    uint32_t        WriteFmt(const char* fmt, ...);
+    uint32_t        WriteFmtV(const char* fmt, va_list av);
 
-    uint32_t        WriteSafeStringLong(const plString &string);    // uses 4 bytes for length
-    uint32_t        WriteSafeWStringLong(const plString &string);
-    char *          ReadSafeStringLong();
-    wchar_t *       ReadSafeWStringLong();
+    uint32_t        WriteSafeStringLong(const plString& string);    // uses 4 bytes for length
+    uint32_t        WriteSafeWStringLong(const plString& string);
+    char*           ReadSafeStringLong();
+    wchar_t*        ReadSafeWStringLong();
 
-    uint32_t        WriteSafeString(const plString &string);        // uses 2 bytes for length
-    uint32_t        WriteSafeWString(const plString &string);
-    char *          ReadSafeString();
-    wchar_t *       ReadSafeWString();
+    uint32_t        WriteSafeString(const plString& string);        // uses 2 bytes for length
+    uint32_t        WriteSafeWString(const plString& string);
+    char*           ReadSafeString();
+    wchar_t*        ReadSafeWString();
 
     plString        ReadSafeStringLong_TEMP();
     plString        ReadSafeWStringLong_TEMP();
     plString        ReadSafeString_TEMP();
     plString        ReadSafeWString_TEMP();
 
-    bool            GetToken(char *s, uint32_t maxLen=uint32_t(-1), const char beginComment=kComment, const char endComment=kEolnCode);
-    bool            ReadLn(char* s, uint32_t maxLen=uint32_t(-1), const char beginComment=kComment, const char endComment=kEolnCode);
-    
+    bool            GetToken(char* s, uint32_t maxLen = uint32_t(-1), const char beginComment = kComment, const char endComment = kEolnCode);
+    bool            ReadLn(char* s, uint32_t maxLen = uint32_t(-1), const char beginComment = kComment, const char endComment = kEolnCode);
+
     // Reads a 4-byte BOOLean
     bool            ReadBOOL();
     // Reads a 1-byte boolean
@@ -166,61 +178,155 @@ public:
 
     /* Overloaded  Begin (8 & 16 & 32 int)*/
     /* yes, swapping an 8 bit value does nothing, just useful*/
-    void            ReadLE(bool* value) { *value = this->ReadByte() ? true : false; }
-    void            ReadLE(uint8_t* value) { *value = this->ReadByte(); }
-    void            ReadLE(int count, uint8_t values[]) { this->Read(count, values); }
-    void            ReadLE(uint16_t* value) { *value = this->ReadLE16(); }
-    void            ReadLE(int count, uint16_t values[]) { this->ReadLE16(count, values); }
-    void            ReadLE(uint32_t* value) { *value = this->ReadLE32(); }
-    void            ReadLE(int count, uint32_t values[]) { this->ReadLE32(count, values); }
+    void            ReadLE(bool* value) {
+        *value = this->ReadByte() ? true : false;
+    }
+    void            ReadLE(uint8_t* value) {
+        *value = this->ReadByte();
+    }
+    void            ReadLE(int count, uint8_t values[]) {
+        this->Read(count, values);
+    }
+    void            ReadLE(uint16_t* value) {
+        *value = this->ReadLE16();
+    }
+    void            ReadLE(int count, uint16_t values[]) {
+        this->ReadLE16(count, values);
+    }
+    void            ReadLE(uint32_t* value) {
+        *value = this->ReadLE32();
+    }
+    void            ReadLE(int count, uint32_t values[]) {
+        this->ReadLE32(count, values);
+    }
 #ifdef STREAM_LOGGER
-                // Begin LogReadLEs
-    virtual void    LogReadLE(bool* value, const char* desc) { this->ReadLE(value); }
-    virtual void    LogReadLE(uint8_t* value, const char* desc) { this->ReadLE(value); }
-    virtual void    LogReadLEArray(int count, uint8_t values[], const char* desc) { this->ReadLE(count, values); }
-    virtual void    LogReadLE(uint16_t* value, const char* desc) { this->ReadLE(value); }
-    virtual void    LogReadLEArray(int count, uint16_t values[], const char* desc) { this->ReadLE(count, values); }
-    virtual void    LogReadLE(uint32_t* value, const char* desc) { this->ReadLE(value); }
-    virtual void    LogReadLEArray(int count, uint32_t values[], const char* desc) { this->ReadLE(count, values); }
-                // End LogReadLEs
+    // Begin LogReadLEs
+    virtual void    LogReadLE(bool* value, const char* desc) {
+        this->ReadLE(value);
+    }
+    virtual void    LogReadLE(uint8_t* value, const char* desc) {
+        this->ReadLE(value);
+    }
+    virtual void    LogReadLEArray(int count, uint8_t values[], const char* desc) {
+        this->ReadLE(count, values);
+    }
+    virtual void    LogReadLE(uint16_t* value, const char* desc) {
+        this->ReadLE(value);
+    }
+    virtual void    LogReadLEArray(int count, uint16_t values[], const char* desc) {
+        this->ReadLE(count, values);
+    }
+    virtual void    LogReadLE(uint32_t* value, const char* desc) {
+        this->ReadLE(value);
+    }
+    virtual void    LogReadLEArray(int count, uint32_t values[], const char* desc) {
+        this->ReadLE(count, values);
+    }
+    // End LogReadLEs
 #endif
-    void            WriteLE(bool value) { this->Write(1,&value); }
-    void            WriteLE(uint8_t value) { this->Write(1,&value); }
-    void            WriteLE(int count, const uint8_t values[]) { this->Write(count, values); }
-    void            WriteLE(uint16_t value) { this->WriteLE16(value); }
-    void            WriteLE(int count, const uint16_t values[]) { this->WriteLE16(count, values); }
-    void            WriteLE(uint32_t value) { this->WriteLE32(value); }
-    void            WriteLE(int count, const  uint32_t values[]) { this->WriteLE32(count, values); }
-    void            ReadLE(int8_t* value) { *value = this->ReadByte(); }
-    void            ReadLE(int count, int8_t values[]) { this->Read(count, values); }
-    void            ReadLE(char* value) { *value = (char)this->ReadByte(); }
-    void            ReadLE(int count, char values[]) { this->Read(count, values); }
-    void            ReadLE(int16_t* value) { *value = (int16_t)this->ReadLE16(); }
-    void            ReadLE(int count, int16_t values[]) { this->ReadLE16(count, (uint16_t*)values); }
-    void            ReadLE(int32_t* value) { *value = (int32_t)this->ReadLE32(); }
-    void            ReadLE(int count, int32_t values[]) { this->ReadLE32(count, (uint32_t*)values); }
+    void            WriteLE(bool value) {
+        this->Write(1, &value);
+    }
+    void            WriteLE(uint8_t value) {
+        this->Write(1, &value);
+    }
+    void            WriteLE(int count, const uint8_t values[]) {
+        this->Write(count, values);
+    }
+    void            WriteLE(uint16_t value) {
+        this->WriteLE16(value);
+    }
+    void            WriteLE(int count, const uint16_t values[]) {
+        this->WriteLE16(count, values);
+    }
+    void            WriteLE(uint32_t value) {
+        this->WriteLE32(value);
+    }
+    void            WriteLE(int count, const  uint32_t values[]) {
+        this->WriteLE32(count, values);
+    }
+    void            ReadLE(int8_t* value) {
+        *value = this->ReadByte();
+    }
+    void            ReadLE(int count, int8_t values[]) {
+        this->Read(count, values);
+    }
+    void            ReadLE(char* value) {
+        *value = (char)this->ReadByte();
+    }
+    void            ReadLE(int count, char values[]) {
+        this->Read(count, values);
+    }
+    void            ReadLE(int16_t* value) {
+        *value = (int16_t)this->ReadLE16();
+    }
+    void            ReadLE(int count, int16_t values[]) {
+        this->ReadLE16(count, (uint16_t*)values);
+    }
+    void            ReadLE(int32_t* value) {
+        *value = (int32_t)this->ReadLE32();
+    }
+    void            ReadLE(int count, int32_t values[]) {
+        this->ReadLE32(count, (uint32_t*)values);
+    }
 #ifdef STREAM_LOGGER
-                // Begin LogReadLEs
-    virtual void    LogReadLE(int8_t* value, const char* desc) { this->ReadLE(value); }
-    virtual void    LogReadLEArray(int count, int8_t values[], const char* desc) { this->ReadLE(count, values); }
-    virtual void    LogReadLE(char* value, const char* desc) { this->ReadLE(value); }
-    virtual void    LogReadLEArray(int count, char values[], const char* desc) { this->ReadLE(count, values); }
-    virtual void    LogReadLE(int16_t* value, const char* desc) { this->ReadLE(value); }
-    virtual void    LogReadLEArray(int count, int16_t values[], const char* desc) { this->ReadLE(count, (uint16_t*)values); }
-    virtual void    LogReadLE(int32_t* value, const char* desc) { this->ReadLE(value); }
-    virtual void    LogReadLEArray(int count, int32_t values[], const char* desc) { this->ReadLE(count, (uint32_t*)values); }
-    virtual void    LogReadLE(int* value, const char* desc) { this->ReadLE(value); }
-    virtual void    LogReadLEArray(int count, int values[], const char* desc) { this->ReadLE(count, (uint32_t*)values); }
-                // End LogReadLEs
+    // Begin LogReadLEs
+    virtual void    LogReadLE(int8_t* value, const char* desc) {
+        this->ReadLE(value);
+    }
+    virtual void    LogReadLEArray(int count, int8_t values[], const char* desc) {
+        this->ReadLE(count, values);
+    }
+    virtual void    LogReadLE(char* value, const char* desc) {
+        this->ReadLE(value);
+    }
+    virtual void    LogReadLEArray(int count, char values[], const char* desc) {
+        this->ReadLE(count, values);
+    }
+    virtual void    LogReadLE(int16_t* value, const char* desc) {
+        this->ReadLE(value);
+    }
+    virtual void    LogReadLEArray(int count, int16_t values[], const char* desc) {
+        this->ReadLE(count, (uint16_t*)values);
+    }
+    virtual void    LogReadLE(int32_t* value, const char* desc) {
+        this->ReadLE(value);
+    }
+    virtual void    LogReadLEArray(int count, int32_t values[], const char* desc) {
+        this->ReadLE(count, (uint32_t*)values);
+    }
+    virtual void    LogReadLE(int* value, const char* desc) {
+        this->ReadLE(value);
+    }
+    virtual void    LogReadLEArray(int count, int values[], const char* desc) {
+        this->ReadLE(count, (uint32_t*)values);
+    }
+    // End LogReadLEs
 #endif
-    void            WriteLE(int8_t value) { this->Write(1,&value); }
-    void            WriteLE(int count, const int8_t values[]) { this->Write(count, values); }
-    void            WriteLE(char value) { this->Write(1,(uint8_t*)&value); }
-    void            WriteLE(int count, const char values[]) { this->Write(count, (uint8_t*)values); }
-    void            WriteLE(int16_t value) { this->WriteLE16((uint16_t)value); }
-    void            WriteLE(int count, const int16_t values[]) { this->WriteLE16(count, (uint16_t*)values); }
-    void            WriteLE(int32_t value) { this->WriteLE32((uint32_t)value); }
-    void            WriteLE(int count, const  int32_t values[]) { this->WriteLE32(count, (uint32_t*)values); }
+    void            WriteLE(int8_t value) {
+        this->Write(1, &value);
+    }
+    void            WriteLE(int count, const int8_t values[]) {
+        this->Write(count, values);
+    }
+    void            WriteLE(char value) {
+        this->Write(1, (uint8_t*)&value);
+    }
+    void            WriteLE(int count, const char values[]) {
+        this->Write(count, (uint8_t*)values);
+    }
+    void            WriteLE(int16_t value) {
+        this->WriteLE16((uint16_t)value);
+    }
+    void            WriteLE(int count, const int16_t values[]) {
+        this->WriteLE16(count, (uint16_t*)values);
+    }
+    void            WriteLE(int32_t value) {
+        this->WriteLE32((uint32_t)value);
+    }
+    void            WriteLE(int count, const  int32_t values[]) {
+        this->WriteLE32(count, (uint32_t*)values);
+    }
     /* Overloaded  End */
 
 
@@ -237,44 +343,78 @@ public:
 
 
     /* Overloaded  Begin (Float)*/
-    void            ReadLE(float* value) { *value = ReadLEFloat(); }
-    void            ReadLE(int count, float values[]) { ReadLEFloat(count, values); }
-    void            ReadLE(double* value) { *value = ReadLEDouble(); }
-    void            ReadLE(int count, double values[]) { ReadLEDouble(count, values); }
+    void            ReadLE(float* value) {
+        *value = ReadLEFloat();
+    }
+    void            ReadLE(int count, float values[]) {
+        ReadLEFloat(count, values);
+    }
+    void            ReadLE(double* value) {
+        *value = ReadLEDouble();
+    }
+    void            ReadLE(int count, double values[]) {
+        ReadLEDouble(count, values);
+    }
 #ifdef STREAM_LOGGER
-                    // Begin LogReadLEs
-    virtual void    LogReadLE(float* value, const char* desc) { ReadLE(value); }
-    virtual void    LogReadLEArray(int count, float values[], const char* desc) { ReadLE(count, values); }
-    virtual void    LogReadLE(double* value, const char* desc) { ReadLE(value); }
-    virtual void    LogReadLEArray(int count, double values[], const char* desc) { ReadLE(count, values); }
-                    // End LogReadLEs
+    // Begin LogReadLEs
+    virtual void    LogReadLE(float* value, const char* desc) {
+        ReadLE(value);
+    }
+    virtual void    LogReadLEArray(int count, float values[], const char* desc) {
+        ReadLE(count, values);
+    }
+    virtual void    LogReadLE(double* value, const char* desc) {
+        ReadLE(value);
+    }
+    virtual void    LogReadLEArray(int count, double values[], const char* desc) {
+        ReadLE(count, values);
+    }
+    // End LogReadLEs
 #endif
-    void            WriteLE(float value) { WriteLEFloat(value); }
-    void            WriteLE(int count, const float values[]) { WriteLEFloat(count, values); }
-    void            WriteLE(double value) { WriteLEDouble(value); }
-    void            WriteLE(int count, const double values[]) { WriteLEDouble(count, values); }
+    void            WriteLE(float value) {
+        WriteLEFloat(value);
+    }
+    void            WriteLE(int count, const float values[]) {
+        WriteLEFloat(count, values);
+    }
+    void            WriteLE(double value) {
+        WriteLEDouble(value);
+    }
+    void            WriteLE(int count, const double values[]) {
+        WriteLEDouble(count, values);
+    }
     /* Overloaded End */
 
-    float           ReadLEScalar() { return (float)this->ReadLEFloat(); }
-    void            ReadLEScalar(int count, float values[])
-                    {
-                        this->ReadLEFloat(count, (float*)values);
-                    }
-    float           ReadBEScalar() { return (float)this->ReadBEFloat(); }
-    void            WriteLEScalar(float value) { this->WriteLEFloat(value); }
-    void            WriteLEScalar(int count, const float values[])
-                    {
-                        this->WriteLEFloat(count, (float*)values);
-                    }
-    void            WriteBEScalar(float value) { this->WriteBEFloat(value); }
+    float           ReadLEScalar() {
+        return (float)this->ReadLEFloat();
+    }
+    void            ReadLEScalar(int count, float values[]) {
+        this->ReadLEFloat(count, (float*)values);
+    }
+    float           ReadBEScalar() {
+        return (float)this->ReadBEFloat();
+    }
+    void            WriteLEScalar(float value) {
+        this->WriteLEFloat(value);
+    }
+    void            WriteLEScalar(int count, const float values[]) {
+        this->WriteLEFloat(count, (float*)values);
+    }
+    void            WriteBEScalar(float value) {
+        this->WriteBEFloat(value);
+    }
 
     void            WriteLEAtom(uint32_t tag, uint32_t size);
     uint32_t          ReadLEAtom(uint32_t* size);
 
 
     /* Overloaded  Begin (Atom)*/
-    void            WriteLE(uint32_t* tag, uint32_t size) { WriteLEAtom(*tag, size); }
-    void            ReadLE(uint32_t* tag, uint32_t *size) { *tag = ReadLEAtom(size); }
+    void            WriteLE(uint32_t* tag, uint32_t size) {
+        WriteLEAtom(*tag, size);
+    }
+    void            ReadLE(uint32_t* tag, uint32_t* size) {
+        *tag = ReadLEAtom(size);
+    }
     /* Overloaded  End */
 };
 
@@ -285,8 +425,7 @@ public:
     virtual uint32_t  GetStreamSize() = 0;
 };
 
-class hsUNIXStream: public hsStream
-{   
+class hsUNIXStream: public hsStream {
     FILE*       fRef;
     char*       fBuff;
 
@@ -306,30 +445,41 @@ public:
     virtual void      Truncate();
     virtual void      Flush();
 
-    FILE*           GetFILE() { return fRef; }
-    void            SetFILE(FILE* file) { fRef = file; }
+    FILE*           GetFILE() {
+        return fRef;
+    }
+    void            SetFILE(FILE* file) {
+        fRef = file;
+    }
 
     virtual uint32_t  GetEOF();
 };
 
 // Small substream class: give it a base stream, an offset and a length, and it'll
-// treat all ops as if you had a chunk from the base stream as a separate, vanilla 
+// treat all ops as if you had a chunk from the base stream as a separate, vanilla
 // stream of the given length.
 
-class plReadOnlySubStream: public hsStream
-{   
-    hsStream    *fBase;
+class plReadOnlySubStream: public hsStream {
+    hsStream*    fBase;
     uint32_t      fOffset, fLength;
 
-    void    IFixPosition( void );
+    void    IFixPosition(void);
 
 public:
-    plReadOnlySubStream(): fBase( nil ), fOffset( 0 ), fLength( 0 ) {}
+    plReadOnlySubStream(): fBase(nil), fOffset(0), fLength(0) {}
     ~plReadOnlySubStream();
 
-    virtual bool      Open(const plFileName &, const char *) { hsAssert(0, "plReadOnlySubStream::Open  NotImplemented"); return false; }
-    void              Open( hsStream *base, uint32_t offset, uint32_t length );
-    virtual bool      Close() { fBase = nil; fOffset = 0; fLength = 0; return true; }
+    virtual bool      Open(const plFileName&, const char*) {
+        hsAssert(0, "plReadOnlySubStream::Open  NotImplemented");
+        return false;
+    }
+    void              Open(hsStream* base, uint32_t offset, uint32_t length);
+    virtual bool      Close() {
+        fBase = nil;
+        fOffset = 0;
+        fLength = 0;
+        return true;
+    }
     virtual bool      AtEnd();
     virtual uint32_t  Read(uint32_t byteCount, void* buffer);
     virtual uint32_t  Write(uint32_t byteCount, const void* buffer);
@@ -345,16 +495,22 @@ class hsRAMStream : public hsStream {
     hsAppender          fAppender;
     hsAppenderIterator  fIter;
 public:
-                hsRAMStream();
-                hsRAMStream(uint32_t chunkSize);
+    hsRAMStream();
+    hsRAMStream(uint32_t chunkSize);
     virtual     ~hsRAMStream();
 
-    virtual bool  Open(const plFileName &, const char *) { hsAssert(0, "hsRAMStream::Open  NotImplemented"); return false; }
-    virtual bool  Close()             { hsAssert(0, "hsRAMStream::Close  NotImplemented"); return false; }
+    virtual bool  Open(const plFileName&, const char*) {
+        hsAssert(0, "hsRAMStream::Open  NotImplemented");
+        return false;
+    }
+    virtual bool  Close()             {
+        hsAssert(0, "hsRAMStream::Close  NotImplemented");
+        return false;
+    }
 
-    
+
     virtual bool      AtEnd();
-    virtual uint32_t  Read(uint32_t byteCount, void * buffer);
+    virtual uint32_t  Read(uint32_t byteCount, void* buffer);
     virtual uint32_t  Write(uint32_t byteCount, const void* buffer);
     virtual void      Skip(uint32_t deltaByteCount);
     virtual void      Rewind();
@@ -369,17 +525,25 @@ public:
 class hsNullStream : public hsStream {
 public:
 
-    virtual bool      Open(const plFileName &, const char *) { return true; }
-    virtual bool      Close()             { return true; }
+    virtual bool      Open(const plFileName&, const char*) {
+        return true;
+    }
+    virtual bool      Close()             {
+        return true;
+    }
 
-    virtual uint32_t  Read(uint32_t byteCount, void * buffer);  // throw's exception
+    virtual uint32_t  Read(uint32_t byteCount, void* buffer);   // throw's exception
     virtual uint32_t  Write(uint32_t byteCount, const void* buffer);
     virtual void      Skip(uint32_t deltaByteCount);
     virtual void      Rewind();
     virtual void      Truncate();
 
-    uint32_t          GetBytesWritten() const { return fBytesRead; }
-    void              Reset( ) { fBytesRead = 0;   }
+    uint32_t          GetBytesWritten() const {
+        return fBytesRead;
+    }
+    void              Reset() {
+        fBytesRead = 0;
+    }
 };
 
 // read only mem stream
@@ -389,20 +553,36 @@ protected:
     char*   fData;
     char*   fStop;
 public:
-    hsReadOnlyStream(int size, const void* data) { Init(size, data); }
+    hsReadOnlyStream(int size, const void* data) {
+        Init(size, data);
+    }
     hsReadOnlyStream() {}
 
-    virtual void      Init(int size, const void* data) { fStart=((char*)data); fData=((char*)data); fStop=((char*)data + size); }
-    virtual bool      Open(const plFileName &, const char *) { hsAssert(0, "hsReadOnlyStream::Open  NotImplemented"); return false; }
-    virtual bool      Close() { hsAssert(0, "hsReadOnlyStream::Close  NotImplemented"); return false; }
+    virtual void      Init(int size, const void* data) {
+        fStart = ((char*)data);
+        fData = ((char*)data);
+        fStop = ((char*)data + size);
+    }
+    virtual bool      Open(const plFileName&, const char*) {
+        hsAssert(0, "hsReadOnlyStream::Open  NotImplemented");
+        return false;
+    }
+    virtual bool      Close() {
+        hsAssert(0, "hsReadOnlyStream::Close  NotImplemented");
+        return false;
+    }
     virtual bool      AtEnd();
-    virtual uint32_t  Read(uint32_t byteCount, void * buffer);
+    virtual uint32_t  Read(uint32_t byteCount, void* buffer);
     virtual uint32_t  Write(uint32_t byteCount, const void* buffer);    // throws exception
     virtual void      Skip(uint32_t deltaByteCount);
     virtual void      Rewind();
     virtual void      Truncate();
-    virtual uint32_t  GetBytesRead() const { return fBytesRead; }
-    virtual uint32_t  GetEOF() { return (uint32_t)(fStop-fStart); }
+    virtual uint32_t  GetBytesRead() const {
+        return fBytesRead;
+    }
+    virtual uint32_t  GetEOF() {
+        return (uint32_t)(fStop - fStart);
+    }
     virtual void      CopyToMem(void* mem);
 };
 
@@ -412,12 +592,22 @@ public:
     hsWriteOnlyStream(int size, const void* data) : hsReadOnlyStream(size, data) {}
     hsWriteOnlyStream() {}
 
-    virtual bool      Open(const plFileName &, const char *) { hsAssert(0, "hsWriteOnlyStream::Open  NotImplemented"); return false; }
-    virtual bool      Close() { hsAssert(0, "hsWriteOnlyStream::Close  NotImplemented"); return false; }
-    virtual uint32_t  Read(uint32_t byteCount, void * buffer);  // throws exception
-    virtual uint32_t  Write(uint32_t byteCount, const void* buffer);    
-    virtual uint32_t  GetBytesRead() const { return 0; }
-    virtual uint32_t  GetBytesWritten() const { return fBytesRead; }
+    virtual bool      Open(const plFileName&, const char*) {
+        hsAssert(0, "hsWriteOnlyStream::Open  NotImplemented");
+        return false;
+    }
+    virtual bool      Close() {
+        hsAssert(0, "hsWriteOnlyStream::Close  NotImplemented");
+        return false;
+    }
+    virtual uint32_t  Read(uint32_t byteCount, void* buffer);   // throws exception
+    virtual uint32_t  Write(uint32_t byteCount, const void* buffer);
+    virtual uint32_t  GetBytesRead() const {
+        return 0;
+    }
+    virtual uint32_t  GetBytesWritten() const {
+        return fBytesRead;
+    }
 };
 
 // circular queue stream
@@ -427,33 +617,46 @@ private:
     uint32_t fReadCursor;
     uint32_t fWriteCursor;
     uint32_t fSize;
-    
+
 public:
     hsQueueStream(int32_t size);
     ~hsQueueStream();
 
-    virtual bool  Open(const plFileName &, const char *) { hsAssert(0, "hsQueueStream::Open  NotImplemented"); return false; }
-    virtual bool  Close() { hsAssert(0, "hsQueueStream::Close  NotImplemented"); return false; }
+    virtual bool  Open(const plFileName&, const char*) {
+        hsAssert(0, "hsQueueStream::Open  NotImplemented");
+        return false;
+    }
+    virtual bool  Close() {
+        hsAssert(0, "hsQueueStream::Close  NotImplemented");
+        return false;
+    }
 
-    virtual uint32_t  Read(uint32_t byteCount, void * buffer);
+    virtual uint32_t  Read(uint32_t byteCount, void* buffer);
     virtual uint32_t  Write(uint32_t byteCount, const void* buffer);
     virtual void      Skip(uint32_t deltaByteCount);
     virtual void      Rewind();
     virtual void      FastFwd();
     virtual bool      AtEnd();
 
-    uint32_t GetSize() { return fSize; }
-    const char* GetQueue() { return fQueue; }
-    uint32_t GetReadCursor() { return fReadCursor; }
-    uint32_t GetWriteCursor() { return fWriteCursor; }
+    uint32_t GetSize() {
+        return fSize;
+    }
+    const char* GetQueue() {
+        return fQueue;
+    }
+    uint32_t GetReadCursor() {
+        return fReadCursor;
+    }
+    uint32_t GetWriteCursor() {
+        return fWriteCursor;
+    }
 };
 
-class hsBufferedStream : public hsStream
-{
+class hsBufferedStream : public hsStream {
     FILE* fRef;
     uint32_t fFileSize;
 
-    enum { kBufferSize = 2*1024 };
+    enum { kBufferSize = 2 * 1024 };
     char fBuffer[kBufferSize];
     // If the buffer is empty, this is zero.  Otherwise it is the size of the
     // buffer (if we read a full block), or something less than that if we read
@@ -490,8 +693,7 @@ public:
 
     // Something optional for when we're doing stats.  Will log the reason why
     // the file was closed.  Really just for plRegistryPageNode.
-    void SetCloseReason(const char* reason)
-    {
+    void SetCloseReason(const char* reason) {
 #ifdef HS_DEBUGGING
         fCloseReason = reason;
 #endif

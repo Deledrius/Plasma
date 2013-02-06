@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsResMgr.h"
 #include "plgDispatch.h"
 
-const char *plArmatureEffectsMgr::SurfaceStrings[] = 
-{
+const char* plArmatureEffectsMgr::SurfaceStrings[] = {
     "Dirt",
     "Puddle",
     "Water",
@@ -78,77 +77,83 @@ const char *plArmatureEffectsMgr::SurfaceStrings[] =
 };
 
 
-void plArmatureEffectsMgr::Read(hsStream *s, hsResMgr *mgr)
+void plArmatureEffectsMgr::Read(hsStream* s, hsResMgr* mgr)
 {
     hsKeyedObject::Read(s, mgr);
 
     int numEffects = s->ReadLE32();
-    while (numEffects > 0)
-    {
-        plRefMsg *msg = new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1);
+
+    while (numEffects > 0) {
+        plRefMsg* msg = new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1);
         hsgResMgr::ResMgr()->ReadKeyNotifyMe(s, msg, plRefFlags::kActiveRef);
         numEffects--;
     }
-    
+
     plgDispatch::Dispatch()->RegisterForExactType(plAvatarStealthModeMsg::Index(), GetKey());
 }
 
-void plArmatureEffectsMgr::Write(hsStream *s, hsResMgr *mgr)
+void plArmatureEffectsMgr::Write(hsStream* s, hsResMgr* mgr)
 {
     hsKeyedObject::Write(s, mgr);
 
     s->WriteLE32(fEffects.GetCount());
     int i;
-    for (i = 0; i < fEffects.GetCount(); i++)
+
+    for (i = 0; i < fEffects.GetCount(); i++) {
         mgr->WriteKey(s, fEffects[i]->GetKey());
+    }
 }
 
 bool plArmatureEffectsMgr::MsgReceive(plMessage* msg)
 {
-    plEventCallbackInterceptMsg *iMsg = plEventCallbackInterceptMsg::ConvertNoRef(msg);
-    if (iMsg)
-    {
-        if (fEnabled)
+    plEventCallbackInterceptMsg* iMsg = plEventCallbackInterceptMsg::ConvertNoRef(msg);
+
+    if (iMsg) {
+        if (fEnabled) {
             iMsg->SendMessageAndKeep();
+        }
     }
 
-    plArmatureEffectMsg *eMsg = plArmatureEffectMsg::ConvertNoRef(msg);
-    plArmatureEffectStateMsg *sMsg = plArmatureEffectStateMsg::ConvertNoRef(msg);
-    if (eMsg || sMsg)
-    {
+    plArmatureEffectMsg* eMsg = plArmatureEffectMsg::ConvertNoRef(msg);
+    plArmatureEffectStateMsg* sMsg = plArmatureEffectStateMsg::ConvertNoRef(msg);
+
+    if (eMsg || sMsg) {
         // Always handle state messages, but only trigger actual effects if we're enabled
-        if (sMsg || fEnabled)
-        {
+        if (sMsg || fEnabled) {
             int i;
-            for (i = 0; i < fEffects.GetCount(); i++)
+
+            for (i = 0; i < fEffects.GetCount(); i++) {
                 fEffects[i]->HandleTrigger(msg);
+            }
         }
 
         return true;
     }
 
-    plGenRefMsg *refMsg = plGenRefMsg::ConvertNoRef(msg);
-    if (refMsg)
-    {
-        plArmatureEffect *effect = plArmatureEffect::ConvertNoRef(refMsg->GetRef());
-        if (effect)
-        {
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
+    plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
+
+    if (refMsg) {
+        plArmatureEffect* effect = plArmatureEffect::ConvertNoRef(refMsg->GetRef());
+
+        if (effect) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fEffects.Append(effect);
-            else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )    
+            } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                 fEffects.RemoveItem(effect);
+            }
 
             return true;
         }
     }
 
-    plAvatarStealthModeMsg *stealthMsg = plAvatarStealthModeMsg::ConvertNoRef(msg);
-    if (stealthMsg && stealthMsg->GetSender() == fArmature->GetTarget(0)->GetKey())
-    {
-        if (stealthMsg->fMode == plAvatarStealthModeMsg::kStealthCloaked)
+    plAvatarStealthModeMsg* stealthMsg = plAvatarStealthModeMsg::ConvertNoRef(msg);
+
+    if (stealthMsg && stealthMsg->GetSender() == fArmature->GetTarget(0)->GetKey()) {
+        if (stealthMsg->fMode == plAvatarStealthModeMsg::kStealthCloaked) {
             fEnabled = false;
-        else
+        } else {
             fEnabled = true;
+        }
 
         return true;
     }
@@ -161,7 +166,7 @@ uint32_t plArmatureEffectsMgr::GetNumEffects()
     return fEffects.GetCount();
 }
 
-plArmatureEffect *plArmatureEffectsMgr::GetEffect(uint32_t num)
+plArmatureEffect* plArmatureEffectsMgr::GetEffect(uint32_t num)
 {
     return fEffects[num];
 }
@@ -169,8 +174,10 @@ plArmatureEffect *plArmatureEffectsMgr::GetEffect(uint32_t num)
 void plArmatureEffectsMgr::ResetEffects()
 {
     int i;
-    for (i = 0; i < fEffects.GetCount(); i++)
+
+    for (i = 0; i < fEffects.GetCount(); i++) {
         fEffects[i]->Reset();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -181,23 +188,26 @@ void plArmatureEffectsMgr::ResetEffects()
 
 plArmatureEffectFootSound::plArmatureEffectFootSound()
 {
-    plArmatureEffectFootSurface *surface = new plArmatureEffectFootSurface;
+    plArmatureEffectFootSurface* surface = new plArmatureEffectFootSurface;
     surface->fID = plArmatureEffectsMgr::kFootNoSurface;
     surface->fTrigger = nil;
     fSurfaces.Append(surface);
     int i;
-    for (i = 0; i < plArmatureEffectsMgr::kMaxSurface; i++)
-    {
+
+    for (i = 0; i < plArmatureEffectsMgr::kMaxSurface; i++) {
         fMods[i] = nil;
     }
+
     SetFootType(kFootTypeShoe);
 }
 
-plArmatureEffectFootSound::~plArmatureEffectFootSound() 
+plArmatureEffectFootSound::~plArmatureEffectFootSound()
 {
     int i;
-    for (i = 0; i < fSurfaces.GetCount(); i++)
+
+    for (i = 0; i < fSurfaces.GetCount(); i++) {
         delete fSurfaces[i];
+    }
 }
 
 void plArmatureEffectFootSound::Read(hsStream* s, hsResMgr* mgr)
@@ -206,9 +216,9 @@ void plArmatureEffectFootSound::Read(hsStream* s, hsResMgr* mgr)
 
     int count = s->ReadByte();
     int i;
-    for (i = 0; i < count; i++)
-    {
-        plGenRefMsg *msg = new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, i, -1);
+
+    for (i = 0; i < count; i++) {
+        plGenRefMsg* msg = new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, i, -1);
         mgr->ReadKeyNotifyMe(s, msg, plRefFlags::kActiveRef);
     }
 }
@@ -218,10 +228,10 @@ uint32_t plArmatureEffectFootSound::IFindSurfaceByTrigger(plKey trigger)
     uint32_t i;
 
     // Skip index 0. It's the special "NoSurface" that should always be at the stack bottom
-    for (i = 1; i < fSurfaces.GetCount(); i++)
-    {
-        if (fSurfaces[i]->fTrigger == trigger)
+    for (i = 1; i < fSurfaces.GetCount(); i++) {
+        if (fSurfaces[i]->fTrigger == trigger) {
             return i;
+        }
     }
 
     return -1;
@@ -233,24 +243,25 @@ void plArmatureEffectFootSound::Write(hsStream* s, hsResMgr* mgr)
 
     s->WriteByte(plArmatureEffectsMgr::kMaxSurface);
     int i;
-    for (i = 0; i < plArmatureEffectsMgr::kMaxSurface; i++)
+
+    for (i = 0; i < plArmatureEffectsMgr::kMaxSurface; i++) {
         mgr->WriteKey(s, (fMods[i] ? fMods[i]->GetKey() : nil));
+    }
 }
 
 bool plArmatureEffectFootSound::MsgReceive(plMessage* msg)
 {
-    plGenRefMsg *refMsg = plGenRefMsg::ConvertNoRef(msg);
-    if (refMsg)
-    {
-        plRandomSoundMod *rsMod = plRandomSoundMod::ConvertNoRef(refMsg->GetRef());
-        if (rsMod)
-        {
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-            {
+    plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
+
+    if (refMsg) {
+        plRandomSoundMod* rsMod = plRandomSoundMod::ConvertNoRef(refMsg->GetRef());
+
+        if (rsMod) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fMods[refMsg->fWhich] = rsMod;
-            }
-            else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )    
+            } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                 fMods[refMsg->fWhich] = nil;
+            }
 
             return true;
         }
@@ -261,17 +272,15 @@ bool plArmatureEffectFootSound::MsgReceive(plMessage* msg)
 
 bool plArmatureEffectFootSound::HandleTrigger(plMessage* msg)
 {
-    plArmatureEffectMsg *eMsg = plArmatureEffectMsg::ConvertNoRef(msg);
-    if (eMsg)
-    {
+    plArmatureEffectMsg* eMsg = plArmatureEffectMsg::ConvertNoRef(msg);
+
+    if (eMsg) {
         uint32_t curSurfaceIndex = fSurfaces[fSurfaces.GetCount() - 1]->fID;
 
-        if (curSurfaceIndex < plArmatureEffectsMgr::kMaxSurface && fMods[curSurfaceIndex] != nil)
-        {
-            if (plgAudioSys::Active() && fActiveSurfaces.IsBitSet(curSurfaceIndex))
-            {
+        if (curSurfaceIndex < plArmatureEffectsMgr::kMaxSurface && fMods[curSurfaceIndex] != nil) {
+            if (plgAudioSys::Active() && fActiveSurfaces.IsBitSet(curSurfaceIndex)) {
                 fMods[curSurfaceIndex]->SetCurrentGroup(eMsg->fTriggerIdx);
-                plAnimCmdMsg *animMsg = new plAnimCmdMsg;
+                plAnimCmdMsg* animMsg = new plAnimCmdMsg;
                 animMsg->AddReceiver(fMods[curSurfaceIndex]->GetKey());
                 animMsg->SetCmd(plAnimCmdMsg::kContinue);
                 plgDispatch::MsgSend(animMsg);
@@ -281,36 +290,34 @@ bool plArmatureEffectFootSound::HandleTrigger(plMessage* msg)
         return true;
     }
 
-    plArmatureEffectStateMsg *sMsg = plArmatureEffectStateMsg::ConvertNoRef(msg);
-    if (sMsg)
-    {
+    plArmatureEffectStateMsg* sMsg = plArmatureEffectStateMsg::ConvertNoRef(msg);
+
+    if (sMsg) {
         // It doesn't matter if we're adding or removing a surface, our load/unload is the same:
         // unload the old surface and load the new one
-        
-        if (sMsg->fAddSurface)
-        {
-            if (IFindSurfaceByTrigger(sMsg->GetSender()) == -1) // Check that it's not a repeat msg
-            {
-                plStatusLog::AddLineS("audio.log", "FTSP: Switching to surface - %s", 
+
+        if (sMsg->fAddSurface) {
+            if (IFindSurfaceByTrigger(sMsg->GetSender()) == -1) { // Check that it's not a repeat msg
+                plStatusLog::AddLineS("audio.log", "FTSP: Switching to surface - %s",
                                       plArmatureEffectsMgr::SurfaceStrings[sMsg->fSurface]);
-                plArmatureEffectFootSurface *surface = new plArmatureEffectFootSurface;
+                plArmatureEffectFootSurface* surface = new plArmatureEffectFootSurface;
                 surface->fID = sMsg->fSurface;
                 surface->fTrigger = sMsg->GetSender();
                 fSurfaces.Append(surface);
-            }   
-        }
-        else
-        {
+            }
+        } else {
             uint32_t index = IFindSurfaceByTrigger(sMsg->GetSender());
-            if (index != -1)
-            {
+
+            if (index != -1) {
                 if (index == fSurfaces.GetCount() - 1) // It's the top on the stack
-                    plStatusLog::AddLineS("audio.log", "FTSP: Switching to surface - %s", 
+                    plStatusLog::AddLineS("audio.log", "FTSP: Switching to surface - %s",
                                           plArmatureEffectsMgr::SurfaceStrings[fSurfaces[index - 1]->fID]);
+
                 delete fSurfaces[index];
                 fSurfaces.Remove(index);
             }
         }
+
         return true;
     }
 
@@ -319,22 +326,20 @@ bool plArmatureEffectFootSound::HandleTrigger(plMessage* msg)
 
 void plArmatureEffectFootSound::Reset()
 {
-    while (fSurfaces.GetCount() > 1)
+    while (fSurfaces.GetCount() > 1) {
         delete fSurfaces.Pop();
+    }
 }
 
 void plArmatureEffectFootSound::SetFootType(uint8_t type)
 {
-    if (type == kFootTypeBare)
-    {
+    if (type == kFootTypeBare) {
         fActiveSurfaces.Clear();
         fActiveSurfaces.SetBit(plArmatureEffectsMgr::kFootDeepWater);
         fActiveSurfaces.SetBit(plArmatureEffectsMgr::kFootPuddle);
         fActiveSurfaces.SetBit(plArmatureEffectsMgr::kFootWater);
         fActiveSurfaces.SetBit(plArmatureEffectsMgr::kFootSwimming);
-    }
-    else
-    {
+    } else {
         fActiveSurfaces.Set(plArmatureEffectsMgr::kMaxSurface);
     }
 }

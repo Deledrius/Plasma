@@ -48,8 +48,7 @@ class plSceneObject;
 class hsGMaterial;
 class plShader;
 
-class plGrassWave
-{
+class plGrassWave {
 public:
     plGrassWave() : fDistX(0.F), fDistY(0.F), fDistZ(0.F), fDirX(0.F), fDirY(0.F), fSpeed(0.F) {}
 
@@ -60,12 +59,11 @@ public:
     float fDirY;
     float fSpeed;
 
-    void Write(hsStream *s);
-    void Read(hsStream *s);
+    void Write(hsStream* s);
+    void Read(hsStream* s);
 };
 
-class plGrassShaderMod : public plModifier
-{
+class plGrassShaderMod : public plModifier {
 public:
     plGrassShaderMod() : fTarget(nil), fMaterial(nil), fVShader(nil), fPShader(nil) {}
     ~plGrassShaderMod();
@@ -73,18 +71,22 @@ public:
     void ResetWaves();
     void RefreshWaves();
 
-    virtual int GetNumTargets() const { return fTarget ? 1 : 0; }
-    virtual plSceneObject* GetTarget(int w) const { return fTarget; }
-    virtual void AddTarget(plSceneObject *object);
-    virtual void RemoveTarget(plSceneObject *object);
+    virtual int GetNumTargets() const {
+        return fTarget ? 1 : 0;
+    }
+    virtual plSceneObject* GetTarget(int w) const {
+        return fTarget;
+    }
+    virtual void AddTarget(plSceneObject* object);
+    virtual void RemoveTarget(plSceneObject* object);
 
-    virtual bool MsgReceive(plMessage *msg);
+    virtual bool MsgReceive(plMessage* msg);
 
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
 
-    CLASSNAME_REGISTER( plGrassShaderMod );
-    GETINTERFACE_ANY( plGrassShaderMod, plModifier );
+    CLASSNAME_REGISTER(plGrassShaderMod);
+    GETINTERFACE_ANY(plGrassShaderMod, plModifier);
 
     enum {
         kRefGrassVS,
@@ -102,31 +104,30 @@ protected:
     virtual bool IEval(double secs, float del, uint32_t dirty);
     virtual void IApplyDynamic() {};    // dummy function required by base class
     void ISetupShaders();
-    void IRefreshWaves(plShader *vShader);
+    void IRefreshWaves(plShader* vShader);
 
-    plSceneObject *fTarget;
-    hsGMaterial *fMaterial;
-    plShader *fVShader;
-    plShader *fPShader;
+    plSceneObject* fTarget;
+    hsGMaterial* fMaterial;
+    plShader* fVShader;
+    plShader* fPShader;
 };
 
-namespace plGrassVS
-{
-    enum {
-        kLocalToNDC     = 0,
-        kNumericConsts  = 4,
-        kAppConsts      = 5,
-        kPiConsts       = 6,
-        kSinConsts      = 7,
-        kWaveDistX      = 8,
-        kWaveDistY      = 9,
-        kWaveDistZ      = 10,
-        kWaveDirX       = 11,
-        kWaveDirY       = 12,
-        kWaveSpeed      = 13,
+namespace plGrassVS {
+enum {
+    kLocalToNDC     = 0,
+    kNumericConsts  = 4,
+    kAppConsts      = 5,
+    kPiConsts       = 6,
+    kSinConsts      = 7,
+    kWaveDistX      = 8,
+    kWaveDistY      = 9,
+    kWaveDistZ      = 10,
+    kWaveDirX       = 11,
+    kWaveDirY       = 12,
+    kWaveSpeed      = 13,
 
-        kNumConsts      = 14,
-    };
+    kNumConsts      = 14,
+};
 };
 
 #endif // PLGRASSSHADERMOD

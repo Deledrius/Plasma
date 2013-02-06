@@ -54,57 +54,63 @@ class plMessage;
 class plPostEffectMod;
 class plAGMasterMod;
 
-class pfGUICheckBoxCtrl : public pfGUIControlMod
-{
-    protected:
+class pfGUICheckBoxCtrl : public pfGUIControlMod {
+protected:
 
-        hsTArray<plKey> fAnimationKeys;
-        plString        fAnimName;
-        bool            fClicking;
+    hsTArray<plKey> fAnimationKeys;
+    plString        fAnimName;
+    bool            fClicking;
 
-        bool            fChecked;
-        bool            fPlaySound;
+    bool            fChecked;
+    bool            fPlaySound;
 
-        virtual bool IEval( double secs, float del, uint32_t dirty ); // called only by owner object's Eval()
+    virtual bool IEval(double secs, float del, uint32_t dirty);   // called only by owner object's Eval()
 
-        virtual uint32_t      IGetDesiredCursor( void ) const;    // As specified in plInputInterface.h
+    virtual uint32_t      IGetDesiredCursor(void) const;      // As specified in plInputInterface.h
 
-    public:
+public:
 
-        pfGUICheckBoxCtrl();
+    pfGUICheckBoxCtrl();
 
-        CLASSNAME_REGISTER( pfGUICheckBoxCtrl );
-        GETINTERFACE_ANY( pfGUICheckBoxCtrl, pfGUIControlMod );
+    CLASSNAME_REGISTER(pfGUICheckBoxCtrl);
+    GETINTERFACE_ANY(pfGUICheckBoxCtrl, pfGUIControlMod);
 
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        virtual void    HandleMouseDown( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseUp( hsPoint3 &mousePt, uint8_t modifiers );
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-        virtual void    UpdateBounds( hsMatrix44 *invXformMatrix = nil, bool force = false );
+    virtual void    HandleMouseDown(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseUp(hsPoint3& mousePt, uint8_t modifiers);
 
-        void        SetChecked( bool checked, bool immediate = false );
-        bool        IsChecked( void ) { return fChecked; }
+    virtual void    UpdateBounds(hsMatrix44* invXformMatrix = nil, bool force = false);
 
-        void DontPlaySounds() { fPlaySound = false; } // should the checkbox play sounds?
-        
-        const hsTArray<plKey>   &GetAnimationKeys( void ) const { return fAnimationKeys; }
-        plString                GetAnimationName( void ) const { return fAnimName; }
+    void        SetChecked(bool checked, bool immediate = false);
+    bool        IsChecked(void) {
+        return fChecked;
+    }
 
-        enum SoundEvents
-        {
-            kMouseDown,
-            kMouseUp,
-            kMouseOver,
-            kMouseOff
-        };
+    void DontPlaySounds() {
+        fPlaySound = false;    // should the checkbox play sounds?
+    }
 
-        // Export only
-        void    SetAnimationKeys( hsTArray<plKey> &keys, const plString &name );
+    const hsTArray<plKey>&   GetAnimationKeys(void) const {
+        return fAnimationKeys;
+    }
+    plString                GetAnimationName(void) const {
+        return fAnimName;
+    }
+
+    enum SoundEvents {
+        kMouseDown,
+        kMouseUp,
+        kMouseOver,
+        kMouseOff
+    };
+
+    // Export only
+    void    SetAnimationKeys(hsTArray<plKey>& keys, const plString& name);
 };
 
 #endif // _pfGUICheckBoxCtrl_h

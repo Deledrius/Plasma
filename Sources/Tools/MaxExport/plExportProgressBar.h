@@ -45,22 +45,21 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class Interface;
 class INode;
 
-class plExportProgressBar
-{
+class plExportProgressBar {
 public:
     plExportProgressBar();
     ~plExportProgressBar();
 
-    void Start(char *name, uint32_t steps=CountNodes());
-    bool Update(char *name=nil, uint32_t inc=1);
-    
+    void Start(char* name, uint32_t steps = CountNodes());
+    bool Update(char* name = nil, uint32_t inc = 1);
+
     static uint32_t CountNodes();
 
 private:
-    static uint32_t INodeCount(INode *node);
-    
+    static uint32_t INodeCount(INode* node);
+
     Interface*  fInterface;
-    
+
     uint32_t fTotalSteps;
     uint32_t fCurStep;
 };

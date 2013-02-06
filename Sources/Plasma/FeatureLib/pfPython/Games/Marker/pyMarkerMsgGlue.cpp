@@ -70,9 +70,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerMsg, upcastToFinalMarkerMsg)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerMsg, getMarkerMsgType, "Returns the type of the Marker message (see PtMarkerMsgTypes)"),
-    PYTHON_METHOD_NOARGS(ptMarkerMsg, upcastToFinalMarkerMsg, "Returns this message as the Marker message it is"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerMsg, getMarkerMsgType, "Returns the type of the Marker message (see PtMarkerMsgTypes)"),
+                     PYTHON_METHOD_NOARGS(ptMarkerMsg, upcastToFinalMarkerMsg, "Returns this message as the Marker message it is"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerMsg, pyGameCliMsg, "Base class for Marker game messages");
@@ -81,9 +81,12 @@ PYTHON_EXPOSE_TYPE_DEFINITION(ptMarkerMsg, pyMarkerMsg);
 // required functions for PyObject interoperability
 PyObject* pyMarkerMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerMsg *newObj = (ptMarkerMsg*)ptMarkerMsg_type.tp_new(&ptMarkerMsg_type, NULL, NULL);
-    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_Marker))
+    ptMarkerMsg* newObj = (ptMarkerMsg*)ptMarkerMsg_type.tp_new(&ptMarkerMsg_type, NULL, NULL);
+
+    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_Marker)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -137,8 +140,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerTemplateCreatedMsg, templateID)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerTemplateCreatedMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerTemplateCreatedMsg, templateID, "Returns the ID number of the template that was created"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerTemplateCreatedMsg, templateID, "Returns the ID number of the template that was created"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerTemplateCreatedMsg, pyMarkerMsg, "Marker message received when a quest game template is created");
@@ -146,9 +149,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerTemplateCreatedMsg, pyMarkerMsg, "Marker messa
 // required functions for PyObject interoperability
 PyObject* pyMarkerTemplateCreatedMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerTemplateCreatedMsg *newObj = (ptMarkerTemplateCreatedMsg*)ptMarkerTemplateCreatedMsg_type.tp_new(&ptMarkerTemplateCreatedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_TemplateCreated))
+    ptMarkerTemplateCreatedMsg* newObj = (ptMarkerTemplateCreatedMsg*)ptMarkerTemplateCreatedMsg_type.tp_new(&ptMarkerTemplateCreatedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_TemplateCreated)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -178,8 +184,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerTeamAssignedMsg, teamNumber)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerTeamAssignedMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerTeamAssignedMsg, teamNumber, "Returns the number of the team you were assigned to"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerTeamAssignedMsg, teamNumber, "Returns the number of the team you were assigned to"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerTeamAssignedMsg, pyMarkerMsg, "Marker message received when you are assigned a team number");
@@ -187,9 +193,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerTeamAssignedMsg, pyMarkerMsg, "Marker message 
 // required functions for PyObject interoperability
 PyObject* pyMarkerTeamAssignedMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerTeamAssignedMsg *newObj = (ptMarkerTeamAssignedMsg*)ptMarkerTeamAssignedMsg_type.tp_new(&ptMarkerTeamAssignedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_TeamAssigned))
+    ptMarkerTeamAssignedMsg* newObj = (ptMarkerTeamAssignedMsg*)ptMarkerTeamAssignedMsg_type.tp_new(&ptMarkerTeamAssignedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_TeamAssigned)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -219,8 +228,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerGameTypeMsg, gameType)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerGameTypeMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerGameTypeMsg, gameType, "Returns the type of the game you just joined"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerGameTypeMsg, gameType, "Returns the type of the game you just joined"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerGameTypeMsg, pyMarkerMsg, "Marker message received when you are assigned a team number");
@@ -228,9 +237,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerGameTypeMsg, pyMarkerMsg, "Marker message rece
 // required functions for PyObject interoperability
 PyObject* pyMarkerGameTypeMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerGameTypeMsg *newObj = (ptMarkerGameTypeMsg*)ptMarkerGameTypeMsg_type.tp_new(&ptMarkerGameTypeMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameType))
+    ptMarkerGameTypeMsg* newObj = (ptMarkerGameTypeMsg*)ptMarkerGameTypeMsg_type.tp_new(&ptMarkerGameTypeMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameType)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -263,9 +275,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerGameStartedMsg, pyMarkerMsg, "Marker message r
 // required functions for PyObject interoperability
 PyObject* pyMarkerGameStartedMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerGameStartedMsg *newObj = (ptMarkerGameStartedMsg*)ptMarkerGameStartedMsg_type.tp_new(&ptMarkerGameStartedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameStarted))
+    ptMarkerGameStartedMsg* newObj = (ptMarkerGameStartedMsg*)ptMarkerGameStartedMsg_type.tp_new(&ptMarkerGameStartedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameStarted)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -295,8 +310,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerGamePausedMsg, timeLeft)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerGamePausedMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerGamePausedMsg, timeLeft, "Returns the amount of time left on the server clock"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerGamePausedMsg, timeLeft, "Returns the amount of time left on the server clock"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerGamePausedMsg, pyMarkerMsg, "Marker message received when the game is paused by the owner");
@@ -304,9 +319,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerGamePausedMsg, pyMarkerMsg, "Marker message re
 // required functions for PyObject interoperability
 PyObject* pyMarkerGamePausedMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerGamePausedMsg *newObj = (ptMarkerGamePausedMsg*)ptMarkerGamePausedMsg_type.tp_new(&ptMarkerGamePausedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GamePaused))
+    ptMarkerGamePausedMsg* newObj = (ptMarkerGamePausedMsg*)ptMarkerGamePausedMsg_type.tp_new(&ptMarkerGamePausedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GamePaused)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -339,9 +357,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerGameResetMsg, pyMarkerMsg, "Marker message rec
 // required functions for PyObject interoperability
 PyObject* pyMarkerGameResetMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerGameResetMsg *newObj = (ptMarkerGameResetMsg*)ptMarkerGameResetMsg_type.tp_new(&ptMarkerGameResetMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameReset))
+    ptMarkerGameResetMsg* newObj = (ptMarkerGameResetMsg*)ptMarkerGameResetMsg_type.tp_new(&ptMarkerGameResetMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameReset)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -374,9 +395,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerGameOverMsg, pyMarkerMsg, "Marker message rece
 // required functions for PyObject interoperability
 PyObject* pyMarkerGameOverMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerGameOverMsg *newObj = (ptMarkerGameOverMsg*)ptMarkerGameOverMsg_type.tp_new(&ptMarkerGameOverMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameOver))
+    ptMarkerGameOverMsg* newObj = (ptMarkerGameOverMsg*)ptMarkerGameOverMsg_type.tp_new(&ptMarkerGameOverMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameOver)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -407,8 +431,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerGameNameChangedMsg, name)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerGameNameChangedMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerGameNameChangedMsg, name, "Returns the new game name"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerGameNameChangedMsg, name, "Returns the new game name"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerGameNameChangedMsg, pyMarkerMsg, "Marker message received when the game name is changed");
@@ -416,9 +440,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerGameNameChangedMsg, pyMarkerMsg, "Marker messa
 // required functions for PyObject interoperability
 PyObject* pyMarkerGameNameChangedMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerGameNameChangedMsg *newObj = (ptMarkerGameNameChangedMsg*)ptMarkerGameNameChangedMsg_type.tp_new(&ptMarkerGameNameChangedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameNameChanged))
+    ptMarkerGameNameChangedMsg* newObj = (ptMarkerGameNameChangedMsg*)ptMarkerGameNameChangedMsg_type.tp_new(&ptMarkerGameNameChangedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameNameChanged)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -448,8 +475,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerTimeLimitChangedMsg, timeLimit)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerTimeLimitChangedMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerTimeLimitChangedMsg, timeLimit, "Returns the new time limit (in ms)"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerTimeLimitChangedMsg, timeLimit, "Returns the new time limit (in ms)"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerTimeLimitChangedMsg, pyMarkerMsg, "Marker message received when the game name is changed");
@@ -457,9 +484,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerTimeLimitChangedMsg, pyMarkerMsg, "Marker mess
 // required functions for PyObject interoperability
 PyObject* pyMarkerTimeLimitChangedMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerTimeLimitChangedMsg *newObj = (ptMarkerTimeLimitChangedMsg*)ptMarkerTimeLimitChangedMsg_type.tp_new(&ptMarkerTimeLimitChangedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_TimeLimitChanged))
+    ptMarkerTimeLimitChangedMsg* newObj = (ptMarkerTimeLimitChangedMsg*)ptMarkerTimeLimitChangedMsg_type.tp_new(&ptMarkerTimeLimitChangedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_TimeLimitChanged)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -489,8 +519,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerGameDeletedMsg, failed)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerGameDeletedMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerGameDeletedMsg, failed, "Returns whether the delete succeeded or not"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerGameDeletedMsg, failed, "Returns whether the delete succeeded or not"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerGameDeletedMsg, pyMarkerMsg, "Marker message received when the game is deleted");
@@ -498,9 +528,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerGameDeletedMsg, pyMarkerMsg, "Marker message r
 // required functions for PyObject interoperability
 PyObject* pyMarkerGameDeletedMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerGameDeletedMsg *newObj = (ptMarkerGameDeletedMsg*)ptMarkerGameDeletedMsg_type.tp_new(&ptMarkerGameDeletedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameDeleted))
+    ptMarkerGameDeletedMsg* newObj = (ptMarkerGameDeletedMsg*)ptMarkerGameDeletedMsg_type.tp_new(&ptMarkerGameDeletedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_GameDeleted)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -557,13 +590,13 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerMarkerAddedMsg, age)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerMarkerAddedMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, x, "Returns x coord of the marker"),
-    PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, y, "Returns y coord of the marker"),
-    PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, z, "Returns z coord of the marker"),
-    PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, markerId, "Returns the id number of the marker"),
-    PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, name, "Returns the name of the marker"),
-    PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, age, "Returns the age the marker was created in"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, x, "Returns x coord of the marker"),
+                     PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, y, "Returns y coord of the marker"),
+                     PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, z, "Returns z coord of the marker"),
+                     PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, markerId, "Returns the id number of the marker"),
+                     PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, name, "Returns the name of the marker"),
+                     PYTHON_METHOD_NOARGS(ptMarkerMarkerAddedMsg, age, "Returns the age the marker was created in"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerMarkerAddedMsg, pyMarkerMsg, "Marker message received when a marker is added to the game");
@@ -571,9 +604,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerMarkerAddedMsg, pyMarkerMsg, "Marker message r
 // required functions for PyObject interoperability
 PyObject* pyMarkerMarkerAddedMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerMarkerAddedMsg *newObj = (ptMarkerMarkerAddedMsg*)ptMarkerMarkerAddedMsg_type.tp_new(&ptMarkerMarkerAddedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_MarkerAdded))
+    ptMarkerMarkerAddedMsg* newObj = (ptMarkerMarkerAddedMsg*)ptMarkerMarkerAddedMsg_type.tp_new(&ptMarkerMarkerAddedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_MarkerAdded)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -603,8 +639,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerMarkerDeletedMsg, markerId)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerMarkerDeletedMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerMarkerDeletedMsg, markerId, "Returns id of the marker that was deleted"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerMarkerDeletedMsg, markerId, "Returns id of the marker that was deleted"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerMarkerDeletedMsg, pyMarkerMsg, "Marker message received when a marker is deleted");
@@ -612,9 +648,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerMarkerDeletedMsg, pyMarkerMsg, "Marker message
 // required functions for PyObject interoperability
 PyObject* pyMarkerMarkerDeletedMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerMarkerDeletedMsg *newObj = (ptMarkerMarkerDeletedMsg*)ptMarkerMarkerDeletedMsg_type.tp_new(&ptMarkerMarkerDeletedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_MarkerDeleted))
+    ptMarkerMarkerDeletedMsg* newObj = (ptMarkerMarkerDeletedMsg*)ptMarkerMarkerDeletedMsg_type.tp_new(&ptMarkerMarkerDeletedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_MarkerDeleted)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -650,9 +689,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerMarkerNameChangedMsg, name)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerMarkerNameChangedMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerMarkerNameChangedMsg, markerId, "Returns id of the marker who's name was changed"),
-    PYTHON_METHOD_NOARGS(ptMarkerMarkerNameChangedMsg, name, "Returns the new name"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerMarkerNameChangedMsg, markerId, "Returns id of the marker who's name was changed"),
+                     PYTHON_METHOD_NOARGS(ptMarkerMarkerNameChangedMsg, name, "Returns the new name"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerMarkerNameChangedMsg, pyMarkerMsg, "Marker message received when the name of a marker is changed");
@@ -660,9 +699,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerMarkerNameChangedMsg, pyMarkerMsg, "Marker mes
 // required functions for PyObject interoperability
 PyObject* pyMarkerMarkerNameChangedMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerMarkerNameChangedMsg *newObj = (ptMarkerMarkerNameChangedMsg*)ptMarkerMarkerNameChangedMsg_type.tp_new(&ptMarkerMarkerNameChangedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_MarkerNameChanged))
+    ptMarkerMarkerNameChangedMsg* newObj = (ptMarkerMarkerNameChangedMsg*)ptMarkerMarkerNameChangedMsg_type.tp_new(&ptMarkerMarkerNameChangedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_MarkerNameChanged)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -697,9 +739,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptMarkerMarkerCapturedMsg, team)
 }
 
 PYTHON_START_METHODS_TABLE(ptMarkerMarkerCapturedMsg)
-    PYTHON_METHOD_NOARGS(ptMarkerMarkerCapturedMsg, markerId, "Returns id of the marker which was captured"),
-    PYTHON_METHOD_NOARGS(ptMarkerMarkerCapturedMsg, team, "Returns the team number of the team that captured it (0 for no team, or a quest game)"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptMarkerMarkerCapturedMsg, markerId, "Returns id of the marker which was captured"),
+                     PYTHON_METHOD_NOARGS(ptMarkerMarkerCapturedMsg, team, "Returns the team number of the team that captured it (0 for no team, or a quest game)"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptMarkerMarkerCapturedMsg, pyMarkerMsg, "Marker message received when a marker is captured");
@@ -707,9 +749,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptMarkerMarkerCapturedMsg, pyMarkerMsg, "Marker messag
 // required functions for PyObject interoperability
 PyObject* pyMarkerMarkerCapturedMsg::New(pfGameCliMsg* msg)
 {
-    ptMarkerMarkerCapturedMsg *newObj = (ptMarkerMarkerCapturedMsg*)ptMarkerMarkerCapturedMsg_type.tp_new(&ptMarkerMarkerNameChangedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_MarkerCaptured))
+    ptMarkerMarkerCapturedMsg* newObj = (ptMarkerMarkerCapturedMsg*)ptMarkerMarkerCapturedMsg_type.tp_new(&ptMarkerMarkerNameChangedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Marker_MarkerCaptured)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 

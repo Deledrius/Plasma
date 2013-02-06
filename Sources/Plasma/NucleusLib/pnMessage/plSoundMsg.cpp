@@ -50,10 +50,10 @@ plSoundMsg::~plSoundMsg()
 }
 
 
-void plSoundMsg::ClearCmd() 
-{ 
+void plSoundMsg::ClearCmd()
+{
     plMessageWithCallbacks::Clear();
-    fCmd.Clear(); 
+    fCmd.Clear();
 }
 
 
@@ -90,5 +90,5 @@ void plSoundMsg::Write(hsStream* stream, hsResMgr* mgr)
     stream->WriteLE(fRepeats);
     stream->WriteLE(fNameStr);
     stream->WriteLE(fVolume);
-    stream->WriteByte( (uint8_t)fFadeType );
+    stream->WriteByte((uint8_t)fFadeType);
 }

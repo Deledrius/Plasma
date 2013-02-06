@@ -57,12 +57,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // should only be created from C++ side
 pyVaultSystemNode::pyVaultSystemNode(RelVaultNode* nfsNode)
-: pyVaultNode(nfsNode)
+    : pyVaultNode(nfsNode)
 {
 }
 
 //create from the Python side
 pyVaultSystemNode::pyVaultSystemNode()
-: pyVaultNode(nil)  // may not create this node type from python
+    : pyVaultNode(nil)  // may not create this node type from python
 {
 }

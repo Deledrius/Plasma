@@ -63,117 +63,130 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #endif
 
 //============================================================================
-static PyObject * GetPlayerVaultFolder (unsigned folderType) {
-    PyObject * result = nil;
-    if (RelVaultNode * rvnPlr = VaultGetPlayerNodeIncRef()) {
-        if (RelVaultNode * rvnFldr = rvnPlr->GetChildFolderNodeIncRef(folderType, 1)) {
+static PyObject* GetPlayerVaultFolder(unsigned folderType)
+{
+    PyObject* result = nil;
+
+    if (RelVaultNode* rvnPlr = VaultGetPlayerNodeIncRef()) {
+        if (RelVaultNode* rvnFldr = rvnPlr->GetChildFolderNodeIncRef(folderType, 1)) {
             result = pyVaultFolderNode::New(rvnFldr);
             rvnFldr->DecRef();
         }
+
         rvnPlr->DecRef();
     }
-    
+
     return result;
 }
 
-pyVaultPlayerNode::pyVaultPlayerNode(RelVaultNode *nfsNode)
-: pyVaultNode(nfsNode)
+pyVaultPlayerNode::pyVaultPlayerNode(RelVaultNode* nfsNode)
+    : pyVaultNode(nfsNode)
 {
 }
 
 //create from the Python side
 pyVaultPlayerNode::pyVaultPlayerNode()
-: pyVaultNode(nil)  // may not create player nodes from python
+    : pyVaultNode(nil)  // may not create player nodes from python
 {
 }
 
 //==================================================================
 // class RelVaultNode : public plVaultNode
 //
-PyObject *pyVaultPlayerNode::GetInbox()
+PyObject* pyVaultPlayerNode::GetInbox()
 {
-    if (PyObject * result = GetPlayerVaultFolder(plVault::kInboxFolder))
+    if (PyObject* result = GetPlayerVaultFolder(plVault::kInboxFolder)) {
         return result;
+    }
 
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetAvatarOutfitFolder()
+PyObject* pyVaultPlayerNode::GetAvatarOutfitFolder()
 {
-    if (PyObject * result = GetPlayerVaultFolder(plVault::kAvatarOutfitFolder))
+    if (PyObject* result = GetPlayerVaultFolder(plVault::kAvatarOutfitFolder)) {
         return result;
+    }
 
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetAvatarClosetFolder()
+PyObject* pyVaultPlayerNode::GetAvatarClosetFolder()
 {
-    if (PyObject * result = GetPlayerVaultFolder(plVault::kAvatarClosetFolder))
+    if (PyObject* result = GetPlayerVaultFolder(plVault::kAvatarClosetFolder)) {
         return result;
+    }
 
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetChronicleFolder()
+PyObject* pyVaultPlayerNode::GetChronicleFolder()
 {
-    if (PyObject * result = GetPlayerVaultFolder(plVault::kChronicleFolder))
+    if (PyObject* result = GetPlayerVaultFolder(plVault::kChronicleFolder)) {
         return result;
+    }
 
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetAgeJournalsFolder()
+PyObject* pyVaultPlayerNode::GetAgeJournalsFolder()
 {
-    if (PyObject * result = GetPlayerVaultFolder(plVault::kAgeJournalsFolder))
+    if (PyObject* result = GetPlayerVaultFolder(plVault::kAgeJournalsFolder)) {
         return result;
+    }
 
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetIgnoreListFolder()
+PyObject* pyVaultPlayerNode::GetIgnoreListFolder()
 {
-    if (PyObject * result = GetPlayerVaultFolder(plVault::kIgnoreListFolder))
+    if (PyObject* result = GetPlayerVaultFolder(plVault::kIgnoreListFolder)) {
         return result;
+    }
 
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetBuddyListFolder()
+PyObject* pyVaultPlayerNode::GetBuddyListFolder()
 {
-    if (PyObject * result = GetPlayerVaultFolder(plVault::kBuddyListFolder))
+    if (PyObject* result = GetPlayerVaultFolder(plVault::kBuddyListFolder)) {
         return result;
+    }
 
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetPeopleIKnowAboutFolder()
+PyObject* pyVaultPlayerNode::GetPeopleIKnowAboutFolder()
 {
-    if (PyObject * result = GetPlayerVaultFolder(plVault::kPeopleIKnowAboutFolder))
+    if (PyObject* result = GetPlayerVaultFolder(plVault::kPeopleIKnowAboutFolder)) {
         return result;
+    }
 
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetAgesICanVisitFolder()
+PyObject* pyVaultPlayerNode::GetAgesICanVisitFolder()
 {
-    if (PyObject * result = GetPlayerVaultFolder(plVault::kAgesICanVisitFolder))
+    if (PyObject* result = GetPlayerVaultFolder(plVault::kAgesICanVisitFolder)) {
         return result;
+    }
 
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetAgesIOwnFolder()
+PyObject* pyVaultPlayerNode::GetAgesIOwnFolder()
 {
-    if (PyObject * result = GetPlayerVaultFolder(plVault::kAgesIOwnFolder))
+    if (PyObject* result = GetPlayerVaultFolder(plVault::kAgesIOwnFolder)) {
         return result;
+    }
 
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetPlayerInfo()
+PyObject* pyVaultPlayerNode::GetPlayerInfo()
 {
-    if (RelVaultNode * rvn = VaultGetPlayerInfoNodeIncRef()) {
-        PyObject * result = pyVaultPlayerInfoNode::New(rvn);
+    if (RelVaultNode* rvn = VaultGetPlayerInfoNodeIncRef()) {
+        PyObject* result = pyVaultPlayerInfoNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -181,12 +194,12 @@ PyObject *pyVaultPlayerNode::GetPlayerInfo()
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetLinkToMyNeighborhood()
+PyObject* pyVaultPlayerNode::GetLinkToMyNeighborhood()
 {
-    plAgeLinkStruct * link = new plAgeLinkStruct();
-    
+    plAgeLinkStruct* link = new plAgeLinkStruct();
+
     if (VaultGetLinkToMyNeighborhood(link)) {
-        PyObject * result = pyAgeLinkStruct::New(link);
+        PyObject* result = pyAgeLinkStruct::New(link);
         return result;
     }
 
@@ -194,12 +207,12 @@ PyObject *pyVaultPlayerNode::GetLinkToMyNeighborhood()
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetLinkToCity()
+PyObject* pyVaultPlayerNode::GetLinkToCity()
 {
-    plAgeLinkStruct * link = new plAgeLinkStruct();
-    
+    plAgeLinkStruct* link = new plAgeLinkStruct();
+
     if (VaultGetLinkToCity(link)) {
-        PyObject * result = pyAgeLinkStruct::New(link);
+        PyObject* result = pyAgeLinkStruct::New(link);
         return result;
     }
 
@@ -207,12 +220,14 @@ PyObject *pyVaultPlayerNode::GetLinkToCity()
     PYTHON_RETURN_NONE;
 }
 
-PyObject *pyVaultPlayerNode::GetOwnedAgeLink(const pyAgeInfoStruct *info)
+PyObject* pyVaultPlayerNode::GetOwnedAgeLink(const pyAgeInfoStruct* info)
 {
     plAgeLinkStruct link;
-    if (VaultGetOwnedAgeLink(info->GetAgeInfo(), &link))
+
+    if (VaultGetOwnedAgeLink(info->GetAgeInfo(), &link)) {
         return pyAgeLinkStruct::New(&link);
-    
+    }
+
     PYTHON_RETURN_NONE;
 }
 
@@ -223,10 +238,10 @@ void pyVaultPlayerNode::RemoveOwnedAgeLink(const char* ageFilename)
     VaultUnregisterOwnedAgeAndWait(&info);
 }
 
-PyObject *pyVaultPlayerNode::GetVisitAgeLink(const pyAgeInfoStruct *info)
+PyObject* pyVaultPlayerNode::GetVisitAgeLink(const pyAgeInfoStruct* info)
 {
-    if (RelVaultNode * rvn = VaultGetVisitAgeLinkIncRef(info->GetAgeInfo())) {
-        PyObject * result = pyVaultAgeLinkNode::New(rvn);
+    if (RelVaultNode* rvn = VaultGetVisitAgeLinkIncRef(info->GetAgeInfo())) {
+        PyObject* result = pyVaultAgeLinkNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -234,7 +249,7 @@ PyObject *pyVaultPlayerNode::GetVisitAgeLink(const pyAgeInfoStruct *info)
     PYTHON_RETURN_NONE;
 }
 
-void pyVaultPlayerNode::RemoveVisitAgeLink(const char *guidstr)
+void pyVaultPlayerNode::RemoveVisitAgeLink(const char* guidstr)
 {
     plAgeInfoStruct info;
     plUUID guid(guidstr);
@@ -242,12 +257,13 @@ void pyVaultPlayerNode::RemoveVisitAgeLink(const char *guidstr)
     VaultUnregisterOwnedAgeAndWait(&info);
 }
 
-PyObject *pyVaultPlayerNode::FindChronicleEntry(const char *entryName)
+PyObject* pyVaultPlayerNode::FindChronicleEntry(const char* entryName)
 {
     wchar_t wStr[MAX_PATH];
     StrToUnicode(wStr, entryName, arrsize(wStr));
-    if (RelVaultNode * rvn = VaultFindChronicleEntryIncRef(wStr)) {
-        PyObject * result = pyVaultChronicleNode::New(rvn);
+
+    if (RelVaultNode* rvn = VaultFindChronicleEntryIncRef(wStr)) {
+        PyObject* result = pyVaultChronicleNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -255,15 +271,16 @@ PyObject *pyVaultPlayerNode::FindChronicleEntry(const char *entryName)
     PYTHON_RETURN_NONE;
 }
 
-void pyVaultPlayerNode::SetPlayerName(const char *value)
+void pyVaultPlayerNode::SetPlayerName(const char* value)
 {
     hsAssert(false, "python may not change a player's name this way");
 }
 
 std::string pyVaultPlayerNode::GetPlayerName()
 {
-    if (!fNode)
+    if (!fNode) {
         return "";
+    }
 
     VaultPlayerNode player(fNode);
     char ansiStr[MAX_PATH];
@@ -271,15 +288,16 @@ std::string pyVaultPlayerNode::GetPlayerName()
     return ansiStr;
 }
 
-void pyVaultPlayerNode::SetAvatarShapeName(const char *value)
+void pyVaultPlayerNode::SetAvatarShapeName(const char* value)
 {
     hsAssert(false, "python may not change a player's avatar this way");
 }
 
 std::string pyVaultPlayerNode::GetAvatarShapeName()
 {
-    if (!fNode)
+    if (!fNode) {
         return "";
+    }
 
     VaultPlayerNode player(fNode);
     char ansiStr[MAX_PATH];
@@ -294,8 +312,9 @@ void pyVaultPlayerNode::SetDisabled(bool value)
 
 bool pyVaultPlayerNode::IsDisabled()
 {
-    if (!fNode)
+    if (!fNode) {
         return false;
+    }
 
     VaultPlayerNode player(fNode);
     return player.GetDisabled();
@@ -308,24 +327,29 @@ void pyVaultPlayerNode::SetOnlineTime(uint32_t value)
 
 uint32_t pyVaultPlayerNode::GetOnlineTime()
 {
-    if (!fNode)
+    if (!fNode) {
         return 0;
+    }
 
     VaultPlayerNode player(fNode);
     return player.GetOnlineTime();
 }
 
-void pyVaultPlayerNode::SetExplorer (bool b) {
-    if (!fNode)
+void pyVaultPlayerNode::SetExplorer(bool b)
+{
+    if (!fNode) {
         return;
+    }
 
     VaultPlayerNode player(fNode);
     player.SetExplorer(b);
 }
 
-bool pyVaultPlayerNode::IsExplorer () {
-    if (!fNode)
+bool pyVaultPlayerNode::IsExplorer()
+{
+    if (!fNode) {
         return false;
+    }
 
     VaultPlayerNode player(fNode);
     return player.GetExplorer();

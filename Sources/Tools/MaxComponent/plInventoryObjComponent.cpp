@@ -92,8 +92,7 @@ void DummyCodeIncludeFuncInventStuff() {}
 CLASS_DESC(plInventoryObjComponent, gInventoryObjDesc, "(ex)InventoryObj",  "(ex)InventoryObj", COMP_TYPE_LOGIC, INVENTORYOBJCOMP_CID)
 
 
-enum
-{
+enum {
     kClickDragDirectional,
     kClickDragDegrees,
     kClickDragUseProxy,
@@ -125,28 +124,28 @@ ParamBlockDesc2 gInventoryObjBlock
     IDD_COMP_INV_OBJECT, IDS_COMP_INV_OBJECTS, 0, 0, NULL, //&gInventoryObjComponentProc,
 
     kAgeSpecificCheckBx,  _T("AgeSpecificObject"), TYPE_BOOL,       0, 0,
-        p_default,  FALSE,
-        p_enable_ctrls, 1, kRespawnAfterLostCheckBx,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_INV_OBJECT_ITINERANTBOOL,
-        end,
+    p_default,  FALSE,
+    p_enable_ctrls, 1, kRespawnAfterLostCheckBx,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_INV_OBJECT_ITINERANTBOOL,
+    end,
 
     kRespawnAfterLostCheckBx,  _T("RespawnAtSPObject"), TYPE_BOOL,      0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_INV_OBJECT_RESPAWNBOOL,
-        end,
-    
-    kConsumableCheckbx , _T("TemporaryObject"), TYPE_BOOL,      0, 0,
-        p_default,  FALSE,
-        p_enable_ctrls, 1, kLifeSpan,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_INV_OBJECT_CONSUMABLE,
-        end,    
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_INV_OBJECT_RESPAWNBOOL,
+    end,
 
-    kLifeSpan,  _T("LifeSpan"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.0,
-        p_range, 0.0, 100000.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_INV_OBJECT_LIFE_EDIT, IDC_COMP_INV_OBJECT_LIFE_SPIN, 1.0f,
-        end,
+    kConsumableCheckbx , _T("TemporaryObject"), TYPE_BOOL,      0, 0,
+    p_default,  FALSE,
+    p_enable_ctrls, 1, kLifeSpan,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_INV_OBJECT_CONSUMABLE,
+    end,
+
+    kLifeSpan,  _T("LifeSpan"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.0,
+    p_range, 0.0, 100000.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_INV_OBJECT_LIFE_EDIT, IDC_COMP_INV_OBJECT_LIFE_SPIN, 1.0f,
+    end,
 
 
 
@@ -166,7 +165,7 @@ const plInventoryObjComponent::LogicKeys& plInventoryObjComponent::GetLogicKeys(
 
 // Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plInventoryObjComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plInventoryObjComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fLogicModKeys.clear();
     fReceivers.Reset();
@@ -176,23 +175,24 @@ bool plInventoryObjComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrM
 plKey plInventoryObjComponent::GetLogicKey(plMaxNode* node)
 {
     LogicKeys::const_iterator it;
-    
-    for (it = fLogicModKeys.begin(); it != fLogicModKeys.end(); it++)
-    {
-        if (node == it->first)
+
+    for (it = fLogicModKeys.begin(); it != fLogicModKeys.end(); it++) {
+        if (node == it->first) {
             return(it->second);
+        }
     }
+
     return nil;
 }
 
 
-bool plInventoryObjComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plInventoryObjComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plLocation loc = node->GetLocation();
-    plSceneObject *obj = node->GetSceneObject();
+    plSceneObject* obj = node->GetSceneObject();
 
     // Create and register the ClickDrag's logic component
-    plLogicModifier *logic = new plLogicModifier;
+    plLogicModifier* logic = new plLogicModifier;
     plString tmpName = plString::Format("%s_%s_LogicModifier", obj->GetKeyName().c_str(), GetINode()->GetName());
     plKey logicKey = hsgResMgr::ResMgr()->NewKey(tmpName, logic, node->GetLocation());
     hsgResMgr::ResMgr()->AddViaNotify(logicKey, new plObjRefMsg(obj->GetKey(), plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier), plRefFlags::kActiveRef);
@@ -201,7 +201,7 @@ bool plInventoryObjComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
 
 
 
-return true;
+    return true;
 }
 
 void plInventoryObjComponent::AddReceiverKey(plKey key, plMaxNode* node)
@@ -209,72 +209,68 @@ void plInventoryObjComponent::AddReceiverKey(plKey key, plMaxNode* node)
     fReceivers.Append(key);
 }
 
-bool plInventoryObjComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plInventoryObjComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
 #include "plNoteTrackDlgComp.h"
 
-class plInventoryObjComponentProc : public ParamMap2UserDlgProc
-{
+class plInventoryObjComponentProc : public ParamMap2UserDlgProc {
 protected:
     plComponentNoteTrackDlg fNoteTrackDlgX;
     plComponentNoteTrackDlg fNoteTrackDlgY;
-    IParamBlock2 *fPB;
+    IParamBlock2* fPB;
 
 public:
-    BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (msg)
-        {
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        switch (msg) {
         case WM_INITDIALOG:
 //          fPB = map->GetParamBlock();
-/*          
-//          fNoteTrackDlgX.Init(GetDlgItem(hWnd, IDC_COMP_CLICK_DRAG_ANIMX),
-//                              nil,
-///                             kClickDragAnimX,
-/                               nil,
-                                fPB,
-                                fPB->GetOwner());
+            /*
+            //          fNoteTrackDlgX.Init(GetDlgItem(hWnd, IDC_COMP_CLICK_DRAG_ANIMX),
+            //                              nil,
+            ///                             kClickDragAnimX,
+            /                               nil,
+                                            fPB,
+                                            fPB->GetOwner());
 
-            fNoteTrackDlgX.Load();
+                        fNoteTrackDlgX.Load();
 
-            EnableWindow(GetDlgItem(hWnd, IDC_COMP_CLICK_DRAG_ANIMX), true);
-            
-            fNoteTrackDlgY.Init(GetDlgItem(hWnd, IDC_COMP_CLICK_DRAG_ANIM_Y),
-                                nil,
-                                kClickDragAnimY,
-                                nil,
-                                fPB,
-                                fPB->GetOwner());
+                        EnableWindow(GetDlgItem(hWnd, IDC_COMP_CLICK_DRAG_ANIMX), true);
 
-            fNoteTrackDlgY.Load();
+                        fNoteTrackDlgY.Init(GetDlgItem(hWnd, IDC_COMP_CLICK_DRAG_ANIM_Y),
+                                            nil,
+                                            kClickDragAnimY,
+                                            nil,
+                                            fPB,
+                                            fPB->GetOwner());
 
-            EnableWindow(GetDlgItem(hWnd, IDC_COMP_CLICK_DRAG_ANIM_Y), true);
-*/
-        return TRUE;
-/*
-        case WM_COMMAND:
-            if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_COMP_CLICK_DRAG_ANIMX)
-            {
-                fNoteTrackDlgX.AnimChanged();
-                return TRUE;
-            }
-            if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_COMP_CLICK_DRAG_ANIM_Y)
-            {
-                fNoteTrackDlgY.AnimChanged();
-                return TRUE;
-            }
-            break;
+                        fNoteTrackDlgY.Load();
+
+                        EnableWindow(GetDlgItem(hWnd, IDC_COMP_CLICK_DRAG_ANIM_Y), true);
             */
+            return TRUE;
+            /*
+                    case WM_COMMAND:
+                        if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_COMP_CLICK_DRAG_ANIMX)
+                        {
+                            fNoteTrackDlgX.AnimChanged();
+                            return TRUE;
+                        }
+                        if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_COMP_CLICK_DRAG_ANIM_Y)
+                        {
+                            fNoteTrackDlgY.AnimChanged();
+                            return TRUE;
+                        }
+                        break;
+                        */
         }
 
-        return false;   
+        return false;
     }
 
-    void DeleteThis()
-    {
+    void DeleteThis() {
 //      fNoteTrackDlgX.DeleteCache();
 //      fNoteTrackDlgY.DeleteCache();
     }

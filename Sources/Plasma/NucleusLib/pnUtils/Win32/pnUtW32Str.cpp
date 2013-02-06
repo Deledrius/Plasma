@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/Win32/pnUtW32Str.cpp
-*   
+*
 ***/
 
 #include "../pnUtils.h"
@@ -55,43 +55,49 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 //===========================================================================
-unsigned StrToAnsi (char * dest, const wchar_t source[], unsigned destChars) {
+unsigned StrToAnsi(char* dest, const wchar_t source[], unsigned destChars)
+{
     return StrToAnsi(dest, source, destChars, CP_ACP);
 }
 
 //===========================================================================
-unsigned StrToAnsi (char * dest, const wchar_t source[], unsigned destChars, unsigned codePage) {
-    ASSERT(destChars != (unsigned)-1);
+unsigned StrToAnsi(char* dest, const wchar_t source[], unsigned destChars, unsigned codePage)
+{
+    ASSERT(destChars != (unsigned) - 1);
     ASSERT(dest      != nil);
 
     int result = WideCharToMultiByte(codePage, 0, source, -1, dest, destChars, nil, nil);
-    if (result)
-        return result - 1;  // return number of characters not including null terminator
-    else if (destChars) {
+
+    if (result) {
+        return result - 1;    // return number of characters not including null terminator
+    } else if (destChars) {
         dest[destChars - 1] = 0;  // null terminate the destination buffer
         return destChars - 1;
-    }
-    else
+    } else {
         return 0;
+    }
 }
 
 //===========================================================================
-unsigned StrToUnicode (wchar_t * dest, const char source[], unsigned destChars) {
+unsigned StrToUnicode(wchar_t* dest, const char source[], unsigned destChars)
+{
     return StrToUnicode(dest, source, destChars, CP_ACP);
 }
 
 //===========================================================================
-unsigned StrToUnicode (wchar_t * dest, const char source[], unsigned destChars, unsigned codePage) {
-    ASSERT(destChars != (unsigned)-1);
+unsigned StrToUnicode(wchar_t* dest, const char source[], unsigned destChars, unsigned codePage)
+{
+    ASSERT(destChars != (unsigned) - 1);
     ASSERT(dest      != nil);
 
     int result = MultiByteToWideChar(codePage, 0, source, -1, dest, destChars);
-    if (result)
-        return result - 1;  // return number of characters not including null terminator
-    else if (destChars) {
+
+    if (result) {
+        return result - 1;    // return number of characters not including null terminator
+    } else if (destChars) {
         dest[destChars - 1] = 0;  // null terminate the destination buffer
         return destChars - 1;
-    }
-    else
+    } else {
         return 0;
+    }
 }

@@ -79,8 +79,9 @@ plMultistageBehMod::plMultistageBehMod(plAnimStageVec* stages,
       fNetProp(true),
       fNetForce(false)
 {
-    if (receivers)
+    if (receivers) {
         fReceivers = *receivers;
+    }
 }
 
 plMultistageBehMod::~plMultistageBehMod()
@@ -88,27 +89,28 @@ plMultistageBehMod::~plMultistageBehMod()
     IDeleteStageVec();
 }
 
-void plMultistageBehMod::Init(plAnimStageVec *stages,
-                                      bool freezePhys,
-                                      bool smartSeek,
-                                      bool reverseFBControlsOnRelease,
-                                      std::vector<plKey>* receivers)
+void plMultistageBehMod::Init(plAnimStageVec* stages,
+                              bool freezePhys,
+                              bool smartSeek,
+                              bool reverseFBControlsOnRelease,
+                              std::vector<plKey>* receivers)
 {
     fStages = stages;
     fFreezePhys = freezePhys;
     fSmartSeek = smartSeek;
     fReverseFBControlsOnRelease = reverseFBControlsOnRelease;
-    if (receivers)
+
+    if (receivers) {
         fReceivers = *receivers;
+    }
 }
 
 void plMultistageBehMod::IDeleteStageVec()
 {
-    if (fStages)
-    {
+    if (fStages) {
         int numStages = fStages->size();
-        for (int i = 0; i < numStages; i++)
-        {
+
+        for (int i = 0; i < numStages; i++) {
             plAnimStage* stage = (*fStages)[i];
             delete stage;
         }
@@ -121,62 +123,64 @@ void plMultistageBehMod::IDeleteStageVec()
 bool plMultistageBehMod::MsgReceive(plMessage* msg)
 {
     plNotifyMsg* notifyMsg = plNotifyMsg::ConvertNoRef(msg);
-    if (notifyMsg)
-    {
+
+    if (notifyMsg) {
         hsAssert(fStages, "Trying to trigger multistage, but no stages are present.");
-        if(fStages)
-        {
+
+        if (fStages) {
             plKey avKey = notifyMsg->GetAvatarKey();
             hsAssert(avKey, "Avatar key missing trying to trigger multistage.");
-            if(avKey)
-            {
-                plSceneObject *avObj = plSceneObject::ConvertNoRef(avKey->ObjectIsLoaded());
+
+            if (avKey) {
+                plSceneObject* avObj = plSceneObject::ConvertNoRef(avKey->ObjectIsLoaded());
                 hsAssert(avObj, "Avatar not loaded when trying to trigger multistage.");
-                if(avObj)
-                {
+
+                if (avObj) {
                     // Create a copy of our reference anim stages to give to the brain
                     plAnimStageVec* stages = new plAnimStageVec;
                     int numStages = fStages->size();
                     stages->reserve(numStages);
                     // hack hack hack
                     bool ladder = false;
-                    for (int i = 0; i < numStages; i++)
-                    {
+
+                    for (int i = 0; i < numStages; i++) {
                         plAnimStage* stage = new plAnimStage;
                         *stage = *((*fStages)[i]);
                         stages->push_back(stage);
-                        if (strstr(stage->GetAnimName(),"adder") != nil)
+
+                        if (strstr(stage->GetAnimName(), "adder") != nil) {
                             ladder = true;
+                        }
                     }
 
-                    const plArmatureMod *avMod = (plArmatureMod*)avObj->GetModifierByType(plArmatureMod::Index());
+                    const plArmatureMod* avMod = (plArmatureMod*)avObj->GetModifierByType(plArmatureMod::Index());
                     hsAssert(avMod, "Missing armature mod on avatar scene object.");
 
-                    if(avMod)
-                    {
+                    if (avMod) {
                         plKey sender = notifyMsg->GetSender();
                         plKey avModKey = avMod->GetKey();
                         plKey seekKey = GetTarget()->GetKey();      // our seek point
-                        
+
 #ifdef DEBUG_MULTISTAGE
                         char sbuf[256];
-                        sprintf(sbuf,"plMultistageModMsg - starting multistage from %s",sender->GetName().c_str());
+                        sprintf(sbuf, "plMultistageModMsg - starting multistage from %s", sender->GetName().c_str());
                         plAvatarMgr::GetInstance()->GetLog()->AddLine(sbuf);
 #endif
-                        plAvSeekMsg *seeker = new plAvSeekMsg(nil, avModKey, seekKey, 1.0f, fSmartSeek);
+                        plAvSeekMsg* seeker = new plAvSeekMsg(nil, avModKey, seekKey, 1.0f, fSmartSeek);
                         seeker->Send();
 
                         // these (currently unused) callbacks are for the brain itself, not any of the stages
-                        plMessage *exitCallback = nil, *enterCallback = nil;
+                        plMessage* exitCallback = nil, *enterCallback = nil;
                         uint32_t exitFlags = plAvBrainGeneric::kExitNormal;
 
-                        plAvBrainGeneric *brain = new plAvBrainGeneric(stages, exitCallback, enterCallback, sender, exitFlags, 
-                                                                       plAvBrainGeneric::kDefaultFadeIn, plAvBrainGeneric::kDefaultFadeOut, 
-                                                                       plAvBrainGeneric::kMoveRelative);
-                        if (ladder)
-                        {
+                        plAvBrainGeneric* brain = new plAvBrainGeneric(stages, exitCallback, enterCallback, sender, exitFlags,
+                                plAvBrainGeneric::kDefaultFadeIn, plAvBrainGeneric::kDefaultFadeOut,
+                                plAvBrainGeneric::kMoveRelative);
+
+                        if (ladder) {
                             brain->SetType(plAvBrainGeneric::kLadder);
                         }
+
                         brain->SetReverseFBControlsOnRelease(fReverseFBControlsOnRelease);
                         plAvPushBrainMsg* pushBrain = new plAvPushBrainMsg(GetKey(), avModKey, brain);
                         pushBrain->Send();
@@ -188,20 +192,20 @@ bool plMultistageBehMod::MsgReceive(plMessage* msg)
         return true;
     }
 
-    plMultistageModMsg *multiMsg = plMultistageModMsg::ConvertNoRef(msg);
-    if (multiMsg)
-    {
-        if (multiMsg->GetCommand(plMultistageModMsg::kSetLoopCount))
-        {
+    plMultistageModMsg* multiMsg = plMultistageModMsg::ConvertNoRef(msg);
+
+    if (multiMsg) {
+        if (multiMsg->GetCommand(plMultistageModMsg::kSetLoopCount)) {
             ((*fStages)[multiMsg->fStageNum])->SetNumLoops(multiMsg->fNumLoops);
         }
+
         return true;
     }
 
     return plSingleModifier::MsgReceive(msg);
 }
 
-void plMultistageBehMod::Read(hsStream *stream, hsResMgr *mgr)
+void plMultistageBehMod::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Read(stream, mgr);
 
@@ -215,8 +219,8 @@ void plMultistageBehMod::Read(hsStream *stream, hsResMgr *mgr)
     fStages->reserve(numStages);
 
     int i;
-    for (i = 0; i < numStages; i++)
-    {
+
+    for (i = 0; i < numStages; i++) {
         plAnimStage* stage = new plAnimStage;
         stage->Read(stream, mgr);
         stage->SetMod(this);
@@ -226,14 +230,14 @@ void plMultistageBehMod::Read(hsStream *stream, hsResMgr *mgr)
     int numReceivers = stream->ReadLE32();
     fReceivers.clear();
     fReceivers.reserve(numReceivers);
-    for (i = 0; i < numReceivers; i++)
-    {
+
+    for (i = 0; i < numReceivers; i++) {
         plKey key = mgr->ReadKey(stream);
         fReceivers.push_back(key);
     }
 }
 
-void plMultistageBehMod::Write(hsStream *stream, hsResMgr *mgr)
+void plMultistageBehMod::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Write(stream, mgr);
 
@@ -245,16 +249,16 @@ void plMultistageBehMod::Write(hsStream *stream, hsResMgr *mgr)
     stream->WriteLE32(numStages);
 
     int i;
-    for (i = 0; i < numStages; i++)
-    {
+
+    for (i = 0; i < numStages; i++) {
         plAnimStage* stage = (*fStages)[i];
         stage->Write(stream, mgr);
     }
 
     int numReceivers = fReceivers.size();
     stream->WriteLE32(numReceivers);
-    for (i = 0; i < numReceivers; i++)
-    {
+
+    for (i = 0; i < numReceivers; i++) {
         plKey key = fReceivers[i];
         mgr->WriteKey(stream, key);
     }

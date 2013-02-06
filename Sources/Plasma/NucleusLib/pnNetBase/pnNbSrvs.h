@@ -74,7 +74,7 @@ enum ESrvType {
     kNumSrvTypes,
 
     // Enforce network message field size
-    kNetSrvForceDword = (unsigned)-1
+    kNetSrvForceDword = (unsigned) - 1
 };
 
 
@@ -84,22 +84,22 @@ enum ESrvType {
 *
 ***/
 
-unsigned GetAuthSrvHostnames (const char*** addrs);   // returns addrCount
-void SetAuthSrvHostname (const char addr[]);
+unsigned GetAuthSrvHostnames(const char** * addrs);   // returns addrCount
+void SetAuthSrvHostname(const char addr[]);
 
-unsigned GetFileSrvHostnames (const char*** addrs);   // returns addrCount
-void SetFileSrvHostname (const char addr[]);
+unsigned GetFileSrvHostnames(const char** * addrs);   // returns addrCount
+void SetFileSrvHostname(const char addr[]);
 
-unsigned GetGateKeeperSrvHostnames (const char*** addrs); // returns addrCount
-void SetGateKeeperSrvHostname (const char addr[]);
+unsigned GetGateKeeperSrvHostnames(const char** * addrs); // returns addrCount
+void SetGateKeeperSrvHostname(const char addr[]);
 
-const char *GetServerStatusUrl ();
-void SetServerStatusUrl (const char url[]);
+const char* GetServerStatusUrl();
+void SetServerStatusUrl(const char url[]);
 
-const char *GetServerSignupUrl ();
-void SetServerSignupUrl (const char url[]);
+const char* GetServerSignupUrl();
+void SetServerSignupUrl(const char url[]);
 
-const char *GetServerDisplayName ();
-void SetServerDisplayName (const char name[]);
+const char* GetServerDisplayName();
+void SetServerDisplayName(const char name[]);
 
 #endif // pnNbSrvs_inc

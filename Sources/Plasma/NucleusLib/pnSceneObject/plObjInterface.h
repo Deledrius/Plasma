@@ -59,11 +59,10 @@ class plAudioInterface;
 
 //
 // Since interfaces are keyed objects with valid uoids and
-// may have dynamic data (coordinate interface), they are 
+// may have dynamic data (coordinate interface), they are
 // synched (saved) objects
 //
-class plObjInterface : public plSynchedObject
-{
+class plObjInterface : public plSynchedObject {
 protected:
     enum {
         kDisable        = 0x0 // Derived interfaces duplicate this, so if you add more here, they need to know.
@@ -76,35 +75,55 @@ protected:
 
     // SetSceneNode just called by owner. If we're an interface to external data,
     // we need to pass the change on. Otherwise, do nothing.
-    virtual void    ISetSceneNode(plKey node) {} 
-    plSceneObject*  IGetOwner() const { return fOwner; }
+    virtual void    ISetSceneNode(plKey node) {}
+    plSceneObject*  IGetOwner() const {
+        return fOwner;
+    }
     virtual void    ISetOwner(plSceneObject* owner);
-    void            ISetAllProperties(const hsBitVector& b);    
+    void            ISetAllProperties(const hsBitVector& b);
 
-    plDrawInterface* IGetOwnerDrawInterface() { return fOwner ? fOwner->GetVolatileDrawInterface() : nil; }
-    plSimulationInterface* IGetOwnerSimulationInterface() { return fOwner ? fOwner->GetVolatileSimulationInterface() : nil; }
-    plCoordinateInterface* IGetOwnerCoordinateInterface() { return fOwner ? fOwner->GetVolatileCoordinateInterface() : nil; }
-    plAudioInterface* IGetOwnerAudioInterface() { return fOwner ? fOwner->GetVolatileAudioInterface() : nil; }
+    plDrawInterface* IGetOwnerDrawInterface() {
+        return fOwner ? fOwner->GetVolatileDrawInterface() : nil;
+    }
+    plSimulationInterface* IGetOwnerSimulationInterface() {
+        return fOwner ? fOwner->GetVolatileSimulationInterface() : nil;
+    }
+    plCoordinateInterface* IGetOwnerCoordinateInterface() {
+        return fOwner ? fOwner->GetVolatileCoordinateInterface() : nil;
+    }
+    plAudioInterface* IGetOwnerAudioInterface() {
+        return fOwner ? fOwner->GetVolatileAudioInterface() : nil;
+    }
 public:
 
     plObjInterface();
     ~plObjInterface();
 
-    CLASSNAME_REGISTER( plObjInterface );
-    GETINTERFACE_ANY( plObjInterface, plSynchedObject );
+    CLASSNAME_REGISTER(plObjInterface);
+    GETINTERFACE_ANY(plObjInterface, plSynchedObject);
 
     virtual bool MsgReceive(plMessage* msg);
 
-    const plSceneObject* GetOwner() const { return IGetOwner(); }
-    plKey GetOwnerKey() const { return IGetOwner() ? IGetOwner()->GetKey() : nil; }
-    
-    virtual plKey GetSceneNode() const { return IGetOwner() ? IGetOwner()->GetSceneNode() : nil; } 
+    const plSceneObject* GetOwner() const {
+        return IGetOwner();
+    }
+    plKey GetOwnerKey() const {
+        return IGetOwner() ? IGetOwner()->GetKey() : nil;
+    }
 
-    // override SetProperty to pass the prop down to the pool objects 
-    virtual void    SetProperty(int prop, bool on) { fProps.SetBit(prop, on); }
-    
+    virtual plKey GetSceneNode() const {
+        return IGetOwner() ? IGetOwner()->GetSceneNode() : nil;
+    }
+
+    // override SetProperty to pass the prop down to the pool objects
+    virtual void    SetProperty(int prop, bool on) {
+        fProps.SetBit(prop, on);
+    }
+
     // shouldn't need to override GetProperty()
-    bool  GetProperty(int prop) const { return fProps.IsBitSet(prop); }
+    bool  GetProperty(int prop) const {
+        return fProps.IsBitSet(prop);
+    }
     virtual int32_t   GetNumProperties() const = 0;
 
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l) = 0;
@@ -112,7 +131,7 @@ public:
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    virtual void    ReleaseData( void ) { }
+    virtual void    ReleaseData(void) { }
 };
 
 

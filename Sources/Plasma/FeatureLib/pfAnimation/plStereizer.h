@@ -55,13 +55,11 @@ class plCoordinateInterface;
 class hsStream;
 class hsResMgr;
 
-class plStereizer : public plSingleModifier
-{
+class plStereizer : public plSingleModifier {
 protected:
 
     // Flags - in a plSingleModifier::hsBitVector.
-    enum
-    {
+    enum {
         kLeftChannel,
         kHasMaster
     };
@@ -92,15 +90,21 @@ protected:
 
     plCoordinateInterface*  IGetParent() const;
 
-    void        ISetHasMaster(bool on) { if(on)SetFlag(kHasMaster); else ClearFlag(kHasMaster); }
+    void        ISetHasMaster(bool on) {
+        if (on) {
+            SetFlag(kHasMaster);
+        } else {
+            ClearFlag(kHasMaster);
+        }
+    }
 
 public:
     plStereizer();
     virtual ~plStereizer();
 
-    CLASSNAME_REGISTER( plStereizer );
-    GETINTERFACE_ANY( plStereizer, plSingleModifier );
-    
+    CLASSNAME_REGISTER(plStereizer);
+    GETINTERFACE_ANY(plStereizer, plSingleModifier);
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
@@ -109,32 +113,62 @@ public:
     bool    Stereize();
     void    SetFromListenerMsg(const plListenerMsg* listMsg);
 
-    void SetAmbientDist(float d) { fAmbientDist = d; }
-    float GetAmbientDist() const { return fAmbientDist; }
+    void SetAmbientDist(float d) {
+        fAmbientDist = d;
+    }
+    float GetAmbientDist() const {
+        return fAmbientDist;
+    }
 
-    void SetTransition(float d) { fTransition = d; }
-    float GetTransition() const { return fTransition; }
+    void SetTransition(float d) {
+        fTransition = d;
+    }
+    float GetTransition() const {
+        return fTransition;
+    }
 
-    void SetMaxSepDist(float d) { fMaxSepDist = d; }
-    float GetMaxSepDist() const { return fMaxSepDist; }
+    void SetMaxSepDist(float d) {
+        fMaxSepDist = d;
+    }
+    float GetMaxSepDist() const {
+        return fMaxSepDist;
+    }
 
-    void SetMinSepDist(float d) { fMinSepDist = d; }
-    float GetMinSepDist() const { return fMinSepDist; }
+    void SetMinSepDist(float d) {
+        fMinSepDist = d;
+    }
+    float GetMinSepDist() const {
+        return fMinSepDist;
+    }
 
     void SetSepAngle(float rads);
     float GetSepAngle() const;
 
-    void SetAsLeftChannel(bool on) { if(on)SetFlag(kLeftChannel); else ClearFlag(kLeftChannel); }
-    bool IsLeftChannel() const { return HasFlag(kLeftChannel); }
+    void SetAsLeftChannel(bool on) {
+        if (on) {
+            SetFlag(kLeftChannel);
+        } else {
+            ClearFlag(kLeftChannel);
+        }
+    }
+    bool IsLeftChannel() const {
+        return HasFlag(kLeftChannel);
+    }
 
-    void SetParentInitPos(const hsPoint3& pos) { fInitPos = pos; }
-    const hsPoint3& GetParentInitPos() const { return fInitPos; }
+    void SetParentInitPos(const hsPoint3& pos) {
+        fInitPos = pos;
+    }
+    const hsPoint3& GetParentInitPos() const {
+        return fInitPos;
+    }
 
     void SetWorldInitPos(const hsPoint3& pos);
     hsPoint3 GetWorldInitPos() const;
 
     bool CheckForMaster();
-    bool HasMaster() const { return HasFlag(kHasMaster); }
+    bool HasMaster() const {
+        return HasFlag(kHasMaster);
+    }
 };
 
 #endif // plStereizer_inc

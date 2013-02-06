@@ -52,7 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plAvTask;
 
 //
-// A msg which is sent to the networking system 
+// A msg which is sent to the networking system
 // to cause a player to be loaded or unloaded
 //
 class plKey;
@@ -61,8 +61,7 @@ class hsResMgr;
 
 // not sure if we need this yet, but it's already in the index so here's just enough
 // implementation to keep the compiler happy.
-class plLoadAvatarMsg : public plLoadCloneMsg
-{
+class plLoadAvatarMsg : public plLoadCloneMsg {
 public:
     plLoadAvatarMsg();
     /** Canonical constructor. If you're trying to initiate a clone, this is
@@ -82,8 +81,8 @@ public:
         \param initialTask - queue up this task after loading (and spawning)
         \param userStr - a string that the user can set
         */
-    plLoadAvatarMsg(const plUoid &uoidToClone, const plKey &requestorKey, uint32_t userData,
-                    bool isPlayer, const plKey &spawnPoint, plAvTask *initialTask, const char *userStr = nil);
+    plLoadAvatarMsg(const plUoid& uoidToClone, const plKey& requestorKey, uint32_t userData,
+                    bool isPlayer, const plKey& spawnPoint, plAvTask* initialTask, const char* userStr = nil);
 
     /** Use this form if you're sending a message about an existing clone -- either
         to propagate it to other machines or to tell them to unload it.
@@ -96,21 +95,21 @@ public:
         \param isLoading - Are we loading or unloading?
         \param userStr - a string that the user can set
         */
-    plLoadAvatarMsg(const plKey &existing, const plKey &requestorKey, uint32_t userData,
-                    bool isPlayer, bool isLoading, const char *userStr = nil);
+    plLoadAvatarMsg(const plKey& existing, const plKey& requestorKey, uint32_t userData,
+                    bool isPlayer, bool isLoading, const char* userStr = nil);
 
     virtual ~plLoadAvatarMsg();
 
     void SetIsPlayer(bool is);
     bool GetIsPlayer();
 
-    void SetSpawnPoint(const plKey &spawnSceneObjectKey);
+    void SetSpawnPoint(const plKey& spawnSceneObjectKey);
     plKey GetSpawnPoint();
 
-    void SetInitialTask(plAvTask *task);
-    plAvTask * GetInitialTask();
+    void SetInitialTask(plAvTask* task);
+    plAvTask* GetInitialTask();
 
-    void SetUserStr(const char *userStr);
+    void SetUserStr(const char* userStr);
     const char* GetUserStr();
 
     CLASSNAME_REGISTER(plLoadAvatarMsg);
@@ -121,12 +120,12 @@ public:
 
     void ReadVersion(hsStream* stream, hsResMgr* mgr);
     void WriteVersion(hsStream* stream, hsResMgr* mgr);
-    
+
 protected:
     bool fIsPlayer;
     plKey fSpawnPoint;
-    plAvTask *fInitialTask;
-    char *fUserStr;
+    plAvTask* fInitialTask;
+    char* fUserStr;
 };
 
 

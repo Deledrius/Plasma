@@ -48,13 +48,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 plNetMember::plNetMember(plNetApp* na)
 {
     Reset();
-    fNetApp=(na);
+    fNetApp = (na);
 }
 
 plNetMember::plNetMember()
-: fNetApp(nil)
-{ 
-    Reset(); 
+    : fNetApp(nil)
+{
+    Reset();
 }
 
 //
@@ -62,5 +62,5 @@ plNetMember::plNetMember()
 //
 void plNetMember::Reset()
 {
-    fFlags=(0);
+    fFlags = (0);
 }

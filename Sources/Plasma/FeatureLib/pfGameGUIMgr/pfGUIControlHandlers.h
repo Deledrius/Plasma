@@ -51,7 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsStream.h"
 
 //// pfGUICtrlProcObject Definition //////////////////////////////////////////
-//  Any control which "does something" (buttons, edit boxes on Enter/Return, 
+//  Any control which "does something" (buttons, edit boxes on Enter/Return,
 //  etc) uses this in some form. Basically, each control will have an (optional?)
 //  pointer to an object derived from this class type. The class has a single
 //  standard, virtual function that gets called on the "do something" event.
@@ -63,7 +63,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  Note the second: DoSomething() takes a parameter--namely, a pointer to
 //  the control that called it. Thus, you can make one object handle
 //  several controls by just switch()ing on that parameter and save yourself
-//  some object creation. 
+//  some object creation.
 //
 //  UserCallback() is an additional function for use in communicating between
 //  procs. Basically, if you want another proc to do something (another dialog),
@@ -77,26 +77,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  Dialogs will use a similar functionality, but with more functions available.
 
 class pfGUIControlMod;
-class pfGUICtrlProcObject
-{
-    protected:
+class pfGUICtrlProcObject {
+protected:
 
-        uint32_t      fRefCnt;
+    uint32_t      fRefCnt;
 
-    public:
+public:
 
-        pfGUICtrlProcObject() { fRefCnt = 0; }
-        virtual ~pfGUICtrlProcObject() { ; }
+    pfGUICtrlProcObject() {
+        fRefCnt = 0;
+    }
+    virtual ~pfGUICtrlProcObject() {
+        ;
+    }
 
-        virtual void    DoSomething( pfGUIControlMod *ctrl ) = 0;
+    virtual void    DoSomething(pfGUIControlMod* ctrl) = 0;
 
-        virtual void    HandleExtendedEvent( pfGUIControlMod *ctrl, uint32_t event ) { ; }
+    virtual void    HandleExtendedEvent(pfGUIControlMod* ctrl, uint32_t event) {
+        ;
+    }
 
-        virtual void    UserCallback( uint32_t userValue ) { ; }
+    virtual void    UserCallback(uint32_t userValue) {
+        ;
+    }
 
-        // ONLY THE GUI SYSTEM SHOULD CALL THESE
-        void    IncRef( void ) { fRefCnt++; }
-        bool    DecRef( void ) { fRefCnt--; return ( fRefCnt > 0 ) ? false : true; }
+    // ONLY THE GUI SYSTEM SHOULD CALL THESE
+    void    IncRef(void) {
+        fRefCnt++;
+    }
+    bool    DecRef(void) {
+        fRefCnt--;
+        return (fRefCnt > 0) ? false : true;
+    }
 };
 
 //// pfGUICtrlProcWriteableObject ////////////////////////////////////////////
@@ -106,91 +118,92 @@ class pfGUICtrlProcObject
 //  NOT derive from this class for your own handlers; this is just for the
 //  handfull that will get added on export.
 
-class pfGUICtrlProcWriteableObject : public pfGUICtrlProcObject
-{
-    protected:
+class pfGUICtrlProcWriteableObject : public pfGUICtrlProcObject {
+protected:
 
-        uint32_t          fType;
+    uint32_t          fType;
 
-        virtual void    IRead( hsStream *s ) = 0;
-        virtual void    IWrite( hsStream *s ) = 0;
+    virtual void    IRead(hsStream* s) = 0;
+    virtual void    IWrite(hsStream* s) = 0;
 
-    public:
+public:
 
-        enum Types
-        {
-            kNull,
-            kConsoleCmd,
-            kPythonScript,
-            kCloseDlg
-        };
+    enum Types {
+        kNull,
+        kConsoleCmd,
+        kPythonScript,
+        kCloseDlg
+    };
 
-        pfGUICtrlProcWriteableObject() { fType = kNull; }
-        pfGUICtrlProcWriteableObject( uint32_t type ) : fType( type ) { ; }
-        virtual ~pfGUICtrlProcWriteableObject() { ; }
+    pfGUICtrlProcWriteableObject() {
+        fType = kNull;
+    }
+    pfGUICtrlProcWriteableObject(uint32_t type) : fType(type) {
+        ;
+    }
+    virtual ~pfGUICtrlProcWriteableObject() {
+        ;
+    }
 
-        virtual void    DoSomething( pfGUIControlMod *ctrl ) = 0;
+    virtual void    DoSomething(pfGUIControlMod* ctrl) = 0;
 
-        static void Write( pfGUICtrlProcWriteableObject *obj, hsStream *s );
+    static void Write(pfGUICtrlProcWriteableObject* obj, hsStream* s);
 
-        static pfGUICtrlProcWriteableObject *Read( hsStream *s );
+    static pfGUICtrlProcWriteableObject* Read(hsStream* s);
 };
 
 //// pfGUIConsoleCmdProc /////////////////////////////////////////////////////
 //  Simply runs the console command specified. Exportable.
 
-class pfGUIConsoleCmdProc : public pfGUICtrlProcWriteableObject
-{
-    protected:
+class pfGUIConsoleCmdProc : public pfGUICtrlProcWriteableObject {
+protected:
 
-        char            *fCommand;
+    char*            fCommand;
 
-        virtual void    IRead( hsStream *s );
-        virtual void    IWrite( hsStream *s );
-    
-    public:
+    virtual void    IRead(hsStream* s);
+    virtual void    IWrite(hsStream* s);
 
-        pfGUIConsoleCmdProc();
-        pfGUIConsoleCmdProc( const char *cmd );
-        virtual ~pfGUIConsoleCmdProc();
+public:
 
-        virtual void    DoSomething( pfGUIControlMod *ctrl );
+    pfGUIConsoleCmdProc();
+    pfGUIConsoleCmdProc(const char* cmd);
+    virtual ~pfGUIConsoleCmdProc();
 
-        void            SetCommand( const char *cmd );
+    virtual void    DoSomething(pfGUIControlMod* ctrl);
+
+    void            SetCommand(const char* cmd);
 };
 
 //// pfGUIPythonScriptProc ///////////////////////////////////////////////////
 
-class pfGUIPythonScriptProc : public pfGUICtrlProcWriteableObject
-{
-    protected:
+class pfGUIPythonScriptProc : public pfGUICtrlProcWriteableObject {
+protected:
 
-        virtual void    IRead( hsStream *s );
-        virtual void    IWrite( hsStream *s );
-    
-    public:
+    virtual void    IRead(hsStream* s);
+    virtual void    IWrite(hsStream* s);
 
-        pfGUIPythonScriptProc();
-        virtual ~pfGUIPythonScriptProc();
+public:
 
-        virtual void    DoSomething( pfGUIControlMod *ctrl );
+    pfGUIPythonScriptProc();
+    virtual ~pfGUIPythonScriptProc();
+
+    virtual void    DoSomething(pfGUIControlMod* ctrl);
 };
 
 //// Simple Runtime Ones /////////////////////////////////////////////////////
 
-class pfGUICloseDlgProc : public pfGUICtrlProcWriteableObject
-{
-    protected:
+class pfGUICloseDlgProc : public pfGUICtrlProcWriteableObject {
+protected:
 
-        virtual void    IRead( hsStream *s ) {}
-        virtual void    IWrite( hsStream *s ) {}
+    virtual void    IRead(hsStream* s) {}
+    virtual void    IWrite(hsStream* s) {}
 
-    public:
+public:
 
-        pfGUICloseDlgProc() : pfGUICtrlProcWriteableObject( kCloseDlg ) {}
-        virtual ~pfGUICloseDlgProc() {}
+    pfGUICloseDlgProc() : pfGUICtrlProcWriteableObject(kCloseDlg) {}
+    virtual ~pfGUICloseDlgProc() {}
 
-        virtual void    DoSomething( pfGUIControlMod *ctrl );
+    virtual void    DoSomething(pfGUIControlMod* ctrl);
 };
 
 #endif // _pfGUIControlHandlers_h

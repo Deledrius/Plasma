@@ -45,12 +45,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 void EncryptFiles(const plFileName& dir, const char* ext, bool encrypt);
 
-void print_version() {
+void print_version()
+{
     puts(plProduct::ProductString().c_str());
     puts("");
 }
 
-void print_help() {
+void print_help()
+{
     puts("plFileEncrypt - Encrypts and Decrypts Uru Files.\n");
     print_version();
     puts("Usage: plFileEncrypt \t[(encrypt|-e)|(decrypt|-d|)|(--help|-h|-?|/h)|(-v)]");
@@ -60,37 +62,35 @@ void print_help() {
     puts("\t-v|--version\t - Prints build version information");
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     bool encrypt = true;
     const char* dir = ".";
 
 #define ARGCMP(y) (strcmp(argv[1], y) == 0)
-    if (argc > 1)
-    {
-        if (ARGCMP("encrypt") || ARGCMP("-e") )
-        {
-            if (argc > 2)
+
+    if (argc > 1) {
+        if (ARGCMP("encrypt") || ARGCMP("-e")) {
+            if (argc > 2) {
                 dir = argv[2];
+            }
+
             encrypt = true;
-        }
-        else if (ARGCMP("decrypt") || ARGCMP("-d"))
-        {
-            if (argc > 2)
+        } else if (ARGCMP("decrypt") || ARGCMP("-d")) {
+            if (argc > 2) {
                 dir = argv[2];
+            }
+
             encrypt = false;
-        }
-        else if(ARGCMP("--help") || ARGCMP("-h") || ARGCMP("-?")  || ARGCMP("/?"))
-        {
+        } else if (ARGCMP("--help") || ARGCMP("-h") || ARGCMP("-?")  || ARGCMP("/?")) {
             print_help();
             return 0;
-        } 
-        else if (ARGCMP("-v") || ARGCMP("--version"))
-        {
+        } else if (ARGCMP("-v") || ARGCMP("--version")) {
             print_version();
             return 0;
         }
     }
+
 #undef ARGCMP
 
     EncryptFiles(dir, "*.age", encrypt);
@@ -104,15 +104,12 @@ int main(int argc, char *argv[])
 void EncryptFiles(const plFileName& dir, const char* ext, bool encrypt)
 {
     std::vector<plFileName> files = plFileSystem::ListDir(dir, ext);
-    for (auto iter = files.begin(); iter != files.end(); ++iter)
-    {
-        if (encrypt)
-        {
+
+    for (auto iter = files.begin(); iter != files.end(); ++iter) {
+        if (encrypt) {
             printf("encrypting: %s\n", iter->GetFileName().c_str());
             plEncryptedStream::FileEncrypt(*iter);
-        }
-        else
-        { 
+        } else {
             printf("decrypting: %s\n", iter->GetFileName().c_str());
             plEncryptedStream::FileDecrypt(*iter);
         }

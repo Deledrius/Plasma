@@ -44,12 +44,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "HeadSpin.h"
 
-class hsStringTable 
-{
+class hsStringTable {
 public:
     class Node {
     protected:
-        Node(char c=0);
+        Node(char c = 0);
         ~Node();
     public:
         void* GetData();
@@ -66,13 +65,13 @@ public:
     ~hsStringTable();
     void Reset();
     Node* Find(const char* str);
-    Node* FindPartial(char* str, int32_t len=0) const;
+    Node* FindPartial(char* str, int32_t len = 0) const;
     void Register(const char* str, void* data);
 
     typedef bool (hsStringTableCallback)(Node*);
-    bool Iterate(hsStringTableCallback* callback, Node* fromNode=nil);
+    bool Iterate(hsStringTableCallback* callback, Node* fromNode = nil);
 private:
-    Node* FindRecur(Node* root, const char* str, bool createIfNeeded=false);
+    Node* FindRecur(Node* root, const char* str, bool createIfNeeded = false);
     Node* FindPartialRecur(Node* root, char* str, int32_t len) const;
     Node* AddRecur(Node* root, const char* str);
     Node* FindLeafRecur(Node* root, char* str, int32_t len) const;

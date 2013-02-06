@@ -41,7 +41,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *==LICENSE==*/
 //////////////////////////////////////////////////////////////////////////////
 //
-//  plResMgrSettings - Class that holds all the various settings for 
+//  plResMgrSettings - Class that holds all the various settings for
 //                     plResManager
 //
 //// History /////////////////////////////////////////////////////////////////
@@ -55,8 +55,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "HeadSpin.h"
 
-class plResMgrSettings
-{
+class plResMgrSettings {
 protected:
     friend class plResManager;
 
@@ -68,8 +67,7 @@ protected:
     bool fPassiveKeyRead;
     bool fLoadPagesOnInit;
 
-    plResMgrSettings()
-    {
+    plResMgrSettings() {
         fFilterOlderPageVersions = true;
         fFilterNewerPageVersions = true;
         fPassiveKeyRead = false;
@@ -78,8 +76,7 @@ protected:
     }
 
 public:
-    enum LogLevels
-    {
+    enum LogLevels {
         kNoLogging = 0,
         kBasicLogging = 1,
         kDetailedLogging = 2,
@@ -87,20 +84,40 @@ public:
         kObjectDetailLogging = 4
     };
 
-    bool GetFilterOlderPageVersions() const { return fFilterOlderPageVersions; }
-    void SetFilterOlderPageVersions(bool f) { fFilterOlderPageVersions = f; }
+    bool GetFilterOlderPageVersions() const {
+        return fFilterOlderPageVersions;
+    }
+    void SetFilterOlderPageVersions(bool f) {
+        fFilterOlderPageVersions = f;
+    }
 
-    bool GetFilterNewerPageVersions() const { return fFilterNewerPageVersions; }
-    void SetFilterNewerPageVersions(bool f) { fFilterNewerPageVersions = f; }
+    bool GetFilterNewerPageVersions() const {
+        return fFilterNewerPageVersions;
+    }
+    void SetFilterNewerPageVersions(bool f) {
+        fFilterNewerPageVersions = f;
+    }
 
-    uint8_t   GetLoggingLevel() const { return fLoggingLevel; }
-    void    SetLoggingLevel(uint8_t level) { fLoggingLevel = level; }
+    uint8_t   GetLoggingLevel() const {
+        return fLoggingLevel;
+    }
+    void    SetLoggingLevel(uint8_t level) {
+        fLoggingLevel = level;
+    }
 
-    bool GetPassiveKeyRead() const { return fPassiveKeyRead; }
-    void SetPassiveKeyRead(bool p) { fPassiveKeyRead = p; }
+    bool GetPassiveKeyRead() const {
+        return fPassiveKeyRead;
+    }
+    void SetPassiveKeyRead(bool p) {
+        fPassiveKeyRead = p;
+    }
 
-    bool GetLoadPagesOnInit() const { return fLoadPagesOnInit; }
-    void SetLoadPagesOnInit(bool load) { fLoadPagesOnInit = load; }
+    bool GetLoadPagesOnInit() const {
+        return fLoadPagesOnInit;
+    }
+    void SetLoadPagesOnInit(bool load) {
+        fLoadPagesOnInit = load;
+    }
 
     static plResMgrSettings& Get();
 };

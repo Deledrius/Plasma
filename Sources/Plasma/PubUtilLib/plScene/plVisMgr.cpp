@@ -49,8 +49,8 @@ hsBitVector plVisMgr::fIdxSet;
 hsBitVector plVisMgr::fIdxNot;
 
 plVisMgr::plVisMgr()
-:   fMaxSet(kCharacter),
-    fMaxNot(-1)
+    :   fMaxSet(kCharacter),
+        fMaxNot(-1)
 {
     ResetNormal();
 }
@@ -84,12 +84,12 @@ void plVisMgr::Register(plVisRegion* reg, bool bnot)
     hsBitVector& indices = bnot ? fIdxNot : fIdxSet;
     int& maxIdx = bnot ? fMaxNot : fMaxSet;
     int i;
-    for( i = kNumReserved; ; i++ )
-    {
-        if( !indices.IsBitSet(i) )
-        {
-            if( i > maxIdx )
+
+    for (i = kNumReserved; ; i++) {
+        if (!indices.IsBitSet(i)) {
+            if (i > maxIdx) {
                 maxIdx = i;
+            }
 
             indices.SetBit(i);
             reg->SetIndex(i);
@@ -97,20 +97,23 @@ void plVisMgr::Register(plVisRegion* reg, bool bnot)
             return;
         }
     }
+
     hsAssert(false, "Infinite bitvector has all bits set?");
 }
 
 void plVisMgr::UnRegister(plVisRegion* reg, bool bnot)
 {
     // Mark our index for recycling
-    hsBitVector& indices= bnot ? fIdxNot : fIdxSet;
+    hsBitVector& indices = bnot ? fIdxNot : fIdxSet;
     indices.ClearBit(reg->GetIndex());
 
     // Nuke the region from our list.
     hsTArray<plVisRegion*>& regions = bnot ? fNotRegions : fRegions;
     int idx = regions.Find(reg);
-    if( regions.kMissingIndex != idx )
+
+    if (regions.kMissingIndex != idx) {
         regions.Remove(idx);
+    }
 }
 
 void plVisMgr::Eval(const hsPoint3& pos)
@@ -118,16 +121,15 @@ void plVisMgr::Eval(const hsPoint3& pos)
     fVisSet = fOnBitSet;
 
     int i;
-    for( i = 0; i < fRegions.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fRegions.GetCount(); i++) {
         hsAssert(fRegions[i], "Nil region in list");
-        if( !fOffBitSet.IsBitSet(fRegions[i]->GetIndex()) )
-        {
-            if( fRegions[i]->Eval(pos) )
-            {
+
+        if (!fOffBitSet.IsBitSet(fRegions[i]->GetIndex())) {
+            if (fRegions[i]->Eval(pos)) {
                 fVisSet.SetBit(fRegions[i]->GetIndex());
-                if( fRegions[i]->DisableNormal() )
-                {
+
+                if (fRegions[i]->DisableNormal()) {
                     fVisSet.ClearBit(kNormal);
                     fVisSet.SetBit(kCharacter);
                 }
@@ -137,13 +139,11 @@ void plVisMgr::Eval(const hsPoint3& pos)
 
     fVisNot = fOnBitNot;
 
-    for( i = 0; i < fNotRegions.GetCount(); i++ )
-    {
+    for (i = 0; i < fNotRegions.GetCount(); i++) {
         hsAssert(fNotRegions[i], "Nil region in list");
-        if( !fOffBitNot.IsBitSet(fNotRegions[i]->GetIndex()) )
-        {
-            if( fNotRegions[i]->Eval(pos) )
-            {
+
+        if (!fOffBitNot.IsBitSet(fNotRegions[i]->GetIndex())) {
+            if (fNotRegions[i]->Eval(pos)) {
                 fVisNot.SetBit(fNotRegions[i]->GetIndex());
             }
         }
@@ -165,12 +165,16 @@ void plVisMgr::ResetNormal()
 void plVisMgr::DisableNormal()
 {
     fOnBitSet.Clear();
-    if( fMaxSet > 0 )
+
+    if (fMaxSet > 0) {
         fOffBitSet.Set(fMaxSet);
+    }
 
     fOnBitNot.Clear();
-    if( fMaxNot > 0 )
+
+    if (fMaxNot > 0) {
         fOffBitNot.Set(fMaxNot);
+    }
 }
 
 void plVisMgr::EnableVisSet(int idx, bool isNot)
@@ -215,8 +219,7 @@ void plGlobalVisMgr::Init()
 
 void plGlobalVisMgr::DeInit()
 {
-    if (fInstance)
-    {
+    if (fInstance) {
         fInstance->UnRegisterAs(kGlobalVisMgr_KEY);
         fInstance = nil;
     }

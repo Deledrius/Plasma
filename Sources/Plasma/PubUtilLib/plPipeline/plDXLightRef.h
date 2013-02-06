@@ -63,34 +63,36 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plLightInfo;
 class plDXLightSettings;
-class plDXLightRef : public plDXDeviceRef
-{
-    public:
-        plLightInfo         *fOwner;
+class plDXLightRef : public plDXDeviceRef {
+public:
+    plLightInfo*         fOwner;
 
-        D3DLIGHT9   fD3DInfo;
-        uint32_t      fD3DIndex;
-        float    fScale;
+    D3DLIGHT9   fD3DInfo;
+    uint32_t      fD3DIndex;
+    float    fScale;
 
-        plDXLightSettings   *fParentSettings;
-        IDirect3DDevice9    *fD3DDevice;
+    plDXLightSettings*   fParentSettings;
+    IDirect3DDevice9*    fD3DDevice;
 
-        void            Link( plDXLightRef **back ) { plDXDeviceRef::Link( (plDXDeviceRef **)back ); }
-        plDXLightRef    *GetNext( void ) { return (plDXLightRef *)fNext; }
+    void            Link(plDXLightRef** back) {
+        plDXDeviceRef::Link((plDXDeviceRef**)back);
+    }
+    plDXLightRef*    GetNext(void) {
+        return (plDXLightRef*)fNext;
+    }
 
-        plDXLightRef()
-        {
-            fOwner = nil;
-            fParentSettings = nil;
-            fD3DDevice = nil;
-            fD3DIndex = -1;
-            fScale = 1.f;
-        }
+    plDXLightRef() {
+        fOwner = nil;
+        fParentSettings = nil;
+        fD3DDevice = nil;
+        fD3DIndex = -1;
+        fScale = 1.f;
+    }
 
-        virtual ~plDXLightRef();
-        void    Release( void );
+    virtual ~plDXLightRef();
+    void    Release(void);
 
-        void    UpdateD3DInfo( IDirect3DDevice9 *dev, plDXLightSettings *settings );
+    void    UpdateD3DInfo(IDirect3DDevice9* dev, plDXLightSettings* settings);
 };
 
 

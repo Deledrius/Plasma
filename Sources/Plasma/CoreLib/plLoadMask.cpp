@@ -56,17 +56,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 int plQuality::fQuality = 0;
 int plQuality::fCapability = 0;
 
-void plQuality::SetQuality(int q) 
-{ 
-    fQuality = q; 
-    plLoadMask::SetGlobalQuality(q); 
+void plQuality::SetQuality(int q)
+{
+    fQuality = q;
+    plLoadMask::SetGlobalQuality(q);
 }
 
 // Set by the pipeline according to platform capabilities.
-void plQuality::SetCapability(int c) 
-{ 
-    fCapability = c; 
-    plLoadMask::SetGlobalCapability(c); 
+void plQuality::SetCapability(int c)
+{
+    fCapability = c;
+    plLoadMask::SetGlobalCapability(c);
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ void plLoadMask::Read(hsStream* s)
 {
     // read as packed byte
     uint8_t qc;
-    s->LogReadLE(&qc,"Quality|Capabilty");
+    s->LogReadLE(&qc, "Quality|Capabilty");
 
     fQuality[0] = (qc & 0xf0) >> 4;
     fQuality[1] = (qc & 0x0f);
@@ -95,7 +95,7 @@ void plLoadMask::Read(hsStream* s)
 void plLoadMask::Write(hsStream* s) const
 {
     // write packed into 1 byte
-    uint8_t qc = (fQuality[0]<<4) | (fQuality[1] & 0xf);
+    uint8_t qc = (fQuality[0] << 4) | (fQuality[1] & 0xf);
     s->WriteLE(qc);
 }
 
@@ -103,18 +103,18 @@ uint32_t plLoadMask::ValidateReps(int num, const int quals[], const int caps[])
 {
     uint32_t retVal = 0;
     int i;
-    for( i = 1; i < num; i++ )
-    {
+
+    for (i = 1; i < num; i++) {
         int j;
-        for( j = 0; j < i; j++ )
-        {
-            if( (quals[i] >= quals[j]) && (caps[i] >= caps[j]) )
-            {
+
+        for (j = 0; j < i; j++) {
+            if ((quals[i] >= quals[j]) && (caps[i] >= caps[j])) {
                 // Bogus, this would double load.
                 retVal |= (1 << i);
             }
         }
     }
+
     return retVal;
 }
 
@@ -122,64 +122,70 @@ uint32_t plLoadMask::ValidateMasks(int num, plLoadMask masks[])
 {
     uint32_t retVal = 0;
     int i;
-    for( i = 0; i < num; i++ )
-    {
-        if( !masks[i].fQuality[0] && !masks[i].fQuality[1] )
+
+    for (i = 0; i < num; i++) {
+        if (!masks[i].fQuality[0] && !masks[i].fQuality[1]) {
             retVal |= (1 << i);
+        }
 
         int j;
-        for( j = 0; j < i; j++ )
-        {
+
+        for (j = 0; j < i; j++) {
             int k;
-            for( k = 0; k <= kMaxCap; k++ )
-            {
-                if( masks[i].fQuality[k] & masks[j].fQuality[k] )
-                {
+
+            for (k = 0; k <= kMaxCap; k++) {
+                if (masks[i].fQuality[k] & masks[j].fQuality[k]) {
                     masks[i].fQuality[k] &= ~masks[j].fQuality[k];
                     retVal |= (1 << i);
                 }
             }
         }
     }
+
     return retVal;
 }
 
 bool plLoadMask::ComputeRepMasks(
-                                   int num,
-                                   const int quals[], 
-                                   const int caps[], 
-                                   plLoadMask masks[])
+    int num,
+    const int quals[],
+    const int caps[],
+    plLoadMask masks[])
 {
     bool retVal = false; // Okay till proven otherwise.
 
     int i;
-    for( i = 0; i < num; i++ )
-    {
+
+    for (i = 0; i < num; i++) {
         int k;
-        for( k = 0; k <= kMaxCap; k++ )
-        {
+
+        for (k = 0; k <= kMaxCap; k++) {
             // Q starts off the bits higher than or equal to 1 << qual.
             // I.e. we just turned off all lower quality bits.
-            uint8_t q = ~( (1 << quals[i]) - 1 );
+            uint8_t q = ~((1 << quals[i]) - 1);
 
             // For this cap level, if we require higher caps,
             // turn off our quality (i.e. we won't load at this
             // cap for any quality setting.
             uint8_t c = caps[i] > kMaxCap ? kMaxCap : caps[i];
-            if( c > k )
+
+            if (c > k) {
                 q = 0;
+            }
 
             // Turn off all bits already covered for this cap level
             // so we never double load.
             int j;
-            for( j = 0; j < i; j++ )
-            {
+
+            for (j = 0; j < i; j++) {
                 q &= ~masks[j].fQuality[k];
             }
+
             masks[i].fQuality[k] = q;
         }
-        if( masks[i].NeverLoads() )
+
+        if (masks[i].NeverLoads()) {
             retVal = true;
+        }
     }
 
     return retVal;

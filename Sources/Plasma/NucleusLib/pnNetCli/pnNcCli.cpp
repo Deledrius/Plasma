@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetCli/pnNcCli.cpp
-*   
+*
 ***/
 
 #include "Pch.h"
@@ -61,8 +61,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #if !defined(PLASMA_EXTERNAL_RELEASE) && defined(HS_BUILD_FOR_WIN32)
 
-struct NetLogMessage_Header
-{
+struct NetLogMessage_Header {
     unsigned    m_protocol;
     int         m_direction;
     unsigned    m_time;
@@ -118,28 +117,28 @@ struct NetCli {
     // communication channel
     AsyncSocket             sock;
     ENetProtocol            protocol;
-    NetMsgChannel *         channel;
+    NetMsgChannel*          channel;
     bool                    server;
 
-    // message queue    
+    // message queue
     LINK(NetCli)            link;
-    NetCliQueue *           queue;
+    NetCliQueue*            queue;
 
     // message send/recv
-    const NetMsgInitRecv *  recvMsg;
-    const NetMsgField *     recvField;
+    const NetMsgInitRecv*   recvMsg;
+    const NetMsgField*      recvField;
     unsigned                recvFieldBytes;
     bool                    recvDispatch;
-    uint8_t *               sendCurr;       // points into sendBuffer
+    uint8_t*                sendCurr;       // points into sendBuffer
     CInputAccumulator       input;
 
     // Message encryption
     ENetCliMode             mode;
     FNetCliEncrypt          encryptFcn;
     uint8_t                 seed[kNetMaxSymmetricSeedBytes];
-    CryptKey *              cryptIn; // nil if encrytpion is disabled
-    CryptKey *              cryptOut; // nil if encrytpion is disabled
-    void *                  encryptParam;
+    CryptKey*               cryptIn; // nil if encrytpion is disabled
+    CryptKey*               cryptOut; // nil if encrytpion is disabled
+    void*                   encryptParam;
 
     // Message buffers
     uint8_t                    sendBuffer[kAsyncSocketBufferSize];
@@ -149,8 +148,7 @@ struct NetCli {
         : sock(nil), protocol((ENetProtocol)0), channel(nil), server(false)
         , queue(nil), recvMsg(nil), recvField(nil), recvFieldBytes(0)
         , recvDispatch(false), sendCurr(nil), mode((ENetCliMode)0)
-        , encryptFcn(nil), cryptIn(nil), cryptOut(nil), encryptParam(nil)
-    {
+        , encryptFcn(nil), cryptIn(nil), cryptOut(nil), encryptParam(nil) {
         memset(seed, 0, sizeof(seed));
         memset(sendBuffer, 0, sizeof(sendBuffer));
     }
@@ -171,7 +169,7 @@ namespace pnNetCli {
 *
 ***/
 
- 
+
 
 /*****************************************************************************
 *
@@ -180,11 +178,13 @@ namespace pnNetCli {
 ***/
 
 //============================================================================
-static void PutBufferOnWire (NetCli * cli, void * data, unsigned bytes) {
+static void PutBufferOnWire(NetCli* cli, void* data, unsigned bytes)
+{
 
-    uint8_t * temp = NULL;
+    uint8_t* temp = NULL;
 
 #if !defined(PLASMA_EXTERNAL_RELEASE) && defined(HS_BUILD_FOR_WIN32)
+
     // Write to the netlog
     if (s_netlog) {
         NetLogMessage_Header header;
@@ -199,24 +199,28 @@ static void PutBufferOnWire (NetCli * cli, void * data, unsigned bytes) {
         WriteFile(s_netlog, data, bytes, &bytesWritten, NULL);
         LeaveCriticalSection(&s_pipeCritical);
     }
+
 #endif // PLASMA_EXTERNAL_RELEASE
 
     if (cli->mode == kNetCliModeEncrypted && cli->cryptOut) {
-        temp = (uint8_t *)malloc(bytes);
+        temp = (uint8_t*)malloc(bytes);
 
         memcpy(temp, data, bytes);
         CryptEncrypt(cli->cryptOut, bytes, temp);
         data = temp;
     }
-    if (cli->sock)
+
+    if (cli->sock) {
         AsyncSocketSend(cli->sock, data, bytes);
-        
+    }
+
     // free heap buffer (if any)
     free(temp);
 }
 
 //============================================================================
-static void FlushSendBuffer (NetCli * cli) {
+static void FlushSendBuffer(NetCli* cli)
+{
     const unsigned bytes = cli->sendCurr - cli->sendBuffer;
     ASSERT(bytes <= arrsize(cli->sendBuffer));
     PutBufferOnWire(cli, cli->sendBuffer, bytes);
@@ -224,22 +228,22 @@ static void FlushSendBuffer (NetCli * cli) {
 }
 
 //===========================================================================
-static void AddToSendBuffer (
-    NetCli *            cli,
+static void AddToSendBuffer(
+    NetCli*             cli,
     unsigned            bytes,
-    void const * const  data
-) {
-    uint8_t const * src = (uint8_t const *) data;
+    void const* const  data
+)
+{
+    uint8_t const* src = (uint8_t const*) data;
 
     if (bytes > arrsize(cli->sendBuffer)) {
         // Let the OS fragment oversize buffers
         FlushSendBuffer(cli);
-        void * heap = malloc(bytes);
+        void* heap = malloc(bytes);
         memcpy(heap, data, bytes);
         PutBufferOnWire(cli, heap, bytes);
         free(heap);
-    }
-    else {
+    } else {
         for (;;) {
             // calculate the space left in the output buffer and use it
             // to determine the maximum number of bytes that will fit
@@ -247,14 +251,17 @@ static void AddToSendBuffer (
             unsigned const copy = min(bytes, left);
 
             // copy the data into the buffer
-            for (unsigned i = 0; i < copy; ++i)
+            for (unsigned i = 0; i < copy; ++i) {
                 cli->sendCurr[i] = src[i];
+            }
+
             cli->sendCurr += copy;
             ASSERT(cli->sendCurr - cli->sendBuffer <= sizeof(cli->sendBuffer));
 
             // if we copied all the data then bail
-            if (copy < left)
+            if (copy < left) {
                 break;
+            }
 
             src   += copy;
             bytes -= copy;
@@ -265,26 +272,28 @@ static void AddToSendBuffer (
 }
 
 //============================================================================
-static void BufferedSendData (
-    NetCli *            cli,
-    const uintptr_t  msg[], 
+static void BufferedSendData(
+    NetCli*             cli,
+    const uintptr_t  msg[],
     unsigned            fieldCount
-) {
-    #define ASSERT_MSG_VALID(expr)          \
+)
+{
+#define ASSERT_MSG_VALID(expr)          \
         ASSERTMSG(expr, "Invalid message definition");
 
     ASSERT(cli);
     ASSERT(msg);
     ASSERT(fieldCount);
 
-    if (!cli->sock)
+    if (!cli->sock) {
         return;
+    }
 
-    uintptr_t const * const msgEnd = msg + fieldCount;
+    uintptr_t const* const msgEnd = msg + fieldCount;
 
-    const NetMsgInitSend * sendMsg = NetMsgChannelFindSendMessage(cli->channel, msg[0]);
+    const NetMsgInitSend* sendMsg = NetMsgChannelFindSendMessage(cli->channel, msg[0]);
     ASSERT(msg[0] == sendMsg->msg.messageId);
-    ASSERT(fieldCount-1 == sendMsg->msg.count);
+    ASSERT(fieldCount - 1 == sendMsg->msg.count);
 
     // insert messageId into command stream
     const uint16_t msgId = hsToLE16((uint16_t)msg[0]);
@@ -295,17 +304,17 @@ static void BufferedSendData (
     // insert fields into command stream
     uint32_t varCount  = 0;
     uint32_t varSize   = 0;
-    const NetMsgField * cmd     = sendMsg->msg.fields;
-    const NetMsgField * cmdEnd  = cmd + sendMsg->msg.count;
+    const NetMsgField* cmd     = sendMsg->msg.fields;
+    const NetMsgField* cmdEnd  = cmd + sendMsg->msg.count;
+
     for (; cmd < cmdEnd; ++msg, ++cmd) {
         switch (cmd->type) {
-            case kNetMsgFieldInteger: {
+        case kNetMsgFieldInteger: {
                 const unsigned count = cmd->count ? cmd->count : 1;
                 const unsigned bytes = cmd->size * count;
-                void * temp = malloc(bytes);
-                
-                if (count == 1)
-                {
+                void* temp = malloc(bytes);
+
+                if (count == 1) {
                     // Single values are passed by value
                     if (cmd->size == sizeof(uint8_t)) {
                         *(uint8_t*)temp = *(uint8_t*)msg;
@@ -316,9 +325,7 @@ static void BufferedSendData (
                     } else if (cmd->size == sizeof(uint64_t)) {
                         *(uint64_t*)temp = hsToLE64(*(uint64_t*)msg);
                     }
-                }
-                else
-                {
+                } else {
                     // Value arrays are passed in by ptr
                     for (size_t i = 0; i < count; i++) {
                         if (cmd->size == sizeof(uint8_t)) {
@@ -332,7 +339,7 @@ static void BufferedSendData (
                         }
                     }
                 }
-                
+
                 // Write values to send buffer
                 AddToSendBuffer(cli, bytes, temp);
 
@@ -340,64 +347,67 @@ static void BufferedSendData (
             }
             break;
 
-            case kNetMsgFieldReal: {
+        case kNetMsgFieldReal: {
                 const unsigned count = cmd->count ? cmd->count : 1;
                 const unsigned bytes = cmd->size * count;
-                
+
                 if (count == 1)
                     // Single values are passed in by value
-                    AddToSendBuffer(cli, bytes, (const void *) msg);
-                else
+                {
+                    AddToSendBuffer(cli, bytes, (const void*) msg);
+                } else
                     // Value arrays are passed in by ptr
-                    AddToSendBuffer(cli, bytes, (const void *) *msg);
+                {
+                    AddToSendBuffer(cli, bytes, (const void*) *msg);
+                }
             }
             break;
 
-            case kNetMsgFieldString: {
+        case kNetMsgFieldString: {
                 // Use less-than instead of less-or-equal because
                 // we reserve one space for the NULL terminator
-                const uint16_t length = (uint16_t) StrLen((const wchar_t *) *msg);
+                const uint16_t length = (uint16_t) StrLen((const wchar_t*) *msg);
                 ASSERT_MSG_VALID(length < cmd->count);
                 // Write actual string length
                 uint16_t size = hsToLE16(length);
                 AddToSendBuffer(cli, sizeof(uint16_t), (const void*)&size);
                 // Write string data
-                AddToSendBuffer(cli, length * sizeof(wchar_t), (const void *) *msg);
+                AddToSendBuffer(cli, length * sizeof(wchar_t), (const void*) *msg);
             }
             break;
 
-            case kNetMsgFieldData:
-            case kNetMsgFieldRawData: {
+        case kNetMsgFieldData:
+        case kNetMsgFieldRawData: {
                 // write values to send buffer
-                AddToSendBuffer(cli, cmd->count * cmd->size, (const void *) *msg);
+                AddToSendBuffer(cli, cmd->count * cmd->size, (const void*) *msg);
             }
             break;
 
-            case kNetMsgFieldVarCount: {
+        case kNetMsgFieldVarCount: {
                 ASSERT(!varCount);
                 ASSERT(!varSize);
                 // remember the element size
                 varSize  = cmd->size;
                 // write the actual element count
-                varCount = hsToLE32((uint32_t)*msg);
+                varCount = hsToLE32((uint32_t) * msg);
                 AddToSendBuffer(cli, sizeof(uint32_t), (const void*)&varCount);
             }
             break;
 
-            case kNetMsgFieldVarPtr:
-            case kNetMsgFieldRawVarPtr: {
+        case kNetMsgFieldVarPtr:
+        case kNetMsgFieldRawVarPtr: {
                 ASSERT(varSize);
                 // write var sized array
-                AddToSendBuffer(cli, varCount * varSize, (const void *) *msg);
+                AddToSendBuffer(cli, varCount * varSize, (const void*) *msg);
                 varCount    = 0;
                 varSize     = 0;
             }
             break;
 
-            case kNetMsgFieldPtr:
-            case kNetMsgFieldRawPtr: {
+        case kNetMsgFieldPtr:
+        case kNetMsgFieldRawPtr: {
                 // write values
-                AddToSendBuffer(cli, cmd->count * cmd->size, (const void *) *msg);
+                AddToSendBuffer(cli, cmd->count * cmd->size, (const void*) *msg);
             }
             break;
 
@@ -406,25 +416,30 @@ static void BufferedSendData (
     }
 
     // prepare to flush this connection
-    if (cli->queue)
+    if (cli->queue) {
         cli->queue->list.Link(cli);
+    }
 }
 
 //===========================================================================
-static bool DispatchData (NetCli * cli, void * param) {
+static bool DispatchData(NetCli* cli, void* param)
+{
 
     uint16_t msgId = 0;
+
     while (!cli->input.Eof()) {
         // if we're not already decompressing a message, start new message
         if (!cli->recvMsg) {
             // get next message id
-            if (!cli->input.Get(sizeof(msgId), &msgId))
+            if (!cli->input.Get(sizeof(msgId), &msgId)) {
                 goto NEED_MORE_DATA;
+            }
 
             msgId = hsToLE16(msgId);
 
-            if (nil == (cli->recvMsg = NetMsgChannelFindRecvMessage(cli->channel, msgId)))
+            if (nil == (cli->recvMsg = NetMsgChannelFindRecvMessage(cli->channel, msgId))) {
                 goto ERR_NO_HANDLER;
+            }
 
             // prepare to start decompressing new fields
             ASSERT(!cli->recvField);
@@ -434,25 +449,26 @@ static bool DispatchData (NetCli * cli, void * param) {
             cli->recvBuffer.Reserve(kAsyncSocketBufferSize);
 
             // store the message id as uint32_t into the destination buffer
-            uint32_t * recvMsgId = (uint32_t *) cli->recvBuffer.New(sizeof(uint32_t));
+            uint32_t* recvMsgId = (uint32_t*) cli->recvBuffer.New(sizeof(uint32_t));
             *recvMsgId = msgId;
         }
 
         for (
-            const NetMsgField * end = cli->recvMsg->msg.fields + cli->recvMsg->msg.count;
+            const NetMsgField* end = cli->recvMsg->msg.fields + cli->recvMsg->msg.count;
             cli->recvField < end;
             ++cli->recvField
         ) {
             switch (cli->recvField->type) {
-                case kNetMsgFieldInteger: {
+            case kNetMsgFieldInteger: {
                     const unsigned count
                         = cli->recvField->count
-                        ? cli->recvField->count
-                        : 1;
+                          ? cli->recvField->count
+                          : 1;
 
                     // Get integer values
                     const unsigned bytes = count * cli->recvField->size;
-                    uint8_t * data = cli->recvBuffer.New(bytes);
+                    uint8_t* data = cli->recvBuffer.New(bytes);
+
                     if (!cli->input.Get(bytes, data)) {
                         cli->recvBuffer.ShrinkBy(bytes);
                         goto NEED_MORE_DATA;
@@ -474,15 +490,16 @@ static bool DispatchData (NetCli * cli, void * param) {
                 }
                 break;
 
-                case kNetMsgFieldReal: {
+            case kNetMsgFieldReal: {
                     const unsigned count
                         = cli->recvField->count
-                        ? cli->recvField->count
-                        : 1;
+                          ? cli->recvField->count
+                          : 1;
 
                     // Get float values
                     const unsigned bytes = count * cli->recvField->size;
-                    uint8_t * data = cli->recvBuffer.New(bytes);
+                    uint8_t* data = cli->recvBuffer.New(bytes);
+
                     if (!cli->input.Get(bytes, data)) {
                         cli->recvBuffer.ShrinkBy(bytes);
                         goto NEED_MORE_DATA;
@@ -492,11 +509,12 @@ static bool DispatchData (NetCli * cli, void * param) {
                 }
                 break;
 
-                case kNetMsgFieldData:
-                case kNetMsgFieldRawData: {
+            case kNetMsgFieldData:
+            case kNetMsgFieldRawData: {
                     // Read fixed-length data into destination buffer
                     const unsigned bytes = cli->recvField->count * cli->recvField->size;
-                    uint8_t * data = cli->recvBuffer.New(bytes);
+                    uint8_t* data = cli->recvBuffer.New(bytes);
+
                     if (!cli->input.Get(bytes, data)) {
                         cli->recvBuffer.ShrinkBy(bytes);
                         goto NEED_MORE_DATA;
@@ -506,10 +524,11 @@ static bool DispatchData (NetCli * cli, void * param) {
                 }
                 break;
 
-                case kNetMsgFieldVarCount: {
+            case kNetMsgFieldVarCount: {
                     // Read var count field into destination buffer
                     const unsigned bytes = sizeof(uint32_t);
-                    uint8_t * data = cli->recvBuffer.New(bytes);
+                    uint8_t* data = cli->recvBuffer.New(bytes);
+
                     if (!cli->input.Get(bytes, data)) {
                         cli->recvBuffer.ShrinkBy(bytes);
                         goto NEED_MORE_DATA;
@@ -525,11 +544,12 @@ static bool DispatchData (NetCli * cli, void * param) {
                 }
                 break;
 
-                case kNetMsgFieldVarPtr:
-                case kNetMsgFieldRawVarPtr: {
+            case kNetMsgFieldVarPtr:
+            case kNetMsgFieldRawVarPtr: {
                     // Read var-length data into destination buffer
                     const unsigned bytes = cli->recvFieldBytes;
-                    uint8_t * data = cli->recvBuffer.New(bytes);
+                    uint8_t* data = cli->recvBuffer.New(bytes);
+
                     if (!cli->input.Get(bytes, data)) {
                         cli->recvBuffer.ShrinkBy(bytes);
                         goto NEED_MORE_DATA;
@@ -540,21 +560,26 @@ static bool DispatchData (NetCli * cli, void * param) {
                 }
                 break;
 
-                case kNetMsgFieldString: {
+            case kNetMsgFieldString: {
                     if (!cli->recvFieldBytes) {
                         // Read string length
                         uint16_t length;
-                        if (!cli->input.Get(sizeof(uint16_t), &length))
+
+                        if (!cli->input.Get(sizeof(uint16_t), &length)) {
                             goto NEED_MORE_DATA;
+                        }
+
                         cli->recvFieldBytes = hsToLE16(length) * sizeof(wchar_t);
 
                         // Validate size. Use >= instead of > to leave room for the NULL terminator.
-                        if (cli->recvFieldBytes >= cli->recvField->count * cli->recvField->size)
+                        if (cli->recvFieldBytes >= cli->recvField->count * cli->recvField->size) {
                             goto ERR_BAD_COUNT;
+                        }
                     }
 
                     const unsigned bytes = cli->recvField->count * cli->recvField->size;
-                    uint8_t * data = cli->recvBuffer.New(bytes);
+                    uint8_t* data = cli->recvBuffer.New(bytes);
+
                     // Read compressed string data (less than full field length)
                     if (!cli->input.Get(cli->recvFieldBytes, data)) {
                         cli->recvBuffer.ShrinkBy(bytes);
@@ -562,7 +587,7 @@ static bool DispatchData (NetCli * cli, void * param) {
                     }
 
                     // Insert NULL terminator
-                    * (wchar_t *)(data + cli->recvFieldBytes) = 0;
+                    * (wchar_t*)(data + cli->recvFieldBytes) = 0;
 
                     // IDEA: fill the remainder with a freaky uint8_t pattern
 
@@ -575,17 +600,20 @@ static bool DispatchData (NetCli * cli, void * param) {
 
         // dispatch message to handler function
         NCCLI_LOG(kLogPerf, L"pnNetCli: Dispatching. msg: %S. cli: %p", cli->recvMsg ? cli->recvMsg->msg.name : "(unknown)", cli);
-        if (!cli->recvMsg->recv(cli->recvBuffer.Ptr(), cli->recvBuffer.Count(), param))
+
+        if (!cli->recvMsg->recv(cli->recvBuffer.Ptr(), cli->recvBuffer.Count(), param)) {
             goto ERR_DISPATCH_FAILED;
-        
+        }
+
         // prepare to start next message
         cli->recvMsg        = nil;
         cli->recvField      = 0;
         cli->recvFieldBytes = 0;
 
         // Release oversize message buffer
-        if (cli->recvBuffer.Count() > kAsyncSocketBufferSize)
+        if (cli->recvBuffer.Count() > kAsyncSocketBufferSize) {
             cli->recvBuffer.Clear();
+        }
     }
 
     return true;
@@ -644,23 +672,27 @@ struct NetCli_Srv2Cli_Error : NetCli_PacketHeader {
 
 
 //===========================================================================
-static void CreateSymmetricKey (
+static void CreateSymmetricKey(
     unsigned        serverBytes,
-    const uint8_t *    serverSeed,
+    const uint8_t*     serverSeed,
     unsigned        clientBytes,
-    const uint8_t *    clientSeed,
+    const uint8_t*     clientSeed,
     unsigned        outputBytes,
-    uint8_t *          outputSeed
-) {
+    uint8_t*           outputSeed
+)
+{
     ASSERT(clientBytes == kNetMaxSymmetricSeedBytes);
     ASSERT(serverBytes == kNetMaxSymmetricSeedBytes);
     ASSERT(outputBytes == kNetMaxSymmetricSeedBytes);
-    for (unsigned i = 0; i < outputBytes; ++i)
-        outputSeed[i] = (uint8_t) (clientSeed[i] ^ serverSeed[i]);
+
+    for (unsigned i = 0; i < outputBytes; ++i) {
+        outputSeed[i] = (uint8_t)(clientSeed[i] ^ serverSeed[i]);
+    }
 }
 
 //============================================================================
-static void ClientConnect (NetCli * cli) {
+static void ClientConnect(NetCli* cli)
+{
 
     // Initiate diffie-hellman for client
     plBigNum clientSeed;
@@ -677,7 +709,7 @@ static void ClientConnect (NetCli * cli) {
     {
         memset(&cli->seed, 0, sizeof(cli->seed));
         unsigned bytes;
-        unsigned char * data = clientSeed.GetData_LE(&bytes);
+        unsigned char* data = clientSeed.GetData_LE(&bytes);
         memcpy(cli->seed, data, min(bytes, sizeof(cli->seed)));
         delete [] data;
     }
@@ -686,10 +718,10 @@ static void ClientConnect (NetCli * cli) {
     if (cli->sock) {
         unsigned bytes;
         NetCli_Cli2Srv_Connect msg;
-        unsigned char * data = serverSeed.GetData_LE(&bytes); // will be 0 if encryption is disabled, and thereby send an empty seed
+        unsigned char* data = serverSeed.GetData_LE(&bytes);  // will be 0 if encryption is disabled, and thereby send an empty seed
         ASSERTMSG(bytes <= sizeof(msg.dh_y_data), "4");
         msg.message    = kNetCliCli2SrvConnect;
-        msg.length     = (uint8_t) (sizeof(msg) - sizeof(msg.dh_y_data) +  bytes);
+        msg.length     = (uint8_t)(sizeof(msg) - sizeof(msg.dh_y_data) +  bytes);
         memcpy(msg.dh_y_data, data, bytes);
         AsyncSocketSend(cli->sock, &msg, msg.length);
         delete [] data;
@@ -697,19 +729,24 @@ static void ClientConnect (NetCli * cli) {
 }
 
 //============================================================================
-static bool ServerRecvConnect (
-    NetCli *                    cli,
-    const NetCli_PacketHeader & pkt
-) {
+static bool ServerRecvConnect(
+    NetCli*                     cli,
+    const NetCli_PacketHeader& pkt
+)
+{
     // Validate connection state
-    if (cli->mode != kNetCliModeServerStart)
+    if (cli->mode != kNetCliModeServerStart) {
         return false;
+    }
 
     // Validate message size
-    const NetCli_Cli2Srv_Connect & msg =
-        * (const NetCli_Cli2Srv_Connect *) &pkt;
-    if (pkt.length < sizeof(msg))
+    const NetCli_Cli2Srv_Connect& msg =
+        * (const NetCli_Cli2Srv_Connect*) &pkt;
+
+    if (pkt.length < sizeof(msg)) {
         return false;
+    }
+
     int seedLength = msg.length - sizeof(pkt);
 
     // Send the server seed to the client (unencrypted)
@@ -724,8 +761,7 @@ static bool ServerRecvConnect (
     if (seedLength == 0) { // client wishes no encryption (that's okay, nobody else can "fake" us as nobody has the private key, so if the client actually wants encryption it will only work with the correct peer)
         cli->cryptIn = nil;
         cli->cryptOut = nil;
-    }
-    else {
+    } else {
         // Compute client seed
         uint8_t clientSeed[kNetMaxSymmetricSeedBytes];
         plBigNum clientSeedValue;
@@ -739,7 +775,7 @@ static bool ServerRecvConnect (
 
             memset(&clientSeed, 0, sizeof(clientSeed));
             unsigned bytes;
-            unsigned char * data = clientSeedValue.GetData_LE(&bytes);
+            unsigned char* data = clientSeedValue.GetData_LE(&bytes);
             memcpy(clientSeed, data, min(bytes, sizeof(clientSeed)));
             delete [] data;
         }
@@ -757,19 +793,21 @@ static bool ServerRecvConnect (
         cli->cryptIn  = CryptKeyCreate(kCryptRc4, sizeof(sharedSeed), sharedSeed);
         cli->cryptOut = CryptKeyCreate(kCryptRc4, sizeof(sharedSeed), sharedSeed);
     }
-    
+
     cli->mode = kNetCliModeEncrypted; // should rather be called "established", but whatever
     return cli->encryptFcn(kNetSuccess, cli->encryptParam);
 }
 
 //============================================================================
-static bool ClientRecvEncrypt (
-    NetCli *                    cli,
-    const NetCli_PacketHeader & pkt
-) {
+static bool ClientRecvEncrypt(
+    NetCli*                     cli,
+    const NetCli_PacketHeader& pkt
+)
+{
     // Validate connection state
-    if (cli->mode != kNetCliModeClientStart)
+    if (cli->mode != kNetCliModeClientStart) {
         return false;
+    }
 
     // find out if we want encryption
     const plBigNum* DH_N;
@@ -777,11 +815,13 @@ static bool ClientRecvEncrypt (
     bool encrypt = !DH_N->isZero();
 
     // Process message
-    const NetCli_Srv2Cli_Encrypt & msg =
-        * (const NetCli_Srv2Cli_Encrypt *) &pkt;
+    const NetCli_Srv2Cli_Encrypt& msg =
+        * (const NetCli_Srv2Cli_Encrypt*) &pkt;
+
     if (encrypt) { // we insist on encryption, don't let some MitM decide for us!
-        if (pkt.length != sizeof(msg))
+        if (pkt.length != sizeof(msg)) {
             return false;
+        }
 
         // Create the symmetric key from a combination
         // of the client seed and the server seed
@@ -795,10 +835,11 @@ static bool ClientRecvEncrypt (
         // Switch to encrypted mode
         cli->cryptIn  = CryptKeyCreate(kCryptRc4, sizeof(sharedSeed), sharedSeed);
         cli->cryptOut = CryptKeyCreate(kCryptRc4, sizeof(sharedSeed), sharedSeed);
-    }
-    else { // honestly we do not care what the other side sends, we will send plaintext
-        if (pkt.length != sizeof(pkt))
+    } else { // honestly we do not care what the other side sends, we will send plaintext
+        if (pkt.length != sizeof(pkt)) {
             return false;
+        }
+
         cli->cryptIn = nil;
         cli->cryptOut = nil;
     }
@@ -808,19 +849,23 @@ static bool ClientRecvEncrypt (
 }
 
 //============================================================================
-static bool ClientRecvError (
-    NetCli *                    cli,
-    const NetCli_PacketHeader & pkt
-) {
+static bool ClientRecvError(
+    NetCli*                     cli,
+    const NetCli_PacketHeader& pkt
+)
+{
     // Validate connection state
-    if (cli->mode != kNetCliModeClientStart)
+    if (cli->mode != kNetCliModeClientStart) {
         return false;
+    }
 
     // Validate message size
-    const NetCli_Srv2Cli_Error & msg =
-        * (const NetCli_Srv2Cli_Error *) &pkt;
-    if (pkt.length < sizeof(msg))
+    const NetCli_Srv2Cli_Error& msg =
+        * (const NetCli_Srv2Cli_Error*) &pkt;
+
+    if (pkt.length < sizeof(msg)) {
         return false;
+    }
 
     cli->encryptFcn((ENetError) msg.error, cli->encryptParam);
     return false;
@@ -828,8 +873,8 @@ static bool ClientRecvError (
 
 //============================================================================
 typedef bool (* FNetCliPacket)(
-    NetCli *                    cli,
-    const NetCli_PacketHeader & pkt
+    NetCli*                     cli,
+    const NetCli_PacketHeader& pkt
 );
 
 #if 0
@@ -861,23 +906,34 @@ static const FNetCliPacket s_recvTbl[kNumNetCliMsgs] = {
 #endif // 0
 
 //===========================================================================
-static unsigned DispatchPacket (
-    NetCli *        cli,
+static unsigned DispatchPacket(
+    NetCli*         cli,
     unsigned        bytes,
     const uint8_t      data[]
-) {
+)
+{
     for (;;) {
-        const NetCli_PacketHeader & pkt = * (const NetCli_PacketHeader *) data;
-        if (bytes < sizeof(pkt))
+        const NetCli_PacketHeader& pkt = * (const NetCli_PacketHeader*) data;
+
+        if (bytes < sizeof(pkt)) {
             break;
-        if (pkt.length > bytes)
+        }
+
+        if (pkt.length > bytes) {
             break;
-        if (pkt.message >= kNumNetCliMsgs)
+        }
+
+        if (pkt.message >= kNumNetCliMsgs) {
             break;
-        if (!s_recvTbl[pkt.message])
+        }
+
+        if (!s_recvTbl[pkt.message]) {
             break;
-        if (!s_recvTbl[pkt.message](cli, pkt))
+        }
+
+        if (!s_recvTbl[pkt.message](cli, pkt)) {
             break;
+        }
 
         // Success!
         return pkt.length;
@@ -897,7 +953,8 @@ static unsigned DispatchPacket (
 ***/
 
 //===========================================================================
-static void ResetSendRecv (NetCli * cli) {
+static void ResetSendRecv(NetCli* cli)
+{
     cli->recvMsg            = nil;
     cli->recvField          = nil;
     cli->recvFieldBytes     = 0;
@@ -908,41 +965,45 @@ static void ResetSendRecv (NetCli * cli) {
 }
 
 //===========================================================================
-static NetCli * ConnCreate (
+static NetCli* ConnCreate(
     AsyncSocket     sock,
     unsigned        protocol,
     ENetCliMode     mode
-) {
+)
+{
     // find channel
     unsigned largestRecv;
-    NetMsgChannel * channel = NetMsgChannelLock(
-        protocol,
-        mode == kNetCliModeServerStart,
-        &largestRecv
-    );
-    if (!channel)
-        return nil;
+    NetMsgChannel* channel = NetMsgChannelLock(
+                                 protocol,
+                                 mode == kNetCliModeServerStart,
+                                 &largestRecv
+                             );
 
-    NetCli * const cli  = new NetCli;
+    if (!channel) {
+        return nil;
+    }
+
+    NetCli* const cli  = new NetCli;
     cli->sock           = sock;
     cli->protocol       = (ENetProtocol) protocol;
     cli->channel        = channel;
     cli->mode           = mode;
 
 #if !defined(PLASMA_EXTERNAL_RELEASE) && defined(HS_BUILD_FOR_WIN32)
+
     // Network debug pipe
     if (!s_netlog) {
         InitializeCriticalSection(&s_pipeCritical);
         WaitNamedPipe(HURU_PIPE_NAME, NMPWAIT_WAIT_FOREVER);
         s_netlog = CreateFileA(
-            HURU_PIPE_NAME,
-            GENERIC_READ | GENERIC_WRITE,
-            0,
-            NULL,
-            OPEN_EXISTING,
-            FILE_ATTRIBUTE_NORMAL,
-            NULL
-        );
+                       HURU_PIPE_NAME,
+                       GENERIC_READ | GENERIC_WRITE,
+                       0,
+                       NULL,
+                       OPEN_EXISTING,
+                       FILE_ATTRIBUTE_NORMAL,
+                       NULL
+                   );
 
         // Not exactly the start, but close enough ;)
         FILETIME timeBase;
@@ -950,6 +1011,7 @@ static NetCli * ConnCreate (
         s_timeOffset.HighPart = timeBase.dwHighDateTime;
         s_timeOffset.LowPart = timeBase.dwLowDateTime;
     }
+
 #endif // PLASMA_EXTERNAL_RELEASE
 
     ResetSendRecv(cli);
@@ -958,15 +1020,17 @@ static NetCli * ConnCreate (
 }
 
 //===========================================================================
-static void SetConnSeed (
-    NetCli *        cli,
+static void SetConnSeed(
+    NetCli*         cli,
     unsigned        seedBytes,
     const uint8_t      seedData[]
-) {
-    if (seedBytes)
+)
+{
+    if (seedBytes) {
         memcpy(cli->seed, seedData, min(sizeof(cli->seed), seedBytes));
-    else
+    } else {
         CryptCreateRandomSeed(sizeof(cli->seed), cli->seed);
+    }
 }
 
 } using namespace pnNetCli;
@@ -979,17 +1043,19 @@ static void SetConnSeed (
 ***/
 
 //============================================================================
-NetCli * NetCliConnectAccept (
+NetCli* NetCliConnectAccept(
     AsyncSocket         sock,
     unsigned            protocol,
     bool                unbuffered,
     FNetCliEncrypt      encryptFcn,
     unsigned            seedBytes,
     const uint8_t          seedData[],
-    void *              encryptParam
-) {
+    void*               encryptParam
+)
+{
     // Create connection
-    NetCli * cli = ConnCreate(sock, protocol, kNetCliModeClientStart);
+    NetCli* cli = ConnCreate(sock, protocol, kNetCliModeClientStart);
+
     if (cli) {
         AsyncSocketEnableNagling(sock, !unbuffered);
         cli->encryptFcn     = encryptFcn;
@@ -997,38 +1063,43 @@ NetCli * NetCliConnectAccept (
         SetConnSeed(cli, seedBytes, seedData);
         Connect::ClientConnect(cli);
     }
+
     return cli;
 }
 
 //============================================================================
 #ifdef SERVER
-NetCli * NetCliListenAccept (
+NetCli* NetCliListenAccept(
     AsyncSocket         sock,
     unsigned            protocol,
     bool                unbuffered,
     FNetCliEncrypt      encryptFcn,
     unsigned            seedBytes,
     const uint8_t          seedData[],
-    void *              encryptParam
-) {
+    void*               encryptParam
+)
+{
     // Create connection
-    NetCli * cli = ConnCreate(sock, protocol, kNetCliModeServerStart);
+    NetCli* cli = ConnCreate(sock, protocol, kNetCliModeServerStart);
+
     if (cli) {
         AsyncSocketEnableNagling(sock, !unbuffered);
         cli->encryptFcn     = encryptFcn;
         cli->encryptParam   = encryptParam;
         SetConnSeed(cli, seedBytes, seedData);
     }
+
     return cli;
 }
 #endif
 
 //============================================================================
 #ifdef SERVER
-void NetCliListenReject (
+void NetCliListenReject(
     AsyncSocket     sock,
     ENetError       error
-) {
+)
+{
     if (sock) {
         Connect::NetCli_Srv2Cli_Error response;
         response.message    = Connect::kNetCliSrv2CliError;
@@ -1040,49 +1111,59 @@ void NetCliListenReject (
 #endif
 
 //============================================================================
-void NetCliClearSocket (NetCli * cli) {
+void NetCliClearSocket(NetCli* cli)
+{
     cli->sock = nil;
 }
 
 //============================================================================
-void NetCliSetQueue (
-    NetCli *        cli,
-    NetCliQueue *   queue
-) {
+void NetCliSetQueue(
+    NetCli*         cli,
+    NetCliQueue*    queue
+)
+{
     cli->queue = queue;
 }
 
 //============================================================================
-void NetCliDisconnect (
-    NetCli *        cli,
+void NetCliDisconnect(
+    NetCli*         cli,
     bool            hardClose
-) {
+)
+{
     // send any existing messages and allow
     // the socket layer to complete sending data
-    if (!hardClose)
+    if (!hardClose) {
         NetCliFlush(cli);
+    }
 
-    if (cli->sock)
+    if (cli->sock) {
         AsyncSocketDisconnect(cli->sock, hardClose);
+    }
 
     // don't allow any more messages to be received
     cli->recvDispatch = false;
 }
 
 //============================================================================
-void NetCliDelete (
-    NetCli *        cli,
+void NetCliDelete(
+    NetCli*         cli,
     bool            deleteSocket
-) {
+)
+{
     NetMsgChannelUnlock(cli->channel);
 
-    if (cli->sock && deleteSocket)
+    if (cli->sock && deleteSocket) {
         AsyncSocketDelete(cli->sock);
+    }
 
-    if (cli->cryptIn)
+    if (cli->cryptIn) {
         CryptKeyClose(cli->cryptIn);
-    if (cli->cryptOut)
+    }
+
+    if (cli->cryptOut) {
         CryptKeyClose(cli->cryptOut);
+    }
 
     cli->input.Clear();
     cli->recvBuffer.Clear();
@@ -1091,39 +1172,44 @@ void NetCliDelete (
 }
 
 //============================================================================
-void NetCliFlush (
-    NetCli *        cli
-) {
-    if (cli->sendCurr != cli->sendBuffer)
+void NetCliFlush(
+    NetCli*         cli
+)
+{
+    if (cli->sendCurr != cli->sendBuffer) {
         FlushSendBuffer(cli);
+    }
 }
 
 //============================================================================
-void NetCliSend (
-    NetCli *            cli,
-    const uintptr_t  msg[], 
+void NetCliSend(
+    NetCli*             cli,
+    const uintptr_t  msg[],
     unsigned            count
-) {
+)
+{
     BufferedSendData(cli, msg, count);
 }
 
 //============================================================================
-bool NetCliDispatch (
-    NetCli *        cli,
+bool NetCliDispatch(
+    NetCli*         cli,
     const uint8_t      data[],
     unsigned        bytes,
-    void *          param
-) {
-    if (!cli->recvDispatch)
+    void*           param
+)
+{
+    if (!cli->recvDispatch) {
         return false;
+    }
 
     do {
         if (cli->mode == kNetCliModeEncrypted) {
             // Decrypt data...
-            uint8_t * temp = NULL;
+            uint8_t* temp = NULL;
 
             if (cli->cryptIn) {
-                temp = (uint8_t *)malloc(bytes);
+                temp = (uint8_t*)malloc(bytes);
 
                 memcpy(temp, data, bytes);
                 CryptDecrypt(cli->cryptIn, bytes, temp);
@@ -1135,6 +1221,7 @@ bool NetCliDispatch (
             bool result = DispatchData(cli, param);
 
 #if !defined(PLASMA_EXTERNAL_RELEASE) && defined(HS_BUILD_FOR_WIN32)
+
             // Write to the netlog
             if (s_netlog) {
                 NetLogMessage_Header header;
@@ -1149,12 +1236,13 @@ bool NetCliDispatch (
                 WriteFile(s_netlog, data, bytes, &bytesWritten, NULL);
                 LeaveCriticalSection(&s_pipeCritical);
             }
+
 #endif // PLASMA_EXTERNAL_RELEASE
 
 #ifdef SERVER
             cli->recvDispatch = result;
 #endif
-            
+
             // free heap buffer (if any)
             free(temp);
 
@@ -1164,8 +1252,10 @@ bool NetCliDispatch (
 
         // Dispatch connect packets until encryption starts
         unsigned used = Connect::DispatchPacket(cli, bytes, data);
-        if (!used)
+
+        if (!used) {
             return false;
+        }
 
         data  += used;
         bytes -= used;

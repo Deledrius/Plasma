@@ -64,75 +64,78 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plMipmap;
 struct hsMatrix44;
 
-class plTextGenerator : public hsKeyedObject
-{
-    protected:
-    
-        plMipmap    *fHost;
-        uint16_t      fWidth, fHeight;
+class plTextGenerator : public hsKeyedObject {
+protected:
+
+    plMipmap*    fHost;
+    uint16_t      fWidth, fHeight;
 
 #if HS_BUILD_FOR_WIN32
-        HDC         fWinRGBDC;
-        HBITMAP     fWinRGBBitmap;
-        HFONT       fWinFont;
-        uint32_t      *fWinRGBBits;
+    HDC         fWinRGBDC;
+    HBITMAP     fWinRGBBitmap;
+    HFONT       fWinFont;
+    uint32_t*      fWinRGBBits;
 
-        HFONT       fWinAlphaFont;
-        HDC         fWinAlphaDC;
-        HBITMAP     fWinAlphaBitmap;
-        uint8_t       *fWinAlphaBits;
+    HFONT       fWinAlphaFont;
+    HDC         fWinAlphaDC;
+    HBITMAP     fWinAlphaBitmap;
+    uint8_t*       fWinAlphaBits;
 #endif
 
-        uint32_t      *IAllocateOSSurface( uint16_t width, uint16_t height );
-        void        IDestroyOSSurface( void );
+    uint32_t*      IAllocateOSSurface(uint16_t width, uint16_t height);
+    void        IDestroyOSSurface(void);
 
-    public:
+public:
 
-        plTextGenerator();
-        plTextGenerator( plMipmap *host, uint16_t width, uint16_t height );
-        virtual ~plTextGenerator();
+    plTextGenerator();
+    plTextGenerator(plMipmap* host, uint16_t width, uint16_t height);
+    virtual ~plTextGenerator();
 
-        void    Attach( plMipmap *host, uint16_t width, uint16_t height );
-        void    Detach( void );
+    void    Attach(plMipmap* host, uint16_t width, uint16_t height);
+    void    Detach(void);
 
-        /// Operations to perform on the text block
-        
-        void    ClearToColor( hsColorRGBA &color );
+    /// Operations to perform on the text block
 
-        void    SetFont( const char *face, uint16_t size, bool antiAliasRGB = true );
-        void    SetTextColor( hsColorRGBA &color, bool blockRGB = false );
+    void    ClearToColor(hsColorRGBA& color);
 
-        void        DrawString( uint16_t x, uint16_t y, const char *text );
-        void        DrawString( uint16_t x, uint16_t y, const wchar_t *text );
-        void        DrawClippedString( int16_t x, int16_t y, const char *text, uint16_t width, uint16_t height );
-        void        DrawClippedString( int16_t x, int16_t y, const wchar_t *text, uint16_t width, uint16_t height );
-        void        DrawClippedString( int16_t x, int16_t y, const char *text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height );
-        void        DrawClippedString( int16_t x, int16_t y, const wchar_t *text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height );
-        void        DrawWrappedString( uint16_t x, uint16_t y, const char *text, uint16_t width, uint16_t height );
-        void        DrawWrappedString( uint16_t x, uint16_t y, const wchar_t *text, uint16_t width, uint16_t height );
-        uint16_t      CalcStringWidth( const char *text, uint16_t *height = nil );
-        uint16_t      CalcStringWidth( const wchar_t *text, uint16_t *height = nil );
-        void        CalcWrappedStringSize( const char *text, uint16_t *width, uint16_t *height );
-        void        CalcWrappedStringSize( const wchar_t *text, uint16_t *width, uint16_t *height );
-        void        FillRect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA &color );
-        void        FrameRect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA &color );
+    void    SetFont(const char* face, uint16_t size, bool antiAliasRGB = true);
+    void    SetTextColor(hsColorRGBA& color, bool blockRGB = false);
 
-        void    FlushToHost( void );
+    void        DrawString(uint16_t x, uint16_t y, const char* text);
+    void        DrawString(uint16_t x, uint16_t y, const wchar_t* text);
+    void        DrawClippedString(int16_t x, int16_t y, const char* text, uint16_t width, uint16_t height);
+    void        DrawClippedString(int16_t x, int16_t y, const wchar_t* text, uint16_t width, uint16_t height);
+    void        DrawClippedString(int16_t x, int16_t y, const char* text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height);
+    void        DrawClippedString(int16_t x, int16_t y, const wchar_t* text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height);
+    void        DrawWrappedString(uint16_t x, uint16_t y, const char* text, uint16_t width, uint16_t height);
+    void        DrawWrappedString(uint16_t x, uint16_t y, const wchar_t* text, uint16_t width, uint16_t height);
+    uint16_t      CalcStringWidth(const char* text, uint16_t* height = nil);
+    uint16_t      CalcStringWidth(const wchar_t* text, uint16_t* height = nil);
+    void        CalcWrappedStringSize(const char* text, uint16_t* width, uint16_t* height);
+    void        CalcWrappedStringSize(const wchar_t* text, uint16_t* width, uint16_t* height);
+    void        FillRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA& color);
+    void        FrameRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA& color);
 
-        uint16_t  GetTextWidth( void );
-        uint16_t  GetTextHeight( void );
+    void    FlushToHost(void);
 
-        uint16_t  GetWidth( void ) { return fWidth; }
-        uint16_t  GetHeight( void ) { return fHeight; }
+    uint16_t  GetTextWidth(void);
+    uint16_t  GetTextHeight(void);
 
-        // Since the textGen can actually create a texture bigger than you were expecting,
-        // you want to be able to apply a layer texture transform that will compensate. This
-        // function will give you that transform. Just feed it into plLayer->SetTransform().
+    uint16_t  GetWidth(void) {
+        return fWidth;
+    }
+    uint16_t  GetHeight(void) {
+        return fHeight;
+    }
 
-        hsMatrix44  GetLayerTransform( void );
+    // Since the textGen can actually create a texture bigger than you were expecting,
+    // you want to be able to apply a layer texture transform that will compensate. This
+    // function will give you that transform. Just feed it into plLayer->SetTransform().
+
+    hsMatrix44  GetLayerTransform(void);
 
 
-        virtual bool MsgReceive( plMessage *msg );
+    virtual bool MsgReceive(plMessage* msg);
 };
 
 

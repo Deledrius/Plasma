@@ -61,36 +61,39 @@ static const int kMagicStringLen = 12;
 
 static const int kFileStartOffset = kMagicStringLen + sizeof(uint32_t);
 
-static const int kMaxBufferedFileSize = 10*1024;
+static const int kMaxBufferedFileSize = 10 * 1024;
 
 const char plSecureStream::kKeyFilename[] = "encryption.key";
 
 plSecureStream::plSecureStream(bool deleteOnExit, uint32_t* key) :
-fRef(INVALID_HANDLE_VALUE),
-fActualFileSize(0),
-fBufferedStream(false),
-fRAMStream(nil),
-fOpenMode(kOpenFail),
-fDeleteOnExit(deleteOnExit)
+    fRef(INVALID_HANDLE_VALUE),
+    fActualFileSize(0),
+    fBufferedStream(false),
+    fRAMStream(nil),
+    fOpenMode(kOpenFail),
+    fDeleteOnExit(deleteOnExit)
 {
-    if (key)
+    if (key) {
         memcpy(&fKey, key, sizeof(kDefaultKey));
-    else
+    } else {
         memcpy(&fKey, &kDefaultKey, sizeof(kDefaultKey));
+    }
 }
 
 plSecureStream::plSecureStream(hsStream* base, uint32_t* key) :
-fRef(INVALID_HANDLE_VALUE),
-fActualFileSize(0),
-fBufferedStream(false),
-fRAMStream(nil),
-fOpenMode(kOpenFail),
-fDeleteOnExit(false)
+    fRef(INVALID_HANDLE_VALUE),
+    fActualFileSize(0),
+    fBufferedStream(false),
+    fRAMStream(nil),
+    fOpenMode(kOpenFail),
+    fDeleteOnExit(false)
 {
-    if (key)
+    if (key) {
         memcpy(&fKey, key, sizeof(kDefaultKey));
-    else
+    } else {
         memcpy(&fKey, &kDefaultKey, sizeof(kDefaultKey));
+    }
+
     Open(base);
 }
 
@@ -110,19 +113,19 @@ plSecureStream::~plSecureStream()
 
 void plSecureStream::IEncipher(uint32_t* const v, uint32_t n)
 {
-    register unsigned long y=v[0], z=v[n-1], e, delta=0x9E3779B9;
-    register unsigned long q = 6 + 52/n, p, sum = 0;
+    register unsigned long y = v[0], z = v[n - 1], e, delta = 0x9E3779B9;
+    register unsigned long q = 6 + 52 / n, p, sum = 0;
 
-    while (q-- > 0)
-    {
+    while (q-- > 0) {
         sum += delta;
         e = (sum >> 2) & 3;
-        for (p = 0; p < n - 1; p++)
-        {
+
+        for (p = 0; p < n - 1; p++) {
             y = v[p + 1];
             v[p] += MX;
             z = v[p];
         }
+
         y = v[0];
         v[n - 1] += MX;
         z = v[n - 1];
@@ -131,18 +134,18 @@ void plSecureStream::IEncipher(uint32_t* const v, uint32_t n)
 
 void plSecureStream::IDecipher(uint32_t* const v, uint32_t n)
 {
-    register unsigned long y=v[0], z=v[n-1], e, delta=0x9E3779B9;
-    register unsigned long q = 6 + 52/n, p, sum = q * delta;
+    register unsigned long y = v[0], z = v[n - 1], e, delta = 0x9E3779B9;
+    register unsigned long q = 6 + 52 / n, p, sum = q * delta;
 
-    while (sum > 0)
-    {
+    while (sum > 0) {
         e = (sum >> 2) & 3;
-        for (p = n - 1; p > 0; p--)
-        {
+
+        for (p = n - 1; p > 0; p--) {
             z = v[p - 1];
             v[p] -= MX;
             y = v[p];
         }
+
         z = v[n - 1];
         v[0] -= MX;
         y = v[0];
@@ -152,38 +155,35 @@ void plSecureStream::IDecipher(uint32_t* const v, uint32_t n)
 
 bool plSecureStream::Open(const plFileName& name, const char* mode)
 {
-    if (strcmp(mode, "rb") == 0)
-    {
+    if (strcmp(mode, "rb") == 0) {
 #if HS_BUILD_FOR_WIN32
-        if (fDeleteOnExit)
-        {
+
+        if (fDeleteOnExit) {
             fRef = CreateFileW(name.AsString().ToWchar(),
-                                GENERIC_READ,   // open for reading
-                                0,              // no one can open the file until we're done
-                                NULL,           // default security
-                                OPEN_EXISTING,  // only open existing files (no creation)
-                                FILE_FLAG_DELETE_ON_CLOSE,  // delete the file from disk when we close the handle
-                                NULL);          // no template
-        }
-        else
-        {
+                               GENERIC_READ,   // open for reading
+                               0,              // no one can open the file until we're done
+                               NULL,           // default security
+                               OPEN_EXISTING,  // only open existing files (no creation)
+                               FILE_FLAG_DELETE_ON_CLOSE,  // delete the file from disk when we close the handle
+                               NULL);          // no template
+        } else {
             fRef = CreateFileW(name.AsString().ToWchar(),
-                                GENERIC_READ,   // open for reading
-                                0,              // no one can open the file until we're done
-                                NULL,           // default security
-                                OPEN_EXISTING,  // only open existing files (no creation)
-                                FILE_ATTRIBUTE_NORMAL,  // normal file attributes
-                                NULL);          // no template
+                               GENERIC_READ,   // open for reading
+                               0,              // no one can open the file until we're done
+                               NULL,           // default security
+                               OPEN_EXISTING,  // only open existing files (no creation)
+                               FILE_ATTRIBUTE_NORMAL,  // normal file attributes
+                               NULL);          // no template
         }
 
         fPosition = 0;
 
-        if (fRef == INVALID_HANDLE_VALUE)
+        if (fRef == INVALID_HANDLE_VALUE) {
             return false;
+        }
 
         // Make sure our special magic string is there
-        if (!ICheckMagicString(fRef))
-        {
+        if (!ICheckMagicString(fRef)) {
             CloseHandle(fRef);
             fRef = INVALID_HANDLE_VALUE;
             return false;
@@ -195,29 +195,29 @@ bool plSecureStream::Open(const plFileName& name, const char* mode)
         fRef = plFileSystem::Open(name, "rb");
         fPosition = 0;
 
-        if (fRef == INVALID_HANDLE_VALUE)
+        if (fRef == INVALID_HANDLE_VALUE) {
             return false;
+        }
 
-        if (!ICheckMagicString(fRef))
-        {
+        if (!ICheckMagicString(fRef)) {
             fclose(fRef);
             fRef = INVALID_HANDLE_VALUE;
             return false;
         }
+
 #endif
 
         // The encrypted stream is inefficient if you do reads smaller than
         // 8 bytes.  Since we do a lot of those, any file under a size threshold
         // is buffered in memory
-        if (fActualFileSize <= kMaxBufferedFileSize)
+        if (fActualFileSize <= kMaxBufferedFileSize) {
             IBufferFile();
+        }
 
         fOpenMode = kOpenRead;
 
         return true;
-    }
-    else if (strcmp(mode, "wb") == 0)
-    {
+    } else if (strcmp(mode, "wb") == 0) {
         fRAMStream = new hsVectorStream;
         fWriteFileName = name;
         fPosition = 0;
@@ -226,9 +226,7 @@ bool plSecureStream::Open(const plFileName& name, const char* mode)
         fBufferedStream = true;
 
         return true;
-    }
-    else
-    {
+    } else {
         hsAssert(0, "Unsupported open mode");
         fOpenMode = kOpenFail;
         return false;
@@ -239,20 +237,24 @@ bool plSecureStream::Open(hsStream* stream)
 {
     uint32_t pos = stream->GetPosition();
     stream->Rewind();
-    if (!ICheckMagicString(stream))
+
+    if (!ICheckMagicString(stream)) {
         return false;
+    }
 
     fActualFileSize = stream->ReadLE32();
     uint32_t trimSize = kMagicStringLen + sizeof(uint32_t) + fActualFileSize;
     fRAMStream = new hsRAMStream;
-    while (!stream->AtEnd())
-    {
+
+    while (!stream->AtEnd()) {
         // Don't write out any garbage
         uint32_t size;
-        if ((trimSize - stream->GetPosition()) < kEncryptChunkSize)
+
+        if ((trimSize - stream->GetPosition()) < kEncryptChunkSize) {
             size = (trimSize - stream->GetPosition());
-        else
+        } else {
             size = kEncryptChunkSize;
+        }
 
         uint8_t buf[kEncryptChunkSize];
         stream->Read(kEncryptChunkSize, &buf);
@@ -272,13 +274,12 @@ bool plSecureStream::Close()
 {
     int rtn = false;
 
-    if (fOpenMode == kOpenWrite)
-    {
+    if (fOpenMode == kOpenWrite) {
         fRAMStream->Rewind();
         rtn = IWriteEncrypted(fRAMStream, fWriteFileName);
     }
-    if (fRef != INVALID_HANDLE_VALUE)
-    {
+
+    if (fRef != INVALID_HANDLE_VALUE) {
 #if HS_BUILD_FOR_WIN32
         rtn = CloseHandle(fRef);
 #elif HS_BUILD_FOR_UNIX
@@ -287,8 +288,7 @@ bool plSecureStream::Close()
         fRef = INVALID_HANDLE_VALUE;
     }
 
-    if (fRAMStream)
-    {
+    if (fRAMStream) {
         delete fRAMStream;
         fRAMStream = nil;
     }
@@ -303,8 +303,10 @@ bool plSecureStream::Close()
 
 uint32_t plSecureStream::IRead(uint32_t bytes, void* buffer)
 {
-    if (fRef == INVALID_HANDLE_VALUE)
+    if (fRef == INVALID_HANDLE_VALUE) {
         return 0;
+    }
+
     uint32_t numItems;
 #if HS_BUILD_FOR_WIN32
     bool success = (ReadFile(fRef, buffer, bytes, (LPDWORD)&numItems, NULL) != 0);
@@ -314,20 +316,18 @@ uint32_t plSecureStream::IRead(uint32_t bytes, void* buffer)
 #endif
     fBytesRead += numItems;
     fPosition += numItems;
-    if ((unsigned)numItems < bytes)
-    {
-        if (success)
-        {
+
+    if ((unsigned)numItems < bytes) {
+        if (success) {
             // EOF ocurred
             char str[128];
             sprintf(str, "Hit EOF on Windows read, only read %d out of requested %d bytes\n", numItems, bytes);
             hsDebugMessage(str, 0);
-        }
-        else
-        {
+        } else {
             hsDebugMessage("Error on Windows read", GetLastError());
         }
     }
+
     return numItems;
 }
 
@@ -335,11 +335,12 @@ void plSecureStream::IBufferFile()
 {
     fRAMStream = new hsVectorStream;
     char buf[1024];
-    while (!AtEnd())
-    {
+
+    while (!AtEnd()) {
         uint32_t numRead = Read(1024, buf);
         fRAMStream->Write(numRead, buf);
     }
+
     fRAMStream->Rewind();
 
     fBufferedStream = true;
@@ -354,21 +355,19 @@ void plSecureStream::IBufferFile()
 
 bool plSecureStream::AtEnd()
 {
-    if (fBufferedStream)
+    if (fBufferedStream) {
         return fRAMStream->AtEnd();
-    else
+    } else {
         return (GetPosition() == fActualFileSize);
+    }
 }
 
 void plSecureStream::Skip(uint32_t delta)
 {
-    if (fBufferedStream)
-    {
+    if (fBufferedStream) {
         fRAMStream->Skip(delta);
         fPosition = fRAMStream->GetPosition();
-    }
-    else if (fRef != INVALID_HANDLE_VALUE)
-    {
+    } else if (fRef != INVALID_HANDLE_VALUE) {
         fBytesRead += delta;
         fPosition += delta;
 #if HS_BUILD_FOR_WIN32
@@ -381,13 +380,10 @@ void plSecureStream::Skip(uint32_t delta)
 
 void plSecureStream::Rewind()
 {
-    if (fBufferedStream)
-    {
+    if (fBufferedStream) {
         fRAMStream->Rewind();
         fPosition = fRAMStream->GetPosition();
-    }
-    else if (fRef != INVALID_HANDLE_VALUE)
-    {
+    } else if (fRef != INVALID_HANDLE_VALUE) {
         fBytesRead = 0;
         fPosition = 0;
 #if HS_BUILD_FOR_WIN32
@@ -400,13 +396,10 @@ void plSecureStream::Rewind()
 
 void plSecureStream::FastFwd()
 {
-    if (fBufferedStream)
-    {
+    if (fBufferedStream) {
         fRAMStream->FastFwd();
         fPosition = fRAMStream->GetPosition();
-    }
-    else if (fRef != INVALID_HANDLE_VALUE)
-    {
+    } else if (fRef != INVALID_HANDLE_VALUE) {
 #if HS_BUILD_FOR_WIN32
         fBytesRead = fPosition = SetFilePointer(fRef, kFileStartOffset + fActualFileSize, 0, FILE_BEGIN);
 #elif HS_BUILD_FOR_UNIX
@@ -422,8 +415,7 @@ uint32_t plSecureStream::GetEOF()
 
 uint32_t plSecureStream::Read(uint32_t bytes, void* buffer)
 {
-    if (fBufferedStream)
-    {
+    if (fBufferedStream) {
         uint32_t numRead = fRAMStream->Read(bytes, buffer);
         fPosition = fRAMStream->GetPosition();
         return numRead;
@@ -443,10 +435,9 @@ uint32_t plSecureStream::Read(uint32_t bytes, void* buffer)
 
     // If the start position is in the middle of a chunk we need to rewind and
     // read that whole chunk in and decrypt it.
-    if (startChunkPos != 0)
-    {
+    if (startChunkPos != 0) {
         // Move to the start of this chunk
-        SetPosition(startPos-startChunkPos);
+        SetPosition(startPos - startChunkPos);
 
         // Read in the chunk and decrypt it
         char buf[kEncryptChunkSize];
@@ -456,36 +447,33 @@ uint32_t plSecureStream::Read(uint32_t bytes, void* buffer)
         // Copy the relevant portion to the output buffer
         memcpy(buffer, &buf[startChunkPos], startAmt);
 
-        SetPosition(startPos+totalNumRead);
+        SetPosition(startPos + totalNumRead);
     }
 
-    if (numMidChunks != 0)
-    {
-        uint32_t* bufferPos = (uint32_t*)(((char*)buffer)+startAmt);
-        for (int i = 0; i < numMidChunks; i++)
-        {
+    if (numMidChunks != 0) {
+        uint32_t* bufferPos = (uint32_t*)(((char*)buffer) + startAmt);
+
+        for (int i = 0; i < numMidChunks; i++) {
             // Decrypt chunk
             IDecipher(bufferPos, kEncryptChunkSize / sizeof(uint32_t));
             bufferPos += (kEncryptChunkSize / sizeof(uint32_t));
         }
     }
 
-    if (endAmt != 0)
-    {
+    if (endAmt != 0) {
         // Read in the final chunk and decrypt it
         char buf[kEncryptChunkSize];
-        SetPosition(startPos + startAmt + numMidChunks*kEncryptChunkSize);
+        SetPosition(startPos + startAmt + numMidChunks * kEncryptChunkSize);
         uint32_t numRead = IRead(kEncryptChunkSize, &buf);
         IDecipher((uint32_t*)&buf, kEncryptChunkSize / sizeof(uint32_t));
 
-        memcpy(((char*)buffer)+totalNumRead-endAmt, &buf, endAmt);
+        memcpy(((char*)buffer) + totalNumRead - endAmt, &buf, endAmt);
 
-        SetPosition(startPos+totalNumRead);
+        SetPosition(startPos + totalNumRead);
     }
 
     // If we read into the padding at the end, update the total read to not include that
-    if (totalNumRead > 0 && startPos + totalNumRead > fActualFileSize)
-    {
+    if (totalNumRead > 0 && startPos + totalNumRead > fActualFileSize) {
         totalNumRead -= (startPos + totalNumRead) - fActualFileSize;
         SetPosition(fActualFileSize);
     }
@@ -495,8 +483,7 @@ uint32_t plSecureStream::Read(uint32_t bytes, void* buffer)
 
 uint32_t plSecureStream::Write(uint32_t bytes, const void* buffer)
 {
-    if (fOpenMode != kOpenWrite)
-    {
+    if (fOpenMode != kOpenWrite) {
         hsAssert(0, "Trying to write to a read stream");
         return 0;
     }
@@ -508,8 +495,9 @@ bool plSecureStream::IWriteEncrypted(hsStream* sourceStream, const plFileName& o
 {
     hsUNIXStream outputStream;
 
-    if (!outputStream.Open(outputFile, "wb"))
+    if (!outputStream.Open(outputFile, "wb")) {
         return false;
+    }
 
     outputStream.Write(kMagicStringLen, kMagicString);
 
@@ -519,24 +507,24 @@ bool plSecureStream::IWriteEncrypted(hsStream* sourceStream, const plFileName& o
     // Write out all the full size encrypted blocks we can
     char buf[kEncryptChunkSize];
     uint32_t amtRead;
-    while ((amtRead = sourceStream->Read(kEncryptChunkSize, &buf)) == kEncryptChunkSize)
-    {
+
+    while ((amtRead = sourceStream->Read(kEncryptChunkSize, &buf)) == kEncryptChunkSize) {
         IEncipher((uint32_t*)&buf, kEncryptChunkSize / sizeof(uint32_t));
         outputStream.Write(kEncryptChunkSize, &buf);
     }
 
     // Pad with random data and write out the final partial block, if there is one
-    if (amtRead > 0)
-    {
+    if (amtRead > 0) {
         static bool seededRand = false;
-        if (!seededRand)
-        {
+
+        if (!seededRand) {
             seededRand = true;
             srand((unsigned int)time(nil));
         }
 
-        for (int i = amtRead; i < kEncryptChunkSize; i++)
+        for (int i = amtRead; i < kEncryptChunkSize; i++) {
             buf[i] = rand();
+        }
 
         IEncipher((uint32_t*)&buf, kEncryptChunkSize / sizeof(uint32_t));
 
@@ -557,15 +545,17 @@ bool plSecureStream::IWriteEncrypted(hsStream* sourceStream, const plFileName& o
 bool plSecureStream::FileEncrypt(const plFileName& fileName, uint32_t* key /* = nil */)
 {
     hsUNIXStream sIn;
-    if (!sIn.Open(fileName))
+
+    if (!sIn.Open(fileName)) {
         return false;
+    }
 
     // Don't double encrypt any files
-    if (ICheckMagicString(sIn.GetFILE()))
-    {
+    if (ICheckMagicString(sIn.GetFILE())) {
         sIn.Close();
         return true;
     }
+
     sIn.Rewind();
 
     plSecureStream sOut(false, key);
@@ -574,8 +564,7 @@ bool plSecureStream::FileEncrypt(const plFileName& fileName, uint32_t* key /* = 
     sIn.Close();
     sOut.Close();
 
-    if (wroteEncrypted)
-    {
+    if (wroteEncrypted) {
         plFileSystem::Unlink(fileName);
         plFileSystem::Move("crypt.dat", fileName);
     }
@@ -586,20 +575,21 @@ bool plSecureStream::FileEncrypt(const plFileName& fileName, uint32_t* key /* = 
 bool plSecureStream::FileDecrypt(const plFileName& fileName, uint32_t* key /* = nil */)
 {
     plSecureStream sIn(false, key);
-    if (!sIn.Open(fileName))
+
+    if (!sIn.Open(fileName)) {
         return false;
+    }
 
     hsUNIXStream sOut;
-    if (!sOut.Open("crypt.dat", "wb"))
-    {
+
+    if (!sOut.Open("crypt.dat", "wb")) {
         sIn.Close();
         return false;
     }
 
     char buf[1024];
 
-    while (!sIn.AtEnd())
-    {
+    while (!sIn.AtEnd()) {
         uint32_t numRead = sIn.Read(sizeof(buf), buf);
         sOut.Write(numRead, buf);
     }
@@ -615,7 +605,7 @@ bool plSecureStream::FileDecrypt(const plFileName& fileName, uint32_t* key /* = 
 
 bool plSecureStream::ICheckMagicString(hsStream* s)
 {
-    char magicString[kMagicStringLen+1];
+    char magicString[kMagicStringLen + 1];
     s->Read(kMagicStringLen, &magicString);
     magicString[kMagicStringLen] = '\0';
     return (strcmp(magicString, kMagicString) == 0);
@@ -623,7 +613,7 @@ bool plSecureStream::ICheckMagicString(hsStream* s)
 
 bool plSecureStream::ICheckMagicString(hsFD fp)
 {
-    char magicString[kMagicStringLen+1];
+    char magicString[kMagicStringLen + 1];
 #ifdef HS_BUILD_FOR_WIN32
     DWORD numread;
     ReadFile(fp, &magicString, kMagicStringLen, &numread, NULL);
@@ -640,18 +630,19 @@ bool plSecureStream::IsSecureFile(const plFileName& fileName)
 
 #if HS_BUILD_FOR_WIN32
     fp = CreateFileW(fileName.AsString().ToWchar(),
-        GENERIC_READ,   // open for reading
-        0,              // no one can open the file until we're done
-        NULL,           // default security
-        OPEN_EXISTING,  // only open existing files (no creation)
-        FILE_ATTRIBUTE_NORMAL,  // normal file attributes
-        NULL);          // no template
+                     GENERIC_READ,   // open for reading
+                     0,              // no one can open the file until we're done
+                     NULL,           // default security
+                     OPEN_EXISTING,  // only open existing files (no creation)
+                     FILE_ATTRIBUTE_NORMAL,  // normal file attributes
+                     NULL);          // no template
 #elif HS_BUILD_FOR_UNIX
     fp = plFileSystem::Open(fileName, "rb");
 #endif
 
-    if (fp == INVALID_HANDLE_VALUE)
+    if (fp == INVALID_HANDLE_VALUE) {
         return false;
+    }
 
     bool isEncrypted = ICheckMagicString(fp);
 
@@ -675,13 +666,17 @@ hsStream* plSecureStream::OpenSecureFile(const plFileName& fileName, const uint3
     bool isEncrypted = IsSecureFile(fileName);
 
     hsStream* s = nil;
-    if (isEncrypted)
-        s = new plSecureStream(deleteOnExit, key);
-    else if (!requireEncryption) // If this isn't an external release, let them use unencrypted data
-        s = new hsUNIXStream;
 
-    if (s)
+    if (isEncrypted) {
+        s = new plSecureStream(deleteOnExit, key);
+    } else if (!requireEncryption) { // If this isn't an external release, let them use unencrypted data
+        s = new hsUNIXStream;
+    }
+
+    if (s) {
         s->Open(fileName, "rb");
+    }
+
     return s;
 }
 
@@ -705,8 +700,7 @@ bool plSecureStream::GetSecureEncryptionKey(const plFileName& filename, uint32_t
     // looks for an encryption key file in the same directory, and reads it
     plFileName keyFile = plFileName::Join(filename.StripFileName(), kKeyFilename);
 
-    if (plFileInfo(keyFile).Exists())
-    {
+    if (plFileInfo(keyFile).Exists()) {
         // file exists, read from it
         hsUNIXStream file;
         file.Open(keyFile, "rb");

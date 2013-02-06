@@ -60,13 +60,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 namespace pnUtilsExe {
 
-uint32_t TimeGetTickCount () {
+uint32_t TimeGetTickCount()
+{
 #if HS_BUILD_FOR_WIN32
     return GetTickCount();
 #else
     struct timeval tv;
-    if (gettimeofday(&tv, NULL) != 0)
+
+    if (gettimeofday(&tv, NULL) != 0) {
         return 0;
+    }
 
     return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 #endif
@@ -85,7 +88,8 @@ uint32_t TimeGetTickCount () {
 static uint32_t s_adjustment;
 
 //===========================================================================
-static void InitializeAdjustment () {
+static void InitializeAdjustment()
+{
     ASSERT(!s_adjustment);
     uint32_t currTime  = TimeGetTickCount();
     uint32_t startBits = (currTime & 0x80) ? 0x7fff0000 : 0xffff0000;
@@ -95,9 +99,11 @@ static void InitializeAdjustment () {
 }
 
 //===========================================================================
-AUTO_INIT_FUNC(AutoInitializeAdjustment) {
-    if (!s_adjustment)
+AUTO_INIT_FUNC(AutoInitializeAdjustment)
+{
+    if (!s_adjustment) {
         InitializeAdjustment();
+    }
 }
 
 } using namespace pnUtilsExe;
@@ -109,22 +115,26 @@ AUTO_INIT_FUNC(AutoInitializeAdjustment) {
 *
 ***/
 
-uint32_t TimeGetSecondsSince2001Utc () {
+uint32_t TimeGetSecondsSince2001Utc()
+{
     uint64_t time    = TimeGetTime();
     uint32_t seconds = (uint32_t)((time - kTime1601To2001) / kTimeIntervalsPerSecond);
     return seconds;
 }
 
-uint64_t TimeGetTime () {
+uint64_t TimeGetTime()
+{
 #ifdef HS_BUILD_FOR_WIN32
     uint64_t time;
     static_assert(sizeof(uint64_t) == sizeof(FILETIME), "FILETIME is not a uint64");
-    GetSystemTimeAsFileTime((FILETIME *) &time);
+    GetSystemTimeAsFileTime((FILETIME*) &time);
     return time;
 #else
     struct timespec ts;
-    if (clock_gettime(CLOCK_MONOTONIC, &ts))
+
+    if (clock_gettime(CLOCK_MONOTONIC, &ts)) {
         return 0;
+    }
 
     long long time = ts.tv_sec * 1000000000LL + ts.tv_nsec;
 
@@ -132,11 +142,15 @@ uint64_t TimeGetTime () {
 #endif
 }
 
-uint32_t TimeGetMs () {
+uint32_t TimeGetMs()
+{
 #ifdef HS_DEBUGGING
+
     // For debug builds, return an adjusted timer value
-    if (!s_adjustment)
+    if (!s_adjustment) {
         InitializeAdjustment();
+    }
+
     return TimeGetTickCount() + s_adjustment;
 #else
     // For release builds, just return the operating system's timer

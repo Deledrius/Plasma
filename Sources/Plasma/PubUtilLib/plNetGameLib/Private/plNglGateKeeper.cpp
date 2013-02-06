@@ -42,53 +42,54 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plNetGateKeeperLib/Private/plNglGateKeeper.cpp
-*   
+*
 ***/
 
 #include "../Pch.h"
 #pragma hdrstop
 
-namespace Ngl { namespace GateKeeper {
+namespace Ngl {
+namespace GateKeeper {
 
 /*****************************************************************************
 *
 *   Private
 *
 ***/
-    
+
 struct CliGkConn : AtomicRef {
-    CliGkConn ();
-    ~CliGkConn ();
+    CliGkConn();
+    ~CliGkConn();
 
     // Reconnection
-    AsyncTimer *        reconnectTimer;
+    AsyncTimer*         reconnectTimer;
     unsigned            reconnectStartMs;
 
     // Ping
-    AsyncTimer *        pingTimer;
+    AsyncTimer*         pingTimer;
     unsigned            pingSendTimeMs;
     unsigned            lastHeardTimeMs;
 
     // This function should be called during object construction
     // to initiate connection attempts to the remote host whenever
     // the socket is disconnected.
-    void AutoReconnect ();
-    bool AutoReconnectEnabled ();
-    void StopAutoReconnect (); // call before destruction
-    void StartAutoReconnect ();
-    void TimerReconnect ();
+    void AutoReconnect();
+    bool AutoReconnectEnabled();
+    void StopAutoReconnect();  // call before destruction
+    void StartAutoReconnect();
+    void TimerReconnect();
 
     // ping
-    void AutoPing ();
-    void StopAutoPing ();
-    void TimerPing ();
+    void AutoPing();
+    void StopAutoPing();
+    void TimerPing();
 
-    void Send (const uintptr_t fields[], unsigned count);
+    void Send(const uintptr_t fields[], unsigned count);
 
     CCritSect       critsect;
     LINK(CliGkConn) link;
     AsyncSocket     sock;
-    NetCli *        cli;
+    NetCli*         cli;
     char            name[MAX_PATH];
     plNetAddress    addr;
     plUUID          token;
@@ -104,22 +105,22 @@ struct CliGkConn : AtomicRef {
 //============================================================================
 struct PingRequestTrans : NetGateKeeperTrans {
     FNetCliGateKeeperPingRequestCallback    m_callback;
-    void *                                  m_param;
+    void*                                   m_param;
     unsigned                                m_pingAtMs;
     unsigned                                m_replyAtMs;
     ARRAY(uint8_t)                             m_payload;
-    
-    PingRequestTrans (
+
+    PingRequestTrans(
         FNetCliGateKeeperPingRequestCallback    callback,
-        void *                                  param,
+        void*                                   param,
         unsigned                                pingAtMs,
         unsigned                                payloadBytes,
-        const void *                            payload
+        const void*                             payload
     );
 
-    bool Send ();
-    void Post ();
-    bool Recv (
+    bool Send();
+    void Post();
+    bool Recv(
         const uint8_t  msg[],
         unsigned    bytes
     );
@@ -130,19 +131,19 @@ struct PingRequestTrans : NetGateKeeperTrans {
 //============================================================================
 struct FileSrvIpAddressRequestTrans : NetGateKeeperTrans {
     FNetCliGateKeeperFileSrvIpAddressRequestCallback    m_callback;
-    void *                                              m_param;
+    void*                                               m_param;
     wchar_t                                               m_addr[64];
     bool                                                m_isPatcher;
-    
-    FileSrvIpAddressRequestTrans (
+
+    FileSrvIpAddressRequestTrans(
         FNetCliGateKeeperFileSrvIpAddressRequestCallback    callback,
-        void *                                              param,
+        void*                                               param,
         bool                                                isPatcher
     );
 
-    bool Send ();
-    void Post ();
-    bool Recv (
+    bool Send();
+    void Post();
+    bool Recv(
         const uint8_t  msg[],
         unsigned    bytes
     );
@@ -153,17 +154,17 @@ struct FileSrvIpAddressRequestTrans : NetGateKeeperTrans {
 //============================================================================
 struct AuthSrvIpAddressRequestTrans : NetGateKeeperTrans {
     FNetCliGateKeeperAuthSrvIpAddressRequestCallback    m_callback;
-    void *                                              m_param;
+    void*                                               m_param;
     wchar_t                                               m_addr[64];
-    
-    AuthSrvIpAddressRequestTrans (
+
+    AuthSrvIpAddressRequestTrans(
         FNetCliGateKeeperAuthSrvIpAddressRequestCallback    callback,
-        void *                                              param
+        void*                                               param
     );
 
-    bool Send ();
-    void Post ();
-    bool Recv (
+    bool Send();
+    void Post();
+    bool Recv(
         const uint8_t  msg[],
         unsigned    bytes
     );
@@ -186,7 +187,7 @@ enum {
 static bool                         s_running;
 static CCritSect                    s_critsect;
 static LISTDECL(CliGkConn, link)    s_conns;
-static CliGkConn *                  s_active;
+static CliGkConn*                   s_active;
 
 static long                         s_perf[kNumPerf];
 
@@ -199,24 +200,30 @@ static long                         s_perf[kNumPerf];
 ***/
 
 //===========================================================================
-static unsigned GetNonZeroTimeMs () {
-    if (unsigned ms = TimeGetMs())
+static unsigned GetNonZeroTimeMs()
+{
+    if (unsigned ms = TimeGetMs()) {
         return ms;
+    }
+
     return 1;
 }
 
 //============================================================================
-static CliGkConn * GetConnIncRef_CS (const char tag[]) {
-    if (CliGkConn * conn = s_active) {
+static CliGkConn* GetConnIncRef_CS(const char tag[])
+{
+    if (CliGkConn* conn = s_active) {
         conn->IncRef(tag);
         return conn;
     }
+
     return nil;
 }
 
 //============================================================================
-static CliGkConn * GetConnIncRef (const char tag[]) {
-    CliGkConn * conn;
+static CliGkConn* GetConnIncRef(const char tag[])
+{
+    CliGkConn* conn;
     s_critsect.Enter();
     {
         conn = GetConnIncRef_CS(tag);
@@ -226,7 +233,8 @@ static CliGkConn * GetConnIncRef (const char tag[]) {
 }
 
 //============================================================================
-static void UnlinkAndAbandonConn_CS (CliGkConn * conn) {
+static void UnlinkAndAbandonConn_CS(CliGkConn* conn)
+{
     s_conns.Unlink(conn);
     conn->abandoned = true;
 
@@ -235,66 +243,69 @@ static void UnlinkAndAbandonConn_CS (CliGkConn * conn) {
     if (conn->cancelId) {
         AsyncSocketConnectCancel(nil, conn->cancelId);
         conn->cancelId  = 0;
-    }
-    else if (conn->sock) {
+    } else if (conn->sock) {
         AsyncSocketDisconnect(conn->sock, true);
-    }
-    else {
+    } else {
         conn->DecRef("Lifetime");
     }
 }
 
 //============================================================================
-static void SendClientRegisterRequest (CliGkConn * conn) {
-/*    const uintptr_t msg[] = {
-        kCli2GateKeeper_ClientRegisterRequest,
-        BuildId(),
-    };
+static void SendClientRegisterRequest(CliGkConn* conn)
+{
+    /*    const uintptr_t msg[] = {
+            kCli2GateKeeper_ClientRegisterRequest,
+            BuildId(),
+        };
 
-    conn->Send(msg, arrsize(msg));*/
+        conn->Send(msg, arrsize(msg));*/
 }
 
 //============================================================================
-static bool ConnEncrypt (ENetError error, void * param) {
-    CliGkConn * conn = (CliGkConn *) param;
-        
+static bool ConnEncrypt(ENetError error, void* param)
+{
+    CliGkConn* conn = (CliGkConn*) param;
+
     if (IS_NET_SUCCESS(error)) {
 
         //SendClientRegisterRequest(conn);
 
-        if (!s_perf[kPingDisabled])
+        if (!s_perf[kPingDisabled]) {
             conn->AutoPing();
+        }
 
         s_critsect.Enter();
         {
             SWAP(s_active, conn);
         }
         s_critsect.Leave();
-            
-    //  AuthConnectedNotifyTrans * trans = new AuthConnectedNotifyTrans;
-    //  NetTransSend(trans);
+
+        //  AuthConnectedNotifyTrans * trans = new AuthConnectedNotifyTrans;
+        //  NetTransSend(trans);
     }
 
     return IS_NET_SUCCESS(error);
 }
 
 //============================================================================
-static void NotifyConnSocketConnect (CliGkConn * conn) {
+static void NotifyConnSocketConnect(CliGkConn* conn)
+{
 
     conn->TransferRef("Connecting", "Connected");
     conn->cli = NetCliConnectAccept(
-        conn->sock,
-        kNetProtocolCli2GateKeeper,
-        false,
-        ConnEncrypt,
-        0,
-        nil,
-        conn
-    );
+                    conn->sock,
+                    kNetProtocolCli2GateKeeper,
+                    false,
+                    ConnEncrypt,
+                    0,
+                    nil,
+                    conn
+                );
 }
 
 //============================================================================
-static void CheckedReconnect (CliGkConn * conn, ENetError error) {
+static void CheckedReconnect(CliGkConn* conn, ENetError error)
+{
 
     unsigned disconnectedMs = GetNonZeroTimeMs() - conn->lastHeardTimeMs;
 
@@ -305,45 +316,52 @@ static void CheckedReconnect (CliGkConn * conn, ENetError error) {
         // conn is dead.
         conn->DecRef("Lifetime");
         ReportNetError(kNetProtocolCli2GateKeeper, error);
-    }
-    else {
+    } else {
         if (conn->token != kNilUuid)
             // previously encrypted; reconnect quickly
+        {
             conn->reconnectStartMs = GetNonZeroTimeMs() + 500;
-        else
+        } else
             // never encrypted; reconnect slowly
+        {
             conn->reconnectStartMs = GetNonZeroTimeMs() + kMaxReconnectIntervalMs;
+        }
 
         // clean up the socket and start reconnect
-        if (conn->cli)
+        if (conn->cli) {
             NetCliDelete(conn->cli, true);
+        }
+
         conn->cli = nil;
         conn->sock = nil;
-        
+
         conn->StartAutoReconnect();
     }
 }
 
 //============================================================================
-static void NotifyConnSocketConnectFailed (CliGkConn * conn) {
+static void NotifyConnSocketConnectFailed(CliGkConn* conn)
+{
 
     s_critsect.Enter();
     {
         conn->cancelId = 0;
         s_conns.Unlink(conn);
 
-        if (conn == s_active)
+        if (conn == s_active) {
             s_active = nil;
+        }
     }
     s_critsect.Leave();
-    
+
     CheckedReconnect(conn, kNetErrConnectFailed);
-    
+
     conn->DecRef("Connecting");
 }
 
 //============================================================================
-static void NotifyConnSocketDisconnect (CliGkConn * conn) {
+static void NotifyConnSocketDisconnect(CliGkConn* conn)
+{
 
     conn->StopAutoPing();
 
@@ -351,9 +369,10 @@ static void NotifyConnSocketDisconnect (CliGkConn * conn) {
     {
         conn->cancelId = 0;
         s_conns.Unlink(conn);
-            
-        if (conn == s_active)
+
+        if (conn == s_active) {
             s_active = nil;
+        }
     }
     s_critsect.Leave();
 
@@ -364,7 +383,8 @@ static void NotifyConnSocketDisconnect (CliGkConn * conn) {
 }
 
 //============================================================================
-static bool NotifyConnSocketRead (CliGkConn * conn, AsyncNotifySocketRead * read) {
+static bool NotifyConnSocketRead(CliGkConn* conn, AsyncNotifySocketRead* read)
+{
     // TODO: Only dispatch messages from the active auth server
     conn->lastHeardTimeMs = GetNonZeroTimeMs();
     bool result = NetCliDispatch(conn->cli, read->buffer, read->bytes, conn);
@@ -373,72 +393,79 @@ static bool NotifyConnSocketRead (CliGkConn * conn, AsyncNotifySocketRead * read
 }
 
 //============================================================================
-static bool SocketNotifyCallback (
+static bool SocketNotifyCallback(
     AsyncSocket         sock,
     EAsyncNotifySocket  code,
-    AsyncNotifySocket * notify,
-    void **             userState
-) {
+    AsyncNotifySocket* notify,
+    void**              userState
+)
+{
     bool result = true;
-    CliGkConn * conn;
+    CliGkConn* conn;
 
     switch (code) {
-        case kNotifySocketConnectSuccess:
-            conn = (CliGkConn *) notify->param;
-            *userState = conn;
-            bool abandoned;
-            s_critsect.Enter();
-            {
-                conn->sock      = sock;
-                conn->cancelId  = 0;
-                abandoned       = conn->abandoned;
-            }
-            s_critsect.Leave();
-            if (abandoned)
-                AsyncSocketDisconnect(sock, true);
-            else
-                NotifyConnSocketConnect(conn);
+    case kNotifySocketConnectSuccess:
+        conn = (CliGkConn*) notify->param;
+        *userState = conn;
+        bool abandoned;
+        s_critsect.Enter();
+        {
+            conn->sock      = sock;
+            conn->cancelId  = 0;
+            abandoned       = conn->abandoned;
+        }
+        s_critsect.Leave();
+
+        if (abandoned) {
+            AsyncSocketDisconnect(sock, true);
+        } else {
+            NotifyConnSocketConnect(conn);
+        }
+
         break;
 
-        case kNotifySocketConnectFailed:
-            conn = (CliGkConn *) notify->param;
-            NotifyConnSocketConnectFailed(conn);
+    case kNotifySocketConnectFailed:
+        conn = (CliGkConn*) notify->param;
+        NotifyConnSocketConnectFailed(conn);
         break;
 
-        case kNotifySocketDisconnect:
-            conn = (CliGkConn *) *userState;
-            NotifyConnSocketDisconnect(conn);
+    case kNotifySocketDisconnect:
+        conn = (CliGkConn*) *userState;
+        NotifyConnSocketDisconnect(conn);
         break;
 
-        case kNotifySocketRead:
-            conn = (CliGkConn *) *userState;
-            result = NotifyConnSocketRead(conn, (AsyncNotifySocketRead *) notify);
+    case kNotifySocketRead:
+        conn = (CliGkConn*) *userState;
+        result = NotifyConnSocketRead(conn, (AsyncNotifySocketRead*) notify);
         break;
     }
-    
+
     return result;
 }
 
 //============================================================================
-static void Connect (
-    CliGkConn * conn
-) {
+static void Connect(
+    CliGkConn* conn
+)
+{
     ASSERT(s_running);
 
     conn->pingSendTimeMs = 0;
 
     s_critsect.Enter();
     {
-        while (CliGkConn * oldConn = s_conns.Head()) {
-            if (oldConn != conn)
+        while (CliGkConn* oldConn = s_conns.Head()) {
+            if (oldConn != conn) {
                 UnlinkAndAbandonConn_CS(oldConn);
-            else
+            } else {
                 s_conns.Unlink(oldConn);
+            }
         }
+
         s_conns.Link(conn);
     }
     s_critsect.Leave();
-    
+
     Cli2GateKeeper_Connect connect;
     connect.hdr.connType        = kConnTypeCliToGateKeeper;
     connect.hdr.hdrBytes        = sizeof(connect.hdr);
@@ -462,13 +489,14 @@ static void Connect (
 }
 
 //============================================================================
-static void Connect (
+static void Connect(
     const char          name[],
     const plNetAddress& addr
-) {
+)
+{
     ASSERT(s_running);
-    
-    CliGkConn * conn        = new CliGkConn;
+
+    CliGkConn* conn        = new CliGkConn;
     conn->addr              = addr;
     conn->seq               = ConnNextSequence();
     conn->lastHeardTimeMs   = GetNonZeroTimeMs();   // used in connect timeout, and ping timeout
@@ -479,12 +507,13 @@ static void Connect (
 }
 
 //============================================================================
-static void AsyncLookupCallback (
-    void *              param,
+static void AsyncLookupCallback(
+    void*               param,
     const char          name[],
     unsigned            addrCount,
     const plNetAddress  addrs[]
-) {
+)
+{
     if (!addrCount) {
         ReportNetError(kNetProtocolCli2GateKeeper, kNetErrNameLookupFailed);
         return;
@@ -505,26 +534,29 @@ static void AsyncLookupCallback (
 ***/
 
 //===========================================================================
-static unsigned CliGkConnTimerDestroyed (void * param) {
-    CliGkConn * conn = (CliGkConn *) param;
+static unsigned CliGkConnTimerDestroyed(void* param)
+{
+    CliGkConn* conn = (CliGkConn*) param;
     conn->DecRef("TimerDestroyed");
     return kAsyncTimeInfinite;
 }
 
 //===========================================================================
-static unsigned CliGkConnReconnectTimerProc (void * param) {
-    ((CliGkConn *) param)->TimerReconnect();
+static unsigned CliGkConnReconnectTimerProc(void* param)
+{
+    ((CliGkConn*) param)->TimerReconnect();
     return kAsyncTimeInfinite;
 }
 
 //===========================================================================
-static unsigned CliGkConnPingTimerProc (void * param) {
-    ((CliGkConn *) param)->TimerPing();
+static unsigned CliGkConnPingTimerProc(void* param)
+{
+    ((CliGkConn*) param)->TimerPing();
     return kPingIntervalMs;
 }
 
 //============================================================================
-CliGkConn::CliGkConn ()
+CliGkConn::CliGkConn()
     : reconnectTimer(nil), reconnectStartMs(0)
     , pingTimer(nil), pingSendTimeMs(0), lastHeardTimeMs(0)
     , sock(nil), cli(nil), seq(0), serverChallenge(0)
@@ -536,23 +568,26 @@ CliGkConn::CliGkConn ()
 }
 
 //============================================================================
-CliGkConn::~CliGkConn () {
-    if (cli)
+CliGkConn::~CliGkConn()
+{
+    if (cli) {
         NetCliDelete(cli, true);
+    }
+
     AtomicAdd(&s_perf[kPerfConnCount], -1);
 }
 
 //===========================================================================
-void CliGkConn::TimerReconnect () {
+void CliGkConn::TimerReconnect()
+{
     ASSERT(!sock);
     ASSERT(!cancelId);
-    
+
     if (!s_running) {
         s_critsect.Enter();
         UnlinkAndAbandonConn_CS(this);
         s_critsect.Leave();
-    }
-    else {
+    } else {
         IncRef("Connecting");
 
         // Remember the time we started the reconnect attempt, guarding against
@@ -566,22 +601,30 @@ void CliGkConn::TimerReconnect () {
 
 //===========================================================================
 // This function is called when after a disconnect to start a new connection
-void CliGkConn::StartAutoReconnect () {
+void CliGkConn::StartAutoReconnect()
+{
     critsect.Enter();
+
     if (reconnectTimer && !s_perf[kAutoReconnectDisabled]) {
         // Make reconnect attempts at regular intervals. If the last attempt
         // took more than the specified max interval time then reconnect
         // immediately; otherwise wait until the time interval is up again
         // then reconnect.
         unsigned remainingMs = 0;
+
         if (reconnectStartMs) {
             remainingMs = reconnectStartMs - GetNonZeroTimeMs();
-            if ((signed)remainingMs < 0)
+
+            if ((signed)remainingMs < 0) {
                 remainingMs = 0;
+            }
+
             LogMsg(kLogPerf, L"GateKeeper auto-reconnecting in %u ms", remainingMs);
         }
+
         AsyncTimerUpdate(reconnectTimer, remainingMs);
     }
+
     critsect.Leave();
 }
 
@@ -589,8 +632,9 @@ void CliGkConn::StartAutoReconnect () {
 // This function should be called during object construction
 // to initiate connection attempts to the remote host whenever
 // the socket is disconnected.
-void CliGkConn::AutoReconnect () {
-        
+void CliGkConn::AutoReconnect()
+{
+
     ASSERT(!reconnectTimer);
     IncRef("ReconnectTimer");
     critsect.Enter();
@@ -606,10 +650,11 @@ void CliGkConn::AutoReconnect () {
 }
 
 //============================================================================
-void CliGkConn::StopAutoReconnect () {
+void CliGkConn::StopAutoReconnect()
+{
     critsect.Enter();
     {
-        if (AsyncTimer * timer = reconnectTimer) {
+        if (AsyncTimer* timer = reconnectTimer) {
             reconnectTimer = nil;
             AsyncTimerDeleteCallback(timer, CliGkConnTimerDestroyed);
         }
@@ -618,13 +663,15 @@ void CliGkConn::StopAutoReconnect () {
 }
 
 //============================================================================
-bool CliGkConn::AutoReconnectEnabled () {
-    
+bool CliGkConn::AutoReconnectEnabled()
+{
+
     return (reconnectTimer != nil) && !s_perf[kAutoReconnectDisabled];
 }
 
 //============================================================================
-void CliGkConn::AutoPing () {
+void CliGkConn::AutoPing()
+{
     ASSERT(!pingTimer);
     IncRef("PingTimer");
     critsect.Enter();
@@ -640,7 +687,8 @@ void CliGkConn::AutoPing () {
 }
 
 //============================================================================
-void CliGkConn::StopAutoPing () {
+void CliGkConn::StopAutoPing()
+{
     critsect.Enter();
     {
         if (pingTimer) {
@@ -652,7 +700,8 @@ void CliGkConn::StopAutoPing () {
 }
 
 //============================================================================
-void CliGkConn::TimerPing () {
+void CliGkConn::TimerPing()
+{
     // Send a ping request
     pingSendTimeMs = GetNonZeroTimeMs();
 
@@ -668,7 +717,8 @@ void CliGkConn::TimerPing () {
 }
 
 //============================================================================
-void CliGkConn::Send (const uintptr_t fields[], unsigned count) {
+void CliGkConn::Send(const uintptr_t fields[], unsigned count)
+{
     critsect.Enter();
     {
         NetCliSend(cli, fields, count);
@@ -685,44 +735,50 @@ void CliGkConn::Send (const uintptr_t fields[], unsigned count) {
 ***/
 
 //============================================================================
-static bool Recv_PingReply (
+static bool Recv_PingReply(
     const uint8_t      msg[],
     unsigned        bytes,
     void *
-) {
-    const GateKeeper2Cli_PingReply & reply = *(const GateKeeper2Cli_PingReply *)msg;
+)
+{
+    const GateKeeper2Cli_PingReply& reply = *(const GateKeeper2Cli_PingReply*)msg;
 
-    if (reply.transId)
+    if (reply.transId) {
         NetTransRecv(reply.transId, msg, bytes);
+    }
 
     return true;
 }
 
 
 //============================================================================
-static bool Recv_FileSrvIpAddressReply (
+static bool Recv_FileSrvIpAddressReply(
     const uint8_t      msg[],
     unsigned        bytes,
     void *
-) {
-    const GateKeeper2Cli_FileSrvIpAddressReply & reply = *(const GateKeeper2Cli_FileSrvIpAddressReply *)msg;
+)
+{
+    const GateKeeper2Cli_FileSrvIpAddressReply& reply = *(const GateKeeper2Cli_FileSrvIpAddressReply*)msg;
 
-    if (reply.transId)
+    if (reply.transId) {
         NetTransRecv(reply.transId, msg, bytes);
+    }
 
     return true;
 }
 
 //============================================================================
-static bool Recv_AuthSrvIpAddressReply (
+static bool Recv_AuthSrvIpAddressReply(
     const uint8_t      msg[],
     unsigned        bytes,
     void *
-) {
-    const GateKeeper2Cli_AuthSrvIpAddressReply & reply = *(const GateKeeper2Cli_AuthSrvIpAddressReply *)msg;
+)
+{
+    const GateKeeper2Cli_AuthSrvIpAddressReply& reply = *(const GateKeeper2Cli_AuthSrvIpAddressReply*)msg;
 
-    if (reply.transId)
+    if (reply.transId) {
         NetTransRecv(reply.transId, msg, bytes);
+    }
 
     return true;
 }
@@ -758,41 +814,44 @@ static NetMsgInitRecv s_recv[] = {
 ***/
 
 //============================================================================
-PingRequestTrans::PingRequestTrans (
+PingRequestTrans::PingRequestTrans(
     FNetCliGateKeeperPingRequestCallback    callback,
-    void *                          param,
+    void*                           param,
     unsigned                        pingAtMs,
     unsigned                        payloadBytes,
-    const void *                    payload
+    const void*                     payload
 ) : NetGateKeeperTrans(kPingRequestTrans)
-,   m_callback(callback)
-,   m_param(param)
-,   m_pingAtMs(pingAtMs)
+    ,   m_callback(callback)
+    ,   m_param(param)
+    ,   m_pingAtMs(pingAtMs)
 {
-    m_payload.Set((const uint8_t *)payload, payloadBytes);
+    m_payload.Set((const uint8_t*)payload, payloadBytes);
 }
 
 //============================================================================
-bool PingRequestTrans::Send () {
+bool PingRequestTrans::Send()
+{
 
-    if (!AcquireConn())
+    if (!AcquireConn()) {
         return false;
+    }
 
     const uintptr_t msg[] = {
         kCli2GateKeeper_PingRequest,
-                        m_pingAtMs,
-                        m_transId,
-                        m_payload.Count(),
+        m_pingAtMs,
+        m_transId,
+        m_payload.Count(),
         (uintptr_t)  m_payload.Ptr(),
     };
-    
+
     m_conn->Send(msg, arrsize(msg));
-    
+
     return true;
 }
 
 //============================================================================
-void PingRequestTrans::Post () {
+void PingRequestTrans::Post()
+{
 
     m_callback(
         m_result,
@@ -805,11 +864,12 @@ void PingRequestTrans::Post () {
 }
 
 //============================================================================
-bool PingRequestTrans::Recv (
+bool PingRequestTrans::Recv(
     const uint8_t  msg[],
     unsigned    bytes
-) {
-    const GateKeeper2Cli_PingReply & reply = *(const GateKeeper2Cli_PingReply *)msg;
+)
+{
+    const GateKeeper2Cli_PingReply& reply = *(const GateKeeper2Cli_PingReply*)msg;
 
     m_payload.Set(reply.payload, reply.payloadBytes);
     m_replyAtMs     = TimeGetMs();
@@ -827,37 +887,40 @@ bool PingRequestTrans::Recv (
 ***/
 
 //============================================================================
-FileSrvIpAddressRequestTrans::FileSrvIpAddressRequestTrans (
+FileSrvIpAddressRequestTrans::FileSrvIpAddressRequestTrans(
     FNetCliGateKeeperFileSrvIpAddressRequestCallback    callback,
-    void *                                              param,
+    void*                                               param,
     bool                                                isPatcher
 ) : NetGateKeeperTrans(kGkFileSrvIpAddressRequestTrans)
-,   m_callback(callback)
-,   m_param(param)
-,   m_isPatcher(isPatcher)
+    ,   m_callback(callback)
+    ,   m_param(param)
+    ,   m_isPatcher(isPatcher)
 {
 }
 
 //============================================================================
-bool FileSrvIpAddressRequestTrans::Send () {
+bool FileSrvIpAddressRequestTrans::Send()
+{
 
-    if (!AcquireConn())
+    if (!AcquireConn()) {
         return false;
+    }
 
-    
+
     const uintptr_t msg[] = {
         kCli2GateKeeper_FileSrvIpAddressRequest,
-                        m_transId,
-                        (uintptr_t)(m_isPatcher == true ? 1 : 0)
+        m_transId,
+        (uintptr_t)(m_isPatcher == true ? 1 : 0)
     };
-    
+
     m_conn->Send(msg, arrsize(msg));
-    
+
     return true;
 }
 
 //============================================================================
-void FileSrvIpAddressRequestTrans::Post () {
+void FileSrvIpAddressRequestTrans::Post()
+{
 
     m_callback(
         m_result,
@@ -867,13 +930,14 @@ void FileSrvIpAddressRequestTrans::Post () {
 }
 
 //============================================================================
-bool FileSrvIpAddressRequestTrans::Recv (
+bool FileSrvIpAddressRequestTrans::Recv(
     const uint8_t  msg[],
     unsigned    bytes
-) {
-    const GateKeeper2Cli_FileSrvIpAddressReply & reply = *(const GateKeeper2Cli_FileSrvIpAddressReply *)msg;
+)
+{
+    const GateKeeper2Cli_FileSrvIpAddressReply& reply = *(const GateKeeper2Cli_FileSrvIpAddressReply*)msg;
 
-    
+
     m_result        = kNetSuccess;
     m_state         = kTransStateComplete;
     StrCopy(m_addr, reply.address, 64);
@@ -889,33 +953,36 @@ bool FileSrvIpAddressRequestTrans::Recv (
 ***/
 
 //============================================================================
-AuthSrvIpAddressRequestTrans::AuthSrvIpAddressRequestTrans (
+AuthSrvIpAddressRequestTrans::AuthSrvIpAddressRequestTrans(
     FNetCliGateKeeperFileSrvIpAddressRequestCallback    callback,
-    void *                                              param
+    void*                                               param
 ) : NetGateKeeperTrans(kGkAuthSrvIpAddressRequestTrans)
-,   m_callback(callback)
-,   m_param(param)
+    ,   m_callback(callback)
+    ,   m_param(param)
 {
 }
 
 //============================================================================
-bool AuthSrvIpAddressRequestTrans::Send () {
+bool AuthSrvIpAddressRequestTrans::Send()
+{
 
-    if (!AcquireConn())
+    if (!AcquireConn()) {
         return false;
+    }
 
     const uintptr_t msg[] = {
         kCli2GateKeeper_AuthSrvIpAddressRequest,
-                        m_transId,
+        m_transId,
     };
-    
+
     m_conn->Send(msg, arrsize(msg));
-    
+
     return true;
 }
 
 //============================================================================
-void AuthSrvIpAddressRequestTrans::Post () {
+void AuthSrvIpAddressRequestTrans::Post()
+{
 
     m_callback(
         m_result,
@@ -925,11 +992,12 @@ void AuthSrvIpAddressRequestTrans::Post () {
 }
 
 //============================================================================
-bool AuthSrvIpAddressRequestTrans::Recv (
+bool AuthSrvIpAddressRequestTrans::Recv(
     const uint8_t  msg[],
     unsigned    bytes
-) {
-    const GateKeeper2Cli_AuthSrvIpAddressReply & reply = *(const GateKeeper2Cli_AuthSrvIpAddressReply *)msg;
+)
+{
+    const GateKeeper2Cli_AuthSrvIpAddressReply& reply = *(const GateKeeper2Cli_AuthSrvIpAddressReply*)msg;
 
     m_result        = kNetSuccess;
     m_state         = kTransStateComplete;
@@ -949,26 +1017,31 @@ bool AuthSrvIpAddressRequestTrans::Recv (
 ***/
 
 //============================================================================
-NetGateKeeperTrans::NetGateKeeperTrans (ETransType transType)
-:   NetTrans(kNetProtocolCli2GateKeeper, transType)
-,   m_conn(nil)
+NetGateKeeperTrans::NetGateKeeperTrans(ETransType transType)
+    :   NetTrans(kNetProtocolCli2GateKeeper, transType)
+    ,   m_conn(nil)
 {
 }
 
 //============================================================================
-NetGateKeeperTrans::~NetGateKeeperTrans () {
+NetGateKeeperTrans::~NetGateKeeperTrans()
+{
     ReleaseConn();
 }
 
 //============================================================================
-bool NetGateKeeperTrans::AcquireConn () {
-    if (!m_conn)
+bool NetGateKeeperTrans::AcquireConn()
+{
+    if (!m_conn) {
         m_conn = GetConnIncRef("AcquireConn");
+    }
+
     return m_conn != nil;
 }
 
 //============================================================================
-void NetGateKeeperTrans::ReleaseConn () {
+void NetGateKeeperTrans::ReleaseConn()
+{
     if (m_conn) {
         m_conn->DecRef("AcquireConn");
         m_conn = nil;
@@ -983,7 +1056,8 @@ void NetGateKeeperTrans::ReleaseConn () {
 ***/
 
 //============================================================================
-void GateKeeperInitialize () {
+void GateKeeperInitialize()
+{
     s_running = true;
     NetMsgProtocolRegister(
         kNetProtocolCli2GateKeeper,
@@ -997,13 +1071,14 @@ void GateKeeperInitialize () {
 }
 
 //============================================================================
-void GateKeeperDestroy (bool wait) {
+void GateKeeperDestroy(bool wait)
+{
     s_running = false;
 
     NetTransCancelByProtocol(
         kNetProtocolCli2GateKeeper,
         kNetErrRemoteShutdown
-    );    
+    );
     NetMsgProtocolDestroy(
         kNetProtocolCli2GateKeeper,
         false
@@ -1011,14 +1086,17 @@ void GateKeeperDestroy (bool wait) {
 
     s_critsect.Enter();
     {
-        while (CliGkConn * conn = s_conns.Head())
+        while (CliGkConn* conn = s_conns.Head()) {
             UnlinkAndAbandonConn_CS(conn);
+        }
+
         s_active = nil;
     }
     s_critsect.Leave();
 
-    if (!wait)
+    if (!wait) {
         return;
+    }
 
     while (s_perf[kPerfConnCount]) {
         NetTransUpdate();
@@ -1027,7 +1105,8 @@ void GateKeeperDestroy (bool wait) {
 }
 
 //============================================================================
-bool GateKeeperQueryConnected () {
+bool GateKeeperQueryConnected()
+{
 
     bool result;
     s_critsect.Enter();
@@ -1039,7 +1118,8 @@ bool GateKeeperQueryConnected () {
 }
 
 //============================================================================
-unsigned GateKeeperGetConnId () {
+unsigned GateKeeperGetConnId()
+{
     unsigned connId;
     s_critsect.Enter();
     connId = (s_active) ? s_active->seq : 0;
@@ -1058,17 +1138,20 @@ unsigned GateKeeperGetConnId () {
 ***/
 
 //============================================================================
-void NetCliGateKeeperStartConnect (
+void NetCliGateKeeperStartConnect(
     const char*   gateKeeperAddrList[],
     uint32_t      gateKeeperAddrCount
-) {
+)
+{
     gateKeeperAddrCount = min(gateKeeperAddrCount, 1);
 
     for (unsigned i = 0; i < gateKeeperAddrCount; ++i) {
         // Do we need to lookup the address?
         const char* name = gateKeeperAddrList[i];
+
         while (unsigned ch = *name) {
             ++name;
+
             if (!(isdigit(ch) || ch == L'.' || ch == L':')) {
                 AsyncCancelId cancelId;
                 AsyncAddressLookupName(
@@ -1081,6 +1164,7 @@ void NetCliGateKeeperStartConnect (
                 break;
             }
         }
+
         if (!name[0]) {
             plNetAddress addr(gateKeeperAddrList[i], kNetDefaultClientPort);
             Connect(gateKeeperAddrList[i], addr);
@@ -1089,28 +1173,32 @@ void NetCliGateKeeperStartConnect (
 }
 
 //============================================================================
-void NetCliGateKeeperDisconnect () {
+void NetCliGateKeeperDisconnect()
+{
     s_critsect.Enter();
     {
-        while (CliGkConn * conn = s_conns.Head())
+        while (CliGkConn* conn = s_conns.Head()) {
             UnlinkAndAbandonConn_CS(conn);
+        }
+
         s_active = nil;
     }
     s_critsect.Leave();
 }
 
 //============================================================================
-void NetCliGateKeeperPingRequest (
+void NetCliGateKeeperPingRequest(
     unsigned                                pingTimeMs,
     unsigned                                payloadBytes,
-    const void *                            payload,
+    const void*                             payload,
     FNetCliGateKeeperPingRequestCallback    callback,
-    void *                                  param
-) {
-    PingRequestTrans * trans = new PingRequestTrans(
+    void*                                   param
+)
+{
+    PingRequestTrans* trans = new PingRequestTrans(
         callback,
         param,
-        pingTimeMs, 
+        pingTimeMs,
         payloadBytes,
         payload
     );
@@ -1118,20 +1206,22 @@ void NetCliGateKeeperPingRequest (
 }
 
 //============================================================================
-void NetCliGateKeeperFileSrvIpAddressRequest (
+void NetCliGateKeeperFileSrvIpAddressRequest(
     FNetCliGateKeeperFileSrvIpAddressRequestCallback    callback,
-    void *                                              param,
+    void*                                               param,
     bool                                                isPatcher
-) {
-    FileSrvIpAddressRequestTrans * trans = new FileSrvIpAddressRequestTrans(callback, param, isPatcher);
+)
+{
+    FileSrvIpAddressRequestTrans* trans = new FileSrvIpAddressRequestTrans(callback, param, isPatcher);
     NetTransSend(trans);
 }
 
 //============================================================================
-void NetCliGateKeeperAuthSrvIpAddressRequest (
+void NetCliGateKeeperAuthSrvIpAddressRequest(
     FNetCliGateKeeperAuthSrvIpAddressRequestCallback    callback,
-    void *                                              param
-) {
-    AuthSrvIpAddressRequestTrans * trans = new AuthSrvIpAddressRequestTrans(callback, param);
+    void*                                               param
+)
+{
+    AuthSrvIpAddressRequestTrans* trans = new AuthSrvIpAddressRequestTrans(callback, param);
     NetTransSend(trans);
 }

@@ -112,7 +112,7 @@ pySceneObject::pySceneObject(pyKey& objkey, pyKey& selfkey)
     fNetForce = false;
 }
 
-pySceneObject::pySceneObject(plKey objkey,pyKey& selfkey)
+pySceneObject::pySceneObject(plKey objkey, pyKey& selfkey)
 {
     // make sure these are created
     fDraw = cyDraw::New();
@@ -149,23 +149,24 @@ pySceneObject::~pySceneObject()
 }
 
 
-bool pySceneObject::operator==(const pySceneObject &sobj) const
+bool pySceneObject::operator==(const pySceneObject& sobj) const
 {
     plKey ours = ((pySceneObject*)this)->getObjKey();
     plKey theirs = ((pySceneObject&)sobj).getObjKey();
-    if ( ours == nil && theirs == nil )
+
+    if (ours == nil && theirs == nil) {
         return true;
-    else if ( ours != nil && theirs != nil )
-        return (ours->GetUoid()==theirs->GetUoid());
-    else
+    } else if (ours != nil && theirs != nil) {
+        return (ours->GetUoid() == theirs->GetUoid());
+    } else {
         return false;
+    }
 }
 
 // getter and setters
 void pySceneObject::addObjKey(plKey key)
 {
-    if ( key != nil )
-    {
+    if (key != nil) {
         fSceneObjects.Append(key);
         IAddObjKeyToAll(key);
     }
@@ -173,8 +174,7 @@ void pySceneObject::addObjKey(plKey key)
 
 void pySceneObject::addObjPyKey(pyKey& objkey)
 {
-    if ( objkey.getKey() != nil )
-    {
+    if (objkey.getKey() != nil) {
         fSceneObjects.Append(objkey.getKey());
         IAddObjKeyToAll(objkey.getKey());
     }
@@ -182,28 +182,30 @@ void pySceneObject::addObjPyKey(pyKey& objkey)
 
 plKey pySceneObject::getObjKey()
 {
-    if ( fSceneObjects.Count() > 0 )
+    if (fSceneObjects.Count() > 0) {
         return fSceneObjects[0];
-    else
+    } else {
         return nil;
+    }
 }
 
 PyObject* pySceneObject::getObjPyKey()
 {
     PyObject* pyobj;    // Python will manage this... it only knows when everyone is done with it
-    if ( fSceneObjects.Count() > 0 )
+
+    if (fSceneObjects.Count() > 0) {
         pyobj = pyKey::New(fSceneObjects[0]);
-    else
-    {
+    } else {
         Py_INCREF(Py_None);
         pyobj = Py_None;
     }
+
     return pyobj;
 }
 
 void pySceneObject::setSenderKey(plKey key)
-{ 
-    fSenderKey=key;
+{
+    fSenderKey = key;
     ISetAllSenderKeys();
 }
 
@@ -221,8 +223,10 @@ void pySceneObject::SetNetForce(bool state)
 
 plString pySceneObject::GetName()
 {
-    if ( fSceneObjects.Count() > 0 )
+    if (fSceneObjects.Count() > 0) {
         return fSceneObjects[0]->GetName();
+    }
+
     return "";
 }
 
@@ -231,18 +235,16 @@ PyObject* pySceneObject::findObj(const plString& name)
     PyObject* pSobj = nil;
     // search through the plKeys that we have looking for this name
     int i;
-    for ( i=0; i<fSceneObjects.Count(); i++ )
-    {
-        if ( name == fSceneObjects[i]->GetName() )
-        {
-            pSobj = pySceneObject::New(fSceneObjects[i],fPyMod);
+
+    for (i = 0; i < fSceneObjects.Count(); i++) {
+        if (name == fSceneObjects[i]->GetName()) {
+            pSobj = pySceneObject::New(fSceneObjects[i], fPyMod);
             break;
         }
     }
 
     // did we find one? if not make an object with nil object
-    if ( pSobj == nil )
-    {
+    if (pSobj == nil) {
         // throw a Python error, so the coder knows it didn't work
         PyErr_SetString(PyExc_KeyError, name.c_str());
     }
@@ -257,21 +259,24 @@ PyObject* pySceneObject::findObj(const plString& name)
 bool pySceneObject::IsLocallyOwned()
 {
     // make sure that there are sceneobjects
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSynchedObject* obj = plSynchedObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj && obj->IsLocallyOwned() == plSynchedObject::kYes )
+
+        if (obj && obj->IsLocallyOwned() == plSynchedObject::kYes) {
             return true;
-        else
+        } else
             // both No and Maybe answers will be assumed to be "not locally ownded"
+        {
             return false;
-    }
-    else
+        }
+    } else
         // if we couldn't find any sceneobject, then there is no way that it could be local... heh
+    {
         return false;
+    }
 }
 
 
@@ -280,19 +285,18 @@ bool pySceneObject::IsLocallyOwned()
 PyObject* pySceneObject::GetLocalToWorld()
 {
     // make sure that there are sceneobjects
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {
+
+        if (obj) {
             const plCoordinateInterface* ci = obj->GetCoordinateInterface();
-            if ( ci )
+
+            if (ci) {
                 return pyMatrix44::New((hsMatrix44)ci->GetLocalToWorld());
-            else
-            {
+            } else {
                 plString errmsg = plString::Format("Sceneobject %s does not have a coordinate interface.",
                                                    obj->GetKeyName().c_str());
                 PyErr_SetString(PyExc_RuntimeError, errmsg.c_str());
@@ -300,6 +304,7 @@ PyObject* pySceneObject::GetLocalToWorld()
             }
         }
     }
+
     // if we couldn't find any sceneobject or a coordinate interface
     return pyMatrix44::New();
 }
@@ -309,19 +314,18 @@ PyObject* pySceneObject::GetLocalToWorld()
 PyObject* pySceneObject::GetWorldToLocal()
 {
     // make sure that there are sceneobjects
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {
+
+        if (obj) {
             const plCoordinateInterface* ci = obj->GetCoordinateInterface();
-            if ( ci )
+
+            if (ci) {
                 return pyMatrix44::New((hsMatrix44)ci->GetWorldToLocal());
-            else
-            {
+            } else {
                 plString errmsg = plString::Format("Sceneobject %s does not have a coordinate interface.",
                                                    obj->GetKeyName().c_str());
                 PyErr_SetString(PyExc_RuntimeError, errmsg.c_str());
@@ -329,6 +333,7 @@ PyObject* pySceneObject::GetWorldToLocal()
             }
         }
     }
+
     // if we couldn't find any sceneobject or a coordinate interface
     return pyMatrix44::New();
 }
@@ -338,19 +343,18 @@ PyObject* pySceneObject::GetWorldToLocal()
 PyObject* pySceneObject::GetLocalToParent()
 {
     // make sure that there are sceneobjects
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {
+
+        if (obj) {
             const plCoordinateInterface* ci = obj->GetCoordinateInterface();
-            if ( ci )
+
+            if (ci) {
                 return pyMatrix44::New((hsMatrix44)ci->GetLocalToParent());
-            else
-            {
+            } else {
                 plString errmsg = plString::Format("Sceneobject %s does not have a coordinate interface.",
                                                    obj->GetKeyName().c_str());
                 PyErr_SetString(PyExc_RuntimeError, errmsg.c_str());
@@ -358,6 +362,7 @@ PyObject* pySceneObject::GetLocalToParent()
             }
         }
     }
+
     // if we couldn't find any sceneobject or a coordinate interface
     return pyMatrix44::New();
 }
@@ -367,19 +372,18 @@ PyObject* pySceneObject::GetLocalToParent()
 PyObject* pySceneObject::GetParentToLocal()
 {
     // make sure that there are sceneobjects
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {
+
+        if (obj) {
             const plCoordinateInterface* ci = obj->GetCoordinateInterface();
-            if ( ci )
+
+            if (ci) {
                 return pyMatrix44::New((hsMatrix44)ci->GetParentToLocal());
-            else
-            {
+            } else {
                 plString errmsg = plString::Format("Sceneobject %s does not have a coordinate interface.",
                                                    obj->GetKeyName().c_str());
                 PyErr_SetString(PyExc_RuntimeError, errmsg.c_str());
@@ -387,6 +391,7 @@ PyObject* pySceneObject::GetParentToLocal()
             }
         }
     }
+
     // if we couldn't find any sceneobject or a coordinate interface
     return pyMatrix44::New();
 }
@@ -396,14 +401,15 @@ PyObject* pySceneObject::GetParentToLocal()
 void pySceneObject::SetTransform(pyMatrix44& l2w, pyMatrix44& w2l)
 {
     // make sure that there are sceneobjects
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-            obj->SetTransform(l2w.fMatrix,w2l.fMatrix);
+
+        if (obj) {
+            obj->SetTransform(l2w.fMatrix, w2l.fMatrix);
+        }
     }
 }
 
@@ -412,19 +418,18 @@ void pySceneObject::SetTransform(pyMatrix44& l2w, pyMatrix44& w2l)
 PyObject* pySceneObject::GetWorldPosition()
 {
     // make sure that there are sceneobjects
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {
+
+        if (obj) {
             const plCoordinateInterface* ci = obj->GetCoordinateInterface();
-            if ( ci )
+
+            if (ci) {
                 return pyPoint3::New((hsPoint3)ci->GetWorldPos());
-            else
-            {
+            } else {
                 plString errmsg = plString::Format("Sceneobject %s does not have a coordinate interface.",
                                                    obj->GetKeyName().c_str());
                 PyErr_SetString(PyExc_RuntimeError, errmsg.c_str());
@@ -432,8 +437,9 @@ PyObject* pySceneObject::GetWorldPosition()
             }
         }
     }
+
     // if we couldn't find any sceneobject or a coordinate interface
-    return pyPoint3::New(hsPoint3(0,0,0));
+    return pyPoint3::New(hsPoint3(0, 0, 0));
 }
 
 //
@@ -441,19 +447,18 @@ PyObject* pySceneObject::GetWorldPosition()
 PyObject* pySceneObject::GetViewVector()
 {
     // make sure that there are sceneobjects
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {
+
+        if (obj) {
             const plCoordinateInterface* ci = obj->GetCoordinateInterface();
-            if ( ci )
+
+            if (ci) {
                 return pyVector3::New(ci->GetLocalToWorld().GetAxis(hsMatrix44::kView));
-            else
-            {
+            } else {
                 plString errmsg = plString::Format("Sceneobject %s does not have a coordinate interface.",
                                                    obj->GetKeyName().c_str());
                 PyErr_SetString(PyExc_RuntimeError, errmsg.c_str());
@@ -461,8 +466,9 @@ PyObject* pySceneObject::GetViewVector()
             }
         }
     }
+
     // if we couldn't find any sceneobject or a coordinate interface
-    return pyVector3::New(hsVector3(0,0,0));
+    return pyVector3::New(hsVector3(0, 0, 0));
 }
 
 //
@@ -470,19 +476,18 @@ PyObject* pySceneObject::GetViewVector()
 PyObject* pySceneObject::GetUpVector()
 {
     // make sure that there are sceneobjects
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {
+
+        if (obj) {
             const plCoordinateInterface* ci = obj->GetCoordinateInterface();
-            if ( ci )
+
+            if (ci) {
                 return pyVector3::New(ci->GetLocalToWorld().GetAxis(hsMatrix44::kUp));
-            else
-            {
+            } else {
                 plString errmsg = plString::Format("Sceneobject %s does not have a coordinate interface.",
                                                    obj->GetKeyName().c_str());
                 PyErr_SetString(PyExc_RuntimeError, errmsg.c_str());
@@ -490,8 +495,9 @@ PyObject* pySceneObject::GetUpVector()
             }
         }
     }
+
     // if we couldn't find any sceneobject or a coordinate interface
-    return pyVector3::New(hsVector3(0,0,0));
+    return pyVector3::New(hsVector3(0, 0, 0));
 }
 
 //
@@ -499,19 +505,18 @@ PyObject* pySceneObject::GetUpVector()
 PyObject* pySceneObject::GetRightVector()
 {
     // make sure that there are sceneobjects
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {
+
+        if (obj) {
             const plCoordinateInterface* ci = obj->GetCoordinateInterface();
-            if ( ci )
+
+            if (ci) {
                 return pyVector3::New(ci->GetLocalToWorld().GetAxis(hsMatrix44::kRight));
-            else
-            {
+            } else {
                 plString errmsg = plString::Format("Sceneobject %s does not have a coordinate interface.",
                                                    obj->GetKeyName().c_str());
                 PyErr_SetString(PyExc_RuntimeError, errmsg.c_str());
@@ -519,8 +524,9 @@ PyObject* pySceneObject::GetRightVector()
             }
         }
     }
+
     // if we couldn't find any sceneobject or a coordinate interface
-    return pyVector3::New(hsVector3(0,0,0));
+    return pyVector3::New(hsVector3(0, 0, 0));
 }
 
 //
@@ -530,26 +536,29 @@ bool pySceneObject::IsAvatar()
 {
     // loop through all the sceneobject... looking for avatar modifiers
     int j;
-    for ( j=0 ; j<fSceneObjects.Count() ; j++ )
-    {
+
+    for (j = 0 ; j < fSceneObjects.Count() ; j++) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[j]->ObjectIsLoaded());
-        if ( obj )
-        {
+
+        if (obj) {
             // search through its modifiers to see if one of them is an avatar modifier
             int i;
-            for ( i=0; i<obj->GetNumModifiers(); i++ )
-            {
+
+            for (i = 0; i < obj->GetNumModifiers(); i++) {
                 const plModifier* mod = obj->GetModifier(i);
                 // see if it is an avatar mod base class
                 const plArmatureMod* avatar = plArmatureMod::ConvertNoRef(mod);
-                if ( avatar )
+
+                if (avatar) {
                     return true;
+                }
             }
         }
     }
+
     // if we couldn't find any sceneobject that had an avatar mod then this ain't an avatar
     return false;
 }
@@ -560,23 +569,23 @@ PyObject* pySceneObject::GetAvatarVelocity()
 {
     // loop through all the sceneobject... looking for avatar modifiers
     int j;
-    for ( j=0 ; j<fSceneObjects.Count() ; j++ )
-    {
+
+    for (j = 0 ; j < fSceneObjects.Count() ; j++) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[j]->ObjectIsLoaded());
-        if ( obj )
-        {
+
+        if (obj) {
             // search through its modifiers to see if one of them is an avatar modifier
             int i;
-            for ( i=0; i<obj->GetNumModifiers(); i++ )
-            {
+
+            for (i = 0; i < obj->GetNumModifiers(); i++) {
                 const plModifier* mod = obj->GetModifier(i);
                 // see if it is an avatar mod base class
                 const plArmatureMod* avatar = plArmatureMod::ConvertNoRef(mod);
-                if ( avatar && avatar->GetController() )
-                {
+
+                if (avatar && avatar->GetController()) {
                     hsVector3 vel = avatar->GetController()->GetLinearVelocity();
                     return pyVector3::New(vel);
                 }
@@ -585,7 +594,7 @@ PyObject* pySceneObject::GetAvatarVelocity()
     }
 
     // if we couldn't find any sceneobject that had an avatar mod then this ain't an avatar
-    return pyVector3::New(hsVector3(0,0,0));
+    return pyVector3::New(hsVector3(0, 0, 0));
 }
 
 
@@ -596,31 +605,34 @@ bool pySceneObject::IsHumanAvatar()
 {
     // loop through all the sceneobject... looking for avatar modifiers
     int j;
-    for ( j=0 ; j<fSceneObjects.Count() ; j++ )
-    {
+
+    for (j = 0 ; j < fSceneObjects.Count() ; j++) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {
+
+        if (obj) {
             // search through its modifiers to see if one of them is an avatar modifier
             int i;
-            for ( i=0; i<obj->GetNumModifiers(); i++ )
-            {
+
+            for (i = 0; i < obj->GetNumModifiers(); i++) {
                 const plModifier* mod = obj->GetModifier(i);
                 // see if it is an avatar mod base class
                 plArmatureMod* avatar = (plArmatureMod*)plArmatureMod::ConvertNoRef(mod);
-                if ( avatar )
-                {
+
+                if (avatar) {
                     plArmatureBrain* brain = avatar->GetCurrentBrain();
                     plAvBrainHuman* human = plAvBrainHuman::ConvertNoRef(brain);
-                    if ( human )
+
+                    if (human) {
                         return true;
+                    }
                 }
             }
         }
     }
+
     // if we couldn't find any sceneobject that had an avatar mod then this ain't an avatar
     return false;
 }
@@ -628,31 +640,32 @@ bool pySceneObject::IsHumanAvatar()
 // switch to / from this object (assuming that it is actually a camera)
 void pySceneObject::PushCutsceneCamera(bool cut, pyKey& avKey)
 {
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {   
-            for (int i = 0; i < obj->GetNumModifiers(); i++)
-            {
+
+        if (obj) {
+            for (int i = 0; i < obj->GetNumModifiers(); i++) {
                 const plCameraModifier1* pCam = plCameraModifier1::ConvertNoRef(obj->GetModifier(i));
-                if (pCam)
-                {
+
+                if (pCam) {
                     plCameraMsg* pMsg = new plCameraMsg;
                     pMsg->SetSender(pCam->GetKey());
                     pMsg->SetBCastFlag(plMessage::kBCastByType);
+
                     // set command to do the transition
-                    if (cut)
+                    if (cut) {
                         pMsg->SetCmd(plCameraMsg::kPythonOverridePushCut);
-                    else
+                    } else {
                         pMsg->SetCmd(plCameraMsg::kPythonOverridePush);
+                    }
+
                     // set the new camera
                     pMsg->SetNewCam(pCam->GetKey());
                     pMsg->SetTriggerer(avKey.getKey());
-                    plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+                    plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
                     return;
                 }
             }
@@ -662,19 +675,17 @@ void pySceneObject::PushCutsceneCamera(bool cut, pyKey& avKey)
 
 void pySceneObject::PopCutsceneCamera(pyKey& avKey)
 {
-    if ( fSceneObjects.Count() > 0 )
-    {
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {   
-            for (int i = 0; i < obj->GetNumModifiers(); i++)
-            {
+
+        if (obj) {
+            for (int i = 0; i < obj->GetNumModifiers(); i++) {
                 const plCameraModifier1* pCam = plCameraModifier1::ConvertNoRef(obj->GetModifier(i));
-                if (pCam)
-                {
+
+                if (pCam) {
                     plCameraMsg* pMsg = new plCameraMsg;
                     pMsg->SetSender(pCam->GetKey());
                     pMsg->SetBCastFlag(plMessage::kBCastByType);
@@ -683,7 +694,7 @@ void pySceneObject::PopCutsceneCamera(pyKey& avKey)
                     // set the new camera
                     pMsg->SetTriggerer(avKey.getKey());
                     pMsg->SetNewCam(pCam->GetKey());
-                    plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+                    plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
                     return;
                 }
             }
@@ -695,14 +706,13 @@ void pySceneObject::PopCutsceneCamera(pyKey& avKey)
 void pySceneObject::PushCamera(pyKey& avKey)
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {   
-        for (int i = 0; i < obj->GetNumModifiers(); i++)
-        {
+
+    if (obj) {
+        for (int i = 0; i < obj->GetNumModifiers(); i++) {
             const plCameraModifier1* pCam = plCameraModifier1::ConvertNoRef(obj->GetModifier(i));
-            if (pCam)
-            {
-                                    
+
+            if (pCam) {
+
                 // create message
                 plCameraMsg* pMsg = new plCameraMsg;
                 pMsg->SetSender(pCam->GetKey());
@@ -715,7 +725,7 @@ void pySceneObject::PushCamera(pyKey& avKey)
                 pMsg->SetTriggerer(avKey.getKey());
                 pMsg->SetNewCam(pCam->GetKey());
 
-                plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+                plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
             }
         }
     }
@@ -724,14 +734,13 @@ void pySceneObject::PushCamera(pyKey& avKey)
 void pySceneObject::PushCameraCut(pyKey& avKey)
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {   
-        for (int i = 0; i < obj->GetNumModifiers(); i++)
-        {
+
+    if (obj) {
+        for (int i = 0; i < obj->GetNumModifiers(); i++) {
             const plCameraModifier1* pCam = plCameraModifier1::ConvertNoRef(obj->GetModifier(i));
-            if (pCam)
-            {
-                                    
+
+            if (pCam) {
+
                 // create message
                 plCameraMsg* pMsg = new plCameraMsg;
                 pMsg->SetSender(pCam->GetKey());
@@ -745,7 +754,7 @@ void pySceneObject::PushCameraCut(pyKey& avKey)
                 pMsg->SetTriggerer(avKey.getKey());
                 pMsg->SetNewCam(pCam->GetKey());
 
-                plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+                plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
             }
         }
     }
@@ -762,14 +771,13 @@ void pySceneObject::PushCameraCut(pyKey& avKey)
 void pySceneObject::PopCamera(pyKey& avKey)
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {   
-        for (int i = 0; i < obj->GetNumModifiers(); i++)
-        {
+
+    if (obj) {
+        for (int i = 0; i < obj->GetNumModifiers(); i++) {
             const plCameraModifier1* pCam = plCameraModifier1::ConvertNoRef(obj->GetModifier(i));
-            if (pCam)
-            {
-                                    
+
+            if (pCam) {
+
                 // create message
                 plCameraMsg* pMsg = new plCameraMsg;
                 pMsg->SetSender(pCam->GetKey());
@@ -781,7 +789,7 @@ void pySceneObject::PopCamera(pyKey& avKey)
                 pMsg->SetTriggerer(avKey.getKey());
                 pMsg->SetNewCam(pCam->GetKey());
 
-                plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+                plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
             }
         }
     }
@@ -790,132 +798,138 @@ void pySceneObject::PopCamera(pyKey& avKey)
 std::vector<PyObject*> pySceneObject::GetResponders()
 {
     std::vector<PyObject*> pyPL;
-    if ( fSceneObjects.Count() > 0 )
-    {
+
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {   
-            for (int i = 0; i < obj->GetNumModifiers(); i++)
-            {
+
+        if (obj) {
+            for (int i = 0; i < obj->GetNumModifiers(); i++) {
                 const plResponderModifier* resp = plResponderModifier::ConvertNoRef(obj->GetModifier(i));
-                if (resp)
+
+                if (resp) {
                     pyPL.push_back(pyKey::New(resp->GetKey()));
+                }
             }
         }
     }
+
     return pyPL;
 }
 
 std::vector<PyObject*> pySceneObject::GetPythonMods()
 {
     std::vector<PyObject*> pyPL;
-    if ( fSceneObjects.Count() > 0 )
-    {
+
+    if (fSceneObjects.Count() > 0) {
         // get the object pointer of just the first one in the list
         // (We really can't tell which one the user is thinking of if they are
         // referring to multiple objects, so the first one in the list will do.)
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if ( obj )
-        {   
-            for (int i = 0; i < obj->GetNumModifiers(); i++)
-            {
+
+        if (obj) {
+            for (int i = 0; i < obj->GetNumModifiers(); i++) {
                 const plPythonFileMod* resp = plPythonFileMod::ConvertNoRef(obj->GetModifier(i));
-                if (resp)
+
+                if (resp) {
                     pyPL.push_back(pyKey::New(resp->GetKey()));
+                }
             }
         }
     }
+
     return pyPL;
 }
 
 void pySceneObject::Animate()
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {
+
+    if (obj) {
         plAnimCmdMsg* pMsg = new plAnimCmdMsg;
         pMsg->AddReceiver(obj->GetKey());
         pMsg->SetCmd(plAnimCmdMsg::kGoToBegin);
         pMsg->SetCmd(plAnimCmdMsg::kContinue);
         pMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
 int8_t pySceneObject::GetResponderState()
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {
-        for (int i = 0; i < obj->GetNumModifiers(); i++)
-        {
+
+    if (obj) {
+        for (int i = 0; i < obj->GetNumModifiers(); i++) {
             const plResponderModifier* resp = plResponderModifier::ConvertNoRef(obj->GetModifier(i));
-            if (resp)
+
+            if (resp) {
                 return resp->GetState();
+            }
         }
     }
+
     return -1;
 }
 
 void pySceneObject::RewindAnim(const char* animName)
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {   
+
+    if (obj) {
         plAnimCmdMsg* pMsg = new plAnimCmdMsg;
         pMsg->AddReceiver(obj->GetKey());
         pMsg->SetAnimName(animName);
         pMsg->SetCmd(plAnimCmdMsg::kGoToBegin);
         pMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes    
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
 void pySceneObject::PlayAnim(const char* animName)
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {
+
+    if (obj) {
         plAnimCmdMsg* pMsg = new plAnimCmdMsg;
         pMsg->AddReceiver(obj->GetKey());
         pMsg->SetAnimName(animName);
         pMsg->SetCmd(plAnimCmdMsg::kContinue);
         pMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes    
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
 void pySceneObject::StopAnim(const char* animName)
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {
+
+    if (obj) {
         plAnimCmdMsg* pMsg = new plAnimCmdMsg;
         pMsg->AddReceiver(obj->GetKey());
         pMsg->SetAnimName(animName);
         pMsg->SetCmd(plAnimCmdMsg::kStop);
         pMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes    
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
 void pySceneObject::RunResponder(int state)
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {
+
+    if (obj) {
         const plModifier* pMod = obj->GetModifierByType(plResponderModifier::Index());
-        if (pMod)
-        {
+
+        if (pMod) {
             plNotifyMsg* pMsg = new plNotifyMsg;
             pMsg->fType = plNotifyMsg::kResponderChangeState;
             pMsg->AddResponderStateEvent(state);
             pMsg->AddReceiver(pMod->GetKey());
             pMsg->Send();
-        
+
             plNotifyMsg* pMsg0 = new plNotifyMsg;
             pMsg0->fState = true;
             pMsg0->AddReceiver(pMod->GetKey());
@@ -928,11 +942,11 @@ void pySceneObject::RunResponder(int state)
 void pySceneObject::FFResponder(int state)
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {
+
+    if (obj) {
         const plModifier* pMod = obj->GetModifierByType(plResponderModifier::Index());
-        if (pMod)
-        {
+
+        if (pMod) {
             plNotifyMsg* pMsg = new plNotifyMsg;
             pMsg->fType = plNotifyMsg::kResponderFF;
             pMsg->AddResponderStateEvent(state);
@@ -945,14 +959,14 @@ void pySceneObject::FFResponder(int state)
 void pySceneObject::SetSoundFilename(int index, const char* filename, bool isCompressed)
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {
+
+    if (obj) {
         const plAudioInterface* ai = obj->GetAudioInterface();
-        if (ai)
-        {
+
+        if (ai) {
             plAudible* au = ai->GetAudible();
-            if (au)
-            {
+
+            if (au) {
                 au->SetFilename(index, filename, isCompressed);
             }
         }
@@ -962,14 +976,14 @@ void pySceneObject::SetSoundFilename(int index, const char* filename, bool isCom
 int pySceneObject::GetSoundObjectIndex(const char* sndObj)
 {
     plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-    if ( obj )
-    {
+
+    if (obj) {
         const plAudioInterface* ai = obj->GetAudioInterface();
-        if (ai)
-        {
+
+        if (ai) {
             plAudible* au = ai->GetAudible();
-            if (au)
-            {
+
+            if (au) {
                 return au->GetSoundIndex(sndObj);
             }
         }
@@ -980,16 +994,16 @@ int pySceneObject::GetSoundObjectIndex(const char* sndObj)
 
 void pySceneObject::VolumeSensorIgnoreExtraEnters(bool ignore)
 {
-    if (fSceneObjects.Count() > 0)
-    {
+    if (fSceneObjects.Count() > 0) {
         plSceneObject* obj = plSceneObject::ConvertNoRef(fSceneObjects[0]->ObjectIsLoaded());
-        if (obj)
-        {
-            for (int i = 0; i < obj->GetNumModifiers(); ++i)
-            {
+
+        if (obj) {
+            for (int i = 0; i < obj->GetNumModifiers(); ++i) {
                 plLogicModifier* logic = const_cast<plLogicModifier*>(plLogicModifier::ConvertNoRef(obj->GetModifier(i)));
-                if (logic)
+
+                if (logic) {
                     logic->VolumeIgnoreExtraEnters(ignore);
+                }
             }
         }
     }

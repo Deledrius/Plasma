@@ -54,14 +54,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class pfGameScore;
 
-class pyGameScore
-{
+class pyGameScore {
 private:
-    pfGameScore * fScore;
+    pfGameScore* fScore;
 
 public:
     pyGameScore();
-    pyGameScore(pfGameScore * score);
+    pyGameScore(pfGameScore* score);
     ~pyGameScore();
 
     // required functions for PyObject interoperability
@@ -70,8 +69,8 @@ public:
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGameScore object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGameScore); // converts a PyObject to a pyGameScore (throws error if not correct type)
 
-    static void     AddPlasmaClasses(PyObject *m);
-    static void     AddPlasmaConstantsClasses(PyObject *m);
+    static void     AddPlasmaClasses(PyObject* m);
+    static void     AddPlasmaConstantsClasses(PyObject* m);
 
     uint32_t        GetOwnerID() const;
     int32_t         GetGameType() const;

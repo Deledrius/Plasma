@@ -52,17 +52,15 @@ class plString;
 ////////////////////////////////
 // A participant (peer) who we can send and recv messages from/to
 ////////////////////////////////
-class plNetMember : public plCreatable
-{
+class plNetMember : public plCreatable {
 public:
-    enum Flags
-    {
-        kWaitingForLinkQuery            = 1<<0,     // only used server side
-        kIndirectMember                 = 1<<1,     // this guy is behind a firewall of some sort
-        kRequestP2P                     = 1<<2,     // wants to play peer to peer
-        kWaitingForChallengeResponse    = 1<<3,     // waiting for client response
-        kIsServer                       = 1<<4,     // used by transport member
-        kAllowTimeOut                   = 1<<5,     // used by gameserver
+    enum Flags {
+        kWaitingForLinkQuery            = 1 << 0,   // only used server side
+        kIndirectMember                 = 1 << 1,   // this guy is behind a firewall of some sort
+        kRequestP2P                     = 1 << 2,   // wants to play peer to peer
+        kWaitingForChallengeResponse    = 1 << 3,   // waiting for client response
+        kIsServer                       = 1 << 4,   // used by transport member
+        kAllowTimeOut                   = 1 << 5,   // used by gameserver
     };
 
 protected:
@@ -75,30 +73,42 @@ protected:
     uint32_t  fFlags;
     plNetApp* fNetApp;
 
-    // these calls should be made by the client/server app only, 
+    // these calls should be made by the client/server app only,
     // so they can keep the netCorePeer userData point to the right member
     virtual ~plNetMember() {}
 
 public:
-    CLASSNAME_REGISTER( plNetMember );
-    GETINTERFACE_ANY( plNetMember, plCreatable );
+    CLASSNAME_REGISTER(plNetMember);
+    GETINTERFACE_ANY(plNetMember, plCreatable);
 
     plNetMember();
     plNetMember(plNetApp* na);
-    
+
     virtual void Reset();   // doesn't remove from session, just resets to initial state
-    virtual bool IsEqualTo(const plNetMember * other) const = 0;
+    virtual bool IsEqualTo(const plNetMember* other) const = 0;
 
     // getters
-    int32_t GetPeerID() const { return fPeerID; }
-    uint32_t GetFlags() const { return fFlags; }
-    plNetApp* GetNetApp() { return fNetApp; }
+    int32_t GetPeerID() const {
+        return fPeerID;
+    }
+    uint32_t GetFlags() const {
+        return fFlags;
+    }
+    plNetApp* GetNetApp() {
+        return fNetApp;
+    }
     virtual plString AsString() const = 0;
 
     // setters
-    void SetFlags(uint32_t f) { fFlags=f; }
-    void SetNetApp(plNetApp* n) { fNetApp=n; }
-    void SetPeerID(int32_t p) { fPeerID=p; }
+    void SetFlags(uint32_t f) {
+        fFlags = f;
+    }
+    void SetNetApp(plNetApp* n) {
+        fNetApp = n;
+    }
+    void SetPeerID(int32_t p) {
+        fPeerID = p;
+    }
 };
 
 #endif  // PLNETMEMBER_inc

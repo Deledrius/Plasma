@@ -63,51 +63,61 @@ class plDynamicTextMap;
 class plLayerInterface;
 class hsGMaterial;
 
-class pfGUIDynDisplayCtrl : public pfGUIControlMod
-{
-    protected:
+class pfGUIDynDisplayCtrl : public pfGUIControlMod {
+protected:
 
-        enum
-        {
-            kRefTextMap = kRefDerivedStart,
-            kRefLayer,
-            kRefMaterial
-        };
+    enum {
+        kRefTextMap = kRefDerivedStart,
+        kRefLayer,
+        kRefMaterial
+    };
 
-        hsTArray<plDynamicTextMap *>    fTextMaps;
-        hsTArray<plLayerInterface *>    fLayers;
+    hsTArray<plDynamicTextMap*>    fTextMaps;
+    hsTArray<plLayerInterface*>    fLayers;
 
-        hsTArray<hsGMaterial *>         fMaterials;
+    hsTArray<hsGMaterial*>         fMaterials;
 
-        virtual bool IEval( double secs, float del, uint32_t dirty ); // called only by owner object's Eval()
+    virtual bool IEval(double secs, float del, uint32_t dirty);   // called only by owner object's Eval()
 
-    public:
+public:
 
-        pfGUIDynDisplayCtrl();
-        virtual ~pfGUIDynDisplayCtrl();
+    pfGUIDynDisplayCtrl();
+    virtual ~pfGUIDynDisplayCtrl();
 
-        CLASSNAME_REGISTER( pfGUIDynDisplayCtrl );
-        GETINTERFACE_ANY( pfGUIDynDisplayCtrl, pfGUIControlMod );
+    CLASSNAME_REGISTER(pfGUIDynDisplayCtrl);
+    GETINTERFACE_ANY(pfGUIDynDisplayCtrl, pfGUIControlMod);
 
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        uint32_t              GetNumMaps( void ) const { return fTextMaps.GetCount(); }
-        plDynamicTextMap    *GetMap( uint32_t i ) const { return fTextMaps[ i ]; }
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-        uint32_t              GetNumLayers( void ) const { return fLayers.GetCount(); }
-        plLayerInterface    *GetLayer( uint32_t i ) const { return fLayers[ i ]; }
+    uint32_t              GetNumMaps(void) const {
+        return fTextMaps.GetCount();
+    }
+    plDynamicTextMap*    GetMap(uint32_t i) const {
+        return fTextMaps[ i ];
+    }
 
-        uint32_t              GetNumMaterials( void ) const { return fMaterials.GetCount(); }
-        hsGMaterial         *GetMaterial( uint32_t i ) const { return fMaterials[ i ]; }
+    uint32_t              GetNumLayers(void) const {
+        return fLayers.GetCount();
+    }
+    plLayerInterface*    GetLayer(uint32_t i) const {
+        return fLayers[ i ];
+    }
 
-        // Export only
-        void    AddMap( plDynamicTextMap *map );
-        void    AddLayer( plLayerInterface *layer );
-        void    AddMaterial( hsGMaterial *material );
+    uint32_t              GetNumMaterials(void) const {
+        return fMaterials.GetCount();
+    }
+    hsGMaterial*         GetMaterial(uint32_t i) const {
+        return fMaterials[ i ];
+    }
+
+    // Export only
+    void    AddMap(plDynamicTextMap* map);
+    void    AddLayer(plLayerInterface* layer);
+    void    AddMaterial(hsGMaterial* material);
 };
 
 #endif // _pfGUIDynDisplayCtrl_h

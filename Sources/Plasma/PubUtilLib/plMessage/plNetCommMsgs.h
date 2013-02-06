@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plMessage/plNetCommMsgs.h
-*   
+*
 ***/
 
 #ifndef plNetCommMsgs_inc
@@ -62,13 +62,19 @@ public:
     };
 
     ENetError   result;
-    void *      param;
+    void*       param;
     EParamType  ptype;
 
-    plNetCommReplyMsg () { SetBCastFlag(kBCastByExactType); }
+    plNetCommReplyMsg() {
+        SetBCastFlag(kBCastByExactType);
+    }
 
-    void Read (hsStream * s, hsResMgr * mgr) { plMessage::IMsgRead(s, mgr); }
-    void Write (hsStream * s, hsResMgr * mgr) { plMessage::IMsgWrite(s, mgr); }
+    void Read(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgRead(s, mgr);
+    }
+    void Write(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgWrite(s, mgr);
+    }
 };
 
 class plNetCommAuthMsg : public plNetCommReplyMsg {
@@ -79,13 +85,19 @@ public:
 
 class plNetCommAuthConnectedMsg : public plMessage {
 public:
-    plNetCommAuthConnectedMsg () { SetBCastFlag(kBCastByExactType); }
+    plNetCommAuthConnectedMsg() {
+        SetBCastFlag(kBCastByExactType);
+    }
 
     CLASSNAME_REGISTER(plNetCommAuthConnectedMsg);
     GETINTERFACE_ANY(plNetCommAuthConnectedMsg, plMessage);
 
-    void Read (hsStream * s, hsResMgr * mgr) { plMessage::IMsgRead(s, mgr); }
-    void Write (hsStream * s, hsResMgr * mgr) { plMessage::IMsgWrite(s, mgr); }
+    void Read(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgRead(s, mgr);
+    }
+    void Write(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgWrite(s, mgr);
+    }
 };
 
 struct NetCliAuthFileInfo;
@@ -100,7 +112,7 @@ public:
 class plNetCommFileDownloadMsg : public plNetCommReplyMsg {
 public:
     wchar_t       filename[MAX_PATH];
-    hsStream *  writer;
+    hsStream*   writer;
 
     CLASSNAME_REGISTER(plNetCommFileDownloadMsg);
     GETINTERFACE_ANY(plNetCommFileDownloadMsg, plMessage);
@@ -140,7 +152,7 @@ class plNetCommPublicAgeListMsg : public plNetCommReplyMsg {
 public:
     CLASSNAME_REGISTER(plNetCommPublicAgeListMsg);
     GETINTERFACE_ANY(plNetCommPublicAgeListMsg, plMessage);
-    
+
     ARRAY(struct NetAgeInfo)    ages;
 };
 
@@ -166,8 +178,12 @@ class plNetCommDisconnectedMsg : public plMessage {
 public:
     ENetProtocol    protocol;
 
-    void Read (hsStream * s, hsResMgr * mgr) { plMessage::IMsgRead(s, mgr); }
-    void Write (hsStream * s, hsResMgr * mgr) { plMessage::IMsgWrite(s, mgr); }
+    void Read(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgRead(s, mgr);
+    }
+    void Write(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgWrite(s, mgr);
+    }
 };
 
 

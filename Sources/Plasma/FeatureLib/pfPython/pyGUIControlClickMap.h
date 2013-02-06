@@ -54,8 +54,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class pyPoint3;
 
-class pyGUIControlClickMap : public pyGUIControl
-{
+class pyGUIControlClickMap : public pyGUIControl {
 protected:
     pyGUIControlClickMap(): pyGUIControl() {} // for python glue only, do NOT call
     pyGUIControlClickMap(pyKey& gckey);
@@ -64,18 +63,18 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptGUIControlClickMap);
-    static PyObject *New(pyKey& gckey);
-    static PyObject *New(plKey objkey);
+    static PyObject* New(pyKey& gckey);
+    static PyObject* New(plKey objkey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGUIControlClickMap object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGUIControlClickMap); // converts a PyObject to a pyGUIControlClickMap (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     static bool IsGUIControlClickMap(pyKey& gckey);
 
-    PyObject* GetLastMousePt( void ); // returns pyPoint3
-    PyObject* GetLastMouseUpPt( void ); // returns pyPoint3
-    PyObject* GetLastMouseDragPt( void ); // returns pyPoint3
+    PyObject* GetLastMousePt(void);   // returns pyPoint3
+    PyObject* GetLastMouseUpPt(void);   // returns pyPoint3
+    PyObject* GetLastMouseDragPt(void);   // returns pyPoint3
 
 };
 

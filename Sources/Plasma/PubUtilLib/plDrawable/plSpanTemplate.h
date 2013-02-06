@@ -53,28 +53,25 @@ class hsStream;
 class INode;
 class hsGMaterial;
 
-class plSpanTemplate
-{
+class plSpanTemplate {
 public:
     // 99% of the time, the defaults are fine. Just tell me
     // how many UVWs, and whether you've got color.
     static uint16_t MakeFormat(bool hasColor, int numUVWs,
-                            bool hasWgtIdx = false,
-                            int numWgts = 0,
-                            bool hasNorm = true,
-                            bool hasPos = true,
-                            bool hasColor2 = true)
-    {
+                               bool hasWgtIdx = false,
+                               int numWgts = 0,
+                               bool hasNorm = true,
+                               bool hasPos = true,
+                               bool hasColor2 = true) {
         return (hasPos ? kPosMask : 0)
-            | (hasNorm ? kNormMask : 0)
-            | (hasColor ? kColorMask : 0)
-            | (hasWgtIdx ? kWgtIdxMask : 0)
-            | ((numUVWs << 4) & kUVWMask)
-            | ((numWgts << 8) & kWeightMask)
-            | (hasColor2 ? kColor2Mask : 0); // Till we can get this out of here.
+               | (hasNorm ? kNormMask : 0)
+               | (hasColor ? kColorMask : 0)
+               | (hasWgtIdx ? kWgtIdxMask : 0)
+               | ((numUVWs << 4) & kUVWMask)
+               | ((numWgts << 8) & kWeightMask)
+               | (hasColor2 ? kColor2Mask : 0); // Till we can get this out of here.
     };
-    enum
-    {
+    enum {
         kPosMask        = 0x1,
 
         kNormMask       = 0x2,
@@ -89,8 +86,7 @@ public:
 
         kColor2Mask     = 0x400
     };
-    enum Channel
-    {
+    enum Channel {
         kPosition,
         kWeight,
         kWgtIdx,
@@ -122,124 +118,195 @@ protected:
     friend class plClusterUtil;
 public:
     plSpanTemplate();
-    virtual ~plSpanTemplate() { DeAlloc(); }
+    virtual ~plSpanTemplate() {
+        DeAlloc();
+    }
 
-    const uint8_t*    VertData() const { return fData; }
+    const uint8_t*    VertData() const {
+        return fData;
+    }
 
-    const uint16_t*   IndexData() const { return fIndices; }
+    const uint16_t*   IndexData() const {
+        return fIndices;
+    }
 
-    uint32_t  NumVerts() const { return fNumVerts; }
-    uint32_t  Stride() const { return uint32_t(fStride); }
+    uint32_t  NumVerts() const {
+        return fNumVerts;
+    }
+    uint32_t  Stride() const {
+        return uint32_t(fStride);
+    }
     uint32_t  CalcStride();
-    uint32_t  VertSize() const { return NumVerts() * Stride(); }
+    uint32_t  VertSize() const {
+        return NumVerts() * Stride();
+    }
 
-    uint32_t  NumTris() const { return fNumTris; }
-    uint32_t  NumIndices() const { return NumTris() * 3; }
-    uint32_t  IndexSize() const { return NumIndices() * sizeof(uint16_t); }
-    
-    uint8_t   PositionOffset() const { return uint8_t(0); }
-    uint8_t   WgtIdxOffset() const { return uint8_t(PositionOffset() + NumPos() * sizeof(hsPoint3)); }
-    uint8_t   WeightOffset() const { return uint8_t(WgtIdxOffset() + NumWgtIdx() * sizeof(uint32_t)); }
-    uint8_t   NormalOffset() const { return uint8_t(WeightOffset() + NumWeights() * sizeof(float)); }
-    uint8_t   ColorOffset() const { return uint8_t(NormalOffset() + NumNorm() * sizeof(hsVector3)); }
-    uint8_t   Color2Offset() const { return uint8_t(ColorOffset() + NumColor() * sizeof(uint32_t)); }
-    uint8_t   UVWOffset() const { return uint8_t(Color2Offset() + NumColor2() * sizeof(uint32_t)); }
+    uint32_t  NumTris() const {
+        return fNumTris;
+    }
+    uint32_t  NumIndices() const {
+        return NumTris() * 3;
+    }
+    uint32_t  IndexSize() const {
+        return NumIndices() * sizeof(uint16_t);
+    }
 
-    uint32_t  NumUVWs() const { return (fFormat & kUVWMask) >> 4; }
-    uint32_t  NumWeights() const { return (fFormat & kWeightMask) >> 8; }
+    uint8_t   PositionOffset() const {
+        return uint8_t(0);
+    }
+    uint8_t   WgtIdxOffset() const {
+        return uint8_t(PositionOffset() + NumPos() * sizeof(hsPoint3));
+    }
+    uint8_t   WeightOffset() const {
+        return uint8_t(WgtIdxOffset() + NumWgtIdx() * sizeof(uint32_t));
+    }
+    uint8_t   NormalOffset() const {
+        return uint8_t(WeightOffset() + NumWeights() * sizeof(float));
+    }
+    uint8_t   ColorOffset() const {
+        return uint8_t(NormalOffset() + NumNorm() * sizeof(hsVector3));
+    }
+    uint8_t   Color2Offset() const {
+        return uint8_t(ColorOffset() + NumColor() * sizeof(uint32_t));
+    }
+    uint8_t   UVWOffset() const {
+        return uint8_t(Color2Offset() + NumColor2() * sizeof(uint32_t));
+    }
 
-    uint32_t  NumPos() const { return (fFormat & kPosMask) >> 0; }
-    uint32_t  NumNorm() const { return (fFormat & kNormMask) >> 1; }
-    uint32_t  NumColor() const { return (fFormat & kColorMask) >> 2; }
-    uint32_t  NumColor2() const { return (fFormat & kColor2Mask) >> 10; }
-    uint32_t  NumWgtIdx() const { return (fFormat & kWgtIdxMask) >> 3; }
+    uint32_t  NumUVWs() const {
+        return (fFormat & kUVWMask) >> 4;
+    }
+    uint32_t  NumWeights() const {
+        return (fFormat & kWeightMask) >> 8;
+    }
 
-    hsPoint3*           Position(int i) const { return (hsPoint3*)GetData(kPosition, i); }
-    hsVector3*          Normal(int i) const { return (hsVector3*)GetData(kNormal, i); }
-    uint32_t*             Color(int i) const { return (uint32_t*)GetData(kColor, i); }
-    uint32_t*             Color2(int i) const { return (uint32_t*)GetData(kColor2, i); }
-    uint32_t*             WgtIdx(int i) const { return (uint32_t*)GetData(kWgtIdx, i); }
-    hsPoint3*           UVWs(int iv, int iuv) const { return (hsPoint3*)GetData(kUVW, iv, iuv); }
-    float*           Weight(int iv, int iw) const { return (float*)GetData(kWeight, iv, iw); }
+    uint32_t  NumPos() const {
+        return (fFormat & kPosMask) >> 0;
+    }
+    uint32_t  NumNorm() const {
+        return (fFormat & kNormMask) >> 1;
+    }
+    uint32_t  NumColor() const {
+        return (fFormat & kColorMask) >> 2;
+    }
+    uint32_t  NumColor2() const {
+        return (fFormat & kColor2Mask) >> 10;
+    }
+    uint32_t  NumWgtIdx() const {
+        return (fFormat & kWgtIdxMask) >> 3;
+    }
 
-    uint8_t*              GetData(Channel chan, int i, int j=0) const
-    {
+    hsPoint3*           Position(int i) const {
+        return (hsPoint3*)GetData(kPosition, i);
+    }
+    hsVector3*          Normal(int i) const {
+        return (hsVector3*)GetData(kNormal, i);
+    }
+    uint32_t*             Color(int i) const {
+        return (uint32_t*)GetData(kColor, i);
+    }
+    uint32_t*             Color2(int i) const {
+        return (uint32_t*)GetData(kColor2, i);
+    }
+    uint32_t*             WgtIdx(int i) const {
+        return (uint32_t*)GetData(kWgtIdx, i);
+    }
+    hsPoint3*           UVWs(int iv, int iuv) const {
+        return (hsPoint3*)GetData(kUVW, iv, iuv);
+    }
+    float*           Weight(int iv, int iw) const {
+        return (float*)GetData(kWeight, iv, iw);
+    }
+
+    uint8_t*              GetData(Channel chan, int i, int j = 0) const {
         ValidateInput(chan, i, j);
         uint8_t* base = fData + i * fStride;
-        switch(chan)
-        {
+
+        switch (chan) {
         case kPosition:
             return base;
+
         case kWeight:
-            return base 
-                + NumPos() * sizeof(hsPoint3)
-                + j * sizeof(float);
+            return base
+                   + NumPos() * sizeof(hsPoint3)
+                   + j * sizeof(float);
+
         case kWgtIdx:
-            return base 
-                + NumPos() * sizeof(hsPoint3)
-                + NumWeights() * sizeof(float);
+            return base
+                   + NumPos() * sizeof(hsPoint3)
+                   + NumWeights() * sizeof(float);
+
         case kNormal:
-            return base 
-                + NumPos() * sizeof(hsPoint3)
-                + NumWeights() * sizeof(float)
-                + NumWgtIdx() * sizeof(uint32_t);
+            return base
+                   + NumPos() * sizeof(hsPoint3)
+                   + NumWeights() * sizeof(float)
+                   + NumWgtIdx() * sizeof(uint32_t);
+
         case kColor:
-            return base 
-                + NumPos() * sizeof(hsPoint3)
-                + NumWeights() * sizeof(float)
-                + NumWgtIdx() * sizeof(uint32_t)
-                + NumNorm() * sizeof(hsVector3);
+            return base
+                   + NumPos() * sizeof(hsPoint3)
+                   + NumWeights() * sizeof(float)
+                   + NumWgtIdx() * sizeof(uint32_t)
+                   + NumNorm() * sizeof(hsVector3);
+
         case kColor2:
-            return base 
-                + NumPos() * sizeof(hsPoint3)
-                + NumWeights() * sizeof(float)
-                + NumWgtIdx() * sizeof(uint32_t)
-                + NumNorm() * sizeof(hsVector3)
-                + NumColor() * sizeof(uint32_t);
+            return base
+                   + NumPos() * sizeof(hsPoint3)
+                   + NumWeights() * sizeof(float)
+                   + NumWgtIdx() * sizeof(uint32_t)
+                   + NumNorm() * sizeof(hsVector3)
+                   + NumColor() * sizeof(uint32_t);
+
         case kUVW:
-            return base 
-                + NumPos() * sizeof(hsPoint3)
-                + NumWeights() * sizeof(float)
-                + NumWgtIdx() * sizeof(uint32_t)
-                + NumNorm() * sizeof(hsVector3)
-                + NumColor() * sizeof(uint32_t)
-                + NumColor2() * sizeof(uint32_t)
-                + j * sizeof(hsPoint3);
+            return base
+                   + NumPos() * sizeof(hsPoint3)
+                   + NumWeights() * sizeof(float)
+                   + NumWgtIdx() * sizeof(uint32_t)
+                   + NumNorm() * sizeof(hsVector3)
+                   + NumColor() * sizeof(uint32_t)
+                   + NumColor2() * sizeof(uint32_t)
+                   + j * sizeof(hsPoint3);
         }
+
         hsAssert(false, "Unrecognized vertex channel");
         return nil;
     }
 
-    bool ValidateInput(Channel chan, int i, int j) const
-    {
-        switch(chan)
-        {
+    bool ValidateInput(Channel chan, int i, int j) const {
+        switch (chan) {
         case kPosition:
             hsAssert(NumPos(), "Invalid data request");
             return NumPos() > 0;
+
         case kWeight:
             hsAssert(NumWeights(), "Invalid data request");
             return NumWeights() > 0;
+
         case kWgtIdx:
             hsAssert(NumWgtIdx() > j, "Invalid data request");
             return NumWgtIdx() > j;
+
         case kNormal:
             hsAssert(NumNorm(), "Invalid data request");
             return NumNorm() > 0;
+
         case kColor:
             hsAssert(NumColor(), "Invalid data request");
             return NumColor() > 0;
+
         case kColor2:
             hsAssert(NumColor2(), "Invalid data request");
             return NumColor2() > 0;
+
         case kUVW:
             hsAssert(NumUVWs() > j, "Invalid data request");
             return NumUVWs() > j;
         }
+
         hsAssert(false, "Unrecognized vertex channel");
         return false;
     }
-    
+
     void Alloc(uint16_t format, uint32_t numVerts, uint32_t numTris);
     void DeAlloc();
 
@@ -248,8 +315,7 @@ public:
 };
 
 // An export only version
-class plSpanTemplateB : public plSpanTemplate
-{
+class plSpanTemplateB : public plSpanTemplate {
     INode*          fSrc;
     hsBounds3Ext    fLocalBounds;
 
@@ -258,20 +324,30 @@ class plSpanTemplateB : public plSpanTemplate
 
 public:
     plSpanTemplateB(INode* src) : plSpanTemplate(), fSrc(src), fMaterial(nil) {}
-    virtual ~plSpanTemplateB() { DeAllocColors(); }
+    virtual ~plSpanTemplateB() {
+        DeAllocColors();
+    }
 
     void ComputeBounds();
 
-    const hsBounds3Ext& GetLocalBounds() const { return fLocalBounds; }
+    const hsBounds3Ext& GetLocalBounds() const {
+        return fLocalBounds;
+    }
 
-    INode*          GetSrcNode() const { return fSrc; }
+    INode*          GetSrcNode() const {
+        return fSrc;
+    }
 
     hsGMaterial*    fMaterial;
 
     plRenderLevel   fRenderLevel;
 
-    hsColorRGBA*    MultColor(int i) const { return &fMultColors[i]; }
-    hsColorRGBA*    AddColor(int i) const { return &fAddColors[i]; }
+    hsColorRGBA*    MultColor(int i) const {
+        return &fMultColors[i];
+    }
+    hsColorRGBA*    AddColor(int i) const {
+        return &fAddColors[i];
+    }
 
     void AllocColors();
     void DeAllocColors();

@@ -74,8 +74,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include <algorithm>
 
-class plAutoProfileImp : public plAutoProfile
-{
+class plAutoProfileImp : public plAutoProfile {
 protected:
     plStringList fAges;
     int fNextAge;
@@ -120,10 +119,11 @@ plAutoProfileImp::plAutoProfileImp() : fNextAge(0), fNextSpawnPoint(0), fLinkedT
 
 void plAutoProfileImp::StartProfile(const char* ageName)
 {
-    if (ageName)
+    if (ageName) {
         fAgeName = ageName;
-    else
+    } else {
         fAgeName = "";
+    }
 
     IInit();
 
@@ -173,8 +173,8 @@ void plAutoProfileImp::IInit()
 void plAutoProfileImp::IShutdown()
 {
     // KLUDGE - Copy the load timing log, in case we used it
-    #define kTimingLog      "readtimings.0.log"
-    #define kAgeTimingLog   "agetimings.0.log"
+#define kTimingLog      "readtimings.0.log"
+#define kAgeTimingLog   "agetimings.0.log"
 
     plFileSystem::Copy(plFileName::Join(plFileSystem::GetLogPath(), kTimingLog),
                        plFileName::Join(plProfileManagerFull::Instance().GetProfilePath(), kTimingLog));
@@ -200,25 +200,22 @@ void plAutoProfileImp::IShutdown()
 void plAutoProfileImp::INextProfile()
 {
     // Haven't linked to our first age yet, do that before we start profiling
-    if (fNextAge == 0)
-    {
-        if (!INextAge())
+    if (fNextAge == 0) {
+        if (!INextAge()) {
             IShutdown();
-    }
-    else
-    {
+        }
+    } else {
         // Log the stats for this spawn point
-        if (!fLastSpawnPointName.IsNull())
-        {
-            const char * ageName = NetCommGetAge()->ageDatasetName;
+        if (!fLastSpawnPointName.IsNull()) {
+            const char* ageName = NetCommGetAge()->ageDatasetName;
             plProfileManagerFull::Instance().LogStats(ageName, fLastSpawnPointName);
 
             plMipmap mipmap;
-            if (plClient::GetInstance()->GetPipeline()->CaptureScreen(&mipmap))
-            {
+
+            if (plClient::GetInstance()->GetPipeline()->CaptureScreen(&mipmap)) {
                 plString fileName = plString::Format("%S%s_%s.jpg",
-                    plProfileManagerFull::Instance().GetProfilePath(),
-                    ageName, fLastSpawnPointName.c_str());
+                                                     plProfileManagerFull::Instance().GetProfilePath(),
+                                                     ageName, fLastSpawnPointName.c_str());
 
                 plJPEG::Instance().SetWriteQuality(100);
                 plJPEG::Instance().WriteToFile(fileName.c_str(), &mipmap);
@@ -228,11 +225,9 @@ void plAutoProfileImp::INextProfile()
         }
 
         // Try to go to the next spawn point
-        if (!INextSpawnPoint())
-        {
+        if (!INextSpawnPoint()) {
             // Link to the next age
-            if (!INextAge())
-            {
+            if (!INextAge()) {
                 // We've done all the ages, shut down
                 IShutdown();
             }
@@ -244,18 +239,17 @@ bool plAutoProfileImp::INextAge()
 {
     const char* ageName = nil;
 
-    if (fAgeName.length() > 0)
-    {
-        if (fLinkedToSingleAge)
+    if (fAgeName.length() > 0) {
+        if (fLinkedToSingleAge) {
             return false;
+        }
 
         fLinkedToSingleAge = true;
         ageName = fAgeName.c_str();
-    }
-    else
-    {
-        if (fNextAge >= fAges.size())
+    } else {
+        if (fNextAge >= fAges.size()) {
             return false;
+        }
 
         ageName = fAges[fNextAge].c_str();
     }
@@ -276,41 +270,40 @@ bool plAutoProfileImp::INextAge()
 
 bool plAutoProfileImp::INextSpawnPoint()
 {
-    if (fJustLinkToAges)
+    if (fJustLinkToAges) {
         return false;
+    }
 
     const char* kPerfSpawnPrefix = "cPerf-";
     int kPerfSpawnLen = strlen(kPerfSpawnPrefix);
 
     // Find the next perf spawn point
     bool foundGood = false;
-    while (fNextSpawnPoint < plAvatarMgr::GetInstance()->NumSpawnPoints())
-    {
+
+    while (fNextSpawnPoint < plAvatarMgr::GetInstance()->NumSpawnPoints()) {
         const plSpawnModifier* spawnMod = plAvatarMgr::GetInstance()->GetSpawnPoint(fNextSpawnPoint);
         fLastSpawnPointName = spawnMod->GetKeyName();
 
-        if (fLastSpawnPointName.CompareN(kPerfSpawnPrefix, kPerfSpawnLen) == 0)
-        {
+        if (fLastSpawnPointName.CompareN(kPerfSpawnPrefix, kPerfSpawnLen) == 0) {
             fStatusMessage = "Profiling spawn point ";
             fStatusMessage += fLastSpawnPointName;
 
             foundGood = true;
             break;
-        }
-        else
+        } else {
             fNextSpawnPoint++;
+        }
     }
 
-    if (!foundGood)
-    {
+    if (!foundGood) {
         fLastSpawnPointName = plString::Null;
         fStatusMessage = "No profile spawn point found";
         return false;
     }
 
-    plArmatureMod *avatar = plAvatarMgr::GetInstance()->GetLocalAvatar();
-    if (avatar)
-    {
+    plArmatureMod* avatar = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+    if (avatar) {
         double fakeTime = 0.0f;
         avatar->SpawnAt(fNextSpawnPoint, fakeTime);
     }
@@ -326,38 +319,38 @@ bool plAutoProfileImp::INextSpawnPoint()
 bool plAutoProfileImp::MsgReceive(plMessage* msg)
 {
     plEvalMsg* evalMsg = plEvalMsg::ConvertNoRef(msg);
-    if (evalMsg)
-    {
-        if (fStatusMessage.GetSize() > 0)
+
+    if (evalMsg) {
+        if (fStatusMessage.GetSize() > 0) {
             plDebugText::Instance().DrawString(10, 10, fStatusMessage.c_str());
+        }
     }
 
     plAgeLoadedMsg* ageLoaded = plAgeLoadedMsg::ConvertNoRef(msg);
-    if (ageLoaded)
-    {
-        if (!ageLoaded->fLoaded)
-        {
+
+    if (ageLoaded) {
+        if (!ageLoaded->fLoaded) {
             fLinkTime = hsTimer::GetFullTickCount();
             hsStatusMessage("Age unloaded");
         }
+
         return true;
     }
 
     plInitialAgeStateLoadedMsg* ageStateLoaded = plInitialAgeStateLoadedMsg::ConvertNoRef(msg);
-    if (ageStateLoaded)
-    {
-        if (fNextAge > 0)
-        {
+
+    if (ageStateLoaded) {
+        if (fNextAge > 0) {
             fLinkTime = hsTimer::GetFullTickCount() - fLinkTime;
             float ms = hsTimer::FullTicksToMs(fLinkTime);
 
             hsStatusMessageF("Age %s finished load, took %.1f ms",
-                fAges[fNextAge-1].c_str(),
-                ms);
+                             fAges[fNextAge - 1].c_str(),
+                             ms);
 
             plStatusLog::AddLineS("agetimings.log", "Age %s took %.1f ms",
-                fAges[fNextAge-1].c_str(),
-                ms);
+                                  fAges[fNextAge - 1].c_str(),
+                                  ms);
         }
 
         fStatusMessage = "Age loaded.  Preparing to profile.";
@@ -369,8 +362,8 @@ bool plAutoProfileImp::MsgReceive(plMessage* msg)
     }
 
     plTimerCallbackMsg* timerMsg = plTimerCallbackMsg::ConvertNoRef(msg);
-    if (timerMsg)
-    {
+
+    if (timerMsg) {
         INextProfile();
         return true;
     }
@@ -379,8 +372,8 @@ bool plAutoProfileImp::MsgReceive(plMessage* msg)
     // so the calibration screen won't pop up and ruin everything.  I'm sure I could try
     // and do this earlier, but I'm not sure when that player folder is set so screw it, it works here.
     plAgeBeginLoadingMsg* ageBeginLoadingMsg = plAgeBeginLoadingMsg::ConvertNoRef(msg);
-    if (ageBeginLoadingMsg)
-    {
+
+    if (ageBeginLoadingMsg) {
         plgDispatch::Dispatch()->UnRegisterForExactType(plAgeBeginLoadingMsg::Index(), GetKey());
         VaultAddChronicleEntryAndWait(L"InitialAvCursomizationsDone", 0, L"1");
         return true;

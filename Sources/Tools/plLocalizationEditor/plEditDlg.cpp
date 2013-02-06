@@ -57,29 +57,38 @@ extern HWND gTreeView;
 plString gCurrentPath;
 
 // split a subtitle path up into its component parts
-void SplitLocalizationPath(plString path, plString &ageName, plString &setName, plString &locName, plString &locLanguage)
+void SplitLocalizationPath(plString path, plString& ageName, plString& setName, plString& locName, plString& locLanguage)
 {
     ageName = setName = locName = locLanguage = "";
 
     std::vector<plString> tokens = path.Tokenize(".");
-    if (tokens.size() >= 1)
+
+    if (tokens.size() >= 1) {
         ageName = tokens[0];
-    if (tokens.size() >= 2)
+    }
+
+    if (tokens.size() >= 2) {
         setName = tokens[1];
-    if (tokens.size() >= 3)
+    }
+
+    if (tokens.size() >= 3) {
         locName = tokens[2];
-    if (tokens.size() >= 4)
+    }
+
+    if (tokens.size() >= 4) {
         locLanguage = tokens[3];
+    }
 }
 
 // saves the current localization text to the data manager
 void SaveLocalizationText()
 {
-    if (gCurrentPath.IsEmpty())
-        return; // no path to save
+    if (gCurrentPath.IsEmpty()) {
+        return;    // no path to save
+    }
 
     uint32_t textLen = (uint32_t)SendMessage(GetDlgItem(gEditDlg, IDC_LOCALIZATIONTEXT), WM_GETTEXTLENGTH, (WPARAM)0, (LPARAM)0);
-    wchar_t *buffer = new wchar_t[textLen + 2];
+    wchar_t* buffer = new wchar_t[textLen + 2];
     GetDlgItemTextW(gEditDlg, IDC_LOCALIZATIONTEXT, buffer, textLen + 1);
     buffer[textLen + 1] = 0;
     plString plainTextData = plString::FromWchar(buffer);
@@ -100,8 +109,9 @@ void ResetDlgDefaults()
 // Enable/disable all edit controls (some won't enable/disable unless an audio file is loaded and the subtitle is timed)
 void EnableDlg(BOOL enable)
 {
-    if (!enable)
-        ResetDlgDefaults(); // reset controls to defaults
+    if (!enable) {
+        ResetDlgDefaults();    // reset controls to defaults
+    }
 
     EnableWindow(GetDlgItem(gEditDlg, IDC_LOCALIZATIONTEXT), enable);
 }
@@ -109,8 +119,9 @@ void EnableDlg(BOOL enable)
 // updates the edit dialog based on the path specified
 void UpdateEditDlg(plString locPath)
 {
-    if (locPath == gCurrentPath)
+    if (locPath == gCurrentPath) {
         return;
+    }
 
     gCurrentPath = locPath;
 
@@ -121,10 +132,9 @@ void UpdateEditDlg(plString locPath)
     SplitLocalizationPath(locPath, ageName, setName, elementName, elementLanguage);
 
     // now make sure they've drilled down deep enough to enable the dialog
-    if (elementLanguage.IsEmpty()) // not deep enough
+    if (elementLanguage.IsEmpty()) { // not deep enough
         EnableDlg(FALSE);
-    else
-    {
+    } else {
         EnableDlg(TRUE);
         plString key = plString::Format("%s.%s.%s", ageName.c_str(), setName.c_str(), elementName.c_str());
         plString elementText = pfLocalizationDataMgr::Instance().GetElementPlainTextData(key, elementLanguage);
@@ -132,31 +142,32 @@ void UpdateEditDlg(plString locPath)
     }
 
     // now to setup the add/delete buttons
-    if (!elementLanguage.IsEmpty()) // they have selected a language
-    {
+    if (!elementLanguage.IsEmpty()) { // they have selected a language
         SetDlgItemText(gEditDlg, IDC_ADD, L"Add Localization");
         EnableWindow(GetDlgItem(gEditDlg, IDC_ADD), TRUE);
         SetDlgItemText(gEditDlg, IDC_DELETE, L"Delete Localization");
-        if (elementLanguage != "English") // don't allow them to delete the default language
+
+        if (elementLanguage != "English") { // don't allow them to delete the default language
             EnableWindow(GetDlgItem(gEditDlg, IDC_DELETE), TRUE);
-        else
+        } else {
             EnableWindow(GetDlgItem(gEditDlg, IDC_DELETE), FALSE);
-    }
-    else // they have selected something else
-    {
+        }
+    } else { // they have selected something else
         SetDlgItemText(gEditDlg, IDC_ADD, L"Add Element");
         EnableWindow(GetDlgItem(gEditDlg, IDC_ADD), TRUE);
         SetDlgItemText(gEditDlg, IDC_DELETE, L"Delete Element");
-        if (!elementName.IsEmpty()) // they have selected an individual element
-        {
+
+        if (!elementName.IsEmpty()) { // they have selected an individual element
             std::vector<plString> elementNames = pfLocalizationDataMgr::Instance().GetElementList(ageName, setName);
-            if (elementNames.size() > 1) // they can't delete the only subtitle in a set
+
+            if (elementNames.size() > 1) { // they can't delete the only subtitle in a set
                 EnableWindow(GetDlgItem(gEditDlg, IDC_DELETE), TRUE);
-            else
+            } else {
                 EnableWindow(GetDlgItem(gEditDlg, IDC_DELETE), FALSE);
-        }
-        else
+            }
+        } else {
             EnableWindow(GetDlgItem(gEditDlg, IDC_DELETE), FALSE);
+        }
     }
 }
 
@@ -166,13 +177,10 @@ BOOL HandleCommandMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     wmID = LOWORD(wParam);
     wmEvent = HIWORD(wParam);
 
-    switch (wmEvent)
-    {
+    switch (wmEvent) {
     case BN_CLICKED:
-        switch (wmID)
-        {
-        case IDC_ADD:
-            {
+        switch (wmID) {
+        case IDC_ADD: {
                 SaveLocalizationText(); // save any current changes to the database
 
                 plString buttonText;
@@ -180,36 +188,33 @@ BOOL HandleCommandMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 GetDlgItemText(gEditDlg, IDC_ADD, buff, 256);
                 buttonText = plString::FromWchar(buff);
 
-                if (buttonText == "Add Element")
-                {
+                if (buttonText == "Add Element") {
                     plAddElementDlg dlg(gCurrentPath);
-                    if (dlg.DoPick(gEditDlg))
-                    {
+
+                    if (dlg.DoPick(gEditDlg)) {
                         plString path = dlg.GetValue(); // path is age.set.name
-                        if (!pfLocalizationDataMgr::Instance().AddElement(path))
+
+                        if (!pfLocalizationDataMgr::Instance().AddElement(path)) {
                             MessageBox(gEditDlg, L"Couldn't add new element because one already exists with that name!", L"Error", MB_ICONERROR | MB_OK);
-                        else
-                        {
+                        } else {
                             gCurrentPath = "";
                             plLocTreeView::ClearTreeView(gTreeView);
                             plLocTreeView::FillTreeViewFromData(gTreeView, path);
                             UpdateEditDlg(path);
                         }
                     }
-                }
-                else if (buttonText == "Add Localization")
-                {
+                } else if (buttonText == "Add Localization") {
                     plAddLocalizationDlg dlg(gCurrentPath);
-                    if (dlg.DoPick(gEditDlg))
-                    {
+
+                    if (dlg.DoPick(gEditDlg)) {
                         plString newLanguage = dlg.GetValue();
                         plString ageName, setName, elementName, elementLanguage;
                         SplitLocalizationPath(gCurrentPath, ageName, setName, elementName, elementLanguage);
                         plString key = plString::Format("%s.%s.%s", ageName.c_str(), setName.c_str(), elementName.c_str());
-                        if (!pfLocalizationDataMgr::Instance().AddLocalization(key, newLanguage))
+
+                        if (!pfLocalizationDataMgr::Instance().AddLocalization(key, newLanguage)) {
                             MessageBox(gEditDlg, L"Couldn't add additional localization!", L"Error", MB_ICONERROR | MB_OK);
-                        else
-                        {
+                        } else {
                             plString path = plString::Format("%s.%s", key.c_str(), newLanguage.c_str());
                             gCurrentPath = "";
                             plLocTreeView::ClearTreeView(gTreeView);
@@ -218,43 +223,40 @@ BOOL HandleCommandMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                         }
                     }
                 }
+
                 return FALSE;
             }
-        case IDC_DELETE:
-            {
+
+        case IDC_DELETE: {
                 SaveLocalizationText(); // save any current changes to the database
 
                 plString messageText = plString::Format("Are you sure that you want to delete %s?", gCurrentPath.c_str());
                 int res = MessageBoxW(gEditDlg, messageText.ToWchar(), L"Delete", MB_ICONQUESTION | MB_YESNO);
-                if (res == IDYES)
-                {
+
+                if (res == IDYES) {
                     plString buttonText;
                     wchar_t buff[256];
                     GetDlgItemText(gEditDlg, IDC_DELETE, buff, 256);
                     buttonText = plString::FromWchar(buff);
 
-                    if (buttonText == "Delete Element")
-                    {
-                        if (!pfLocalizationDataMgr::Instance().DeleteElement(gCurrentPath))
+                    if (buttonText == "Delete Element") {
+                        if (!pfLocalizationDataMgr::Instance().DeleteElement(gCurrentPath)) {
                             MessageBox(gEditDlg, L"Couldn't delete element!", L"Error", MB_ICONERROR | MB_OK);
-                        else
-                        {
+                        } else {
                             plString path = gCurrentPath;
                             gCurrentPath = "";
                             plLocTreeView::ClearTreeView(gTreeView);
                             plLocTreeView::FillTreeViewFromData(gTreeView, path);
                             UpdateEditDlg(path);
                         }
-                    }
-                    else if (buttonText == "Delete Localization")
-                    {
+                    } else if (buttonText == "Delete Localization") {
                         plString ageName, setName, elementName, elementLanguage;
                         SplitLocalizationPath(gCurrentPath, ageName, setName, elementName, elementLanguage);
                         plString key = plString::Format("%s.%s.%s", ageName.c_str(), setName.c_str(), elementName.c_str());
-                        if (!pfLocalizationDataMgr::Instance().DeleteLocalization(key, elementLanguage))
+
+                        if (!pfLocalizationDataMgr::Instance().DeleteLocalization(key, elementLanguage)) {
                             MessageBox(gEditDlg, L"Couldn't delete localization!", L"Error", MB_ICONERROR | MB_OK);
-                        else
-                        {
+                        } else {
                             plString path = gCurrentPath;
                             gCurrentPath = "";
                             plLocTreeView::ClearTreeView(gTreeView);
@@ -264,19 +266,19 @@ BOOL HandleCommandMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     }
                 }
             }
+
             return FALSE;
         }
     }
+
     return (BOOL)DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 // our dialog's window procedure
 BOOL CALLBACK EditDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch(msg)
-    {
-    case WM_INITDIALOG:
-        {
+    switch (msg) {
+    case WM_INITDIALOG: {
             gEditDlg = hWnd;
             EnableDlg(FALSE);
         }

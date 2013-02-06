@@ -52,8 +52,7 @@ static PyObject* stdFile;   // python object of the stdout and err file
 void PythonInterface::initPython(const plFileName& rootDir)
 {
     // if haven't been initialized then do it
-    if ( Py_IsInitialized() == 0 )
-    {
+    if (Py_IsInitialized() == 0) {
         // initialize the Python stuff
         // let Python do some intialization...
         Py_SetProgramName(const_cast<char*>("plasma"));
@@ -71,16 +70,17 @@ void PythonInterface::initPython(const plFileName& rootDir)
         stdFile = (*PycStringIO->NewOutput)(20000);
         // if we need the builtins then find the builtin module
         PyObject* sysmod = PyImport_ImportModule("sys");
+
         // then add the builtin dicitionary to our module's dictionary
-        if (sysmod != NULL )
-        {
+        if (sysmod != NULL) {
             // get the sys's dictionary to find the stdout and stderr
             PyObject* sys_dict = PyModule_GetDict(sysmod);
-            if (stdFile != nil)
-            {
+
+            if (stdFile != nil) {
                 PyDict_SetItemString(sys_dict, "stdout", stdFile);
                 PyDict_SetItemString(sys_dict, "stderr", stdFile);
             }
+
             // NOTE: we will reset the path to not include paths
             // ...that Python may have found in the registery
             PyObject* path_list = PyList_New(0);
@@ -104,14 +104,15 @@ void PythonInterface::initPython(const plFileName& rootDir)
             Py_DECREF(sysmod);
         }
     }
+
 //  initialized++;
 }
 
 void PythonInterface::addPythonPath(const plFileName& path)
 {
     PyObject* sysmod = PyImport_ImportModule("sys");
-    if (sysmod != NULL)
-    {
+
+    if (sysmod != NULL) {
         PyObject* sys_dict = PyModule_GetDict(sysmod);
         PyObject* path_list = PyDict_GetItemString(sys_dict, "path");
 
@@ -125,8 +126,7 @@ void PythonInterface::addPythonPath(const plFileName& path)
 
 void PythonInterface::finiPython()
 {
-    if (Py_IsInitialized() != 0)
-    {
+    if (Py_IsInitialized() != 0) {
         Py_Finalize();
     }
 }
@@ -139,7 +139,7 @@ void PythonInterface::finiPython()
 //
 //  PURPOSE    : run a python string in a specific module name
 //
-PyObject* PythonInterface::CompileString(const char *command, const plFileName& filename)
+PyObject* PythonInterface::CompileString(const char* command, const plFileName& filename)
 {
     PyObject* pycode = Py_CompileString(command, filename.AsString().c_str(), Py_file_input);
     return pycode;
@@ -155,23 +155,21 @@ PyObject* PythonInterface::CompileString(const char *command, const plFileName& 
 //
 bool PythonInterface::DumpObject(PyObject* pyobj, char** pickle, int32_t* size)
 {
-    PyObject *s;        // the python string object where the marsalled object wil go
+    PyObject* s;        // the python string object where the marsalled object wil go
     // convert object to a marshalled string python object
 #if (PY_MAJOR_VERSION == 2) && (PY_MINOR_VERSION < 4)
     s = PyMarshal_WriteObjectToString(pyobj);
 #else
     s = PyMarshal_WriteObjectToString(pyobj, Py_MARSHAL_VERSION);
 #endif
+
     // did it actually do it?
-    if ( s != NULL )
-    {
+    if (s != NULL) {
         // yes, then get the size and the string address
         *size = PyString_Size(s);
         *pickle =  PyString_AsString(s);
         return true;
-    }
-    else  // otherwise, there was an error
-    {
+    } else { // otherwise, there was an error
         // Yikes! errors!
         PyErr_Print();  // FUTURE: we may have to get the string to display in max...later
         return false;
@@ -188,28 +186,31 @@ bool PythonInterface::DumpObject(PyObject* pyobj, char** pickle, int32_t* size)
 int PythonInterface::getOutputAndReset(char** line)
 {
     PyObject* pyStr = (*PycStringIO->cgetvalue)(stdFile);
-    char *str = PyString_AsString( pyStr );
-    int size = PyString_Size( pyStr );
+    char* str = PyString_AsString(pyStr);
+    int size = PyString_Size(pyStr);
 
     // reset the file back to zero
     PyObject_CallMethod(stdFile, const_cast<char*>("reset"), const_cast<char*>(""));
-/*
-    // check to see if the debug python module is loaded
-    if ( dbgOut != nil )
-    {
-        // then send it the new text
-        if ( PyObject_CallFunction(dbgOut,"s",str) == nil )
+
+    /*
+        // check to see if the debug python module is loaded
+        if ( dbgOut != nil )
         {
-            // for some reason this function didn't, remember that and not call it again
-            dbgOut = nil;
-            // if there was an error make sure that the stderr gets flushed so it can be seen
-            PyErr_Print();      // make sure the error is printed
-            PyErr_Clear();      // clear the error
+            // then send it the new text
+            if ( PyObject_CallFunction(dbgOut,"s",str) == nil )
+            {
+                // for some reason this function didn't, remember that and not call it again
+                dbgOut = nil;
+                // if there was an error make sure that the stderr gets flushed so it can be seen
+                PyErr_Print();      // make sure the error is printed
+                PyErr_Clear();      // clear the error
+            }
         }
-    }
-*/
-    if (line)
+    */
+    if (line) {
         *line = str;
+    }
+
     return size;
 }
 
@@ -222,29 +223,39 @@ int PythonInterface::getOutputAndReset(char** line)
 //
 PyObject* PythonInterface::CreateModule(const char* module)
 {
-    PyObject *m, *d;
+    PyObject* m, *d;
 // first we must get rid of any old modules of the same name, we'll replace it
-    PyObject *modules = PyImport_GetModuleDict();
+    PyObject* modules = PyImport_GetModuleDict();
+
     if ((m = PyDict_GetItemString(modules, module)) != NULL && PyModule_Check(m))
         // clear it
+    {
         _PyModule_Clear(m);
+    }
 
 // create the module
     m = PyImport_AddModule(module);
-    if (m == NULL)
+
+    if (m == NULL) {
         return nil;
+    }
+
     d = PyModule_GetDict(m);
+
 // add in the built-ins
     // first make sure that we don't already have the builtins
-    if (PyDict_GetItemString(d, "__builtins__") == NULL)
-    {
+    if (PyDict_GetItemString(d, "__builtins__") == NULL) {
         // if we need the builtins then find the builtin module
-        PyObject *bimod = PyImport_ImportModule("__builtin__");
+        PyObject* bimod = PyImport_ImportModule("__builtin__");
+
         // then add the builtin dicitionary to our module's dictionary
-        if (bimod == NULL || PyDict_SetItemString(d, "__builtins__", bimod) != 0)
+        if (bimod == NULL || PyDict_SetItemString(d, "__builtins__", bimod) != 0) {
             return nil;
+        }
+
         Py_DECREF(bimod);
     }
+
     return m;
 }
 
@@ -258,29 +269,36 @@ PyObject* PythonInterface::CreateModule(const char* module)
 //
 bool PythonInterface::RunPYC(PyObject* code, PyObject* module)
 {
-    PyObject *d, *v;
+    PyObject* d, *v;
+
     // make sure that we're given a good module... or at least one with an address
-    if ( !module )
-    {
+    if (!module) {
         // if no module was given then use just use the main module
         module = PyImport_AddModule("__main__");
-        if (module == NULL)
+
+        if (module == NULL) {
             return false;
+        }
     }
+
     // get the dictionaries for this module
     d = PyModule_GetDict(module);
     // run the string
     v = PyEval_EvalCode((PyCodeObject*)code, d, d);
+
     // check for errors and print them
-    if (v == NULL)
-    {
+    if (v == NULL) {
         // Yikes! errors!
         PyErr_Print();
         return false;
     }
+
     Py_DECREF(v);
-    if (Py_FlushLine())
+
+    if (Py_FlushLine()) {
         PyErr_Clear();
+    }
+
     return true;
 }
 
@@ -293,11 +311,11 @@ bool PythonInterface::RunPYC(PyObject* code, PyObject* module)
 //
 PyObject* PythonInterface::GetModuleItem(const char* item, PyObject* module)
 {
-    if ( module )
-    {
+    if (module) {
         PyObject* d = PyModule_GetDict(module);
         return PyDict_GetItemString(d, item);
     }
+
     return nil;
 }
 

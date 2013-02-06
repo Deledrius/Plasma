@@ -46,13 +46,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-plATCEaseCurve *plATCEaseCurve::CreateEaseCurve(uint8_t type, float minLength, float maxLength, float length, 
-                                                float startSpeed, float goalSpeed)
+plATCEaseCurve* plATCEaseCurve::CreateEaseCurve(uint8_t type, float minLength, float maxLength, float length,
+        float startSpeed, float goalSpeed)
 {
-    if (type == plAnimEaseTypes::kConstAccel)
+    if (type == plAnimEaseTypes::kConstAccel) {
         return new plConstAccelEaseCurve(minLength, maxLength, length, startSpeed, goalSpeed);
-    if (type == plAnimEaseTypes::kSpline)
+    }
+
+    if (type == plAnimEaseTypes::kSpline) {
         return new plSplineEaseCurve(minLength, maxLength, length, startSpeed, goalSpeed);
+    }
 
     return nil;
 }
@@ -61,31 +64,37 @@ void plATCEaseCurve::RecalcToSpeed(float startSpeed, float goalSpeed, bool prese
 {
     float rate = 1;
 
-    if (fSpeed == goalSpeed && fStartSpeed == startSpeed) // already there, no need to do anything
+    if (fSpeed == goalSpeed && fStartSpeed == startSpeed) { // already there, no need to do anything
         return;
+    }
 
-    if (preserveRate)
+    if (preserveRate) {
         rate = (fSpeed - fStartSpeed) / fLength;
+    }
 
     fStartSpeed = startSpeed;
     fSpeed = goalSpeed;
 
-    if (preserveRate)
+    if (preserveRate) {
         SetLengthOnRate(rate);
+    }
 }
 
 void plATCEaseCurve::SetLengthOnRate(float rate)
 {
     fLength = (fSpeed - fStartSpeed) / rate;
-    if (fLength < 0)
+
+    if (fLength < 0) {
         fLength = -fLength;
+    }
 }
 
 float plATCEaseCurve::GetMinDistance()
 {
-    if (fMinLength == 0)
+    if (fMinLength == 0) {
         return 0;
-    
+    }
+
     float oldLength = fLength;
     fLength = fMinLength;
     float result = PositionGivenTime(fMinLength);
@@ -95,8 +104,9 @@ float plATCEaseCurve::GetMinDistance()
 
 float plATCEaseCurve::GetMaxDistance()
 {
-    if (fMaxLength == 0)
+    if (fMaxLength == 0) {
         return 0;
+    }
 
     float oldLength = fLength;
     fLength = fMaxLength;
@@ -107,9 +117,10 @@ float plATCEaseCurve::GetMaxDistance()
 
 float plATCEaseCurve::GetNormDistance()
 {
-    if (fNormLength == 0)
+    if (fNormLength == 0) {
         return 0;
-    
+    }
+
     float oldLength = fLength;
     fLength = fNormLength;
     float result = PositionGivenTime(fNormLength);
@@ -117,7 +128,7 @@ float plATCEaseCurve::GetNormDistance()
     return result;
 }
 
-void plATCEaseCurve::Read(hsStream *s, hsResMgr *mgr)
+void plATCEaseCurve::Read(hsStream* s, hsResMgr* mgr)
 {
     plCreatable::Read(s, mgr);
 
@@ -129,7 +140,7 @@ void plATCEaseCurve::Read(hsStream *s, hsResMgr *mgr)
     fBeginWorldTime = s->ReadLEDouble();
 }
 
-void plATCEaseCurve::Write(hsStream *s, hsResMgr *mgr)
+void plATCEaseCurve::Write(hsStream* s, hsResMgr* mgr)
 {
     plCreatable::Write(s, mgr);
 
@@ -151,20 +162,20 @@ plConstAccelEaseCurve::plConstAccelEaseCurve()
     RecalcToSpeed(0, 1);
 }
 
-plConstAccelEaseCurve::plConstAccelEaseCurve(float minLength, float maxLength, float length, 
-                                             float startSpeed, float goalSpeed)
+plConstAccelEaseCurve::plConstAccelEaseCurve(float minLength, float maxLength, float length,
+        float startSpeed, float goalSpeed)
 {
     fMinLength = minLength;
     fMaxLength = maxLength;
-    fNormLength = fLength = length; 
+    fNormLength = fLength = length;
     fBeginWorldTime = 0;
 
     RecalcToSpeed(startSpeed, goalSpeed);
 }
 
-plATCEaseCurve *plConstAccelEaseCurve::Clone() const
+plATCEaseCurve* plConstAccelEaseCurve::Clone() const
 {
-    plConstAccelEaseCurve *curve = new plConstAccelEaseCurve;
+    plConstAccelEaseCurve* curve = new plConstAccelEaseCurve;
     curve->fStartSpeed = fStartSpeed;
     curve->fMinLength = fMinLength;
     curve->fMaxLength = fMaxLength;
@@ -206,20 +217,20 @@ plSplineEaseCurve::plSplineEaseCurve()
     RecalcToSpeed(0, 1);
 }
 
-plSplineEaseCurve::plSplineEaseCurve(float minLength, float maxLength, float length, 
+plSplineEaseCurve::plSplineEaseCurve(float minLength, float maxLength, float length,
                                      float startSpeed, float goalSpeed)
 {
     fMinLength = minLength;
     fMaxLength = maxLength;
-    fNormLength = fLength = length; 
+    fNormLength = fLength = length;
     fBeginWorldTime = 0;
 
     RecalcToSpeed(startSpeed, goalSpeed);
 }
 
-plATCEaseCurve *plSplineEaseCurve::Clone() const
+plATCEaseCurve* plSplineEaseCurve::Clone() const
 {
-    plSplineEaseCurve *curve = new plSplineEaseCurve;
+    plSplineEaseCurve* curve = new plSplineEaseCurve;
     curve->fStartSpeed = fStartSpeed;
     curve->fMinLength = fMinLength;
     curve->fMaxLength = fMaxLength;
@@ -229,8 +240,10 @@ plATCEaseCurve *plSplineEaseCurve::Clone() const
     curve->fSpeed = fSpeed;
 
     int i;
-    for (i = 0; i < 4; i++)
+
+    for (i = 0; i < 4; i++) {
         curve->fCoef[i] = fCoef[i];
+    }
 
     return curve;
 }
@@ -238,10 +251,10 @@ plATCEaseCurve *plSplineEaseCurve::Clone() const
 void plSplineEaseCurve::RecalcToSpeed(float startSpeed, float goalSpeed, bool preserveRate /* = false */)
 {
     plATCEaseCurve::RecalcToSpeed(startSpeed, goalSpeed, preserveRate);
-    
+
     // These are greatly simplified because the in/out tangents are always zero
     // Note: "b" is always zero for the ease splines we're currently doing (and will remain that way
-    //       so long as the initial acceleration is zero. Can optimize a bit of the eval math to take 
+    //       so long as the initial acceleration is zero. Can optimize a bit of the eval math to take
     //       advantage of this.
     float a, b, c, d;
 
@@ -270,7 +283,7 @@ float plSplineEaseCurve::PositionGivenTime(float time) const
     t2 = t1 * t1;
     t3 = t2 * t1;
     t4 = t3 * t1;
-    
+
     return fLength * (fCoef[0] * t1 + fCoef[1] * t2 / 2 + fCoef[2] * t3 / 3 + fCoef[3] * t4 / 4);
 }
 
@@ -283,7 +296,7 @@ float plSplineEaseCurve::VelocityGivenTime(float time) const
     return fCoef[0] + fCoef[1] * t1 + fCoef[2] * t2 + fCoef[3] * t3;
 }
 
-float plSplineEaseCurve::TimeGivenVelocity(float velocity) const 
+float plSplineEaseCurve::TimeGivenVelocity(float velocity) const
 {
     // Code based off of Graphics Gems V, pp 11-12 and
     // http://www.worldserver.com/turk/opensource/FindCubicRoots.c.txt
@@ -300,42 +313,45 @@ float plSplineEaseCurve::TimeGivenVelocity(float velocity) const
     float Q3 = Q * Q * Q;
     float D = Q3 - R * R;
 
-    if (D >= 0) 
-    {   
+    if (D >= 0) {
         // 3 roots, find the one in the range [0, 1]
         const float pi = 3.14159;
         double theta = acos(R / sqrt(Q3));
         double sqrtQ = sqrt(Q);
 
         root = (float)(-2 * sqrtQ * cos((theta + 4 * pi) / 3) - c / 3); // Middle root, most likely to match
-        if (root < 0.f || root > 1.f)
-        {
+
+        if (root < 0.f || root > 1.f) {
             root = (float)(-2 * sqrtQ * cos((theta + 2 * pi) / 3) - c / 3); // Lower root
-            if (root < 0.f || root > 1.f)
-            {
+
+            if (root < 0.f || root > 1.f) {
                 root = (float)(-2 * sqrtQ * cos(theta / 3) - c / 3); // Upper root
             }
         }
-    }
-    else // One root to the equation (I don't expect this to happen for ease splines, but JIC)
-    {
+    } else { // One root to the equation (I don't expect this to happen for ease splines, but JIC)
         double E = sqrt(-D) + pow(fabs(R), 1.f / 3.f);
         root = (float)((E + Q / E) - c / 3);
-        if (R > 0)
+
+        if (R > 0) {
             root = -root;
+        }
     }
 
-    if (root < 0.f || root > 1.f)
-    {
+    if (root < 0.f || root > 1.f) {
         hsAssert(false, "No valid root found while solving animation spline");
         // Either a bug, or a rare case of floating-point inaccuracy. Either way, guess
         // the proper root as either the start or end of the curve based on the velocity.
         float dStart = velocity - fStartSpeed;
-        if (dStart < 0)
+
+        if (dStart < 0) {
             dStart = -dStart;
+        }
+
         float dEnd = velocity - fSpeed;
-        if (dEnd < 0)
+
+        if (dEnd < 0) {
             dEnd = -dEnd;
+        }
 
         root = (dStart < dEnd ? 0.f : 1.f);
     }
@@ -343,7 +359,7 @@ float plSplineEaseCurve::TimeGivenVelocity(float velocity) const
     return root * fLength;
 }
 
-void plSplineEaseCurve::Read(hsStream *s, hsResMgr *mgr)
+void plSplineEaseCurve::Read(hsStream* s, hsResMgr* mgr)
 {
     plATCEaseCurve::Read(s, mgr);
 
@@ -353,7 +369,7 @@ void plSplineEaseCurve::Read(hsStream *s, hsResMgr *mgr)
     fCoef[3] = s->ReadLEScalar();
 }
 
-void plSplineEaseCurve::Write(hsStream *s, hsResMgr *mgr)
+void plSplineEaseCurve::Write(hsStream* s, hsResMgr* mgr)
 {
     plATCEaseCurve::Write(s, mgr);
 

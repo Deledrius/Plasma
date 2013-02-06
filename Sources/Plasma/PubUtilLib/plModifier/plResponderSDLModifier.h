@@ -49,33 +49,39 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 class plResponderModifier;
 class plStateDataRecord;
-class plResponderSDLModifier : public plSDLModifier
-{
+class plResponderSDLModifier : public plSDLModifier {
 protected:
-    // var labels 
-    static char kStrCurState[]; 
-    static char kStrCurCommand[];   
-    static char kStrNetRequest[];   
+    // var labels
+    static char kStrCurState[];
+    static char kStrCurCommand[];
+    static char kStrNetRequest[];
     static char kStrCompletedEvents[];
     static char kStrEnabled[];
     static char kStrPlayerKey[];
     static char kStrTriggerer[];
-    
+
     plResponderModifier* fResponder;
 
     void IPutCurrentStateIn(plStateDataRecord* dstState);
     void ISetCurrentStateFrom(const plStateDataRecord* srcState);
 public:
-    CLASSNAME_REGISTER( plResponderSDLModifier );
-    GETINTERFACE_ANY( plResponderSDLModifier, plSDLModifier);
-        
+    CLASSNAME_REGISTER(plResponderSDLModifier);
+    GETINTERFACE_ANY(plResponderSDLModifier, plSDLModifier);
+
     plResponderSDLModifier() : fResponder(nil) {}
 
-    const char* GetSDLName() const { return kSDLResponder; }
+    const char* GetSDLName() const {
+        return kSDLResponder;
+    }
     plKey GetStateOwnerKey() const;
-    
-    plResponderModifier* GetResponder() const { return fResponder; }
-    void SetResponder(plResponderModifier* r) { fResponder=r; AddTarget(nil); }
+
+    plResponderModifier* GetResponder() const {
+        return fResponder;
+    }
+    void SetResponder(plResponderModifier* r) {
+        fResponder = r;
+        AddTarget(nil);
+    }
 };
 
 #endif  // plResponderSDLModifier_inc

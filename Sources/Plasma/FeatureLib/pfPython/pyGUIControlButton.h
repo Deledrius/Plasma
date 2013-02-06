@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pyGlueHelpers.h"
 #include "pyGUIControl.h"
 
-class pyGUIControlButton : public pyGUIControl
-{
+class pyGUIControlButton : public pyGUIControl {
 protected:
     pyGUIControlButton(): pyGUIControl() {} // used by python glue, do NOT call
     pyGUIControlButton(pyKey& gckey);
@@ -63,16 +62,16 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptGUIControlButton);
-    static PyObject *New(pyKey& gckey);
-    static PyObject *New(plKey objkey);
+    static PyObject* New(pyKey& gckey);
+    static PyObject* New(plKey objkey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGUIControlButton object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGUIControlButton); // converts a PyObject to a pyGUIControlButton (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
-    static void AddPlasmaConstantsClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
+    static void AddPlasmaConstantsClasses(PyObject* m);
 
     static bool IsGUIControlButton(pyKey& gckey);
-    
+
     virtual void    SetNotifyType(int32_t kind);
     virtual int32_t   GetNotifyType();
     virtual bool    IsButtonDown();

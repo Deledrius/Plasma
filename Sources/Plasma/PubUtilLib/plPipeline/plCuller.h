@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plSpaceTree;
 
-class plCuller
-{
+class plCuller {
 
 public:
     plCuller() {}

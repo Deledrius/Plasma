@@ -50,65 +50,61 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #define MCN_UPGRADE_OLD_ANIM_BLOCKS
 
-namespace plPassBaseParamIDs
-{
-    enum AdvancedIDs
-    {
-        // Specular
-        kPBAdvUseSpec,  // Not used anymore, feel free to replace with new fields as necessary
-        kPBAdvSpecType, // ditto
-        kPBAdvShine,        // ...
-        kPBAdvShineStr, // ...
+namespace plPassBaseParamIDs {
+enum AdvancedIDs {
+    // Specular
+    kPBAdvUseSpec,  // Not used anymore, feel free to replace with new fields as necessary
+    kPBAdvSpecType, // ditto
+    kPBAdvShine,        // ...
+    kPBAdvShineStr, // ...
 
-        // Misc
-        kPBAdvWire,
-        kPBAdvMeshOutlines,
-        kPBAdvTwoSided,
+    // Misc
+    kPBAdvWire,
+    kPBAdvMeshOutlines,
+    kPBAdvTwoSided,
 
-        // Shading
-        kPBAdvSoftShadow,
-        kPBAdvNoProj,
-        kPBAdvVertexShade,
-        kPBAdvNoShade,
-        kPBAdvNoFog,
-        kPBAdvWhite,
+    // Shading
+    kPBAdvSoftShadow,
+    kPBAdvNoProj,
+    kPBAdvVertexShade,
+    kPBAdvNoShade,
+    kPBAdvNoFog,
+    kPBAdvWhite,
 
-        // Z
-        kPBAdvZOnly,
-        kPBAdvZClear,
-        kPBAdvZNoRead,
-        kPBAdvZNoWrite,
-        kPBAdvZInc,
+    // Z
+    kPBAdvZOnly,
+    kPBAdvZClear,
+    kPBAdvZNoRead,
+    kPBAdvZNoWrite,
+    kPBAdvZInc,
 
-        // Alpha test
-        kPBAdvAlphaTestHigh
-    };
+    // Alpha test
+    kPBAdvAlphaTestHigh
+};
 
-    enum SpecularTypes
-    {
-        kSpecTypeAlpha,
-        kSpecTypeColor,
-        kSpecTypeHighlight
-    };
+enum SpecularTypes {
+    kSpecTypeAlpha,
+    kSpecTypeColor,
+    kSpecTypeHighlight
+};
 
-    enum AnimationIDs
-    {
-        kPBAnimName,
-        kPBAnimAutoStart,
-        kPBAnimLoop,
-        kPBAnimLoopName,
-        kPBAnimEaseInType,
-        kPBAnimEaseOutType,
-        kPBAnimEaseInLength,
-        kPBAnimEaseOutLength,
-        kPBAnimEaseInMin,
-        kPBAnimEaseInMax,
-        kPBAnimEaseOutMin,
-        kPBAnimEaseOutMax,
-        kPBAnimUseGlobal,
-        kPBAnimGlobalName,
-        kPBAnimStealthNodes
-    };
+enum AnimationIDs {
+    kPBAnimName,
+    kPBAnimAutoStart,
+    kPBAnimLoop,
+    kPBAnimLoopName,
+    kPBAnimEaseInType,
+    kPBAnimEaseOutType,
+    kPBAnimEaseInLength,
+    kPBAnimEaseOutLength,
+    kPBAnimEaseInMin,
+    kPBAnimEaseInMax,
+    kPBAnimEaseOutMin,
+    kPBAnimEaseOutMax,
+    kPBAnimUseGlobal,
+    kPBAnimGlobalName,
+    kPBAnimStealthNodes
+};
 
 
 }

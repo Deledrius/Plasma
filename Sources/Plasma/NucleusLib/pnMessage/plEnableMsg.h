@@ -48,12 +48,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsStream;
 
-class plEnableMsg : public plMessage
-{
+class plEnableMsg : public plMessage {
 
 public:
-    enum 
-    {
+    enum {
         kDisable        = 0,
         kEnable,
         kDrawable,
@@ -62,66 +60,80 @@ public:
         kAll,
         kByType
     };
-    
+
     hsBitVector     fCmd;
     hsBitVector     fTypes;
 
-    bool Cmd(int n) const { return fCmd.IsBitSet(n); }
-    void SetCmd(int n) { fCmd.SetBit(n); }
-    void ClearCmd() { fCmd.Clear(); }
-    
-    void AddType(uint16_t t) { fTypes.SetBit(t); }
-    void RemoveType(uint16_t t) { fTypes.ClearBit(t); }
-    bool Type(uint16_t t) const { return fTypes.IsBitSet(t); }
-    const hsBitVector& Types() const { return fTypes; }
+    bool Cmd(int n) const {
+        return fCmd.IsBitSet(n);
+    }
+    void SetCmd(int n) {
+        fCmd.SetBit(n);
+    }
+    void ClearCmd() {
+        fCmd.Clear();
+    }
+
+    void AddType(uint16_t t) {
+        fTypes.SetBit(t);
+    }
+    void RemoveType(uint16_t t) {
+        fTypes.ClearBit(t);
+    }
+    bool Type(uint16_t t) const {
+        return fTypes.IsBitSet(t);
+    }
+    const hsBitVector& Types() const {
+        return fTypes;
+    }
 
     plEnableMsg() { }
-    plEnableMsg(const plKey &s, int which , int type) : plMessage() 
-    { SetCmd(which); SetCmd(type); }
+    plEnableMsg(const plKey& s, int which , int type) : plMessage() {
+        SetCmd(which);
+        SetCmd(type);
+    }
 
-    CLASSNAME_REGISTER( plEnableMsg );
-    GETINTERFACE_ANY( plEnableMsg, plMessage );
+    CLASSNAME_REGISTER(plEnableMsg);
+    GETINTERFACE_ANY(plEnableMsg, plMessage);
 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fCmd.Read(stream);
         fTypes.Read(stream);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         fCmd.Write(stream);
         fTypes.Write(stream);
     }
 
-    enum MsgContentFlags
-    {
+    enum MsgContentFlags {
         kCmd,
         kTypes,
     };
 
-    void ReadVersion(hsStream* stream, hsResMgr* mgr)
-    {
+    void ReadVersion(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgReadVersion(stream, mgr);
         hsBitVector contentFlags;
         contentFlags.Read(stream);
 
-        if (contentFlags.IsBitSet(kCmd))
+        if (contentFlags.IsBitSet(kCmd)) {
             fCmd.Read(stream);
-        if (contentFlags.IsBitSet(kTypes))
+        }
+
+        if (contentFlags.IsBitSet(kTypes)) {
             fTypes.Read(stream);
+        }
     }
 
-    void WriteVersion(hsStream* stream, hsResMgr* mgr)
-    {
+    void WriteVersion(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWriteVersion(stream, mgr);
         hsBitVector contentFlags;
         contentFlags.SetBit(kCmd);
         contentFlags.SetBit(kTypes);
         contentFlags.Write(stream);
-        
+
         fCmd.Write(stream);
         fTypes.Write(stream);
     }

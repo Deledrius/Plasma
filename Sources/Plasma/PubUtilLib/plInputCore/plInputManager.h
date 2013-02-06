@@ -57,51 +57,58 @@ class plDInputDevice;
 class plInputInterfaceMgr;
 class plPipeline;
 
-class plInputManager :public hsKeyedObject
-{
+class plInputManager : public hsKeyedObject {
 private:
     static bool fUseDInput;
 public:
     plInputManager();
-    plInputManager( hsWindowHndl hWnd );
+    plInputManager(hsWindowHndl hWnd);
     ~plInputManager();
-    
-    CLASSNAME_REGISTER( plInputManager );
-    GETINTERFACE_ANY( plInputManager, hsKeyedObject );
+
+    CLASSNAME_REGISTER(plInputManager);
+    GETINTERFACE_ANY(plInputManager, hsKeyedObject);
 
 
     void AddInputDevice(plInputDevice* pDev);
     void InitDInput(hsWindowInst hInst, hsWindowHndl hWnd);
 
-    static void UseDInput(bool b) { fUseDInput = b; }
+    static void UseDInput(bool b) {
+        fUseDInput = b;
+    }
     void Update();
-    static plInputManager*  GetInstance() { return fInstance; }
+    static plInputManager*  GetInstance() {
+        return fInstance;
+    }
     static plInputManager*  fInstance;
     virtual bool MsgReceive(plMessage* msg);
-    static bool RecenterMouse() { return bRecenterMouse > 0; }
-    static void SetRecenterMouse(bool b); 
+    static bool RecenterMouse() {
+        return bRecenterMouse > 0;
+    }
+    static void SetRecenterMouse(bool b);
     static void RecenterCursor();
     void CreateInterfaceMod(plPipeline* p);
 
-    void    Activate( bool activating );
+    void    Activate(bool activating);
 
-    float    GetMouseScale( void ) const { return fMouseScale; }
-    void        SetMouseScale( float s );
-    
+    float    GetMouseScale(void) const {
+        return fMouseScale;
+    }
+    void        SetMouseScale(float s);
+
     static plKeyDef UntranslateKey(plKeyDef key, bool extended);
-    
+
 protected:
-    
+
     hsTArray<plInputDevice*>    fInputDevices;
     plDInputMgr*                fDInputMgr;
-    plInputInterfaceMgr         *fInterfaceMgr;
-    bool                        fActive, fFirstActivated;       
+    plInputInterfaceMgr*         fInterfaceMgr;
+    bool                        fActive, fFirstActivated;
 
     float                    fMouseScale;
     static uint8_t           bRecenterMouse;
     static hsWindowHndl      fhWnd;
-	std::locale localeC;
-    
+    std::locale localeC;
+
 public:
 #if HS_BUILD_FOR_WIN32
     // event handlers

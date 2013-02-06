@@ -53,7 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMessage/plAnimCmdMsg.h"
 
 plSimpleModifier::plSimpleModifier()
-: 
+    :
     fTarget(nil)
 {
     fTimeConvert.SetOwner(this);
@@ -61,8 +61,9 @@ plSimpleModifier::plSimpleModifier()
 
 plSimpleModifier::~plSimpleModifier()
 {
-    if( !fTimeConvert.IsStopped() )
+    if (!fTimeConvert.IsStopped()) {
         IEnd();
+    }
 }
 
 void plSimpleModifier::Read(hsStream* s, hsResMgr* mgr)
@@ -71,8 +72,9 @@ void plSimpleModifier::Read(hsStream* s, hsResMgr* mgr)
 
     fTimeConvert.Read(s, mgr);
 
-    if( !fTimeConvert.IsStopped() )
-        IBegin();       // TEMP TILL Message causes IBEGIN
+    if (!fTimeConvert.IsStopped()) {
+        IBegin();    // TEMP TILL Message causes IBEGIN
+    }
 }
 
 void plSimpleModifier::Write(hsStream* s, hsResMgr* mgr)
@@ -85,8 +87,10 @@ void plSimpleModifier::Write(hsStream* s, hsResMgr* mgr)
 void plSimpleModifier::AddTarget(plSceneObject* o)
 {
     fTarget = o;
-    if( !fTimeConvert.IsStopped() )
-        IBegin();       // TEMP TILL Message causes IBEGIN
+
+    if (!fTimeConvert.IsStopped()) {
+        IBegin();    // TEMP TILL Message causes IBEGIN
+    }
 }
 
 void plSimpleModifier::RemoveTarget(plSceneObject* o)
@@ -97,19 +101,18 @@ void plSimpleModifier::RemoveTarget(plSceneObject* o)
 
 void plSimpleModifier::IBegin()
 {
-    if( fTarget )
-    {
+    if (fTarget) {
         fTimeConvert.Start();
         plgDispatch::Dispatch()->RegisterForExactType(plEvalMsg::Index(), GetKey());
-        
+
     }
 }
 
 void plSimpleModifier::IEnd()
 {
     fTimeConvert.Stop();
-    if( fTarget )
-    {
+
+    if (fTarget) {
         plgDispatch::Dispatch()->UnRegisterForExactType(plEvalMsg::Index(), GetKey());
     }
 }
@@ -122,24 +125,27 @@ bool plSimpleModifier::IEval(double secs, float del, uint32_t dirty)
 bool plSimpleModifier::MsgReceive(plMessage* msg)
 {
     plRefMsg* refMsg = plRefMsg::ConvertNoRef(msg);
-    if( refMsg )
-    {
+
+    if (refMsg) {
         return IHandleRef(refMsg);
     }
+
     plAnimCmdMsg* modMsg = plAnimCmdMsg::ConvertNoRef(msg);
-    if( modMsg )
-    {
+
+    if (modMsg) {
         return IHandleCmd(modMsg);
     }
+
     return plModifier::MsgReceive(msg);
 }
 
 bool plSimpleModifier::IHandleRef(plRefMsg* refMsg)
 {
-    if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
+    if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
         AddTarget(plSceneObject::ConvertNoRef(refMsg->GetRef()));
-    else
+    } else {
         RemoveTarget(plSceneObject::ConvertNoRef(refMsg->GetRef()));
+    }
 
     return true;
 }
@@ -152,21 +158,17 @@ bool plSimpleModifier::IHandleCmd(plAnimCmdMsg* modMsg)
 
     bool isStopped = fTimeConvert.IsStopped();
 
-    if( wasStopped != isStopped )
-    {
-        if( isStopped )
-        {
+    if (wasStopped != isStopped) {
+        if (isStopped) {
             IEnd();
-        }
-        else
-        {
+        } else {
             IBegin();
         }
     }
 
 #if 0   // debug
     char str[256];
-        sprintf(str, "ModHandleCmd: time=%f, ts=%f FWD=%d, BWD=%d, SpeedChange=%d sp=%f, CONT=%d, STOP=%d\n",
+    sprintf(str, "ModHandleCmd: time=%f, ts=%f FWD=%d, BWD=%d, SpeedChange=%d sp=%f, CONT=%d, STOP=%d\n",
             hsTimer::GetSysSeconds(),
             modMsg->GetTimeStamp(),
             modMsg->Cmd(plAnimCmdMsg::kSetForewards),
@@ -175,21 +177,21 @@ bool plSimpleModifier::IHandleCmd(plAnimCmdMsg* modMsg)
             modMsg->fSpeed,
             modMsg->Cmd(plAnimCmdMsg::kContinue),
             modMsg->Cmd(plAnimCmdMsg::kStop));
-        hsStatusMessage(str);
+    hsStatusMessage(str);
 #endif
     return true;
-}   
+}
 
 bool plSimpleModifier::IHandleTime(double wSecs, float del)
 {
 
-    if( !fTarget )
+    if (!fTarget) {
         return true;
+    }
 
     float secs = fTimeConvert.WorldToAnimTime(wSecs);
-    
-    if( secs != fCurrentTime )
-    {
+
+    if (secs != fCurrentTime) {
         fCurrentTime = secs;
 
         IApplyDynamic();

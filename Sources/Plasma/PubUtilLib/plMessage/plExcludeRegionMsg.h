@@ -46,14 +46,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsStream;
 
-class plExcludeRegionMsg : public plMessage
-{
+class plExcludeRegionMsg : public plMessage {
 public:
-    enum CmdType
-    {
+    enum CmdType {
         kClear,     // Moves all avatars from the affected region. Once they are gone, It sends a
-                    // callback message and turns the region into a solid object that avatars
-                    // cannot penetrate.
+        // callback message and turns the region into a solid object that avatars
+        // cannot penetrate.
         kRelease    // Makes the xRegion not solid anymore
     };
 
@@ -62,26 +60,28 @@ protected:
 
 public:
     plExcludeRegionMsg() : fCmd(kClear), fSynchFlags(0) {}
-    plExcludeRegionMsg(const plKey &s, const plKey &r, const double* t) : fCmd(kClear), fSynchFlags(0) {}
+    plExcludeRegionMsg(const plKey& s, const plKey& r, const double* t) : fCmd(kClear), fSynchFlags(0) {}
     ~plExcludeRegionMsg() {}
 
     CLASSNAME_REGISTER(plExcludeRegionMsg);
     GETINTERFACE_ANY(plExcludeRegionMsg, plMessage);
-    
-    void SetCmd(CmdType cmd) { fCmd = cmd; }
-    uint8_t GetCmd() { return fCmd; }
+
+    void SetCmd(CmdType cmd) {
+        fCmd = cmd;
+    }
+    uint8_t GetCmd() {
+        return fCmd;
+    }
 
     uint32_t fSynchFlags;
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fCmd = stream->ReadByte();
         fSynchFlags = stream->ReadLE32();
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         stream->WriteByte(fCmd);
         stream->WriteLE32(fSynchFlags);

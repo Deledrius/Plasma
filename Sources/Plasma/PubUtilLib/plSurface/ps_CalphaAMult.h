@@ -63,7 +63,7 @@ static const uint8_t ps_CalphaAMultCodes[] = {
     0x0,    0x0,    0xe4,   0x80,
     0x0,    0x0,    0xe4,   0x90,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl ps_CalphaAMultDecl("sha/ps_CalphaAMult.inl", ps_CalphaAMult, ps_CalphaAMultbyteLen, ps_CalphaAMultCodes);
 

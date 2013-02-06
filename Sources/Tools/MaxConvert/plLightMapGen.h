@@ -60,8 +60,7 @@ class plConvertSettings;
 class hsBounds3Ext;
 class plLightMapComponent;
 
-class plLightMapInfo
-{
+class plLightMapInfo {
 public:
     ObjLightDesc*       fObjLiDesc;
     INode*              fLiNode;
@@ -71,8 +70,7 @@ public:
     bool                fNewRender;
 };
 
-class plLightMapGen
-{
+class plLightMapGen {
 protected:
     Interface*                  fInterface;
     TimeValue                   fTime;
@@ -81,7 +79,7 @@ protected:
     float                       fScale;
 
     float                       fMapRange;
-    
+
     int                         fWidth;
     int                         fHeight;
 
@@ -94,7 +92,7 @@ protected:
     plRenderGlobalContext*      fRGC;
 #endif // MF_NEW_RGC
     RendParams*                 fRP;
-    
+
     hsTArray<plLightMapInfo>    fAllLights;
     hsTArray<plLightMapInfo*>   fActiveLights;
 
@@ -119,9 +117,9 @@ protected:
     bool        IReleaseAllLights();
 
     int         IPowerOfTwo(int sz) const;
-    bool        ISelectBitmapDimension(plMaxNode* node, const hsMatrix44& l2w, const hsMatrix44& w2l, hsTArray<plGeometrySpan *> &spans);
+    bool        ISelectBitmapDimension(plMaxNode* node, const hsMatrix44& l2w, const hsMatrix44& w2l, hsTArray<plGeometrySpan*>& spans);
     bool        ICompressLightMaps();
-    
+
     bool        IsFresh(plBitmap* map) const;
 
     bool                IAddToLightMap(plLayerInterface* lay, plMipmap* src) const;
@@ -129,16 +127,18 @@ protected:
     void                IInitBitmapColor(plMipmap* bitmap, const hsColorRGBA& col) const;
     plLayerInterface*   IGetLightMapLayer(plMaxNode* node, plGeometrySpan& span);
     plLayerInterface*   IMakeLightMapLayer(plMaxNode* node, plGeometrySpan& span);
-    int                 IGetUVWSrc() const { return fUVWSrc; }
+    int                 IGetUVWSrc() const {
+        return fUVWSrc;
+    }
 
     uint32_t      IShadePoint(plMaxLightContext& ctx, const Color& amb, const hsPoint3& p, const hsVector3& n);
     bool        IShadeVerts(plMaxLightContext& ctx, const Color& amb, const hsPoint3 pt[3], const hsVector3 norm[3], const hsPoint3 uv[3], plMipmap* bitmap);
     bool        IShadeFace(plMaxNode* node, const hsMatrix44& l2w, const hsMatrix44& w2l, plGeometrySpan& span, int iFace, plMipmap* bitmap);
     bool        IShadeSpan(plMaxNode* node, const hsMatrix44& l2w, const hsMatrix44& w2l, plGeometrySpan& spans);
-    bool        IShadeGeometrySpans(plMaxNode* node, const hsMatrix44& l2w, const hsMatrix44& w2l, hsTArray<plGeometrySpan *> &spans);
+    bool        IShadeGeometrySpans(plMaxNode* node, const hsMatrix44& l2w, const hsMatrix44& w2l, hsTArray<plGeometrySpan*>& spans);
 
     bool        IWantsMaps(plMaxNode* node);
-    bool        IValidateUVWSrc(hsTArray<plGeometrySpan *> &spans) const;
+    bool        IValidateUVWSrc(hsTArray<plGeometrySpan*>& spans) const;
 
 public:
     plLightMapGen();
@@ -148,15 +148,23 @@ public:
     void SetRGC(RenderGlobalContext* rgc); // Don't call this ever ever ever
 #endif // MF_NEW_RGC
 
-    bool        Open(Interface* ip, TimeValue t, bool forceRegen=true);
-    bool        InitNode(INode* node, bool softShadow=true); // unnecessary when using MakeMaps()
+    bool        Open(Interface* ip, TimeValue t, bool forceRegen = true);
+    bool        InitNode(INode* node, bool softShadow = true); // unnecessary when using MakeMaps()
     bool        Update(TimeValue t);
 
-    void SetUVWSrc(int i) { fUVWSrc = i; }
-    int GetUVWSrc() const { return fUVWSrc; }
+    void SetUVWSrc(int i) {
+        fUVWSrc = i;
+    }
+    int GetUVWSrc() const {
+        return fUVWSrc;
+    }
 
-    void SetScale(float f) { fScale = f; }
-    float GetScale() const { return fScale; }
+    void SetScale(float f) {
+        fScale = f;
+    }
+    float GetScale() const {
+        return fScale;
+    }
 
     // Calls to either the global or single must be wrapped in
     // a call to Open and a call to close. That is, you must first
@@ -170,7 +178,7 @@ public:
     // a light (or any other node) while the shader is Open. For your
     // own safety and the safety of your fellow passengers, don't
     // return control to the user until the system is Closed.
-    bool        MakeMaps(plMaxNode* node, const hsMatrix44& l2w, const hsMatrix44& w2l, hsTArray<plGeometrySpan *>& spans, plErrorMsg *pErrMsg, plConvertSettings *settings);
+    bool        MakeMaps(plMaxNode* node, const hsMatrix44& l2w, const hsMatrix44& w2l, hsTArray<plGeometrySpan*>& spans, plErrorMsg* pErrMsg, plConvertSettings* settings);
 
     Color       ShadowPoint(plMaxLightContext& ctx);
     Color       ShadePoint(plMaxLightContext& ctx); // ctx already contains pos & norm

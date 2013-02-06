@@ -46,12 +46,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plString.h"
 
 //
-// An abstract base class which contains a status log and simple functions 
+// An abstract base class which contains a status log and simple functions
 // for writing Debug and Error msgs to the log
 //
 class plStatusLog;
-class plLoggable
-{
+class plLoggable {
 protected:
     mutable plStatusLog* fStatusLog;
     mutable bool    fWeCreatedLog;
@@ -61,18 +60,18 @@ protected:
     void    IDeleteLog();
 
 public:
-    plLoggable() : fStatusLog(nil), fWeCreatedLog(false),fComplainAboutMissingLog(true) {   }
+    plLoggable() : fStatusLog(nil), fWeCreatedLog(false), fComplainAboutMissingLog(true) {   }
     virtual ~plLoggable();
 
     plStatusLog* GetLog() const;
-    void SetLog( plStatusLog * log, bool deleteOnDestruct=false );
+    void SetLog(plStatusLog* log, bool deleteOnDestruct = false);
 
     // logging
 
-    virtual bool Log( const char * str ) const;
+    virtual bool Log(const char* str) const;
     virtual bool Log(const plString& str) const;
-    virtual bool LogF( const char * fmt, ... ) const;
-    virtual bool LogV( const char * fmt, va_list args ) const;
+    virtual bool LogF(const char* fmt, ...) const;
+    virtual bool LogV(const char* fmt, va_list args) const;
     virtual bool ErrorMsgV(const char* fmt, va_list args) const ;
     virtual bool DebugMsgV(const char* fmt, va_list args) const ;
     virtual bool WarningMsgV(const char* fmt, va_list args) const ;

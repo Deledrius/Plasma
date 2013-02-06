@@ -57,27 +57,26 @@ class plGUIControlMod;
 //  Helper dialog proc that takes all control events and turns them into
 //  notify messages that get sent out.
 
-class pfGUIDialogNotifyProc : public pfGUIDialogProc
-{
-    protected:
-        
-        plKey   fReceiver;
+class pfGUIDialogNotifyProc : public pfGUIDialogProc {
+protected:
 
-        void    ISendNotify( plKey ctrlKey, uint32_t event );
+    plKey   fReceiver;
 
-    public:
+    void    ISendNotify(plKey ctrlKey, uint32_t event);
 
-        pfGUIDialogNotifyProc( plKey &r );
+public:
 
-        virtual void    DoSomething( pfGUIControlMod *ctrl );
-        virtual void    HandleExtendedEvent( pfGUIControlMod *ctrl, uint32_t event );
-        virtual void    OnInit( void );
-        virtual void    OnShow( void );
-        virtual void    OnHide( void );
-        virtual void    OnDestroy( void );
-        virtual void    OnCtrlFocusChange( pfGUIControlMod *oldCtrl, pfGUIControlMod *newCtrl );
-        virtual void    OnControlEvent( ControlEvt event );
-        virtual void    OnInterestingEvent( pfGUIControlMod *ctrl );
+    pfGUIDialogNotifyProc(plKey& r);
+
+    virtual void    DoSomething(pfGUIControlMod* ctrl);
+    virtual void    HandleExtendedEvent(pfGUIControlMod* ctrl, uint32_t event);
+    virtual void    OnInit(void);
+    virtual void    OnShow(void);
+    virtual void    OnHide(void);
+    virtual void    OnDestroy(void);
+    virtual void    OnCtrlFocusChange(pfGUIControlMod* oldCtrl, pfGUIControlMod* newCtrl);
+    virtual void    OnControlEvent(ControlEvt event);
+    virtual void    OnInterestingEvent(pfGUIControlMod* ctrl);
 };
 
 #endif // _pfGUIDialogNotifyProc_h

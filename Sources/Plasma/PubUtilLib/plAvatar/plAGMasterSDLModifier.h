@@ -45,25 +45,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plModifier/plAnimTimeConvertSDLModifier.h"
 
 //
-// This modifier is responsible for sending and recving 
+// This modifier is responsible for sending and recving
 // an object's animation state
 //
 class plAGMasterMod;
 class plSceneObject;
 class plStateDataRecord;
 
-class plAGMasterSDLModifier : public plAnimTimeConvertSDLModifier
-{
+class plAGMasterSDLModifier : public plAnimTimeConvertSDLModifier {
 protected:
-    // var labels 
-    struct AGMasterVarNames
-    {
+    // var labels
+    struct AGMasterVarNames {
         static char kStrAtcs[];     // animTimeConverts
         static char kStrBlends[];
     };
 
     plAGMasterMod* IGetObjectsAGMasterMod(plSceneObject* obj);
-    
+
     void IPutBlends(plStateDataRecord* state, plAGMasterMod* objAGMaster);
     void ISetCurrentBlends(const plStateDataRecord* state, plAGMasterMod* objAGMaster);
 
@@ -73,13 +71,15 @@ protected:
     uint32_t IApplyModFlags(uint32_t sendFlags);
 
 public:
-    CLASSNAME_REGISTER( plAGMasterSDLModifier);
-    GETINTERFACE_ANY( plAGMasterSDLModifier, plAnimTimeConvertSDLModifier);
+    CLASSNAME_REGISTER(plAGMasterSDLModifier);
+    GETINTERFACE_ANY(plAGMasterSDLModifier, plAnimTimeConvertSDLModifier);
 
     plAGMasterSDLModifier() {}
     ~plAGMasterSDLModifier() {}
-        
-    const char* GetSDLName() const { return kSDLAGMaster; }
+
+    const char* GetSDLName() const {
+        return kSDLAGMaster;
+    }
 };
 
 #endif  // plAGMasterSDLModifier_inc

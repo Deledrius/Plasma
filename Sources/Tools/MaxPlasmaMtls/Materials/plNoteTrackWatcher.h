@@ -53,7 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef _plNoteTrackWatcher_h
 #define _plNoteTrackWatcher_h
 
-extern TCHAR *GetString(int id);
+extern TCHAR* GetString(int id);
 extern HINSTANCE hInstance;
 
 #define NTWATCHER_CLASSID       Class_ID(0x313f531e, 0xa5f132f)
@@ -65,34 +65,38 @@ class NoteTrack;
 
 //// Class Def ///////////////////////////////////////////////////////////////
 
-class plNoteTrackWatcher : public ReferenceMaker
-{
+class plNoteTrackWatcher : public ReferenceMaker {
 protected:
-    plPassMtlBase   *fParentMtl;
+    plPassMtlBase*   fParentMtl;
 
     // For tracking notetrack additions to the parent
     int             fNoteTrackCount;
 
 public:
 
-    enum Refs
-    {
+    enum Refs {
         kRefParentMtl = 0
     };
 
-    plNoteTrackWatcher( plPassMtlBase *parentMtl );
+    plNoteTrackWatcher(plPassMtlBase* parentMtl);
     virtual ~plNoteTrackWatcher();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
-    Class_ID    ClassID()               { return NTWATCHER_CLASSID; }      
-    SClass_ID   SuperClassID()          { return REF_MAKER_CLASS_ID; }
-    
+    Class_ID    ClassID()               {
+        return NTWATCHER_CLASSID;
+    }
+    SClass_ID   SuperClassID()          {
+        return REF_MAKER_CLASS_ID;
+    }
+
     int             NumRefs();
     RefTargetHandle GetReference(int i);
     void            SetReference(int i, RefTargetHandle rtarg);
-    RefResult       NotifyRefChanged(Interval changeInt,RefTargetHandle hTarget, PartID& partID, RefMessage message);
+    RefResult       NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, PartID& partID, RefMessage message);
 
-    virtual BOOL    IsRealDependency( ReferenceTarget *rtarg );
+    virtual BOOL    IsRealDependency(ReferenceTarget* rtarg);
 };
 
 #endif //_plNoteTrackWatcher_h 

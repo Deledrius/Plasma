@@ -54,19 +54,19 @@ PYTHON_DEFAULT_DEALLOC_DEFINITION(ptGUISkin)
 
 PYTHON_INIT_DEFINITION(ptGUISkin, args, keywords)
 {
-    PyObject *keyObject = NULL;
-    if (!PyArg_ParseTuple(args, "O", &keyObject))
-    {
-        PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
-        PYTHON_RETURN_INIT_ERROR;
-    }
-    if (!pyKey::Check(keyObject))
-    {
+    PyObject* keyObject = NULL;
+
+    if (!PyArg_ParseTuple(args, "O", &keyObject)) {
         PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
         PYTHON_RETURN_INIT_ERROR;
     }
 
-    pyKey *key = pyKey::ConvertFrom(keyObject);
+    if (!pyKey::Check(keyObject)) {
+        PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
+        PYTHON_RETURN_INIT_ERROR;
+    }
+
+    pyKey* key = pyKey::ConvertFrom(keyObject);
     self->fThis->setKey(key->getKey());
 
     PYTHON_RETURN_INIT_OK;
@@ -74,33 +74,35 @@ PYTHON_INIT_DEFINITION(ptGUISkin, args, keywords)
 
 PYTHON_RICH_COMPARE_DEFINITION(ptGUISkin, obj1, obj2, compareType)
 {
-    if ((obj1 == Py_None) || (obj2 == Py_None) || !pyGUISkin::Check(obj1) || !pyGUISkin::Check(obj2))
-    {
+    if ((obj1 == Py_None) || (obj2 == Py_None) || !pyGUISkin::Check(obj1) || !pyGUISkin::Check(obj2)) {
         // if they aren't the same type, they don't match, obviously (we also never equal none)
-        if (compareType == Py_EQ)
+        if (compareType == Py_EQ) {
             PYTHON_RCOMPARE_FALSE;
-        else if (compareType == Py_NE)
+        } else if (compareType == Py_NE) {
             PYTHON_RCOMPARE_TRUE;
-        else
-        {
+        } else {
             PyErr_SetString(PyExc_NotImplementedError, "invalid comparison for a ptGUISkin object");
             PYTHON_RCOMPARE_ERROR;
         }
     }
-    pyGUISkin *skin1 = pyGUISkin::ConvertFrom(obj1);
-    pyGUISkin *skin2 = pyGUISkin::ConvertFrom(obj2);
-    if (compareType == Py_EQ)
-    {
-        if ((*skin1) == (*skin2))
+
+    pyGUISkin* skin1 = pyGUISkin::ConvertFrom(obj1);
+    pyGUISkin* skin2 = pyGUISkin::ConvertFrom(obj2);
+
+    if (compareType == Py_EQ) {
+        if ((*skin1) == (*skin2)) {
             PYTHON_RCOMPARE_TRUE;
+        }
+
+        PYTHON_RCOMPARE_FALSE;
+    } else if (compareType == Py_NE) {
+        if ((*skin1) != (*skin2)) {
+            PYTHON_RCOMPARE_TRUE;
+        }
+
         PYTHON_RCOMPARE_FALSE;
     }
-    else if (compareType == Py_NE)
-    {
-        if ((*skin1) != (*skin2))
-            PYTHON_RCOMPARE_TRUE;
-        PYTHON_RCOMPARE_FALSE;
-    }
+
     PyErr_SetString(PyExc_NotImplementedError, "invalid comparison for a ptGUISkin object");
     PYTHON_RCOMPARE_ERROR;
 }
@@ -111,8 +113,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGUISkin, getKey)
 }
 
 PYTHON_START_METHODS_TABLE(ptGUISkin)
-    PYTHON_METHOD_NOARGS(ptGUISkin, getKey, "Returns this object's ptKey"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGUISkin, getKey, "Returns this object's ptKey"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 #define ptGUISkin_COMPARE       PYTHON_NO_COMPARE
@@ -128,16 +130,16 @@ PLASMA_CUSTOM_TYPE(ptGUISkin, "Params: key\nPlasma GUI Skin object");
 // required functions for PyObject interoperability
 PYTHON_CLASS_NEW_IMPL(ptGUISkin, pyGUISkin)
 
-PyObject *pyGUISkin::New(pyKey& gckey)
+PyObject* pyGUISkin::New(pyKey& gckey)
 {
-    ptGUISkin *newObj = (ptGUISkin*)ptGUISkin_type.tp_new(&ptGUISkin_type, NULL, NULL);
+    ptGUISkin* newObj = (ptGUISkin*)ptGUISkin_type.tp_new(&ptGUISkin_type, NULL, NULL);
     newObj->fThis->fGCkey = gckey.getKey();
     return (PyObject*)newObj;
 }
 
-PyObject *pyGUISkin::New(plKey objkey)
+PyObject* pyGUISkin::New(plKey objkey)
 {
-    ptGUISkin *newObj = (ptGUISkin*)ptGUISkin_type.tp_new(&ptGUISkin_type, NULL, NULL);
+    ptGUISkin* newObj = (ptGUISkin*)ptGUISkin_type.tp_new(&ptGUISkin_type, NULL, NULL);
     newObj->fThis->fGCkey = objkey;
     return (PyObject*)newObj;
 }
@@ -149,7 +151,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptGUISkin, pyGUISkin)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyGUISkin::AddPlasmaClasses(PyObject *m)
+void pyGUISkin::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptGUISkin);

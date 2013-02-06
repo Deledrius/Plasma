@@ -53,10 +53,10 @@ static const int kDefFaces = 200;
 static const float kDefSize = 1000.f;
 
 plDicer::plDicer()
-:   fMaxSize(kDefSize, kDefSize, kDefSize),
-    fMaxFaces(kDefFaces)
+    :   fMaxSize(kDefSize, kDefSize, kDefSize),
+        fMaxFaces(kDefFaces)
 {
-    
+
 }
 
 plDicer::~plDicer()
@@ -85,23 +85,22 @@ int plDicer::GetMaxFaces() const
 
 BOOL plDicer::Dice(INode* node, INodeTab& out)
 {
-    Object *obj = node->EvalWorldState(TimeValue(0)).obj;
-    if( !obj )
-    {
+    Object* obj = node->EvalWorldState(TimeValue(0)).obj;
+
+    if (!obj) {
         out.Append(1, &node);
         return false;
     }
 
-    if( !obj->CanConvertToType( triObjectClassID ) )
-    {
+    if (!obj->CanConvertToType(triObjectClassID)) {
         out.Append(1, &node);
         return false;
     }
 
     // Convert to triMesh object
-    TriObject   *meshObj = (TriObject*)obj->ConvertToType(TimeValue(0), triObjectClassID);
-    if( !meshObj )
-    {
+    TriObject*   meshObj = (TriObject*)obj->ConvertToType(TimeValue(0), triObjectClassID);
+
+    if (!meshObj) {
         out.Append(1, &node);
         return false;
     }
@@ -110,15 +109,15 @@ BOOL plDicer::Dice(INode* node, INodeTab& out)
     newObj->mesh = meshObj->mesh;
 
     plTriObjectTab triList;
-    if( !IDiceIter(newObj, triList) )
-    {
+
+    if (!IDiceIter(newObj, triList)) {
         delete newObj;
         out.Append(1, &node);
         return false;
     }
 
     IMakeIntoNodes(node, triList, out);
-    
+
     node->Delete(TimeValue(0), true);
 
     return true;
@@ -136,13 +135,13 @@ BOOL plDicer::IDetach(TriObject* triObj, BitArray& faces, plTriObjectTab& triLis
 
     meshDelta.Apply(triObj->mesh);
 
-    if( newObj->mesh.getNumFaces() )
+    if (newObj->mesh.getNumFaces()) {
         triList.Append(1, &newObj);
-    else
+    } else {
         delete newObj;
+    }
 
-    if( triObj->mesh.getNumFaces() )
-    {
+    if (triObj->mesh.getNumFaces()) {
         newObj = CreateNewTriObject();
         newObj->mesh = triObj->mesh;
         triList.Append(1, &newObj);
@@ -160,37 +159,39 @@ BOOL plDicer::IHalf(TriObject* triObj, plTriObjectTab& triList)
 
     int iAxis = 0;
     float maxDim = mesh.getBoundingBox().Width()[0];
-    if( mesh.getBoundingBox().Width()[1] > maxDim )
-    {
+
+    if (mesh.getBoundingBox().Width()[1] > maxDim) {
         maxDim = mesh.getBoundingBox().Width()[1];
         iAxis = 1;
     }
-    if( mesh.getBoundingBox().Width()[2] > maxDim )
-    {
+
+    if (mesh.getBoundingBox().Width()[2] > maxDim) {
         maxDim = mesh.getBoundingBox().Width()[2];
         iAxis = 2;
     }
+
     float middle = mesh.getBoundingBox().Center()[iAxis];
 
     int numHi = 0;
     int i;
-    for( i = 0; i < mesh.getNumFaces(); i++ )
-    {
+
+    for (i = 0; i < mesh.getNumFaces(); i++) {
         Point3 p[3];
         p[0] = mesh.getVert(mesh.faces[i].getVert(0));
         p[1] = mesh.getVert(mesh.faces[i].getVert(1));
         p[2] = mesh.getVert(mesh.faces[i].getVert(2));
 
-        if( (p[0][iAxis] > middle)
-            &&(p[1][iAxis] > middle)
-            &&(p[2][iAxis] > middle) )
-        {
+        if ((p[0][iAxis] > middle)
+                && (p[1][iAxis] > middle)
+                && (p[2][iAxis] > middle)) {
             numHi++;
             faces.Set(i);
         }
     }
-    if( !numHi || (numHi == mesh.getNumFaces()) )
+
+    if (!numHi || (numHi == mesh.getNumFaces())) {
         return false;
+    }
 
     return IDetach(triObj, faces, triList);
 }
@@ -202,25 +203,29 @@ BOOL plDicer::IDice(TriObject* triObj, plTriObjectTab& triList)
     BOOL doChop = false;
     // First, does he need chopping?
     Mesh& mesh = triObj->mesh;
-    if( mesh.getNumFaces() > GetMaxFaces() )
-    {
+
+    if (mesh.getNumFaces() > GetMaxFaces()) {
         doChop = true;
-    }
-    else
-    {
+    } else {
         Box3 bnd = mesh.getBoundingBox();
         Point3 wid = bnd.Width();
-        
-        if( wid.x > GetMaxSize().x )
+
+        if (wid.x > GetMaxSize().x) {
             doChop = true;
-        if( wid.y > GetMaxSize().y )
+        }
+
+        if (wid.y > GetMaxSize().y) {
             doChop = true;
-        if( wid.z > GetMaxSize().z )
+        }
+
+        if (wid.z > GetMaxSize().z) {
             doChop = true;
+        }
     }
 
-    if( !doChop )
+    if (!doChop) {
         return false;
+    }
 
     // Okay, we got to chop.
     return IHalf(triObj, triList);
@@ -232,19 +237,18 @@ BOOL plDicer::IDiceIter(TriObject* triObj, plTriObjectTab& triList)
 
     plTriObjectTab inList;
     plTriObjectTab cutList;
-    
+
     inList.Append(1, &triObj);
 
-    while( inList.Count() )
-    {
+    while (inList.Count()) {
         int i;
-        for( i = 0; i < inList.Count(); i++ )
-        {
-            if( !IDice(inList[i], cutList) )
-            {
+
+        for (i = 0; i < inList.Count(); i++) {
+            if (!IDice(inList[i], cutList)) {
                 triList.Append(1, &inList[i]);
             }
         }
+
         inList = cutList;
         cutList.ZeroCount();
     }
@@ -254,12 +258,12 @@ BOOL plDicer::IDiceIter(TriObject* triObj, plTriObjectTab& triList)
 
 BOOL plDicer::IMakeIntoNodes(INode* node, plTriObjectTab& triList, INodeTab& out)
 {
-    NameMaker *nn = GetCOREInterface()->NewNameMaker();
+    NameMaker* nn = GetCOREInterface()->NewNameMaker();
     TSTR nodeName(node->GetName());
 
     int i;
-    for( i = 0; i < triList.Count(); i++ )
-    {
+
+    for (i = 0; i < triList.Count(); i++) {
         INode* outNode = GetCOREInterface()->CreateObjectNode(triList[i]);
 
         outNode->SetNodeTM(TimeValue(0), node->GetNodeTM(TimeValue(0)));
@@ -274,5 +278,6 @@ BOOL plDicer::IMakeIntoNodes(INode* node, plTriObjectTab& triList, INodeTab& out
 
         out.Append(1, &outNode);
     }
+
     return true;
 }

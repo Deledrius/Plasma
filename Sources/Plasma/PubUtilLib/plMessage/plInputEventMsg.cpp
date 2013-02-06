@@ -47,15 +47,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsBitVector.h"
 
 plInputEventMsg::plInputEventMsg() :
-fEvent(-1)
+    fEvent(-1)
 {
     SetBCastFlag(plMessage::kBCastByType);
 }
 
-plInputEventMsg::plInputEventMsg(const plKey &s, 
-            const plKey &r, 
-            const double* t) :
-fEvent(-1)
+plInputEventMsg::plInputEventMsg(const plKey& s,
+                                 const plKey& r,
+                                 const double* t) :
+    fEvent(-1)
 {
     SetBCastFlag(plMessage::kBCastByType);
 }
@@ -67,19 +67,18 @@ plInputEventMsg::~plInputEventMsg()
 void plInputEventMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
-    
+
     stream->ReadLE(&fEvent);
 }
 
 void plInputEventMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(stream, mgr);
-    
+
     stream->WriteLE(fEvent);
 }
 
-enum InputEventMsgFlags
-{
+enum InputEventMsgFlags {
     kInputEventMsgEvent,
 };
 
@@ -90,8 +89,9 @@ void plInputEventMsg::ReadVersion(hsStream* s, hsResMgr* mgr)
     hsBitVector contentFlags;
     contentFlags.Read(s);
 
-    if (contentFlags.IsBitSet(kInputEventMsgEvent))
+    if (contentFlags.IsBitSet(kInputEventMsgEvent)) {
         s->ReadLE(&fEvent);
+    }
 }
 
 void plInputEventMsg::WriteVersion(hsStream* s, hsResMgr* mgr)
@@ -106,28 +106,28 @@ void plInputEventMsg::WriteVersion(hsStream* s, hsResMgr* mgr)
     s->WriteLE(fEvent);
 }
 
-plControlEventMsg::plControlEventMsg() : 
+plControlEventMsg::plControlEventMsg() :
     fCmd(nil)
 {
-    fTurnToPt.Set(0,0,0);
+    fTurnToPt.Set(0, 0, 0);
     fControlPct = 1.0f;
     SetBCastFlag(plMessage::kPropagateToModifiers);
     SetBCastFlag(plMessage::kBCastByType, false);
 }
 
-plControlEventMsg::plControlEventMsg(const plKey &s, 
-            const plKey &r, 
-            const double* t) :
+plControlEventMsg::plControlEventMsg(const plKey& s,
+                                     const plKey& r,
+                                     const double* t) :
     fCmd(nil)
 {
-    fTurnToPt.Set(0,0,0);
+    fTurnToPt.Set(0, 0, 0);
     fControlPct = 1.0f;
     SetBCastFlag(plMessage::kBCastByType, false);
     SetBCastFlag(plMessage::kPropagateToModifiers);
 }
 
 plControlEventMsg::~plControlEventMsg()
-{   
+{
     delete [] fCmd;
 }
 
@@ -150,13 +150,12 @@ void plControlEventMsg::Write(hsStream* stream, hsResMgr* mgr)
     stream->WriteBOOL(fControlActivated);
     stream->WriteLE(fControlPct);
     fTurnToPt.Write(stream);
-    
+
     // write cmd/string
     plMsgCStringHelper::Poke(fCmd, stream);
 }
 
-enum ControlEventMsgFlags
-{
+enum ControlEventMsgFlags {
     kControlEventMsgCode,
     kControlEventMsgActivated,
     kControlEventMsgPct,
@@ -171,21 +170,26 @@ void plControlEventMsg::ReadVersion(hsStream* s, hsResMgr* mgr)
     hsBitVector contentFlags;
     contentFlags.Read(s);
 
-    if (contentFlags.IsBitSet(kControlEventMsgCode))
+    if (contentFlags.IsBitSet(kControlEventMsgCode)) {
         s->ReadLE((int32_t*)&fControlCode);
+    }
 
-    if (contentFlags.IsBitSet(kControlEventMsgActivated))
+    if (contentFlags.IsBitSet(kControlEventMsgActivated)) {
         fControlActivated = s->ReadBOOL();
+    }
 
-    if (contentFlags.IsBitSet(kControlEventMsgPct))
+    if (contentFlags.IsBitSet(kControlEventMsgPct)) {
         s->ReadLE(&fControlPct);
+    }
 
-    if (contentFlags.IsBitSet(kControlEventMsgTurnToPt))
+    if (contentFlags.IsBitSet(kControlEventMsgTurnToPt)) {
         fTurnToPt.Read(s);
+    }
 
     // read cmd/string
-    if (contentFlags.IsBitSet(kControlEventMsgCmd))
+    if (contentFlags.IsBitSet(kControlEventMsgCmd)) {
         plMsgCStringHelper::Peek(fCmd, s);
+    }
 }
 
 void plControlEventMsg::WriteVersion(hsStream* s, hsResMgr* mgr)
@@ -200,7 +204,7 @@ void plControlEventMsg::WriteVersion(hsStream* s, hsResMgr* mgr)
     contentFlags.SetBit(kControlEventMsgCmd);
     contentFlags.Write(s);
 
-    // kControlEventMsgCode,    
+    // kControlEventMsgCode,
     s->WriteLE((int32_t)fControlCode);
 
     // kControlEventMsgActivated,
@@ -220,8 +224,8 @@ plKeyEventMsg::plKeyEventMsg()
 {
 }
 
-plKeyEventMsg::plKeyEventMsg(const plKey &s, 
-                             const plKey &r, 
+plKeyEventMsg::plKeyEventMsg(const plKey& s,
+                             const plKey& r,
                              const double* t)
 {
 }
@@ -235,8 +239,8 @@ plDebugKeyEventMsg::plDebugKeyEventMsg()
 {
 }
 
-plDebugKeyEventMsg::plDebugKeyEventMsg(const plKey &s, 
-                                       const plKey &r, 
+plDebugKeyEventMsg::plDebugKeyEventMsg(const plKey& s,
+                                       const plKey& r,
                                        const double* t)
 {
 }
@@ -246,12 +250,12 @@ plDebugKeyEventMsg::~plDebugKeyEventMsg()
 }
 
 
-plMouseEventMsg::plMouseEventMsg() : fXPos(0.0f),fYPos(0.0f),fDX(0.0f),fDY(0.0f),fButton(0)
+plMouseEventMsg::plMouseEventMsg() : fXPos(0.0f), fYPos(0.0f), fDX(0.0f), fDY(0.0f), fButton(0)
 {
 }
 
-plMouseEventMsg::plMouseEventMsg(const plKey &s, 
-                                 const plKey &r, 
+plMouseEventMsg::plMouseEventMsg(const plKey& s,
+                                 const plKey& r,
                                  const double* t)
 {
 }
@@ -263,8 +267,7 @@ plMouseEventMsg::~plMouseEventMsg()
 /////////////////////////////////////////////////////////////////////////////
 
 // Mapping of bits to the control events we care about
-const ControlEventCode plAvatarInputStateMsg::fCodeMap[] =
-{
+const ControlEventCode plAvatarInputStateMsg::fCodeMap[] = {
     B_CONTROL_MOVE_FORWARD,
     B_CONTROL_MOVE_BACKWARD,
     B_CONTROL_ROTATE_LEFT,
@@ -280,38 +283,38 @@ const ControlEventCode plAvatarInputStateMsg::fCodeMap[] =
 };
 const uint8_t plAvatarInputStateMsg::fMapSize = 12;
 
-void plAvatarInputStateMsg::Read(hsStream *s, hsResMgr *mgr)
+void plAvatarInputStateMsg::Read(hsStream* s, hsResMgr* mgr)
 {
     plMessage::IMsgRead(s, mgr);
     fState = s->ReadLE16();
 }
 
-void plAvatarInputStateMsg::Write(hsStream *s, hsResMgr *mgr)
+void plAvatarInputStateMsg::Write(hsStream* s, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(s, mgr);
     s->WriteLE16(fState);
 }
 
-enum AvatarInputStateMsgFlags
-{
+enum AvatarInputStateMsgFlags {
     kAvatarInputStateMsgState,
 };
 
 void plAvatarInputStateMsg::ReadVersion(hsStream* s, hsResMgr* mgr)
 {
     plMessage::IMsgReadVersion(s, mgr);
-    
+
     hsBitVector contentFlags;
     contentFlags.Read(s);
 
-    if (contentFlags.IsBitSet(kAvatarInputStateMsgState))
+    if (contentFlags.IsBitSet(kAvatarInputStateMsgState)) {
         fState = s->ReadLE16();
+    }
 }
 
 void plAvatarInputStateMsg::WriteVersion(hsStream* s, hsResMgr* mgr)
 {
     plMessage::IMsgWriteVersion(s, mgr);
-    
+
     hsBitVector contentFlags;
     contentFlags.SetBit(kAvatarInputStateMsgState);
     contentFlags.Write(s);
@@ -322,10 +325,11 @@ void plAvatarInputStateMsg::WriteVersion(hsStream* s, hsResMgr* mgr)
 bool plAvatarInputStateMsg::IsCodeInMap(ControlEventCode code)
 {
     int i;
-    for (i = 0; i < fMapSize; i++)
-    {
-        if (fCodeMap[i] == code)
+
+    for (i = 0; i < fMapSize; i++) {
+        if (fCodeMap[i] == code) {
             return true;
+        }
     }
 
     return false;

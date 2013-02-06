@@ -48,9 +48,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMessage/plCondRefMsg.h"
 
 
-plORConditionalObject::plORConditionalObject() 
+plORConditionalObject::plORConditionalObject()
 {
-    
+
 }
 
 plORConditionalObject::~plORConditionalObject()
@@ -61,33 +61,35 @@ plORConditionalObject::~plORConditionalObject()
 bool plORConditionalObject::MsgReceive(plMessage* msg)
 {
     plCondRefMsg* pCondMsg = plCondRefMsg::ConvertNoRef(msg);
-    if (pCondMsg)
-    {
-        fChildren[pCondMsg->fWhich] = plConditionalObject::ConvertNoRef( pCondMsg->GetRef() );
+
+    if (pCondMsg) {
+        fChildren[pCondMsg->fWhich] = plConditionalObject::ConvertNoRef(pCondMsg->GetRef());
         fChildren[pCondMsg->fWhich]->SetLogicMod(fLogicMod);
         return true;
     }
-    
+
     return plConditionalObject::MsgReceive(msg);
 }
 
 void plORConditionalObject::SetLogicMod(plLogicModBase* pMod)
 {
     fLogicMod = pMod;
-    for (int i = 0; i < fChildren.Count(); i++)
-    {
-        if( fChildren[i] )
+
+    for (int i = 0; i < fChildren.Count(); i++) {
+        if (fChildren[i]) {
             fChildren[i]->SetLogicMod(pMod);
+        }
     }
 }
 
-bool plORConditionalObject::Satisfied() 
+bool plORConditionalObject::Satisfied()
 {
-    for (int i = 0; i < fChildren.Count(); i++)
-    {
-        if (fChildren[i]->Satisfied())
+    for (int i = 0; i < fChildren.Count(); i++) {
+        if (fChildren[i]->Satisfied()) {
             return true;
+        }
     }
+
     return false;
 }
 
@@ -99,30 +101,33 @@ void plORConditionalObject::AddChild(plConditionalObject* pObj)
 
 void plORConditionalObject::Reset()
 {
-    for (int i = 0; i < fChildren.Count(); i++)
+    for (int i = 0; i < fChildren.Count(); i++) {
         fChildren[i]->Reset();
+    }
 }
 
 void plORConditionalObject::Read(hsStream* stream, hsResMgr* mgr)
 {
     plConditionalObject::Read(stream, mgr);
-    
+
     plCondRefMsg* refMsg;
     int n = stream->ReadLE32();
     fChildren.SetCountAndZero(n);
-    for(int i = 0; i < n; i++ )
-    {   
+
+    for (int i = 0; i < n; i++) {
         refMsg = new plCondRefMsg(GetKey(), i);
-        mgr->ReadKeyNotifyMe(stream,refMsg, plRefFlags::kActiveRef);
-    }   
+        mgr->ReadKeyNotifyMe(stream, refMsg, plRefFlags::kActiveRef);
+    }
 }
 
 void plORConditionalObject::Write(hsStream* stream, hsResMgr* mgr)
 {
     plConditionalObject::Write(stream, mgr);
-    
+
     stream->WriteLE32(fChildren.GetCount());
-    for( int i = 0; i < fChildren.GetCount(); i++ )
+
+    for (int i = 0; i < fChildren.GetCount(); i++) {
         mgr->WriteKey(stream, fChildren[i]);
+    }
 }
 

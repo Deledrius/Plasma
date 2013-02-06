@@ -46,7 +46,6 @@ class plMaxNodeBase;
 
 #define ONESHOTCLASS_ID Class_ID(0x1efd285a, 0x11ba00a2)
 
-namespace OneShotComp
-{
-    plKey GetOneShotKey(plComponentBase *oneShotComp, plMaxNodeBase *target);
+namespace OneShotComp {
+plKey GetOneShotKey(plComponentBase* oneShotComp, plMaxNodeBase* target);
 }

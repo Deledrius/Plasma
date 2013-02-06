@@ -66,36 +66,40 @@ class plRenderRequest;
 
 //// Class Definition /////////////////////////////////////////////////////////
 
-class plCubicRenderTargetModifier : public plModifier
-{
+class plCubicRenderTargetModifier : public plModifier {
 
 public:
     plCubicRenderTargetModifier();
     virtual ~plCubicRenderTargetModifier();
 
-    CLASSNAME_REGISTER( plCubicRenderTargetModifier );
-    GETINTERFACE_ANY( plCubicRenderTargetModifier, plModifier);
+    CLASSNAME_REGISTER(plCubicRenderTargetModifier);
+    GETINTERFACE_ANY(plCubicRenderTargetModifier, plModifier);
 
     // Functions related to/required by plModifier
-    virtual int             GetNumTargets( void ) const { return fTarget ? 1 : 0; }
-    virtual plSceneObject   *GetTarget( int w ) const { hsAssert(w < GetNumTargets(), "Bad target"); return fTarget; }
-    virtual void            AddTarget( plSceneObject* so );
-    virtual void            RemoveTarget( plSceneObject* so );
+    virtual int             GetNumTargets(void) const {
+        return fTarget ? 1 : 0;
+    }
+    virtual plSceneObject*   GetTarget(int w) const {
+        hsAssert(w < GetNumTargets(), "Bad target");
+        return fTarget;
+    }
+    virtual void            AddTarget(plSceneObject* so);
+    virtual void            RemoveTarget(plSceneObject* so);
 
-    virtual void    Read( hsStream* s, hsResMgr* mgr ); 
-    virtual void    Write( hsStream* s, hsResMgr* mgr );
-    virtual bool    MsgReceive( plMessage* msg );
+    virtual void    Read(hsStream* s, hsResMgr* mgr);
+    virtual void    Write(hsStream* s, hsResMgr* mgr);
+    virtual bool    MsgReceive(plMessage* msg);
 
 protected:
 
-    plSceneObject           *fTarget;
-    plCubicRenderTarget     *fCubic;
+    plSceneObject*           fTarget;
+    plCubicRenderTarget*     fCubic;
 
-    plRenderRequest         *fRequests[ 6 ];
+    plRenderRequest*         fRequests[ 6 ];
 
-    virtual bool    IEval( double secs, float del, uint32_t dirty ); // required by plModifier
+    virtual bool    IEval(double secs, float del, uint32_t dirty);   // required by plModifier
 
-    void            ICreateRenderRequest( int face );
+    void            ICreateRenderRequest(int face);
 
 };
 

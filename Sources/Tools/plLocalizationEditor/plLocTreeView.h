@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "HeadSpin.h"
 #include "plString.h"
 
-class plLocTreeView
-{
+class plLocTreeView {
 protected:
     static plString fPath;
 
@@ -57,7 +56,9 @@ public:
     static void SelectionChanged(HWND treeCtrl);
     static void    SelectionDblClicked(HWND treeCtrl);
 
-    static plString GetPath() {return fPath;}
+    static plString GetPath() {
+        return fPath;
+    }
 };
 
 #endif //_plLocTreeView_h

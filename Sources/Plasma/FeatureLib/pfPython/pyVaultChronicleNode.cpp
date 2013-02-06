@@ -55,22 +55,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // should only be created from C++ side
 pyVaultChronicleNode::pyVaultChronicleNode(RelVaultNode* nfsNode)
-: pyVaultNode(nfsNode)
-, ansiName(nil)
-, ansiValue(nil)
+    : pyVaultNode(nfsNode)
+    , ansiName(nil)
+    , ansiValue(nil)
 {
 }
 
 //create from the Python side
 pyVaultChronicleNode::pyVaultChronicleNode(int n)
-: pyVaultNode(new RelVaultNode)
-, ansiName(nil)
-, ansiValue(nil)
+    : pyVaultNode(new RelVaultNode)
+    , ansiName(nil)
+    , ansiValue(nil)
 {
     fNode->SetNodeType(plVault::kNodeType_Chronicle);
 }
 
-pyVaultChronicleNode::~pyVaultChronicleNode () {
+pyVaultChronicleNode::~pyVaultChronicleNode()
+{
     free(ansiName);
     free(ansiValue);
 }
@@ -79,70 +80,77 @@ pyVaultChronicleNode::~pyVaultChronicleNode () {
 //==================================================================
 // class RelVaultNode : public plVaultNode
 //
-void pyVaultChronicleNode::Chronicle_SetName( const char * text )
+void pyVaultChronicleNode::Chronicle_SetName(const char* text)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
+    }
 
-    wchar_t * wStr = StrDupToUnicode(text);
+    wchar_t* wStr = StrDupToUnicode(text);
     VaultChronicleNode chron(fNode);
     chron.SetEntryName(wStr);
     free(wStr);
 }
 
-const char * pyVaultChronicleNode::Chronicle_GetName( void )
+const char* pyVaultChronicleNode::Chronicle_GetName(void)
 {
-    if (!fNode)
+    if (!fNode) {
         return "";
+    }
 
     free(ansiName);
     VaultChronicleNode chron(fNode);
     ansiName = StrDupToAnsi(chron.GetEntryName());
-    
+
     return ansiName;
 }
 
-void pyVaultChronicleNode::Chronicle_SetValue( const char * text )
+void pyVaultChronicleNode::Chronicle_SetValue(const char* text)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
-        
-    wchar_t * wStr = StrDupToUnicode(text);
+    }
+
+    wchar_t* wStr = StrDupToUnicode(text);
     VaultChronicleNode chron(fNode);
     chron.SetEntryValue(wStr);
     free(wStr);
 }
 
-const char * pyVaultChronicleNode::Chronicle_GetValue( void )
+const char* pyVaultChronicleNode::Chronicle_GetValue(void)
 {
-    if (!fNode)
+    if (!fNode) {
         return "";
-        
+    }
+
     free(ansiValue);
     ansiValue = nil;
-    
+
     VaultChronicleNode chron(fNode);
-    
-    if (!chron.GetEntryValue())
+
+    if (!chron.GetEntryValue()) {
         return "";
-        
+    }
+
     ansiValue = StrDupToAnsi(chron.GetEntryValue());
     return ansiValue;
 }
 
-void pyVaultChronicleNode::Chronicle_SetType( uint32_t type )
+void pyVaultChronicleNode::Chronicle_SetType(uint32_t type)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
+    }
 
     VaultChronicleNode chron(fNode);
     chron.SetEntryType(type);
 }
 
-uint32_t pyVaultChronicleNode::Chronicle_GetType( void )
+uint32_t pyVaultChronicleNode::Chronicle_GetType(void)
 {
-    if (!fNode)
+    if (!fNode) {
         return 0;
+    }
 
     VaultChronicleNode chron(fNode);
     return chron.GetEntryType();

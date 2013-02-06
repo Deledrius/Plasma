@@ -52,10 +52,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 //                  This class is meant to construct diff buffers using two
 //                  ops: add and copy. Basically, the syntax is defined so
-//                  that to reconstruct the new buffer, you run through the 
+//                  that to reconstruct the new buffer, you run through the
 //                  list of ops sequentially, each one defining the next
 //                  chunk of data in the new buffer. Add ops will add new data
-//                  to the buffer that didn't exist in the old buffer, and 
+//                  to the buffer that didn't exist in the old buffer, and
 //                  copy ops will copy data that existed in the old buffer
 //                  (from an arbitrary offset, to facilitate encoding data
 //                  shuffling). Delete ops are implicit, as they simply aren't
@@ -77,42 +77,41 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsRAMStream;
 class plBSDiffBuffer;
-class plDiffBuffer
-{
-    protected:
+class plDiffBuffer {
+protected:
 
-        bool         fWriting, f16BitMode;
-        uint32_t     fNewLength;
-        hsRAMStream *fStream;
-        
-        // Support for BSDiff patch buffers (Patching only)
-        plBSDiffBuffer  *fBSDiffBuffer;
-        bool             fIsBSDiff;
+    bool         fWriting, f16BitMode;
+    uint32_t     fNewLength;
+    hsRAMStream* fStream;
 
-    public:
+    // Support for BSDiff patch buffers (Patching only)
+    plBSDiffBuffer*  fBSDiffBuffer;
+    bool             fIsBSDiff;
 
-        plDiffBuffer( uint32_t newLength, uint32_t oldLength = 0 );     // Constructor for writing new buffers. oldLength isn't required but helpful for optimizations
-        plDiffBuffer( void *buffer, uint32_t length );    // Constructor for applying a given diff set
-                                                        // to an old buffer
-        virtual ~plDiffBuffer();
+public:
 
-
-        /// Creation/write functions
-
-        // Add() appends an Add-New-Data operation to the diff buffer. The data supplied will be copied internally.
-        void    Add( int32_t length, void *newData );
-
-        // Copy() appends a Copy-Data-From-Old operation to the diff buffer
-        void    Copy( int32_t length, uint32_t oldOffset );
-
-        // GetBuffer() will copy the diff stream into a new buffer and return it. You are responsible for freeing the buffer.
-        void    GetBuffer( uint32_t &length, void *&bufferPtr );
+    plDiffBuffer(uint32_t newLength, uint32_t oldLength = 0);       // Constructor for writing new buffers. oldLength isn't required but helpful for optimizations
+    plDiffBuffer(void* buffer, uint32_t length);      // Constructor for applying a given diff set
+    // to an old buffer
+    virtual ~plDiffBuffer();
 
 
-        /// Apply functions
+    /// Creation/write functions
 
-        // Apply() will take this diff buffer and apply it to the given old buffer, allocating and producing a new buffer. You are responsible for freeing the new buffer.
-        void    Apply( uint32_t oldLength, void *oldBuffer, uint32_t &newLength, void *&newBuffer );
+    // Add() appends an Add-New-Data operation to the diff buffer. The data supplied will be copied internally.
+    void    Add(int32_t length, void* newData);
+
+    // Copy() appends a Copy-Data-From-Old operation to the diff buffer
+    void    Copy(int32_t length, uint32_t oldOffset);
+
+    // GetBuffer() will copy the diff stream into a new buffer and return it. You are responsible for freeing the buffer.
+    void    GetBuffer(uint32_t& length, void*& bufferPtr);
+
+
+    /// Apply functions
+
+    // Apply() will take this diff buffer and apply it to the given old buffer, allocating and producing a new buffer. You are responsible for freeing the new buffer.
+    void    Apply(uint32_t oldLength, void* oldBuffer, uint32_t& newLength, void*& newBuffer);
 
 };
 

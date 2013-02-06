@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
     This is currently no different whatsoever from plAvBrainGeneric,
     but it's quite possible that it will need to vary, so we're
     keeping it around for the moment. */
-class plAvBrainCoop : public plAvBrainGeneric
-{
+class plAvBrainCoop : public plAvBrainGeneric {
 public:
 
     // used only by the class factory...
@@ -57,30 +56,30 @@ public:
 
     // use this constructor for a host brain; it sets up the unique ID
     plAvBrainCoop(uint32_t exitFlags, float fadeIn, float fadeOut, MoveMode moveMode, plKey guestKey);
-    
+
     // use this constructor for the guest brain, when you already have the unique ID
     plAvBrainCoop(uint32_t exitFlags, float fadeIn, float fadeOut, MoveMode moveMode,
                   uint32_t initiatorID, uint16_t initiatorSerial, plKey hostKey);
 
-    bool MsgReceive(plMessage *msg);
-    virtual bool RelayNotifyMsg(plNotifyMsg *msg);
+    bool MsgReceive(plMessage* msg);
+    virtual bool RelayNotifyMsg(plNotifyMsg* msg);
     void EnableGuestClick();
 
     // rtti
-    CLASSNAME_REGISTER( plAvBrainCoop );
-    GETINTERFACE_ANY( plAvBrainCoop, plAvBrainGeneric);
+    CLASSNAME_REGISTER(plAvBrainCoop);
+    GETINTERFACE_ANY(plAvBrainCoop, plAvBrainGeneric);
 
     // i/o
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     // stuff
     uint32_t GetInitiatorID();
     uint16_t GetInitiatorSerial();
 
     virtual plKey GetRecipient();
-    virtual void SetRecipient(plKey &recipient);
-    
+    virtual void SetRecipient(plKey& recipient);
+
 private:
     uint32_t fInitiatorID;
     uint16_t fInitiatorSerial;
@@ -91,6 +90,6 @@ private:
     bool fWaitingForClick;
 
     std::vector<plKey> fRecipients; // we have an array for a slight hack so relto book sharing works
-};  
+};
 
 #endif

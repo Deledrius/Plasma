@@ -47,51 +47,50 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plLinkEffectsTriggerMsg;
 class plPseudoLinkEffectMsg;
 
-class plLinkEffectsMgr : public hsKeyedObject
-{
+class plLinkEffectsMgr : public hsKeyedObject {
 protected:
     // Collection of links in progress (in or out)
-    hsTArray<plLinkEffectsTriggerMsg *> fLinks;
+    hsTArray<plLinkEffectsTriggerMsg*> fLinks;
 
     // Players we know exist, but aren't ready to link yet
-    hsTArray<plLinkEffectsTriggerMsg *> fWaitlist; 
+    hsTArray<plLinkEffectsTriggerMsg*> fWaitlist;
 
-    // Queue of delayed messages from people linking in that 
-    // we haven't received yet but are no longer necessary, 
+    // Queue of delayed messages from people linking in that
+    // we haven't received yet but are no longer necessary,
     // because we either received the trigger from them, or
     // they're no longer in the age.
-    hsTArray<plLinkEffectsTriggerMsg *> fDeadlist;
-    
-    // queue of pseudo link messages
-    hsTArray<plPseudoLinkEffectMsg *> fPseudolist;
+    hsTArray<plLinkEffectsTriggerMsg*> fDeadlist;
 
-    plLinkEffectsTriggerMsg *IFindLinkTriggerMsg(plKey avatarKey);
-    void IAddLink(plLinkEffectsTriggerMsg *msg);
-    void IAddWait(plLinkEffectsTriggerMsg *msg);
-    void IAddDead(plLinkEffectsTriggerMsg *msg);
-    void IAddPsuedo(plPseudoLinkEffectMsg *msg);
+    // queue of pseudo link messages
+    hsTArray<plPseudoLinkEffectMsg*> fPseudolist;
+
+    plLinkEffectsTriggerMsg* IFindLinkTriggerMsg(plKey avatarKey);
+    void IAddLink(plLinkEffectsTriggerMsg* msg);
+    void IAddWait(plLinkEffectsTriggerMsg* msg);
+    void IAddDead(plLinkEffectsTriggerMsg* msg);
+    void IAddPsuedo(plPseudoLinkEffectMsg* msg);
     void IRemovePseudo(plKey avatarKey);
     plPseudoLinkEffectMsg* IFindPseudo(plKey avatarKey);
 
-    bool IHuntWaitlist(plLinkEffectsTriggerMsg *msg);
+    bool IHuntWaitlist(plLinkEffectsTriggerMsg* msg);
     bool IHuntWaitlist(plKey linkKey);
-    bool IHuntDeadlist(plLinkEffectsTriggerMsg *msg);
+    bool IHuntDeadlist(plLinkEffectsTriggerMsg* msg);
     void ISendAllReadyCallbacks();
-    
+
 public:
     plLinkEffectsMgr();
     ~plLinkEffectsMgr();
     void Init();
 
-    CLASSNAME_REGISTER( plLinkEffectsMgr );
-    GETINTERFACE_ANY( plLinkEffectsMgr, hsKeyedObject );
+    CLASSNAME_REGISTER(plLinkEffectsMgr);
+    GETINTERFACE_ANY(plLinkEffectsMgr, hsKeyedObject);
 
     void WaitForEffect(plKey linkKey, float time);
     void WaitForPseudoEffect(plKey linkKey, float time);
-    
-    plMessage *WaitForEffect(plKey linkKey);
 
-    virtual bool MsgReceive(plMessage *msg);
+    plMessage* WaitForEffect(plKey linkKey);
+
+    virtual bool MsgReceive(plMessage* msg);
 };
 
 #endif // plLinkEffectsMgr_inc

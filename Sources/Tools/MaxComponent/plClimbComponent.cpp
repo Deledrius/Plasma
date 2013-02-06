@@ -79,8 +79,7 @@ void DummyCodeIncludeFuncClimbTrigger() {}
 //
 /////////////////////////////////////////////////////////////////
 // CLIMBCOMMANDS
-enum Commands
-{
+enum Commands {
     kMount              = 0,
     kEnableDismount     = 1,
     kDisableDismount    = 2,
@@ -92,8 +91,7 @@ enum Commands
 };
 
 // these synchronized ^^^^VVVVV
-const char * fCommandStrs[] =
-{
+const char* fCommandStrs[] = {
     "Start Climbing",
     "Enable Dismount",
     "Disable Dismount",
@@ -103,8 +101,7 @@ const char * fCommandStrs[] =
     "Let Go"
 };
 
-enum Directions
-{
+enum Directions {
     kUp     = 0,
     kDown   = 1,
     kLeft   = 2,
@@ -112,8 +109,7 @@ enum Directions
     kMaxDirections
 };
 
-const char * fDirectionStrs[] =
-{
+const char* fDirectionStrs[] = {
     "Up",
     "Down",
     "Left",
@@ -135,7 +131,7 @@ static plClimbTriggerComponentProc gClimbTriggerComponentProc;
 
 // PARAM BLOCK
 ParamBlockDesc2 gClimbTriggerBk
-(   
+(
 
     plComponent::kBlkComp, _T("ClimbTrigger"), 0, &gClimbTriggerDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
@@ -143,15 +139,15 @@ ParamBlockDesc2 gClimbTriggerBk
     IDD_COMP_CLIMB_TRIGGER, IDS_COMP_CLIMB_TRIGGER, 0, 0, &gClimbTriggerComponentProc,
 
     plClimbTriggerComponent::kCommand, _T("Command"),   TYPE_INT, 0, 0,
-        p_default, kMount,
-        end,
+    p_default, kMount,
+    end,
 
     plClimbTriggerComponent::kDirection, _T("Direction"),   TYPE_INT, 0, 0,
-        p_default, kUp,
-        end,
+    p_default, kUp,
+    end,
 
     plClimbTriggerComponent::kWallPicker, _T("WallPicker"), TYPE_INODE,     0, 0,
-        end,
+    end,
 
     end
 );
@@ -169,72 +165,79 @@ plClimbTriggerComponent::plClimbTriggerComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-extern const plArmatureMod * FindArmatureMod(const plSceneObject *obj);
+extern const plArmatureMod* FindArmatureMod(const plSceneObject* obj);
 
 // CONVERT
-bool plClimbTriggerComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plClimbTriggerComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plClimbMsg::Command enterCommand;       // when entering the region
     plClimbMsg::Command exitCommand;        // run this command when exiting the region
     bool enterStatus = false;
     bool exitStatus = false;
     plClimbMsg::Direction direction;        // direction is assumed the same for both enter and exit commands
-                                            // i.e. enable up, disable up
+    // i.e. enable up, disable up
 
     int iCommand = fCompPB->GetInt(plClimbTriggerComponent::kCommand);
     int iDirection = fCompPB->GetInt(plClimbTriggerComponent::kDirection);
 
-    switch(iCommand)
-    {
+    switch (iCommand) {
     case kMount:
         enterCommand = plClimbMsg::kStartClimbing;
         exitCommand = plClimbMsg::kNoCommand;
         break;
+
     case kEnableClimb:
         enterCommand = plClimbMsg::kEnableClimb;
         enterStatus = true;
         exitCommand = plClimbMsg::kEnableClimb;
         exitStatus = false;
         break;
+
     case kDisableClimb:
         enterCommand = plClimbMsg::kEnableClimb;
         enterStatus = false;
         exitCommand = plClimbMsg::kEnableClimb;
         exitStatus = true;
         break;
+
     case kEnableDismount:
         enterCommand = plClimbMsg::kEnableDismount;
         enterStatus = true;
         exitCommand = plClimbMsg::kEnableDismount;
         exitStatus = false;
         break;
+
     case kDisableDismount:
         enterCommand = plClimbMsg::kEnableDismount;
         enterStatus = false;
         exitCommand = plClimbMsg::kEnableDismount;
         exitStatus = true;
         break;
+
     case kFallOff:
         enterCommand = plClimbMsg::kFallOff;
         exitCommand = plClimbMsg::kNoCommand;
         break;
+
     case kRelease:
         enterCommand = plClimbMsg::kRelease;
         exitCommand = plClimbMsg::kNoCommand;
         break;
     }
 
-    switch(iDirection)
-    {
+    switch (iDirection) {
     case kUp:
         direction = plClimbMsg::kUp;
         break;
+
     case kDown:
         direction = plClimbMsg::kDown;
         break;
+
     case kLeft:
         direction = plClimbMsg::kLeft;
         break;
+
     case kRight:
         direction = plClimbMsg::kRight;
         break;
@@ -242,45 +245,47 @@ bool plClimbTriggerComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 
     plKey nilKey = nil;
     plKey target = node->GetSceneObject()->GetKey();
-    plClimbMsg *enterMsg = nil;
-    if (enterCommand != plClimbMsg::kNoCommand)
-    {
+    plClimbMsg* enterMsg = nil;
+
+    if (enterCommand != plClimbMsg::kNoCommand) {
         enterMsg = new plClimbMsg(nilKey, nilKey, enterCommand, direction, enterStatus, target);
         enterMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
         enterMsg->SetBCastFlag(plMessage::kNetPropagate);
         enterMsg->SetBCastFlag(plMessage::kNetForce);
     }
 
-    plClimbMsg *exitMsg = nil;
-    if (exitCommand != plClimbMsg::kNoCommand)
-    {
+    plClimbMsg* exitMsg = nil;
+
+    if (exitCommand != plClimbMsg::kNoCommand) {
         exitMsg = new plClimbMsg(nilKey, nilKey, exitCommand, direction, exitStatus, target);
         exitMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
         exitMsg->SetBCastFlag(plMessage::kNetPropagate);
         exitMsg->SetBCastFlag(plMessage::kNetForce);
     }
 
-    plSimpleRegionSensor *sensMod = new plSimpleRegionSensor(enterMsg, exitMsg);
+    plSimpleRegionSensor* sensMod = new plSimpleRegionSensor(enterMsg, exitMsg);
     node->AddModifier(sensMod, IGetUniqueName(node));
-    
+
     return true;
 }
 
-bool plClimbTriggerComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plClimbTriggerComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     node->SetForceLocal(true);
     node->SetDrawable(false);
 
-    plPhysicalProps *props = node->GetPhysicalProps();
+    plPhysicalProps* props = node->GetPhysicalProps();
 
     // only if movable will it have mass (then it will keep track of movements in PhysX)
-    if ( node->IsMovable() || node->IsTMAnimatedRecur() )
+    if (node->IsMovable() || node->IsTMAnimatedRecur()) {
         props->SetMass(1.0, node, pErrMsg);
+    }
+
     props->SetFriction(0.0, node, pErrMsg);
     props->SetRestitution(0.0, node, pErrMsg);
     props->SetBoundsType(plSimDefs::kExplicitBounds, node, pErrMsg);
     props->SetGroup(plSimDefs::kGroupDetector, node, pErrMsg);
-    props->SetReportGroup(1<<plSimDefs::kGroupAvatar, node, pErrMsg);
+    props->SetReportGroup(1 << plSimDefs::kGroupAvatar, node, pErrMsg);
 //  props->SetPinned(true, node, pErrMsg);
 
     return true;
@@ -292,29 +297,32 @@ bool plClimbTriggerComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrM
 // DIALOG PROC IMPLEMENTATION
 //
 /////////////////////////////////////////////////////////////////
-BOOL plClimbTriggerComponentProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL plClimbTriggerComponentProc::DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    IParamBlock2 *pb = pm->GetParamBlock();
+    IParamBlock2* pb = pm->GetParamBlock();
     HWND hCommandMenu = GetDlgItem(hWnd, IDC_COMP_CLIMB_COMMAND);
     HWND hDirectionMenu = GetDlgItem(hWnd, IDC_COMP_CLIMB_DIRECTION);
     HWND hPick = GetDlgItem(hWnd, IDC_COMP_WALL_PICK);
-    INode *curPick = nil;
+    INode* curPick = nil;
     int curSurface = 0;
 
-    switch (msg)
-    {
-    case WM_INITDIALOG:
-        {
+    switch (msg) {
+    case WM_INITDIALOG: {
             int i = 0;
+
             // fill out the command menu
-            for (i = 0; i < kMaxCommands; i++)
+            for (i = 0; i < kMaxCommands; i++) {
                 ComboBox_AddString(hCommandMenu, fCommandStrs[i]);
+            }
+
             // reflect the current selection
             ComboBox_SetCurSel(hCommandMenu, pb->GetInt(ParamID(plClimbTriggerComponent::kCommand)));
 
             // fill out the direction menu
-            for (i = 0; i < kMaxDirections; i++)
+            for (i = 0; i < kMaxDirections; i++) {
                 ComboBox_AddString(hDirectionMenu, fDirectionStrs[i]);
+            }
+
             // reflect the current selection
             ComboBox_SetCurSel(hDirectionMenu, pb->GetInt(ParamID(plClimbTriggerComponent::kDirection)));
 
@@ -322,36 +330,31 @@ BOOL plClimbTriggerComponentProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd
             curPick = pb->GetINode(ParamID(plClimbTriggerComponent::kWallPicker));
             Button_SetText(hPick, (curPick == nil ? "None" : curPick->GetName()));
         }
+
         return TRUE;
         break;
 
 
     case WM_COMMAND:
-        if (HIWORD(wParam) == BN_CLICKED)
-        {
-            if (LOWORD(wParam) == IDC_COMP_WALL_PICK)
-            {
+        if (HIWORD(wParam) == BN_CLICKED) {
+            if (LOWORD(wParam) == IDC_COMP_WALL_PICK) {
                 // we're picking a new climbing wall
                 std::vector<Class_ID> pickableClasses;
                 pickableClasses.push_back(PHYSICS_TERRAIN_CID);     // allow picking terrains
                 pickableClasses.push_back(PHYS_CLIMBABLE_CID);      // and climbables
-                if (plPick::NodeRefKludge(pb, plClimbTriggerComponent::kWallPicker, &pickableClasses, true, false))         
-                {
+
+                if (plPick::NodeRefKludge(pb, plClimbTriggerComponent::kWallPicker, &pickableClasses, true, false)) {
                     curPick = pb->GetINode(ParamID(plClimbTriggerComponent::kWallPicker));
                     Button_SetText(hPick, (curPick == nil ? "None" : curPick->GetName()));
                 }
-            
+
                 return TRUE;
             }
-        }
-        else if (LOWORD(wParam) == IDC_COMP_CLIMB_COMMAND)
-        {
+        } else if (LOWORD(wParam) == IDC_COMP_CLIMB_COMMAND) {
             HWND hSurface = GetDlgItem(hWnd, IDC_COMP_CLIMB_COMMAND);
             curSurface = ComboBox_GetCurSel(hSurface);
             pb->SetValue(ParamID(plClimbTriggerComponent::kCommand), 0, curSurface);
-        }
-        else if (LOWORD(wParam) == IDC_COMP_CLIMB_DIRECTION)
-        {
+        } else if (LOWORD(wParam) == IDC_COMP_CLIMB_DIRECTION) {
             HWND hSurface = GetDlgItem(hWnd, IDC_COMP_CLIMB_DIRECTION);
             curSurface = ComboBox_GetCurSel(hSurface);
             pb->SetValue(ParamID(plClimbTriggerComponent::kDirection), 0, curSurface);
@@ -371,15 +374,14 @@ BOOL plClimbTriggerComponentProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //Class that accesses the paramblock below.
-class plClimbBlockerComponent : public plComponent
-{
+class plClimbBlockerComponent : public plComponent {
 public:
     plClimbBlockerComponent();
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    bool SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 //Max desc stuff necessary below.
@@ -402,11 +404,11 @@ plClimbBlockerComponent::plClimbBlockerComponent()
 
 // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plClimbBlockerComponent::SetupProperties(plMaxNode *node,  plErrorMsg *errMsg)
+bool plClimbBlockerComponent::SetupProperties(plMaxNode* node,  plErrorMsg* errMsg)
 {
     node->SetDrawable(false);
 
-    plPhysicalProps *props = node->GetPhysicalProps();
+    plPhysicalProps* props = node->GetPhysicalProps();
 
 //  props->SetMass(0.0, node, errMsg);
 //  props->SetFriction(0.0, node, errMsg);
@@ -418,7 +420,7 @@ bool plClimbBlockerComponent::SetupProperties(plMaxNode *node,  plErrorMsg *errM
     return true;
 }
 
-bool plClimbBlockerComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plClimbBlockerComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }

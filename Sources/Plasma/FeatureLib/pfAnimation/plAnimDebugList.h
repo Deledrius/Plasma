@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // Simple debugging tool, everything is public
 // This class collects a list of keyed objects that deal with
 // animation, to report info on them when requested.
-class plAnimDebugList
-{
+class plAnimDebugList {
 public:
     bool fEnabled;
     hsTArray<plKey> fSOKeys;
@@ -55,8 +54,8 @@ public:
     plAnimDebugList() : fEnabled(false) {}
     ~plAnimDebugList() {}
 
-    void AddObjects(const plString &subString);
-    void RemoveObjects(const plString &subString);
+    void AddObjects(const plString& subString);
+    void RemoveObjects(const plString& subString);
     void ShowReport();
 };
 

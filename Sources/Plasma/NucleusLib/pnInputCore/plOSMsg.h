@@ -55,8 +55,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "hsWindows.h" // FIXME: This gives me a sad
 
-enum plOSMsg
-{
+enum plOSMsg {
     KEYDOWN         = WM_KEYDOWN,
     KEYUP           = WM_KEYUP,
     MOUSEMOVE       = WM_MOUSEMOVE,
@@ -87,13 +86,11 @@ enum plOSMsg { };
 //
 //
 
-struct plMouseState
-{
-    enum
-    {
+struct plMouseState {
+    enum {
         kLeftButton     =   0x0001,
         kRightButton    =   0x0002,
-        kMiddleButton   =   0x0004, 
+        kMiddleButton   =   0x0004,
     };
     float   fX;
     float   fY;

@@ -92,8 +92,8 @@ plRenderGlobalContext::plRenderGlobalContext(Interface* ip, TimeValue t)
 plRenderGlobalContext::~plRenderGlobalContext()
 {
     int i;
-    for( i = 0; i < fInstList.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fInstList.GetCount(); i++) {
         fInstList[i].Cleanup();
     }
 }
@@ -103,72 +103,83 @@ void plRenderGlobalContext::Update(TimeValue t)
     time = t;
 
     int i;
-    for( i = 0; i < fInstList.GetCount(); i++ )
+
+    for (i = 0; i < fInstList.GetCount(); i++) {
         fInstList[i].Update(time);
+    }
 }
 
 void plRenderGlobalContext::MakeRenderInstances(plMaxNode* root, TimeValue t)
 {
     time = t;
     int i;
-    for( i = 0; i < root->NumberOfChildren(); i++ )
-        IMakeRenderInstances((plMaxNode*)root->GetChildNode(i), t, false);
 
-    for( i = 0; i < fInstList.GetCount() - 1; i++ )
-        fInstList[i].SetNext(&fInstList[i+1]);
+    for (i = 0; i < root->NumberOfChildren(); i++) {
+        IMakeRenderInstances((plMaxNode*)root->GetChildNode(i), t, false);
+    }
+
+    for (i = 0; i < fInstList.GetCount() - 1; i++) {
+        fInstList[i].SetNext(&fInstList[i + 1]);
+    }
 }
 
 RenderInstance* plRenderGlobalContext::GetRenderInstance(int i) const
 {
-    if (fInstList.GetCount() > i)
+    if (fInstList.GetCount() > i) {
         return &fInstList[i];
-    else
+    } else {
         return nil;
+    }
 }
 
 void plRenderGlobalContext::IMakeRenderInstances(plMaxNode* node, TimeValue t, bool isBarney)
 {
     const char* dbgNodeName = node->GetName();
-    if( !isBarney )
+
+    if (!isBarney) {
         isBarney = node->GetIsBarney();
+    }
 
     bool doMe = isBarney || (node->CanConvert() && node->GetDrawable());
 
-    if( !doMe )
+    if (!doMe) {
         return;
+    }
 
     int idx = fInstList.GetCount();
 
     plRenderInstance* inst = fInstList.Push();
-    
-    if( !inst->GetFromNode(node, t, idx) )
+
+    if (!inst->GetFromNode(node, t, idx)) {
         fInstList.Pop();
+    }
 
     int i;
-    for( i = 0; i < node->NumberOfChildren(); i++ )
-        IMakeRenderInstances((plMaxNode *)node->GetChildNode(i), t, isBarney);
+
+    for (i = 0; i < node->NumberOfChildren(); i++) {
+        IMakeRenderInstances((plMaxNode*)node->GetChildNode(i), t, isBarney);
+    }
 }
 
-void plRenderGlobalContext::IntersectRay(RenderInstance *inst, Ray& origRay, ISect &isct, ISectList &xplist, BOOL findExit)
+void plRenderGlobalContext::IntersectRay(RenderInstance* inst, Ray& origRay, ISect& isct, ISectList& xplist, BOOL findExit)
 {
     const float kFarAway = 1.e5f;
     Ray ray;
-    if( findExit )
-    {
+
+    if (findExit) {
         ray.p = origRay.p + origRay.dir * kFarAway;
         ray.dir = -ray.dir;
-    }
-    else
-    {
+    } else {
         ray = origRay;
     }
+
     float at;
     Point3 norm;
     DWORD faceIdx;
     Point3 bary;
     int hit = inst->mesh->IntersectRay(ray, at, norm, faceIdx, bary);
-    if( hit )
-    {
+
+    if (hit) {
         ISect thisHit;
         thisHit.t = findExit ? kFarAway - at : at;
         thisHit.exit = findExit;
@@ -186,8 +197,7 @@ void plRenderGlobalContext::IntersectRay(RenderInstance *inst, Ray& origRay, ISe
 
         thisHit.next = nil;
 
-        if( thisHit.matreq & (MTLREQ_TRANSP | MTLREQ_ADDITIVE_TRANSP) )
-        {
+        if (thisHit.matreq & (MTLREQ_TRANSP | MTLREQ_ADDITIVE_TRANSP)) {
             // advance the ray and try again. This one goes in the xplist.
             ISect* xHit = GetNewISect();
             *xHit = thisHit;
@@ -198,36 +208,33 @@ void plRenderGlobalContext::IntersectRay(RenderInstance *inst, Ray& origRay, ISe
             newRay.p = origRay.p + origRay.dir * (thisHit.t + kAdvanceHack);
             newRay.dir = origRay.dir;
             IntersectRay(inst, newRay, isct, xplist, findExit);
-        }
-        else
-        {
+        } else {
             xplist.Prune(thisHit.t);
             isct = thisHit;
         }
     }
 }
 
-BOOL plRenderGlobalContext::IntersectWorld(Ray &ray, int skipID, ISect &hit, ISectList &xplist, int blurFrame)
+BOOL plRenderGlobalContext::IntersectWorld(Ray& ray, int skipID, ISect& hit, ISectList& xplist, int blurFrame)
 {
     hit.t = -1.f;
     xplist.Init();
     int i;
-    for( i = 0; i < fInstList.GetCount(); i++ )
-    {
-        if( skipID != i )
-        {
+
+    for (i = 0; i < fInstList.GetCount(); i++) {
+        if (skipID != i) {
             ISect thisHit;
             hit.t = -1.f;
             IntersectRay(&fInstList[i], ray, thisHit, xplist, false);
-            if( thisHit.t >= 0 )
-            {
-                if( (hit.t < 0) || (thisHit.t < hit.t) )
-                {
+
+            if (thisHit.t >= 0) {
+                if ((hit.t < 0) || (thisHit.t < hit.t)) {
                     // grab our new winner.
                     hit = thisHit;
                 }
             }
         }
     }
+
     return (hit.t >= 0) || !xplist.IsEmpty();
 }

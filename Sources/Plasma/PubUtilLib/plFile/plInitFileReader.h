@@ -69,82 +69,83 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //// Base Section Class //////////////////////////////////////////////////////
 //  Define a derived version of this for each section of your init file.
 
-class plInitSectionReader
-{
-    public:
+class plInitSectionReader {
+public:
 
-        // Override this to define what [string] your section starts with
-        virtual const char  *GetSectionName( void ) const = 0;
+    // Override this to define what [string] your section starts with
+    virtual const char*  GetSectionName(void) const = 0;
 
-        // Override this to parse each line in your section. Return false to abort parsing
-        virtual bool        ParseLine( const char *line, uint32_t userData ) = 0;
-        
-        // Override this if you're defining an unhandled section reader
-        virtual void SetSectionName(const char* section) {}
+    // Override this to parse each line in your section. Return false to abort parsing
+    virtual bool        ParseLine(const char* line, uint32_t userData) = 0;
+
+    // Override this if you're defining an unhandled section reader
+    virtual void SetSectionName(const char* section) {}
 };
 
 //// Semi-Derived Class //////////////////////////////////////////////////////
-//  Half-way derived class for parsing lines by tokens rather than pure 
+//  Half-way derived class for parsing lines by tokens rather than pure
 //  strings.
 
 class hsStringTokenizer;
 
-class plInitSectionTokenReader : public plInitSectionReader
-{
-    protected:
+class plInitSectionTokenReader : public plInitSectionReader {
+protected:
 
-        const char  *fSeparators;
+    const char*  fSeparators;
 
-        // Override this to parse each token in your section. Return false to abort parsing
-        virtual bool        IParseToken( const char *token, hsStringTokenizer *tokenizer, uint32_t userData ) = 0;
+    // Override this to parse each token in your section. Return false to abort parsing
+    virtual bool        IParseToken(const char* token, hsStringTokenizer* tokenizer, uint32_t userData) = 0;
 
-    public:
+public:
 
-        plInitSectionTokenReader( const char *separators = ",=\t" );
+    plInitSectionTokenReader(const char* separators = ",=\t");
 
-        // Overridden for you. Override IParseToken()
-        virtual bool        ParseLine( const char *line, uint32_t userData );
+    // Overridden for you. Override IParseToken()
+    virtual bool        ParseLine(const char* line, uint32_t userData);
 };
 
 //// Main Reader Class ///////////////////////////////////////////////////////
 //  Create one of these and add an array of derived versions of the above
 //  reader to parse your init file.
 
-class plInitFileReader
-{
-    protected:
+class plInitFileReader {
+protected:
 
-        hsStream            *fStream;
-        hsStream            *fOurStream;
-        char                *fCurrLine;
-        uint32_t              fLineSize;
+    hsStream*            fStream;
+    hsStream*            fOurStream;
+    char*                fCurrLine;
+    uint32_t              fLineSize;
 
-        plInitSectionReader             *fCurrSection;
-        hsTArray<plInitSectionReader *> fSections;
-        plInitSectionReader* fUnhandledSection;
-        
-        void    IInitReaders( plInitSectionReader **readerArray );
+    plInitSectionReader*             fCurrSection;
+    hsTArray<plInitSectionReader*> fSections;
+    plInitSectionReader* fUnhandledSection;
 
-    public:
+    void    IInitReaders(plInitSectionReader** readerArray);
 
-        // The array passed in should be an array of pointers to plInitSectionReader,
-        // with the last pointer being nil (denoting the end of the array). The first
-        // element of the array will be the "default" section--i.e. if there is no section
-        // header at the top of the file, that reader will be used.
+public:
 
-        plInitFileReader( plInitSectionReader **readerArray, uint16_t lineSize = 256 );
-        plInitFileReader( const char *fileName, plInitSectionReader **readerArray, uint16_t lineSize = 256 );
-        plInitFileReader( hsStream *stream, plInitSectionReader **readerArray, uint16_t lineSize = 256 );
-        virtual ~plInitFileReader();
+    // The array passed in should be an array of pointers to plInitSectionReader,
+    // with the last pointer being nil (denoting the end of the array). The first
+    // element of the array will be the "default" section--i.e. if there is no section
+    // header at the top of the file, that reader will be used.
 
-        void SetUnhandledSectionReader(plInitSectionReader* reader) { fUnhandledSection = reader; }
+    plInitFileReader(plInitSectionReader** readerArray, uint16_t lineSize = 256);
+    plInitFileReader(const char* fileName, plInitSectionReader** readerArray, uint16_t lineSize = 256);
+    plInitFileReader(hsStream* stream, plInitSectionReader** readerArray, uint16_t lineSize = 256);
+    virtual ~plInitFileReader();
 
-        bool    Open( const char *fileName );
-        bool    Open( hsStream *stream );
-        bool    Parse( uint32_t userData = 0 );
-        void    Close( void );
+    void SetUnhandledSectionReader(plInitSectionReader* reader) {
+        fUnhandledSection = reader;
+    }
 
-        bool    IsOpen( void ) const { return fStream != nil; }
+    bool    Open(const char* fileName);
+    bool    Open(hsStream* stream);
+    bool    Parse(uint32_t userData = 0);
+    void    Close(void);
+
+    bool    IsOpen(void) const {
+        return fStream != nil;
+    }
 };
 
 #endif //_plInitFileReader_h

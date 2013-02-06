@@ -60,8 +60,7 @@ class plDrawable;
 class hsGMaterial;
 class plPipeline;
 
-class plRenderRequest : public plRenderRequestBase
-{
+class plRenderRequest : public plRenderRequestBase {
 public:
 protected:
     uint32_t                  fRenderState; // Or'ed from plPipeline::RenderStateSettings::kRender*
@@ -99,106 +98,214 @@ public:
     plRenderRequest();
     ~plRenderRequest();
 
-    bool            GetRenderSelect() const { return !fVisForce.Empty(); }
+    bool            GetRenderSelect() const {
+        return !fVisForce.Empty();
+    }
     bool            GetRenderCharacters() const;
 
-    void            SetRenderState(uint32_t st) { fRenderState = st; }
-    uint32_t          GetRenderState() const { return fRenderState; }
+    void            SetRenderState(uint32_t st) {
+        fRenderState = st;
+    }
+    uint32_t          GetRenderState() const {
+        return fRenderState;
+    }
 
-    void            SetDrawableMask(uint32_t m) { fDrawableMask = m; }
-    uint32_t          GetDrawableMask() const { return fDrawableMask; }
+    void            SetDrawableMask(uint32_t m) {
+        fDrawableMask = m;
+    }
+    uint32_t          GetDrawableMask() const {
+        return fDrawableMask;
+    }
 
-    void            SetSubDrawableMask(uint32_t m) { fSubDrawableMask = m; }
-    uint32_t          GetSubDrawableMask() const { return fSubDrawableMask; }
+    void            SetSubDrawableMask(uint32_t m) {
+        fSubDrawableMask = m;
+    }
+    uint32_t          GetSubDrawableMask() const {
+        return fSubDrawableMask;
+    }
 
-    void            RequestAck(plKey key) { fAck = key; }
-    plKey           GetAck() const { return fAck; }
+    void            RequestAck(plKey key) {
+        fAck = key;
+    }
+    plKey           GetAck() const {
+        return fAck;
+    }
 
-    plDrawable*             GetClearDrawable() const { return fClearDrawable; }
-    void                    SetClearDrawable(plDrawable* d) { fClearDrawable = d; }
+    plDrawable*             GetClearDrawable() const {
+        return fClearDrawable;
+    }
+    void                    SetClearDrawable(plDrawable* d) {
+        fClearDrawable = d;
+    }
 
-    hsGMaterial*            GetOverrideMat() const { return fOverrideMat; }
-    void                    SetOverrideMat(hsGMaterial* m) { fOverrideMat = m; }
+    hsGMaterial*            GetOverrideMat() const {
+        return fOverrideMat;
+    }
+    void                    SetOverrideMat(hsGMaterial* m) {
+        fOverrideMat = m;
+    }
 
-    hsGMaterial*            GetEraseMat() const { return fEraseMat; }
-    void                    SetEraseMat(hsGMaterial* m) { fEraseMat = m; }
+    hsGMaterial*            GetEraseMat() const {
+        return fEraseMat;
+    }
+    void                    SetEraseMat(hsGMaterial* m) {
+        fEraseMat = m;
+    }
 
-    plRenderTarget*         GetRenderTarget() const { return fRenderTarget; }
+    plRenderTarget*         GetRenderTarget() const {
+        return fRenderTarget;
+    }
     void                    SetRenderTarget(plRenderTarget* t);
 
-    plPageTreeMgr*          GetPageTreeMgr() const { return fPageMgr; }
-    void                    SetPageTreeMgr(plPageTreeMgr* mgr) { fPageMgr = mgr; }
+    plPageTreeMgr*          GetPageTreeMgr() const {
+        return fPageMgr;
+    }
+    void                    SetPageTreeMgr(plPageTreeMgr* mgr) {
+        fPageMgr = mgr;
+    }
 
-    const hsBitVector&      GetVisForce() const { return fVisForce; }
+    const hsBitVector&      GetVisForce() const {
+        return fVisForce;
+    }
     void                    SetVisForce(const hsBitVector& b);
 
-    const hsMatrix44&   GetLocalToWorld() const { return fLocalToWorld; }
-    const hsMatrix44&   GetWorldToLocal() const { return fWorldToLocal; }
-    const hsMatrix44&   GetWorldToCamera() const { return fViewTransform.GetWorldToCamera(); }
-    const hsMatrix44&   GetCameraToWorld() const { return fViewTransform.GetCameraToWorld(); }
+    const hsMatrix44&   GetLocalToWorld() const {
+        return fLocalToWorld;
+    }
+    const hsMatrix44&   GetWorldToLocal() const {
+        return fWorldToLocal;
+    }
+    const hsMatrix44&   GetWorldToCamera() const {
+        return fViewTransform.GetWorldToCamera();
+    }
+    const hsMatrix44&   GetCameraToWorld() const {
+        return fViewTransform.GetCameraToWorld();
+    }
 
-    const plViewTransform&  GetViewTransform() const { return fViewTransform; }
+    const plViewTransform&  GetViewTransform() const {
+        return fViewTransform;
+    }
 
-    float GetHither() const { return fViewTransform.GetHither(); }
-    float GetYon() const { return fViewTransform.GetYon(); }
+    float GetHither() const {
+        return fViewTransform.GetHither();
+    }
+    float GetYon() const {
+        return fViewTransform.GetYon();
+    }
 
-    float GetFovX() const { return fViewTransform.GetFovXDeg(); }
-    float GetFovY() const { return fViewTransform.GetFovYDeg(); }
+    float GetFovX() const {
+        return fViewTransform.GetFovXDeg();
+    }
+    float GetFovY() const {
+        return fViewTransform.GetFovYDeg();
+    }
 
-    float GetSizeX() const { return fViewTransform.GetOrthoWidth(); }
-    float GetSizeY() const { return fViewTransform.GetOrthoHeight(); }
+    float GetSizeX() const {
+        return fViewTransform.GetOrthoWidth();
+    }
+    float GetSizeY() const {
+        return fViewTransform.GetOrthoHeight();
+    }
 
-    uint16_t GetScreenWidth() const { return fViewTransform.GetScreenWidth(); }
-    uint16_t GetScreenHeight() const { return fViewTransform.GetScreenHeight(); }
+    uint16_t GetScreenWidth() const {
+        return fViewTransform.GetScreenWidth();
+    }
+    uint16_t GetScreenHeight() const {
+        return fViewTransform.GetScreenHeight();
+    }
 
-    const hsColorRGBA& GetClearColor() const { return fClearColor; }
-    float GetClearDepth() const { return fClearDepth; }
+    const hsColorRGBA& GetClearColor() const {
+        return fClearColor;
+    }
+    float GetClearDepth() const {
+        return fClearDepth;
+    }
     // FogStart
     // negative => use current settings (default)
     // 0 => no fog == fog starts at yon
     // 1 => fog starts at camera.
     // Fog start greater than 1 is legal. Fog always linear.
-    float GetFogStart() const { return fFogStart; }
+    float GetFogStart() const {
+        return fFogStart;
+    }
 
-    float GetPriority() const { return fPriority; }
+    float GetPriority() const {
+        return fPriority;
+    }
 
     void SetLocalTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);
 
-    void SetViewTransform(const plViewTransform& v) { fViewTransform = v; }
+    void SetViewTransform(const plViewTransform& v) {
+        fViewTransform = v;
+    }
 
-    void SetCameraTransform(const hsMatrix44& w2c, const hsMatrix44& c2w) { fViewTransform.SetCameraTransform(w2c, c2w); }
+    void SetCameraTransform(const hsMatrix44& w2c, const hsMatrix44& c2w) {
+        fViewTransform.SetCameraTransform(w2c, c2w);
+    }
 
-    void SetPerspective(bool on=true) { fViewTransform.SetPerspective(on); }
-    void SetOrthogonal(bool on=true) { fViewTransform.SetOrthogonal(on); }
+    void SetPerspective(bool on = true) {
+        fViewTransform.SetPerspective(on);
+    }
+    void SetOrthogonal(bool on = true) {
+        fViewTransform.SetOrthogonal(on);
+    }
 
-    void SetHither(float f) { fViewTransform.SetHither(f); }
-    void SetYon(float f) { fViewTransform.SetYon(f); }
-    
-    void SetFovX(float f) { fViewTransform.SetFovXDeg(f); }
-    void SetFovY(float f) { fViewTransform.SetFovYDeg(f); }
+    void SetHither(float f) {
+        fViewTransform.SetHither(f);
+    }
+    void SetYon(float f) {
+        fViewTransform.SetYon(f);
+    }
 
-    void SetSizeX(float f) { fViewTransform.SetWidth(f); }
-    void SetSizeY(float f) { fViewTransform.SetHeight(f); }
+    void SetFovX(float f) {
+        fViewTransform.SetFovXDeg(f);
+    }
+    void SetFovY(float f) {
+        fViewTransform.SetFovYDeg(f);
+    }
 
-    void SetClearColor(const hsColorRGBA& c) { fClearColor = c; }
-    void SetClearDepth(float d) { fClearDepth = d; }
+    void SetSizeX(float f) {
+        fViewTransform.SetWidth(f);
+    }
+    void SetSizeY(float f) {
+        fViewTransform.SetHeight(f);
+    }
+
+    void SetClearColor(const hsColorRGBA& c) {
+        fClearColor = c;
+    }
+    void SetClearDepth(float d) {
+        fClearDepth = d;
+    }
     // FogStart
     // negative => use current settings (default)
     // 0 => no fog == fog starts at yon
     // 1 => fog starts at camera.
     // Fog start greater than 1 is legal. Fog always linear.
-    void SetFogStart(float d) { fFogStart = d; } 
+    void SetFogStart(float d) {
+        fFogStart = d;
+    }
 
-    void SetPriority(float p) { fPriority = p; }
+    void SetPriority(float p) {
+        fPriority = p;
+    }
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);
 
-    void SetUserData(uint32_t n) { fUserData = n; }
-    uint32_t GetUserData() const { return fUserData; }
-    
-    void SetIgnoreOccluders(bool b) { fIgnoreOccluders = b; }
-    bool GetIgnoreOccluders() { return fIgnoreOccluders; }
+    void SetUserData(uint32_t n) {
+        fUserData = n;
+    }
+    uint32_t GetUserData() const {
+        return fUserData;
+    }
+
+    void SetIgnoreOccluders(bool b) {
+        fIgnoreOccluders = b;
+    }
+    bool GetIgnoreOccluders() {
+        return fIgnoreOccluders;
+    }
 
     // This function is called after the render request is processed by the client
     virtual void    Render(plPipeline* pipe, plPageTreeMgr* pageMgr);

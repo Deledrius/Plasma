@@ -51,21 +51,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plControlConfig;
 
-class plCmdIfaceModMsg : public plMessage
-{
+class plCmdIfaceModMsg : public plMessage {
 protected:
 
 public:
-    plCmdIfaceModMsg() : fInterface(nil), fIndex(0), fControlCode(0){SetBCastFlag(plMessage::kBCastByExactType);}
-    plCmdIfaceModMsg(const plKey* s, 
-                    const plKey* r, 
-                    const double* t) : fInterface(nil){;}
-    
-    CLASSNAME_REGISTER( plCmdIfaceModMsg );
-    GETINTERFACE_ANY( plCmdIfaceModMsg, plMessage );
+    plCmdIfaceModMsg() : fInterface(nil), fIndex(0), fControlCode(0) {
+        SetBCastFlag(plMessage::kBCastByExactType);
+    }
+    plCmdIfaceModMsg(const plKey* s,
+                     const plKey* r,
+                     const double* t) : fInterface(nil) {
+        ;
+    }
 
-    enum 
-    {
+    CLASSNAME_REGISTER(plCmdIfaceModMsg);
+    GETINTERFACE_ANY(plCmdIfaceModMsg, plMessage);
+
+    enum {
         kAdd = 0,
         kRemove,
         kPushInterface,
@@ -81,23 +83,29 @@ public:
     hsBitVector         fCmd;
     plControlConfig*    fInterface;
     uint32_t              fControlCode;
-    int                 fIndex; 
+    int                 fIndex;
 
-    bool Cmd(int n) { return fCmd.IsBitSet(n); }
-    void SetCmd(int n) { fCmd.SetBit(n); }
-    void ClearCmd() { fCmd.Clear(); }
-    void ClearCmd(int n) { fCmd.ClearBit(n); }
-    
+    bool Cmd(int n) {
+        return fCmd.IsBitSet(n);
+    }
+    void SetCmd(int n) {
+        fCmd.SetBit(n);
+    }
+    void ClearCmd() {
+        fCmd.Clear();
+    }
+    void ClearCmd(int n) {
+        fCmd.ClearBit(n);
+    }
+
     // IO
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
     }
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
     }
-    
+
 };
 
 #endif // plCmdIfaceModMsg_inc

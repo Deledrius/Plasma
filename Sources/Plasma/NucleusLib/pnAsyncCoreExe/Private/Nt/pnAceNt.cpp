@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCoreExe/Private/Nt/pnAceNt.cpp
-*   
+*
 ***/
 
 #include "../../Pch.h"
@@ -79,39 +79,46 @@ static unsigned                 s_pageSizeMask;
 ***/
 
 //===========================================================================
-CNtWaitHandle::CNtWaitHandle () {
+CNtWaitHandle::CNtWaitHandle()
+{
     m_refCount = 1;
     m_event = CreateEvent(
-        (LPSECURITY_ATTRIBUTES) nil,
-        true,   // manual reset
-        false,  // initial state
-        (LPCTSTR) nil
-    );
+                  (LPSECURITY_ATTRIBUTES) nil,
+                  true,   // manual reset
+                  false,  // initial state
+                  (LPCTSTR) nil
+              );
 }
 
 //===========================================================================
-CNtWaitHandle::~CNtWaitHandle () {
+CNtWaitHandle::~CNtWaitHandle()
+{
     CloseHandle(m_event);
 }
 
 //===========================================================================
-void CNtWaitHandle::IncRef () {
+void CNtWaitHandle::IncRef()
+{
     InterlockedIncrement(&m_refCount);
 }
 
 //===========================================================================
-void CNtWaitHandle::DecRef () {
-    if (!InterlockedDecrement(&m_refCount))
+void CNtWaitHandle::DecRef()
+{
+    if (!InterlockedDecrement(&m_refCount)) {
         delete this;
+    }
 }
 
 //===========================================================================
-bool CNtWaitHandle::WaitForObject (unsigned timeMs) const {
+bool CNtWaitHandle::WaitForObject(unsigned timeMs) const
+{
     return WAIT_TIMEOUT != WaitForSingleObject(m_event, timeMs);
 }
 
 //===========================================================================
-void CNtWaitHandle::SignalObject () const {
+void CNtWaitHandle::SignalObject() const
+{
     SetEvent(m_event);
 }
 
@@ -123,33 +130,34 @@ void CNtWaitHandle::SignalObject () const {
 ***/
 
 //===========================================================================
-static void INtOpDispatch (
-    NtObject *  ntObj,
-    Operation * op,
+static void INtOpDispatch(
+    NtObject*   ntObj,
+    Operation* op,
     uint32_t    bytes
-) {
+)
+{
     for (;;) {
         switch (op->opType) {
-            case kOpConnAttempt:
-                INtSocketOpCompleteSocketConnect((NtOpConnAttempt *) op);
+        case kOpConnAttempt:
+            INtSocketOpCompleteSocketConnect((NtOpConnAttempt*) op);
             // operation not associated with ntObj so there is no next operation.
             // operation has already been deleted by OpCompleteSocketConnect.
             return;
 
-            case kOpQueuedSocketWrite:
-                INtSocketOpCompleteQueuedSocketWrite((NtSock *) ntObj, (NtOpSocketWrite *) op);
+        case kOpQueuedSocketWrite:
+            INtSocketOpCompleteQueuedSocketWrite((NtSock*) ntObj, (NtOpSocketWrite*) op);
             // operation converted into kOpSocketWrite so we cannot move
             // to next operation until write operation completes
             return;
 
-            case kOpSocketRead:
-                ASSERT(bytes != (uint32_t) -1);
-                INtSocketOpCompleteSocketRead((NtSock *) ntObj, bytes);
+        case kOpSocketRead:
+            ASSERT(bytes != (uint32_t) - 1);
+            INtSocketOpCompleteSocketRead((NtSock*) ntObj, bytes);
             return;
 
-            case kOpSocketWrite:
-                ASSERT(bytes != (uint32_t) -1);
-                INtSocketOpCompleteSocketWrite((NtSock *) ntObj, (NtOpSocketWrite *) op);
+        case kOpSocketWrite:
+            ASSERT(bytes != (uint32_t) - 1);
+            INtSocketOpCompleteSocketWrite((NtSock*) ntObj, (NtOpSocketWrite*) op);
             break;
 
             DEFAULT_FATAL(opType);
@@ -160,6 +168,7 @@ static void INtOpDispatch (
         // convert the operation to OP_NULL, which will get completed when it reaches
         // the head of the list.
         ntObj->critsect.Enter();
+
         if (ntObj->opList.Prev(op)) {
             // setting the completion flag must be done inside the critical section
             // because it will be checked by sibling operations when they have the
@@ -174,15 +183,18 @@ static void INtOpDispatch (
         // critical section to do so. This is a big win because a single operation
         // that takes a long time to complete can backlog a long list of completed ops.
         bool continueDispatch;
+
         for (;;) {
             // wake up any other threads waiting on this event
-            CNtWaitHandle * signalComplete = op->signalComplete;
+            CNtWaitHandle* signalComplete = op->signalComplete;
             op->signalComplete = nil;
 
             // since this operation is at the head of the list we can complete it
-            if (op->asyncId && !++ntObj->nextCompleteSequence)
+            if (op->asyncId && !++ntObj->nextCompleteSequence) {
                 ++ntObj->nextCompleteSequence;
-            Operation * next = ntObj->opList.Next(op);
+            }
+
+            Operation* next = ntObj->opList.Next(op);
             ntObj->opList.Delete(op);
             op = next;
 
@@ -200,45 +212,51 @@ static void INtOpDispatch (
 
             // opTypes >= kOpSequence complete when they reach the head of the list
             continueDispatch = op->opType >= kOpSequence;
-            if (op->pending)
+
+            if (op->pending) {
                 break;
+            }
 
             InterlockedDecrement(&ntObj->ioCount);
         }
+
         ntObj->critsect.Leave();
 
         INtConnCompleteOperation(ntObj);
 
-        if (!continueDispatch)
+        if (!continueDispatch) {
             break;
+        }
 
         // certain operations which depend upon the value of bytes (reads & writes)
         // can only be dispatched when they are completed normally. To ensure that
         // we're not accidentally processing an operation that shouldn't be executed,
         // set the bytes field to an invalid value.
-        bytes = (uint32_t) -1;
+        bytes = (uint32_t) - 1;
     }
 }
 
 //===========================================================================
-static unsigned THREADCALL NtWorkerThreadProc (AsyncThread * thread) {
+static unsigned THREADCALL NtWorkerThreadProc(AsyncThread* thread)
+{
     unsigned sleepMs    = INFINITE;
+
     while (s_running) {
 
         // process I/O operations
         {
             DWORD bytes;
-            NtObject *  ntObj;
-            Operation * op;
+            NtObject*   ntObj;
+            Operation* op;
             (void) GetQueuedCompletionStatus(
                 s_ioPort,
                 &bytes,
-            #ifdef _WIN64
+#ifdef _WIN64
                 (PULONG_PTR) &ntObj,
-            #else
+#else
                 (LPDWORD) &ntObj,
-            #endif
-                (LPOVERLAPPED *) &op,
+#endif
+                (LPOVERLAPPED*) &op,
                 sleepMs
             );
 
@@ -266,29 +284,35 @@ static unsigned THREADCALL NtWorkerThreadProc (AsyncThread * thread) {
 ***/
 
 //===========================================================================
-void INtConnPostOperation (NtObject * ntObj, Operation * op, unsigned bytes) {
+void INtConnPostOperation(NtObject* ntObj, Operation* op, unsigned bytes)
+{
     PostQueuedCompletionStatus(
         s_ioPort,
         bytes,
-        #ifdef _WIN64
-            (ULONG_PTR) ntObj,
-        #else
-            (DWORD) ntObj,
-        #endif
+#ifdef _WIN64
+        (ULONG_PTR) ntObj,
+#else
+        (DWORD) ntObj,
+#endif
         &op->overlapped
     );
 }
 
 //===========================================================================
-AsyncId INtConnSequenceStart (NtObject * ntObj) {
+AsyncId INtConnSequenceStart(NtObject* ntObj)
+{
     unsigned result;
-    if (0 == (result = ++ntObj->nextStartSequence))
+
+    if (0 == (result = ++ntObj->nextStartSequence)) {
         result = ++ntObj->nextStartSequence;
+    }
+
     return (AsyncId) result;
 }
 
 //===========================================================================
-bool INtConnInitialize (NtObject * ntObj) {
+bool INtConnInitialize(NtObject* ntObj)
+{
     if (!CreateIoCompletionPort(ntObj->handle, s_ioPort, (DWORD) ntObj, 0)) {
         LogMsg(kLogFatal, "CreateIoCompletionPort failed");
         return false;
@@ -298,19 +322,22 @@ bool INtConnInitialize (NtObject * ntObj) {
 }
 
 //===========================================================================
-void INtConnCompleteOperation (NtObject * ntObj) {
+void INtConnCompleteOperation(NtObject* ntObj)
+{
     // are we completing the last operation for this object?
-    if (InterlockedDecrement(&ntObj->ioCount))
+    if (InterlockedDecrement(&ntObj->ioCount)) {
         return;
+    }
 
     DWORD err = GetLastError();
+
     switch (ntObj->ioType) {
-        case kNtSocket:
-            INtSockDelete((NtSock *) ntObj);
+    case kNtSocket:
+        INtSockDelete((NtSock*) ntObj);
         break;
 
-        default:
-            LogMsg(kLogError, "NtConnCompleteOp %p %u", ntObj, ntObj->ioType);
+    default:
+        LogMsg(kLogError, "NtConnCompleteOp %p %u", ntObj, ntObj->ioType);
         break;
     }
 }
@@ -322,25 +349,31 @@ void INtConnCompleteOperation (NtObject * ntObj) {
 ***/
 
 //===========================================================================
-void NtInitialize () {
+void NtInitialize()
+{
     // ensure initialization only occurs once
-    if (s_running)
+    if (s_running) {
         return;
+    }
+
     s_running = true;
 
     // create a cleanup event
     s_waitEvent = CreateEvent(
-        (LPSECURITY_ATTRIBUTES) 0,
-        true,           // manual reset
-        false,          // initial state off
-        (LPCTSTR) nil   // name
-    );
-    if (!s_waitEvent)
-        ErrorAssert(__LINE__, __FILE__, "CreateEvent %#x", GetLastError());        
+                      (LPSECURITY_ATTRIBUTES) 0,
+                      true,           // manual reset
+                      false,          // initial state off
+                      (LPCTSTR) nil   // name
+                  );
+
+    if (!s_waitEvent) {
+        ErrorAssert(__LINE__, __FILE__, "CreateEvent %#x", GetLastError());
+    }
 
     // create IO completion port
-    if (0 == (s_ioPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0)))
-        ErrorAssert(__LINE__, __FILE__, "CreateIoCompletionPort %#x", GetLastError());        
+    if (0 == (s_ioPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0))) {
+        ErrorAssert(__LINE__, __FILE__, "CreateIoCompletionPort %#x", GetLastError());
+    }
 
     // calculate number of IO worker threads to create
     if (!s_pageSizeMask) {
@@ -350,6 +383,7 @@ void NtInitialize () {
 
         // Set worker thread count
         s_ioThreadCount = si.dwNumberOfProcessors * 2;
+
         if (s_ioThreadCount > kMaxWorkerThreads) {
             s_ioThreadCount = kMaxWorkerThreads;
             LogMsg(kLogError, "kMaxWorkerThreads too small!");
@@ -359,10 +393,10 @@ void NtInitialize () {
     // create IO worker threads
     for (long thread = 0; thread < s_ioThreadCount; thread++) {
         s_ioThreadHandles[thread] = (HANDLE) AsyncThreadCreate(
-            NtWorkerThreadProc,
-            (void *) thread,
-            L"NtWorkerThread"
-        );
+                                        NtWorkerThreadProc,
+                                        (void*) thread,
+                                        L"NtWorkerThread"
+                                    );
     }
 
     INtSocketInitialize();
@@ -372,7 +406,8 @@ void NtInitialize () {
 // DANGER: calling this function will slam closed any files which are still open.
 // MOST PROGRAMS DO NOT NEED TO CALL THIS FUNCTION. In general, the best way to
 // shut down the program is to simply let the atexit() handler take care of it.
-void NtDestroy (unsigned exitThreadWaitMs) {
+void NtDestroy(unsigned exitThreadWaitMs)
+{
     // cleanup modules that post completion notifications as part of their shutdown
     INtSocketStartCleanup(exitThreadWaitMs);
 
@@ -382,8 +417,10 @@ void NtDestroy (unsigned exitThreadWaitMs) {
     if (s_ioPort) {
         // Post a completion notification to worker threads to wake them up
         long thread;
-        for (thread = 0; thread < s_ioThreadCount; thread++)
+
+        for (thread = 0; thread < s_ioThreadCount; thread++) {
             PostQueuedCompletionStatus(s_ioPort, 0, 0, 0);
+        }
 
         // Close each thread
         for (thread = 0; thread < s_ioThreadCount; thread++) {
@@ -408,14 +445,17 @@ void NtDestroy (unsigned exitThreadWaitMs) {
 }
 
 //===========================================================================
-void NtSignalShutdown () {
+void NtSignalShutdown()
+{
     SetEvent(s_waitEvent);
 }
 
 //===========================================================================
-void NtWaitForShutdown () {
-    if (s_waitEvent)
+void NtWaitForShutdown()
+{
+    if (s_waitEvent) {
         WaitForSingleObject(s_waitEvent, INFINITE);
+    }
 }
 
 } using namespace Nt;
@@ -428,13 +468,14 @@ void NtWaitForShutdown () {
 ***/
 
 //===========================================================================
-void NtGetApi (AsyncApi * api) {
+void NtGetApi(AsyncApi* api)
+{
     api->initialize             = NtInitialize;
     api->destroy                = NtDestroy;
     api->signalShutdown         = NtSignalShutdown;
     api->waitForShutdown        = NtWaitForShutdown;
     api->sleep                  = NtSleep;
-    
+
     api->socketConnect          = NtSocketConnect;
     api->socketConnectCancel    = NtSocketConnectCancel;
     api->socketDisconnect       = NtSocketDisconnect;

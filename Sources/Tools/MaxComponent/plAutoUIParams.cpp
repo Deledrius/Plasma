@@ -58,7 +58,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plSurface/plLayerInterface.h"
 #include "plGImage/plDynamicTextMap.h"
 
-plAutoUIParam::plAutoUIParam(ParamID id, const char *name) :
+plAutoUIParam::plAutoUIParam(ParamID id, const char* name) :
     fID(id), fName(hsStrcpy(name)), fVisID(-1), fHeight(0)
 {
 }
@@ -68,15 +68,17 @@ plAutoUIParam::~plAutoUIParam()
     delete [] fName;
 }
 
-int plAutoUIParam::Create(HWND hDlg, IParamBlock2 *pb, int yOffset)
+int plAutoUIParam::Create(HWND hDlg, IParamBlock2* pb, int yOffset)
 {
     int size = fControlVec.size();
-    if (size > 0)
+
+    if (size > 0) {
         fControlVec.clear();
+    }
 
     int initialOffset = yOffset;
     int finalOffset = CreateControls(hDlg, pb, yOffset);
-    
+
     fHeight = finalOffset - initialOffset;
     fhDlg = hDlg;
 
@@ -98,10 +100,10 @@ int plAutoUIParam::ISizeControl(HWND hDlg, HWND hControl, int w, int h, int y, i
     return rect.bottom;
 }
 
-HWND plAutoUIParam::ICreateControl(HWND hDlg, const char *className, const char *wndName, DWORD style, DWORD exStyle)
+HWND plAutoUIParam::ICreateControl(HWND hDlg, const char* className, const char* wndName, DWORD style, DWORD exStyle)
 {
     HWND hwnd = CreateWindowEx(exStyle, className, wndName, WS_VISIBLE | WS_CHILD | style,
-                0, 0, 0, 0, hDlg, 0/*(HMENU)fDlgItemID*/, hInstance, NULL);
+                               0, 0, 0, 0, hDlg, 0/*(HMENU)fDlgItemID*/, hInstance, NULL);
 
     fControlVec.push_back(hwnd);
 
@@ -114,7 +116,7 @@ void plAutoUIParam::ISetControlFont(HWND hControl)
     SendMessage(hControl, WM_SETFONT, (WPARAM)GetCOREInterface()->GetAppHFont(), TRUE);
 }
 
-int plAutoUIParam::IAddStaticText(HWND hDlg, int y, const char *text)
+int plAutoUIParam::IAddStaticText(HWND hDlg, int y, const char* text)
 {
     HWND hStatic = ICreateControl(hDlg, "Static", text, SS_LEFT);
     int height = ISizeControl(hDlg, hStatic, 100, 8, y) + 2;
@@ -135,11 +137,10 @@ void plAutoUIParam::Show(int yOffset)
     int ctrlOffset = 0;
     RECT rect;
 
-    for (int i = 0; i < fControlVec.size(); i++)
-    {
+    for (int i = 0; i < fControlVec.size(); i++) {
         tmp = fControlVec[i];
         GetWindowRect(tmp, &rect);
-        
+
         SetRect(&rect, 3, 0, (rect.right - rect.left) + 3, rect.bottom - rect.top);
         //MapDialogRect(fhDlg, &rect);
         // Y is already in screen units
@@ -159,8 +160,7 @@ void plAutoUIParam::Hide()
 {
     HWND tmp;
 
-    for (int i = 0; i < fControlVec.size(); i++)
-    {
+    for (int i = 0; i < fControlVec.size(); i++) {
         tmp = fControlVec[i];
         ShowWindow(tmp, SW_HIDE);
     }
@@ -179,61 +179,52 @@ void plAutoUIParam::SetVisInfo(ParamID id, std::vector<std::string>* states)
 
 bool plAutoUIParam::CheckVisibility(ParamID id, std::string state)
 {
-    if (fVisStates.size() == 0)
-    {
+    if (fVisStates.size() == 0) {
         return true;
-    }
-    else
-    {
-        if (fVisID == id)
-        {
-            if (std::find(fVisStates.begin(), fVisStates.end(), state) != fVisStates.end())
-            {
+    } else {
+        if (fVisID == id) {
+            if (std::find(fVisStates.begin(), fVisStates.end(), state) != fVisStates.end()) {
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
 }
 
-bool plAutoUIParam::GetBool(IParamBlock2 *pb)
+bool plAutoUIParam::GetBool(IParamBlock2* pb)
 {
     hsAssert(false, "Parameter is not a bool");
     return false;
 }
-float plAutoUIParam::GetFloat(IParamBlock2 *pb)
+float plAutoUIParam::GetFloat(IParamBlock2* pb)
 {
     hsAssert(false, "Parameter is not a float");
     return -1;
 }
-int plAutoUIParam::GetInt(IParamBlock2 *pb)
+int plAutoUIParam::GetInt(IParamBlock2* pb)
 {
     hsAssert(false, "Parameter is not an int");
     return -1;
 }
-const char* plAutoUIParam::GetString(IParamBlock2 *pb)
+const char* plAutoUIParam::GetString(IParamBlock2* pb)
 {
     hsAssert(false, "Parameter is not a string");
     return nil;
 }
-int plAutoUIParam::GetCount(IParamBlock2 *pb)
+int plAutoUIParam::GetCount(IParamBlock2* pb)
 {
     hsAssert(false, "Parameter is not a key list");
     return -1;
 }
-plKey plAutoUIParam::GetKey(IParamBlock2 *pb, int idx)
+plKey plAutoUIParam::GetKey(IParamBlock2* pb, int idx)
 {
     hsAssert(false, "Parameter is not a key");
     return nil;
 }
-plComponentBase *plAutoUIParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plAutoUIParam::GetComponent(IParamBlock2* pb, int idx)
 {
     hsAssert(false, "Parameter is not a component");
     return nil;
@@ -242,12 +233,12 @@ plComponentBase *plAutoUIParam::GetComponent(IParamBlock2 *pb, int idx)
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plCheckBoxParam::plCheckBoxParam(ParamID id, const char *name) :
-  plAutoUIParam(id, name), fhCheck(nil)
+plCheckBoxParam::plCheckBoxParam(ParamID id, const char* name) :
+    plAutoUIParam(id, name), fhCheck(nil)
 {
 }
 
-int plCheckBoxParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
+int plCheckBoxParam::CreateControls(HWND hDlg, IParamBlock2* pb, int yOffset)
 {
     // Create the checkbox
     fhCheck = ICreateControl(hDlg, "Button", fName, BS_AUTOCHECKBOX);
@@ -259,12 +250,10 @@ int plCheckBoxParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
     return yOffset;
 }
 
-bool plCheckBoxParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plCheckBoxParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhCheck)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhCheck) {
             // Get the state
             bool checked = (SendMessage(fhCheck, BM_GETCHECK, 0, 0) == BST_CHECKED);
             // Set the state in the paramblock
@@ -280,7 +269,7 @@ int plCheckBoxParam::GetParamType()
 {
     return kTypeBool;
 }
-bool plCheckBoxParam::GetBool(IParamBlock2 *pb)
+bool plCheckBoxParam::GetBool(IParamBlock2* pb)
 {
     return pb->GetInt(fID);
 }
@@ -288,12 +277,12 @@ bool plCheckBoxParam::GetBool(IParamBlock2 *pb)
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plSpinnerParam::plSpinnerParam(ParamID id, const char *name, bool isFloat) :
+plSpinnerParam::plSpinnerParam(ParamID id, const char* name, bool isFloat) :
     plAutoUIParam(id, name), fIsFloat(isFloat), fhSpinner(nil)
 {
 }
 
-int plSpinnerParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
+int plSpinnerParam::CreateControls(HWND hDlg, IParamBlock2* pb, int yOffset)
 {
     yOffset += IAddStaticText(hDlg, yOffset, fName);
 
@@ -306,17 +295,15 @@ int plSpinnerParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
     yOffset += ISizeControl(hDlg, fhSpinner, 8, 10, yOffset, 33) + 2;
 
     // Initialize the spinner
-    ISpinnerControl *spin = GetISpinner(fhSpinner);
-    ParamDef &def = pb->GetParamDef(fID);
-    if (fIsFloat)
-    {
+    ISpinnerControl* spin = GetISpinner(fhSpinner);
+    ParamDef& def = pb->GetParamDef(fID);
+
+    if (fIsFloat) {
         spin->SetLimits(def.range_low.f, def.range_high.f, FALSE);
         spin->SetValue(pb->GetFloat(fID), FALSE);
         spin->SetScale(0.1f);
         spin->LinkToEdit(hEdit, EDITTYPE_FLOAT);
-    }
-    else
-    {
+    } else {
         spin->SetLimits(def.range_low.i, def.range_high.i, FALSE);
         spin->SetValue(pb->GetInt(fID), FALSE);
         spin->SetScale(1);
@@ -330,7 +317,7 @@ int plSpinnerParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
 
 void plSpinnerParam::Show(int yOffset)
 {
-    yOffset += ISizeControl(fhDlg, fControlVec[0], 100, 8, yOffset) + 2;    
+    yOffset += ISizeControl(fhDlg, fControlVec[0], 100, 8, yOffset) + 2;
     ISizeControl(fhDlg, fControlVec[1], 30, 10, yOffset);
     ISizeControl(fhDlg, fControlVec[2], 8, 10, yOffset, 33);
 
@@ -339,19 +326,20 @@ void plSpinnerParam::Show(int yOffset)
     ShowWindow(fControlVec[2], SW_SHOW);
 }
 
-bool plSpinnerParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plSpinnerParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == CC_SPINNER_CHANGE)// && HIWORD(wParam) == FALSE)
-    {
-        ISpinnerControl *spin = (ISpinnerControl*)lParam;
+    if (msg == CC_SPINNER_CHANGE) { // && HIWORD(wParam) == FALSE)
+        ISpinnerControl* spin = (ISpinnerControl*)lParam;
         HWND hSpinner = spin->GetHwnd();
-        if (hSpinner == fhSpinner)
-        {
+
+        if (hSpinner == fhSpinner) {
             // Set the state
-            if (fIsFloat)
+            if (fIsFloat) {
                 pb->SetValue(fID, 0, spin->GetFVal());
-            else
+            } else {
                 pb->SetValue(fID, 0, spin->GetIVal());
+            }
+
             return true;
         }
     }
@@ -363,11 +351,11 @@ int plSpinnerParam::GetParamType()
 {
     return fIsFloat ? kTypeFloat : kTypeInt;
 }
-float plSpinnerParam::GetFloat(IParamBlock2 *pb)
+float plSpinnerParam::GetFloat(IParamBlock2* pb)
 {
     return (fIsFloat ? pb->GetFloat(fID) : -1);
 }
-int plSpinnerParam::GetInt(IParamBlock2 *pb)
+int plSpinnerParam::GetInt(IParamBlock2* pb)
 {
     return (!fIsFloat ? pb->GetInt(fID) : -1);
 }
@@ -375,12 +363,12 @@ int plSpinnerParam::GetInt(IParamBlock2 *pb)
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plEditParam::plEditParam(ParamID id, const char *name, int lines) :
+plEditParam::plEditParam(ParamID id, const char* name, int lines) :
     plAutoUIParam(id, name), fhEdit(nil), fLines(lines)
 {
 }
 
-int plEditParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
+int plEditParam::CreateControls(HWND hDlg, IParamBlock2* pb, int yOffset)
 {
     yOffset += IAddStaticText(hDlg, yOffset, fName);
 
@@ -388,12 +376,14 @@ int plEditParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
     // Create the edit box
     //
     DWORD flags = ES_AUTOHSCROLL | ES_LEFT | WS_BORDER;
+
     // If this edit box has more than one line, add the multiline flags
-    if (fLines > 1)
+    if (fLines > 1) {
         flags |= ES_AUTOVSCROLL | ES_MULTILINE | ES_WANTRETURN;
+    }
 
     fhEdit = ICreateControl(hDlg, "Edit", nil, flags, WS_EX_CLIENTEDGE);
-    yOffset += ISizeControl(hDlg, fhEdit, 100, 5 + 8*fLines, yOffset) + 2;
+    yOffset += ISizeControl(hDlg, fhEdit, 100, 5 + 8 * fLines, yOffset) + 2;
     ISetControlFont(fhEdit);
 
     // Initialize the edit box
@@ -405,35 +395,31 @@ int plEditParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
 void plEditParam::Show(int yOffset)
 {
     yOffset += ISizeControl(fhDlg, fControlVec[0], 100, 8, yOffset) + 2;
-    ISizeControl(fhDlg, fControlVec[1], 100, 5 + 8*fLines, yOffset);
+    ISizeControl(fhDlg, fControlVec[1], 100, 5 + 8 * fLines, yOffset);
 
     ShowWindow(fControlVec[0], SW_SHOW);
     ShowWindow(fControlVec[1], SW_SHOW);
 }
 
-bool plEditParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plEditParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND)
-    {
+    if (msg == WM_COMMAND) {
         // Disable Max accelerators when the edit box gets focus
-        if (HIWORD(wParam) == EN_SETFOCUS && (HWND)lParam == fhEdit)
-        {
+        if (HIWORD(wParam) == EN_SETFOCUS && (HWND)lParam == fhEdit) {
             plMaxAccelerators::Disable();
             return true;
-        }
-        else if (HIWORD(wParam) == EN_KILLFOCUS && (HWND)lParam == fhEdit)
-        {
+        } else if (HIWORD(wParam) == EN_KILLFOCUS && (HWND)lParam == fhEdit) {
             // Get the text from the edit and store it in the paramblock
-            int len = GetWindowTextLength(fhEdit)+1;
-            if (len > 1)
-            {
-                char *buf = new char[len];
+            int len = GetWindowTextLength(fhEdit) + 1;
+
+            if (len > 1) {
+                char* buf = new char[len];
                 GetWindowText(fhEdit, buf, len);
                 pb->SetValue(fID, 0, buf);
                 delete [] buf;
-            }
-            else
+            } else {
                 pb->SetValue(fID, 0, "");
+            }
 
             plMaxAccelerators::Enable();
 
@@ -448,7 +434,7 @@ int plEditParam::GetParamType()
 {
     return kTypeString;
 }
-const char* plEditParam::GetString(IParamBlock2 *pb)
+const char* plEditParam::GetString(IParamBlock2* pb)
 {
     return pb->GetStr(fID);
 }
@@ -456,20 +442,21 @@ const char* plEditParam::GetString(IParamBlock2 *pb)
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickListParam::plPickListParam(ParamID id, const char *name, std::vector<Class_ID>* filter) :
+plPickListParam::plPickListParam(ParamID id, const char* name, std::vector<Class_ID>* filter) :
     plAutoUIParam(id, name), fhList(nil), fhAdd(nil), fhRemove(nil)
 {
-    if (filter)
+    if (filter) {
         fCIDs = *filter;
+    }
 }
 
-int plPickListParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
+int plPickListParam::CreateControls(HWND hDlg, IParamBlock2* pb, int yOffset)
 {
     yOffset += IAddStaticText(hDlg, yOffset, fName) + 2;
 
     // Create the listbox
     fhList = ICreateControl(hDlg, "ListBox", nil, LBS_STANDARD | LBS_NOINTEGRALHEIGHT, WS_EX_CLIENTEDGE);
-    yOffset += ISizeControl(hDlg, fhList, 100, 5+4*8, yOffset) + 2;
+    yOffset += ISizeControl(hDlg, fhList, 100, 5 + 4 * 8, yOffset) + 2;
     ISetControlFont(fhList);
 
     // Create the Add button
@@ -487,8 +474,8 @@ int plPickListParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
 
 void plPickListParam::Show(int yOffset)
 {
-    yOffset += ISizeControl(fhDlg, fControlVec[0], 100, 8, yOffset) + 4;    
-    yOffset += ISizeControl(fhDlg, fControlVec[1], 100, 5+4*8, yOffset) + 2;
+    yOffset += ISizeControl(fhDlg, fControlVec[0], 100, 8, yOffset) + 4;
+    yOffset += ISizeControl(fhDlg, fControlVec[1], 100, 5 + 4 * 8, yOffset) + 2;
     ISizeControl(fhDlg, fControlVec[2], 48, 14, yOffset, 4);
     ISizeControl(fhDlg, fControlVec[3], 48, 14, yOffset, 54);
 
@@ -498,30 +485,28 @@ void plPickListParam::Show(int yOffset)
     ShowWindow(fControlVec[3], SW_SHOW);
 }
 
-bool plPickListParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickListParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_INITDIALOG)
-    {
+    if (msg == WM_INITDIALOG) {
         IUpdateList(pb);
         return false;
     }
 
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhAdd)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhAdd) {
             plPick::Node(pb, fID, &fCIDs, false, false);
             IUpdateList(pb);
             return true;
         }
-        if ((HWND)lParam == fhRemove)
-        {
+
+        if ((HWND)lParam == fhRemove) {
             int sel = SendMessage(fhList, LB_GETCURSEL, 0, 0);
-            if (sel != -1)
-            {
+
+            if (sel != -1) {
                 pb->Delete(fID, sel, 1);
                 IUpdateList(pb);
             }
+
             return true;
         }
     }
@@ -529,15 +514,15 @@ bool plPickListParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParam
     return false;
 }
 
-void plPickListParam::IUpdateList(IParamBlock2 *pb)
+void plPickListParam::IUpdateList(IParamBlock2* pb)
 {
     SendMessage(fhList, LB_RESETCONTENT, 0, 0);
 
     int count = pb->Count(fID);
-    for (int i = 0; i < count; i++)
-    {
-        INode *node = pb->GetINode(fID, 0, i);
-        const char *name = node ? node->GetName() : "<deleted>";
+
+    for (int i = 0; i < count; i++) {
+        INode* node = pb->GetINode(fID, 0, i);
+        const char* name = node ? node->GetName() : "<deleted>";
         SendMessage(fhList, LB_ADDSTRING, 0, (LPARAM)name);
     }
 }
@@ -546,15 +531,17 @@ int plPickListParam::GetParamType()
 {
     return kTypeSceneObj;
 }
-int plPickListParam::GetCount(IParamBlock2 *pb)
+int plPickListParam::GetCount(IParamBlock2* pb)
 {
     return pb->Count(fID);
 }
-plKey plPickListParam::GetKey(IParamBlock2 *pb, int idx)
+plKey plPickListParam::GetKey(IParamBlock2* pb, int idx)
 {
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID, 0, idx);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID, 0, idx);
+
+    if (node) {
         return node->GetKey();
+    }
 
     return nil;
 }
@@ -564,39 +551,41 @@ plKey plPickListParam::GetKey(IParamBlock2 *pb, int idx)
 
 class plPickButtonParam;
 
-class PickNodeButtonFilter : public PickNodeCallback
-{
+class PickNodeButtonFilter : public PickNodeCallback {
 public:
-    virtual BOOL Filter(INode *node) { return TRUE; }
+    virtual BOOL Filter(INode* node) {
+        return TRUE;
+    }
 };
 static PickNodeButtonFilter gPickFilter;
 
-class PickNodeButtonMode : public PickModeCallback
-{
+class PickNodeButtonMode : public PickModeCallback {
 public:
-    plPickButtonParam *fParam;
-    IParamBlock2 *fPB;
+    plPickButtonParam* fParam;
+    IParamBlock2* fPB;
 
-    BOOL HitTest(IObjParam *ip, HWND hWnd, ViewExp *vpt, IPoint2 m, int flags)
-    {
-        return (ip->PickNode(hWnd,m,&gPickFilter) != NULL);
+    BOOL HitTest(IObjParam* ip, HWND hWnd, ViewExp* vpt, IPoint2 m, int flags) {
+        return (ip->PickNode(hWnd, m, &gPickFilter) != NULL);
     }
-    BOOL Pick(IObjParam *ip, ViewExp *vpt);
-    
-    PickNodeCallback *GetFilter() { return &gPickFilter; }
-    BOOL    RightClick(IObjParam *ip, ViewExp *vpt);
+    BOOL Pick(IObjParam* ip, ViewExp* vpt);
+
+    PickNodeCallback* GetFilter() {
+        return &gPickFilter;
+    }
+    BOOL    RightClick(IObjParam* ip, ViewExp* vpt);
 };
 
 static PickNodeButtonMode gPickMode;
 
-plPickButtonParam::plPickButtonParam(ParamID id, const char *name, std::vector<Class_ID>* filter, bool canConvertToType) :
-      plAutoUIParam(id, name), fButton(nil), fCanConvertToType(canConvertToType)
+plPickButtonParam::plPickButtonParam(ParamID id, const char* name, std::vector<Class_ID>* filter, bool canConvertToType) :
+    plAutoUIParam(id, name), fButton(nil), fCanConvertToType(canConvertToType)
 {
-    if (filter)
+    if (filter) {
         fCIDs = *filter;
+    }
 }
 
-int plPickButtonParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
+int plPickButtonParam::CreateControls(HWND hDlg, IParamBlock2* pb, int yOffset)
 {
     yOffset += IAddStaticText(hDlg, yOffset, fName) + 2;
 
@@ -612,11 +601,13 @@ int plPickButtonParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
     fButton->SetCheckHighlight(TRUE);
     fButton->SetHighlightColor(GREEN_WASH);
 
-    INode *node = (INode*)pb->GetReferenceTarget(fID);
-    if (node)
+    INode* node = (INode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         fButton->SetText(node->GetName());
-    else
+    } else {
         fButton->SetText("(none)");
+    }
 
     // Create the Remove button
     fhRemove = ICreateControl(hDlg, "Button");
@@ -628,7 +619,7 @@ int plPickButtonParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
 
 void plPickButtonParam::Show(int yOffset)
 {
-    yOffset += ISizeControl(fhDlg, fControlVec[0], 100, 8, yOffset) + 4;    
+    yOffset += ISizeControl(fhDlg, fControlVec[0], 100, 8, yOffset) + 4;
     ISizeControl(fhDlg, fControlVec[1], 84, 12, yOffset);
     ISizeControl(fhDlg, fControlVec[2], 17, 12, yOffset, 89);
 
@@ -638,35 +629,28 @@ void plPickButtonParam::Show(int yOffset)
     ShowWindow(fControlVec[2], SW_SHOW);
 }
 
-bool plPickButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fCIDs.size() > 0)
-            {
-                if (fButton->IsChecked())
-                {
-                    if (plPick::Node(pb, fID, &fCIDs, true, fCanConvertToType))
-                    {
-                        INode *node = (INode*)pb->GetReferenceTarget(fID);
-                        if (node)
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fCIDs.size() > 0) {
+                if (fButton->IsChecked()) {
+                    if (plPick::Node(pb, fID, &fCIDs, true, fCanConvertToType)) {
+                        INode* node = (INode*)pb->GetReferenceTarget(fID);
+
+                        if (node) {
                             fButton->SetText(node->GetName());
+                        }
                     }
+
                     fButton->SetCheck(FALSE);
                 }
-            }
-            else
-            {
-                if (fButton->IsChecked())
-                {
+            } else {
+                if (fButton->IsChecked()) {
                     gPickMode.fParam = this;
                     gPickMode.fPB = pb;
                     GetCOREInterface()->SetPickMode(&gPickMode);
-                }
-                else
-                {
+                } else {
                     GetCOREInterface()->ClearPickMode();
                 }
             }
@@ -676,10 +660,8 @@ bool plPickButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IPar
     }
 
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
@@ -689,10 +671,9 @@ bool plPickButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IPar
     return false;
 }
 
-void plPickButtonParam::SetPickNode(INode *node, IParamBlock2 *pb)
+void plPickButtonParam::SetPickNode(INode* node, IParamBlock2* pb)
 {
-    if (node && pb)
-    {
+    if (node && pb) {
         pb->SetValue(fID, 0, (ReferenceTarget*)node);
         fButton->SetText(node->GetName());
     }
@@ -701,21 +682,26 @@ void plPickButtonParam::SetPickNode(INode *node, IParamBlock2 *pb)
 }
 
 
-BOOL PickNodeButtonMode::Pick(IObjParam *ip, ViewExp *vpt)
+BOOL PickNodeButtonMode::Pick(IObjParam* ip, ViewExp* vpt)
 {
-    INode *node = vpt->GetClosestHit();
-    if (node && fParam && fPB)
+    INode* node = vpt->GetClosestHit();
+
+    if (node && fParam && fPB) {
         fParam->SetPickNode(node, fPB);
+    }
+
     fParam = nil;
     fPB = nil;
 
     return TRUE;
 }
 
-BOOL PickNodeButtonMode::RightClick(IObjParam *ip, ViewExp *vpt)
+BOOL PickNodeButtonMode::RightClick(IObjParam* ip, ViewExp* vpt)
 {
-    if (fParam && fPB)
+    if (fParam && fPB) {
         fParam->SetPickNode(nil, nil);
+    }
+
     fParam = nil;
     fPB = nil;
 
@@ -726,16 +712,18 @@ int plPickButtonParam::GetParamType()
 {
     return kTypeSceneObj;
 }
-int plPickButtonParam::GetCount(IParamBlock2 *pb)
+int plPickButtonParam::GetCount(IParamBlock2* pb)
 {
     return (pb->GetReferenceTarget(fID) ? 1 : 0);
 }
-plKey plPickButtonParam::GetKey(IParamBlock2 *pb, int idx)
+plKey plPickButtonParam::GetKey(IParamBlock2* pb, int idx)
 {
     hsAssert(idx == 0, "Pick buttons only have one key");
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         return node->GetKey();
+    }
 
     return nil;
 }
@@ -743,8 +731,8 @@ plKey plPickButtonParam::GetKey(IParamBlock2 *pb, int idx)
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickComponentButtonParam::plPickComponentButtonParam(ParamID id, const char *name, std::vector<Class_ID>* filter, bool canConvertToType) :
-      plPickButtonParam(id, name, filter, canConvertToType)
+plPickComponentButtonParam::plPickComponentButtonParam(ParamID id, const char* name, std::vector<Class_ID>* filter, bool canConvertToType) :
+    plPickButtonParam(id, name, filter, canConvertToType)
 {
     hsAssert(filter, "Need to have a ClassID filter for pick component buttons");
 }
@@ -754,12 +742,14 @@ int plPickComponentButtonParam::GetParamType()
     return kTypeComponent;
 }
 
-plComponentBase* plPickComponentButtonParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickComponentButtonParam::GetComponent(IParamBlock2* pb, int idx)
 {
     hsAssert(idx == 0, "Pick buttons only have one key");
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
@@ -767,12 +757,12 @@ plComponentBase* plPickComponentButtonParam::GetComponent(IParamBlock2 *pb, int 
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickComponentListParam::plPickComponentListParam(ParamID id, const char *name, std::vector<Class_ID>* filter) :
+plPickComponentListParam::plPickComponentListParam(ParamID id, const char* name, std::vector<Class_ID>* filter) :
     plPickListParam(id, name, filter)
 {
 }
 
-bool plPickComponentListParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickComponentListParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
     return plPickListParam::IsMyMessage(msg, wParam, lParam, pb);
 }
@@ -782,11 +772,13 @@ int plPickComponentListParam::GetParamType()
     return kTypeComponent;
 }
 
-plComponentBase *plPickComponentListParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickComponentListParam::GetComponent(IParamBlock2* pb, int idx)
 {
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID, 0, idx);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID, 0, idx);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
@@ -794,7 +786,7 @@ plComponentBase *plPickComponentListParam::GetComponent(IParamBlock2 *pb, int id
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickActivatorButtonParam::plPickActivatorButtonParam(ParamID id, const char *name) :
+plPickActivatorButtonParam::plPickActivatorButtonParam(ParamID id, const char* name) :
     plPickButtonParam(id, name, nil, false)
 {
 }
@@ -803,41 +795,41 @@ int plPickActivatorButtonParam::GetParamType()
 {
     return kTypeActivator;
 }
-plComponentBase* plPickActivatorButtonParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickActivatorButtonParam::GetComponent(IParamBlock2* pb, int idx)
 {
     hsAssert(idx == 0, "Pick buttons only have one key");
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
 
-bool plPickActivatorButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickActivatorButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if (plPick::Activator(pb, fID, true))
-                {
-                    INode *node = (INode*)pb->GetReferenceTarget(fID);
-                    if (node)
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (plPick::Activator(pb, fID, true)) {
+                    INode* node = (INode*)pb->GetReferenceTarget(fID);
+
+                    if (node) {
                         fButton->SetText(node->GetName());
+                    }
                 }
+
                 fButton->SetCheck(FALSE);
             }
 
             return true;
         }
     }
+
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
@@ -851,17 +843,15 @@ bool plPickActivatorButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lPa
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickActivatorListParam::plPickActivatorListParam(ParamID id, const char *name) :
+plPickActivatorListParam::plPickActivatorListParam(ParamID id, const char* name) :
     plPickListParam(id, name, nil)
 {
 }
 
-bool plPickActivatorListParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickActivatorListParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhAdd)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhAdd) {
             plPick::Activator(pb, fID, false);
             IUpdateList(pb);
             return true;
@@ -876,11 +866,13 @@ int plPickActivatorListParam::GetParamType()
     return kTypeActivator;
 }
 
-plComponentBase *plPickActivatorListParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickActivatorListParam::GetComponent(IParamBlock2* pb, int idx)
 {
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID, 0, idx);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID, 0, idx);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
@@ -888,7 +880,7 @@ plComponentBase *plPickActivatorListParam::GetComponent(IParamBlock2 *pb, int id
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickDynamicTextButtonParam::plPickDynamicTextButtonParam(ParamID id, const char *name) :
+plPickDynamicTextButtonParam::plPickDynamicTextButtonParam(ParamID id, const char* name) :
     plPickButtonParam(id, name, nil, false)
 {
 }
@@ -899,55 +891,57 @@ int plPickDynamicTextButtonParam::GetParamType()
 }
 
 // temp hack to get the name of the texture map name
-const char* plPickDynamicTextButtonParam::GetString(IParamBlock2 *pb)
+const char* plPickDynamicTextButtonParam::GetString(IParamBlock2* pb)
 {
     // get the plKeys based on the texture map that the DynamicText map is on
     Texmap* texmap = (Texmap*)pb->GetReferenceTarget(fID);
     return texmap->GetName();
 }
 
-int plPickDynamicTextButtonParam::GetCount(IParamBlock2 *pb)
+int plPickDynamicTextButtonParam::GetCount(IParamBlock2* pb)
 {
 
     // get the plKeys based on the texture map that the DynamicText map is on
     Texmap* texmap = (Texmap*)pb->GetReferenceTarget(fID);
+
     // make sure that there was a texmap set
-    if ( texmap )
-    {
-        plPlasmaMAXLayer *maxLayer = plPlasmaMAXLayer::GetPlasmaMAXLayer( texmap );
-        if( maxLayer != nil )
-        {
+    if (texmap) {
+        plPlasmaMAXLayer* maxLayer = plPlasmaMAXLayer::GetPlasmaMAXLayer(texmap);
+
+        if (maxLayer != nil) {
             // It's one of our Plasma layer types, which means most likely it got converted.
- 
-            // Note: if the following count is zero, it was never converted, which most likely means 
+
+            // Note: if the following count is zero, it was never converted, which most likely means
             // no visible geometry in the scene uses this layer. So why do you even care about it?
             return maxLayer->GetNumConversionTargets();
         }
     }
+
     return 0;
 }
 
-plKey plPickDynamicTextButtonParam::GetKey(IParamBlock2 *pb, int idx)
+plKey plPickDynamicTextButtonParam::GetKey(IParamBlock2* pb, int idx)
 {
 
     // get the plKeys based on the texture map that the DynamicText map is on
     Texmap* texmap = (Texmap*)pb->GetReferenceTarget(fID);
+
     // make sure that there was a texmap set
-    if ( texmap )
-    {
-        plPlasmaMAXLayer *maxLayer = plPlasmaMAXLayer::GetPlasmaMAXLayer( texmap );
-        if( maxLayer != nil )
-        {
+    if (texmap) {
+        plPlasmaMAXLayer* maxLayer = plPlasmaMAXLayer::GetPlasmaMAXLayer(texmap);
+
+        if (maxLayer != nil) {
             // make sure the index is valid
-            if ( idx >= 0 && idx < maxLayer->GetNumConversionTargets() )
-            {
-                plLayerInterface *convertedLayer = maxLayer->GetConversionTarget(idx);
-                if ( convertedLayer )
-                {
+            if (idx >= 0 && idx < maxLayer->GetNumConversionTargets()) {
+                plLayerInterface* convertedLayer = maxLayer->GetConversionTarget(idx);
+
+                if (convertedLayer) {
                     plBitmap* bmap = convertedLayer->GetTexture();
+
                     // make sure there was a bitmap and that it is a DynamicTextMap
-                    if ( bmap )
+                    if (bmap) {
                         return bmap->GetKey();
+                    }
                 }
             }
         }
@@ -957,7 +951,7 @@ plKey plPickDynamicTextButtonParam::GetKey(IParamBlock2 *pb, int idx)
     return nil;
 }
 
-int plPickDynamicTextButtonParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
+int plPickDynamicTextButtonParam::CreateControls(HWND hDlg, IParamBlock2* pb, int yOffset)
 {
     yOffset += IAddStaticText(hDlg, yOffset, fName) + 2;
 
@@ -974,10 +968,12 @@ int plPickDynamicTextButtonParam::CreateControls(HWND hDlg, IParamBlock2 *pb, in
     fButton->SetHighlightColor(GREEN_WASH);
 
     Texmap* texmap = (Texmap*)pb->GetReferenceTarget(fID);
-    if (texmap)
+
+    if (texmap) {
         fButton->SetText(texmap->GetName());
-    else
+    } else {
         fButton->SetText("(none)");
+    }
 
     // Create the Remove button
     fhRemove = ICreateControl(hDlg, "Button");
@@ -987,20 +983,19 @@ int plPickDynamicTextButtonParam::CreateControls(HWND hDlg, IParamBlock2 *pb, in
     return yOffset;
 }
 
-bool plPickDynamicTextButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickDynamicTextButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if ( plPickMaterialMap::PickTexmap(pb, fID) )
-                {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (plPickMaterialMap::PickTexmap(pb, fID)) {
                     Texmap* texmap = (Texmap*)pb->GetReferenceTarget(fID);
-                    if (texmap)
+
+                    if (texmap) {
                         fButton->SetText(texmap->GetName());
+                    }
                 }
+
                 fButton->SetCheck(FALSE);
             }
 
@@ -1009,10 +1004,8 @@ bool plPickDynamicTextButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM l
     }
 
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
@@ -1027,11 +1020,11 @@ bool plPickDynamicTextButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM l
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 
-plPickSingleComponentButtonParam::plPickSingleComponentButtonParam(ParamID id, const char *name, int myType, Class_ID myClassToPick ) :
+plPickSingleComponentButtonParam::plPickSingleComponentButtonParam(ParamID id, const char* name, int myType, Class_ID myClassToPick) :
     plPickButtonParam(id, name, nil, false)
 {
-        fClassToPick = myClassToPick;
-        fMyType = myType;
+    fClassToPick = myClassToPick;
+    fMyType = myType;
 }
 
 int plPickSingleComponentButtonParam::GetParamType()
@@ -1039,31 +1032,32 @@ int plPickSingleComponentButtonParam::GetParamType()
     return fMyType;
 }
 
-plComponentBase* plPickSingleComponentButtonParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickSingleComponentButtonParam::GetComponent(IParamBlock2* pb, int idx)
 {
     hsAssert(idx == 0, "Pick buttons only have one key");
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
 
 
-bool plPickSingleComponentButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickSingleComponentButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if (plPick::GenericClass(pb, fID, true,fClassToPick))
-                {
-                    INode *node = (INode*)pb->GetReferenceTarget(fID);
-                    if (node)
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (plPick::GenericClass(pb, fID, true, fClassToPick)) {
+                    INode* node = (INode*)pb->GetReferenceTarget(fID);
+
+                    if (node) {
                         fButton->SetText(node->GetName());
+                    }
                 }
+
                 fButton->SetCheck(FALSE);
             }
 
@@ -1072,10 +1066,8 @@ bool plPickSingleComponentButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPAR
     }
 
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
@@ -1089,7 +1081,7 @@ bool plPickSingleComponentButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPAR
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 
-plPickExcludeRegionButtonParam::plPickExcludeRegionButtonParam(ParamID id, const char *name) :
+plPickExcludeRegionButtonParam::plPickExcludeRegionButtonParam(ParamID id, const char* name) :
     plPickButtonParam(id, name, nil, false)
 {
 }
@@ -1099,42 +1091,42 @@ int plPickExcludeRegionButtonParam::GetParamType()
     return kTypeExcludeRegion;
 }
 
-plComponentBase* plPickExcludeRegionButtonParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickExcludeRegionButtonParam::GetComponent(IParamBlock2* pb, int idx)
 {
     hsAssert(idx == 0, "Pick buttons only have one key");
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
 
 
-bool plPickExcludeRegionButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickExcludeRegionButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if (plPick::ExcludeRegion(pb, fID, true))
-                {
-                    INode *node = (INode*)pb->GetReferenceTarget(fID);
-                    if (node)
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (plPick::ExcludeRegion(pb, fID, true)) {
+                    INode* node = (INode*)pb->GetReferenceTarget(fID);
+
+                    if (node) {
                         fButton->SetText(node->GetName());
+                    }
                 }
+
                 fButton->SetCheck(FALSE);
             }
 
             return true;
         }
     }
+
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
@@ -1149,7 +1141,7 @@ bool plPickExcludeRegionButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 
-plPickWaterComponentButtonParam::plPickWaterComponentButtonParam(ParamID id, const char *name) :
+plPickWaterComponentButtonParam::plPickWaterComponentButtonParam(ParamID id, const char* name) :
     plPickButtonParam(id, name, nil, false)
 {
 }
@@ -1159,42 +1151,42 @@ int plPickWaterComponentButtonParam::GetParamType()
     return kTypeWaterComponent;
 }
 
-plComponentBase* plPickWaterComponentButtonParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickWaterComponentButtonParam::GetComponent(IParamBlock2* pb, int idx)
 {
     hsAssert(idx == 0, "Pick buttons only have one key");
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
 
 
-bool plPickWaterComponentButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickWaterComponentButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if (plPick::WaterComponent(pb, fID, true))
-                {
-                    INode *node = (INode*)pb->GetReferenceTarget(fID);
-                    if (node)
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (plPick::WaterComponent(pb, fID, true)) {
+                    INode* node = (INode*)pb->GetReferenceTarget(fID);
+
+                    if (node) {
                         fButton->SetText(node->GetName());
+                    }
                 }
+
                 fButton->SetCheck(FALSE);
             }
 
             return true;
         }
     }
+
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
@@ -1207,7 +1199,7 @@ bool plPickWaterComponentButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARA
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickSwimCurrentInterfaceButtonParam::plPickSwimCurrentInterfaceButtonParam(ParamID id, const char *name) :
+plPickSwimCurrentInterfaceButtonParam::plPickSwimCurrentInterfaceButtonParam(ParamID id, const char* name) :
     plPickButtonParam(id, name, nil, false)
 {
 }
@@ -1217,42 +1209,42 @@ int plPickSwimCurrentInterfaceButtonParam::GetParamType()
     return kTypeSwimCurrentInterface;
 }
 
-plComponentBase* plPickSwimCurrentInterfaceButtonParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickSwimCurrentInterfaceButtonParam::GetComponent(IParamBlock2* pb, int idx)
 {
     hsAssert(idx == 0, "Pick buttons only have one key");
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
 
 
-bool plPickSwimCurrentInterfaceButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickSwimCurrentInterfaceButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if (plPick::Swim2DComponent(pb, fID, true))
-                {
-                    INode *node = (INode*)pb->GetReferenceTarget(fID);
-                    if (node)
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (plPick::Swim2DComponent(pb, fID, true)) {
+                    INode* node = (INode*)pb->GetReferenceTarget(fID);
+
+                    if (node) {
                         fButton->SetText(node->GetName());
+                    }
                 }
+
                 fButton->SetCheck(FALSE);
             }
 
             return true;
         }
     }
+
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
@@ -1265,7 +1257,7 @@ bool plPickSwimCurrentInterfaceButtonParam::IsMyMessage(UINT msg, WPARAM wParam,
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickClusterComponentButtonParam::plPickClusterComponentButtonParam(ParamID id, const char *name) :
+plPickClusterComponentButtonParam::plPickClusterComponentButtonParam(ParamID id, const char* name) :
     plPickButtonParam(id, name, nil, false)
 {
 }
@@ -1275,52 +1267,54 @@ int plPickClusterComponentButtonParam::GetParamType()
     return kTypeClusterComponent;
 }
 
-plComponentBase* plPickClusterComponentButtonParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickClusterComponentButtonParam::GetComponent(IParamBlock2* pb, int idx)
 {
     hsAssert(idx == 0, "Pick buttons only have one key");
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
 
-bool plPickClusterComponentButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickClusterComponentButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if (plPick::ClusterComponent(pb, fID, true))
-                {
-                    INode *node = (INode*)pb->GetReferenceTarget(fID);
-                    if (node)
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (plPick::ClusterComponent(pb, fID, true)) {
+                    INode* node = (INode*)pb->GetReferenceTarget(fID);
+
+                    if (node) {
                         fButton->SetText(node->GetName());
+                    }
                 }
+
                 fButton->SetCheck(FALSE);
             }
+
             return true;
         }
     }
+
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
         }
     }
+
     return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickAnimationButtonParam::plPickAnimationButtonParam(ParamID id, const char *name) :
+plPickAnimationButtonParam::plPickAnimationButtonParam(ParamID id, const char* name) :
     plPickButtonParam(id, name, nil, false)
 {
 }
@@ -1330,31 +1324,32 @@ int plPickAnimationButtonParam::GetParamType()
     return kTypeAnimation;
 }
 
-plComponentBase* plPickAnimationButtonParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickAnimationButtonParam::GetComponent(IParamBlock2* pb, int idx)
 {
     hsAssert(idx == 0, "Pick buttons only have one key");
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
 
 
-bool plPickAnimationButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickAnimationButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if (plPick::Animation(pb, fID, true))
-                {
-                    INode *node = (INode*)pb->GetReferenceTarget(fID);
-                    if (node)
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (plPick::Animation(pb, fID, true)) {
+                    INode* node = (INode*)pb->GetReferenceTarget(fID);
+
+                    if (node) {
                         fButton->SetText(node->GetName());
+                    }
                 }
+
                 fButton->SetCheck(FALSE);
             }
 
@@ -1363,15 +1358,14 @@ bool plPickAnimationButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lPa
     }
 
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
         }
     }
+
     return false;
 }
 
@@ -1379,7 +1373,7 @@ bool plPickAnimationButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lPa
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 
-plPickBehaviorButtonParam::plPickBehaviorButtonParam(ParamID id, const char *name) :
+plPickBehaviorButtonParam::plPickBehaviorButtonParam(ParamID id, const char* name) :
     plPickButtonParam(id, name, nil, false)
 {
 }
@@ -1389,31 +1383,32 @@ int plPickBehaviorButtonParam::GetParamType()
     return kTypeBehavior;
 }
 
-plComponentBase* plPickBehaviorButtonParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickBehaviorButtonParam::GetComponent(IParamBlock2* pb, int idx)
 {
     hsAssert(idx == 0, "Pick buttons only have one key");
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
 
 
-bool plPickBehaviorButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickBehaviorButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if (plPick::Behavior(pb, fID, true))
-                {
-                    INode *node = (INode*)pb->GetReferenceTarget(fID);
-                    if (node)
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (plPick::Behavior(pb, fID, true)) {
+                    INode* node = (INode*)pb->GetReferenceTarget(fID);
+
+                    if (node) {
                         fButton->SetText(node->GetName());
+                    }
                 }
+
                 fButton->SetCheck(FALSE);
             }
 
@@ -1422,22 +1417,21 @@ bool plPickBehaviorButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lPar
     }
 
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
         }
     }
+
     return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickMaterialButtonParam::plPickMaterialButtonParam(ParamID id, const char *name) :
+plPickMaterialButtonParam::plPickMaterialButtonParam(ParamID id, const char* name) :
     plPickButtonParam(id, name, nil, false)
 {
 }
@@ -1448,55 +1442,57 @@ int plPickMaterialButtonParam::GetParamType()
 }
 
 // temp hack to get the name of the texture map name
-const char* plPickMaterialButtonParam::GetString(IParamBlock2 *pb)
+const char* plPickMaterialButtonParam::GetString(IParamBlock2* pb)
 {
     // get the plKeys based on the texture map that the DynamicText map is on
     Texmap* texmap = (Texmap*)pb->GetReferenceTarget(fID);
     return texmap->GetName();
 }
 
-int plPickMaterialButtonParam::GetCount(IParamBlock2 *pb)
+int plPickMaterialButtonParam::GetCount(IParamBlock2* pb)
 {
 
     // get the plKeys based on the texture map that the Texture map is on
     Texmap* texmap = (Texmap*)pb->GetReferenceTarget(fID);
+
     // make sure that there was a texmap set
-    if ( texmap )
-    {
-        plPlasmaMAXLayer *maxLayer = plPlasmaMAXLayer::GetPlasmaMAXLayer( texmap );
-        if( maxLayer != nil )
-        {
+    if (texmap) {
+        plPlasmaMAXLayer* maxLayer = plPlasmaMAXLayer::GetPlasmaMAXLayer(texmap);
+
+        if (maxLayer != nil) {
             // It's one of our Plasma layer types, which means most likely it got converted.
- 
-            // Note: if the following count is zero, it was never converted, which most likely means 
+
+            // Note: if the following count is zero, it was never converted, which most likely means
             // no visible geometry in the scene uses this layer. So why do you even care about it?
             return maxLayer->GetNumConversionTargets();
         }
     }
+
     return 0;
 }
 
-plKey plPickMaterialButtonParam::GetKey(IParamBlock2 *pb, int idx)
+plKey plPickMaterialButtonParam::GetKey(IParamBlock2* pb, int idx)
 {
 
     // get the plKeys based on the texture map that the Texture map is on
     Texmap* texmap = (Texmap*)pb->GetReferenceTarget(fID);
+
     // make sure that there was a texmap set
-    if ( texmap )
-    {
-        plPlasmaMAXLayer *maxLayer = plPlasmaMAXLayer::GetPlasmaMAXLayer( texmap );
-        if( maxLayer != nil )
-        {
+    if (texmap) {
+        plPlasmaMAXLayer* maxLayer = plPlasmaMAXLayer::GetPlasmaMAXLayer(texmap);
+
+        if (maxLayer != nil) {
             // make sure the index is valid
-            if ( idx >= 0 && idx < maxLayer->GetNumConversionTargets() )
-            {
-                plLayerInterface *convertedLayer = maxLayer->GetConversionTarget(idx);
-                if ( convertedLayer )
-                {
+            if (idx >= 0 && idx < maxLayer->GetNumConversionTargets()) {
+                plLayerInterface* convertedLayer = maxLayer->GetConversionTarget(idx);
+
+                if (convertedLayer) {
                     plBitmap* bmap = convertedLayer->GetTexture();
+
                     // make sure there was a bitmap
-                    if ( bmap )
+                    if (bmap) {
                         return bmap->GetKey();
+                    }
                 }
             }
         }
@@ -1506,7 +1502,7 @@ plKey plPickMaterialButtonParam::GetKey(IParamBlock2 *pb, int idx)
     return nil;
 }
 
-int plPickMaterialButtonParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
+int plPickMaterialButtonParam::CreateControls(HWND hDlg, IParamBlock2* pb, int yOffset)
 {
     yOffset += IAddStaticText(hDlg, yOffset, fName) + 2;
 
@@ -1523,10 +1519,12 @@ int plPickMaterialButtonParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int y
     fButton->SetHighlightColor(GREEN_WASH);
 
     Texmap* texmap = (Texmap*)pb->GetReferenceTarget(fID);
-    if (texmap)
+
+    if (texmap) {
         fButton->SetText(texmap->GetName());
-    else
+    } else {
         fButton->SetText("(none)");
+    }
 
     // Create the Remove button
     fhRemove = ICreateControl(hDlg, "Button");
@@ -1536,20 +1534,19 @@ int plPickMaterialButtonParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int y
     return yOffset;
 }
 
-bool plPickMaterialButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickMaterialButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if ( plPickMaterialMap::PickTexmap(pb, fID) )
-                {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (plPickMaterialMap::PickTexmap(pb, fID)) {
                     Texmap* texmap = (Texmap*)pb->GetReferenceTarget(fID);
-                    if (texmap)
+
+                    if (texmap) {
                         fButton->SetText(texmap->GetName());
+                    }
                 }
+
                 fButton->SetCheck(FALSE);
             }
 
@@ -1558,10 +1555,8 @@ bool plPickMaterialButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lPar
     }
 
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
@@ -1574,7 +1569,7 @@ bool plPickMaterialButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lPar
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickMaterialAnimationButtonParam::plPickMaterialAnimationButtonParam(ParamID id, const char *name) :
+plPickMaterialAnimationButtonParam::plPickMaterialAnimationButtonParam(ParamID id, const char* name) :
     plPickButtonParam(id, name, nil, false)
 {
 }
@@ -1584,23 +1579,22 @@ int plPickMaterialAnimationButtonParam::GetParamType()
     return kTypeMaterialAnimation;
 }
 
-const char* plPickMaterialAnimationButtonParam::GetString(IParamBlock2 *pb)
+const char* plPickMaterialAnimationButtonParam::GetString(IParamBlock2* pb)
 {
     Mtl* texmap = (Mtl*)pb->GetReferenceTarget(fID);
     return texmap->GetName();
 }
 
-int plPickMaterialAnimationButtonParam::GetCount(IParamBlock2 *pb)
+int plPickMaterialAnimationButtonParam::GetCount(IParamBlock2* pb)
 {
     return fKeys.Count();
 }
 
-plKey plPickMaterialAnimationButtonParam::GetKey(IParamBlock2 *pb, int idx)
-{   
+plKey plPickMaterialAnimationButtonParam::GetKey(IParamBlock2* pb, int idx)
+{
     int kcount = fKeys.Count();
 
-    if ( idx >= 0 && idx < kcount )
-    {
+    if (idx >= 0 && idx < kcount) {
         return fKeys[idx];
     }
 
@@ -1624,7 +1618,7 @@ void plPickMaterialAnimationButtonParam::DestroyKeyArray()
     fKeys.Reset();
 }
 
-int plPickMaterialAnimationButtonParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
+int plPickMaterialAnimationButtonParam::CreateControls(HWND hDlg, IParamBlock2* pb, int yOffset)
 {
     yOffset += IAddStaticText(hDlg, yOffset, fName) + 2;
 
@@ -1641,10 +1635,12 @@ int plPickMaterialAnimationButtonParam::CreateControls(HWND hDlg, IParamBlock2 *
     fButton->SetHighlightColor(GREEN_WASH);
 
     Mtl* texmap = (Mtl*)pb->GetReferenceTarget(fID);
-    if (texmap)
+
+    if (texmap) {
         fButton->SetText(texmap->GetName());
-    else
+    } else {
         fButton->SetText("(none)");
+    }
 
     // Create the Remove button
     fhRemove = ICreateControl(hDlg, "Button");
@@ -1654,19 +1650,16 @@ int plPickMaterialAnimationButtonParam::CreateControls(HWND hDlg, IParamBlock2 *
     return yOffset;
 }
 
-bool plPickMaterialAnimationButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickMaterialAnimationButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if ( Mtl* mtl = plPickMaterialMap::PickMaterial(0) )
-                {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (Mtl* mtl = plPickMaterialMap::PickMaterial(0)) {
                     pb->SetValue(fID, 0, (ReferenceTarget*)mtl);
                     fButton->SetText(mtl->GetName());
                 }
+
                 fButton->SetCheck(FALSE);
             }
 
@@ -1675,10 +1668,8 @@ bool plPickMaterialAnimationButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LP
     }
 
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;
@@ -1691,14 +1682,15 @@ bool plPickMaterialAnimationButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LP
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plDropDownListParam::plDropDownListParam(ParamID id, const char *name, std::vector<std::string>* options) :
+plDropDownListParam::plDropDownListParam(ParamID id, const char* name, std::vector<std::string>* options) :
     plAutoUIParam(id, name), fhList(nil)
 {
-    if (options)
+    if (options) {
         fOptions = *options;
+    }
 }
 
-int plDropDownListParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset)
+int plDropDownListParam::CreateControls(HWND hDlg, IParamBlock2* pb, int yOffset)
 {
     yOffset += IAddStaticText(hDlg, yOffset, fName) + 2;
 
@@ -1711,22 +1703,18 @@ int plDropDownListParam::CreateControls(HWND hDlg, IParamBlock2 *pb, int yOffset
     return yOffset + 5;
 }
 
-bool plDropDownListParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plDropDownListParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_INITDIALOG)
-    {
+    if (msg == WM_INITDIALOG) {
         IUpdateList(pb);
         return false;
     }
-    
-    if ((HWND)lParam == fhList)
-    {
-        if (HIWORD(wParam) == CBN_SELENDOK)
-        {
+
+    if ((HWND)lParam == fhList) {
+        if (HIWORD(wParam) == CBN_SELENDOK) {
             int idx = ComboBox_GetCurSel(fhList);
 
-            if (idx >=0 && idx < fOptions.size())
-            {
+            if (idx >= 0 && idx < fOptions.size()) {
                 char* buf = new char[fOptions[idx].size() + 1];
                 strcpy(buf, fOptions[idx].c_str());
                 pb->SetValue(fID, 0, buf);
@@ -1740,34 +1728,32 @@ bool plDropDownListParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IP
     return false;
 }
 
-void plDropDownListParam::IUpdateList(IParamBlock2 *pb)
+void plDropDownListParam::IUpdateList(IParamBlock2* pb)
 {
     std::string val = "";
     int selection = -1;
-    
-    if (pb)
-    {
+
+    if (pb) {
         const char* bob = pb->GetStr(fID);
-        if (bob)
+
+        if (bob) {
             val = bob;
+        }
     }
-    
+
     ComboBox_ResetContent(fhList);
 
-    for (int i = 0; i < fOptions.size(); i++)
-    {
-        const char *name = fOptions[i].c_str();
-        
+    for (int i = 0; i < fOptions.size(); i++) {
+        const char* name = fOptions[i].c_str();
+
         ComboBox_AddString(fhList, name);
 
-        if (fOptions[i] == val)
-        {
+        if (fOptions[i] == val) {
             selection = i;
         }
     }
 
-    if (selection >= 0)
-    {
+    if (selection >= 0) {
         ComboBox_SetCurSel(fhList, selection);
     }
 }
@@ -1777,12 +1763,12 @@ int plDropDownListParam::GetParamType()
     return kTypeDropDownList;
 }
 
-int plDropDownListParam::GetCount(IParamBlock2 *pb)
+int plDropDownListParam::GetCount(IParamBlock2* pb)
 {
     return pb->Count(fID);
 }
 
-const char* plDropDownListParam::GetString(IParamBlock2 *pb)
+const char* plDropDownListParam::GetString(IParamBlock2* pb)
 {
     return pb->GetStr(fID);
 }
@@ -1799,7 +1785,7 @@ void plDropDownListParam::Show(int yOffset)
     {
         tmp = fControlVec[i];
         GetWindowRect(tmp, &rect);
-        
+
         SetRect(&rect, 3, 0, (rect.right - rect.left) + 3, rect.bottom - rect.top);
         //MapDialogRect(fhDlg, &rect);
         // Y is already in screen units
@@ -1824,8 +1810,8 @@ void plDropDownListParam::Show(int yOffset)
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-plPickGrassComponentButtonParam::plPickGrassComponentButtonParam(ParamID id, const char *name) :
-plPickButtonParam(id, name, nil, false)
+plPickGrassComponentButtonParam::plPickGrassComponentButtonParam(ParamID id, const char* name) :
+    plPickButtonParam(id, name, nil, false)
 {
 }
 
@@ -1834,42 +1820,42 @@ int plPickGrassComponentButtonParam::GetParamType()
     return kTypeGrassComponent;
 }
 
-plComponentBase* plPickGrassComponentButtonParam::GetComponent(IParamBlock2 *pb, int idx)
+plComponentBase* plPickGrassComponentButtonParam::GetComponent(IParamBlock2* pb, int idx)
 {
     hsAssert(idx == 0, "Pick buttons only have one key");
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(fID);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(fID);
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
 
 
-bool plPickGrassComponentButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2 *pb)
+bool plPickGrassComponentButtonParam::IsMyMessage(UINT msg, WPARAM wParam, LPARAM lParam, IParamBlock2* pb)
 {
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP)
-    {
-        if ((HWND)lParam == fButton->GetHwnd())
-        {
-            if (fButton->IsChecked())
-            {
-                if (plPick::GrassComponent(pb, fID, true))
-                {
-                    INode *node = (INode*)pb->GetReferenceTarget(fID);
-                    if (node)
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_BUTTONUP) {
+        if ((HWND)lParam == fButton->GetHwnd()) {
+            if (fButton->IsChecked()) {
+                if (plPick::GrassComponent(pb, fID, true)) {
+                    INode* node = (INode*)pb->GetReferenceTarget(fID);
+
+                    if (node) {
                         fButton->SetText(node->GetName());
+                    }
                 }
+
                 fButton->SetCheck(FALSE);
             }
 
             return true;
         }
     }
+
     // check if the reset button is hit
-    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED)
-    {
-        if ((HWND)lParam == fhRemove)
-        {
+    if (msg == WM_COMMAND && HIWORD(wParam) == BN_CLICKED) {
+        if ((HWND)lParam == fhRemove) {
             pb->SetValue(fID, 0, (ReferenceTarget*)nil);
             fButton->SetText("(none)");
             return true;

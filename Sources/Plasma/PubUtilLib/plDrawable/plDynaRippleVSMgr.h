@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plWaveSetBase;
 
-class plDynaRippleVSMgr : public plDynaRippleMgr
-{
+class plDynaRippleVSMgr : public plDynaRippleMgr {
 public:
     enum {
         kRefWaveSetBase     = kRefNextAvailable
@@ -57,7 +56,7 @@ protected:
 
     plWaveSetBase*      fWaveSetBase;
 
-    virtual bool        IRippleFromShape(const plPrintShape* shape, bool force=false);
+    virtual bool        IRippleFromShape(const plPrintShape* shape, bool force = false);
 
     virtual int         INewDecal();
 
@@ -67,8 +66,8 @@ public:
     plDynaRippleVSMgr();
     virtual ~plDynaRippleVSMgr();
 
-    CLASSNAME_REGISTER( plDynaRippleVSMgr );
-    GETINTERFACE_ANY( plDynaRippleVSMgr, plDynaRippleMgr );
+    CLASSNAME_REGISTER(plDynaRippleVSMgr);
+    GETINTERFACE_ANY(plDynaRippleVSMgr, plDynaRippleMgr);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);

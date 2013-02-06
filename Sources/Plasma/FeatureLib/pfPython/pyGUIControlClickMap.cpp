@@ -62,44 +62,52 @@ pyGUIControlClickMap::pyGUIControlClickMap(plKey objkey) : pyGUIControl(objkey)
 
 bool pyGUIControlClickMap::IsGUIControlClickMap(pyKey& gckey)
 {
-    if ( gckey.getKey() && pfGUIClickMapCtrl::ConvertNoRef(gckey.getKey()->ObjectIsLoaded()) )
+    if (gckey.getKey() && pfGUIClickMapCtrl::ConvertNoRef(gckey.getKey()->ObjectIsLoaded())) {
         return true;
+    }
+
     return false;
 }
 
 
-PyObject* pyGUIControlClickMap::GetLastMousePt( void )
+PyObject* pyGUIControlClickMap::GetLastMousePt(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         // get the pointer to the modifier
         pfGUIClickMapCtrl* pcmmod = pfGUIClickMapCtrl::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pcmmod )
+
+        if (pcmmod) {
             return pyPoint3::New(pcmmod->GetLastMousePt());
+        }
     }
+
     PYTHON_RETURN_NONE;
 }
 
-PyObject* pyGUIControlClickMap::GetLastMouseUpPt( void )
+PyObject* pyGUIControlClickMap::GetLastMouseUpPt(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         // get the pointer to the modifier
         pfGUIClickMapCtrl* pcmmod = pfGUIClickMapCtrl::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pcmmod )
+
+        if (pcmmod) {
             return pyPoint3::New(pcmmod->GetLastMouseUpPt());
+        }
     }
+
     PYTHON_RETURN_NONE;
 }
 
-PyObject* pyGUIControlClickMap::GetLastMouseDragPt( void )
+PyObject* pyGUIControlClickMap::GetLastMouseDragPt(void)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         // get the pointer to the modifier
         pfGUIClickMapCtrl* pcmmod = pfGUIClickMapCtrl::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pcmmod )
+
+        if (pcmmod) {
             return pyPoint3::New(pcmmod->GetLastMouseDragPt());
+        }
     }
+
     PYTHON_RETURN_NONE;
 }

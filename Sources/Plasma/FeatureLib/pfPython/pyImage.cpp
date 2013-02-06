@@ -54,8 +54,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 void pyImage::setKey(pyKey& mipmapKey) // only for python glue, do NOT call
 {
 #ifndef BUILDING_PYPLASMA
-    if (fMipmap && fMipMapKey)
+
+    if (fMipmap && fMipMapKey) {
         fMipMapKey->UnRefObject();
+    }
+
     fMipmap = nil;
 #endif
     fMipMapKey = mipmapKey.getKey();
@@ -64,37 +67,53 @@ void pyImage::setKey(pyKey& mipmapKey) // only for python glue, do NOT call
 #ifndef BUILDING_PYPLASMA
 plMipmap* pyImage::GetImage()
 {
-    if (fMipmap)
+    if (fMipmap) {
         return fMipmap;
-    return ( plMipmap::ConvertNoRef(fMipMapKey->ObjectIsLoaded()) );
+    }
+
+    return (plMipmap::ConvertNoRef(fMipMapKey->ObjectIsLoaded()));
 }
 
 // GetPixelColor
 // takes an x and y coord (x and y from 0 to 1) and returns the pixel color at that location
 PyObject* pyImage::GetPixelColor(float x, float y)
 {
-    if (x > 1.0) x = 1.0;
-    if (x < 0.0) x = 0.0;
-    if (y > 1.0) y = 1.0;
-    if (y < 0.0) y = 0.0;
-    
+    if (x > 1.0) {
+        x = 1.0;
+    }
+
+    if (x < 0.0) {
+        x = 0.0;
+    }
+
+    if (y > 1.0) {
+        y = 1.0;
+    }
+
+    if (y < 0.0) {
+        y = 0.0;
+    }
+
     plMipmap* image;
-    if (fMipmap)
+
+    if (fMipmap) {
         image = fMipmap;
-    else
+    } else {
         image = plMipmap::ConvertNoRef(fMipMapKey->ObjectIsLoaded());
-    if (image)
-    {
+    }
+
+    if (image) {
         uint32_t height = image->GetHeight();
         uint32_t width = image->GetWidth();
         uint32_t iX = (uint32_t)((float)width * x);
         uint32_t iY = (uint32_t)((float)height * y);
         hsColorRGBA pixColor;
         image->SetCurrLevel(0);
-        uint32_t *color = image->GetAddr32(iX,iY);
+        uint32_t* color = image->GetAddr32(iX, iY);
         pixColor.FromARGB32(*color);
         return pyColor::New(pixColor);
     }
+
     PYTHON_RETURN_NONE;
 }
 
@@ -102,39 +121,41 @@ PyObject* pyImage::GetPixelColor(float x, float y)
 // takes a color to look for and returns the x and y coord for its location (x and y from 0 to 1), if the
 // color exists in more than one location, then the location with the lowest x and y will be returned.
 // if the color is not found, it trys to return the closest match
-PyObject* pyImage::GetColorLoc(const pyColor &color)
+PyObject* pyImage::GetColorLoc(const pyColor& color)
 {
     plMipmap* image;
-    if (fMipmap)
+
+    if (fMipmap) {
         image = fMipmap;
-    else
+    } else {
         image = plMipmap::ConvertNoRef(fMipMapKey->ObjectIsLoaded());
-    if (image)
-    {
+    }
+
+    if (image) {
         uint32_t height = image->GetHeight();
         uint32_t width = image->GetWidth();
         double minSqrDist = 9999999;
         hsPoint3 closestMatch;
         image->SetCurrLevel(0);
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 hsColorRGBA pixColor;
-                pixColor.FromARGB32(*(image->GetAddr32(x,y)));
+                pixColor.FromARGB32(*(image->GetAddr32(x, y)));
                 PyObject* imgColorObj = pyColor::New(pixColor);
                 pyColor* imgColor = pyColor::ConvertFrom(imgColorObj);
-                if ((*imgColor) == color)
-                {
+
+                if ((*imgColor) == color) {
                     Py_DECREF(imgColorObj);
                     float fX, fY;
                     fX = (float)x / (float)width;
                     fY = (float)y / (float)height;
                     return pyPoint3::New(hsPoint3(fX, fY, 0));
                 }
-                double dist = pow((imgColor->getRed() - color.getRed()),2) + pow((imgColor->getGreen() - color.getGreen()),2) + pow((imgColor->getBlue() - color.getBlue()),2);
-                if (dist < minSqrDist)
-                {
+
+                double dist = pow((imgColor->getRed() - color.getRed()), 2) + pow((imgColor->getGreen() - color.getGreen()), 2) + pow((imgColor->getBlue() - color.getBlue()), 2);
+
+                if (dist < minSqrDist) {
                     minSqrDist = dist;
                     float fX, fY;
                     fX = (float)x / (float)width;
@@ -142,11 +163,14 @@ PyObject* pyImage::GetColorLoc(const pyColor &color)
                     closestMatch.fX = fX;
                     closestMatch.fY = fY;
                 }
+
                 Py_DECREF(imgColorObj);
             }
         }
+
         return pyPoint3::New(closestMatch);
     }
+
     PYTHON_RETURN_NONE;
 }
 
@@ -155,12 +179,17 @@ PyObject* pyImage::GetColorLoc(const pyColor &color)
 uint32_t pyImage::GetWidth()
 {
     plMipmap* image;
-    if (fMipmap)
+
+    if (fMipmap) {
         image = fMipmap;
-    else
+    } else {
         image = plMipmap::ConvertNoRef(fMipMapKey->ObjectIsLoaded());
-    if (image)
+    }
+
+    if (image) {
         return image->GetWidth();
+    }
+
     return 0;
 }
 
@@ -169,20 +198,24 @@ uint32_t pyImage::GetWidth()
 uint32_t pyImage::GetHeight()
 {
     plMipmap* image;
-    if (fMipmap)
+
+    if (fMipmap) {
         image = fMipmap;
-    else
+    } else {
         image = plMipmap::ConvertNoRef(fMipMapKey->ObjectIsLoaded());
-    if (image)
+    }
+
+    if (image) {
         return image->GetHeight();
+    }
+
     return 0;
 }
 
 void pyImage::SaveAsJPEG(const plFileName& fileName, uint8_t quality)
 {
-    if (quality <= 0 || quality > 100)
-    {
-            quality = 75;
+    if (quality <= 0 || quality > 100) {
+        quality = 75;
     }
 
     plJPEG::Instance().SetWriteQuality(quality);
@@ -198,12 +231,10 @@ void pyImage::SaveAsPNG(const plFileName& fileName)
 PyObject* pyImage::LoadJPEGFromDisk(const plFileName& filename, uint16_t width, uint16_t height)
 {
     plMipmap* theMipmap = plJPEG::Instance().ReadFromFile(filename);
-    if (theMipmap)
-    {
-        if (width > 0 && height > 0)
-        {
-            if (!theMipmap->ResizeNicely(width, height, plMipmap::kDefaultFilter))
-            {
+
+    if (theMipmap) {
+        if (width > 0 && height > 0) {
+            if (!theMipmap->ResizeNicely(width, height, plMipmap::kDefaultFilter)) {
                 delete theMipmap;
                 PYTHON_RETURN_NONE;
             }
@@ -213,22 +244,20 @@ PyObject* pyImage::LoadJPEGFromDisk(const plFileName& filename, uint16_t width, 
         plString name = plString::Format("PtImageFromDisk_%s", filename.AsString().c_str());
 
         hsgResMgr::ResMgr()->NewKey(name, theMipmap, plLocation::kGlobalFixedLoc);
-        
-        return pyImage::New( theMipmap );
-    }
-    else
+
+        return pyImage::New(theMipmap);
+    } else {
         PYTHON_RETURN_NONE;
+    }
 }
 
 PyObject* pyImage::LoadPNGFromDisk(const plFileName& filename, uint16_t width, uint16_t height)
 {
     plMipmap* theMipmap = plPNG::Instance().ReadFromFile(filename);
-    if (theMipmap)
-    {
-        if (width > 0 && height > 0)
-        {
-            if (!theMipmap->ResizeNicely(width, height, plMipmap::kDefaultFilter))
-            {
+
+    if (theMipmap) {
+        if (width > 0 && height > 0) {
+            if (!theMipmap->ResizeNicely(width, height, plMipmap::kDefaultFilter)) {
                 delete theMipmap;
                 PYTHON_RETURN_NONE;
             }
@@ -239,10 +268,10 @@ PyObject* pyImage::LoadPNGFromDisk(const plFileName& filename, uint16_t width, u
 
         hsgResMgr::ResMgr()->NewKey(name, theMipmap, plLocation::kGlobalFixedLoc);
 
-        return pyImage::New( theMipmap );
-    }
-    else
+        return pyImage::New(theMipmap);
+    } else {
         PYTHON_RETURN_NONE;
+    }
 }
 
 #endif

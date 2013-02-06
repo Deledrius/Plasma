@@ -56,8 +56,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class pyColor;
 class pfGUIColorScheme;
 
-class pyGUIControlTextBox : public pyGUIControl
-{
+class pyGUIControlTextBox : public pyGUIControl {
 private:
     pfGUIColorScheme*       fOriginalColorScheme;
 
@@ -69,23 +68,23 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptGUIControlTextBox);
-    static PyObject *New(pyKey& gckey);
-    static PyObject *New(plKey objkey);
+    static PyObject* New(pyKey& gckey);
+    static PyObject* New(plKey objkey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGUIControlTextBox object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGUIControlTextBox); // converts a PyObject to a pyGUIControlTextBox (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     static bool IsGUIControlTextBox(pyKey& gckey);
 
-    virtual void    SetText( const char *text );
-    virtual void    SetTextW( std::wstring text );
+    virtual void    SetText(const char* text);
+    virtual void    SetTextW(std::wstring text);
     virtual std::string GetText();
     virtual std::wstring GetTextW();
-    virtual void    SetFontSize( uint8_t size );
-    virtual void    SetForeColor( pyColor& color );
-    virtual void    SetBackColor( pyColor& color );
-    virtual void    SetJustify( uint8_t justify );
+    virtual void    SetFontSize(uint8_t size);
+    virtual void    SetForeColor(pyColor& color);
+    virtual void    SetBackColor(pyColor& color);
+    virtual void    SetJustify(uint8_t justify);
     virtual uint8_t   GetJustify();
     virtual PyObject* GetForeColor(); // returns pyColor
 };

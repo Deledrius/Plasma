@@ -56,14 +56,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 static const char* kPackFilePath = ".\\Python\\";
 
-struct plPackOffsetInfo
-{
+struct plPackOffsetInfo {
     uint32_t fOffset;
     uint32_t fStreamIndex; // index of the stream object in the plPythonPack object that the file resides in
 };
 
-class plPythonPack
-{
+class plPythonPack {
 protected:
     std::vector<hsStream*> fPackStreams;
     bool fPackNotFound;     // No pack file, don't keep trying
@@ -81,7 +79,7 @@ public:
     bool Open();
     void Close();
 
-    PyObject* OpenPacked(const char *fileName);
+    PyObject* OpenPacked(const char* fileName);
     bool IsPackedFile(const char* fileName);
 };
 
@@ -112,12 +110,14 @@ plPythonPack& plPythonPack::Instance()
 
 bool plPythonPack::Open()
 {
-    if (fPackStreams.size() > 0)
+    if (fPackStreams.size() > 0) {
         return true;
-    
+    }
+
     // We already tried and it wasn't there
-    if (fPackNotFound)
+    if (fPackNotFound) {
         return false;
+    }
 
     fPackNotFound = true;
 
@@ -127,26 +127,28 @@ bool plPythonPack::Open()
     std::vector<time_t> modTimes; // the modification time for each of the streams (to resolve duplicate file issues)
 
     // grab all the .pak files in the folder
-    for (int curName = 0; curName < files.size(); curName++)
-    {
+    for (int curName = 0; curName < files.size(); curName++) {
         // obtain the stream
-        hsStream *fPackStream = plStreamSource::GetInstance()->GetFile(files[curName]);
-        if (fPackStream)
-        {
+        hsStream* fPackStream = plStreamSource::GetInstance()->GetFile(files[curName]);
+
+        if (fPackStream) {
             fPackStream->Rewind(); // make sure we're at the beginning of the file
             fPackNotFound = false;
 
             time_t curModTime = 0;
             plFileInfo info(files[curName]);
-            if (info.Exists())
+
+            if (info.Exists()) {
                 curModTime = info.ModifyTime();
+            }
+
             modTimes.push_back(curModTime);
 
             // read the index data
             int numFiles = fPackStream->ReadLE32();
             uint32_t streamIndex = (uint32_t)(fPackStreams.size());
-            for (int i = 0; i < numFiles; i++)
-            {
+
+            for (int i = 0; i < numFiles; i++) {
                 // and pack the index into our own data structure
                 char* buf = fPackStream->ReadSafeString();
                 std::string pythonName = buf; // reading a "string" from a hsStream directly into a stl string causes memory loss
@@ -157,15 +159,17 @@ bool plPythonPack::Open()
                 offsetInfo.fOffset = offset;
                 offsetInfo.fStreamIndex = streamIndex;
 
-                if (fFileOffsets.find(pythonName) != fFileOffsets.end())
-                {
+                if (fFileOffsets.find(pythonName) != fFileOffsets.end()) {
                     uint32_t index = fFileOffsets[pythonName].fStreamIndex;
-                    if (modTimes[index] < curModTime) // is the existing file older then the new one?
-                        fFileOffsets[pythonName] = offsetInfo; // yup, so replace it with the new info
+
+                    if (modTimes[index] < curModTime) { // is the existing file older then the new one?
+                        fFileOffsets[pythonName] = offsetInfo;    // yup, so replace it with the new info
+                    }
+                } else {
+                    fFileOffsets[pythonName] = offsetInfo;    // no conflicts, add the info
                 }
-                else
-                    fFileOffsets[pythonName] = offsetInfo; // no conflicts, add the info
             }
+
             fPackStreams.push_back(fPackStream);
         }
     }
@@ -175,12 +179,13 @@ bool plPythonPack::Open()
 
 void plPythonPack::Close()
 {
-    if (fPackStreams.size() == 0)
+    if (fPackStreams.size() == 0) {
         return;
-    
+    }
+
     int i;
-    for (i=0; i<fPackStreams.size(); i++)
-    {
+
+    for (i = 0; i < fPackStreams.size(); i++) {
         hsStream* fPackStream = fPackStreams[i];
 
         // do NOT close or delete the streams, the preloader will do that for us
@@ -193,30 +198,31 @@ void plPythonPack::Close()
 
 PyObject* plPythonPack::OpenPacked(const char* fileName)
 {
-    if (!Open())
+    if (!Open()) {
         return nil;
+    }
 
     std::string pythonName = fileName;
     pythonName += ".py";
 
     FileOffset::iterator it = fFileOffsets.find(pythonName);
-    if (it != fFileOffsets.end())
-    {
+
+    if (it != fFileOffsets.end()) {
         plPackOffsetInfo offsetInfo = (*it).second;
         hsStream* fPackStream = fPackStreams[offsetInfo.fStreamIndex];
-        
+
         fPackStream->SetPosition(offsetInfo.fOffset);
 
         int32_t size = fPackStream->ReadLE32();
-        if (size > 0)
-        {
-            char *buf = new char[size];
+
+        if (size > 0) {
+            char* buf = new char[size];
             uint32_t readSize = fPackStream->Read(size, buf);
             hsAssert(readSize <= size, plString::Format("Python PackFile %s: Incorrect amount of data, read %d instead of %d",
-                fileName, readSize, size).c_str());
+                     fileName, readSize, size).c_str());
 
             // let the python marshal make it back into a code object
-            PyObject *pythonCode = PyMarshal_ReadObjectFromString(buf, size);
+            PyObject* pythonCode = PyMarshal_ReadObjectFromString(buf, size);
 
             delete [] buf;
 
@@ -229,15 +235,18 @@ PyObject* plPythonPack::OpenPacked(const char* fileName)
 
 bool plPythonPack::IsPackedFile(const char* fileName)
 {
-    if (!Open())
+    if (!Open()) {
         return nil;
+    }
 
     std::string pythonName = fileName;
     pythonName += ".py";
 
     FileOffset:: iterator it = fFileOffsets.find(pythonName);
-    if (it != fFileOffsets.end())
+
+    if (it != fFileOffsets.end()) {
         return true;
+    }
 
     return false;
 }

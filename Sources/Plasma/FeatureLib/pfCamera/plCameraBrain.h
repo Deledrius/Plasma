@@ -52,12 +52,10 @@ class plCameraModifier1;
 class plSceneObject;
 class plRailCameraMod;
 
-class plCameraBrain1 : public hsKeyedObject
-{
-    
+class plCameraBrain1 : public hsKeyedObject {
+
 public:
-    enum
-    {
+    enum {
         kCutPos = 0,
         kCutPosOnce,
         kCutPOA,
@@ -88,76 +86,150 @@ public:
     plCameraBrain1(plCameraModifier1* pMod);
     plCameraBrain1();
     ~plCameraBrain1();
-    
-    CLASSNAME_REGISTER( plCameraBrain1 );
-    GETINTERFACE_ANY( plCameraBrain1, hsKeyedObject );
 
-    void SetCamera(plCameraModifier1* pMod) { fCamera = pMod; }
-    
-    void SetAccel       (float f) { fAccel = f; }
-    void SetDecel       (float f) { fDecel = f; }
-    void SetVelocity    (float f) { fVelocity = f; }
-    void SetPOAAccel    (float f) { fPOAAccel = f; }
-    void SetPOADecel    (float f) { fPOADecel = f; }
-    void SetPOAVelocity (float f) { fPOAVelocity = f; }
+    CLASSNAME_REGISTER(plCameraBrain1);
+    GETINTERFACE_ANY(plCameraBrain1, hsKeyedObject);
 
-    const plCameraModifier1* GetCamera() { return fCamera; }
+    void SetCamera(plCameraModifier1* pMod) {
+        fCamera = pMod;
+    }
+
+    void SetAccel(float f) {
+        fAccel = f;
+    }
+    void SetDecel(float f) {
+        fDecel = f;
+    }
+    void SetVelocity(float f) {
+        fVelocity = f;
+    }
+    void SetPOAAccel(float f) {
+        fPOAAccel = f;
+    }
+    void SetPOADecel(float f) {
+        fPOADecel = f;
+    }
+    void SetPOAVelocity(float f) {
+        fPOAVelocity = f;
+    }
+
+    const plCameraModifier1* GetCamera() {
+        return fCamera;
+    }
 
     virtual void        Update(bool forced = false);
     virtual bool        MsgReceive(plMessage* msg);
 
     virtual plSceneObject*  GetSubject();
     virtual void SetSubject(plSceneObject* sub);
-    
-    virtual hsVector3   GetPOAOffset() { return fPOAOffset; }   
-    void        SetPOAOffset(hsVector3 pt) { fPOAOffset = pt; }
+
+    virtual hsVector3   GetPOAOffset() {
+        return fPOAOffset;
+    }
+    void        SetPOAOffset(hsVector3 pt) {
+        fPOAOffset = pt;
+    }
     void AddTarget();
- 
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    virtual bool    GetFaded() { return false; }
-    virtual bool    SetFaded(bool b) { return false; }
+    virtual bool    GetFaded() {
+        return false;
+    }
+    virtual bool    SetFaded(bool b) {
+        return false;
+    }
 
-    bool    HasMovementFlag(int f) { return fMoveFlags.IsBitSet(f); }
-    void    SetMovementFlag(int f); 
-    void    ClearMovementFlag(int which) { fMoveFlags.ClearBit( which ); }
-    void    SetFlags(int i) { fFlags.SetBit(i); }
-    void    ClearFlags(int which) { fFlags.ClearBit( which ); }
-    bool    HasFlag(int f) { return fFlags.IsBitSet(f); }
+    bool    HasMovementFlag(int f) {
+        return fMoveFlags.IsBitSet(f);
+    }
+    void    SetMovementFlag(int f);
+    void    ClearMovementFlag(int which) {
+        fMoveFlags.ClearBit(which);
+    }
+    void    SetFlags(int i) {
+        fFlags.SetBit(i);
+    }
+    void    ClearFlags(int which) {
+        fFlags.ClearBit(which);
+    }
+    bool    HasFlag(int f) {
+        return fFlags.IsBitSet(f);
+    }
 
-    void    SetGoal(hsPoint3 pt) { fGoal = pt; }
-    void    SetPOAGoal(hsPoint3 pt) { fPOAGoal = pt; }
+    void    SetGoal(hsPoint3 pt) {
+        fGoal = pt;
+    }
+    void    SetPOAGoal(hsPoint3 pt) {
+        fPOAGoal = pt;
+    }
     void    SetFOVGoal(float h, double t);
     void    SetZoomParams(float max, float min, float rate);
-    
-    void    SetXPanLimit(float x) {fXPanLimit = x;}
-    void    SetZPanLimit(float y) {fZPanLimit = y;}
-    float    GetXPanLimit() {return fXPanLimit;}
-    float    GetZPanLimit() {return fZPanLimit;}
 
-    void    SetRail(plRailCameraMod* m) { fRail = m; }
+    void    SetXPanLimit(float x) {
+        fXPanLimit = x;
+    }
+    void    SetZPanLimit(float y) {
+        fZPanLimit = y;
+    }
+    float    GetXPanLimit() {
+        return fXPanLimit;
+    }
+    float    GetZPanLimit() {
+        return fZPanLimit;
+    }
 
-    hsPoint3 GetGoal() { return fGoal; }
-    hsPoint3 GetPOAGoal() { return fPOAGoal; }
+    void    SetRail(plRailCameraMod* m) {
+        fRail = m;
+    }
+
+    hsPoint3 GetGoal() {
+        return fGoal;
+    }
+    hsPoint3 GetPOAGoal() {
+        return fPOAGoal;
+    }
 
     virtual void Push(bool recenter = true);
     virtual void Pop();
-    
-    float GetVelocity()      { return fVelocity; }
-    float GetAccel()         { return fAccel; }
-    float GetDecel()         { return fDecel; }
-    float GetPOAAccel()      { return fPOAAccel; }
-    float GetPOAVelocity()   { return fPOAVelocity; }
-    float GetPOADecel()      { return fPOADecel; }
 
-    float GetCurrentCamSpeed() { return fCurCamSpeed; }
-    float GetCurrentViewSpeed() { return fCurViewSpeed; }
+    float GetVelocity()      {
+        return fVelocity;
+    }
+    float GetAccel()         {
+        return fAccel;
+    }
+    float GetDecel()         {
+        return fDecel;
+    }
+    float GetPOAAccel()      {
+        return fPOAAccel;
+    }
+    float GetPOAVelocity()   {
+        return fPOAVelocity;
+    }
+    float GetPOADecel()      {
+        return fPOADecel;
+    }
 
-    void SetCurrentCamSpeed(float s) { fCurCamSpeed = s; }
-    void SetCurrentViewSpeed(float s) { fCurViewSpeed = s;   }
-    
-    hsMatrix44 GetTargetMatrix() { return fTargetMatrix; }
+    float GetCurrentCamSpeed() {
+        return fCurCamSpeed;
+    }
+    float GetCurrentViewSpeed() {
+        return fCurViewSpeed;
+    }
+
+    void SetCurrentCamSpeed(float s) {
+        fCurCamSpeed = s;
+    }
+    void SetCurrentViewSpeed(float s) {
+        fCurViewSpeed = s;
+    }
+
+    hsMatrix44 GetTargetMatrix() {
+        return fTargetMatrix;
+    }
 
     static float fFallVelocity;
     static float fFallAccel;
@@ -168,16 +240,16 @@ public:
     static float fFallPOADecel;
 
 protected:
-        
+
     virtual void AdjustForInput(double secs);
     void IMoveTowardGoal(double time);
     void IPointTowardGoal(double time);
     void IAnimateFOV(double time);
-    void IAdjustVelocity(float adjAccelRate, 
-                         float adjDecelRate, 
-                         hsVector3* dir, 
-                         hsVector3* vel, 
-                         float maxSpeed, 
+    void IAdjustVelocity(float adjAccelRate,
+                         float adjDecelRate,
+                         hsVector3* dir,
+                         hsVector3* vel,
+                         float maxSpeed,
                          float distToGoal,
                          double elapsedTime);
 
@@ -206,7 +278,7 @@ protected:
     float            fFOVGoal;
     double              fFOVStartTime;
     double              fFOVEndTime;
-    float            fFOVAnimRate; 
+    float            fFOVAnimRate;
     float            fZoomRate;
     float            fZoomMax;
     float            fZoomMin;
@@ -220,8 +292,7 @@ protected:
 
 class plControlEventMsg;
 
-class plCameraBrain1_Drive : public plCameraBrain1
-{
+class plCameraBrain1_Drive : public plCameraBrain1 {
 protected:
     hsPoint3    fDesiredPosition;
     hsPoint3    fFacingTarget;
@@ -238,10 +309,12 @@ public:
     plCameraBrain1_Drive(plCameraModifier1* pMod);
     ~plCameraBrain1_Drive();
 
-    static void SetSensitivity(float f) { fTurnRate = f; }
-    
-    CLASSNAME_REGISTER( plCameraBrain1_Drive );
-    GETINTERFACE_ANY( plCameraBrain1_Drive, plCameraBrain1 );
+    static void SetSensitivity(float f) {
+        fTurnRate = f;
+    }
+
+    CLASSNAME_REGISTER(plCameraBrain1_Drive);
+    GETINTERFACE_ANY(plCameraBrain1_Drive, plCameraBrain1);
 
     virtual void        Update(bool forced = false);
     virtual bool        MsgReceive(plMessage* msg);
@@ -255,30 +328,38 @@ public:
 };
 
 
-class plCameraBrain1_Avatar : public plCameraBrain1
-{
+class plCameraBrain1_Avatar : public plCameraBrain1 {
 public:
-    
+
     plCameraBrain1_Avatar();
     plCameraBrain1_Avatar(plCameraModifier1* pMod);
     ~plCameraBrain1_Avatar();
-    
-    CLASSNAME_REGISTER( plCameraBrain1_Avatar );
-    GETINTERFACE_ANY( plCameraBrain1_Avatar, plCameraBrain1 );
+
+    CLASSNAME_REGISTER(plCameraBrain1_Avatar);
+    GETINTERFACE_ANY(plCameraBrain1_Avatar, plCameraBrain1);
 
 
     virtual void        Update(bool forced = false);
     virtual bool        MsgReceive(plMessage* msg);
-    
-    virtual void        CalculatePosition();                
-    hsVector3   GetOffset() { return fOffset; } 
-    void        SetOffset(hsVector3 pt) { fOffset = pt; }
+
+    virtual void        CalculatePosition();
+    hsVector3   GetOffset() {
+        return fOffset;
+    }
+    void        SetOffset(hsVector3 pt) {
+        fOffset = pt;
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
-    
-    virtual bool    GetFaded() { return fFaded; }
-    virtual bool    SetFaded(bool b) { fFaded = b; return true; }
+
+    virtual bool    GetFaded() {
+        return fFaded;
+    }
+    virtual bool    SetFaded(bool b) {
+        fFaded = b;
+        return true;
+    }
 
     virtual void Pop();
     virtual void Push(bool recenter = true);
@@ -295,46 +376,46 @@ protected:
     plSceneObject*      fObstacle;
 };
 
-class plCameraBrain1_FirstPerson : public plCameraBrain1_Avatar
-{
+class plCameraBrain1_FirstPerson : public plCameraBrain1_Avatar {
 public:
-    
+
     plCameraBrain1_FirstPerson();
     plCameraBrain1_FirstPerson(plCameraModifier1* pMod);
     ~plCameraBrain1_FirstPerson();
-    
-    CLASSNAME_REGISTER( plCameraBrain1_FirstPerson );
-    GETINTERFACE_ANY( plCameraBrain1_FirstPerson, plCameraBrain1_Avatar );
-    
-    virtual void CalculatePosition();               
+
+    CLASSNAME_REGISTER(plCameraBrain1_FirstPerson);
+    GETINTERFACE_ANY(plCameraBrain1_FirstPerson, plCameraBrain1_Avatar);
+
+    virtual void CalculatePosition();
     virtual void Push(bool recenter = true);
     virtual void Pop();
     virtual bool        MsgReceive(plMessage* msg);
-    
+
     // for console hack
     static bool fDontFade;
 protected:
     plSceneObject* fPosNode;
-    
+
 
 };
 
 
-class plCameraBrain1_Fixed : public plCameraBrain1
-{
+class plCameraBrain1_Fixed : public plCameraBrain1 {
 public:
-    
+
     plCameraBrain1_Fixed();
     plCameraBrain1_Fixed(plCameraModifier1* pMod);
     ~plCameraBrain1_Fixed();
-    
-    CLASSNAME_REGISTER( plCameraBrain1_Fixed );
-    GETINTERFACE_ANY( plCameraBrain1_Fixed, plCameraBrain1 );
 
-    void SetTargetPoint(plCameraModifier1* pt) { fTargetPoint = pt; }
+    CLASSNAME_REGISTER(plCameraBrain1_Fixed);
+    GETINTERFACE_ANY(plCameraBrain1_Fixed, plCameraBrain1);
+
+    void SetTargetPoint(plCameraModifier1* pt) {
+        fTargetPoint = pt;
+    }
 
     virtual void    Update(bool forced = false);
-    void            CalculatePosition();                
+    void            CalculatePosition();
     virtual bool MsgReceive(plMessage* msg);
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -347,12 +428,10 @@ private:
 //
 // circle cam brain
 //
-class plCameraBrain1_Circle : public plCameraBrain1_Fixed
-{
+class plCameraBrain1_Circle : public plCameraBrain1_Fixed {
 
 public:
-    enum CircleFlags
-    {
+    enum CircleFlags {
         kLagged         = 0x01,
         kAbsoluteLag    = (0x02 | kLagged),
         kFarthest       = 0x04,
@@ -372,33 +451,57 @@ protected:
 
     hsPoint3    IGetClosestPointOnCircle(const hsPoint3* toThisPt);
 public:
-    plCameraBrain1_Circle(); 
-    plCameraBrain1_Circle(plCameraModifier1* pMod); 
+    plCameraBrain1_Circle();
+    plCameraBrain1_Circle(plCameraModifier1* pMod);
     ~plCameraBrain1_Circle();
 
-    CLASSNAME_REGISTER( plCameraBrain1_Circle );
-    GETINTERFACE_ANY( plCameraBrain1_Circle, plCameraBrain1_Fixed );
+    CLASSNAME_REGISTER(plCameraBrain1_Circle);
+    GETINTERFACE_ANY(plCameraBrain1_Circle, plCameraBrain1_Fixed);
 
-    
-    virtual void Read(hsStream *stream, hsResMgr* mgr);
-    virtual void Write(hsStream *stream, hsResMgr* mgr);
+
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
     virtual hsPoint3    MoveTowardsFromGoal(const hsPoint3* fromGoal, double secs, bool warp = false);
     virtual void        Update(bool forced = false);
     virtual bool        MsgReceive(plMessage* msg);
-    
-    uint32_t GetCircleFlags() { return fCircleFlags; }
-    hsPoint3* GetCenter() { return &fCenter; }      // use GetCenterPoint
-    hsPoint3  GetCenterPoint();
-    float GetRadius() { return fRadius; }
-    plSceneObject* GetCenterObject() { return fCenterObject; }
 
-    void SetCircumferencePerSec(float h) { fCirPerSec = h; }
-    void SetCircleFlags(uint32_t f) { fCircleFlags|=f; }
-    void SetCenter(hsPoint3* ctr) { fCenter = *ctr; }       // Circle lies in the plane z = ctr->z
-    void SetRadius(float radius) {   fRadius = radius; }
-    void SetFarCircleCam(bool farType) { if (farType) fCircleFlags |= kFarthest; else fCircleFlags &= ~kFarthest; }
+    uint32_t GetCircleFlags() {
+        return fCircleFlags;
+    }
+    hsPoint3* GetCenter() {
+        return &fCenter;    // use GetCenterPoint
+    }
+    hsPoint3  GetCenterPoint();
+    float GetRadius() {
+        return fRadius;
+    }
+    plSceneObject* GetCenterObject() {
+        return fCenterObject;
+    }
+
+    void SetCircumferencePerSec(float h) {
+        fCirPerSec = h;
+    }
+    void SetCircleFlags(uint32_t f) {
+        fCircleFlags |= f;
+    }
+    void SetCenter(hsPoint3* ctr) {
+        fCenter = *ctr;    // Circle lies in the plane z = ctr->z
+    }
+    void SetRadius(float radius) {
+        fRadius = radius;
+    }
+    void SetFarCircleCam(bool farType) {
+        if (farType) {
+            fCircleFlags |= kFarthest;
+        } else {
+            fCircleFlags &= ~kFarthest;
+        }
+    }
     void SetCenterObjectKey(plKey k);
-    void SetPOAObject(plSceneObject* pObj) { fPOAObj = pObj; }
+    void SetPOAObject(plSceneObject* pObj) {
+        fPOAObj = pObj;
+    }
 
 };
 

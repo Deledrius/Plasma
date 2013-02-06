@@ -50,15 +50,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plSurface/plLayer.h"
 
 plPhysicalProxy::plPhysicalProxy()
-:   plProxyGen(hsColorRGBA().Set(0,0,0,1.f), hsColorRGBA().Set(1.f,0.8f,0.2f,1.f), 0.5f),
-    fOwner(nil)
+    :   plProxyGen(hsColorRGBA().Set(0, 0, 0, 1.f), hsColorRGBA().Set(1.f, 0.8f, 0.2f, 1.f), 0.5f),
+        fOwner(nil)
 {
 }
 
 plPhysicalProxy::plPhysicalProxy(const hsColorRGBA& amb, const hsColorRGBA& dif, float opac)
-:   plProxyGen(amb, dif, opac),
-    fOwner(nil),
-    fController(nil)
+    :   plProxyGen(amb, dif, opac),
+        fOwner(nil),
+        fController(nil)
 {
 }
 
@@ -79,8 +79,9 @@ bool plPhysicalProxy::Init(plPhysical* liInfo)
 bool plPhysicalProxy::Init(plPXPhysicalControllerCore* controller)
 {
     if (controller)
-        if (controller->GetOwner())
+        if (controller->GetOwner()) {
             plProxyGen::Init(controller->GetOwner()->GetObjectPtr());
+        }
 
     fController = controller;
     fProxyMsgType = plProxyDrawMsg::kPhysical;
@@ -88,24 +89,28 @@ bool plPhysicalProxy::Init(plPXPhysicalControllerCore* controller)
     return fController != nil;
 }
 
-plKey plPhysicalProxy::IGetNode() const 
+plKey plPhysicalProxy::IGetNode() const
 {
-    if (fOwner)
+    if (fOwner) {
         return fOwner->GetSceneNode();
-    if (fController)
+    }
+
+    if (fController) {
         return fController->GetOwner();
+    }
+
     return nil;
 }
 
 plDrawableSpans* plPhysicalProxy::ICreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo)
 {
-    if (fOwner)
-    {
+    if (fOwner) {
         return fOwner->CreateProxy(mat, idx, addTo);
     }
-    if (fController)
-    {
-        return fController->CreateProxy(mat,idx,addTo);
+
+    if (fController) {
+        return fController->CreateProxy(mat, idx, addTo);
     }
+
     return nil;
 }

@@ -61,8 +61,7 @@ struct hsPoint3;
 struct hsVector3;
 struct hsColorRGBA;
 
-class plCullTree : public plCuller
-{
+class plCullTree : public plCuller {
 protected:
 
     // Visualization stuff, to be nuked from production version.
@@ -89,8 +88,12 @@ protected:
 
     int16_t                           fRoot;
     mutable hsTArray<plCullNode>    fNodeList; // Scratch list we make the tree from.
-    plCullNode*                     IGetRoot() const { return IGetNode(fRoot); }
-    plCullNode*                     IGetNode(int16_t i) const { return i >= 0 ? &fNodeList[i] : nil; }
+    plCullNode*                     IGetRoot() const {
+        return IGetNode(fRoot);
+    }
+    plCullNode*                     IGetNode(int16_t i) const {
+        return i >= 0 ? &fNodeList[i] : nil;
+    }
 
     void                ITestNode(const plSpaceTree* space, int16_t who, hsTArray<int16_t>& outList) const; // Appends to outlist
     void                ITestList(const plSpaceTree* space, const hsTArray<int16_t>& inList, hsTArray<int16_t>& outList) const;
@@ -101,12 +104,24 @@ protected:
     int16_t               IMakePolyNode(const plCullPoly& poly, int i0, int i1) const;
 
     // Some scratch areas for the nodes use when building the tree etc.
-    hsTArray<plCullPoly>&           ScratchPolys() const { return fScratchPolys; }
-    hsLargeArray<int16_t>&            ScratchClear() const { return fScratchClear; }
-    hsLargeArray<int16_t>&            ScratchSplit() const { return fScratchSplit; }
-    hsLargeArray<int16_t>&            ScratchCulled() const { return fScratchCulled; }
-    hsBitVector&                    ScratchBitVec() const { return fScratchBitVec; }
-    hsBitVector&                    ScratchTotVec() const { return fScratchTotVec; }
+    hsTArray<plCullPoly>&           ScratchPolys() const {
+        return fScratchPolys;
+    }
+    hsLargeArray<int16_t>&            ScratchClear() const {
+        return fScratchClear;
+    }
+    hsLargeArray<int16_t>&            ScratchSplit() const {
+        return fScratchSplit;
+    }
+    hsLargeArray<int16_t>&            ScratchCulled() const {
+        return fScratchCulled;
+    }
+    hsBitVector&                    ScratchBitVec() const {
+        return fScratchBitVec;
+    }
+    hsBitVector&                    ScratchTotVec() const {
+        return fScratchTotVec;
+    }
 
     void                            ISetupScratch(uint16_t nNodes);
 
@@ -121,33 +136,47 @@ public:
     void                    SetViewPos(const hsPoint3& pos);
     void                    AddPoly(const plCullPoly& poly);
 
-    uint32_t                  GetNumNodes() const { return fNodeList.GetCount(); }
+    uint32_t                  GetNumNodes() const {
+        return fNodeList.GetCount();
+    }
 
     virtual void            Harvest(const plSpaceTree* space, hsTArray<int16_t>& outList) const;
     virtual bool            BoundsVisible(const hsBounds3Ext& bnd) const;
     virtual bool            SphereVisible(const hsPoint3& center, float rad) const;
 
     // Visualization stuff. Only to be called by the pipeline (or some other vis manager).
-    void                    SetVisualizationYon(float y) const { fVisYon = y; }
-    void                    BeginCapturePolys() const { fCapturePolys = true; }
-    void                    EndCapturePolys() const { fCapturePolys = false; }
-    hsTArray<hsPoint3>&     GetCaptureVerts() const { return fVisVerts; }
-    hsTArray<hsVector3>&    GetCaptureNorms() const { return fVisNorms; }
-    hsTArray<hsColorRGBA>&  GetCaptureColors() const { return fVisColors; }
-    hsTArray<uint16_t>&       GetCaptureTris() const { return fVisTris; }
+    void                    SetVisualizationYon(float y) const {
+        fVisYon = y;
+    }
+    void                    BeginCapturePolys() const {
+        fCapturePolys = true;
+    }
+    void                    EndCapturePolys() const {
+        fCapturePolys = false;
+    }
+    hsTArray<hsPoint3>&     GetCaptureVerts() const {
+        return fVisVerts;
+    }
+    hsTArray<hsVector3>&    GetCaptureNorms() const {
+        return fVisNorms;
+    }
+    hsTArray<hsColorRGBA>&  GetCaptureColors() const {
+        return fVisColors;
+    }
+    hsTArray<uint16_t>&       GetCaptureTris() const {
+        return fVisTris;
+    }
     void                    ReleaseCapture() const;
 };
 
-class plCullNode
-{
+class plCullNode {
 public:
-enum plCullStatus
-{
-    kClear,
-    kCulled,
-    kSplit,
-    kPureSplit
-};
+    enum plCullStatus {
+        kClear,
+        kCulled,
+        kSplit,
+        kPureSplit
+    };
 protected:
     hsVector3           fNorm;
     float            fDist;
@@ -183,41 +212,67 @@ protected:
     float                    IInterpVert(const hsPoint3& p0, const hsPoint3& p1, hsPoint3& out) const;
     plCullNode::plCullStatus    ISplitPoly(const plCullPoly& poly, plCullPoly*& innerPoly, plCullPoly*& outerPoly) const;
     void                        IMarkClipped(const plCullPoly& poly, const hsBitVector& onVerts) const;
-    void                        ITakeHalfPoly(const plCullPoly& scrPoly, 
-                                   const hsTArray<int>& vtxIdx, 
-                                   const hsBitVector& onVerts, 
-                                   plCullPoly& outPoly) const;
+    void                        ITakeHalfPoly(const plCullPoly& scrPoly,
+            const hsTArray<int>& vtxIdx,
+            const hsBitVector& onVerts,
+            plCullPoly& outPoly) const;
     void                        IBreakPoly(const plCullPoly& poly, const hsTArray<float>& depths,
-                                    hsBitVector& inVerts,
-                                    hsBitVector& outVerts,
-                                    hsBitVector& onVerts,
-                                    plCullPoly& srcPoly) const;
+                                           hsBitVector& inVerts,
+                                           hsBitVector& outVerts,
+                                           hsBitVector& onVerts,
+                                           plCullPoly& srcPoly) const;
 
-    hsTArray<plCullPoly>&           ScratchPolys() const { return fTree->ScratchPolys(); }
-    hsLargeArray<int16_t>&            ScratchClear() const { return fTree->ScratchClear(); }
-    hsLargeArray<int16_t>&            ScratchSplit() const { return fTree->ScratchSplit(); }
-    hsLargeArray<int16_t>&            ScratchCulled() const { return fTree->ScratchCulled(); }
-    hsBitVector&                    ScratchBitVec() const { return fTree->ScratchBitVec(); }
-    hsBitVector&                    ScratchTotVec() const { return fTree->ScratchTotVec(); }
+    hsTArray<plCullPoly>&           ScratchPolys() const {
+        return fTree->ScratchPolys();
+    }
+    hsLargeArray<int16_t>&            ScratchClear() const {
+        return fTree->ScratchClear();
+    }
+    hsLargeArray<int16_t>&            ScratchSplit() const {
+        return fTree->ScratchSplit();
+    }
+    hsLargeArray<int16_t>&            ScratchCulled() const {
+        return fTree->ScratchCulled();
+    }
+    hsBitVector&                    ScratchBitVec() const {
+        return fTree->ScratchBitVec();
+    }
+    hsBitVector&                    ScratchTotVec() const {
+        return fTree->ScratchTotVec();
+    }
 
     friend class plCullTree;
 public:
 
-    void    Init(const plCullTree* t, const hsVector3& n, float d) { fIsFace = false; fTree = t; fInnerChild = fOuterChild = -1; SetPlane(n, d); }
-    void    Init(const plCullTree* t, const plCullPoly& poly) { Init(t, poly.fNorm, poly.fDist); }
+    void    Init(const plCullTree* t, const hsVector3& n, float d) {
+        fIsFace = false;
+        fTree = t;
+        fInnerChild = fOuterChild = -1;
+        SetPlane(n, d);
+    }
+    void    Init(const plCullTree* t, const plCullPoly& poly) {
+        Init(t, poly.fNorm, poly.fDist);
+    }
 
-    void    SetPlane(const hsVector3& n, float d) { fNorm = n; fDist = d; }
-    
-    const hsVector3& GetNormal() const { return fNorm; }
-    float GetDist() const { return fDist; }
+    void    SetPlane(const hsVector3& n, float d) {
+        fNorm = n;
+        fDist = d;
+    }
+
+    const hsVector3& GetNormal() const {
+        return fNorm;
+    }
+    float GetDist() const {
+        return fDist;
+    }
 
     plCullStatus    TestBounds(const hsBounds3Ext& bnd) const;
     plCullStatus    TestSphere(const hsPoint3& center, float rad) const;
 };
 
 inline plCullNode* plCullNode::IGetNode(int16_t i) const
-{ 
-    return fTree->IGetNode(i); 
+{
+    return fTree->IGetNode(i);
 }
 
 #endif // plCullTree_inc

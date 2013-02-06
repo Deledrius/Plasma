@@ -52,40 +52,48 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class hsResMgr;
 
-class plFakeOutMsg : public plMessage
-{
+class plFakeOutMsg : public plMessage {
 protected:
 
 public:
-    plFakeOutMsg(){SetBCastFlag(plMessage::kPropagateToModifiers);}
-    plFakeOutMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t){SetBCastFlag(plMessage::kPropagateToModifiers);}
-    
-    CLASSNAME_REGISTER( plFakeOutMsg );
-    GETINTERFACE_ANY( plFakeOutMsg, plMessage );
+    plFakeOutMsg() {
+        SetBCastFlag(plMessage::kPropagateToModifiers);
+    }
+    plFakeOutMsg(const plKey& s,
+                 const plKey& r,
+                 const double* t) {
+        SetBCastFlag(plMessage::kPropagateToModifiers);
+    }
 
-    enum 
-    {
+    CLASSNAME_REGISTER(plFakeOutMsg);
+    GETINTERFACE_ANY(plFakeOutMsg, plMessage);
+
+    enum {
         kNumCmds = 0,
     };
 
     hsBitVector     fCmd;
 
-    bool Cmd(int n) const { return fCmd.IsBitSet(n); }
-    void SetCmd(int n) { fCmd.SetBit(n); }
-    void ClearCmd() { fCmd.Clear(); }
-    void ClearCmd(int n) { fCmd.ClearBit(n); }
-    
+    bool Cmd(int n) const {
+        return fCmd.IsBitSet(n);
+    }
+    void SetCmd(int n) {
+        fCmd.SetBit(n);
+    }
+    void ClearCmd() {
+        fCmd.Clear();
+    }
+    void ClearCmd(int n) {
+        fCmd.ClearBit(n);
+    }
+
     // IO
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fCmd.Read(stream);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         fCmd.Write(stream);
     }

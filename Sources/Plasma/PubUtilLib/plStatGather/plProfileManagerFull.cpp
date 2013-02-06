@@ -69,37 +69,35 @@ plProfileManagerFull& plProfileManagerFull::Instance()
 void plProfileManagerFull::GetGroups(GroupSet& groups)
 {
     groups.clear();
-    for (int i = 0; i < fVars.size(); i++)
+
+    for (int i = 0; i < fVars.size(); i++) {
         groups.insert(fVars[i]->GetGroup());
+    }
 }
 
 void plProfileManagerFull::ShowGroup(const char* groupName)
 {
-    if (!groupName)
+    if (!groupName) {
         groupName = "General";
+    }
 
     // If we're already showing this group, stop
-    if (fShowGroups.find(groupName) != fShowGroups.end())
-    {
+    if (fShowGroups.find(groupName) != fShowGroups.end()) {
         CreateStandardGraphs(groupName, false);
         fShowGroups.erase(groupName);
         ISetActive(groupName, false);
-    }
-    else
-    {
+    } else {
         const char* shareGroupName = nil;
-        for (int i = 0; i < fVars.size(); i++)
-        {
-            if (stricmp(fVars[i]->GetGroup(), groupName) == 0)
-            {
+
+        for (int i = 0; i < fVars.size(); i++) {
+            if (stricmp(fVars[i]->GetGroup(), groupName) == 0) {
                 shareGroupName = fVars[i]->GetGroup();
             }
         }
 
         // We do have a group with this name, so insert one of the variable's
         // pointers to the name into our list (we can hang on to those pointers)
-        if (shareGroupName)
-        {
+        if (shareGroupName) {
             ISetActive(shareGroupName, true);
             CreateStandardGraphs(shareGroupName, true);
             fShowGroups.insert(shareGroupName);
@@ -110,45 +108,46 @@ void plProfileManagerFull::ShowGroup(const char* groupName)
 void plProfileManagerFull::ShowNextGroup()
 {
     plString curGroup;
-    if (fShowGroups.begin() != fShowGroups.end())
+
+    if (fShowGroups.begin() != fShowGroups.end()) {
         curGroup = *(fShowGroups.begin());
+    }
 
     GroupSet groups;
     GetGroups(groups);
 
     plString nextGroup;
-    if (!curGroup.IsNull())
-    {
+
+    if (!curGroup.IsNull()) {
         CreateStandardGraphs(curGroup.c_str(), false);
 
         GroupSet::iterator it = groups.find(curGroup);
         it++;
-        if (it != groups.end())
-        {
+
+        if (it != groups.end()) {
             nextGroup = *it;
         }
+
         ISetActive(curGroup.c_str(), false);
-    }
-    else
-    {
+    } else {
         nextGroup = *(groups.begin());
     }
 
     fShowGroups.clear();
-    if (!nextGroup.IsNull())
-    {
+
+    if (!nextGroup.IsNull()) {
         ISetActive(nextGroup.c_str(), true);
         CreateStandardGraphs(nextGroup.c_str(), true);
         fShowGroups.insert(nextGroup);
     }
 }
 
-plProfileVar* plProfileManagerFull::IFindTimer(const char *name)
+plProfileVar* plProfileManagerFull::IFindTimer(const char* name)
 {
-    for (int i = 0; i < fVars.size(); i++)
-    {
-        if (stricmp(fVars[i]->GetName(), name) == 0)
+    for (int i = 0; i < fVars.size(); i++) {
+        if (stricmp(fVars[i]->GetName(), name) == 0) {
             return fVars[i];
+        }
     }
 
     return nil;
@@ -156,11 +155,10 @@ plProfileVar* plProfileManagerFull::IFindTimer(const char *name)
 
 void plProfileManagerFull::GetLaps(LapNames& lapNames)
 {
-    for (int i = 0; i < fVars.size(); i++)
-    {
+    for (int i = 0; i < fVars.size(); i++) {
         plProfileVar* var = fVars[i];
-        if (var->GetLaps())
-        {
+
+        if (var->GetLaps()) {
             LapPair lapPair;
             lapPair.group = var->GetGroup();
             lapPair.varName = var->GetName();
@@ -170,8 +168,7 @@ void plProfileManagerFull::GetLaps(LapNames& lapNames)
 }
 
 
-enum
-{
+enum {
     kColName,
     kColValue,
     kColAvg,
@@ -181,7 +178,7 @@ enum
 
 typedef std::vector<plProfileBase*> ProfileGroup;
 
-static void PrintColumn(ProfileGroup& group, const char* groupName, int column, int x, int y, int& width, int& height, int off =0)
+static void PrintColumn(ProfileGroup& group, const char* groupName, int column, int x, int y, int& width, int& height, int off = 0)
 {
     plDebugText& txt = plDebugText::Instance();
     int yInc = txt.GetFontHeight() + 2;
@@ -190,21 +187,19 @@ static void PrintColumn(ProfileGroup& group, const char* groupName, int column, 
     width = 0;
 
     width = hsMaximum(width, txt.CalcStringWidth(groupName) + 1);
-    txt.DrawString(x, y+height, groupName, 255, 255, 255, 255, plDebugText::kStyleBold);
+    txt.DrawString(x, y + height, groupName, 255, 255, 255, 255, plDebugText::kStyleBold);
     height += yInc;
 
     uint32_t samplesWidth = txt.CalcStringWidth("[000]");
 
-    for (int i = 0; i < group.size(); i++)
-    {
+    for (int i = 0; i < group.size(); i++) {
         char str[1024];
 
-        switch (column)
-        {
+        switch (column) {
         case kColName:
             strcpy(str, group[i]->GetName());
 
-            // Since we don't draw the samples text for stats that only have 1 sample, 
+            // Since we don't draw the samples text for stats that only have 1 sample,
             // if the stat with the longest name is fluctuating between 1 and more than
             // 1 sample the width of the column will jump around.  So we calculate the
             // width based on the stat name plus the width of the widest sample we should
@@ -212,30 +207,37 @@ static void PrintColumn(ProfileGroup& group, const char* groupName, int column, 
             width = hsMaximum(width, txt.CalcStringWidth(str) + samplesWidth + 1);
 
             // Now add on the samples text, if we have any
-            if (group[i]->GetTimerSamples())
-            {
+            if (group[i]->GetTimerSamples()) {
                 char cnt[20];
                 sprintf(cnt, "[%d]", group[i]->GetTimerSamples());
                 strcat(str, cnt);
             }
+
             break;
+
         case kColValue:
             group[i]->PrintValue(str);
             break;
+
         case kColAvg:
             group[i]->PrintAvg(str);
             break;
+
         case kColMax:
             group[i]->PrintMax(str);
             break;
+
         case kColIndex:
-            sprintf(str,"[%3d]",i+off);
+            sprintf(str, "[%3d]", i + off);
             break;
         }
 
-        txt.DrawString(x, y+height, str);
-        if (column != kColName)
+        txt.DrawString(x, y + height, str);
+
+        if (column != kColName) {
             width = hsMaximum(width, txt.CalcStringWidth(str) + 1);
+        }
+
         height += yInc;
     }
 
@@ -267,15 +269,14 @@ static void PrintLapGroup(ProfileGroup& group, const char* groupName, int& x, in
 {
     int width, height;
 
-    if(min > 0)
-    {
+    if (min > 0) {
         PrintColumn(group, "Index", kColIndex, x, y, width, height, min);
         x += width + 10;
     }
 
     PrintColumn(group, "Avg", kColAvg, x, y, width, height);
     x += width + 10;
-    
+
     PrintColumn(group, groupName, kColName, x, y, width, height);
     x += width + 10;
 
@@ -292,8 +293,9 @@ void plProfileManagerFull::EndFrame()
 
 void plProfileManagerFull::Update()
 {
-    if (fLogStats)
+    if (fLogStats) {
         ILogStats();
+    }
 
     //
     // Print the groups we're showing
@@ -302,15 +304,16 @@ void plProfileManagerFull::Update()
 
     int y = 10;
     GroupSet::iterator it;
-    for (it = fShowGroups.begin(); it != fShowGroups.end(); it++)
-    {
+
+    for (it = fShowGroups.begin(); it != fShowGroups.end(); it++) {
         plString groupName = *it;
 
         std::vector<plProfileBase*> group;
 
         for (int i = 0; i < fVars.size(); i++)
-            if (groupName.Compare(fVars[i]->GetGroup()) == 0)
+            if (groupName.Compare(fVars[i]->GetGroup()) == 0) {
                 group.push_back(fVars[i]);
+            }
 
         int x = 10;
         PrintGroup(group, groupName.c_str(), x, y);
@@ -322,20 +325,22 @@ void plProfileManagerFull::Update()
     //
     // Print the laps we're showing
     //
-    if (fShowLaps && fShowLaps->GetLaps())
-    {
+    if (fShowLaps && fShowLaps->GetLaps()) {
         plProfileLaps* laps = fShowLaps->GetLaps();
 
         std::vector<plProfileBase*> group;
         int numLaps = laps->GetNumLaps();
-        
-        if(numLaps < fMinLap)
+
+        if (numLaps < fMinLap) {
             fMinLap = 0;
-        for (int i = 0; i < numLaps; i++)
-        {
-            if(i >= fMinLap && i < (fMinLap + 40))
-                group.push_back(laps->GetLap(i));
         }
+
+        for (int i = 0; i < numLaps; i++) {
+            if (i >= fMinLap && i < (fMinLap + 40)) {
+                group.push_back(laps->GetLap(i));
+            }
+        }
+
         y = 10;
         char buf[256];
         sprintf(buf, "%s - %s", fShowLaps->GetGroup(), fShowLaps->GetName());
@@ -349,13 +354,11 @@ void plProfileManagerFull::Update()
     float xPos = 1 - size / 2;
     float yPos = -1 + size / 2;
 
-    for (int i = 0; i < fGraphs.size(); i++)
-    {
+    for (int i = 0; i < fGraphs.size(); i++) {
         plGraphPlate* graph = fGraphs[i];
         plProfileVar* var = IFindTimer(graph->GetTitle());
 
-        if (var)
-        {
+        if (var) {
             graph->SetPosition(xPos, yPos);
             graph->AddData(var->GetValue());
             graph->SetVisible(true);
@@ -369,20 +372,21 @@ void plProfileManagerFull::Update()
     float detailSize = 0.9;
     float detailX = 1 - detailSize / 2;
     float detailY = 1 - detailSize / 2;
-    if (fDetailGraph)
-    {
-        fDetailGraph->SetPosition(detailX,detailY);
+
+    if (fDetailGraph) {
+        fDetailGraph->SetPosition(detailX, detailY);
         double value;
         double scale;
         int i;
         std::vector<int32_t> values;
-        for (i=0; i<fDetailVars.size(); i++)
-        {
+
+        for (i = 0; i < fDetailVars.size(); i++) {
             value = (double)fDetailVars[i].var->GetValue();
-            scale = 100.0/((double)(fDetailVars[i].max-fDetailVars[i].min));
-            value = scale*value-fDetailVars[i].min;
+            scale = 100.0 / ((double)(fDetailVars[i].max - fDetailVars[i].min));
+            value = scale * value - fDetailVars[i].min;
             values.push_back((int32_t)value);
         }
+
         fDetailGraph->AddData(values);
         fDetailGraph->SetVisible(true);
     }
@@ -390,8 +394,7 @@ void plProfileManagerFull::Update()
 
 void plProfileManagerFull::ActivateAllStats()
 {
-    for (int i = 0; i < fVars.size(); i++)
-    {
+    for (int i = 0; i < fVars.size(); i++) {
         fVars[i]->SetActive(true);
         fVars[i]->Start();
     }
@@ -401,15 +404,15 @@ void plProfileManagerFull::IPrintGroup(hsStream* s, const char* groupName, bool 
 {
     char buf[256];
 
-    for (int i = 0; i < fVars.size(); i++)
-    {
+    for (int i = 0; i < fVars.size(); i++) {
         plProfileVar* var = fVars[i];
-        if (strcmp(var->GetGroup(), groupName) == 0)
-        {
-            if (printTitle)
+
+        if (strcmp(var->GetGroup(), groupName) == 0) {
+            if (printTitle) {
                 sprintf(buf, "%s:%s", var->GetGroup(), var->GetName());
-            else
+            } else {
                 var->PrintAvg(buf, false);
+            }
 
             s->Write(strlen(buf), buf);
             s->WriteByte(',');
@@ -428,15 +431,14 @@ plFileName plProfileManagerFull::GetProfilePath()
 {
     static plFileName profilePath;
 
-    if (!profilePath.IsValid())
-    {
+    if (!profilePath.IsValid()) {
         plUnifiedTime curTime = plUnifiedTime::GetCurrent(plUnifiedTime::kLocal);
 
         profilePath = plFileName::Join(plFileSystem::GetUserDataPath(), "Profile",
-            plString::Format("%02d-%02d-%04d_%02d-%02d",
-                             curTime.GetMonth(), curTime.GetDay(),
-                             curTime.GetYear(), curTime.GetHour(),
-                             curTime.GetMinute()));
+                                       plString::Format("%02d-%02d-%04d_%02d-%02d",
+                                               curTime.GetMonth(), curTime.GetDay(),
+                                               curTime.GetYear(), curTime.GetHour(),
+                                               curTime.GetMinute()));
 
         plFileSystem::CreateDir(profilePath, true);
     }
@@ -451,24 +453,23 @@ void plProfileManagerFull::ILogStats()
     bool exists = plFileInfo(statFilename).Exists();
 
     hsUNIXStream s;
-    if (s.Open(statFilename, "ab"))
-    {
+
+    if (s.Open(statFilename, "ab")) {
         GroupSet groups;
         GetGroups(groups);
 
         GroupSet::iterator it;
 
-        if (!exists)
-        {
+        if (!exists) {
             static const char kSpawn[] = "Spawn";
             s.Write(strlen(kSpawn), kSpawn);
             s.WriteByte(',');
 
-            for (it = groups.begin(); it != groups.end(); it++)
-            {
+            for (it = groups.begin(); it != groups.end(); it++) {
                 plString groupName = *it;
                 IPrintGroup(&s, groupName.c_str(), true);
             }
+
             s.WriteByte('\r');
             s.WriteByte('\n');
         }
@@ -476,11 +477,11 @@ void plProfileManagerFull::ILogStats()
         s.Write(fLogSpawnName.GetSize(), fLogSpawnName.c_str());
         s.WriteByte(',');
 
-        for (it = groups.begin(); it != groups.end(); it++)
-        {
+        for (it = groups.begin(); it != groups.end(); it++) {
             plString groupName = *it;
             IPrintGroup(&s, groupName.c_str());
         }
+
         s.WriteByte('\r');
         s.WriteByte('\n');
 
@@ -498,53 +499,50 @@ void plProfileManagerFull::ShowLaps(const char* groupName, const char* varName)
     plProfileVar* var = nil;
 
 
-    if(fShowLaps)
+    if (fShowLaps) {
         fShowLaps->SetLapsActive(false);
+    }
 
-    for (int i = 0; i < fVars.size(); i++)
-    {
+    for (int i = 0; i < fVars.size(); i++) {
         int j = 0;
-        while(fVars[i]->GetName()[j++] == ' ') {}
-        if (stricmp(&(fVars[i]->GetName()[j-1]), varName) == 0 &&
-            stricmp(fVars[i]->GetGroup(), groupName) == 0)
-        {
+
+        while (fVars[i]->GetName()[j++] == ' ') {}
+
+        if (stricmp(&(fVars[i]->GetName()[j - 1]), varName) == 0 &&
+                stricmp(fVars[i]->GetGroup(), groupName) == 0) {
             var = fVars[i];
             break;
         }
     }
 
-    if (var)
-    {
-        if (var == fShowLaps)
-        {
-    
+    if (var) {
+        if (var == fShowLaps) {
+
             fShowLaps = nil;
-        }
-        else 
-        {
+        } else {
             fShowLaps = var;
         }
     }
-    if(fShowLaps)
+
+    if (fShowLaps) {
         fShowLaps->SetLapsActive(true);
+    }
 }
 
 void plProfileManagerFull::CreateGraph(const char* varName, uint32_t min, uint32_t max)
 {
     // If the graph is already created, destroy it
-    for (int i = 0; i < fGraphs.size(); i++)
-    {
-        if (strcmp(fGraphs[i]->GetTitle(), varName) == 0)
-        {
+    for (int i = 0; i < fGraphs.size(); i++) {
+        if (strcmp(fGraphs[i]->GetTitle(), varName) == 0) {
             plPlateManager::Instance().DestroyPlate(fGraphs[i]);
-            fGraphs.erase(fGraphs.begin()+i);
+            fGraphs.erase(fGraphs.begin() + i);
             return;
         }
     }
 
     plProfileVar* var = IFindTimer(varName);
-    if (var)
-    {
+
+    if (var) {
         plGraphPlate* graph = nil;
         plPlateManager::Instance().CreateGraphPlate(&graph);
         graph->SetSize(0.25, 0.25);
@@ -558,38 +556,40 @@ void plProfileManagerFull::CreateGraph(const char* varName, uint32_t min, uint32
 void plProfileManagerFull::ResetDefaultDetailVars()
 {
     fDetailVars.clear();
-    AddDetailVar("ApplyAnimation",0,50);
-    AddDetailVar("AnimatingPhysicals",0,50);
-    AddDetailVar("StoppedAnimPhysicals",0,50);
-    AddDetailVar("DrawableTime",0,50);
-    AddDetailVar("Polys",0,150000);
-    AddDetailVar("Step",0,50);
-    AddDetailVar("LineOfSight",0,50);
-    AddDetailVar("  PhysicsUpdates",0,50);
-    AddDetailVar("Stream Shove Time",0,50);
-    AddDetailVar("RenderSetup",0,50);
+    AddDetailVar("ApplyAnimation", 0, 50);
+    AddDetailVar("AnimatingPhysicals", 0, 50);
+    AddDetailVar("StoppedAnimPhysicals", 0, 50);
+    AddDetailVar("DrawableTime", 0, 50);
+    AddDetailVar("Polys", 0, 150000);
+    AddDetailVar("Step", 0, 50);
+    AddDetailVar("LineOfSight", 0, 50);
+    AddDetailVar("  PhysicsUpdates", 0, 50);
+    AddDetailVar("Stream Shove Time", 0, 50);
+    AddDetailVar("RenderSetup", 0, 50);
 }
 
 void plProfileManagerFull::ShowDetailGraph()
 {
     // if graph is already created, kill it
-    if (fDetailGraph)
+    if (fDetailGraph) {
         HideDetailGraph();
-    if (fDetailVars.size() == 0)
+    }
+
+    if (fDetailVars.size() == 0) {
         ResetDefaultDetailVars();
-    
+    }
+
     plPlateManager::Instance().CreateGraphPlate(&fDetailGraph);
-    fDetailGraph->SetSize(0.9,0.9);
-    fDetailGraph->SetDataRange(0,500,500);
-    fDetailGraph->SetDataLabels(0,100); // should be relatively simple to cast everything to a 0-100 range
+    fDetailGraph->SetSize(0.9, 0.9);
+    fDetailGraph->SetDataRange(0, 500, 500);
+    fDetailGraph->SetDataLabels(0, 100); // should be relatively simple to cast everything to a 0-100 range
     fDetailGraph->SetTitle("Detail");
     UpdateDetailLabels();
 }
 
 void plProfileManagerFull::HideDetailGraph()
 {
-    if (fDetailGraph)
-    {
+    if (fDetailGraph) {
         plPlateManager::Instance().DestroyPlate(fDetailGraph);
         fDetailGraph = nil;
     }
@@ -597,20 +597,26 @@ void plProfileManagerFull::HideDetailGraph()
 
 void plProfileManagerFull::AddDetailVar(const char* varName, uint32_t min, uint32_t max)
 {
-    int i=0;
-    for (i=0; i<fDetailVars.size(); i++)
-    {
-        if (stricmp(fDetailVars[i].var->GetName(), varName) == 0)
-            return; // don't add it again
+    int i = 0;
+
+    for (i = 0; i < fDetailVars.size(); i++) {
+        if (stricmp(fDetailVars[i].var->GetName(), varName) == 0) {
+            return;    // don't add it again
+        }
     }
 
     plProfileVar* var = IFindTimer(varName);
-    if (!var)
+
+    if (!var) {
         return;
+    }
+
     var->SetActive(true);
 
-    if (fDetailVars.size() == 10)
-        fDetailVars.erase(fDetailVars.begin()); // we don't want any more then 10 at this point, so drop the oldest one
+    if (fDetailVars.size() == 10) {
+        fDetailVars.erase(fDetailVars.begin());    // we don't want any more then 10 at this point, so drop the oldest one
+    }
+
     detailVar temp;
     temp.var = var;
     temp.min = min;
@@ -621,25 +627,26 @@ void plProfileManagerFull::AddDetailVar(const char* varName, uint32_t min, uint3
 
 void plProfileManagerFull::RemoveDetailVar(const char* varName)
 {
-    int i=0;
-    for (i=0; i<fDetailVars.size(); i++)
-    {
-        if (stricmp(fDetailVars[i].var->GetName(), varName) == 0)
-        {
-            fDetailVars.erase(fDetailVars.begin()+i);
+    int i = 0;
+
+    for (i = 0; i < fDetailVars.size(); i++) {
+        if (stricmp(fDetailVars[i].var->GetName(), varName) == 0) {
+            fDetailVars.erase(fDetailVars.begin() + i);
         }
     }
+
     UpdateDetailLabels();
 }
 
 void plProfileManagerFull::UpdateDetailLabels()
 {
-    if (fDetailGraph)
-    {
+    if (fDetailGraph) {
         int i;
         std::vector<std::string> labels;
-        for (i=0; i<fDetailVars.size(); i++)
+
+        for (i = 0; i < fDetailVars.size(); i++) {
             labels.push_back(fDetailVars[i].var->GetName());
+        }
 
         fDetailGraph->SetLabelText(labels);
 
@@ -662,16 +669,15 @@ void plProfileManagerFull::UpdateDetailLabels()
 
 void plProfileManagerFull::ResetMax()
 {
-    for (int i = 0; i < fVars.size(); i++)
+    for (int i = 0; i < fVars.size(); i++) {
         fVars[i]->ResetMax();
+    }
 }
 
 void plProfileManagerFull::ISetActive(const char* groupName, bool active)
 {
-    for (int i = 0; i < fVars.size(); i++)
-    {
-        if (stricmp(fVars[i]->GetGroup(), groupName) == 0)
-        {
+    for (int i = 0; i < fVars.size(); i++) {
+        if (stricmp(fVars[i]->GetGroup(), groupName) == 0) {
             fVars[i]->SetActive(active);
         }
     }

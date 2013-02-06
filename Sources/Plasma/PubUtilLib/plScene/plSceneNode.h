@@ -64,8 +64,7 @@ class plDrawableCriteria;
 class plVolumeIsect;
 class plVisMgr;
 
-class plSceneNode : public hsKeyedObject
-{
+class plSceneNode : public hsKeyedObject {
 public:
     enum {
         kMaxSceneDepth                  = 4
@@ -77,7 +76,7 @@ protected:
     int16_t                               fDepth;
 
     hsTArray<plSceneObject*>            fSceneObjects;
-    
+
     hsTArray<plDrawable*>               fDrawPool;
     hsTArray<plPhysical*>               fSimulationPool;
     hsTArray<plAudible*>                fAudioPool;
@@ -114,14 +113,14 @@ protected:
     bool IOnAdd(plNodeRefMsg* refMsg);
 
     // Export only: Clean up empty drawables
-    void    ICleanUp( void );
+    void    ICleanUp(void);
 
 public:
     plSceneNode();
     virtual ~plSceneNode();
 
-    CLASSNAME_REGISTER( plSceneNode );
-    GETINTERFACE_ANY( plSceneNode, hsKeyedObject );
+    CLASSNAME_REGISTER(plSceneNode);
+    GETINTERFACE_ANY(plSceneNode, hsKeyedObject);
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);
@@ -133,23 +132,33 @@ public:
 
     virtual bool MsgReceive(plMessage* msg);
 
-    int16_t GetDepth() { return fDepth; }
-    int16_t IncDepth() { return ++fDepth; }
-    int16_t DecDepth() { return --fDepth; }
+    int16_t GetDepth() {
+        return fDepth;
+    }
+    int16_t IncDepth() {
+        return ++fDepth;
+    }
+    int16_t DecDepth() {
+        return --fDepth;
+    }
 
-    void    Init( void );
+    void    Init(void);
 
     plSpaceTree*    GetSpaceTree();
 
     // Export only: Query for a given drawable
-    virtual plDrawable  *GetMatchingDrawable( const plDrawableCriteria& crit );
+    virtual plDrawable*  GetMatchingDrawable(const plDrawableCriteria& crit);
 
     // Export only: Optimize all my stinkin' drawables
-    virtual void    OptimizeDrawables( void );
+    virtual void    OptimizeDrawables(void);
 
-    void SetFilterGenericsOnly(bool b) { fFilterGenerics = b; }
+    void SetFilterGenericsOnly(bool b) {
+        fFilterGenerics = b;
+    }
 
-    const hsTArray<plDrawable*>& GetDrawPool() const { return fDrawPool; }
+    const hsTArray<plDrawable*>& GetDrawPool() const {
+        return fDrawPool;
+    }
 };
 
 #endif // plSceneNode_inc

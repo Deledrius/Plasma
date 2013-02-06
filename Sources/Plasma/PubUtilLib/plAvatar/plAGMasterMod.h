@@ -71,7 +71,7 @@ class plAGMasterSDLModifier;
 //
 ////////////////
 /** \class plAGMasterMod
-    A modifier which can apply animations to scene objects. 
+    A modifier which can apply animations to scene objects.
     Works together with a plAGModifier, which can apply animation to a
     single scene object. A master modifier hooks up to a family of
     ag modifiers to do its job.
@@ -84,8 +84,7 @@ class plAGMasterSDLModifier;
 
     \sa plAGAnim, plAGAnimInstance, plAGModifier
     */
-class plAGMasterMod : public plModifier
-{
+class plAGMasterMod : public plModifier {
     friend class plAGMasterSDLModifier;
 public:
     /** Default constructor. Primarily for use by the class factory. */
@@ -94,7 +93,7 @@ public:
     virtual ~plAGMasterMod();
 
     /** Find an individual plAGModifier of the given name under our control. */
-    plAGModifier * GetChannelMod(const plString & name, bool dontCache = false) const;
+    plAGModifier* GetChannelMod(const plString& name, bool dontCache = false) const;
 
     /** \name Managing Animations */
     // \{
@@ -102,53 +101,53 @@ public:
     /** Attach the given animation object with the given blend factor.
         If there's no animation already attached to blend with, the
         animation will be attached at full strength. */
-    plAGAnimInstance *AttachAnimationBlended(plAGAnim *anim, float blendFactor = 0,
-                                             uint16_t blendPriority = kAGMedBlendPriority,
-                                             bool cache = false);
+    plAGAnimInstance* AttachAnimationBlended(plAGAnim* anim, float blendFactor = 0,
+            uint16_t blendPriority = kAGMedBlendPriority,
+            bool cache = false);
 
     /** Look up the given animation by name and attach it
         with the given blend factor. */
-    plAGAnimInstance *AttachAnimationBlended(const plString &name, float blendFactor = 0,
-                                             uint16_t blendPriority = kAGMedBlendPriority,
-                                             bool cache = false);
+    plAGAnimInstance* AttachAnimationBlended(const plString& name, float blendFactor = 0,
+            uint16_t blendPriority = kAGMedBlendPriority,
+            bool cache = false);
 
-    /** Play a simple anim (one that doesn't affect root) once and auto detach. 
+    /** Play a simple anim (one that doesn't affect root) once and auto detach.
         Intended for Zandi's facial animations that run seperate from the behaviors. */
-    void PlaySimpleAnim(const plString &name);
-                                             
+    void PlaySimpleAnim(const plString& name);
+
     /** Detach the given animation instance. Does nothing
         if the instance is not managed by this master mod. */
-    void DetachAnimation(plAGAnimInstance *instance);
+    void DetachAnimation(plAGAnimInstance* instance);
     void DetachAllAnimations();
 
     /** Detach the given animation by name. Searches for
         any instances derived from animations with the
         given name and removes them. */
-    void DetachAnimation(const plString &name);
+    void DetachAnimation(const plString& name);
     // \}
 
     /** Print the current animation stack to the console.
         Will list all the animations and their blend strengths.
         Animations later in the list will mask animations earlier
         in the list. */
-    void DumpCurrentAnims(const char *header);
+    void DumpCurrentAnims(const char* header);
 
     /** Find and return any animation instances with the
         given name on this master modifer. */
-    plAGAnimInstance *FindAnimInstance(const plString &name);
+    plAGAnimInstance* FindAnimInstance(const plString& name);
 
     /** Return the Ith animation instance, based on blend
         order. Of dubious utility, but, y'know. */
-    plAGAnimInstance *GetAnimInstance(int i);
+    plAGAnimInstance* GetAnimInstance(int i);
 
     /** Attach the animation if it's not already attached. If
         it is attached, return the instance.
-        Note that if it's attached by this function, it 
+        Note that if it's attached by this function, it
         will be on top of the stack, but if it was already
         attached, it could be anywhere, including buried under
         a bunch of other animations. If it's important that it be
         on top of the stack, you may need to detach it first. */
-    plAGAnimInstance *FindOrAttachInstance(const plString &name, float blendFactor);
+    plAGAnimInstance* FindOrAttachInstance(const plString& name, float blendFactor);
 
     /** Return the number of animations available. */
     int GetNumAnimations();
@@ -159,7 +158,7 @@ public:
     int GetNumPrivateAnimations();
 
     int GetNumATCAnimations();
-    plAGAnimInstance *GetATCAnimInstance(int i);
+    plAGAnimInstance* GetATCAnimInstance(int i);
 
     /** Apply all our animations to all our parts.
         \param timeNow is the current world time
@@ -181,12 +180,12 @@ public:
     /** We've done something that invalidates the cached connectivity in the graph.
         Mark this for fixup. */
     void SetNeedCompile(bool needCompile);
-    
+
     /** List the animationg graph to stdOut, with a ASCII representation of the tree
         structure. Done by recursively dumping the graph; some types of nodes will have
         more output information than others.
         */
-    void DumpAniGraph(const char *channel, bool optimized, double time);
+    void DumpAniGraph(const char* channel, bool optimized, double time);
 
     /** Set whether or not this is the "group master" so grouped animations will only have
         one member getting/setting sdl animation state in order to synch the anims
@@ -195,33 +194,37 @@ public:
     void SetIsGroupMaster(bool master, plMsgForwarder* msgForwarder);
 
     // PLASMA PROTOCOL
-    virtual int GetNumTargets() const { return fTarget ? 1 : 0; }
-    virtual plSceneObject* GetTarget(int w) const { /* hsAssert(w < GetNumTargets(), "Bad target"); */ return fTarget; }
-    virtual void AddTarget(plSceneObject * object);
-    virtual void RemoveTarget(plSceneObject * object);
+    virtual int GetNumTargets() const {
+        return fTarget ? 1 : 0;
+    }
+    virtual plSceneObject* GetTarget(int w) const {
+        /* hsAssert(w < GetNumTargets(), "Bad target"); */ return fTarget;
+    }
+    virtual void AddTarget(plSceneObject* object);
+    virtual void RemoveTarget(plSceneObject* object);
 
     bool MsgReceive(plMessage* msg);
 
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
-    virtual void Read(hsStream * stream, hsResMgr *mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
 
     bool HasRunningAnims();
-    bool DirtySynchState(const char* SDLStateName, uint32_t synchFlags);    
-    
-    CLASSNAME_REGISTER( plAGMasterMod );
-    GETINTERFACE_ANY( plAGMasterMod, plModifier );
+    bool DirtySynchState(const char* SDLStateName, uint32_t synchFlags);
+
+    CLASSNAME_REGISTER(plAGMasterMod);
+    GETINTERFACE_ANY(plAGMasterMod, plModifier);
 
 protected:
     // -- methods --
-    plAGModifier * ICacheChannelMod(plAGModifier *mod) const;
-    plAGModifier * IFindChannelMod(const plSceneObject *obj, const plString &name) const;
+    plAGModifier* ICacheChannelMod(plAGModifier* mod) const;
+    plAGModifier* IFindChannelMod(const plSceneObject* obj, const plString& name) const;
 
     virtual bool IEval(double secs, float del, uint32_t dirty);
-    
+
     virtual void IApplyDynamic() {};    // dummy function required by base class
 
     // Find markers in an anim for environment effects (footsteps)
-    virtual void ISetupMarkerCallbacks(plATCAnim *anim, plAnimTimeConvert *atc) {}
+    virtual void ISetupMarkerCallbacks(plATCAnim* anim, plAnimTimeConvert* atc) {}
 
     // -- members
     plSceneObject*  fTarget;
@@ -240,20 +243,20 @@ protected:
 
     // animations that require AnimTimeConvert state to be synched
     plInstanceVector fATCAnimInstances;
-    
+
     bool fFirstEval;
     bool fNeedEval;
     void IRegForEval(bool val);
 
     // SDL modifier which sends/recvs dynamics state
-    plAGMasterSDLModifier *fAGMasterSDLMod; 
+    plAGMasterSDLModifier* fAGMasterSDLMod;
 
     bool fNeedCompile;
 
     bool fIsGrouped;
     bool fIsGroupMaster;
     plMsgForwarder* fMsgForwarder;
-    
+
     enum {
         kPrivateAnim,
         kPublicAnim,

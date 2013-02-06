@@ -67,25 +67,43 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Externs //////////////////////////////////////////////////////////////////
 
-extern TCHAR *GetString( int id );
+extern TCHAR* GetString(int id);
 extern HINSTANCE hInstance;
 
 //// ClassDesc Definition /////////////////////////////////////////////////////
 
-class plDynamicEnvLayerClassDesc : public ClassDesc2
-{
+class plDynamicEnvLayerClassDesc : public ClassDesc2 {
 public:
-    int             IsPublic()      { return TRUE; }
-    void*           Create(BOOL loading = FALSE) { return new plDynamicEnvLayer(); }
-    const TCHAR*    ClassName()     { return GetString(IDS_DYNAMIC_ENVMAP_LAYER); }
-    SClass_ID       SuperClassID()  { return TEXMAP_CLASS_ID; }
-    Class_ID        ClassID()       { return DYNAMIC_ENV_LAYER_CLASS_ID; }
-    const TCHAR*    Category()      { return TEXMAP_CAT_ENV; }
-    const TCHAR*    InternalName()  { return _T("PlasmaDynamicEnvMapLayer"); }
-    HINSTANCE       HInstance()     { return hInstance; }
+    int             IsPublic()      {
+        return TRUE;
+    }
+    void*           Create(BOOL loading = FALSE) {
+        return new plDynamicEnvLayer();
+    }
+    const TCHAR*    ClassName()     {
+        return GetString(IDS_DYNAMIC_ENVMAP_LAYER);
+    }
+    SClass_ID       SuperClassID()  {
+        return TEXMAP_CLASS_ID;
+    }
+    Class_ID        ClassID()       {
+        return DYNAMIC_ENV_LAYER_CLASS_ID;
+    }
+    const TCHAR*    Category()      {
+        return TEXMAP_CAT_ENV;
+    }
+    const TCHAR*    InternalName()  {
+        return _T("PlasmaDynamicEnvMapLayer");
+    }
+    HINSTANCE       HInstance()     {
+        return hInstance;
+    }
 };
 static plDynamicEnvLayerClassDesc plDynamicEnvLayerDesc;
-ClassDesc2* GetDynamicEnvLayerDesc() { return &plDynamicEnvLayerDesc; }
+ClassDesc2* GetDynamicEnvLayerDesc()
+{
+    return &plDynamicEnvLayerDesc;
+}
 
 #include "plDynamicEnvLayerBitmapPB.cpp"
 
@@ -99,7 +117,7 @@ plDynamicEnvLayer::plDynamicEnvLayer() :
     fIValid(NEVER)
 {
     plDynamicEnvLayerDesc.MakeAutoParamBlocks(this);
-    ReplaceReference(kRefUVGen, GetNewDefaultUVGen());  
+    ReplaceReference(kRefUVGen, GetNewDefaultUVGen());
 }
 
 plDynamicEnvLayer::~plDynamicEnvLayer()
@@ -107,14 +125,14 @@ plDynamicEnvLayer::~plDynamicEnvLayer()
     IDiscardTexHandle();
 }
 
-void    plDynamicEnvLayer::GetClassName( TSTR& s ) 
+void    plDynamicEnvLayer::GetClassName(TSTR& s)
 {
-    s = GetString( IDS_DYNAMIC_ENVMAP_LAYER ); 
+    s = GetString(IDS_DYNAMIC_ENVMAP_LAYER);
 }
 
 //// Reset ////////////////////////////////////////////////////////////////////
 
-void plDynamicEnvLayer::Reset() 
+void plDynamicEnvLayer::Reset()
 {
     GetDynamicEnvLayerDesc()->Reset(this, TRUE);    // reset all pb2's
     NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE);
@@ -124,13 +142,12 @@ void plDynamicEnvLayer::Reset()
 
 //// Update ///////////////////////////////////////////////////////////////////
 
-void plDynamicEnvLayer::Update(TimeValue t, Interval& valid) 
+void plDynamicEnvLayer::Update(TimeValue t, Interval& valid)
 {
-    if (!fIValid.InInterval(t))
-    {
+    if (!fIValid.InInterval(t)) {
         fIValid.SetInfinite();
 
-        fUVGen->Update(t,fIValid);
+        fUVGen->Update(t, fIValid);
         fBitmapPB->GetValidity(t, fIValid);
     }
 
@@ -153,18 +170,18 @@ Interval plDynamicEnvLayer::Validity(TimeValue t)
 
 //// CreateParamDlg ///////////////////////////////////////////////////////////
 
-ParamDlg* plDynamicEnvLayer::CreateParamDlg(HWND hwMtlEdit, IMtlParams *imp) 
+ParamDlg* plDynamicEnvLayer::CreateParamDlg(HWND hwMtlEdit, IMtlParams* imp)
 {
     fIMtlParams = imp;
     IAutoMParamDlg* masterDlg = plDynamicEnvLayerDesc.CreateParamDlgs(hwMtlEdit, imp, this);
 
-    return masterDlg;   
+    return masterDlg;
 }
 
 //// SetDlgThing //////////////////////////////////////////////////////////////
 
 BOOL plDynamicEnvLayer::SetDlgThing(ParamDlg* dlg)
-{   
+{
     return FALSE;
 }
 
@@ -175,30 +192,37 @@ int plDynamicEnvLayer::NumRefs()
     return 2;
 }
 
-RefTargetHandle plDynamicEnvLayer::GetReference( int i ) 
+RefTargetHandle plDynamicEnvLayer::GetReference(int i)
 {
-    switch( i )
-    {
-        case kRefUVGen:     return fUVGen;
-        case kRefBitmap:    return fBitmapPB;
-        default: return NULL;
+    switch (i) {
+    case kRefUVGen:
+        return fUVGen;
+
+    case kRefBitmap:
+        return fBitmapPB;
+
+    default:
+        return NULL;
     }
 }
 
-void    plDynamicEnvLayer::SetReference( int i, RefTargetHandle rtarg ) 
+void    plDynamicEnvLayer::SetReference(int i, RefTargetHandle rtarg)
 {
     Interval    garbage;
 
-    switch( i )
-    {
-        case kRefUVGen:  
-            fUVGen = (UVGen *)rtarg; 
-            if( fUVGen )
-                fUVGen->Update( TimeValue( 0 ), garbage );
-            break;
-        case kRefBitmap:
-            fBitmapPB = (IParamBlock2 *)rtarg;
-            break;
+    switch (i) {
+    case kRefUVGen:
+        fUVGen = (UVGen*)rtarg;
+
+        if (fUVGen) {
+            fUVGen->Update(TimeValue(0), garbage);
+        }
+
+        break;
+
+    case kRefBitmap:
+        fBitmapPB = (IParamBlock2*)rtarg;
+        break;
     }
 }
 
@@ -209,28 +233,31 @@ int plDynamicEnvLayer::NumParamBlocks()
     return 1;
 }
 
-IParamBlock2    *plDynamicEnvLayer::GetParamBlock( int i )
+IParamBlock2*    plDynamicEnvLayer::GetParamBlock(int i)
 {
-    switch( i )
-    {
-        case 0: return fBitmapPB;
-        default: return NULL;
+    switch (i) {
+    case 0:
+        return fBitmapPB;
+
+    default:
+        return NULL;
     }
 }
 
-IParamBlock2    *plDynamicEnvLayer::GetParamBlockByID( BlockID id )
+IParamBlock2*    plDynamicEnvLayer::GetParamBlockByID(BlockID id)
 {
-    if( fBitmapPB->ID() == id )
+    if (fBitmapPB->ID() == id) {
         return fBitmapPB;
-    else
+    } else {
         return NULL;
+    }
 }
 
 //// Clone ////////////////////////////////////////////////////////////////////
 
-RefTargetHandle plDynamicEnvLayer::Clone( RemapDir &remap ) 
+RefTargetHandle plDynamicEnvLayer::Clone(RemapDir& remap)
 {
-    plDynamicEnvLayer *mnew = new plDynamicEnvLayer();
+    plDynamicEnvLayer* mnew = new plDynamicEnvLayer();
     *((MtlBase*)mnew) = *((MtlBase*)this); // copy superclass stuff
     mnew->ReplaceReference(kRefBitmap, remap.CloneRef(fBitmapPB));
     mnew->ReplaceReference(kRefUVGen, remap.CloneRef(fUVGen));
@@ -245,37 +272,38 @@ int plDynamicEnvLayer::NumSubs()
     return 1;
 }
 
-Animatable  *plDynamicEnvLayer::SubAnim( int i ) 
+Animatable*  plDynamicEnvLayer::SubAnim(int i)
 {
-    switch( i )
-    {
-        case kRefBitmap:    return fBitmapPB;
-        default: return NULL;
+    switch (i) {
+    case kRefBitmap:
+        return fBitmapPB;
+
+    default:
+        return NULL;
     }
 }
 
-TSTR    plDynamicEnvLayer::SubAnimName( int i ) 
+TSTR    plDynamicEnvLayer::SubAnimName(int i)
 {
-    switch( i )
-    {
-        case kRefBitmap:    return fBitmapPB->GetLocalName();
-        default: return "";
+    switch (i) {
+    case kRefBitmap:
+        return fBitmapPB->GetLocalName();
+
+    default:
+        return "";
     }
 }
 
 //// NotifyRefChanged /////////////////////////////////////////////////////////
 
-RefResult   plDynamicEnvLayer::NotifyRefChanged( Interval changeInt, RefTargetHandle hTarget, 
-                                                   PartID& partID, RefMessage message ) 
+RefResult   plDynamicEnvLayer::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
+        PartID& partID, RefMessage message)
 {
-    switch (message)
-    {
-        case REFMSG_CHANGE:
-        {
+    switch (message) {
+    case REFMSG_CHANGE: {
             fIValid.SetEmpty();
 
-            if (hTarget == fBitmapPB)
-            {
+            if (hTarget == fBitmapPB) {
                 // see if this message came from a changing parameter in the pblock,
                 // if so, limit rollout update to the changing item and update any active viewport texture
                 ParamID changingParam = fBitmapPB->LastNotifyParamID();
@@ -284,9 +312,9 @@ RefResult   plDynamicEnvLayer::NotifyRefChanged( Interval changeInt, RefTargetHa
         }
         break;
 
-        case REFMSG_UV_SYM_CHANGE:
-            IDiscardTexHandle();  
-            break;
+    case REFMSG_UV_SYM_CHANGE:
+        IDiscardTexHandle();
+        break;
     }
 
     return REF_SUCCEED;
@@ -296,31 +324,36 @@ RefResult   plDynamicEnvLayer::NotifyRefChanged( Interval changeInt, RefTargetHa
 
 #define TEX_HDR_CHUNK 0x5000
 
-IOResult plDynamicEnvLayer::Save(ISave *isave) 
+IOResult plDynamicEnvLayer::Save(ISave* isave)
 {
     IOResult res;
 
     isave->BeginChunk(TEX_HDR_CHUNK);
     res = MtlBase::Save(isave);
-    if (res != IO_OK)
+
+    if (res != IO_OK) {
         return res;
+    }
+
     isave->EndChunk();
 
     return IO_OK;
-}   
+}
 
-IOResult plDynamicEnvLayer::Load(ILoad *iload) 
+IOResult plDynamicEnvLayer::Load(ILoad* iload)
 {
     IOResult res;
-    while (IO_OK == (res = iload->OpenChunk()))
-    {
-        if (iload->CurChunkID() == TEX_HDR_CHUNK)
-        {
+
+    while (IO_OK == (res = iload->OpenChunk())) {
+        if (iload->CurChunkID() == TEX_HDR_CHUNK) {
             res = MtlBase::Load(iload);
         }
+
         iload->CloseChunk();
-        if (res != IO_OK) 
+
+        if (res != IO_OK) {
             return res;
+        }
     }
 
     return IO_OK;
@@ -328,26 +361,30 @@ IOResult plDynamicEnvLayer::Load(ILoad *iload)
 
 //// EvalColor ////////////////////////////////////////////////////////////////
 
-inline Point2 CompUV(float x, float y, float z) 
+inline Point2 CompUV(float x, float y, float z)
 {
-    return Point2( 0.5f * ( x / z + 1.0f ), 0.5f * ( y / z + 1.0f ) );
+    return Point2(0.5f * (x / z + 1.0f), 0.5f * (y / z + 1.0f));
 }
 
 AColor plDynamicEnvLayer::EvalColor(ShadeContext& sc)
 {
-    if (!sc.doMaps) 
+    if (!sc.doMaps) {
         return AColor(0.0f, 0.0f, 0.0f, 1.0f);
+    }
 
     AColor color;
-    if (sc.GetCache(this, color)) 
-        return color;
 
-    if (gbufID) 
+    if (sc.GetCache(this, color)) {
+        return color;
+    }
+
+    if (gbufID) {
         sc.SetGBufferID(gbufID);
+    }
 
     color.White();
 
-    sc.PutCache(this, color); 
+    sc.PutCache(this, color);
     return color;
 }
 
@@ -367,10 +404,9 @@ ULONG plDynamicEnvLayer::LocalRequirements(int subMtlNum)
     return MTLREQ_VIEW_DEP;
 }
 
-void plDynamicEnvLayer::IDiscardTexHandle() 
+void plDynamicEnvLayer::IDiscardTexHandle()
 {
-    if (fTexHandle)
-    {
+    if (fTexHandle) {
         fTexHandle->DeleteThis();
         fTexHandle = NULL;
     }
@@ -378,43 +414,46 @@ void plDynamicEnvLayer::IDiscardTexHandle()
 
 void plDynamicEnvLayer::ActivateTexDisplay(BOOL onoff)
 {
-    if (!onoff)
+    if (!onoff) {
         IDiscardTexHandle();
+    }
 }
 
-BITMAPINFO *plDynamicEnvLayer::GetVPDisplayDIB(TimeValue t, TexHandleMaker& thmaker, Interval &valid, BOOL mono, BOOL forceW, BOOL forceH)
+BITMAPINFO* plDynamicEnvLayer::GetVPDisplayDIB(TimeValue t, TexHandleMaker& thmaker, Interval& valid, BOOL mono, BOOL forceW, BOOL forceH)
 {
     return NULL;
 }
 
-DWORD plDynamicEnvLayer::GetActiveTexHandle(TimeValue t, TexHandleMaker& thmaker) 
+DWORD plDynamicEnvLayer::GetActiveTexHandle(TimeValue t, TexHandleMaker& thmaker)
 {
     // FIXME: ignore validity for now
-    if (fTexHandle && fIValid.InInterval(t))// && texTime == CalcFrame(t)) 
+    if (fTexHandle && fIValid.InInterval(t)) { // && texTime == CalcFrame(t))
         return fTexHandle->GetHandle();
-    else
-    {
+    } else {
         IDiscardTexHandle();
-        
+
         fTexTime = 0;//CalcFrame(t);
         fTexHandle = thmaker.MakeHandle(GetVPDisplayDIB(t, thmaker, fIValid));
-        if (fTexHandle)
+
+        if (fTexHandle) {
             return fTexHandle->GetHandle();
-        else
+        } else {
             return 0;
+        }
     }
 }
 
 //// MustBeUnique /////////////////////////////////////////////////////////////
-//  Fun stuff here. If our anchor is set to nil (i.e. "self"), then we must be 
-//  unique for each object we're applied to. However, that means the material 
+//  Fun stuff here. If our anchor is set to nil (i.e. "self"), then we must be
+//  unique for each object we're applied to. However, that means the material
 //  must *ALSO* be unique. Hence why this function is called by
 //  hsMaterialConverter::IMustBeUniqueMaterial().
 
-bool    plDynamicEnvLayer::MustBeUnique( void )
+bool    plDynamicEnvLayer::MustBeUnique(void)
 {
-    if( fBitmapPB->GetINode( kBmpAnchorNode ) == nil )
+    if (fBitmapPB->GetINode(kBmpAnchorNode) == nil) {
         return true;
+    }
 
     return false;
 }

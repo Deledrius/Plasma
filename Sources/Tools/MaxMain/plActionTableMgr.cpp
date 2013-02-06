@@ -78,50 +78,45 @@ void plActionTableMgr::AddActionTable(ActionTableInfo& actionTable, ActionCallba
     fActionTables.push_back(&actionTable);
 }
 
-CoreExport void *__cdecl MAX_new(size_t size);
+CoreExport void* __cdecl MAX_new(size_t size);
 CoreExport void __cdecl MAX_delete(void* mem);
 
-class plActionTable : public ActionTable
-{
+class plActionTable : public ActionTable {
 public:
     plActionTable(ActionTableId id, ActionContextId contextId, TSTR& name, HACCEL hDefaults, int numIds, ActionDescription* pOps, HINSTANCE hInst)
         : ActionTable(id, contextId, name, hDefaults, numIds, pOps, hInst) {}
     plActionTable(ActionTableId id, ActionContextId contextId, TSTR& name)
         : ActionTable(id, contextId, name) {}
 
-    void *operator new (size_t)
-    {
+    void* operator new(size_t) {
         return MAX_new(sizeof(plActionTable));
     }
-    void operator delete (void * mem)
-    {
+    void operator delete(void* mem) {
         MAX_delete(mem);
     }
 };
 
 ActionTable* plActionTableMgr::GetActionTable(int i)
 {
-    if(i > this->NumActionTables())
-    {
+    if (i > this->NumActionTables()) {
         return NULL;
     }
 
     ActionTableInfo* pTableInfo = fActionTables[i];
 
-    if(pTableInfo->Created)
-    {
+    if (pTableInfo->Created) {
         return GetCOREInterface()->GetActionManager()->FindTable(pTableInfo->TableId);
     }
 
 
-    ActionTable *pTab = new plActionTable(
-        pTableInfo->TableId, 
-        pTableInfo->ContextId, 
-        pTableInfo->Name, NULL, 
-        pTableInfo->Actions.size(), 
-        &pTableInfo->Actions[0], 
+    ActionTable* pTab = new plActionTable(
+        pTableInfo->TableId,
+        pTableInfo->ContextId,
+        pTableInfo->Name, NULL,
+        pTableInfo->Actions.size(),
+        &pTableInfo->Actions[0],
         hInstance
-        );
+    );
 
     // register the action table with the system before we hand it off
     GetCOREInterface()->GetActionManager()->RegisterActionContext(pTableInfo->ContextId, pTableInfo->Name);
@@ -132,7 +127,7 @@ ActionTable* plActionTableMgr::GetActionTable(int i)
 }
 
 
-void plActionTableMgr::SysStartup(void *param, NotifyInfo *info) 
+void plActionTableMgr::SysStartup(void* param, NotifyInfo* info)
 {
     plActionTableMgr* pActionTableMgr = (plActionTableMgr*)param;
 
@@ -140,8 +135,7 @@ void plActionTableMgr::SysStartup(void *param, NotifyInfo *info)
 
     IActionManager* pActionMgr = GetCOREInterface()->GetActionManager();
 
-    for(int i = 0; i < pActionTableMgr->NumActionTables(); i++)
-    {
+    for (int i = 0; i < pActionTableMgr->NumActionTables(); i++) {
         ActionTableInfo* pTableInfo = pActionTableMgr->fActionTables[i];
 
         pActionMgr->ActivateActionTable(pTableInfo->ActionCB, pTableInfo->TableId);
@@ -149,14 +143,13 @@ void plActionTableMgr::SysStartup(void *param, NotifyInfo *info)
 }
 
 
-void plActionTableMgr::SysShutdown(void *param, NotifyInfo *info) 
+void plActionTableMgr::SysShutdown(void* param, NotifyInfo* info)
 {
     plActionTableMgr* pActionTableMgr = (plActionTableMgr*)param;
 
     IActionManager* pActionMgr = GetCOREInterface()->GetActionManager();
 
-    for(int i = 0; i < pActionTableMgr->NumActionTables(); i++)
-    {
+    for (int i = 0; i < pActionTableMgr->NumActionTables(); i++) {
         ActionTableInfo* pTableInfo = pActionTableMgr->fActionTables[i];
 
         pActionMgr->DeactivateActionTable(pTableInfo->ActionCB, pTableInfo->TableId);

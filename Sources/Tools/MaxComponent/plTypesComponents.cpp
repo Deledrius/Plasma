@@ -82,14 +82,15 @@ void DummyCodeIncludeFuncTypes()
 //
 
 //Class that accesses the paramblock below.
-class plStartingPointComponent : public plComponent
-{
+class plStartingPointComponent : public plComponent {
 public:
     plStartingPointComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
     bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
-    bool PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
     //bool IsValidNodeType(plMaxNode *pNode);
 };
 
@@ -115,14 +116,14 @@ bool plStartingPointComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErr
     node->SetForceLocal(true);
     return true;
 }
-bool plStartingPointComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plStartingPointComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plSpawnModifier* pSpawn = new plSpawnModifier;
     node->AddModifier(pSpawn, IGetUniqueName(node));
     return true;
 }
 
-bool plStartingPointComponent::PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plStartingPointComponent::PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     return true;
 }
@@ -133,8 +134,7 @@ bool plStartingPointComponent::PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg)
 
 class plVehicleModifier;
 
-class plVehicleComponent : public plComponent
-{
+class plVehicleComponent : public plComponent {
 protected:
     plVehicleModifier* fMod;
 
@@ -144,14 +144,13 @@ public:
     plVehicleComponent();
 
     bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
-    bool PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 CLASS_DESC(plVehicleComponent, gVehicleDesc, "(ex)Vehicle", "Vehicle", COMP_TYPE_MISC, Class_ID(0x75903e2, 0x50ac210b))
 
-enum
-{
+enum {
     kVehicleChassis,
     kVehicleWheelFR,
     kVehicleWheelFL,
@@ -164,35 +163,30 @@ enum
     kVehicleDriveDet,
 };
 
-class plVehicleComponentProc : public ParamMap2UserDlgProc
-{
+class plVehicleComponentProc : public ParamMap2UserDlgProc {
 protected:
-    void IUpdateButtonText(HWND hWnd, IParamBlock2 *pb)
-    {
-        INode *node = pb->GetINode(kVehicleDriveDet);
+    void IUpdateButtonText(HWND hWnd, IParamBlock2* pb) {
+        INode* node = pb->GetINode(kVehicleDriveDet);
         SetWindowText(GetDlgItem(hWnd, IDC_DRIVE), node ? node->GetName() : "(none)");
     }
 
 public:
-    BOOL DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (msg)
-        {
+    BOOL DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        switch (msg) {
         case WM_INITDIALOG:
             IUpdateButtonText(hWnd, pm->GetParamBlock());
             return TRUE;
 
         case WM_COMMAND:
-            if (HIWORD(wParam) == BN_CLICKED)
-            {
-                if (LOWORD(wParam) == IDC_DRIVE)
-                {
+            if (HIWORD(wParam) == BN_CLICKED) {
+                if (LOWORD(wParam) == IDC_DRIVE) {
                     // Adding an activator.  Set it and refresh the UI to show it in our list.
                     plPick::Activator(pm->GetParamBlock(), kVehicleDriveDet, true);
                     IUpdateButtonText(hWnd, pm->GetParamBlock());
                     return TRUE;
                 }
             }
+
             break;
         }
 
@@ -209,37 +203,37 @@ ParamBlockDesc2 gVehicleBlock
     IDD_COMP_VEHICLE, IDS_COMP_VEHICLE, 0, 0, &gVehicleComponentProc,
 
     kVehicleChassis,    _T("chassis"),      TYPE_INODE,     0, 0,
-        p_ui,           TYPE_PICKNODEBUTTON, IDC_CHASSIS,
-        end,
+    p_ui,           TYPE_PICKNODEBUTTON, IDC_CHASSIS,
+    end,
 
     kVehicleWheelFR,    _T("wheelFR"),  TYPE_INODE,     0, 0,
-        p_ui,           TYPE_PICKNODEBUTTON, IDC_FR_WHEEL,
-        end,
+    p_ui,           TYPE_PICKNODEBUTTON, IDC_FR_WHEEL,
+    end,
     kVehicleWheelFL,    _T("wheelFL"),  TYPE_INODE,     0, 0,
-        p_ui,           TYPE_PICKNODEBUTTON, IDC_FL_WHEEL,
-        end,
+    p_ui,           TYPE_PICKNODEBUTTON, IDC_FL_WHEEL,
+    end,
     kVehicleWheelRR,    _T("wheelRR"),  TYPE_INODE,     0, 0,
-        p_ui,           TYPE_PICKNODEBUTTON, IDC_RR_WHEEL,
-        end,
+    p_ui,           TYPE_PICKNODEBUTTON, IDC_RR_WHEEL,
+    end,
     kVehicleWheelRL,    _T("wheelRL"),  TYPE_INODE,     0, 0,
-        p_ui,           TYPE_PICKNODEBUTTON, IDC_RL_WHEEL,
-        end,
+    p_ui,           TYPE_PICKNODEBUTTON, IDC_RL_WHEEL,
+    end,
 
     kVehicleHardpointFR,    _T("hardpointFR"),  TYPE_INODE,     0, 0,
-        p_ui,           TYPE_PICKNODEBUTTON, IDC_FR_HARDPOINT,
-        end,
+    p_ui,           TYPE_PICKNODEBUTTON, IDC_FR_HARDPOINT,
+    end,
     kVehicleHardpointFL,    _T("hardpointFL"),  TYPE_INODE,     0, 0,
-        p_ui,           TYPE_PICKNODEBUTTON, IDC_FL_HARDPOINT,
-        end,
+    p_ui,           TYPE_PICKNODEBUTTON, IDC_FL_HARDPOINT,
+    end,
     kVehicleHardpointRR,    _T("hardpointRR"),  TYPE_INODE,     0, 0,
-        p_ui,           TYPE_PICKNODEBUTTON, IDC_RR_HARDPOINT,
-        end,
+    p_ui,           TYPE_PICKNODEBUTTON, IDC_RR_HARDPOINT,
+    end,
     kVehicleHardpointRL,    _T("hardpointRL"),  TYPE_INODE,     0, 0,
-        p_ui,           TYPE_PICKNODEBUTTON, IDC_RL_HARDPOINT,
-        end,
+    p_ui,           TYPE_PICKNODEBUTTON, IDC_RL_HARDPOINT,
+    end,
 
     kVehicleDriveDet,   _T("driveDet"), TYPE_INODE,     0, 0,
-        end,
+    end,
 
     end
 );
@@ -281,16 +275,16 @@ bool plVehicleComponent::IIsValid()
 {
     return
         (
-        fCompPB->GetINode(kVehicleChassis) &&
-        fCompPB->GetINode(kVehicleWheelFR) &&
-        fCompPB->GetINode(kVehicleWheelFL) &&
-        fCompPB->GetINode(kVehicleWheelRR) &&
-        fCompPB->GetINode(kVehicleWheelRL) &&
-        fCompPB->GetINode(kVehicleHardpointFR) &&
-        fCompPB->GetINode(kVehicleHardpointFL) &&
-        fCompPB->GetINode(kVehicleHardpointRR) &&
-        fCompPB->GetINode(kVehicleHardpointRL) &&
-        fCompPB->GetINode(kVehicleDriveDet)
+            fCompPB->GetINode(kVehicleChassis) &&
+            fCompPB->GetINode(kVehicleWheelFR) &&
+            fCompPB->GetINode(kVehicleWheelFL) &&
+            fCompPB->GetINode(kVehicleWheelRR) &&
+            fCompPB->GetINode(kVehicleWheelRL) &&
+            fCompPB->GetINode(kVehicleHardpointFR) &&
+            fCompPB->GetINode(kVehicleHardpointFL) &&
+            fCompPB->GetINode(kVehicleHardpointRR) &&
+            fCompPB->GetINode(kVehicleHardpointRL) &&
+            fCompPB->GetINode(kVehicleDriveDet)
         );
 }
 
@@ -298,8 +292,10 @@ bool plVehicleComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return false;
 #if 0
-    if (!IIsValid())
+
+    if (!IIsValid()) {
         return false;
+    }
 
     plMaxNode* chassis = (plMaxNode*)fCompPB->GetINode(kVehicleChassis);
     plMaxNode* wheelFR = (plMaxNode*)fCompPB->GetINode(kVehicleWheelFR);
@@ -329,20 +325,24 @@ bool plVehicleComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 #endif
 }
 
-bool plVehicleComponent::PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plVehicleComponent::PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     return false;
 #if 0
-    if (!IIsValid())
+
+    if (!IIsValid()) {
         return false;
+    }
 
     fMod = new plVehicleModifier;
     plKey modKey = pNode->AddModifier(fMod, IGetUniqueName(pNode));
 
     plMaxNode* detectorNode = (plMaxNode*)fCompPB->GetINode(kVehicleDriveDet);
     plComponentBase* comp = detectorNode ? detectorNode->ConvertToComponent() : nil;
-    if (comp)
+
+    if (comp) {
         comp->AddReceiverKey(modKey);
+    }
 
     return true;
 #endif
@@ -374,12 +374,14 @@ void GetSuspensionProps(plMaxNode* hardPoint, plMaxNode* wheel, hsPoint3& chassi
 
 #endif
 
-bool plVehicleComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plVehicleComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return false;
 #if 0
-    if (!IIsValid())
+
+    if (!IIsValid()) {
         return false;
+    }
 
     plMaxNode* chassis = (plMaxNode*)fCompPB->GetINode(kVehicleChassis);
     plMaxNode* wheelFR = (plMaxNode*)fCompPB->GetINode(kVehicleWheelFR);
@@ -409,7 +411,7 @@ bool plVehicleComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 
     return true;
 #endif
-}   
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //   Maintainers Marker Component
@@ -418,19 +420,19 @@ bool plVehicleComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 
 #include "plModifier/plMaintainersMarkerModifier.h"
 
-enum
-{
+enum {
     kCalibrated,
 };
 //Class that accesses the paramblock below.
-class plMaintainersMarkerComponent : public plComponent
-{
+class plMaintainersMarkerComponent : public plComponent {
 public:
     plMaintainersMarkerComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
     bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
-    bool PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 //Max desc stuff necessary.
@@ -439,14 +441,14 @@ CLASS_DESC(plMaintainersMarkerComponent, gMaintainersDesc, "Maintainers Marker",
 //The MAX paramblock stuff below
 ParamBlockDesc2 gMaintainersBk
 (
-    
+
     1, _T("maintainersMarker"), 0, &gMaintainersDesc, P_AUTO_CONSTRUCT  + P_AUTO_UI, plComponent::kRefComp,
     IDD_COMP_MAINTAINERS_MARKER, IDS_COMP_MAINTAINERS_MARKER, 0, 0, NULL,
 
     kCalibrated, _T("Calibrated"),      TYPE_INT,       0, 0,
-        p_ui, TYPE_RADIO, 3,    IDC_RADIO_BROKEN, IDC_RADIO_REPAIRED, IDC_RADIO_CALIBRATED,
-        p_vals, plMaintainersMarkerModifier::kBroken, plMaintainersMarkerModifier::kRepaired, plMaintainersMarkerModifier::kCalibrated,
-        end,
+    p_ui, TYPE_RADIO, 3,    IDC_RADIO_BROKEN, IDC_RADIO_REPAIRED, IDC_RADIO_CALIBRATED,
+    p_vals, plMaintainersMarkerModifier::kBroken, plMaintainersMarkerModifier::kRepaired, plMaintainersMarkerModifier::kCalibrated,
+    end,
     end
 );
 
@@ -461,7 +463,7 @@ bool plMaintainersMarkerComponent::SetupProperties(plMaxNode* node, plErrorMsg* 
     node->SetForceLocal(true);
     return true;
 }
-bool plMaintainersMarkerComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plMaintainersMarkerComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plMaintainersMarkerModifier* pSpawn = new plMaintainersMarkerModifier;
     pSpawn->SetCalibrated(fCompPB->GetInt(kCalibrated));
@@ -469,7 +471,7 @@ bool plMaintainersMarkerComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     return true;
 }
 
-bool plMaintainersMarkerComponent::PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plMaintainersMarkerComponent::PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     return true;
 }
@@ -486,8 +488,7 @@ bool plMaintainersMarkerComponent::PreConvert(plMaxNode *pNode, plErrorMsg *pErr
 #include "plResponderMtl.h"
 #include "plResponderGetComp.h"
 
-class plGameMarkerComponent : public plComponent
-{
+class plGameMarkerComponent : public plComponent {
 protected:
     plKey IGetMtlAnimKey(int paramID, plMaxNode* node);
     plKey IGetAnimKey(int nodeID, int compID);
@@ -495,14 +496,13 @@ protected:
 public:
     plGameMarkerComponent();
     bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
-    bool PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 CLASS_DESC(plGameMarkerComponent, gGameMarkerDesc, "Game Marker",  "GameMarker", COMP_TYPE_TYPE, Class_ID(0x4a15029a, 0x350f7258))
 
-enum
-{
+enum {
     kMarkerPhys,
     kMarkerMtl,
     kMarkerGreenAnim,
@@ -516,45 +516,50 @@ enum
     kMarkerSndHit,
 };
 
-class plGameMarkerComponentProc : public ParamMap2UserDlgProc
-{
+class plGameMarkerComponentProc : public ParamMap2UserDlgProc {
 protected:
-    void IComboChanged(HWND hWnd, IParamBlock2 *pb, int id)
-    {
+    void IComboChanged(HWND hWnd, IParamBlock2* pb, int id) {
         char buf[256];
         GetDlgItemText(hWnd, id, buf, sizeof(buf));
         int paramID = 0;
-        switch (id)
-        {
-        case IDC_ANIM_RED_COMBO:    paramID = kMarkerRedAnim;   break;
-        case IDC_ANIM_GREEN_COMBO:  paramID = kMarkerGreenAnim; break;
-        case IDC_ANIM_OPEN_COMBO:   paramID = kMarkerOpenAnim;  break;
+
+        switch (id) {
+        case IDC_ANIM_RED_COMBO:
+            paramID = kMarkerRedAnim;
+            break;
+
+        case IDC_ANIM_GREEN_COMBO:
+            paramID = kMarkerGreenAnim;
+            break;
+
+        case IDC_ANIM_OPEN_COMBO:
+            paramID = kMarkerOpenAnim;
+            break;
         }
 
         pb->SetValue(paramID, 0, buf);
     }
 
-    void ILoadCombo(HWND hWnd, int ctrlID, int paramID, IParamBlock2* pb, plNotetrackAnim& anim)
-    {
+    void ILoadCombo(HWND hWnd, int ctrlID, int paramID, IParamBlock2* pb, plNotetrackAnim& anim) {
         const char* savedName = pb->GetStr(paramID);
         HWND hCombo = GetDlgItem(hWnd, ctrlID);
         ComboBox_ResetContent(hCombo);
 
         plString animName;
-        while (!(animName = anim.GetNextAnimName()).IsNull())
-        {
+
+        while (!(animName = anim.GetNextAnimName()).IsNull()) {
             int sel = ComboBox_AddString(hCombo, animName.c_str());
-            if (animName.Compare(savedName) == 0)
+
+            if (animName.Compare(savedName) == 0) {
                 ComboBox_SetCurSel(hCombo, sel);
+            }
         }
     }
 
-    void IInit(HWND hWnd, IParamBlock2* pb)
-    {
+    void IInit(HWND hWnd, IParamBlock2* pb) {
         Mtl* mtl = pb->GetMtl(kMarkerMtl);
 
-        if (mtl)
-        {
+        if (mtl) {
             SetDlgItemText(hWnd, IDC_MTL_BUTTON, mtl->GetName());
 
             plNotetrackAnim anim(mtl, nil);
@@ -563,79 +568,78 @@ protected:
             ILoadCombo(hWnd, IDC_ANIM_OPEN_COMBO, kMarkerOpenAnim, pb, anim);
         }
 
-        if (pb->GetINode(kMarkerMtlNode))
+        if (pb->GetINode(kMarkerMtlNode)) {
             SetDlgItemText(hWnd, IDC_MTL_NODE_BUTTON, pb->GetINode(kMarkerMtlNode)->GetName());
-        else
+        } else {
             SetDlgItemText(hWnd, IDC_MTL_NODE_BUTTON, "(none)");
+        }
 
-        if (pb->GetINode(kMarkerBounceNode))
+        if (pb->GetINode(kMarkerBounceNode)) {
             SetDlgItemText(hWnd, IDC_BOUNCE_BUTTON, pb->GetINode(kMarkerBounceNode)->GetName());
-        else
+        } else {
             SetDlgItemText(hWnd, IDC_BOUNCE_BUTTON, "(none)");
+        }
 
-        if (pb->GetINode(kMarkerSndPlace))
+        if (pb->GetINode(kMarkerSndPlace)) {
             SetDlgItemText(hWnd, IDC_PLACE_BUTTON, pb->GetINode(kMarkerSndPlace)->GetName());
-        else
+        } else {
             SetDlgItemText(hWnd, IDC_PLACE_BUTTON, "(none)");
+        }
 
-        if (pb->GetINode(kMarkerSndHit))
+        if (pb->GetINode(kMarkerSndHit)) {
             SetDlgItemText(hWnd, IDC_HIT_BUTTON, pb->GetINode(kMarkerSndHit)->GetName());
-        else
+        } else {
             SetDlgItemText(hWnd, IDC_HIT_BUTTON, "(none)");
+        }
     }
 
 public:
-    BOOL DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (msg)
-        {
+    BOOL DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        switch (msg) {
         case WM_INITDIALOG:
             IInit(hWnd, pm->GetParamBlock());
             return TRUE;
 
         case WM_COMMAND:
-            if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_MTL_BUTTON)
-            {
+            if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_MTL_BUTTON) {
                 Mtl* pickedMtl = plPickMaterialMap::PickMaterial(plMtlCollector::kUsedOnly |
-                                                                plMtlCollector::kPlasmaOnly);
-                if (pickedMtl)
-                {
+                                 plMtlCollector::kPlasmaOnly);
+
+                if (pickedMtl) {
                     pm->GetParamBlock()->SetValue(kMarkerMtl, 0, pickedMtl);
                     IInit(hWnd, pm->GetParamBlock());
                 }
 
                 return TRUE;
-            }
-            else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_MTL_NODE_BUTTON)
-            {
-                if (plPick::MtlNodes(pm->GetParamBlock(), kMarkerMtlNode, pm->GetParamBlock()->GetMtl(kMarkerMtl)))
+            } else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_MTL_NODE_BUTTON) {
+                if (plPick::MtlNodes(pm->GetParamBlock(), kMarkerMtlNode, pm->GetParamBlock()->GetMtl(kMarkerMtl))) {
                     IInit(hWnd, pm->GetParamBlock());
-            }
-            else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_BOUNCE_BUTTON)
-            {
+                }
+            } else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_BOUNCE_BUTTON) {
                 plResponderGetComp::ClassIDs ids;
                 ids.push_back(ANIM_COMP_CID);
-                if (plResponderGetComp::Instance().GetComp(pm->GetParamBlock(), kMarkerBounceNode, kMarkerBounceComp, &ids))
+
+                if (plResponderGetComp::Instance().GetComp(pm->GetParamBlock(), kMarkerBounceNode, kMarkerBounceComp, &ids)) {
                     IInit(hWnd, pm->GetParamBlock());
+                }
 
                 return TRUE;
-            }
-            else if (HIWORD(wParam) == BN_CLICKED && (LOWORD(wParam) == IDC_PLACE_BUTTON || LOWORD(wParam) == IDC_HIT_BUTTON))
-            {
+            } else if (HIWORD(wParam) == BN_CLICKED && (LOWORD(wParam) == IDC_PLACE_BUTTON || LOWORD(wParam) == IDC_HIT_BUTTON)) {
                 std::vector<Class_ID> cids;
                 cids.push_back(SOUND_3D_COMPONENT_ID);
 
                 int paramID = (LOWORD(wParam) == IDC_PLACE_BUTTON) ? kMarkerSndPlace : kMarkerSndHit;
 
-                if (plPick::Node(pm->GetParamBlock(), paramID, &cids, true, false))
+                if (plPick::Node(pm->GetParamBlock(), paramID, &cids, true, false)) {
                     IInit(hWnd, pm->GetParamBlock());
+                }
+
                 return TRUE;
-            }
-            else if (HIWORD(wParam) == CBN_SELCHANGE)
-            {
+            } else if (HIWORD(wParam) == CBN_SELCHANGE) {
                 IComboChanged(hWnd, pm->GetParamBlock(), LOWORD(wParam));
                 return TRUE;
             }
+
             break;
         }
 
@@ -651,32 +655,32 @@ ParamBlockDesc2 gGameMarkerBlk
     IDD_COMP_MARKER, IDS_COMP_MARKER, 0, 0, &gGameMarkerComponentProc,
 
     kMarkerPhys,    _T("physical"),     TYPE_INODE,     0, 0,
-        p_ui,       TYPE_PICKNODEBUTTON, IDC_MARKER_PHYS,
-        end,
+    p_ui,       TYPE_PICKNODEBUTTON, IDC_MARKER_PHYS,
+    end,
 
     kMarkerMtl,     _T("mtl"),          TYPE_MTL,       0, 0,
-        end,
+    end,
 
     kMarkerGreenAnim,   _T("green"),    TYPE_STRING,    0, 0,
-        end,
+    end,
     kMarkerRedAnim,     _T("red"),      TYPE_STRING,    0, 0,
-        end,
+    end,
     kMarkerOpenAnim,    _T("open"),     TYPE_STRING,    0, 0,
-        end,
+    end,
 
     kMarkerBounceNode,  _T("bounceNode"), TYPE_INODE, 0, 0,
-        end,
+    end,
     kMarkerBounceComp,  _T("bounceComp"), TYPE_INODE, 0, 0,
-        end,
+    end,
 
     kMarkerMtlNode,     _T("mtlNode"),  TYPE_INODE,     0, 0,
-        end,
+    end,
 
     kMarkerSndPlace,    _T("sndPlace"), TYPE_INODE,     0, 0,
-        end,
+    end,
 
     kMarkerSndHit,      _T("sndHit"),   TYPE_INODE,     0, 0,
-        end,
+    end,
 
     end
 );
@@ -697,17 +701,20 @@ bool plGameMarkerComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg
     plPhysicalProps* physProps = node->GetPhysicalProps();
     physProps->SetBoundsType(plSimDefs::kSphereBounds, node, pErrMsg);
     physProps->SetPinned(true, node, pErrMsg);
+
     // only if movable will it have mass (then it will keep track of movements in PhysX)
-    if ( node->IsMovable() || node->IsTMAnimated() )
+    if (node->IsMovable() || node->IsTMAnimated()) {
         physProps->SetMass(1.0, node, pErrMsg);
+    }
+
     physProps->SetGroup(plSimDefs::kGroupDetector, node, pErrMsg);
-    physProps->SetReportGroup(1<<plSimDefs::kGroupAvatar, node, pErrMsg);
+    physProps->SetReportGroup(1 << plSimDefs::kGroupAvatar, node, pErrMsg);
     physProps->SetProxyNode(proxy, node, pErrMsg);
 
     return true;
 }
 
-bool plGameMarkerComponent::PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plGameMarkerComponent::PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     return true;
 }
@@ -727,8 +734,8 @@ plKey plGameMarkerComponent::IGetAnimKey(int nodeID, int compID)
 {
     plMaxNode* animComp = (plMaxNode*)fCompPB->GetINode(compID);
     plMaxNode* animNode = (plMaxNode*)fCompPB->GetINode(nodeID);
-    if (animComp && animNode)
-    {
+
+    if (animComp && animNode) {
         plAnimComponent* comp = (plAnimComponent*)animComp->ConvertToComponent();
         return comp->GetModKey(animNode);
     }
@@ -736,7 +743,7 @@ plKey plGameMarkerComponent::IGetAnimKey(int nodeID, int compID)
     return nil;
 }
 
-bool plGameMarkerComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plGameMarkerComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plGameMarkerModifier* markerMod = new plGameMarkerModifier;
 
@@ -767,18 +774,19 @@ bool plGameMarkerComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 
 //Class that accesses the paramblock below.
 
-class plCameraComponent : public plComponent
-{
+class plCameraComponent : public plComponent {
 public:
     plCameraComponent();
-    void DeleteThis() { delete this; }
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool IsValidNodeType(plMaxNode *pNode);
+    void DeleteThis() {
+        delete this;
+    }
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool IsValidNodeType(plMaxNode* pNode);
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
 
 };
 
@@ -788,24 +796,23 @@ OBSOLETE_CLASS_DESC(plCameraComponent, gCameraDesc, "Camera",  "Camera", COMP_TY
 //
 // Block not necessary, kept for backwards compat.
 //
-enum
-{
+enum {
     kCamera,
     kCameraV2
 };
 
 //Max paramblock2 stuff below.
 ParamBlockDesc2 gCameraBk
-(   
+(
     1, _T("camera"), 0, &gCameraDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_CAMERA, IDS_COMP_CAMERAS,  0, 0, NULL,
 
     // params
     kCamera,    _T("Animation"),        TYPE_INT,       0, 0,
-        p_default, 0,
-        p_ui,       TYPE_RADIO, 2, /*IDC_RADIO_DEFAULT,*/ IDC_RADIO_FIXEDCAM, IDC_RADIO_FIXEDPANCAM,
-        end,
+    p_default, 0,
+    p_ui,       TYPE_RADIO, 2, /*IDC_RADIO_DEFAULT,*/ IDC_RADIO_FIXEDCAM, IDC_RADIO_FIXEDPANCAM,
+    end,
     //kCamera,  _T("CamType"),      TYPE_INT,       0, 0,
     /// p_ui,       TYPE_RADIO, 2, IDC_RADIO_FIXEDCAM, IDC_RADIO_FIXEDPANCAM,
     //  end,
@@ -823,26 +830,26 @@ plCameraComponent::plCameraComponent()
 
 // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plCameraComponent::SetupProperties(plMaxNode* pNode, plErrorMsg *pErrMsg)
+bool plCameraComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
 
-bool plCameraComponent::PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plCameraComponent::PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
-bool plCameraComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plCameraComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
 
-bool plCameraComponent::IsValidNodeType(plMaxNode *pNode)
+bool plCameraComponent::IsValidNodeType(plMaxNode* pNode)
 {
-        return false;
+    return false;
 }
 
 

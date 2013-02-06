@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class hsResMgr;
 
-class plLayRefMsg : public plRefMsg
-{
+class plLayRefMsg : public plRefMsg {
 public:
     enum {
         kTexture        = 1,
@@ -59,10 +58,10 @@ public:
     };
 
     plLayRefMsg() : fType(-1), fWhich(-1) {}
-    plLayRefMsg(const plKey &r, uint8_t f, int8_t which, int8_t type) : plRefMsg(r, f), fWhich(which), fType(type) {}
+    plLayRefMsg(const plKey& r, uint8_t f, int8_t which, int8_t type) : plRefMsg(r, f), fWhich(which), fType(type) {}
 
-    CLASSNAME_REGISTER( plLayRefMsg );
-    GETINTERFACE_ANY( plLayRefMsg, plRefMsg );
+    CLASSNAME_REGISTER(plLayRefMsg);
+    GETINTERFACE_ANY(plLayRefMsg, plRefMsg);
 
     int8_t        fType;
     int8_t        fWhich;

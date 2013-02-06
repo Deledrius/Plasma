@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCliMsg.h"
 
-class pyMarkerMsg : public pyGameCliMsg
-{
+class pyMarkerMsg : public pyGameCliMsg {
 protected:
     pyMarkerMsg();
     pyMarkerMsg(pfGameCliMsg* msg);
@@ -76,8 +75,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerTemplateCreatedMsg : public pyMarkerMsg
-{
+class pyMarkerTemplateCreatedMsg : public pyMarkerMsg {
 protected:
     pyMarkerTemplateCreatedMsg();
     pyMarkerTemplateCreatedMsg(pfGameCliMsg* msg);
@@ -95,8 +93,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerTeamAssignedMsg : public pyMarkerMsg
-{
+class pyMarkerTeamAssignedMsg : public pyMarkerMsg {
 protected:
     pyMarkerTeamAssignedMsg();
     pyMarkerTeamAssignedMsg(pfGameCliMsg* msg);
@@ -114,8 +111,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerGameTypeMsg : public pyMarkerMsg
-{
+class pyMarkerGameTypeMsg : public pyMarkerMsg {
 protected:
     pyMarkerGameTypeMsg();
     pyMarkerGameTypeMsg(pfGameCliMsg* msg);
@@ -133,8 +129,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerGameStartedMsg : public pyMarkerMsg
-{
+class pyMarkerGameStartedMsg : public pyMarkerMsg {
 protected:
     pyMarkerGameStartedMsg();
     pyMarkerGameStartedMsg(pfGameCliMsg* msg);
@@ -150,8 +145,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerGamePausedMsg : public pyMarkerMsg
-{
+class pyMarkerGamePausedMsg : public pyMarkerMsg {
 protected:
     pyMarkerGamePausedMsg();
     pyMarkerGamePausedMsg(pfGameCliMsg* msg);
@@ -169,8 +163,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerGameResetMsg : public pyMarkerMsg
-{
+class pyMarkerGameResetMsg : public pyMarkerMsg {
 protected:
     pyMarkerGameResetMsg();
     pyMarkerGameResetMsg(pfGameCliMsg* msg);
@@ -186,8 +179,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerGameOverMsg : public pyMarkerMsg
-{
+class pyMarkerGameOverMsg : public pyMarkerMsg {
 protected:
     pyMarkerGameOverMsg();
     pyMarkerGameOverMsg(pfGameCliMsg* msg);
@@ -203,8 +195,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerGameNameChangedMsg : public pyMarkerMsg
-{
+class pyMarkerGameNameChangedMsg : public pyMarkerMsg {
 protected:
     pyMarkerGameNameChangedMsg();
     pyMarkerGameNameChangedMsg(pfGameCliMsg* msg);
@@ -222,8 +213,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerTimeLimitChangedMsg : public pyMarkerMsg
-{
+class pyMarkerTimeLimitChangedMsg : public pyMarkerMsg {
 protected:
     pyMarkerTimeLimitChangedMsg();
     pyMarkerTimeLimitChangedMsg(pfGameCliMsg* msg);
@@ -241,8 +231,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerGameDeletedMsg : public pyMarkerMsg
-{
+class pyMarkerGameDeletedMsg : public pyMarkerMsg {
 protected:
     pyMarkerGameDeletedMsg();
     pyMarkerGameDeletedMsg(pfGameCliMsg* msg);
@@ -260,8 +249,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerMarkerAddedMsg : public pyMarkerMsg
-{
+class pyMarkerMarkerAddedMsg : public pyMarkerMsg {
 protected:
     pyMarkerMarkerAddedMsg();
     pyMarkerMarkerAddedMsg(pfGameCliMsg* msg);
@@ -284,8 +272,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerMarkerDeletedMsg : public pyMarkerMsg
-{
+class pyMarkerMarkerDeletedMsg : public pyMarkerMsg {
 protected:
     pyMarkerMarkerDeletedMsg();
     pyMarkerMarkerDeletedMsg(pfGameCliMsg* msg);
@@ -303,8 +290,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerMarkerNameChangedMsg : public pyMarkerMsg
-{
+class pyMarkerMarkerNameChangedMsg : public pyMarkerMsg {
 protected:
     pyMarkerMarkerNameChangedMsg();
     pyMarkerMarkerNameChangedMsg(pfGameCliMsg* msg);
@@ -323,8 +309,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyMarkerMarkerCapturedMsg : public pyMarkerMsg
-{
+class pyMarkerMarkerCapturedMsg : public pyMarkerMsg {
 protected:
     pyMarkerMarkerCapturedMsg();
     pyMarkerMarkerCapturedMsg(pfGameCliMsg* msg);

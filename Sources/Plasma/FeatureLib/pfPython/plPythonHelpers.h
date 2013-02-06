@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //////////////////////////////////////////////////////////////////////
 
 // notetrack data structure
-typedef struct
-{
+typedef struct {
     plKey       objKey;     // plKey to the object
     const char* note_name;  // notetrack name
     plKey       modKey; // the animation modifier plKey that is associated with the notetrack name
@@ -58,16 +57,14 @@ typedef struct
 
 
 // material animation record structure
-typedef struct
-{
+typedef struct {
     const char* material_name;      // material name
     const char* note_name;          // notetrack name
     plKey       modKey;     // the animation modifier plKey that is associated with this material animation
 } PY_MATERIAL_ANIM;
 
 // material animation record structure
-typedef struct
-{
+typedef struct {
     const char* sound_name;     // the sound name
     int         sound_index;    // the sound index that goes with the sound
 } PY_SOUND_IDX;

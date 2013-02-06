@@ -58,7 +58,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #define LOG_SCENEVIWER
 
-static plUpdatableResManager *GetResMgr()
+static plUpdatableResManager* GetResMgr()
 {
     return (plUpdatableResManager*)hsgResMgr::ResMgr();
 }
@@ -67,26 +67,24 @@ plUpdatableClient::plUpdatableClient() : fPipeName(nil), fUpdateSignal(nil), fDa
 {
 #ifdef LOG_SCENEVIWER
     fLog = plStatusLogMgr::GetInstance().CreateStatusLog(25, "SceneViewer",
-        plStatusLog::kDontWriteFile | plStatusLog::kFilledBackground | plStatusLog::kAlignToTop);
+            plStatusLog::kDontWriteFile | plStatusLog::kFilledBackground | plStatusLog::kAlignToTop);
 #endif // LOG_SCENEVIWER
 }
 
 plUpdatableClient::~plUpdatableClient()
 {
-    if (fUpdateSignal)
-    {
+    if (fUpdateSignal) {
         delete fUpdateSignal;
         fUpdateSignal = nil;
     }
 
-    if (fLog)
-    {
+    if (fLog) {
         delete fLog;
         fLog = nil;
     }
 }
 
-void plUpdatableClient::InitUpdate(const char *semaphoreName, const char *pipeName, const char *dir)
+void plUpdatableClient::InitUpdate(const char* semaphoreName, const char* pipeName, const char* dir)
 {
     fUpdateSignal = new hsSemaphore(0, semaphoreName);
     fPipeName = pipeName;
@@ -99,7 +97,7 @@ hsG3DDeviceModeRecord plUpdatableClient::ILoadDevMode(const char* devModeFile)
     hsG3DDeviceModeRecord dmr = plClient::ILoadDevMode(devModeFile);
 
     // Override the mode with a windowed one
-    hsG3DDeviceMode *mode = (hsG3DDeviceMode*)dmr.GetMode();
+    hsG3DDeviceMode* mode = (hsG3DDeviceMode*)dmr.GetMode();
     mode->SetColorDepth(0);
 
     return hsG3DDeviceModeRecord(*dmr.GetDevice(), *mode);
@@ -111,8 +109,7 @@ hsG3DDeviceModeRecord plUpdatableClient::ILoadDevMode(const char* devModeFile)
 void plUpdatableClient::IGetUpdate()
 {
     // If the semaphore is signaled an update is ready
-    if (fUpdateSignal && fUpdateSignal->Wait(0))
-    {
+    if (fUpdateSignal && fUpdateSignal->Wait(0)) {
         hsNamedPipeStream s;
         s.Open(fPipeName, "r");
 
@@ -125,18 +122,15 @@ void plUpdatableClient::IGetUpdate()
 
         uint8_t type = s.ReadByte();
 
-        if (type == ClientUpdate::kShutdown)
-        {
-            #ifdef LOG_SCENEVIWER
+        if (type == ClientUpdate::kShutdown) {
+#ifdef LOG_SCENEVIWER
             fLog->AddLine("Client shutdown");
-            #endif // LOG_SCENEVIWER
+#endif // LOG_SCENEVIWER
 
             PostMessage(GetWindowHandle(), WM_SYSCOMMAND, SC_CLOSE, 0);
-        }
-        else if (type == ClientUpdate::kUpdate)
-        {
+        } else if (type == ClientUpdate::kUpdate) {
             fDirty = true;
-            
+
             IEnableProxies(false);
 
             int i;
@@ -148,17 +142,16 @@ void plUpdatableClient::IGetUpdate()
             std::vector<plKey*> delKeys;
             delKeys.reserve(numDeleted);
 
-            for (i = 0; i < numDeleted; i++)
-            {
+            for (i = 0; i < numDeleted; i++) {
                 plUoid uoid;
                 uoid.Read(&s);
-                plKey *key = hsgResMgr::ResMgr()->FindKey(uoid);
+                plKey* key = hsgResMgr::ResMgr()->FindKey(uoid);
                 hsAssert(key, "Key to delete not found");
-                if (key)
-                {
-                    #ifdef LOG_SCENEVIWER
+
+                if (key) {
+#ifdef LOG_SCENEVIWER
                     fLog->AddLineF("Remove: %s", key->GetName());
-                    #endif // LOG_SCENEVIWER
+#endif // LOG_SCENEVIWER
 
                     GetResMgr()->RemoveObject(key, false);
                     delKeys.push_back(key);
@@ -177,31 +170,33 @@ void plUpdatableClient::IGetUpdate()
             // Read in the new keys and objects
             //
             int numNew = s.ReadSwap32();
-            for (i = 0; i < numNew; i++)
-            {
-                plCreatable *cre = GetResMgr()->ReadCreatable(&s);
 
-                hsKeyedObject *ko = hsKeyedObject::ConvertNoRef(cre);
+            for (i = 0; i < numNew; i++) {
+                plCreatable* cre = GetResMgr()->ReadCreatable(&s);
 
-                #ifdef LOG_SCENEVIWER
-                if (ko)
+                hsKeyedObject* ko = hsKeyedObject::ConvertNoRef(cre);
+
+#ifdef LOG_SCENEVIWER
+
+                if (ko) {
                     fLog->AddLineF("Read: %s", ko->GetKey()->GetName());
-                else
+                } else {
                     fLog->AddLine("Read: (null)");
-                #endif // LOG_SCENEVIWER
+                }
+
+#endif // LOG_SCENEVIWER
             }
 
             GetResMgr()->DelayLoad(false);
 
             // Clear out any objects that were never reloaded (really deleted)
-            for (i = 0; i < delKeys.size(); i++)
-            {
-                plKey *key = delKeys[i];
-                if (!key->ObjectIsLoaded())
-                {
-                    #ifdef LOG_SCENEVIWER
+            for (i = 0; i < delKeys.size(); i++) {
+                plKey* key = delKeys[i];
+
+                if (!key->ObjectIsLoaded()) {
+#ifdef LOG_SCENEVIWER
                     fLog->AddLineF("Key deleted: %s", key->GetName());
-                    #endif // LOG_SCENEVIWER
+#endif // LOG_SCENEVIWER
 
                     GetResMgr()->RemoveObject(key);
                 }
@@ -216,8 +211,7 @@ void plUpdatableClient::IGetUpdate()
 
 bool plUpdatableClient::Init()
 {
-    if (plClient::Init())
-    {
+    if (plClient::Init()) {
         GetResMgr()->ForceLoadDirectory(fDataPath, true);
         // Page in the SceneViewer now that our key is ready
         GetResMgr()->PageInSceneViewer();
@@ -231,10 +225,9 @@ bool plUpdatableClient::MainLoop()
 {
     IGetUpdate();
 
-    if (fActive)
+    if (fActive) {
         return plClient::MainLoop();
-    else
-    {
+    } else {
         Sleep(100);
         return true;
     }
@@ -244,15 +237,14 @@ bool plUpdatableClient::MainLoop()
 
 bool plUpdatableClient::Shutdown()
 {
-    if (fDirty && fDataPath)
-    {
+    if (fDirty && fDataPath) {
         char oldCwd[MAX_PATH];
         getcwd(oldCwd, sizeof(oldCwd));
 
         // Even bigger hack
         char tempCrap[MAX_PATH];
         strcpy(tempCrap, fDataPath);
-        tempCrap[strlen(tempCrap)-strlen("dat\\")] = '\0';
+        tempCrap[strlen(tempCrap) - strlen("dat\\")] = '\0';
         chdir(tempCrap);
 
         GetResMgr()->WriteSceneViewer();
@@ -265,38 +257,34 @@ bool plUpdatableClient::Shutdown()
 
 void plUpdatableClient::IEnableProxies(bool enable)
 {
-    if (enable)
-    {
+    if (enable) {
         // switch back on any drawable proxies
-        if (fPipeline->GetDrawableTypeMask() & plDrawableSpans::kAudibleProxy)
-        {   
+        if (fPipeline->GetDrawableTypeMask() & plDrawableSpans::kAudibleProxy) {
             plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kAudible | plProxyDrawMsg::kCreate);
             plgDispatch::MsgSend(msg);
         }
-        if (fPipeline->GetDrawableTypeMask() & plDrawableSpans::kOccluderProxy)
-        {   
+
+        if (fPipeline->GetDrawableTypeMask() & plDrawableSpans::kOccluderProxy) {
             plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kOccluder | plProxyDrawMsg::kCreate);
             plgDispatch::MsgSend(msg);
         }
-        if (fPipeline->GetDrawableTypeMask() & plDrawableSpans::kPhysicalProxy)
-        {   
+
+        if (fPipeline->GetDrawableTypeMask() & plDrawableSpans::kPhysicalProxy) {
             plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kPhysical | plProxyDrawMsg::kCreate);
             plgDispatch::MsgSend(msg);
         }
-        if (fPipeline->GetDrawableTypeMask() & plDrawableSpans::kLightProxy)
-        {   
+
+        if (fPipeline->GetDrawableTypeMask() & plDrawableSpans::kLightProxy) {
             plProxyDrawMsg* msg = new plProxyDrawMsg(plProxyDrawMsg::kLight | plProxyDrawMsg::kCreate);
             plgDispatch::MsgSend(msg);
         }
-    }
-    else
-    {
+    } else {
         // notify any and all drawable proxies to stop drawing...
         plProxyDrawMsg* nuke = new plProxyDrawMsg(plProxyDrawMsg::kAudible
-                                                | plProxyDrawMsg::kOccluder
-                                                | plProxyDrawMsg::kPhysical
-                                                | plProxyDrawMsg::kLight
-                                                | plProxyDrawMsg::kDestroy);
+                | plProxyDrawMsg::kOccluder
+                | plProxyDrawMsg::kPhysical
+                | plProxyDrawMsg::kLight
+                | plProxyDrawMsg::kDestroy);
         plgDispatch::MsgSend(nuke);
     }
 }

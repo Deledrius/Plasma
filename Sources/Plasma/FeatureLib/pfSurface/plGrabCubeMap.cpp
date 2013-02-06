@@ -61,22 +61,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMessage/plRenderRequestMsg.h"
 
 plGrabCubeRenderRequest::plGrabCubeRenderRequest()
-:   fQuality(75)
+    :   fQuality(75)
 {
 }
 
 void plGrabCubeRenderRequest::Render(plPipeline* pipe, plPageTreeMgr* pageMgr)
 {
-    if( !fFileName[0] )
+    if (!fFileName[0]) {
         return;
+    }
 
     plRenderRequest::Render(pipe, pageMgr);
 
     pipe->EndRender();
 
     plMipmap        mipmap;
-    if( pipe->CaptureScreen(&mipmap) )
-    {
+
+    if (pipe->CaptureScreen(&mipmap)) {
         plJPEG::Instance().SetWriteQuality(fQuality);
 
         plJPEG::Instance().WriteToFile(fFileName, &mipmap);
@@ -89,18 +90,15 @@ void plGrabCubeRenderRequest::Render(plPipeline* pipe, plPageTreeMgr* pageMgr)
 void plGrabCubeMap::GrabCube(plPipeline* pipe, plSceneObject* obj, const char* pref, const hsColorRGBA& clearColor, uint8_t q)
 {
     hsPoint3 center;
-    if( obj && !(obj->GetLocalToWorld().fFlags & hsMatrix44::kIsIdent) )
-    {
+
+    if (obj && !(obj->GetLocalToWorld().fFlags & hsMatrix44::kIsIdent)) {
         center = obj->GetLocalToWorld().GetTranslate();
-    }
-    else if( obj && obj->GetDrawInterface() )
-    {
+    } else if (obj && obj->GetDrawInterface()) {
         center = obj->GetDrawInterface()->GetWorldBounds().GetCenter();
-    }
-    else
-    {
+    } else {
         center = pipe->GetCameraToWorld().GetTranslate();
     }
+
     ISetupRenderRequests(pipe, center, pref, clearColor, q);
 }
 
@@ -115,10 +113,10 @@ void plGrabCubeMap::ISetupRenderRequests(plPipeline* pipe, const hsPoint3& cente
     hsMatrix44 cameraToWorlds[6];
     hsMatrix44::MakeEnvMapMatrices(center, worldToCameras, cameraToWorlds);
 
-    uint32_t renderState 
+    uint32_t renderState
         = plPipeline::kRenderNormal
-        | plPipeline::kRenderClearColor
-        | plPipeline::kRenderClearDepth;
+          | plPipeline::kRenderClearColor
+          | plPipeline::kRenderClearDepth;
 
     float hither;
     float yon;
@@ -130,11 +128,12 @@ void plGrabCubeMap::ISetupRenderRequests(plPipeline* pipe, const hsPoint3& cente
         "BK",
         "FR",
         "UP",
-        "DN" };
+        "DN"
+    };
 
     int i;
-    for( i = 0; i < 6; i++ )
-    {
+
+    for (i = 0; i < 6; i++) {
         plGrabCubeRenderRequest* req = new plGrabCubeRenderRequest;
         req->SetRenderState(renderState);
 

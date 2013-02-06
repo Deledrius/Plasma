@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCore/Private/pnAcCore.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNASYNCCORE_PRIVATE_PNACCORE_H
@@ -57,8 +57,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *
 ***/
 
-void AsyncCoreInitialize ();
-void AsyncCoreDestroy (unsigned waitMs);
+void AsyncCoreInitialize();
+void AsyncCoreDestroy(unsigned waitMs);
 
 /*****************************************************************************
 *
@@ -96,11 +96,11 @@ enum EAsyncPerfCounter {
     kAsyncPerfThreadTaskThreadsDesired,
     kAsyncPerfThreadTaskThreadsRunning,
     kAsyncPerfThreadTaskThreadsActive,
-    
+
     kNumAsyncPerfCounters
 };
 
-long AsyncPerfGetCounter (unsigned id);
+long AsyncPerfGetCounter(unsigned id);
 
 
 /*****************************************************************************
@@ -109,5 +109,5 @@ long AsyncPerfGetCounter (unsigned id);
 *
 ***/
 
-void AsyncSignalShutdown ();
-void AsyncWaitForShutdown ();
+void AsyncSignalShutdown();
+void AsyncWaitForShutdown();

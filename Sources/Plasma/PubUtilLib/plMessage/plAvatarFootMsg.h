@@ -50,40 +50,43 @@ class hsResMgr;
 class plArmatureMod;
 class plAvBrain;
 
-class plAvatarFootMsg : public plEventCallbackMsg
-{
+class plAvatarFootMsg : public plEventCallbackMsg {
 protected:
     bool            fIsLeft;
     plArmatureMod*  fArmature;
 public:
-    plAvatarFootMsg() 
-    {
+    plAvatarFootMsg() {
         fEvent = kTime;
         SetBCastFlag(plMessage::kBCastByExactType);
     }
-    plAvatarFootMsg(const plKey& s, plArmatureMod *armature, bool isLeft) : plEventCallbackMsg(s, nil, nil), fArmature(armature), fIsLeft(isLeft) 
-    {
+    plAvatarFootMsg(const plKey& s, plArmatureMod* armature, bool isLeft) : plEventCallbackMsg(s, nil, nil), fArmature(armature), fIsLeft(isLeft) {
         fEvent = kTime;
         SetBCastFlag(plMessage::kBCastByExactType);
     }
 
-    CLASSNAME_REGISTER( plAvatarFootMsg );
-    GETINTERFACE_ANY( plAvatarFootMsg, plEventCallbackMsg );
+    CLASSNAME_REGISTER(plAvatarFootMsg);
+    GETINTERFACE_ANY(plAvatarFootMsg, plEventCallbackMsg);
 
-    virtual void Read(hsStream *stream, hsResMgr *mgr)
-    {
+    virtual void Read(hsStream* stream, hsResMgr* mgr) {
         hsAssert(false, "This message is not supposed to travel over the network or persist in a file.");
     }
-    virtual void Write(hsStream *stream, hsResMgr *mgr)
-    {
+    virtual void Write(hsStream* stream, hsResMgr* mgr) {
         hsAssert(false, "This message is not supposed to travel over the network or persist in a file.");
     }
 
-    bool IsLeft() const { return fIsLeft; }
-    void SetIsLeft(bool on) { fIsLeft = (0 != on); }
+    bool IsLeft() const {
+        return fIsLeft;
+    }
+    void SetIsLeft(bool on) {
+        fIsLeft = (0 != on);
+    }
 
-    plArmatureMod* GetArmature() const { return fArmature; }
-    void SetArmature(plArmatureMod* a) { fArmature = a; }
+    plArmatureMod* GetArmature() const {
+        return fArmature;
+    }
+    void SetArmature(plArmatureMod* a) {
+        fArmature = a;
+    }
 
 };
 

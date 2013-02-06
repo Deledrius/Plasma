@@ -50,17 +50,16 @@ class plConvexVolume;
 class hsResMgr;
 class plSceneObject;
 
-class plParticleEffect : public hsKeyedObject
-{
+class plParticleEffect : public hsKeyedObject {
 public:
-    CLASSNAME_REGISTER( plParticleEffect );
-    GETINTERFACE_ANY( plParticleEffect, hsKeyedObject );
+    CLASSNAME_REGISTER(plParticleEffect);
+    GETINTERFACE_ANY(plParticleEffect, hsKeyedObject);
 
     // Order is:
     //  PrepareEffect is called with a given target (including valid
     //      ParticleContext).
-    //  ApplyEffect is called some once for each particle (maybe zero times). 
-    //      It can return true to kill a particle. 
+    //  ApplyEffect is called some once for each particle (maybe zero times).
+    //      It can return true to kill a particle.
     //      Target and Context passed in with Prepare will be
     //      guaranteed to remain valid until,
     //  EndEffect marks no more particles will be processed with the above
@@ -71,77 +70,80 @@ public:
     virtual void EndEffect(const plEffectTargetInfo& target) {}
 };
 
-class plParticleCollisionEffect : public plParticleEffect
-{
+class plParticleCollisionEffect : public plParticleEffect {
 public:
     plParticleCollisionEffect();
     ~plParticleCollisionEffect();
 
-    CLASSNAME_REGISTER( plParticleCollisionEffect );
-    GETINTERFACE_ANY( plParticleCollisionEffect, plParticleEffect );
+    CLASSNAME_REGISTER(plParticleCollisionEffect);
+    GETINTERFACE_ANY(plParticleCollisionEffect, plParticleEffect);
 
     virtual void PrepareEffect(const plEffectTargetInfo& target);
 
-    virtual void Read(hsStream *s, hsResMgr *mgr);
-    virtual void Write(hsStream *s, hsResMgr *mgr);
-    virtual bool MsgReceive(plMessage *msg);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
+    virtual bool MsgReceive(plMessage* msg);
 
 protected:
-    plSceneObject *fSceneObj;
-    plConvexVolume *fBounds;
+    plSceneObject* fSceneObj;
+    plConvexVolume* fBounds;
 };
 
 // Default particle blocker. Doesn't affect particle's velocity,
 // so it'll keep "beat"ing on the deflector until the velocity
 // dotted with the deflector normal slides it off an edge.
-class plParticleCollisionEffectBeat : public plParticleCollisionEffect
-{
+class plParticleCollisionEffectBeat : public plParticleCollisionEffect {
 public:
     plParticleCollisionEffectBeat();
 
-    CLASSNAME_REGISTER( plParticleCollisionEffectBeat );
-    GETINTERFACE_ANY( plParticleCollisionEffectBeat, plParticleCollisionEffect );
+    CLASSNAME_REGISTER(plParticleCollisionEffectBeat);
+    GETINTERFACE_ANY(plParticleCollisionEffectBeat, plParticleCollisionEffect);
 
     virtual bool ApplyEffect(const plEffectTargetInfo& target, int32_t i);
 };
 
 // This particle blocker just kills any particles that hit it.
-class plParticleCollisionEffectDie : public plParticleCollisionEffect
-{
+class plParticleCollisionEffectDie : public plParticleCollisionEffect {
 public:
     plParticleCollisionEffectDie();
 
-    CLASSNAME_REGISTER( plParticleCollisionEffectDie );
-    GETINTERFACE_ANY( plParticleCollisionEffectDie, plParticleCollisionEffect );
+    CLASSNAME_REGISTER(plParticleCollisionEffectDie);
+    GETINTERFACE_ANY(plParticleCollisionEffectDie, plParticleCollisionEffect);
 
     virtual bool ApplyEffect(const plEffectTargetInfo& target, int32_t i);
 };
 
-class plParticleCollisionEffectBounce : public plParticleCollisionEffect
-{
+class plParticleCollisionEffectBounce : public plParticleCollisionEffect {
 protected:
     float    fBounce;
     float    fFriction;
 public:
     plParticleCollisionEffectBounce();
 
-    CLASSNAME_REGISTER( plParticleCollisionEffectBounce );
-    GETINTERFACE_ANY( plParticleCollisionEffectBounce, plParticleCollisionEffect );
+    CLASSNAME_REGISTER(plParticleCollisionEffectBounce);
+    GETINTERFACE_ANY(plParticleCollisionEffectBounce, plParticleCollisionEffect);
 
     virtual bool ApplyEffect(const plEffectTargetInfo& target, int32_t i);
 
-    virtual void Read(hsStream *s, hsResMgr *mgr);
-    virtual void Write(hsStream *s, hsResMgr *mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-    void SetBounce(float b) { fBounce = b; }
-    float GetBounce() const { return fBounce; }
+    void SetBounce(float b) {
+        fBounce = b;
+    }
+    float GetBounce() const {
+        return fBounce;
+    }
 
-    void SetFriction(float f) { fFriction = f; }
-    float GetFriction() const { return fFriction; }
+    void SetFriction(float f) {
+        fFriction = f;
+    }
+    float GetFriction() const {
+        return fFriction;
+    }
 };
 
-class plParticleFadeVolumeEffect : public plParticleEffect
-{
+class plParticleFadeVolumeEffect : public plParticleEffect {
 protected:
     // Some cached properties. These will be the same for all
     // particles between matching PrepareEffect and EndEffect calls.
@@ -153,22 +155,21 @@ public:
     plParticleFadeVolumeEffect();
     ~plParticleFadeVolumeEffect();
 
-    CLASSNAME_REGISTER( plParticleFadeVolumeEffect );
-    GETINTERFACE_ANY( plParticleFadeVolumeEffect, plParticleEffect );
+    CLASSNAME_REGISTER(plParticleFadeVolumeEffect);
+    GETINTERFACE_ANY(plParticleFadeVolumeEffect, plParticleEffect);
 
     virtual void PrepareEffect(const plEffectTargetInfo& target);
     virtual bool ApplyEffect(const plEffectTargetInfo& target, int32_t i);
 
-    virtual void Read(hsStream *s, hsResMgr *mgr);
-    virtual void Write(hsStream *s, hsResMgr *mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
     //virtual bool MsgReceive(plMessage *msg);
 
     float fLength;
     bool fIgnoreZ;
 };
 
-class plParticleWindEffect : public plParticleEffect
-{
+class plParticleWindEffect : public plParticleEffect {
 protected:
     // The properties that define the wind. These might/should be animatable.
     float    fStrength;
@@ -189,33 +190,50 @@ public:
     plParticleWindEffect();
     ~plParticleWindEffect();
 
-    CLASSNAME_REGISTER( plParticleWindEffect );
-    GETINTERFACE_ANY( plParticleWindEffect, plParticleEffect );
+    CLASSNAME_REGISTER(plParticleWindEffect);
+    GETINTERFACE_ANY(plParticleWindEffect, plParticleEffect);
 
     virtual void PrepareEffect(const plEffectTargetInfo& target);
     virtual bool ApplyEffect(const plEffectTargetInfo& target, int32_t i) = 0;
 
-    virtual void Read(hsStream *s, hsResMgr *mgr);
-    virtual void Write(hsStream *s, hsResMgr *mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-    void                SetStrength(float v) { fStrength = v; }
-    float            GetStrength() const { return fStrength; }
+    void                SetStrength(float v) {
+        fStrength = v;
+    }
+    float            GetStrength() const {
+        return fStrength;
+    }
 
-    void                SetConstancy(float c) { fConstancy = c; }
-    float            GetConstancy() const { return fConstancy; }
+    void                SetConstancy(float c) {
+        fConstancy = c;
+    }
+    float            GetConstancy() const {
+        return fConstancy;
+    }
 
-    void                SetSwirl(float s) { fSwirl = s; }
-    float            GetSwirl() const { return fSwirl; }
+    void                SetSwirl(float s) {
+        fSwirl = s;
+    }
+    float            GetSwirl() const {
+        return fSwirl;
+    }
 
-    void                SetHorizontal(bool on) { fHorizontal = on; }
-    bool                GetHorizontal() const { return fHorizontal; }
+    void                SetHorizontal(bool on) {
+        fHorizontal = on;
+    }
+    bool                GetHorizontal() const {
+        return fHorizontal;
+    }
 
     void                SetRefDirection(const hsVector3& v);
-    const hsVector3&    GetRefDirection() const { return fRefDir; }
+    const hsVector3&    GetRefDirection() const {
+        return fRefDir;
+    }
 };
 
-class plParticleLocalWind : public plParticleWindEffect
-{
+class plParticleLocalWind : public plParticleWindEffect {
 protected:
     hsVector3   fScale;
     float    fSpeed;
@@ -223,30 +241,37 @@ protected:
     hsVector3   fPhase;
     hsVector3   fInvScale;
     double      fLastPhaseSecs;
-    
+
 public:
     plParticleLocalWind();
     ~plParticleLocalWind();
 
-    CLASSNAME_REGISTER( plParticleLocalWind );
-    GETINTERFACE_ANY( plParticleLocalWind, plParticleWindEffect );
+    CLASSNAME_REGISTER(plParticleLocalWind);
+    GETINTERFACE_ANY(plParticleLocalWind, plParticleWindEffect);
 
     virtual void PrepareEffect(const plEffectTargetInfo& target);
     virtual bool ApplyEffect(const plEffectTargetInfo& target, int32_t i);
 
-    void                SetScale(const hsVector3& v) { fScale = v; }
-    const hsVector3&    GetScale() const { return fScale; }
+    void                SetScale(const hsVector3& v) {
+        fScale = v;
+    }
+    const hsVector3&    GetScale() const {
+        return fScale;
+    }
 
-    void                SetSpeed(float v) { fSpeed = v; }
-    float            GetSpeed() const { return fSpeed; }
+    void                SetSpeed(float v) {
+        fSpeed = v;
+    }
+    float            GetSpeed() const {
+        return fSpeed;
+    }
 
-    virtual void Read(hsStream *s, hsResMgr *mgr);
-    virtual void Write(hsStream *s, hsResMgr *mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
 };
 
-class plParticleUniformWind : public plParticleWindEffect
-{
+class plParticleUniformWind : public plParticleWindEffect {
 protected:
 
     float    fFreqMin;
@@ -262,8 +287,8 @@ public:
     plParticleUniformWind();
     ~plParticleUniformWind();
 
-    CLASSNAME_REGISTER( plParticleUniformWind );
-    GETINTERFACE_ANY( plParticleUniformWind, plParticleWindEffect );
+    CLASSNAME_REGISTER(plParticleUniformWind);
+    GETINTERFACE_ANY(plParticleUniformWind, plParticleWindEffect);
 
     virtual void PrepareEffect(const plEffectTargetInfo& target);
     virtual bool ApplyEffect(const plEffectTargetInfo& target, int32_t i);
@@ -271,20 +296,18 @@ public:
     void        SetFrequencyRange(float minSecsPerCycle, float maxSecsPerCycle);
     void        SetFrequencyRate(float secsPerCycle);
 
-    virtual void Read(hsStream *s, hsResMgr *mgr);
-    virtual void Write(hsStream *s, hsResMgr *mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
 };
 
-class plParticleInfluenceInfo
-{
+class plParticleInfluenceInfo {
 public:
     hsVector3 fAvgVel;
     hsVector3 fRepDir;
 };
 
-class plParticleFlockEffect : public plParticleEffect
-{
+class plParticleFlockEffect : public plParticleEffect {
 //protected:
 protected:
     hsPoint3 fTargetOffset;     // Worldspace offset from our target to get the true goal
@@ -301,53 +324,76 @@ protected:
     float fMaxChaseSpeed;
 
     uint16_t fMaxParticles;
-    float *fDistSq;          // Table of distances from particle to particle
-    plParticleInfluenceInfo *fInfluences; 
+    float* fDistSq;          // Table of distances from particle to particle
+    plParticleInfluenceInfo* fInfluences;
 
-    void IUpdateDistances(const plEffectTargetInfo &target);
-    void IUpdateInfluences(const plEffectTargetInfo &target);
+    void IUpdateDistances(const plEffectTargetInfo& target);
+    void IUpdateInfluences(const plEffectTargetInfo& target);
 
 public:
     plParticleFlockEffect();
     ~plParticleFlockEffect();
 
-    CLASSNAME_REGISTER( plParticleFlockEffect );
-    GETINTERFACE_ANY( plParticleFlockEffect, plParticleEffect );
+    CLASSNAME_REGISTER(plParticleFlockEffect);
+    GETINTERFACE_ANY(plParticleFlockEffect, plParticleEffect);
 
     virtual void PrepareEffect(const plEffectTargetInfo& target);
-    virtual bool ApplyEffect(const plEffectTargetInfo& target, int32_t i);  
+    virtual bool ApplyEffect(const plEffectTargetInfo& target, int32_t i);
 
-    void SetTargetOffset(const hsPoint3 &offset) { fTargetOffset = offset; }
-    void SetDissenterTarget(const hsPoint3 &target) { fDissenterTarget = target; }
-    void SetInfluenceAvgRadius(float val) { fInfAvgRadSq = val * val; }
-    void SetInfluenceRepelRadius(float val) { fInfRepRadSq = val * val; }
-    void SetGoalRadius(float val) { fGoalDistSq = val * val; }
-    void SetFullChaseRadius(float val) { fFullChaseDistSq = val * val; }
-    void SetConformStr(float val) { fAvgVelStr = val; }
-    void SetRepelStr(float val) { fRepDirStr = val; }
-    void SetGoalOrbitStr(float val) { fGoalOrbitStr = val; }
-    void SetGoalChaseStr(float val) { fGoalChaseStr = val; }
-    void SetMaxOrbitSpeed(float val) { fMaxOrbitSpeed = val; }
-    void SetMaxChaseSpeed(float val) { fMaxChaseSpeed = val; }
+    void SetTargetOffset(const hsPoint3& offset) {
+        fTargetOffset = offset;
+    }
+    void SetDissenterTarget(const hsPoint3& target) {
+        fDissenterTarget = target;
+    }
+    void SetInfluenceAvgRadius(float val) {
+        fInfAvgRadSq = val * val;
+    }
+    void SetInfluenceRepelRadius(float val) {
+        fInfRepRadSq = val * val;
+    }
+    void SetGoalRadius(float val) {
+        fGoalDistSq = val * val;
+    }
+    void SetFullChaseRadius(float val) {
+        fFullChaseDistSq = val * val;
+    }
+    void SetConformStr(float val) {
+        fAvgVelStr = val;
+    }
+    void SetRepelStr(float val) {
+        fRepDirStr = val;
+    }
+    void SetGoalOrbitStr(float val) {
+        fGoalOrbitStr = val;
+    }
+    void SetGoalChaseStr(float val) {
+        fGoalChaseStr = val;
+    }
+    void SetMaxOrbitSpeed(float val) {
+        fMaxOrbitSpeed = val;
+    }
+    void SetMaxChaseSpeed(float val) {
+        fMaxChaseSpeed = val;
+    }
     void SetMaxParticles(uint16_t num);
 
-    virtual void Read(hsStream *s, hsResMgr *mgr);
-    virtual void Write(hsStream *s, hsResMgr *mgr);
-    virtual bool MsgReceive(plMessage *msg);  
-};  
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
+    virtual bool MsgReceive(plMessage* msg);
+};
 
-class plParticleFollowSystemEffect : public plParticleEffect
-{
+class plParticleFollowSystemEffect : public plParticleEffect {
 public:
-    CLASSNAME_REGISTER( plParticleFollowSystemEffect );
-    GETINTERFACE_ANY( plParticleFollowSystemEffect, plParticleEffect );
-    
+    CLASSNAME_REGISTER(plParticleFollowSystemEffect);
+    GETINTERFACE_ANY(plParticleFollowSystemEffect, plParticleEffect);
+
     plParticleFollowSystemEffect();
 
     virtual void PrepareEffect(const plEffectTargetInfo& target);
     virtual bool ApplyEffect(const plEffectTargetInfo& target, int32_t i);
     virtual void EndEffect(const plEffectTargetInfo& target);
-    
+
 protected:
     hsMatrix44 fOldW2L;
     bool fEvalThisFrame;

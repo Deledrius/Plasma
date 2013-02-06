@@ -50,8 +50,7 @@ class plMaxNode;
 class Mtl;
 class IParamBlock2;
 
-class plPickNodeBase
-{
+class plPickNodeBase {
 protected:
     IParamBlock2* fPB;
     int fNodeParamID;
@@ -64,8 +63,8 @@ protected:
 
     void ISetNodeValue(plMaxNode* node);
     void IGetSelNode(HWND hList);
-    
-    virtual bool ICheckNode(plMaxNode* node)=0;
+
+    virtual bool ICheckNode(plMaxNode* node) = 0;
 
     virtual void IAddUserType(HWND hList) {}
     virtual void ISetUserType(plMaxNode* node, const char* userType) {}
@@ -77,13 +76,12 @@ public:
     bool DoPick();
 };
 
-class plPickNode : public plPickNodeBase
-{
+class plPickNode : public plPickNodeBase {
 protected:
     std::vector<Class_ID> fCIDs;
     bool fCanConvertToType;
 
-    bool ICanConvertToType(Object *obj);
+    bool ICanConvertToType(Object* obj);
     virtual bool ICheckNode(plMaxNode* node);
 
 public:
@@ -93,8 +91,7 @@ public:
 //
 // Pick one of the nodes a material is attached to
 //
-class plPickMtlNode : public plPickNodeBase
-{
+class plPickMtlNode : public plPickNodeBase {
 protected:
     Mtl* fMtl;
 
@@ -107,8 +104,7 @@ public:
 //
 // Pick one of the nodes a component is attached to
 //
-class plPickCompNode : public plPickNodeBase
-{
+class plPickCompNode : public plPickNodeBase {
 protected:
     plComponentBase* fComp;
 

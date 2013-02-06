@@ -43,39 +43,61 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnUUID/pnUUID.h"
 #include <algorithm>
 
-namespace plNetCommon
+namespace plNetCommon {
+////////////////////////////////////////////////////////////////
+namespace VaultTasks {
+const char* VaultTaskStr(int taskID)
 {
-    ////////////////////////////////////////////////////////////////
-    namespace VaultTasks
-    {
-        const char * VaultTaskStr( int taskID )
-        {
-            switch ( taskID )
-            {
-            case kCreatePlayer:         return "CreatePlayer";
-            case kDeletePlayer:         return "DeletePlayer";
-            case kGetPlayerList:        return "GetPlayerList";
-            case kCreateNeighborhood:   return "CreateNeighborhood";
-            case kJoinNeighborhood:     return "JoinNeighborhood";
-            case kSetAgePublic:         return "SetAgePublic";
-            case kIncPlayerOnlineTime:  return "IncPlayerOnlineTime";
-            case kEnablePlayer:         return "EnablePlayer";
-            case kRegisterOwnedAge:     return "RegisterOwnedAge";
-            case kUnRegisterOwnedAge:   return "UnRegisterOwnedAge";
-            case kRegisterVisitAge:     return "RegisterVisitAge";
-            case kUnRegisterVisitAge:   return "UnRegisterVisitAge";
-            case kFriendInvite:         return "FriendInvite";
-            default:                    return "UNKNOWN VAULT TASK";
-            }
-        }
-    }
+    switch (taskID) {
+    case kCreatePlayer:
+        return "CreatePlayer";
 
-    ////////////////////////////////////////////////////////////////
-    namespace Accounts
-    {
-        ////////////////////////////////////////////////////////////
-        namespace Reserved
-        {
+    case kDeletePlayer:
+        return "DeletePlayer";
+
+    case kGetPlayerList:
+        return "GetPlayerList";
+
+    case kCreateNeighborhood:
+        return "CreateNeighborhood";
+
+    case kJoinNeighborhood:
+        return "JoinNeighborhood";
+
+    case kSetAgePublic:
+        return "SetAgePublic";
+
+    case kIncPlayerOnlineTime:
+        return "IncPlayerOnlineTime";
+
+    case kEnablePlayer:
+        return "EnablePlayer";
+
+    case kRegisterOwnedAge:
+        return "RegisterOwnedAge";
+
+    case kUnRegisterOwnedAge:
+        return "UnRegisterOwnedAge";
+
+    case kRegisterVisitAge:
+        return "RegisterVisitAge";
+
+    case kUnRegisterVisitAge:
+        return "UnRegisterVisitAge";
+
+    case kFriendInvite:
+        return "FriendInvite";
+
+    default:
+        return "UNKNOWN VAULT TASK";
+    }
+}
+}
+
+////////////////////////////////////////////////////////////////
+namespace Accounts {
+////////////////////////////////////////////////////////////
+namespace Reserved {
 ////////////////////////////////////////////
 // Adding a new reserved Avatar? Make sure you:
 //  1) Add it to the switch statement in GetReservedAvatarShape()
@@ -98,32 +120,52 @@ namespace plNetCommon
 #define kAvatarShapeYeesha          "Yeesha"
 ////////////////////////////////////////////
 
-            const char * GetReservedAvatarShape( const char * playerName, const char * currShapeName )
-            {
-                if ( stricmp( playerName, kPlayerNameDrWatson )==0 )
-                    return kAvatarShapeDrWatson;
-                if ( stricmp( playerName, kPlayerNameRand )==0 )
-                    return kAvatarShapeRand;
-                if ( stricmp( playerName, kPlayerNameDrWatson )==0 )
-                    return kAvatarShapeDrWatson;
-                if ( stricmp( playerName, kPlayerNameRand )==0 )
-                    return kAvatarShapeRand;
-                if ( stricmp( playerName, kPlayerNameSutherland )==0 )
-                    return kAvatarShapeSutherland;
-                if ( stricmp( playerName, kPlayerNameLaxman )==0 )
-                    return kAvatarShapeLaxman;
-                if ( stricmp( playerName, kPlayerNameKodama )==0 )
-                    return kAvatarShapeKodama;
-                if ( stricmp( playerName, kPlayerNameEngberg )==0 )
-                    return kAvatarShapeEngberg;                 
-                if ( stricmp( playerName, kPlayerNameZandi )==0 )
-                    return kAvatarShapeZandi;                   
-                if ( stricmp( playerName, kPlayerNameYeesha )==0 )
-                    return kAvatarShapeYeesha;                  
-                    // other reserved players go here.
-                return currShapeName;
-            }
-
-        }
+const char* GetReservedAvatarShape(const char* playerName, const char* currShapeName)
+{
+    if (stricmp(playerName, kPlayerNameDrWatson) == 0) {
+        return kAvatarShapeDrWatson;
     }
+
+    if (stricmp(playerName, kPlayerNameRand) == 0) {
+        return kAvatarShapeRand;
+    }
+
+    if (stricmp(playerName, kPlayerNameDrWatson) == 0) {
+        return kAvatarShapeDrWatson;
+    }
+
+    if (stricmp(playerName, kPlayerNameRand) == 0) {
+        return kAvatarShapeRand;
+    }
+
+    if (stricmp(playerName, kPlayerNameSutherland) == 0) {
+        return kAvatarShapeSutherland;
+    }
+
+    if (stricmp(playerName, kPlayerNameLaxman) == 0) {
+        return kAvatarShapeLaxman;
+    }
+
+    if (stricmp(playerName, kPlayerNameKodama) == 0) {
+        return kAvatarShapeKodama;
+    }
+
+    if (stricmp(playerName, kPlayerNameEngberg) == 0) {
+        return kAvatarShapeEngberg;
+    }
+
+    if (stricmp(playerName, kPlayerNameZandi) == 0) {
+        return kAvatarShapeZandi;
+    }
+
+    if (stricmp(playerName, kPlayerNameYeesha) == 0) {
+        return kAvatarShapeYeesha;
+    }
+
+    // other reserved players go here.
+    return currShapeName;
+}
+
+}
+}
 }

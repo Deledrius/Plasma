@@ -48,13 +48,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plMessage;
 
-class plTimerCallback 
-{
+class plTimerCallback {
 public:
-    
+
     plTimerCallback(double time, plMessage* pMsg);
     ~plTimerCallback();
-    
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
@@ -62,15 +61,14 @@ public:
     plMessage*  fMsg;
 };
 
-class plTimerCallbackManager : public hsKeyedObject
-{
+class plTimerCallbackManager : public hsKeyedObject {
 public:
-    
+
     plTimerCallbackManager();
     ~plTimerCallbackManager();
 
-    CLASSNAME_REGISTER( plTimerCallbackManager );
-    GETINTERFACE_ANY( plTimerCallbackManager, hsKeyedObject );
+    CLASSNAME_REGISTER(plTimerCallbackManager);
+    GETINTERFACE_ANY(plTimerCallbackManager, hsKeyedObject);
 
     virtual plTimerCallback* NewTimer(float time, plMessage* pMsg);
     bool CancelCallback(plTimerCallback* pTimer);
@@ -78,29 +76,34 @@ public:
 
 
     virtual bool MsgReceive(plMessage* msg);
-        
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
 private:
-    
+
     hsTArray<plTimerCallback*>  fCallbacks;
 };
 
-class plgTimerCallbackMgr
-{
+class plgTimerCallbackMgr {
 private:
     static plTimerCallbackManager*      fMgr;
 public:
 
     static void Init();
     static void Shutdown();
-    static plTimerCallbackManager* Mgr() { return fMgr; }
+    static plTimerCallbackManager* Mgr() {
+        return fMgr;
+    }
 
     // External modifier use only
-    static void SetTheTimerCallbackMgr(plTimerCallbackManager *mgr) { fMgr = mgr; }
+    static void SetTheTimerCallbackMgr(plTimerCallbackManager* mgr) {
+        fMgr = mgr;
+    }
 
-    static plTimerCallback* NewTimer(float time, plMessage* pMsg) { return (fMgr->NewTimer(time, pMsg)); }
+    static plTimerCallback* NewTimer(float time, plMessage* pMsg) {
+        return (fMgr->NewTimer(time, pMsg));
+    }
     static bool CancelCallback(plTimerCallback* pTimer);
     static bool CancelCallbacksToKey(const plKey& key);
 };

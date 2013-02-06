@@ -83,18 +83,20 @@ void plDispatchLog::LogStatusBarChange(const char* name, const char* action)
     // Note: this will return shared mem too on Win9x.  There's a way to catch that, but it's too slow -Colin
     uint32_t processMemUsed = 0;
     void* curAddress = 0;
-    while (VirtualQuery(curAddress, &mbi, sizeof(MEMORY_BASIC_INFORMATION)) == sizeof(MEMORY_BASIC_INFORMATION))
-    {
-        if (mbi.State == MEM_COMMIT && mbi.Type == MEM_PRIVATE)
+
+    while (VirtualQuery(curAddress, &mbi, sizeof(MEMORY_BASIC_INFORMATION)) == sizeof(MEMORY_BASIC_INFORMATION)) {
+        if (mbi.State == MEM_COMMIT && mbi.Type == MEM_PRIVATE) {
             processMemUsed += mbi.RegionSize;
+        }
+
         curAddress = ((BYTE*)mbi.BaseAddress) + mbi.RegionSize;
     }
-    
-    #define ToMB(mem) float(mem) / (1024.f*1024.f)
+
+#define ToMB(mem) float(mem) / (1024.f*1024.f)
     fLog->AddLineF("# Mem stats");
-    fLog->AddLineF("#   Physical: %.1f MB used %.1f MB free", ToMB(ms.dwTotalPhys-ms.dwAvailPhys), ToMB(ms.dwAvailPhys));
-    fLog->AddLineF("#   Virtual:  %.1f MB used %.1f MB free", ToMB(ms.dwTotalVirtual-ms.dwAvailVirtual), ToMB(ms.dwAvailVirtual));
-    fLog->AddLineF("#   Pagefile: %.1f MB used %.1f MB free", ToMB(ms.dwTotalPageFile-ms.dwAvailPageFile), ToMB(ms.dwAvailPageFile));
+    fLog->AddLineF("#   Physical: %.1f MB used %.1f MB free", ToMB(ms.dwTotalPhys - ms.dwAvailPhys), ToMB(ms.dwAvailPhys));
+    fLog->AddLineF("#   Virtual:  %.1f MB used %.1f MB free", ToMB(ms.dwTotalVirtual - ms.dwAvailVirtual), ToMB(ms.dwAvailVirtual));
+    fLog->AddLineF("#   Pagefile: %.1f MB used %.1f MB free", ToMB(ms.dwTotalPageFile - ms.dwAvailPageFile), ToMB(ms.dwAvailPageFile));
     fLog->AddLineF("#   Process:  %.1f MB used", ToMB(processMemUsed));
 #endif // HS_BUILD_FOR_WIN32
 }
@@ -102,30 +104,38 @@ void plDispatchLog::LogStatusBarChange(const char* name, const char* action)
 void plDispatchLog::LogLongReceive(const char* keyname, const char* className, uint32_t clonePlayerID, plMessage* msg, float ms)
 {
     plString info;
-    if (DumpSpecificMsgInfo(msg, info))
+
+    if (DumpSpecificMsgInfo(msg, info)) {
         fLog->AddLineF("%-30s[%7u](%-20s) took %6.1f ms to receive %s[%s]\n", keyname, clonePlayerID, className, ms, msg->ClassName(), info.c_str());
-    else
+    } else {
         fLog->AddLineF("%-30s[%7u](%-20s) took %6.1f ms to receive %s\n", keyname, clonePlayerID, className, ms, msg->ClassName());
+    }
 }
 
 void plDispatchLog::DumpMsg(plMessage* msg, int numReceivers, int sendTimeMs, int32_t indent)
 {
-    if (!msg)
+    if (!msg) {
         return;
+    }
 
-    bool found=fIncludeTypes.IsBitSet(msg->ClassIndex());
+    bool found = fIncludeTypes.IsBitSet(msg->ClassIndex());
+
     if (found && !hsCheckBits(fFlags, plDispatchLogBase::kInclude))
         // it's an exclude list and we found it
+    {
         return;
+    }
+
     if (!found && hsCheckBits(fFlags, plDispatchLogBase::kInclude))
         // it's an include list and we didn't find it
+    {
         return;
+    }
 
-    static float lastTime=0;
+    static float lastTime = 0;
     float curTime = (float)hsTimer::GetSysSeconds();
 
-    if (lastTime!=curTime)
-    {
+    if (lastTime != curTime) {
         // add linebreak for new frame
         fLog->AddLine("\n");
     }
@@ -133,56 +143,62 @@ void plDispatchLog::DumpMsg(plMessage* msg, int numReceivers, int sendTimeMs, in
     float sendTime = hsTimer::FullTicksToMs(hsTimer::GetFullTickCount() - fStartTicks);
 
     char indentStr[50];
-    indent = hsMinimum(indent, sizeof(indentStr)-1);
+    indent = hsMinimum(indent, sizeof(indentStr) - 1);
     memset(indentStr, ' ', indent);
     indentStr[indent] = '\0';
 
     fLog->AddLineF("%sDispatched (%d) %d ms: time=%d CName=%s, sndr=%s, rcvr(%d)=%s, flags=0x%lx, tstamp=%f\n",
-        indentStr, numReceivers, sendTimeMs,
-        int(sendTime), msg->ClassName(), msg->fSender?msg->fSender->GetName().c_str():"nil",
-        msg->GetNumReceivers(), msg->GetNumReceivers() && msg->GetReceiver(0)
-            ? msg->GetReceiver(0)->GetName().c_str():"nil",
-        msg->fBCastFlags, msg->fTimeStamp);
+                   indentStr, numReceivers, sendTimeMs,
+                   int(sendTime), msg->ClassName(), msg->fSender ? msg->fSender->GetName().c_str() : "nil",
+                   msg->GetNumReceivers(), msg->GetNumReceivers() && msg->GetReceiver(0)
+                   ? msg->GetReceiver(0)->GetName().c_str() : "nil",
+                   msg->fBCastFlags, msg->fTimeStamp);
 
-    lastTime=curTime;
+    lastTime = curTime;
 }
 
 void plDispatchLog::AddFilterType(uint16_t hClass)
 {
-    if (hClass>=plFactory::GetNumClasses())
-        return; 
+    if (hClass >= plFactory::GetNumClasses()) {
+        return;
+    }
 
     int i;
-    for( i = 0; i < plFactory::GetNumClasses(); i++ )
-    {
-        if( plFactory::DerivesFrom(hClass, i) )
+
+    for (i = 0; i < plFactory::GetNumClasses(); i++) {
+        if (plFactory::DerivesFrom(hClass, i)) {
             AddFilterExactType(i);
+        }
     }
 }
 
 void plDispatchLog::AddFilterExactType(uint16_t type)
 {
-    if (type<plFactory::GetNumClasses())
+    if (type < plFactory::GetNumClasses()) {
         fIncludeTypes.SetBit(type);
+    }
 }
 
 void plDispatchLog::RemoveFilterType(uint16_t hClass)
 {
-    if (hClass>=plFactory::GetNumClasses())
-        return; 
+    if (hClass >= plFactory::GetNumClasses()) {
+        return;
+    }
 
     int i;
-    for( i = 0; i < plFactory::GetNumClasses(); i++ )
-    {
-        if( plFactory::DerivesFrom(hClass, i) )
+
+    for (i = 0; i < plFactory::GetNumClasses(); i++) {
+        if (plFactory::DerivesFrom(hClass, i)) {
             RemoveFilterExactType(i);
+        }
     }
 }
 
 void plDispatchLog::RemoveFilterExactType(uint16_t type)
 {
-    if (type<plFactory::GetNumClasses())
+    if (type < plFactory::GetNumClasses()) {
         fIncludeTypes.ClearBit(type);
+    }
 }
 
 
@@ -199,10 +215,10 @@ static bool DumpSpecificMsgInfo(plMessage* msg, plString& info)
 {
 #ifndef PLASMA_EXTERNAL_RELEASE // Don't bloat up the external release with all these strings
     pfKIMsg* kiMsg = pfKIMsg::ConvertNoRef(msg);
-    if (kiMsg)
-    {
+
+    if (kiMsg) {
         const char* typeName = "(unknown)";
-        #define PrintKIType(type)   if (kiMsg->GetCommand() == pfKIMsg::type) typeName = #type;
+#define PrintKIType(type)   if (kiMsg->GetCommand() == pfKIMsg::type) typeName = #type;
         PrintKIType(kHACKChatMsg);              // send chat message via pfKIMsg
         PrintKIType(kEnterChatMode);                // toggle chat mode
         PrintKIType(kSetChatFadeDelay);         // set the chat delay
@@ -258,20 +274,20 @@ static bool DumpSpecificMsgInfo(plMessage* msg, plString& info)
         PrintKIType(kNoCommand);
 
         info = plString::Format("Type: %s Str: %s User: %s(%d) Delay: %f Int: %d",
-            typeName,
-            kiMsg->GetString() != "" ? kiMsg->GetString().c_str() : "(nil)",
-            kiMsg->GetUser() ? kiMsg->GetUser() : "(nil)",
-            kiMsg->GetPlayerID(),
-            kiMsg->GetDelay(),
-            kiMsg->GetIntValue());
+                                typeName,
+                                kiMsg->GetString() != "" ? kiMsg->GetString().c_str() : "(nil)",
+                                kiMsg->GetUser() ? kiMsg->GetUser() : "(nil)",
+                                kiMsg->GetPlayerID(),
+                                kiMsg->GetDelay(),
+                                kiMsg->GetIntValue());
 
         return true;
     }
-        
+
     plClientMsg* clientMsg = plClientMsg::ConvertNoRef(msg);
-    if (clientMsg)
-    {
-        #define PrintType(type) if (clientMsg->GetClientMsgFlag() == plClientMsg::type) info = #type;
+
+    if (clientMsg) {
+#define PrintType(type) if (clientMsg->GetClientMsgFlag() == plClientMsg::type) info = #type;
         PrintType(kLoadRoom);
         PrintType(kLoadRoomHold);
         PrintType(kUnloadRoom);
@@ -283,22 +299,21 @@ static bool DumpSpecificMsgInfo(plMessage* msg, plString& info)
         PrintType(kLoadAgeKeys);
         PrintType(kReleaseAgeKeys);
 
-        switch (clientMsg->GetClientMsgFlag())
-        {
+        switch (clientMsg->GetClientMsgFlag()) {
         case plClientMsg::kLoadRoom:
         case plClientMsg::kLoadRoomHold:
-        case plClientMsg::kUnloadRoom:
-            {
+        case plClientMsg::kUnloadRoom: {
                 info += " - Pages: ";
 
                 const std::vector<plLocation>& locs = clientMsg->GetRoomLocs();
-                for (int i = 0; i < locs.size(); i++)
-                {
+
+                for (int i = 0; i < locs.size(); i++) {
                     const plLocation& loc = locs[i];
                     const plPageInfo* pageInfo = plKeyFinder::Instance().GetLocationInfo(loc);
 
-                    if (pageInfo)
+                    if (pageInfo) {
                         info += plString::Format("%s-%s ", pageInfo->GetAge().c_str(), pageInfo->GetPage().c_str());
+                    }
                 }
             }
             break;
@@ -308,14 +323,15 @@ static bool DumpSpecificMsgInfo(plMessage* msg, plString& info)
             info += plString::Format(" - Age: %s", clientMsg->GetAgeName().c_str());
             break;
         }
+
         return true;
     }
 
     plRefMsg* refMsg = plRefMsg::ConvertNoRef(msg);
-    if (refMsg)
-    {
+
+    if (refMsg) {
         const char* typeName = nil;
-        #define GetType(type)   if (refMsg->GetContext() == plRefMsg::type) typeName = #type;
+#define GetType(type)   if (refMsg->GetContext() == plRefMsg::type) typeName = #type;
         GetType(kOnCreate);
         GetType(kOnDestroy);
         GetType(kOnRequest);
@@ -325,6 +341,7 @@ static bool DumpSpecificMsgInfo(plMessage* msg, plString& info)
 
         return true;
     }
+
 #endif // PLASMA_EXTERNAL_RELEASE
 
     return false;

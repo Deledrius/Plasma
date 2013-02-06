@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtList.cpp
-*   
+*
 ***/
 
 #include "pnUtList.h"
@@ -55,52 +55,57 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 //===========================================================================
-void CBaseList::Link (CBaseList * list, uint8_t * afterNode, uint8_t * beforeNode, ELinkType linkType, uint8_t * existingNode) {
+void CBaseList::Link(CBaseList* list, uint8_t* afterNode, uint8_t* beforeNode, ELinkType linkType, uint8_t* existingNode)
+{
 
     // Verify that the two lists share a common link offset
     ASSERT(m_linkOffset != LINK_OFFSET_UNINIT);
     ASSERT(m_linkOffset == list->m_linkOffset);
 
     // Verify that the two lists are distinct
-    CBaseLink * sourceTerminator = &list->m_terminator;
+    CBaseLink* sourceTerminator = &list->m_terminator;
     ASSERT(sourceTerminator != &m_terminator);
 
     // Find the first and last nodes to move from the source list
-    CBaseLink * afterLink  = afterNode  ? GetLink(afterNode)  : sourceTerminator;
-    CBaseLink * beforeLink = beforeNode ? GetLink(beforeNode) : sourceTerminator;
-    CBaseLink * firstLink  = afterLink->NextLink();
-    CBaseLink * lastLink   = beforeLink->m_prevLink;
-    if (lastLink == afterLink)
+    CBaseLink* afterLink  = afterNode  ? GetLink(afterNode)  : sourceTerminator;
+    CBaseLink* beforeLink = beforeNode ? GetLink(beforeNode) : sourceTerminator;
+    CBaseLink* firstLink  = afterLink->NextLink();
+    CBaseLink* lastLink   = beforeLink->m_prevLink;
+
+    if (lastLink == afterLink) {
         return;
+    }
+
     ASSERT(firstLink != beforeLink);
 
     // Store nodes for later use in linking
-    uint8_t * firstNode    = afterLink->m_next;
-    uint8_t * lastNextNode = lastLink->m_next;
+    uint8_t* firstNode    = afterLink->m_next;
+    uint8_t* lastNextNode = lastLink->m_next;
     ASSERT(firstNode);
     ASSERT(lastNextNode);
 
-    // Find the previous and next nodes in the destination list which will 
+    // Find the previous and next nodes in the destination list which will
     // bound all of the nodes of the source list
-    CBaseLink * existingLink = existingNode ? GetLink(existingNode) : &m_terminator;
-    CBaseLink * prevLink, * nextLink;
+    CBaseLink* existingLink = existingNode ? GetLink(existingNode) : &m_terminator;
+    CBaseLink* prevLink, * nextLink;
+
     switch (linkType) {
-    
-        case kListLinkAfter:
-            prevLink = existingLink;
-            nextLink = existingLink->NextLink();
+
+    case kListLinkAfter:
+        prevLink = existingLink;
+        nextLink = existingLink->NextLink();
         break;
 
-        case kListLinkBefore:
-            prevLink = existingLink->m_prevLink;
-            nextLink = existingLink;
+    case kListLinkBefore:
+        prevLink = existingLink->m_prevLink;
+        nextLink = existingLink;
         break;
 
         DEFAULT_FATAL(linkType);
 
     }
 
-    // Update the first and last nodes of the moved range to point to the 
+    // Update the first and last nodes of the moved range to point to the
     // previous and next nodes in the destination list
     firstLink->m_prevLink = prevLink;
     lastLink->m_next      = prevLink->m_next;
@@ -118,11 +123,13 @@ void CBaseList::Link (CBaseList * list, uint8_t * afterNode, uint8_t * beforeNod
 }
 
 //===========================================================================
-void CBaseList::UnlinkAll () {
-    for (CBaseLink * link = m_terminator.m_prevLink, * prev; link != &m_terminator; link = prev) {
+void CBaseList::UnlinkAll()
+{
+    for (CBaseLink* link = m_terminator.m_prevLink, * prev; link != &m_terminator; link = prev) {
         prev = link->m_prevLink;
         link->InitializeLinksWithOffset(m_linkOffset);
     }
+
     m_terminator.InitializeLinksWithOffset(m_linkOffset);
 }
 

@@ -54,12 +54,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plAudioFileReader.h"
 
 
-struct plSoundMarker
-{
-    char *fName;
+struct plSoundMarker {
+    char* fName;
     double fOffset; // in Secs
 
-    plSoundMarker () { fName = NULL;fOffset = 0.0; }
+    plSoundMarker() {
+        fName = NULL;
+        fOffset = 0.0;
+    }
 
 };
 
@@ -71,41 +73,46 @@ struct plSoundMarker
 
 
 
-class CWaveFile : public plAudioFileReader
-{
+class CWaveFile : public plAudioFileReader {
 public:
     CWaveFile();
     ~CWaveFile();
 
-    HRESULT Open(const char *strFileName, WAVEFORMATEX* pwfx, DWORD dwFlags );
-    HRESULT OpenFromMemory( BYTE* pbData, ULONG ulDataSize, WAVEFORMATEX* pwfx, DWORD dwFlags );
+    HRESULT Open(const char* strFileName, WAVEFORMATEX* pwfx, DWORD dwFlags);
+    HRESULT OpenFromMemory(BYTE* pbData, ULONG ulDataSize, WAVEFORMATEX* pwfx, DWORD dwFlags);
 
-    HRESULT Read( BYTE* pBuffer, DWORD dwSizeToRead, DWORD* pdwSizeRead );
-    HRESULT AdvanceWithoutRead( DWORD dwSizeToRead, DWORD* pdwSizeRead );
-    HRESULT Write( UINT nSizeToWrite, BYTE* pbData, UINT* pnSizeWrote );
+    HRESULT Read(BYTE* pBuffer, DWORD dwSizeToRead, DWORD* pdwSizeRead);
+    HRESULT AdvanceWithoutRead(DWORD dwSizeToRead, DWORD* pdwSizeRead);
+    HRESULT Write(UINT nSizeToWrite, BYTE* pbData, UINT* pnSizeWrote);
 
     DWORD   GetSize();
     HRESULT ResetFile();
-    WAVEFORMATEX* GetFormat() { return m_pwfx; };
+    WAVEFORMATEX* GetFormat() {
+        return m_pwfx;
+    };
 
-    DWORD GetNumMarkers() { return fMarkers.size() ; };
-    plSoundMarker *GetSoundMarker(int i) { return fMarkers[i]; }
+    DWORD GetNumMarkers() {
+        return fMarkers.size() ;
+    };
+    plSoundMarker* GetSoundMarker(int i) {
+        return fMarkers[i];
+    }
 
 
     // Overloads for plAudioFileReader
-    CWaveFile( const char *path, plAudioCore::ChannelSelect whichChan );
-    virtual bool    OpenForWriting( const char *path, plWAVHeader &header );
-    virtual plWAVHeader &GetHeader( void );
-    virtual void    Close( void );
-    virtual uint32_t  GetDataSize( void );
-    virtual float   GetLengthInSecs( void );
+    CWaveFile(const char* path, plAudioCore::ChannelSelect whichChan);
+    virtual bool    OpenForWriting(const char* path, plWAVHeader& header);
+    virtual plWAVHeader& GetHeader(void);
+    virtual void    Close(void);
+    virtual uint32_t  GetDataSize(void);
+    virtual float   GetLengthInSecs(void);
 
-    virtual bool    SetPosition( uint32_t numBytes );
-    virtual bool    Read( uint32_t numBytes, void *buffer );
-    virtual uint32_t  NumBytesLeft( void );
-    virtual uint32_t  Write( uint32_t bytes, void *buffer );
+    virtual bool    SetPosition(uint32_t numBytes);
+    virtual bool    Read(uint32_t numBytes, void* buffer);
+    virtual uint32_t  NumBytesLeft(void);
+    virtual uint32_t  Write(uint32_t bytes, void* buffer);
 
-    virtual bool    IsValid( void );
+    virtual bool    IsValid(void);
     WAVEFORMATEX* m_pwfx;        // Pointer to WAVEFORMATEX structure
     HMMIO         m_hmmio;       // MM I/O handle for the WAVE
     MMCKINFO      m_ck;          // Multimedia RIFF chunk
@@ -117,7 +124,7 @@ public:
     BYTE*         m_pbData;
     BYTE*         m_pbDataCur;
     ULONG         m_ulDataSize;
-    
+
     plWAVHeader     fHeader;
 
     std::vector<plSoundMarker*>  fMarkers;
@@ -125,7 +132,7 @@ public:
 
 protected:
     HRESULT ReadMMIO();
-    HRESULT WriteMMIO( WAVEFORMATEX *pwfxDest );
+    HRESULT WriteMMIO(WAVEFORMATEX* pwfxDest);
     HRESULT IClose();
 };
 #endif // BUILDING_MAXPLUGIN

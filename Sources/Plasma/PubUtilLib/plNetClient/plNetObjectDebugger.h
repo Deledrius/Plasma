@@ -48,11 +48,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsKeyedObject;
 class plStatusLog;
-class plNetObjectDebugger : public plNetObjectDebuggerBase
-{
+class plNetObjectDebugger : public plNetObjectDebuggerBase {
 public:
-    enum Flags
-    {
+    enum Flags {
         kExactStringMatch   = 0x1,
         kEndStringMatch     = 0x2,
         kStartStringMatch   = 0x4,
@@ -60,8 +58,7 @@ public:
         kPageMatch          = 0x10      // has page info specified
     };
 private:
-    struct DebugObject
-    {
+    struct DebugObject {
         std::string fObjName;
         plLocation fLoc;
         uint32_t fFlags;
@@ -82,14 +79,20 @@ public:
 
     static plNetObjectDebugger* GetInstance();
 
-    bool GetDebugging() const { return fDebugging;  }
-    void SetDebugging(bool b) { fDebugging=b;   }
+    bool GetDebugging() const {
+        return fDebugging;
+    }
+    void SetDebugging(bool b) {
+        fDebugging = b;
+    }
 
     // object fxns
-    bool AddDebugObject(const char* objName, const char* pageName=nil);
-    bool RemoveDebugObject(const char* objName, const char* pageName=nil);
+    bool AddDebugObject(const char* objName, const char* pageName = nil);
+    bool RemoveDebugObject(const char* objName, const char* pageName = nil);
     void ClearAllDebugObjects();
-    int GetNumDebugObjects() const { return fDebugObjects.size(); }
+    int GetNumDebugObjects() const {
+        return fDebugObjects.size();
+    }
     bool IsDebugObject(const hsKeyedObject* obj) const;
 
     void LogMsgIfMatch(const char* msg) const;      // write to status log if there's a string match

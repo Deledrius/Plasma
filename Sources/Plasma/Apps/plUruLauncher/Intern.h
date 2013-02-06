@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/Apps/plUruLauncher/Intern.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_APPS_PLURULAUNCHER_INTERN_H
@@ -57,5 +57,5 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *   SelfPatcher.cpp
 *
 ***/
-bool SelfPatch (bool noSelfPatch, bool * abort, ENetError * result, plLauncherInfo *info);
-void SetReturnCode (DWORD retCode);
+bool SelfPatch(bool noSelfPatch, bool* abort, ENetError* result, plLauncherInfo* info);
+void SetReturnCode(DWORD retCode);

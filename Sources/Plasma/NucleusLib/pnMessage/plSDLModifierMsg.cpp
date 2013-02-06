@@ -49,12 +49,13 @@ plSDLModifierMsg::plSDLModifierMsg(const plString& sdlName, Action a) :
     fPlayerID(0),
     fManageStateMem(false),
     fFlags(0)
-{ 
+{
     SetBCastFlag(plMessage::kPropagateToModifiers);
 }
 
 plSDLModifierMsg::~plSDLModifierMsg()
 {
-    if ( fManageStateMem )
+    if (fManageStateMem) {
         delete fState;
+    }
 }

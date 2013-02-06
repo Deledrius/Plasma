@@ -45,19 +45,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnDispatch/plDispatch.h"
 #include "pnMessage/plSelfDestructMsg.h"
 
-void hsKeyedObject::SetKey(plKey k)              
+void hsKeyedObject::SetKey(plKey k)
 {
-    if (fpKey != nil)
-    {
+    if (fpKey != nil) {
         hsAssert(k == nil || k == fpKey, "Changing an object's key is not allowed");
-        ((plKeyImp*)fpKey)->SetObjectPtr(nil); 
+        ((plKeyImp*)fpKey)->SetObjectPtr(nil);
     }
 
     fpKey = k;
 
-    if (fpKey != nil)
-        ((plKeyImp*)fpKey)->SetObjectPtr(this); 
-}   
+    if (fpKey != nil) {
+        ((plKeyImp*)fpKey)->SetObjectPtr(this);
+    }
+}
 
 bool hsKeyedObject::SendRef(plRefMsg* refMsg, plRefFlags::Type flags)
 {
@@ -67,16 +67,16 @@ bool hsKeyedObject::SendRef(plRefMsg* refMsg, plRefFlags::Type flags)
 
 plString hsKeyedObject::GetKeyName() const
 {
-    if (fpKey)
+    if (fpKey) {
         return fpKey->GetName();
-    else
+    } else {
         return "(unknown)";
+    }
 }
 
 hsKeyedObject::~hsKeyedObject()
-{ 
-    if( fpKey && fpKey->ObjectIsLoaded() )
-    {
+{
+    if (fpKey && fpKey->ObjectIsLoaded()) {
         // If our key is pointing to an object (presumably back to us),
         // then UnRegister will call SetObjectPtr(nil) will unregister the key (and us), which will
         // decrement our RefCnt. Unfortunately, we are here because of a call
@@ -84,17 +84,18 @@ hsKeyedObject::~hsKeyedObject()
         // destructor again. So we'll just up the RefCnt, plKey::UnRegister will dec it back to 1.
         hsRefCnt_SafeRef(fpKey->ObjectIsLoaded());
     }
-    UnRegister(); 
+
+    UnRegister();
 }
 
 void hsKeyedObject::UnRegister()
 {
-    if (fpKey)
-    {
-        if (plgDispatch::Dispatch())
+    if (fpKey) {
+        if (plgDispatch::Dispatch()) {
             plgDispatch::Dispatch()->UnRegisterAll(fpKey);
-        
-        ((plKeyImp *)fpKey)->SetObjectPtr(nil);
+        }
+
+        ((plKeyImp*)fpKey)->SetObjectPtr(nil);
     }
 }
 
@@ -104,16 +105,14 @@ plKey hsKeyedObject::RegisterAs(plFixedKeyId fixedKey)
 
     hsAssert(meUoid.GetClassType() == ClassIndex(), "Registering as wrong type!");
     plKey key = hsgResMgr::ResMgr()->FindKey(meUoid);
-    if (key == nil)
-    {
+
+    if (key == nil) {
         key = hsgResMgr::ResMgr()->NewKey(meUoid, this);
 
         //  the key list "helpfully" assigns us an object id.
         // we don't want one for fixed keys however (initialization order might bite us in the ass)
         static_cast<plKeyImp*>(key)->SetObjectID(0);
-    }
-    else
-    {
+    } else {
         SetKey(key);
     }
 
@@ -129,29 +128,31 @@ void hsKeyedObject::UnRegisterAs(plFixedKeyId fixedKey)
 
 plKey hsKeyedObject::RegisterAsManual(plUoid& meUoid, const plString& p)
 {
-    hsAssert(meUoid.GetClassType() == ClassIndex(),"Registering as wrong type!");
+    hsAssert(meUoid.GetClassType() == ClassIndex(), "Registering as wrong type!");
     // Really should be a NewKey() call just for fixed keys, so change this once player rooms behave
-    plKey pkey = hsgResMgr::ResMgr()->ReRegister(p,meUoid);
+    plKey pkey = hsgResMgr::ResMgr()->ReRegister(p, meUoid);
 
-    if (pkey)
+    if (pkey) {
         SetKey(pkey);
+    }
+
     return pkey;
 }
 
 
 void hsKeyedObject::UnRegisterAsManual(plUoid& inUoid)
 {
-    if (fpKey)
-    {
+    if (fpKey) {
         plUoid myUoid = fpKey->GetUoid();
-        if (!(inUoid == myUoid))
-        {
+
+        if (!(inUoid == myUoid)) {
 #if !HS_BUILD_FOR_UNIX      // disable for unix servers
             hsAssert(false,
-                plString::Format("Request to Unregister wrong FixedKey, keyName=%s, inUoid=%s, myUoid=%s",
-                    fpKey->GetName().c_str("?"), inUoid.StringIze().c_str(), myUoid.StringIze().c_str()).c_str());
+                     plString::Format("Request to Unregister wrong FixedKey, keyName=%s, inUoid=%s, myUoid=%s",
+                                      fpKey->GetName().c_str("?"), inUoid.StringIze().c_str(), myUoid.StringIze().c_str()).c_str());
 #endif
         }
+
         ((plKeyImp*)fpKey)->UnRegister();
     }
 }
@@ -160,8 +161,7 @@ void hsKeyedObject::Validate()
 {
     const char* msg = "KeyedObject invalid!";
 
-    if (fpKey)
-    {
+    if (fpKey) {
         hsAssert(fpKey->GetObjectPtr() == this, msg);
     }
 }
@@ -174,19 +174,20 @@ void hsKeyedObject::Read(hsStream* s, hsResMgr* mgr)
 
 void hsKeyedObject::Write(hsStream* s, hsResMgr* mgr)
 {
-    hsAssert(GetKey(),"hsKeyedObject:Must have a key!");
+    hsAssert(GetKey(), "hsKeyedObject:Must have a key!");
     mgr->WriteKey(s, fpKey);
 }
 
 bool hsKeyedObject::MsgReceive(plMessage* msg)
 {
     plSelfDestructMsg* nuke = plSelfDestructMsg::ConvertNoRef(msg);
-    if (nuke)
-    {
+
+    if (nuke) {
         hsAssert(RefCnt() == 1, "Trying to selfdestruct with bogus refcnt");
-        hsRefCnt_SafeUnRef(this); 
+        hsRefCnt_SafeUnRef(this);
 
         return true;
     }
+
     return plReceiver::MsgReceive(msg);
 }

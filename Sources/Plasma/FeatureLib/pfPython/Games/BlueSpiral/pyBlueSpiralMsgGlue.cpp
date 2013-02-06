@@ -70,9 +70,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptBlueSpiralMsg, upcastToFinalBlueSpiralMsg)
 }
 
 PYTHON_START_METHODS_TABLE(ptBlueSpiralMsg)
-    PYTHON_METHOD_NOARGS(ptBlueSpiralMsg, getBlueSpiralMsgType, "Returns the type of the BlueSpiral message (see PtBlueSpiralMsgTypes)"),
-    PYTHON_METHOD_NOARGS(ptBlueSpiralMsg, upcastToFinalBlueSpiralMsg, "Returns this message as the BlueSpiral message it really is"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptBlueSpiralMsg, getBlueSpiralMsgType, "Returns the type of the BlueSpiral message (see PtBlueSpiralMsgTypes)"),
+                     PYTHON_METHOD_NOARGS(ptBlueSpiralMsg, upcastToFinalBlueSpiralMsg, "Returns this message as the BlueSpiral message it really is"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptBlueSpiralMsg, pyGameCliMsg, "Base class for BlueSpiral game messages");
@@ -81,9 +81,12 @@ PYTHON_EXPOSE_TYPE_DEFINITION(ptBlueSpiralMsg, pyBlueSpiralMsg);
 // required functions for PyObject interoperability
 PyObject* pyBlueSpiralMsg::New(pfGameCliMsg* msg)
 {
-    ptBlueSpiralMsg *newObj = (ptBlueSpiralMsg*)ptBlueSpiralMsg_type.tp_new(&ptBlueSpiralMsg_type, NULL, NULL);
-    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_BlueSpiral))
+    ptBlueSpiralMsg* newObj = (ptBlueSpiralMsg*)ptBlueSpiralMsg_type.tp_new(&ptBlueSpiralMsg_type, NULL, NULL);
+
+    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_BlueSpiral)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -125,14 +128,17 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptBlueSpiralClothOrderMsg, order)
 {
     std::vector<int> order = self->fThis->Order();
     PyObject* retVal = PyList_New(order.size());
-    for (unsigned i = 0; i < order.size(); ++i)
+
+    for (unsigned i = 0; i < order.size(); ++i) {
         PyList_SetItem(retVal, i, PyInt_FromLong(order[i]));
+    }
+
     return retVal;
 }
 
 PYTHON_START_METHODS_TABLE(ptBlueSpiralClothOrderMsg)
-    PYTHON_METHOD_NOARGS(ptBlueSpiralClothOrderMsg, order, "Returns a list of numbers indicating the correct order to hit the clothes in"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptBlueSpiralClothOrderMsg, order, "Returns a list of numbers indicating the correct order to hit the clothes in"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptBlueSpiralClothOrderMsg, pyBlueSpiralMsg, "BlueSpiral message received when the game is started and the cloth order is set");
@@ -140,9 +146,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptBlueSpiralClothOrderMsg, pyBlueSpiralMsg, "BlueSpira
 // required functions for PyObject interoperability
 PyObject* pyBlueSpiralClothOrderMsg::New(pfGameCliMsg* msg)
 {
-    ptBlueSpiralClothOrderMsg *newObj = (ptBlueSpiralClothOrderMsg*)ptBlueSpiralClothOrderMsg_type.tp_new(&ptBlueSpiralClothOrderMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_BlueSpiral_ClothOrder))
+    ptBlueSpiralClothOrderMsg* newObj = (ptBlueSpiralClothOrderMsg*)ptBlueSpiralClothOrderMsg_type.tp_new(&ptBlueSpiralClothOrderMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_BlueSpiral_ClothOrder)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -174,9 +183,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptBlueSpiralSuccessfulHitMsg, pyBlueSpiralMsg, "BlueSp
 // required functions for PyObject interoperability
 PyObject* pyBlueSpiralSuccessfulHitMsg::New(pfGameCliMsg* msg)
 {
-    ptBlueSpiralSuccessfulHitMsg *newObj = (ptBlueSpiralSuccessfulHitMsg*)ptBlueSpiralSuccessfulHitMsg_type.tp_new(&ptBlueSpiralSuccessfulHitMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_BlueSpiral_SuccessfulHit))
+    ptBlueSpiralSuccessfulHitMsg* newObj = (ptBlueSpiralSuccessfulHitMsg*)ptBlueSpiralSuccessfulHitMsg_type.tp_new(&ptBlueSpiralSuccessfulHitMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_BlueSpiral_SuccessfulHit)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -208,9 +220,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptBlueSpiralGameWonMsg, pyBlueSpiralMsg, "BlueSpiral m
 // required functions for PyObject interoperability
 PyObject* pyBlueSpiralGameWonMsg::New(pfGameCliMsg* msg)
 {
-    ptBlueSpiralGameWonMsg *newObj = (ptBlueSpiralGameWonMsg*)ptBlueSpiralGameWonMsg_type.tp_new(&ptBlueSpiralGameWonMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_BlueSpiral_GameWon))
+    ptBlueSpiralGameWonMsg* newObj = (ptBlueSpiralGameWonMsg*)ptBlueSpiralGameWonMsg_type.tp_new(&ptBlueSpiralGameWonMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_BlueSpiral_GameWon)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -242,9 +257,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptBlueSpiralGameOverMsg, pyBlueSpiralMsg, "BlueSpiral 
 // required functions for PyObject interoperability
 PyObject* pyBlueSpiralGameOverMsg::New(pfGameCliMsg* msg)
 {
-    ptBlueSpiralGameOverMsg *newObj = (ptBlueSpiralGameOverMsg*)ptBlueSpiralGameOverMsg_type.tp_new(&ptBlueSpiralGameOverMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_BlueSpiral_GameOver))
+    ptBlueSpiralGameOverMsg* newObj = (ptBlueSpiralGameOverMsg*)ptBlueSpiralGameOverMsg_type.tp_new(&ptBlueSpiralGameOverMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_BlueSpiral_GameOver)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -273,8 +291,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptBlueSpiralGameStartedMsg, startSpin)
 }
 
 PYTHON_START_METHODS_TABLE(ptBlueSpiralGameStartedMsg)
-    PYTHON_METHOD_NOARGS(ptBlueSpiralGameStartedMsg, startSpin, "Returns true if you are supposed to start spinning the door thingy"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptBlueSpiralGameStartedMsg, startSpin, "Returns true if you are supposed to start spinning the door thingy"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptBlueSpiralGameStartedMsg, pyBlueSpiralMsg, "BlueSpiral message received when someone starts the game (or when you join a game that is running)");
@@ -282,9 +300,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptBlueSpiralGameStartedMsg, pyBlueSpiralMsg, "BlueSpir
 // required functions for PyObject interoperability
 PyObject* pyBlueSpiralGameStartedMsg::New(pfGameCliMsg* msg)
 {
-    ptBlueSpiralGameStartedMsg *newObj = (ptBlueSpiralGameStartedMsg*)ptBlueSpiralGameStartedMsg_type.tp_new(&ptBlueSpiralGameStartedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_BlueSpiral_GameStarted))
+    ptBlueSpiralGameStartedMsg* newObj = (ptBlueSpiralGameStartedMsg*)ptBlueSpiralGameStartedMsg_type.tp_new(&ptBlueSpiralGameStartedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_BlueSpiral_GameStarted)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 

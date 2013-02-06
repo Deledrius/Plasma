@@ -61,16 +61,17 @@ plNetClientStreamRecorder::plNetClientStreamRecorder(TimeWrapper* timeWrapper) :
     fRecordStream(nil),
     fResMgr(nil)
 {
-    if (fLog)
+    if (fLog) {
         delete fLog;
+    }
+
     fLog = plStatusLogMgr::GetInstance().CreateStatusLog(30, "StreamRecorder.log", plStatusLog::kAlignToTop);
 }
 
 
 plNetClientStreamRecorder::~plNetClientStreamRecorder()
 {
-    if (fRecordStream)
-    {
+    if (fRecordStream) {
         fRecordStream->Close();
         delete fRecordStream;
     }
@@ -78,10 +79,11 @@ plNetClientStreamRecorder::~plNetClientStreamRecorder()
 
 hsResMgr* plNetClientStreamRecorder::GetResMgr()
 {
-    if (fResMgr)
+    if (fResMgr) {
         return fResMgr;
-    else
+    } else {
         return hsgResMgr::ResMgr();
+    }
 }
 
 double plNetClientStreamRecorder::GetNextMessageTimeDelta()
@@ -89,21 +91,18 @@ double plNetClientStreamRecorder::GetNextMessageTimeDelta()
     return fNextPlaybackTime - (GetTime() - fPlaybackTimeOffset);
 }
 
-enum NetClientRecFlags
-{
+enum NetClientRecFlags {
     kNetClientRecSDLDesc,
 };
 
 bool plNetClientStreamRecorder::BeginRecording(const char* recName)
 {
-    if (!fRecordStream)
-    {
+    if (!fRecordStream) {
         fRecordStream = new hsUNIXStream;
         char path[256];
         IMakeFilename(recName, path);
 
-        if (!fRecordStream->Open(path, "wb"))
-        {
+        if (!fRecordStream->Open(path, "wb")) {
             delete fRecordStream;
             return false;
         }
@@ -123,26 +122,23 @@ bool plNetClientStreamRecorder::BeginRecording(const char* recName)
 
 bool plNetClientStreamRecorder::BeginPlayback(const char* recName)
 {
-    if (!fRecordStream)
-    {
+    if (!fRecordStream) {
         fRecordStream = new hsUNIXStream;
         char path[256];
         IMakeFilename(recName, path);
 
-        if (fRecordStream->Open(path, "rb"))
-        {
+        if (fRecordStream->Open(path, "rb")) {
             hsBitVector contentFlags;
             contentFlags.Read(fRecordStream);
 
-            if (contentFlags.IsBitSet(kNetClientRecSDLDesc))
+            if (contentFlags.IsBitSet(kNetClientRecSDLDesc)) {
                 plSDLMgr::GetInstance()->Read(fRecordStream);
+            }
 
             fPlaybackTimeOffset = GetTime();
             fNextPlaybackTime = fRecordStream->ReadLEDouble();
             fBetweenAges = false;
-        }
-        else
-        {
+        } else {
             delete fRecordStream;
             fRecordStream = nil;
             return false;
@@ -156,11 +152,11 @@ bool plNetClientStreamRecorder::BeginPlayback(const char* recName)
 
 void plNetClientStreamRecorder::RecordMsg(plNetMessage* msg, double secs)
 {
-    if (!fRecordStream)
+    if (!fRecordStream) {
         return;
+    }
 
-    if (IProcessRecordMsg(msg,secs))
-    {
+    if (IProcessRecordMsg(msg, secs)) {
         fRecordStream->WriteLEDouble(secs - fPlaybackTimeOffset);
         GetResMgr()->WriteCreatableVersion(fRecordStream, msg);
 
@@ -172,13 +168,10 @@ void plNetClientStreamRecorder::RecordAgeLoadedMsg(plAgeLoadedMsg* ageLoadedMsg)
 {
     fLog->AddLineF("Age %s", ageLoadedMsg->fLoaded ? "Loaded" : "Unloaded");
 
-    if (ageLoadedMsg->fLoaded)
-    {
+    if (ageLoadedMsg->fLoaded) {
         fBetweenAges = false;
         fPlaybackTimeOffset = GetTime();
-    }
-    else
-    {
+    } else {
         fBetweenAges = true;
     }
 }
@@ -192,12 +185,13 @@ bool plNetClientStreamRecorder::IsQueueEmpty()
 plNetMessage* plNetClientStreamRecorder::GetNextMessage()
 {
     plNetMessage* msg = nil;
-    while (!fBetweenAges && (msg = IGetNextMessage()))
-    {
-        if (IIsValidMsg(msg))
+
+    while (!fBetweenAges && (msg = IGetNextMessage())) {
+        if (IIsValidMsg(msg)) {
             return msg;
-        else
+        } else {
             hsRefCnt_SafeUnRef(msg);
+        }
     }
 
     return nil;
@@ -207,15 +201,14 @@ plNetMessage* plNetClientStreamRecorder::IGetNextMessage()
 {
     plNetMessage* msg = nil;
 
-    if (!IsQueueEmpty() && GetNextMessageTimeDelta() <= 0 )
-    {
+    if (!IsQueueEmpty() && GetNextMessageTimeDelta() <= 0) {
         msg = plNetMessage::ConvertNoRef(GetResMgr()->ReadCreatableVersion(fRecordStream));
         // msg->SetPeeked(true);
 
         // Fix the flags on game messages, so we won't get an assert later
         plNetMsgGameMessage* gameMsg = plNetMsgGameMessage::ConvertNoRef(msg);
-        if (gameMsg)
-        {
+
+        if (gameMsg) {
             plMessage* plMsg = gameMsg->GetContainedMsg(GetResMgr());
             plNetClientApp::GetInstance()->UnInheritNetMsgFlags(plMsg);
 
@@ -229,27 +222,27 @@ plNetMessage* plNetClientStreamRecorder::IGetNextMessage()
         }
 
         double nextPlaybackTime = fRecordStream->ReadLEDouble();
-        if (nextPlaybackTime < fNextPlaybackTime)
+
+        if (nextPlaybackTime < fNextPlaybackTime) {
             fBetweenAges = true;
+        }
 
         fNextPlaybackTime = nextPlaybackTime;
 
         // If this was the last message, stop playing back
-        if (fRecordStream->AtEnd())
-        {
+        if (fRecordStream->AtEnd()) {
             fRecordStream->Close();
             delete fRecordStream;
             fRecordStream = nil;
         }
     }
-    
+
     return msg;
 }
 
 bool plNetClientStreamRecorder::IIsValidMsg(plNetMessage* msg)
 {
-    if (plNetMsgGameMessage* gameMsg = plNetMsgGameMessage::ConvertNoRef(msg))
-    {
+    if (plNetMsgGameMessage* gameMsg = plNetMsgGameMessage::ConvertNoRef(msg)) {
         int16_t type = gameMsg->StreamInfo()->GetStreamType();
 
         //
@@ -257,31 +250,26 @@ bool plNetClientStreamRecorder::IIsValidMsg(plNetMessage* msg)
         // so don't dispatch them in that case.
         //
 
-        if (type == CLASS_INDEX_SCOPED(plLinkEffectsTriggerMsg))
-        {
+        if (type == CLASS_INDEX_SCOPED(plLinkEffectsTriggerMsg)) {
             plLinkEffectsTriggerMsg* linkMsg = plLinkEffectsTriggerMsg::ConvertNoRef(gameMsg->GetContainedMsg(GetResMgr()));
-            if (plNetClientApp::GetInstance())
-            {
+
+            if (plNetClientApp::GetInstance()) {
                 bool isLocal = (linkMsg->GetLinkKey() == plNetClientApp::GetInstance()->GetLocalPlayerKey());
                 hsRefCnt_SafeUnRef(linkMsg);
 
-                if (isLocal)
-                {
+                if (isLocal) {
                     ILogMsg(msg, "IGNORING ");
                     return false;
                 }
             }
-        }
-        else if (type == CLASS_INDEX_SCOPED(plLoadAvatarMsg))
-        {
+        } else if (type == CLASS_INDEX_SCOPED(plLoadAvatarMsg)) {
             plLoadAvatarMsg* loadAvMsg = plLoadAvatarMsg::ConvertNoRef(gameMsg->GetContainedMsg(GetResMgr()));
-            if (plNetClientApp::GetInstance())
-            {
+
+            if (plNetClientApp::GetInstance()) {
                 bool isLocal = (loadAvMsg->GetCloneKey() == plNetClientApp::GetInstance()->GetLocalPlayerKey());
                 hsRefCnt_SafeUnRef(loadAvMsg);
 
-                if (isLocal)
-                {
+                if (isLocal) {
                     ILogMsg(msg, "IGNORING ");
                     return false;
                 }
@@ -295,34 +283,67 @@ bool plNetClientStreamRecorder::IIsValidMsg(plNetMessage* msg)
 
 void plNetClientStreamRecorder::ILogMsg(plNetMessage* msg, const char* preText)
 {
-    if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plNetMsgGameMessage))
-    {
+    if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plNetMsgGameMessage)) {
         plNetMsgGameMessage* gameMsg = plNetMsgGameMessage::ConvertNoRef(msg);
         fLog->AddLineF("%s%s(%s)", preText, msg->ClassName(), plFactory::GetNameOfClass(gameMsg->StreamInfo()->GetStreamType()));
 
-        if (gameMsg->StreamInfo()->GetStreamType() == CLASS_INDEX_SCOPED(plNotifyMsg))
-        {
+        if (gameMsg->StreamInfo()->GetStreamType() == CLASS_INDEX_SCOPED(plNotifyMsg)) {
             plNotifyMsg* notifyMsg = plNotifyMsg::ConvertNoRef(gameMsg->GetContainedMsg(GetResMgr()));
             int numEvents = notifyMsg->GetEventCount();
-            for (int i = 0; i < numEvents; i++)
-            {
+
+            for (int i = 0; i < numEvents; i++) {
                 const char* eventName = "";
 
                 proEventData* event = notifyMsg->GetEventRecord(i);
-                switch (event->fEventType)
-                {
-                case proEventData::kCollision:      eventName = "Collision";        break;
-                case proEventData::kPicked:         eventName = "Picked";           break;
-                case proEventData::kControlKey:     eventName = "ControlKey";       break;
-                case proEventData::kVariable:       eventName = "Variable";         break;
-                case proEventData::kFacing:         eventName = "Facing";           break;
-                case proEventData::kContained:      eventName = "Contained";        break;
-                case proEventData::kActivate:       eventName = "Activate";         break;
-                case proEventData::kCallback:       eventName = "Callback";         break;
-                case proEventData::kResponderState: eventName = "ResponderState";   break;
-                case proEventData::kMultiStage:     eventName = "MultiStage";       break;
-                case proEventData::kSpawned:        eventName = "Spawned";          break;
-                case proEventData::kClickDrag:      eventName = "ClickDrag";        break;
+
+                switch (event->fEventType) {
+                case proEventData::kCollision:
+                    eventName = "Collision";
+                    break;
+
+                case proEventData::kPicked:
+                    eventName = "Picked";
+                    break;
+
+                case proEventData::kControlKey:
+                    eventName = "ControlKey";
+                    break;
+
+                case proEventData::kVariable:
+                    eventName = "Variable";
+                    break;
+
+                case proEventData::kFacing:
+                    eventName = "Facing";
+                    break;
+
+                case proEventData::kContained:
+                    eventName = "Contained";
+                    break;
+
+                case proEventData::kActivate:
+                    eventName = "Activate";
+                    break;
+
+                case proEventData::kCallback:
+                    eventName = "Callback";
+                    break;
+
+                case proEventData::kResponderState:
+                    eventName = "ResponderState";
+                    break;
+
+                case proEventData::kMultiStage:
+                    eventName = "MultiStage";
+                    break;
+
+                case proEventData::kSpawned:
+                    eventName = "Spawned";
+                    break;
+
+                case proEventData::kClickDrag:
+                    eventName = "ClickDrag";
+                    break;
                 }
 
                 fLog->AddLineF("\t%s", eventName);
@@ -330,14 +351,12 @@ void plNetClientStreamRecorder::ILogMsg(plNetMessage* msg, const char* preText)
 
             hsRefCnt_SafeUnRef(notifyMsg);
         }
-    }
-    else if (plNetMsgSDLState* sdlMsg = plNetMsgSDLState::ConvertNoRef(msg))
-    {
-        hsReadOnlyStream stream(sdlMsg->StreamInfo()->GetStreamLen(), sdlMsg->StreamInfo()->GetStreamBuf());        
+    } else if (plNetMsgSDLState* sdlMsg = plNetMsgSDLState::ConvertNoRef(msg)) {
+        hsReadOnlyStream stream(sdlMsg->StreamInfo()->GetStreamLen(), sdlMsg->StreamInfo()->GetStreamBuf());
         plString descName;
         int ver;
-        if (plStateDataRecord::ReadStreamHeader(&stream, &descName, &ver))
-        {
+
+        if (plStateDataRecord::ReadStreamHeader(&stream, &descName, &ver)) {
             fLog->AddLineF("%s%s(%s)", preText, msg->ClassName(), descName.c_str());
 
             int i;
@@ -346,21 +365,21 @@ void plNetClientStreamRecorder::ILogMsg(plNetMessage* msg, const char* preText)
             sdRec.Read(&stream, 0);
             plStateDataRecord::SimpleVarsList vars;
             sdRec.GetDirtyVars(&vars);
-            for (i = 0; i < vars.size(); i++)
-            {
+
+            for (i = 0; i < vars.size(); i++) {
                 fLog->AddLineF("\t%s", vars[i]->GetVarDescriptor()->GetName().c_str());
             }
 
             plStateDataRecord::SDVarsList sdVars;
             sdRec.GetDirtySDVars(&sdVars);
-            for (i = 0; i < sdVars.size(); i++)
-            {
+
+            for (i = 0; i < sdVars.size(); i++) {
                 fLog->AddLineF("\t%s", sdVars[i]->GetSDVarDescriptor()->GetName().c_str());
             }
         }
-    }
-    else
+    } else {
         fLog->AddLineF("%s%s", preText, msg->ClassName());
+    }
 }
 
 
@@ -369,9 +388,9 @@ bool plNetClientStressStreamRecorder::IsRecordableMsg(plNetMessage* msg) const
     uint16_t idx = msg->ClassIndex();
 
     return (
-        plNetClientStreamRecorder::IsRecordableMsg(msg)
-        || idx == CLASS_INDEX_SCOPED(plNetMsgTestAndSet)
-        || idx == CLASS_INDEX_SCOPED(plNetMsgGameMessageDirected)
-        || idx == CLASS_INDEX_SCOPED(plNetMsgVoice)
-        );
+               plNetClientStreamRecorder::IsRecordableMsg(msg)
+               || idx == CLASS_INDEX_SCOPED(plNetMsgTestAndSet)
+               || idx == CLASS_INDEX_SCOPED(plNetMsgGameMessageDirected)
+               || idx == CLASS_INDEX_SCOPED(plNetMsgVoice)
+           );
 }

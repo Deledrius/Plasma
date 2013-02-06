@@ -45,11 +45,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 struct hsMatrix44;
 class plMaxNode;
 
-class plMaxMeshExtractor
-{
+class plMaxMeshExtractor {
 public:
-    struct NeutralMesh
-    {
+    struct NeutralMesh {
         int fNumVerts;
         hsPoint3* fVerts;
         int fNumFaces;

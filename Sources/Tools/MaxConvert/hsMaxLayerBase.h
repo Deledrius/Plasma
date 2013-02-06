@@ -50,81 +50,81 @@ const Class_ID hsEnvironMapMtlClassID(0x98777b3, 0x5eb270dd);
 
 class hsMaxLayerBase : public BitmapTex {
 public:
-   enum hsMatBlendFlags {
+    enum hsMatBlendFlags {
         kBlendTest  = 0x1,                          // dev
-            // Rest of blends are mutually exclusive
-            kBlendAlpha                     = 0x2,      // dev
-            kBlendMult                      = 0x4,      // dev
-            kBlendAdd                       = 0x8,      // dev
-            kBlendAddColorTimesAlpha        = 0x10,     // dev
-            kBlendAntiAlias                 = 0x20,
-            kBlendDetail                    = 0x40,
-            kBlendDetailAdd                 = 0x80,
-            kBlendMask                      = kBlendAlpha
-            | kBlendMult
-            | kBlendAdd
-            | kBlendAddColorTimesAlpha
-            | kBlendAntiAlias
-            | kBlendDetail
-            | kBlendDetailAdd,
-            kBlendInvertAlpha               = 0x1000,   // dev
-            kBlendInvertColor               = 0x2000,   // dev
-            kBlendAlphaMult                 = 0x4000,
-            kBlendAlphaAdd                  = 0x8000,
-            kBlendNoColor                   = 0x10000,
-            kBlendNoVtxAlpha                = 0x20000
+        // Rest of blends are mutually exclusive
+        kBlendAlpha                     = 0x2,      // dev
+        kBlendMult                      = 0x4,      // dev
+        kBlendAdd                       = 0x8,      // dev
+        kBlendAddColorTimesAlpha        = 0x10,     // dev
+        kBlendAntiAlias                 = 0x20,
+        kBlendDetail                    = 0x40,
+        kBlendDetailAdd                 = 0x80,
+        kBlendMask                      = kBlendAlpha
+                                          | kBlendMult
+                                          | kBlendAdd
+                                          | kBlendAddColorTimesAlpha
+                                          | kBlendAntiAlias
+                                          | kBlendDetail
+                                          | kBlendDetailAdd,
+        kBlendInvertAlpha               = 0x1000,   // dev
+        kBlendInvertColor               = 0x2000,   // dev
+        kBlendAlphaMult                 = 0x4000,
+        kBlendAlphaAdd                  = 0x8000,
+        kBlendNoColor                   = 0x10000,
+        kBlendNoVtxAlpha                = 0x20000
     };
-    
-   enum hsMatZFlags {
-       kZIncLayer           = 0x1, // dev
-           kZOnlyZ              = 0x2,      // dev
-           kZClearZ         = 0x4, // dev
-           kZNoZRead            = 0x8, // dev
-           kZNoZWrite           = 0x10,
-           kZMask               = kZNoZWrite | kZClearZ | kZNoZRead,
-           kZLODBias            = 0x20
-   };
+
+    enum hsMatZFlags {
+        kZIncLayer           = 0x1, // dev
+        kZOnlyZ              = 0x2,      // dev
+        kZClearZ         = 0x4, // dev
+        kZNoZRead            = 0x8, // dev
+        kZNoZWrite           = 0x10,
+        kZMask               = kZNoZWrite | kZClearZ | kZNoZRead,
+        kZLODBias            = 0x20
+    };
 
     enum hsMatShadeFlags {
         kShadeSoftShadow        = 0x1,          // view, dev
-            kShadeNoProjectors      = 0x2,          // projector
-            kShadeVertexShade       = 0x20,         // dev
-            kShadeNoShade           = 0x40,         // view,dev
-            kShadeBlack             = kShadeNoShade,
-            kShadeSpecular          = 0x80,         // view, dev
-            kShadeNoFog             = 0x100,        // dev
-            kShadeWhite             = 0x200,
-            kShadeSpecularAlpha     = 0x400,
-            kShadeSpecularColor     = 0x800,
-            kShadeSpecularHighlight = 0x1000,
-            kShadeVertColShade      = 0x2000,
-            kShadeInherit           = 0x4000
+        kShadeNoProjectors      = 0x2,          // projector
+        kShadeVertexShade       = 0x20,         // dev
+        kShadeNoShade           = 0x40,         // view,dev
+        kShadeBlack             = kShadeNoShade,
+        kShadeSpecular          = 0x80,         // view, dev
+        kShadeNoFog             = 0x100,        // dev
+        kShadeWhite             = 0x200,
+        kShadeSpecularAlpha     = 0x400,
+        kShadeSpecularColor     = 0x800,
+        kShadeSpecularHighlight = 0x1000,
+        kShadeVertColShade      = 0x2000,
+        kShadeInherit           = 0x4000
     };
 
     enum hsMatMiscFlags {
         kMiscWireFrame          = 0x1,          // dev (running out of bits)
-            kMiscDrawMeshOutlines   = 0x2,          // dev, currently unimplemented
-            kMiscTwoSided           = 0x4,          // view,dev
-            kMiscDrawAsSplats       = 0x8,          // dev? bwt
-            kMiscMipMap             = 0x10,
-            kMiscUseBitmap          = 0x20,
-            kMiscIntensityOnly      = 0x40,
-            kMiscAutoStart          = 0x80,
-            kMiscDetailBias         = 0x100,    // obsolete...
-            kMiscDetailMax          = 0x200,    // obsolete...
-            kMiscExplicitMipmap     = 0x400,
-            kMiscAdjustPlane        = 0x800,
-            kMiscAdjustCylinder     = 0x1000,
-            kMiscAdjustSphere       = 0x2000,
-            kMiscTroubledLoner      = 0x4000,
-            kMiscBindSkip           = 0x8000,
-            kMiscBindMask           = 0x10000,
-            kMiscForceNonCompressed = 0x20000,
-            kMiscNoMaxSize          = 0x40000,
-            kMiscHalfSize           = 0x80000,
-            kMiscBindNext           = 0x100000,
-            kMiscBindPrev           = 0x200000,
-            kMiscReserved           = 0x400000
+        kMiscDrawMeshOutlines   = 0x2,          // dev, currently unimplemented
+        kMiscTwoSided           = 0x4,          // view,dev
+        kMiscDrawAsSplats       = 0x8,          // dev? bwt
+        kMiscMipMap             = 0x10,
+        kMiscUseBitmap          = 0x20,
+        kMiscIntensityOnly      = 0x40,
+        kMiscAutoStart          = 0x80,
+        kMiscDetailBias         = 0x100,    // obsolete...
+        kMiscDetailMax          = 0x200,    // obsolete...
+        kMiscExplicitMipmap     = 0x400,
+        kMiscAdjustPlane        = 0x800,
+        kMiscAdjustCylinder     = 0x1000,
+        kMiscAdjustSphere       = 0x2000,
+        kMiscTroubledLoner      = 0x4000,
+        kMiscBindSkip           = 0x8000,
+        kMiscBindMask           = 0x10000,
+        kMiscForceNonCompressed = 0x20000,
+        kMiscNoMaxSize          = 0x40000,
+        kMiscHalfSize           = 0x80000,
+        kMiscBindNext           = 0x100000,
+        kMiscBindPrev           = 0x200000,
+        kMiscReserved           = 0x400000
     };
 
     enum ProcType {
@@ -142,7 +142,7 @@ public:
         kUseMask        = 0x20,
         kUseShadowLight = 0x40,
         kUseHelper      = 0x80,
-        
+
         kUseGuess       = 0x10000000
     };
 
@@ -158,17 +158,17 @@ public:
     virtual void GuessUsage() = 0;
 
     // For interactive renderer
-    virtual Color GetAmbient(int mtlNum=0, BOOL backFace=FALSE) = 0;
-    virtual Color GetColor(int mtlNum=0, BOOL backFace=FALSE) = 0;
+    virtual Color GetAmbient(int mtlNum = 0, BOOL backFace = FALSE) = 0;
+    virtual Color GetColor(int mtlNum = 0, BOOL backFace = FALSE) = 0;
 
-    virtual float GetShininess(int mtlNum=0, BOOL backFace=FALSE) = 0;
-    virtual float GetShinStr(int mtlNum=0, BOOL backFace=FALSE) = 0;
-    virtual float GetOpacity(int mtlNum=0, BOOL backFace=FALSE) = 0;
+    virtual float GetShininess(int mtlNum = 0, BOOL backFace = FALSE) = 0;
+    virtual float GetShinStr(int mtlNum = 0, BOOL backFace = FALSE) = 0;
+    virtual float GetOpacity(int mtlNum = 0, BOOL backFace = FALSE) = 0;
 
     // For exporter
     virtual Color GetAmbient(TimeValue t) const = 0;
-    virtual Color GetColor(TimeValue t) const = 0;        
-    
+    virtual Color GetColor(TimeValue t) const = 0;
+
     virtual float GetShininess(TimeValue t) const = 0;
     virtual float GetShinStr(TimeValue t) const = 0;
     virtual float GetMapPercent(TimeValue t) const = 0;
@@ -190,7 +190,7 @@ public:
     virtual hsMatUsage GetUsage() const = 0;
 
     virtual int GetNumExplicitMipmaps() const = 0;
-    virtual TCHAR *GetExplicitMipmapName(int i) const = 0;
+    virtual TCHAR* GetExplicitMipmapName(int i) const = 0;
     virtual BOOL ExplicitMipmapEnabled(int i) const = 0;
     virtual int GetExplicitMipmapLevel(int i) const = 0;
 

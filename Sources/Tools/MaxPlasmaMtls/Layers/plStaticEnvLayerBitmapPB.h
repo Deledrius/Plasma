@@ -54,8 +54,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define _plStaticEnvLayerBitmapPB_h
 
 // Param ID's
-enum
-{
+enum {
     kBmpFrontBitmap,
     kBmpBackBitmap,
     kBmpLeftBitmap,

@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetProtocol/Private/Protocols/Srv2Log/pnNpSrv2Log.cpp
-*   
+*
 ***/
 
 #ifdef SERVER
@@ -60,24 +60,30 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 //===========================================================================
-bool Srv2LogValidateConnect (
-    AsyncNotifySocketListen *   listen,
-    Srv2Log_ConnData *        connectPtr
-) {
+bool Srv2LogValidateConnect(
+    AsyncNotifySocketListen*    listen,
+    Srv2Log_ConnData*         connectPtr
+)
+{
     // Ensure that there are enough bytes for the header
-    const Srv2Log_ConnData & connect = * (const Srv2Log_ConnData *) listen->buffer;
+    const Srv2Log_ConnData& connect = * (const Srv2Log_ConnData*) listen->buffer;
 
     // Validate message size
     const unsigned kMinStructSize = sizeof(uint32_t) * 3;
-    if (listen->bytes < kMinStructSize)
+
+    if (listen->bytes < kMinStructSize) {
         return false;
-    if (listen->bytes < connect.dataBytes)
+    }
+
+    if (listen->bytes < connect.dataBytes) {
         return false;
+    }
 
     // Validate connect server type
-    if (!(connect.srvType == kSrvTypeAuth || connect.srvType == kSrvTypeGame || connect.srvType == kSrvTypeVault || connect.srvType == kSrvTypeDb || 
-          connect.srvType == kSrvTypeMcp || connect.srvType == kSrvTypeState || connect.srvType == kSrvTypeFile || connect.srvType == kSrvTypeDll))
+    if (!(connect.srvType == kSrvTypeAuth || connect.srvType == kSrvTypeGame || connect.srvType == kSrvTypeVault || connect.srvType == kSrvTypeDb ||
+            connect.srvType == kSrvTypeMcp || connect.srvType == kSrvTypeState || connect.srvType == kSrvTypeFile || connect.srvType == kSrvTypeDll)) {
         return false;
+    }
 
     memset(connectPtr, 0, sizeof(*connectPtr));
     memcpy(connectPtr, &connect, min(sizeof(*connectPtr), connect.dataBytes));

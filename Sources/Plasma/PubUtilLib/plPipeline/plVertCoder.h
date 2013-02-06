@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsStream;
 
-class plVertCoder
-{
+class plVertCoder {
 public:
     enum {
         kPosition,
@@ -57,8 +56,7 @@ public:
 
 protected:
 
-    class FloatCode
-    {
+    class FloatCode {
     public:
         float    fOffset;
         bool        fAllSame;
@@ -67,8 +65,7 @@ protected:
 
     FloatCode       fFloats[kNumFloatFields][3];
 
-    class byteCode
-    {
+    class byteCode {
     public:
         uint16_t      fCount;
         uint8_t       fVal;
@@ -108,15 +105,34 @@ public:
     void Write(hsStream* s, const uint8_t* src, const uint8_t format, const uint32_t stride, const uint16_t numVerts);
 
 
-    static void ClearAverage() { fCodedVerts = 0; fCodedBytes = 0; fRawBytes = 0; fSkippedBytes = 0; }
-    static uint32_t CodedBytes() { return fCodedBytes; }
-    static uint32_t RawBytes() { return fRawBytes; }
-    static uint32_t CodedVerts() { return fCodedVerts; }
-    static float AverageCodedVertSize() { return fCodedVerts ? float(fCodedBytes) / float(fCodedVerts) : 0; }
-    static float AverageRawVertSize() { return fCodedVerts ? float(fRawBytes) / float(fCodedVerts) : 0; }
+    static void ClearAverage() {
+        fCodedVerts = 0;
+        fCodedBytes = 0;
+        fRawBytes = 0;
+        fSkippedBytes = 0;
+    }
+    static uint32_t CodedBytes() {
+        return fCodedBytes;
+    }
+    static uint32_t RawBytes() {
+        return fRawBytes;
+    }
+    static uint32_t CodedVerts() {
+        return fCodedVerts;
+    }
+    static float AverageCodedVertSize() {
+        return fCodedVerts ? float(fCodedBytes) / float(fCodedVerts) : 0;
+    }
+    static float AverageRawVertSize() {
+        return fCodedVerts ? float(fRawBytes) / float(fCodedVerts) : 0;
+    }
 
-    static uint32_t SkippedBytes() { return fSkippedBytes; }
-    static void AddSkippedBytes(uint32_t f) { fSkippedBytes += f; }
+    static uint32_t SkippedBytes() {
+        return fSkippedBytes;
+    }
+    static void AddSkippedBytes(uint32_t f) {
+        fSkippedBytes += f;
+    }
 };
 
 #endif // plVertCoder_inc

@@ -48,8 +48,7 @@ hsCodecManager& hsCodecManager::Instance()
     static hsCodecManager the_instance;
     static bool initialized = false;
 
-    if (!initialized)
-    {
+    if (!initialized) {
         initialized = true;
     }
 
@@ -60,23 +59,23 @@ hsCodecManager::hsCodecManager()
 {
 }
 
-plMipmap *hsCodecManager::CreateCompressedMipmap(uint32_t compressionFormat, plMipmap *uncompressed)
+plMipmap* hsCodecManager::CreateCompressedMipmap(uint32_t compressionFormat, plMipmap* uncompressed)
 {
     return nil;
 }
 
-plMipmap *hsCodecManager::CreateUncompressedMipmap(plMipmap *compressed, uint8_t bitDepth)
+plMipmap* hsCodecManager::CreateUncompressedMipmap(plMipmap* compressed, uint8_t bitDepth)
 {
     return nil;
 
 }
 
-bool hsCodecManager::ColorizeCompMipmap( plMipmap *bMap, const uint8_t *colorMask )
+bool hsCodecManager::ColorizeCompMipmap(plMipmap* bMap, const uint8_t* colorMask)
 {
     return false;
 }
 
-bool hsCodecManager::Register(hsCodec *codec, uint32_t compressionFormat, hsScalar priority)
+bool hsCodecManager::Register(hsCodec* codec, uint32_t compressionFormat, hsScalar priority)
 {
     return true;
 }

@@ -58,8 +58,10 @@ bool HSMemory::EqualBlocks(const void* block1, const void* block2, uint32_t leng
     const uint8_t* byte2 = (uint8_t*)block2;
 
     while (length--)
-        if (*byte1++ != *byte2++)
+        if (*byte1++ != *byte2++) {
             return false;
+        }
+
     return true;
 }
 
@@ -70,7 +72,7 @@ void* HSMemory::New(uint32_t size)
 
 void HSMemory::Delete(void* block)
 {
-    delete[] (uint32_t*)block;
+    delete[](uint32_t*)block;
 }
 
 void* HSMemory::Copy(uint32_t length, const void* source)
@@ -86,21 +88,25 @@ void HSMemory::Clear(void* m, uint32_t byteLen)
     uint8_t*  mem = (uint8_t*)m;
     uint8_t*  memStop = mem + byteLen;
 
-    if (byteLen > 8)
-    {   while (uintptr_t(mem) & 3)
+    if (byteLen > 8) {
+        while (uintptr_t(mem) & 3) {
             *mem++ = 0;
-        
+        }
+
         uint32_t* mem32 = (uint32_t*)mem;
         uint32_t* mem32Stop = (uint32_t*)(uintptr_t(memStop) & ~3);
+
         do {
             *mem32++ = 0;
         } while (mem32 < mem32Stop);
-        
+
         mem = (uint8_t*)mem32;
         // fall through to finish any remaining bytes (0..3)
     }
-    while (mem < memStop)
+
+    while (mem < memStop) {
         *mem++ = 0;
+    }
 
     hsAssert(mem == memStop, "oops");
 }
@@ -112,10 +118,10 @@ template <class T> T* hsSoftNew(T*& obj)
 {
     try {
         obj = new T;
-    }
-    catch (...) {
+    } catch (...) {
         obj = nil;
     }
+
     return obj;
 }
 
@@ -123,10 +129,10 @@ inline template <class T> T* hsSoftNew(T*& obj, unsigned count)
 {
     try {
         obj = new T[count];
-    }
-    catch (...) {
+    } catch (...) {
         obj = nil;
     }
+
     return obj;
 }
 #endif
@@ -183,11 +189,12 @@ void hsChunkAllocator::Reset()
 {
     hsPrivateChunk* chunk = fChunk;
 
-    while (chunk)
-    {   hsPrivateChunk* next = chunk->fNext;
+    while (chunk) {
+        hsPrivateChunk* next = chunk->fNext;
         HSMemory::Delete(chunk);
         chunk = next;
     }
+
     fChunk = nil;
     hsDebugCode(fChunkCount = 0;)
 }
@@ -201,9 +208,11 @@ void* hsChunkAllocator::Allocate(uint32_t size, const void* data)
 {
     void*   addr;
 
-    if (fChunk == nil || fChunk->fAvailableSize < size)
-    {   if (size > fChunkSize)
+    if (fChunk == nil || fChunk->fAvailableSize < size) {
+        if (size > fChunkSize) {
             fChunkSize = size;
+        }
+
         fChunk = hsPrivateChunk::NewPrivateChunk(fChunk, fChunkSize);
         hsDebugCode(fChunkCount += 1;)
     }
@@ -213,8 +222,9 @@ void* hsChunkAllocator::Allocate(uint32_t size, const void* data)
     fChunk->fAvailableSize -= size;
     hsDebugCode(fChunk->fCount += 1;)
 
-    if (data)
+    if (data) {
         HSMemory::BlockMove(data, addr, size);
+    }
 
     return addr;
 }
@@ -240,56 +250,77 @@ struct hsAppenderHead {
     void*   fFirst;
     void*   fStop;
     void*   fBottom;
-    
-    void*   GetTop() const { return (char*)this + sizeof(*this); }
-    void*   GetBottom() const { return fBottom; }
-    void*   GetStop() const { return fStop; }
 
-    void*    GetFirst() const { return fFirst; }
-    void*    GetLast(uint32_t elemSize) const { return (char*)fStop - elemSize; }
-    uint32_t GetSize() const { return (char*)fStop - (char*)fFirst; }
+    void*   GetTop() const {
+        return (char*)this + sizeof(*this);
+    }
+    void*   GetBottom() const {
+        return fBottom;
+    }
+    void*   GetStop() const {
+        return fStop;
+    }
 
-    bool    CanPrepend() const { return fFirst != this->GetTop(); }
-    int     PrependSize() const { return (char*)fFirst - (char*)this->GetTop(); }
-    bool    CanAppend() const { return fStop != this->GetBottom(); }
-    int     AppendSize() const { return (char*)this->GetBottom() - (char*)fStop; }
-    
-    void* Prepend(uint32_t elemSize)
-    {
+    void*    GetFirst() const {
+        return fFirst;
+    }
+    void*    GetLast(uint32_t elemSize) const {
+        return (char*)fStop - elemSize;
+    }
+    uint32_t GetSize() const {
+        return (char*)fStop - (char*)fFirst;
+    }
+
+    bool    CanPrepend() const {
+        return fFirst != this->GetTop();
+    }
+    int     PrependSize() const {
+        return (char*)fFirst - (char*)this->GetTop();
+    }
+    bool    CanAppend() const {
+        return fStop != this->GetBottom();
+    }
+    int     AppendSize() const {
+        return (char*)this->GetBottom() - (char*)fStop;
+    }
+
+    void* Prepend(uint32_t elemSize) {
         hsAssert(this->CanPrepend(), "bad prepend");
         fFirst = (char*)fFirst - elemSize;
         hsAssert((char*)fFirst >= (char*)this->GetTop(), "bad elemSize");
         return fFirst;
     }
-    void* Append(uint32_t elemSize)
-    {
+    void* Append(uint32_t elemSize) {
         hsAssert(this->CanAppend(), "bad append");
         void* data = fStop;
         fStop = (char*)fStop + elemSize;
         hsAssert((char*)fStop <= (char*)fBottom, "bad elemSize");
         return data;
     }
-    bool PopHead(uint32_t elemSize, void* data)
-    {
+    bool PopHead(uint32_t elemSize, void* data) {
         hsAssert(fFirst != fStop, "Empty");
-        if( data )
+
+        if (data) {
             HSMemory::BlockMove(fFirst, data, elemSize);
+        }
+
         fFirst = (char*)fFirst + elemSize;
         return fFirst == fStop;
     }
-    bool PopTail(uint32_t elemSize, void* data)
-    {
+    bool PopTail(uint32_t elemSize, void* data) {
         hsAssert(fFirst != fStop, "Empty");
         fStop = (char*)fStop - elemSize;
-        if( data )
+
+        if (data) {
             HSMemory::BlockMove(fStop, data, elemSize);
+        }
+
         return fFirst == fStop;
     }
 
-    static hsAppenderHead* NewAppend(uint32_t elemSize, uint32_t elemCount, hsAppenderHead* prev)
-    {
+    static hsAppenderHead* NewAppend(uint32_t elemSize, uint32_t elemCount, hsAppenderHead* prev) {
         uint32_t          dataSize = elemSize * elemCount;
-         hsAppenderHead*    head = (hsAppenderHead*)HSMemory::New(sizeof(hsAppenderHead) + dataSize);
+        hsAppenderHead*    head = (hsAppenderHead*)HSMemory::New(sizeof(hsAppenderHead) + dataSize);
 
         head->fNext = nil;
         head->fPrev = prev;
@@ -298,10 +329,9 @@ struct hsAppenderHead {
         head->fBottom   = (char*)head->fFirst + dataSize;
         return head;
     }
-    static hsAppenderHead* NewPrepend(uint32_t elemSize, uint32_t elemCount, hsAppenderHead* next)
-    {
+    static hsAppenderHead* NewPrepend(uint32_t elemSize, uint32_t elemCount, hsAppenderHead* next) {
         uint32_t          dataSize = elemSize * elemCount;
-         hsAppenderHead*    head = (hsAppenderHead*)HSMemory::New(sizeof(hsAppenderHead) + dataSize);
+        hsAppenderHead*    head = (hsAppenderHead*)HSMemory::New(sizeof(hsAppenderHead) + dataSize);
 
         head->fNext = next;
         head->fPrev = nil;
@@ -315,7 +345,7 @@ struct hsAppenderHead {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 hsAppender::hsAppender(uint32_t elemSize, uint32_t elemCount)
-        : fFirstBlock(nil), fElemSize(elemSize), fElemCount(elemCount), fCount(0)
+    : fFirstBlock(nil), fElemSize(elemSize), fElemCount(elemCount), fCount(0)
 {
 }
 
@@ -326,20 +356,22 @@ hsAppender::~hsAppender()
 
 uint32_t hsAppender::CopyInto(void* data) const
 {
-    if (data)
-    {   const hsAppenderHead*   head = fFirstBlock;
+    if (data) {
+        const hsAppenderHead*   head = fFirstBlock;
         hsDebugCode(uint32_t totalSize = 0;)
 
-        while (head != nil)
-        {   uint32_t  size = head->GetSize();
+        while (head != nil) {
+            uint32_t  size = head->GetSize();
             HSMemory::BlockMove(head->GetFirst(), data, size);
-            
+
             data = (char*)data + size;
             head = head->fNext;
             hsDebugCode(totalSize += size;)
         }
+
         hsAssert(totalSize == fCount * fElemSize, "bad size");
     }
+
     return fCount * fElemSize;
 }
 
@@ -347,8 +379,8 @@ void hsAppender::Reset()
 {
     hsAppenderHead* head = fFirstBlock;
 
-    while (head != nil)
-    {   hsAppenderHead* next = head->fNext;
+    while (head != nil) {
+        hsAppenderHead* next = head->fNext;
         HSMemory::Delete(head);
         head = next;
     }
@@ -360,12 +392,12 @@ void hsAppender::Reset()
 
 void* hsAppender::PushHead()
 {
-    if (fFirstBlock == nil)
-    {   fFirstBlock = hsAppenderHead::NewPrepend(fElemSize, fElemCount, nil);
+    if (fFirstBlock == nil) {
+        fFirstBlock = hsAppenderHead::NewPrepend(fElemSize, fElemCount, nil);
         fLastBlock      = fFirstBlock;
-    }
-    else if (fFirstBlock->CanPrepend() == false)
+    } else if (fFirstBlock->CanPrepend() == false) {
         fFirstBlock = hsAppenderHead::NewPrepend(fElemSize, fElemCount, fFirstBlock);
+    }
 
     fCount += 1;
     return fFirstBlock->Prepend(fElemSize);
@@ -374,34 +406,44 @@ void* hsAppender::PushHead()
 void hsAppender::PushHead(const void* data)
 {
     void*   addr = this->PushHead();
-    if (data)
+
+    if (data) {
         HSMemory::BlockMove(data, addr, fElemSize);
+    }
 }
 
 void* hsAppender::PeekHead() const
 {
-    if (fFirstBlock)
+    if (fFirstBlock) {
         return (char*)fFirstBlock->fFirst;
-    else
+    } else {
         return nil;
+    }
 }
 
 bool hsAppender::PopHead(void* data)
 {
-    if (fCount == 0)
+    if (fCount == 0) {
         return false;
+    }
 
     fCount -= 1;
 
-    if (fFirstBlock->PopHead(fElemSize, data))
-    {   hsAppenderHead* next = fFirstBlock->fNext;
-        if (next)
+    if (fFirstBlock->PopHead(fElemSize, data)) {
+        hsAppenderHead* next = fFirstBlock->fNext;
+
+        if (next) {
             next->fPrev = nil;
+        }
+
         HSMemory::Delete(fFirstBlock);
         fFirstBlock = next;
-        if (next == nil)
+
+        if (next == nil) {
             fLastBlock = nil;
+        }
     }
+
     return true;
 }
 
@@ -412,41 +454,50 @@ int hsAppender::PopHead(int count, void* data)
     int sizeNeeded = count * fElemSize;
     int origCount = fCount;
 
-    while (fCount > 0)
-    {   int size = fFirstBlock->GetSize();
-        if (size > sizeNeeded)
-            size = sizeNeeded;
+    while (fCount > 0) {
+        int size = fFirstBlock->GetSize();
 
-        if (fFirstBlock->PopHead(size, data))
-        {   hsAppenderHead* next = fFirstBlock->fNext;
-            if (next)
-                next->fPrev = nil;
-            HSMemory::Delete(fFirstBlock);
-            fFirstBlock = next;
-            if (next == nil)
-                fLastBlock = nil;
+        if (size > sizeNeeded) {
+            size = sizeNeeded;
         }
 
-        if (data)
+        if (fFirstBlock->PopHead(size, data)) {
+            hsAppenderHead* next = fFirstBlock->fNext;
+
+            if (next) {
+                next->fPrev = nil;
+            }
+
+            HSMemory::Delete(fFirstBlock);
+            fFirstBlock = next;
+
+            if (next == nil) {
+                fLastBlock = nil;
+            }
+        }
+
+        if (data) {
             data = (void*)((char*)data + size);
+        }
+
         sizeNeeded -= size;
         fCount -= size / fElemSize;
         hsAssert(int(fCount) >= 0, "bad fElemSize");
     }
+
     return origCount - fCount;      // return number of elements popped
 }
 
 void* hsAppender::PushTail()
 {
-    if (fFirstBlock == nil)
-    {   fFirstBlock = hsAppenderHead::NewAppend(fElemSize, fElemCount, nil);
+    if (fFirstBlock == nil) {
+        fFirstBlock = hsAppenderHead::NewAppend(fElemSize, fElemCount, nil);
         fLastBlock      = fFirstBlock;
-    }
-    else if (fLastBlock->CanAppend() == false)
-    {   fLastBlock->fNext   = hsAppenderHead::NewAppend(fElemSize, fElemCount, fLastBlock);
+    } else if (fLastBlock->CanAppend() == false) {
+        fLastBlock->fNext   = hsAppenderHead::NewAppend(fElemSize, fElemCount, fLastBlock);
         fLastBlock      = fLastBlock->fNext;
     }
-    
+
     fCount += 1;
     return fLastBlock->Append(fElemSize);
 }
@@ -454,8 +505,10 @@ void* hsAppender::PushTail()
 void hsAppender::PushTail(const void* data)
 {
     void*   addr = this->PushTail();
-    if (data)
+
+    if (data) {
         HSMemory::BlockMove(data, addr, fElemSize);
+    }
 }
 
 void hsAppender::PushTail(int count, const void* data)
@@ -464,56 +517,68 @@ void hsAppender::PushTail(int count, const void* data)
 
     int sizeNeeded = count * fElemSize;
 
-    while (sizeNeeded > 0)
-    {   if (fFirstBlock == nil)
-        {   hsAssert(fCount == 0, "uninited count");
+    while (sizeNeeded > 0) {
+        if (fFirstBlock == nil) {
+            hsAssert(fCount == 0, "uninited count");
             fFirstBlock = hsAppenderHead::NewAppend(fElemSize, fElemCount, nil);
             fLastBlock      = fFirstBlock;
-        }
-        else if (fLastBlock->CanAppend() == false)
-        {   fLastBlock->fNext   = hsAppenderHead::NewAppend(fElemSize, fElemCount, fLastBlock);
+        } else if (fLastBlock->CanAppend() == false) {
+            fLastBlock->fNext   = hsAppenderHead::NewAppend(fElemSize, fElemCount, fLastBlock);
             fLastBlock      = fLastBlock->fNext;
         }
 
         int     size = fLastBlock->AppendSize();
         hsAssert(size > 0, "bad appendsize");
-        if (size > sizeNeeded)
+
+        if (size > sizeNeeded) {
             size = sizeNeeded;
+        }
+
         void*   dst = fLastBlock->Append(size);
 
-        if (data)
-        {   HSMemory::BlockMove(data, dst, size);
+        if (data) {
+            HSMemory::BlockMove(data, dst, size);
             data = (char*)data + size;
         }
+
         sizeNeeded -= size;
     }
+
     fCount += count;
 }
 
 void* hsAppender::PeekTail() const
 {
-    if (fLastBlock)
+    if (fLastBlock) {
         return (char*)fLastBlock->fStop - fElemSize;
-    else
+    } else {
         return nil;
+    }
 }
 
 bool hsAppender::PopTail(void* data)
 {
-    if (fCount == 0)
+    if (fCount == 0) {
         return false;
+    }
 
     fCount -= 1;
 
-    if (fLastBlock->PopTail(fElemSize, data))
-    {   hsAppenderHead* prev = fLastBlock->fPrev;
-        if (prev)
+    if (fLastBlock->PopTail(fElemSize, data)) {
+        hsAppenderHead* prev = fLastBlock->fPrev;
+
+        if (prev) {
             prev->fNext = nil;
+        }
+
         HSMemory::Delete(fLastBlock);
         fLastBlock = prev;
-        if (prev == nil)
+
+        if (prev == nil) {
             fFirstBlock = nil;
+        }
     }
+
     return true;
 }
 
@@ -523,16 +588,18 @@ hsAppenderIterator::hsAppenderIterator(const hsAppender* list)
 {
     this->ResetToHead(list);
 }
-            
+
 void hsAppenderIterator::ResetToHead(const hsAppender* list)
 {
     fAppender = list;
     fCurrBlock = nil;
 
-    if (fAppender)
-    {   fCurrBlock = fAppender->fFirstBlock;
-        if (fCurrBlock)
+    if (fAppender) {
+        fCurrBlock = fAppender->fFirstBlock;
+
+        if (fCurrBlock) {
             fCurrItem = fCurrBlock->GetFirst();
+        }
     }
 }
 
@@ -541,10 +608,12 @@ void hsAppenderIterator::ResetToTail(const hsAppender* list)
     fAppender = list;
     fCurrBlock = nil;
 
-    if (fAppender)
-    {   fCurrBlock = fAppender->fLastBlock;
-        if (fCurrBlock)
+    if (fAppender) {
+        fCurrBlock = fAppender->fLastBlock;
+
+        if (fCurrBlock) {
             fCurrItem = fCurrBlock->GetLast(fAppender->fElemSize);
+        }
     }
 }
 
@@ -552,42 +621,52 @@ void* hsAppenderIterator::Next()
 {
     void*   item = nil;
 
-    if (fCurrBlock)
-    {   item = fCurrItem;
+    if (fCurrBlock) {
+        item = fCurrItem;
         fCurrItem = (char*)fCurrItem + fAppender->fElemSize;
-        if (fCurrItem == fCurrBlock->GetBottom())
-        {   fCurrBlock = fCurrBlock->fNext;
-            if (fCurrBlock)
+
+        if (fCurrItem == fCurrBlock->GetBottom()) {
+            fCurrBlock = fCurrBlock->fNext;
+
+            if (fCurrBlock) {
                 fCurrItem = fCurrBlock->GetFirst();
-        }
-        else if (fCurrItem == fCurrBlock->GetStop())
-        {   hsAssert(fCurrBlock->fNext == nil, "oops");
+            }
+        } else if (fCurrItem == fCurrBlock->GetStop()) {
+            hsAssert(fCurrBlock->fNext == nil, "oops");
             fCurrBlock = nil;
         }
     }
+
     return item;
 }
 
 bool hsAppenderIterator::Next(void* data)
 {
     void*   addr = this->Next();
-    if (addr)
-    {   if (data)
+
+    if (addr) {
+        if (data) {
             HSMemory::BlockMove(addr, data, fAppender->fElemSize);
+        }
+
         return true;
     }
+
     return false;
 }
 
 int hsAppenderIterator::Next(int count, void* data)
 {
     int origCount = count;
-    
-    while (count > 0 && this->Next(data))
-    {   if (data)
+
+    while (count > 0 && this->Next(data)) {
+        if (data) {
             data = (void*)((char*)data + fAppender->fElemSize);
+        }
+
         count -= 1;
     }
+
     return origCount - count;
 }
 
@@ -595,30 +674,37 @@ void* hsAppenderIterator::Prev()
 {
     void*   item = nil;
 
-    if (fCurrBlock)
-    {   item = fCurrItem;
+    if (fCurrBlock) {
+        item = fCurrItem;
         fCurrItem = (char*)fCurrItem - fAppender->fElemSize;
-        if (item == fCurrBlock->GetTop())
-        {   fCurrBlock = fCurrBlock->fPrev;
-            if (fCurrBlock)
+
+        if (item == fCurrBlock->GetTop()) {
+            fCurrBlock = fCurrBlock->fPrev;
+
+            if (fCurrBlock) {
                 fCurrItem = fCurrBlock->GetLast(fAppender->fElemSize);
-        }
-        else if (item == fCurrBlock->GetFirst())
-        {   hsAssert(fCurrBlock->fPrev == nil, "oops");
+            }
+        } else if (item == fCurrBlock->GetFirst()) {
+            hsAssert(fCurrBlock->fPrev == nil, "oops");
             fCurrBlock = nil;
         }
     }
+
     return item;
 }
 
 bool hsAppenderIterator::Prev(void* data)
 {
     void*   addr = this->Prev();
-    if (addr)
-    {   if (data)
+
+    if (addr) {
+        if (data) {
             HSMemory::BlockMove(addr, data, fAppender->fElemSize);
+        }
+
         return true;
     }
+
     return false;
 }
 
@@ -629,26 +715,25 @@ bool hsAppenderIterator::Prev(void* data)
 //-------------------------------------------------------------
 
 #if 1//!(defined(HS_DEBUGGING)&&(HS_BUILD_FOR_WIN32)&& defined(HS_FIND_MEM_LEAKS))
-    // EMPTY STUB
-void SortNDumpUnfreedMemory(const char *, bool ) // file name base, and FULL report indicator
+// EMPTY STUB
+void SortNDumpUnfreedMemory(const char*, bool)   // file name base, and FULL report indicator
 {
 }
 
 #else
-  
-typedef struct _CrtMemBlockHeader
-{
+
+typedef struct _CrtMemBlockHeader {
 // Pointer to the block allocated just before this one:
-   struct _CrtMemBlockHeader *pBlockHeaderNext; 
+    struct _CrtMemBlockHeader* pBlockHeaderNext;
 // Pointer to the block allocated just after this one:
-   struct _CrtMemBlockHeader *pBlockHeaderPrev; 
-   char *szFileName;   // File name
-   int nLine;          // Line number
-   size_t nDataSize;   // Size of user block
-   int nBlockUse;      // Type of block
-   long lRequest;      // Allocation number
+    struct _CrtMemBlockHeader* pBlockHeaderPrev;
+    char* szFileName;   // File name
+    int nLine;          // Line number
+    size_t nDataSize;   // Size of user block
+    int nBlockUse;      // Type of block
+    long lRequest;      // Allocation number
 // Buffer just before (lower than) the user's memory:
-   unsigned char gap[4];  
+    unsigned char gap[4];
 } _CrtMemBlockHeader;
 
 /* In an actual memory block in the debug heap,
@@ -660,31 +745,34 @@ typedef struct _CrtMemBlockHeader
 //
 // Dump formatted string to OutputDebugString
 //
-void __cdecl DebugMsg( LPSTR fmt, ... )
+void __cdecl DebugMsg(LPSTR fmt, ...)
 {
 
     char buff[256];
-    wvsprintf(buff, fmt, (char *)(&fmt+1));
+    wvsprintf(buff, fmt, (char*)(&fmt + 1));
     hsStatusMessage(buff);
 
 }
 
-char *TrimFileName(char *name)      // Trim file name of leading Directories
+char* TrimFileName(char* name)      // Trim file name of leading Directories
 {
     int len = 0;
-    char *ptr;
-    if (!name) return NULL;
+    char* ptr;
+
+    if (!name) {
+        return NULL;
+    }
 
     len = strlen(name);
     ptr = name + len;
-    for ( ptr--; ptr > name; ptr--)
-    {
-        if (*ptr == '\\')
-        {
+
+    for (ptr--; ptr > name; ptr--) {
+        if (*ptr == '\\') {
             ptr++;
             break;
         }
     }
+
     return ptr;
 }
 
@@ -693,7 +781,7 @@ char *TrimFileName(char *name)      // Trim file name of leading Directories
 //
 
 struct looktbl {
-    char * fName;       // Name of file
+    char* fName;        // Name of file
 //  long    fAllocs;    // Number of Alloc calls
     long    fBytes;     // Total Bytes Alloc'd
 };
@@ -706,150 +794,165 @@ struct looktbl {
 // call with !full, it will (attempt) to report on the newest allocations, backward to the last checkpoint
 //--------------------------------------------------------------------------
 
-void SortNDumpUnfreedMemory(const char *nm, bool full) // file name base, and FULL report indicator
+void SortNDumpUnfreedMemory(const char* nm, bool full) // file name base, and FULL report indicator
 {
 #ifndef DO_MEMORY_REPORTS
-    if (!full)                  // full is launched by control M...partials are called each time the engine starts
+
+    if (!full) {                // full is launched by control M...partials are called each time the engine starts
         return;
+    }
+
 #endif
 
     char fname[512];
-    sprintf(fname,"%s_dmp.txt",nm);
-    char *errStr = "";
+    sprintf(fname, "%s_dmp.txt", nm);
+    char* errStr = "";
 
 
     _CrtMemState heap_state;
-static  uint32_t GrandTotal =0;
-static  _CrtMemBlockHeader *cmbh_last;  // Remember this header for next incremental check DANGER this 
-                        // could break if this is freed...(gives bad report)
-    _CrtMemBlockHeader *cmbh_last_good;
-    
-    _CrtMemBlockHeader *cmbh;
+    static  uint32_t GrandTotal = 0;
+    static  _CrtMemBlockHeader* cmbh_last;  // Remember this header for next incremental check DANGER this
+    // could break if this is freed...(gives bad report)
+    _CrtMemBlockHeader* cmbh_last_good;
+
+    _CrtMemBlockHeader* cmbh;
     // Get Current heap state
 
     _CrtMemCheckpoint(&heap_state);
 
     cmbh = heap_state.pBlockHeader;
 
-    long totsize= 0;        // Track Total Bytes
+    long totsize = 0;       // Track Total Bytes
     long normsize = 0;      // Track total of NORMAL Blocks
 
-    looktbl *ltb = new looktbl[LTBLMAX];
-    long tblEnd=1;          // first is "NULL";
+    looktbl* ltb = new looktbl[LTBLMAX];
+    long tblEnd = 1;        // first is "NULL";
 
-    memset((void *)ltb,0,sizeof(looktbl) * LTBLMAX);        // clear table area
+    memset((void*)ltb, 0, sizeof(looktbl) * LTBLMAX);       // clear table area
 
-    char *ftrim;
+    char* ftrim;
 
 
     ltb[0].fName = "NULL";      // Use first Table Pos for NULL
 
     long tblpos;
-    while (cmbh != NULL)        // Accumulate Stats to table
-    {
-        if (cmbh == cmbh_last && !full) // full indicates ignore last "checkpoint", stop at last checkpoint if !full
+
+    while (cmbh != NULL) {      // Accumulate Stats to table
+        if (cmbh == cmbh_last && !full) { // full indicates ignore last "checkpoint", stop at last checkpoint if !full
             break;
+        }
+
         cmbh_last_good = cmbh;
         totsize += cmbh->nDataSize;
-        if (cmbh->nBlockUse == _NORMAL_BLOCK) 
-        {
-            normsize += cmbh->nDataSize; 
-            
-            if (cmbh->szFileName != NULL)               // Shorten to just the file name, looks better, and strcmps faster
-            {
+
+        if (cmbh->nBlockUse == _NORMAL_BLOCK) {
+            normsize += cmbh->nDataSize;
+
+            if (cmbh->szFileName != NULL) {             // Shorten to just the file name, looks better, and strcmps faster
                 ftrim = TrimFileName(cmbh->szFileName);
-                for (tblpos  = 1; tblpos < tblEnd; tblpos++)    // find the name in the table
-                {   
-                    if (!strcmp(ftrim,ltb[tblpos].fName))
-                        break;  // found it
+
+                for (tblpos  = 1; tblpos < tblEnd; tblpos++) {  // find the name in the table
+                    if (!strcmp(ftrim, ltb[tblpos].fName)) {
+                        break;    // found it
+                    }
                 }
-            }
-            else
-            {   
+            } else {
                 tblpos = 0;     // Use "NULL", first pos of table
             }
 
-            if (tblpos == tblEnd)       // Did not find it...add it
-            {
+            if (tblpos == tblEnd) {     // Did not find it...add it
                 tblEnd++;
-                if (tblEnd >= LTBLMAX) 
-                {   DebugMsg("DumpUnfreedMemoryInfo: EXCEED MAX TABLE LENGTH\n");
+
+                if (tblEnd >= LTBLMAX) {
+                    DebugMsg("DumpUnfreedMemoryInfo: EXCEED MAX TABLE LENGTH\n");
                     tblEnd--;
                     break;
                 }
+
                 ltb[tblpos].fName = ftrim;  // Add name
             }
-                // Add Stats
+
+            // Add Stats
 //          ltb[tblpos].fAllocs++;
             ltb[tblpos].fBytes += cmbh->nDataSize;
 
-            
-        }
-        cmbh = cmbh->pBlockHeaderNext;
-        
-    }
-        // This Code relies on the _CrtMemBlockHeader *cmbh_last_good for the "last" checkpoint to still be around...
-        // If the following occurs, that chunk has been deleted.  we could fix this by allocating our own
-        // chunk and keeping it (watch for mem leaks though) or figuring out an "approximat" re syncying routine
-        // that works before we run thru collecting data. PBG
 
-    if (cmbh_last && !full && cmbh == NULL)
-    {
+        }
+
+        cmbh = cmbh->pBlockHeaderNext;
+
+    }
+
+    // This Code relies on the _CrtMemBlockHeader *cmbh_last_good for the "last" checkpoint to still be around...
+    // If the following occurs, that chunk has been deleted.  we could fix this by allocating our own
+    // chunk and keeping it (watch for mem leaks though) or figuring out an "approximat" re syncying routine
+    // that works before we run thru collecting data. PBG
+
+    if (cmbh_last && !full && cmbh == NULL) {
         //hsAssert(0,"Stats error: incremental mem check point has been deleted");
         errStr = "CHECK POINT ERROR, Results Inacurate";
     }
 
-    if (normsize)       // Don't write out about nothing
-    {
-        
-        CreateDirectory("Reports",NULL);            // stick em in a sub directory
+    if (normsize) {     // Don't write out about nothing
+
+        CreateDirectory("Reports", NULL);           // stick em in a sub directory
         char fnm[512];
-        sprintf(fnm,"Reports\\%s",fname);
- 
-        FILE * DumpLogFile = fopen( fnm, "w" );
+        sprintf(fnm, "Reports\\%s", fname);
+
+        FILE* DumpLogFile = fopen(fnm, "w");
+
 //      long allocs=0;
-        if ( DumpLogFile != NULL )
-        {
-                // Print Stats
-            fprintf(DumpLogFile, "Filename                Total=%ld(k) %s\n",(normsize + 500)/1000,errStr);
-            for (int i = 0; i < tblEnd; i++)
-            {   //fprintf(DumpLogFile,"%s\t%ld\n",ltb[i].fName, (ltb[i].fBytes+500)/1000);//,ltb[i].fAllocs);
-                fprintf(DumpLogFile,"%s ",ltb[i].fName);
+        if (DumpLogFile != NULL) {
+            // Print Stats
+            fprintf(DumpLogFile, "Filename                Total=%ld(k) %s\n", (normsize + 500) / 1000, errStr);
+
+            for (int i = 0; i < tblEnd; i++) {
+                //fprintf(DumpLogFile,"%s\t%ld\n",ltb[i].fName, (ltb[i].fBytes+500)/1000);//,ltb[i].fAllocs);
+                fprintf(DumpLogFile, "%s ", ltb[i].fName);
                 int len = strlen(ltb[i].fName);
 
-                for(int x=len; x < 25; x++)
-                    fputc(' ',DumpLogFile);             // make even columns
-                fprintf(DumpLogFile,"%5ld K\n",(uint32_t)( ltb[i].fBytes+500)/1000);//,ltb[i].fAllocs);
-                
+                for (int x = len; x < 25; x++) {
+                    fputc(' ', DumpLogFile);    // make even columns
+                }
+
+                fprintf(DumpLogFile, "%5ld K\n", (uint32_t)(ltb[i].fBytes + 500) / 1000); //,ltb[i].fAllocs);
+
                 //allocs += ltb[i].fAllocs;
             }
 
-            DebugMsg("MEMORY USE FILE DUMPED TO %s \n",fname);
-            DebugMsg("MEMORY Check: Total size %ld, Normal Size: %ld\n",totsize,normsize);
+            DebugMsg("MEMORY USE FILE DUMPED TO %s \n", fname);
+            DebugMsg("MEMORY Check: Total size %ld, Normal Size: %ld\n", totsize, normsize);
 
             fclose(DumpLogFile);
         }
-        static int first=1;
-        if (!full)          // if this is a partial mem dump, write to the ROOMS.txt file a summary
-        {   
-            sprintf(fnm,"Reports\\%s","ROOMS.txt");
- 
-            if (first)
-            {   DumpLogFile = fopen( fnm, "w" );    // first time clobber the old
-                if (DumpLogFile)
-                    fprintf(DumpLogFile, "Filename              Memory-Used(K)       RunningTotal\n");//  \tAllocation Calls \n" );
-                first = 0;
-            }
-            else
-                DumpLogFile = fopen( fnm, "a+" );
-            if( DumpLogFile)
-            {   fprintf(DumpLogFile,"%s ",nm);
-                int len = strlen(nm);
-                GrandTotal += (uint32_t)(normsize+500)/1000;
 
-                for(int x=len; x < 25; x++)
-                    fputc(' ',DumpLogFile);                 // make even columns
-                fprintf(DumpLogFile,"%5ld K           %5ld  %s\n",(uint32_t)(normsize+500)/1000,GrandTotal,errStr);//, allocs);
+        static int first = 1;
+
+        if (!full) {        // if this is a partial mem dump, write to the ROOMS.txt file a summary
+            sprintf(fnm, "Reports\\%s", "ROOMS.txt");
+
+            if (first) {
+                DumpLogFile = fopen(fnm, "w");      // first time clobber the old
+
+                if (DumpLogFile) {
+                    fprintf(DumpLogFile, "Filename              Memory-Used(K)       RunningTotal\n");    //  \tAllocation Calls \n" );
+                }
+
+                first = 0;
+            } else {
+                DumpLogFile = fopen(fnm, "a+");
+            }
+
+            if (DumpLogFile) {
+                fprintf(DumpLogFile, "%s ", nm);
+                int len = strlen(nm);
+                GrandTotal += (uint32_t)(normsize + 500) / 1000;
+
+                for (int x = len; x < 25; x++) {
+                    fputc(' ', DumpLogFile);    // make even columns
+                }
+
+                fprintf(DumpLogFile, "%5ld K           %5ld  %s\n", (uint32_t)(normsize + 500) / 1000, GrandTotal, errStr); //, allocs);
                 fclose(DumpLogFile);
             }
         }

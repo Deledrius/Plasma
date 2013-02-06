@@ -53,20 +53,18 @@ class plMaxNode;
 class plPointShadowMaster;
 class plShadowCaster;
 
-class plShadowCastComponent : public plComponent
-{
+class plShadowCastComponent : public plComponent {
 public:
-enum    
-{
-    kSelfShadow,
-    kBlur,
-    kBlurScale,
-    kAtten,
-    kAttenScale,
-    kBoost,
-    kQuality,
-    kLimitRes
-};
+    enum {
+        kSelfShadow,
+        kBlur,
+        kBlurScale,
+        kAtten,
+        kAttenScale,
+        kBoost,
+        kQuality,
+        kLimitRes
+    };
 protected:
     plShadowCaster*     fCaster;
 public:
@@ -74,34 +72,30 @@ public:
 
     bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
     bool PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
     static bool AddShadowCastModifier(plMaxNode* pNode, plShadowCaster* caster);
     static bool AddShadowCastModifier(plSceneObject* so, plShadowCaster* caster);
 };
 
-class plShadowRcvComponent : public plComponent
-{
+class plShadowRcvComponent : public plComponent {
 public:
-enum    
-{
-    kForceRadio
-};
-enum
-{
-    kForceOn,
-    kForceOff
-};
+    enum {
+        kForceRadio
+    };
+    enum {
+        kForceOn,
+        kForceOff
+    };
 public:
     plShadowRcvComponent();
 
     bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
     bool PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
-class plShadowLightComponent : public plComponent
-{
+class plShadowLightComponent : public plComponent {
 public:
     enum {
         kFalloff,
@@ -121,7 +115,7 @@ public:
 
     bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
     bool PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 

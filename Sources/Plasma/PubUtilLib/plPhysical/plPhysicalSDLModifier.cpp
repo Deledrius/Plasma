@@ -60,10 +60,10 @@ static const char* kStrOrientation  = "orientation";
 int plPhysicalSDLModifier::fLogLevel = 0;
 
 static void IGetVars(plStateDataRecord::SimpleVarsList& vars,
-    hsPoint3& pos, bool& isPosSet,
-    hsQuat& rot, bool& isRotSet,
-    hsVector3& linV, bool& isLinVSet,
-    hsVector3& angV, bool& isAngVSet);
+                     hsPoint3& pos, bool& isPosSet,
+                     hsQuat& rot, bool& isRotSet,
+                     hsVector3& linV, bool& isLinVSet,
+                     hsVector3& angV, bool& isAngVSet);
 
 //
 // get current state from physical
@@ -85,14 +85,15 @@ void plPhysicalSDLModifier::IPutCurrentStateIn(plStateDataRecord* dstState)
     dstState->FindVar(kStrLinear)->Set(&curLinear.fX);
     dstState->FindVar(kStrAngular)->Set(&curAngular.fX);
 
-    if (fLogLevel > 1)
+    if (fLogLevel > 1) {
         ILogState(dstState, false, "PUT", plStatusLog::kWhite);
+    }
 }
 
 void plPhysicalSDLModifier::ISetCurrentStateFrom(const plStateDataRecord* srcState)
 {
     plPhysical* phys = IGetPhysical();
-    
+
     // FIXME PHYSX
 
 //  if(phys->GetBody()->isFixed())
@@ -122,8 +123,9 @@ void plPhysicalSDLModifier::ISetCurrentStateFrom(const plStateDataRecord* srcSta
         srcState->GetUsedVars(&vars);
         IGetVars(vars, pos, isPosSet, rot, isRotSet, linV, isLinVSet, angV, isAngVSet);
 
-        if (fLogLevel > 0)
+        if (fLogLevel > 0) {
             ILogState(srcState, false, "RCV", plStatusLog::kGreen);
+        }
 
         phys->SetSyncState(
             isPosSet ? &pos : nil,
@@ -135,8 +137,7 @@ void plPhysicalSDLModifier::ISetCurrentStateFrom(const plStateDataRecord* srcSta
 
 void plPhysicalSDLModifier::ISentState(const plStateDataRecord* sentState)
 {
-    if (fLogLevel > 0)
-    {
+    if (fLogLevel > 0) {
         ILogState(sentState, true, "SND", plStatusLog::kYellow);
 
 //      plPhysical* phys = IGetPhysical();
@@ -146,10 +147,10 @@ void plPhysicalSDLModifier::ISentState(const plStateDataRecord* sentState)
 }
 
 static void IGetVars(plStateDataRecord::SimpleVarsList& vars,
-    hsPoint3& pos, bool& isPosSet,
-    hsQuat& rot, bool& isRotSet,
-    hsVector3& linV, bool& isLinVSet,
-    hsVector3& angV, bool& isAngVSet)
+                     hsPoint3& pos, bool& isPosSet,
+                     hsQuat& rot, bool& isRotSet,
+                     hsVector3& linV, bool& isLinVSet,
+                     hsVector3& angV, bool& isAngVSet)
 {
     isPosSet = false;
     isRotSet = false;
@@ -157,38 +158,23 @@ static void IGetVars(plStateDataRecord::SimpleVarsList& vars,
     isAngVSet = false;
 
     int num = vars.size();
-    for (int i = 0; i < num; i++)
-    {
-        if (vars[i]->IsNamed(kStrPosition))
-        {
+
+    for (int i = 0; i < num; i++) {
+        if (vars[i]->IsNamed(kStrPosition)) {
             vars[i]->Get(&pos.fX);
-            isPosSet= true;
-        }
-        else
-        if (vars[i]->IsNamed(kStrOrientation))
-        {
+            isPosSet = true;
+        } else if (vars[i]->IsNamed(kStrOrientation)) {
             vars[i]->Get(&rot.fX);
             isRotSet = true;
-        }
-        else
-        if (vars[i]->IsNamed(kStrLinear))
-        {
+        } else if (vars[i]->IsNamed(kStrLinear)) {
             vars[i]->Get(&linV.fX);
             isLinVSet = true;
-        }
-        else
-        if (vars[i]->IsNamed(kStrAngular))
-        {
+        } else if (vars[i]->IsNamed(kStrAngular)) {
             vars[i]->Get(&angV.fX);
             isAngVSet = true;
-        }
-        else
-        if (vars[i]->IsNamed("subworld"))
-        {
+        } else if (vars[i]->IsNamed("subworld")) {
             // Unused
-        }
-        else
-        {
+        } else {
             hsAssert(false, "Unknown var name");
         }
     }
@@ -206,10 +192,12 @@ void plPhysicalSDLModifier::ILogState(const plStateDataRecord* state, bool useDi
     bool isAngVSet;
 
     plStateDataRecord::SimpleVarsList vars;
-    if (useDirty)
+
+    if (useDirty) {
         state->GetDirtyVars(&vars);
-    else
+    } else {
         state->GetUsedVars(&vars);
+    }
 
     IGetVars(vars, pos, isPosSet, rot, isRotSet, linV, isLinVSet, angV, isAngVSet);
 
@@ -217,25 +205,29 @@ void plPhysicalSDLModifier::ILogState(const plStateDataRecord* state, bool useDi
 
     plString log = plString::Format("%s: %s", phys->GetKeyName().c_str(), prefix);
 
-    if (isPosSet)
+    if (isPosSet) {
         log += plString::Format(" Pos=%.1f %.1f %.1f", pos.fX, pos.fY, pos.fZ);
-    else
+    } else {
         log += " Pos=None";
+    }
 
-    if (isLinVSet)
+    if (isLinVSet) {
         log += plString::Format(" LinV=%.1f %.1f %.1f", linV.fX, linV.fY, linV.fZ);
-    else
+    } else {
         log += " LinV=None";
+    }
 
-    if (isAngVSet)
+    if (isAngVSet) {
         log += plString::Format(" AngV=%.1f %.1f %.1f", angV.fX, angV.fY, angV.fZ);
-    else
+    } else {
         log += " AngV=None";
+    }
 
-    if (isRotSet)
+    if (isRotSet) {
         log += plString::Format(" Rot=%.1f %.1f %.1f %.1f", rot.fX, rot.fY, rot.fZ, rot.fW);
-    else
+    } else {
         log += " Rot=None";
+    }
 
     IGetLog()->AddLine(log.c_str(), color);
 }
@@ -243,13 +235,13 @@ void plPhysicalSDLModifier::ILogState(const plStateDataRecord* state, bool useDi
 plStatusLog* plPhysicalSDLModifier::IGetLog()
 {
     static plStatusLog* gLog = nil;
-    if (!gLog)
-    {
+
+    if (!gLog) {
         gLog = plStatusLogMgr::GetInstance().CreateStatusLog(20, "PhysicsSDL.log",
-                    plStatusLog::kFilledBackground |
-                    plStatusLog::kTimestamp |
-                    plStatusLog::kDeleteForMe |
-                    plStatusLog::kAlignToTop);
+                plStatusLog::kFilledBackground |
+                plStatusLog::kTimestamp |
+                plStatusLog::kDeleteForMe |
+                plStatusLog::kAlignToTop);
     }
 
     return gLog;
@@ -260,11 +252,13 @@ plPhysical* plPhysicalSDLModifier::IGetPhysical()
     plPhysical* phys = nil;
 
     plSceneObject* sobj = GetTarget();
-    if (sobj)
-    {
+
+    if (sobj) {
         const plSimulationInterface* si = sobj->GetSimulationInterface();
-        if (si)
+
+        if (si) {
             phys = si->GetPhysical();
+        }
     }
 
     hsAssert(phys, "nil hkPhysical");

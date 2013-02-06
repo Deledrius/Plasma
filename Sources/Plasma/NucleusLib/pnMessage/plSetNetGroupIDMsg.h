@@ -46,16 +46,21 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnNetCommon/plNetGroup.h"
 
 // Send this to a SynchedObject to change its NetGroupID
-class plSetNetGroupIDMsg : public plMessage
-{
+class plSetNetGroupIDMsg : public plMessage {
 public:
     CLASSNAME_REGISTER(plSetNetGroupIDMsg);
     GETINTERFACE_ANY(plSetNetGroupIDMsg, plMessage);
 
     plNetGroupId fId;
 
-    void Read(hsStream* stream, hsResMgr* mgr)  { plMessage::IMsgRead(stream, mgr);  fId.Read(stream); }
-    void Write(hsStream* stream, hsResMgr* mgr) { plMessage::IMsgWrite(stream, mgr); fId.Write(stream); }
+    void Read(hsStream* stream, hsResMgr* mgr)  {
+        plMessage::IMsgRead(stream, mgr);
+        fId.Read(stream);
+    }
+    void Write(hsStream* stream, hsResMgr* mgr) {
+        plMessage::IMsgWrite(stream, mgr);
+        fId.Write(stream);
+    }
 };
 
 #endif // plSetNetGroupIDMsg_h_inc

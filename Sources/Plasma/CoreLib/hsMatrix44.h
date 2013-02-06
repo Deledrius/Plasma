@@ -64,9 +64,9 @@ struct hsMatrix44 {
     uint32_t         fFlags;
 
     hsMatrix44() : fFlags(0) {}
-    hsMatrix44(const hsScalarTriple &translate, const hsQuat &rotate);
+    hsMatrix44(const hsScalarTriple& translate, const hsQuat& rotate);
 
-    void DecompRigid(hsScalarTriple &translate, hsQuat &rotate) const;
+    void DecompRigid(hsScalarTriple& translate, hsQuat& rotate) const;
 
     static const hsMatrix44& IdentityMatrix();
 
@@ -75,52 +75,64 @@ struct hsMatrix44 {
     static void MakeCameraMatrices(const hsPoint3& from, const hsPoint3& at, const hsVector3& up, hsMatrix44& worldToCamera, hsMatrix44& cameraToWorld);
 
     // Concat transform
-    hsMatrix44&     Translate(const hsVector3 *);
-    hsMatrix44&     Scale(const hsVector3 *);
+    hsMatrix44&     Translate(const hsVector3*);
+    hsMatrix44&     Scale(const hsVector3*);
     hsMatrix44&     Rotate(int axis, float radians);
 
-    hsMatrix44&     Reset(bool asIdent=true) 
-    {
-        fMap[0][0] = 1.0f; fMap[0][1] = 0.0f; fMap[0][2] = 0.0f; fMap[0][3]  = 0.0f;
-        fMap[1][0] = 0.0f; fMap[1][1] = 1.0f; fMap[1][2] = 0.0f; fMap[1][3]  = 0.0f;
-        fMap[2][0] = 0.0f; fMap[2][1] = 0.0f; fMap[2][2] = 1.0f; fMap[2][3]  = 0.0f;
-        fMap[3][0] = 0.0f; fMap[3][1] = 0.0f; fMap[3][2] = 0.0f; fMap[3][3]  = 1.0f;
+    hsMatrix44&     Reset(bool asIdent = true) {
+        fMap[0][0] = 1.0f;
+        fMap[0][1] = 0.0f;
+        fMap[0][2] = 0.0f;
+        fMap[0][3]  = 0.0f;
+        fMap[1][0] = 0.0f;
+        fMap[1][1] = 1.0f;
+        fMap[1][2] = 0.0f;
+        fMap[1][3]  = 0.0f;
+        fMap[2][0] = 0.0f;
+        fMap[2][1] = 0.0f;
+        fMap[2][2] = 1.0f;
+        fMap[2][3]  = 0.0f;
+        fMap[3][0] = 0.0f;
+        fMap[3][1] = 0.0f;
+        fMap[3][2] = 0.0f;
+        fMap[3][3]  = 1.0f;
 
         fFlags = asIdent ? kIsIdent : 0;
         return *this;
     }
 
     // Create matrix from scratch
-    hsMatrix44&     MakeTranslateMat(const hsVector3 *trans);
-    hsMatrix44&     MakeScaleMat(const hsVector3 *scale);
+    hsMatrix44&     MakeTranslateMat(const hsVector3* trans);
+    hsMatrix44&     MakeScaleMat(const hsVector3* scale);
     hsMatrix44&     MakeRotateMat(int axis, float radians);
-    hsMatrix44&     Make(const hsPoint3* from, const hsPoint3* at, 
-                        const hsVector3* up);   // Not a camera matrix
-    hsMatrix44&     MakeUpPreserving(const hsPoint3* from, const hsPoint3* at, 
-                        const hsVector3* up);   // Not a camera matrix
+    hsMatrix44&     Make(const hsPoint3* from, const hsPoint3* at,
+                         const hsVector3* up);   // Not a camera matrix
+    hsMatrix44&     MakeUpPreserving(const hsPoint3* from, const hsPoint3* at,
+                                     const hsVector3* up);   // Not a camera matrix
     // Camera matrix
     hsMatrix44&     MakeCamera(const hsPoint3* from, const hsPoint3* at,
-                        const hsVector3* up);
+                               const hsVector3* up);
     hsMatrix44&     MakeCameraUpPreserving(const hsPoint3* from, const hsPoint3* at,
-                        const hsVector3* up);
+                                           const hsVector3* up);
 
     bool            GetParity() const;
     float           GetDeterminant() const;
     hsMatrix44*     GetInverse(hsMatrix44* inverse) const;
     hsMatrix44*     GetTranspose(hsMatrix44* inverse) const;
     hsMatrix44*     GetAdjoint(hsMatrix44* adjoint) const;
-    hsVector3*      GetTranslate(hsVector3 *pt) const;
-    hsPoint3*       GetTranslate(hsPoint3 *pt) const 
-        {   return (hsPoint3*)GetTranslate((hsVector3*)pt); }
+    hsVector3*      GetTranslate(hsVector3* pt) const;
+    hsPoint3*       GetTranslate(hsPoint3* pt) const {
+        return (hsPoint3*)GetTranslate((hsVector3*)pt);
+    }
     const hsPoint3  GetTranslate() const;
-    void            GetAxis(hsVector3* view, hsVector3 *up, hsVector3* right);
-    void            GetAxisFromCamera(hsVector3* view, hsVector3 *up, hsVector3* right);
+    void            GetAxis(hsVector3* view, hsVector3* up, hsVector3* right);
+    void            GetAxisFromCamera(hsVector3* view, hsVector3* up, hsVector3* right);
 
     const hsVector3 GetAxis(int i) const;
 
     // Change component of matrix
-    hsMatrix44&     SetTranslate(const hsScalarTriple *);
-    hsMatrix44&     SetScale(const hsVector3 *);
+    hsMatrix44&     SetTranslate(const hsScalarTriple*);
+    hsMatrix44&     SetScale(const hsVector3*);
     hsMatrix44&     SetRotate(int axis, float radians);
 
     hsVector3       RemoveScale();      // returns old scale
@@ -129,30 +141,36 @@ struct hsMatrix44 {
     void MakeZRotation(float radians);
 
 
-    hsPoint3        operator*(const hsPoint3& p) const
-                    {   
-                        if( fFlags & hsMatrix44::kIsIdent )
-                            return p;
+    hsPoint3        operator*(const hsPoint3& p) const {
+        if (fFlags & hsMatrix44::kIsIdent) {
+            return p;
+        }
 
-                        hsPoint3 rVal;
-                        rVal.fX = (p.fX * fMap[0][0]) + (p.fY * fMap[0][1]) + (p.fZ * fMap[0][2]) + fMap[0][3];
-                        rVal.fY = (p.fX * fMap[1][0]) + (p.fY * fMap[1][1]) + (p.fZ * fMap[1][2])  + fMap[1][3];
-                        rVal.fZ = (p.fX * fMap[2][0]) + (p.fY * fMap[2][1]) + (p.fZ * fMap[2][2])  + fMap[2][3];
-                        return rVal;
-                    }
+        hsPoint3 rVal;
+        rVal.fX = (p.fX * fMap[0][0]) + (p.fY * fMap[0][1]) + (p.fZ * fMap[0][2]) + fMap[0][3];
+        rVal.fY = (p.fX * fMap[1][0]) + (p.fY * fMap[1][1]) + (p.fZ * fMap[1][2])  + fMap[1][3];
+        rVal.fZ = (p.fX * fMap[2][0]) + (p.fY * fMap[2][1]) + (p.fZ * fMap[2][2])  + fMap[2][3];
+        return rVal;
+    }
     hsVector3 operator*(const hsVector3& p) const;
-    hsMatrix44 operator *(const hsMatrix44& other) const { return mat_mult.call(*this, other); }
-    
+    hsMatrix44 operator *(const hsMatrix44& other) const {
+        return mat_mult.call(*this, other);
+    }
+
     hsPoint3*           MapPoints(long count, hsPoint3 points[]) const;
-    
+
     bool  IsIdentity(void);
-    void  NotIdentity() { fFlags &= ~kIsIdent; }
+    void  NotIdentity() {
+        fFlags &= ~kIsIdent;
+    }
 
     bool operator==(const hsMatrix44& ss) const;
-    bool operator!=(const hsMatrix44& ss) const { return !(ss == *this); }
+    bool operator!=(const hsMatrix44& ss) const {
+        return !(ss == *this);
+    }
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
     //  CPU-optimized functions
     typedef hsMatrix44(*mat_mult_ptr)(const hsMatrix44&, const hsMatrix44&);

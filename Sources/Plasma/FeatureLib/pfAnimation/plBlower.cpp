@@ -60,7 +60,7 @@ static const float kDefaultBias = 0.25f;
 static const float kInitialMaxOffDist = 1.f;
 
 plBlower::plBlower()
-:   
+    :
     fMasterPower(kDefaultMasterPower),
     fMasterFrequency(kDefaultMasterFrequency),
     fDirectRate(kDefaultDirectRate),
@@ -70,9 +70,9 @@ plBlower::plBlower()
     fMaxOffsetDist(kInitialMaxOffDist),
     fAccumTime(0)
 {
-    fRestPos.Set(0,0,0);
-    fLocalRestPos.Set(0,0,0);
-    fCurrDel.Set(0,0,0);
+    fRestPos.Set(0, 0, 0);
+    fLocalRestPos.Set(0, 0, 0);
+    fCurrDel.Set(0, 0, 0);
 
     fDirection.Set(fRandom.RandMinusOneToOne(), fRandom.RandMinusOneToOne(), 0);
     hsFastMath::NormalizeAppr(fDirection);
@@ -97,8 +97,8 @@ void plBlower::IBlow(double secs, float delSecs)
 
     float strength = 0;
     int i;
-    for( i = 0; i < fOscillators.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fOscillators.GetCount(); i++) {
         float c, s;
         t *= fOscillators[i].fFrequency * fMasterFrequency;
         t += fOscillators[i].fPhase;
@@ -106,10 +106,12 @@ void plBlower::IBlow(double secs, float delSecs)
         c += fBias;
         strength += c * fOscillators[i].fPower;
     }
+
     strength *= fMasterPower;
 
-    if( strength < 0 )
+    if (strength < 0) {
         strength = 0;
+    }
 
     fDirection.fX += fRandom.RandMinusOneToOne() * delSecs * fDirectRate;
     fDirection.fY += fRandom.RandMinusOneToOne() * delSecs * fDirectRate;
@@ -117,14 +119,16 @@ void plBlower::IBlow(double secs, float delSecs)
     hsFastMath::NormalizeAppr(fDirection);
 
     float offDist = hsVector3(&fRestPos, &worldPos).Magnitude();
-    if( offDist > fMaxOffsetDist )
+
+    if (offDist > fMaxOffsetDist) {
         fMaxOffsetDist = offDist;
+    }
 
     hsVector3 force = fDirection * strength;
 
     static float kOffsetDistFrac = 0.5f; // make me const
-    if( offDist > fMaxOffsetDist * kOffsetDistFrac )
-    {
+
+    if (offDist > fMaxOffsetDist * kOffsetDistFrac) {
         offDist /= fMaxOffsetDist;
         offDist *= fMasterPower;
 
@@ -134,6 +138,7 @@ void plBlower::IBlow(double secs, float delSecs)
         force.fY += impulse * fRandom.RandMinusOneToOne();
         force.fZ += impulse * fRandom.RandMinusOneToOne();
     }
+
     const float kOffsetDistDecay = 0.999f;
     fMaxOffsetDist *= kOffsetDistDecay;
 
@@ -148,8 +153,11 @@ void plBlower::IBlow(double secs, float delSecs)
 bool plBlower::IEval(double secs, float delSecs, uint32_t dirty)
 {
     const float kMaxDelSecs = 0.1f;
-    if( delSecs > kMaxDelSecs )
+
+    if (delSecs > kMaxDelSecs) {
         delSecs = kMaxDelSecs;
+    }
+
     IBlow(secs, delSecs);
 
     ISetTargetTransform();
@@ -160,8 +168,8 @@ bool plBlower::IEval(double secs, float delSecs, uint32_t dirty)
 void plBlower::ISetTargetTransform()
 {
     plCoordinateInterface* ci = IGetTargetCoordinateInterface(0);
-    if( ci )
-    {
+
+    if (ci) {
         hsMatrix44 l2p = ci->GetLocalToParent();
         hsMatrix44 p2l = ci->GetParentToLocal();
 
@@ -171,7 +179,7 @@ void plBlower::ISetTargetTransform()
         hsPoint3 neg = -pos;
         l2p.SetTranslate(&pos);
         p2l.SetTranslate(&neg);
-    
+
         ci->SetLocalToParent(l2p, p2l);
     }
 }
@@ -180,8 +188,7 @@ void plBlower::SetTarget(plSceneObject* so)
 {
     plSingleModifier::SetTarget(so);
 
-    if( fTarget )
-    {
+    if (fTarget) {
         fRestPos = fTarget->GetLocalToWorld().GetTranslate();
         fLocalRestPos = fTarget->GetLocalToParent().GetTranslate();
         plgDispatch::Dispatch()->RegisterForExactType(plEvalMsg::Index(), GetKey());
@@ -215,9 +222,9 @@ void plBlower::IInitOscillators()
     const float kBasePower = 5.f;
     fOscillators.SetCount(5);
     int i;
-    for( i = 0; i < fOscillators.GetCount(); i++ )
-    {
-        float fi = float(i+1);
+
+    for (i = 0; i < fOscillators.GetCount(); i++) {
+        float fi = float(i + 1);
         fOscillators[i].fFrequency = fi / M_PI * fRandom.RandRangeF(0.75f, 1.25f);
 //      fOscillators[i].fFrequency = 1.f / M_PI * fRandom.RandRangeF(0.5f, 1.5f);
         fOscillators[i].fPhase = fRandom.RandZeroToOne();
@@ -227,10 +234,11 @@ void plBlower::IInitOscillators()
 
 void plBlower::SetConstancy(float f)
 {
-    if( f < 0 )
+    if (f < 0) {
         f = 0;
-    else if( f > 1.f )
+    } else if (f > 1.f) {
         f = 1.f;
+    }
 
     fBias = f;
 }

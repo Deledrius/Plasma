@@ -46,26 +46,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #define DECAL_MTL_CLASS_ID  Class_ID(0x691d2257, 0x419d629e)
 
-extern TCHAR *GetString(int id);
+extern TCHAR* GetString(int id);
 
-class plDecalMtl : public plPassMtlBase
-{
+class plDecalMtl : public plPassMtlBase {
 protected:
 
-    virtual void        ICloneRefs( plPassMtlBase *target, RemapDir &remap );
+    virtual void        ICloneRefs(plPassMtlBase* target, RemapDir& remap);
 
 public:
 
-    enum
-    {
+    enum {
         kRefBasic,
         kRefLayers,
         kRefAdv,
         kRefAnim,
     };
-    
-    enum Blocks
-    {
+
+    enum Blocks {
         kBlkBasic,
         kBlkLayers,
         kBlkAdv,
@@ -73,47 +70,55 @@ public:
     };
 
     plDecalMtl(BOOL loading);
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     //From Animatable
-    Class_ID ClassID() { return DECAL_MTL_CLASS_ID; }       
-    SClass_ID SuperClassID() { return MATERIAL_CLASS_ID; }
+    Class_ID ClassID() {
+        return DECAL_MTL_CLASS_ID;
+    }
+    SClass_ID SuperClassID() {
+        return MATERIAL_CLASS_ID;
+    }
     void GetClassName(TSTR& s);
 
-    ParamDlg *CreateParamDlg(HWND hwMtlEdit, IMtlParams *imp);
+    ParamDlg* CreateParamDlg(HWND hwMtlEdit, IMtlParams* imp);
     void Update(TimeValue t, Interval& valid);
     Interval Validity(TimeValue t);
 
     void NotifyChanged();
 
-    BOOL SupportsMultiMapsInViewport() { return FALSE; }
-    void SetupGfxMultiMaps(TimeValue t, Material *mtl, MtlMakerCallback &cb);
+    BOOL SupportsMultiMapsInViewport() {
+        return FALSE;
+    }
+    void SetupGfxMultiMaps(TimeValue t, Material* mtl, MtlMakerCallback& cb);
 
     // Shade and displacement calculation
     void Shade(ShadeContext& sc);
-    void ShadeWithBackground(ShadeContext &sc, Color background);
-    float EvalDisplacement(ShadeContext& sc); 
-    Interval DisplacementValidity(TimeValue t);     
+    void ShadeWithBackground(ShadeContext& sc, Color background);
+    float EvalDisplacement(ShadeContext& sc);
+    Interval DisplacementValidity(TimeValue t);
 
-    virtual RefTargetHandle GetReference( int i );
-    virtual void            SetReference( int i, RefTargetHandle rtarg );
+    virtual RefTargetHandle GetReference(int i);
+    virtual void            SetReference(int i, RefTargetHandle rtarg);
 
     // SubTexmap access methods
     int NumSubTexmaps();
     Texmap* GetSubTexmap(int i);
-    void SetSubTexmap(int i, Texmap *m);
+    void SetSubTexmap(int i, Texmap* m);
     TSTR GetSubTexmapSlotName(int i);
     TSTR GetSubTexmapTVName(int i);
-   int SubTexmapOn(int i);
-      
+    int SubTexmapOn(int i);
+
     BOOL SetDlgThing(ParamDlg* dlg);
 
-    RefTargetHandle Clone( RemapDir &remap );
-    RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, 
-        PartID& partID,  RefMessage message);
+    RefTargetHandle Clone(RemapDir& remap);
+    RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
+                               PartID& partID,  RefMessage message);
 
     int NumSubs();
-    Animatable* SubAnim(int i); 
+    Animatable* SubAnim(int i);
     TSTR SubAnimName(int i);
 
     int NumParamBlocks();
@@ -126,19 +131,19 @@ public:
 //  void SetNumSubTexmaps(int num);
 
     // From MtlBase and Mtl
-    void SetAmbient(Color c, TimeValue t);      
-    void SetDiffuse(Color c, TimeValue t);      
+    void SetAmbient(Color c, TimeValue t);
+    void SetDiffuse(Color c, TimeValue t);
     void SetSpecular(Color c, TimeValue t);
     void SetShininess(float v, TimeValue t);
-    Color GetAmbient(int mtlNum=0, BOOL backFace=FALSE);
-    Color GetDiffuse(int mtlNum=0, BOOL backFace=FALSE);
-    Color GetSpecular(int mtlNum=0, BOOL backFace=FALSE);
-    float GetXParency(int mtlNum=0, BOOL backFace=FALSE);
-    float GetShininess(int mtlNum=0, BOOL backFace=FALSE);      
-    float GetShinStr(int mtlNum=0, BOOL backFace=FALSE);
-    float WireSize(int mtlNum=0, BOOL backFace=FALSE);
+    Color GetAmbient(int mtlNum = 0, BOOL backFace = FALSE);
+    Color GetDiffuse(int mtlNum = 0, BOOL backFace = FALSE);
+    Color GetSpecular(int mtlNum = 0, BOOL backFace = FALSE);
+    float GetXParency(int mtlNum = 0, BOOL backFace = FALSE);
+    float GetShininess(int mtlNum = 0, BOOL backFace = FALSE);
+    float GetShinStr(int mtlNum = 0, BOOL backFace = FALSE);
+    float WireSize(int mtlNum = 0, BOOL backFace = FALSE);
 
-    ULONG   Requirements( int subMtlNum );
+    ULONG   Requirements(int subMtlNum);
 
     virtual bool    HasAlpha();
     // Massive list of inherited accessor functions for ParamBlock data
@@ -185,18 +190,18 @@ public:
     virtual int     GetUseSpec();
     virtual int     GetShine();
     virtual Color   GetSpecularColor();
-    virtual Control *GetPreshadeColorController();
-    virtual Control *GetAmbColorController();
-    virtual Control *GetOpacityController();
-    virtual Control *GetSpecularColorController();
+    virtual Control* GetPreshadeColorController();
+    virtual Control* GetAmbColorController();
+    virtual Control* GetOpacityController();
+    virtual Control* GetSpecularColorController();
     virtual int     GetDiffuseColorLock();
     virtual Color   GetRuntimeColor();
-    virtual Control *GetRuntimeColorController();
-    
+    virtual Control* GetRuntimeColorController();
+
     // Layer block
-    virtual Texmap *GetBaseLayer();
+    virtual Texmap* GetBaseLayer();
     virtual int     GetTopLayerOn();
-    virtual Texmap *GetTopLayer();
+    virtual Texmap* GetTopLayer();
     virtual int     GetLayerBlend();
     virtual int     GetOutputAlpha();
     virtual int     GetOutputBlend();

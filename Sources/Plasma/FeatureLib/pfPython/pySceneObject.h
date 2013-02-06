@@ -56,8 +56,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class pyMatrix44;
 
-class pySceneObject
-{
+class pySceneObject {
 private:
     hsTArray<plKey>     fSceneObjects;
     plKey               fSenderKey;     // the holder of the who (the modifier) we are
@@ -70,7 +69,7 @@ private:
 protected:
     pySceneObject();
     pySceneObject(pyKey& objkey, pyKey& selfkey);
-    pySceneObject(plKey objkey,pyKey& selfkey);
+    pySceneObject(plKey objkey, pyKey& selfkey);
     pySceneObject(plKey objkey);
 
 public:
@@ -78,18 +77,20 @@ public:
 
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptSceneobject);
-    static PyObject *New(plKey objKey, PyObject *selfKeyObj);
-    static PyObject *New(plKey objKey, pyKey &selfKey);
-    static PyObject *New(plKey objKey, plKey selfkey);
-    static PyObject *New(plKey objKey);
+    static PyObject* New(plKey objKey, PyObject* selfKeyObj);
+    static PyObject* New(plKey objKey, pyKey& selfKey);
+    static PyObject* New(plKey objKey, plKey selfkey);
+    static PyObject* New(plKey objKey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pySceneObject object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pySceneObject); // converts a PyObject to a pySceneObject (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     // override the equals to operator
-    bool operator==(const pySceneObject &sobj) const;
-    bool operator!=(const pySceneObject &sobj) const { return !(sobj == *this);   }
+    bool operator==(const pySceneObject& sobj) const;
+    bool operator!=(const pySceneObject& sobj) const {
+        return !(sobj == *this);
+    }
 
     PyObject*               fDraw; // cyDraw
     PyObject*               fPhysics; // cyPhysics
@@ -103,8 +104,12 @@ public:
     virtual PyObject* getObjPyKey(); // pyKey
 
     virtual void setSenderKey(plKey key);
-    virtual void setPyMod(pyKey& pymod) { fPyMod = pymod.getKey(); }
-    virtual void setPyMod(const plKey& key) { fPyMod = key; }
+    virtual void setPyMod(pyKey& pymod) {
+        fPyMod = pymod.getKey();
+    }
+    virtual void setPyMod(const plKey& key) {
+        fPyMod = key;
+    }
 
     virtual void SetNetForce(bool state);
 
@@ -117,7 +122,7 @@ public:
     // deteremine if this object (or the first object in the list)
     // ...is locally owned
     virtual bool IsLocallyOwned();
-    
+
     //
     // get the local to world matrix
     virtual PyObject* GetLocalToWorld();
@@ -176,10 +181,10 @@ public:
     void PopCutsceneCamera(pyKey& avKey);
 
     void Animate();
-    
+
     // return responder state (if responder modifier found)
     int8_t GetResponderState();
-    
+
     // some animation commands for s.o.'s w/ multiple animations attached
 
     void RewindAnim(const char* animName);
@@ -188,7 +193,7 @@ public:
 
     void RunResponder(int state);
     void FFResponder(int state);
-    
+
     void SetSoundFilename(int index, const char* filename, bool isCompressed);
     int GetSoundObjectIndex(const char* sndObj);
 

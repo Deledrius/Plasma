@@ -62,15 +62,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // CTOR
 plAGModifier::plAGModifier()
-: plSingleModifier()
+    : plSingleModifier()
 {
     fAutoApply = true;
     fEnabled = true;
 }
 
 // CTOR(name)
-plAGModifier::plAGModifier(const plString &name, bool autoApply)
-: plSingleModifier(), fAutoApply(autoApply)
+plAGModifier::plAGModifier(const plString& name, bool autoApply)
+    : plSingleModifier(), fAutoApply(autoApply)
 {
     fChannelName = name;
     fEnabled = true;
@@ -80,8 +80,8 @@ plAGModifier::plAGModifier(const plString &name, bool autoApply)
 plAGModifier::~plAGModifier()
 {
     int i;
-    for (i = 0; i < fApps.size(); i++)
-    {
+
+    for (i = 0; i < fApps.size(); i++) {
         delete fApps[i];
     }
 }
@@ -99,7 +99,7 @@ void plAGModifier::Enable(bool val)
 }
 
 // SETCHANNELNAME
-void plAGModifier::SetChannelName(const plString & name)
+void plAGModifier::SetChannelName(const plString& name)
 {
     fChannelName = name;
 }
@@ -113,13 +113,13 @@ void plAGModifier::SetChannelName(const plString & name)
 // If you run into a case where you think it's necessary, see me. -Bob
 void plAGModifier::Apply(double time) const
 {
-    if (!fEnabled)
+    if (!fEnabled) {
         return;
-    
-    for (int i = 0; i < fApps.size(); i++)
-    {
-        plAGApplicator *app = fApps[i];
-        
+    }
+
+    for (int i = 0; i < fApps.size(); i++) {
+        plAGApplicator* app = fApps[i];
+
         app->Apply(this, time);
     }
 }
@@ -128,29 +128,32 @@ void plAGModifier::Apply(double time) const
 // Apply our channels to our scene object
 bool plAGModifier::IEval(double time, float delta, uint32_t dirty)
 {
-    if(fAutoApply) {
-    //  Apply(time, delta);
+    if (fAutoApply) {
+        //  Apply(time, delta);
     }
+
     return true;
 }
 
 // GETAPPLICATOR
-plAGApplicator * plAGModifier::GetApplicator(plAGPinType pinType) const
+plAGApplicator* plAGModifier::GetApplicator(plAGPinType pinType) const
 {
     int numApps = fApps.size();
 
-    for (int i = 0; i < numApps; i++)
-    {
-        plAGApplicator *app = fApps[i];
+    for (int i = 0; i < numApps; i++) {
+        plAGApplicator* app = fApps[i];
         plAGPinType otherType = app->GetPinType();
-        if(otherType == pinType)
+
+        if (otherType == pinType) {
             return app;
+        }
     }
+
     return nil;
 }
 
 // SETAPPLICATOR
-void plAGModifier::SetApplicator(plAGApplicator *newApp)
+void plAGModifier::SetApplicator(plAGApplicator* newApp)
 {
     int numApps = fApps.size();
     plAGPinType newPinType = newApp->GetPinType();
@@ -159,23 +162,21 @@ void plAGModifier::SetApplicator(plAGApplicator *newApp)
     // I sketched out how it *should* work and implemented the base protocol.
     // In reality, most of these code paths are not accessed now...
     // -- mm
-    for(int i = 0; i < numApps; i++)
-    {
-        plAGApplicator *existingApp = fApps[i];
+    for (int i = 0; i < numApps; i++) {
+        plAGApplicator* existingApp = fApps[i];
         plAGPinType extPinType = existingApp->GetPinType();
 
-        if(extPinType == newPinType)
-        {
+        if (extPinType == newPinType) {
             hsStatusMessage("Two applicators accessing same pin type...congratulations for being the first to test this.");
             // these applicators both try to set the same thing; try to merge them
 
-            plAGChannel *newChannel = newApp->GetChannel();
+            plAGChannel* newChannel = newApp->GetChannel();
 
             hsAssert(newChannel = nil, "Trying to merge in new applicator which already has channel. Incomplete.");
 
             // *** right now I just want to support the case of putting in a new applicator - not merging animations
 
-            plAGChannel *extChannel = existingApp->GetChannel();
+            plAGChannel* extChannel = existingApp->GetChannel();
             newApp->SetChannel(extChannel);
             existingApp->SetChannel(nil);
             fApps[i] = newApp;
@@ -200,6 +201,7 @@ void plAGModifier::SetApplicator(plAGApplicator *newApp)
 //          }
         }
     }
+
     // didn't find any conflicts; just add our app on the end
     fApps.push_back(newApp);
 }
@@ -207,64 +209,66 @@ void plAGModifier::SetApplicator(plAGApplicator *newApp)
 // MERGECHANNEL
 // Intended as a replacement for attach/blend channel. You want to add a channel to this node,
 // we do that for you. Don't ask us how, you shouldn't have to know.
-plAGChannel * plAGModifier::MergeChannel(plAGApplicator *app,
-                                         plAGChannel *channel,
-                                         plScalarChannel *blend,
-                                         plAGAnimInstance *anim,
-                                         int priority)
+plAGChannel* plAGModifier::MergeChannel(plAGApplicator* app,
+                                        plAGChannel* channel,
+                                        plScalarChannel* blend,
+                                        plAGAnimInstance* anim,
+                                        int priority)
 {
     int numApps = fApps.size();
-    plAGChannel * result = nil;
+    plAGChannel* result = nil;
 
-    for (int i = 0; i < numApps; i++)
-    {
-        plAGApplicator *existingApp = fApps[i];
+    for (int i = 0; i < numApps; i++) {
+        plAGApplicator* existingApp = fApps[i];
         result = existingApp->MergeChannel(app, channel, blend, priority);
-        if (result)
+
+        if (result) {
             return result;
+        }
     }
 
-    if (!result)
-    {
+    if (!result) {
         // didn't blend or combine with an existing channel; add a new channel
-        plAGApplicator *newApp = app->CloneWithChannel(channel);
+        plAGApplicator* newApp = app->CloneWithChannel(channel);
         fApps.push_back(newApp);
     }
+
     return result;
 }
 
 // DETACHCHANNEL
-bool plAGModifier::DetachChannel(plAGChannel * channel)
+bool plAGModifier::DetachChannel(plAGChannel* channel)
 {
     plAppTable::iterator i = fApps.begin();
 
-    while( i != fApps.end() )
-    {
-        plAGApplicator *app = *i;
-        plAGChannel *existingChannel = app->GetChannel();
-        if(existingChannel)
-        {
-            plAGChannel *replacementChannel = existingChannel->Detach(channel);
+    while (i != fApps.end()) {
+        plAGApplicator* app = *i;
+        plAGChannel* existingChannel = app->GetChannel();
 
-            if (existingChannel != replacementChannel)
-            {
+        if (existingChannel) {
+            plAGChannel* replacementChannel = existingChannel->Detach(channel);
+
+            if (existingChannel != replacementChannel) {
                 app->SetChannel(replacementChannel);
-                if( ! replacementChannel && app->AutoDelete())
-                {
+
+                if (! replacementChannel && app->AutoDelete()) {
                     // Don't need to adjust the iterator since we're about to exit the loop
                     fApps.erase(i);
                     delete app;
                 }
+
                 return true;
             }
         }
+
         ++i;
     }
+
     return false;
 }
 
 // READ
-void plAGModifier::Read(hsStream *stream, hsResMgr *mgr)
+void plAGModifier::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Read(stream, mgr);
 
@@ -273,7 +277,7 @@ void plAGModifier::Read(hsStream *stream, hsResMgr *mgr)
 }
 
 // WRITE
-void plAGModifier::Write(hsStream *stream, hsResMgr *mgr)
+void plAGModifier::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Write(stream, mgr);
 
@@ -289,25 +293,22 @@ void plAGModifier::Write(hsStream *stream, hsResMgr *mgr)
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const plModifier * FindModifierByClass(const plSceneObject *obj, int classID)
+const plModifier* FindModifierByClass(const plSceneObject* obj, int classID)
 {
-    if(obj)
-    {
+    if (obj) {
         int modCount = obj->GetNumModifiers();
 
-        for (int i = 0; i < modCount; i++)
-        {
-            const plModifier *mod = obj->GetModifier(i);
+        for (int i = 0; i < modCount; i++) {
+            const plModifier* mod = obj->GetModifier(i);
 
-            if(mod)     // modifier might not be loaded yet
-            {
-                if(mod->ClassIndex() == classID)
-                {
+            if (mod) {  // modifier might not be loaded yet
+                if (mod->ClassIndex() == classID) {
                     return mod;
                 }
             }
         }
     }
+
     return nil;
 }
 

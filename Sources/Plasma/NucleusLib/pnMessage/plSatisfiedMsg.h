@@ -45,17 +45,20 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnMessage/plMessage.h"
 
-class plSatisfiedMsg : public plMessage
-{
+class plSatisfiedMsg : public plMessage {
 public:
     plSatisfiedMsg() {}
-    plSatisfiedMsg(const plKey &s) : plMessage(s, s, nil) {}
+    plSatisfiedMsg(const plKey& s) : plMessage(s, s, nil) {}
 
-    CLASSNAME_REGISTER( plSatisfiedMsg );
-    GETINTERFACE_ANY( plSatisfiedMsg, plMessage );
+    CLASSNAME_REGISTER(plSatisfiedMsg);
+    GETINTERFACE_ANY(plSatisfiedMsg, plMessage);
 
-    virtual void Read(hsStream* stream, hsResMgr* mgr) { IMsgRead(stream, mgr); }
-    virtual void Write(hsStream* stream, hsResMgr* mgr) { IMsgWrite(stream, mgr); }
+    virtual void Read(hsStream* stream, hsResMgr* mgr) {
+        IMsgRead(stream, mgr);
+    }
+    virtual void Write(hsStream* stream, hsResMgr* mgr) {
+        IMsgWrite(stream, mgr);
+    }
 
 };
 

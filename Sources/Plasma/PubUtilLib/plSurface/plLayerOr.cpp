@@ -55,32 +55,34 @@ plLayerOr::~plLayerOr()
 {
 }
 
-void    plLayerOr::SetState( const hsGMatState& state )
+void    plLayerOr::SetState(const hsGMatState& state)
 {
-    SetBlendFlags( state.fBlendFlags );
-    SetClampFlags( state.fClampFlags );
-    SetShadeFlags( state.fShadeFlags );
-    SetZFlags( state.fZFlags );
-    SetMiscFlags( state.fMiscFlags );
+    SetBlendFlags(state.fBlendFlags);
+    SetClampFlags(state.fClampFlags);
+    SetShadeFlags(state.fShadeFlags);
+    SetZFlags(state.fZFlags);
+    SetMiscFlags(state.fMiscFlags);
 }
 
-plLayerInterface    *plLayerOr::Attach( plLayerInterface* prev )
+plLayerInterface*    plLayerOr::Attach(plLayerInterface* prev)
 {
     fDirty = true;
 
-    return plLayerInterface::Attach( prev );
+    return plLayerInterface::Attach(prev);
 }
 
 uint32_t plLayerOr::Eval(double secs, uint32_t frame, uint32_t ignore)
 {
     uint32_t ret = plLayerInterface::Eval(secs, frame, ignore);
-    if( fUnderLay )
-    {
-        if( fDirty || (ret & kState) )
-        {
+
+    if (fUnderLay) {
+        if (fDirty || (ret & kState)) {
             *fState = fUnderLay->GetState();
-            if( fOringState.fBlendFlags & hsGMatState::kBlendMask )
+
+            if (fOringState.fBlendFlags & hsGMatState::kBlendMask) {
                 fState->fBlendFlags &= ~hsGMatState::kBlendMask;
+            }
+
             fState->fBlendFlags |= fOringState.fBlendFlags;
 
             fState->fClampFlags = fUnderLay->GetClampFlags() | fOringState.fClampFlags;
@@ -91,5 +93,6 @@ uint32_t plLayerOr::Eval(double secs, uint32_t frame, uint32_t ignore)
             fDirty = false;
         }
     }
+
     return ret;
 }

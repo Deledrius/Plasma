@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/CoreLib/hsCritSect.cpp
-*   
+*
 *
 *   By Eric Anderson (10/23/2005)
 *   Copyright 2005 Cyan Worlds, Inc.
@@ -62,41 +62,49 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #ifdef HS_BUILD_FOR_WIN32
 //===========================================================================
-CCritSect::CCritSect () {
+CCritSect::CCritSect()
+{
     InitializeCriticalSection(&m_handle);
 }
 
 //===========================================================================
-CCritSect::~CCritSect () {
+CCritSect::~CCritSect()
+{
     DeleteCriticalSection(&m_handle);
 }
 
 //===========================================================================
-void CCritSect::Enter () {
+void CCritSect::Enter()
+{
     EnterCriticalSection(&m_handle);
 }
 
 //===========================================================================
-void CCritSect::Leave () {
+void CCritSect::Leave()
+{
     LeaveCriticalSection(&m_handle);
 }
 #elif HS_BUILD_FOR_UNIX
 //===========================================================================
-CCritSect::CCritSect () {
+CCritSect::CCritSect()
+{
     m_handle = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
 }
 
 //===========================================================================
-CCritSect::~CCritSect () {
+CCritSect::~CCritSect()
+{
 }
 
 //===========================================================================
-void CCritSect::Enter () {
+void CCritSect::Enter()
+{
     pthread_mutex_lock(&m_handle);
 }
 
 //===========================================================================
-void CCritSect::Leave () {
+void CCritSect::Leave()
+{
     pthread_mutex_unlock(&m_handle);
 }
 #endif

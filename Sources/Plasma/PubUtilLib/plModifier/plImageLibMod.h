@@ -48,32 +48,34 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plKey.h"
 
 class plBitmap;
-class plImageLibMod : public plSingleModifier
-{
+class plImageLibMod : public plSingleModifier {
 protected:
 
-    hsTArray<plBitmap *>    fImages;
+    hsTArray<plBitmap*>    fImages;
 
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return false; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return false;
+    }
 
 public:
     plImageLibMod();
     virtual ~plImageLibMod();
 
-    CLASSNAME_REGISTER( plImageLibMod );
-    GETINTERFACE_ANY( plImageLibMod, plSingleModifier );
+    CLASSNAME_REGISTER(plImageLibMod);
+    GETINTERFACE_ANY(plImageLibMod, plSingleModifier);
 
     virtual bool MsgReceive(plMessage* msg);
-    
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    enum Refs
-    {
+    enum Refs {
         kRefImage = 0
     };
 
-    uint32_t  GetNumImages( void ) const { return fImages.GetCount(); }
+    uint32_t  GetNumImages(void) const {
+        return fImages.GetCount();
+    }
 };
 
 #endif // plImageLibMod_inc

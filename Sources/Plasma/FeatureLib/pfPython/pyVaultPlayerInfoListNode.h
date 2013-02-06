@@ -55,33 +55,32 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 struct RelVaultNode;
 class pyVaultPlayerInfoNode;
 
-    
-class pyVaultPlayerInfoListNode : public pyVaultFolderNode
-{
+
+class pyVaultPlayerInfoListNode : public pyVaultFolderNode {
 protected:
     // should only be created from C++ side
     pyVaultPlayerInfoListNode(RelVaultNode* nfsNode);
 
     //create from the Python side
-    pyVaultPlayerInfoListNode(int n=0);
+    pyVaultPlayerInfoListNode(int n = 0);
 
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptVaultPlayerInfoListNode);
-    static PyObject *New(RelVaultNode* nfsNode);
-    static PyObject *New(int n=0);
+    static PyObject* New(RelVaultNode* nfsNode);
+    static PyObject* New(int n = 0);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyVaultPlayerInfoListNode object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyVaultPlayerInfoListNode); // converts a PyObject to a pyVaultPlayerInfoListNode (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
 //==================================================================
 // class RelVaultNode : public plVaultFolderNode
 //
-    virtual bool  HasPlayer( uint32_t playerID );
-    bool    AddPlayer( uint32_t playerID );
-    void    RemovePlayer( uint32_t playerID );
-    PyObject * GetPlayer( uint32_t playerID ); // returns pyVaultPlayerInfoNode
+    virtual bool  HasPlayer(uint32_t playerID);
+    bool    AddPlayer(uint32_t playerID);
+    void    RemovePlayer(uint32_t playerID);
+    PyObject* GetPlayer(uint32_t playerID);    // returns pyVaultPlayerInfoNode
 
     void    Sort();
 

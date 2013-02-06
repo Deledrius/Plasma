@@ -346,7 +346,7 @@ static const uint8_t vs_WaveRip7Codes[] = {
     0x0,    0x0,    0xf,    0xe0,
     0x1,    0x0,    0xe4,   0x80,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl vs_WaveRip7Decl("sha/vs_WaveRip7.inl", vs_WaveRip7, vs_WaveRip7byteLen, vs_WaveRip7Codes);
 

@@ -50,8 +50,7 @@ class hsStream;
 class hsResMgr;
 class plMessage;
 
-class plSoftVolume : public plRegionBase
-{
+class plSoftVolume : public plRegionBase {
 public:
     enum RefTypes {
         kSubVolume
@@ -75,7 +74,9 @@ protected:
 
     virtual float        IUpdateListenerStrength() const;
 
-    float                IRemapStrength(float s) const { return fOutsideStrength + s * (fInsideStrength - fOutsideStrength); }
+    float                IRemapStrength(float s) const {
+        return fOutsideStrength + s * (fInsideStrength - fOutsideStrength);
+    }
 
 private:
     // Don't call this, use public GetStrength().
@@ -85,20 +86,26 @@ public:
     plSoftVolume();
     virtual ~plSoftVolume();
 
-    CLASSNAME_REGISTER( plSoftVolume );
-    GETINTERFACE_ANY( plSoftVolume, plRegionBase );
+    CLASSNAME_REGISTER(plSoftVolume);
+    GETINTERFACE_ANY(plSoftVolume, plRegionBase);
 
     virtual float GetStrength(const hsPoint3& pos) const;
-    virtual bool IsInside(const hsPoint3& pos) const { return GetStrength(pos) >= 1.f; }
+    virtual bool IsInside(const hsPoint3& pos) const {
+        return GetStrength(pos) >= 1.f;
+    }
 
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l) = 0;
 
-    virtual int32_t   GetNumProperties() const { return 1; } // This is stupid.
+    virtual int32_t   GetNumProperties() const {
+        return 1;    // This is stupid.
+    }
 
     virtual float    GetListenerStrength() const;
     virtual void        UpdateListenerPosition(const hsPoint3& p);
-    virtual void        SetCheckListener(bool on=true);
-    virtual bool        GetCheckListener() const { return 0 != (fListenState & kListenCheck); }
+    virtual void        SetCheckListener(bool on = true);
+    virtual bool        GetCheckListener() const {
+        return 0 != (fListenState & kListenCheck);
+    }
 
     virtual bool MsgReceive(plMessage* msg);
 
@@ -108,8 +115,12 @@ public:
     void SetInsideStrength(float s);
     void SetOutsideStrength(float s);
 
-    float GetInsideStrength() const { return fInsideStrength; }
-    float GetOutsideStrength() const { return fOutsideStrength; }
+    float GetInsideStrength() const {
+        return fInsideStrength;
+    }
+    float GetOutsideStrength() const {
+        return fOutsideStrength;
+    }
 };
 
 #endif // plSoftVolume_inc

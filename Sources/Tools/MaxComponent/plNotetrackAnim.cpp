@@ -52,30 +52,29 @@ plNotetrackAnim::plNotetrackAnim() : fSegMap(nil)
 {
 }
 
-plNotetrackAnim::plNotetrackAnim(Animatable *anim, plErrorMsg *pErrMsg)
+plNotetrackAnim::plNotetrackAnim(Animatable* anim, plErrorMsg* pErrMsg)
 {
     if (anim->SuperClassID() == HELPER_CLASS_ID &&
-        ((Object*)anim)->CanConvertToType(COMPONENT_CLASSID))
-    {
-        plComponentBase *comp = (plComponentBase*)anim;
+            ((Object*)anim)->CanConvertToType(COMPONENT_CLASSID)) {
+        plComponentBase* comp = (plComponentBase*)anim;
         std::vector<Animatable*> targs;
 
-        for (int i = 0; i < comp->NumTargets(); i++)
-        {
-            plMaxNodeBase *node = comp->GetTarget(i);
-            if (node)
+        for (int i = 0; i < comp->NumTargets(); i++) {
+            plMaxNodeBase* node = comp->GetTarget(i);
+
+            if (node) {
                 targs.push_back(node);
+            }
         }
 
         fSegMap = GetSharedAnimSegmentMap(targs, pErrMsg);
-    }
-    else
-    {
+    } else {
         fSegMap = GetAnimSegmentMap(anim, pErrMsg);
     }
 
-    if (fSegMap)
+    if (fSegMap) {
         fAnimIt = fSegMap->begin();
+    }
 }
 
 plNotetrackAnim::~plNotetrackAnim()
@@ -85,44 +84,46 @@ plNotetrackAnim::~plNotetrackAnim()
 
 plString plNotetrackAnim::GetNextAnimName()
 {
-    if (!fSegMap)
+    if (!fSegMap) {
         return plString::Null;
+    }
 
-    while (fAnimIt != fSegMap->end())
-    {
-        SegmentSpec *spec = fAnimIt->second;
+    while (fAnimIt != fSegMap->end()) {
+        SegmentSpec* spec = fAnimIt->second;
         fAnimIt++;
 
-        if (spec->fType == SegmentSpec::kAnim)
+        if (spec->fType == SegmentSpec::kAnim) {
             return spec->fName;
+        }
     }
 
     fAnimIt = fSegMap->begin();
     return plString::Null;
 }
 
-plAnimInfo plNotetrackAnim::GetAnimInfo(const plString &animName)
+plAnimInfo plNotetrackAnim::GetAnimInfo(const plString& animName)
 {
-    if (!fSegMap)
+    if (!fSegMap) {
         return plAnimInfo();
+    }
 
-    if (animName.IsEmpty() || fSegMap->find(animName) == fSegMap->end())
+    if (animName.IsEmpty() || fSegMap->find(animName) == fSegMap->end()) {
         return plAnimInfo(fSegMap, plString::Null);
-    else 
+    } else {
         return plAnimInfo(fSegMap, animName);
+    }
 
     return plAnimInfo();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-plAnimInfo::plAnimInfo(SegmentMap *segMap, const plString &animName)
+plAnimInfo::plAnimInfo(SegmentMap* segMap, const plString& animName)
 {
     fSegMap = segMap;
     fAnimSpec = !animName.IsNull() ? (*fSegMap)[animName] : nil;
 
-    if (fSegMap)
-    {
+    if (fSegMap) {
         fLoopIt = fSegMap->begin();
         fMarkerIt = fSegMap->begin();
         fStopPointIt = fSegMap->begin();
@@ -151,52 +152,57 @@ float plAnimInfo::GetAnimInitial()
 
 plString plAnimInfo::GetNextLoopName()
 {
-    if (!fSegMap)
+    if (!fSegMap) {
         return plString::Null;
+    }
 
-    while (fLoopIt != fSegMap->end())
-    {
-        SegmentSpec *spec = fLoopIt->second;
+    while (fLoopIt != fSegMap->end()) {
+        SegmentSpec* spec = fLoopIt->second;
         fLoopIt++;
 
         if (spec->fType == SegmentSpec::kLoop &&
-            (!fAnimSpec || fAnimSpec->Contains(spec)))
+                (!fAnimSpec || fAnimSpec->Contains(spec))) {
             return spec->fName;
+        }
     }
 
     fLoopIt = fSegMap->begin();
     return plString::Null;
 }
 
-float plAnimInfo::GetLoopStart(const plString &loopName)
+float plAnimInfo::GetLoopStart(const plString& loopName)
 {
-    if (!fSegMap || loopName.IsNull())
+    if (!fSegMap || loopName.IsNull()) {
         return -1;
+    }
 
-    if (fSegMap->find(loopName) != fSegMap->end())
-    {
-        SegmentSpec *spec = (*fSegMap)[loopName];
-        if (spec->fStart == -1)
-            return -1;//GetAnimStart();
-        else
+    if (fSegMap->find(loopName) != fSegMap->end()) {
+        SegmentSpec* spec = (*fSegMap)[loopName];
+
+        if (spec->fStart == -1) {
+            return -1;    //GetAnimStart();
+        } else {
             return spec->fStart;
+        }
     }
 
     return -1;
 }
 
-float plAnimInfo::GetLoopEnd(const plString &loopName)
+float plAnimInfo::GetLoopEnd(const plString& loopName)
 {
-    if (!fSegMap || loopName.IsNull())
+    if (!fSegMap || loopName.IsNull()) {
         return -1;
+    }
 
-    if (fSegMap->find(loopName) != fSegMap->end())
-    {
-        SegmentSpec *spec = (*fSegMap)[loopName];
-        if (spec->fEnd == -1)
-            return -1;//GetAnimEnd();
-        else
+    if (fSegMap->find(loopName) != fSegMap->end()) {
+        SegmentSpec* spec = (*fSegMap)[loopName];
+
+        if (spec->fEnd == -1) {
+            return -1;    //GetAnimEnd();
+        } else {
             return spec->fEnd;
+        }
     }
 
     return -1;
@@ -204,31 +210,32 @@ float plAnimInfo::GetLoopEnd(const plString &loopName)
 
 plString plAnimInfo::GetNextMarkerName()
 {
-    if (!fSegMap)
+    if (!fSegMap) {
         return plString::Null;
+    }
 
-    while (fMarkerIt != fSegMap->end())
-    {
-        SegmentSpec *spec = fMarkerIt->second;
+    while (fMarkerIt != fSegMap->end()) {
+        SegmentSpec* spec = fMarkerIt->second;
         fMarkerIt++;
 
         if (spec->fType == SegmentSpec::kMarker &&
-            (!fAnimSpec || fAnimSpec->Contains(spec)))
+                (!fAnimSpec || fAnimSpec->Contains(spec))) {
             return spec->fName;
+        }
     }
 
     fMarkerIt = fSegMap->begin();
     return plString::Null;
 }
 
-float plAnimInfo::GetMarkerTime(const plString &markerName)
+float plAnimInfo::GetMarkerTime(const plString& markerName)
 {
-    if (!fSegMap)
+    if (!fSegMap) {
         return -1;
+    }
 
-    if (fSegMap->find(markerName) != fSegMap->end())
-    {
-        SegmentSpec *spec = (*fSegMap)[markerName];
+    if (fSegMap->find(markerName) != fSegMap->end()) {
+        SegmentSpec* spec = (*fSegMap)[markerName];
         return spec->fStart;
     }
 
@@ -237,34 +244,37 @@ float plAnimInfo::GetMarkerTime(const plString &markerName)
 
 float plAnimInfo::GetNextStopPoint()
 {
-    if (!fSegMap)
+    if (!fSegMap) {
         return -1;
+    }
 
-    while (fStopPointIt != fSegMap->end())
-    {
-        SegmentSpec *spec = fStopPointIt->second;
+    while (fStopPointIt != fSegMap->end()) {
+        SegmentSpec* spec = fStopPointIt->second;
         fStopPointIt++;
 
         if (spec->fType == SegmentSpec::kStopPoint &&
-            (!fAnimSpec || fAnimSpec->Contains(spec)))
+                (!fAnimSpec || fAnimSpec->Contains(spec))) {
             return spec->fStart;
+        }
     }
 
     fStopPointIt = fSegMap->begin();
     return -1;
 }
 
-bool plAnimInfo::IsSuppressed(const plString &animName)
+bool plAnimInfo::IsSuppressed(const plString& animName)
 {
-    if (!fSegMap || animName.IsNull())
+    if (!fSegMap || animName.IsNull()) {
         return false;
-
-    if (fSegMap->find(animName) != fSegMap->end())
-    {
-        SegmentSpec *spec = (*fSegMap)[animName];
-        if (spec->fType == SegmentSpec::kSuppress)
-            return true;
     }
-    
+
+    if (fSegMap->find(animName) != fSegMap->end()) {
+        SegmentSpec* spec = (*fSegMap)[animName];
+
+        if (spec->fType == SegmentSpec::kSuppress) {
+            return true;
+        }
+    }
+
     return false;
 }

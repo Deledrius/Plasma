@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ////////////////////////////////////////////////////////////////////
 
 #ifndef SERVER
-class plNetCoreStatsSummary : public plCreatable
-{
+class plNetCoreStatsSummary : public plCreatable {
     static const uint8_t StreamVersion;
     float fULBitsPS;
     float fDLBitsPS;
@@ -65,34 +64,46 @@ class plNetCoreStatsSummary : public plCreatable
     uint32_t fDLDroppedPackets;
 public:
     plNetCoreStatsSummary();
-    CLASSNAME_REGISTER( plNetCoreStatsSummary );
-    GETINTERFACE_ANY( plNetCoreStatsSummary, plCreatable );
-    void Read(hsStream* s, hsResMgr* mgr=nil);
-    void Write(hsStream* s, hsResMgr* mgr=nil);
-    float GetULBitsPS() const { return fULBitsPS; }
-    float GetDLBitsPS() const { return fDLBitsPS; }
-    float GetULPeakBitsPS() const { return fULPeakBitsPS; }
-    float GetDLPeakBitsPS() const { return fDLPeakBitsPS; }
-    float GetULPeakPktsPS() const { return fULPeakPktsPS; }
-    float GetDLPeakPktsPS() const { return fDLPeakPktsPS; }
-    uint32_t GetDLDroppedPackets() const { return fDLDroppedPackets; }
+    CLASSNAME_REGISTER(plNetCoreStatsSummary);
+    GETINTERFACE_ANY(plNetCoreStatsSummary, plCreatable);
+    void Read(hsStream* s, hsResMgr* mgr = nil);
+    void Write(hsStream* s, hsResMgr* mgr = nil);
+    float GetULBitsPS() const {
+        return fULBitsPS;
+    }
+    float GetDLBitsPS() const {
+        return fDLBitsPS;
+    }
+    float GetULPeakBitsPS() const {
+        return fULPeakBitsPS;
+    }
+    float GetDLPeakBitsPS() const {
+        return fDLPeakBitsPS;
+    }
+    float GetULPeakPktsPS() const {
+        return fULPeakPktsPS;
+    }
+    float GetDLPeakPktsPS() const {
+        return fDLPeakPktsPS;
+    }
+    uint32_t GetDLDroppedPackets() const {
+        return fDLDroppedPackets;
+    }
 };
 #endif // SERVER
 
 
 ////////////////////////////////////////////////////////////////////
 
-class plCreatableListHelper : public plCreatable
-{
+class plCreatableListHelper : public plCreatable {
     enum { kDefaultCompressionThreshold = 255 }; // bytes
-    enum Flags
-    {
-        kWantCompression    = 1<<0,
-        kCompressed         = 1<<1,
-        kWritten            = 1<<2,
+    enum Flags {
+        kWantCompression    = 1 << 0,
+        kCompressed         = 1 << 1,
+        kWritten            = 1 << 2,
     };
     uint8_t                             fFlags;
-    std::map<uint16_t,plCreatable*>     fItems;
+    std::map<uint16_t, plCreatable*>     fItems;
     mutable std::vector<plCreatable*>   fManagedItems;
     uint32_t  fCompressionThreshold;  // NOT WRITTEN
     std::string fWritten;
@@ -100,43 +111,60 @@ class plCreatableListHelper : public plCreatable
 
 public:
     plCreatableListHelper();
-    ~plCreatableListHelper() { IClearItems();}
+    ~plCreatableListHelper() {
+        IClearItems();
+    }
 
-    CLASSNAME_REGISTER( plCreatableListHelper );
-    GETINTERFACE_ANY( plCreatableListHelper, plCreatable );
+    CLASSNAME_REGISTER(plCreatableListHelper);
+    GETINTERFACE_ANY(plCreatableListHelper, plCreatable);
 
-    void    Read( hsStream* s, hsResMgr* mgr );
-    void    Write( hsStream* s, hsResMgr* mgr );
-    void    Clear() { IClearItems();    }
-    void    CopyFrom( const plCreatableListHelper * other, bool manageItems );
+    void    Read(hsStream* s, hsResMgr* mgr);
+    void    Write(hsStream* s, hsResMgr* mgr);
+    void    Clear() {
+        IClearItems();
+    }
+    void    CopyFrom(const plCreatableListHelper* other, bool manageItems);
 
-    void    SetWantCompression( bool v ) { if ( v ) fFlags|=kWantCompression; else fFlags&=~kWantCompression; }
-    bool    WantCompression() const { return ( fFlags&kWantCompression )!=0; }
-    uint32_t  GetCompressionThreshold() const { return fCompressionThreshold; }
-    void    SetCompressionThreshold( uint32_t v ) { fCompressionThreshold=v; }
-    
+    void    SetWantCompression(bool v) {
+        if (v) {
+            fFlags |= kWantCompression;
+        } else {
+            fFlags &= ~kWantCompression;
+        }
+    }
+    bool    WantCompression() const {
+        return (fFlags & kWantCompression) != 0;
+    }
+    uint32_t  GetCompressionThreshold() const {
+        return fCompressionThreshold;
+    }
+    void    SetCompressionThreshold(uint32_t v) {
+        fCompressionThreshold = v;
+    }
+
     // support for generic arguments
-    void    AddItem( uint16_t id, plCreatable * item, bool manageItem=false );
-    void    AddItem( uint16_t id, const plCreatable * item, bool manageItem=false );
-    plCreatable* GetItem( uint16_t id, bool unManageItem=false ) const;
-    void    RemoveItem( uint16_t id, bool unManageItem=false );
-    bool    ItemExists( uint16_t id ) const;
-    int     GetNumItems() const { return fItems.size();}
+    void    AddItem(uint16_t id, plCreatable* item, bool manageItem = false);
+    void    AddItem(uint16_t id, const plCreatable* item, bool manageItem = false);
+    plCreatable* GetItem(uint16_t id, bool unManageItem = false) const;
+    void    RemoveItem(uint16_t id, bool unManageItem = false);
+    bool    ItemExists(uint16_t id) const;
+    int     GetNumItems() const {
+        return fItems.size();
+    }
     // helpers for typed arguments
-    void    AddString( uint16_t id, const char * value );
-    void    AddString( uint16_t id, std::string & value );
-    const char * GetString( uint16_t id );
-    void    AddInt( uint16_t id, int32_t value );
-    int32_t   GetInt( uint16_t id );
-    void    AddDouble( uint16_t id, double value );
-    double  GetDouble( uint16_t id );
-    void    GetItemsAsVec( std::vector<plCreatable*>& out );
-    void    GetItems( std::map<uint16_t,plCreatable*>& out );
+    void    AddString(uint16_t id, const char* value);
+    void    AddString(uint16_t id, std::string& value);
+    const char* GetString(uint16_t id);
+    void    AddInt(uint16_t id, int32_t value);
+    int32_t   GetInt(uint16_t id);
+    void    AddDouble(uint16_t id, double value);
+    double  GetDouble(uint16_t id);
+    void    GetItemsAsVec(std::vector<plCreatable*>& out);
+    void    GetItems(std::map<uint16_t, plCreatable*>& out);
 };
 
 /////////////////////////////////////////////////////////////////////
-struct plOperationTimer
-{
+struct plOperationTimer {
     bool    fRunning;
     double  fStartTime;
     double  fEndTime;
@@ -144,37 +172,41 @@ struct plOperationTimer
     std::string fSpacer;
     bool    fPrintAtStart;
     std::string fTag;
-    plOperationTimer( const char * tag="", bool printAtStart=false )
-        : fRunning( false )
-        , fTag( tag )
-        , fStartTime( 0.0 )
-        , fEndTime( 0.0 )
-        , fPrintAtStart( printAtStart )
+    plOperationTimer(const char* tag = "", bool printAtStart = false)
+        : fRunning(false)
+        , fTag(tag)
+        , fStartTime(0.0)
+        , fEndTime(0.0)
+        , fPrintAtStart(printAtStart)
     {}
-    ~plOperationTimer() { Stop(); }
-    void Start( const char * comment, int level=0 )
-    {
-        fSpacer = std::string( level, '\t' );
+    ~plOperationTimer() {
+        Stop();
+    }
+    void Start(const char* comment, int level = 0) {
+        fSpacer = std::string(level, '\t');
         Stop();
         fRunning = true;
         fComment = comment;
         fStartTime = hsTimer::GetSeconds();
-        if ( fPrintAtStart )
-        {
-            hsLogEntry( plNetApp::StaticDebugMsg( "%s%s Timing: %s",
-            fSpacer.c_str(), fTag.c_str(), fComment.c_str() ) );
+
+        if (fPrintAtStart) {
+            hsLogEntry(plNetApp::StaticDebugMsg("%s%s Timing: %s",
+                                                fSpacer.c_str(), fTag.c_str(), fComment.c_str()));
         }
     }
-    void Stop()
-    {
-        if ( !fRunning )
+    void Stop() {
+        if (!fRunning) {
             return;
+        }
+
         fRunning = false;
-        fEndTime = hsTimer::GetSeconds()-fStartTime;
-        hsLogEntry( plNetApp::StaticDebugMsg( "%s%s Timed: %f secs: %s",
-            fSpacer.c_str(), fTag.c_str(), fEndTime, fComment.c_str() ) );
+        fEndTime = hsTimer::GetSeconds() - fStartTime;
+        hsLogEntry(plNetApp::StaticDebugMsg("%s%s Timed: %f secs: %s",
+                                            fSpacer.c_str(), fTag.c_str(), fEndTime, fComment.c_str()));
     }
-    double GetTime() const { return fEndTime;}
+    double GetTime() const {
+        return fEndTime;
+    }
 };
 
 

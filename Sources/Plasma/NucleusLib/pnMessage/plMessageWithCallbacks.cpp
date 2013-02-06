@@ -51,20 +51,20 @@ plMessageWithCallbacks::~plMessageWithCallbacks()
     Clear();
 }
 
-void plMessageWithCallbacks::AddCallback(plMessage* e) 
-{ 
-    hsRefCnt_SafeRef(e); 
+void plMessageWithCallbacks::AddCallback(plMessage* e)
+{
+    hsRefCnt_SafeRef(e);
 
     // make sure callback msgs have the same net propagate properties as the container msg
     e->SetBCastFlag(plMessage::kNetPropagate, HasBCastFlag(plMessage::kNetPropagate));
 
-    fCallbacks.Append(e); 
+    fCallbacks.Append(e);
 }
 
 void plMessageWithCallbacks::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
-    
+
     Clear();
 
     // read count
@@ -73,8 +73,8 @@ void plMessageWithCallbacks::Read(hsStream* stream, hsResMgr* mgr)
 
     // read callbacks
     int i;
-    for( i = 0; i < n; i++ )
-    {
+
+    for (i = 0; i < n; i++) {
         fCallbacks[i] = plMessage::ConvertNoRef(mgr->ReadCreatable(stream));
     }
 }
@@ -84,17 +84,18 @@ void plMessageWithCallbacks::Write(hsStream* stream, hsResMgr* mgr)
     plMessage::IMsgWrite(stream, mgr);
 
     // write count
-    int n=fCallbacks.GetCount();
+    int n = fCallbacks.GetCount();
     stream->WriteLE32(n);
 
     // write callbacks
     int i;
-    for( i = 0; i < fCallbacks.GetCount(); i++ )
-        mgr->WriteCreatable( stream, fCallbacks[i] );
+
+    for (i = 0; i < fCallbacks.GetCount(); i++) {
+        mgr->WriteCreatable(stream, fCallbacks[i]);
+    }
 }
 
-enum MsgWithCallbacksFlags
-{
+enum MsgWithCallbacksFlags {
     kMsgWithCBsCallbacks,
 };
 
@@ -107,14 +108,14 @@ void plMessageWithCallbacks::ReadVersion(hsStream* s, hsResMgr* mgr)
     hsBitVector contentFlags;
     contentFlags.Read(s);
 
-    if (contentFlags.IsBitSet(kMsgWithCBsCallbacks))
-    {
+    if (contentFlags.IsBitSet(kMsgWithCBsCallbacks)) {
         // read count
         int n = s->ReadLE32();
         fCallbacks.SetCount(n);
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++) {
             fCallbacks[i] = plMessage::ConvertNoRef(mgr->ReadCreatableVersion(s));
+        }
     }
 }
 
@@ -131,23 +132,27 @@ void plMessageWithCallbacks::WriteVersion(hsStream* s, hsResMgr* mgr)
     s->WriteLE32(n);
 
     // write callbacks
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++) {
         mgr->WriteCreatableVersion(s, fCallbacks[i]);
+    }
 }
 
-void plMessageWithCallbacks::Clear() 
-{ 
+void plMessageWithCallbacks::Clear()
+{
     int i;
-    for( i = 0; i < fCallbacks.GetCount(); i++ )
+
+    for (i = 0; i < fCallbacks.GetCount(); i++) {
         hsRefCnt_SafeUnRef(fCallbacks[i]);
+    }
+
     fCallbacks.SetCount(0);
 }
 
 void plMessageWithCallbacks::SendCallbacks()
 {
     int i;
-    for (i = fCallbacks.GetCount() - 1; i >= 0; i--)
-    {
+
+    for (i = fCallbacks.GetCount() - 1; i >= 0; i--) {
         plgDispatch::MsgSend(fCallbacks[i]);
         fCallbacks.Remove(i);
     }

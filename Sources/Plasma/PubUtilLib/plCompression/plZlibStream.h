@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // This is for reading a .gz file from a buffer, and writing the uncompressed data to a file.
 // Call open with the name of the uncompressed file, then call write with the compressed data.
 //
-class plZlibStream : public hsStream
-{
+class plZlibStream : public hsStream {
 protected:
     hsStream* fOutput;
     void* fZStream;
@@ -77,7 +76,9 @@ public:
     // Since most functions don't check the return value from Write, you can
     // call this after you've passed in all your data to determine if it
     // decompressed ok
-    bool DecompressedOk() { return fDecompressedOk; }
+    bool DecompressedOk() {
+        return fDecompressedOk;
+    }
 
     // You can't use these
     virtual bool     AtEnd();

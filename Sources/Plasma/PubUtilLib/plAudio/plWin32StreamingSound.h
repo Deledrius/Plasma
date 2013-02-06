@@ -50,55 +50,58 @@ class plAudioFileReader;
 class plStreamingSoundThread;
 class plSoundDeswizzler;
 
-class plWin32StreamingSound : public plWin32Sound
-{
+class plWin32StreamingSound : public plWin32Sound {
 public:
     plWin32StreamingSound();
     ~plWin32StreamingSound();
 
-    CLASSNAME_REGISTER( plWin32StreamingSound );
-    GETINTERFACE_ANY( plWin32StreamingSound, plWin32Sound );
+    CLASSNAME_REGISTER(plWin32StreamingSound);
+    GETINTERFACE_ANY(plWin32StreamingSound, plWin32Sound);
 
     virtual void        DeActivate();
-    virtual bool        LoadSound( bool is3D );
+    virtual bool        LoadSound(bool is3D);
     virtual float       GetActualTimeSec();
     virtual unsigned    GetByteOffset();
-    virtual StreamType  GetStreamType() const { return fStreamType; }
-    virtual void        SetFilename(const char *filename, bool isCompressed);
+    virtual StreamType  GetStreamType() const {
+        return fStreamType;
+    }
+    virtual void        SetFilename(const char* filename, bool isCompressed);
     virtual void        Update();   // temp
     void                StreamUpdate();
-    virtual bool        MsgReceive( plMessage *pMsg );
-    
+    virtual bool        MsgReceive(plMessage* pMsg);
+
 protected:
     float               fTimeAtBufferStart;
-    plAudioFileReader  *fDataStream;
+    plAudioFileReader*  fDataStream;
     float               fBufferLengthInSecs;
     uint8_t             fBlankBufferFillCounter;
-    plSoundDeswizzler  *fDeswizzler;
+    plSoundDeswizzler*  fDeswizzler;
     plFileName          fSrcFilename;
     StreamType          fStreamType;
     bool                fIsCompressed;      // this applies only to the new sound file specified in fNewFilename, so we can play both ogg's and wav's
     plFileName          fNewFilename;       // allow the filename to be changed so we can play from a different source.
-                                            // ultimately this filename will be given to fDataBuffer, but since it's not always around we'll store it here
-    bool                fStopping;  
+    // ultimately this filename will be given to fDataBuffer, but since it's not always around we'll store it here
+    bool                fStopping;
 
     double              fLastStreamingUpdate;
     bool                fPlayWhenStopped;
     unsigned            fStartPos;
 
-    float               IGetTimeAtBufferStart( void ) { return fTimeAtBufferStart; }
+    float               IGetTimeAtBufferStart(void) {
+        return fTimeAtBufferStart;
+    }
     virtual void        SetStartPos(unsigned bytes);
 
-    virtual void        IDerivedActuallyPlay( void );
+    virtual void        IDerivedActuallyPlay(void);
     void                IActuallyStop();
-    virtual void        ISetActualTime( double t );
-    
-    virtual void        IAddCallback( plEventCallbackMsg *pMsg );
-    virtual void        IRemoveCallback( plEventCallbackMsg *pMsg );
+    virtual void        ISetActualTime(double t);
 
-    virtual void        IFreeBuffers( void );
+    virtual void        IAddCallback(plEventCallbackMsg* pMsg);
+    virtual void        IRemoveCallback(plEventCallbackMsg* pMsg);
+
+    virtual void        IFreeBuffers(void);
     void                IStreamUpdate();
-    virtual plSoundBuffer::ELoadReturnVal IPreLoadBuffer( bool playWhenLoaded, bool isIncidental = false  );
+    virtual plSoundBuffer::ELoadReturnVal IPreLoadBuffer(bool playWhenLoaded, bool isIncidental = false);
 };
 
 #endif //plWin32StreamingSound_h

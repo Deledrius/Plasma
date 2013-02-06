@@ -61,7 +61,7 @@ bool plPickLocalizationDlg::DoPick()
     plMaxAccelerators::Disable();
 
     BOOL ret = DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_PICK_LOCALIZATION),
-        GetCOREInterface()->GetMAXHWnd(), IDlgProc, (LPARAM)this);
+                              GetCOREInterface()->GetMAXHWnd(), IDlgProc, (LPARAM)this);
 
     plMaxAccelerators::Enable();
 
@@ -73,8 +73,7 @@ char locToken[200];
 
 bool plPickLocalizationDlg::IInitDlg(HWND hDlg)
 {
-    if (!pfLocalizationDataMgr::InstanceValid())
-    {
+    if (!pfLocalizationDataMgr::InstanceValid()) {
         MessageBox(hDlg, "Localization data manger is not initialized! (BTW, this is BAD)", "Error", MB_ICONERROR + MB_OK);
         return false;
     }
@@ -84,12 +83,18 @@ bool plPickLocalizationDlg::IInitDlg(HWND hDlg)
 
     std::string ageName = "", setName = "", itemName = "";
     locIzer.Reset(fPath.c_str(), ".");
-    if (locIzer.Next(locToken, 200))
+
+    if (locIzer.Next(locToken, 200)) {
         ageName = locToken;
-    if (locIzer.Next(locToken, 200))
+    }
+
+    if (locIzer.Next(locToken, 200)) {
         setName = locToken;
-    if (locIzer.Next(locToken, 200))
+    }
+
+    if (locIzer.Next(locToken, 200)) {
         itemName = locToken;
+    }
 
     IAddLocalizations(ageName, setName, itemName);
     IUpdateValue(hDlg);
@@ -100,7 +105,7 @@ bool plPickLocalizationDlg::IInitDlg(HWND hDlg)
 std::string WStringToString(std::wstring val)
 {
     std::string retVal;
-    char *buff = hsWStringToString(val.c_str());
+    char* buff = hsWStringToString(val.c_str());
     retVal = buff;
     delete [] buff;
     return retVal;
@@ -118,8 +123,7 @@ HTREEITEM plPickLocalizationDlg::IAddVar(std::string name, std::string match, HT
 
     HTREEITEM hItem = TreeView_InsertItem(fTree, &tvi);
 
-    if (name == match)
-    {
+    if (name == match) {
         TreeView_SelectItem(fTree, hItem);
         TreeView_EnsureVisible(fTree, hItem);
     }
@@ -131,18 +135,19 @@ void plPickLocalizationDlg::IAddLocalizations(std::string ageName, std::string s
 {
     std::vector<plString> ages = pfLocalizationDataMgr::Instance().GetAgeList();
 
-    for (int curAge = 0; curAge < ages.size(); curAge++)
-    {
+    for (int curAge = 0; curAge < ages.size(); curAge++) {
         HTREEITEM hAgeItem = IAddVar(ages[curAge].c_str(), ageName, TVI_ROOT);
 
         std::vector<plString> sets = pfLocalizationDataMgr::Instance().GetSetList(ages[curAge]);
-        for (int curSet = 0; curSet < sets.size(); curSet++)
-        {
+
+        for (int curSet = 0; curSet < sets.size(); curSet++) {
             std::vector<plString> elements = pfLocalizationDataMgr::Instance().GetElementList(ages[curAge], sets[curSet]);
 
             HTREEITEM hSetItem = IAddVar(sets[curSet].c_str(), setName, hAgeItem);
-            for (int curElement = 0; curElement < elements.size(); curElement++)
+
+            for (int curElement = 0; curElement < elements.size(); curElement++) {
                 IAddVar(elements[curElement].c_str(), itemName, hSetItem);
+            }
         }
     }
 }
@@ -154,8 +159,8 @@ void plPickLocalizationDlg::IUpdateValue(HWND hDlg)
     HTREEITEM hItem = TreeView_GetSelection(fTree);
 
     std::vector<std::string> path;
-    while (hItem)
-    {
+
+    while (hItem) {
         char s[200];
         TVITEM tvi = {0};
         tvi.hItem = hItem;
@@ -167,12 +172,13 @@ void plPickLocalizationDlg::IUpdateValue(HWND hDlg)
         hItem = TreeView_GetParent(fTree, hItem);
     }
 
-    while (!path.empty())
-    {
+    while (!path.empty()) {
         fPath.append(path.back());
         path.pop_back();
-        if (!path.empty())
+
+        if (!path.empty()) {
             fPath.append(".");
+        }
     }
 
     SetDlgItemText(hDlg, IDC_LOCALIZATIONSTRING, fPath.c_str());
@@ -187,26 +193,38 @@ void plPickLocalizationDlg::IUpdateOkBtn(HWND hDlg)
     char s[512];
     GetDlgItemText(hDlg, IDC_LOCALIZATIONSTRING, s, 511);
 
-    EnableWindow(hOk, strlen(s)>0 && IValidatePath());
+    EnableWindow(hOk, strlen(s) > 0 && IValidatePath());
 }
 
 bool plPickLocalizationDlg::IValidatePath()
 {
     std::string ageName = "", setName = "", itemName = "";
     locIzer.Reset(fPath.c_str(), ".");
-    if (locIzer.Next(locToken, 200))
-        ageName = locToken;
-    if (locIzer.Next(locToken, 200))
-        setName = locToken;
-    if (locIzer.Next(locToken, 200))
-        itemName = locToken;
 
-    if (ageName == "")
-        return false; // no age, so not valid
-    if (setName == "")
-        return false; // no set, so not valid
-    if (itemName == "")
-        return false; // no item, so not valid
+    if (locIzer.Next(locToken, 200)) {
+        ageName = locToken;
+    }
+
+    if (locIzer.Next(locToken, 200)) {
+        setName = locToken;
+    }
+
+    if (locIzer.Next(locToken, 200)) {
+        itemName = locToken;
+    }
+
+    if (ageName == "") {
+        return false;    // no age, so not valid
+    }
+
+    if (setName == "") {
+        return false;    // no set, so not valid
+    }
+
+    if (itemName == "") {
+        return false;    // no item, so not valid
+    }
+
     return true;
 }
 
@@ -214,52 +232,54 @@ BOOL CALLBACK plPickLocalizationDlg::IDlgProc(HWND hDlg, UINT msg, WPARAM wParam
 {
     static plPickLocalizationDlg* pthis = nil;
 
-    switch (msg)
-    {
+    switch (msg) {
     case WM_INITDIALOG:
         pthis = (plPickLocalizationDlg*)lParam;
-        if (!pthis->IInitDlg(hDlg))
+
+        if (!pthis->IInitDlg(hDlg)) {
             EndDialog(hDlg, 0);
+        }
+
         return FALSE;
 
     case WM_COMMAND:
-        if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDOK)
-        {
+        if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDOK) {
             EndDialog(hDlg, 1);
             return TRUE;
-        }
-        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDCANCEL)
-        {
+        } else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDCANCEL) {
             EndDialog(hDlg, 0);
             return TRUE;
         }
+
         break;
 
     case WM_SYSCOMMAND:
-        switch (wParam)
-        {
+        switch (wParam) {
         case SC_CLOSE:
             EndDialog(hDlg, 0);
             return TRUE;
         }
+
         break;
 
     case WM_NOTIFY:
-        NMHDR *nmhdr = (NMHDR*)lParam;
-        if (nmhdr->idFrom == IDC_LOCALIZATIONTREE)
-        {
-            switch (nmhdr->code)
-            {
+        NMHDR* nmhdr = (NMHDR*)lParam;
+
+        if (nmhdr->idFrom == IDC_LOCALIZATIONTREE) {
+            switch (nmhdr->code) {
             case TVN_SELCHANGED:
                 pthis->IUpdateValue(hDlg);
                 return TRUE;
 
             case NM_DBLCLK:
-                if (pthis->IValidatePath()) // only close the dialog if it's a valid path
+                if (pthis->IValidatePath()) { // only close the dialog if it's a valid path
                     EndDialog(hDlg, 1);
+                }
+
                 return TRUE;
             }
         }
+
         break;
     }
 

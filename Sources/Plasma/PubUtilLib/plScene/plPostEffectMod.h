@@ -55,8 +55,7 @@ class plRenderTarget;
 class plRenderRequest;
 class plViewTransform;
 
-class plPostEffectMod : public plSingleModifier
-{
+class plPostEffectMod : public plSingleModifier {
 public:
     enum plPostEffectModStates {
         kEnabled = 0
@@ -103,40 +102,62 @@ public:
     plPostEffectMod();
     virtual ~plPostEffectMod();
 
-    CLASSNAME_REGISTER( plPostEffectMod );
-    GETINTERFACE_ANY( plPostEffectMod, plSingleModifier );
+    CLASSNAME_REGISTER(plPostEffectMod);
+    GETINTERFACE_ANY(plPostEffectMod, plSingleModifier);
 
 
     virtual bool    MsgReceive(plMessage* pMsg);
-    
+
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);
 
-    void        GetDefaultWorldToCamera( hsMatrix44 &w2c, hsMatrix44 &c2w );
+    void        GetDefaultWorldToCamera(hsMatrix44& w2c, hsMatrix44& c2w);
 
     // Export only
-    void        SetNodeKey(plKey key) { fNodeKey = key; }
-    plKey       GetNodeKey() const { return fNodeKey; }
+    void        SetNodeKey(plKey key) {
+        fNodeKey = key;
+    }
+    plKey       GetNodeKey() const {
+        return fNodeKey;
+    }
 
-    void        SetHither(float h) { fHither = h; }
-    void        SetYon(float y) { fYon = y; }
-    void        SetFovX(float f) { fFovX = f; }
-    void        SetFovY(float f) { fFovY = f; }
+    void        SetHither(float h) {
+        fHither = h;
+    }
+    void        SetYon(float y) {
+        fYon = y;
+    }
+    void        SetFovX(float f) {
+        fFovX = f;
+    }
+    void        SetFovY(float f) {
+        fFovY = f;
+    }
 
-    float    GetHither() const { return fHither; }
-    float    GetYon() const { return fYon; }
-    float    GetFovX() const { return fFovX; }
-    float    GetFovY() const { return fFovY; }
+    float    GetHither() const {
+        return fHither;
+    }
+    float    GetYon() const {
+        return fYon;
+    }
+    float    GetFovX() const {
+        return fFovX;
+    }
+    float    GetFovY() const {
+        return fFovY;
+    }
 
-    plPageTreeMgr* GetPageMgr() const { return fPageMgr; }
+    plPageTreeMgr* GetPageMgr() const {
+        return fPageMgr;
+    }
 
     const plViewTransform& GetViewTransform();
 
     // If translating from a scene object, send WorldToLocal() and LocalToWorld(), in that order
-    void        SetWorldToCamera( hsMatrix44 &w2c, hsMatrix44 &c2w );
+    void        SetWorldToCamera(hsMatrix44& w2c, hsMatrix44& c2w);
 
     // Very bad
-    void        EnableLightsOnRenderRequest( void );
+    void        EnableLightsOnRenderRequest(void);
 };
 
 #endif // plPostEffectMod_inc

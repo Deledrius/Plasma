@@ -50,8 +50,7 @@ class plMaxNode;
 #define ANIMEVENT_CID Class_ID(0x32eb34af, 0x62c70002)
 #define MTLEVENT_CID Class_ID(0x2984243c, 0x30ea3acb)
 
-class plAnimEventComponent : public plActivatorBaseComponent
-{
+class plAnimEventComponent : public plActivatorBaseComponent {
 protected:
     bool fCanExport;
 
@@ -63,8 +62,7 @@ public:
     bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
-class plMtlEventComponent : public plActivatorBaseComponent
-{
+class plMtlEventComponent : public plActivatorBaseComponent {
 protected:
     bool fCanExport;
 

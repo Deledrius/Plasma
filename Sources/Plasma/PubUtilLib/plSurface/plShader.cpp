@@ -74,11 +74,11 @@ void plShaderConst::Write(hsStream* s)
 //////////////////////////////////////////////////////////////////////////////////
 
 plShader::plShader()
-:   fFlags(0),
-    fDeviceRef(nil),
-    fInput(0),
-    fOutput(0),
-    fDecl(0)
+    :   fFlags(0),
+        fDeviceRef(nil),
+        fInput(0),
+        fOutput(0),
+        fDecl(0)
 {
 }
 
@@ -87,51 +87,51 @@ plShader::~plShader()
     delete fDeviceRef;
 }
 
-void plShader::SetDeviceRef(hsGDeviceRef* ref) const 
-{ 
-    hsRefCnt_SafeAssign(fDeviceRef, ref); 
+void plShader::SetDeviceRef(hsGDeviceRef* ref) const
+{
+    hsRefCnt_SafeAssign(fDeviceRef, ref);
 }
 
 
 void plShader::SetMatrix(int i, const plFloat44& xfm)
 {
     // Stuff in the transpose
-    SetVector(i+0, xfm.m[0][0], xfm.m[1][0], xfm.m[2][0], xfm.m[3][0]);
-    SetVector(i+1, xfm.m[0][1], xfm.m[1][1], xfm.m[2][1], xfm.m[3][1]);
-    SetVector(i+2, xfm.m[0][2], xfm.m[1][2], xfm.m[2][2], xfm.m[3][2]);
-    SetVector(i+3, xfm.m[0][3], xfm.m[1][3], xfm.m[2][3], xfm.m[3][3]);
+    SetVector(i + 0, xfm.m[0][0], xfm.m[1][0], xfm.m[2][0], xfm.m[3][0]);
+    SetVector(i + 1, xfm.m[0][1], xfm.m[1][1], xfm.m[2][1], xfm.m[3][1]);
+    SetVector(i + 2, xfm.m[0][2], xfm.m[1][2], xfm.m[2][2], xfm.m[3][2]);
+    SetVector(i + 3, xfm.m[0][3], xfm.m[1][3], xfm.m[2][3], xfm.m[3][3]);
 }
 
 void plShader::SetMatrix3(int i, const plFloat44& xfm)
 {
     // Stuff in the transpose
-    SetVector(i+0, xfm.m[0][0], xfm.m[1][0], xfm.m[2][0], xfm.m[3][0]);
-    SetVector(i+1, xfm.m[0][1], xfm.m[1][1], xfm.m[2][1], xfm.m[3][1]);
-    SetVector(i+2, xfm.m[0][2], xfm.m[1][2], xfm.m[2][2], xfm.m[3][2]);
+    SetVector(i + 0, xfm.m[0][0], xfm.m[1][0], xfm.m[2][0], xfm.m[3][0]);
+    SetVector(i + 1, xfm.m[0][1], xfm.m[1][1], xfm.m[2][1], xfm.m[3][1]);
+    SetVector(i + 2, xfm.m[0][2], xfm.m[1][2], xfm.m[2][2], xfm.m[3][2]);
 }
 
 void plShader::SetMatrix44(int i, const hsMatrix44& xfm)
 {
     // hsMatrix44 is already transpose of the rest of the world
-    SetVector(i+0, xfm.fMap[0][0], xfm.fMap[0][1], xfm.fMap[0][2], xfm.fMap[0][3]);
-    SetVector(i+1, xfm.fMap[1][0], xfm.fMap[1][1], xfm.fMap[1][2], xfm.fMap[1][3]);
-    SetVector(i+2, xfm.fMap[2][0], xfm.fMap[2][1], xfm.fMap[2][2], xfm.fMap[2][3]);
-    SetVector(i+3, xfm.fMap[3][0], xfm.fMap[3][1], xfm.fMap[3][2], xfm.fMap[3][3]);
+    SetVector(i + 0, xfm.fMap[0][0], xfm.fMap[0][1], xfm.fMap[0][2], xfm.fMap[0][3]);
+    SetVector(i + 1, xfm.fMap[1][0], xfm.fMap[1][1], xfm.fMap[1][2], xfm.fMap[1][3]);
+    SetVector(i + 2, xfm.fMap[2][0], xfm.fMap[2][1], xfm.fMap[2][2], xfm.fMap[2][3]);
+    SetVector(i + 3, xfm.fMap[3][0], xfm.fMap[3][1], xfm.fMap[3][2], xfm.fMap[3][3]);
 }
 
 void plShader::SetMatrix34(int i, const hsMatrix44& xfm)
 {
     // hsMatrix44 is already transpose of the rest of the world
-    SetVector(i+0, xfm.fMap[0][0], xfm.fMap[0][1], xfm.fMap[0][2], xfm.fMap[0][3]);
-    SetVector(i+1, xfm.fMap[1][0], xfm.fMap[1][1], xfm.fMap[1][2], xfm.fMap[1][3]);
-    SetVector(i+2, xfm.fMap[2][0], xfm.fMap[2][1], xfm.fMap[2][2], xfm.fMap[2][3]);
+    SetVector(i + 0, xfm.fMap[0][0], xfm.fMap[0][1], xfm.fMap[0][2], xfm.fMap[0][3]);
+    SetVector(i + 1, xfm.fMap[1][0], xfm.fMap[1][1], xfm.fMap[1][2], xfm.fMap[1][3]);
+    SetVector(i + 2, xfm.fMap[2][0], xfm.fMap[2][1], xfm.fMap[2][2], xfm.fMap[2][3]);
 }
 
 void plShader::SetMatrix24(int i, const hsMatrix44& xfm)
 {
     // hsMatrix44 is already transpose of the rest of the world
-    SetVector(i+0, xfm.fMap[0][0], xfm.fMap[0][1], xfm.fMap[0][2], xfm.fMap[0][3]);
-    SetVector(i+1, xfm.fMap[1][0], xfm.fMap[1][1], xfm.fMap[1][2], xfm.fMap[1][3]);
+    SetVector(i + 0, xfm.fMap[0][0], xfm.fMap[0][1], xfm.fMap[0][2], xfm.fMap[0][3]);
+    SetVector(i + 1, xfm.fMap[1][0], xfm.fMap[1][1], xfm.fMap[1][2], xfm.fMap[1][3]);
 }
 
 void plShader::SetColor(int i, const hsColorRGBA& col)
@@ -173,12 +173,15 @@ plFloat44 plShader::GetMatrix(int i) const
     // untranspose
     plFloat44 xfm;
     int j;
-    for( j = 0; j < 4; j++ )
-    {
+
+    for (j = 0; j < 4; j++) {
         int k;
-        for( k = 0; k < 4; k++ )
-            xfm.m[j][k] = fConsts[i+k].fArray[j];
+
+        for (k = 0; k < 4; k++) {
+            xfm.m[j][k] = fConsts[i + k].fArray[j];
+        }
     }
+
     return xfm;
 }
 
@@ -187,12 +190,15 @@ plFloat44 plShader::GetMatrix3(int i) const
     // untranspose
     plFloat44 xfm;
     int j;
-    for( j = 0; j < 4; j++ )
-    {
+
+    for (j = 0; j < 4; j++) {
         int k;
-        for( k = 0; k < 3; k++ )
-            xfm.m[j][k] = fConsts[i+k].fArray[j];
+
+        for (k = 0; k < 3; k++) {
+            xfm.m[j][k] = fConsts[i + k].fArray[j];
+        }
     }
+
     xfm.m[0][3] = xfm.m[1][3] = xfm.m[2][3] = 0;
     xfm.m[3][3] = 1.f;
     return xfm;
@@ -203,11 +209,13 @@ hsMatrix44 plShader::GetMatrix44(int i) const
     hsMatrix44 xfm;
     xfm.NotIdentity();
     int j;
-    for( j = 0; j < 4; j++ )
-    {
+
+    for (j = 0; j < 4; j++) {
         int k;
-        for( k = 0; k < 4; k++ )
-            xfm.fMap[j][k] = fConsts[i+j][k];
+
+        for (k = 0; k < 4; k++) {
+            xfm.fMap[j][k] = fConsts[i + j][k];
+        }
     }
 
     return xfm;
@@ -218,12 +226,15 @@ hsMatrix44 plShader::GetMatrix34(int i) const
     hsMatrix44 xfm;
     xfm.NotIdentity();
     int j;
-    for( j = 0; j < 3; j++ )
-    {
+
+    for (j = 0; j < 3; j++) {
         int k;
-        for( k = 0; k < 4; k++ )
-            xfm.fMap[j][k] = fConsts[i+j][k];
+
+        for (k = 0; k < 4; k++) {
+            xfm.fMap[j][k] = fConsts[i + j][k];
+        }
     }
+
     xfm.fMap[3][0] = xfm.fMap[3][1] = xfm.fMap[3][2] = 0;
     xfm.fMap[3][3] = 1.f;
 
@@ -235,12 +246,15 @@ hsMatrix44 plShader::GetMatrix24(int i) const
     hsMatrix44 xfm;
     xfm.NotIdentity();
     int j;
-    for( j = 0; j < 2; j++ )
-    {
+
+    for (j = 0; j < 2; j++) {
         int k;
-        for( k = 0; k < 4; k++ )
-            xfm.fMap[j][k] = fConsts[i+j][k];
+
+        for (k = 0; k < 4; k++) {
+            xfm.fMap[j][k] = fConsts[i + j][k];
+        }
     }
+
     xfm.fMap[2][0] = xfm.fMap[2][1] = xfm.fMap[2][2] = xfm.fMap[2][3] = 0;
     xfm.fMap[3][0] = xfm.fMap[3][1] = xfm.fMap[3][2] = 0;
     xfm.fMap[3][3] = 1.f;
@@ -290,8 +304,10 @@ void plShader::Read(hsStream* s, hsResMgr* mgr)
     uint32_t n = s->ReadLE32();
     fConsts.SetCount(n);
     int i;
-    for( i = 0; i < n; i++ )
+
+    for (i = 0; i < n; i++) {
         fConsts[i].Read(s);
+    }
 
     plShaderID::ID id = plShaderID::ID(s->ReadLE32());
     SetDecl(plShaderTable::Decl(id));
@@ -306,8 +322,10 @@ void plShader::Write(hsStream* s, hsResMgr* mgr)
 
     s->WriteLE32(fConsts.GetCount());
     int i;
-    for( i = 0; i < fConsts.GetCount(); i++ )
+
+    for (i = 0; i < fConsts.GetCount(); i++) {
         fConsts[i].Write(s);
+    }
 
     s->WriteLE32(fDecl->GetID());
 
@@ -328,10 +346,11 @@ void plShader::SetDecl(plShaderID::ID id)
 void plShader::SetNumPipeConsts(int n)
 {
     int nOld = fPipeConsts.GetCount();
-    if( n > nOld )
-    {
+
+    if (n > nOld) {
         // This will copy forward any existing entries.
         fPipeConsts.Expand(n);
     }
+
     fPipeConsts.SetCount(n);
 }

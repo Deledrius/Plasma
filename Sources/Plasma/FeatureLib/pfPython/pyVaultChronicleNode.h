@@ -55,39 +55,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 struct RelVaultNode;
 
 
-class pyVaultChronicleNode : public pyVaultNode
-{
-    char *  ansiName;
-    char *  ansiValue;
-    
+class pyVaultChronicleNode : public pyVaultNode {
+    char*   ansiName;
+    char*   ansiValue;
+
 protected:
     // should only be created from C++ side
     pyVaultChronicleNode(RelVaultNode* nfsNode);
 
     //create from the Python side
-    pyVaultChronicleNode(int n=0);
+    pyVaultChronicleNode(int n = 0);
 
 public:
-    ~pyVaultChronicleNode ();
-    
+    ~pyVaultChronicleNode();
+
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptVaultChronicleNode);
-    static PyObject *New(RelVaultNode* nfsNode);
-    static PyObject *New(int n=0);
+    static PyObject* New(RelVaultNode* nfsNode);
+    static PyObject* New(int n = 0);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyVaultChronicleNode object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyVaultChronicleNode); // converts a PyObject to a pyVaultChronicleNode (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
 //==================================================================
 // class RelVaultNode : public plVaultNode
 //
-    void Chronicle_SetName( const char * text );
-    const char * Chronicle_GetName( void );
-    void Chronicle_SetValue( const char * text );
-    const char * Chronicle_GetValue( void );
-    void Chronicle_SetType( uint32_t type );
-    uint32_t Chronicle_GetType( void );
+    void Chronicle_SetName(const char* text);
+    const char* Chronicle_GetName(void);
+    void Chronicle_SetValue(const char* text);
+    const char* Chronicle_GetValue(void);
+    void Chronicle_SetType(uint32_t type);
+    uint32_t Chronicle_GetType(void);
 };
 
 #endif // _pyVaultChronicleNode_h_

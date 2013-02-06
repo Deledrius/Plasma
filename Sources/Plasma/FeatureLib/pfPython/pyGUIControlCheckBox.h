@@ -55,8 +55,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plKey;
 
-class pyGUIControlCheckBox : public pyGUIControl
-{
+class pyGUIControlCheckBox : public pyGUIControl {
 protected:
     pyGUIControlCheckBox(): pyGUIControl() {} // only used by python glue, do NOT call
     pyGUIControlCheckBox(pyKey& gckey);
@@ -65,17 +64,17 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptGUIControlCheckBox);
-    static PyObject *New(pyKey& gckey);
-    static PyObject *New(plKey objkey);
+    static PyObject* New(pyKey& gckey);
+    static PyObject* New(plKey objkey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGUIControlCheckBox object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGUIControlCheckBox); // converts a PyObject to a pyGUIControlCheckBox (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     static bool IsGUIControlCheckBox(pyKey& gckey);
 
-    virtual void    SetChecked( bool checked );
-    virtual bool    IsChecked( void );
+    virtual void    SetChecked(bool checked);
+    virtual bool    IsChecked(void);
 
 };
 

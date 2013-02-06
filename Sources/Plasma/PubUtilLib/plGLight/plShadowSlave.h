@@ -52,8 +52,7 @@ class plShadowCaster;
 class plVolumeIsect;
 class plPipeline;
 
-class plShadowSlave
-{
+class plShadowSlave {
 public:
 
     uint32_t              fIndex;
@@ -87,8 +86,7 @@ public:
 
     uint32_t              fFlags;
 
-    enum SlaveFlag
-    {
+    enum SlaveFlag {
         kObeysLightGroups       = 0x1,
         kIncludesChars          = 0x2,
         kSelfShadow             = 0x4,
@@ -101,19 +99,45 @@ public:
 
     virtual ~plShadowSlave() { }
 
-    void SetFlag(SlaveFlag f, bool on) { if(on) fFlags |= f; else fFlags &= ~f; }
-    bool HasFlag(SlaveFlag f) const { return 0 != (fFlags & f); }
+    void SetFlag(SlaveFlag f, bool on) {
+        if (on) {
+            fFlags |= f;
+        } else {
+            fFlags &= ~f;
+        }
+    }
+    bool HasFlag(SlaveFlag f) const {
+        return 0 != (fFlags & f);
+    }
 
-    bool ObeysLightGroups() const { return HasFlag(kObeysLightGroups); }
-    bool IncludesChars() const { return HasFlag(kIncludesChars); }
-    bool SelfShadow() const { return HasFlag(kSelfShadow); }
-    bool CastInCameraSpace() const { return HasFlag(kCastInCameraSpace); }
-    bool ReverseZ() const { return HasFlag(kReverseZ); }
-    bool TwoSided() const { return HasFlag(kTwoSided); }
-    bool ReverseCull() const { return HasFlag(kReverseCull); }
-    bool Positional() const { return HasFlag(kPositional); }
+    bool ObeysLightGroups() const {
+        return HasFlag(kObeysLightGroups);
+    }
+    bool IncludesChars() const {
+        return HasFlag(kIncludesChars);
+    }
+    bool SelfShadow() const {
+        return HasFlag(kSelfShadow);
+    }
+    bool CastInCameraSpace() const {
+        return HasFlag(kCastInCameraSpace);
+    }
+    bool ReverseZ() const {
+        return HasFlag(kReverseZ);
+    }
+    bool TwoSided() const {
+        return HasFlag(kTwoSided);
+    }
+    bool ReverseCull() const {
+        return HasFlag(kReverseCull);
+    }
+    bool Positional() const {
+        return HasFlag(kPositional);
+    }
 
-    virtual void Init() { fFlags = 0; }
+    virtual void Init() {
+        fFlags = 0;
+    }
 
     const plShadowCaster*       fCaster;
 
@@ -121,7 +145,7 @@ public:
     int                         fLightIndex;
     int                         fLightRefIdx;
     int                         fSelfShadowOn;
-    void*                       fPipeData; 
+    void*                       fPipeData;
 
     bool                ISetupOrthoViewTransform();
     bool                ISetupPerspViewTransform();
@@ -129,14 +153,16 @@ public:
     virtual bool        SetupViewTransform(plPipeline* pipe) = 0;
 };
 
-class plDirectShadowSlave : public plShadowSlave
-{
-    virtual bool        SetupViewTransform(plPipeline* pipe) { return ISetupOrthoViewTransform(); }
+class plDirectShadowSlave : public plShadowSlave {
+    virtual bool        SetupViewTransform(plPipeline* pipe) {
+        return ISetupOrthoViewTransform();
+    }
 };
 
-class plPointShadowSlave : public plShadowSlave
-{
-    virtual bool        SetupViewTransform(plPipeline* pipe) { return ISetupPerspViewTransform(); }
+class plPointShadowSlave : public plShadowSlave {
+    virtual bool        SetupViewTransform(plPipeline* pipe) {
+        return ISetupPerspViewTransform();
+    }
 };
 
 #endif // plShadowSlave_inc

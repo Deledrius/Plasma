@@ -65,175 +65,175 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plPipeline;
 
 //// plStatusLog Definition //////////////////////////////////////////////////
-//  Currently, they all display in the same location, so only one should 
+//  Currently, they all display in the same location, so only one should
 //  really be visible at any given time.
 
 class plStatusLogMgr;
 class hsMutex;
 class plStatusLogDrawerStub;
-class plStatusLog
-{
+class plStatusLog {
     friend class plStatusLogMgr;
     friend class plStatusLogDrawerStub;
     friend class plStatusLogDrawer;
-    
-    protected:
+
+protected:
 
 
-        mutable uint32_t      fFlags;     // Mutable so we can change it in IPrintLineToFile() internally
-        uint32_t  fOrigFlags;
+    mutable uint32_t      fFlags;     // Mutable so we can change it in IPrintLineToFile() internally
+    uint32_t  fOrigFlags;
 
-        uint32_t     fMaxNumLines;
-        plFileName   fFilename;
-        char**       fLines;
-        uint32_t*    fColors;
-        hsSemaphore* fSema;
-        FILE*        fFileHandle;
-        uint32_t     fSize;
-        bool         fForceLog;
+    uint32_t     fMaxNumLines;
+    plFileName   fFilename;
+    char**       fLines;
+    uint32_t*    fColors;
+    hsSemaphore* fSema;
+    FILE*        fFileHandle;
+    uint32_t     fSize;
+    bool         fForceLog;
 
-        plStatusLog *fNext, **fBack;
+    plStatusLog* fNext, ** fBack;
 
-        plStatusLog **fDisplayPointer;      // Inside pfConsole
-        
-        void    IUnlink( void );
-        void    ILink( plStatusLog **back );
+    plStatusLog** fDisplayPointer;      // Inside pfConsole
 
-        bool    IAddLine( const char *line, int32_t count, uint32_t color );
-        bool    IPrintLineToFile( const char *line, uint32_t count );
-        void    IParseFileName(plFileName &fileNoExt, plString &ext) const;
+    void    IUnlink(void);
+    void    ILink(plStatusLog** back);
 
-        void    IInit( void );
-        void    IFini( void );
-        bool    IReOpen( void );
+    bool    IAddLine(const char* line, int32_t count, uint32_t color);
+    bool    IPrintLineToFile(const char* line, uint32_t count);
+    void    IParseFileName(plFileName& fileNoExt, plString& ext) const;
 
-        plStatusLog( uint8_t numDisplayLines, const plFileName &filename, uint32_t flags );
+    void    IInit(void);
+    void    IFini(void);
+    bool    IReOpen(void);
 
-    public:
+    plStatusLog(uint8_t numDisplayLines, const plFileName& filename, uint32_t flags);
 
-        static uint32_t fLoggingOff;
-        enum StatusFlagType
-        {
-            kFilledBackground   = 0x00000001,
-            kAppendToLast       = 0x00000002,
-            kDontWriteFile      = 0x00000004,
-            kDeleteForMe        = 0x00000008,   // BE CAREFUL USING THIS!!
-                                                // kDeleteForMe instructs the statusLogMgr to delete
-                                                // this log itself when it destructs, which is at the
-                                                // very end of client shutdown (the manager is static).
-                                                // Because of this, it's safe to use this so long as you'll
-                                                // never reference it at the very end of shutdown (as an
-                                                // object is deleted by the resManager, for example, is
-                                                // okay because that's done in plClient::Shutdown(), not 
-                                                // at the very end of app destruction). If you use this
-                                                // and your log is deleted before you, your pointer will
-                                                // NOT reflect this; it's up to you 
-            kAlignToTop         = 0x00000010,
-            kDebugOutput        = 0x00000020,   // Also write string to debug console
-            kTimestamp          = 0x00000040,   // Write a timestamp in Local time with each entry.
-            kStdout             = 0x00000080,   // Also write string to stdout
-            kTimeInSeconds      = 0x00000100,   // Write timestamp as seconds since epoch
-            kTimeAsDouble       = 0x00000200,   // Write timestamp as seconds.millis
-            kDontRotateLogs     = 0x00000400,   // Don't rename/renumber log fileName
-            kServerTimestamp    = 0x00000800,   // Timestamp each entry with the server's time
-            kRawTimeStamp       = 0x00001000,   // hsTimer::GetSeconds()
-            kThreadID           = 0x00002000,   // ID of current thread
-            kTimestampGMT       = 0x00004000,   // Write a timestamp in GMT with each entry.
-            kNonFlushedLog      = 0x00008000,   // Do not flush the log after each write
-        };
+public:
 
-        enum 
-        {
-            kRed    = 0xffff0000,
-            kGreen  = 0xff00ff00,
-            kBlue   = 0xff0000ff,
-            kYellow = 0xffffff00,
-            kWhite  = 0xffffffff
-        };
+    static uint32_t fLoggingOff;
+    enum StatusFlagType {
+        kFilledBackground   = 0x00000001,
+        kAppendToLast       = 0x00000002,
+        kDontWriteFile      = 0x00000004,
+        kDeleteForMe        = 0x00000008,   // BE CAREFUL USING THIS!!
+        // kDeleteForMe instructs the statusLogMgr to delete
+        // this log itself when it destructs, which is at the
+        // very end of client shutdown (the manager is static).
+        // Because of this, it's safe to use this so long as you'll
+        // never reference it at the very end of shutdown (as an
+        // object is deleted by the resManager, for example, is
+        // okay because that's done in plClient::Shutdown(), not
+        // at the very end of app destruction). If you use this
+        // and your log is deleted before you, your pointer will
+        // NOT reflect this; it's up to you
+        kAlignToTop         = 0x00000010,
+        kDebugOutput        = 0x00000020,   // Also write string to debug console
+        kTimestamp          = 0x00000040,   // Write a timestamp in Local time with each entry.
+        kStdout             = 0x00000080,   // Also write string to stdout
+        kTimeInSeconds      = 0x00000100,   // Write timestamp as seconds since epoch
+        kTimeAsDouble       = 0x00000200,   // Write timestamp as seconds.millis
+        kDontRotateLogs     = 0x00000400,   // Don't rename/renumber log fileName
+        kServerTimestamp    = 0x00000800,   // Timestamp each entry with the server's time
+        kRawTimeStamp       = 0x00001000,   // hsTimer::GetSeconds()
+        kThreadID           = 0x00002000,   // ID of current thread
+        kTimestampGMT       = 0x00004000,   // Write a timestamp in GMT with each entry.
+        kNonFlushedLog      = 0x00008000,   // Do not flush the log after each write
+    };
 
-        enum
-        {
-            kMaxFileSize    = 300000000,    // 300 megs
-        };
+    enum {
+        kRed    = 0xffff0000,
+        kGreen  = 0xff00ff00,
+        kBlue   = 0xff0000ff,
+        kYellow = 0xffffff00,
+        kWhite  = 0xffffffff
+    };
 
-        ~plStatusLog();
+    enum {
+        kMaxFileSize    = 300000000,    // 300 megs
+    };
 
-        bool    AddLine( const char *line, uint32_t color = kWhite );
+    ~plStatusLog();
 
-        /// printf-like functions
+    bool    AddLine(const char* line, uint32_t color = kWhite);
 
-        bool    AddLineF( const char *format, ... );
-        bool    AddLineF( uint32_t color, const char *format, ... );
+    /// printf-like functions
 
-        bool    AddLineV( const char *format, va_list arguments );
-        bool    AddLineV( uint32_t color, const char *format, va_list arguments );
+    bool    AddLineF(const char* format, ...);
+    bool    AddLineF(uint32_t color, const char* format, ...);
 
-        /// Static functions that you give a filename to and it searches for a log based on that
-        /// (or creates one if it isn't available)
-        static bool AddLineS( const plFileName &filename, const char *format, ... );
-        static bool AddLineS( const plFileName &filename, uint32_t color, const char *format, ... );
+    bool    AddLineV(const char* format, va_list arguments);
+    bool    AddLineV(uint32_t color, const char* format, va_list arguments);
 
-        void    Clear( void );
+    /// Static functions that you give a filename to and it searches for a log based on that
+    /// (or creates one if it isn't available)
+    static bool AddLineS(const plFileName& filename, const char* format, ...);
+    static bool AddLineS(const plFileName& filename, uint32_t color, const char* format, ...);
 
-        // Clear and open a new file.
-        void    Bounce( uint32_t flags=0 );
+    void    Clear(void);
 
-        const plFileName &GetFileName() const { return fFilename; }
+    // Clear and open a new file.
+    void    Bounce(uint32_t flags = 0);
 
-        void SetForceLog(bool force) { fForceLog = force; }
+    const plFileName& GetFileName() const {
+        return fFilename;
+    }
+
+    void SetForceLog(bool force) {
+        fForceLog = force;
+    }
 };
 
 
 //// Manager Class Definition ////////////////////////////////////////////////
 
-class plStatusLogMgr
-{
+class plStatusLogMgr {
     friend class plStatusLog;
 
-    private:
+private:
 
-        plStatusLogMgr();
-        static plStatusLogMgr   fManager;
+    plStatusLogMgr();
+    static plStatusLogMgr   fManager;
 
-    protected:
+protected:
 
-        plStatusLog     *fDisplays;
-        plStatusLog     *fCurrDisplay;
+    plStatusLog*     fDisplays;
+    plStatusLog*     fCurrDisplay;
 
-        plStatusLogDrawerStub   *fDrawer;
+    plStatusLogDrawerStub*   fDrawer;
 
-        double fLastLogChangeTime;
+    double fLastLogChangeTime;
 
-        static plFileName IGetBasePath();
+    static plFileName IGetBasePath();
 
-        hsMutex     fMutex;     // To make multithreaded-safe
+    hsMutex     fMutex;     // To make multithreaded-safe
 
-    public:
+public:
 
-        enum
-        {
-            kDefaultNumLines    = 40
-        };
+    enum {
+        kDefaultNumLines    = 40
+    };
 
-        ~plStatusLogMgr();
+    ~plStatusLogMgr();
 
-        static plStatusLogMgr   &GetInstance( void );
+    static plStatusLogMgr&   GetInstance(void);
 
-        void        Draw( void );
+    void        Draw(void);
 
-        plStatusLog *CreateStatusLog( uint8_t numDisplayLines, const plFileName &filename, uint32_t flags = plStatusLog::kFilledBackground );
-        void        ToggleStatusLog( plStatusLog *logToDisplay );
-        void        NextStatusLog( void );
-        void        PrevStatusLog( void );
-        void        SetCurrStatusLog( const plFileName &logName );
-        plStatusLog *FindLog( const plFileName &filename, bool createIfNotFound = true );
+    plStatusLog* CreateStatusLog(uint8_t numDisplayLines, const plFileName& filename, uint32_t flags = plStatusLog::kFilledBackground);
+    void        ToggleStatusLog(plStatusLog* logToDisplay);
+    void        NextStatusLog(void);
+    void        PrevStatusLog(void);
+    void        SetCurrStatusLog(const plFileName& logName);
+    plStatusLog* FindLog(const plFileName& filename, bool createIfNotFound = true);
 
-        void        SetDrawer( plStatusLogDrawerStub *drawer ) { fDrawer = drawer; }
+    void        SetDrawer(plStatusLogDrawerStub* drawer) {
+        fDrawer = drawer;
+    }
 
-        void        BounceLogs();
+    void        BounceLogs();
 
-        // Create a new folder and copy all log files into it (returns false on failure)
-        bool        DumpLogs( const plFileName &newFolderName );
+    // Create a new folder and copy all log files into it (returns false on failure)
+    bool        DumpLogs(const plFileName& newFolderName);
 };
 
 //// plStatusLogDrawerStub Class ////////////////////////////////////////////
@@ -243,20 +243,29 @@ class plStatusLogMgr
 //  pointer to it (by, say, the pipeline), then we use it to draw and all
 //  is happy. If not, we don't draw.
 
-class plStatusLogDrawerStub
-{
-    protected:
+class plStatusLogDrawerStub {
+protected:
 
-        uint32_t      IGetMaxNumLines( plStatusLog *log ) const { return log->fMaxNumLines; }
-        char        **IGetLines( plStatusLog *log ) const { return log->fLines; }
-        plFileName    IGetFilename( plStatusLog *log ) const { return log->GetFileName(); }
-        uint32_t     *IGetColors( plStatusLog *log ) const { return log->fColors; }
-        uint32_t      IGetFlags( plStatusLog *log ) const { return log->fFlags; }
-        
-    public:
-        virtual ~plStatusLogDrawerStub() {}
+    uint32_t      IGetMaxNumLines(plStatusLog* log) const {
+        return log->fMaxNumLines;
+    }
+    char**        IGetLines(plStatusLog* log) const {
+        return log->fLines;
+    }
+    plFileName    IGetFilename(plStatusLog* log) const {
+        return log->GetFileName();
+    }
+    uint32_t*     IGetColors(plStatusLog* log) const {
+        return log->fColors;
+    }
+    uint32_t      IGetFlags(plStatusLog* log) const {
+        return log->fFlags;
+    }
 
-        virtual void    Draw(plStatusLog* curLog, plStatusLog* firstLog) {}
+public:
+    virtual ~plStatusLogDrawerStub() {}
+
+    virtual void    Draw(plStatusLog* curLog, plStatusLog* firstLog) {}
 };
 
 #endif //_plStatusLog_h

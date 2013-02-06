@@ -54,11 +54,9 @@ class plExportProgressBar;
 class plDistTree;
 
 //Class that accesses the paramblock below.
-class plDistribComponent : public plComponent
-{
+class plDistribComponent : public plComponent {
 public:
-    enum 
-    {
+    enum {
         kRollTemplates,
         kRollSpacing,
         kRollScale,
@@ -74,8 +72,7 @@ public:
 
         kNumRollups
     };
-    enum 
-    {
+    enum {
         kTemplates = 0,
 
         // Spacing
@@ -99,10 +96,10 @@ public:
         // Orient
         kAlignWgt,
         kPolarRange,
-        kAzimuthRange,      
-        
+        kAzimuthRange,
+
         kPolarBunch,
-        
+
         // Angle prob
         kAngProbHi,
         kAngProbLo,
@@ -163,10 +160,12 @@ public:
 
 public:
     plDistribComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
 
-    BOOL            Distribute(plDistribInstTab& reps, plErrorMsg* pErrMsg, plExportProgressBar& bar, plDistTree* dt=nil);
+    BOOL            Distribute(plDistribInstTab& reps, plErrorMsg* pErrMsg, plExportProgressBar& bar, plDistTree* dt = nil);
     void            Done();
 
     void            Clear();
@@ -183,43 +182,47 @@ public:
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)     { return true; }
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg) { return true; }
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)     {
+        return true;
+    }
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg) {
+        return true;
+    }
 };
 
 
-    // GetFade() notes.
-    // Fade returned as follows:
-    // Box3.Min()[0] == fadeInTransparent
-    // Box3.Min()[1] == fadeInOpaque
-    // Box3.Max()[0] == fadeOutTransparent
-    // Box3.Max()[1] == fadeOutOpaque
-    //
-    // Box3.Min()[2] == 0 turns off fadein.
-    // Box3.Max()[2] == 0 turns off fadeout.
-    // 
-    // In all cases, max(Min()[0],Min()[1]) <= min(Max()[0], Max()[1])
-    //
-    // Also, either Min()[0] <= Min()[1] && Max()[0] >= Max()[1]
-    //          or Min()[0] >= Min()[1] && Max()[0] <= Max()[1]
-    // that is, we either start transparent, go to opaque and back to transparent,
-    //              or we start opaque, go transparent, and back to opaque.
-    // Makes sense if you think about it.
-    //
-    // If Min()[0] == Min()[1], there is no fade in, we start transparent or opaque
-    //      as determined by Max()[0] and Max()[1].
-    // Same for equal Maxs.
-    // Naturally, Min()[0] == Min()[1] && Max()[0] == Max()[1] turns the whole thing off.
-    //
-    // Also, as a convenience, if the transparent distance is less than the opaque distance
-    // (signifying a fade out), then the Z component will be -1, else if it's off, zero, else 1.
-    // In Summario:
-    //  if( box.Min()[0] < box.Min()[1] ) // Transparent less than Opaque
-    //      box.Min()[2] = -1.f;
-    //  else if( box.Min()[0] == box.Min()[1] ) // Tran same as Opaque, disabled
-    //      box.Min()[2] = 0;
-    //  else                                // Leaves Opaque less than Transparent.
-    //      box.Min()[2] = 1.f;
+// GetFade() notes.
+// Fade returned as follows:
+// Box3.Min()[0] == fadeInTransparent
+// Box3.Min()[1] == fadeInOpaque
+// Box3.Max()[0] == fadeOutTransparent
+// Box3.Max()[1] == fadeOutOpaque
+//
+// Box3.Min()[2] == 0 turns off fadein.
+// Box3.Max()[2] == 0 turns off fadeout.
+//
+// In all cases, max(Min()[0],Min()[1]) <= min(Max()[0], Max()[1])
+//
+// Also, either Min()[0] <= Min()[1] && Max()[0] >= Max()[1]
+//          or Min()[0] >= Min()[1] && Max()[0] <= Max()[1]
+// that is, we either start transparent, go to opaque and back to transparent,
+//              or we start opaque, go transparent, and back to opaque.
+// Makes sense if you think about it.
+//
+// If Min()[0] == Min()[1], there is no fade in, we start transparent or opaque
+//      as determined by Max()[0] and Max()[1].
+// Same for equal Maxs.
+// Naturally, Min()[0] == Min()[1] && Max()[0] == Max()[1] turns the whole thing off.
+//
+// Also, as a convenience, if the transparent distance is less than the opaque distance
+// (signifying a fade out), then the Z component will be -1, else if it's off, zero, else 1.
+// In Summario:
+//  if( box.Min()[0] < box.Min()[1] ) // Transparent less than Opaque
+//      box.Min()[2] = -1.f;
+//  else if( box.Min()[0] == box.Min()[1] ) // Tran same as Opaque, disabled
+//      box.Min()[2] = 0;
+//  else                                // Leaves Opaque less than Transparent.
+//      box.Min()[2] = 1.f;
 
 #endif // plDistribComponent_inc

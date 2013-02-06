@@ -45,11 +45,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnSceneObject/plCoordinateInterface.h"
 
-class plFilterCoordInterface : public plCoordinateInterface
-{
+class plFilterCoordInterface : public plCoordinateInterface {
 public:
-    enum
-    {
+    enum {
         kNoRotation = 0x1,
         kNoTransX   = 0x2,
         kNoTransY   = 0x4,
@@ -61,23 +59,31 @@ protected:
     uint32_t              fFilterMask;
     hsMatrix44          fRefParentLocalToWorld;
 
-    virtual void IRecalcTransforms(); 
+    virtual void IRecalcTransforms();
 public:
     plFilterCoordInterface();
     ~plFilterCoordInterface();
 
-    CLASSNAME_REGISTER( plFilterCoordInterface );
-    GETINTERFACE_ANY( plFilterCoordInterface, plCoordinateInterface );
+    CLASSNAME_REGISTER(plFilterCoordInterface);
+    GETINTERFACE_ANY(plFilterCoordInterface, plCoordinateInterface);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
 
-    void SetFilterMask(uint32_t f) { fFilterMask = f; }
-    uint32_t GetFilterMask() const { return fFilterMask; }
+    void SetFilterMask(uint32_t f) {
+        fFilterMask = f;
+    }
+    uint32_t GetFilterMask() const {
+        return fFilterMask;
+    }
 
-    void SetRefLocalToWorld(const hsMatrix44& m) { fRefParentLocalToWorld = m; }
-    const hsMatrix44& GetRefLocalToWorld() const { return fRefParentLocalToWorld; }
+    void SetRefLocalToWorld(const hsMatrix44& m) {
+        fRefParentLocalToWorld = m;
+    }
+    const hsMatrix44& GetRefLocalToWorld() const {
+        return fRefParentLocalToWorld;
+    }
 
 };
 

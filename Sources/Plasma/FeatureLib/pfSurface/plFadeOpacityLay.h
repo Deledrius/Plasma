@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plSurface/plLayerInterface.h"
 
 
-class plFadeOpacityLay : public plLayerInterface
-{
+class plFadeOpacityLay : public plLayerInterface {
 protected:
 
     float        fOpScale;
@@ -56,16 +55,20 @@ public:
     plFadeOpacityLay();
     virtual ~plFadeOpacityLay();
 
-    CLASSNAME_REGISTER( plFadeOpacityLay );
-    GETINTERFACE_ANY( plFadeOpacityLay, plLayerInterface );
+    CLASSNAME_REGISTER(plFadeOpacityLay);
+    GETINTERFACE_ANY(plFadeOpacityLay, plLayerInterface);
 
     virtual uint32_t          Eval(double secs, uint32_t frame, uint32_t ignore);
 
     virtual void            Read(hsStream* s, hsResMgr* mgr);
     virtual void            Write(hsStream* s, hsResMgr* mgr);
 
-    void SetOpacity(float f) { fOpScale = f; }
-    float GetOpacity() const { return fOpScale; }
+    void SetOpacity(float f) {
+        fOpScale = f;
+    }
+    float GetOpacity() const {
+        return fOpScale;
+    }
 };
 
 #endif // plFadeOpacityLay_inc

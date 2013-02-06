@@ -64,20 +64,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 /// Note: the namespace is so our enums and such don't clash with anything
 /// else
-namespace plCAnimPB
-{
+namespace plCAnimPB {
 
 //// ParamBlock IDs //////////////////////////////////////////////////////////
 //  IDs for the common paramblock def below
 
-enum Rollouts
-{
+enum Rollouts {
     kRollMain,
     kRollEase
 };
 
-enum 
-{
+enum {
     kAnimRadio_DEAD,
     kAnimAutoStart,         // Start the Animation on load  (V2)
     kAnimLoop,              // Start Looping at Begin Location
@@ -109,13 +106,12 @@ enum
 //  first. Defined here so the macro can get to it; don't reference it
 //  directly!
 
-class plPBBaseDec
-{
-    public:
-        static int  kPlComponentBlkID;
-        static int  kPlComponentRefID;
+class plPBBaseDec {
+public:
+    static int  kPlComponentBlkID;
+    static int  kPlComponentRefID;
 
-        static ParamBlockDesc2      fAnimBlock;
+    static ParamBlockDesc2      fAnimBlock;
 };
 
 //// ParamBlock Macro ////////////////////////////////////////////////////////
@@ -134,7 +130,7 @@ class plPBBaseDec
         &plPBBaseDec::fAnimBlock,       /* ParamBlock to include */                                 \
         end,                                                                                        \
     );
-        
+
 
 
 };  // namespace

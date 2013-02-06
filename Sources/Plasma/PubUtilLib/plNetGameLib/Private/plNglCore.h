@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plNetGameLib/Private/plNglCore.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_PUBUTILLIB_PLNETGAMELIB_PRIVATE_PLNGLCORE_H
@@ -58,17 +58,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *
 ***/
 
-void NetClientInitialize ();
+void NetClientInitialize();
 // void NetClientCancelAllTrans ();
-void NetClientDestroy (bool wait = true);
+void NetClientDestroy(bool wait = true);
 
-void NetClientUpdate ();
+void NetClientUpdate();
 
-void NetClientSetTransTimeoutMs (unsigned ms);
-void NetClientPingEnable (bool enable);
+void NetClientSetTransTimeoutMs(unsigned ms);
+void NetClientPingEnable(bool enable);
 
 typedef void (*FNetClientErrorProc)(
     ENetProtocol    protocol,
     ENetError       error
 );
-void NetClientSetErrorHandler (FNetClientErrorProc errorProc);
+void NetClientSetErrorHandler(FNetClientErrorProc errorProc);

@@ -56,11 +56,12 @@ PYTHON_DEFAULT_DEALLOC_DEFINITION(ptVaultFolderNode)
 PYTHON_INIT_DEFINITION(ptVaultFolderNode, args, keywords)
 {
     int n = 0;
-    if (!PyArg_ParseTuple(args, "|i", &n))
-    {
+
+    if (!PyArg_ParseTuple(args, "|i", &n)) {
         PyErr_SetString(PyExc_TypeError, "__init__ expects an optional int");
         PYTHON_RETURN_INIT_ERROR;
     }
+
     // we don't really do anything? Not according to the associated constructor. Odd...
     PYTHON_RETURN_INIT_OK;
 }
@@ -68,11 +69,12 @@ PYTHON_INIT_DEFINITION(ptVaultFolderNode, args, keywords)
 PYTHON_METHOD_DEFINITION(ptVaultFolderNode, folderSetType, args)
 {
     int folderType;
-    if (!PyArg_ParseTuple(args, "i", &folderType))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &folderType)) {
         PyErr_SetString(PyExc_TypeError, "folderSetType expects an int");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Folder_SetType(folderType);
     PYTHON_RETURN_NONE;
 }
@@ -85,11 +87,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultFolderNode, folderGetType)
 PYTHON_METHOD_DEFINITION(ptVaultFolderNode, folderSetName, args)
 {
     char* name;
-    if (!PyArg_ParseTuple(args, "s", &name))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &name)) {
         PyErr_SetString(PyExc_TypeError, "folderSetName expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Folder_SetName(name);
     PYTHON_RETURN_NONE;
 }
@@ -102,11 +105,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultFolderNode, folderGetName)
 PYTHON_METHOD_DEFINITION(ptVaultFolderNode, setFolderType, args)
 {
     int folderType;
-    if (!PyArg_ParseTuple(args, "i", &folderType))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &folderType)) {
         PyErr_SetString(PyExc_TypeError, "setFolderType expects an int");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Folder_SetType(folderType);
     PYTHON_RETURN_NONE;
 }
@@ -119,11 +123,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultFolderNode, getFolderType)
 PYTHON_METHOD_DEFINITION(ptVaultFolderNode, setFolderName, args)
 {
     char* name;
-    if (!PyArg_ParseTuple(args, "s", &name))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &name)) {
         PyErr_SetString(PyExc_TypeError, "setFolderName expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Folder_SetName(name);
     PYTHON_RETURN_NONE;
 }
@@ -131,13 +136,13 @@ PYTHON_METHOD_DEFINITION(ptVaultFolderNode, setFolderName, args)
 PYTHON_METHOD_DEFINITION(ptVaultFolderNode, setFolderNameW, args)
 {
     PyObject* textObj;
-    if (!PyArg_ParseTuple(args, "O", &textObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &textObj)) {
         PyErr_SetString(PyExc_TypeError, "setFolderNameW expects a unicode string");
         PYTHON_RETURN_ERROR;
     }
-    if (PyUnicode_Check(textObj))
-    {
+
+    if (PyUnicode_Check(textObj)) {
         int strLen = PyUnicode_GetSize(textObj);
         wchar_t* name = new wchar_t[strLen + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)textObj, name, strLen);
@@ -145,14 +150,13 @@ PYTHON_METHOD_DEFINITION(ptVaultFolderNode, setFolderNameW, args)
         self->fThis->Folder_SetNameW(name);
         delete [] name;
         PYTHON_RETURN_NONE;
-    }
-    else if (PyString_Check(textObj))
-    {
+    } else if (PyString_Check(textObj)) {
         // we'll allow this, just in case something goes weird
         char* name = PyString_AsString(textObj);
         self->fThis->Folder_SetName(name);
         PYTHON_RETURN_NONE;
     }
+
     PyErr_SetString(PyExc_TypeError, "setFolderNameW expects a unicode string");
     PYTHON_RETURN_ERROR;
 }
@@ -169,39 +173,45 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultFolderNode, getFolderNameW)
 }
 
 PYTHON_START_METHODS_TABLE(ptVaultFolderNode)
-    // legacy glue
-    PYTHON_METHOD(ptVaultFolderNode, folderSetType, "Params: type\nLEGACY\nSet the folder type"),
-    PYTHON_METHOD_NOARGS(ptVaultFolderNode, folderGetType, "LEGACY\nReturns the folder type (of the standard folder types)"),
-    PYTHON_METHOD(ptVaultFolderNode, folderSetName, "Params: name\nLEGACY\nSet the folder name"),
-    PYTHON_METHOD_NOARGS(ptVaultFolderNode, folderGetName, "LEGACY\nReturns the folder's name"),
-    // new glue
-    PYTHON_METHOD(ptVaultFolderNode, setFolderType, "Params: type\nSet the folder type"),
-    PYTHON_METHOD_NOARGS(ptVaultFolderNode, getFolderType, "Returns the folder type (of the standard folder types)"),
-    PYTHON_METHOD(ptVaultFolderNode, setFolderName, "Params: name\nSet the folder name"),
-    PYTHON_METHOD(ptVaultFolderNode, setFolderNameW, "Params: name\nUnicode version of setFolderName"),
-    PYTHON_METHOD_NOARGS(ptVaultFolderNode, getFolderName, "Returns the folder's name"),
-    PYTHON_METHOD_NOARGS(ptVaultFolderNode, getFolderNameW, "Unicode version of getFolerName"),
-PYTHON_END_METHODS_TABLE;
+// legacy glue
+PYTHON_METHOD(ptVaultFolderNode, folderSetType, "Params: type\nLEGACY\nSet the folder type"),
+              PYTHON_METHOD_NOARGS(ptVaultFolderNode, folderGetType, "LEGACY\nReturns the folder type (of the standard folder types)"),
+              PYTHON_METHOD(ptVaultFolderNode, folderSetName, "Params: name\nLEGACY\nSet the folder name"),
+              PYTHON_METHOD_NOARGS(ptVaultFolderNode, folderGetName, "LEGACY\nReturns the folder's name"),
+              // new glue
+              PYTHON_METHOD(ptVaultFolderNode, setFolderType, "Params: type\nSet the folder type"),
+              PYTHON_METHOD_NOARGS(ptVaultFolderNode, getFolderType, "Returns the folder type (of the standard folder types)"),
+              PYTHON_METHOD(ptVaultFolderNode, setFolderName, "Params: name\nSet the folder name"),
+              PYTHON_METHOD(ptVaultFolderNode, setFolderNameW, "Params: name\nUnicode version of setFolderName"),
+              PYTHON_METHOD_NOARGS(ptVaultFolderNode, getFolderName, "Returns the folder's name"),
+              PYTHON_METHOD_NOARGS(ptVaultFolderNode, getFolderNameW, "Unicode version of getFolerName"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVaultFolderNode, pyVaultNode, "Params: n=0\nPlasma vault folder node");
 PYTHON_EXPOSE_TYPE_DEFINITION(ptVaultFolderNode, pyVaultFolderNode);
 
 // required functions for PyObject interoperability
-PyObject *pyVaultFolderNode::New(RelVaultNode* nfsNode)
+PyObject* pyVaultFolderNode::New(RelVaultNode* nfsNode)
 {
-    ptVaultFolderNode *newObj = (ptVaultFolderNode*)ptVaultFolderNode_type.tp_new(&ptVaultFolderNode_type, NULL, NULL);
-    if (newObj->fThis->fNode)
+    ptVaultFolderNode* newObj = (ptVaultFolderNode*)ptVaultFolderNode_type.tp_new(&ptVaultFolderNode_type, NULL, NULL);
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->DecRef();
+    }
+
     newObj->fThis->fNode = nfsNode;
-    if (newObj->fThis->fNode)
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->IncRef();
+    }
+
     return (PyObject*)newObj;
 }
 
-PyObject *pyVaultFolderNode::New(int n /* =0 */)
+PyObject* pyVaultFolderNode::New(int n /* =0 */)
 {
-    ptVaultFolderNode *newObj = (ptVaultFolderNode*)ptVaultFolderNode_type.tp_new(&ptVaultFolderNode_type, NULL, NULL);
+    ptVaultFolderNode* newObj = (ptVaultFolderNode*)ptVaultFolderNode_type.tp_new(&ptVaultFolderNode_type, NULL, NULL);
     // oddly enough, nothing to do here
     return (PyObject*)newObj;
 }
@@ -213,7 +223,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptVaultFolderNode, pyVaultFolderNode)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyVaultFolderNode::AddPlasmaClasses(PyObject *m)
+void pyVaultFolderNode::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptVaultFolderNode);

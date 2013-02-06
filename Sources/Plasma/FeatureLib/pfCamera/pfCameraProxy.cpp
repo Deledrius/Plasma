@@ -48,8 +48,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plScene/plSceneNode.h"
 
 plCameraProxy::plCameraProxy()
-:   plProxyGen(hsColorRGBA().Set(0.2f,0.2f,0.8f,1.f), hsColorRGBA().Set(1.f,0.5f,0.5f,1.f), 0.2f),
-    fOwner(nil), node(nil)
+    :   plProxyGen(hsColorRGBA().Set(0.2f, 0.2f, 0.8f, 1.f), hsColorRGBA().Set(1.f, 0.5f, 0.5f, 1.f), 0.2f),
+        fOwner(nil), node(nil)
 {
 }
 
@@ -67,18 +67,20 @@ bool plCameraProxy::Init(plVirtualCam1* aud)
     return fOwner != nil;
 }
 
-plKey plCameraProxy::IGetNode() const 
+plKey plCameraProxy::IGetNode() const
 {
-    if (node)
+    if (node) {
         return node->GetKey();
-    return nil; 
+    }
+
+    return nil;
 }
 
 plDrawableSpans* plCameraProxy::ICreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo)
 {
-    if( fOwner )
-    {
+    if (fOwner) {
 //      return fOwner->CreateProxy(mat, idx, addTo);
     }
+
     return nil;
 }

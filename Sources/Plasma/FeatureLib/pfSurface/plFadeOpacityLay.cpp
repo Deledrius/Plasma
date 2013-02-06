@@ -45,7 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plFadeOpacityLay.h"
 
 plFadeOpacityLay::plFadeOpacityLay()
-:   fOpScale(1.f)
+    :   fOpScale(1.f)
 {
     fOwnedChannels |= kOpacity;
     fOpacity = new float;
@@ -59,14 +59,10 @@ uint32_t plFadeOpacityLay::Eval(double secs, uint32_t frame, uint32_t ignore)
 {
     uint32_t ret = plLayerInterface::Eval(secs, frame, ignore);
 
-    if( fUnderLay )
-    {
-        if( GetBlendFlags() & hsGMatState::kBlendAdd )
-        {
+    if (fUnderLay) {
+        if (GetBlendFlags() & hsGMatState::kBlendAdd) {
             *fRuntimeColor = fUnderLay->GetRuntimeColor() * fOpScale;
-        }
-        else
-        {
+        } else {
             *fOpacity = fUnderLay->GetOpacity() * fOpScale;
         }
     }

@@ -48,43 +48,40 @@ class plSharedMesh;
 class hsGMaterial;
 class plDrawableSpans;
 
-class plReplaceGeometryMsg : public plMessage
-{
+class plReplaceGeometryMsg : public plMessage {
 public:
-    plSharedMesh *fMesh;
-    hsGMaterial *fMaterial;
+    plSharedMesh* fMesh;
+    hsGMaterial* fMaterial;
     uint32_t fFlags;
-    
+
     plReplaceGeometryMsg() : fMesh(nil), fMaterial(nil), fFlags(0) {}
     ~plReplaceGeometryMsg() {}
 
-    CLASSNAME_REGISTER( plReplaceGeometryMsg );
-    GETINTERFACE_ANY( plReplaceGeometryMsg, plMessage );    
+    CLASSNAME_REGISTER(plReplaceGeometryMsg);
+    GETINTERFACE_ANY(plReplaceGeometryMsg, plMessage);
 
     // No R/W, these shouldn't be sent over the wire
     virtual void Read(hsStream* stream, hsResMgr* mgr) {}
     virtual void Write(hsStream* stream, hsResMgr* mgr) {}
 
     // flags
-    enum
-    {
+    enum {
         kAddingGeom = 0x0001,
         kAddToFront = 0x0002,
     };
 
 };
 
-class plSwapSpansRefMsg : public plGenRefMsg
-{
+class plSwapSpansRefMsg : public plGenRefMsg {
 public:
-    plDrawableSpans *fSpans;
+    plDrawableSpans* fSpans;
 
     plSwapSpansRefMsg() : plGenRefMsg(), fSpans(nil) {}
-    plSwapSpansRefMsg(const plKey &r, uint8_t c, int which, int type) : plGenRefMsg(r, c, which, type) {}
+    plSwapSpansRefMsg(const plKey& r, uint8_t c, int which, int type) : plGenRefMsg(r, c, which, type) {}
     ~plSwapSpansRefMsg() {}
 
-    CLASSNAME_REGISTER( plSwapSpansRefMsg );
-    GETINTERFACE_ANY( plSwapSpansRefMsg, plGenRefMsg );
+    CLASSNAME_REGISTER(plSwapSpansRefMsg);
+    GETINTERFACE_ANY(plSwapSpansRefMsg, plGenRefMsg);
 };
 
 #endif

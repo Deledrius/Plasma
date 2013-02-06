@@ -48,32 +48,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plKey;
 
-class plObjectInBoxConditionalObject : public plConditionalObject
-{
+class plObjectInBoxConditionalObject : public plConditionalObject {
 protected:
 
     hsTArray<plKey>     fInside;
     plKey               fCurrentTrigger;
 
 public:
-    
+
     plObjectInBoxConditionalObject();
-    ~plObjectInBoxConditionalObject(){;}
-    
-    CLASSNAME_REGISTER( plObjectInBoxConditionalObject );
-    GETINTERFACE_ANY( plObjectInBoxConditionalObject, plConditionalObject );
-    
+    ~plObjectInBoxConditionalObject() {
+        ;
+    }
+
+    CLASSNAME_REGISTER(plObjectInBoxConditionalObject);
+    GETINTERFACE_ANY(plObjectInBoxConditionalObject, plConditionalObject);
+
     bool MsgReceive(plMessage* msg);
 
-    void Evaluate(){;}
-    void Reset() { SetSatisfied(false); }
-    virtual bool Satisfied() { return true; }
+    void Evaluate() {
+        ;
+    }
+    void Reset() {
+        SetSatisfied(false);
+    }
+    virtual bool Satisfied() {
+        return true;
+    }
     virtual bool Verify(plMessage* msg);
 
 };
 
-class plVolumeSensorConditionalObject : public plConditionalObject
-{
+class plVolumeSensorConditionalObject : public plConditionalObject {
 
 protected:
 
@@ -88,42 +94,58 @@ public:
     static bool makeBriceHappyVar;
 
 
-    enum
-    {
+    enum {
         kTypeEnter  = 1,
         kTypeExit,
     };
     plVolumeSensorConditionalObject();
-    ~plVolumeSensorConditionalObject(){;}
-    
-    CLASSNAME_REGISTER( plVolumeSensorConditionalObject );
-    GETINTERFACE_ANY( plVolumeSensorConditionalObject, plConditionalObject );
-    
+    ~plVolumeSensorConditionalObject() {
+        ;
+    }
+
+    CLASSNAME_REGISTER(plVolumeSensorConditionalObject);
+    GETINTERFACE_ANY(plVolumeSensorConditionalObject, plConditionalObject);
+
     virtual bool MsgReceive(plMessage* msg);
 
-    void Evaluate(){;}
-    void Reset() { SetSatisfied(false); }
+    void Evaluate() {
+        ;
+    }
+    void Reset() {
+        SetSatisfied(false);
+    }
     virtual bool Satisfied();
-    void    SetType(int i) { fType = i; }
+    void    SetType(int i) {
+        fType = i;
+    }
 
-    void SetTrigNum(int i) { fTrigNum = i; }
-    void SetFirst(bool b) { fFirst = b; }
+    void SetTrigNum(int i) {
+        fTrigNum = i;
+    }
+    void SetFirst(bool b) {
+        fFirst = b;
+    }
 
-    void IgnoreExtraEnters(bool ignore = true) {fIgnoreExtraEnters = ignore;}
+    void IgnoreExtraEnters(bool ignore = true) {
+        fIgnoreExtraEnters = ignore;
+    }
 
-    virtual void Read(hsStream* stream, hsResMgr* mgr); 
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
 };
-class plVolumeSensorConditionalObjectNoArbitration : public plVolumeSensorConditionalObject
-{
+class plVolumeSensorConditionalObjectNoArbitration : public plVolumeSensorConditionalObject {
 public:
-    plVolumeSensorConditionalObjectNoArbitration ():plVolumeSensorConditionalObject(){;}
-    ~plVolumeSensorConditionalObjectNoArbitration (){;}
-    CLASSNAME_REGISTER( plVolumeSensorConditionalObjectNoArbitration );
-    GETINTERFACE_ANY( plVolumeSensorConditionalObjectNoArbitration, plConditionalObject );
+    plVolumeSensorConditionalObjectNoArbitration(): plVolumeSensorConditionalObject() {
+        ;
+    }
+    ~plVolumeSensorConditionalObjectNoArbitration() {
+        ;
+    }
+    CLASSNAME_REGISTER(plVolumeSensorConditionalObjectNoArbitration);
+    GETINTERFACE_ANY(plVolumeSensorConditionalObjectNoArbitration, plConditionalObject);
     virtual bool MsgReceive(plMessage* msg);
-    virtual void Read(hsStream* stream, hsResMgr* mgr); 
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
 protected:
     plKey fHittee;
 };

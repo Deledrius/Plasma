@@ -51,8 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 //////////////////////////////////////////////////////////////////////
 
-class pyCluster
-{
+class pyCluster {
 private:
     plKey fClusterKey;
 
@@ -64,12 +63,12 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptCluster);
-    static PyObject *New(plKey key);
-    static PyObject *New(pyKey& key);
+    static PyObject* New(plKey key);
+    static PyObject* New(pyKey& key);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyCluster object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyCluster); // converts a PyObject to a pyCluster (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     void SetKey(pyKey& key); // for python glue only, do NOT call
 

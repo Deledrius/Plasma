@@ -51,29 +51,28 @@ class Mtl;
 class IParamBlock2;
 class plString;
 
-int GetMatAnimModKey(Mtl* mtl, plMaxNodeBase* node, const plString &segName, hsTArray<plKey>& keys);
+int GetMatAnimModKey(Mtl* mtl, plMaxNodeBase* node, const plString& segName, hsTArray<plKey>& keys);
 
-class plResponderCmdMtl : public plResponderCmd
-{
+class plResponderCmdMtl : public plResponderCmd {
 public:
     static plResponderCmdMtl& Instance();
-    virtual ParamBlockDesc2 *GetDesc();
+    virtual ParamBlockDesc2* GetDesc();
 
     virtual int NumTypes();
-    virtual const char *GetCategory(int type);
-    virtual const char *GetName(int type);
-    virtual const char *GetInstanceName(IParamBlock2 *pb);
+    virtual const char* GetCategory(int type);
+    virtual const char* GetName(int type);
+    virtual const char* GetInstanceName(IParamBlock2* pb);
 
-    virtual IParamBlock2 *CreatePB(int type);
+    virtual IParamBlock2* CreatePB(int type);
     virtual void SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg, IParamBlock2* pb);
     virtual plMessage* CreateMsg(plMaxNode* node, plErrorMsg* pErrMsg, IParamBlock2* pb);
 
-    virtual bool IsWaitable(IParamBlock2 *pb);
-    virtual void GetWaitPoints(IParamBlock2 *pb, WaitPoints& waitPoints);
-    virtual void CreateWait(plMaxNode* node, plErrorMsg* pErrMsg, IParamBlock2 *pb, ResponderWaitInfo& waitInfo);
-    
-    Mtl *GetMtl(IParamBlock2 *pb);
-    plString GetAnim(IParamBlock2 *pb);
+    virtual bool IsWaitable(IParamBlock2* pb);
+    virtual void GetWaitPoints(IParamBlock2* pb, WaitPoints& waitPoints);
+    virtual void CreateWait(plMaxNode* node, plErrorMsg* pErrMsg, IParamBlock2* pb, ResponderWaitInfo& waitInfo);
+
+    Mtl* GetMtl(IParamBlock2* pb);
+    plString GetAnim(IParamBlock2* pb);
 };
 
 int GetMatAnimModKey(Mtl* mtl, plMaxNodeBase* node, const plString& segName, hsTArray<plKey>& keys);

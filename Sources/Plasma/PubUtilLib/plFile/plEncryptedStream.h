@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // in the usual way, but they will be in memory until Close is called.  Files
 // will be decrypted on the fly during read.operations
 //
-class plEncryptedStream : public hsStream
-{
+class plEncryptedStream : public hsStream {
 protected:
     FILE* fRef;
     uint32_t fKey[4];
@@ -79,7 +78,7 @@ protected:
 
 public:
     // If you don't pass in a key (4 uint32_t's), the default one will be used
-    plEncryptedStream(uint32_t* key=nil);
+    plEncryptedStream(uint32_t* key = nil);
     ~plEncryptedStream();
 
     virtual bool    Open(const plFileName& name, const char* mode = "rb");
@@ -93,7 +92,9 @@ public:
     virtual void    FastFwd();
     virtual uint32_t  GetEOF();
 
-    uint32_t GetActualFileSize() const { return fActualFileSize;}
+    uint32_t GetActualFileSize() const {
+        return fActualFileSize;
+    }
 
     static bool FileEncrypt(const plFileName& fileName);
     static bool FileDecrypt(const plFileName& fileName);

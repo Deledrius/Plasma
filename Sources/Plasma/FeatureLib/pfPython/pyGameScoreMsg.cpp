@@ -49,74 +49,98 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 PyObject* pyGameScoreMsg::CreateFinal(pfGameScoreMsg* msg)
 {
-    if (pfGameScoreListMsg* l = pfGameScoreListMsg::ConvertNoRef(msg))
+    if (pfGameScoreListMsg* l = pfGameScoreListMsg::ConvertNoRef(msg)) {
         return pyGameScoreListMsg::New(l);
-    if (pfGameScoreTransferMsg* t = pfGameScoreTransferMsg::ConvertNoRef(msg))
+    }
+
+    if (pfGameScoreTransferMsg* t = pfGameScoreTransferMsg::ConvertNoRef(msg)) {
         return pyGameScoreTransferMsg::New(t);
-    if (pfGameScoreUpdateMsg* u = pfGameScoreUpdateMsg::ConvertNoRef(msg))
+    }
+
+    if (pfGameScoreUpdateMsg* u = pfGameScoreUpdateMsg::ConvertNoRef(msg)) {
         return pyGameScoreUpdateMsg::New(u);
+    }
+
     return nil;
 }
 
 plString pyGameScoreMsg::GetError() const
 {
-    if (fMsg)
+    if (fMsg) {
         return plString::FromWchar(NetErrorToString(fMsg->GetResult()));
+    }
+
     return "pfGameScoreMsg is NULL";
 }
 
 bool pyGameScoreMsg::IsValid() const
 {
-    if (fMsg)
+    if (fMsg) {
         return IS_NET_SUCCESS(fMsg->GetResult());
+    }
+
     return false;
 }
 
 plString pyGameScoreListMsg::GetName() const
 {
-    if (pfGameScoreListMsg* pList = pfGameScoreListMsg::ConvertNoRef(fMsg))
+    if (pfGameScoreListMsg* pList = pfGameScoreListMsg::ConvertNoRef(fMsg)) {
         return pList->GetName();
+    }
+
     return plString::Null;
 }
 
 uint32_t pyGameScoreListMsg::GetOwnerID() const
 {
-    if (pfGameScoreListMsg* pList = pfGameScoreListMsg::ConvertNoRef(fMsg))
+    if (pfGameScoreListMsg* pList = pfGameScoreListMsg::ConvertNoRef(fMsg)) {
         return pList->GetOwnerID();
+    }
+
     return 0;
 }
 
 size_t pyGameScoreListMsg::GetNumScores() const
 {
-    if (pfGameScoreListMsg* pList = pfGameScoreListMsg::ConvertNoRef(fMsg))
+    if (pfGameScoreListMsg* pList = pfGameScoreListMsg::ConvertNoRef(fMsg)) {
         return pList->GetNumScores();
+    }
+
     return 0;
 }
 
 PyObject* pyGameScoreListMsg::GetScore(size_t idx) const
 {
-    if (pfGameScoreListMsg* pList = pfGameScoreListMsg::ConvertNoRef(fMsg))
+    if (pfGameScoreListMsg* pList = pfGameScoreListMsg::ConvertNoRef(fMsg)) {
         return pyGameScore::New(pList->GetScore(idx));
+    }
+
     return nil;
 }
 
 PyObject* pyGameScoreTransferMsg::GetDestinationScore() const
 {
-    if (pfGameScoreTransferMsg* pTrans = pfGameScoreTransferMsg::ConvertNoRef(fMsg))
+    if (pfGameScoreTransferMsg* pTrans = pfGameScoreTransferMsg::ConvertNoRef(fMsg)) {
         return pyGameScore::New(pTrans->GetDestination());
+    }
+
     return nil;
 }
 
 PyObject* pyGameScoreTransferMsg::GetSourceScore() const
 {
-    if (pfGameScoreTransferMsg* pTrans = pfGameScoreTransferMsg::ConvertNoRef(fMsg))
+    if (pfGameScoreTransferMsg* pTrans = pfGameScoreTransferMsg::ConvertNoRef(fMsg)) {
         return pyGameScore::New(pTrans->GetSource());
+    }
+
     return nil;
 }
 
 PyObject* pyGameScoreUpdateMsg::GetScore() const
 {
-    if (pfGameScoreUpdateMsg* pUp = pfGameScoreUpdateMsg::ConvertNoRef(fMsg))
+    if (pfGameScoreUpdateMsg* pUp = pfGameScoreUpdateMsg::ConvertNoRef(fMsg)) {
         return pyGameScore::New(pUp->GetScore());
+    }
+
     return nil;
 }

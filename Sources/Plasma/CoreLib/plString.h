@@ -78,20 +78,19 @@ typedef unsigned int UniChar;
  *  \sa plString
  */
 template <typename _Ch>
-class plStringBuffer
-{
+class plStringBuffer {
 private:
-    struct StringRef
-    {
+    struct StringRef {
         unsigned int fRefs;
-        const _Ch *fStringData;
+        const _Ch* fStringData;
 
-        StringRef(const _Ch *data)
+        StringRef(const _Ch* data)
             : fRefs(1), fStringData(data) { }
 
-        inline void AddRef() { ++fRefs; }
-        inline void DecRef()
-        {
+        inline void AddRef() {
+            ++fRefs;
+        }
+        inline void DecRef() {
             if (--fRefs == 0) {
                 delete [] fStringData;
                 delete this;
@@ -100,23 +99,28 @@ private:
     };
 
     union {
-        StringRef *fData;
+        StringRef* fData;
         _Ch fShort[SSO_CHARS];
     };
     size_t fSize;
 
-    bool IHaveACow() const { return fSize >= SSO_CHARS; }
+    bool IHaveACow() const {
+        return fSize >= SSO_CHARS;
+    }
 
 public:
     /** Construct an empty string buffer. */
-    plStringBuffer() : fSize(0) { memset(fShort, 0, sizeof(fShort)); }
+    plStringBuffer() : fSize(0) {
+        memset(fShort, 0, sizeof(fShort));
+    }
 
     /** Copy constructor - adds a reference to the copied buffer */
-    plStringBuffer(const plStringBuffer<_Ch> &copy) : fSize(copy.fSize)
-    {
+    plStringBuffer(const plStringBuffer<_Ch>& copy) : fSize(copy.fSize) {
         memcpy(fShort, copy.fShort, sizeof(fShort));
-        if (IHaveACow())
+
+        if (IHaveACow()) {
             fData->AddRef();
+        }
     }
 
     /** Construct a string buffer which holds a COPY of the \a data, up to
@@ -124,35 +128,37 @@ public:
      *  meaning this constructor is safe to use on buffers which are not
      *  already null-terminated.
      */
-    plStringBuffer(const _Ch *data, size_t size) : fSize(size)
-    {
+    plStringBuffer(const _Ch* data, size_t size) : fSize(size) {
         memset(fShort, 0, sizeof(fShort));
-        _Ch *copyData = IHaveACow() ? new _Ch[size + 1] : fShort;
+        _Ch* copyData = IHaveACow() ? new _Ch[size + 1] : fShort;
         memcpy(copyData, data, size);
         copyData[size] = 0;
 
-        if (IHaveACow())
+        if (IHaveACow()) {
             fData = new StringRef(copyData);
+        }
     }
 
     /** Destructor.  The ref-counted data will only be freed if no other
      *  string buffers still reference it.
      */
-    ~plStringBuffer<_Ch>()
-    {
-        if (IHaveACow())
+    ~plStringBuffer<_Ch>() {
+        if (IHaveACow()) {
             fData->DecRef();
+        }
     }
 
     /** Assignment operator.  Changes the reference to point to the
      *  copied buffer in \a copy.
      */
-    plStringBuffer<_Ch> &operator=(const plStringBuffer<_Ch> &copy)
-    {
-        if (copy.IHaveACow())
+    plStringBuffer<_Ch>& operator=(const plStringBuffer<_Ch>& copy) {
+        if (copy.IHaveACow()) {
             copy.fData->AddRef();
-        if (IHaveACow())
+        }
+
+        if (IHaveACow()) {
             fData->DecRef();
+        }
 
         memcpy(fShort, copy.fShort, sizeof(fShort));
         fSize = copy.fSize;
@@ -160,17 +166,23 @@ public:
     }
 
     /** Returns a pointer to the referenced string buffer. */
-    const _Ch *GetData() const { return IHaveACow() ? fData->fStringData : fShort; }
+    const _Ch* GetData() const {
+        return IHaveACow() ? fData->fStringData : fShort;
+    }
 
     /** Returns the number of characters (not including the '\0') in the
      *  referenced string buffer.
      */
-    size_t GetSize() const { return fSize; }
+    size_t GetSize() const {
+        return fSize;
+    }
 
     /** Cast operator.  This is a shortcut for not needing to call GetData on
      *  buffer objects passed to methods or objects expecting a C-style string.
      */
-    operator const _Ch *() const { return GetData(); }
+    operator const _Ch* () const {
+        return GetData();
+    }
 
     /** Create a writable buffer for \a size characters.
      *  From Haxxia with love!  This will release the current string buffer
@@ -182,14 +194,15 @@ public:
      *           Not doing so may cause problems for functions and objects
      *           expecting a null-terminated C-style string.
      */
-    _Ch *CreateWritableBuffer(size_t size)
-    {
-        if (IHaveACow())
+    _Ch* CreateWritableBuffer(size_t size) {
+        if (IHaveACow()) {
             fData->DecRef();
+        }
 
         fSize = size;
+
         if (IHaveACow()) {
-            _Ch *writable = new _Ch[fSize + 1];
+            _Ch* writable = new _Ch[fSize + 1];
             fData = new StringRef(writable);
             return writable;
         } else {
@@ -211,8 +224,7 @@ typedef plStringBuffer<UniChar> plUnicodeBuffer;
  *  a plString object will do so in a new string buffer, allowing other
  *  string objects to retain the old data without getting unexpected changes.
  */
-class plString
-{
+class plString {
 public:
     enum {
         /** Automatically determine the size of input (Requires input to be
@@ -227,11 +239,11 @@ public:
 private:
     plStringBuffer<char> fUtf8Buffer;
 
-    void IConvertFromUtf8(const char *utf8, size_t size);
-    void IConvertFromUtf16(const uint16_t *utf16, size_t size);
-    void IConvertFromWchar(const wchar_t *wstr, size_t size);
-    void IConvertFromUtf32(const UniChar *ustr, size_t size);
-    void IConvertFromIso8859_1(const char *astr, size_t size);
+    void IConvertFromUtf8(const char* utf8, size_t size);
+    void IConvertFromUtf16(const uint16_t* utf16, size_t size);
+    void IConvertFromWchar(const wchar_t* wstr, size_t size);
+    void IConvertFromUtf32(const UniChar* ustr, size_t size);
+    void IConvertFromIso8859_1(const char* astr, size_t size);
 
     // Constructing and comparing with nil or nullptr won't break plString,
     // but it's preferred not to do so with the constants.  That is to say,
@@ -250,78 +262,92 @@ public:
      *  \note This constructor expects the input to be UTF-8 encoded.  For
      *        conversion from ISO-8859-1 8-bit data, use FromIso8859_1().
      */
-    plString(const char *cstr, size_t size = kSizeAuto) { IConvertFromUtf8(cstr, size); }
+    plString(const char* cstr, size_t size = kSizeAuto) {
+        IConvertFromUtf8(cstr, size);
+    }
 
     /** Copy constructor. */
-    plString(const plString &copy) : fUtf8Buffer(copy.fUtf8Buffer) { }
+    plString(const plString& copy) : fUtf8Buffer(copy.fUtf8Buffer) { }
 
     /** Copy constructor from plStringBuffer<char>.
      *  \note This constructor expects the input to be UTF-8 encoded.  For
      *        conversion from ISO-8859-1 8-bit data, use FromIso8859_1().
      */
-    plString(const plStringBuffer<char> &init) { operator=(init); }
+    plString(const plStringBuffer<char>& init) {
+        operator=(init);
+    }
 
     /** Construct a string from expanded Unicode data. */
-    plString(const plUnicodeBuffer &init) { IConvertFromUtf32(init.GetData(), init.GetSize()); }
+    plString(const plUnicodeBuffer& init) {
+        IConvertFromUtf32(init.GetData(), init.GetSize());
+    }
 
     /** Assignment operator.  Same as plString(const char *). */
-    plString &operator=(const char *cstr) { IConvertFromUtf8(cstr, kSizeAuto); return *this; }
+    plString& operator=(const char* cstr) {
+        IConvertFromUtf8(cstr, kSizeAuto);
+        return *this;
+    }
 
     /** Assignment operator.  Same as plString(const plString &). */
-    plString &operator=(const plString &copy) { fUtf8Buffer = copy.fUtf8Buffer; return *this; }
+    plString& operator=(const plString& copy) {
+        fUtf8Buffer = copy.fUtf8Buffer;
+        return *this;
+    }
 
     /** Assignment operator.  Same as plString(const plStringBuffer<char> &). */
-    plString &operator=(const plStringBuffer<char> &init);
+    plString& operator=(const plStringBuffer<char>& init);
 
     /** Assignment operator.  Same as plString(const plUnicodeBuffer &). */
-    plString &operator=(const plUnicodeBuffer &init) { IConvertFromUtf32(init.GetData(), init.GetSize()); return *this; }
+    plString& operator=(const plUnicodeBuffer& init) {
+        IConvertFromUtf32(init.GetData(), init.GetSize());
+        return *this;
+    }
 
     /** Append UTF-8 data from a C-style string pointer to the end of this
      *  string object.
      *  \sa plStringStream
      */
-    plString &operator+=(const char *cstr) { return operator=(*this + cstr); }
+    plString& operator+=(const char* cstr) {
+        return operator=(*this + cstr);
+    }
 
     /** Append the string \a str to the end of this string object.
      *  \sa plStringStream
      */
-    plString &operator+=(const plString &str) { return operator=(*this + str); }
+    plString& operator+=(const plString& str) {
+        return operator=(*this + str);
+    }
 
     /** Create a new plString object from the UTF-8 formatted data in \a utf8. */
-    static inline plString FromUtf8(const char *utf8, size_t size = kSizeAuto)
-    {
+    static inline plString FromUtf8(const char* utf8, size_t size = kSizeAuto) {
         plString str;
         str.IConvertFromUtf8(utf8, size);
         return str;
     }
 
     /** Create a new plString object from the UTF-16 formatted data in \a utf16. */
-    static inline plString FromUtf16(const uint16_t *utf16, size_t size = kSizeAuto)
-    {
+    static inline plString FromUtf16(const uint16_t* utf16, size_t size = kSizeAuto) {
         plString str;
         str.IConvertFromUtf16(utf16, size);
         return str;
     }
 
     /** Create a new plString object from the \p wchar_t data in \a wstr. */
-    static inline plString FromWchar(const wchar_t *wstr, size_t size = kSizeAuto)
-    {
+    static inline plString FromWchar(const wchar_t* wstr, size_t size = kSizeAuto) {
         plString str;
         str.IConvertFromWchar(wstr, size);
         return str;
     }
 
     /** Create a new plString object from the UTF-32 formatted data in \a utf32. */
-    static inline plString FromUtf32(const UniChar *utf32, size_t size = kSizeAuto)
-    {
+    static inline plString FromUtf32(const UniChar* utf32, size_t size = kSizeAuto) {
         plString str;
         str.IConvertFromUtf32(utf32, size);
         return str;
     }
 
     /** Create a new plString object from the ISO-8859-1 formatted data in \a astr. */
-    static inline plString FromIso8859_1(const char *astr, size_t size = kSizeAuto)
-    {
+    static inline plString FromIso8859_1(const char* astr, size_t size = kSizeAuto) {
         plString str;
         str.IConvertFromIso8859_1(astr, size);
         return str;
@@ -331,17 +357,22 @@ public:
      *  expecting C-style string pointers.  If this string is empty, returns
      *  \a substitute instead.
      */
-    const char *c_str(const char *substitute = "") const
-    { return IsEmpty() ? substitute : fUtf8Buffer.GetData(); }
+    const char* c_str(const char* substitute = "") const {
+        return IsEmpty() ? substitute : fUtf8Buffer.GetData();
+    }
 
     /** Return the byte at position \a position.  Note that this may be in
      *  the middle of a UTF-8 sequence -- if you want an actual Unicode
      *  character, use the buffer returned from GetUnicodeArray() instead.
      */
-    char CharAt(size_t position) const { return c_str()[position]; }
+    char CharAt(size_t position) const {
+        return c_str()[position];
+    }
 
     /** Returns the internal UTF-8 data buffer object. */
-    plStringBuffer<char> ToUtf8() const { return fUtf8Buffer; }
+    plStringBuffer<char> ToUtf8() const {
+        return fUtf8Buffer;
+    }
 
     /** Convert this string's data to a UTF-16 string buffer. */
     plStringBuffer<uint16_t> ToUtf16() const;
@@ -368,10 +399,14 @@ public:
     /** Returns the size in number of bytes (excluding the null-terminator) of
      *  this string.
      */
-    size_t GetSize() const { return fUtf8Buffer.GetSize(); }
+    size_t GetSize() const {
+        return fUtf8Buffer.GetSize();
+    }
 
     /** Returns \c true if this string is empty (""). */
-    bool IsEmpty() const { return fUtf8Buffer.GetSize() == 0; }
+    bool IsEmpty() const {
+        return fUtf8Buffer.GetSize() == 0;
+    }
 
     /** Returns \c true if this string is "null".  Currently, this is just
      *  a synonym for IsEmpty(), as plString makes no distinction between
@@ -379,7 +414,9 @@ public:
      *  \todo Evaluate whether Plasma actually needs to distinguish between
      *        empty and NULL strings.  Ideally, only IsEmpty should be required.
      */
-    bool IsNull() const { return IsEmpty(); }
+    bool IsNull() const {
+        return IsEmpty();
+    }
 
     /** Convert the string data to an integer in base \a base.
      *  If base is set to 0, this function behaves like strtol, which checks
@@ -402,13 +439,13 @@ public:
     double ToDouble() const;
 
     /** Construct a plString using a printf-like format string. */
-    static plString Format(const char *fmt, ...);
+    static plString Format(const char* fmt, ...);
 
     /** Construct a plString using a printf-like format string.
      *  This function should be called inside of vararg functions, such as
      *  plString::Format().
      */
-    static plString IFormat(const char *fmt, va_list vptr);
+    static plString IFormat(const char* fmt, va_list vptr);
 
     enum CaseSensitivity {
         kCaseSensitive, kCaseInsensitive
@@ -420,10 +457,9 @@ public:
      *    \li \p \<0 - this string is lexicographically less than \a str
      *    \li \p \>0 - this string is lexicographically greater than \a str
      */
-    int Compare(const plString &str, CaseSensitivity sense = kCaseSensitive) const
-    {
+    int Compare(const plString& str, CaseSensitivity sense = kCaseSensitive) const {
         return (sense == kCaseSensitive) ? strcmp(c_str(), str.c_str())
-                                         : stricmp(c_str(), str.c_str());
+               : stricmp(c_str(), str.c_str());
     }
 
     /** Compare this string with \a str.
@@ -432,58 +468,73 @@ public:
      *    \li \p \<0 - this string is lexicographically less than \a str
      *    \li \p \>0 - this string is lexicographically greater than \a str
      */
-    int Compare(const char *str, CaseSensitivity sense = kCaseSensitive) const
-    {
+    int Compare(const char* str, CaseSensitivity sense = kCaseSensitive) const {
         return (sense == kCaseSensitive) ? strcmp(c_str(), str ? str : "")
-                                         : stricmp(c_str(), str ? str : "");
+                   : stricmp(c_str(), str ? str : "");
     }
 
     /** Compare up to but never exceeding the first \a count bytes of this
      *  string with \a str.
      *  \sa Compare(const plString &, CaseSensitivity) const
      */
-    int CompareN(const plString &str, size_t count, CaseSensitivity sense = kCaseSensitive) const
-    {
+    int CompareN(const plString& str, size_t count, CaseSensitivity sense = kCaseSensitive) const {
         return (sense == kCaseSensitive) ? strncmp(c_str(), str.c_str(), count)
-                                         : strnicmp(c_str(), str.c_str(), count);
+               : strnicmp(c_str(), str.c_str(), count);
     }
 
     /** Compare up to but never exceeding the first \a count bytes of this
      *  string with \a str.
      *  \sa Compare(const char *, CaseSensitivity) const
      */
-    int CompareN(const char *str, size_t count, CaseSensitivity sense = kCaseSensitive) const
-    {
+    int CompareN(const char* str, size_t count, CaseSensitivity sense = kCaseSensitive) const {
         return (sense == kCaseSensitive) ? strncmp(c_str(), str ? str : "", count)
-                                         : strnicmp(c_str(), str ? str : "", count);
+                   : strnicmp(c_str(), str ? str : "", count);
     }
 
     /** Shortcut for Compare(str, kCaseInsensitive). */
-    int CompareI(const plString &str) const { return Compare(str, kCaseInsensitive); }
+    int CompareI(const plString& str) const {
+        return Compare(str, kCaseInsensitive);
+    }
 
     /** Shortcut for Compare(str, kCaseInsensitive). */
-    int CompareI(const char *str) const { return Compare(str, kCaseInsensitive); }
+    int CompareI(const char* str) const {
+        return Compare(str, kCaseInsensitive);
+    }
 
     /** Shortcut for CompareN(str, kCaseInsensitive). */
-    int CompareNI(const plString &str, size_t count) const { return CompareN(str, count, kCaseInsensitive); }
+    int CompareNI(const plString& str, size_t count) const {
+        return CompareN(str, count, kCaseInsensitive);
+    }
 
     /** Shortcut for CompareN(str, kCaseInsensitive). */
-    int CompareNI(const char *str, size_t count) const { return CompareN(str, count, kCaseInsensitive); }
+    int CompareNI(const char* str, size_t count) const {
+        return CompareN(str, count, kCaseInsensitive);
+    }
 
     /** Operator overload for use in containers which depend on \c std::less. */
-    bool operator<(const plString &other) const { return Compare(other) < 0; }
+    bool operator<(const plString& other) const {
+        return Compare(other) < 0;
+    }
 
     /** Test if this string contains the same string data as \a other. */
-    bool operator==(const char *other) const { return Compare(other) == 0; }
+    bool operator==(const char* other) const {
+        return Compare(other) == 0;
+    }
 
     /** Test if this string contains the same string data as \a other. */
-    bool operator==(const plString &other) const { return Compare(other) == 0; }
+    bool operator==(const plString& other) const {
+        return Compare(other) == 0;
+    }
 
     /** Inverse of operator==(const char *) const. */
-    bool operator!=(const char *other) const { return Compare(other) != 0; }
+    bool operator!=(const char* other) const {
+        return Compare(other) != 0;
+    }
 
     /** Inverse of operator==(const plString &) const. */
-    bool operator!=(const plString &other) const { return Compare(other) != 0; }
+    bool operator!=(const plString& other) const {
+        return Compare(other) != 0;
+    }
 
     /** Find the index of the first instance of \a ch in this string.
      *  \return -1 if the character was not found.
@@ -498,19 +549,20 @@ public:
     /** Find the index of the first instance of \a str in this string.
      *  \return -1 if the substring was not found.
      */
-    int Find(const char *str, CaseSensitivity sense = kCaseSensitive) const;
+    int Find(const char* str, CaseSensitivity sense = kCaseSensitive) const;
 
     /** Find the index of the first instance of \a str in this string.
      *  \return -1 if the substring was not found.
      */
-    int Find(const plString &str, CaseSensitivity sense = kCaseSensitive) const
-    { return Find(str.c_str(), sense); }
+    int Find(const plString& str, CaseSensitivity sense = kCaseSensitive) const {
+        return Find(str.c_str(), sense);
+    }
 
     /** Check that this string matches the specified regular expression.
      *  This with only return true if the whole string can be matched
      *  by \a pattern.
      */
-    bool REMatch(const char *pattern, CaseSensitivity sense = kCaseSensitive) const;
+    bool REMatch(const char* pattern, CaseSensitivity sense = kCaseSensitive) const;
 
     /** Search for substrings which match the specified regular expression.
      *  If capture groups are specified in the pattern, they will be
@@ -518,23 +570,23 @@ public:
      *  index 1 (index 0 contains the whole match).  If the pattern was not
      *  found, this returns an empty vector.
      */
-    std::vector<plString> RESearch(const char *pattern, CaseSensitivity sense = kCaseSensitive) const;
+    std::vector<plString> RESearch(const char* pattern, CaseSensitivity sense = kCaseSensitive) const;
 
     /** Trim any characters in the supplied \a charset from the left of
      *  this string.
      */
-    plString TrimLeft(const char *charset = WHITESPACE_CHARS) const;
+    plString TrimLeft(const char* charset = WHITESPACE_CHARS) const;
 
     /** Trim any characters in the supplied \a charset from the right of
      *  this string.
      */
-    plString TrimRight(const char *charset = WHITESPACE_CHARS) const;
+    plString TrimRight(const char* charset = WHITESPACE_CHARS) const;
 
     /** Trim any characters in the supplied \a charset from both ends of
      *  this string.  Logically equivalent to (but more efficient than)
      *  str.TrimLeft(charset).TrimRight(charset)
      */
-    plString Trim(const char *charset = WHITESPACE_CHARS) const;
+    plString Trim(const char* charset = WHITESPACE_CHARS) const;
 
     /** Return a substring starting at index \a start, with up to \a size
      *  characters from the start position.  If \a size is greater than the
@@ -546,16 +598,20 @@ public:
     /** Return a substring containing at most \a size characters from the left
      *  of the string.  Equivalent to Substr(0, size).
      */
-    plString Left(size_t size) const { return Substr(0, size); }
+    plString Left(size_t size) const {
+        return Substr(0, size);
+    }
 
     /** Return a substring containing at most \a size characters from the right
      *  of the string.  Equivalent to Substr(GetSize() - size, size).
      */
-    plString Right(size_t size) const { return Substr(GetSize() - size, size); }
+    plString Right(size_t size) const {
+        return Substr(GetSize() - size, size);
+    }
 
     /** Return a copy of this string with all occurances of \a from replaced
      *  with \a to. */
-    plString Replace(const char *from, const char *to) const;
+    plString Replace(const char* from, const char* to) const;
 
     /** Return a copy of this string with all Latin-1 alphabetic characters
      *  converted to upper case.
@@ -575,47 +631,47 @@ public:
      *  string in the returned vector.
      *  \sa Tokenize()
      */
-    std::vector<plString> Split(const char *split, size_t maxSplits = kSizeAuto) const;
+    std::vector<plString> Split(const char* split, size_t maxSplits = kSizeAuto) const;
 
     /** Split this string into tokens, delimited by \a delims.
      *  Note that, unlike Split(), Tokenize will return only non-blank strings
      *  after stripping out all delimiters between tokens.
      *  \sa Split()
      */
-    std::vector<plString> Tokenize(const char *delims = WHITESPACE_CHARS) const;
+    std::vector<plString> Tokenize(const char* delims = WHITESPACE_CHARS) const;
 
     /** Create a string initialized with \a count copies of the character \a c. */
     static plString Fill(size_t count, char c);
 
 public:
     /** Functor which compares two strings case-insensitively for sorting. */
-    struct less_i
-    {
-        bool operator()(const plString &_L, const plString &_R) const
-        { return _L.Compare(_R, kCaseInsensitive) < 0; }
+    struct less_i {
+        bool operator()(const plString& _L, const plString& _R) const {
+            return _L.Compare(_R, kCaseInsensitive) < 0;
+        }
     };
 
     /** Functor which compares two strings case-insensitively for equality. */
-    struct equal_i
-    {
-        bool operator()(const plString &_L, const plString &_R) const
-        { return _L.Compare(_R, kCaseInsensitive) == 0; }
+    struct equal_i {
+        bool operator()(const plString& _L, const plString& _R) const {
+            return _L.Compare(_R, kCaseInsensitive) == 0;
+        }
     };
 
 private:
-    friend plString operator+(const plString &left, const plString &right);
-    friend plString operator+(const plString &left, const char *right);
-    friend plString operator+(const char *left, const plString &right);
+    friend plString operator+(const plString& left, const plString& right);
+    friend plString operator+(const plString& left, const char* right);
+    friend plString operator+(const char* left, const plString& right);
 };
 
 /** Concatenation operator for plStrings. */
-plString operator+(const plString &left, const plString &right);
+plString operator+(const plString& left, const plString& right);
 
 /** Concatenation operator for plStrings and UTF-8 C-style string data. */
-plString operator+(const plString &left, const char *right);
+plString operator+(const plString& left, const char* right);
 
 /** Concatenation operator for plStrings and UTF-8 C-style string data. */
-plString operator+(const char *left, const plString &right);
+plString operator+(const char* left, const plString& right);
 
 
 /** Helper class for writing frequent data to a text buffer efficiently.
@@ -623,8 +679,7 @@ plString operator+(const char *left, const plString &right);
  *  string data in pieces, as it keeps a running buffer instead of allocating
  *  new storage for each append result.
  */
-class plStringStream
-{
+class plStringStream {
 public:
     /** Construct a new empty string stream.  The first STRING_STACK_SIZE
      *  bytes are allocated on the stack for further efficiency.
@@ -632,67 +687,81 @@ public:
     plStringStream() : fBufSize(STRING_STACK_SIZE), fLength(0) { }
 
     /** Destructor, frees any allocated heap memory owned by the stream. */
-    ~plStringStream() { if (ICanHasHeap()) delete [] fBuffer; }
+    ~plStringStream() {
+        if (ICanHasHeap()) {
+            delete [] fBuffer;
+        }
+    }
 
     /** Append string data to the end of the stream. */
-    plStringStream &append(const char *data, size_t length);
+    plStringStream& append(const char* data, size_t length);
 
     /** Append UTF-8 C-style string data to the stream. */
-    plStringStream &operator<<(const char *text);
+    plStringStream& operator<<(const char* text);
 
     /** Append a base-10 formatted signed integer to the stream. */
-    plStringStream &operator<<(int num);
+    plStringStream& operator<<(int num);
 
     /** Append a base-10 formatted unsigned integer to the stream. */
-    plStringStream &operator<<(unsigned int num);
+    plStringStream& operator<<(unsigned int num);
 
     /** Append a base-10 formatted float to the stream. */
-    plStringStream &operator<<(float num) { return operator<<(static_cast<double>(num)); }
+    plStringStream& operator<<(float num) {
+        return operator<<(static_cast<double>(num));
+    }
 
     /** Append a base-10 formatted double to the stream. */
-    plStringStream &operator<<(double num);
+    plStringStream& operator<<(double num);
 
     /** Append a single Latin-1 character to the stream. */
-    plStringStream &operator<<(char ch) { return append(&ch, 1); }
+    plStringStream& operator<<(char ch) {
+        return append(&ch, 1);
+    }
 
     /** Append the contents of \a text to the stream. */
-    plStringStream &operator<<(const plString &text)
-    {
+    plStringStream& operator<<(const plString& text) {
         return append(text.c_str(), text.GetSize());
     }
 
     /** Returns a pointer to the beginning of the stream buffer.
      *  \warning This pointer is not null-terminated.
      */
-    const char *GetRawBuffer() const
-    {
+    const char* GetRawBuffer() const {
         return ICanHasHeap() ? fBuffer : fShort;
     }
 
     /** Return the size (in bytes) of the stream's data. */
-    size_t GetLength() const { return fLength; }
+    size_t GetLength() const {
+        return fLength;
+    }
 
     /** Convert the stream's data to a UTF-8 string. */
-    plString GetString() const { return plString::FromUtf8(GetRawBuffer(), fLength); }
+    plString GetString() const {
+        return plString::FromUtf8(GetRawBuffer(), fLength);
+    }
 
     /** Reset the stream's append pointer back to the beginning.
      *  This does not incur a reallocation of the buffer -- it is left
      *  with as much space as it had before, making this method more
      *  useful for re-using string streams in loops.
      */
-    void Truncate() { fLength = 0; }
+    void Truncate() {
+        fLength = 0;
+    }
 
 private:
     union {
-        char *fBuffer;
+        char* fBuffer;
         char fShort[STRING_STACK_SIZE];
     };
     size_t fBufSize, fLength;
 
-    bool ICanHasHeap() const { return fBufSize > STRING_STACK_SIZE; }
+    bool ICanHasHeap() const {
+        return fBufSize > STRING_STACK_SIZE;
+    }
 };
 
 /** \p strlen implementation for UniChar based C-style string buffers. */
-size_t ustrlen(const UniChar *ustr, size_t max = plString::kSizeAuto);
+size_t ustrlen(const UniChar* ustr, size_t max = plString::kSizeAuto);
 
 #endif //plString_Defined

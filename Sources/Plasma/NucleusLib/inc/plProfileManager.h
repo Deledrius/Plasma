@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plProfile.h"
 
-class plProfileManager 
-{
+class plProfileManager {
 protected:
     friend class plProfileManagerFull;
 
@@ -73,26 +72,36 @@ public:
 
     void SetAvgTime(uint32_t avgMS);
 
-    uint32_t GetProcessorSpeed() { return fProcessorSpeed; }
+    uint32_t GetProcessorSpeed() {
+        return fProcessorSpeed;
+    }
 
     // Backdoor for hack timers in calculated profiles
     static uint32_t GetTime();
 };
 
-class plProfileLaps
-{
+class plProfileLaps {
 protected:
-    class LapInfo : public plProfileBase
-    {
+    class LapInfo : public plProfileBase {
     protected:
 
     public:
         bool fUsedThisFrame;
-        LapInfo(const char* name) { fName = name; fDisplayFlags = kDisplayTime; }
-        bool operator<(const LapInfo& rhs) const { return fLastAvg < rhs.fLastAvg; }
+        LapInfo(const char* name) {
+            fName = name;
+            fDisplayFlags = kDisplayTime;
+        }
+        bool operator<(const LapInfo& rhs) const {
+            return fLastAvg < rhs.fLastAvg;
+        }
 
-        void BeginTiming(uint32_t value) { fValue -= value; }
-        void EndTiming(uint32_t value) { fValue += value; fTimerSamples++; }
+        void BeginTiming(uint32_t value) {
+            fValue -= value;
+        }
+        void EndTiming(uint32_t value) {
+            fValue += value;
+            fTimerSamples++;
+        }
     };
     std::vector<LapInfo> fLapTimes;
 

@@ -47,21 +47,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 // Client-side version
 //
-class plNetClientMsgScreener : public plNetMsgScreener
-{
+class plNetClientMsgScreener : public plNetMsgScreener {
 protected:
     void ICreateStatusLog() const;
-    const char* IGetSenderName(const plNetGameMember* gm) const { return "local";   }
+    const char* IGetSenderName(const plNetGameMember* gm) const {
+        return "local";
+    }
     const char* IGetAgeName() const;
     bool IIsLocalAvatarKey(plKey key, const plNetGameMember* gm) const;
     bool IIsLocalArmatureModKey(plKey key, const plNetGameMember* gm) const;
-    bool IIsSenderCCR(const plNetGameMember* gm=nil) const;
-    bool IAmClient() const { return true; }
+    bool IIsSenderCCR(const plNetGameMember* gm = nil) const;
+    bool IAmClient() const {
+        return true;
+    }
     bool IScreenIncoming(const plMessage* msg) const;
 public:
 
     plNetClientMsgScreener();
-    
+
     bool AllowOutgoingMessage(const plMessage* msg) const;
     bool AllowIncomingMessage(const plMessage* msg) const;
 };

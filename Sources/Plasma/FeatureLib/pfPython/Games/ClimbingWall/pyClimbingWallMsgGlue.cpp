@@ -70,9 +70,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptClimbingWallMsg, upcastToFinalClimbingWallMsg)
 }
 
 PYTHON_START_METHODS_TABLE(ptClimbingWallMsg)
-    PYTHON_METHOD_NOARGS(ptClimbingWallMsg, getClimbingWallMsgType, "Returns the type of the ClimbingWall message (see PtClimbingWallMsgTypes)"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallMsg, upcastToFinalClimbingWallMsg, "Returns this message as the ClimbingWall msg it is"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptClimbingWallMsg, getClimbingWallMsgType, "Returns the type of the ClimbingWall message (see PtClimbingWallMsgTypes)"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallMsg, upcastToFinalClimbingWallMsg, "Returns this message as the ClimbingWall msg it is"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallMsg, pyGameCliMsg, "Base class for ClimbingWall game messages");
@@ -81,9 +81,12 @@ PYTHON_EXPOSE_TYPE_DEFINITION(ptClimbingWallMsg, pyClimbingWallMsg);
 // required functions for PyObject interoperability
 PyObject* pyClimbingWallMsg::New(pfGameCliMsg* msg)
 {
-    ptClimbingWallMsg *newObj = (ptClimbingWallMsg*)ptClimbingWallMsg_type.tp_new(&ptClimbingWallMsg_type, NULL, NULL);
-    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_ClimbingWall))
+    ptClimbingWallMsg* newObj = (ptClimbingWallMsg*)ptClimbingWallMsg_type.tp_new(&ptClimbingWallMsg_type, NULL, NULL);
+
+    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_ClimbingWall)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -133,9 +136,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptClimbingWallNumBlockersChangedMsg, localOnly)
 }
 
 PYTHON_START_METHODS_TABLE(ptClimbingWallNumBlockersChangedMsg)
-    PYTHON_METHOD_NOARGS(ptClimbingWallNumBlockersChangedMsg, newBlockerCount, "Returns the number of blockers this game is current running with"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallNumBlockersChangedMsg, localOnly, "Returns true if we are only supposed to adjust our stuff locally, and not net-prop it"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptClimbingWallNumBlockersChangedMsg, newBlockerCount, "Returns the number of blockers this game is current running with"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallNumBlockersChangedMsg, localOnly, "Returns true if we are only supposed to adjust our stuff locally, and not net-prop it"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallNumBlockersChangedMsg, pyClimbingWallMsg, "ClimbingWall message received when the number of blockers is changed");
@@ -143,9 +146,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallNumBlockersChangedMsg, pyClimbingWallMsg
 // required functions for PyObject interoperability
 PyObject* pyClimbingWallNumBlockersChangedMsg::New(pfGameCliMsg* msg)
 {
-    ptClimbingWallNumBlockersChangedMsg *newObj = (ptClimbingWallNumBlockersChangedMsg*)ptClimbingWallNumBlockersChangedMsg_type.tp_new(&ptClimbingWallNumBlockersChangedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_NumBlockersChanged))
+    ptClimbingWallNumBlockersChangedMsg* newObj = (ptClimbingWallNumBlockersChangedMsg*)ptClimbingWallNumBlockersChangedMsg_type.tp_new(&ptClimbingWallNumBlockersChangedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_NumBlockersChanged)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -190,11 +196,11 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptClimbingWallReadyMsg, localOnly)
 }
 
 PYTHON_START_METHODS_TABLE(ptClimbingWallReadyMsg)
-    PYTHON_METHOD_NOARGS(ptClimbingWallReadyMsg, readyType, "The type of ready message this represents (see PtClimbingWallReadyTypes)"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallReadyMsg, team1Ready, "Whether team 1 is ready or not"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallReadyMsg, team2Ready, "Whether team 2 is ready or not"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallReadyMsg, localOnly, "Returns true if we are only supposed to adjust our stuff locally, and not net-prop it"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptClimbingWallReadyMsg, readyType, "The type of ready message this represents (see PtClimbingWallReadyTypes)"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallReadyMsg, team1Ready, "Whether team 1 is ready or not"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallReadyMsg, team2Ready, "Whether team 2 is ready or not"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallReadyMsg, localOnly, "Returns true if we are only supposed to adjust our stuff locally, and not net-prop it"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallReadyMsg, pyClimbingWallMsg, "ClimbingWall message received when the ready state of the teams is changed");
@@ -202,9 +208,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallReadyMsg, pyClimbingWallMsg, "ClimbingWa
 // required functions for PyObject interoperability
 PyObject* pyClimbingWallReadyMsg::New(pfGameCliMsg* msg)
 {
-    ptClimbingWallReadyMsg *newObj = (ptClimbingWallReadyMsg*)ptClimbingWallReadyMsg_type.tp_new(&ptClimbingWallReadyMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_Ready))
+    ptClimbingWallReadyMsg* newObj = (ptClimbingWallReadyMsg*)ptClimbingWallReadyMsg_type.tp_new(&ptClimbingWallReadyMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_Ready)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -237,8 +246,11 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptClimbingWallBlockersChangedMsg, blockersSet)
 {
     std::vector<int> blockers = self->fThis->BlockersSet();
     PyObject* retVal = PyList_New(blockers.size());
-    for (unsigned i = 0; i < blockers.size(); ++i)
-        PyList_SetItem(retVal, i, PyInt_FromLong(blockers[i])); // steals the ref
+
+    for (unsigned i = 0; i < blockers.size(); ++i) {
+        PyList_SetItem(retVal, i, PyInt_FromLong(blockers[i]));    // steals the ref
+    }
+
     return retVal;
 }
 
@@ -248,10 +260,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptClimbingWallBlockersChangedMsg, localOnly)
 }
 
 PYTHON_START_METHODS_TABLE(ptClimbingWallBlockersChangedMsg)
-    PYTHON_METHOD_NOARGS(ptClimbingWallBlockersChangedMsg, teamNumber, "The team that this message is for"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallBlockersChangedMsg, blockersSet, "Returns an array of blocker indicies denoting which blockers are set"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallBlockersChangedMsg, localOnly, "Returns true if we are only supposed to adjust our stuff locally, and not net-prop it"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptClimbingWallBlockersChangedMsg, teamNumber, "The team that this message is for"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallBlockersChangedMsg, blockersSet, "Returns an array of blocker indicies denoting which blockers are set"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallBlockersChangedMsg, localOnly, "Returns true if we are only supposed to adjust our stuff locally, and not net-prop it"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallBlockersChangedMsg, pyClimbingWallMsg, "ClimbingWall message received when the blocker state changes");
@@ -259,9 +271,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallBlockersChangedMsg, pyClimbingWallMsg, "
 // required functions for PyObject interoperability
 PyObject* pyClimbingWallBlockersChangedMsg::New(pfGameCliMsg* msg)
 {
-    ptClimbingWallBlockersChangedMsg *newObj = (ptClimbingWallBlockersChangedMsg*)ptClimbingWallBlockersChangedMsg_type.tp_new(&ptClimbingWallBlockersChangedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_BlockersChanged))
+    ptClimbingWallBlockersChangedMsg* newObj = (ptClimbingWallBlockersChangedMsg*)ptClimbingWallBlockersChangedMsg_type.tp_new(&ptClimbingWallBlockersChangedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_BlockersChanged)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -294,9 +309,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallPlayerEnteredMsg, pyClimbingWallMsg, "Cl
 // required functions for PyObject interoperability
 PyObject* pyClimbingWallPlayerEnteredMsg::New(pfGameCliMsg* msg)
 {
-    ptClimbingWallPlayerEnteredMsg *newObj = (ptClimbingWallPlayerEnteredMsg*)ptClimbingWallPlayerEnteredMsg_type.tp_new(&ptClimbingWallPlayerEnteredMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_PlayerEntered))
+    ptClimbingWallPlayerEnteredMsg* newObj = (ptClimbingWallPlayerEnteredMsg*)ptClimbingWallPlayerEnteredMsg_type.tp_new(&ptClimbingWallPlayerEnteredMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_PlayerEntered)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -336,10 +354,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptClimbingWallSuitMachineLockedMsg, localOnly)
 }
 
 PYTHON_START_METHODS_TABLE(ptClimbingWallSuitMachineLockedMsg)
-    PYTHON_METHOD_NOARGS(ptClimbingWallSuitMachineLockedMsg, team1MachineLocked, "Whether team 1's suit machine is locked or not"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallSuitMachineLockedMsg, team2MachineLocked, "Whether team 2's suit machine is locked or not"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallSuitMachineLockedMsg, localOnly, "Returns true if we are only supposed to adjust our stuff locally, and not net-prop it"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptClimbingWallSuitMachineLockedMsg, team1MachineLocked, "Whether team 1's suit machine is locked or not"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallSuitMachineLockedMsg, team2MachineLocked, "Whether team 2's suit machine is locked or not"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallSuitMachineLockedMsg, localOnly, "Returns true if we are only supposed to adjust our stuff locally, and not net-prop it"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallSuitMachineLockedMsg, pyClimbingWallMsg, "ClimbingWall message received when the locked state of the suit machines is changed");
@@ -347,9 +365,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallSuitMachineLockedMsg, pyClimbingWallMsg,
 // required functions for PyObject interoperability
 PyObject* pyClimbingWallSuitMachineLockedMsg::New(pfGameCliMsg* msg)
 {
-    ptClimbingWallSuitMachineLockedMsg *newObj = (ptClimbingWallSuitMachineLockedMsg*)ptClimbingWallSuitMachineLockedMsg_type.tp_new(&ptClimbingWallSuitMachineLockedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_SuitMachineLocked))
+    ptClimbingWallSuitMachineLockedMsg* newObj = (ptClimbingWallSuitMachineLockedMsg*)ptClimbingWallSuitMachineLockedMsg_type.tp_new(&ptClimbingWallSuitMachineLockedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_SuitMachineLocked)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -382,8 +403,11 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptClimbingWallGameOverMsg, team1Blockers)
 {
     std::vector<int> blockers = self->fThis->Team1Blockers();
     PyObject* retVal = PyList_New(blockers.size());
-    for (unsigned i = 0; i < blockers.size(); ++i)
-        PyList_SetItem(retVal, i, PyInt_FromLong(blockers[i])); // steals the ref
+
+    for (unsigned i = 0; i < blockers.size(); ++i) {
+        PyList_SetItem(retVal, i, PyInt_FromLong(blockers[i]));    // steals the ref
+    }
+
     return retVal;
 }
 
@@ -391,8 +415,11 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptClimbingWallGameOverMsg, team2Blockers)
 {
     std::vector<int> blockers = self->fThis->Team2Blockers();
     PyObject* retVal = PyList_New(blockers.size());
-    for (unsigned i = 0; i < blockers.size(); ++i)
-        PyList_SetItem(retVal, i, PyInt_FromLong(blockers[i])); // steals the ref
+
+    for (unsigned i = 0; i < blockers.size(); ++i) {
+        PyList_SetItem(retVal, i, PyInt_FromLong(blockers[i]));    // steals the ref
+    }
+
     return retVal;
 }
 
@@ -402,11 +429,11 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptClimbingWallGameOverMsg, localOnly)
 }
 
 PYTHON_START_METHODS_TABLE(ptClimbingWallGameOverMsg)
-    PYTHON_METHOD_NOARGS(ptClimbingWallGameOverMsg, teamWon, "The team that won the game"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallGameOverMsg, team1Blockers, "Returns an array of blocker indicies denoting which blockers team 1 set"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallGameOverMsg, team2Blockers, "Returns an array of blocker indicies denoting which blockers team 2 set"),
-    PYTHON_METHOD_NOARGS(ptClimbingWallGameOverMsg, localOnly, "Returns true if we are only supposed to adjust our stuff locally, and not net-prop it"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptClimbingWallGameOverMsg, teamWon, "The team that won the game"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallGameOverMsg, team1Blockers, "Returns an array of blocker indicies denoting which blockers team 1 set"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallGameOverMsg, team2Blockers, "Returns an array of blocker indicies denoting which blockers team 2 set"),
+                     PYTHON_METHOD_NOARGS(ptClimbingWallGameOverMsg, localOnly, "Returns true if we are only supposed to adjust our stuff locally, and not net-prop it"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallGameOverMsg, pyClimbingWallMsg, "ClimbingWall message received when the game is over");
@@ -414,9 +441,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallGameOverMsg, pyClimbingWallMsg, "Climbin
 // required functions for PyObject interoperability
 PyObject* pyClimbingWallGameOverMsg::New(pfGameCliMsg* msg)
 {
-    ptClimbingWallGameOverMsg *newObj = (ptClimbingWallGameOverMsg*)ptClimbingWallGameOverMsg_type.tp_new(&ptClimbingWallGameOverMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_GameOver))
+    ptClimbingWallGameOverMsg* newObj = (ptClimbingWallGameOverMsg*)ptClimbingWallGameOverMsg_type.tp_new(&ptClimbingWallGameOverMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_ClimbingWall_GameOver)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 

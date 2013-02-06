@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 int main(int argc, const char* argv[])
 {
     // Parse command line arguments. We MUST have the file argument
-    if (argc != 2)
-    {
+    if (argc != 2) {
         hsMessageBox("You should never run this manually.", "Error", hsMessageBoxNormal, hsMessageBoxIconExclamation);
         return 1;
     }

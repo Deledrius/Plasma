@@ -50,18 +50,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // Most messages which are intended to go through the Simulation interface to the pool
 // objects (without being explictly relayed by the Simulation interface) should subclass
 // from this
-class plSimulationMsg : public plMessage
-{
+class plSimulationMsg : public plMessage {
 public:
     // pass-through constructors
     plSimulationMsg() : plMessage() {};
-    plSimulationMsg(const plKey &sender, const plKey &receiver, const double *time) : plMessage(sender, receiver, time) {};
+    plSimulationMsg(const plKey& sender, const plKey& receiver, const double* time) : plMessage(sender, receiver, time) {};
 
-CLASSNAME_REGISTER( plSimulationMsg );
-    GETINTERFACE_ANY( plSimulationMsg, plMessage );
+    CLASSNAME_REGISTER(plSimulationMsg);
+    GETINTERFACE_ANY(plSimulationMsg, plMessage);
 
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 };
 
 #endif // PLSIMULATIONMSG_H

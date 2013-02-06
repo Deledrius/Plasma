@@ -66,154 +66,156 @@ class plDynamicTextMap;
 
 //// Class Definition /////////////////////////////////////////////////////////
 
-class plDynSurfaceWriter
-{
-    public:
+class plDynSurfaceWriter {
+public:
 
-        //// Public Flags ////
-        enum Justify
-        {
-            kLeftJustify = 0,
-            kCenter,
-            kRightJustify
-        };
+    //// Public Flags ////
+    enum Justify {
+        kLeftJustify = 0,
+        kCenter,
+        kRightJustify
+    };
 
-        enum Flags
-        {
-            kSupportAlpha   = 0x00000001,
-            
-            kFontBold       = 0x00000002,
-            kFontItalic     = 0x00000004,
-            kFontShadowed   = 0x00000008,
-            kFontMask       = 0x0000000e,
+    enum Flags {
+        kSupportAlpha   = 0x00000001,
 
-            kDiscardOnFlush = 0x00000010
-        };
+        kFontBold       = 0x00000002,
+        kFontItalic     = 0x00000004,
+        kFontShadowed   = 0x00000008,
+        kFontMask       = 0x0000000e,
 
-        //// Public Data /////
-        
-        
-        //// Public Members ////
+        kDiscardOnFlush = 0x00000010
+    };
+
+    //// Public Data /////
 
 
-        plDynSurfaceWriter();
-        plDynSurfaceWriter( plDynamicTextMap *target, uint32_t flags = 0 );
-        virtual ~plDynSurfaceWriter();
+    //// Public Members ////
 
 
-        /// Operations to perform on the text block
-        
-        void    ClearToColor( hsColorRGBA &color );
-        void    SetFont( const char *face, uint16_t size, uint8_t fontFlags = 0, bool antiAliasRGB = true );
-        void    SetTextColor( hsColorRGBA &color, bool blockRGB = false );
-        void    SetJustify( Justify j );
+    plDynSurfaceWriter();
+    plDynSurfaceWriter(plDynamicTextMap* target, uint32_t flags = 0);
+    virtual ~plDynSurfaceWriter();
 
-        void    DrawString( uint16_t x, uint16_t y, const char *text );
-        void    DrawClippedString( int16_t x, int16_t y, const char *text, uint16_t width, uint16_t height );
-        void    DrawClippedString( int16_t x, int16_t y, const char *text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height );
-        void    DrawWrappedString( uint16_t x, uint16_t y, const char *text, uint16_t width, uint16_t height );
-        uint16_t  CalcStringWidth( const char *text, uint16_t *height = nil );
-        void    CalcWrappedStringSize( const char *text, uint16_t *width, uint16_t *height );
-        void    FillRect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA &color );
-        void    FrameRect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA &color );
+
+    /// Operations to perform on the text block
+
+    void    ClearToColor(hsColorRGBA& color);
+    void    SetFont(const char* face, uint16_t size, uint8_t fontFlags = 0, bool antiAliasRGB = true);
+    void    SetTextColor(hsColorRGBA& color, bool blockRGB = false);
+    void    SetJustify(Justify j);
+
+    void    DrawString(uint16_t x, uint16_t y, const char* text);
+    void    DrawClippedString(int16_t x, int16_t y, const char* text, uint16_t width, uint16_t height);
+    void    DrawClippedString(int16_t x, int16_t y, const char* text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height);
+    void    DrawWrappedString(uint16_t x, uint16_t y, const char* text, uint16_t width, uint16_t height);
+    uint16_t  CalcStringWidth(const char* text, uint16_t* height = nil);
+    void    CalcWrappedStringSize(const char* text, uint16_t* width, uint16_t* height);
+    void    FillRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA& color);
+    void    FrameRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA& color);
 
 //      void    DrawImage( uint16_t x, uint16_t y, plMipmap *image, bool respectAlpha = false );
-//      void    DrawClippedImage( uint16_t x, uint16_t y, plMipmap *image, uint16_t srcClipX, uint16_t srcClipY, 
+//      void    DrawClippedImage( uint16_t x, uint16_t y, plMipmap *image, uint16_t srcClipX, uint16_t srcClipY,
 //                              uint16_t srcClipWidth, uint16_t srcClipHeight, bool respectAlpha = false );
 
-        // Copy the raw data from the given buffer.
+    // Copy the raw data from the given buffer.
 //      void    SetBitsFromBuffer( uint32_t *clearBuffer, uint16_t width, uint16_t height )
 
-        /// Target switching operations
+    /// Target switching operations
 
-        // Flushes all ops to the target.
-        void    FlushToTarget( void );
+    // Flushes all ops to the target.
+    void    FlushToTarget(void);
 
-        // Switches targets. Will flush to old target before switching. Also, if kDiscard isn't specified, will copy contents of new target to working surface
-        void    SwitchTarget( plDynamicTextMap *target );       // Will force a flush
+    // Switches targets. Will flush to old target before switching. Also, if kDiscard isn't specified, will copy contents of new target to working surface
+    void    SwitchTarget(plDynamicTextMap* target);         // Will force a flush
 
-        // Clears and resets everything. Does NOT flush.
-        void    Reset( void );
+    // Clears and resets everything. Does NOT flush.
+    void    Reset(void);
 
-        bool    IsValid( void ) const;
+    bool    IsValid(void) const;
 
-        static bool     CanHandleLotsOfThem( void );
+    static bool     CanHandleLotsOfThem(void);
 
-    protected:
+protected:
 
-        //// Protected Members ////
+    //// Protected Members ////
 
-        void        IInit( void );
-        void        IEnsureSurfaceUpdated( void );
-        void        IRefreshOSJustify( void );
-        void        ISetTextColor( hsColorRGBA &color, bool blockRGB );
+    void        IInit(void);
+    void        IEnsureSurfaceUpdated(void);
+    void        IRefreshOSJustify(void);
+    void        ISetTextColor(hsColorRGBA& color, bool blockRGB);
 
-        void        ISetFont( const char *face, uint16_t size, uint8_t fontFlags = 0, bool antiAliasRGB = true );
+    void        ISetFont(const char* face, uint16_t size, uint8_t fontFlags = 0, bool antiAliasRGB = true);
 
-        plDynamicTextMap    *fCurrTarget;
-        uint32_t              fFlags;
-        Justify             fJustify;
-        bool                fFlushed;
+    plDynamicTextMap*    fCurrTarget;
+    uint32_t              fFlags;
+    Justify             fJustify;
+    bool                fFlushed;
 
-        char        *fFontFace;
-        uint16_t      fFontSize;
-        uint8_t       fFontFlags;
-        bool        fFontAntiAliasRGB;
-        bool        fFontBlockedRGB;
+    char*        fFontFace;
+    uint16_t      fFontSize;
+    uint8_t       fFontFlags;
+    bool        fFontAntiAliasRGB;
+    bool        fFontBlockedRGB;
 
-        static bool         fForceSharedSurfaces;
-        static bool         fOSDetected;
-        static bool         fOSCanShareSurfaces;
+    static bool         fForceSharedSurfaces;
+    static bool         fOSDetected;
+    static bool         fOSCanShareSurfaces;
 
 #if HS_BUILD_FOR_WIN32
-        class plWinSurface
-        {
-            protected:
-                void        *fBits;
+    class plWinSurface {
+    protected:
+        void*        fBits;
 
-                virtual uint8_t   IBitsPerPixel( void ) const = 0;
+        virtual uint8_t   IBitsPerPixel(void) const = 0;
 
-            public:
-                HDC         fDC;
-                HBITMAP     fBitmap;
-                HFONT       fFont;
-                COLORREF    fTextColor;
-                int         fSaveNum;
+    public:
+        HDC         fDC;
+        HBITMAP     fBitmap;
+        HFONT       fFont;
+        COLORREF    fTextColor;
+        int         fSaveNum;
 
-                uint16_t      fWidth, fHeight;
+        uint16_t      fWidth, fHeight;
 
-                char        *fFontFace;
-                uint16_t      fFontSize;
-                uint8_t       fFontFlags;
-                bool        fFontAntiAliasRGB, fFontBlockedRGB;
+        char*        fFontFace;
+        uint16_t      fFontSize;
+        uint8_t       fFontFlags;
+        bool        fFontAntiAliasRGB, fFontBlockedRGB;
 
-                plWinSurface();
-                ~plWinSurface();
+        plWinSurface();
+        ~plWinSurface();
 
-                void    Allocate( uint16_t w, uint16_t h );
-                void    Release( void );
+        void    Allocate(uint16_t w, uint16_t h);
+        void    Release(void);
 
-                bool    WillFit( uint16_t w, uint16_t h );
-                bool    FontMatches( const char *face, uint16_t size, uint8_t flags, bool aaRGB );
-                void    SetFont( const char *face, uint16_t size, uint8_t flags, bool aaRGB );
-        };
+        bool    WillFit(uint16_t w, uint16_t h);
+        bool    FontMatches(const char* face, uint16_t size, uint8_t flags, bool aaRGB);
+        void    SetFont(const char* face, uint16_t size, uint8_t flags, bool aaRGB);
+    };
 
-        class plWinRGBSurface : public plWinSurface
-        {
-                virtual uint8_t   IBitsPerPixel( void ) const { return 32; }
-            public:
-                uint32_t  *GetBits( void ) const { return (uint32_t *)fBits; }
-        };
+    class plWinRGBSurface : public plWinSurface {
+        virtual uint8_t   IBitsPerPixel(void) const {
+            return 32;
+        }
+    public:
+        uint32_t*  GetBits(void) const {
+            return (uint32_t*)fBits;
+        }
+    };
 
-        class plWinAlphaSurface : public plWinSurface
-        {
-                virtual uint8_t   IBitsPerPixel( void ) const { return 8; }
-            public:
-                uint8_t   *GetBits( void ) const { return (uint8_t *)fBits; }
-        };
+    class plWinAlphaSurface : public plWinSurface {
+        virtual uint8_t   IBitsPerPixel(void) const {
+            return 8;
+        }
+    public:
+        uint8_t*   GetBits(void) const {
+            return (uint8_t*)fBits;
+        }
+    };
 
-        plWinRGBSurface     fRGBSurface;
-        plWinAlphaSurface   fAlphaSurface;
+    plWinRGBSurface     fRGBSurface;
+    plWinAlphaSurface   fAlphaSurface;
 #endif
 };
 

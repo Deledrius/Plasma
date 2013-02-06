@@ -46,61 +46,67 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class INode;
 
-class plAutoUIComp : public plAutoUIBase
-{
+class plAutoUIComp : public plAutoUIBase {
 public:
-    plAutoUIComp(plAutoUIClassDesc *cd);
+    plAutoUIComp(plAutoUIClassDesc* cd);
 
     /////////////////////////////////////////////////////////////////////////////////////
     // Get the value of a control.  Pass in the id and your 'this' pointer.
     //
-    bool     GetCheckBox(int16_t id, plComponentBase *comp);
-    float GetFloatSpinner(int16_t id, plComponentBase *comp);
-    int      GetIntSpinner(int16_t id, plComponentBase *comp);
-    TSTR     GetEditBox(int16_t id, plComponentBase *comp);
-    INode*   GetPickNode(int16_t id, plComponentBase *comp, int idx);
+    bool     GetCheckBox(int16_t id, plComponentBase* comp);
+    float GetFloatSpinner(int16_t id, plComponentBase* comp);
+    int      GetIntSpinner(int16_t id, plComponentBase* comp);
+    TSTR     GetEditBox(int16_t id, plComponentBase* comp);
+    INode*   GetPickNode(int16_t id, plComponentBase* comp, int idx);
 
     // Get the count for a parameter that takes an index
-    int Count(int16_t id, plComponentBase *comp);
+    int Count(int16_t id, plComponentBase* comp);
 
     /////////////////////////////////////////////////////////////////////////////////////
     // Max/internal functions
     //
     // Called by the ClassDesc.
-    void BeginEditParams(IObjParam *ip, ReferenceMaker *obj, ULONG flags, Animatable *prev);
-    void EndEditParams(IObjParam *ip, ReferenceMaker *obj, ULONG flags, Animatable *prev);
+    void BeginEditParams(IObjParam* ip, ReferenceMaker* obj, ULONG flags, Animatable* prev);
+    void EndEditParams(IObjParam* ip, ReferenceMaker* obj, ULONG flags, Animatable* prev);
 };
 
-class plAutoUIClassDesc : public plComponentClassDesc
-{
+class plAutoUIClassDesc : public plComponentClassDesc {
 public:
-    virtual bool IsAutoUI() { return true; }
-    virtual bool IsObsolete()   { return true; }
-
-    plAutoUIComp *autoComp;
-    void BeginEditParams(IObjParam *ip, ReferenceMaker* obj, ULONG flags, Animatable *prev)
-    {
-        ClassDesc2::BeginEditParams(ip, obj, flags, prev);
-        if (autoComp) autoComp->BeginEditParams(ip, obj, flags, prev);
+    virtual bool IsAutoUI() {
+        return true;
     }
-    void EndEditParams(IObjParam *ip, ReferenceMaker* obj, ULONG flags, Animatable *prev)
-    {
-        if (autoComp) autoComp->EndEditParams(ip, obj, flags, prev);
+    virtual bool IsObsolete()   {
+        return true;
+    }
+
+    plAutoUIComp* autoComp;
+    void BeginEditParams(IObjParam* ip, ReferenceMaker* obj, ULONG flags, Animatable* prev) {
+        ClassDesc2::BeginEditParams(ip, obj, flags, prev);
+
+        if (autoComp) {
+            autoComp->BeginEditParams(ip, obj, flags, prev);
+        }
+    }
+    void EndEditParams(IObjParam* ip, ReferenceMaker* obj, ULONG flags, Animatable* prev) {
+        if (autoComp) {
+            autoComp->EndEditParams(ip, obj, flags, prev);
+        }
+
         ClassDesc2::EndEditParams(ip, obj, flags, prev);
     }
-    void CreateAutoRollup(IParamBlock2 *pb)
-    {
-        if (autoComp)
+    void CreateAutoRollup(IParamBlock2* pb) {
+        if (autoComp) {
             autoComp->CreateAutoRollup(pb);
+        }
     }
-    void DestroyAutoRollup()
-    {
-        if (autoComp)
+    void DestroyAutoRollup() {
+        if (autoComp) {
             autoComp->DestroyAutoRollup();
+        }
     }
 };
 
-void plExternalComponentReg(ClassDesc *desc);
+void plExternalComponentReg(ClassDesc* desc);
 
 #define AUTO_CLASS_DESC(classname, varname, longname, shortname, category, id)  \
 class classname##ClassDesc : public plAutoUIClassDesc                           \
@@ -110,7 +116,7 @@ class classname##ClassDesc : public plAutoUIClassDesc                           
 };                                                                              \
 DECLARE_CLASS_DESC(classname, varname)
 
-// 
+//
 void ReleaseGlobals();
 
 //

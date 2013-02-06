@@ -58,26 +58,36 @@ pyGameMgrMsg::pyGameMgrMsg(pfGameMgrMsg* msg): message(msg) {}
 
 int pyGameMgrMsg::GetType() const
 {
-    if (message)
+    if (message) {
         return message->netMsg->messageId;
+    }
+
     return -1;
 }
 
 PyObject* pyGameMgrMsg::UpcastToInviteReceivedMsg() const
 {
-    if (!message)
+    if (!message) {
         PYTHON_RETURN_NONE;
-    if (message->netMsg->messageId != kSrv2Cli_GameMgr_InviteReceived)
+    }
+
+    if (message->netMsg->messageId != kSrv2Cli_GameMgr_InviteReceived) {
         PYTHON_RETURN_NONE;
+    }
+
     return pyGameMgrInviteReceivedMsg::New(message);
 }
 
 PyObject* pyGameMgrMsg::UpcastToInviteRevokedMsg() const
 {
-    if (!message)
+    if (!message) {
         PYTHON_RETURN_NONE;
-    if (message->netMsg->messageId != kSrv2Cli_GameMgr_InviteRevoked)
+    }
+
+    if (message->netMsg->messageId != kSrv2Cli_GameMgr_InviteRevoked) {
         PYTHON_RETURN_NONE;
+    }
+
     return pyGameMgrInviteRevokedMsg::New(message);
 }
 
@@ -90,37 +100,38 @@ pyGameMgrInviteReceivedMsg::pyGameMgrInviteReceivedMsg(): pyGameMgrMsg() {}
 
 pyGameMgrInviteReceivedMsg::pyGameMgrInviteReceivedMsg(pfGameMgrMsg* msg): pyGameMgrMsg(msg)
 {
-    if (message && (message->netMsg->messageId != kSrv2Cli_GameMgr_InviteReceived))
-        message = nil; // wrong type, just clear it out
+    if (message && (message->netMsg->messageId != kSrv2Cli_GameMgr_InviteReceived)) {
+        message = nil;    // wrong type, just clear it out
+    }
 }
 
 uint32_t pyGameMgrInviteReceivedMsg::InviterID() const
 {
-    if (message)
-    {
+    if (message) {
         const Srv2Cli_GameMgr_InviteReceived* gmMsg = (const Srv2Cli_GameMgr_InviteReceived*)message->netMsg;
         return gmMsg->inviterId;
     }
+
     return 0;
 }
 
 plUUID pyGameMgrInviteReceivedMsg::GameTypeID() const
 {
-    if (message)
-    {
+    if (message) {
         const Srv2Cli_GameMgr_InviteReceived* gmMsg = (const Srv2Cli_GameMgr_InviteReceived*)message->netMsg;
         return gmMsg->gameTypeId;
     }
+
     return kNilUuid;
 }
 
 uint32_t pyGameMgrInviteReceivedMsg::NewGameID() const
 {
-    if (message)
-    {
+    if (message) {
         const Srv2Cli_GameMgr_InviteReceived* gmMsg = (const Srv2Cli_GameMgr_InviteReceived*)message->netMsg;
         return gmMsg->newGameId;
     }
+
     return 0;
 }
 
@@ -129,36 +140,37 @@ pyGameMgrInviteRevokedMsg::pyGameMgrInviteRevokedMsg(): pyGameMgrMsg() {}
 
 pyGameMgrInviteRevokedMsg::pyGameMgrInviteRevokedMsg(pfGameMgrMsg* msg): pyGameMgrMsg(msg)
 {
-    if (message && (message->netMsg->messageId != kSrv2Cli_GameMgr_InviteRevoked))
-        message = nil; // wrong type, just clear it out
+    if (message && (message->netMsg->messageId != kSrv2Cli_GameMgr_InviteRevoked)) {
+        message = nil;    // wrong type, just clear it out
+    }
 }
 
 uint32_t pyGameMgrInviteRevokedMsg::InviterID() const
 {
-    if (message)
-    {
+    if (message) {
         const Srv2Cli_GameMgr_InviteRevoked* gmMsg = (const Srv2Cli_GameMgr_InviteRevoked*)message->netMsg;
         return gmMsg->inviterId;
     }
+
     return 0;
 }
 
 plUUID pyGameMgrInviteRevokedMsg::GameTypeID() const
 {
-    if (message)
-    {
+    if (message) {
         const Srv2Cli_GameMgr_InviteRevoked* gmMsg = (const Srv2Cli_GameMgr_InviteRevoked*)message->netMsg;
         return gmMsg->gameTypeId;
     }
+
     return kNilUuid;
 }
 
 uint32_t pyGameMgrInviteRevokedMsg::NewGameID() const
 {
-    if (message)
-    {
+    if (message) {
         const Srv2Cli_GameMgr_InviteRevoked* gmMsg = (const Srv2Cli_GameMgr_InviteRevoked*)message->netMsg;
         return gmMsg->newGameId;
     }
+
     return 0;
 }

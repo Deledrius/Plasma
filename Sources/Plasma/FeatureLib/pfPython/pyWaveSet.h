@@ -54,8 +54,7 @@ class pyVector3;
 // pyWaveSet   - a wrapper class to provide interface to wave sets
 //
 //////////////////////////////////////////////////////////////////////
-class pyWaveSet
-{
+class pyWaveSet {
 private:
     plKey fWaterKey;
 
@@ -67,14 +66,16 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptWaveSet);
-    static PyObject *New(plKey key);
-    static PyObject *New(pyKey& key);
+    static PyObject* New(plKey key);
+    static PyObject* New(pyKey& key);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyWaveSet object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyWaveSet); // converts a PyObject to a pyWaveSet (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
-    void setKey(pyKey& key) {fWaterKey = key.getKey();} // for python glue only, do NOT call
+    void setKey(pyKey& key) {
+        fWaterKey = key.getKey();   // for python glue only, do NOT call
+    }
 
     // ==============================================================================
     // Set functions
@@ -82,63 +83,63 @@ public:
 
     // Geometric wave parameters. These are all safe to twiddle at any time or speed.
     // The new settings take effect as new waves are spawned.
-    
-    void SetGeoMaxLength(float s, float secs=0);
-    void SetGeoMinLength(float s, float secs=0);
-    void SetGeoAmpOverLen(float s, float secs=0);
-    void SetGeoChop(float s, float secs=0);
-    void SetGeoAngleDev(float s, float secs=0);
+
+    void SetGeoMaxLength(float s, float secs = 0);
+    void SetGeoMinLength(float s, float secs = 0);
+    void SetGeoAmpOverLen(float s, float secs = 0);
+    void SetGeoChop(float s, float secs = 0);
+    void SetGeoAngleDev(float s, float secs = 0);
 
     // Texture wave parameters. Safe to twiddle any time or speed.
     // The new settings take effect as new waves are spawned.
 
-    void SetTexMaxLength(float s, float secs=0);
-    void SetTexMinLength(float s, float secs=0);
-    void SetTexAmpOverLen(float s, float secs=0);
-    void SetTexChop(float s, float secs=0);
-    void SetTexAngleDev(float s, float secs=0);
+    void SetTexMaxLength(float s, float secs = 0);
+    void SetTexMinLength(float s, float secs = 0);
+    void SetTexAmpOverLen(float s, float secs = 0);
+    void SetTexChop(float s, float secs = 0);
+    void SetTexAngleDev(float s, float secs = 0);
 
-    // The size in feet of one tile of the ripple texture. If you change this (I don't 
+    // The size in feet of one tile of the ripple texture. If you change this (I don't
     // recommend it), you need to change it very slowly or it will look very stupid.
-    void SetRippleScale(float s, float secs=0);
+    void SetRippleScale(float s, float secs = 0);
 
     // The direction the wind is blowing (waves will be more or less perpindicular to wind dir).
     // Change somewhat slowly, like over 30 seconds.
-    void SetWindDir(const pyVector3& s, float secs=0);
+    void SetWindDir(const pyVector3& s, float secs = 0);
 
     // Change these gently, effect is immediate.
-    void SetSpecularNoise(float s, float secs=0);
-    void SetSpecularStart(float s, float secs=0);
-    void SetSpecularEnd(float s, float secs=0);
+    void SetSpecularNoise(float s, float secs = 0);
+    void SetSpecularStart(float s, float secs = 0);
+    void SetSpecularEnd(float s, float secs = 0);
 
     // Water Height is overriden if the ref object is animated.
-    void SetWaterHeight(float s, float secs=0);
+    void SetWaterHeight(float s, float secs = 0);
 
     // Water Offset and DepthFalloff are complicated, and not immediately interesting to animate.
-    void SetWaterOffset(const pyVector3& s, float secs=0);
-        void SetOpacOffset(float s, float secs=0);
-        void SetReflOffset(float s, float secs=0);
-        void SetWaveOffset(float s, float secs=0);
-    void SetDepthFalloff(const pyVector3& s, float secs=0);
-        void SetOpacFalloff(float s, float secs=0);
-        void SetReflFalloff(float s, float secs=0);
-        void SetWaveFalloff(float s, float secs=0);
+    void SetWaterOffset(const pyVector3& s, float secs = 0);
+    void SetOpacOffset(float s, float secs = 0);
+    void SetReflOffset(float s, float secs = 0);
+    void SetWaveOffset(float s, float secs = 0);
+    void SetDepthFalloff(const pyVector3& s, float secs = 0);
+    void SetOpacFalloff(float s, float secs = 0);
+    void SetReflFalloff(float s, float secs = 0);
+    void SetWaveFalloff(float s, float secs = 0);
 
     // Max and Min Atten aren't very interesting, and will probably go away.
-    void SetMaxAtten(const pyVector3& s, float secs=0);
-    void SetMinAtten(const pyVector3& s, float secs=0);
+    void SetMaxAtten(const pyVector3& s, float secs = 0);
+    void SetMinAtten(const pyVector3& s, float secs = 0);
 
     // Water colors, adjust slowly, effect is immediate.
-    void SetWaterTint(pyColor& s, float secs=0);
-    void SetWaterOpacity(float s, float secs=0);
-    void SetSpecularTint(pyColor& s, float secs=0);
-    void SetSpecularMute(float s, float secs=0);
+    void SetWaterTint(pyColor& s, float secs = 0);
+    void SetWaterOpacity(float s, float secs = 0);
+    void SetSpecularTint(pyColor& s, float secs = 0);
+    void SetSpecularMute(float s, float secs = 0);
 
     // The environment map is essentially projected onto a sphere. Moving the center of
     // the sphere north will move the reflections north, changing the radius of the
     // sphere effects parallax in the obvious way.
-    void SetEnvCenter(const pyPoint3& s, float secs=0);
-    void SetEnvRadius(float s, float secs=0);
+    void SetEnvCenter(const pyPoint3& s, float secs = 0);
+    void SetEnvRadius(float s, float secs = 0);
 
     // ==============================================================================
     // Get functions
@@ -167,13 +168,13 @@ public:
     float GetWaterHeight() const;
 
     PyObject* GetWaterOffset() const; // returns pyVector3
-        float GetOpacOffset() const;
-        float GetReflOffset() const;
-        float GetWaveOffset() const;
+    float GetOpacOffset() const;
+    float GetReflOffset() const;
+    float GetWaveOffset() const;
     PyObject* GetDepthFalloff() const; // returns pyVector3
-        float GetOpacFalloff() const;
-        float GetReflFalloff() const;
-        float GetWaveFalloff() const;
+    float GetOpacFalloff() const;
+    float GetReflFalloff() const;
+    float GetWaveFalloff() const;
 
     PyObject* GetMaxAtten() const; // returns pyVector3
     PyObject* GetMinAtten() const; // returns pyVector3

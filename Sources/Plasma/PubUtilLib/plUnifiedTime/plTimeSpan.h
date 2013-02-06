@@ -44,14 +44,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plUnifiedTime.h"
 
-class plTimeSpan : public plUnifiedTime
-{
+class plTimeSpan : public plUnifiedTime {
 public:
-    plTimeSpan():plUnifiedTime() {}
-    plTimeSpan(const timeval & tv):plUnifiedTime(tv) {}
-    plTimeSpan(time_t t):plUnifiedTime(t) {}
-    plTimeSpan(int year, int month, int day, int hour, int min, int sec, unsigned long usec=0, int dst=-1):plUnifiedTime(year, month, day, hour, min, sec, usec, dst) {}
-    plTimeSpan(const plUnifiedTime & src):plUnifiedTime(src) {}
+    plTimeSpan(): plUnifiedTime() {}
+    plTimeSpan(const timeval& tv): plUnifiedTime(tv) {}
+    plTimeSpan(time_t t): plUnifiedTime(t) {}
+    plTimeSpan(int year, int month, int day, int hour, int min, int sec, unsigned long usec = 0, int dst = -1): plUnifiedTime(year, month, day, hour, min, sec, usec, dst) {}
+    plTimeSpan(const plUnifiedTime& src): plUnifiedTime(src) {}
 
     // get length of span
     long GetTotalDays() const;

@@ -61,16 +61,19 @@ plSDLModifier::~plSDLModifier()
 }
 
 plKey plSDLModifier::GetStateOwnerKey() const
-{ 
-    return GetTarget() ? GetTarget()->GetKey() : nil; 
+{
+    return GetTarget() ? GetTarget()->GetKey() : nil;
 }
 
-void plSDLModifier::AddTarget(plSceneObject* so) 
+void plSDLModifier::AddTarget(plSceneObject* so)
 {
-    if (so)
+    if (so) {
         plSingleModifier::AddTarget(so);
-    if (!fStateCache)
+    }
+
+    if (!fStateCache) {
         fStateCache = new plStateDataRecord(GetSDLName());
+    }
 }
 
 uint32_t plSDLModifier::IApplyModFlags(uint32_t sendFlags)
@@ -86,21 +89,25 @@ void plSDLModifier::ISendNetMsg(plStateDataRecord*& state, plKey senderKey, uint
     hsAssert(senderKey, "nil senderKey?");
 
     plSynchedObject* sobj = plSynchedObject::ConvertNoRef(senderKey->ObjectIsLoaded());
-    if (sobj && (sobj->IsInSDLVolatileList(GetSDLName())))
+
+    if (sobj && (sobj->IsInSDLVolatileList(GetSDLName()))) {
         state->SetFlags(state->GetFlags() | plStateDataRecord::kVolatile);
+    }
 
     bool dirtyOnly = (sendFlags & plSynchedObject::kForceFullSend) == 0;
     bool broadcast = (sendFlags & plSynchedObject::kBCastToClients) != 0;
-    int writeOptions=0;
+    int writeOptions = 0;
 //  if (dirtyOnly)
-        writeOptions |= plSDL::kDirtyOnly;
-    if (broadcast)
+    writeOptions |= plSDL::kDirtyOnly;
+
+    if (broadcast) {
         writeOptions |= plSDL::kBroadcast;
-        
+    }
+
     writeOptions |= plSDL::kTimeStampOnRead;
-    
+
     plNetClientMgr::GetInstance()->StoreSDLState(state, senderKey->GetUoid(), sendFlags, writeOptions);
-        
+
     fSentOrRecvdState = true;
 }
 
@@ -110,32 +117,26 @@ void plSDLModifier::ISendNetMsg(plStateDataRecord*& state, plKey senderKey, uint
 bool plSDLModifier::MsgReceive(plMessage* msg)
 {
     plSDLModifierMsg* sdlMsg = plSDLModifierMsg::ConvertNoRef(msg);
-    if (sdlMsg && !sdlMsg->GetSDLName().CompareI(GetSDLName()))
-    {       
+
+    if (sdlMsg && !sdlMsg->GetSDLName().CompareI(GetSDLName())) {
         uint32_t sendFlags = IApplyModFlags(sdlMsg->GetFlags());
 
-        if (!fSentOrRecvdState)
+        if (!fSentOrRecvdState) {
             sendFlags |= plSynchedObject::kNewState;
-        
-        if (sdlMsg->GetAction()==plSDLModifierMsg::kSendToServer)
-        {
+        }
+
+        if (sdlMsg->GetAction() == plSDLModifierMsg::kSendToServer) {
             // local player is changing the state and sending it out
-            plStateChangeNotifier::SetCurrentPlayerID(plNetClientApp::GetInstance()->GetPlayerID());    
+            plStateChangeNotifier::SetCurrentPlayerID(plNetClientApp::GetInstance()->GetPlayerID());
 
             SendState(sendFlags);
-        }
-        else
-        if (sdlMsg->GetAction()==plSDLModifierMsg::kSendToServerAndClients)
-        {
+        } else if (sdlMsg->GetAction() == plSDLModifierMsg::kSendToServerAndClients) {
             // local player is changing the state and sending it out
             plStateChangeNotifier::SetCurrentPlayerID(plNetClientApp::GetInstance()->GetPlayerID());
 
             SendState(sendFlags | plSynchedObject::kBCastToClients);
-        }
-        else
-        if (sdlMsg->GetAction()==plSDLModifierMsg::kRecv)
-        {
-            plStateDataRecord* sdRec=sdlMsg->GetState();
+        } else if (sdlMsg->GetAction() == plSDLModifierMsg::kRecv) {
+            plStateDataRecord* sdRec = sdlMsg->GetState();
             plStateChangeNotifier::SetCurrentPlayerID(sdlMsg->GetPlayerID());   // remote player changed the state
             ReceiveState(sdRec);
         }
@@ -149,38 +150,36 @@ bool plSDLModifier::MsgReceive(plMessage* msg)
 //
 // send a state update
 //
-bool gMooseDump=false;
+bool gMooseDump = false;
 void plSDLModifier::SendState(uint32_t sendFlags)
 {
     hsAssert(fStateCache, "nil stateCache");
 
-    bool debugObject = (plNetObjectDebugger::GetInstance() && 
-            plNetObjectDebugger::GetInstance()->IsDebugObject(GetStateOwnerKey()->ObjectIsLoaded()));
-    
+    bool debugObject = (plNetObjectDebugger::GetInstance() &&
+                        plNetObjectDebugger::GetInstance()->IsDebugObject(GetStateOwnerKey()->ObjectIsLoaded()));
+
     bool force = (sendFlags & plSynchedObject::kForceFullSend) != 0;
     bool broadcast = (sendFlags & plSynchedObject::kBCastToClients) != 0;
 
     // record current state
     plStateDataRecord* curState = new plStateDataRecord(GetSDLName());
     IPutCurrentStateIn(curState);   // return sdl record which reflects current state of sceneObj, dirties curState
-    if (!force)
-    {
+
+    if (!force) {
         curState->FlagDifferentState(*fStateCache); // flag items which are different from localCopy as dirty
     }
 
-    if (curState->IsDirty())
-    {
+    if (curState->IsDirty()) {
         // send current state
         bool dirtyOnly = force ? false : true;
         ISendNetMsg(curState, GetStateOwnerKey(), sendFlags);           // send the state
 
-        if (debugObject)
-        {
-            gMooseDump=true;
+        if (debugObject) {
+            gMooseDump = true;
             plNetObjectDebugger::GetInstance()->SetDebugging(true);
             curState->DumpToObjectDebugger(plString::Format("Object %s SENDS SDL state",
-                GetStateOwnerKey()->GetName().c_str(), dirtyOnly).c_str());
-            gMooseDump=false;
+                                           GetStateOwnerKey()->GetName().c_str(), dirtyOnly).c_str());
+            gMooseDump = false;
         }
 
         // cache current state, send notifications if necessary
@@ -188,10 +187,12 @@ void plSDLModifier::SendState(uint32_t sendFlags)
 
         ISentState(curState);
     }
+
     delete curState;
 
-    if (plNetObjectDebugger::GetInstance())
+    if (plNetObjectDebugger::GetInstance()) {
         plNetObjectDebugger::GetInstance()->SetDebugging(false);
+    }
 }
 
 void plSDLModifier::ReceiveState(const plStateDataRecord* srcState)
@@ -199,34 +200,31 @@ void plSDLModifier::ReceiveState(const plStateDataRecord* srcState)
     hsAssert(fStateCache, "nil stateCache");
 
     if (plNetObjectDebugger::GetInstance() &&
-        plNetObjectDebugger::GetInstance()->IsDebugObject(GetStateOwnerKey()->ObjectIsLoaded()))
-    {
-        gMooseDump=true;
+            plNetObjectDebugger::GetInstance()->IsDebugObject(GetStateOwnerKey()->ObjectIsLoaded())) {
+        gMooseDump = true;
         plNetObjectDebugger::GetInstance()->SetDebugging(true);
         srcState->DumpToObjectDebugger(plString::Format("Object %s RECVS SDL state",
-            GetStateOwnerKey()->GetName().c_str()).c_str());
-        gMooseDump=false;
+                                       GetStateOwnerKey()->GetName().c_str()).c_str());
+        gMooseDump = false;
     }
 
-    if (srcState->IsUsed())
-    {
+    if (srcState->IsUsed()) {
         plSynchEnabler ps(false);   // disable dirty tracking while we are receiving/applying state
 
         // apply incoming state
         ISetCurrentStateFrom(srcState);         // apply incoming state to sceneObj
 
-        // cache state, send notifications if necessary 
+        // cache state, send notifications if necessary
         fStateCache->UpdateFrom(*srcState, false);  // update local copy of state
         fSentOrRecvdState = true;
-    }
-    else
-    {
+    } else {
         plNetClientApp::GetInstance()->DebugMsg("\tReceiving and ignoring unused SDL state msg: type %s, object %s",
-            GetSDLName(), GetStateOwnerKey()->GetName().c_str());
+                                                GetSDLName(), GetStateOwnerKey()->GetName().c_str());
     }
 
-    if (plNetObjectDebugger::GetInstance())
+    if (plNetObjectDebugger::GetInstance()) {
         plNetObjectDebugger::GetInstance()->SetDebugging(false);
+    }
 }
 
 void plSDLModifier::AddNotifyForVar(plKey key, const plString& varName, float tolerance) const
@@ -235,11 +233,13 @@ void plSDLModifier::AddNotifyForVar(plKey key, const plString& varName, float to
     plStateChangeNotifier notifier(tolerance, key);
     // set the notification
     plStateDataRecord* rec = GetStateCache();
-    if (rec)
-    {
+
+    if (rec) {
         plSimpleStateVariable* var = rec->FindVar(varName);
+
         // was the variable found?
-        if (var)
+        if (var) {
             var->AddStateChangeNotification(notifier);
+        }
     }
 }

@@ -46,32 +46,31 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 /** \class plSwimMsg
     You're either entering the pool, or leaving. Those are the only swim messages right now.
-*/  
-class plSwimMsg : public plMessage
-{
+*/
+class plSwimMsg : public plMessage {
 public:
 
     // tors
     plSwimMsg();
-    plSwimMsg(const plKey &sender, const plKey &receiver, bool entering, plKey regionKey);
+    plSwimMsg(const plKey& sender, const plKey& receiver, bool entering, plKey regionKey);
 
 
     bool GetIsEntering();
     bool GetIsLeaving();
 
     // plasma protocol
-    CLASSNAME_REGISTER( plSwimMsg );
-    GETINTERFACE_ANY( plSwimMsg, plMessage );
+    CLASSNAME_REGISTER(plSwimMsg);
+    GETINTERFACE_ANY(plSwimMsg, plMessage);
 
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     plKey fSwimRegionKey;
-    
+
 private:
     bool fIsEntering;   // right now, if you're not entering, you're leaving
-                        // that might not be so simple later, so we hide it
-                        // behind a getter.
+    // that might not be so simple later, so we hide it
+    // behind a getter.
 };
 
 

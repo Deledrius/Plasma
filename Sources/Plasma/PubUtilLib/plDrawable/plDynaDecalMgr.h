@@ -83,11 +83,9 @@ class plPipeline;
 
 // plDynaDecalInfo - information we store specific to what we've
 // done about a specific avatar part or scene object.
-class plDynaDecalInfo
-{
+class plDynaDecalInfo {
 public:
-    enum
-    {
+    enum {
         kNone           = 0x0,
         kImmersed       = 0x1,
         kActive         = 0x2
@@ -115,17 +113,15 @@ typedef std::map< uintptr_t, plDynaDecalInfo, std::less<uintptr_t> > plDynaDecal
 //  Create DynaDecals and destroy them when they expire.
 //  Assign vertex and index subsets to DynaDecals
 //  Call Update on DynaDecals
-class plDynaDecalMgr : public plSynchedObject
-{
+class plDynaDecalMgr : public plSynchedObject {
 public:
-    enum DynaRefType
-    {
+    enum DynaRefType {
         kRefMatPreShade,
         kRefMatRTShade,
         kRefTarget,
         kRefAvatar,
         kRefPartyObject,
-        kRefParticles, 
+        kRefParticles,
         kRefNextAvailable   = 10
     };
 protected:
@@ -156,7 +152,7 @@ protected:
     uint16_t                      fMaxNumIdx;
 
     uint32_t                      fWaitOnEnable;
-    
+
     float                    fWetLength;
     float                    fRampEnd;
     float                    fDecayStart;
@@ -169,7 +165,7 @@ protected:
     hsVector3                   fScale;
 
     // some temp calculated stuff
-    float                    fInitAtten; 
+    float                    fInitAtten;
     // These 4 are in normalized units [0..1], not feet.
     float                    fMinDepth;
     float                    fMinDepthRange;
@@ -225,7 +221,7 @@ protected:
 
     void                ISetDepthFalloff(); // Sets from current cutter settings.
 
-    virtual void        ICutoutCallback(const hsTArray<plCutoutPoly>& cutouts, bool hasWaterHeight=false, float waterHeight=0.f);
+    virtual void        ICutoutCallback(const hsTArray<plCutoutPoly>& cutouts, bool hasWaterHeight = false, float waterHeight = 0.f);
 
     hsGMaterial*        IConvertToEnvMap(hsGMaterial* mat, plBitmap* envMap);
 
@@ -241,8 +237,8 @@ public:
     plDynaDecalMgr();
     virtual ~plDynaDecalMgr();
 
-    CLASSNAME_REGISTER( plDynaDecalMgr );
-    GETINTERFACE_ANY( plDynaDecalMgr, plSynchedObject );
+    CLASSNAME_REGISTER(plDynaDecalMgr);
+    GETINTERFACE_ANY(plDynaDecalMgr, plSynchedObject);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -253,40 +249,90 @@ public:
     // a DynaDecalMgr on the fly. It's normally called on Read().
     void    InitAuxSpans();
 
-    void SetScale(const hsVector3& v) { fScale = v; }
-    const hsVector3& GetScale() const { return fScale; }
+    void SetScale(const hsVector3& v) {
+        fScale = v;
+    }
+    const hsVector3& GetScale() const {
+        return fScale;
+    }
 
-    void SetWaitOnEnable(bool on) { fWaitOnEnable = on; }
-    bool GetWaitOnEnable() const { return fWaitOnEnable; }
+    void SetWaitOnEnable(bool on) {
+        fWaitOnEnable = on;
+    }
+    bool GetWaitOnEnable() const {
+        return fWaitOnEnable;
+    }
 
-    void SetWetLength(float f) { fWetLength = f; }
-    void SetRampEnd(float f) { fRampEnd = f; }
-    void SetDecayStart(float f) { fDecayStart = f; }
-    void SetLifeSpan(float f) { fLifeSpan = f; }
-    void SetIntensity(float f) { fIntensity = f; }
-    float GetWetLength() const { return fWetLength; }
-    float GetRampEnd() const { return fRampEnd; }
-    float GetDecayStart() const { return fDecayStart; }
-    float GetLifeSpan() const { return fLifeSpan; }
-    float GetIntensity() const { return fIntensity; }
+    void SetWetLength(float f) {
+        fWetLength = f;
+    }
+    void SetRampEnd(float f) {
+        fRampEnd = f;
+    }
+    void SetDecayStart(float f) {
+        fDecayStart = f;
+    }
+    void SetLifeSpan(float f) {
+        fLifeSpan = f;
+    }
+    void SetIntensity(float f) {
+        fIntensity = f;
+    }
+    float GetWetLength() const {
+        return fWetLength;
+    }
+    float GetRampEnd() const {
+        return fRampEnd;
+    }
+    float GetDecayStart() const {
+        return fDecayStart;
+    }
+    float GetLifeSpan() const {
+        return fLifeSpan;
+    }
+    float GetIntensity() const {
+        return fIntensity;
+    }
 
-    void        SetPartyTime(float secs) { fPartyTime = secs; } // Duration of particle spewage
-    float    GetPartyTime() const { return fPartyTime; }
+    void        SetPartyTime(float secs) {
+        fPartyTime = secs;    // Duration of particle spewage
+    }
+    float    GetPartyTime() const {
+        return fPartyTime;
+    }
 
     void ConvertToEnvMap(plBitmap* envMap);
     const plMipmap* GetMipmap() const;
 
-    void AddNotify(const plKey& k) { fNotifies.Append(k); }
-    uint32_t GetNumNotifies() const { return fNotifies.GetCount(); }
-    const plKey& GetNotify(int i) const { return fNotifies[i]; }
+    void AddNotify(const plKey& k) {
+        fNotifies.Append(k);
+    }
+    uint32_t GetNumNotifies() const {
+        return fNotifies.GetCount();
+    }
+    const plKey& GetNotify(int i) const {
+        return fNotifies[i];
+    }
 
-    static void SetDisableAccumulate(bool on) { fDisableAccumulate = on; }
-    static void ToggleDisableAccumulate() { fDisableAccumulate = !fDisableAccumulate; }
-    static bool GetDisableAccumulate() { return fDisableAccumulate; }
+    static void SetDisableAccumulate(bool on) {
+        fDisableAccumulate = on;
+    }
+    static void ToggleDisableAccumulate() {
+        fDisableAccumulate = !fDisableAccumulate;
+    }
+    static bool GetDisableAccumulate() {
+        return fDisableAccumulate;
+    }
 
-    static void SetDisableUpdate(bool on) { fDisableUpdate = on; }
-    static void ToggleDisableUpdate() { fDisableUpdate = !fDisableUpdate; }
-    static bool GetDisableUpdate() { return fDisableUpdate; }
+    static void SetDisableUpdate(bool on) {
+        fDisableUpdate = on;
+    }
+    static void ToggleDisableUpdate() {
+        fDisableUpdate = !fDisableUpdate;
+    }
+    static bool GetDisableUpdate() {
+        return fDisableUpdate;
+    }
 };
 
 #endif // plDynaDecalMgr_inc

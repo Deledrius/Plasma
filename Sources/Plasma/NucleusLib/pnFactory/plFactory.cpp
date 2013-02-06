@@ -65,8 +65,9 @@ plFactory::~plFactory()
 
 bool plFactory::ICreateTheFactory()
 {
-    if( theFactory )
+    if (theFactory) {
         return true;
+    }
 
     theFactory = new plFactory;
 
@@ -81,10 +82,9 @@ uint16_t plFactory::IGetNumClasses()
 void plFactory::IForceShutdown()
 {
     int i;
-    for( i = 0; i < fCreators.GetCount(); i++ )
-    {
-        if( fCreators[i] )
-        {
+
+    for (i = 0; i < fCreators.GetCount(); i++) {
+        if (fCreators[i]) {
             hsRefCnt_SafeUnRef(this);
             fCreators[i] = nil;
         }
@@ -109,40 +109,43 @@ uint16_t plFactory::IRegister(uint16_t hClass, plCreator* worker)
 //
 bool plFactory::CanCreate(uint16_t hClass)
 {
-    if( hClass & 0x8000 )               // nil creatable
+    if (hClass & 0x8000) {              // nil creatable
         return false;
+    }
 
-    if( !theFactory && !ICreateTheFactory() )   // no factory
+    if (!theFactory && !ICreateTheFactory()) {  // no factory
         return false;
+    }
 
-    if( hClass >= theFactory->IGetNumClasses() )    // invalid index
+    if (hClass >= theFactory->IGetNumClasses()) {   // invalid index
         return false;
+    }
 
-    return ( theFactory->fCreators[ hClass ] != nil );  // check creator
+    return (theFactory->fCreators[ hClass ] != nil);    // check creator
 }
 
 plCreatable* plFactory::ICreate(uint16_t hClass)
 {
-    if (CanCreate(hClass))
-    {
+    if (CanCreate(hClass)) {
         return fCreators[hClass]->Create();
     }
 
-    if (!(hClass & 0x8000))
-    {
-        hsAssert( false, "Invalid class index or nil creator : plFactory::Create()" );  
+    if (!(hClass & 0x8000)) {
+        hsAssert(false, "Invalid class index or nil creator : plFactory::Create()");
     }
+
     return nil;
 }
 
 void plFactory::UnRegister(uint16_t hClass, plCreator* worker)
 {
-    if( theFactory )
-    {
+    if (theFactory) {
         theFactory->IUnRegister(hClass);
         hsRefCnt_SafeUnRef(theFactory);
-        if( theFactory->RefCnt() < 2 )
+
+        if (theFactory->RefCnt() < 2) {
             IShutdown();
+        }
     }
 }
 
@@ -153,8 +156,9 @@ void plFactory::IUnRegister(uint16_t hClass)
 
 uint16_t plFactory::Register(uint16_t hClass, plCreator* worker)
 {
-    if( !theFactory && !ICreateTheFactory() )
+    if (!theFactory && !ICreateTheFactory()) {
         return 0;
+    }
 
     hsRefCnt_SafeRef(theFactory);
     return theFactory->IRegister(hClass, worker);
@@ -162,8 +166,9 @@ uint16_t plFactory::Register(uint16_t hClass, plCreator* worker)
 
 plCreatable* plFactory::Create(uint16_t hClass)
 {
-    if( !theFactory && !ICreateTheFactory() )
-            return nil;
+    if (!theFactory && !ICreateTheFactory()) {
+        return nil;
+    }
 
     return theFactory->ICreate(hClass);
 }
@@ -172,24 +177,27 @@ plCreatable* plFactory::Create(uint16_t hClass)
 
 uint16_t plFactory::GetNumClasses()
 {
-    if( !theFactory && !ICreateTheFactory() )
+    if (!theFactory && !ICreateTheFactory()) {
         return 0;
+    }
 
     return theFactory->IGetNumClasses();
 }
 
 bool plFactory::IDerivesFrom(uint16_t hBase, uint16_t hDer)
 {
-    if( hDer >= fCreators.GetCount() )
+    if (hDer >= fCreators.GetCount()) {
         return false;
+    }
 
     return fCreators[hDer] ? fCreators[hDer]->HasBaseClass(hBase) : false;
 }
 
 bool plFactory::DerivesFrom(uint16_t hBase, uint16_t hDer)
 {
-    if( !theFactory && !ICreateTheFactory() )
+    if (!theFactory && !ICreateTheFactory()) {
         return 0;
+    }
 
     return theFactory->IDerivesFrom(hBase, hDer);
 }
@@ -197,26 +205,25 @@ bool plFactory::DerivesFrom(uint16_t hBase, uint16_t hDer)
 // slow lookup for things like console
 uint16_t plFactory::FindClassIndex(const char* className)
 {
-    int numClasses=GetNumClasses();
+    int numClasses = GetNumClasses();
 
-    if (className && theFactory)
-    {
+    if (className && theFactory) {
         int i;
-        for( i = 0; i < theFactory->fCreators.GetCount(); i++ )
-        {
-            if( theFactory->fCreators[i] && !stricmp(className, theFactory->fCreators[i]->ClassName()) )
-            {
+
+        for (i = 0; i < theFactory->fCreators.GetCount(); i++) {
+            if (theFactory->fCreators[i] && !stricmp(className, theFactory->fCreators[i]->ClassName())) {
                 return theFactory->fCreators[i]->ClassIndex();
             }
         }
     }
+
     return numClasses;      // err
 }
 
 
 bool plFactory::IIsValidClassIndex(uint16_t hClass)
 {
-    return ( hClass < fCreators.GetCount() );
+    return (hClass < fCreators.GetCount());
 }
 
 bool plFactory::IsValidClassIndex(uint16_t hClass)
@@ -237,20 +244,18 @@ void plFactory::SetTheFactory(plFactory* fac)
     //      go ahead and delete it.
     // 4) Our factory is nil and the new one is nil
     //      Shouldn't happen, but if it does, just ignore it.
-    if( !theFactory && fac )
-    {
+    if (!theFactory && fac) {
         hsRefCnt_SafeAssign(theFactory, fac);
-    }
-    else if( theFactory && fac )
-    {
+    } else if (theFactory && fac) {
         theFactory->IForceShutdown();
         hsRefCnt_SafeAssign(theFactory, fac);
-    }
-    else if( theFactory && !fac )
-    {
+    } else if (theFactory && !fac) {
         hsRefCnt_SafeUnRef(theFactory);
-        if( theFactory->RefCnt() < 2 )
+
+        if (theFactory->RefCnt() < 2) {
             delete theFactory;
+        }
+
         theFactory = nil;
     }
 
@@ -258,40 +263,46 @@ void plFactory::SetTheFactory(plFactory* fac)
 
 plFactory* plFactory::GetTheFactory()
 {
-    if( !theFactory && !ICreateTheFactory() )
-            return nil;
+    if (!theFactory && !ICreateTheFactory()) {
+        return nil;
+    }
 
     return theFactory;
 }
 
 // For my own nefarious purposes... hsStatusMessage  plCreatableIndex
-const char  *plFactory::GetNameOfClass(uint16_t type)
+const char*  plFactory::GetNameOfClass(uint16_t type)
 {
-    if( type < GetNumClasses() )
-    {
-        if( theFactory->fCreators[ type ] )
+    if (type < GetNumClasses()) {
+        if (theFactory->fCreators[ type ]) {
             return theFactory->fCreators[ type ]->ClassName();
-        
-        static int keyedStringsSize = sizeof(plCreatableStrings::fKeyedStrings)/4;
-        // If we don't have a creator yet, try falling back on plCreatableStrings
-        if( type < KEYED_OBJ_DELINEATOR && type<keyedStringsSize)
-            return plCreatableStrings::fKeyedStrings[ type ];
-
-        if (type < plCreatableIndex::kDatabaseStructIndexesStart)
-        {
-            static int nonKeyedStringsSize = sizeof(plCreatableStrings::fNonKeyedStrings)/4;
-            int idx=type - KEYED_OBJ_DELINEATOR;
-            if (idx<nonKeyedStringsSize)
-                return plCreatableStrings::fNonKeyedStrings[ idx ];
         }
 
-        static int nonKeyedPostDBStringsSize = sizeof(plCreatableStrings::fNonKeyedPostDBStrings)/4;
-        int idx=type - plCreatableIndex::kDatabaseStructIndexesEnd -1;
-        if (idx<nonKeyedPostDBStringsSize)
+        static int keyedStringsSize = sizeof(plCreatableStrings::fKeyedStrings) / 4;
+
+        // If we don't have a creator yet, try falling back on plCreatableStrings
+        if (type < KEYED_OBJ_DELINEATOR && type < keyedStringsSize) {
+            return plCreatableStrings::fKeyedStrings[ type ];
+        }
+
+        if (type < plCreatableIndex::kDatabaseStructIndexesStart) {
+            static int nonKeyedStringsSize = sizeof(plCreatableStrings::fNonKeyedStrings) / 4;
+            int idx = type - KEYED_OBJ_DELINEATOR;
+
+            if (idx < nonKeyedStringsSize) {
+                return plCreatableStrings::fNonKeyedStrings[ idx ];
+            }
+        }
+
+        static int nonKeyedPostDBStringsSize = sizeof(plCreatableStrings::fNonKeyedPostDBStrings) / 4;
+        int idx = type - plCreatableIndex::kDatabaseStructIndexesEnd - 1;
+
+        if (idx < nonKeyedPostDBStringsSize) {
             return plCreatableStrings::fNonKeyedPostDBStrings[ idx ];
+        }
     }
 
-    hsAssert(type < GetNumClasses() || type==0xffff,"InValid type");
+    hsAssert(type < GetNumClasses() || type == 0xffff, "InValid type");
     return nil;
 }
 
@@ -302,7 +313,7 @@ const char  *plFactory::GetNameOfClass(uint16_t type)
 **  Function Name:          Validate
 **  Input(s):               Void
 **  Output(s):              Void
-**  Function Description:   This function examines all the Workers in the Factory and compares their Factory 
+**  Function Description:   This function examines all the Workers in the Factory and compares their Factory
 **                              index to the Enums found in plCreatableIndex.  If they are Keyed objects, and
 **                              larger than 512 on the Factory index, or non-Keyed objects with a Factory
 **                              index of less than 512, exit with an Error Message.  Otherwise continue through
@@ -318,34 +329,29 @@ void plFactory::IValidate(uint16_t keyIndex)
 
     bool bogus = false;
 
-    for(int iter=0; iter < FactoryIndex; iter++)
-    {
-        if (IDerivesFrom(keyIndex, iter))
-        {
-            if(iter >= KEYED_OBJ_DELINEATOR && theFactory->fCreators[iter])
-            {
+    for (int iter = 0; iter < FactoryIndex; iter++) {
+        if (IDerivesFrom(keyIndex, iter)) {
+            if (iter >= KEYED_OBJ_DELINEATOR && theFactory->fCreators[iter]) {
                 char Buffer[512];
-                sprintf(Buffer, "Object %s is a hsKeyedObject, Must appear before 'KEYED_OBJ_DELINEATOR' in plCreatableIndex.h\n",GetNameOfClass(iter));
+                sprintf(Buffer, "Object %s is a hsKeyedObject, Must appear before 'KEYED_OBJ_DELINEATOR' in plCreatableIndex.h\n", GetNameOfClass(iter));
                 hsStatusMessage(Buffer);
                 bogus = true;
-            } 
-            
-        }
-        else
-        {
-            if(iter < KEYED_OBJ_DELINEATOR && theFactory->fCreators[iter])
-            {
+            }
+
+        } else {
+            if (iter < KEYED_OBJ_DELINEATOR && theFactory->fCreators[iter]) {
                 char Buffer[512];
-                sprintf(Buffer, "Object %s is NOT a hsKeyedObject, Must appear after 'KEYED_OBJ_DELINEATOR' in plCreatableIndex.h\n",GetNameOfClass(iter));
+                sprintf(Buffer, "Object %s is NOT a hsKeyedObject, Must appear after 'KEYED_OBJ_DELINEATOR' in plCreatableIndex.h\n", GetNameOfClass(iter));
                 hsStatusMessage(Buffer);
                 bogus = true;
-            
-            } 
+
+            }
         }
     }
-    hsAssert(!bogus,"The class(s) you just added to plCreatableIndex.h in wrong spot, see output window");
 
-}  
+    hsAssert(!bogus, "The class(s) you just added to plCreatableIndex.h in wrong spot, see output window");
+
+}
 
 void plFactory::Validate(uint16_t keyIndex)
 {

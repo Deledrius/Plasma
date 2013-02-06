@@ -46,10 +46,12 @@ class hsRefCnt {
 private:
     int         fRefCnt;
 public:
-                hsRefCnt() : fRefCnt(1) {}
+    hsRefCnt() : fRefCnt(1) {}
     virtual     ~hsRefCnt();
 
-    virtual int     RefCnt() const { return fRefCnt; }
+    virtual int     RefCnt() const {
+        return fRefCnt;
+    }
     virtual void    UnRef();
     virtual void    Ref();
 };

@@ -59,19 +59,18 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsCodec;
 class plMipmap;
 
-class hsCodecManager
-{
+class hsCodecManager {
 private:
     hsCodecManager();
 public:
     ~hsCodecManager()       { }
     static hsCodecManager& Instance();
 
-    plMipmap    *CreateCompressedMipmap( uint32_t compressionFormat, plMipmap *uncompressed );
-    plMipmap    *CreateUncompressedMipmap( plMipmap *compressed, uint8_t bitDepth = 0 );
-    bool        ColorizeCompMipmap( plMipmap *bMap, const uint8_t *colorMask );
+    plMipmap*    CreateCompressedMipmap(uint32_t compressionFormat, plMipmap* uncompressed);
+    plMipmap*    CreateUncompressedMipmap(plMipmap* compressed, uint8_t bitDepth = 0);
+    bool        ColorizeCompMipmap(plMipmap* bMap, const uint8_t* colorMask);
 
-    bool        Register(hsCodec *codec, uint32_t compressionFormat, float priority);
+    bool        Register(hsCodec* codec, uint32_t compressionFormat, float priority);
 
     /// Decompression flags
     enum {
@@ -89,17 +88,15 @@ public:
     };
 
 private:
-    struct hsCodecEntry
-    {
+    struct hsCodecEntry {
         hsCodecEntry() : fPriority(0), fCodec(nil) { }
-        hsCodecEntry(float p, hsCodec *c) : fPriority(p), fCodec(c) { }
+        hsCodecEntry(float p, hsCodec* c) : fPriority(p), fCodec(c) { }
 
         float                fPriority;
-        hsCodec                 *fCodec;
+        hsCodec*                 fCodec;
     };
 
-    struct hsCodecList
-    {
+    struct hsCodecList {
         hsCodecList() : fCompressionFormat(0) { }
         hsCodecList(uint32_t f) : fCompressionFormat(f) { }
 

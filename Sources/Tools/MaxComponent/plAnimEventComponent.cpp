@@ -65,8 +65,7 @@ void DummyCodeIncludeFuncAnimDetector() {}
 CLASS_DESC(plAnimEventComponent, gAnimEventDesc, "Anim Event", "AnimEvent", COMP_TYPE_DETECTOR, ANIMEVENT_CID)
 
 
-class plAnimEventProc : public plAnimCompProc
-{
+class plAnimEventProc : public plAnimCompProc {
 protected:
     virtual void IPickComponent(IParamBlock2* pb);
     virtual void ILoadUser(HWND hWnd, IParamBlock2* pb);
@@ -78,8 +77,7 @@ public:
 static plAnimEventProc gAnimEventProc;
 
 
-enum
-{
+enum {
     kAnimComp,
     kAnimNode,
     kAnimEvent_DEAD,
@@ -90,8 +88,7 @@ enum
     kAnimMarkers,
 };
 
-enum
-{
+enum {
     kAnimEventBegin,
     kAnimEventEnd,
     kAnimEventMarker,
@@ -104,17 +101,17 @@ ParamBlockDesc2 gAnimEventBlock
     IDD_COMP_DETECTOR_ANIM, IDS_COMP_DETECTOR_ANIM, 0, 0, &gAnimEventProc,
 
     kAnimComp,  _T("animComp"), TYPE_INODE, 0, 0,
-        end,
+    end,
 
     kAnimNode,  _T("animNode"), TYPE_INODE, 0, 0,
-        end,
+    end,
 
     kAnimBegin, _T("animBegin"),    TYPE_BOOL,  0, 0,
-        end,
+    end,
     kAnimEnd,   _T("animEnd"),      TYPE_BOOL,  0, 0,
-        end,
+    end,
     kAnimMarkers,   _T("animMarkers"),  TYPE_STRING_TAB, 0,     0, 0,
-        end,
+    end,
 
     end
 );
@@ -130,26 +127,27 @@ bool plAnimEventComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plComponentBase* animComp;
     plMaxNode* animNode;
-    if (!gAnimEventProc.GetCompAndNode(fCompPB, animComp, animNode))
-    {
+
+    if (!gAnimEventProc.GetCompAndNode(fCompPB, animComp, animNode)) {
         pErrMsg->Set(true,
-                    "Anim Event Component",
-                    "Component %s does not have a valid anim component and node selected.\n"
-                    "It will not be exported.",
-                    GetINode()->GetName()).Show();
+                     "Anim Event Component",
+                     "Component %s does not have a valid anim component and node selected.\n"
+                     "It will not be exported.",
+                     GetINode()->GetName()).Show();
         pErrMsg->Set(false);
         fCanExport = false;
-    }
-    else
+    } else {
         fCanExport = true;
+    }
 
     return plActivatorBaseComponent::SetupProperties(node, pErrMsg);
 }
 
 bool plAnimEventComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if (!fCanExport)
+    if (!fCanExport) {
         return false;
+    }
 
     plAnimEventModifier* mod = new plAnimEventModifier;
     plKey modKey = node->AddModifier(mod, IGetUniqueName(node));
@@ -161,7 +159,7 @@ bool plAnimEventComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 
 plEventCallbackMsg* CreateCallbackMsg(plAnimCmdMsg* animMsg, plKey modKey)
 {
-    plEventCallbackMsg *eventMsg = new plEventCallbackMsg;
+    plEventCallbackMsg* eventMsg = new plEventCallbackMsg;
     eventMsg->AddReceiver(modKey);
     eventMsg->fRepeats = -1;
 
@@ -171,10 +169,11 @@ plEventCallbackMsg* CreateCallbackMsg(plAnimCmdMsg* animMsg, plKey modKey)
     return eventMsg;
 }
 
-bool plAnimEventComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAnimEventComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if (!fCanExport)
+    if (!fCanExport) {
         return false;
+    }
 
     plKey modKey = fLogicModKeys[node];
     plAnimEventModifier* mod = plAnimEventModifier::ConvertNoRef(modKey->GetObjectPtr());
@@ -189,41 +188,40 @@ bool plAnimEventComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     plKey animKey = animComp->GetModKey(animNode);
     plString animName = animComp->GetAnimName();
 
-    plAnimCmdMsg *animMsg = new plAnimCmdMsg;
+    plAnimCmdMsg* animMsg = new plAnimCmdMsg;
     animMsg->SetCmd(plAnimCmdMsg::kAddCallbacks);
     animMsg->SetSender(modKey);
     animMsg->SetAnimName(animName);
     animMsg->AddReceiver(animKey);
 
-    if (fCompPB->GetInt(kAnimBegin))
-    {
-        plEventCallbackMsg *eventMsg = CreateCallbackMsg(animMsg, modKey);
+    if (fCompPB->GetInt(kAnimBegin)) {
+        plEventCallbackMsg* eventMsg = CreateCallbackMsg(animMsg, modKey);
         eventMsg->fEvent = kBegin;
     }
-    if (fCompPB->GetInt(kAnimEnd))
-    {
-        plEventCallbackMsg *eventMsg = CreateCallbackMsg(animMsg, modKey);
+
+    if (fCompPB->GetInt(kAnimEnd)) {
+        plEventCallbackMsg* eventMsg = CreateCallbackMsg(animMsg, modKey);
         eventMsg->fEvent = kEnd;
     }
-    if (fCompPB->Count(kAnimMarkers) > 0)
-    {
+
+    if (fCompPB->Count(kAnimMarkers) > 0) {
         plNotetrackAnim anim(animComp, nil);
         plAnimInfo info = anim.GetAnimInfo(animName);
 
         int numMarkers = fCompPB->Count(kAnimMarkers);
-        for (int i = 0; i < numMarkers; i++)
-        {
+
+        for (int i = 0; i < numMarkers; i++) {
             plString marker = plString::FromUtf8(fCompPB->GetStr(kAnimMarkers, 0, i));
             float time = info.GetMarkerTime(marker);
 
-            plEventCallbackMsg *eventMsg = CreateCallbackMsg(animMsg, modKey);
+            plEventCallbackMsg* eventMsg = CreateCallbackMsg(animMsg, modKey);
             eventMsg->fEvent = kTime;
             eventMsg->fEventTime = time;
         }
     }
 
     mod->SetCallback(animMsg);
-    
+
     hsTArray<plKey> receivers;
     IGetReceivers(node, receivers);
     mod->SetReceivers(receivers);
@@ -259,15 +257,16 @@ static int ListBox_AddStringData(HWND hList, const char* text, int data)
     return idx;
 }
 
-static bool IsMarkerSelected(IParamBlock2* pb, int paramID, const plString& marker, bool remove=false)
+static bool IsMarkerSelected(IParamBlock2* pb, int paramID, const plString& marker, bool remove = false)
 {
     int numMarkers = pb->Count(paramID);
-    for (int i = 0; i < numMarkers; i++)
-    {
-        if (marker.Compare(pb->GetStr(paramID, 0, i)) == 0)
-        {
-            if (remove)
+
+    for (int i = 0; i < numMarkers; i++) {
+        if (marker.Compare(pb->GetStr(paramID, 0, i)) == 0) {
+            if (remove) {
                 pb->Delete(paramID, i, 1);
+            }
+
             return true;
         }
     }
@@ -281,11 +280,11 @@ static bool IsMarkerSelected(IParamBlock2* pb, int paramID, const plString& mark
 static void RemoveDeadMarkers(IParamBlock2* pb, int paramID, plAnimInfo& info)
 {
     int numMarkers = pb->Count(paramID);
-    for (int i = numMarkers-1; i >= 0; i--)
-    {
+
+    for (int i = numMarkers - 1; i >= 0; i--) {
         float time = info.GetMarkerTime(plString::FromUtf8(pb->GetStr(paramID, 0, i)));
-        if (time == -1)
-        {
+
+        if (time == -1) {
             pb->Delete(paramID, i, 1);
         }
     }
@@ -302,13 +301,12 @@ void plAnimEventProc::ILoadUser(HWND hWnd, IParamBlock2* pb)
     //
     // If we don't have a valid comp and node, we should be disabled
     //
-    if (!GetCompAndNode(pb, (plComponentBase*&)comp, node))
-    {
+    if (!GetCompAndNode(pb, (plComponentBase*&)comp, node)) {
         EnableWindow(hList, FALSE);
         return;
-    }
-    else
+    } else {
         EnableWindow(hList, TRUE);
+    }
 
     //
     // Load the events
@@ -316,15 +314,18 @@ void plAnimEventProc::ILoadUser(HWND hWnd, IParamBlock2* pb)
     int idx;
 
     idx = ListBox_AddStringData(hList, "(Begin)", kAnimEventBegin);
-    if (pb->GetInt(kAnimBegin))
+
+    if (pb->GetInt(kAnimBegin)) {
         ListBox_SetSel(hList, TRUE, idx);
+    }
 
     idx = ListBox_AddStringData(hList, "(End)", kAnimEventEnd);
-    if (pb->GetInt(kAnimEnd))
-        ListBox_SetSel(hList, TRUE, idx);
 
-    if (comp)
-    {
+    if (pb->GetInt(kAnimEnd)) {
+        ListBox_SetSel(hList, TRUE, idx);
+    }
+
+    if (comp) {
         // Get the shared animations for all the nodes this component is applied to
         plNotetrackAnim anim(comp, nil);
         plAnimInfo info = anim.GetAnimInfo(comp->GetAnimName());
@@ -333,44 +334,42 @@ void plAnimEventProc::ILoadUser(HWND hWnd, IParamBlock2* pb)
 
         // Get all the markers in this animation
         plString marker;
-        while (!(marker = info.GetNextMarkerName()).IsNull())
-        {
+
+        while (!(marker = info.GetNextMarkerName()).IsNull()) {
             idx = ListBox_AddStringData(hList, marker.c_str(), kAnimEventMarker);
 
-            if (IsMarkerSelected(pb, kAnimMarkers, marker))
+            if (IsMarkerSelected(pb, kAnimMarkers, marker)) {
                 ListBox_SetSel(hList, TRUE, idx);
+            }
         }
     }
 }
 
 bool plAnimEventProc::IUserCommand(HWND hWnd, IParamBlock2* pb, int cmd, int resID)
 {
-    if (cmd == LBN_SELCHANGE && resID == IDC_EVENT_LIST)
-    {
+    if (cmd == LBN_SELCHANGE && resID == IDC_EVENT_LIST) {
         HWND hList = GetDlgItem(hWnd, IDC_EVENT_LIST);
         int idx = ListBox_GetCurSel(hList);
         BOOL selected = ListBox_GetSel(hList, idx);
         int eventType = ListBox_GetItemData(hList, idx);
 
-        if (eventType == kAnimEventBegin)
+        if (eventType == kAnimEventBegin) {
             pb->SetValue(kAnimBegin, 0, selected);
-        else if (eventType == kAnimEventEnd)
+        } else if (eventType == kAnimEventEnd) {
             pb->SetValue(kAnimEnd, 0, selected);
-        else if (eventType == kAnimEventMarker)
-        {
+        } else if (eventType == kAnimEventMarker) {
             char buf[256];
             ListBox_GetText(hList, idx, buf);
             plString text = plString::FromUtf8(buf);
-            if (selected)
-            {
-                if (!IsMarkerSelected(pb, kAnimMarkers, text))
-                {
+
+            if (selected) {
+                if (!IsMarkerSelected(pb, kAnimMarkers, text)) {
                     TCHAR* name = buf;
                     pb->Append(kAnimMarkers, 1, &name);
                 }
-            }
-            else
+            } else {
                 IsMarkerSelected(pb, kAnimMarkers, text, true);
+            }
         }
 
         return true;
@@ -386,8 +385,7 @@ bool plAnimEventProc::IUserCommand(HWND hWnd, IParamBlock2* pb, int cmd, int res
 
 CLASS_DESC(plMtlEventComponent, gMtlEventDesc, "Mtl Event", "MtlEvent", COMP_TYPE_DETECTOR, MTLEVENT_CID)
 
-class plMtlEventProc : public plMtlAnimProc
-{
+class plMtlEventProc : public plMtlAnimProc {
 public:
     plMtlEventProc();
 
@@ -397,8 +395,7 @@ protected:
 };
 static plMtlEventProc gMtlEventProc;
 
-enum
-{
+enum {
     kMtlMtl,
     kMtlNode,
     kMtlAnim,
@@ -415,20 +412,20 @@ ParamBlockDesc2 gMtlEventBlock
     IDD_COMP_DETECTOR_MTL, IDS_COMP_DETECTOR_MTL, 0, 0, &gMtlEventProc,
 
     kMtlMtl,    _T("mtl"),          TYPE_MTL,           0, 0,
-        end,
+    end,
 
     kMtlNode,   _T("node"),         TYPE_INODE,         0, 0,
-        end,
+    end,
 
     kMtlAnim,   _T("anim"),         TYPE_STRING,        0, 0,
-        end,
+    end,
 
     kMtlBegin,  _T("animBegin"),    TYPE_BOOL,          0, 0,
-        end,
+    end,
     kMtlEnd,    _T("animEnd"),      TYPE_BOOL,          0, 0,
-        end,
-    kMtlMarkers,_T("markers"),      TYPE_STRING_TAB, 0, 0, 0,
-        end,
+    end,
+    kMtlMarkers, _T("markers"),      TYPE_STRING_TAB, 0, 0, 0,
+    end,
 
     end
 );
@@ -444,26 +441,26 @@ bool plMtlEventComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     Mtl* mtl = fCompPB->GetMtl(kMtlMtl);
 
-    if (!mtl)
-    {
+    if (!mtl) {
         pErrMsg->Set(true,
-                    "Mtl Event Component",
-                    "Component %s does not have a valid material selected.\n"
-                    "It will not be exported.",
-                    GetINode()->GetName()).Show();
+                     "Mtl Event Component",
+                     "Component %s does not have a valid material selected.\n"
+                     "It will not be exported.",
+                     GetINode()->GetName()).Show();
         pErrMsg->Set(false);
         fCanExport = false;
-    }
-    else
+    } else {
         fCanExport = true;
+    }
 
     return plActivatorBaseComponent::SetupProperties(node, pErrMsg);
 }
 
 bool plMtlEventComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if (!fCanExport)
+    if (!fCanExport) {
         return false;
+    }
 
     plAnimEventModifier* mod = new plAnimEventModifier;
     plKey modKey = node->AddModifier(mod, IGetUniqueName(node));
@@ -476,10 +473,11 @@ bool plMtlEventComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 // KLUDGE - The material animation key getter is here, so we have to include all this crap
 #include "plResponderMtl.h"
 
-bool plMtlEventComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plMtlEventComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if (!fCanExport)
+    if (!fCanExport) {
         return false;
+    }
 
     plKey modKey = fLogicModKeys[node];
     plAnimEventModifier* mod = plAnimEventModifier::ConvertNoRef(modKey->GetObjectPtr());
@@ -494,34 +492,33 @@ bool plMtlEventComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     hsTArray<plKey> animKeys;
     GetMatAnimModKey(mtl, mtlNode, mtlAnim, animKeys);
 
-    plAnimCmdMsg *animMsg = new plAnimCmdMsg;
+    plAnimCmdMsg* animMsg = new plAnimCmdMsg;
     animMsg->SetCmd(plAnimCmdMsg::kAddCallbacks);
     animMsg->SetSender(modKey);
     animMsg->SetAnimName(mtlAnim);
     animMsg->AddReceivers(animKeys);
 
-    if (fCompPB->GetInt(kMtlBegin))
-    {
-        plEventCallbackMsg *eventMsg = CreateCallbackMsg(animMsg, modKey);
+    if (fCompPB->GetInt(kMtlBegin)) {
+        plEventCallbackMsg* eventMsg = CreateCallbackMsg(animMsg, modKey);
         eventMsg->fEvent = kBegin;
     }
-    if (fCompPB->GetInt(kMtlEnd))
-    {
-        plEventCallbackMsg *eventMsg = CreateCallbackMsg(animMsg, modKey);
+
+    if (fCompPB->GetInt(kMtlEnd)) {
+        plEventCallbackMsg* eventMsg = CreateCallbackMsg(animMsg, modKey);
         eventMsg->fEvent = kEnd;
     }
-    if (fCompPB->Count(kMtlMarkers) > 0)
-    {
+
+    if (fCompPB->Count(kMtlMarkers) > 0) {
         plNotetrackAnim anim(mtl, nil);
         plAnimInfo info = anim.GetAnimInfo(mtlAnim);
 
         int numMarkers = fCompPB->Count(kMtlMarkers);
-        for (int i = 0; i < numMarkers; i++)
-        {
+
+        for (int i = 0; i < numMarkers; i++) {
             plString marker = plString::FromUtf8(fCompPB->GetStr(kMtlMarkers, 0, i));
             float time = info.GetMarkerTime(marker);
 
-            plEventCallbackMsg *eventMsg = CreateCallbackMsg(animMsg, modKey);
+            plEventCallbackMsg* eventMsg = CreateCallbackMsg(animMsg, modKey);
             eventMsg->fEvent = kTime;
             eventMsg->fEventTime = time;
         }
@@ -559,13 +556,13 @@ void plMtlEventProc::ILoadUser(HWND hWnd, IParamBlock2* pb)
     // If we don't have a valid material, we should be disabled
     //
     Mtl* mtl = pb->GetMtl(kMtlMtl);
-    if (!mtl)
-    {
+
+    if (!mtl) {
         EnableWindow(hList, FALSE);
         return;
-    }
-    else
+    } else {
         EnableWindow(hList, TRUE);
+    }
 
     //
     // Load the events
@@ -573,15 +570,18 @@ void plMtlEventProc::ILoadUser(HWND hWnd, IParamBlock2* pb)
     int idx;
 
     idx = ListBox_AddStringData(hList, "(Begin)", kAnimEventBegin);
-    if (pb->GetInt(kMtlBegin))
+
+    if (pb->GetInt(kMtlBegin)) {
         ListBox_SetSel(hList, TRUE, idx);
+    }
 
     idx = ListBox_AddStringData(hList, "(End)", kAnimEventEnd);
-    if (pb->GetInt(kMtlEnd))
-        ListBox_SetSel(hList, TRUE, idx);
 
-    if (mtl)
-    {
+    if (pb->GetInt(kMtlEnd)) {
+        ListBox_SetSel(hList, TRUE, idx);
+    }
+
+    if (mtl) {
         plString mtlAnim = plString::FromUtf8(pb->GetStr(kMtlAnim));
 
         // Get the shared animations for all the nodes this component is applied to
@@ -592,44 +592,42 @@ void plMtlEventProc::ILoadUser(HWND hWnd, IParamBlock2* pb)
 
         // Get all the markers in this animation
         plString marker;
-        while (!(marker = info.GetNextMarkerName()).IsNull())
-        {
+
+        while (!(marker = info.GetNextMarkerName()).IsNull()) {
             idx = ListBox_AddStringData(hList, marker.c_str(), kAnimEventMarker);
 
-            if (IsMarkerSelected(pb, kMtlMarkers, marker))
+            if (IsMarkerSelected(pb, kMtlMarkers, marker)) {
                 ListBox_SetSel(hList, TRUE, idx);
+            }
         }
     }
 }
 
 bool plMtlEventProc::IUserCommand(HWND hWnd, IParamBlock2* pb, int cmd, int resID)
 {
-    if (cmd == LBN_SELCHANGE && resID == IDC_EVENT_LIST)
-    {
+    if (cmd == LBN_SELCHANGE && resID == IDC_EVENT_LIST) {
         HWND hList = GetDlgItem(hWnd, IDC_EVENT_LIST);
         int idx = ListBox_GetCurSel(hList);
         BOOL selected = ListBox_GetSel(hList, idx);
         int eventType = ListBox_GetItemData(hList, idx);
 
-        if (eventType == kAnimEventBegin)
+        if (eventType == kAnimEventBegin) {
             pb->SetValue(kMtlBegin, 0, selected);
-        else if (eventType == kAnimEventEnd)
+        } else if (eventType == kAnimEventEnd) {
             pb->SetValue(kMtlEnd, 0, selected);
-        else if (eventType == kAnimEventMarker)
-        {
+        } else if (eventType == kAnimEventMarker) {
             char buf[256];
             ListBox_GetText(hList, idx, buf);
             plString text = plString::FromUtf8(buf);
-            if (selected)
-            {
-                if (!IsMarkerSelected(pb, kMtlMarkers, text))
-                {
+
+            if (selected) {
+                if (!IsMarkerSelected(pb, kMtlMarkers, text)) {
                     TCHAR* name = buf;
                     pb->Append(kMtlMarkers, 1, &name);
                 }
-            }
-            else
+            } else {
                 IsMarkerSelected(pb, kMtlMarkers, text, true);
+            }
         }
 
         return true;

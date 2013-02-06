@@ -51,8 +51,7 @@ class plPipeline;
 class plRenderMsg;
 class plFadeOpacityLay;
 
-class plFadeOpacityMod : public plSingleModifier
-{
+class plFadeOpacityMod : public plSingleModifier {
 public:
     enum {
         kBoundsCenter   = 1
@@ -101,14 +100,16 @@ protected:
     void        ISetup(plSceneObject* so);
 
     // We only act in response to messages.
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return false; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return false;
+    }
 
 public:
     plFadeOpacityMod();
     virtual ~plFadeOpacityMod();
 
-    CLASSNAME_REGISTER( plFadeOpacityMod );
-    GETINTERFACE_ANY( plFadeOpacityMod, plSingleModifier );
+    CLASSNAME_REGISTER(plFadeOpacityMod);
+    GETINTERFACE_ANY(plFadeOpacityMod, plSingleModifier);
 
     virtual void            SetKey(plKey k);
 
@@ -121,16 +122,34 @@ public:
 
     void FadeUp();
     void FadeDown();
-    void Fade(bool up) { if( up ) FadeUp(); else FadeDown(); }
+    void Fade(bool up) {
+        if (up) {
+            FadeUp();
+        } else {
+            FadeDown();
+        }
+    }
 
-    void SetFadeUp(float f) { fFadeUp = f; }
-    float GetFadeUp() const { return fFadeUp; }
+    void SetFadeUp(float f) {
+        fFadeUp = f;
+    }
+    float GetFadeUp() const {
+        return fFadeUp;
+    }
 
-    void SetFadeDown(float f) { fFadeDown = f; }
-    float GetFadeDown() const { return fFadeDown; }
+    void SetFadeDown(float f) {
+        fFadeDown = f;
+    }
+    float GetFadeDown() const {
+        return fFadeDown;
+    }
 
-    static bool GetLOSCheckDisabled() { return fLOSCheckDisabled; }
-    static void SetLOSCheckDisabled(bool on) { fLOSCheckDisabled = on; }
+    static bool GetLOSCheckDisabled() {
+        return fLOSCheckDisabled;
+    }
+    static void SetLOSCheckDisabled(bool on) {
+        fLOSCheckDisabled = on;
+    }
 };
 
 #endif // plFadeOpacityMod_inc

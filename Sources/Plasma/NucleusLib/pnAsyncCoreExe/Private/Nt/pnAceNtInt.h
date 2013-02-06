@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCoreExe/Private/Nt/pnAceNtInt.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNASYNCCOREEXE_PRIVATE_NT_PNACENTINT_H
@@ -72,7 +72,7 @@ enum EOpType {
     kOpSocketWrite,
     kOpFileRead,
     kOpFileWrite,
-    
+
     // opType >= kOpSequence complete when they reach the head of the list
     kOpSequence,
     kOpFileFlush,
@@ -84,7 +84,9 @@ enum EOpType {
 
 class CNtCritSect : public CCritSect {
 public:
-    BOOL TryEnter () { return TryEnterCriticalSection(&m_handle); }
+    BOOL TryEnter() {
+        return TryEnterCriticalSection(&m_handle);
+    }
 };
 
 class CNtWaitHandle {
@@ -92,12 +94,12 @@ class CNtWaitHandle {
     HANDLE  m_event;
 
 public:
-    CNtWaitHandle ();
-    ~CNtWaitHandle ();
-    void IncRef ();
-    void DecRef ();
-    bool WaitForObject (unsigned timeMs) const;
-    void SignalObject () const;
+    CNtWaitHandle();
+    ~CNtWaitHandle();
+    void IncRef();
+    void DecRef();
+    bool WaitForObject(unsigned timeMs) const;
+    void SignalObject() const;
 };
 
 struct Operation {
@@ -106,28 +108,27 @@ struct Operation {
     AsyncId         asyncId;
     bool            notify;
     unsigned        pending;
-    CNtWaitHandle * signalComplete;
+    CNtWaitHandle* signalComplete;
     LINK(Operation) link;
 
     Operation()
         : opType((EOpType)0), asyncId(nil), notify(false), pending(0),
-          signalComplete(nil)
-    {
+          signalComplete(nil) {
         memset(&overlapped, 0, sizeof(overlapped));
     }
 
-    #ifdef HS_DEBUGGING
-    ~Operation () {
+#ifdef HS_DEBUGGING
+    ~Operation() {
         ASSERT(!signalComplete);
     }
-    #endif
+#endif
 };
 
 struct NtObject {
     CNtCritSect                 critsect;
     EIoType                     ioType;
     HANDLE                      handle;
-    void *                      userState;
+    void*                       userState;
     LISTDECL(Operation, link)   opList;
     long                        nextCompleteSequence;
     long                        nextStartSequence;
@@ -147,11 +148,11 @@ struct NtObject {
 *
 ***/
 
-void INtWakeupMainIoThreads ();
-void INtConnPostOperation (NtObject * ntObj, Operation * op, unsigned bytes);
-AsyncId INtConnSequenceStart (NtObject * ntObj);
-bool INtConnInitialize (NtObject * ntObj);
-void INtConnCompleteOperation (NtObject * ntObj);
+void INtWakeupMainIoThreads();
+void INtConnPostOperation(NtObject* ntObj, Operation* op, unsigned bytes);
+AsyncId INtConnSequenceStart(NtObject* ntObj);
+bool INtConnInitialize(NtObject* ntObj);
+void INtConnCompleteOperation(NtObject* ntObj);
 
 
 
@@ -165,28 +166,28 @@ struct NtSock;
 struct NtOpConnAttempt;
 struct NtOpSocketWrite;
 
-void INtSocketInitialize ();
-void INtSocketStartCleanup (unsigned exitThreadWaitMs);
-void INtSocketDestroy ();
+void INtSocketInitialize();
+void INtSocketStartCleanup(unsigned exitThreadWaitMs);
+void INtSocketDestroy();
 
-void INtSockDelete (
-    NtSock * sock
+void INtSockDelete(
+    NtSock* sock
 );
 
-void INtSocketOpCompleteSocketConnect (
-    NtOpConnAttempt * op
+void INtSocketOpCompleteSocketConnect(
+    NtOpConnAttempt* op
 );
-void INtSocketOpCompleteSocketRead (
-    NtSock *    sock,
+void INtSocketOpCompleteSocketRead(
+    NtSock*     sock,
     unsigned    bytes
 );
-void INtSocketOpCompleteSocketWrite (
-    NtSock *            sock, 
-    NtOpSocketWrite *   op
+void INtSocketOpCompleteSocketWrite(
+    NtSock*             sock,
+    NtOpSocketWrite*    op
 );
-bool INtSocketOpCompleteQueuedSocketWrite (
-    NtSock *            sock, 
-    NtOpSocketWrite *   op
+bool INtSocketOpCompleteQueuedSocketWrite(
+    NtSock*             sock,
+    NtOpSocketWrite*    op
 );
 
 
@@ -196,58 +197,58 @@ bool INtSocketOpCompleteQueuedSocketWrite (
 *
 ***/
 
-void NtInitialize ();
-void NtDestroy (unsigned exitThreadWaitMs);
-void NtSignalShutdown ();
-void NtWaitForShutdown ();
-void NtSleep (unsigned sleepMs);
-void NtSocketConnect (
-    AsyncCancelId *         cancelId,
+void NtInitialize();
+void NtDestroy(unsigned exitThreadWaitMs);
+void NtSignalShutdown();
+void NtWaitForShutdown();
+void NtSleep(unsigned sleepMs);
+void NtSocketConnect(
+    AsyncCancelId*          cancelId,
     const plNetAddress&     netAddr,
     FAsyncNotifySocketProc  notifyProc,
-    void *                  param,
-    const void *            sendData,
+    void*                   param,
+    const void*             sendData,
     unsigned                sendBytes,
     unsigned                connectMs,
     unsigned                localPort
 );
-void NtSocketConnectCancel (
+void NtSocketConnectCancel(
     FAsyncNotifySocketProc  notifyProc,
     AsyncCancelId           cancelId
 );
-void NtSocketDisconnect (
+void NtSocketDisconnect(
     AsyncSocket     sock,
     bool            hardClose
 );
-void NtSocketDelete (AsyncSocket sock);
-bool NtSocketSend (
+void NtSocketDelete(AsyncSocket sock);
+bool NtSocketSend(
     AsyncSocket     sock,
-    const void *    data,
+    const void*     data,
     unsigned        bytes
 );
-bool NtSocketWrite (
+bool NtSocketWrite(
     AsyncSocket     sock,
-    const void *    buffer,
+    const void*     buffer,
     unsigned        bytes,
-    void *          param
+    void*           param
 );
-void NtSocketSetNotifyProc (
+void NtSocketSetNotifyProc(
     AsyncSocket             sock,
     FAsyncNotifySocketProc  notifyProc
 );
-void NtSocketSetBacklogAlloc (
+void NtSocketSetBacklogAlloc(
     AsyncSocket     sock,
     unsigned        bufferSize
 );
-unsigned NtSocketStartListening (
+unsigned NtSocketStartListening(
     const plNetAddress&     listenAddr,
     FAsyncNotifySocketProc  notifyProc
 );
-void NtSocketStopListening (
+void NtSocketStopListening(
     const plNetAddress&     listenAddr,
     FAsyncNotifySocketProc  notifyProc
 );
-void NtSocketEnableNagling (
+void NtSocketEnableNagling(
     AsyncSocket             conn,
     bool                    enable
 );

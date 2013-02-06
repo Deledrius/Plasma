@@ -45,18 +45,17 @@ class plAgeFile;
 class MaxAssBranchAccess;
 class ISpinnerControl;
 
-typedef struct _TREEITEM    *HTREEITEM;
+typedef struct _TREEITEM*    HTREEITEM;
 
-class plAgeDescInterface
-{
+class plAgeDescInterface {
 protected:
     HWND fhDlg;
     bool fDirty;
     int fCurAge;
-    
-    ISpinnerControl *fSpin;
-    ISpinnerControl *fCapSpin;
-    ISpinnerControl *fSeqPrefixSpin;
+
+    ISpinnerControl* fSpin;
+    ISpinnerControl* fCapSpin;
+    ISpinnerControl* fSeqPrefixSpin;
 
     HTREEITEM       fCurrAgeItem;
     bool            fCurrAgeCheckedOut;
@@ -69,18 +68,18 @@ protected:
     HBRUSH      fHiliteBrush;
 
     std::vector<plAgeFile*> fAgeFiles;
-   
-    MaxAssBranchAccess  *fAssetManIface;
+
+    MaxAssBranchAccess*  fAssetManIface;
 
     plAgeDescInterface();
 
 public:
     ~plAgeDescInterface();
     static plAgeDescInterface& Instance();
-    
+
     // Open the dialog
     void Open();
-    
+
     static BOOL CALLBACK ForwardDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
     BOOL DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -92,38 +91,38 @@ protected:
     static void IClearAgeFiles(std::vector<plAgeFile*>& ageFiles);
 
     void IResetParams();
-    
+
     void IInitControls();
     void ISetControlDefaults();
     void IEnableControls(bool enable);
     void IEnablePageControls(bool enable);
     void ICheckedPageFlag(int ctrlID);
-    
+
     // Save the settings for the last age and load the settings for the currently one
     void IUpdateCurAge();
-    void ISaveCurAge( const plFileName &path, bool checkSeqNum = false );
-    void ILoadAge( const plFileName &path, bool checkSeqNum = false );
+    void ISaveCurAge(const plFileName& path, bool checkSeqNum = false);
+    void ILoadAge(const plFileName& path, bool checkSeqNum = false);
 
     static plFileName IGetLocalAgePath();
 
     // Fill out the age tree view
-    void IFillAgeTree( void );
+    void IFillAgeTree(void);
 
     // Create a new age file and select it in the browser
     void INewAge();
     void INewPage();
 
 
-    uint32_t  IGetNextFreeSequencePrefix( bool getReservedPrefix );
-    uint32_t  IGetFreePageSeqSuffix( HWND pageCombo );
+    uint32_t  IGetNextFreeSequencePrefix(bool getReservedPrefix);
+    uint32_t  IGetFreePageSeqSuffix(HWND pageCombo);
 
-    void    ICheckOutCurrentAge( void );
-    void    ICheckInCurrentAge( void );
-    void    IUndoCheckOutCurrentAge( void );
-    bool    IMakeSureCheckedIn( void );
+    void    ICheckOutCurrentAge(void);
+    void    ICheckInCurrentAge(void);
+    void    IUndoCheckOutCurrentAge(void);
+    bool    IMakeSureCheckedIn(void);
 
-    plAgeFile* IGetCurrentAge( void );
+    plAgeFile* IGetCurrentAge(void);
 
-    void    IInvalidateCheckOutIndicator( void );
-    void    ICheckSequenceNumber( plAgeDescription &aged );
+    void    IInvalidateCheckOutIndicator(void);
+    void    ICheckSequenceNumber(plAgeDescription& aged);
 };

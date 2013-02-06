@@ -52,8 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCli.h"
 
-class pyVarSyncGame : public pyGameCli
-{
+class pyVarSyncGame : public pyGameCli {
 protected:
     pyVarSyncGame();
     pyVarSyncGame(pfGameCli* client);

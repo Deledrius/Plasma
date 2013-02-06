@@ -63,21 +63,18 @@ PYTHON_NO_INIT_DEFINITION(ptHeekGame)
 PYTHON_GLOBAL_METHOD_DEFINITION(PtIsHeekGame, args, "Params: typeID\nReturns true if the specifed typeID (guid as a string) is a Heek game")
 {
     PyObject* textObj;
-    if (!PyArg_ParseTuple(args, "O", &textObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &textObj)) {
         PyErr_SetString(PyExc_TypeError, "PtIsHeekGame expects a string");
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyString_CheckEx(textObj))
-    {
+    if (PyString_CheckEx(textObj)) {
         plString text = PyString_AsStringEx(textObj);
 
         bool retVal = pyHeekGame::IsHeekGame(text);
         PYTHON_RETURN_BOOL(retVal);
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtIsHeekGame expects a string");
         PYTHON_RETURN_ERROR;
     }
@@ -87,16 +84,17 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtJoinCommonHeekGame, args, "Params: callbackKey
 {
     PyObject* callbackObj = NULL;
     int gameID = 0;
-    if (!PyArg_ParseTuple(args, "Oi", &callbackObj, &gameID))
-    {
+
+    if (!PyArg_ParseTuple(args, "Oi", &callbackObj, &gameID)) {
         PyErr_SetString(PyExc_TypeError, "PtJoinCommonHeekGame expects a ptKey and an integer");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(callbackObj))
-    {
+
+    if (!pyKey::Check(callbackObj)) {
         PyErr_SetString(PyExc_TypeError, "PtJoinCommonHeekGame expects a ptKey and an integer");
         PYTHON_RETURN_ERROR;
     }
+
     pyKey* key = pyKey::ConvertFrom(callbackObj);
     pyHeekGame::JoinCommonHeekGame(*key, gameID);
     PYTHON_RETURN_NONE;
@@ -107,13 +105,13 @@ PYTHON_METHOD_DEFINITION(ptHeekGame, playGame, args)
     int position = 0;
     long points = 0;
     PyObject* textObj = NULL;
-    if (!PyArg_ParseTuple(args,"ilO", &position, &points, &textObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "ilO", &position, &points, &textObj)) {
         PyErr_SetString(PyExc_TypeError, "playGame expects an int, a long, and a unicode string");
         PYTHON_RETURN_ERROR;
     }
-    if (PyUnicode_Check(textObj))
-    {
+
+    if (PyUnicode_Check(textObj)) {
         int strLen = PyUnicode_GetSize(textObj);
         wchar_t* temp = new wchar_t[strLen + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)textObj, temp, strLen);
@@ -121,18 +119,14 @@ PYTHON_METHOD_DEFINITION(ptHeekGame, playGame, args)
         self->fThis->PlayGame(position, points, temp);
         delete [] temp;
         PYTHON_RETURN_NONE;
-    }
-    else if (PyString_Check(textObj))
-    {
+    } else if (PyString_Check(textObj)) {
         // we'll allow this, just in case something goes weird
         char* temp = PyString_AsString(textObj);
         wchar_t* wTemp = hsStringToWString(temp);
         self->fThis->PlayGame(position, points, wTemp);
         delete [] wTemp;
         PYTHON_RETURN_NONE;
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "playGame expects an int, a long, and a unicode string");
         PYTHON_RETURN_ERROR;
     }
@@ -143,11 +137,12 @@ PYTHON_BASIC_METHOD_DEFINITION(ptHeekGame, leaveGame, LeaveGame)
 PYTHON_METHOD_DEFINITION(ptHeekGame, choose, args)
 {
     int choice = 0;
-    if (!PyArg_ParseTuple(args, "i", &choice))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &choice)) {
         PyErr_SetString(PyExc_TypeError, "choose expects an int");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Choose(choice);
     PYTHON_RETURN_NONE;
 }
@@ -155,21 +150,22 @@ PYTHON_METHOD_DEFINITION(ptHeekGame, choose, args)
 PYTHON_METHOD_DEFINITION(ptHeekGame, sequenceFinished, args)
 {
     int seq = 0;
-    if (!PyArg_ParseTuple(args, "i", &seq))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &seq)) {
         PyErr_SetString(PyExc_TypeError, "sequenceFinished expects an int");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SequenceFinished(seq);
     PYTHON_RETURN_NONE;
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekGame)
-    PYTHON_METHOD(ptHeekGame, playGame, "Params: position, points, name\nRequests to start playing the game in the specified position"),
-    PYTHON_BASIC_METHOD(ptHeekGame, leaveGame, "Leaves this game (puts us into \"observer\" mode"),
-    PYTHON_METHOD(ptHeekGame, choose, "Params: choice\nMakes the specified move (see PtHeekGameChoice)"),
-    PYTHON_METHOD(ptHeekGame, sequenceFinished, "Params: sequence\nTells the server that the specified animation finished (see PtHeekGameSeq)"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptHeekGame, playGame, "Params: position, points, name\nRequests to start playing the game in the specified position"),
+              PYTHON_BASIC_METHOD(ptHeekGame, leaveGame, "Leaves this game (puts us into \"observer\" mode"),
+              PYTHON_METHOD(ptHeekGame, choose, "Params: choice\nMakes the specified move (see PtHeekGameChoice)"),
+              PYTHON_METHOD(ptHeekGame, sequenceFinished, "Params: sequence\nTells the server that the specified animation finished (see PtHeekGameSeq)"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekGame, pyGameCli, "Game client for the Heek game");
@@ -177,9 +173,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekGame, pyGameCli, "Game client for the Heek game"
 // required functions for PyObject interoperability
 PyObject* pyHeekGame::New(pfGameCli* client)
 {
-    ptHeekGame *newObj = (ptHeekGame*)ptHeekGame_type.tp_new(&ptHeekGame_type, NULL, NULL);
-    if (client && (client->GetGameTypeId() == kGameTypeId_Heek))
+    ptHeekGame* newObj = (ptHeekGame*)ptHeekGame_type.tp_new(&ptHeekGame_type, NULL, NULL);
+
+    if (client && (client->GetGameTypeId() == kGameTypeId_Heek)) {
         newObj->fThis->gameClient = client;
+    }
+
     return (PyObject*)newObj;
 }
 

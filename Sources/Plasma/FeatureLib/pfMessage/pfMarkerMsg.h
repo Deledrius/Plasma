@@ -45,11 +45,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plMessage.h"
 struct hsPoint3;
 
-class pfMarkerMsg : public plMessage
-{
+class pfMarkerMsg : public plMessage {
 public:
-    enum Type
-    {
+    enum Type {
         // Sent by yourself when you hit a marker
         // - fMarkerID is the id number of the marker we hit
         kMarkerCaptured,
@@ -57,7 +55,7 @@ public:
     Type fType;
 
     uint32_t fMarkerID;
-    
+
     pfMarkerMsg();
     virtual ~pfMarkerMsg();
 

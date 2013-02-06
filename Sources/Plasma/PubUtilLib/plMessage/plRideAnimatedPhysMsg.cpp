@@ -45,24 +45,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsStream.h"
 
 plRideAnimatedPhysMsg::plRideAnimatedPhysMsg()
-:fRegion(nil)
-,fEntering(false)
-{   
+    : fRegion(nil)
+    , fEntering(false)
+{
 }
-plRideAnimatedPhysMsg::plRideAnimatedPhysMsg(const plKey &sender, const plKey &receiver, bool entering, plKey regionKey)
-: plMessage(sender, receiver, nil)
-,fRegion(regionKey)
-,fEntering(entering)
+plRideAnimatedPhysMsg::plRideAnimatedPhysMsg(const plKey& sender, const plKey& receiver, bool entering, plKey regionKey)
+    : plMessage(sender, receiver, nil)
+    , fRegion(regionKey)
+    , fEntering(entering)
 {
 }
 
-void plRideAnimatedPhysMsg::Read(hsStream *stream, hsResMgr *mgr)
+void plRideAnimatedPhysMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
     fEntering = stream->ReadBool();
     fRegion = mgr->ReadKey(stream);
 }
-void plRideAnimatedPhysMsg::Write(hsStream *stream, hsResMgr *mgr)
+void plRideAnimatedPhysMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(stream, mgr);
     stream->WriteBool(fEntering);

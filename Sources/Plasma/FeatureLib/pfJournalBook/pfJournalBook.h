@@ -194,26 +194,23 @@ class pfGUIMultiLineEditCtrl;
 class pfJournalBook;
 class pfBookMultiLineEditProc;
 
-class pfBookData : public hsKeyedObject
-{
+class pfBookData : public hsKeyedObject {
 public:
-    enum WhichSide
-    {
+    enum WhichSide {
         kLeftSide = 0x01,
         kRightSide = 0x02,
         kBothSides = 0x03,
         kNoSides = 0
     };
 
-    enum DynDisplayIndex
-    {
+    enum DynDisplayIndex {
         kLeftPage = 0,
         kRightPage,
         kTurnFrontPage,
         kTurnBackPage
     };
-    
-    pfBookData(const plString &guiName = plString::Null);
+
+    pfBookData(const plString& guiName = plString::Null);
     virtual ~pfBookData();
 
     void LoadGUI(); // need this seperate because the plKey isn't setup until the constructor is done
@@ -221,37 +218,87 @@ public:
     CLASSNAME_REGISTER(pfBookData);
     GETINTERFACE_ANY(pfBookData, hsKeyedObject);
 
-    virtual bool MsgReceive(plMessage *pMsg);
+    virtual bool MsgReceive(plMessage* pMsg);
 
-    pfGUIDialogMod *Dialog() const {return fDialog;}
-    pfGUICheckBoxCtrl *CoverButton() const {return fCoverButton;}
-    pfGUICheckBoxCtrl *TurnPageButton() const {return fTurnPageButton;}
-    pfGUIClickMapCtrl *LeftPageMap() const {return fLeftPageMap;}
-    pfGUIClickMapCtrl *RightPageMap() const {return fRightPageMap;}
-    plLayerInterface *CoverLayer() const {return fCoverLayer;}
-    hsGMaterial *CoverMaterial() const {return fCoverMaterial;}
-    hsGMaterial *PageMaterial(int index) const {if ((index<0)||(index>3)) return nil; else return fPageMaterials[index];}
-    pfGUIButtonMod *LeftCorner() const {return fLeftCorner;}
-    pfGUIButtonMod *RightCorner() const {return fRightCorner;}
-    pfGUIProgressCtrl *WidthCtrl() const {return fWidthCtrl;}
-    pfGUIProgressCtrl *HeightCtrl() const {return fHeightCtrl;}
-    plMipmap *DefaultCover() const {return fDefaultCover;}
-    pfJournalBook *CurBook() const {return fCurrBook;}
+    pfGUIDialogMod* Dialog() const {
+        return fDialog;
+    }
+    pfGUICheckBoxCtrl* CoverButton() const {
+        return fCoverButton;
+    }
+    pfGUICheckBoxCtrl* TurnPageButton() const {
+        return fTurnPageButton;
+    }
+    pfGUIClickMapCtrl* LeftPageMap() const {
+        return fLeftPageMap;
+    }
+    pfGUIClickMapCtrl* RightPageMap() const {
+        return fRightPageMap;
+    }
+    plLayerInterface* CoverLayer() const {
+        return fCoverLayer;
+    }
+    hsGMaterial* CoverMaterial() const {
+        return fCoverMaterial;
+    }
+    hsGMaterial* PageMaterial(int index) const {
+        if ((index < 0) || (index > 3)) {
+            return nil;
+        } else {
+            return fPageMaterials[index];
+        }
+    }
+    pfGUIButtonMod* LeftCorner() const {
+        return fLeftCorner;
+    }
+    pfGUIButtonMod* RightCorner() const {
+        return fRightCorner;
+    }
+    pfGUIProgressCtrl* WidthCtrl() const {
+        return fWidthCtrl;
+    }
+    pfGUIProgressCtrl* HeightCtrl() const {
+        return fHeightCtrl;
+    }
+    plMipmap* DefaultCover() const {
+        return fDefaultCover;
+    }
+    pfJournalBook* CurBook() const {
+        return fCurrBook;
+    }
 
-    bool StartedOpen() {return fStartedOpen;}
-    bool CurrentlyOpen() {return fCurrentlyOpen;}
-    bool CurrentlyTurning() {return fCurrentlyTurning;}
-    bool IsEditable() {return fEditable;}
-    WhichSide CurSFXPages() {return fCurrSFXPages;}
+    bool StartedOpen() {
+        return fStartedOpen;
+    }
+    bool CurrentlyOpen() {
+        return fCurrentlyOpen;
+    }
+    bool CurrentlyTurning() {
+        return fCurrentlyTurning;
+    }
+    bool IsEditable() {
+        return fEditable;
+    }
+    WhichSide CurSFXPages() {
+        return fCurrSFXPages;
+    }
 
-    void StartedOpen(bool startedOpen) {fStartedOpen = startedOpen;}
-    void CurrentlyOpen(bool currentlyOpen) {fCurrentlyOpen = currentlyOpen;}
-    void CurrentlyTurning(bool currentlyTurning) {fCurrentlyTurning = currentlyTurning;}
-    void CurBook(pfJournalBook *curBook) {fCurrBook = curBook;}
+    void StartedOpen(bool startedOpen) {
+        fStartedOpen = startedOpen;
+    }
+    void CurrentlyOpen(bool currentlyOpen) {
+        fCurrentlyOpen = currentlyOpen;
+    }
+    void CurrentlyTurning(bool currentlyTurning) {
+        fCurrentlyTurning = currentlyTurning;
+    }
+    void CurBook(pfJournalBook* curBook) {
+        fCurrBook = curBook;
+    }
 
     // Quick helper
-    plDynamicTextMap *GetDTMap(uint32_t which);
-    pfGUIMultiLineEditCtrl *GetEditCtrl(uint32_t which);
+    plDynamicTextMap* GetDTMap(uint32_t which);
+    pfGUIMultiLineEditCtrl* GetEditCtrl(uint32_t which);
 
     // Seeks the width and height animations to set the desired book size. Sizes are in % across the animation
     void SetCurrSize(float w, float h);
@@ -274,14 +321,15 @@ public:
     void HitEndOfControlList(int32_t cursorPos);
     void HitBeginningOfControlList(int32_t cursorPos);
 
-    void EnableEditGUI(bool enable=true);
-    void DisableEditGUI() {EnableEditGUI(false);}
-    
+    void EnableEditGUI(bool enable = true);
+    void DisableEditGUI() {
+        EnableEditGUI(false);
+    }
+
 protected:
     friend class pfJournalDlgProc;
 
-    enum Refs
-    {
+    enum Refs {
         kRefDialog = 0,
         kRefDefaultCover
     };
@@ -289,31 +337,31 @@ protected:
     plString            fGUIName;
 
     // The pointer to our dialog
-    pfGUIDialogMod      *fDialog;
+    pfGUIDialogMod*      fDialog;
 
     // And other interesting pointers
-    pfGUICheckBoxCtrl   *fCoverButton;
-    pfGUICheckBoxCtrl   *fTurnPageButton;
-    pfGUIClickMapCtrl   *fLeftPageMap;
-    pfGUIClickMapCtrl   *fRightPageMap;
-    plLayerInterface    *fCoverLayer;
-    hsGMaterial         *fCoverMaterial;
-    hsGMaterial         *fPageMaterials[4];
-    pfGUIButtonMod      *fLeftCorner;
-    pfGUIButtonMod      *fRightCorner;
-    pfGUIProgressCtrl   *fWidthCtrl;
-    pfGUIProgressCtrl   *fHeightCtrl;
-    
-    pfGUIMultiLineEditCtrl *fLeftEditCtrl;
-    pfGUIMultiLineEditCtrl *fRightEditCtrl;
-    pfGUIMultiLineEditCtrl *fTurnFrontEditCtrl;
-    pfGUIMultiLineEditCtrl *fTurnBackEditCtrl;
+    pfGUICheckBoxCtrl*   fCoverButton;
+    pfGUICheckBoxCtrl*   fTurnPageButton;
+    pfGUIClickMapCtrl*   fLeftPageMap;
+    pfGUIClickMapCtrl*   fRightPageMap;
+    plLayerInterface*    fCoverLayer;
+    hsGMaterial*         fCoverMaterial;
+    hsGMaterial*         fPageMaterials[4];
+    pfGUIButtonMod*      fLeftCorner;
+    pfGUIButtonMod*      fRightCorner;
+    pfGUIProgressCtrl*   fWidthCtrl;
+    pfGUIProgressCtrl*   fHeightCtrl;
+
+    pfGUIMultiLineEditCtrl* fLeftEditCtrl;
+    pfGUIMultiLineEditCtrl* fRightEditCtrl;
+    pfGUIMultiLineEditCtrl* fTurnFrontEditCtrl;
+    pfGUIMultiLineEditCtrl* fTurnBackEditCtrl;
 
     // Pointer to our default (base) cover mipmap
-    plMipmap            *fDefaultCover;
+    plMipmap*            fDefaultCover;
 
     // The current book using our data
-    pfJournalBook       *fCurrBook;
+    pfJournalBook*       fCurrBook;
 
     // Which side(s) we're currently doing SFX for
     WhichSide   fCurrSFXPages;
@@ -330,7 +378,7 @@ protected:
     int32_t       fAdjustCursorTo;
 
     // Inits our dialog template
-    void IInitTemplate(pfGUIDialogMod *templateDlg);
+    void IInitTemplate(pfGUIDialogMod* templateDlg);
 
     // Process SFX for this frame
     void IHandleSFX(float currTime, WhichSide whichSide = kNoSides);
@@ -345,241 +393,243 @@ protected:
     void IFinishTriggeredFlip(bool wasBackwards);
 };
 
-class pfJournalBook : public hsKeyedObject
-{
-    public:
+class pfJournalBook : public hsKeyedObject {
+public:
 
-        // Enums of event types for the Book plNotifyMsg type
-        enum NotifyTypes
-        {
-            kNotifyImageLink = 0,
-            kNotifyShow,
-            kNotifyHide,
-            kNotifyNextPage,
-            kNotifyPreviousPage,
-            kNotifyCheckUnchecked,
-            kNotifyClose,
-        };
+    // Enums of event types for the Book plNotifyMsg type
+    enum NotifyTypes {
+        kNotifyImageLink = 0,
+        kNotifyShow,
+        kNotifyHide,
+        kNotifyNextPage,
+        kNotifyPreviousPage,
+        kNotifyCheckUnchecked,
+        kNotifyClose,
+    };
 
-        // The constructor takes in the esHTML source for the journal, along with
-        // the name of the mipmap to use as the cover of the book. The callback
-        // key is the keyed object to send event messages to (see <img> tag).
-        pfJournalBook( const char *esHTMLSource, plKey coverImageKey = nil, plKey callbackKey = nil, const plLocation &hintLoc = plLocation::kGlobalFixedLoc, const plString &guiName = plString::Null );
-        pfJournalBook( const wchar_t *esHTMLSource, plKey coverImageKey = nil, plKey callbackKey = nil, const plLocation &hintLoc = plLocation::kGlobalFixedLoc, const plString &guiName = plString::Null );
+    // The constructor takes in the esHTML source for the journal, along with
+    // the name of the mipmap to use as the cover of the book. The callback
+    // key is the keyed object to send event messages to (see <img> tag).
+    pfJournalBook(const char* esHTMLSource, plKey coverImageKey = nil, plKey callbackKey = nil, const plLocation& hintLoc = plLocation::kGlobalFixedLoc, const plString& guiName = plString::Null);
+    pfJournalBook(const wchar_t* esHTMLSource, plKey coverImageKey = nil, plKey callbackKey = nil, const plLocation& hintLoc = plLocation::kGlobalFixedLoc, const plString& guiName = plString::Null);
 
-        virtual ~pfJournalBook();
+    virtual ~pfJournalBook();
 
-        CLASSNAME_REGISTER( pfJournalBook );
-        GETINTERFACE_ANY( pfJournalBook, hsKeyedObject );
+    CLASSNAME_REGISTER(pfJournalBook);
+    GETINTERFACE_ANY(pfJournalBook, hsKeyedObject);
 
-        // Our required virtual
-        virtual bool    MsgReceive( plMessage *pMsg );
+    // Our required virtual
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        // Init the singleton, for client startup
-        static void SingletonInit( void );
-        
-        // Shutdown the singleton
-        static void SingletonShutdown( void );
-        
-        // loads a gui
-        static void LoadGUI( const plString &guiName );
+    // Init the singleton, for client startup
+    static void SingletonInit(void);
 
-        // unloads a gui if we don't need it any more and want to free up memory
-        static void UnloadGUI( const plString &guiName );
+    // Shutdown the singleton
+    static void SingletonShutdown(void);
 
-        // unloads all GUIs except for the default
-        static void UnloadAllGUIs();
+    // loads a gui
+    static void LoadGUI(const plString& guiName);
 
-        void    SetGUI( const plString &guiName );
+    // unloads a gui if we don't need it any more and want to free up memory
+    static void UnloadGUI(const plString& guiName);
 
-        // Shows the book, optionally starting open or closed
-        void    Show( bool startOpened = false );
+    // unloads all GUIs except for the default
+    static void UnloadAllGUIs();
 
-    
-        /// NOTE: The following functions expose functionality that is normally
-        /// handled by the book logic itself. So you should only need to use these
-        /// in unusual circumstances.
+    void    SetGUI(const plString& guiName);
+
+    // Shows the book, optionally starting open or closed
+    void    Show(bool startOpened = false);
 
 
-        // Book handles hiding itself once someone clicks away. 
-        void    Hide( void );
+    /// NOTE: The following functions expose functionality that is normally
+    /// handled by the book logic itself. So you should only need to use these
+    /// in unusual circumstances.
 
-        // Opens the book, optionally to the given page
-        void    Open( uint32_t startingPage = 0 );
 
-        // Closes the book.
-        void    Close( void );
+    // Book handles hiding itself once someone clicks away.
+    void    Hide(void);
 
-        // Advances forward one page
-        void    NextPage( void );
+    // Opens the book, optionally to the given page
+    void    Open(uint32_t startingPage = 0);
 
-        // Same, only back
-        void    PreviousPage( void );
+    // Closes the book.
+    void    Close(void);
 
-        // For completeness...
-        void    GoToPage( uint32_t pageNumber );
+    // Advances forward one page
+    void    NextPage(void);
 
-        // See below. Just forces a full calc of the cached info
-        void    ForceCacheCalculations( void );
+    // Same, only back
+    void    PreviousPage(void);
 
-        // Closes the book, then calls Hide() once it's done closing
-        void    CloseAndHide( void );
+    // For completeness...
+    void    GoToPage(uint32_t pageNumber);
 
-        // Sets the book size scaling. 1,1 would be full size, 0,0 is the smallest size possible
-        void    SetBookSize( float width, float height );
+    // See below. Just forces a full calc of the cached info
+    void    ForceCacheCalculations(void);
 
-        // What page are we on?
-        uint32_t  GetCurrentPage( void ) const { return fCurrentPage; }
+    // Closes the book, then calls Hide() once it's done closing
+    void    CloseAndHide(void);
 
-        // Set the margin (defaults to 16 pixels)
-        void    SetPageMargin( uint32_t margin ) { fPageTMargin = fPageLMargin = fPageBMargin = fPageRMargin = margin; }
+    // Sets the book size scaling. 1,1 would be full size, 0,0 is the smallest size possible
+    void    SetBookSize(float width, float height);
 
-        // Turns on or off page turning
-        void    AllowPageTurning( bool allow ) { fAllowTurning = allow; }
+    // What page are we on?
+    uint32_t  GetCurrentPage(void) const {
+        return fCurrentPage;
+    }
 
-        // grabs a certain movie based on it's index in the source file
-        plKey   GetMovie( uint8_t index );
+    // Set the margin (defaults to 16 pixels)
+    void    SetPageMargin(uint32_t margin) {
+        fPageTMargin = fPageLMargin = fPageBMargin = fPageRMargin = margin;
+    }
 
-        // turns on and off editing of the book
-        void    SetEditable( bool editable=true );
+    // Turns on or off page turning
+    void    AllowPageTurning(bool allow) {
+        fAllowTurning = allow;
+    }
 
-        // returns the text contained by the edit controls
-        std::string GetEditableText();
+    // grabs a certain movie based on it's index in the source file
+    plKey   GetMovie(uint8_t index);
 
-        void    SetEditableText(std::string text);
-        
-    protected:
+    // turns on and off editing of the book
+    void    SetEditable(bool editable = true);
 
-        struct loadedMovie
-        {
-            pfEsHTMLChunk *movieChunk;
-            plLayerBink *movieLayer;
-        };
+    // returns the text contained by the edit controls
+    std::string GetEditableText();
 
-        friend class pfJournalDlgProc;
-        friend class pfBookData;
+    void    SetEditableText(std::string text);
 
-        // Our compiled esHTML source
-        std::wstring                fUncompiledSource;
-        plLocation                  fDefLoc;
-        hsTArray<pfEsHTMLChunk *>   fHTMLSource;
-        hsTArray<pfEsHTMLChunk *>   fCoverDecals; // stored in a separate location so we can draw them all immediately
+protected:
 
-        hsTArray<loadedMovie *> fLoadedMovies;
+    struct loadedMovie {
+        pfEsHTMLChunk* movieChunk;
+        plLayerBink* movieLayer;
+    };
 
-        // The key of the mipmap to use as the cover image
-        plKey   fCoverMipKey;
-        bool    fTintCover;
-        hsColorRGBA fCoverTint;
-        bool    fTintFirst; // tint before applying decals?
+    friend class pfJournalDlgProc;
+    friend class pfBookData;
 
-        // Receiver key to send notifys to, if any
-        plKey   fCallbackKey;
-        bool    fCoverFromHTML;
-        // Cached array of page starts in the esHTML source. Generated as we flip through
-        // the book, so that going backwards can be done efficiently.
-        hsTArray<uint32_t>    fPageStarts;
+    // Our compiled esHTML source
+    std::wstring                fUncompiledSource;
+    plLocation                  fDefLoc;
+    hsTArray<pfEsHTMLChunk*>   fHTMLSource;
+    hsTArray<pfEsHTMLChunk*>   fCoverDecals;  // stored in a separate location so we can draw them all immediately
 
-        // is the book done showing and ready for more page calculations
-        bool    fAreWeShowing;
+    hsTArray<loadedMovie*> fLoadedMovies;
 
-        // Our current page
-        uint32_t  fCurrentPage;
+    // The key of the mipmap to use as the cover image
+    plKey   fCoverMipKey;
+    bool    fTintCover;
+    hsColorRGBA fCoverTint;
+    bool    fTintFirst; // tint before applying decals?
 
-        // are we editing this book? (adjusts how we draw and flip pages)
-        bool    fAreEditing;
-        bool    fWantEditing; // the code specifies that we want to edit, but the gui doesn't support it, we will check again if the gui changes
+    // Receiver key to send notifys to, if any
+    plKey   fCallbackKey;
+    bool    fCoverFromHTML;
+    // Cached array of page starts in the esHTML source. Generated as we flip through
+    // the book, so that going backwards can be done efficiently.
+    hsTArray<uint32_t>    fPageStarts;
 
-        bool    fAllowTurning; // do we allow the user to turn pages?
+    // is the book done showing and ready for more page calculations
+    bool    fAreWeShowing;
 
-        // The ending page. -1 until calculated by flipping to it
-        uint32_t  fLastPage;
+    // Our current page
+    uint32_t  fCurrentPage;
 
-        // Per book size
-        float    fWidthScale, fHeightScale;
+    // are we editing this book? (adjusts how we draw and flip pages)
+    bool    fAreEditing;
+    bool    fWantEditing; // the code specifies that we want to edit, but the gui doesn't support it, we will check again if the gui changes
 
-        // Per book margin around the edge (defaults to 16 pixels)
-        uint32_t      fPageTMargin, fPageLMargin, fPageBMargin, fPageRMargin;
+    bool    fAllowTurning; // do we allow the user to turn pages?
 
-        // Some animation keys we use
-        plKey   fPageTurnAnimKey;
+    // The ending page. -1 until calculated by flipping to it
+    uint32_t  fLastPage;
 
-        // Current list of linkable image chunks we have visible on the screen, for quick hit testing
-        hsTArray<pfEsHTMLChunk *>   fVisibleLinks;
+    // Per book size
+    float    fWidthScale, fHeightScale;
 
-        static std::map<plString,pfBookData*> fBookGUIs;
-        plString fCurBookGUI;
+    // Per book margin around the edge (defaults to 16 pixels)
+    uint32_t      fPageTMargin, fPageLMargin, fPageBMargin, fPageRMargin;
 
-        enum Refs
-        {
-            kRefImage = 0
-        };
+    // Some animation keys we use
+    plKey   fPageTurnAnimKey;
 
-        // Compiles the given string of esHTML source into our compiled chunk list
-        bool    ICompileSource( const wchar_t *source, const plLocation &hintLoc );
+    // Current list of linkable image chunks we have visible on the screen, for quick hit testing
+    hsTArray<pfEsHTMLChunk*>   fVisibleLinks;
 
-        // Frees our source array
-        void    IFreeSource( void );
+    static std::map<plString, pfBookData*> fBookGUIs;
+    plString fCurBookGUI;
 
-        // Compile helpers
-        uint8_t   IGetTagType( const wchar_t *string );
-        bool    IGetNextOption( const wchar_t *&string, wchar_t *name, wchar_t *option );
+    enum Refs {
+        kRefImage = 0
+    };
 
-        plKey   IGetMipmapKey( const wchar_t *name, const plLocation &loc );
+    // Compiles the given string of esHTML source into our compiled chunk list
+    bool    ICompileSource(const wchar_t* source, const plLocation& hintLoc);
 
-        // Renders one (1) page into the given DTMap
-        void    IRenderPage( uint32_t page, uint32_t whichDTMap, bool suppressRendering = false );
+    // Frees our source array
+    void    IFreeSource(void);
 
-        // moves the movie layers from one material onto another
-        void    IMoveMovies( hsGMaterial *source, hsGMaterial *dest);
+    // Compile helpers
+    uint8_t   IGetTagType(const wchar_t* string);
+    bool    IGetNextOption(const wchar_t*& string, wchar_t* name, wchar_t* option);
 
-        // Starting at the given chunk, works backwards to determine the full set of current
-        // font properties at that point, or assigns defaults if none were specified
-        void    IFindFontProps( uint32_t chunkIdx, const wchar_t *&face, uint8_t &size, uint8_t &flags, hsColorRGBA &color, int16_t &spacing );
+    plKey   IGetMipmapKey(const wchar_t* name, const plLocation& loc);
 
-        // Find the last paragraph chunk and thus the last par alignment settings
-        uint8_t   IFindLastAlignment( void ) const;
+    // Renders one (1) page into the given DTMap
+    void    IRenderPage(uint32_t page, uint32_t whichDTMap, bool suppressRendering = false);
 
-        // Handle clicks on either side of the book
-        void    IHandleLeftSideClick( void );
-        void    IHandleRightSideClick( void );
+    // moves the movie layers from one material onto another
+    void    IMoveMovies(hsGMaterial* source, hsGMaterial* dest);
 
-        // Just sends out a notify to our currently set receiver key
-        void    ISendNotify( uint32_t type, uint32_t linkID = 0 );
+    // Starting at the given chunk, works backwards to determine the full set of current
+    // font properties at that point, or assigns defaults if none were specified
+    void    IFindFontProps(uint32_t chunkIdx, const wchar_t*& face, uint8_t& size, uint8_t& flags, hsColorRGBA& color, int16_t& spacing);
 
-        // Close with a notify
-        void    ITriggerCloseWithNotify( bool closeNotOpen, bool immediate );
+    // Find the last paragraph chunk and thus the last par alignment settings
+    uint8_t   IFindLastAlignment(void) const;
 
-        // Finish showing the book, due to the animation being done seeking
-        void    IFinishShow( bool startOpened );
+    // Handle clicks on either side of the book
+    void    IHandleLeftSideClick(void);
+    void    IHandleRightSideClick(void);
 
-        // Find the current moused link, if any
-        int32_t   IFindCurrVisibleLink( bool rightNotLeft, bool hoverNotUp );
+    // Just sends out a notify to our currently set receiver key
+    void    ISendNotify(uint32_t type, uint32_t linkID = 0);
 
-        // Ensures that all the page starts are calced up to the given page (but not including it)
-        void    IRecalcPageStarts( uint32_t upToPage );
+    // Close with a notify
+    void    ITriggerCloseWithNotify(bool closeNotOpen, bool immediate);
 
-        // Load (or unload) all the images for the book
-        void    ILoadAllImages( bool unload );
-        
-        // Purge the DynaTextMaps
-        void    IPurgeDynaTextMaps( );
+    // Finish showing the book, due to the animation being done seeking
+    void    IFinishShow(bool startOpened);
 
-        // Process a click on the given "check box" image
-        void    IHandleCheckClick( uint32_t idx, pfBookData::WhichSide which );
+    // Find the current moused link, if any
+    int32_t   IFindCurrVisibleLink(bool rightNotLeft, bool hoverNotUp);
 
-        // Draw me an image!
-        void    IDrawMipmap( pfEsHTMLChunk *chunk, uint16_t x, uint16_t y, plMipmap *mip, plDynamicTextMap *dtMap, uint32_t whichDTMap, bool dontRender );
-        
-        // Movie functions
-        loadedMovie         *IMovieAlreadyLoaded(pfEsHTMLChunk *chunk);
-        loadedMovie         *IGetMovieByIndex(uint8_t index);
-        plLayerBink         *IMakeMovieLayer(pfEsHTMLChunk *chunk, uint16_t x, uint16_t y, plMipmap *baseMipmap, uint32_t whichDTMap, bool dontRender);
+    // Ensures that all the page starts are calced up to the given page (but not including it)
+    void    IRecalcPageStarts(uint32_t upToPage);
 
-        // Cover functions
-        plLayerInterface    *IMakeBaseLayer(plMipmap *image);
-        plLayerInterface    *IMakeDecalLayer(pfEsHTMLChunk *decalChunk, plMipmap *decal, plMipmap *baseMipmap);
-        void    ISetDecalLayers(hsGMaterial *material,hsTArray<plLayerInterface*> layers);
+    // Load (or unload) all the images for the book
+    void    ILoadAllImages(bool unload);
+
+    // Purge the DynaTextMaps
+    void    IPurgeDynaTextMaps();
+
+    // Process a click on the given "check box" image
+    void    IHandleCheckClick(uint32_t idx, pfBookData::WhichSide which);
+
+    // Draw me an image!
+    void    IDrawMipmap(pfEsHTMLChunk* chunk, uint16_t x, uint16_t y, plMipmap* mip, plDynamicTextMap* dtMap, uint32_t whichDTMap, bool dontRender);
+
+    // Movie functions
+    loadedMovie*         IMovieAlreadyLoaded(pfEsHTMLChunk* chunk);
+    loadedMovie*         IGetMovieByIndex(uint8_t index);
+    plLayerBink*         IMakeMovieLayer(pfEsHTMLChunk* chunk, uint16_t x, uint16_t y, plMipmap* baseMipmap, uint32_t whichDTMap, bool dontRender);
+
+    // Cover functions
+    plLayerInterface*    IMakeBaseLayer(plMipmap* image);
+    plLayerInterface*    IMakeDecalLayer(pfEsHTMLChunk* decalChunk, plMipmap* decal, plMipmap* baseMipmap);
+    void    ISetDecalLayers(hsGMaterial* material, hsTArray<plLayerInterface*> layers);
 };
 
 

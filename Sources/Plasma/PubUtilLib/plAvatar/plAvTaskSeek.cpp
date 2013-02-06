@@ -73,8 +73,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // PROTOTYPES
 //
 /////////////////////////////////////////////////////////////////////////////////////////
-float QuatAngleDiff(const hsQuat &a, const hsQuat &b);
-void MakeMatrixUpright(hsMatrix44 &mat);
+float QuatAngleDiff(const hsQuat& a, const hsQuat& b);
+void MakeMatrixUpright(hsMatrix44& mat);
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -112,7 +112,7 @@ void plAvTaskSeek::IInitDefaults()
     fShuffleRange = kDefaultShuffleRange;
     fMaxSidleRange = kDefaultMaxSidleRange;
     fMaxSidleAngle = kDefaultMaxSidleAngle;
-    fFlags = kSeekFlagForce3rdPersonOnStart;  
+    fFlags = kSeekFlagForce3rdPersonOnStart;
     fState = kSeekRunNormal;
     fNotifyFinishedKey = nil;
 }
@@ -120,42 +120,46 @@ void plAvTaskSeek::IInitDefaults()
 // -------------
 plAvTaskSeek::plAvTaskSeek() {}
 
-plAvTaskSeek::plAvTaskSeek(plAvSeekMsg *msg)
+plAvTaskSeek::plAvTaskSeek(plAvSeekMsg* msg)
 {
     IInitDefaults();
 
     fAlign = msg->fAlignType;
     fAnimName = msg->fAnimName;
 
-    plKey &target = msg->fSeekPoint;
-    if (target)
+    plKey& target = msg->fSeekPoint;
+
+    if (target) {
         SetTarget(target);
-    else
+    } else {
         SetTarget(msg->fTargetPos, msg->fTargetLookAt);
-    
-    if (msg->UnForce3rdPersonOnFinish())
+    }
+
+    if (msg->UnForce3rdPersonOnFinish()) {
         fFlags |= kSeekFlagUnForce3rdPersonOnFinish;
-    else
+    } else {
         fFlags &= ~kSeekFlagUnForce3rdPersonOnFinish;
+    }
 
-    if (msg->Force3rdPersonOnStart())
+    if (msg->Force3rdPersonOnStart()) {
         fFlags |= kSeekFlagForce3rdPersonOnStart;
-    else
+    } else {
         fFlags &= ~kSeekFlagForce3rdPersonOnStart;
+    }
 
-    if (msg->NoWarpOnTimeout())
+    if (msg->NoWarpOnTimeout()) {
         fFlags |= kSeekFlagNoWarpOnTimeout;
-    else
+    } else {
         fFlags &= ~kSeekFlagNoWarpOnTimeout;
+    }
 
-    if (msg->RotationOnly())
-    {
+    if (msg->RotationOnly()) {
         fFlags |= kSeekFlagRotationOnly;
         fStillPositioning = false;
         fPosGoalHit = true;
-    }
-    else
+    } else {
         fFlags &= ~kSeekFlagRotationOnly;
+    }
 
     fNotifyFinishedKey = msg->fFinishKey;
 }
@@ -185,17 +189,15 @@ plAvTaskSeek::plAvTaskSeek(plKey target, plAvAlignment align, const plString& an
 void plAvTaskSeek::SetTarget(plKey target)
 {
     hsAssert(target, "Bad key to seek task");
-    if(target)
-    {
+
+    if (target) {
         fSeekObject = plSceneObject::ConvertNoRef(target->ObjectIsLoaded());
-    }
-    else
-    {
+    } else {
         fSeekObject = nil;
     }
 }
-    
-void plAvTaskSeek::SetTarget(hsPoint3 &pos, hsPoint3 &lookAt)
+
+void plAvTaskSeek::SetTarget(hsPoint3& pos, hsPoint3& lookAt)
 {
     fSeekPos = pos;
     hsVector3 up(0.f, 0.f, 1.f);
@@ -205,63 +207,65 @@ void plAvTaskSeek::SetTarget(hsPoint3 &pos, hsPoint3 &lookAt)
 
 // Start -----------------------------------------------------------------------------------------
 // ------
-bool plAvTaskSeek::Start(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvTaskSeek::Start(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
-    plAvBrainHuman *huBrain = plAvBrainHuman::ConvertNoRef(brain);
+    plAvBrainHuman* huBrain = plAvBrainHuman::ConvertNoRef(brain);
     hsAssert(huBrain, "Seek task only works on human brains");
 
     plAvatarMgr::GetInstance()->GetLog()->AddLine("Starting SMART SEEK");
     //controller needs to know we are seeking. prevents controller from interacting with exclusion regions
-    
-    if (avatar->GetController() )
+
+    if (avatar->GetController()) {
         avatar->GetController()->SetSeek(true);
+    }
+
     fStartTime = time;
-    if(huBrain)
-    {
+
+    if (huBrain) {
         avatar->SuspendInput();     // stop accepting input from the user, but queue any messages
-                                    // ...and save our current input state.
-        
+        // ...and save our current input state.
+
         ILimitPlayersInput(avatar);
-        
-        if (plAvOneShotTask::fForce3rdPerson && avatar->IsLocalAvatar() && (fFlags & plAvSeekMsg::kSeekFlagForce3rdPersonOnStart))
-        {
+
+        if (plAvOneShotTask::fForce3rdPerson && avatar->IsLocalAvatar() && (fFlags & plAvSeekMsg::kSeekFlagForce3rdPersonOnStart)) {
             // create message
             plCameraMsg* pMsg = new plCameraMsg;
             pMsg->SetBCastFlag(plMessage::kBCastByExactType);
             pMsg->SetBCastFlag(plMessage::kNetPropagate, false);
             pMsg->SetCmd(plCameraMsg::kResponderSetThirdPerson);
-            plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
-        }       
+            plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
+        }
 
         huBrain->IdleOnly(); // Makes sure to kill jumps too. Just calling ClearInputFlags isn't enough
         IUpdateObjective(avatar);
         return true;
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
 
 // Process -------------------------------------------------------------------------------------------
 // --------
-bool plAvTaskSeek::Process(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvTaskSeek::Process(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
-    if (fState == kSeekAbort)
+    if (fState == kSeekAbort) {
         return false;
-    
-    plAvBrainHuman *uBrain = plAvBrainHuman::ConvertNoRef(brain);
-    if (uBrain)
-    {
-        if (fMovingTarget)
-        {
+    }
+
+    plAvBrainHuman* uBrain = plAvBrainHuman::ConvertNoRef(brain);
+
+    if (uBrain) {
+        if (fMovingTarget) {
             IUpdateObjective(avatar);
         }
-        
+
         IAnalyze(avatar);
         bool result = IMoveTowardsGoal(avatar, uBrain, time, elapsed);
-        if (fLogProcess)
+
+        if (fLogProcess) {
             DumpToAvatarLog(avatar);
+        }
+
         return result;
     }
 
@@ -270,42 +274,42 @@ bool plAvTaskSeek::Process(plArmatureMod *avatar, plArmatureBrain *brain, double
 
 // Finish ---------------------------------------------------------------------------------------
 // -------
-void plAvTaskSeek::Finish(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+void plAvTaskSeek::Finish(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
-    plAvBrainHuman *huBrain = plAvBrainHuman::ConvertNoRef(brain);
-    
-    if(huBrain)
-    {
+    plAvBrainHuman* huBrain = plAvBrainHuman::ConvertNoRef(brain);
+
+    if (huBrain) {
         // this will process any queued input messages so if the user pressed or released a key while we were busy, we'll note it now.
-        avatar->ResumeInput();  
+        avatar->ResumeInput();
         IUndoLimitPlayersInput(avatar);
-        
-        if (plAvOneShotTask::fForce3rdPerson && avatar->IsLocalAvatar() && (fFlags & plAvSeekMsg::kSeekFlagUnForce3rdPersonOnFinish))
-        {
+
+        if (plAvOneShotTask::fForce3rdPerson && avatar->IsLocalAvatar() && (fFlags & plAvSeekMsg::kSeekFlagUnForce3rdPersonOnFinish)) {
             // create message
             plCameraMsg* pMsg = new plCameraMsg;
             pMsg->SetBCastFlag(plMessage::kBCastByExactType);
             pMsg->SetBCastFlag(plMessage::kNetPropagate, false);
             pMsg->SetCmd(plCameraMsg::kResponderUndoThirdPerson);
-            plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+            plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
         }
-        
+
         avatar->SynchIfLocal(hsTimer::GetSysSeconds(), false);
     }
 
-    if (fNotifyFinishedKey)
-    {
-        plAvTaskSeekDoneMsg *msg = new plAvTaskSeekDoneMsg(avatar->GetKey(), fNotifyFinishedKey);
+    if (fNotifyFinishedKey) {
+        plAvTaskSeekDoneMsg* msg = new plAvTaskSeekDoneMsg(avatar->GetKey(), fNotifyFinishedKey);
         msg->fAborted = (fState == kSeekAbort);
         msg->Send();
     }
-    plAvatarMgr::GetInstance()->GetLog()->AddLine("Finished SMART SEEK");   
+
+    plAvatarMgr::GetInstance()->GetLog()->AddLine("Finished SMART SEEK");
+
     //inform controller we are done seeking
-    if (avatar->GetController())
+    if (avatar->GetController()) {
         avatar->GetController()->SetSeek(false);
+    }
 }
 
-void plAvTaskSeek::LeaveAge(plArmatureMod *avatar)
+void plAvTaskSeek::LeaveAge(plArmatureMod* avatar)
 {
     fSeekObject = nil;
     fState = kSeekAbort;
@@ -313,7 +317,7 @@ void plAvTaskSeek::LeaveAge(plArmatureMod *avatar)
 
 // IAnalyze ----------------------------------------
 // ---------
-bool plAvTaskSeek::IAnalyze(plArmatureMod *avatar)
+bool plAvTaskSeek::IAnalyze(plArmatureMod* avatar)
 {
     avatar->GetPositionAndRotationSim(&fPosition, &fRotation);
     hsScalarTriple tmp(fSeekPos - fPosition);
@@ -323,19 +327,16 @@ bool plAvTaskSeek::IAnalyze(plArmatureMod *avatar)
 
     fDistance = sqrt(fGoalVec.fX * fGoalVec.fX + fGoalVec.fY * fGoalVec.fY);
 
-    if(fDistance < 3.0f)
-    {
+    if (fDistance < 3.0f) {
         // we're in "near target" mode
         fMinFwdAngle = .5f;         // walk forward if target's in 90' cone straight ahead
         fMaxBackAngle = -.2f;       // walk backward if target's in a 144' cone behind
-    }
-    else
-    {
+    } else {
         // we're in "far target" mode
         fMinFwdAngle = .2f;         // walk forward if target's in a 144' cone ahead
         fMaxBackAngle = -2.0;       // disable backing up if goal is far out (-1 is the minimum usable value here)
     }
-    
+
     hsQuat invRot = fRotation.Conjugate();
     hsPoint3 globFwd = invRot.Rotate(&kAvatarForward);
     hsPoint3 globRight = invRot.Rotate(&kAvatarRight);
@@ -352,21 +353,20 @@ bool plAvTaskSeek::IAnalyze(plArmatureMod *avatar)
 
 // IMoveTowardsGoal --------------------------------------------------------------
 // -----------------
-bool plAvTaskSeek::IMoveTowardsGoal(plArmatureMod *avatar, plAvBrainHuman *brain,
-                                      double time, float elapsed)
+bool plAvTaskSeek::IMoveTowardsGoal(plArmatureMod* avatar, plAvBrainHuman* brain,
+                                    double time, float elapsed)
 {
     bool stillRunning = true;
     avatar->ClearInputFlags(false, false);
 
     double duration = time - fStartTime;
 
-    if(duration > kSeekTimeout)
-    {
-        if (fFlags & kSeekFlagNoWarpOnTimeout)
-        {
+    if (duration > kSeekTimeout) {
+        if (fFlags & kSeekFlagNoWarpOnTimeout) {
             fState = kSeekAbort;
             return false;
         }
+
         fSeekRot.Normalize();
         avatar->SetPositionAndRotationSim(&fSeekPos, &fSeekRot);
         IAnalyze(avatar); // Recalcs fPosition, fDistance, etc.
@@ -378,116 +378,119 @@ bool plAvTaskSeek::IMoveTowardsGoal(plArmatureMod *avatar, plAvBrainHuman *brain
         fRotGoalHit = true;
     }
 
-    if (!(fDistance > fShuffleRange))
+    if (!(fDistance > fShuffleRange)) {
         fPosGoalHit = true;
+    }
 
-    if (!fPosGoalHit)
-    {
+    if (!fPosGoalHit) {
         bool right = fAngRight > 0.0f;
         bool inSidleRange = fDistance < fMaxSidleRange;
-        
+
         bool sidling = fabs(fDistRight) > fabs(fDistForward) && inSidleRange;
 
-        if(sidling)
-        {
-            if(right)
+        if (sidling) {
+            if (right) {
                 avatar->SetStrafeRightKeyDown();
-            else
+            } else {
                 avatar->SetStrafeLeftKeyDown();
-        }
-        else
-        {
-            if(fAngForward < fMaxBackAngle)
+            }
+        } else {
+            if (fAngForward < fMaxBackAngle) {
                 avatar->SetBackwardKeyDown();
+            }
 
-            else
-            {
-                if(fAngForward > fMinFwdAngle)
+            else {
+                if (fAngForward > fMinFwdAngle) {
                     avatar->SetForwardKeyDown();
+                }
 
-                if(right)
+                if (right) {
                     avatar->SetTurnRightKeyDown();
-                else
+                } else {
                     avatar->SetTurnLeftKeyDown();
+                }
             }
         }
-    }
-    else 
-    {
-        if (!(QuatAngleDiff(fRotation, fSeekRot) > .1))
+    } else {
+        if (!(QuatAngleDiff(fRotation, fSeekRot) > .1)) {
             fRotGoalHit = true;
+        }
 
-        if (!fRotGoalHit)
-        {
+        if (!fRotGoalHit) {
             hsQuat invRot = fSeekRot.Conjugate();
             hsPoint3 globFwd = invRot.Rotate(&kAvatarForward);
             globFwd = fRotation.Rotate(&globFwd);
-        
-            if (globFwd.fX < 0)
-                avatar->SetTurnRightKeyDown();
-            else
-                avatar->SetTurnLeftKeyDown();
-        }
-    }       
 
-    if (fPosGoalHit && fRotGoalHit)
+            if (globFwd.fX < 0) {
+                avatar->SetTurnRightKeyDown();
+            } else {
+                avatar->SetTurnLeftKeyDown();
+            }
+        }
+    }
+
+    if (fPosGoalHit && fRotGoalHit) {
         stillRunning = ITryFinish(avatar, brain, time, elapsed);
+    }
 
     return stillRunning;
 }
 
 
 // ITRYFINISH
-bool plAvTaskSeek::ITryFinish(plArmatureMod *avatar, plAvBrainHuman *brain, double time, float elapsed)
+bool plAvTaskSeek::ITryFinish(plArmatureMod* avatar, plAvBrainHuman* brain, double time, float elapsed)
 {
     bool animsDone = brain->IsMovementZeroBlend();
 
     hsPoint3 newPosition = fPosition;
     hsQuat newRotation = fRotation;
 
-    if (!(fFlags & kSeekFlagRotationOnly) && (fStillPositioning || !animsDone))
+    if (!(fFlags & kSeekFlagRotationOnly) && (fStillPositioning || !animsDone)) {
         fStillPositioning = IFinishPosition(newPosition, avatar, brain, time, elapsed);
-    if (fStillRotating || !animsDone)
+    }
+
+    if (fStillRotating || !animsDone) {
         fStillRotating = IFinishRotation(newRotation, avatar, brain, time, elapsed);
+    }
 
     newRotation.Normalize();
-    if (hsCheckBits(fFlags, kSeekFlagRotationOnly))
+
+    if (hsCheckBits(fFlags, kSeekFlagRotationOnly)) {
         avatar->SetPositionAndRotationSim(nil, &newRotation);
-    else
+    } else {
         avatar->SetPositionAndRotationSim(&newPosition, &newRotation);
+    }
 
     return fStillPositioning || fStillRotating || !animsDone;
 }
 
-bool plAvTaskSeek::IFinishPosition(hsPoint3 &newPosition,
-                                     plArmatureMod *avatar, plAvBrainHuman *brain,
-                                     double time, float elapsed)
+bool plAvTaskSeek::IFinishPosition(hsPoint3& newPosition,
+                                   plArmatureMod* avatar, plAvBrainHuman* brain,
+                                   double time, float elapsed)
 {
     // While warping, we might be hovering just above the ground. Don't want that to
     // trigger any falling behavior.
-    if(brain&&brain->fWalkingStrategy)
-    {
-        
+    if (brain && brain->fWalkingStrategy) {
+
         brain->fWalkingStrategy->ResetAirTime();
     }
+
     // how far will we translate this frame?
     float thisDist = kFloatSpeed * elapsed;
     // what percentage of the remaining distance will we cover?
     float thisPct = (fDistance ? thisDist / fDistance : 1.f);
-    
-    if(thisPct > 0.9f)
-    {
+
+    if (thisPct > 0.9f) {
         // we're pretty much done; just hop the rest of the way
         newPosition = fSeekPos;
         return false; // we're done
-    }
-    else
-    {
+    } else {
         // move incrementally toward the target position
         hsVector3 thisMove = fGoalVec * thisPct;
         newPosition = fPosition + thisMove;
         return true;        // we're still processing
     }
+
     return true;
 }
 
@@ -495,9 +498,9 @@ bool plAvTaskSeek::IFinishPosition(hsPoint3 &newPosition,
 
 // IFinishRotation --------------------------------------
 // ----------------
-bool plAvTaskSeek::IFinishRotation(hsQuat &newRotation,
-                                     plArmatureMod *avatar, plAvBrainHuman *brain,
-                                     double time, float elapsed)
+bool plAvTaskSeek::IFinishRotation(hsQuat& newRotation,
+                                   plArmatureMod* avatar, plAvBrainHuman* brain,
+                                   double time, float elapsed)
 {
     // we're pretty much done; just hop the rest of the way
     newRotation = fSeekRot;
@@ -506,24 +509,28 @@ bool plAvTaskSeek::IFinishRotation(hsQuat &newRotation,
 
 // IUpdateObjective ----------------------------------------
 // -----------------
-bool plAvTaskSeek::IUpdateObjective(plArmatureMod *avatar)
+bool plAvTaskSeek::IUpdateObjective(plArmatureMod* avatar)
 {
     // This is an entirely valid case. It just means our goal is fixed.
-    if (fSeekObject == nil)
+    if (fSeekObject == nil) {
         return true;
+    }
 
     // goal here is to express the target matrix in the avatar's PHYSICAL space
     hsMatrix44 targL2W = fSeekObject->GetLocalToWorld();
     const plCoordinateInterface* subworldCI = nil;
-    if (avatar->GetController())
+
+    if (avatar->GetController()) {
         subworldCI = avatar->GetController()->GetSubworldCI();
-    if (subworldCI)
+    }
+
+    if (subworldCI) {
         targL2W = subworldCI->GetWorldToLocal() * targL2W;
+    }
 
     MakeMatrixUpright(targL2W);
 
-    switch(fAlign)
-    {
+    switch (fAlign) {
         // match our handle to the target matrix at the end of the given animation
         // This case isn't currently used but will be important someday. The idea
         // is that you have a target point and an animation, and you want to seek
@@ -531,20 +538,20 @@ bool plAvTaskSeek::IUpdateObjective(plArmatureMod *avatar)
         // up, after the animation completes, at the target location.
         // Hence "AlignHandleAnimEnd" = "align the avatar so the animation will
         // end on the target."
-        case kAlignHandleAnimEnd:
-            {
-                hsMatrix44 adjustment;
-                plAGAnim *anim = avatar->FindCustomAnim(fAnimName);
-                // don't need to do this every frame; the animation doesn't change.
-                // *** cache the adjustment;
-                GetStartToEndTransform(anim, nil, &adjustment, "Handle");   // actually getting end-to-start
-                // ... but we do still need to multiply by the (potentially changed) target
-                targL2W = targL2W * adjustment;
-            }
-            break;
-        case kAlignHandle:      // targetMat is already correct
-        default:
-            break;
+    case kAlignHandleAnimEnd: {
+            hsMatrix44 adjustment;
+            plAGAnim* anim = avatar->FindCustomAnim(fAnimName);
+            // don't need to do this every frame; the animation doesn't change.
+            // *** cache the adjustment;
+            GetStartToEndTransform(anim, nil, &adjustment, "Handle");   // actually getting end-to-start
+            // ... but we do still need to multiply by the (potentially changed) target
+            targL2W = targL2W * adjustment;
+        }
+        break;
+
+    case kAlignHandle:      // targetMat is already correct
+    default:
+        break;
     };
 
     GetPositionAndRotation(targL2W, &fSeekPos, &fSeekRot);
@@ -556,7 +563,7 @@ bool plAvTaskSeek::IUpdateObjective(plArmatureMod *avatar)
 
 // DumpDebug -----------------------------------------------------------------------------------------------------
 // ----------
-void plAvTaskSeek::DumpDebug(const char *name, int &x, int&y, int lineHeight, char *strBuf, plDebugText &debugTxt)
+void plAvTaskSeek::DumpDebug(const char* name, int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt)
 {
     sprintf(strBuf, "duration: %.2f pos: (%.3f, %.3f, %.3f) goalPos: (%.3f, %.3f, %.3f) ",
             hsTimer::GetSysSeconds() - fStartTime,
@@ -568,16 +575,16 @@ void plAvTaskSeek::DumpDebug(const char *name, int &x, int&y, int lineHeight, ch
             fStillPositioning, fStillRotating, fGoalVec.fX, fGoalVec.fY, fGoalVec.fZ, fDistance, fAngForward, fAngRight);
     debugTxt.DrawString(x, y, strBuf);
     y += lineHeight;
-    
+
     sprintf(strBuf, " distFwd: %.3f distRt: %.3f shufRange: %.3f sidAngle: %.3f sidRange: %.3f, fMinWalk: %.3f",
             fDistForward, fDistRight, fShuffleRange, fMaxSidleAngle, fMaxSidleRange, fMinFwdAngle);
     debugTxt.DrawString(x, y, strBuf);
     y += lineHeight;
 }
 
-void plAvTaskSeek::DumpToAvatarLog(plArmatureMod *avatar)
+void plAvTaskSeek::DumpToAvatarLog(plArmatureMod* avatar)
 {
-    plStatusLog *log = plAvatarMgr::GetInstance()->GetLog();
+    plStatusLog* log = plAvatarMgr::GetInstance()->GetLog();
     char strBuf[256];
     avatar->GetMoveKeyString(strBuf);
     log->AddLine(strBuf);
@@ -586,7 +593,7 @@ void plAvTaskSeek::DumpToAvatarLog(plArmatureMod *avatar)
             hsTimer::GetSysSeconds() - fStartTime,
             fPosition.fX, fPosition.fY, fPosition.fZ, fSeekPos.fX, fSeekPos.fY, fSeekPos.fZ);
     log->AddLine(strBuf);
-    
+
     sprintf(strBuf, "    positioning: %d rotating %d goalVec: (%.3f, %.3f, %.3f) dist: %.3f angFwd: %.3f angRt: %.3f",
             fStillPositioning, fStillRotating, fGoalVec.fX, fGoalVec.fY, fGoalVec.fZ, fDistance, fAngForward, fAngRight);
     log->AddLine(strBuf);
@@ -604,7 +611,7 @@ void plAvTaskSeek::DumpToAvatarLog(plArmatureMod *avatar)
 
 // QuatAngleDiff ------------------------------------
 // --------------
-float QuatAngleDiff(const hsQuat &a, const hsQuat &b)
+float QuatAngleDiff(const hsQuat& a, const hsQuat& b)
 {
     float theta;     /* angle between A and B */
     float cos_t;     /* sine, cosine of theta */
@@ -613,15 +620,16 @@ float QuatAngleDiff(const hsQuat &a, const hsQuat &b)
     cos_t = a.Dot(b);
 
     /* if B is on opposite hemisphere from A, use -B instead */
-    if (cos_t < 0.0)
-    {
+    if (cos_t < 0.0) {
         cos_t = -cos_t;
-    } 
+    }
 
     // Calling acos on 1.0 is returning an undefined value. Need to check for it.
     float epsilon = 0.00001;
-    if (hsABS(cos_t - 1.f) < epsilon)
+
+    if (hsABS(cos_t - 1.f) < epsilon) {
         return 0;
+    }
 
     theta   = acos(cos_t);
     return theta;
@@ -632,11 +640,13 @@ float QuatAngleDiff(const hsQuat &a, const hsQuat &b)
 // ensure that the z axis of the given matrix points at the sky.
 // does not orthonormalize
 // man, I could have sworn I did this somewhere else...
-void MakeMatrixUpright(hsMatrix44 &mat)
+void MakeMatrixUpright(hsMatrix44& mat)
 {
     mat.fMap[0][2] = 0.0f;          // eliminate any z in the x axis
     mat.fMap[1][2] = 0.0f;          // eliminate any z in the y axis
-    mat.fMap[2][0] = 0.0f; mat.fMap[2][1] = 0.0f; mat.fMap[2][2] = 1.0f;    // z axis = pure sky
+    mat.fMap[2][0] = 0.0f;
+    mat.fMap[2][1] = 0.0f;
+    mat.fMap[2][2] = 1.0f;    // z axis = pure sky
 }
 
 

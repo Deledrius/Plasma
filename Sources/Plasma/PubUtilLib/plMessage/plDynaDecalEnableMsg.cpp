@@ -47,26 +47,29 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsStream.h"
 
 plDynaDecalEnableMsg::plDynaDecalEnableMsg()
-:   plMessage(nil, nil, nil),
-    fKey(nil),
-    fFlags(0),
-    fConTime(0),
-    fID(uint32_t(-1))
+    :   plMessage(nil, nil, nil),
+        fKey(nil),
+        fFlags(0),
+        fConTime(0),
+        fID(uint32_t(-1))
 {
 }
 
 plDynaDecalEnableMsg::plDynaDecalEnableMsg(const plKey& r, const plKey& a, double t, float w, bool end, uint32_t id, bool isArm)
-:   plMessage(nil, r, nil),
-    fKey(a),
-    fFlags(0),
-    fConTime(t),
-    fWetLength(w),
-    fID(id)
+    :   plMessage(nil, r, nil),
+        fKey(a),
+        fFlags(0),
+        fConTime(t),
+        fWetLength(w),
+        fID(id)
 {
-    if( end )
+    if (end) {
         fFlags |= kAtEnd;
-    if( isArm )
+    }
+
+    if (isArm) {
         fFlags |= kArmature;
+    }
 }
 
 plDynaDecalEnableMsg::~plDynaDecalEnableMsg()

@@ -66,7 +66,7 @@ void plSwimRegionInterface::Write(hsStream* s, hsResMgr* mgr)
     s->WriteLEScalar(fMaxUpwardVel);
 }
 
-void plSwimRegionInterface::GetCurrent(plPhysicalControllerCore *physical, hsVector3 &linearResult, float &angularResult, float elapsed)
+void plSwimRegionInterface::GetCurrent(plPhysicalControllerCore* physical, hsVector3& linearResult, float& angularResult, float elapsed)
 {
     linearResult.Set(0.f, 0.f, 0.f);
     angularResult = 0.f;
@@ -74,9 +74,9 @@ void plSwimRegionInterface::GetCurrent(plPhysicalControllerCore *physical, hsVec
 
 /////////////////////////////////////////////////////////////////////////
 
-plSwimCircularCurrentRegion::plSwimCircularCurrentRegion() : 
-    fCurrentSO(nil), 
-    fRotation(0.f), 
+plSwimCircularCurrentRegion::plSwimCircularCurrentRegion() :
+    fCurrentSO(nil),
+    fRotation(0.f),
     fPullNearDistSq(1.f),
     fPullNearVel(0.f),
     fPullFarDistSq(1.f),
@@ -87,19 +87,19 @@ plSwimCircularCurrentRegion::plSwimCircularCurrentRegion() :
 void plSwimCircularCurrentRegion::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSwimRegionInterface::Read(stream, mgr);
-    
+
     fRotation = stream->ReadLEScalar();
     fPullNearDistSq = stream->ReadLEScalar();
     fPullNearVel = stream->ReadLEScalar();
     fPullFarDistSq = stream->ReadLEScalar();
     fPullFarVel = stream->ReadLEScalar();
-    mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1), plRefFlags::kActiveRef); // currentSO      
+    mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1), plRefFlags::kActiveRef); // currentSO
 }
 
 void plSwimCircularCurrentRegion::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSwimRegionInterface::Write(stream, mgr);
-    
+
     stream->WriteLEScalar(fRotation);
     stream->WriteLEScalar(fPullNearDistSq);
     stream->WriteLEScalar(fPullNearVel);
@@ -110,17 +110,18 @@ void plSwimCircularCurrentRegion::Write(hsStream* stream, hsResMgr* mgr)
 
 bool plSwimCircularCurrentRegion::MsgReceive(plMessage* msg)
 {
-    plGenRefMsg *refMsg = plGenRefMsg::ConvertNoRef(msg);
-    if (refMsg)
-    {
-        plSceneObject *so = plSceneObject::ConvertNoRef(refMsg->GetRef());
-        if (so)
-        {
-            if (refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace))
+    plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
+
+    if (refMsg) {
+        plSceneObject* so = plSceneObject::ConvertNoRef(refMsg->GetRef());
+
+        if (so) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fCurrentSO = so;
-            else if (refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove))
+            } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                 fCurrentSO = nil;
-            
+            }
+
             return true;
         }
     }
@@ -128,10 +129,9 @@ bool plSwimCircularCurrentRegion::MsgReceive(plMessage* msg)
     return plSwimRegionInterface::MsgReceive(msg);
 }
 
-void plSwimCircularCurrentRegion::GetCurrent(plPhysicalControllerCore *physical, hsVector3 &linearResult, float &angularResult, float elapsed)
+void plSwimCircularCurrentRegion::GetCurrent(plPhysicalControllerCore* physical, hsVector3& linearResult, float& angularResult, float elapsed)
 {
-    if (elapsed <= 0.f || fCurrentSO == nil || GetProperty(kDisable))
-    {
+    if (elapsed <= 0.f || fCurrentSO == nil || GetProperty(kDisable)) {
         linearResult.Set(0.f, 0.f, 0.f);
         angularResult = 0.f;
         return;
@@ -142,8 +142,8 @@ void plSwimCircularCurrentRegion::GetCurrent(plPhysicalControllerCore *physical,
     center.Set(&xlate);
 
     plKey worldKey = physical->GetSubworld();
-    if (worldKey)
-    {
+
+    if (worldKey) {
         plSceneObject* so = plSceneObject::ConvertNoRef(worldKey->ObjectIsLoaded());
         center = so->GetWorldToLocal() * center;
     }
@@ -151,28 +151,28 @@ void plSwimCircularCurrentRegion::GetCurrent(plPhysicalControllerCore *physical,
     center.fZ = 0.f; // Just doing 2D
 
     physical->GetPositionSim(pos);
-    
+
     bool applyPull = true;
     hsVector3 pos2Center(center.fX - pos.fX, center.fY - pos.fY, 0.f);
     float pullVel;
     float distSq = pos2Center.MagnitudeSquared();
-    if (distSq < .5)
-    {
+
+    if (distSq < .5) {
         // Don't want to pull us too close to the center, or we
         // get this annoying jitter.
         pullVel = 0.f;
-    }
-    else if (distSq <= fPullNearDistSq)
+    } else if (distSq <= fPullNearDistSq) {
         pullVel = fPullNearVel;
-    else if (distSq >= fPullFarDistSq)
+    } else if (distSq >= fPullFarDistSq) {
         pullVel = fPullFarVel;
-    else
+    } else {
         pullVel = fPullNearVel + (fPullFarVel - fPullNearVel) * (distSq - fPullNearDistSq) / (fPullFarDistSq - fPullNearDistSq);
+    }
 
     hsVector3 pull = pos2Center;
     pull.Normalize();
     linearResult.Set(pull.fY, -pull.fX, pull.fZ);
-    
+
     pull *= pullVel;
     linearResult *= fRotation;
     linearResult += pull;
@@ -180,22 +180,27 @@ void plSwimCircularCurrentRegion::GetCurrent(plPhysicalControllerCore *physical,
     hsVector3 v1 = linearResult * elapsed - pos2Center;
     hsVector3 v2 = -pos2Center;
     float invCos = v1.InnerProduct(v2) / v1.Magnitude() / v2.Magnitude();
-    if (invCos > 1)
+
+    if (invCos > 1) {
         invCos = 1;
-    if (invCos < -1)
+    }
+
+    if (invCos < -1) {
         invCos = -1;
+    }
+
     angularResult = acos(invCos) / elapsed;
 
 //  hsAssert(real_finite(linearResult.fX) &&
 //           real_finite(linearResult.fY) &&
 //           real_finite(linearResult.fZ) &&
-//           real_finite(angularResult), "Bad water current computation."); 
-}   
+//           real_finite(angularResult), "Bad water current computation.");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-plSwimStraightCurrentRegion::plSwimStraightCurrentRegion() : 
-    fCurrentSO(nil), 
+plSwimStraightCurrentRegion::plSwimStraightCurrentRegion() :
+    fCurrentSO(nil),
     fNearDist(1.f),
     fNearVel(0.f),
     fFarDist(1.f),
@@ -206,18 +211,18 @@ plSwimStraightCurrentRegion::plSwimStraightCurrentRegion() :
 void plSwimStraightCurrentRegion::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSwimRegionInterface::Read(stream, mgr);
-    
+
     fNearDist = stream->ReadLEScalar();
     fNearVel = stream->ReadLEScalar();
     fFarDist = stream->ReadLEScalar();
     fFarVel = stream->ReadLEScalar();
-    mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1), plRefFlags::kActiveRef); // currentSO      
+    mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1), plRefFlags::kActiveRef); // currentSO
 }
 
 void plSwimStraightCurrentRegion::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSwimRegionInterface::Write(stream, mgr);
-    
+
     stream->WriteLEScalar(fNearDist);
     stream->WriteLEScalar(fNearVel);
     stream->WriteLEScalar(fFarDist);
@@ -227,17 +232,18 @@ void plSwimStraightCurrentRegion::Write(hsStream* stream, hsResMgr* mgr)
 
 bool plSwimStraightCurrentRegion::MsgReceive(plMessage* msg)
 {
-    plGenRefMsg *refMsg = plGenRefMsg::ConvertNoRef(msg);
-    if (refMsg)
-    {
-        plSceneObject *so = plSceneObject::ConvertNoRef(refMsg->GetRef());
-        if (so)
-        {
-            if (refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace))
+    plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
+
+    if (refMsg) {
+        plSceneObject* so = plSceneObject::ConvertNoRef(refMsg->GetRef());
+
+        if (so) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fCurrentSO = so;
-            else if (refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove))
+            } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                 fCurrentSO = nil;
-            
+            }
+
             return true;
         }
     }
@@ -245,12 +251,11 @@ bool plSwimStraightCurrentRegion::MsgReceive(plMessage* msg)
     return plSwimRegionInterface::MsgReceive(msg);
 }
 
-void plSwimStraightCurrentRegion::GetCurrent(plPhysicalControllerCore *physical, hsVector3 &linearResult, float &angularResult, float elapsed)
+void plSwimStraightCurrentRegion::GetCurrent(plPhysicalControllerCore* physical, hsVector3& linearResult, float& angularResult, float elapsed)
 {
     angularResult = 0.f;
 
-    if (elapsed <= 0.f || GetProperty(kDisable))
-    {
+    if (elapsed <= 0.f || GetProperty(kDisable)) {
         linearResult.Set(0.f, 0.f, 0.f);
         return;
     }
@@ -262,8 +267,8 @@ void plSwimStraightCurrentRegion::GetCurrent(plPhysicalControllerCore *physical,
     physical->GetPositionSim(pos);
 
     plKey worldKey = physical->GetSubworld();
-    if (worldKey)
-    {
+
+    if (worldKey) {
         plSceneObject* so = plSceneObject::ConvertNoRef(worldKey->ObjectIsLoaded());
         hsMatrix44 w2l = so->GetWorldToLocal();
         center = w2l * center;
@@ -273,13 +278,14 @@ void plSwimStraightCurrentRegion::GetCurrent(plPhysicalControllerCore *physical,
     hsVector3 pos2Center(center.fX - pos.fX, center.fY - pos.fY, 0.f);
     float dist = current.InnerProduct(pos - center);
     float pullVel;
-    
-    if (dist <= fNearDist)
+
+    if (dist <= fNearDist) {
         pullVel = fNearVel;
-    else if (dist >= fFarDist)
+    } else if (dist >= fFarDist) {
         pullVel = fFarVel;
-    else
+    } else {
         pullVel = fNearVel + (fFarVel - fNearVel) * (dist - fNearDist) / (fFarDist - fNearDist);
+    }
 
     linearResult = current * pullVel;
-}   
+}

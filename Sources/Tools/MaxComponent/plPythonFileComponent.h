@@ -45,8 +45,7 @@ class plComponentClassDesc;
 
 #define PYTHON_FILE_CID Class_ID(0x670d3629, 0x559e4f11)
 
-namespace PythonFile
-{
-    plComponentClassDesc *GetClassDesc();
-    void AddAutoUIBlock(plAutoUIBlock *block);
+namespace PythonFile {
+plComponentClassDesc* GetClassDesc();
+void AddAutoUIBlock(plAutoUIBlock* block);
 }

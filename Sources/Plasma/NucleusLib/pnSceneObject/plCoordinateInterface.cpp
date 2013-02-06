@@ -62,8 +62,8 @@ uint8_t plCoordinateInterface::fTransformPhase = plCoordinateInterface::kTransfo
 bool plCoordinateInterface::fDelayedTransformsEnabled = true;
 
 plCoordinateInterface::plCoordinateInterface()
-: fParent(nil),
-  fReason(kReasonUnknown)
+    : fParent(nil),
+      fReason(kReasonUnknown)
 {
     fLocalToParent.Reset();
     fParentToLocal.Reset();
@@ -76,27 +76,32 @@ plCoordinateInterface::plCoordinateInterface()
 
 plCoordinateInterface::~plCoordinateInterface()
 {
-    if( fParent )
+    if (fParent) {
         fParent->IRemoveChild(IGetOwner());
+    }
+
     int i;
-    for( i = fChildren.GetCount()-1; i >= 0; i-- )
+
+    for (i = fChildren.GetCount() - 1; i >= 0; i--) {
         IRemoveChild(i);
+    }
 }
 
 void plCoordinateInterface::ISetSceneNode(plKey newNode)
 {
     int i;
-    for( i = 0; i < fChildren.GetCount(); i++ )
-    {
-        if( fChildren[i] )
+
+    for (i = 0; i < fChildren.GetCount(); i++) {
+        if (fChildren[i]) {
             fChildren[i]->SetSceneNode(newNode);
+        }
     }
 }
 
 void plCoordinateInterface::ISetOwner(plSceneObject* so)
 {
     plObjInterface::ISetOwner(so);
-    
+
     IDirtyTransform();
     fReason |= kReasonUnknown;
 }
@@ -106,34 +111,39 @@ void plCoordinateInterface::ISetParent(plCoordinateInterface* par)
     fParent = par;
 
     // This won't have any effect if my owner is NetGroupConstant
-    if( fParent )
+    if (fParent) {
         ISetNetGroupRecur(fParent->GetNetGroup());
+    }
 
     IDirtyTransform();
     fReason |= kReasonUnknown;
 }
 
-plCoordinateInterface* plCoordinateInterface::GetChild(int i) const 
-{ 
-    return fChildren[i] ? fChildren[i]->GetVolatileCoordinateInterface() : nil; 
+plCoordinateInterface* plCoordinateInterface::GetChild(int i) const
+{
+    return fChildren[i] ? fChildren[i]->GetVolatileCoordinateInterface() : nil;
 }
 
 void plCoordinateInterface::IRemoveChild(int i)
 {
-    if( fChildren[i] )
-    {
+    if (fChildren[i]) {
         plCoordinateInterface* childCI = fChildren[i]->GetVolatileCoordinateInterface();
-        if( childCI )
+
+        if (childCI) {
             childCI->ISetParent(nil);
+        }
     }
+
     fChildren.Remove(i);
 }
 
 void plCoordinateInterface::IRemoveChild(plSceneObject* child)
 {
     int idx = fChildren.Find(child);
-    if( idx != fChildren.kMissingIndex )
+
+    if (idx != fChildren.kMissingIndex) {
         IRemoveChild(idx);
+    }
 }
 
 void plCoordinateInterface::ISetChild(plSceneObject* child, int which)
@@ -143,17 +153,18 @@ void plCoordinateInterface::ISetChild(plSceneObject* child, int which)
     hsAssert(childCI, "Child with no coordinate interface");
     childCI->ISetParent(this);
 
-    if( which < 0 )
+    if (which < 0) {
         which = fChildren.GetCount();
-    fChildren.ExpandAndZero(which+1);
+    }
+
+    fChildren.ExpandAndZero(which + 1);
     fChildren[which] = child;
 
     // If we can't delay our transform update, neither can any of our parents.
-    if (!childCI->GetProperty(kDelayedTransformEval))
-    {
-        plCoordinateInterface *current = childCI->GetParent();
-        while (current)
-        {
+    if (!childCI->GetProperty(kDelayedTransformEval)) {
+        plCoordinateInterface* current = childCI->GetParent();
+
+        while (current) {
             current->SetProperty(kDelayedTransformEval, false);
             current = current->GetParent();
         }
@@ -171,21 +182,24 @@ void plCoordinateInterface::IAttachChild(plSceneObject* child, uint8_t flags)
     plCoordinateInterface* childCI = child->GetVolatileCoordinateInterface();
     hsAssert(childCI, "Owner without CoordinateInterface being attached");
 
-    if (childCI->GetParent() == this)
-        return; // We're already attached! Who told us to do this?
-    
+    if (childCI->GetParent() == this) {
+        return;    // We're already attached! Who told us to do this?
+    }
+
     hsMatrix44 l2w = childCI->GetLocalToWorld();
     hsMatrix44 w2l = childCI->GetWorldToLocal();
 
-    if( childCI->GetParent() )
+    if (childCI->GetParent()) {
         childCI->GetParent()->IDetachChild(child, flags | kAboutToAttach);
+    }
 
     childCI->IUnRegisterForTransformMessage();
 
     IAddChild(child);
 
-    if( flags & kMaintainWorldPosition )
-        childCI->WarpToWorld(l2w,w2l);
+    if (flags & kMaintainWorldPosition) {
+        childCI->WarpToWorld(l2w, w2l);
+    }
 }
 
 void plCoordinateInterface::IDetachChild(plSceneObject* child, uint8_t flags)
@@ -198,17 +212,22 @@ void plCoordinateInterface::IDetachChild(plSceneObject* child, uint8_t flags)
     hsMatrix44 w2l = childCI->GetWorldToLocal();
 
     GetKey()->Release(child->GetKey());
-    if( IGetOwner() && IGetOwner()->GetKey() )
+
+    if (IGetOwner() && IGetOwner()->GetKey()) {
         IGetOwner()->GetKey()->Release(child->GetKey());
+    }
+
     IRemoveChild(child);
 
-    if( flags & kMaintainWorldPosition )
-        childCI->WarpToWorld(l2w,w2l);
+    if (flags & kMaintainWorldPosition) {
+        childCI->WarpToWorld(l2w, w2l);
+    }
 
-    // If the child was keeping us from delaying our transform, 
+    // If the child was keeping us from delaying our transform,
     // maybe we can, now that it's gone.
-    if (!childCI->GetProperty(kDelayedTransformEval))
+    if (!childCI->GetProperty(kDelayedTransformEval)) {
         IUpdateDelayProp();
+    }
 }
 
 /*
@@ -231,26 +250,30 @@ void plCoordinateInterface::IDetachChild(plSceneObject* child, uint8_t flags)
  *  BTW: The POINT of all this is that when we update our l2w transforms because
  *  we're animated, and then we update AGAIN after a parent node of ours involved
  *  in physics gets a slight nudge, the first update becomes pointless. The
- *  delay prop bookkeeping keeps us from doing the wasted calculations. And since 
+ *  delay prop bookkeeping keeps us from doing the wasted calculations. And since
  *  nearly all bones on the avatar are in this exact situation, it's worth doing.
  */
 void plCoordinateInterface::IUpdateDelayProp()
 {
     int i;
-    if (!GetProperty(kCanEverDelayTransform))
-        return;
 
-    for (i = 0; i < GetNumChildren(); i++)
-    {
-        // If we still have a child that needs the delay...     
-        if (!GetChild(i)->GetProperty(kDelayedTransformEval))
+    if (!GetProperty(kCanEverDelayTransform)) {
+        return;
+    }
+
+    for (i = 0; i < GetNumChildren(); i++) {
+        // If we still have a child that needs the delay...
+        if (!GetChild(i)->GetProperty(kDelayedTransformEval)) {
             return;
+        }
     }
 
     // Cool, we can delay now, which means maybe our parent can too.
     SetProperty(kDelayedTransformEval, true);
-    if (GetParent())
+
+    if (GetParent()) {
         GetParent()->IUpdateDelayProp();
+    }
 }
 
 plCoordinateInterface* plCoordinateInterface::IGetRoot()
@@ -260,19 +283,20 @@ plCoordinateInterface* plCoordinateInterface::IGetRoot()
 
 void plCoordinateInterface::IRegisterForTransformMessage(bool delayed)
 {
-    if( IGetOwner() )
-    {
-        if ((delayed || fTransformPhase == kTransformPhaseDelayed) && fDelayedTransformsEnabled)
+    if (IGetOwner()) {
+        if ((delayed || fTransformPhase == kTransformPhaseDelayed) && fDelayedTransformsEnabled) {
             plgDispatch::Dispatch()->RegisterForExactType(plDelayedTransformMsg::Index(), IGetOwner()->GetKey());
-        else
+        } else {
             plgDispatch::Dispatch()->RegisterForExactType(plTransformMsg::Index(), IGetOwner()->GetKey());
+        }
     }
 }
 
 void plCoordinateInterface::IUnRegisterForTransformMessage()
 {
-    if( IGetOwner() )
+    if (IGetOwner()) {
         plgDispatch::Dispatch()->UnRegisterForExactType(plTransformMsg::Index(), IGetOwner()->GetKey());
+    }
 }
 
 
@@ -295,13 +319,10 @@ void plCoordinateInterface::MultTransformLocal(const hsMatrix44& move, const hsM
 void plCoordinateInterface::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l)
 {
     fReason |= kReasonUnknown;
-    
-    if( fParent )
-    {
+
+    if (fParent) {
         SetLocalToParent(fParent->GetWorldToLocal() * l2w, w2l * fParent->GetLocalToWorld());
-    }
-    else
-    {
+    } else {
         SetLocalToParent(l2w, w2l);
     }
 }
@@ -315,14 +336,12 @@ void plCoordinateInterface::SetTransformPhysical(const hsMatrix44& l2w, const hs
     //            so that we don't get reasonPhysics + reasonUnknown, just reasonPhysics
     uint16_t oldReason = fReason;
 
-    if( fParent )
-    {
+    if (fParent) {
         SetLocalToParent(fParent->GetWorldToLocal() * l2w, w2l * fParent->GetLocalToWorld());
-    }
-    else
-    {
+    } else {
         SetLocalToParent(l2w, w2l);
     }
+
     fReason = oldReason | kReasonPhysics;
 }
 
@@ -351,21 +370,20 @@ void plCoordinateInterface::WarpToLocal(const hsMatrix44& l2p, const hsMatrix44&
     SetLocalToParent(l2p, p2l);
 
     // update physical state when an object is warped
-    if (IGetOwner())
+    if (IGetOwner()) {
         IGetOwner()->DirtySynchState(kSDLPhysical, 0);
+    }
 }
 
 void plCoordinateInterface::WarpToWorld(const hsMatrix44& l2w, const hsMatrix44& w2l)
 {
     fReason |= kReasonUnknown;
-    if( fParent )
-    {
+
+    if (fParent) {
         hsMatrix44 l2p = fParent->GetWorldToLocal() * l2w;
         hsMatrix44 p2l = w2l * fParent->GetLocalToWorld();
         WarpToLocal(l2p, p2l);
-    }
-    else
-    {
+    } else {
         WarpToLocal(l2w, w2l);
     }
 }
@@ -388,55 +406,55 @@ static inline hsMatrix44 IMatrixMul34(const hsMatrix44& lhs, const hsMatrix44& r
     ret.fMap[3][3] = 1.f;
 
     ret.fMap[0][0] = lhs.fMap[0][0] * rhs.fMap[0][0]
-        + lhs.fMap[0][1] * rhs.fMap[1][0]
-        + lhs.fMap[0][2] * rhs.fMap[2][0];
+                     + lhs.fMap[0][1] * rhs.fMap[1][0]
+                     + lhs.fMap[0][2] * rhs.fMap[2][0];
 
     ret.fMap[0][1] = lhs.fMap[0][0] * rhs.fMap[0][1]
-        + lhs.fMap[0][1] * rhs.fMap[1][1]
-        + lhs.fMap[0][2] * rhs.fMap[2][1];
+                     + lhs.fMap[0][1] * rhs.fMap[1][1]
+                     + lhs.fMap[0][2] * rhs.fMap[2][1];
 
     ret.fMap[0][2] = lhs.fMap[0][0] * rhs.fMap[0][2]
-        + lhs.fMap[0][1] * rhs.fMap[1][2]
-        + lhs.fMap[0][2] * rhs.fMap[2][2];
+                     + lhs.fMap[0][1] * rhs.fMap[1][2]
+                     + lhs.fMap[0][2] * rhs.fMap[2][2];
 
     ret.fMap[0][3] = lhs.fMap[0][0] * rhs.fMap[0][3]
-        + lhs.fMap[0][1] * rhs.fMap[1][3]
-        + lhs.fMap[0][2] * rhs.fMap[2][3]
-        + lhs.fMap[0][3];
+                     + lhs.fMap[0][1] * rhs.fMap[1][3]
+                     + lhs.fMap[0][2] * rhs.fMap[2][3]
+                     + lhs.fMap[0][3];
 
     ret.fMap[1][0] = lhs.fMap[1][0] * rhs.fMap[0][0]
-        + lhs.fMap[1][1] * rhs.fMap[1][0]
-        + lhs.fMap[1][2] * rhs.fMap[2][0];
+                     + lhs.fMap[1][1] * rhs.fMap[1][0]
+                     + lhs.fMap[1][2] * rhs.fMap[2][0];
 
     ret.fMap[1][1] = lhs.fMap[1][0] * rhs.fMap[0][1]
-        + lhs.fMap[1][1] * rhs.fMap[1][1]
-        + lhs.fMap[1][2] * rhs.fMap[2][1];
+                     + lhs.fMap[1][1] * rhs.fMap[1][1]
+                     + lhs.fMap[1][2] * rhs.fMap[2][1];
 
     ret.fMap[1][2] = lhs.fMap[1][0] * rhs.fMap[0][2]
-        + lhs.fMap[1][1] * rhs.fMap[1][2]
-        + lhs.fMap[1][2] * rhs.fMap[2][2];
+                     + lhs.fMap[1][1] * rhs.fMap[1][2]
+                     + lhs.fMap[1][2] * rhs.fMap[2][2];
 
     ret.fMap[1][3] = lhs.fMap[1][0] * rhs.fMap[0][3]
-        + lhs.fMap[1][1] * rhs.fMap[1][3]
-        + lhs.fMap[1][2] * rhs.fMap[2][3]
-        + lhs.fMap[1][3];
+                     + lhs.fMap[1][1] * rhs.fMap[1][3]
+                     + lhs.fMap[1][2] * rhs.fMap[2][3]
+                     + lhs.fMap[1][3];
 
     ret.fMap[2][0] = lhs.fMap[2][0] * rhs.fMap[0][0]
-        + lhs.fMap[2][1] * rhs.fMap[1][0]
-        + lhs.fMap[2][2] * rhs.fMap[2][0];
+                     + lhs.fMap[2][1] * rhs.fMap[1][0]
+                     + lhs.fMap[2][2] * rhs.fMap[2][0];
 
     ret.fMap[2][1] = lhs.fMap[2][0] * rhs.fMap[0][1]
-        + lhs.fMap[2][1] * rhs.fMap[1][1]
-        + lhs.fMap[2][2] * rhs.fMap[2][1];
+                     + lhs.fMap[2][1] * rhs.fMap[1][1]
+                     + lhs.fMap[2][2] * rhs.fMap[2][1];
 
     ret.fMap[2][2] = lhs.fMap[2][0] * rhs.fMap[0][2]
-        + lhs.fMap[2][1] * rhs.fMap[1][2]
-        + lhs.fMap[2][2] * rhs.fMap[2][2];
+                     + lhs.fMap[2][1] * rhs.fMap[1][2]
+                     + lhs.fMap[2][2] * rhs.fMap[2][2];
 
     ret.fMap[2][3] = lhs.fMap[2][0] * rhs.fMap[0][3]
-        + lhs.fMap[2][1] * rhs.fMap[1][3]
-        + lhs.fMap[2][2] * rhs.fMap[2][3]
-        + lhs.fMap[2][3];
+                     + lhs.fMap[2][1] * rhs.fMap[1][3]
+                     + lhs.fMap[2][2] * rhs.fMap[2][3]
+                     + lhs.fMap[2][3];
 
     return ret;
 }
@@ -445,16 +463,15 @@ void plCoordinateInterface::IRecalcTransforms()
 {
     plProfile_IncCount(CIRecalc, 1);
     plProfile_BeginTiming(CIRecalcT);
-    if( fParent )
-    {
+
+    if (fParent) {
         fLocalToWorld = IMatrixMul34(fParent->GetLocalToWorld(), fLocalToParent);
         fWorldToLocal = IMatrixMul34(fParentToLocal, fParent->GetWorldToLocal());
-    }
-    else
-    {
+    } else {
         fLocalToWorld = fLocalToParent;
         fWorldToLocal = fParentToLocal;
     }
+
     plProfile_EndTiming(CIRecalcT);
 }
 
@@ -465,43 +482,42 @@ void plCoordinateInterface::ITransformChanged(bool force, uint16_t reasons, bool
 
     // inherit reasons for transform change from our parents
     fReason |= reasons;
-    
+
     uint16_t propagateReasons = fReason;
 
     bool process = !(checkForDelay && GetProperty(kDelayedTransformEval)) || !fDelayedTransformsEnabled;
 
-    if (process)
-    {
-        if( fState & kTransformDirty )
+    if (process) {
+        if (fState & kTransformDirty) {
             force = true;
+        }
     }
 
-    if( force )
-    {
+    if (force) {
         IRecalcTransforms();
 
         plProfile_IncCount(CISet, 1);
         plProfile_BeginTiming(CISetT);
-        if( IGetOwner() )
-        {
+
+        if (IGetOwner()) {
             IGetOwner()->ISetTransform(fLocalToWorld, fWorldToLocal);
         }
+
         plProfile_EndTiming(CISetT);
-        fState &= ~kTransformDirty;     
+        fState &= ~kTransformDirty;
     }
 
     plProfile_EndTiming(CITransT);
-    if (process)
-    {
+
+    if (process) {
         int i;
-        for( i = 0; i < fChildren.GetCount(); i++ )
-        {
-            if( fChildren[i] && fChildren[i]->GetVolatileCoordinateInterface() )
+
+        for (i = 0; i < fChildren.GetCount(); i++) {
+            if (fChildren[i] && fChildren[i]->GetVolatileCoordinateInterface()) {
                 fChildren[i]->GetVolatileCoordinateInterface()->ITransformChanged(force, propagateReasons, checkForDelay);
+            }
         }
-    }
-    else if (force)
-    {
+    } else if (force) {
         plProfile_IncCount(CIDirty, 1);
         plProfile_BeginTiming(CITransT);
         // Our parent is dirty and we're bailing out on evaluating right now.
@@ -510,32 +526,34 @@ void plCoordinateInterface::ITransformChanged(bool force, uint16_t reasons, bool
         IDirtyTransform();
         plProfile_EndTiming(CIDirtyT);
         plProfile_EndTiming(CITransT);
-    }       
+    }
 }
 
 void plCoordinateInterface::FlushTransform(bool fromRoot)
 {
-    if( fromRoot )
+    if (fromRoot) {
         IGetRoot()->ITransformChanged(false, 0, false);
-    else
+    } else {
         ITransformChanged(false, 0, false);
+    }
 }
 
 void plCoordinateInterface::ISetNetGroupRecur(plNetGroupId netGroup)
 {
-    if( !IGetOwner() )
+    if (!IGetOwner()) {
         return;
+    }
 
-    if( IGetOwner()->GetSynchFlags() & kHasConstantNetGroup )
+    if (IGetOwner()->GetSynchFlags() & kHasConstantNetGroup) {
         return;
+    }
 
     IGetOwner()->plSynchedObject::SetNetGroup(netGroup);
 
     int i;
-    for( i = 0; i < GetNumChildren(); i++ )
-    {
-        if( GetChild(i) )
-        {
+
+    for (i = 0; i < GetNumChildren(); i++) {
+        if (GetChild(i)) {
             GetChild(i)->ISetNetGroupRecur(netGroup);
         }
     }
@@ -554,10 +572,10 @@ void plCoordinateInterface::Read(hsStream* stream, hsResMgr* mgr)
 
     int n = stream->ReadLE32();
     int i;
-    for( i = 0; i < n; i++ )
-    {
+
+    for (i = 0; i < n; i++) {
         plIntRefMsg* refMsg = new plIntRefMsg(GetKey(), plRefMsg::kOnCreate, -1, plIntRefMsg::kChildObject);
-        mgr->ReadKeyNotifyMe(stream,refMsg, plRefFlags::kPassiveRef);
+        mgr->ReadKeyNotifyMe(stream, refMsg, plRefFlags::kPassiveRef);
     }
 }
 
@@ -573,8 +591,10 @@ void plCoordinateInterface::Write(hsStream* stream, hsResMgr* mgr)
 
     stream->WriteLE32(fChildren.GetCount());
     int i;
-    for( i = 0; i < fChildren.GetCount(); i++ )
+
+    for (i = 0; i < fChildren.GetCount(); i++) {
         mgr->WriteKey(stream, fChildren[i]);
+    }
 
 }
 
@@ -585,65 +605,56 @@ bool plCoordinateInterface::MsgReceive(plMessage* msg)
 
     // warp message
     plWarpMsg* pWarpMsg = plWarpMsg::ConvertNoRef(msg);
-    if (pWarpMsg)
-    {
+
+    if (pWarpMsg) {
         hsMatrix44 l2w = pWarpMsg->GetTransform();
         hsMatrix44 inv;
         l2w.GetInverse(&inv);
-        WarpToWorld(l2w,inv);
-        if (pWarpMsg->GetWarpFlags() & plWarpMsg::kFlushTransform)
+        WarpToWorld(l2w, inv);
+
+        if (pWarpMsg->GetWarpFlags() & plWarpMsg::kFlushTransform) {
             ITransformChanged(false, kReasonUnknown, false);
+        }
+
         return true;
-    }
-    else if((intRefMsg = plIntRefMsg::ConvertNoRef(msg)))
-    {
-        switch( intRefMsg->fType )
-        {
+    } else if ((intRefMsg = plIntRefMsg::ConvertNoRef(msg))) {
+        switch (intRefMsg->fType) {
         case plIntRefMsg::kChildObject:
-        case plIntRefMsg::kChild:
-            {
+        case plIntRefMsg::kChild: {
                 plSceneObject* co = nil;
-                if( intRefMsg->fType == plIntRefMsg::kChildObject )
-                {
+
+                if (intRefMsg->fType == plIntRefMsg::kChildObject) {
                     co = plSceneObject::ConvertNoRef(intRefMsg->GetRef());
-                }
-                else
-                {
+                } else {
                     plCoordinateInterface* ci = plCoordinateInterface::ConvertNoRef(intRefMsg->GetRef());
                     co = ci ? ci->IGetOwner() : nil;
                 }
-                if( intRefMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnReplace) )
-                {
+
+                if (intRefMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnReplace)) {
                     ISetChild(co, intRefMsg->fWhich);
-                }
-                else if( intRefMsg->GetContext() & plRefMsg::kOnDestroy )
-                {
+                } else if (intRefMsg->GetContext() & plRefMsg::kOnDestroy) {
                     IRemoveChild(co);
-                }
-                else if( intRefMsg->GetContext() & plRefMsg::kOnRequest )
-                {
-                    IAttachChild(co, kMaintainWorldPosition|kMaintainSceneNode);
-                }
-                else if( intRefMsg->GetContext() & plRefMsg::kOnRemove )
-                {
-                    IDetachChild(co, kMaintainWorldPosition|kMaintainSceneNode);
+                } else if (intRefMsg->GetContext() & plRefMsg::kOnRequest) {
+                    IAttachChild(co, kMaintainWorldPosition | kMaintainSceneNode);
+                } else if (intRefMsg->GetContext() & plRefMsg::kOnRemove) {
+                    IDetachChild(co, kMaintainWorldPosition | kMaintainSceneNode);
                 }
             }
+
             return true;
+
         default:
             break;
         }
-    }
-    else if((corrMsg = plCorrectionMsg::ConvertNoRef(msg)))
-    {
+    } else if ((corrMsg = plCorrectionMsg::ConvertNoRef(msg))) {
         SetTransformPhysical(corrMsg->fLocalToWorld, corrMsg->fWorldToLocal);
 
-        if(corrMsg->fDirtySynch)
-        {
-            if (IGetOwner())
+        if (corrMsg->fDirtySynch) {
+            if (IGetOwner()) {
                 IGetOwner()->DirtySynchState(kSDLPhysical, 0);
+            }
         }
-        
+
         return true;
     }
 

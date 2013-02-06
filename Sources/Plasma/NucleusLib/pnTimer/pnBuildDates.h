@@ -53,18 +53,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef _pnBuildDates_h
 #define _pnBuildDates_h
 
-class pnBuildDates
-{
-    private:
+class pnBuildDates {
+private:
 
-        void    IGetString( int resID, char *destBuffer, int size );
+    void    IGetString(int resID, char* destBuffer, int size);
 
-    public:
-        static char fBuildDate[];
-        static char fBuildTime[];
-        static char fBranchDate[];
+public:
+    static char fBuildDate[];
+    static char fBuildTime[];
+    static char fBranchDate[];
 
-        pnBuildDates();
+    pnBuildDates();
 };
 
 #endif //_pnBuildDates_h

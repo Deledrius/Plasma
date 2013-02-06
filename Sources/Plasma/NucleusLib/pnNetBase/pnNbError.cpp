@@ -52,7 +52,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //============================================================================
 // These errors should only be used in debugging.  They should not be shown
 // in release clients because they are not localized
-const wchar_t * NetErrorToString (ENetError code) {
+const wchar_t* NetErrorToString(ENetError code)
+{
 
     static const wchar_t* s_errors[] = {
         L"Success",                         // kNetSuccess
@@ -106,20 +107,23 @@ const wchar_t * NetErrorToString (ENetError code) {
         L"Vault Node Access Violation",     // kNetErrVaultNodeAccessViolation
     };
     static_assert(arrsize(s_errors) == kNumNetErrors, "Number of Net Error descriptions and total Net Error count are not equal");
-    
+
     if ((unsigned)code >= arrsize(s_errors)) {
-        if (code == kNetPending)
+        if (code == kNetPending) {
             return L"Pending";
+        }
+
         return L"Unknown Error";
     }
-    
+
     return s_errors[code];
 }
 
 //============================================================================
 // These errors should only be used in debugging.  They should not be shown
 // in release clients because they are not localized
-const wchar_t * NetErrorAsString (ENetError code) {
+const wchar_t* NetErrorAsString(ENetError code)
+{
 
     static const wchar_t* s_errors[] = {
         L"kNetSuccess",
@@ -173,12 +177,14 @@ const wchar_t * NetErrorAsString (ENetError code) {
         L"kNetErrVaultNodeAccessViolation",
     };
     static_assert(arrsize(s_errors) == kNumNetErrors, "Number of string-ized Net Errors and total Net Error count are not equal");
-    
+
     if ((unsigned)code >= arrsize(s_errors)) {
-        if (code == kNetPending)
+        if (code == kNetPending) {
             return L"kNetPending";
+        }
+
         return L"ErrUnknown";
     }
-    
+
     return s_errors[code];
 }

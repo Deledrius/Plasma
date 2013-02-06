@@ -49,9 +49,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsRadixSortElem;
 class plSpaceTree;
- 
-class plSpacePrepNode
-{
+
+class plSpacePrepNode {
 public:
     hsBounds3Ext        fWorldBounds;
 
@@ -61,8 +60,7 @@ public:
     plSpacePrepNode*    fChildren[2];
 };
 
-class plSpaceTreeMaker
-{
+class plSpaceTreeMaker {
 protected:
     hsTArray<plSpacePrepNode*>      fLeaves; // input
 
@@ -90,7 +88,7 @@ protected:
     void                            IMakeSpaceTreeRecur(plSpacePrepNode* sub, plSpaceTree* tree, const int targetLevel, int currLevel);
     plSpaceTree*                    IMakeSpaceTree();
     int                             ITreeDepth(plSpacePrepNode* subRoot);
-    
+
     void                            IDeleteTreeRecur(plSpacePrepNode* node);
 
 public:
@@ -98,7 +96,7 @@ public:
     void                            Cleanup();
 
     void                            Reset();
-    int32_t                           AddLeaf(const hsBounds3Ext& worldBnd, bool disable=false);
+    int32_t                           AddLeaf(const hsBounds3Ext& worldBnd, bool disable = false);
     plSpaceTree*                    MakeTree();
 
     void                            TestTree(); // development only - NUKE ME mf horse

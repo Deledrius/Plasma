@@ -54,7 +54,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 // AddPlasmaConstantsClasses
 //
-void pyAIMsg::AddPlasmaConstantsClasses(PyObject *m)
+void pyAIMsg::AddPlasmaConstantsClasses(PyObject* m)
 {
     PYTHON_ENUM_START(PtAIMsgType);
     PYTHON_ENUM_ELEMENT(PtAIMsgType, kUnknown, plAIMsg::kAIMsg_Unknown);
@@ -75,33 +75,35 @@ PYTHON_NO_INIT_DEFINITION(ptCritterBrain)
 
 PYTHON_RICH_COMPARE_DEFINITION(ptCritterBrain, obj1, obj2, compareType)
 {
-    if ((obj1 == Py_None) || (obj2 == Py_None) || !pyCritterBrain::Check(obj1) || !pyCritterBrain::Check(obj2))
-    {
+    if ((obj1 == Py_None) || (obj2 == Py_None) || !pyCritterBrain::Check(obj1) || !pyCritterBrain::Check(obj2)) {
         // if they aren't the same type, they don't match, obviously (we also never equal none)
-        if (compareType == Py_EQ)
+        if (compareType == Py_EQ) {
             PYTHON_RCOMPARE_FALSE;
-        else if (compareType == Py_NE)
+        } else if (compareType == Py_NE) {
             PYTHON_RCOMPARE_TRUE;
-        else
-        {
+        } else {
             PyErr_SetString(PyExc_NotImplementedError, "invalid comparison for a ptCritterBrain object");
             PYTHON_RCOMPARE_ERROR;
         }
     }
+
     pyCritterBrain* brain1 = pyCritterBrain::ConvertFrom(obj1);
     pyCritterBrain* brain2 = pyCritterBrain::ConvertFrom(obj2);
-    if (compareType == Py_EQ)
-    {
-        if ((*brain1) == (*brain2))
+
+    if (compareType == Py_EQ) {
+        if ((*brain1) == (*brain2)) {
             PYTHON_RCOMPARE_TRUE;
+        }
+
+        PYTHON_RCOMPARE_FALSE;
+    } else if (compareType == Py_NE) {
+        if ((*brain1) != (*brain2)) {
+            PYTHON_RCOMPARE_TRUE;
+        }
+
         PYTHON_RCOMPARE_FALSE;
     }
-    else if (compareType == Py_NE)
-    {
-        if ((*brain1) != (*brain2))
-            PYTHON_RCOMPARE_TRUE;
-        PYTHON_RCOMPARE_FALSE;
-    }
+
     PyErr_SetString(PyExc_NotImplementedError, "invalid comparison for a ptCritterBrain object");
     PYTHON_RCOMPARE_ERROR;
 }
@@ -109,16 +111,17 @@ PYTHON_RICH_COMPARE_DEFINITION(ptCritterBrain, obj1, obj2, compareType)
 PYTHON_METHOD_DEFINITION(ptCritterBrain, addReceiver, args)
 {
     PyObject* keyObj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &keyObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "addReceiver expects a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(keyObj))
-    {
+
+    if (!pyKey::Check(keyObj)) {
         PyErr_SetString(PyExc_TypeError, "addReceiver expects a ptKey");
         PYTHON_RETURN_ERROR;
     }
+
     pyKey* key = pyKey::ConvertFrom(keyObj);
     self->fThis->AddReceiver(*key);
     PYTHON_RETURN_NONE;
@@ -127,16 +130,17 @@ PYTHON_METHOD_DEFINITION(ptCritterBrain, addReceiver, args)
 PYTHON_METHOD_DEFINITION(ptCritterBrain, removeReceiver, args)
 {
     PyObject* keyObj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &keyObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "removeReceiver expects a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(keyObj))
-    {
+
+    if (!pyKey::Check(keyObj)) {
         PyErr_SetString(PyExc_TypeError, "removeReceiver expects a ptKey");
         PYTHON_RETURN_ERROR;
     }
+
     pyKey* key = pyKey::ConvertFrom(keyObj);
     self->fThis->RemoveReceiver(*key);
     PYTHON_RETURN_NONE;
@@ -154,15 +158,15 @@ PYTHON_METHOD_DEFINITION_WKEY(ptCritterBrain, addBehavior, args, keywords)
     PyObject* behNameObj = NULL;
     char loop = 1, randomStartPos = 1;
     float fadeInLen = 2.f, fadeOutLen = 2.f;
-    if (!PyArg_ParseTupleAndKeywords(args, keywords, "OO|bbff", kwlist, &animNameObj, &behNameObj, &loop, &randomStartPos, &fadeInLen, &fadeOutLen))
-    {
+
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "OO|bbff", kwlist, &animNameObj, &behNameObj, &loop, &randomStartPos, &fadeInLen, &fadeOutLen)) {
         PyErr_SetString(PyExc_TypeError, "addBehavior expects two strings, and optionally two booleans and two floats");
         PYTHON_RETURN_ERROR;
     }
 
     std::string animName = "";
-    if (PyUnicode_Check(animNameObj))
-    {
+
+    if (PyUnicode_Check(animNameObj)) {
         int strLen = PyUnicode_GetSize(animNameObj);
         wchar_t* text = new wchar_t[strLen + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)animNameObj, text, strLen);
@@ -171,18 +175,16 @@ PYTHON_METHOD_DEFINITION_WKEY(ptCritterBrain, addBehavior, args, keywords)
         animName = cText;
         delete [] cText;
         delete [] text;
-    }
-    else if (PyString_Check(animNameObj))
+    } else if (PyString_Check(animNameObj)) {
         animName = PyString_AsString(animNameObj);
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "addBehavior expects two strings, and optionally two booleans and two floats");
         PYTHON_RETURN_ERROR;
     }
 
     std::string behName = "";
-    if (PyUnicode_Check(behNameObj))
-    {
+
+    if (PyUnicode_Check(behNameObj)) {
         int strLen = PyUnicode_GetSize(behNameObj);
         wchar_t* text = new wchar_t[strLen + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)behNameObj, text, strLen);
@@ -191,11 +193,9 @@ PYTHON_METHOD_DEFINITION_WKEY(ptCritterBrain, addBehavior, args, keywords)
         behName = cText;
         delete [] cText;
         delete [] text;
-    }
-    else if (PyString_Check(behNameObj))
+    } else if (PyString_Check(behNameObj)) {
         behName = PyString_AsString(behNameObj);
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "addBehavior expects two strings, and optionally two booleans and two floats");
         PYTHON_RETURN_ERROR;
     }
@@ -209,15 +209,15 @@ PYTHON_METHOD_DEFINITION_WKEY(ptCritterBrain, startBehavior, args, keywords)
     char* kwlist[] = {"behaviorName", "fade", NULL};
     PyObject* behNameObj = NULL;
     char fade = 1;
-    if (!PyArg_ParseTupleAndKeywords(args, keywords, "O|b", kwlist, &behNameObj, &fade))
-    {
+
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "O|b", kwlist, &behNameObj, &fade)) {
         PyErr_SetString(PyExc_TypeError, "startBehavior expects a string, and an optional boolean");
         PYTHON_RETURN_NONE;
     }
 
     std::string behName = "";
-    if (PyUnicode_Check(behNameObj))
-    {
+
+    if (PyUnicode_Check(behNameObj)) {
         int strLen = PyUnicode_GetSize(behNameObj);
         wchar_t* text = new wchar_t[strLen + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)behNameObj, text, strLen);
@@ -226,11 +226,9 @@ PYTHON_METHOD_DEFINITION_WKEY(ptCritterBrain, startBehavior, args, keywords)
         behName = cText;
         delete [] cText;
         delete [] text;
-    }
-    else if (PyString_Check(behNameObj))
+    } else if (PyString_Check(behNameObj)) {
         behName = PyString_AsString(behNameObj);
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "startBehavior expects a string, and an optional boolean");
         PYTHON_RETURN_ERROR;
     }
@@ -242,14 +240,13 @@ PYTHON_METHOD_DEFINITION_WKEY(ptCritterBrain, startBehavior, args, keywords)
 PYTHON_METHOD_DEFINITION(ptCritterBrain, runningBehavior, args)
 {
     PyObject* behNameObj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &behNameObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &behNameObj)) {
         PyErr_SetString(PyExc_TypeError, "runningBehavior expects a string");
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyUnicode_Check(behNameObj))
-    {
+    if (PyUnicode_Check(behNameObj)) {
         int strLen = PyUnicode_GetSize(behNameObj);
         wchar_t* text = new wchar_t[strLen + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)behNameObj, text, strLen);
@@ -259,14 +256,10 @@ PYTHON_METHOD_DEFINITION(ptCritterBrain, runningBehavior, args)
         delete [] cText;
         delete [] text;
         PYTHON_RETURN_BOOL(retVal);
-    }
-    else if (PyString_Check(behNameObj))
-    {
+    } else if (PyString_Check(behNameObj)) {
         bool retVal = self->fThis->RunningBehavior(PyString_AsString(behNameObj));
         PYTHON_RETURN_BOOL(retVal);
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "runningBehavior expects a string");
         PYTHON_RETURN_ERROR;
     }
@@ -275,22 +268,24 @@ PYTHON_METHOD_DEFINITION(ptCritterBrain, runningBehavior, args)
 PYTHON_METHOD_DEFINITION(ptCritterBrain, behaviorName, args)
 {
     int behavior;
-    if (!PyArg_ParseTuple(args, "i", &behavior))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &behavior)) {
         PyErr_SetString(PyExc_TypeError, "behaviorName expects an integer");
         PYTHON_RETURN_ERROR;
     }
+
     return PyString_FromString(self->fThis->BehaviorName(behavior).c_str());
 }
 
 PYTHON_METHOD_DEFINITION(ptCritterBrain, animationName, args)
 {
     int behavior;
-    if (!PyArg_ParseTuple(args, "i", &behavior))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &behavior)) {
         PyErr_SetString(PyExc_TypeError, "animationName expects an integer");
         PYTHON_RETURN_ERROR;
     }
+
     return PyString_FromString(self->fThis->AnimationName(behavior).c_str());
 }
 
@@ -319,17 +314,17 @@ PYTHON_METHOD_DEFINITION_WKEY(ptCritterBrain, goToGoal, args, keywords)
     char* kwlist[] = {"newGoal", "avoidingAvatars", NULL};
     PyObject* goalObj = NULL;
     char avoidingAvatars = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, keywords, "O|b", kwlist, &goalObj, &avoidingAvatars))
-    {
+
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "O|b", kwlist, &goalObj, &avoidingAvatars)) {
         PyErr_SetString(PyExc_TypeError, "goToGoal expects a ptPoint and an optional boolean.");
         PYTHON_RETURN_ERROR;
     }
 
-    if (!pyPoint3::Check(goalObj))
-    {
+    if (!pyPoint3::Check(goalObj)) {
         PyErr_SetString(PyExc_TypeError, "goToGoal expects a ptPoint and an optional boolean.");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->GoToGoal(pyPoint3::ConvertFrom(goalObj)->fPoint, avoidingAvatars != 0);
     PYTHON_RETURN_NONE;
 }
@@ -352,11 +347,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptCritterBrain, atGoal)
 PYTHON_METHOD_DEFINITION(ptCritterBrain, setStopDistance, args)
 {
     float dist;
-    if (!PyArg_ParseTuple(args, "f", &dist))
-    {
+
+    if (!PyArg_ParseTuple(args, "f", &dist)) {
         PyErr_SetString(PyExc_TypeError, "setStopDistance expects a float");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->StopDistance(dist);
     PYTHON_RETURN_NONE;
 }
@@ -369,11 +365,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptCritterBrain, getStopDistance)
 PYTHON_METHOD_DEFINITION(ptCritterBrain, setSightCone, args)
 {
     float dist;
-    if (!PyArg_ParseTuple(args, "f", &dist))
-    {
+
+    if (!PyArg_ParseTuple(args, "f", &dist)) {
         PyErr_SetString(PyExc_TypeError, "setSightCone expects a float");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SightCone(dist);
     PYTHON_RETURN_NONE;
 }
@@ -386,11 +383,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptCritterBrain, getSightCone)
 PYTHON_METHOD_DEFINITION(ptCritterBrain, setSightDistance, args)
 {
     float dist;
-    if (!PyArg_ParseTuple(args, "f", &dist))
-    {
+
+    if (!PyArg_ParseTuple(args, "f", &dist)) {
         PyErr_SetString(PyExc_TypeError, "setSightDistance expects a float");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SightDistance(dist);
     PYTHON_RETURN_NONE;
 }
@@ -403,11 +401,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptCritterBrain, getSightDistance)
 PYTHON_METHOD_DEFINITION(ptCritterBrain, setHearingDistance, args)
 {
     float dist;
-    if (!PyArg_ParseTuple(args, "f", &dist))
-    {
+
+    if (!PyArg_ParseTuple(args, "f", &dist)) {
         PyErr_SetString(PyExc_TypeError, "setHearingDistance expects a float");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->HearingDistance(dist);
     PYTHON_RETURN_NONE;
 }
@@ -420,22 +419,24 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptCritterBrain, getHearingDistance)
 PYTHON_METHOD_DEFINITION(ptCritterBrain, canSeeAvatar, args)
 {
     unsigned long id;
-    if (!PyArg_ParseTuple(args, "k", &id))
-    {
+
+    if (!PyArg_ParseTuple(args, "k", &id)) {
         PyErr_SetString(PyExc_TypeError, "canSeeAvatar expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_BOOL(self->fThis->CanSeeAvatar(id));
 }
 
 PYTHON_METHOD_DEFINITION(ptCritterBrain, canHearAvatar, args)
 {
     unsigned long id;
-    if (!PyArg_ParseTuple(args, "k", &id))
-    {
+
+    if (!PyArg_ParseTuple(args, "k", &id)) {
         PyErr_SetString(PyExc_TypeError, "canHearAvatar expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_BOOL(self->fThis->CanHearAvatar(id));
 }
 
@@ -452,50 +453,51 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptCritterBrain, playersICanHear)
 PYTHON_METHOD_DEFINITION(ptCritterBrain, vectorToPlayer, args)
 {
     unsigned long id;
-    if (!PyArg_ParseTuple(args, "k", &id))
-    {
+
+    if (!PyArg_ParseTuple(args, "k", &id)) {
         PyErr_SetString(PyExc_TypeError, "vectorToPlayer expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     return self->fThis->VectorToPlayer(id);
 }
 
 PYTHON_START_METHODS_TABLE(ptCritterBrain)
-    PYTHON_METHOD(ptCritterBrain, addReceiver, "Params: key\nTells the brain that the specified key wants AI messages"),
-    PYTHON_METHOD(ptCritterBrain, removeReceiver, "Params: key\nTells the brain that the specified key no longer wants AI messages"),
-    PYTHON_METHOD(ptCritterBrain, getSceneObject, "Returns the ptSceneObject this brain controls."),
-    PYTHON_METHOD_WKEY(ptCritterBrain, addBehavior, "Params: animName, behaviorName, loop = 1, randomStartPos = 1, fadeInLen = 2.0, fadeOutLen = 2.0\n"
-        "Adds a new animation to the brain as a behavior with the specified name and parameters. If multiple animations are assigned to the same behavior, "
-        "they will be randomly picked from when started."),
-    PYTHON_METHOD_WKEY(ptCritterBrain, startBehavior, "Params: behaviorName, fade = 1\nStarts playing the named behavior. If fade is true, it will fade out "
-        "the previous behavior and fade in the new one. If false, they will immediately switch."),
-    PYTHON_METHOD(ptCritterBrain, runningBehavior, "Params: behaviorName\nReturns true if the named behavior is running."),
-    PYTHON_METHOD(ptCritterBrain, behaviorName, "Params: behavior\nReturns the behavior name associated with the specified integral behavior."),
-    PYTHON_METHOD(ptCritterBrain, animationName, "Params: behavior\nReturns the animation name associated with the specified integral behavior."),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, curBehavior, "Returns the current integral behavior the brain is running."),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, nextBehavior, "Returns the behavior the brain will be switching to next frame. (-1 if no change)"),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, idleBehaviorName, "Returns the name of the brain's idle behavior."),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, runBehaviorName, "Returns the name of the brain's run behavior."),
-    PYTHON_METHOD_WKEY(ptCritterBrain, goToGoal, "Params: newGoal, avoidingAvatars = 0\nTells the brain to start running towards the specified location, "
-        "avoiding avatars it can see or hear if told to."),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, currentGoal, "Returns the current ptPoint that the brain is running towards."),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, avoidingAvatars, "Are we currently avoiding avatars while pathfinding?"),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, atGoal, "Are we currently are our final destination?"),
-    PYTHON_METHOD(ptCritterBrain, setStopDistance, "Params: dist\nSet how far away from the goal we should be when we are considered there and stop running."),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, getStopDistance, "Returns how far away from the goal we could be and still be considered there."),
-    PYTHON_METHOD(ptCritterBrain, setSightCone, "Params: radians\nSet how wide the brain's field of view is in radians. Note that it is the total angle of the "
-        "cone, half on one side of the brain's line of sight, half on the other."),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, getSightCone, "Returns the width of the brain's field of view in radians."),
-    PYTHON_METHOD(ptCritterBrain, setSightDistance, "Params: dist\nSet how far away the brain can see."),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, getSightDistance, "Returns how far the brain can see."),
-    PYTHON_METHOD(ptCritterBrain, setHearingDistance, "Params: dist\nSet how far away the brain can hear (360 degree field of hearing)."),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, getHearingDistance, "Returns how far away the brain can hear."),
-    PYTHON_METHOD(ptCritterBrain, canSeeAvatar, "Params: avatarID\nReturns whether this brain can see the avatar with the specified id."),
-    PYTHON_METHOD(ptCritterBrain, canHearAvatar, "Params: avatarID\nReturns whether this brain can hear the avatar with the specified id."),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, playersICanSee, "Returns a list of player ids which this brain can see."),
-    PYTHON_METHOD_NOARGS(ptCritterBrain, playersICanHear, "Returns a list of player ids which this brain can hear."),
-    PYTHON_METHOD(ptCritterBrain, vectorToPlayer, "Params: avatarID\nReturns the vector between us and the specified player."),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptCritterBrain, addReceiver, "Params: key\nTells the brain that the specified key wants AI messages"),
+              PYTHON_METHOD(ptCritterBrain, removeReceiver, "Params: key\nTells the brain that the specified key no longer wants AI messages"),
+              PYTHON_METHOD(ptCritterBrain, getSceneObject, "Returns the ptSceneObject this brain controls."),
+              PYTHON_METHOD_WKEY(ptCritterBrain, addBehavior, "Params: animName, behaviorName, loop = 1, randomStartPos = 1, fadeInLen = 2.0, fadeOutLen = 2.0\n"
+                                 "Adds a new animation to the brain as a behavior with the specified name and parameters. If multiple animations are assigned to the same behavior, "
+                                 "they will be randomly picked from when started."),
+              PYTHON_METHOD_WKEY(ptCritterBrain, startBehavior, "Params: behaviorName, fade = 1\nStarts playing the named behavior. If fade is true, it will fade out "
+                                 "the previous behavior and fade in the new one. If false, they will immediately switch."),
+              PYTHON_METHOD(ptCritterBrain, runningBehavior, "Params: behaviorName\nReturns true if the named behavior is running."),
+              PYTHON_METHOD(ptCritterBrain, behaviorName, "Params: behavior\nReturns the behavior name associated with the specified integral behavior."),
+              PYTHON_METHOD(ptCritterBrain, animationName, "Params: behavior\nReturns the animation name associated with the specified integral behavior."),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, curBehavior, "Returns the current integral behavior the brain is running."),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, nextBehavior, "Returns the behavior the brain will be switching to next frame. (-1 if no change)"),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, idleBehaviorName, "Returns the name of the brain's idle behavior."),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, runBehaviorName, "Returns the name of the brain's run behavior."),
+              PYTHON_METHOD_WKEY(ptCritterBrain, goToGoal, "Params: newGoal, avoidingAvatars = 0\nTells the brain to start running towards the specified location, "
+                                 "avoiding avatars it can see or hear if told to."),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, currentGoal, "Returns the current ptPoint that the brain is running towards."),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, avoidingAvatars, "Are we currently avoiding avatars while pathfinding?"),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, atGoal, "Are we currently are our final destination?"),
+              PYTHON_METHOD(ptCritterBrain, setStopDistance, "Params: dist\nSet how far away from the goal we should be when we are considered there and stop running."),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, getStopDistance, "Returns how far away from the goal we could be and still be considered there."),
+              PYTHON_METHOD(ptCritterBrain, setSightCone, "Params: radians\nSet how wide the brain's field of view is in radians. Note that it is the total angle of the "
+                            "cone, half on one side of the brain's line of sight, half on the other."),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, getSightCone, "Returns the width of the brain's field of view in radians."),
+              PYTHON_METHOD(ptCritterBrain, setSightDistance, "Params: dist\nSet how far away the brain can see."),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, getSightDistance, "Returns how far the brain can see."),
+              PYTHON_METHOD(ptCritterBrain, setHearingDistance, "Params: dist\nSet how far away the brain can hear (360 degree field of hearing)."),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, getHearingDistance, "Returns how far away the brain can hear."),
+              PYTHON_METHOD(ptCritterBrain, canSeeAvatar, "Params: avatarID\nReturns whether this brain can see the avatar with the specified id."),
+              PYTHON_METHOD(ptCritterBrain, canHearAvatar, "Params: avatarID\nReturns whether this brain can hear the avatar with the specified id."),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, playersICanSee, "Returns a list of player ids which this brain can see."),
+              PYTHON_METHOD_NOARGS(ptCritterBrain, playersICanHear, "Returns a list of player ids which this brain can hear."),
+              PYTHON_METHOD(ptCritterBrain, vectorToPlayer, "Params: avatarID\nReturns the vector between us and the specified player."),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 #define ptCritterBrain_COMPARE      PYTHON_NO_COMPARE
@@ -511,7 +513,7 @@ PLASMA_CUSTOM_TYPE(ptCritterBrain, "Object to manipulate critter brains");
 // required functions for PyObject interoperability
 PyObject* pyCritterBrain::New(plAvBrainCritter* brain)
 {
-    ptCritterBrain *newObj = (ptCritterBrain*)ptCritterBrain_type.tp_new(&ptCritterBrain_type, NULL, NULL);
+    ptCritterBrain* newObj = (ptCritterBrain*)ptCritterBrain_type.tp_new(&ptCritterBrain_type, NULL, NULL);
     newObj->fThis->fBrain = brain;
     return (PyObject*)newObj;
 }
@@ -523,7 +525,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptCritterBrain, pyCritterBrain)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyCritterBrain::AddPlasmaClasses(PyObject *m)
+void pyCritterBrain::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptCritterBrain);

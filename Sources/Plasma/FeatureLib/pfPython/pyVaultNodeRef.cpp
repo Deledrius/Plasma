@@ -61,74 +61,90 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 // should only be created from C++ side
-pyVaultNodeRef::pyVaultNodeRef(RelVaultNode * parent, RelVaultNode * child)
-: fParent(parent)
-, fChild(child)
+pyVaultNodeRef::pyVaultNodeRef(RelVaultNode* parent, RelVaultNode* child)
+    : fParent(parent)
+    , fChild(child)
 {
     fParent->IncRef();
     fChild->IncRef();
 }
 
 pyVaultNodeRef::pyVaultNodeRef(int)
-: fParent(nil)
-, fChild(nil)
+    : fParent(nil)
+    , fChild(nil)
 {
 }
 
 pyVaultNodeRef::~pyVaultNodeRef()
 {
-    if (fParent)
+    if (fParent) {
         fParent->DecRef();
-    if (fChild)
+    }
+
+    if (fChild) {
         fChild->DecRef();
+    }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////
 
-PyObject* pyVaultNodeRef::GetParent ( void )
+PyObject* pyVaultNodeRef::GetParent(void)
 {
     return pyVaultNode::New(fParent);
 }
 
-PyObject* pyVaultNodeRef::GetChild( void )
+PyObject* pyVaultNodeRef::GetChild(void)
 {
     return pyVaultNode::New(fChild);
 }
 
-unsigned pyVaultNodeRef::GetParentID () {
-    if (!fParent)
+unsigned pyVaultNodeRef::GetParentID()
+{
+    if (!fParent) {
         return 0;
+    }
+
     return fParent->GetNodeId();
 }
 
-unsigned pyVaultNodeRef::GetChildID () {
-    if (!fChild)
+unsigned pyVaultNodeRef::GetChildID()
+{
+    if (!fChild) {
         return 0;
+    }
+
     return fChild->GetNodeId();
 }
 
-unsigned pyVaultNodeRef::GetSaverID () {
-    if (!fParent || !fChild)
+unsigned pyVaultNodeRef::GetSaverID()
+{
+    if (!fParent || !fChild) {
         return 0;
+    }
 
     unsigned saverId = 0;
-    if (RelVaultNode * child = VaultGetNodeIncRef(fChild->GetNodeId())) {
+
+    if (RelVaultNode* child = VaultGetNodeIncRef(fChild->GetNodeId())) {
         saverId = child->GetRefOwnerId(fParent->GetNodeId());
         child->DecRef();
     }
+
     return saverId;
 }
 
-PyObject * pyVaultNodeRef::GetSaver () {
-    if (!fParent || !fChild)
+PyObject* pyVaultNodeRef::GetSaver()
+{
+    if (!fParent || !fChild) {
         return 0;
+    }
 
-    RelVaultNode * saver = nil;
-    if (RelVaultNode * child = VaultGetNodeIncRef(fChild->GetNodeId())) {
+    RelVaultNode* saver = nil;
+
+    if (RelVaultNode* child = VaultGetNodeIncRef(fChild->GetNodeId())) {
         if (unsigned saverId = child->GetRefOwnerId(fParent->GetNodeId())) {
             // Find the player info node representing the saver
-            NetVaultNode * templateNode = new NetVaultNode;
+            NetVaultNode* templateNode = new NetVaultNode;
             templateNode->IncRef();
             templateNode->SetNodeType(plVault::kNodeType_PlayerInfo);
             VaultPlayerInfoNode access(templateNode);
@@ -138,6 +154,7 @@ PyObject * pyVaultNodeRef::GetSaver () {
             if (!saver) {
                 ARRAY(unsigned) nodeIds;
                 VaultFindNodesAndWait(templateNode, &nodeIds);
+
                 if (nodeIds.Count() > 0) {
                     VaultFetchNodesAndWait(nodeIds.Ptr(), nodeIds.Count());
                     saver = VaultGetNodeIncRef(nodeIds[0]);
@@ -146,23 +163,29 @@ PyObject * pyVaultNodeRef::GetSaver () {
 
             templateNode->DecRef();
         }
+
         child->DecRef();
     }
-    if (!saver)
+
+    if (!saver) {
         PYTHON_RETURN_NONE;
-        
-    PyObject * result = pyVaultPlayerInfoNode::New(saver);
+    }
+
+    PyObject* result = pyVaultPlayerInfoNode::New(saver);
     saver->DecRef();
     return result;
 }
 
-bool pyVaultNodeRef::BeenSeen () {
+bool pyVaultNodeRef::BeenSeen()
+{
     return false;
 }
 
-void pyVaultNodeRef::SetSeen (bool v) {
-    if (!fParent || !fChild)
+void pyVaultNodeRef::SetSeen(bool v)
+{
+    if (!fParent || !fChild) {
         return;
+    }
 
     fParent->SetSeen(fChild->GetNodeId(), v);
 }

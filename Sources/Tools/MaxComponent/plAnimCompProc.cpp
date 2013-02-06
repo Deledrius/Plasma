@@ -68,10 +68,8 @@ plAnimCompProc::plAnimCompProc() :
 
 BOOL plAnimCompProc::DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
-    case WM_INITDIALOG:
-        {
+    switch (msg) {
+    case WM_INITDIALOG: {
             IParamBlock2* pb = pm->GetParamBlock();
 
             IUpdateNodeButton(hWnd, pb);
@@ -79,36 +77,34 @@ BOOL plAnimCompProc::DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, W
 
             ILoadUser(hWnd, pb);
         }
+
         return TRUE;
 
-    case WM_COMMAND:
-        {
+    case WM_COMMAND: {
             int cmd = HIWORD(wParam);
             int resID = LOWORD(wParam);
 
-            if (cmd == BN_CLICKED && resID == fCompButtonID)
-            {
+            if (cmd == BN_CLICKED && resID == fCompButtonID) {
                 ICompButtonPress(hWnd, pm->GetParamBlock());
                 return TRUE;
-            }
-            else if (cmd == BN_CLICKED && resID == fNodeButtonID)
-            {
+            } else if (cmd == BN_CLICKED && resID == fNodeButtonID) {
                 INodeButtonPress(hWnd, pm->GetParamBlock());
                 return TRUE;
-            }
-            else if (IUserCommand(hWnd, pm->GetParamBlock(), cmd, resID))
+            } else if (IUserCommand(hWnd, pm->GetParamBlock(), cmd, resID)) {
                 return TRUE;
+            }
 
         }
         break;
     }
+
     return FALSE;
 }
 
 void plAnimCompProc::ICompButtonPress(HWND hWnd, IParamBlock2* pb)
 {
     IPickComponent(pb);
-    
+
     IUpdateCompButton(hWnd, pb);
     IUpdateNodeButton(hWnd, pb);
 
@@ -123,8 +119,10 @@ void plAnimCompProc::IPickNode(IParamBlock2* pb, plComponentBase* comp)
 void plAnimCompProc::INodeButtonPress(HWND hWnd, IParamBlock2* pb)
 {
     plComponentBase* comp = IGetComp(pb);
-    if (comp)
+
+    if (comp) {
         IPickNode(pb, comp);
+    }
 
     IUpdateNodeButton(hWnd, pb);
     ILoadUser(hWnd, pb);
@@ -135,16 +133,15 @@ void plAnimCompProc::IUpdateNodeButton(HWND hWnd, IParamBlock2* pb)
     HWND hButton = GetDlgItem(hWnd, fNodeButtonID);
 
     plComponentBase* comp = IGetComp(pb);
-    if (!comp)
-    {
+
+    if (!comp) {
         SetWindowText(hButton, "(none)");
         EnableWindow(hButton, FALSE);
         return;
     }
 
     // If this is an anim grouped component you can't pick a target
-    if (comp->ClassID() == ANIM_GROUP_COMP_CID)
-    {
+    if (comp->ClassID() == ANIM_GROUP_COMP_CID) {
         IClearNode(pb);
         SetWindowText(hButton, "(none)");
         EnableWindow(hButton, FALSE);
@@ -155,10 +152,12 @@ void plAnimCompProc::IUpdateNodeButton(HWND hWnd, IParamBlock2* pb)
 
     // Make sure the node is actually in the components target list
     plMaxNode* node = IGetNode(pb);
-    if (comp->IsTarget((plMaxNodeBase*)node))
+
+    if (comp->IsTarget((plMaxNodeBase*)node)) {
         SetWindowText(hButton, node->GetName());
-    else
+    } else {
         SetWindowText(hButton, "(none)");
+    }
 }
 
 void plAnimCompProc::IUpdateCompButton(HWND hWnd, IParamBlock2* pb)
@@ -166,54 +165,62 @@ void plAnimCompProc::IUpdateCompButton(HWND hWnd, IParamBlock2* pb)
     HWND hAnim = GetDlgItem(hWnd, fCompButtonID);
 
     plComponentBase* comp = IGetComp(pb);
-    if (comp)
+
+    if (comp) {
         SetWindowText(hAnim, comp->GetINode()->GetName());
-    else
+    } else {
         SetWindowText(hAnim, "(none)");
+    }
 }
 
 plComponentBase* plAnimCompProc::IGetComp(IParamBlock2* pb)
 {
     plMaxNode* node = nil;
-    if (pb->GetParameterType(fCompParamID) == TYPE_REFTARG)
-        node = (plMaxNode*)pb->GetReferenceTarget(fCompParamID);
-    else
-        node = (plMaxNode*)pb->GetINode(fCompParamID);
 
-    if (node)
+    if (pb->GetParameterType(fCompParamID) == TYPE_REFTARG) {
+        node = (plMaxNode*)pb->GetReferenceTarget(fCompParamID);
+    } else {
+        node = (plMaxNode*)pb->GetINode(fCompParamID);
+    }
+
+    if (node) {
         return node->ConvertToComponent();
+    }
 
     return nil;
 }
 
 plMaxNode* plAnimCompProc::IGetNode(IParamBlock2* pb)
 {
-    if (pb->GetParameterType(fNodeParamID) == TYPE_REFTARG)
+    if (pb->GetParameterType(fNodeParamID) == TYPE_REFTARG) {
         return (plMaxNode*)pb->GetReferenceTarget(fNodeParamID);
-    else
+    } else {
         return (plMaxNode*)pb->GetINode(fNodeParamID);
+    }
 }
 
 void plAnimCompProc::IClearNode(IParamBlock2* pb)
 {
-    if (pb->GetParameterType(fNodeParamID) == TYPE_REFTARG)
+    if (pb->GetParameterType(fNodeParamID) == TYPE_REFTARG) {
         pb->SetValue(fNodeParamID, 0, (ReferenceTarget*)nil);
-    else
+    } else {
         pb->SetValue(fNodeParamID, 0, (INode*)nil);
+    }
 }
 
 bool plAnimCompProc::GetCompAndNode(IParamBlock2* pb, plComponentBase*& comp, plMaxNode*& node)
 {
     comp = IGetComp(pb);
-    if (comp)
-    {
+
+    if (comp) {
         node = IGetNode(pb);
 
         // If it's an anim group component (don't need a node), or we have a node
         // and the component is attached to it, we're ok.
         if (comp->ClassID() == ANIM_GROUP_COMP_CID ||
-            (node && comp->IsTarget((plMaxNodeBase*)node)))
+                (node && comp->IsTarget((plMaxNodeBase*)node))) {
             return true;
+        }
     }
 
     return false;
@@ -234,42 +241,35 @@ plMtlAnimProc::plMtlAnimProc() :
 
 BOOL plMtlAnimProc::DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
-    case WM_INITDIALOG:
-        {
+    switch (msg) {
+    case WM_INITDIALOG: {
             IParamBlock2* pb = pm->GetParamBlock();
 
             IOnInitDlg(hWnd, pb);
 
             IUpdateMtlButton(hWnd, pb);
         }
+
         return TRUE;
 
-    case WM_COMMAND:
-        {
+    case WM_COMMAND: {
             int cmd = HIWORD(wParam);
             int resID = LOWORD(wParam);
 
             IParamBlock2* pb = pm->GetParamBlock();
 
-            if (cmd == BN_CLICKED && resID == fMtlButtonID)
-            {
+            if (cmd == BN_CLICKED && resID == fMtlButtonID) {
                 IMtlButtonPress(hWnd, pb);
                 return TRUE;
-            }
-            else if (cmd == BN_CLICKED && resID == fNodeButtonID)
-            {
+            } else if (cmd == BN_CLICKED && resID == fNodeButtonID) {
                 INodeButtonPress(hWnd, pb);
                 return TRUE;
-            }
-            else if (cmd == CBN_SELCHANGE && resID == fAnimComboID)
-            {
+            } else if (cmd == CBN_SELCHANGE && resID == fAnimComboID) {
                 IAnimComboChanged(hWnd, pb);
                 return TRUE;
-            }
-            else if (IUserCommand(hWnd, pb, cmd, resID))
+            } else if (IUserCommand(hWnd, pb, cmd, resID)) {
                 return TRUE;
+            }
         }
         break;
     }
@@ -282,12 +282,13 @@ void plMtlAnimProc::IUpdateMtlButton(HWND hWnd, IParamBlock2* pb)
     HWND hMtl = GetDlgItem(hWnd, fMtlButtonID);
 
     // Get the saved material
-    Mtl *savedMtl = IGetMtl(pb);
+    Mtl* savedMtl = IGetMtl(pb);
 
-    if (savedMtl)
+    if (savedMtl) {
         SetWindowText(hMtl, savedMtl->GetName());
-    else
+    } else {
         SetWindowText(hMtl, "(none)");
+    }
 
     // Enable the node button if a material is selected
     EnableWindow(GetDlgItem(hWnd, fNodeButtonID), (savedMtl != nil));
@@ -311,28 +312,32 @@ void plMtlAnimProc::ILoadAnimCombo(HWND hWnd, IParamBlock2* pb)
     ComboBox_ResetContent(hAnim);
     int sel = ComboBox_AddString(hAnim, ENTIRE_ANIMATION_NAME);
     ComboBox_SetCurSel(hAnim, sel);
-    
+
     const char* savedName = pb->GetStr(fAnimParamID);
-    if (!savedName)
+
+    if (!savedName) {
         savedName = "";
+    }
 
     Mtl* mtl = IGetMtl(pb);
-    if (mtl)
-    {
+
+    if (mtl) {
         plNotetrackAnim anim(mtl, nil);
         plString animName;
-        while (!(animName = anim.GetNextAnimName()).IsNull())
-        {
+
+        while (!(animName = anim.GetNextAnimName()).IsNull()) {
             int idx = ComboBox_AddString(hAnim, animName.c_str());
             ComboBox_SetItemData(hAnim, idx, 1);
-            if (!animName.Compare(savedName))
+
+            if (!animName.Compare(savedName)) {
                 ComboBox_SetCurSel(hAnim, idx);
+            }
         }
 
         EnableWindow(hAnim, TRUE);
-    }
-    else
+    } else {
         EnableWindow(hAnim, FALSE);
+    }
 
     // Update the dependencies of this
     ILoadUser(hWnd, pb);
@@ -342,22 +347,24 @@ void plMtlAnimProc::IMtlButtonPress(HWND hWnd, IParamBlock2* pb)
 {
     // Let the user pick a new material
     Mtl* pickedMtl = plPickMaterialMap::PickMaterial(plMtlCollector::kUsedOnly |
-                                                    plMtlCollector::kPlasmaOnly);
+                     plMtlCollector::kPlasmaOnly);
 
     // Save the mtl in the pb and update the interface
-    if (pickedMtl != nil)
-    {
-        if (pb->GetParameterType(fMtlParamID) == TYPE_REFTARG)
+    if (pickedMtl != nil) {
+        if (pb->GetParameterType(fMtlParamID) == TYPE_REFTARG) {
             pb->SetValue(fMtlParamID, 0, (ReferenceTarget*)pickedMtl);
-        else
+        } else {
             pb->SetValue(fMtlParamID, 0, pickedMtl);
+        }
     }
 
 
     // Make sure the current node has the selected material on it (clear it otherwise)
     INode* node = pb->GetINode(fNodeParamID);
-    if (!pickedMtl || !node || node->GetMtl() != pickedMtl)
+
+    if (!pickedMtl || !node || node->GetMtl() != pickedMtl) {
         pb->SetValue(fNodeParamID, 0, (INode*)nil);
+    }
 
     IUpdateMtlButton(hWnd, pb);
 }
@@ -374,12 +381,10 @@ void plMtlAnimProc::IAnimComboChanged(HWND hWnd, IParamBlock2* pb)
     HWND hCombo = GetDlgItem(hWnd, fAnimComboID);
     int idx = ComboBox_GetCurSel(hCombo);
 
-    if (idx != CB_ERR)
-    {
-        if (ComboBox_GetItemData(hCombo, idx) == 0)
+    if (idx != CB_ERR) {
+        if (ComboBox_GetItemData(hCombo, idx) == 0) {
             pb->SetValue(fAnimParamID, 0, "");
-        else
-        {
+        } else {
             // Get the name of the animation and save it
             char buf[256];
             ComboBox_GetText(hCombo, buf, sizeof(buf));
@@ -393,34 +398,34 @@ void plMtlAnimProc::IAnimComboChanged(HWND hWnd, IParamBlock2* pb)
 
 Mtl* plMtlAnimProc::IGetMtl(IParamBlock2* pb)
 {
-    if (pb->GetParameterType(fMtlParamID) == TYPE_REFTARG)
+    if (pb->GetParameterType(fMtlParamID) == TYPE_REFTARG) {
         return (Mtl*)pb->GetReferenceTarget(fMtlParamID);
-    else
+    } else {
         return pb->GetMtl(fMtlParamID);
+    }
 }
 
 static const char* kUserTypeAll = "(All)";
 
-class plPickAllMtlNode : public plPickMtlNode
-{
+class plPickAllMtlNode : public plPickMtlNode {
 protected:
-    void IAddUserType(HWND hList)
-    {
+    void IAddUserType(HWND hList) {
         int idx = ListBox_AddString(hList, kUserTypeAll);
-        if (!fPB->GetINode(fNodeParamID))
+
+        if (!fPB->GetINode(fNodeParamID)) {
             ListBox_SetCurSel(hList, idx);
+        }
     }
 
-    void ISetUserType(plMaxNode* node, const char* userType)
-    {
-        if (strcmp(userType, kUserTypeAll) == 0)
+    void ISetUserType(plMaxNode* node, const char* userType) {
+        if (strcmp(userType, kUserTypeAll) == 0) {
             ISetNodeValue(nil);
+        }
     }
 
 public:
     plPickAllMtlNode(IParamBlock2* pb, int nodeParamID, Mtl* mtl) :
-      plPickMtlNode(pb, nodeParamID, mtl)
-    {
+        plPickMtlNode(pb, nodeParamID, mtl) {
     }
 };
 
@@ -435,9 +440,11 @@ void plMtlAnimProc::ISetNodeButtonText(HWND hWnd, IParamBlock2* pb)
     HWND hNode = GetDlgItem(hWnd, fNodeButtonID);
 
     INode* node = pb->GetINode(fNodeParamID);
-    if (node)
+
+    if (node) {
         SetWindowText(hNode, node->GetName());
-    else
+    } else {
         SetWindowText(hNode, kUserTypeAll);
+    }
 }
 

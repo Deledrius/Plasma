@@ -47,11 +47,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsGeometry3.h"
 
 // flags for control event codes
-enum 
-{
+enum {
     kControlFlagNormal              =   0x00000001,
     kControlFlagNoRepeat            =   0x00000002,
-    kControlFlagDownEvent           =   0x00000004, 
+    kControlFlagDownEvent           =   0x00000004,
     kControlFlagUpEvent             =   0x00000008,
     kControlFlagToggle              =   0x00000010,
     kControlFlagXAxisEvent          =   0x00000020,
@@ -82,8 +81,7 @@ enum
 };
 
 // mouse button flags
-enum
-{
+enum {
     kLeftButtonDown     = 0x0001,
     kLeftButtonUp       = 0x0002,
     kRightButtonDown    = 0x0004,
@@ -103,40 +101,34 @@ enum
 };
 
 // mouse cursor flags
-enum
-{
+enum {
     kMouseNormal    = 0x0000,
     kMouseClickable = 0x0001,
 };
 
 
-struct Win32keyConvert
-{
+struct Win32keyConvert {
     uint32_t  fVKey;
     const char*   fKeyName;
 };
 
-struct CommandConvert
-{
+struct CommandConvert {
     ControlEventCode fCode;
     const char* fDesc;
 };
 
 
-struct plMouseInfo
-{
-    plMouseInfo(ControlEventCode _code, uint32_t _flags, hsPoint4 _box, const char* _desc)
-    {
+struct plMouseInfo {
+    plMouseInfo(ControlEventCode _code, uint32_t _flags, hsPoint4 _box, const char* _desc) {
         fCode = _code;
         fControlFlags = _flags;
         fBox = _box;
         fControlDescription = _desc;
     }
-    plMouseInfo(ControlEventCode _code, uint32_t _flags, float pt1, float pt2, float pt3, float pt4, const char* _desc)
-    {
+    plMouseInfo(ControlEventCode _code, uint32_t _flags, float pt1, float pt2, float pt3, float pt4, const char* _desc) {
         fCode = _code;
         fControlFlags = _flags;
-        fBox.Set(pt1,pt2,pt3,pt4);
+        fBox.Set(pt1, pt2, pt3, pt4);
         fControlDescription = _desc;
     }
     ControlEventCode    fCode;

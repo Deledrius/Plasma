@@ -53,13 +53,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // should only be created from C++ side
 pyVaultMarkerGameNode::pyVaultMarkerGameNode(RelVaultNode* nfsNode)
-: pyVaultNode(nfsNode)
+    : pyVaultNode(nfsNode)
 {
 }
 
 //create from the Python side
 pyVaultMarkerGameNode::pyVaultMarkerGameNode(int n)
-: pyVaultNode(new RelVaultNode)
+    : pyVaultNode(new RelVaultNode)
 {
     fNode->SetNodeType(plVault::kNodeType_MarkerGame);
 }
@@ -68,18 +68,19 @@ pyVaultMarkerGameNode::pyVaultMarkerGameNode(int n)
 // class RelVaultNode : public plVaultNode
 //
 
-const char * pyVaultMarkerGameNode::GetGameName () const
+const char* pyVaultMarkerGameNode::GetGameName() const
 {
     fGameName[0] = 0;
-    
+
     if (fNode) {
         VaultMarkerGameNode access(fNode);
         StrToAnsi(fGameName, access.GetGameName(), arrsize(fGameName));
     }
+
     return fGameName;
 }
 
-void pyVaultMarkerGameNode::SetGameName (const char v[])
+void pyVaultMarkerGameNode::SetGameName(const char v[])
 {
     if (fNode) {
         VaultMarkerGameNode access(fNode);
@@ -95,10 +96,11 @@ plUUID pyVaultMarkerGameNode::GetGameGuid() const
         VaultMarkerGameNode access(fNode);
         return access.GetGameGuid();
     }
+
     return kNilUuid;
 }
 
-void pyVaultMarkerGameNode::SetGameGuid (const char v[])
+void pyVaultMarkerGameNode::SetGameGuid(const char v[])
 {
     if (fNode) {
         VaultMarkerGameNode access(fNode);

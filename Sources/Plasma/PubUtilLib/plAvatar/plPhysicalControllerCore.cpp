@@ -54,31 +54,34 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define kGravity -32.174f
 #define kTerminalVelocity kGravity
 
-static inline hsVector3 GetYAxis(hsMatrix44 &mat) { return hsVector3(mat.fMap[1][0], mat.fMap[1][1], mat.fMap[1][2]); }
+static inline hsVector3 GetYAxis(hsMatrix44& mat)
+{
+    return hsVector3(mat.fMap[1][0], mat.fMap[1][1], mat.fMap[1][2]);
+}
 static float AngleRad2d(float x1, float y1, float x3, float y3);
 
-bool CompareMatrices(const hsMatrix44 &matA, const hsMatrix44 &matB, float tolerance);
+bool CompareMatrices(const hsMatrix44& matA, const hsMatrix44& matB, float tolerance);
 
 
 // plPhysicalControllerCore
 plPhysicalControllerCore::plPhysicalControllerCore(plKey OwnerSceneObject, float height, float radius)
     : fOwner(OwnerSceneObject),
-    fWorldKey(nil),
-    fHeight(height),
-    fRadius(radius),
-    fLOSDB(plSimDefs::kLOSDBNone),
-    fMovementStrategy(nil),
-    fSimLength(0.0f),
-    fLocalRotation(0.0f, 0.0f, 0.0f, 1.0f),
-    fLocalPosition(0.0f, 0.0f, 0.0f),
-    fLastLocalPosition(0.0f, 0.0f, 0.0f),
-    fLinearVelocity(0.0f, 0.0f, 0.0f),
-    fAchievedLinearVelocity(0.0f, 0.0f, 0.0f),
-    fPushingPhysical(nil),
-    fFacingPushingPhysical(false),
-    fSeeking(false),
-    fEnabled(false),
-    fEnableChanged(false)
+      fWorldKey(nil),
+      fHeight(height),
+      fRadius(radius),
+      fLOSDB(plSimDefs::kLOSDBNone),
+      fMovementStrategy(nil),
+      fSimLength(0.0f),
+      fLocalRotation(0.0f, 0.0f, 0.0f, 1.0f),
+      fLocalPosition(0.0f, 0.0f, 0.0f),
+      fLastLocalPosition(0.0f, 0.0f, 0.0f),
+      fLinearVelocity(0.0f, 0.0f, 0.0f),
+      fAchievedLinearVelocity(0.0f, 0.0f, 0.0f),
+      fPushingPhysical(nil),
+      fFacingPushingPhysical(false),
+      fSeeking(false),
+      fEnabled(false),
+      fEnableChanged(false)
 {
     fLastGlobalLoc.Reset();
     fPrevSubworldW2L.Reset();
@@ -86,11 +89,12 @@ plPhysicalControllerCore::plPhysicalControllerCore(plKey OwnerSceneObject, float
 
 const plCoordinateInterface* plPhysicalControllerCore::GetSubworldCI()
 {
-    if (fWorldKey)
-    {
+    if (fWorldKey) {
         plSceneObject* so = plSceneObject::ConvertNoRef(fWorldKey->ObjectIsLoaded());
-        if (so)
+
+        if (so) {
             return so->GetCoordinateInterface();
+        }
     }
 
     return nil;
@@ -103,16 +107,21 @@ void plPhysicalControllerCore::IncrementAngle(float deltaAngle)
 
     fLocalRotation.NormalizeIfNeeded();
     fLocalRotation.GetAngleAxis(&angle, &axis);
-    if (axis.fZ < 0)
-        angle = (2.0f * float(M_PI)) - angle; // axis is backwards, so reverse the angle too
+
+    if (axis.fZ < 0) {
+        angle = (2.0f * float(M_PI)) - angle;    // axis is backwards, so reverse the angle too
+    }
 
     angle += deltaAngle;
 
     // make sure we wrap around
-    if (angle < 0.0f)
-        angle = (2.0f * float(M_PI)) + angle; // angle is -, so this works like a subtract
-    if (angle >= (2.0f * float(M_PI)))
+    if (angle < 0.0f) {
+        angle = (2.0f * float(M_PI)) + angle;    // angle is -, so this works like a subtract
+    }
+
+    if (angle >= (2.0f * float(M_PI))) {
         angle = angle - (2.0f * float(M_PI));
+    }
 
     // set the new angle
     axis.Set(0.0f, 0.0f, 1.0f);
@@ -126,19 +135,21 @@ void plPhysicalControllerCore::IApply(float delSecs)
     // Match controller to owner if transform has changed since the last frame
     plSceneObject* so = plSceneObject::ConvertNoRef(fOwner->ObjectIsLoaded());
     const hsMatrix44& l2w = so->GetCoordinateInterface()->GetLocalToWorld();
-    if (!CompareMatrices(fLastGlobalLoc, l2w, 0.0001f))
-        SetGlobalLoc(l2w);
 
-    if (fEnabled)
-    {
+    if (!CompareMatrices(fLastGlobalLoc, l2w, 0.0001f)) {
+        SetGlobalLoc(l2w);
+    }
+
+    if (fEnabled) {
         // Convert velocity from avatar to world space
-        if (!fLinearVelocity.IsEmpty())
-        {
+        if (!fLinearVelocity.IsEmpty()) {
             fLinearVelocity = l2w * fLinearVelocity;
 
             const plCoordinateInterface* subworldCI = GetSubworldCI();
-            if (subworldCI)
+
+            if (subworldCI) {
                 fLinearVelocity = subworldCI->GetWorldToLocal() * fLinearVelocity;
+            }
         }
 
         fMovementStrategy->Apply(delSecs);
@@ -146,8 +157,7 @@ void plPhysicalControllerCore::IApply(float delSecs)
 }
 void plPhysicalControllerCore::IUpdate(int numSubSteps, float alpha)
 {
-    if (fEnabled)
-    {
+    if (fEnabled) {
         // Update local position and acheived velocity
         fLastLocalPosition = fLocalPosition;
         GetPositionSim(fLocalPosition);
@@ -162,8 +172,8 @@ void plPhysicalControllerCore::IUpdate(int numSubSteps, float alpha)
         fLocalRotation.MakeMatrix(&fLastGlobalLoc);
         fLastGlobalLoc.SetTranslate(&interpLocalPos);
         const plCoordinateInterface* subworldCI = GetSubworldCI();
-        if (subworldCI)
-        {
+
+        if (subworldCI) {
             const hsMatrix44& subL2W = subworldCI->GetLocalToWorld();
             fLastGlobalLoc = subL2W * fLastGlobalLoc;
             fPrevSubworldW2L = subworldCI->GetWorldToLocal();
@@ -171,15 +181,13 @@ void plPhysicalControllerCore::IUpdate(int numSubSteps, float alpha)
 
         fMovementStrategy->Update(fSimLength);
         ISendCorrectionMessages(true);
-    }
-    else
-    {
+    } else {
         fAchievedLinearVelocity.Set(0.0f, 0.0f, 0.0f);
 
         // Update global location if in a subworld
         const plCoordinateInterface* subworldCI = GetSubworldCI();
-        if (subworldCI)
-        {
+
+        if (subworldCI) {
             hsMatrix44 l2s = fPrevSubworldW2L * fLastGlobalLoc;
             const hsMatrix44& subL2W = subworldCI->GetLocalToWorld();
             fLastGlobalLoc = subL2W * l2s;
@@ -189,39 +197,37 @@ void plPhysicalControllerCore::IUpdate(int numSubSteps, float alpha)
         }
     }
 
-    if (fEnableChanged)
+    if (fEnableChanged) {
         IHandleEnableChanged();
+    }
 }
 void plPhysicalControllerCore::IUpdateNonPhysical(float alpha)
 {
     // Update global location if owner transform hasn't changed.
     plSceneObject* so = plSceneObject::ConvertNoRef(fOwner->ObjectIsLoaded());
     const hsMatrix44& l2w = so->GetCoordinateInterface()->GetLocalToWorld();
-    if (CompareMatrices(fLastGlobalLoc, l2w, 0.0001f))
-    {
-        if (fEnabled)
-        {
+
+    if (CompareMatrices(fLastGlobalLoc, l2w, 0.0001f)) {
+        if (fEnabled) {
             hsVector3 displacement = (hsVector3)(fLocalPosition - fLastLocalPosition);
             hsPoint3 interpLocalPos = fLastLocalPosition + (displacement * alpha);
 
             fLocalRotation.MakeMatrix(&fLastGlobalLoc);
             fLastGlobalLoc.SetTranslate(&interpLocalPos);
             const plCoordinateInterface* subworldCI = GetSubworldCI();
-            if (subworldCI)
-            {
+
+            if (subworldCI) {
                 const hsMatrix44& subL2W = subworldCI->GetLocalToWorld();
                 fLastGlobalLoc = subL2W * fLastGlobalLoc;
                 fPrevSubworldW2L = subworldCI->GetWorldToLocal();
             }
 
             ISendCorrectionMessages();
-        }
-        else
-        {
+        } else {
             // Update global location if in a subworld
             const plCoordinateInterface* subworldCI = GetSubworldCI();
-            if (subworldCI)
-            {
+
+            if (subworldCI) {
                 hsMatrix44 l2s = fPrevSubworldW2L * fLastGlobalLoc;
                 const hsMatrix44& subL2W = subworldCI->GetLocalToWorld();
                 fLastGlobalLoc = subL2W * l2s;
@@ -251,47 +257,49 @@ plMovementStrategy::plMovementStrategy(plPhysicalControllerCore* controller)
 {
 }
 
-void plMovementStrategy::Reset(bool newAge) { fController->SetMovementStrategy(this); }
+void plMovementStrategy::Reset(bool newAge)
+{
+    fController->SetMovementStrategy(this);
+}
 
 
 // Animated Movement Strategy
 plAnimatedMovementStrategy::plAnimatedMovementStrategy(plAGApplicator* rootApp, plPhysicalControllerCore* controller)
     : plMovementStrategy(controller),
-    fRootApp(rootApp),
-    fAnimLinearVel(0.0f, 0.0f, 0.0f),
-    fAnimAngularVel(0.0f),
-    fTurnStr(0.0f)
+      fRootApp(rootApp),
+      fAnimLinearVel(0.0f, 0.0f, 0.0f),
+      fAnimAngularVel(0.0f),
+      fTurnStr(0.0f)
 {
 }
 
 void plAnimatedMovementStrategy::RecalcVelocity(double timeNow, float elapsed, bool useAnim)
 {
-    if (useAnim)
-    {
+    if (useAnim) {
         // while you may think it would be correct to cache this, what we're actually asking is "what would the animation's
         // position be at the previous time given its *current* parameters (particularly blends)"
-        hsMatrix44 prevMat = ((plMatrixChannel *)fRootApp->GetChannel())->Value(timeNow - elapsed, true);
-        hsMatrix44 curMat = ((plMatrixChannel *)fRootApp->GetChannel())->Value(timeNow, true);
-        
+        hsMatrix44 prevMat = ((plMatrixChannel*)fRootApp->GetChannel())->Value(timeNow - elapsed, true);
+        hsMatrix44 curMat = ((plMatrixChannel*)fRootApp->GetChannel())->Value(timeNow, true);
+
         IRecalcLinearVelocity(elapsed, prevMat, curMat);
         IRecalcAngularVelocity(elapsed, prevMat, curMat);
-    }
-    else
-    {
+    } else {
         fAnimLinearVel.Set(0.0f, 0.0f, 0.0f);
         fAnimAngularVel = 0.0f;
     }
 
     // Update controller rotation
     float zRot = fAnimAngularVel + fTurnStr;
-    if (hsABS(zRot) > 0.0001f)
+
+    if (hsABS(zRot) > 0.0001f) {
         fController->IncrementAngle(zRot * elapsed);
+    }
 
     // Update controller velocity
     fController->SetLinearVelocity(fAnimLinearVel);
 }
 
-void plAnimatedMovementStrategy::IRecalcLinearVelocity(float elapsed, hsMatrix44 &prevMat, hsMatrix44 &curMat)
+void plAnimatedMovementStrategy::IRecalcLinearVelocity(float elapsed, hsMatrix44& prevMat, hsMatrix44& curMat)
 {
     hsPoint3 startPos(0.0f, 0.0f, 0.0f);                    // default position (at start of anim)
     hsPoint3 prevPos = prevMat.GetTranslate();              // position previous frame
@@ -299,12 +307,9 @@ void plAnimatedMovementStrategy::IRecalcLinearVelocity(float elapsed, hsMatrix44
 
     hsVector3 prev2Now = (hsVector3)(nowPos - prevPos);     // frame-to-frame delta
 
-    if (fabs(prev2Now.fX) < 0.0001f && fabs(prev2Now.fY) < 0.0001f && fabs(prev2Now.fZ) < 0.0001f)
-    {
+    if (fabs(prev2Now.fX) < 0.0001f && fabs(prev2Now.fY) < 0.0001f && fabs(prev2Now.fZ) < 0.0001f) {
         fAnimLinearVel.Set(0.f, 0.f, 0.f);
-    }
-    else
-    {
+    } else {
         hsVector3 start2Now = (hsVector3)(nowPos - startPos);    // start-to-frame delta
 
         float prev2NowMagSqr = prev2Now.MagnitudeSquared();
@@ -320,8 +325,7 @@ void plAnimatedMovementStrategy::IRecalcLinearVelocity(float elapsed, hsMatrix44
         // If they don't agree (dot < 0,) then we probably mpst wrapped around.
         // The right answer would be to compare the current frame to the start of
         // the anim loop, but it's cheaper to cheat and use the previous frame's velocity.
-        if (dot > 0.0f)
-        {
+        if (dot > 0.0f) {
             prev2Now /= elapsed;
 
             float xfabs = fabs(prev2Now.fX);
@@ -330,15 +334,14 @@ void plAnimatedMovementStrategy::IRecalcLinearVelocity(float elapsed, hsMatrix44
             static const float maxVel = 20.0f;
             bool valid = xfabs < maxVel && yfabs < maxVel && zfabs < maxVel;
 
-            if (valid)
-            {
+            if (valid) {
                 fAnimLinearVel = prev2Now;
             }
         }
     }
 }
 
-void plAnimatedMovementStrategy::IRecalcAngularVelocity(float elapsed, hsMatrix44 &prevMat, hsMatrix44 &curMat)
+void plAnimatedMovementStrategy::IRecalcAngularVelocity(float elapsed, hsMatrix44& prevMat, hsMatrix44& curMat)
 {
     fAnimAngularVel = 0.0f;
     float appliedVelocity = 0.0f;
@@ -347,26 +350,29 @@ void plAnimatedMovementStrategy::IRecalcAngularVelocity(float elapsed, hsMatrix4
 
     float angleSincePrev = AngleRad2d(curForward.fX, curForward.fY, prevForward.fX, prevForward.fY);
     bool sincePrevSign = angleSincePrev > 0.0f;
-    if (angleSincePrev > float(M_PI))
+
+    if (angleSincePrev > float(M_PI)) {
         angleSincePrev = angleSincePrev - TWO_PI;
+    }
 
     const hsVector3 startForward = hsVector3(0.0f, -1.0f, 0.0f);    // the Y orientation of a "resting" armature....
     float angleSinceStart = AngleRad2d(curForward.fX, curForward.fY, startForward.fX, startForward.fY);
     bool sinceStartSign = angleSinceStart > 0.0f;
-    if (angleSinceStart > float(M_PI))
+
+    if (angleSinceStart > float(M_PI)) {
         angleSinceStart = angleSinceStart - TWO_PI;
+    }
 
     // HANDLING ANIMATION WRAPPING:
     // under normal conditions, the angle from rest to the current frame will have the same
     // sign as the angle from the previous frame to the current frame.
     // if it does not, we have (most likely) wrapped the motivating animation from frame n back
     // to frame zero, creating a large angle from the previous frame to the current one
-    if (sincePrevSign == sinceStartSign)
-    {
+    if (sincePrevSign == sinceStartSign) {
         // signs are the same; didn't wrap; use the frame-to-frame angle difference
-        appliedVelocity = angleSincePrev / elapsed;	// rotation / time
-        if (fabs(appliedVelocity) < 3)
-        {
+        appliedVelocity = angleSincePrev / elapsed; // rotation / time
+
+        if (fabs(appliedVelocity) < 3) {
             fAnimAngularVel = appliedVelocity;
         }
     }
@@ -376,17 +382,17 @@ void plAnimatedMovementStrategy::IRecalcAngularVelocity(float elapsed, hsMatrix4
 // Walking Strategy
 plWalkingStrategy::plWalkingStrategy(plAGApplicator* rootApp, plPhysicalControllerCore* controller)
     : plAnimatedMovementStrategy(rootApp, controller),
-    fSlidingNormals(),
-    fImpactVelocity(0.0f, 0.0f, 0.0f),
-    fImpactTime(0.0f),
-    fTimeInAir(0.0f),
-    fControlledFlightTime(0.0f),
-    fControlledFlight(0),
-    fGroundHit(false),
-    fFalseGround(false),
-    fHeadHit(false),
-    fClearImpact(false),
-    fHitGroundInThisAge(false)
+      fSlidingNormals(),
+      fImpactVelocity(0.0f, 0.0f, 0.0f),
+      fImpactTime(0.0f),
+      fTimeInAir(0.0f),
+      fControlledFlightTime(0.0f),
+      fControlledFlight(0),
+      fGroundHit(false),
+      fFalseGround(false),
+      fHeadHit(false),
+      fClearImpact(false),
+      fHitGroundInThisAge(false)
 {
 }
 
@@ -396,27 +402,26 @@ void plWalkingStrategy::Apply(float delSecs)
     hsVector3 achievedVelocity = fController->GetAchievedLinearVelocity();
 
     // Add in gravity if the avatar's z velocity isn't being set explicitly
-    if (hsABS(velocity.fZ) < 0.001f)
-    {
+    if (hsABS(velocity.fZ) < 0.001f) {
         // Get our previous z velocity.  If we're on the ground, clamp it to zero at
         // the largest, so we won't launch into the air if we're running uphill.
         float prevZVel = achievedVelocity.fZ;
-        if (IsOnGround())
+
+        if (IsOnGround()) {
             prevZVel = hsMinimum(prevZVel, 0.0f);
+        }
 
         velocity.fZ = prevZVel + (kGravity * delSecs);
     }
 
     // If we're airborne and the velocity isn't set, use the velocity from
     // the last frame so we maintain momentum.
-    if (!IsOnGround() && velocity.fX == 0.0f && velocity.fY == 0.0f)
-    {
+    if (!IsOnGround() && velocity.fX == 0.0f && velocity.fY == 0.0f) {
         velocity.fX = achievedVelocity.fX;
         velocity.fY = achievedVelocity.fY;
     }
 
-    if (!fGroundHit && fSlidingNormals.Count())
-    {
+    if (!fGroundHit && fSlidingNormals.Count()) {
         // We're not on solid ground, so we should be sliding against whatever
         // we're hitting (like a rock cliff). Each vector in fSlidingNormals is
         // the surface normal of a collision that's too steep to be ground, so
@@ -432,25 +437,27 @@ void plWalkingStrategy::Apply(float delSecs)
         //
         // Yes, there's room for optimization here if we care.
         hsVector3 offset(0.0f, 0.0f, 0.0f);
-        for (int i = 0; i < fSlidingNormals.GetCount(); i++)
-        {
+
+        for (int i = 0; i < fSlidingNormals.GetCount(); i++) {
             offset += fSlidingNormals[i];
             hsVector3 velNorm = velocity;
 
-            if (velNorm.MagnitudeSquared() > 0.0f)
+            if (velNorm.MagnitudeSquared() > 0.0f) {
                 velNorm.Normalize();
+            }
 
-            if (velNorm * fSlidingNormals[i] < 0.0f)
-            {
+            if (velNorm * fSlidingNormals[i] < 0.0f) {
                 hsVector3 proj = (velNorm % fSlidingNormals[i]) % fSlidingNormals[i];
-                if (velNorm * proj < 0.0f)
+
+                if (velNorm * proj < 0.0f) {
                     proj *= -1.0f;
+                }
 
                 velocity = velocity.Magnitude() * proj;
             }
         }
-        if (offset.MagnitudeSquared() > 0.0f)
-        {
+
+        if (offset.MagnitudeSquared() > 0.0f) {
             // 5 ft/sec is roughly the speed we walk backwards.
             // The higher the value, the less likely you'll trip
             // the bug, and this seems reasonable.
@@ -459,8 +466,9 @@ void plWalkingStrategy::Apply(float delSecs)
         }
     }
 
-    if (velocity.fZ < kTerminalVelocity)
+    if (velocity.fZ < kTerminalVelocity) {
         velocity.fZ = kTerminalVelocity;
+    }
 
     // Convert to a displacement vector
     hsVector3 displacement = velocity * delSecs;
@@ -472,35 +480,40 @@ void plWalkingStrategy::Apply(float delSecs)
     fSlidingNormals.SetCount(0);
 
     unsigned int collideResults = 0;
-    unsigned int collideFlags = 1<<plSimDefs::kGroupStatic | 1<<plSimDefs::kGroupAvatarBlocker | 1<<plSimDefs::kGroupDynamic;
-    if (!fController->IsSeeking())
-        collideFlags |= (1<<plSimDefs::kGroupExcludeRegion);
+    unsigned int collideFlags = 1 << plSimDefs::kGroupStatic | 1 << plSimDefs::kGroupAvatarBlocker | 1 << plSimDefs::kGroupDynamic;
+
+    if (!fController->IsSeeking()) {
+        collideFlags |= (1 << plSimDefs::kGroupExcludeRegion);
+    }
 
     fController->Move(displacement, collideFlags, collideResults);
 
-    if ((!fGroundHit) && (collideResults & kBottom))
+    if ((!fGroundHit) && (collideResults & kBottom)) {
         fFalseGround = true;
+    }
 
-    if (collideResults & kTop)
+    if (collideResults & kTop) {
         fHeadHit = true;
+    }
 }
 void plWalkingStrategy::Update(float delSecs)
 {
-    if (fGroundHit || fFalseGround)
+    if (fGroundHit || fFalseGround) {
         fTimeInAir = 0.0f;
-    else
-    {
+    } else {
         fTimeInAir += delSecs;
-        if (fHeadHit)
-        {
+
+        if (fHeadHit) {
             // If we're airborne and hit our head, override achieved velocity to avoid being shoved sideways
             hsVector3 velocity = fController->GetLinearVelocity();
             hsVector3 achievedVelocity = fController->GetAchievedLinearVelocity();
 
             achievedVelocity.fX = velocity.fX;
             achievedVelocity.fY = velocity.fY;
-            if (achievedVelocity.fZ > 0.0f)
+
+            if (achievedVelocity.fZ > 0.0f) {
                 achievedVelocity.fZ = 0.0f;
+            }
 
             fController->OverrideAchievedLinearVelocity(achievedVelocity);
         }
@@ -509,19 +522,18 @@ void plWalkingStrategy::Update(float delSecs)
     hsVector3 zeroVelocity(0.f, 0.f, 0.f);
     fController->SetLinearVelocity(zeroVelocity);
 
-    if (!fHitGroundInThisAge && IsOnGround())
+    if (!fHitGroundInThisAge && IsOnGround()) {
         fHitGroundInThisAge = true;
+    }
 
-    if (fClearImpact)
-    {
+    if (fClearImpact) {
         fImpactTime = 0.0f;
         fImpactVelocity.Set(0.0f, 0.0f, 0.0f);
     }
 
-    if (IsOnGround())
+    if (IsOnGround()) {
         fClearImpact = true;
-    else
-    {
+    } else {
         fImpactTime = fTimeInAir;
         fImpactVelocity = fController->GetAchievedLinearVelocity();
         // convert orientation from subworld to avatar-local coordinates
@@ -533,10 +545,12 @@ void plWalkingStrategy::Update(float delSecs)
 void plWalkingStrategy::AddContactNormals(hsVector3& vec)
 {
     float dot = vec * kAvatarUp;
-    if (dot >= 0.5f)
+
+    if (dot >= 0.5f) {
         fGroundHit = true;
-    else
+    } else {
         fSlidingNormals.Append(vec);
+    }
 }
 
 void plWalkingStrategy::Reset(bool newAge)
@@ -544,8 +558,8 @@ void plWalkingStrategy::Reset(bool newAge)
     plMovementStrategy::Reset(newAge);
     fImpactVelocity.Set(0.0f, 0.0f, 0.0f);
     fImpactTime = 0.0f;
-    if (newAge)
-    {
+
+    if (newAge) {
         fTimeInAir = 0.0f;
         fClearImpact = true;
         fHitGroundInThisAge = false;
@@ -555,13 +569,14 @@ void plWalkingStrategy::Reset(bool newAge)
 
 void plWalkingStrategy::RecalcVelocity(double timeNow, float elapsed, bool useAnim)
 {
-    if (fControlledFlight != 0)
-    {
-        if (IsOnGround())
+    if (fControlledFlight != 0) {
+        if (IsOnGround()) {
             fControlledFlightTime = fTimeInAir;
+        }
 
-        if (fControlledFlightTime > kControlledFlightThreshold)
+        if (fControlledFlightTime > kControlledFlightThreshold) {
             EnableControlledFlight(false);
+        }
     }
 
     plAnimatedMovementStrategy::RecalcVelocity(timeNow, elapsed, useAnim);
@@ -569,21 +584,27 @@ void plWalkingStrategy::RecalcVelocity(double timeNow, float elapsed, bool useAn
 
 bool plWalkingStrategy::EnableControlledFlight(bool status)
 {
-    if (status)
-    {
-        if (fControlledFlight == 0)
+    if (status) {
+        if (fControlledFlight == 0) {
             fControlledFlightTime = 0.0f;
+        }
 
         ++fControlledFlight;
-    }
-    else
+    } else {
         fControlledFlight = max(--fControlledFlight, 0);
+    }
 
     return status;
 }
 
-plPhysical* plWalkingStrategy::GetPushingPhysical() const { return fController->GetPushingPhysical(); }
-bool plWalkingStrategy::GetFacingPushingPhysical() const { return fController->GetFacingPushingPhysical(); }
+plPhysical* plWalkingStrategy::GetPushingPhysical() const
+{
+    return fController->GetPushingPhysical();
+}
+bool plWalkingStrategy::GetFacingPushingPhysical() const
+{
+    return fController->GetFacingPushingPhysical();
+}
 
 const float plWalkingStrategy::kAirTimeThreshold = 0.1f;
 const float plWalkingStrategy::kControlledFlightThreshold = 1.0f;
@@ -592,11 +613,11 @@ const float plWalkingStrategy::kControlledFlightThreshold = 1.0f;
 // Swim Strategy
 plSwimStrategy::plSwimStrategy(plAGApplicator* rootApp, plPhysicalControllerCore* controller)
     : plAnimatedMovementStrategy(rootApp, controller),
-    fBuoyancy(0.0f),
-    fSurfaceHeight(0.0f),
-    fCurrentRegion(nil),
-    fOnGround(false),
-    fHadContacts(false)
+      fBuoyancy(0.0f),
+      fSurfaceHeight(0.0f),
+      fCurrentRegion(nil),
+      fOnGround(false),
+      fHadContacts(false)
 {
 }
 
@@ -610,8 +631,10 @@ void plSwimStrategy::Apply(float delSecs)
     //trying to dampen the oscillations
     float retardent = 0.0f;
     static float finalBobSpeed = 0.5f;
-    if ((achievedVelocity.fZ > finalBobSpeed) || (achievedVelocity.fZ < -finalBobSpeed))
+
+    if ((achievedVelocity.fZ > finalBobSpeed) || (achievedVelocity.fZ < -finalBobSpeed)) {
         retardent = achievedVelocity.fZ * -0.90f;
+    }
 
     float zacc = (1.0f - fBuoyancy) * kGravity + retardent;
     velocity.fZ += (zacc * delSecs);
@@ -619,23 +642,25 @@ void plSwimStrategy::Apply(float delSecs)
     velocity.fZ += achievedVelocity.fZ;
 
     // Water Current
-    if (fCurrentRegion != nil)
-    {
+    if (fCurrentRegion != nil) {
         float angCurrent = 0.0f;
         hsVector3 linCurrent(0.0f, 0.0f, 0.0f);
         fCurrentRegion->GetCurrent(fController, linCurrent, angCurrent, delSecs);
 
-        if (hsABS(angCurrent) > 0.0001f)
+        if (hsABS(angCurrent) > 0.0001f) {
             fController->IncrementAngle(angCurrent * delSecs);
+        }
 
         velocity += linCurrent;
 
-        if (velocity.fZ > fCurrentRegion->fMaxUpwardVel)
+        if (velocity.fZ > fCurrentRegion->fMaxUpwardVel) {
             velocity.fZ = fCurrentRegion->fMaxUpwardVel;
+        }
     }
 
-    if (velocity.fZ < kTerminalVelocity)
+    if (velocity.fZ < kTerminalVelocity) {
         velocity.fZ = kTerminalVelocity;
+    }
 
     // Convert to displacement vector
     hsVector3 displacement = velocity * delSecs;
@@ -646,24 +671,29 @@ void plSwimStrategy::Apply(float delSecs)
     fHadContacts = fOnGround = false;
 
     unsigned int collideResults = 0;
-    unsigned int collideFlags = 1<<plSimDefs::kGroupStatic | 1<<plSimDefs::kGroupAvatarBlocker | 1<<plSimDefs::kGroupDynamic;
-    if (!fController->IsSeeking())
-        collideFlags |= (1<<plSimDefs::kGroupExcludeRegion);
+    unsigned int collideFlags = 1 << plSimDefs::kGroupStatic | 1 << plSimDefs::kGroupAvatarBlocker | 1 << plSimDefs::kGroupDynamic;
+
+    if (!fController->IsSeeking()) {
+        collideFlags |= (1 << plSimDefs::kGroupExcludeRegion);
+    }
 
     fController->Move(displacement, collideFlags, collideResults);
 
-    if ((collideResults & kBottom) || (collideResults & kSides))
+    if ((collideResults & kBottom) || (collideResults & kSides)) {
         fHadContacts = true;
+    }
 }
 
 void plSwimStrategy::AddContactNormals(hsVector3& vec)
 {
     float dot = vec * kAvatarUp;
-    if (dot >= kSlopeLimit)
+
+    if (dot >= kSlopeLimit) {
         fOnGround = true;
+    }
 }
 
-void plSwimStrategy::SetSurface(plSwimRegionInterface *region, float surfaceHeight)
+void plSwimStrategy::SetSurface(plSwimRegionInterface* region, float surfaceHeight)
 {
     fCurrentRegion = region;
     fSurfaceHeight = surfaceHeight;
@@ -678,8 +708,7 @@ void plSwimStrategy::IAdjustBuoyancy()
     // 2.0 = opposite of gravity, floating upwards
     static const float buoyancyAtSurface = 1.0f;
 
-    if (fCurrentRegion == nil)
-    {
+    if (fCurrentRegion == nil) {
         fBuoyancy = 0.f;
         return;
     }
@@ -689,12 +718,13 @@ void plSwimStrategy::IAdjustBuoyancy()
     float depth = fSurfaceHeight - posSim.fZ;
 
     // this isn't a smooth transition but hopefully it won't be too obvious
-    if (depth <= 0.0) //all the away above water
-        fBuoyancy = 0.f; // Same as being above ground. Plain old gravity.
-    else if (depth >= 5.0f)
-        fBuoyancy = 3.0f; //completely Submereged
-    else
+    if (depth <= 0.0) { //all the away above water
+        fBuoyancy = 0.f;    // Same as being above ground. Plain old gravity.
+    } else if (depth >= 5.0f) {
+        fBuoyancy = 3.0f;    //completely Submereged
+    } else {
         fBuoyancy = depth / surfaceDepth;
+    }
 }
 
 
@@ -710,27 +740,31 @@ void plDynamicWalkingStrategy::Apply(float delSecs)
     hsVector3 achievedVelocity = fController->GetAchievedLinearVelocity();
 
     // Add in gravity if the avatar's z velocity isn't being set explicitly
-    if (hsABS(velocity.fZ) < 0.001f)
-    {
+    if (hsABS(velocity.fZ) < 0.001f) {
         // Get our previous z velocity.  If we're on the ground, clamp it to zero at
         // the largest, so we won't launch into the air if we're running uphill.
         float prevZVel = achievedVelocity.fZ;
-        if (IsOnGround())
+
+        if (IsOnGround()) {
             prevZVel = hsMinimum(prevZVel, 0.f);
+        }
 
         velocity.fZ = prevZVel + (kGravity * delSecs);
     }
 
-    if (velocity.fZ < kTerminalVelocity)
+    if (velocity.fZ < kTerminalVelocity) {
         velocity.fZ = kTerminalVelocity;
+    }
 
     fController->SetPushingPhysical(nil);
     fController->SetFacingPushingPhysical(false);
     fGroundHit = fFalseGround = false;
 
     float groundZVelocity;
-    if (ICheckForGround(groundZVelocity))
+
+    if (ICheckForGround(groundZVelocity)) {
         velocity.fZ += groundZVelocity;
+    }
 
     fController->SetLinearVelocitySim(velocity);
 }
@@ -738,7 +772,7 @@ void plDynamicWalkingStrategy::Apply(float delSecs)
 bool plDynamicWalkingStrategy::ICheckForGround(float& zVelocity)
 {
     std::vector<plControllerSweepRecord> groundHits;
-    uint32_t collideFlags = 1<<plSimDefs::kGroupStatic | 1<<plSimDefs::kGroupAvatarBlocker | 1<<plSimDefs::kGroupDynamic;
+    uint32_t collideFlags = 1 << plSimDefs::kGroupStatic | 1 << plSimDefs::kGroupAvatarBlocker | 1 << plSimDefs::kGroupDynamic;
 
     hsPoint3 startPos;
     fController->GetPositionSim(startPos);
@@ -749,19 +783,20 @@ bool plDynamicWalkingStrategy::ICheckForGround(float& zVelocity)
     endPos.fZ -= 0.05f;
 
     int possiblePlatformCount = fController->SweepControllerPath(startPos, endPos, true, true, collideFlags, groundHits);
-    if (possiblePlatformCount)
-    {
+
+    if (possiblePlatformCount) {
         zVelocity = -FLT_MAX;
 
         std::vector<plControllerSweepRecord>::iterator curRecord;
-        for (curRecord = groundHits.begin(); curRecord != groundHits.end(); ++curRecord)
-        {
-            if (curRecord->ObjHit != nil)
-            {
+
+        for (curRecord = groundHits.begin(); curRecord != groundHits.end(); ++curRecord) {
+            if (curRecord->ObjHit != nil) {
                 hsVector3 objVelocity;
                 curRecord->ObjHit->GetLinearVelocitySim(objVelocity);
-                if (objVelocity.fZ > zVelocity)
+
+                if (objVelocity.fZ > zVelocity) {
                     zVelocity = objVelocity.fZ;
+                }
 
                 fGroundHit = true;
             }
@@ -805,27 +840,25 @@ in radians.  0 <= ANGLE_DEG_2D < 2 PI.  If either ray has zero length,
 then ANGLE_RAD_2D is set to 0.
 */
 
-static float AngleRad2d( float x1, float y1, float x3, float y3 )
+static float AngleRad2d(float x1, float y1, float x3, float y3)
 {
     float value;
     float x;
     float y;
 
-    x = ( x1 ) * ( x3 ) + ( y1 ) * ( y3 );
-    y = ( x1 ) * ( y3 ) - ( y1 ) * ( x3 );
+    x = (x1) * (x3) + (y1) * (y3);
+    y = (x1) * (y3) - (y1) * (x3);
 
-    if ( x == 0.0 && y == 0.0 ) {
+    if (x == 0.0 && y == 0.0) {
         value = 0.0;
-    }
-    else
-    {
-        value = atan2 ( y, x );
+    } else {
+        value = atan2(y, x);
 
-        if ( value < 0.0 )
-        {
+        if (value < 0.0) {
             value = (float)(value + TWO_PI);
         }
     }
+
     return value;
 }
 

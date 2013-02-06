@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plMessage;
 class plGameMarkerModifier;
 
-class pfMarkerInfo
-{
+class pfMarkerInfo {
 public:
     enum MarkerType { kMarkerOpen, kMarkerGreen, kMarkerRed, kMarkerLocal, kMarkerLocalSelected };
 
@@ -77,7 +76,9 @@ public:
 
     static void Init();
 
-    plKey GetKey() { return fKey; }
+    plKey GetKey() {
+        return fKey;
+    }
 
     void Spawn(MarkerType type);
     void InitSpawned(plKey markerKey);
@@ -86,15 +87,23 @@ public:
     void Update(double curTime);
 
     void Show(bool show);
-    bool IsVisible() { return fVisible; }
+    bool IsVisible() {
+        return fVisible;
+    }
 
     void SetType(pfMarkerInfo::MarkerType type);
-    pfMarkerInfo::MarkerType GetType() { return fType; }
+    pfMarkerInfo::MarkerType GetType() {
+        return fType;
+    }
 
     void SetFrozen(double freezeStartTime);
-    bool IsFrozen() { return fLastChange != 0; }
+    bool IsFrozen() {
+        return fLastChange != 0;
+    }
 
-    void PlayHitSound() { IPlaySound(false); }
+    void PlayHitSound() {
+        IPlaySound(false);
+    }
 };
 
 #endif // pfMarkerInfo_h_inc

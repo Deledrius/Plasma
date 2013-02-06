@@ -55,15 +55,13 @@ extern ClassDesc* GetGUPDesc();
 
 typedef void (*TextureSetFunc)(Texmap* texmap, int iBmp, uint64_t assetId);
 
-struct TexInfo
-{
+struct TexInfo {
     Texmap* texmap;
     int iBmp;
     std::string texName;
 };
 
-class PlasmaMax : public GUP
-{
+class PlasmaMax : public GUP {
 public:
     PlasmaMax();
     ~PlasmaMax() {}
@@ -72,8 +70,7 @@ public:
     DWORD Start();
     void Stop();
 
-    enum ControlVals
-    {
+    enum ControlVals {
         // Pass this to Control and get back a jvArray<TexInfo>* of all the textures in the scene
         kGetTextures,
         // Pass this to Control and get back a pointer to the TextureSetFunc

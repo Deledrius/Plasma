@@ -52,11 +52,9 @@ class plSceneObject;
 class hsStream;
 class hsResMgr;
 
-class plBlower : public plSingleModifier
-{
+class plBlower : public plSingleModifier {
 protected:
-    class Oscillator
-    {
+    class Oscillator {
     public:
         float    fFrequency;
         float    fPhase;
@@ -85,32 +83,52 @@ protected:
     void    IInitOscillators();
     void    ISetTargetTransform();
     void    IBlow(double secs, float delSecs);
-    
+
     virtual bool IEval(double secs, float del, uint32_t dirty);
 public:
     ~plBlower();
     plBlower();
 
-    CLASSNAME_REGISTER( plBlower );
-    GETINTERFACE_ANY( plBlower, plSingleModifier );
-    
+    CLASSNAME_REGISTER(plBlower);
+    GETINTERFACE_ANY(plBlower, plSingleModifier);
+
     virtual void SetTarget(plSceneObject* so);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    void SetMasterPower(float f) { fMasterPower = f; }
-    void SetMasterFrequency(float f) { fMasterFrequency = f; }
-    void SetDirectRate(float f) { fDirectRate = f; }
-    void SetImpulseRate(float f) { fImpulseRate = f; }
-    void SetSpringKonst(float f) { fSpringKonst = f; }
+    void SetMasterPower(float f) {
+        fMasterPower = f;
+    }
+    void SetMasterFrequency(float f) {
+        fMasterFrequency = f;
+    }
+    void SetDirectRate(float f) {
+        fDirectRate = f;
+    }
+    void SetImpulseRate(float f) {
+        fImpulseRate = f;
+    }
+    void SetSpringKonst(float f) {
+        fSpringKonst = f;
+    }
     void SetConstancy(float f);
 
-    float GetMasterPower() const { return fMasterPower; }
-    float GetMasterFrequency() const { return fMasterFrequency; }
-    float GetDirectRate() const { return fDirectRate; }
-    float GetImpulseRate() const { return fImpulseRate; }
-    float GetSpringKonst() const { return fSpringKonst; }
+    float GetMasterPower() const {
+        return fMasterPower;
+    }
+    float GetMasterFrequency() const {
+        return fMasterFrequency;
+    }
+    float GetDirectRate() const {
+        return fDirectRate;
+    }
+    float GetImpulseRate() const {
+        return fImpulseRate;
+    }
+    float GetSpringKonst() const {
+        return fSpringKonst;
+    }
     float GetConstancy() const;
 };
 

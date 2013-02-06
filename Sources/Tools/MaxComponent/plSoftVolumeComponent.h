@@ -63,8 +63,7 @@ const Class_ID EFFVISSET_CID(0x30141876, 0x3ffb3fda);
 class plSoftVolume;
 class plVisRegion;
 
-class plSoftVolBaseComponent : public plComponent
-{
+class plSoftVolBaseComponent : public plComponent {
 protected:
     bool                fValid;
     plKey               fSoftKey;
@@ -76,39 +75,41 @@ protected:
 public:
 
     bool SetupProperties(plMaxNode* pNode, plErrorMsg* errMsg);
-    bool PreConvert(plMaxNode* pNode, plErrorMsg* errMsg) { return true; }
-    bool Convert(plMaxNode *node, plErrorMsg *errMsg) { return true; }
+    bool PreConvert(plMaxNode* pNode, plErrorMsg* errMsg) {
+        return true;
+    }
+    bool Convert(plMaxNode* node, plErrorMsg* errMsg) {
+        return true;
+    }
 
-    plKey GetSoftVolume(); 
+    plKey GetSoftVolume();
 
-    virtual bool DeInit(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool DeInit(plMaxNode* node, plErrorMsg* pErrMsg);
 
     static plSoftVolBaseComponent* GetSoftComponent(INode* node);
-    static plSoftVolBaseComponent* GetSoftComponent(plComponentBase *comp);
+    static plSoftVolBaseComponent* GetSoftComponent(plComponentBase* comp);
 };
 
 //// plSingleCompSelProc Declaration ////////////////////////////////////////////////////////////
 //  Utilitiy class for any dialog that consists of a single button that is used to select
-//  a soft volume. 
+//  a soft volume.
 //  Just declare like this:
 //      static plSingleCompSelProc gSoftVolNegateSingleSel( paramID, buttonCtrlID, promptString );
 //  and use it as the dialog proc for your dialog's ParamMap.
 
-class plSingleCompSelProc : public ParamMap2UserDlgProc
-{
+class plSingleCompSelProc : public ParamMap2UserDlgProc {
 protected:
     ParamID         fNodeID;
     int             fDlgItem;
     TCHAR           fTitle[ 128 ];
 
 public:
-    plSingleCompSelProc(ParamID nodeID, int dlgItem, TCHAR *title);
-    BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    plSingleCompSelProc(ParamID nodeID, int dlgItem, TCHAR* title);
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     void DeleteThis() {}
 };
 
-class plVisRegionComponent : public plComponent
-{
+class plVisRegionComponent : public plComponent {
 public:
     enum {
         kSoftVolume,
@@ -124,20 +125,21 @@ protected:
     void            ICheckVisRegion(const plLocation& loc);
 public:
     plVisRegionComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    bool SetupProperties(plMaxNode *pNode, plErrorMsg *errMsg);
+    bool SetupProperties(plMaxNode* pNode, plErrorMsg* errMsg);
 
-    bool PreConvert(plMaxNode *pNode, plErrorMsg *errMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *errMsg);
+    bool PreConvert(plMaxNode* pNode, plErrorMsg* errMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* errMsg);
 
     static void CollectRegions(plMaxNode* node, hsTArray<plVisRegion*>& regions);
 };
 
-class plEffVisSetComponent : public plComponent
-{
+class plEffVisSetComponent : public plComponent {
 public:
     enum {
         kHideNormal
@@ -146,13 +148,15 @@ protected:
     plVisRegion*        fVisReg;
 public:
     plEffVisSetComponent();
-    void DeleteThis() { delete this; }
-    
+    void DeleteThis() {
+        delete this;
+    }
+
     bool SetupProperties(plMaxNode* pNode, plErrorMsg* errMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *errMsg);
-    
+    bool Convert(plMaxNode* node, plErrorMsg* errMsg);
+
     plVisRegion* GetVisRegion(plMaxNode* node);
-    
+
     static plEffVisSetComponent* ConvertToEffVisSetComponent(plMaxNode* node);
     static void CollectRegions(plMaxNode* node, hsTArray<plVisRegion*>& regions);
 };

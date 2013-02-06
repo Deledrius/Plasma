@@ -59,8 +59,10 @@ void plActivatorBaseComponent::AddReceiverKey(plKey pKey, plMaxNode* node)
 plKey plActivatorBaseComponent::GetLogicKey(plMaxNode* node)
 {
     LogicKeys::const_iterator it = fLogicModKeys.find(node);
-    if (it != fLogicModKeys.end())
+
+    if (it != fLogicModKeys.end()) {
         return it->second;
+    }
 
     return nil;
 }
@@ -70,34 +72,38 @@ void plActivatorBaseComponent::IGetReceivers(plMaxNode* node, hsTArray<plKey>& r
     // Add the guys who want to be notified by all instances
     ReceiverKeys::iterator lowIt = fReceivers.lower_bound(nil);
     ReceiverKeys::iterator highIt = fReceivers.upper_bound(nil);
-    for (; lowIt != highIt; lowIt++)
+
+    for (; lowIt != highIt; lowIt++) {
         receivers.Append(lowIt->second);
+    }
 
     // Add the ones for just this instance
     lowIt = fReceivers.lower_bound(node);
     highIt = fReceivers.upper_bound(node);
-    for (; lowIt != highIt; lowIt++)
+
+    for (; lowIt != highIt; lowIt++) {
         receivers.Append(lowIt->second);
+    }
 }
 
 // Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plActivatorBaseComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plActivatorBaseComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fLogicModKeys.clear();
     fReceivers.clear();
     return true;
 }
 
-bool plActivatorBaseComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plActivatorBaseComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     node->SetForceLocal(true);
 
     plLocation loc = node->GetLocation();
-    plSceneObject *obj = node->GetSceneObject();
+    plSceneObject* obj = node->GetSceneObject();
 
     // Create and register the VolumeGadget's logic component
-    plLogicModifier *logic = new plLogicModifier;
+    plLogicModifier* logic = new plLogicModifier;
     plKey logicKey = hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), logic, node->GetLocation());
     hsgResMgr::ResMgr()->AddViaNotify(logicKey, new plObjRefMsg(obj->GetKey(), plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier), plRefFlags::kActiveRef);
 
@@ -106,9 +112,9 @@ bool plActivatorBaseComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
     return true;
 }
 
-bool plActivatorBaseComponent::DeInit( plMaxNode *node, plErrorMsg *pErrMsg )
+bool plActivatorBaseComponent::DeInit(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fReceivers.clear();
     fLogicModKeys.clear();
-    return plPhysicCoreComponent::DeInit( node, pErrMsg ); 
+    return plPhysicCoreComponent::DeInit(node, pErrMsg);
 }

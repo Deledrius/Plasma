@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plMessage.h"
 #include "hsGeometry3.h"
 
-class plListenerMsg : public plMessage
-{
+class plListenerMsg : public plMessage {
 protected:
 
     hsPoint3        fPos;
@@ -57,33 +56,49 @@ protected:
 
 public:
     plListenerMsg() : plMessage(nil, nil, nil),
-                        fPos(0,0,0),
-                        fDir(0,1.f,0),
-                        fUp(0,0,1.f),
-                        fVel(0,0,0)
-            { SetBCastFlag(kBCastByExactType); }
+        fPos(0, 0, 0),
+        fDir(0, 1.f, 0),
+        fUp(0, 0, 1.f),
+        fVel(0, 0, 0) {
+        SetBCastFlag(kBCastByExactType);
+    }
 
     ~plListenerMsg() {}
-    
-    CLASSNAME_REGISTER( plListenerMsg );
-    GETINTERFACE_ANY( plListenerMsg, plMessage );
+
+    CLASSNAME_REGISTER(plListenerMsg);
+    GETINTERFACE_ANY(plListenerMsg, plMessage);
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);
 
-    const hsPoint3&     SetPosition(const hsPoint3& pos) { return fPos = pos; }
-    const hsVector3&    SetDirection(const hsVector3& dir) { return fDir = dir; }
-    const hsVector3&    SetUp(const hsVector3& up) { return fUp = up; }
-    const hsVector3&    SetVelocity(const hsVector3& vel) { return fVel = vel; }
+    const hsPoint3&     SetPosition(const hsPoint3& pos) {
+        return fPos = pos;
+    }
+    const hsVector3&    SetDirection(const hsVector3& dir) {
+        return fDir = dir;
+    }
+    const hsVector3&    SetUp(const hsVector3& up) {
+        return fUp = up;
+    }
+    const hsVector3&    SetVelocity(const hsVector3& vel) {
+        return fVel = vel;
+    }
 
-    const hsPoint3& GetPosition() const { return fPos; }
-    const hsVector3& GetDirection() const { return fDir; }
-    const hsVector3& GetUp() const { return fUp; }
-    const hsVector3& GetVelocity() const { return fVel; }
+    const hsPoint3& GetPosition() const {
+        return fPos;
+    }
+    const hsVector3& GetDirection() const {
+        return fDir;
+    }
+    const hsVector3& GetUp() const {
+        return fUp;
+    }
+    const hsVector3& GetVelocity() const {
+        return fVel;
+    }
 };
 
-class plSetListenerMsg : public plMessage
-{
+class plSetListenerMsg : public plMessage {
 protected:
 
     uint8_t       fType;
@@ -91,9 +106,8 @@ protected:
     bool        fBinding;
 
 public:
-    
-    enum SrcType
-    {
+
+    enum SrcType {
         kPosition   = 0x01,
         kVelocity   = 0x02,
         kFacing     = 0x04,
@@ -102,21 +116,30 @@ public:
         kListener   = kPosition | kVelocity | kFacing
     };
 
-    plSetListenerMsg() : plMessage( nil, nil, nil ) { fType = 0; fBinding = false; }
-    plSetListenerMsg( uint8_t type, const plKey &srcKey, bool binding );
+    plSetListenerMsg() : plMessage(nil, nil, nil) {
+        fType = 0;
+        fBinding = false;
+    }
+    plSetListenerMsg(uint8_t type, const plKey& srcKey, bool binding);
     ~plSetListenerMsg();
-    
-    CLASSNAME_REGISTER( plSetListenerMsg );
-    GETINTERFACE_ANY( plSetListenerMsg, plMessage );
+
+    CLASSNAME_REGISTER(plSetListenerMsg);
+    GETINTERFACE_ANY(plSetListenerMsg, plMessage);
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);
 
-    void    Set( const plKey &key, uint8_t type, bool binding );
+    void    Set(const plKey& key, uint8_t type, bool binding);
 
-    plKey       &GetSrcKey( void ) { return fSrcKey; }
-    uint8_t       GetType( void ) const { return fType; }
-    bool        IsBinding( void ) const { return fBinding; }
+    plKey&       GetSrcKey(void) {
+        return fSrcKey;
+    }
+    uint8_t       GetType(void) const {
+        return fType;
+    }
+    bool        IsBinding(void) const {
+        return fBinding;
+    }
 };
 
 #endif // plListenerMsg_inc

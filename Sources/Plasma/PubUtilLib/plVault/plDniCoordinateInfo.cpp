@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plVault/plDniCoordinateInfo.cpp
-*   
+*
 ***/
 
 #include "Pch.h"
@@ -56,44 +56,44 @@ const uint8_t plDniCoordinateInfo::StreamVersion = 1;
 
 
 plDniCoordinateInfo::plDniCoordinateInfo()
-: fHSpans(0)
-, fVSpans(0)
-, fTorans(0)
+    : fHSpans(0)
+    , fVSpans(0)
+    , fTorans(0)
 {
 }
 
-void plDniCoordinateInfo::CopyFrom( const plDniCoordinateInfo * other )
+void plDniCoordinateInfo::CopyFrom(const plDniCoordinateInfo* other)
 {
     hsRAMStream stream;
-    plCreatable * otherNonConst = const_cast<plDniCoordinateInfo*>( other );    // because plCreatable Write isn't const, but should be.
-    otherNonConst->Write( &stream, nil );
+    plCreatable* otherNonConst = const_cast<plDniCoordinateInfo*>(other);       // because plCreatable Write isn't const, but should be.
+    otherNonConst->Write(&stream, nil);
     stream.Rewind();
-    Read( &stream, nil );
+    Read(&stream, nil);
 }
 
-void plDniCoordinateInfo::Read( hsStream* s, hsResMgr* mgr )
+void plDniCoordinateInfo::Read(hsStream* s, hsResMgr* mgr)
 {
     uint8_t streamVer;
-    s->ReadLE( &streamVer );
-    if ( streamVer==StreamVersion )
-    {
-        s->ReadLE( &fHSpans );
-        s->ReadLE( &fVSpans );
-        s->ReadLE( &fTorans );
+    s->ReadLE(&streamVer);
+
+    if (streamVer == StreamVersion) {
+        s->ReadLE(&fHSpans);
+        s->ReadLE(&fVSpans);
+        s->ReadLE(&fTorans);
     }
 }
 
-void plDniCoordinateInfo::Write( hsStream* s, hsResMgr* mgr )
+void plDniCoordinateInfo::Write(hsStream* s, hsResMgr* mgr)
 {
-    s->WriteLE( StreamVersion );
-    s->WriteLE( fHSpans );
-    s->WriteLE( fVSpans );
-    s->WriteLE( fTorans );
+    s->WriteLE(StreamVersion);
+    s->WriteLE(fHSpans);
+    s->WriteLE(fVSpans);
+    s->WriteLE(fTorans);
 }
 
-plString plDniCoordinateInfo::AsString( int level ) const
+plString plDniCoordinateInfo::AsString(int level) const
 {
-    plString space = plString::Fill( level, ' ' );
-    return plString::Format( "%sDniCoords[%d,%d,%d]", space.c_str(), fHSpans, fVSpans, fTorans );
+    plString space = plString::Fill(level, ' ');
+    return plString::Format("%sDniCoords[%d,%d,%d]", space.c_str(), fHSpans, fVSpans, fTorans);
 }
 #endif // def CLIENT

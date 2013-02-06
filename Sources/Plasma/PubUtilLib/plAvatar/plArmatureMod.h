@@ -100,31 +100,34 @@ class plPhysicalControllerCore;
 typedef std::vector<plKey> plKeyVector;
 typedef std::vector<plArmatureBrain*> plBrainStack;
 
-class plArmatureModBase : public plAGMasterMod
-{
+class plArmatureModBase : public plAGMasterMod {
 public:
     plArmatureModBase();
     virtual ~plArmatureModBase();
 
-    CLASSNAME_REGISTER( plArmatureModBase );
-    GETINTERFACE_ANY( plArmatureModBase, plAGMasterMod );   
-    
+    CLASSNAME_REGISTER(plArmatureModBase);
+    GETINTERFACE_ANY(plArmatureModBase, plAGMasterMod);
+
     virtual bool    MsgReceive(plMessage* msg);
-    virtual void    AddTarget(plSceneObject* so);   
+    virtual void    AddTarget(plSceneObject* so);
     virtual void    RemoveTarget(plSceneObject* so);
     virtual bool    IEval(double secs, float del, uint32_t dirty);
-    virtual void    Read(hsStream *stream, hsResMgr *mgr);
-    virtual void    Write(hsStream *stream, hsResMgr *mgr);
-    
-    plMatrixDifferenceApp *GetRootAnimator() { return fRootAnimator; }
-    plPhysicalControllerCore* GetController() const { return fController; }
+    virtual void    Read(hsStream* stream, hsResMgr* mgr);
+    virtual void    Write(hsStream* stream, hsResMgr* mgr);
+
+    plMatrixDifferenceApp* GetRootAnimator() {
+        return fRootAnimator;
+    }
+    plPhysicalControllerCore* GetController() const {
+        return fController;
+    }
     plKey GetWorldKey() const;
     virtual bool ValidatePhysics();
     virtual bool ValidateMesh();
-    virtual void PushBrain(plArmatureBrain *brain);
+    virtual void PushBrain(plArmatureBrain* brain);
     virtual void PopBrain();
-    plArmatureBrain *GetCurrentBrain() const;
-    plDrawable *FindDrawable() const;
+    plArmatureBrain* GetCurrentBrain() const;
+    plDrawable* FindDrawable() const;
     virtual void LeaveAge();
     virtual bool IsFinal();
 
@@ -133,13 +136,12 @@ public:
     bool    SetLOD(int newLOD);     // switch to a different resolution
     void    RefreshTree();              // Resend an LOD update to all our nodes (for when geometry changes)
     int     AppendMeshKey(plKey meshKey);
-    int     AppendBoneVec(plKeyVector *boneVec);
+    int     AppendBoneVec(plKeyVector* boneVec);
     uint8_t   GetNumLOD() const;
-    
+
     // A collection of reasons (flags) that things might be disabled. When all flags are gone
     // The object is re-enabled.
-    enum
-    {
+    enum {
         kDisableReasonUnknown   = 0x0001,
         kDisableReasonRelRegion = 0x0002,
         kDisableReasonLinking   = 0x0004,
@@ -147,29 +149,32 @@ public:
         kDisableReasonVehicle   = 0x0010,
         kDisableReasonGenericBrain  = 0x0020,
         kDisableReasonKinematic = 0x0040
-    };  
+    };
     void EnablePhysics(bool status, uint16_t reason = kDisableReasonUnknown);
     void EnablePhysicsKinematic(bool status);
-    void EnableDrawing(bool status, uint16_t reason = kDisableReasonUnknown);   
-    bool IsPhysicsEnabled() { return fDisabledPhysics == 0; }
-    bool IsDrawEnabled() { return fDisabledDraw == 0; }
+    void EnableDrawing(bool status, uint16_t reason = kDisableReasonUnknown);
+    bool IsPhysicsEnabled() {
+        return fDisabledPhysics == 0;
+    }
+    bool IsDrawEnabled() {
+        return fDisabledDraw == 0;
+    }
 
 
-    static void AddressMessageToDescendants(const plCoordinateInterface * CI, plMessage *msg);
-    static void EnableDrawingTree(const plSceneObject *object, bool status);  
+    static void AddressMessageToDescendants(const plCoordinateInterface* CI, plMessage* msg);
+    static void EnableDrawingTree(const plSceneObject* object, bool status);
 
     static int fMinLOD;                     // throttle for lowest-indexed LOD
     static double fLODDistance;             // Distance for first LOD switch 2nd is 2x this distance (for now)
-    
+
 protected:
     virtual void IFinalize();
     virtual void ICustomizeApplicator();
     void IEnableBones(int lod, bool enable);
-        
+
     // Some of these flags are only needed by derived classes, but I just want
     // the one waitFlags variable.
-    enum
-    {
+    enum {
         kNeedMesh               = 0x01,
         kNeedPhysics            = 0x02,
         kNeedAudio              = 0x04,
@@ -178,39 +183,38 @@ protected:
         kNeedApplicator         = 0x20,
         kNeedBrainActivation    = 0x40,
     };
-    uint16_t fWaitFlags;  
-    
+    uint16_t fWaitFlags;
+
     int fCurLOD;
     plPhysicalControllerCore* fController;
     plKeyVector fMeshKeys;
-    plBrainStack fBrains;   
-    plMatrixDifferenceApp *fRootAnimator;
+    plBrainStack fBrains;
+    plMatrixDifferenceApp* fRootAnimator;
     std::vector<plKeyVector*> fUnusedBones;
     uint16_t fDisabledPhysics;
     uint16_t fDisabledDraw;
 };
 
-class plArmatureMod : public plArmatureModBase
-{
+class plArmatureMod : public plArmatureModBase {
     friend class plHBehavior;
     friend class plAvatarSDLModifier;
     friend class plAvatarPhysicalSDLModifier;
     friend class plClothingSDLModifier;
     friend class plAvOneShotLinkTask;
-    
+
 public:
     plArmatureMod();
     virtual ~plArmatureMod();
-    
-    CLASSNAME_REGISTER( plArmatureMod );
-    GETINTERFACE_ANY( plArmatureMod, plArmatureModBase );
-    
+
+    CLASSNAME_REGISTER(plArmatureMod);
+    GETINTERFACE_ANY(plArmatureMod, plArmatureModBase);
+
     virtual bool    MsgReceive(plMessage* msg);
     virtual void    AddTarget(plSceneObject* so);
     virtual void    RemoveTarget(plSceneObject* so);
     virtual bool    IEval(double secs, float del, uint32_t dirty);
-    virtual void    Read(hsStream *stream, hsResMgr *mgr);
-    virtual void    Write(hsStream *stream, hsResMgr *mgr);
+    virtual void    Read(hsStream* stream, hsResMgr* mgr);
+    virtual void    Write(hsStream* stream, hsResMgr* mgr);
 
     virtual bool ValidatePhysics();
     virtual bool ValidateMesh();
@@ -222,11 +226,11 @@ public:
 
     bool IsLocalAvatar();
     bool IsLocalAI();
-    virtual const plSceneObject *FindBone(const plString & name) const;
-    virtual const plSceneObject *FindBone(uint32_t id) const; // use an id from an appropriate taxonomy, such as plAvBrainHuman::BoneID
-    virtual void AddBoneMapping(uint32_t id, const plSceneObject *bone);
-    plAGModifier *GetRootAGMod();
-    plAGAnim *FindCustomAnim(const plString& baseName) const;
+    virtual const plSceneObject* FindBone(const plString& name) const;
+    virtual const plSceneObject* FindBone(uint32_t id) const; // use an id from an appropriate taxonomy, such as plAvBrainHuman::BoneID
+    virtual void AddBoneMapping(uint32_t id, const plSceneObject* bone);
+    plAGModifier* GetRootAGMod();
+    plAGAnim* FindCustomAnim(const plString& baseName) const;
 
     virtual void Spawn(double timeNow);
     virtual void SpawnAt(int which, double timeNow);
@@ -235,18 +239,29 @@ public:
     virtual void PanicLink(bool playLinkOutAnim = true);
     virtual void PersonalLink();
 
-    virtual bool ToggleDontPanicLinkFlag() { fDontPanicLink = fDontPanicLink ? false : true; return fDontPanicLink; }
+    virtual bool ToggleDontPanicLinkFlag() {
+        fDontPanicLink = fDontPanicLink ? false : true;
+        return fDontPanicLink;
+    }
 
     int GetBrainCount();
-    plArmatureBrain *GetNextBrain(plArmatureBrain *brain);
-    plArmatureBrain *GetBrain(int index) { if(index <= fBrains.size()) return fBrains.at(index); else return nil; }
-    plArmatureBrain *FindBrainByClass(uint32_t classID) const;
+    plArmatureBrain* GetNextBrain(plArmatureBrain* brain);
+    plArmatureBrain* GetBrain(int index) {
+        if (index <= fBrains.size()) {
+            return fBrains.at(index);
+        } else {
+            return nil;
+        }
+    }
+    plArmatureBrain* FindBrainByClass(uint32_t classID) const;
 
-    void TurnToPoint(hsPoint3 &point);
+    void TurnToPoint(hsPoint3& point);
     void SuspendInput();
     void ResumeInput();
-    
-    uint8_t       IsInputSuspended() { return fSuspendInputCount; }
+
+    uint8_t       IsInputSuspended() {
+        return fSuspendInputCount;
+    }
     void        IProcessQueuedInput();
     void        PreserveInputState();
     void        RestoreInputState();
@@ -278,20 +293,25 @@ public:
     void SetTurnLeftKeyDown(bool status = true);
     void SetTurnRightKeyDown(bool status = true);
     void SetJumpKeyDown();
-    void DebugDumpMoveKeys(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt);
-    void GetMoveKeyString(char *buff);
+    void DebugDumpMoveKeys(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt);
+    void GetMoveKeyString(char* buff);
 
     void SynchIfLocal(double timeNow, int force); // Just physical state
-    void SynchInputState(uint32_t rcvID = kInvalidPlayerID);  
-    bool DirtySynchState(const char* SDLStateName, uint32_t synchFlags );
+    void SynchInputState(uint32_t rcvID = kInvalidPlayerID);
+    bool DirtySynchState(const char* SDLStateName, uint32_t synchFlags);
     bool DirtyPhysicalSynchState(uint32_t synchFlags);
-    plClothingOutfit *GetClothingOutfit() const { return fClothingOutfit; }
-    plClothingSDLModifier *GetClothingSDLMod() const { return fClothingSDLMod; }
-    const plSceneObject *GetClothingSO(uint8_t lod) const;
-    plArmatureEffectsMgr *GetArmatureEffects() const { return fEffects; }
+    plClothingOutfit* GetClothingOutfit() const {
+        return fClothingOutfit;
+    }
+    plClothingSDLModifier* GetClothingSDLMod() const {
+        return fClothingSDLMod;
+    }
+    const plSceneObject* GetClothingSO(uint8_t lod) const;
+    plArmatureEffectsMgr* GetArmatureEffects() const {
+        return fEffects;
+    }
 
-    enum
-    {
+    enum {
         kWalk,
         kRun,
         kTurn,
@@ -299,97 +319,133 @@ public:
         kSwim,
     };
 
-    plString GetAnimRootName(const plString &name);
-    int8_t AnimNameToIndex(const plString &name);
-    void SetBodyType(int type) { fBodyType = type; }
-    int  GetBodyType(int type) { return fBodyType; }
+    plString GetAnimRootName(const plString& name);
+    int8_t AnimNameToIndex(const plString& name);
+    void SetBodyType(int type) {
+        fBodyType = type;
+    }
+    int  GetBodyType(int type) {
+        return fBodyType;
+    }
     int  GetCurrentGenericType();
-    bool FindMatchingGenericBrain(const char *names[], int count);
+    bool FindMatchingGenericBrain(const char* names[], int count);
     plString MakeAnimationName(const plString& baseName) const;
     plString GetRootName();
-    void SetRootName(const plString &name);
-    
+    void SetRootName(const plString& name);
+
     int  RefreshDebugDisplay();
-    void DumpToDebugDisplay(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt);
-    void SetDebugState(bool state) { fDebugOn = (state != 0); }
-    bool GetDebugState() { return fDebugOn; }
+    void DumpToDebugDisplay(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt);
+    void SetDebugState(bool state) {
+        fDebugOn = (state != 0);
+    }
+    bool GetDebugState() {
+        return fDebugOn;
+    }
 
     virtual void    RefreshTree() {}
     bool    IsInStealthMode() const;
-    int     GetStealthLevel() const { return fStealthLevel; }
+    int     GetStealthLevel() const {
+        return fStealthLevel;
+    }
 
     bool    IsOpaque();
     bool    IsLinkedIn();
     bool    IsMidLink();
     bool    ConsumeJump(); // returns true if the jump keypress was available to consume
 
-    void SendBehaviorNotify(uint32_t type, bool start = true) { IFireBehaviorNotify(type,start); }
+    void SendBehaviorNotify(uint32_t type, bool start = true) {
+        IFireBehaviorNotify(type, start);
+    }
     // Discovered a bug which makes these values horribly out of scale. So we do the rescale
     // in the Get/Set functions for backwards compatability.
-    static void     SetMouseTurnSensitivity(float val) { fMouseTurnSensitivity = val / 150.f; }
-    static float GetMouseTurnSensitivity() { return fMouseTurnSensitivity * 150.f; } 
-    
-    static void SetSpawnPointOverride( const char *overrideObjName );
+    static void     SetMouseTurnSensitivity(float val) {
+        fMouseTurnSensitivity = val / 150.f;
+    }
+    static float GetMouseTurnSensitivity() {
+        return fMouseTurnSensitivity * 150.f;
+    }
+
+    static void SetSpawnPointOverride(const char* overrideObjName);
     static void WindowActivate(bool active);
-    void SetFollowerParticleSystemSO(plSceneObject *follower);
-    plSceneObject *GetFollowerParticleSystemSO();
+    void SetFollowerParticleSystemSO(plSceneObject* follower);
+    plSceneObject* GetFollowerParticleSystemSO();
     void RegisterForBehaviorNotify(plKey key);
     void UnRegisterForBehaviorNotify(plKey key);
-    const hsBitVector& GetRelRegionCareAbout() const    { return fRegionsICareAbout; }
-    const hsBitVector& GetRelRegionImIn() const         { return fRegionsImIn; }
+    const hsBitVector& GetRelRegionCareAbout() const    {
+        return fRegionsICareAbout;
+    }
+    const hsBitVector& GetRelRegionImIn() const         {
+        return fRegionsImIn;
+    }
 
     bool    IsKILowestLevel();
     int     GetKILevel();
-    void    SetLinkInAnim(const char *animName);
+    void    SetLinkInAnim(const char* animName);
     plKey   GetLinkInAnimKey() const;
 
-    enum
-    {
+    enum {
         kSwapTargetShadow,
         kMaxSwapType
     };
-    enum
-    {
+    enum {
         kBoneBaseMale = 0,
         kBoneBaseFemale,
         kBoneBaseCritter, // AI controlled avatar
         kBoneBaseActor, // human controlled, non human avatar
         kMaxBoneBase
-    };  
-    enum
-    {
+    };
+    enum {
         kAvatarLOSGround,
         kAvatarLOSSwimSurface,
     };
-    plMatrixDelayedCorrectionApplicator *fBoneRootAnimator;
+    plMatrixDelayedCorrectionApplicator* fBoneRootAnimator;
 
     static const float kAvatarInputSynchThreshold;
     static bool fClickToTurn;
-    static const char *BoneStrings[];
-    
-    void SetPhysicalDims(float height, float width) { fPhysHeight = height; fPhysWidth = width; }
+    static const char* BoneStrings[];
 
-    void SetBodyAgeName(const char* ageName) {if (ageName) fBodyAgeName = ageName; else fBodyAgeName = "";}
-    void SetBodyFootstepSoundPage(const char* pageName) {if (pageName) fBodyFootstepSoundPage = pageName; else fBodyFootstepSoundPage = "";}
-    void SetAnimationPrefix(const plString& prefix) { fAnimationPrefix = prefix; }
+    void SetPhysicalDims(float height, float width) {
+        fPhysHeight = height;
+        fPhysWidth = width;
+    }
 
-    const char* GetUserStr() {return fUserStr.c_str();}
+    void SetBodyAgeName(const char* ageName) {
+        if (ageName) {
+            fBodyAgeName = ageName;
+        } else {
+            fBodyAgeName = "";
+        }
+    }
+    void SetBodyFootstepSoundPage(const char* pageName) {
+        if (pageName) {
+            fBodyFootstepSoundPage = pageName;
+        } else {
+            fBodyFootstepSoundPage = "";
+        }
+    }
+    void SetAnimationPrefix(const plString& prefix) {
+        fAnimationPrefix = prefix;
+    }
+
+    const char* GetUserStr() {
+        return fUserStr.c_str();
+    }
 
 protected:
     void IInitDefaults();
-    virtual void IFinalize();   
+    virtual void IFinalize();
     virtual void ICustomizeApplicator();
-    virtual void ISetupMarkerCallbacks(plATCAnim *anim, plAnimTimeConvert *atc);
-    
+    virtual void ISetupMarkerCallbacks(plATCAnim* anim, plAnimTimeConvert* atc);
+
     void    NetworkSynch(double timeNow, int force = 0);
     bool    IHandleControlMsg(plControlEventMsg* pMsg);
     void    IFireBehaviorNotify(uint32_t type, bool behaviorStart = true);
-    void    IHandleInputStateMsg(plAvatarInputStateMsg *msg);
+    void    IHandleInputStateMsg(plAvatarInputStateMsg* msg);
     void    ILinkToPersonalAge();
     int     IFindSpawnOverride(void);
     void    ISetTransparentDrawOrder(bool val);
-    plLayerLinkAnimation *IFindLayerLinkAnim();
-    
+    plLayerLinkAnimation* IFindLayerLinkAnim();
+
     plString            fRootName;          // the name of the player root (from the max file)
     hsBitVector         fMoveFlags;         // which keys/buttons are currently pressed
     hsBitVector         fMoveFlagsBackup;   // a copy of fMoveFlags
@@ -400,8 +456,8 @@ protected:
     plKey               fLinkSoundSOKey;    // Same thing for linking... wwwwawAWAWAwawa...
     plKey               fLinkInAnimKey;     // Set when we link out, this is the anim to play (backwards) when we link in.
     static float        fMouseTurnSensitivity;
-    plArmatureUpdateMsg *fUpdateMsg;    
-    
+    plArmatureUpdateMsg* fUpdateMsg;
+
     // Trying to be a good lad here and align all our bools and bytes...
     bool fIsLinkedIn;       // We have finished playing the LinkEffects and are properly in the age
     bool fMidLink;          // We're in between a LeaveAge and an EnterAge
@@ -411,29 +467,29 @@ protected:
     bool fPendingSynch;
     bool fDebugOn;
     bool fOpaque;
-    uint8_t fSuspendInputCount;   
+    uint8_t fSuspendInputCount;
     uint8_t fStealthMode;
     int fStealthLevel;  // you are invisible to other players/CCRs of lower stealthLevel
-    
-    plAGModifier * fRootAGMod;
-    plAvBoneMap * fBoneMap;                 // uses id codes to look up bones. set up by the brain as needed.
+
+    plAGModifier* fRootAGMod;
+    plAvBoneMap* fBoneMap;                  // uses id codes to look up bones. set up by the brain as needed.
     double fLastSynch;
     int fBodyType;
-    plClothingOutfit *fClothingOutfit;
-    plClothingSDLModifier *fClothingSDLMod;
-    plAvatarSDLModifier *fAvatarSDLMod;
-    plAvatarPhysicalSDLModifier *fAvatarPhysicalSDLMod;
+    plClothingOutfit* fClothingOutfit;
+    plClothingSDLModifier* fClothingSDLMod;
+    plAvatarSDLModifier* fAvatarSDLMod;
+    plAvatarPhysicalSDLModifier* fAvatarPhysicalSDLMod;
     hsTArray<const plSceneObject*> fClothToSOMap;
-    plArmatureEffectsMgr *fEffects;
-    plSceneObject *fFollowerParticleSystemSO;
-    static char *fSpawnPointOverride;
+    plArmatureEffectsMgr* fEffects;
+    plSceneObject* fFollowerParticleSystemSO;
+    static char* fSpawnPointOverride;
 
     // These vectors are used with relevance regions for culling out other objects
     hsBitVector fRegionsImIn;
     hsBitVector fRegionsICareAbout;
     hsBitVector fOldRegionsImIn;
     hsBitVector fOldRegionsICareAbout;
-    
+
     hsTArray<plKey> fNotifyKeys;
 
     // Extra info for creating our special physical at runtime
@@ -453,34 +509,32 @@ protected:
 
 // PLARMATURELOD
 // This class has been phased into plArmatureModBase. It's left behind
-// for backwards compatability. 
-class plArmatureLODMod : public plArmatureMod
-{
+// for backwards compatability.
+class plArmatureLODMod : public plArmatureMod {
 public:
     // tors
     plArmatureLODMod();
-    plArmatureLODMod(const plString & root_name);
+    plArmatureLODMod(const plString& root_name);
     virtual ~plArmatureLODMod();
 
-    CLASSNAME_REGISTER( plArmatureLODMod );
-    GETINTERFACE_ANY( plArmatureLODMod, plArmatureMod );
+    CLASSNAME_REGISTER(plArmatureLODMod);
+    GETINTERFACE_ANY(plArmatureLODMod, plArmatureMod);
 
-    virtual void    Read(hsStream *stream, hsResMgr *mgr);
-    virtual void    Write(hsStream *stream, hsResMgr *mgr);
+    virtual void    Read(hsStream* stream, hsResMgr* mgr);
+    virtual void    Write(hsStream* stream, hsResMgr* mgr);
 };
 
-class plAvBoneMap
-{
+class plAvBoneMap {
 public:
     plAvBoneMap();
     virtual ~plAvBoneMap();
 
-    const plSceneObject * FindBone(uint32_t boneID);          // you probably want to use plAvBrainHuman::BoneID;
-    void AddBoneMapping(uint32_t boneID, const plSceneObject *SO);
+    const plSceneObject* FindBone(uint32_t boneID);           // you probably want to use plAvBrainHuman::BoneID;
+    void AddBoneMapping(uint32_t boneID, const plSceneObject* SO);
 
 protected:
     class BoneMapImp;       // forward declaration to keep the header clean: see .cpp for implementation
-    BoneMapImp *fImp;       // the thing that actually holds our map
+    BoneMapImp* fImp;       // the thing that actually holds our map
 };
 
 #define TWO_PI (M_PI * 2)

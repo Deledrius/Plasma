@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plMorphDelta.h"
 
-class plMorphArray
-{
+class plMorphArray {
 protected:
     hsTArray<plMorphDelta>      fDeltas;
 public:
@@ -56,14 +55,22 @@ public:
     void Apply(hsTArray<plAccessSpan>& dst, hsTArray<float>* weights = nil) const;
 
     void Read(hsStream* s, hsResMgr* mgr);
-    void Write(hsStream* s, hsResMgr* mgr); 
+    void Write(hsStream* s, hsResMgr* mgr);
 
     void Reset();
     void AddDelta(const plMorphDelta& delta);
 
-    int GetNumDeltas() const { return fDeltas.GetCount(); }
-    float GetWeight(int iDel) { return fDeltas[iDel].GetWeight(); }
-    void SetWeight(int iDel, float w) { if( iDel < fDeltas.GetCount() )fDeltas[iDel].SetWeight(w); }
+    int GetNumDeltas() const {
+        return fDeltas.GetCount();
+    }
+    float GetWeight(int iDel) {
+        return fDeltas[iDel].GetWeight();
+    }
+    void SetWeight(int iDel, float w) {
+        if (iDel < fDeltas.GetCount()) {
+            fDeltas[iDel].SetWeight(w);
+        }
+    }
 };
 
 #endif // plMorphArray_inc

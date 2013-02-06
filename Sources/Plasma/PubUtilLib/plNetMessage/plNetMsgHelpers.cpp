@@ -53,7 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ////////////////////////////////////////////////////////////////////
 // plNetMsgStreamableHelper
 
-plNetMsgStreamableHelper & plNetMsgStreamableHelper::operator =(hsStreamable * value)
+plNetMsgStreamableHelper& plNetMsgStreamableHelper::operator =(hsStreamable* value)
 {
     fObject = value;
     return *this;
@@ -76,65 +76,68 @@ int plNetMsgStreamableHelper::Peek(hsStream* stream, uint32_t peekOptions)
 ////////////////////////////////////////////////////////////////////
 // plNetMsgCreatableHelper
 
-plNetMsgCreatableHelper::plNetMsgCreatableHelper(plCreatable * object)
-:fCreatable(object)
-,fWeCreatedIt(false)
+plNetMsgCreatableHelper::plNetMsgCreatableHelper(plCreatable* object)
+    : fCreatable(object)
+    , fWeCreatedIt(false)
 {
 }
 
 plNetMsgCreatableHelper::~plNetMsgCreatableHelper()
 {
-    if (fWeCreatedIt)
+    if (fWeCreatedIt) {
         hsRefCnt_SafeUnRef(fCreatable);
+    }
 }
 
-plNetMsgCreatableHelper & plNetMsgCreatableHelper::operator =(plCreatable * value)
+plNetMsgCreatableHelper& plNetMsgCreatableHelper::operator =(plCreatable* value)
 {
     SetObject(value);
     return *this;
 }
 
-plNetMsgCreatableHelper::operator plCreatable*()
+plNetMsgCreatableHelper::operator plCreatable* ()
 {
     return GetObject();
 }
 
-plNetMsgCreatableHelper::operator const plCreatable*()
+plNetMsgCreatableHelper::operator const plCreatable* ()
 {
     return GetObject();
 }
 
-void plNetMsgCreatableHelper::SetObject(plCreatable * object)
+void plNetMsgCreatableHelper::SetObject(plCreatable* object)
 {
-    if (fWeCreatedIt)
+    if (fWeCreatedIt) {
         hsRefCnt_SafeUnRef(fCreatable);
+    }
+
     fCreatable = object;
     fWeCreatedIt = false;
 }
 
-plCreatable * plNetMsgCreatableHelper::GetObject()
+plCreatable* plNetMsgCreatableHelper::GetObject()
 {
     return fCreatable;
 }
 
-int plNetMsgCreatableHelper::Poke(hsStream * s, uint32_t peekOptions)
+int plNetMsgCreatableHelper::Poke(hsStream* s, uint32_t peekOptions)
 {
-    hsAssert(fCreatable,"plNetMsgCreatableHelper::Poke: fCreatable not set");
+    hsAssert(fCreatable, "plNetMsgCreatableHelper::Poke: fCreatable not set");
     uint16_t classIndex = fCreatable->ClassIndex();
     s->WriteLE(classIndex);
-    fCreatable->Write(s,nil);
+    fCreatable->Write(s, nil);
     return s->GetPosition();
 }
 
-int plNetMsgCreatableHelper::Peek(hsStream * s, uint32_t peekOptions)
+int plNetMsgCreatableHelper::Peek(hsStream* s, uint32_t peekOptions)
 {
     uint16_t classIndex;
     s->LogSubStreamStart("push me");
-    s->LogReadLE(&classIndex,"ClassIdx");
+    s->LogReadLE(&classIndex, "ClassIdx");
     SetObject(plFactory::Create(classIndex));
     fWeCreatedIt = true;
-    hsAssert(fCreatable,"plNetMsgCreatableHelper::Peek: Failed to create plCreatable. Invalid ClassIndex?");
-    fCreatable->Read(s,nil);
+    hsAssert(fCreatable, "plNetMsgCreatableHelper::Peek: Failed to create plCreatable. Invalid ClassIndex?");
+    fCreatable->Read(s, nil);
     s->LogSubStreamEnd();
     return s->GetPosition();
 }
@@ -144,9 +147,9 @@ int plNetMsgCreatableHelper::Peek(hsStream * s, uint32_t peekOptions)
 // NOT A MSG
 // PL STREAM MSG - HELPER class
 /////////////////////////////////////////////////////////
-plNetMsgStreamHelper::plNetMsgStreamHelper() :  fStreamBuf(nil), fStreamType(-1), fStreamLen(0), 
-        fCompressionType(plNetMessage::kCompressionNone), fUncompressedSize(0),
-        fCompressionThreshold( kDefaultCompressionThreshold )
+plNetMsgStreamHelper::plNetMsgStreamHelper() :  fStreamBuf(nil), fStreamType(-1), fStreamLen(0),
+    fCompressionType(plNetMessage::kCompressionNone), fUncompressedSize(0),
+    fCompressionThreshold(kDefaultCompressionThreshold)
 {
 }
 
@@ -162,8 +165,10 @@ void plNetMsgStreamHelper::Clear()
 
 int plNetMsgStreamHelper::Poke(hsStream* stream, uint32_t peekOptions)
 {
-    if ( !(peekOptions & plNetMessage::kDontCompress) )
+    if (!(peekOptions & plNetMessage::kDontCompress)) {
         Compress();
+    }
+
     stream->WriteLE(fUncompressedSize);
     stream->WriteLE(fCompressionType);
     stream->WriteLE(fStreamLen);
@@ -174,27 +179,29 @@ int plNetMsgStreamHelper::Poke(hsStream* stream, uint32_t peekOptions)
 int plNetMsgStreamHelper::Peek(hsStream* stream, const uint32_t peekOptions)
 {
     stream->LogSubStreamStart("Stream Helper");
-    stream->LogReadLE(&fUncompressedSize,"UncompressedSize");
-    stream->LogReadLE(&fCompressionType,"CompressionType");
-    stream->LogReadLE(&fStreamLen,"StreamLen");
+    stream->LogReadLE(&fUncompressedSize, "UncompressedSize");
+    stream->LogReadLE(&fCompressionType, "CompressionType");
+    stream->LogReadLE(&fStreamLen, "StreamLen");
 
-    if (fStreamLen)     // stream data exists
-    {
-        if (!(peekOptions & plNetMessage::kSkipStream))
-        {
-                if (!fStreamBuf)
-                    IAllocStream(fStreamLen);
-                stream->LogRead(fStreamLen, fStreamBuf,"StreamData");
-                if ( !(peekOptions & plNetMessage::kDontCompress) )
-                    Uncompress();
-                fStreamType = *(int16_t*)fStreamBuf;      // grab from start fo stream
-        }
-        else
-        {
+    if (fStreamLen) {   // stream data exists
+        if (!(peekOptions & plNetMessage::kSkipStream)) {
+            if (!fStreamBuf) {
+                IAllocStream(fStreamLen);
+            }
+
+            stream->LogRead(fStreamLen, fStreamBuf, "StreamData");
+
+            if (!(peekOptions & plNetMessage::kDontCompress)) {
+                Uncompress();
+            }
+
+            fStreamType = *(int16_t*)fStreamBuf;      // grab from start fo stream
+        } else {
             stream->ReadLE(&fStreamType);     // never compressed, set by reading directly from stream
-            stream->LogSkip(fStreamLen-sizeof(fStreamType),"SkippedStreamHelper");
+            stream->LogSkip(fStreamLen - sizeof(fStreamType), "SkippedStreamHelper");
         }
     }
+
     stream->LogSubStreamEnd();
     return stream->GetPosition();
 }
@@ -204,17 +211,24 @@ void plNetMsgStreamHelper::ReadVersion(hsStream* s, hsResMgr* mgr)
     hsBitVector contentFlags;
     contentFlags.Read(s);
 
-    if (contentFlags.IsBitSet(kUncompressedSize))
+    if (contentFlags.IsBitSet(kUncompressedSize)) {
         s->ReadLE(&fUncompressedSize);
-    if (contentFlags.IsBitSet(kCompressionType))
+    }
+
+    if (contentFlags.IsBitSet(kCompressionType)) {
         s->ReadLE(&fCompressionType);
-    if (contentFlags.IsBitSet(kStreamLen))
+    }
+
+    if (contentFlags.IsBitSet(kStreamLen)) {
         s->ReadLE(&fStreamLen);
-    if (contentFlags.IsBitSet(kStreamBuf))
-    {
-        if (!fStreamBuf)
+    }
+
+    if (contentFlags.IsBitSet(kStreamBuf)) {
+        if (!fStreamBuf) {
             IAllocStream(fStreamLen);
-        s->Read(fStreamLen,fStreamBuf);
+        }
+
+        s->Read(fStreamLen, fStreamBuf);
     }
 }
 
@@ -230,21 +244,23 @@ void plNetMsgStreamHelper::WriteVersion(hsStream* s, hsResMgr* mgr)
     s->WriteLE(fUncompressedSize);
     s->WriteLE(fCompressionType);
     s->WriteLE(fStreamLen);
-    s->Write(fStreamLen,fStreamBuf);
+    s->Write(fStreamLen, fStreamBuf);
 }
 
 void plNetMsgStreamHelper::IAllocStream(uint32_t len)
 {
     delete [] fStreamBuf;
-    fStreamBuf=nil;
-    fStreamLen=len;
-    if (len)
+    fStreamBuf = nil;
+    fStreamLen = len;
+
+    if (len) {
         fStreamBuf = new uint8_t[len];
+    }
 }
 
 void plNetMsgStreamHelper::CopyStream(hsStream* ssStream)
 {
-    uint32_t len=ssStream->GetEOF();
+    uint32_t len = ssStream->GetEOF();
     IAllocStream(len);
     ssStream->CopyToMem(fStreamBuf);
     fStreamType = *(int16_t*)fStreamBuf;
@@ -266,72 +282,70 @@ void plNetMsgStreamHelper::CopyFrom(const plNetMsgStreamHelper* other)
 
 bool plNetMsgStreamHelper::Compress(int offset)
 {
-    if ( !IsCompressable() )
+    if (!IsCompressable()) {
         return true;
+    }
 
     plZlibCompress compressor;
     uint8_t* buf = (uint8_t*)GetStreamBuf();    // skip creatable index
     uint32_t bufLen = GetStreamLen();
     uint32_t uncompressedSize = bufLen;
-    SetUncompressedSize( uncompressedSize );
-    if ( compressor.Compress( &buf, &bufLen, offset) )
-    {
-        SetCompressionType( plNetMessage::kCompressionZlib );
+    SetUncompressedSize(uncompressedSize);
+
+    if (compressor.Compress(&buf, &bufLen, offset)) {
+        SetCompressionType(plNetMessage::kCompressionZlib);
         SetStreamLen(bufLen);
         SetStreamBuf(buf);
-        int32_t diff = uncompressedSize-bufLen;
+        int32_t diff = uncompressedSize - bufLen;
 #if 0
-        plNetApp::StaticDebugMsg( "\tCompressed stream: %lu->%lu bytes, (%s %d bytes, %.1f%%)",
-            uncompressedSize, bufLen, (diff>=0)?"shrunk":"GREW?!?", diff, (diff/(float)uncompressedSize)*100 );
+        plNetApp::StaticDebugMsg("\tCompressed stream: %lu->%lu bytes, (%s %d bytes, %.1f%%)",
+                                 uncompressedSize, bufLen, (diff >= 0) ? "shrunk" : "GREW?!?", diff, (diff / (float)uncompressedSize) * 100);
 #endif
         return true;
-    }
-    else
-    {
-        hsAssert( false, "plNetMsgStreamHelper: Compression failed" );
-        SetCompressionType( plNetMessage::kCompressionFailed );
+    } else {
+        hsAssert(false, "plNetMsgStreamHelper: Compression failed");
+        SetCompressionType(plNetMessage::kCompressionFailed);
         return false;
     }
 }
 
 bool plNetMsgStreamHelper::Uncompress(int offset)
 {
-    if ( !IsCompressed() )
+    if (!IsCompressed()) {
         return true;
+    }
 
     uint32_t origLen = GetStreamLen();
     plZlibCompress compressor;
     uint8_t* buf = (uint8_t*)GetStreamBuf();
     uint32_t bufLen = origLen;
-    if ( compressor.Uncompress( &buf, &bufLen, GetUncompressedSize(), offset ) )
-    {
-        SetCompressionType( plNetMessage::kCompressionNone );
+
+    if (compressor.Uncompress(&buf, &bufLen, GetUncompressedSize(), offset)) {
+        SetCompressionType(plNetMessage::kCompressionNone);
         SetStreamLen(bufLen);
         SetStreamBuf(buf);
-        int32_t diff = bufLen-origLen;
+        int32_t diff = bufLen - origLen;
 #if 0
-        plNetApp::StaticDebugMsg( "\tUncompressed stream: %lu->%lu bytes, (%s %d bytes, %.1f%%)",
-            origLen, bufLen, (diff>=0)?"grew":"SHRUNK?!?", diff, (diff/(float)bufLen)*100 );
+        plNetApp::StaticDebugMsg("\tUncompressed stream: %lu->%lu bytes, (%s %d bytes, %.1f%%)",
+                                 origLen, bufLen, (diff >= 0) ? "grew" : "SHRUNK?!?", diff, (diff / (float)bufLen) * 100);
 #endif
         return true;
-    }
-    else
-    {
-        hsAssert( false, "plNetMsgStreamHelper: Uncompression failed" );
-        SetCompressionType( plNetMessage::kCompressionFailed );
+    } else {
+        hsAssert(false, "plNetMsgStreamHelper: Uncompression failed");
+        SetCompressionType(plNetMessage::kCompressionFailed);
         return false;
     }
 }
 
 bool plNetMsgStreamHelper::IsCompressed() const
 {
-    return ( fCompressionType==plNetMessage::kCompressionZlib );
+    return (fCompressionType == plNetMessage::kCompressionZlib);
 }
 
 bool plNetMsgStreamHelper::IsCompressable() const
 {
-    return ( fCompressionType==plNetMessage::kCompressionNone
-        && fStreamLen>fCompressionThreshold );
+    return (fCompressionType == plNetMessage::kCompressionNone
+            && fStreamLen > fCompressionThreshold);
 }
 
 
@@ -341,7 +355,7 @@ bool plNetMsgStreamHelper::IsCompressable() const
 // plNetMsgObject - HELPER class
 ////////////////////////////////////////////////////////
 
-plNetMsgObjectHelper & plNetMsgObjectHelper::operator =(const plNetMsgObjectHelper & other)
+plNetMsgObjectHelper& plNetMsgObjectHelper::operator =(const plNetMsgObjectHelper& other)
 {
     fUoid = other.GetUoid();
     return *this;
@@ -350,7 +364,7 @@ plNetMsgObjectHelper & plNetMsgObjectHelper::operator =(const plNetMsgObjectHelp
 int plNetMsgObjectHelper::Poke(hsStream* stream, uint32_t peekOptions)
 {
     fUoid.Write(stream);
-    
+
     return stream->GetPosition();
 }
 
@@ -362,11 +376,12 @@ int plNetMsgObjectHelper::Peek(hsStream* stream, const uint32_t peekOptions)
     return stream->GetPosition();
 }
 
-bool plNetMsgObjectHelper::SetFromKey(const plKey &key)
+bool plNetMsgObjectHelper::SetFromKey(const plKey& key)
 {
-    if (!key || key->GetName().IsNull())
+    if (!key || key->GetName().IsNull()) {
         return false;
-    
+    }
+
     fUoid = key->GetUoid();
 
     return true;
@@ -377,8 +392,9 @@ void plNetMsgObjectHelper::ReadVersion(hsStream* s, hsResMgr* mgr)
     hsBitVector contentFlags;
     contentFlags.Read(s);
 
-    if (contentFlags.IsBitSet(kObjHelperUoid))
+    if (contentFlags.IsBitSet(kObjHelperUoid)) {
         fUoid.Read(s);
+    }
 }
 
 void plNetMsgObjectHelper::WriteVersion(hsStream* s, hsResMgr* mgr)
@@ -397,17 +413,18 @@ void plNetMsgObjectHelper::WriteVersion(hsStream* s, hsResMgr* mgr)
 ////////////////////////////////////////////////////////
 plNetMsgObjectListHelper::~plNetMsgObjectListHelper()
 {
-    Reset();         
+    Reset();
 }
 
 void plNetMsgObjectListHelper::Reset()
 {
     int i;
-    for( i=0 ; i<GetNumObjects() ; i++  )
-    {
+
+    for (i = 0 ; i < GetNumObjects() ; i++) {
         delete GetObject(i);
         fObjects[i] = nil;
-    } // for    
+    } // for
+
     fObjects.clear();
 }
 
@@ -416,10 +433,10 @@ int plNetMsgObjectListHelper::Poke(hsStream* stream, uint32_t peekOptions)
     int16_t num = GetNumObjects();
     stream->WriteLE(num);
     int i;
-    for( i=0 ;i<num  ;i++  )
-    {
+
+    for (i = 0 ; i < num  ; i++) {
         GetObject(i)->Poke(stream, peekOptions);
-    } // for         
+    } // for
 
     return stream->GetPosition();
 }
@@ -430,14 +447,15 @@ int plNetMsgObjectListHelper::Peek(hsStream* stream, const uint32_t peekOptions)
 
     stream->LogSubStreamStart("push me");
     int16_t num;
-    stream->LogReadLE(&num,"ObjectListHelper Num");
+    stream->LogReadLE(&num, "ObjectListHelper Num");
 
     int i;
-    for( i=0 ;i<num  ;i++  )
-    {
+
+    for (i = 0 ; i < num  ; i++) {
         fObjects.push_back(new plNetMsgObjectHelper);
         GetObject(i)->Peek(stream, peekOptions);
-    } // for         
+    } // for
+
     stream->LogSubStreamEnd();
     return stream->GetPosition();
 }
@@ -447,15 +465,15 @@ int plNetMsgObjectListHelper::Peek(hsStream* stream, const uint32_t peekOptions)
 // plNetMsgMemberInfoHelper - HELPER class
 ////////////////////////////////////////////////////////
 plNetMsgMemberInfoHelper::plNetMsgMemberInfoHelper()
-: fFlags(0)
+    : fFlags(0)
 {
 }
 
 int plNetMsgMemberInfoHelper::Peek(hsStream* s, const uint32_t peekOptions)
 {
     s->LogSubStreamStart("push me");
-    s->LogReadLE(&fFlags,"MemberInfoHelper Flags");
-    fClientGuid.Read( s, nil );
+    s->LogReadLE(&fFlags, "MemberInfoHelper Flags");
+    fClientGuid.Read(s, nil);
     fAvatarUoid.Read(s);
     s->LogSubStreamEnd();
     return s->GetPosition();
@@ -464,7 +482,7 @@ int plNetMsgMemberInfoHelper::Peek(hsStream* s, const uint32_t peekOptions)
 int plNetMsgMemberInfoHelper::Poke(hsStream* s, const uint32_t peekOptions)
 {
     s->WriteLE(fFlags);
-    fClientGuid.Write( s, nil );
+    fClientGuid.Write(s, nil);
     fAvatarUoid.Write(s);
     return s->GetPosition();
 }
@@ -476,24 +494,27 @@ int plNetMsgMemberInfoHelper::Poke(hsStream* s, const uint32_t peekOptions)
 plNetMsgMemberListHelper::~plNetMsgMemberListHelper()
 {
     int i;
-    for(i=0;i<GetNumMembers();i++)
+
+    for (i = 0; i < GetNumMembers(); i++) {
         delete fMembers[i];
+    }
 }
 
 int plNetMsgMemberListHelper::Peek(hsStream* stream, const uint32_t peekOptions)
 {
     int16_t numMembers;
     stream->LogSubStreamStart("push me");
-    stream->LogReadLE(&numMembers,"MemberListHelper NumMembers");
+    stream->LogReadLE(&numMembers, "MemberListHelper NumMembers");
     fMembers.clear();
     int i;
-    for(i=0;i<numMembers;i++)
-    {
-        plNetMsgMemberInfoHelper* addr=new plNetMsgMemberInfoHelper;
+
+    for (i = 0; i < numMembers; i++) {
+        plNetMsgMemberInfoHelper* addr = new plNetMsgMemberInfoHelper;
         addr->Peek(stream, peekOptions);
         AddMember(addr);
     }
-    stream->LogSubStreamEnd();  
+
+    stream->LogSubStreamEnd();
     return stream->GetPosition();
 }
 
@@ -503,8 +524,8 @@ int plNetMsgMemberListHelper::Poke(hsStream* stream, const uint32_t peekOptions)
     stream->WriteLE(numMembers);
 
     int i;
-    for(i=0;i<numMembers;i++)
-    {
+
+    for (i = 0; i < numMembers; i++) {
         fMembers[i]->GetClientGuid()->SetClientKey("");
         fMembers[i]->GetClientGuid()->SetAccountUUID(plUUID());
         fMembers[i]->Poke(stream, peekOptions);
@@ -523,17 +544,18 @@ int plNetMsgReceiversListHelper::Peek(hsStream* stream, const uint32_t peekOptio
 {
     uint8_t numIDs;
     stream->LogSubStreamStart("push me");
-    stream->LogReadLE(&numIDs,"ReceiversListHelper NumIDs");
-    
+    stream->LogReadLE(&numIDs, "ReceiversListHelper NumIDs");
+
     fPlayerIDList.clear();
     int i;
-    for(i=0;i<numIDs;i++)
-    {
+
+    for (i = 0; i < numIDs; i++) {
         uint32_t ID;
-        stream->LogReadLE(&ID,"ReceiversListHelper ID");      
+        stream->LogReadLE(&ID, "ReceiversListHelper ID");
         AddReceiverPlayerID(ID);
     }
-    stream->LogSubStreamEnd();  
+
+    stream->LogSubStreamEnd();
     return stream->GetPosition();
 }
 
@@ -543,8 +565,10 @@ int plNetMsgReceiversListHelper::Poke(hsStream* stream, const uint32_t peekOptio
     stream->WriteLE(numIDs);
 
     int i;
-    for(i=0;i<numIDs;i++)
+
+    for (i = 0; i < numIDs; i++) {
         stream->WriteLE(GetReceiverPlayerID(i));
+    }
 
     return stream->GetPosition();
 }
@@ -553,11 +577,12 @@ int plNetMsgReceiversListHelper::Poke(hsStream* stream, const uint32_t peekOptio
 bool plNetMsgReceiversListHelper::RemoveReceiverPlayerID(uint32_t n)
 {
     std::vector<uint32_t>::iterator res = std::find(fPlayerIDList.begin(), fPlayerIDList.end(), n);
-    if (res != fPlayerIDList.end())
-    {
+
+    if (res != fPlayerIDList.end()) {
         fPlayerIDList.erase(res);
         return true;
     }
+
     return false;
 }
 

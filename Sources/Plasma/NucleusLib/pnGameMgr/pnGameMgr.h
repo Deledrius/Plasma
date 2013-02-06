@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnGameMgr/pnGameMgr.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNGAMEMGR_PNGAMEMGR_H
@@ -65,7 +65,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *
 ***/
 
-const unsigned  kGameMgrGlobalGameIdFlag = !((unsigned)-1 - 1);  // 0x10000000
+const unsigned  kGameMgrGlobalGameIdFlag = !((unsigned) - 1 - 1); // 0x10000000
 
 //============================================================================
 // EGameJoinError
@@ -104,12 +104,12 @@ enum EGameInviteError {
     If set  :   Anyone may join; no invite necessary.
     Not set :   Only players with invites may join.
 */
-const unsigned kGameCreatePublic    = 1<<0;
+const unsigned kGameCreatePublic    = 1 << 0;
 /*
     If set  :   Anyone may invite others to play.
     Not set :   Only the game owner may send invites.
 */
-const unsigned kGameCreateOpen      = 1<<1;
+const unsigned kGameCreateOpen      = 1 << 1;
 /*
     If set  :   Player joins or creates the "common" instance of the game. In
                 this case, the 'newGameId' field is not meaningful. If the
@@ -124,10 +124,10 @@ const unsigned kGameCreateOpen      = 1<<1;
                 receives a GameJoined reply in any case. Inspect the 'result'
                 field to see whether the join was successful.
 */
-const unsigned kGameJoinCommon      = 1<<2;
+const unsigned kGameJoinCommon      = 1 << 2;
 /*
 */
-const unsigned kGameJoinObserver    = 1<<3;
+const unsigned kGameJoinObserver    = 1 << 3;
 
 
 //============================================================================
@@ -168,82 +168,82 @@ enum {
 #pragma pack(push,1)
 //============================================================================
 
-    struct GameMsgHeader {
-        uint32_t       messageId;
-        uint32_t       transId;
-        uint32_t       recvGameId; // 0 --> GameMgr, non-zero --> GameSrv
-        uint32_t       messageBytes;
-    };
+struct GameMsgHeader {
+    uint32_t       messageId;
+    uint32_t       transId;
+    uint32_t       recvGameId; // 0 --> GameMgr, non-zero --> GameSrv
+    uint32_t       messageBytes;
+};
 
-    //========================================================================
-    // GameMgr message structures
-    //========================================================================
+//========================================================================
+// GameMgr message structures
+//========================================================================
 
-    // Cli2Srv
-    struct Cli2Srv_GameMgr_CreateGame : GameMsgHeader {
-        plUUID                 gameTypeId;
-        uint32_t               createOptions;
-        uint32_t               createDataBytes;
-        uint8_t                createData[1];  // [createDataBytes]
-    };
-    struct Cli2Srv_GameMgr_JoinGame : GameMsgHeader {
-        // Field ordering here is vitally important, see pfGameMgr::JoinGame for explanation
-        uint32_t               newGameId;
-        uint32_t               createOptions;
-        plUUID                 gameTypeId;
-        uint32_t               createDataBytes;
-        uint8_t                createData[1];  // [createDataBytes]
-    };
+// Cli2Srv
+struct Cli2Srv_GameMgr_CreateGame : GameMsgHeader {
+    plUUID                 gameTypeId;
+    uint32_t               createOptions;
+    uint32_t               createDataBytes;
+    uint8_t                createData[1];  // [createDataBytes]
+};
+struct Cli2Srv_GameMgr_JoinGame : GameMsgHeader {
+    // Field ordering here is vitally important, see pfGameMgr::JoinGame for explanation
+    uint32_t               newGameId;
+    uint32_t               createOptions;
+    plUUID                 gameTypeId;
+    uint32_t               createDataBytes;
+    uint8_t                createData[1];  // [createDataBytes]
+};
 
-    // Srv2Cli
-    struct Srv2Cli_GameMgr_GameInstance : GameMsgHeader {
-        EGameJoinError      result;
-        uint32_t               ownerId;
-        plUUID                 gameTypeId;
-        uint32_t               newGameId;
-    };
-    struct Srv2Cli_GameMgr_InviteReceived : GameMsgHeader {
-        uint32_t               inviterId;
-        plUUID                 gameTypeId;
-        uint32_t               newGameId;
-    };
-    struct Srv2Cli_GameMgr_InviteRevoked : GameMsgHeader {
-        uint32_t               inviterId;
-        plUUID                 gameTypeId;
-        uint32_t               newGameId;
-    };
+// Srv2Cli
+struct Srv2Cli_GameMgr_GameInstance : GameMsgHeader {
+    EGameJoinError      result;
+    uint32_t               ownerId;
+    plUUID                 gameTypeId;
+    uint32_t               newGameId;
+};
+struct Srv2Cli_GameMgr_InviteReceived : GameMsgHeader {
+    uint32_t               inviterId;
+    plUUID                 gameTypeId;
+    uint32_t               newGameId;
+};
+struct Srv2Cli_GameMgr_InviteRevoked : GameMsgHeader {
+    uint32_t               inviterId;
+    plUUID                 gameTypeId;
+    uint32_t               newGameId;
+};
 
 
-    //========================================================================
-    // GameCli/Srv message structures
-    //========================================================================
+//========================================================================
+// GameCli/Srv message structures
+//========================================================================
 
-    // Cli2Srv
-    struct Cli2Srv_Game_LeaveGame : GameMsgHeader {
-    };
-    struct Cli2Srv_Game_Invite : GameMsgHeader {
-        uint32_t       playerId;
-    };
-    struct Cli2Srv_Game_Uninvite : GameMsgHeader {
-        uint32_t       playerId;
-    };
+// Cli2Srv
+struct Cli2Srv_Game_LeaveGame : GameMsgHeader {
+};
+struct Cli2Srv_Game_Invite : GameMsgHeader {
+    uint32_t       playerId;
+};
+struct Cli2Srv_Game_Uninvite : GameMsgHeader {
+    uint32_t       playerId;
+};
 
-    // Srv2Cli
-    struct Srv2Cli_Game_PlayerJoined : GameMsgHeader {
-        uint32_t       playerId;
-    };
-    struct Srv2Cli_Game_PlayerLeft : GameMsgHeader {
-        uint32_t       playerId;
-    };
-    struct Srv2Cli_Game_InviteFailed : GameMsgHeader {
-        uint32_t               inviteeId;
-        uint32_t               operationId;
-        EGameInviteError    error;
-    };
-    struct Srv2Cli_Game_OwnerChange : GameMsgHeader {
-        uint32_t       ownerId;
-    };
-    
+// Srv2Cli
+struct Srv2Cli_Game_PlayerJoined : GameMsgHeader {
+    uint32_t       playerId;
+};
+struct Srv2Cli_Game_PlayerLeft : GameMsgHeader {
+    uint32_t       playerId;
+};
+struct Srv2Cli_Game_InviteFailed : GameMsgHeader {
+    uint32_t               inviteeId;
+    uint32_t               operationId;
+    EGameInviteError    error;
+};
+struct Srv2Cli_Game_OwnerChange : GameMsgHeader {
+    uint32_t       ownerId;
+};
+
 
 //============================================================================
 // End networked data structures

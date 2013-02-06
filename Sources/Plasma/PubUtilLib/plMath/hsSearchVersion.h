@@ -62,19 +62,31 @@ protected:
     int32_t                                   fIndex;
     hsVersionNode<T>*       fNext;
 public:
-    hsVersionNode(const uint32_t idx, const T &data) : fIndex(idx), fNext(nil) { fData = data; }
-    ~hsVersionNode() { delete fNext; }
+    hsVersionNode(const uint32_t idx, const T& data) : fIndex(idx), fNext(nil) {
+        fData = data;
+    }
+    ~hsVersionNode() {
+        delete fNext;
+    }
 
-    hsVersionNode<T>*   Next() const { return fNext; }
+    hsVersionNode<T>*   Next() const {
+        return fNext;
+    }
 
-    int32_t               Index() const { return fIndex; }
+    int32_t               Index() const {
+        return fIndex;
+    }
 
     inline void Append(hsVersionNode<T>* next);
     inline int operator==(const T& o) const;
-    
-    int operator!=(const T& o) const { return !(this->operator==(o)); }
 
-    T&          GetData() { return fData; }
+    int operator!=(const T& o) const {
+        return !(this->operator==(o));
+    }
+
+    T&          GetData() {
+        return fData;
+    }
 };
 
 template <class T> int hsVersionNode<T>::operator==(const T& data) const
@@ -84,10 +96,11 @@ template <class T> int hsVersionNode<T>::operator==(const T& data) const
 
 template <class T> void hsVersionNode<T>::Append(hsVersionNode<T>* next)
 {
-    if( fNext )
+    if (fNext) {
         fNext->Append(next);
-    else
+    } else {
         fNext = next;
+    }
 }
 
 template <class T> class hsSearchVersion {
@@ -104,14 +117,16 @@ public:
     hsSearchVersion(uint32_t len, uint32_t inc = 0);
     ~hsSearchVersion();
 
-    T&          operator[]( int32_t index );
+    T&          operator[](int32_t index);
 
-    int32_t               Find(int where, const T& what, bool forceUnique=false);
+    int32_t               Find(int where, const T& what, bool forceUnique = false);
 
-    uint32_t              GetCount() const { return fNextIndex; }
+    uint32_t              GetCount() const {
+        return fNextIndex;
+    }
 };
 
-template <class T> T& hsSearchVersion<T>::operator[]( int32_t index )
+template <class T> T& hsSearchVersion<T>::operator[](int32_t index)
 {
     hsDebugCode(hsThrowIfBadParam((uint32_t)index >= (uint32_t)fNextIndex);)
 
@@ -120,57 +135,62 @@ template <class T> T& hsSearchVersion<T>::operator[]( int32_t index )
 
 template <class T> hsSearchVersion<T>::hsSearchVersion(uint32_t len, uint32_t inc)
     : fNextIndex(0)
-{ 
+{
     fIncIndex = inc ? inc : len;
-    fLength = len; 
-    fArray = new hsVersionNode<T>*[fLength]; 
-    HSMemory::Clear(fArray, fLength*sizeof(*fArray)); 
+    fLength = len;
+    fArray = new hsVersionNode<T>* [fLength];
+    HSMemory::Clear(fArray, fLength * sizeof(*fArray));
     fBackArray = new T*[fNumIndex = fLength];
 }
 
 template <class T> hsSearchVersion<T>::~hsSearchVersion()
 {
     int i;
-    for( i = 0; i < fLength; i++ )
+
+    for (i = 0; i < fLength; i++) {
         delete fArray[i];
+    }
+
     delete [] fArray;
     delete [] fBackArray;
 }
 
 template <class T> void hsSearchVersion<T>::ICheckBackArray()
 {
-    if( fNextIndex >= fNumIndex )
-    {
+    if (fNextIndex >= fNumIndex) {
         T** newBackArray = new T*[fNumIndex + fIncIndex];
-        HSMemory::BlockMove(fBackArray, newBackArray, fNextIndex*sizeof(T*));
+        HSMemory::BlockMove(fBackArray, newBackArray, fNextIndex * sizeof(T*));
         delete [] fBackArray;
         fBackArray = newBackArray;
         fNumIndex += fIncIndex;
     }
 }
 
-template <class T> int32_t hsSearchVersion<T>::Find(int where, const T&what, bool forceUnique)
+template <class T> int32_t hsSearchVersion<T>::Find(int where, const T& what, bool forceUnique)
 {
     hsVersionNode<T>* curr = fArray[where];
 
     ICheckBackArray();
 
-    if( !curr )
-    {
+    if (!curr) {
         hsVersionNode<T>* next = new hsVersionNode<T>(fNextIndex, what);
         fArray[where] = next;
         fBackArray[fNextIndex] = &next->GetData();
         return fNextIndex++;
     }
-    if( *curr == what )
+
+    if (*curr == what) {
         return curr->Index();
+    }
 
-    while( curr->Next() 
-        && (forceUnique || (*curr->Next() != what)) )
+    while (curr->Next()
+            && (forceUnique || (*curr->Next() != what))) {
         curr = curr->Next();
+    }
 
-    if( curr->Next() )
+    if (curr->Next()) {
         return curr->Next()->Index();
+    }
 
     hsVersionNode<T>* next = new hsVersionNode<T>(fNextIndex, what);
     curr->Append(next);

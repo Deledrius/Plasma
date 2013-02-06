@@ -55,13 +55,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // should only be created from C++ side
 pyVaultSDLNode::pyVaultSDLNode(RelVaultNode* nfsNode)
-: pyVaultNode(nfsNode)
+    : pyVaultNode(nfsNode)
 {
 }
 
 //create from the Python side
 pyVaultSDLNode::pyVaultSDLNode()
-: pyVaultNode(new RelVaultNode)
+    : pyVaultNode(new RelVaultNode)
 {
     fNode->SetNodeType(plVault::kNodeType_SDL);
 }
@@ -70,55 +70,62 @@ pyVaultSDLNode::pyVaultSDLNode()
 //==================================================================
 // class RelVaultNode : public plVaultNode
 //
-void pyVaultSDLNode::SetIdent( int v )
+void pyVaultSDLNode::SetIdent(int v)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
-    
+    }
+
     VaultSDLNode sdl(fNode);
     sdl.SetSDLIdent(v);
 }
 
 int pyVaultSDLNode::GetIdent() const
 {
-    if (!fNode)
+    if (!fNode) {
         return 0;
-    
+    }
+
     VaultSDLNode sdl(fNode);
     return sdl.GetSDLIdent();
 }
 
-PyObject * pyVaultSDLNode::GetStateDataRecord() const
+PyObject* pyVaultSDLNode::GetStateDataRecord() const
 {
-    if (!fNode)
+    if (!fNode) {
         PYTHON_RETURN_NONE;
-        
+    }
+
     VaultSDLNode sdl(fNode);
-    plStateDataRecord * rec = new plStateDataRecord;
-    if (sdl.GetStateDataRecord(rec))
+    plStateDataRecord* rec = new plStateDataRecord;
+
+    if (sdl.GetStateDataRecord(rec)) {
         return pySDLStateDataRecord::New(rec);
-    else
+    } else {
         delete rec;
+    }
 
     PYTHON_RETURN_NONE;
 }
 
-void pyVaultSDLNode::InitStateDataRecord( const char* agename, int flags)
+void pyVaultSDLNode::InitStateDataRecord(const char* agename, int flags)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
+    }
 
     wchar_t wStr[MAX_PATH];
-    StrToUnicode(wStr, agename, arrsize(wStr)); 
+    StrToUnicode(wStr, agename, arrsize(wStr));
     VaultSDLNode sdl(fNode);
     sdl.InitStateDataRecord(wStr, flags);
 }
 
-void pyVaultSDLNode::SetStateDataRecord( const pySDLStateDataRecord & rec, int writeOptions/*=0 */)
+void pyVaultSDLNode::SetStateDataRecord(const pySDLStateDataRecord& rec, int writeOptions/*=0 */)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
-    
+    }
+
     VaultSDLNode sdl(fNode);
     sdl.SetStateDataRecord(rec.GetRec(), writeOptions);
 }

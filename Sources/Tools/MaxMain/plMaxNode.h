@@ -77,10 +77,9 @@ class plSpotModifier;
 class plSynchedObject;
 class plXImposterComp;
 
-typedef bool (plMaxNode:: *PMaxNodeFunc) (plErrorMsg *, plConvertSettings *); // Function pointer to a plMaxNode member funtion
+typedef bool (plMaxNode:: *PMaxNodeFunc)(plErrorMsg*, plConvertSettings*);    // Function pointer to a plMaxNode member funtion
 
-class plMaxNodeTab : public Tab<plMaxNode*>
-{
+class plMaxNodeTab : public Tab<plMaxNode*> {
 };
 
 //-------------------------------------------
@@ -95,40 +94,39 @@ class plMaxNodeTab : public Tab<plMaxNode*>
 // NOTE: an INode can be cast to a plMaxNode, but currently it is the MakeSceneObject Pass which
 // Adds the plMaxNodeData to the Node
 
-class plMaxNode : public plMaxNodeBase
-{
+class plMaxNode : public plMaxNodeBase {
 public:
-    bool DoRecur(PMaxNodeFunc p,plErrorMsg *, plConvertSettings *, plExportProgressBar*);
-    bool DoAllRecur(PMaxNodeFunc p,plErrorMsg *, plConvertSettings *, plExportProgressBar*);
+    bool DoRecur(PMaxNodeFunc p, plErrorMsg*, plConvertSettings*, plExportProgressBar*);
+    bool DoAllRecur(PMaxNodeFunc p, plErrorMsg*, plConvertSettings*, plExportProgressBar*);
 
     // DoRecur takes one of the following functions
-    bool ConvertValidate              (plErrorMsg *, plConvertSettings *);
-    bool SetupPropertiesPass          (plErrorMsg *, plConvertSettings *);
-    bool MakeSceneObject              (plErrorMsg *, plConvertSettings *);
-    bool PrepareSkin                  (plErrorMsg *, plConvertSettings *);
-    bool MakePhysical                 (plErrorMsg *, plConvertSettings *);
-    bool FirstComponentPass           (plErrorMsg *, plConvertSettings *);
-    bool MakeController               (plErrorMsg *, plConvertSettings *);
-    bool MakeCoordinateInterface      (plErrorMsg *, plConvertSettings *);
-    bool MakeModifiers                (plErrorMsg *, plConvertSettings *);
-    bool MakeParentOrRoomConnection   (plErrorMsg *, plConvertSettings *);
-    bool MakeMesh                     (plErrorMsg *, plConvertSettings *);
-    bool MakeLight                    (plErrorMsg *, plConvertSettings *);
-    bool MakeOccluder                 (plErrorMsg *, plConvertSettings *);
-    bool ConvertComponents            (plErrorMsg *, plConvertSettings *);
-    bool ClearData                    (plErrorMsg *, plConvertSettings *);
-    bool ShadeMesh                    (plErrorMsg *, plConvertSettings *);
-    bool MakeIfaceReferences          (plErrorMsg *, plConvertSettings *);
-    bool ClearMaxNodeData             (plErrorMsg *, plConvertSettings *);
-    bool DeInitComponents             (plErrorMsg *, plConvertSettings *);
+    bool ConvertValidate(plErrorMsg*, plConvertSettings*);
+    bool SetupPropertiesPass(plErrorMsg*, plConvertSettings*);
+    bool MakeSceneObject(plErrorMsg*, plConvertSettings*);
+    bool PrepareSkin(plErrorMsg*, plConvertSettings*);
+    bool MakePhysical(plErrorMsg*, plConvertSettings*);
+    bool FirstComponentPass(plErrorMsg*, plConvertSettings*);
+    bool MakeController(plErrorMsg*, plConvertSettings*);
+    bool MakeCoordinateInterface(plErrorMsg*, plConvertSettings*);
+    bool MakeModifiers(plErrorMsg*, plConvertSettings*);
+    bool MakeParentOrRoomConnection(plErrorMsg*, plConvertSettings*);
+    bool MakeMesh(plErrorMsg*, plConvertSettings*);
+    bool MakeLight(plErrorMsg*, plConvertSettings*);
+    bool MakeOccluder(plErrorMsg*, plConvertSettings*);
+    bool ConvertComponents(plErrorMsg*, plConvertSettings*);
+    bool ClearData(plErrorMsg*, plConvertSettings*);
+    bool ShadeMesh(plErrorMsg*, plConvertSettings*);
+    bool MakeIfaceReferences(plErrorMsg*, plConvertSettings*);
+    bool ClearMaxNodeData(plErrorMsg*, plConvertSettings*);
+    bool DeInitComponents(plErrorMsg*, plConvertSettings*);
 
     // Does specified function for all components attached to this node
     enum { kSetupProperties, kPreConvert, kConvert };
-    bool DoComponents(int convertType, plErrorMsg *, plConvertSettings *);
+    bool DoComponents(int convertType, plErrorMsg*, plConvertSettings*);
 
-    plKey AddModifier(plModifier *pMod, const plString& name);
+    plKey AddModifier(plModifier* pMod, const plString& name);
 
-    bool ConvertToOccluder            (plErrorMsg* pErrMsg, bool twoSided, bool isHole);
+    bool ConvertToOccluder(plErrorMsg* pErrMsg, bool twoSided, bool isHole);
 
     plDrawableCriteria          GetDrawableCriteria(bool needBlending, bool needSorting);
     Point3                      GetFlexibility(); // returns Point3(flexibility, interRand, intraRand).
@@ -144,14 +142,14 @@ public:
     plAGMasterMod*  GetAGMasterMod();
     plMaxNode*      GetBonesRoot(); // Returns the root of my bones hierarchy, if I have any bones, else nil.
     void            GetBonesRootsRecur(hsTArray<plMaxNode*>& list);
-    plSceneObject*  MakeCharacterHierarchy(plErrorMsg *pErrMsg);
-    void            SetupBonesAliasesRecur(const char *rootName);
-    void            SetupBoneHierarchyPalette(plMaxBoneMap *bones = nil);
+    plSceneObject*  MakeCharacterHierarchy(plErrorMsg* pErrMsg);
+    void            SetupBonesAliasesRecur(const char* rootName);
+    void            SetupBoneHierarchyPalette(plMaxBoneMap* bones = nil);
 
-    void SetDISceneNodeSpans( plDrawInterface *di, bool needBlending );
+    void SetDISceneNodeSpans(plDrawInterface* di, bool needBlending);
 
     bool IsLegalDecal(bool checkParent = true);
-    
+
     bool IsAnimatedLight();
 
     // These are public so the animation component can use them, no one else should need them
@@ -164,26 +162,28 @@ public:
     plLightMapComponent* GetLightMapComponent();
     // Starting at 0, returns an incrementing index for each maxNode. Useful for assigning
     // indices to sound objects attached to the node
-    uint32_t  GetNextSoundIdx( void );
+    uint32_t  GetNextSoundIdx(void);
 
-    bool    IsPhysical( void );
+    bool    IsPhysical(void);
 
-    bool    CanMakeMesh( Object *obj, plErrorMsg *pErrMsg, plConvertSettings *settings );
+    bool    CanMakeMesh(Object* obj, plErrorMsg* pErrMsg, plConvertSettings* settings);
     plDrawInterface* GetDrawInterface(); // Returns nil if there isn't a sceneobject and a drawinterface.
 
     // Only call during convert
-    plPhysicalProps *GetPhysicalProps();
+    plPhysicalProps* GetPhysicalProps();
 
     // Little helper function. Calls FindKey() in the resManager using the location (page) of this node
-    plKey   FindPageKey( uint16_t classIdx, const plString &name );
-    const char *GetAgeName();
+    plKey   FindPageKey(uint16_t classIdx, const plString& name);
+    const char* GetAgeName();
 
     void CheckSynchOptions(plSynchedObject* so);
 
 protected:
-    INode *GetRootNode()    { return GetInterface()->GetRootNode(); }
+    INode* GetRootNode()    {
+        return GetInterface()->GetRootNode();
+    }
 
-    plDrawableSpans *IGetSceneNodeSpans( plSceneNode *node, bool needBlending, bool needSorting=true );
+    plDrawableSpans* IGetSceneNodeSpans(plSceneNode* node, bool needBlending, bool needSorting = true);
 
     plLightInfo*    IMakeDirectional(plErrorMsg* pErrMsg, plConvertSettings* settings);
     plLightInfo*    IMakeOmni(plErrorMsg* pErrMsg, plConvertSettings* settings);
@@ -192,7 +192,7 @@ protected:
     plLightInfo*    IMakeRTDirectional(plErrorMsg* pErrMsg, plConvertSettings* settings);
     plLightInfo*    IMakeRTOmni(plErrorMsg* pErrMsg, plConvertSettings* settings);
     plLightInfo*    IMakeRTSpot(plErrorMsg* pErrMsg, plConvertSettings* settings);
-    plLightInfo*    IMakeRTProjDirectional( plErrorMsg *pErrMsg, plConvertSettings *settings );
+    plLightInfo*    IMakeRTProjDirectional(plErrorMsg* pErrMsg, plConvertSettings* settings);
 
     void            IGetCone(plSpotLightInfo* liInfo, LightObject* light, LightState& ls);
     void            IGetLightColors(plLightInfo* liInfo, LightObject* light, LightState& ls);
@@ -202,56 +202,55 @@ protected:
     void            IGetRTLightColors(plLightInfo* liInfo, IParamBlock2* ProperPB);
     void            IGetRTLightAttenuation(plOmniLightInfo* liInfo, IParamBlock2* ProperPB);
     // RunTime Light animation builders
-    bool            IGetRTLightAttenValues(IParamBlock2* ProperPB, float& attenConst, float& attenLinear, float& attenQuadratic,float &attenCutoff);
+    bool            IGetRTLightAttenValues(IParamBlock2* ProperPB, float& attenConst, float& attenLinear, float& attenQuadratic, float& attenCutoff);
     void            IAdjustRTColorByIntensity(plController* ctl, IParamBlock2* ProperPB);
     bool            IAttachRTLightModifier(plLightModifier* liMod);
 
-    plLightInfo*    IMakeLight(plErrorMsg *pErrMsg, plConvertSettings *settings);
+    plLightInfo*    IMakeLight(plErrorMsg* pErrMsg, plConvertSettings* settings);
 
-    plSceneNode*    IGetDrawableSceneNode(plErrorMsg *pErrMsg);
-    void            IAssignSpansToDrawables( hsTArray<plGeometrySpan *> &spanArray, plDrawInterface *di,
-                                            plErrorMsg *pErrMsg, plConvertSettings *settings );
-    void            IAssignSpan( plDrawableSpans *drawable, hsTArray<plGeometrySpan *> &spanArray, uint32_t &index,
-                                 hsMatrix44 &l2w, hsMatrix44 &w2l,
-                                 plErrorMsg *pErrMsg, plConvertSettings *settings );
-    void            ISetupBones( plDrawableSpans *drawable, hsTArray<plGeometrySpan *> &spanArray,
-                                 hsMatrix44 &l2w, hsMatrix44 &w2l,
-                                 plErrorMsg *pErrMsg, plConvertSettings *settings );
-    bool            IFindBones(plErrorMsg *pErrMsg, plConvertSettings *settings);
+    plSceneNode*    IGetDrawableSceneNode(plErrorMsg* pErrMsg);
+    void            IAssignSpansToDrawables(hsTArray<plGeometrySpan*>& spanArray, plDrawInterface* di,
+                                            plErrorMsg* pErrMsg, plConvertSettings* settings);
+    void            IAssignSpan(plDrawableSpans* drawable, hsTArray<plGeometrySpan*>& spanArray, uint32_t& index,
+                                hsMatrix44& l2w, hsMatrix44& w2l,
+                                plErrorMsg* pErrMsg, plConvertSettings* settings);
+    void            ISetupBones(plDrawableSpans* drawable, hsTArray<plGeometrySpan*>& spanArray,
+                                hsMatrix44& l2w, hsMatrix44& w2l,
+                                plErrorMsg* pErrMsg, plConvertSettings* settings);
+    bool            IFindBones(plErrorMsg* pErrMsg, plConvertSettings* settings);
 
     void            IWipeBranchDrawable(bool b);
 
-    uint32_t          IBuildInstanceList( Object *obj, TimeValue t, hsTArray<plMaxNode *> &nodes, bool beMoreAccurate = false );
-    bool            IMakeInstanceSpans( plMaxNode *node, hsTArray<plGeometrySpan *> &spanArray,
-                                       plErrorMsg *pErrMsg, plConvertSettings *settings );
-    bool            IMaterialsMatch( plMaxNode *otherNode, bool beMoreAccurate );
+    uint32_t          IBuildInstanceList(Object* obj, TimeValue t, hsTArray<plMaxNode*>& nodes, bool beMoreAccurate = false);
+    bool            IMakeInstanceSpans(plMaxNode* node, hsTArray<plGeometrySpan*>& spanArray,
+                                       plErrorMsg* pErrMsg, plConvertSettings* settings);
+    bool            IMaterialsMatch(plMaxNode* otherNode, bool beMoreAccurate);
 
-    int             IGetCachedAlphaHackValue( int iSubMtl );
-    void            ISetCachedAlphaHackValue( int iSubMtl, int value );
-    
-friend class plLocationDlg;
+    int             IGetCachedAlphaHackValue(int iSubMtl);
+    void            ISetCachedAlphaHackValue(int iSubMtl, int value);
+
+    friend class plLocationDlg;
 };
 
-class plMaxBoneMap
-{
+class plMaxBoneMap {
 protected:
     typedef std::map<plMaxNodeBase*, uint32_t> BoneMap;
     BoneMap fBones;
     typedef std::map<plDrawable*, uint32_t> DrawableMap;
     DrawableMap fBaseMatrices;
-    
+
 public:
     uint8_t fNumBones;
-    plMaxNodeBase *fOwner; // Make note of which node created us, so they can delete us.
+    plMaxNodeBase* fOwner; // Make note of which node created us, so they can delete us.
 
     plMaxBoneMap() : fNumBones(0), fOwner(nil) {}
 
-    void AddBone(plMaxNodeBase *bone);
-    uint8_t GetIndex(plMaxNodeBase *bone);
-    void FillBoneArray(plMaxNodeBase **boneArray);
-    uint32_t GetBaseMatrixIndex(plDrawable *draw);
-    void SetBaseMatrixIndex(plDrawable *draw, uint32_t idx);
+    void AddBone(plMaxNodeBase* bone);
+    uint8_t GetIndex(plMaxNodeBase* bone);
+    void FillBoneArray(plMaxNodeBase** boneArray);
+    uint32_t GetBaseMatrixIndex(plDrawable* draw);
+    void SetBaseMatrixIndex(plDrawable* draw, uint32_t idx);
     void SortBones();
 };
 
-#endif 
+#endif

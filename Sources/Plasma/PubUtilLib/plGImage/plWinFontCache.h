@@ -71,58 +71,57 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Class Definition /////////////////////////////////////////////////////////
 
-class plWinFontCache
-{
-    protected:  
+class plWinFontCache {
+protected:
 
-        class plFontRecord
-        {
-            public:
-                HFONT   fFont;
-
-                char    *fFace;     // Pointer is owned by fFontNameCache
-                int     fHeight;
-                int     fWeight;
-                bool    fItalic;
-                uint32_t  fQuality;
-        };
-
-        class plCustFont
-        {
-            public:
-                plFileName fFilename;
-
-                plCustFont(const plFileName &c) { fFilename = c; }
-        };
-
-        bool    fInShutdown;
-
-        hsTArray<plFontRecord>  fFontCache;
-        hsTArray<char *>        fFontNameCache;
-
-        char                    *fCustFontDir;
-        hsTArray<plCustFont *>  fCustFonts;
-
-        plWinFontCache();
-
-        HFONT   IFindFont( const char *face, int height, int weight, bool italic, uint32_t quality );
-        HFONT   IMakeFont( const char *face, int height, int weight, bool italic, uint32_t quality );
-
-        void    ILoadCustomFonts( void );
-
+    class plFontRecord {
     public:
+        HFONT   fFont;
 
-        virtual ~plWinFontCache();
-        static plWinFontCache   &GetInstance( void );
+        char*    fFace;     // Pointer is owned by fFontNameCache
+        int     fHeight;
+        int     fWeight;
+        bool    fItalic;
+        uint32_t  fQuality;
+    };
 
-        HFONT   GetMeAFont( const char *face, int height, int weight, bool italic, uint32_t quality );
-        void    FreeFont( HFONT font );
-        void    Clear( void );
+    class plCustFont {
+    public:
+        plFileName fFilename;
 
-        void    LoadCustomFonts( const char *dir );
+        plCustFont(const plFileName& c) {
+            fFilename = c;
+        }
+    };
 
-        // Our custom font extension
-        static const char* kCustFontExtension;
+    bool    fInShutdown;
+
+    hsTArray<plFontRecord>  fFontCache;
+    hsTArray<char*>        fFontNameCache;
+
+    char*                    fCustFontDir;
+    hsTArray<plCustFont*>  fCustFonts;
+
+    plWinFontCache();
+
+    HFONT   IFindFont(const char* face, int height, int weight, bool italic, uint32_t quality);
+    HFONT   IMakeFont(const char* face, int height, int weight, bool italic, uint32_t quality);
+
+    void    ILoadCustomFonts(void);
+
+public:
+
+    virtual ~plWinFontCache();
+    static plWinFontCache&   GetInstance(void);
+
+    HFONT   GetMeAFont(const char* face, int height, int weight, bool italic, uint32_t quality);
+    void    FreeFont(HFONT font);
+    void    Clear(void);
+
+    void    LoadCustomFonts(const char* dir);
+
+    // Our custom font extension
+    static const char* kCustFontExtension;
 };
 
 

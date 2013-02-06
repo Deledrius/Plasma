@@ -72,21 +72,19 @@ struct hsColorRGBA;
 #define POA_TRANS_FIXED     4
 #define POA_TRANS_FOLLOW    5
 
-class plVirtualCam1 : public hsKeyedObject
-{
+class plVirtualCam1 : public hsKeyedObject {
     typedef std::vector<plCameraModifier1*> plCameraVec;
     typedef std::vector<plSceneObject*>     plSOVec;
 
 protected:
-    
+
 
     void Output();
     void IUpdate();
     void INext();
-        
+
 public:
-    enum flags
-    {
+    enum flags {
         kSetFOV,
         kCutNextTrans,
         kRender,
@@ -104,9 +102,8 @@ public:
         kJustLinkedIn,
         kFirstPersonUserSelected,
     };
-    
-    enum action
-    {
+
+    enum action {
         kPush   = 0,
         kPop,
         kReplacement,
@@ -116,70 +113,114 @@ public:
     plVirtualCam1();
     virtual ~plVirtualCam1();
 
-    CLASSNAME_REGISTER( plVirtualCam1 );
-    GETINTERFACE_ANY( plVirtualCam1, hsKeyedObject );
+    CLASSNAME_REGISTER(plVirtualCam1);
+    GETINTERFACE_ANY(plVirtualCam1, hsKeyedObject);
 
-    void SetPipeline(plPipeline* p); 
+    void SetPipeline(plPipeline* p);
     void Init();
 
     virtual bool MsgReceive(plMessage* msg);
     static void SetFOV(float w, float h);
     static void SetFOV(float w, float h, plCameraModifier1* pCam);
     static void SetDepth(float h, float y);
-    static float GetFOVw() { return fFOVw; }
-    static float GetFOVh() { return fFOVh; }
-    static float GetHither() { return fHither; }
-    static float GetYon()    { return fYon; }
+    static float GetFOVw() {
+        return fFOVw;
+    }
+    static float GetFOVh() {
+        return fFOVh;
+    }
+    static float GetHither() {
+        return fHither;
+    }
+    static float GetYon()    {
+        return fYon;
+    }
     static void  SetOffset(float x, float y, float z);
-    static void  SetAspectRatio(float aspect) { fAspectRatio = aspect; }
-    static float GetAspectRatio() { return fAspectRatio; }
-    
-    bool InTransition() { return fTransPos != POS_TRANS_OFF; }
+    static void  SetAspectRatio(float aspect) {
+        fAspectRatio = aspect;
+    }
+    static float GetAspectRatio() {
+        return fAspectRatio;
+    }
+
+    bool InTransition() {
+        return fTransPos != POS_TRANS_OFF;
+    }
     plCameraModifier1* GetCurrentCamera();
     plCameraModifier1* GetCurrentStackCamera();
-    plCameraModifier1* GetTransitionCamera(){return fTransitionCamera;}
+    plCameraModifier1* GetTransitionCamera() {
+        return fTransitionCamera;
+    }
     bool Is1stPersonCamera();
 
-    bool    HasMovementFlag(int f) { return fMoveFlags.IsBitSet(f); }
-    void    SetMovementFlag(int f, bool on = true) { fMoveFlags.SetBit(f, on);} 
-        
-    hsPoint3 GetCameraPos() { return fOutputPos; }
-    hsPoint3 GetCameraPOA() { return fOutputPOA; }
-    hsVector3 GetCameraUp() { return fOutputUp; }
+    bool    HasMovementFlag(int f) {
+        return fMoveFlags.IsBitSet(f);
+    }
+    void    SetMovementFlag(int f, bool on = true) {
+        fMoveFlags.SetBit(f, on);
+    }
+
+    hsPoint3 GetCameraPos() {
+        return fOutputPos;
+    }
+    hsPoint3 GetCameraPOA() {
+        return fOutputPOA;
+    }
+    hsVector3 GetCameraUp() {
+        return fOutputUp;
+    }
     void    SetCutNextTrans(); // used when player warps into a new camera region
 
-    const hsMatrix44 GetCurrentMatrix() { return fMatrix; }
-    static plVirtualCam1* Instance() { return fInstance; }
-    
-    size_t GetNumCameras() { return fCameraStack.size(); }
+    const hsMatrix44 GetCurrentMatrix() {
+        return fMatrix;
+    }
+    static plVirtualCam1* Instance() {
+        return fInstance;
+    }
+
+    size_t GetNumCameras() {
+        return fCameraStack.size();
+    }
     plCameraModifier1* GetCameraNumber(size_t camNumber);
     void RebuildStack(const plKey& key);
 
-    void SetFlags(int flag) { fFlags.SetBit(flag); }
-    bool HasFlags(int flag) { return fFlags.IsBitSet(flag); }
-    void ClearFlags(int flag) { fFlags.ClearBit(flag); }
+    void SetFlags(int flag) {
+        fFlags.SetBit(flag);
+    }
+    bool HasFlags(int flag) {
+        return fFlags.IsBitSet(flag);
+    }
+    void ClearFlags(int flag) {
+        fFlags.ClearBit(flag);
+    }
 
     // console command stuff
     static void Next();
     static void Prev();
     static void Deactivate();
-    void CameraRegions(bool b) { fFlags.SetBit(kRegionIgnore,b); }
-    void LogFOV(bool b) { printFOV = b; }
+    void CameraRegions(bool b) {
+        fFlags.SetBit(kRegionIgnore, b);
+    }
+    void LogFOV(bool b) {
+        printFOV = b;
+    }
     void Drive();
     void PushThirdPerson();
-    
+
     static void AddMsgToLog(const char* msg);
     static bool IsCurrentCamera(const plCameraModifier1* mod);
     void ClearStack();
 
-    void AddCameraLoaded(plSceneObject* pCam) { fCamerasLoaded.push_back(pCam); }
+    void AddCameraLoaded(plSceneObject* pCam) {
+        fCamerasLoaded.push_back(pCam);
+    }
     bool RestoreFromName(const plString& name);
     void StartUnPan();
     // these are for console access
-    static bool fUseAccelOverride, freeze, alwaysCutForColin, WalkPan3rdPerson,StayInFirstPersonForever;
+    static bool fUseAccelOverride, freeze, alwaysCutForColin, WalkPan3rdPerson, StayInFirstPersonForever;
     static float fDecel, fAccel, fVel;
     static float fFallTimerDelay;
-    
+
 private:
 
     void Reset(bool bRender);
@@ -194,15 +235,19 @@ private:
     void SetRender(bool render);
     void IHandleCameraStatusLog(plCameraModifier1* pMod, int action);
     void ICreatePlate();
-    void FreezeOutput(int frames) { fFreezeCounter = frames; } // I hate this and I hate myself for doing it
-    void UnFadeAvatarIn(int frames) { fFadeCounter = frames; } // ditto
+    void FreezeOutput(int frames) {
+        fFreezeCounter = frames;    // I hate this and I hate myself for doing it
+    }
+    void UnFadeAvatarIn(int frames) {
+        fFadeCounter = frames;    // ditto
+    }
     void FirstPersonOverride();
-    
+
     void AdjustForInput();
     void UnPanIfNeeded();
     void StartInterpPanLimits();
     void InterpPanLimits();
-    
+
     plPipeline*         fPipe;
     hsMatrix44          fMatrix;
     hsPoint3            fOutputPos;
@@ -231,9 +276,9 @@ private:
     double              fUnPanEndTime;
     double              fInterpPanLimitTime;
     float               fRetainedFY;
-    
+
     // built-in cameras
-    plCameraModifier1*  fDriveCamera; // for driving around 
+    plCameraModifier1*  fDriveCamera; // for driving around
     plCameraModifier1*  fTransitionCamera; // transitions between cameras placed in scenes
     plCameraModifier1*  fPythonOverride; // a special camera pushed by python
     plCameraModifier1*  fFirstPersonOverride; // the built-in first person camera
@@ -243,7 +288,7 @@ private:
     static float fFOVh, fFOVw;
     static float fHither, fYon;
     static plVirtualCam1* fInstance;
-    static bool printFOV; 
+    static bool printFOV;
     static float fPanResponseTime;
     static float fAspectRatio;
     bool fForceCutOnce;

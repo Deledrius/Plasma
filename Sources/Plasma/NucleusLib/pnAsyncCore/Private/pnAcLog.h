@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCore/Private/pnAcLog.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNASYNCCORE_PRIVATE_PNACLOG_H
@@ -60,26 +60,26 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 enum ELogSeverity {
     // For indicating design problems
     kLogDebug,
-    
+
     // For indicating performance warnings
     // (e.g. transaction failed, retrying...)
     kLogPerf,
-    
+
     // For indicating error conditions that change program behavior
     // (e.g. socket connect failed)
     kLogError,
-    
+
     // For indicating failures that may lead to program termination
     // (e.g. out of memory)
     kLogFatal,
-    
+
     kNumLogSeverity
 };
 
-void LogMsg  (ELogSeverity severity, const char  format[], ...);
-void LogMsg  (ELogSeverity severity, const wchar_t format[], ...);
-void LogMsgV (ELogSeverity severity, const char  format[], va_list args);
-void LogMsgV (ELogSeverity severity, const wchar_t format[], va_list args);
+void LogMsg(ELogSeverity severity, const char  format[], ...);
+void LogMsg(ELogSeverity severity, const wchar_t format[], ...);
+void LogMsgV(ELogSeverity severity, const char  format[], va_list args);
+void LogMsgV(ELogSeverity severity, const wchar_t format[], va_list args);
 
 /****************************************************************************
 *
@@ -89,12 +89,12 @@ void LogMsgV (ELogSeverity severity, const wchar_t format[], va_list args);
 
 #ifdef HS_DEBUGGING
 
-    void LogMsgDebug (const char  format[], ...);
-    void LogMsgDebug (const wchar_t format[], ...);
+void LogMsgDebug(const char  format[], ...);
+void LogMsgDebug(const wchar_t format[], ...);
 
 #else
 
-    inline void LogMsgDebug (const char  *, ...) { }
-    inline void LogMsgDebug (const wchar_t *, ...) { }
+inline void LogMsgDebug(const char*, ...) { }
+inline void LogMsgDebug(const wchar_t*, ...) { }
 
 #endif

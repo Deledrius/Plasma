@@ -42,13 +42,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plClientUpdateFormat_h_inc
 #define plClientUpdateFormat_h_inc
 
-namespace ClientUpdate
-{
-    enum
-    {
-        kUpdate,
-        kShutdown,
-    };
+namespace ClientUpdate {
+enum {
+    kUpdate,
+    kShutdown,
+};
 }
 
 //

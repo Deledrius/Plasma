@@ -47,24 +47,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsStream.h"
 
 plClimbMsg::plClimbMsg()
-: fCommand(kNoCommand),
-  fDirection(plClimbMsg::kCenter),
-  fStatus(false),
-  fTarget(nil)
+    : fCommand(kNoCommand),
+      fDirection(plClimbMsg::kCenter),
+      fStatus(false),
+      fTarget(nil)
 {
     // nothing
 }
 
-plClimbMsg::plClimbMsg(const plKey &sender, const plKey &receiver, Command command, Direction direction, bool status, plKey target)
-: plMessage(sender, receiver, nil),
-  fCommand(command), fDirection(direction),
-  fStatus(status),
-  fTarget(target)
+plClimbMsg::plClimbMsg(const plKey& sender, const plKey& receiver, Command command, Direction direction, bool status, plKey target)
+    : plMessage(sender, receiver, nil),
+      fCommand(command), fDirection(direction),
+      fStatus(status),
+      fTarget(target)
 {
     // not here
 }
 
-void plClimbMsg::Read(hsStream *stream, hsResMgr *mgr)
+void plClimbMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
 
@@ -74,7 +74,7 @@ void plClimbMsg::Read(hsStream *stream, hsResMgr *mgr)
     fTarget = mgr->ReadKey(stream);
 }
 
-void plClimbMsg::Write(hsStream *stream, hsResMgr *mgr)
+void plClimbMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(stream, mgr);
     stream->WriteLE32(static_cast<uint32_t>(fCommand));

@@ -51,8 +51,7 @@ class hsStream;
 class hsResMgr;
 
 
-class plRippleShapeMsg : public plMessage
-{
+class plRippleShapeMsg : public plMessage {
 protected:
     const plPrintShape*     fShape;
 public:
@@ -60,14 +59,18 @@ public:
     plRippleShapeMsg(const plKey& r, const plPrintShape* shape);
     ~plRippleShapeMsg();
 
-    CLASSNAME_REGISTER( plRippleShapeMsg );
-    GETINTERFACE_ANY( plRippleShapeMsg, plMessage );
+    CLASSNAME_REGISTER(plRippleShapeMsg);
+    GETINTERFACE_ANY(plRippleShapeMsg, plMessage);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    const plPrintShape* GetShape() const { return fShape; }
-    void SetShape(const plPrintShape* shape) { fShape = shape; }
+    const plPrintShape* GetShape() const {
+        return fShape;
+    }
+    void SetShape(const plPrintShape* shape) {
+        fShape = shape;
+    }
 
 };
 

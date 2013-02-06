@@ -76,161 +76,182 @@ class plPostEffectMod;
 //
 //  Easy, huh?
 
-class pfGUITag
-{
-    public:
-        uint32_t  fID;
-        char    fName[ 128 ];
+class pfGUITag {
+public:
+    uint32_t  fID;
+    char    fName[ 128 ];
 };
 
 
 //
 // This class just holds a name and the key to set the receiver to
 // after the dialog gets loaded.
-class pfDialogNameSetKey
-{
+class pfDialogNameSetKey {
 private:
-    char    *fName;
+    char*    fName;
     plKey   fKey;
 public:
-    pfDialogNameSetKey(const char *name, plKey key) { fName = hsStrcpy(name); fKey=key; }
-    ~pfDialogNameSetKey() { delete [] fName; }
-    const char *GetName() { return fName; }
-    plKey GetKey() { return fKey; }
+    pfDialogNameSetKey(const char* name, plKey key) {
+        fName = hsStrcpy(name);
+        fKey = key;
+    }
+    ~pfDialogNameSetKey() {
+        delete [] fName;
+    }
+    const char* GetName() {
+        return fName;
+    }
+    plKey GetKey() {
+        return fKey;
+    }
 };
 
 //// Manager Class Definition ////////////////////////////////////////////////
 
 class pfGUIPopUpMenu;
-class pfGameGUIMgr : public hsKeyedObject
-{
+class pfGameGUIMgr : public hsKeyedObject {
     friend class pfGameUIInputInterface;
 
-    public:
+public:
 
-        enum EventType
-        {
-            kMouseDown,
-            kMouseUp,
-            kMouseMove,
-            kMouseDrag,
-            kKeyDown,
-            kKeyUp,
-            kKeyRepeat,
-            kMouseDblClick
-        };
+    enum EventType {
+        kMouseDown,
+        kMouseUp,
+        kMouseMove,
+        kMouseDrag,
+        kKeyDown,
+        kKeyUp,
+        kKeyRepeat,
+        kMouseDblClick
+    };
 
-        enum
-        {
-            kNoModifiers = 0,
-            kShiftDown  = 0x01,
-            kCtrlDown   = 0x02,
-            kCapsDown   = 0x04
-        };
+    enum {
+        kNoModifiers = 0,
+        kShiftDown  = 0x01,
+        kCtrlDown   = 0x02,
+        kCapsDown   = 0x04
+    };
 
-    private:
+private:
 
-        static pfGameGUIMgr *fInstance;
+    static pfGameGUIMgr* fInstance;
 
-    protected:
+protected:
 
-        hsTArray<pfGUIDialogMod *>  fDialogs;
-        pfGUIDialogMod              *fActiveDialogs;
+    hsTArray<pfGUIDialogMod*>  fDialogs;
+    pfGUIDialogMod*              fActiveDialogs;
 
-        // These two lists help us manage when dialogs get told to load or unload versus when they actually *do*
-        hsTArray<pfDialogNameSetKey *>  fDlgsPendingLoad;
-        hsTArray<pfDialogNameSetKey *>  fDlgsPendingUnload;
+    // These two lists help us manage when dialogs get told to load or unload versus when they actually *do*
+    hsTArray<pfDialogNameSetKey*>  fDlgsPendingLoad;
+    hsTArray<pfDialogNameSetKey*>  fDlgsPendingUnload;
 
-        bool    fActivated;
-        uint32_t  fActiveDlgCount;
+    bool    fActivated;
+    uint32_t  fActiveDlgCount;
 
-        pfGameUIInputInterface      *fInputConfig;
-        uint32_t                      fInputCtlIndex;
+    pfGameUIInputInterface*      fInputConfig;
+    uint32_t                      fInputCtlIndex;
 
-        uint32_t                      fDefaultCursor;
-        float                    fCursorOpacity;
-        float                fAspectRatio;
+    uint32_t                      fDefaultCursor;
+    float                    fCursorOpacity;
+    float                fAspectRatio;
 
-        // This is an array of the dialogs (by name) that need their
-        // receiver key set once they are loaded.
-        // This array shouldn't get more than one entry... but
-        // it could be more....
-        // LoadDialog adds an entry and MsgReceive removes it
-        hsTArray<pfDialogNameSetKey *>  fDialogToSetKeyOf;
+    // This is an array of the dialogs (by name) that need their
+    // receiver key set once they are loaded.
+    // This array shouldn't get more than one entry... but
+    // it could be more....
+    // LoadDialog adds an entry and MsgReceive removes it
+    hsTArray<pfDialogNameSetKey*>  fDialogToSetKeyOf;
 
-        void    ILoadDialog( const char *name );
-        void    IShowDialog( const char *name );
-        void    IHideDialog( const char *name );
+    void    ILoadDialog(const char* name);
+    void    IShowDialog(const char* name);
+    void    IHideDialog(const char* name);
 
-        void    IAddDlgToList( hsKeyedObject *obj );
-        void    IRemoveDlgFromList( hsKeyedObject *obj );
+    void    IAddDlgToList(hsKeyedObject* obj);
+    void    IRemoveDlgFromList(hsKeyedObject* obj);
 
-        void    IActivateGUI( bool activate );
+    void    IActivateGUI(bool activate);
 
-        bool    IHandleMouse( EventType event, float mouseX, float mouseY, uint8_t modifiers, uint32_t *desiredCursor );
-        bool    IHandleKeyEvt( EventType event, plKeyDef key, uint8_t modifiers );
-        bool    IHandleKeyPress( wchar_t key, uint8_t modifiers );
+    bool    IHandleMouse(EventType event, float mouseX, float mouseY, uint8_t modifiers, uint32_t* desiredCursor);
+    bool    IHandleKeyEvt(EventType event, plKeyDef key, uint8_t modifiers);
+    bool    IHandleKeyPress(wchar_t key, uint8_t modifiers);
 
-        bool    IModalBlocking( void );
+    bool    IModalBlocking(void);
 
-        pfGUIDialogMod  *IGetTopModal( void ) const;
+    pfGUIDialogMod*  IGetTopModal(void) const;
 
-    public:
+public:
 
-        enum
-        {
-            kDlgModRef = 0
-        };
+    enum {
+        kDlgModRef = 0
+    };
 
 
-        pfGameGUIMgr();
-        ~pfGameGUIMgr();
+    pfGameGUIMgr();
+    ~pfGameGUIMgr();
 
-        CLASSNAME_REGISTER( pfGameGUIMgr );
-        GETINTERFACE_ANY( pfGameGUIMgr, hsKeyedObject );
+    CLASSNAME_REGISTER(pfGameGUIMgr);
+    GETINTERFACE_ANY(pfGameGUIMgr, hsKeyedObject);
 
-        void        Draw( plPipeline *p );
+    void        Draw(plPipeline* p);
 
-        bool        Init( void );
+    bool        Init(void);
 
-        virtual bool    MsgReceive( plMessage* pMsg );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        void    LoadDialog( const char *name, plKey recvrKey=nil, const char *ageName = nil );  // AgeName = nil defaults to "GUI"
-        void    ShowDialog( const char *name ) { IShowDialog(name); }
-        void    HideDialog( const char *name ) { IHideDialog(name); }
-        void    UnloadDialog( const char *name );
-        void    UnloadDialog( pfGUIDialogMod *dlg );
+    void    LoadDialog(const char* name, plKey recvrKey = nil, const char* ageName = nil);  // AgeName = nil defaults to "GUI"
+    void    ShowDialog(const char* name) {
+        IShowDialog(name);
+    }
+    void    HideDialog(const char* name) {
+        IHideDialog(name);
+    }
+    void    UnloadDialog(const char* name);
+    void    UnloadDialog(pfGUIDialogMod* dlg);
 
-        void    ShowDialog( pfGUIDialogMod *dlg, bool resetClickables=true );
-        void    HideDialog( pfGUIDialogMod *dlg );
+    void    ShowDialog(pfGUIDialogMod* dlg, bool resetClickables = true);
+    void    HideDialog(pfGUIDialogMod* dlg);
 
-        bool    IsDialogLoaded( const char *name );
-        pfGUIDialogMod *GetDialogFromString( const char *name );
+    bool    IsDialogLoaded(const char* name);
+    pfGUIDialogMod* GetDialogFromString(const char* name);
 
-        void    SetDialogToNotify(const char *name, plKey recvrKey);
-        void    SetDialogToNotify(pfGUIDialogMod *dlg, plKey recvrKey);
+    void    SetDialogToNotify(const char* name, plKey recvrKey);
+    void    SetDialogToNotify(pfGUIDialogMod* dlg, plKey recvrKey);
 
-        void    SetDefaultCursor(uint32_t defaultCursor) { fDefaultCursor = defaultCursor; }
-        uint32_t  GetDefaultCursor() { return fDefaultCursor; }
-        void    SetCursorOpacity(float opacity) { fCursorOpacity = opacity; }
-        float    GetCursorOpacity() { return fCursorOpacity; }
+    void    SetDefaultCursor(uint32_t defaultCursor) {
+        fDefaultCursor = defaultCursor;
+    }
+    uint32_t  GetDefaultCursor() {
+        return fDefaultCursor;
+    }
+    void    SetCursorOpacity(float opacity) {
+        fCursorOpacity = opacity;
+    }
+    float    GetCursorOpacity() {
+        return fCursorOpacity;
+    }
 
-        pfGUIPopUpMenu  *FindPopUpMenu( const char *name );
+    pfGUIPopUpMenu*  FindPopUpMenu(const char* name);
 
-        std::vector<plPostEffectMod*> GetDlgRenderMods( void ) const;
-        bool    IsModalBlocking( void ) {return IModalBlocking();}
+    std::vector<plPostEffectMod*> GetDlgRenderMods(void) const;
+    bool    IsModalBlocking(void) {
+        return IModalBlocking();
+    }
 
-        // Tag ID stuff
-        pfGUIDialogMod  *GetDialogFromTag( uint32_t tagID );
-        pfGUIControlMod *GetControlFromTag( pfGUIDialogMod *dlg, uint32_t tagID );
+    // Tag ID stuff
+    pfGUIDialogMod*  GetDialogFromTag(uint32_t tagID);
+    pfGUIControlMod* GetControlFromTag(pfGUIDialogMod* dlg, uint32_t tagID);
 
-        static uint32_t       GetNumTags( void );
-        static pfGUITag     *GetTag( uint32_t tagIndex );
-        static uint32_t       GetHighestTag( void );
-        void SetAspectRatio(float aspectratio);
-        float GetAspectRatio() { return fAspectRatio; }
- 
-        static pfGameGUIMgr *GetInstance( void ) { return fInstance; }
+    static uint32_t       GetNumTags(void);
+    static pfGUITag*     GetTag(uint32_t tagIndex);
+    static uint32_t       GetHighestTag(void);
+    void SetAspectRatio(float aspectratio);
+    float GetAspectRatio() {
+        return fAspectRatio;
+    }
+
+    static pfGameGUIMgr* GetInstance(void) {
+        return fInstance;
+    }
 };
 
 #endif //_pfGameGUIMgr_h

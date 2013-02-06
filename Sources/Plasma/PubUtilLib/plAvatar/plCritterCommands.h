@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 typedef std::vector<std::string> VCharArray;
 
-class plCritterCommands
-{
+class plCritterCommands {
 public:
     // The order of these is significant; setting the blend on an animation in this list
     // to maximum will prevent all animations above it from playing.
@@ -72,8 +71,7 @@ public:
     //Vector is used because the []operator is handy for filling
     //the dialog boxes for implementation Components. -RXA
     // KEEP THIS SYNCHRONIZED with the enum above.
-    plCritterCommands() 
-    {
+    plCritterCommands() {
         fAnimNameTypes.push_back("Idle");
         fAnimNameTypes.push_back("TurnLeft");
         fAnimNameTypes.push_back("TurnRight");
@@ -85,7 +83,9 @@ public:
         fAnimNameTypes.push_back("Impact Down");
     }
 
-    int GetNumElements() { return fAnimNameTypes.size(); }
+    int GetNumElements() {
+        return fAnimNameTypes.size();
+    }
 
 };
 
@@ -132,7 +132,7 @@ public:
     //Vector is used because the []operator is handy for filling
     //the dialog boxes for implementation Components. -RXA
     // KEEP THIS SYNCHRONIZED with the enum above.
-    plCritterCommands() 
+    plCritterCommands()
     {
         fAnimNameTypes.push_back("Torso Straighten Out");
         fAnimNameTypes.push_back("Torso Spastic Rotate");

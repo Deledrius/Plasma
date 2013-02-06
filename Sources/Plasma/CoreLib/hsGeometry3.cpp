@@ -48,7 +48,7 @@ hsVector3 operator%(const hsVector3& t, const hsVector3& s)
     hsVector3       result;
 
     return *result.Set((t.fY * s.fZ) - (s.fY * t.fZ),
-                      -(t.fX * s.fZ) + (s.fX * t.fZ),
+                       -(t.fX * s.fZ) + (s.fX * t.fZ),
                        (t.fX * s.fY) - (s.fX * t.fY));
 }
 
@@ -62,14 +62,14 @@ float hsScalarTriple::Magnitude() const
     return sqrt(MagnitudeSquared());
 }
 
-void hsScalarTriple::Read(hsStream *stream)
+void hsScalarTriple::Read(hsStream* stream)
 {
-    
+
     // DANGER for speed read directly into these variables...ASSUMES fX,fY, and fZ are in contiguous order (PBG)
     stream->Read12Bytes(&fX);
 }
 
-void hsScalarTriple::Write(hsStream *stream) const
+void hsScalarTriple::Write(hsStream* stream) const
 {
     stream->WriteLEScalar(fX);
     stream->WriteLEScalar(fY);
@@ -92,14 +92,14 @@ hsPlane3::hsPlane3(const hsPoint3* pt1, const hsPoint3* pt2, const hsPoint3* pt3
 }
 
 
-void hsPlane3::Read(hsStream *stream) 
-{ 
-    fN.Read(stream); 
-    fD=stream->ReadLEScalar(); 
+void hsPlane3::Read(hsStream* stream)
+{
+    fN.Read(stream);
+    fD = stream->ReadLEScalar();
 }
 
-void hsPlane3::Write(hsStream *stream) const 
-{ 
-    fN.Write(stream); 
-    stream->WriteLEScalar(fD); 
+void hsPlane3::Write(hsStream* stream) const
+{
+    fN.Write(stream);
+    stream->WriteLEScalar(fD);
 }

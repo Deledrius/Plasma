@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plConvexVolume;
 struct hsMatrix44;
 
-class plBoundInterface : public plObjInterface
-{
+class plBoundInterface : public plObjInterface {
     enum {
         kDisable        = 0x0,
 
@@ -57,19 +56,23 @@ class plBoundInterface : public plObjInterface
 
 protected:
     //hsMatrix44 fLocalToWorld;
-    plConvexVolume *fBounds;
+    plConvexVolume* fBounds;
 
 public:
     plBoundInterface();
     ~plBoundInterface();
 
-    void Init(plConvexVolume *bounds);
-    plConvexVolume *GetVolume() { return fBounds; }
+    void Init(plConvexVolume* bounds);
+    plConvexVolume* GetVolume() {
+        return fBounds;
+    }
 
-    CLASSNAME_REGISTER( plBoundInterface );
-    GETINTERFACE_ANY( plBoundInterface, plObjInterface );
-    
-    virtual int32_t GetNumProperties() const { return kNumProps; }
+    CLASSNAME_REGISTER(plBoundInterface);
+    GETINTERFACE_ANY(plBoundInterface, plObjInterface);
+
+    virtual int32_t GetNumProperties() const {
+        return kNumProps;
+    }
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);

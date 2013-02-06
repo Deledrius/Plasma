@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCliMsg.h"
 
-class pyHeekMsg : public pyGameCliMsg
-{
+class pyHeekMsg : public pyGameCliMsg {
 protected:
     pyHeekMsg();
     pyHeekMsg(pfGameCliMsg* msg);
@@ -76,8 +75,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyHeekPlayGameMsg : public pyHeekMsg
-{
+class pyHeekPlayGameMsg : public pyHeekMsg {
 protected:
     pyHeekPlayGameMsg();
     pyHeekPlayGameMsg(pfGameCliMsg* msg);
@@ -97,8 +95,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyHeekGoodbyeMsg : public pyHeekMsg
-{
+class pyHeekGoodbyeMsg : public pyHeekMsg {
 protected:
     pyHeekGoodbyeMsg();
     pyHeekGoodbyeMsg(pfGameCliMsg* msg);
@@ -114,8 +111,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyHeekWelcomeMsg : public pyHeekMsg
-{
+class pyHeekWelcomeMsg : public pyHeekMsg {
 protected:
     pyHeekWelcomeMsg();
     pyHeekWelcomeMsg(pfGameCliMsg* msg);
@@ -135,8 +131,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyHeekDropMsg : public pyHeekMsg
-{
+class pyHeekDropMsg : public pyHeekMsg {
 protected:
     pyHeekDropMsg();
     pyHeekDropMsg(pfGameCliMsg* msg);
@@ -154,8 +149,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyHeekSetupMsg : public pyHeekMsg
-{
+class pyHeekSetupMsg : public pyHeekMsg {
 protected:
     pyHeekSetupMsg();
     pyHeekSetupMsg(pfGameCliMsg* msg);
@@ -175,8 +169,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyHeekLightStateMsg : public pyHeekMsg
-{
+class pyHeekLightStateMsg : public pyHeekMsg {
 protected:
     pyHeekLightStateMsg();
     pyHeekLightStateMsg(pfGameCliMsg* msg);
@@ -196,8 +189,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyHeekInterfaceStateMsg : public pyHeekMsg
-{
+class pyHeekInterfaceStateMsg : public pyHeekMsg {
 protected:
     pyHeekInterfaceStateMsg();
     pyHeekInterfaceStateMsg(pfGameCliMsg* msg);
@@ -215,8 +207,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyHeekCountdownStateMsg : public pyHeekMsg
-{
+class pyHeekCountdownStateMsg : public pyHeekMsg {
 protected:
     pyHeekCountdownStateMsg();
     pyHeekCountdownStateMsg(pfGameCliMsg* msg);
@@ -235,8 +226,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyHeekWinLoseMsg : public pyHeekMsg
-{
+class pyHeekWinLoseMsg : public pyHeekMsg {
 protected:
     pyHeekWinLoseMsg();
     pyHeekWinLoseMsg(pfGameCliMsg* msg);
@@ -255,8 +245,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyHeekGameWinMsg : public pyHeekMsg
-{
+class pyHeekGameWinMsg : public pyHeekMsg {
 protected:
     pyHeekGameWinMsg();
     pyHeekGameWinMsg(pfGameCliMsg* msg);
@@ -274,8 +263,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyHeekPointUpdateMsg : public pyHeekMsg
-{
+class pyHeekPointUpdateMsg : public pyHeekMsg {
 protected:
     pyHeekPointUpdateMsg();
     pyHeekPointUpdateMsg(pfGameCliMsg* msg);

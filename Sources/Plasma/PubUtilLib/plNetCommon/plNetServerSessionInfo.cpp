@@ -54,117 +54,153 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 ////////////////////////////////////////////////////////////////////
 
-void plAgeInfoStruct::Read( hsStream * s, hsResMgr* )
+void plAgeInfoStruct::Read(hsStream* s, hsResMgr*)
 {
     s->LogSubStreamStart("push me");
-    s->LogReadLE( &fFlags ,"AgeInfoStruct Flags");
-    if ( IsFlagSet( kHasAgeFilename ) ) {
+    s->LogReadLE(&fFlags , "AgeInfoStruct Flags");
+
+    if (IsFlagSet(kHasAgeFilename)) {
         s->LogSubStreamPushDesc("AgeFilename");
-        plMsgStdStringHelper::Peek(fAgeFilename,s);
+        plMsgStdStringHelper::Peek(fAgeFilename, s);
     }
-    if ( IsFlagSet( kHasAgeInstanceName ) ) {
+
+    if (IsFlagSet(kHasAgeInstanceName)) {
         s->LogSubStreamPushDesc("AgeInstanceName");
-        plMsgStdStringHelper::Peek(fAgeInstanceName,s);
+        plMsgStdStringHelper::Peek(fAgeInstanceName, s);
     }
-    if ( IsFlagSet( kHasAgeInstanceGuid ) ) {
+
+    if (IsFlagSet(kHasAgeInstanceGuid)) {
         s->LogSubStreamPushDesc("AgeInstanceGuid");
-        fAgeInstanceGuid.Read( s );
+        fAgeInstanceGuid.Read(s);
     }
-    if ( IsFlagSet( kHasAgeUserDefinedName ) ){
+
+    if (IsFlagSet(kHasAgeUserDefinedName)) {
         s->LogSubStreamPushDesc("UserDefinedName");
-        plMsgStdStringHelper::Peek(fAgeUserDefinedName,s);
+        plMsgStdStringHelper::Peek(fAgeUserDefinedName, s);
     }
-    if ( IsFlagSet( kHasAgeSequenceNumber ) ) {
-        s->LogReadLE( &fAgeSequenceNumber ,"AgeSequenceNumber");
+
+    if (IsFlagSet(kHasAgeSequenceNumber)) {
+        s->LogReadLE(&fAgeSequenceNumber , "AgeSequenceNumber");
     }
-    if ( IsFlagSet( kHasAgeDescription ) ) {
+
+    if (IsFlagSet(kHasAgeDescription)) {
         s->LogSubStreamPushDesc("AgeDescription");
-        plMsgStdStringHelper::Peek(fAgeDescription,s);
+        plMsgStdStringHelper::Peek(fAgeDescription, s);
     }
-    if ( IsFlagSet( kHasAgeLanguage ) ) {
-        s->LogReadLE( &fAgeLanguage ,"AgeLanguage");
+
+    if (IsFlagSet(kHasAgeLanguage)) {
+        s->LogReadLE(&fAgeLanguage , "AgeLanguage");
     }
+
     UpdateFlags();
     s->LogSubStreamEnd();
 }
 
-void plAgeInfoStruct::Write( hsStream * s, hsResMgr* )
+void plAgeInfoStruct::Write(hsStream* s, hsResMgr*)
 {
     UpdateFlags();
-    s->WriteLE( fFlags );
-    if ( IsFlagSet( kHasAgeFilename ) )
-        plMsgStdStringHelper::Poke(fAgeFilename,s);
-    if ( IsFlagSet( kHasAgeInstanceName ) )
-        plMsgStdStringHelper::Poke(fAgeInstanceName,s);
-    if ( IsFlagSet( kHasAgeInstanceGuid ) )
-        fAgeInstanceGuid.Write( s );
-    if ( IsFlagSet( kHasAgeUserDefinedName ) )
-        plMsgStdStringHelper::Poke(fAgeUserDefinedName,s);
-    if ( IsFlagSet( kHasAgeSequenceNumber ) )
-        s->WriteLE( fAgeSequenceNumber );
-    if ( IsFlagSet( kHasAgeDescription ) )
-        plMsgStdStringHelper::Poke(fAgeDescription,s);
-    if ( IsFlagSet( kHasAgeLanguage ) )
-        s->WriteLE( fAgeLanguage );
+    s->WriteLE(fFlags);
+
+    if (IsFlagSet(kHasAgeFilename)) {
+        plMsgStdStringHelper::Poke(fAgeFilename, s);
+    }
+
+    if (IsFlagSet(kHasAgeInstanceName)) {
+        plMsgStdStringHelper::Poke(fAgeInstanceName, s);
+    }
+
+    if (IsFlagSet(kHasAgeInstanceGuid)) {
+        fAgeInstanceGuid.Write(s);
+    }
+
+    if (IsFlagSet(kHasAgeUserDefinedName)) {
+        plMsgStdStringHelper::Poke(fAgeUserDefinedName, s);
+    }
+
+    if (IsFlagSet(kHasAgeSequenceNumber)) {
+        s->WriteLE(fAgeSequenceNumber);
+    }
+
+    if (IsFlagSet(kHasAgeDescription)) {
+        plMsgStdStringHelper::Poke(fAgeDescription, s);
+    }
+
+    if (IsFlagSet(kHasAgeLanguage)) {
+        s->WriteLE(fAgeLanguage);
+    }
 }
 
-bool plAgeInfoStruct::IsEqualTo( const plAgeInfoStruct * other ) const
+bool plAgeInfoStruct::IsEqualTo(const plAgeInfoStruct* other) const
 {
     UpdateFlags();
     other->UpdateFlags();
 
     // if we both have guids, just compare them.
-    if ( HasAgeInstanceGuid() && other->HasAgeInstanceGuid() )
-        return fAgeInstanceGuid.IsEqualTo( other->GetAgeInstanceGuid() );
+    if (HasAgeInstanceGuid() && other->HasAgeInstanceGuid()) {
+        return fAgeInstanceGuid.IsEqualTo(other->GetAgeInstanceGuid());
+    }
+
     // otherwise compare everything.
     bool match = true;
-    if (match && HasAgeFilename() && other->HasAgeFilename())
-        match = match && ( stricmp( GetAgeFilename(), other->GetAgeFilename() )==0 );
-    if (match && HasAgeInstanceName() && other->HasAgeInstanceName())
-        match = match && ( stricmp( GetAgeInstanceName(), other->GetAgeInstanceName() )==0 );
-    if (match && HasAgeUserDefinedName() && other->HasAgeUserDefinedName())
-        match = match && ( stricmp( GetAgeUserDefinedName(), other->GetAgeUserDefinedName() )==0 );
-    if (match && HasAgeSequenceNumber() && other->HasAgeSequenceNumber())
-        match = match && fAgeSequenceNumber==other->GetAgeSequenceNumber();
-    if (match && HasAgeLanguage() && other->HasAgeLanguage())
-        match = match && fAgeLanguage==other->GetAgeLanguage();
+
+    if (match && HasAgeFilename() && other->HasAgeFilename()) {
+        match = match && (stricmp(GetAgeFilename(), other->GetAgeFilename()) == 0);
+    }
+
+    if (match && HasAgeInstanceName() && other->HasAgeInstanceName()) {
+        match = match && (stricmp(GetAgeInstanceName(), other->GetAgeInstanceName()) == 0);
+    }
+
+    if (match && HasAgeUserDefinedName() && other->HasAgeUserDefinedName()) {
+        match = match && (stricmp(GetAgeUserDefinedName(), other->GetAgeUserDefinedName()) == 0);
+    }
+
+    if (match && HasAgeSequenceNumber() && other->HasAgeSequenceNumber()) {
+        match = match && fAgeSequenceNumber == other->GetAgeSequenceNumber();
+    }
+
+    if (match && HasAgeLanguage() && other->HasAgeLanguage()) {
+        match = match && fAgeLanguage == other->GetAgeLanguage();
+    }
+
     // don't compare description fields
     return match;
 }
 
-void plAgeInfoStruct::CopyFrom( const plVaultAgeInfoNode * node )
+void plAgeInfoStruct::CopyFrom(const plVaultAgeInfoNode* node)
 {
     hsAssert(false, "eric, port me");
     Clear();
-/*
-    if ( node )
-    {
-        SetAgeFilename( node->GetAgeFilename() );
-        SetAgeInstanceName( node->GetAgeInstanceName() );
-        SetAgeInstanceGuid( node->GetAgeInstanceGuid() );
-        SetAgeUserDefinedName( node->GetAgeUserDefinedName() );
-        SetAgeSequenceNumber( node->GetSequenceNumber() );
-        SetAgeDescription( node->GetAgeDescription() );
-        SetAgeLanguage( node->GetAgeLanguage() );
-        UpdateFlags();
-    }
-*/
+    /*
+        if ( node )
+        {
+            SetAgeFilename( node->GetAgeFilename() );
+            SetAgeInstanceName( node->GetAgeInstanceName() );
+            SetAgeInstanceGuid( node->GetAgeInstanceGuid() );
+            SetAgeUserDefinedName( node->GetAgeUserDefinedName() );
+            SetAgeSequenceNumber( node->GetSequenceNumber() );
+            SetAgeDescription( node->GetAgeDescription() );
+            SetAgeLanguage( node->GetAgeLanguage() );
+            UpdateFlags();
+        }
+    */
 }
 
 //============================================================================
-void plAgeInfoStruct::CopyFrom(const NetAgeInfo & info) {
+void plAgeInfoStruct::CopyFrom(const NetAgeInfo& info)
+{
     char tmp[MAX_PATH];
 
-    // Filename 
+    // Filename
     StrToAnsi(tmp, info.ageFilename, arrsize(tmp));
     SetAgeFilename(tmp);
-    // InstanceName 
+    // InstanceName
     StrToAnsi(tmp, info.ageInstName, arrsize(tmp));
     SetAgeInstanceName(tmp);
-    // UserDefinedName  
+    // UserDefinedName
     StrToAnsi(tmp, info.ageUserName, arrsize(tmp));
     SetAgeUserDefinedName(tmp);
-    // Description  
+    // Description
     StrToAnsi(tmp, info.ageDesc, arrsize(tmp));
     SetAgeDescription(tmp);
 
@@ -177,168 +213,147 @@ void plAgeInfoStruct::CopyFrom(const NetAgeInfo & info) {
 //============================================================================
 plString plAgeInfoStruct::AsString() const
 {
-    const char * spacer = kEmpty;
+    const char* spacer = kEmpty;
 
     plStringStream ss;
 
     ss << "[";
 
-    if (HasAgeFilename())
-    {
+    if (HasAgeFilename()) {
         ss  << spacer
             << "FName:"
             << SAFE(GetAgeFilename());
         spacer = kComma;
     }
-    if (HasAgeInstanceName())
-    {
+
+    if (HasAgeInstanceName()) {
         ss  << spacer
             << "IName:"
             << SAFE(GetAgeInstanceName());
         spacer = kComma;
     }
-    if (HasAgeInstanceGuid())
-    {
+
+    if (HasAgeInstanceGuid()) {
         ss  << spacer
             << "Guid:"
             << fAgeInstanceGuid.AsString();
         spacer = kComma;
     }
-    if (HasAgeUserDefinedName())
-    {
+
+    if (HasAgeUserDefinedName()) {
         ss  << spacer
             << "UName:"
             << SAFE(GetAgeUserDefinedName());
         spacer = kComma;
     }
-    if (HasAgeSequenceNumber())
-    {
+
+    if (HasAgeSequenceNumber()) {
         ss  << spacer
             << "Seq:"
             << GetAgeSequenceNumber();
         spacer = kComma;
     }
-    if (HasAgeDescription())
-    {
+
+    if (HasAgeDescription()) {
         ss  << spacer
             << "Desc:"
             << SAFE(GetAgeDescription());
         spacer = kComma;
     }
-    if (HasAgeLanguage())
-    {
+
+    if (HasAgeLanguage()) {
         ss  << spacer
             << "Lang:"
             << GetAgeLanguage();
         spacer = kComma;
     }
+
     ss  << "]";
 
     return ss.GetString();
 }
 
 
-void plAgeInfoStruct::SetAgeFilename( const char * v )
+void plAgeInfoStruct::SetAgeFilename(const char* v)
 {
-    if ( v && v[0])
-    {
-        SetFlag( kHasAgeFilename );
-        fAgeFilename=v;
-    }
-    else
-    {
-        ClearFlag( kHasAgeFilename );
+    if (v && v[0]) {
+        SetFlag(kHasAgeFilename);
+        fAgeFilename = v;
+    } else {
+        ClearFlag(kHasAgeFilename);
     }
 }
 
-void plAgeInfoStruct::SetAgeInstanceName( const char * v )
+void plAgeInfoStruct::SetAgeInstanceName(const char* v)
 {
-    if ( v && v[0])
-    {
-        SetFlag( kHasAgeInstanceName );
-        fAgeInstanceName=v;
-    }
-    else
-    {
-        ClearFlag( kHasAgeInstanceName );
+    if (v && v[0]) {
+        SetFlag(kHasAgeInstanceName);
+        fAgeInstanceName = v;
+    } else {
+        ClearFlag(kHasAgeInstanceName);
     }
 }
 
-void plAgeInfoStruct::SetAgeInstanceGuid( const plUUID * v )
+void plAgeInfoStruct::SetAgeInstanceGuid(const plUUID* v)
 {
-    if ( v )
-    {
-        SetFlag( kHasAgeInstanceGuid );
-        fAgeInstanceGuid.CopyFrom( v );
-    }
-    else
-    {
-        ClearFlag( kHasAgeInstanceGuid );
+    if (v) {
+        SetFlag(kHasAgeInstanceGuid);
+        fAgeInstanceGuid.CopyFrom(v);
+    } else {
+        ClearFlag(kHasAgeInstanceGuid);
         fAgeInstanceGuid.Clear();
     }
 }
 
-void plAgeInfoStruct::SetAgeUserDefinedName( const char * v )
+void plAgeInfoStruct::SetAgeUserDefinedName(const char* v)
 {
-    if ( v && v[0])
-    {
-        SetFlag( kHasAgeUserDefinedName );
-        fAgeUserDefinedName=v;
-    }
-    else
-    {
-        ClearFlag( kHasAgeUserDefinedName );
+    if (v && v[0]) {
+        SetFlag(kHasAgeUserDefinedName);
+        fAgeUserDefinedName = v;
+    } else {
+        ClearFlag(kHasAgeUserDefinedName);
     }
 }
 
-void plAgeInfoStruct::SetAgeSequenceNumber( uint32_t v )
+void plAgeInfoStruct::SetAgeSequenceNumber(uint32_t v)
 {
-    if ( v )
-    {
-        SetFlag( kHasAgeSequenceNumber );
-        fAgeSequenceNumber=v;
-    }
-    else
-    {
-        ClearFlag( kHasAgeSequenceNumber );
+    if (v) {
+        SetFlag(kHasAgeSequenceNumber);
+        fAgeSequenceNumber = v;
+    } else {
+        ClearFlag(kHasAgeSequenceNumber);
     }
 }
 
-void plAgeInfoStruct::SetAgeDescription( const char * v )
+void plAgeInfoStruct::SetAgeDescription(const char* v)
 {
-    if ( v && v[0])
-    {
-        SetFlag( kHasAgeDescription );
-        fAgeDescription=v;
-    }
-    else
-    {
-        ClearFlag( kHasAgeDescription );
+    if (v && v[0]) {
+        SetFlag(kHasAgeDescription);
+        fAgeDescription = v;
+    } else {
+        ClearFlag(kHasAgeDescription);
     }
 }
 
-void plAgeInfoStruct::SetAgeLanguage( uint32_t v )
+void plAgeInfoStruct::SetAgeLanguage(uint32_t v)
 {
-    if (v != static_cast<uint32_t>(-1))
-    {
-        SetFlag( kHasAgeLanguage );
+    if (v != static_cast<uint32_t>(-1)) {
+        SetFlag(kHasAgeLanguage);
         fAgeLanguage = v;
-    }
-    else
-    {
-        ClearFlag( kHasAgeLanguage );
+    } else {
+        ClearFlag(kHasAgeLanguage);
     }
 }
 
 void plAgeInfoStruct::UpdateFlags() const
 {
-    SetFlag( kHasAgeFilename, fAgeFilename.size()!=0 );
-    SetFlag( kHasAgeInstanceName, fAgeInstanceName.size()!=0 );
-    SetFlag( kHasAgeUserDefinedName, fAgeUserDefinedName.size()!=0 );
-    SetFlag( kHasAgeInstanceGuid, fAgeInstanceGuid.IsSet() );
-    SetFlag( kHasAgeSequenceNumber, fAgeSequenceNumber!=0 );
-    SetFlag( kHasAgeDescription, fAgeDescription.size()!=0 );
-    SetFlag( kHasAgeLanguage, fAgeLanguage>=0 );
+    SetFlag(kHasAgeFilename, fAgeFilename.size() != 0);
+    SetFlag(kHasAgeInstanceName, fAgeInstanceName.size() != 0);
+    SetFlag(kHasAgeUserDefinedName, fAgeUserDefinedName.size() != 0);
+    SetFlag(kHasAgeInstanceGuid, fAgeInstanceGuid.IsSet());
+    SetFlag(kHasAgeSequenceNumber, fAgeSequenceNumber != 0);
+    SetFlag(kHasAgeDescription, fAgeDescription.size() != 0);
+    SetFlag(kHasAgeLanguage, fAgeLanguage >= 0);
 }
 
 void plAgeInfoStruct::Clear()
@@ -357,117 +372,126 @@ void plAgeInfoStruct::Clear()
 ////////////////////////////////////////////////////////////////////
 
 plAgeLinkStruct::plAgeLinkStruct()
-: fFlags( kHasAgeInfo|kHasLinkingRules|kHasSpawnPt )
-, fLinkingRules( plNetCommon::LinkingRules::kBasicLink )
-, fSpawnPoint( kDefaultSpawnPoint )
-, fAmCCR( 0 )
+    : fFlags(kHasAgeInfo | kHasLinkingRules | kHasSpawnPt)
+    , fLinkingRules(plNetCommon::LinkingRules::kBasicLink)
+    , fSpawnPoint(kDefaultSpawnPoint)
+    , fAmCCR(0)
 {
 }
 
-void plAgeLinkStruct::Read( hsStream * s, hsResMgr* m)
+void plAgeLinkStruct::Read(hsStream* s, hsResMgr* m)
 {
     s->LogSubStreamStart("push me");
-    s->LogReadLE( &fFlags ,"AgeLinkStruct Flags");
-    if ( IsFlagSet( kHasAgeInfo ) ) {
+    s->LogReadLE(&fFlags , "AgeLinkStruct Flags");
+
+    if (IsFlagSet(kHasAgeInfo)) {
         s->LogSubStreamPushDesc("AgeInfo");
-        fAgeInfo.Read( s,m );
+        fAgeInfo.Read(s, m);
     }
-    if ( IsFlagSet( kHasLinkingRules ) )
-        s->LogReadLE( &fLinkingRules ,"LinkingRules");
-    if ( IsFlagSet( kHasSpawnPt_DEAD ) )
-    {
+
+    if (IsFlagSet(kHasLinkingRules)) {
+        s->LogReadLE(&fLinkingRules , "LinkingRules");
+    }
+
+    if (IsFlagSet(kHasSpawnPt_DEAD)) {
         plString str;
         s->LogSubStreamPushDesc("SpawnPt_DEAD");
-        plMsgStdStringHelper::Peek(str,s);
-        fSpawnPoint.SetName( str );
-        if ( fSpawnPoint.GetName() == kDefaultSpawnPtName )
-            fSpawnPoint.SetTitle( kDefaultSpawnPtTitle );
-        else
-            fSpawnPoint.SetTitle( str );
-        ClearFlag( kHasSpawnPt_DEAD );
-        SetFlag( kHasSpawnPt );
+        plMsgStdStringHelper::Peek(str, s);
+        fSpawnPoint.SetName(str);
+
+        if (fSpawnPoint.GetName() == kDefaultSpawnPtName) {
+            fSpawnPoint.SetTitle(kDefaultSpawnPtTitle);
+        } else {
+            fSpawnPoint.SetTitle(str);
+        }
+
+        ClearFlag(kHasSpawnPt_DEAD);
+        SetFlag(kHasSpawnPt);
     }
-    if ( IsFlagSet( kHasSpawnPt_DEAD2 ) )
-    {
+
+    if (IsFlagSet(kHasSpawnPt_DEAD2)) {
         s->LogSubStreamPushDesc("SpawnPt_DEAD2");
-        fSpawnPoint.ReadOld( s );
-        ClearFlag( kHasSpawnPt_DEAD2 );
-        SetFlag( kHasSpawnPt );
-    }
-    else if ( IsFlagSet( kHasSpawnPt ) )
-    {
+        fSpawnPoint.ReadOld(s);
+        ClearFlag(kHasSpawnPt_DEAD2);
+        SetFlag(kHasSpawnPt);
+    } else if (IsFlagSet(kHasSpawnPt)) {
         s->LogSubStreamPushDesc("SpawnPt");
-        fSpawnPoint.Read( s );
+        fSpawnPoint.Read(s);
     }
-    if ( IsFlagSet( kHasAmCCR ) )
-        s->LogReadLE( &fAmCCR ,"AmCCR");
 
-    if ( IsFlagSet( kHasParentAgeFilename ) )
-    {
+    if (IsFlagSet(kHasAmCCR)) {
+        s->LogReadLE(&fAmCCR , "AmCCR");
+    }
+
+    if (IsFlagSet(kHasParentAgeFilename)) {
         s->LogSubStreamPushDesc("ParentAgeFilename");
-        plMsgStdStringHelper::Peek(fParentAgeFilename,s);
+        plMsgStdStringHelper::Peek(fParentAgeFilename, s);
     }
 }
 
-void plAgeLinkStruct::Write( hsStream * s, hsResMgr* m)
+void plAgeLinkStruct::Write(hsStream* s, hsResMgr* m)
 {
-    s->WriteLE( fFlags );
-    if ( IsFlagSet( kHasAgeInfo ) )
-        fAgeInfo.Write( s,m );
-    if ( IsFlagSet( kHasLinkingRules ) )
-        s->WriteLE( fLinkingRules );
-    if ( IsFlagSet( kHasSpawnPt ) )
-        fSpawnPoint.Write( s );
-    if ( IsFlagSet( kHasAmCCR ) )
-        s->WriteLE( fAmCCR );
-    if ( IsFlagSet( kHasParentAgeFilename ) )
-        plMsgStdStringHelper::Poke(fParentAgeFilename,s);
-}
+    s->WriteLE(fFlags);
 
-void plAgeLinkStruct::SetParentAgeFilename( const char * v )
-{
-    if ( v )
-    {
-        SetFlag( kHasParentAgeFilename );
-        fParentAgeFilename=v;
+    if (IsFlagSet(kHasAgeInfo)) {
+        fAgeInfo.Write(s, m);
     }
-    else
-    {
-        ClearFlag( kHasParentAgeFilename );
+
+    if (IsFlagSet(kHasLinkingRules)) {
+        s->WriteLE(fLinkingRules);
+    }
+
+    if (IsFlagSet(kHasSpawnPt)) {
+        fSpawnPoint.Write(s);
+    }
+
+    if (IsFlagSet(kHasAmCCR)) {
+        s->WriteLE(fAmCCR);
+    }
+
+    if (IsFlagSet(kHasParentAgeFilename)) {
+        plMsgStdStringHelper::Poke(fParentAgeFilename, s);
     }
 }
 
-void plAgeLinkStruct::CopyFrom( const plAgeLinkStruct * other )
+void plAgeLinkStruct::SetParentAgeFilename(const char* v)
 {
-    if ( other )
-    {
-        *this=*other;
+    if (v) {
+        SetFlag(kHasParentAgeFilename);
+        fParentAgeFilename = v;
+    } else {
+        ClearFlag(kHasParentAgeFilename);
     }
-    else
-    {
+}
+
+void plAgeLinkStruct::CopyFrom(const plAgeLinkStruct* other)
+{
+    if (other) {
+        *this = *other;
+    } else {
         Clear();
     }
 }
 
-void plAgeLinkStruct::CopyFrom( const plVaultAgeLinkNode * node )
+void plAgeLinkStruct::CopyFrom(const plVaultAgeLinkNode* node)
 {
     // don't clear ourselves, copy age info from node. leave spawn point alone.
-    if ( node )
-    {
+    if (node) {
         hsAssert(false, "eric, port me");
 //      fAgeInfo.CopyFrom( node->GetAgeInfo() );
-    }
-    else
-    {
+    } else {
         Clear();
     }
 }
 
-bool plAgeLinkStruct::IsEqualTo( const plAgeLinkStruct * other ) const
+bool plAgeLinkStruct::IsEqualTo(const plAgeLinkStruct* other) const
 {
     bool match = true;
-    if (match && IsFlagSet(kHasAgeInfo) && other->IsFlagSet(kHasAgeInfo))
-        match = match && fAgeInfo.IsEqualTo( other->GetAgeInfo() );
+
+    if (match && IsFlagSet(kHasAgeInfo) && other->IsFlagSet(kHasAgeInfo)) {
+        match = match && fAgeInfo.IsEqualTo(other->GetAgeInfo());
+    }
+
     // don't compare linking rules.
     // don't compare SpawnPt
     // don't compare AmCCR
@@ -485,40 +509,40 @@ void plAgeLinkStruct::Clear()
 
 plString plAgeLinkStruct::AsString() const
 {
-    const char * spacer = kEmpty;
+    const char* spacer = kEmpty;
 
     plStringStream ss;
 
     ss << "[";
 
-    if (HasAgeInfo())
-    {
+    if (HasAgeInfo()) {
         ss  << spacer
             << "Nfo:"
             << fAgeInfo.AsString();
         spacer = kComma;
     }
-    if (HasLinkingRules())
-    {
+
+    if (HasLinkingRules()) {
         ss  << spacer
             << "Rule:"
-            << plNetCommon::LinkingRules::LinkingRuleStr( GetLinkingRules() );
+            << plNetCommon::LinkingRules::LinkingRuleStr(GetLinkingRules());
         spacer = kComma;
     }
-    if (HasSpawnPt())
-    {
+
+    if (HasSpawnPt()) {
         ss  << spacer
             << "Spwn:"
             << fSpawnPoint.AsString();
         spacer = kComma;
     }
-    if (HasAmCCR())
-    {
+
+    if (HasAmCCR()) {
         ss  << spacer
             << "CCR:"
-            << ( GetAmCCR()?"yes":"no" );
+            << (GetAmCCR() ? "yes" : "no");
         spacer = kComma;
     }
+
     ss  << "]";
 
     return ss.GetString();
@@ -531,20 +555,27 @@ void plNetServerSessionInfo::Read(hsStream* s, hsResMgr*)
 {
     Clear();
     s->LogSubStreamStart("push me");
-    s->LogReadLE(&fFlags,"ServerSessionInfo Flags");
-    if (IsFlagSet(kHasServerName)){
+    s->LogReadLE(&fFlags, "ServerSessionInfo Flags");
+
+    if (IsFlagSet(kHasServerName)) {
         s->LogSubStreamPushDesc("ServerName");
-        plMsgStdStringHelper::Peek(fServerName,s);
+        plMsgStdStringHelper::Peek(fServerName, s);
     }
-    if (IsFlagSet(kHasServerType))
-        s->LogReadLE(&fServerType,"ServerType");
-    if (IsFlagSet(kHasServerAddr)){
+
+    if (IsFlagSet(kHasServerType)) {
+        s->LogReadLE(&fServerType, "ServerType");
+    }
+
+    if (IsFlagSet(kHasServerAddr)) {
         s->LogSubStreamPushDesc("ServerAddr");
-        plMsgStdStringHelper::Peek(fServerAddr,s);
+        plMsgStdStringHelper::Peek(fServerAddr, s);
     }
-    if (IsFlagSet(kHasServerPort))
-        s->LogReadLE(&fServerPort,"ServerPort");
-    if (IsFlagSet(kHasServerGuid)){
+
+    if (IsFlagSet(kHasServerPort)) {
+        s->LogReadLE(&fServerPort, "ServerPort");
+    }
+
+    if (IsFlagSet(kHasServerGuid)) {
         s->LogSubStreamPushDesc("ServerGuid");
         fServerGuid.Read(s);
     }
@@ -553,16 +584,26 @@ void plNetServerSessionInfo::Read(hsStream* s, hsResMgr*)
 void plNetServerSessionInfo::Write(hsStream* s, hsResMgr*)
 {
     s->WriteLE(fFlags);
-    if (IsFlagSet(kHasServerName))
-        plMsgStdStringHelper::Poke(fServerName,s);
-    if (IsFlagSet(kHasServerType))
+
+    if (IsFlagSet(kHasServerName)) {
+        plMsgStdStringHelper::Poke(fServerName, s);
+    }
+
+    if (IsFlagSet(kHasServerType)) {
         s->WriteLE(fServerType);
-    if (IsFlagSet(kHasServerAddr))
-        plMsgStdStringHelper::Poke(fServerAddr,s);
-    if (IsFlagSet(kHasServerPort))
+    }
+
+    if (IsFlagSet(kHasServerAddr)) {
+        plMsgStdStringHelper::Poke(fServerAddr, s);
+    }
+
+    if (IsFlagSet(kHasServerPort)) {
         s->WriteLE(fServerPort);
-    if (IsFlagSet(kHasServerGuid))
+    }
+
+    if (IsFlagSet(kHasServerGuid)) {
         fServerGuid.Write(s);
+    }
 }
 
 // Read and Write already have their own flags, so I'll just leave those for now. -Colin
@@ -586,54 +627,50 @@ void plNetServerSessionInfo::Clear()
     fServerGuid = plUUID();
 }
 
-void plNetServerSessionInfo::CopyFrom(const plNetServerSessionInfo * other)
+void plNetServerSessionInfo::CopyFrom(const plNetServerSessionInfo* other)
 {
-    if ( other )
-    {
+    if (other) {
         fFlags = other->fFlags;
         fServerName = other->fServerName;
         fServerType = other->fServerType;
         fServerAddr = other->fServerAddr;
         fServerPort = other->fServerPort;
         fServerGuid.CopyFrom(other->fServerGuid);
-    }
-    else
-    {
+    } else {
         Clear();
     }
 }
 
 plString plNetServerSessionInfo::AsString() const
 {
-    const char * spacer = kEmpty;
+    const char* spacer = kEmpty;
 
     plStringStream ss;
 
     ss << "[";
 
-    if (HasServerType())
-    {
+    if (HasServerType()) {
         ss  << spacer
             << "T:"
             << plNetServerConstants::GetServerTypeStr(fServerType);
         spacer = kComma;
     }
-    if (HasServerName())
-    {
+
+    if (HasServerName()) {
         ss  << spacer
             << "N:"
             << SAFE(fServerName.c_str());
         spacer = kComma;
     }
-    if (HasServerGuid())
-    {
+
+    if (HasServerGuid()) {
         ss  << spacer
             << "G:"
             << fServerGuid.AsString();
         spacer = kComma;
     }
-    if (HasServerAddr() || HasServerPort())
-    {
+
+    if (HasServerAddr() || HasServerPort()) {
         ss  << spacer
             << "A:["
             << SAFE(fServerAddr.c_str())
@@ -642,6 +679,7 @@ plString plNetServerSessionInfo::AsString() const
             << "]";
         spacer = kComma;
     }
+
     ss  << "]";
 
     return ss.GetString();
@@ -654,34 +692,29 @@ plString plNetServerSessionInfo::AsLogString() const
     plStringStream ss;
     plString typeName;
 
-    if (HasServerType())
-    {
+    if (HasServerType()) {
         typeName = plNetServerConstants::GetServerTypeStr(fServerType);
     }
 
-    if (HasServerName())
-    {
+    if (HasServerName()) {
         ss << typeName << "Name" << "=";
         ss << fServerName.c_str();
         ss << spacer;
     }
 
-    if (HasServerAddr())
-    {
+    if (HasServerAddr()) {
         ss << typeName << "Addr" << "=";
         ss << fServerAddr.c_str();
         ss << spacer;
     }
 
-    if (HasServerPort())
-    {
+    if (HasServerPort()) {
         ss << typeName << "Port" << "=";
         ss << fServerPort;
         ss << spacer;
     }
 
-    if (HasServerGuid())
-    {
+    if (HasServerGuid()) {
         ss << typeName << "Guid" << "=";
         ss << fServerGuid.AsString();
         ss << spacer;
@@ -690,60 +723,62 @@ plString plNetServerSessionInfo::AsLogString() const
     return ss.GetString();
 }
 
-bool plNetServerSessionInfo::IsEqualTo(const plNetServerSessionInfo * other) const
+bool plNetServerSessionInfo::IsEqualTo(const plNetServerSessionInfo* other) const
 {
     bool match = true;
-    if (match && IsFlagSet(kHasServerGuid) && other->IsFlagSet(kHasServerGuid))
+
+    if (match && IsFlagSet(kHasServerGuid) && other->IsFlagSet(kHasServerGuid)) {
         match = match && fServerGuid.IsEqualTo(other->GetServerGuid());
-    if (match && IsFlagSet(kHasServerName) && other->IsFlagSet(kHasServerName))
-        match = match && (stricmp(fServerName.c_str(),other->fServerName.c_str())==0);
-    if (match && IsFlagSet(kHasServerType) && other->IsFlagSet(kHasServerType))
-        match = match && fServerType==other->fServerType;
-    if (match && IsFlagSet(kHasServerAddr) && other->IsFlagSet(kHasServerAddr))
-        match = match && (stricmp(fServerAddr.c_str(),other->fServerAddr.c_str())==0);
-    if (match && IsFlagSet(kHasServerPort) && other->IsFlagSet(kHasServerPort))
-        match = match && fServerPort==other->fServerPort;
+    }
+
+    if (match && IsFlagSet(kHasServerName) && other->IsFlagSet(kHasServerName)) {
+        match = match && (stricmp(fServerName.c_str(), other->fServerName.c_str()) == 0);
+    }
+
+    if (match && IsFlagSet(kHasServerType) && other->IsFlagSet(kHasServerType)) {
+        match = match && fServerType == other->fServerType;
+    }
+
+    if (match && IsFlagSet(kHasServerAddr) && other->IsFlagSet(kHasServerAddr)) {
+        match = match && (stricmp(fServerAddr.c_str(), other->fServerAddr.c_str()) == 0);
+    }
+
+    if (match && IsFlagSet(kHasServerPort) && other->IsFlagSet(kHasServerPort)) {
+        match = match && fServerPort == other->fServerPort;
+    }
+
     return match;
 }
 
 
-void plNetServerSessionInfo::SetServerName(const char * val)
+void plNetServerSessionInfo::SetServerName(const char* val)
 {
-    if (val)
-    {
-        fServerName=val;
+    if (val) {
+        fServerName = val;
         SetFlag(kHasServerName);
-    }
-    else
-    {
-        fServerName="";
+    } else {
+        fServerName = "";
         ClearFlag(kHasServerName);
     }
 }
 
 void plNetServerSessionInfo::SetServerType(uint8_t val)
 {
-    if (val>0)
-    {
-        fServerType=val;
+    if (val > 0) {
+        fServerType = val;
         SetFlag(kHasServerType);
-    }
-    else
-    {
-        fServerType=0;
+    } else {
+        fServerType = 0;
         ClearFlag(kHasServerType);
     }
 }
 
-void plNetServerSessionInfo::SetServerAddr(const char * val)
+void plNetServerSessionInfo::SetServerAddr(const char* val)
 {
-    if (val)
-    {
+    if (val) {
         fServerAddr = val;
         SetFlag(kHasServerAddr);
-    }
-    else
-    {
+    } else {
         fServerAddr = "";
         ClearFlag(kHasServerAddr);
     }
@@ -751,41 +786,32 @@ void plNetServerSessionInfo::SetServerAddr(const char * val)
 
 void plNetServerSessionInfo::SetServerPort(uint16_t val)
 {
-    if (val>0)
-    {
-        fServerPort=val;
+    if (val > 0) {
+        fServerPort = val;
         SetFlag(kHasServerPort);
-    }
-    else
-    {
-        fServerPort=0;
+    } else {
+        fServerPort = 0;
         ClearFlag(kHasServerPort);
     }
 }
 
-void plNetServerSessionInfo::SetServerGuid(const plUUID * val)
+void plNetServerSessionInfo::SetServerGuid(const plUUID* val)
 {
-    if (val && val->IsSet())
-    {
+    if (val && val->IsSet()) {
         fServerGuid.CopyFrom(val);
         SetFlag(kHasServerGuid);
-    }
-    else
-    {
+    } else {
         fServerGuid.Clear();
         ClearFlag(kHasServerGuid);
     }
 }
 
-void plNetServerSessionInfo::CopyServerGuid(const plUUID & val)
+void plNetServerSessionInfo::CopyServerGuid(const plUUID& val)
 {
-    if (val.IsSet())
-    {
+    if (val.IsSet()) {
         fServerGuid.CopyFrom(val);
         SetFlag(kHasServerGuid);
-    }
-    else
-    {
+    } else {
         fServerGuid.Clear();
         ClearFlag(kHasServerGuid);
     }

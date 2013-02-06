@@ -50,8 +50,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 
 class hsStream;
-class plNetResManager : public plResManager
-{
+class plNetResManager : public plResManager {
 public:
     plNetResManager();
     ~plNetResManager();

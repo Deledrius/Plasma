@@ -68,10 +68,10 @@ plFileName plMaxConfig::GetClientPath(bool getNew, bool quiet)
     plFileName plasmaPath = plString::FromWchar(buffer);
 
     // If we didn't find a path, or we want a new one, ask the user for one
-    if ((len == 0 || getNew) && !quiet)
-    {
+    if ((len == 0 || getNew) && !quiet) {
         // If the user selects one, save it
         plasmaPath = plBrowseFolder::GetFolder(plasmaPath, "Specify your client folder");
+
         if (plasmaPath.IsValid())
             WritePrivateProfileStringW(L"SceneViewer", L"Directory", plasmaPath.AsString().ToWchar(),
                                        plugDir.AsString().ToWchar());
@@ -81,7 +81,7 @@ plFileName plMaxConfig::GetClientPath(bool getNew, bool quiet)
     return plasmaPath;
 }
 
-void plMaxConfig::SetClientPath(const plFileName &path)
+void plMaxConfig::SetClientPath(const plFileName& path)
 {
     plFileName plugDir = GetPluginIni();
     WritePrivateProfileStringW(L"SceneViewer", L"Directory", path.AsString().ToWchar(),
@@ -93,8 +93,7 @@ bool plMaxConfig::AssetManInterfaceDisabled()
     static bool inited = false;
     static bool disabled = false;
 
-    if (!inited)
-    {
+    if (!inited) {
         wchar_t configstr[MAX_PATH];
         configstr[0] = '\0';
 
@@ -102,10 +101,11 @@ bool plMaxConfig::AssetManInterfaceDisabled()
         uint32_t len = GetPrivateProfileStringW(L"AssetMan", L"Disable", L"", configstr, MAX_PATH,
                                                 plugDir.AsString().ToWchar());
 
-        if (wcscmp(configstr, L"1") == 0 || wcsicmp(configstr, L"true") == 0)
+        if (wcscmp(configstr, L"1") == 0 || wcsicmp(configstr, L"true") == 0) {
             disabled = true;
-        else
+        } else {
             disabled = false;
+        }
 
         inited = true;
     }

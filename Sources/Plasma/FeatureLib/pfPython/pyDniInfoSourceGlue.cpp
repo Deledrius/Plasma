@@ -78,11 +78,11 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptDniInfoSource, getAgeGuid)
 }
 
 PYTHON_START_METHODS_TABLE(ptDniInfoSource)
-    PYTHON_METHOD_NOARGS(ptDniInfoSource, getAgeCoords, "Current coords of the player in current age as a ptDniCoordinates"),
-    PYTHON_METHOD_NOARGS(ptDniInfoSource, getAgeTime, "Current time in current age (tbd)"),
-    PYTHON_METHOD_NOARGS(ptDniInfoSource, getAgeName, "Name of current age"),
-    PYTHON_METHOD_NOARGS(ptDniInfoSource, getAgeGuid, "Unique identifier for this age instance"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptDniInfoSource, getAgeCoords, "Current coords of the player in current age as a ptDniCoordinates"),
+                     PYTHON_METHOD_NOARGS(ptDniInfoSource, getAgeTime, "Current time in current age (tbd)"),
+                     PYTHON_METHOD_NOARGS(ptDniInfoSource, getAgeName, "Name of current age"),
+                     PYTHON_METHOD_NOARGS(ptDniInfoSource, getAgeGuid, "Unique identifier for this age instance"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptDniInfoSource, "DO NOT USE");
@@ -97,7 +97,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptDniInfoSource, pyDniInfoSource)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyDniInfoSource::AddPlasmaClasses(PyObject *m)
+void pyDniInfoSource::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptDniInfoSource);

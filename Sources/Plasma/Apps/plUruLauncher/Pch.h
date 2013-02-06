@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/Apps/plUruLauncher/Pch.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_APPS_PLURULAUNCHER_PCH_H

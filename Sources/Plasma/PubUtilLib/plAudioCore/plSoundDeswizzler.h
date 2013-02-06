@@ -54,18 +54,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Class Definition ////////////////////////////////////////////////////////
 
-class plSoundDeswizzler
-{
+class plSoundDeswizzler {
 public:
-    plSoundDeswizzler( void *srcPtr, uint32_t srcLength, uint8_t numChannels, uint32_t sampleSize );
-    plSoundDeswizzler( uint32_t srcLength, uint8_t numChannels, uint32_t sampleSize );
+    plSoundDeswizzler(void* srcPtr, uint32_t srcLength, uint8_t numChannels, uint32_t sampleSize);
+    plSoundDeswizzler(uint32_t srcLength, uint8_t numChannels, uint32_t sampleSize);
     ~plSoundDeswizzler();
 
-    void    *GetSourceBuffer( void ) const { return fData; }
-    void    Extract( uint8_t channelSelect, void *destPtr, uint32_t numBytesToProcess = 0 );
+    void*    GetSourceBuffer(void) const {
+        return fData;
+    }
+    void    Extract(uint8_t channelSelect, void* destPtr, uint32_t numBytesToProcess = 0);
 
 protected:
-    uint8_t   *fData;
+    uint8_t*   fData;
     uint32_t  fNumSamples, fSampleSize, fStride;
     bool    fOwnsData;
 };

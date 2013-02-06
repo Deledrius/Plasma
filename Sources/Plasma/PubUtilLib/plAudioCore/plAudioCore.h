@@ -51,32 +51,28 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //// plWAVHeader Class ///////////////////////////////////////////////////////
 //  Just a small info class about WAV sound
 
-class plWAVHeader
-{
-    public:
-        uint16_t  fFormatTag;
-        uint16_t  fNumChannels;
-        uint32_t  fNumSamplesPerSec;
-        uint32_t  fAvgBytesPerSec;
-        uint16_t  fBlockAlign;
-        uint16_t  fBitsPerSample;
+class plWAVHeader {
+public:
+    uint16_t  fFormatTag;
+    uint16_t  fNumChannels;
+    uint32_t  fNumSamplesPerSec;
+    uint32_t  fAvgBytesPerSec;
+    uint16_t  fBlockAlign;
+    uint16_t  fBitsPerSample;
 
-        enum
-        {
-            kPCMFormatTag = 1
-        };
+    enum {
+        kPCMFormatTag = 1
+    };
 };
 
 //// plAudioCore Konstants ///////////////////////////////////////////////////
 
-namespace plAudioCore
-{
-    enum ChannelSelect
-    {
-        kAll = 0,
-        kLeft,
-        kRight
-    };
+namespace plAudioCore {
+enum ChannelSelect {
+    kAll = 0,
+    kLeft,
+    kRight
+};
 
 };
 

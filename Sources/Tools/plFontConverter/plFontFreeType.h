@@ -49,20 +49,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plGImage/plFont.h"
 
-class plFontFreeType : public plFont
-{
-    public:
+class plFontFreeType : public plFont {
+public:
 
-        struct Options
-        {
-            uint8_t   fSize;
-            bool    fUseKerning;
-            uint8_t   fBitDepth;
-            uint32_t  fScreenRes;
-            uint32_t  fMaxCharLimit;
+    struct Options {
+        uint8_t   fSize;
+        bool    fUseKerning;
+        uint8_t   fBitDepth;
+        uint32_t  fScreenRes;
+        uint32_t  fMaxCharLimit;
 
-            Options() { fSize = 12; fUseKerning = false; fBitDepth = 1; fScreenRes = 96; fMaxCharLimit = 255; }
-        };
+        Options() {
+            fSize = 12;
+            fUseKerning = false;
+            fBitDepth = 1;
+            fScreenRes = 96;
+            fMaxCharLimit = 255;
+        }
+    };
 
-        bool    ImportFreeType( const char *fontPath, Options *options, plBDFConvertCallback *callback );
+    bool    ImportFreeType(const char* fontPath, Options* options, plBDFConvertCallback* callback);
 };

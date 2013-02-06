@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plAvatarFootMsg;
 
-class plDynaFootMgr : public plDynaDecalMgr
-{
+class plDynaFootMgr : public plDynaDecalMgr {
 protected:
     virtual bool        IPrintFromShape(const plPrintShape* shape, bool flip);
 
@@ -57,8 +56,8 @@ public:
     plDynaFootMgr();
     virtual ~plDynaFootMgr();
 
-    CLASSNAME_REGISTER( plDynaFootMgr );
-    GETINTERFACE_ANY( plDynaFootMgr, plDynaDecalMgr );
+    CLASSNAME_REGISTER(plDynaFootMgr);
+    GETINTERFACE_ANY(plDynaFootMgr, plDynaDecalMgr);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);

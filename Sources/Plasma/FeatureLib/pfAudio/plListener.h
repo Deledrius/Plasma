@@ -48,35 +48,44 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plSceneObject;
 class plVirtualCam1;
 
-class plListener : public plSingleModifier
-{
+class plListener : public plSingleModifier {
 public:
 
-    plListener() :  fVCam(nil), fInitMe(true){;}
-    ~plListener(){;}
+    plListener() :  fVCam(nil), fInitMe(true) {
+        ;
+    }
+    ~plListener() {
+        ;
+    }
 
-    CLASSNAME_REGISTER( plListener );
-    GETINTERFACE_ANY( plListener, plSingleModifier );
+    CLASSNAME_REGISTER(plListener);
+    GETINTERFACE_ANY(plListener, plSingleModifier);
 
     virtual bool MsgReceive(plMessage* msg);
 
-    static void ShowDebugInfo( bool s ) { fPrintDbgInfo = s; }
+    static void ShowDebugInfo(bool s) {
+        fPrintDbgInfo = s;
+    }
 
     // Get info for which object these things are attached to - camera or refObject
-    uint8_t GetAttachedPosType() { return (uint8_t)fPosRatio; }
-    uint8_t GetAttachedFacingType() { return (uint8_t)fFacingRatio; }
-    uint8_t GetAttachedVelType() { return (uint8_t)fVelRatio; }
-    
-    enum 
-    {
+    uint8_t GetAttachedPosType() {
+        return (uint8_t)fPosRatio;
+    }
+    uint8_t GetAttachedFacingType() {
+        return (uint8_t)fFacingRatio;
+    }
+    uint8_t GetAttachedVelType() {
+        return (uint8_t)fVelRatio;
+    }
+
+    enum {
         kCamera = 0,
         kAvatar = 1
     };
 
 protected:
-    
-    enum Refs
-    {
+
+    enum Refs {
         kRefObject,
         kRefVCam
     };
@@ -89,10 +98,10 @@ protected:
     static bool         fPrintDbgInfo;
 
     virtual bool    IEval(double secs, float del, uint32_t dirty);
-    void            ISetRef( const plKey &ref, bool binding, int type );
-    void            ICheckAudio( void ) const;
+    void            ISetRef(const plKey& ref, bool binding, int type);
+    void            ICheckAudio(void) const;
 
-    void            IEnsureVCamValid( void );
+    void            IEnsureVCamValid(void);
 };
 
 #endif //plWin32Sound_h

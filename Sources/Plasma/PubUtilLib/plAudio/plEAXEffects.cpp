@@ -88,7 +88,7 @@ static EAXSet           s_EAXSet;
 
 //// GetInstance /////////////////////////////////////////////////////////////
 
-plEAXListener   &plEAXListener::GetInstance( void )
+plEAXListener&   plEAXListener::GetInstance(void)
 {
     static plEAXListener    instance;
     return instance;
@@ -109,53 +109,49 @@ plEAXListener::~plEAXListener()
 
 //// Init ////////////////////////////////////////////////////////////////////
 
-bool    plEAXListener::Init( void )
+bool    plEAXListener::Init(void)
 {
 #ifdef EAX_SDK_AVAILABLE
-    if( fInited )
-        return true;
 
-    if(!alIsExtensionPresent((ALchar *)"EAX4.0"))       // is eax 4 supported
-    {
-        if(!alIsExtensionPresent((ALchar *) "EAX4.0Emulated"))      // is an earlier version of eax supported
-        {
+    if (fInited) {
+        return true;
+    }
+
+    if (!alIsExtensionPresent((ALchar*)"EAX4.0")) {     // is eax 4 supported
+        if (!alIsExtensionPresent((ALchar*) "EAX4.0Emulated")) {    // is an earlier version of eax supported
             plStatusLog::AddLineS("audio.log", "EAX not supported");
             return false;
-        }
-        else
-        {
+        } else {
             plStatusLog::AddLineS("audio.log", "EAX 4 Emulated supported");
         }
-    }
-    else
-    {
+    } else {
         plStatusLog::AddLineS("audio.log", "EAX 4 available");
     }
-    
-    // EAX is supported 
-    s_EAXGet = (EAXGet)alGetProcAddress((ALchar *)"EAXGet");
-    s_EAXSet = (EAXSet)alGetProcAddress((ALchar *)"EAXSet");
-    if(!s_EAXGet || ! s_EAXSet)
-    {
-        IFail( "EAX initialization failed", true );
+
+    // EAX is supported
+    s_EAXGet = (EAXGet)alGetProcAddress((ALchar*)"EAXGet");
+    s_EAXSet = (EAXSet)alGetProcAddress((ALchar*)"EAXSet");
+
+    if (!s_EAXGet || ! s_EAXSet) {
+        IFail("EAX initialization failed", true);
         return false;
     }
+
     fInited = true;
 
 #if 1
-    try
-    {
+
+    try {
         // Make an EAX call here to prevent problems on WDM driver
         unsigned int lRoom = -10000;
 
-        SetGlobalEAXProperty(DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOM, &lRoom, sizeof( unsigned int ));
-    }
-    catch ( ... )
-    {
+        SetGlobalEAXProperty(DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOM, &lRoom, sizeof(unsigned int));
+    } catch (...) {
         plStatusLog::AddLineS("audio.log", "Unable to set EAX Property Set, disabling EAX...");
         plgAudioSys::EnableEAX(false);
         return false;
     }
+
 #endif
 
     ClearProcessCache();
@@ -169,10 +165,11 @@ bool    plEAXListener::Init( void )
 
 //// Shutdown ////////////////////////////////////////////////////////////////
 
-void    plEAXListener::Shutdown( void )
+void    plEAXListener::Shutdown(void)
 {
-    if( !fInited )
+    if (!fInited) {
         return;
+    }
 
 #ifdef EAX_SDK_AVAILABLE
     s_EAXSet = nil;
@@ -182,29 +179,29 @@ void    plEAXListener::Shutdown( void )
 }
 
 
-bool plEAXListener::SetGlobalEAXProperty(GUID guid, unsigned long ulProperty, void *pData, unsigned long ulDataSize )
+bool plEAXListener::SetGlobalEAXProperty(GUID guid, unsigned long ulProperty, void* pData, unsigned long ulDataSize)
 {
-    if(fInited)
-    {
+    if (fInited) {
 #ifdef EAX_SDK_AVAILABLE
         return s_EAXSet(&guid, ulProperty, 0, pData, ulDataSize) == AL_NO_ERROR;
 #endif
     }
+
     return false;
 }
 
-bool plEAXListener::GetGlobalEAXProperty(GUID guid, unsigned long ulProperty, void *pData, unsigned long ulDataSize)
+bool plEAXListener::GetGlobalEAXProperty(GUID guid, unsigned long ulProperty, void* pData, unsigned long ulDataSize)
 {
-    if(fInited)
-    {
+    if (fInited) {
 #ifdef EAX_SDK_AVAILABLE
         return s_EAXGet(&guid, ulProperty, 0, pData, ulDataSize) == AL_NO_ERROR;
 #endif
     }
+
     return false;
 }
 
-bool plEAXSource::SetSourceEAXProperty(unsigned source, GUID guid, unsigned long ulProperty, void *pData, unsigned long ulDataSize)
+bool plEAXSource::SetSourceEAXProperty(unsigned source, GUID guid, unsigned long ulProperty, void* pData, unsigned long ulDataSize)
 {
 #ifdef EAX_SDK_AVAILABLE
     return s_EAXSet(&guid, ulProperty, source, pData, ulDataSize) == AL_NO_ERROR;
@@ -213,7 +210,7 @@ bool plEAXSource::SetSourceEAXProperty(unsigned source, GUID guid, unsigned long
 #endif
 }
 
-bool plEAXSource::GetSourceEAXProperty(unsigned source, GUID guid, unsigned long ulProperty, void *pData, unsigned long ulDataSize)
+bool plEAXSource::GetSourceEAXProperty(unsigned source, GUID guid, unsigned long ulProperty, void* pData, unsigned long ulDataSize)
 {
 #ifdef EAX_SDK_AVAILABLE
     return s_EAXGet(&guid, ulProperty, source, pData, ulDataSize) == AL_NO_ERROR;
@@ -225,36 +222,38 @@ bool plEAXSource::GetSourceEAXProperty(unsigned source, GUID guid, unsigned long
 
 //// IRelease ////////////////////////////////////////////////////////////////
 
-void    plEAXListener::IRelease( void )
+void    plEAXListener::IRelease(void)
 {
     fInited = false;
 }
 
 //// IFail ///////////////////////////////////////////////////////////////////
 
-void    plEAXListener::IFail(  bool major )
+void    plEAXListener::IFail(bool major)
 {
-    plStatusLog::AddLineS( "audio.log", plStatusLog::kRed,
-                            "ERROR in plEAXListener: Could not set global eax params");
+    plStatusLog::AddLineS("audio.log", plStatusLog::kRed,
+                          "ERROR in plEAXListener: Could not set global eax params");
 
-    if( major )
+    if (major) {
         IRelease();
+    }
 }
 
-void    plEAXListener::IFail( const char *msg, bool major )
+void    plEAXListener::IFail(const char* msg, bool major)
 {
-    plStatusLog::AddLineS( "audio.log", plStatusLog::kRed,
-                            "ERROR in plEAXListener: %s", msg );
+    plStatusLog::AddLineS("audio.log", plStatusLog::kRed,
+                          "ERROR in plEAXListener: %s", msg);
 
-    if( major )
+    if (major) {
         IRelease();
+    }
 }
 
 //// IMuteProperties /////////////////////////////////////////////////////////
 //  Mutes the given properties, so if you have some props that you want
 //  half strength, this function will do it for ya.
 
-void    plEAXListener::IMuteProperties( EAXREVERBPROPERTIES *props, float percent )
+void    plEAXListener::IMuteProperties(EAXREVERBPROPERTIES* props, float percent)
 {
     // We only mute the room, roomHF and roomLF, since those control the overall effect
     // application. All three are a direct linear blend as defined by eax-util.cpp, so
@@ -264,7 +263,7 @@ void    plEAXListener::IMuteProperties( EAXREVERBPROPERTIES *props, float percen
 
     // The old way, as dictated by EAX sample code...
 #ifdef EAX_SDK_AVAILABLE
-    props->lRoom   = (int)( ( (float)EAXLISTENER_MINROOM   * invPercent ) + ( (float)props->lRoom   * percent ) );
+    props->lRoom   = (int)(((float)EAXLISTENER_MINROOM   * invPercent) + ((float)props->lRoom   * percent));
 #endif
     // The new way, as suggested by EAX guys...
 //  props->lRoom = (int)( 2000.f * log( invPercent ) ) + props->lRoom;
@@ -277,7 +276,7 @@ void    plEAXListener::IMuteProperties( EAXREVERBPROPERTIES *props, float percen
 //  Clears the cache settings used to speed up ProcessMods(). Call whenever
 //  the list of mods changed.
 
-void    plEAXListener::ClearProcessCache( void )
+void    plEAXListener::ClearProcessCache(void)
 {
     fLastBigRegion = nil;
     fLastModCount = -1;
@@ -290,156 +289,154 @@ void    plEAXListener::ClearProcessCache( void )
 //  to a region iff it's the only region from the last pass that had a
 //  strength > 0. The reason we can't do our trick before is because even if
 //  we have a region w/ strength 1, another region might power up from 1 and
-//  thus suddenly alter the total reverb settings. Thus, the only time we 
+//  thus suddenly alter the total reverb settings. Thus, the only time we
 //  can wisely skip is if our current big region == fLastBigRegion *and*
 //  the total strength is the same.
 
-void    plEAXListener::ProcessMods( hsTArray<plEAXListenerMod *> &modArray )
+void    plEAXListener::ProcessMods(hsTArray<plEAXListenerMod*>& modArray)
 {
 #ifdef EAX_SDK_AVAILABLE
     int     i;
     float   totalStrength;
     bool    firstOne;
 
-    plEAXListenerMod        *thisBigRegion = nil;
+    plEAXListenerMod*        thisBigRegion = nil;
     EAXLISTENERPROPERTIES   finalProps;
     static int oldTime = timeGetTime();     // Get starting time
     int newTime;
     bool bMorphing = false;
 
-    static plStatusLog  *myLog = nil;
+    static plStatusLog*  myLog = nil;
 
-    if( myLog == nil && plgAudioSys::AreExtendedLogsEnabled() )
-        myLog = plStatusLogMgr::GetInstance().CreateStatusLog( 30, "EAX Reverbs", plStatusLog::kFilledBackground | plStatusLog::kDeleteForMe | plStatusLog::kDontWriteFile );
-    else if( myLog != nil && !plgAudioSys::AreExtendedLogsEnabled() )
-    {
+    if (myLog == nil && plgAudioSys::AreExtendedLogsEnabled()) {
+        myLog = plStatusLogMgr::GetInstance().CreateStatusLog(30, "EAX Reverbs", plStatusLog::kFilledBackground | plStatusLog::kDeleteForMe | plStatusLog::kDontWriteFile);
+    } else if (myLog != nil && !plgAudioSys::AreExtendedLogsEnabled()) {
         delete myLog;
         myLog = nil;
     }
 
-    if( myLog != nil )
+    if (myLog != nil) {
         myLog->Clear();
+    }
 
-    if( modArray.GetCount() != fLastModCount )
-    {
-        kDebugLog "Clearing cache..." );
+    if (modArray.GetCount() != fLastModCount) {
+        kDebugLog "Clearing cache...");
         ClearProcessCache();    // Code path changed, clear the entire cache
         fLastModCount = modArray.GetCount();
-    }
-    else
-    {
-        kDebugLog "" );
+    } else {
+        kDebugLog "");
     }
 
-    if( modArray.GetCount() > 0 )
-    {
-        kDebugLog "%d regions to calc", modArray.GetCount() );
+    if (modArray.GetCount() > 0) {
+        kDebugLog "%d regions to calc", modArray.GetCount());
 
         // Reset and find a new one if applicable
         thisBigRegion = nil;
 
-        // Accumulate settings from all the active listener regions (shouldn't be too many, we hope)
-        totalStrength = 0.f;
-        firstOne = true;
-        for( i = 0; i < modArray.GetCount(); i++ )
-        {
-            float strength = modArray[ i ]->GetStrength();
-            kDebugLog "%4.2f - %s", strength, modArray[ i ]->GetKey()->GetUoid().GetObjectName() );
-            if( strength > 0.f )
-            {
-                // fLastBigRegion will point to a region iff it's the only region w/ strength > 0
-                if( totalStrength == 0.f )
-                    thisBigRegion = modArray[ i ];
-                else
-                    thisBigRegion = nil;
+                        // Accumulate settings from all the active listener regions (shouldn't be too many, we hope)
+                        totalStrength = 0.f;
+                                        firstOne = true;
 
-                if( firstOne )
-                {
+                                                for (i = 0;
+
+                                            i < modArray.GetCount();
+        i++) {
+            float strength = modArray[ i ]->GetStrength();
+            kDebugLog "%4.2f - %s", strength, modArray[ i ]->GetKey()->GetUoid().GetObjectName());
+
+            if (strength > 0.f) {
+            // fLastBigRegion will point to a region iff it's the only region w/ strength > 0
+            if (totalStrength == 0.f) {
+                    thisBigRegion = modArray[ i ];
+                } else {
+                    thisBigRegion = nil;
+                }
+
+                if (firstOne) {
                     // First one, just init to it
-                    memcpy( &finalProps, modArray[ i ]->GetListenerProps(), sizeof( finalProps ) );
+                    memcpy(&finalProps, modArray[ i ]->GetListenerProps(), sizeof(finalProps));
                     totalStrength = strength;
                     firstOne = false;
-                }
-                else
-                {
-                    float scale = strength / ( totalStrength + strength );
-                    EAX3ListenerInterpolate( &finalProps, modArray[ i ]->GetListenerProps(), scale, &finalProps, false );
+                } else {
+                    float scale = strength / (totalStrength + strength);
+                    EAX3ListenerInterpolate(&finalProps, modArray[ i ]->GetListenerProps(), scale, &finalProps, false);
                     totalStrength += strength;
                     bMorphing = true;
                 }
-                
-                if( totalStrength >= 1.f )
+
+                if (totalStrength >= 1.f) {
                     break;
+                }
             }
         }
 
-        if( firstOne )
-        {
-            // No regions of strength > 0, so just make it quiet
-            kDebugLog "Reverb should be quiet" );
-            if( fLastWasEmpty )
-                return;
+        if (firstOne) {
+        // No regions of strength > 0, so just make it quiet
+        kDebugLog "Reverb should be quiet");
 
-            memcpy( &finalProps, &EAX30_ORIGINAL_PRESETS[ ORIGINAL_GENERIC ], sizeof( EAXLISTENERPROPERTIES ) );
-            finalProps.lRoom = EAXLISTENER_MINROOM;
-//          finalProps.lRoomLF = EAXLISTENER_MINROOMLF;
-//          finalProps.lRoomHF = EAXLISTENER_MINROOMHF;
-            fLastWasEmpty = true;
-            fLastBigRegion = nil;
-            fLastSingleStrength = -1.f;
-        }
-        else 
-        {
-            fLastWasEmpty = false;
-
-            if( thisBigRegion == fLastBigRegion && totalStrength == fLastSingleStrength )
-                // Cached values should be the same, so we can bail at this point
-                return;
-
-            fLastBigRegion = thisBigRegion;
-            fLastSingleStrength = ( thisBigRegion != nil ) ? totalStrength : -1.f;
-
-            if( totalStrength < 1.f )
-            {
-                kDebugLog "Total strength < 1; muting result" );
-                // All of them together is less than full strength, so mute our result
-                IMuteProperties( &finalProps, totalStrength );
-            }
-        }
-    }
-    else
-    {
-        kDebugLog "No regions at all; disabling reverb" );
-        // No regions whatsoever, so disable listener props entirely
-        if( fLastWasEmpty )
+        if (fLastWasEmpty)
             return;
 
-        memcpy( &finalProps, &EAX30_ORIGINAL_PRESETS[ ORIGINAL_GENERIC ], sizeof( EAXLISTENERPROPERTIES ) );
-        finalProps.lRoom = EAXLISTENER_MINROOM;
+                  memcpy(&finalProps, &EAX30_ORIGINAL_PRESETS[ ORIGINAL_GENERIC ] { , sizeof(EAXLISTENERPROPERTIES)); }
+                  finalProps.lRoom = EAXLISTENER_MINROOM;
+//          finalProps.lRoomLF = EAXLISTENER_MINROOMLF;
+//          finalProps.lRoomHF = EAXLISTENER_MINROOMHF;
+                                     fLastWasEmpty = true;
+                                             fLastBigRegion = nil;
+                                                     fLastSingleStrength = -1.f;
+        } else {
+            fLastWasEmpty = false;
+
+            if (thisBigRegion == fLastBigRegion && totalStrength == fLastSingleStrength)
+                // Cached values should be the same, so we can bail at this point
+            {
+                return;
+            }
+
+            fLastBigRegion = thisBigRegion;
+            fLastSingleStrength = (thisBigRegion != nil) ? totalStrength : -1.f;
+
+            if (totalStrength < 1.f) {
+                kDebugLog "Total strength < 1; muting result");
+                // All of them together is less than full strength, so mute our result
+                IMuteProperties(&finalProps, totalStrength);
+            }
+        }
+    } else {
+        kDebugLog "No regions at all; disabling reverb");
+
+        // No regions whatsoever, so disable listener props entirely
+        if (fLastWasEmpty)
+        return;
+
+              memcpy(&finalProps, &EAX30_ORIGINAL_PRESETS[ ORIGINAL_GENERIC ] { , sizeof(EAXLISTENERPROPERTIES)); }
+              finalProps.lRoom = EAXLISTENER_MINROOM;
 //      finalProps.lRoomLF = EAXLISTENER_MINROOMLF;
 //      finalProps.lRoomHF = EAXLISTENER_MINROOMHF;
-        fLastWasEmpty = true;
+                                 fLastWasEmpty = true;
     }
 
-    // if were morphing between regions, do 10th of a second check, otherwise just let it 
-    // change due to opt out(caching) feature.
-    if(bMorphing)
-    {
+                                     // if were morphing between regions, do 10th of a second check, otherwise just let it
+                                     // change due to opt out(caching) feature.
+    if (bMorphing) {
         newTime = timeGetTime();
 
         // Update, at most, ten times per second
-        if((newTime - oldTime) < 100) return;
-            
+        if ((newTime - oldTime) < 100) {
+            return;
+        }
+
         oldTime = newTime;      // update time
     }
+
 //finalProps.flAirAbsorptionHF *= 0.3048f; // Convert to feet
     //kDebugLog "** Updating property set **" );
 
 
-    if(!SetGlobalEAXProperty(DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ALLPARAMETERS, &finalProps, sizeof( finalProps )))
-    {
-        IFail(  false );
+    if (!SetGlobalEAXProperty(DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ALLPARAMETERS, &finalProps, sizeof(finalProps))) {
+        IFail(false);
     }
+
 #endif /* EAX_SDK_AVAILABLE */
 }
 
@@ -453,7 +450,7 @@ void    plEAXListener::ProcessMods( hsTArray<plEAXListenerMod *> &modArray )
 plEAXSourceSettings::plEAXSourceSettings()
 {
     fDirtyParams = kAll;
-    Enable( false );
+    Enable(false);
 }
 
 plEAXSourceSettings::~plEAXSourceSettings()
@@ -462,60 +459,60 @@ plEAXSourceSettings::~plEAXSourceSettings()
 
 //// Read/Write/Set //////////////////////////////////////////////////////////
 
-void    plEAXSourceSettings::Read( hsStream *s )
+void    plEAXSourceSettings::Read(hsStream* s)
 {
     fEnabled = s->ReadBool();
-    if( fEnabled )
-    {
+
+    if (fEnabled) {
         fRoom = s->ReadLE16();
         fRoomHF = s->ReadLE16();
         fRoomAuto = s->ReadBool();
         fRoomHFAuto = s->ReadBool();
 
         fOutsideVolHF = s->ReadLE16();
-        
+
         fAirAbsorptionFactor = s->ReadLEFloat();
         fRoomRolloffFactor = s->ReadLEFloat();
         fDopplerFactor = s->ReadLEFloat();
         fRolloffFactor = s->ReadLEFloat();
 
-        fSoftStarts.Read( s );
-        fSoftEnds.Read( s );
+        fSoftStarts.Read(s);
+        fSoftEnds.Read(s);
 
         fOcclusionSoftValue = -1.f;
-        SetOcclusionSoftValue( s->ReadLEFloat() );
+        SetOcclusionSoftValue(s->ReadLEFloat());
 
         fDirtyParams = kAll;
+    } else {
+        Enable(false);    // Force init of params
     }
-    else
-        Enable( false );    // Force init of params
 }
 
-void    plEAXSourceSettings::Write( hsStream *s )
+void    plEAXSourceSettings::Write(hsStream* s)
 {
-    s->WriteBool( fEnabled );
-    if( fEnabled )
-    {
-        s->WriteLE16( fRoom );
-        s->WriteLE16( fRoomHF );
-        s->WriteBool( fRoomAuto );
-        s->WriteBool( fRoomHFAuto );
+    s->WriteBool(fEnabled);
 
-        s->WriteLE16( fOutsideVolHF );
-        
-        s->WriteLEFloat( fAirAbsorptionFactor );
-        s->WriteLEFloat( fRoomRolloffFactor );
-        s->WriteLEFloat( fDopplerFactor );
-        s->WriteLEFloat( fRolloffFactor );
+    if (fEnabled) {
+        s->WriteLE16(fRoom);
+        s->WriteLE16(fRoomHF);
+        s->WriteBool(fRoomAuto);
+        s->WriteBool(fRoomHFAuto);
 
-        fSoftStarts.Write( s );
-        fSoftEnds.Write( s );
+        s->WriteLE16(fOutsideVolHF);
 
-        s->WriteLEFloat( fOcclusionSoftValue );
+        s->WriteLEFloat(fAirAbsorptionFactor);
+        s->WriteLEFloat(fRoomRolloffFactor);
+        s->WriteLEFloat(fDopplerFactor);
+        s->WriteLEFloat(fRolloffFactor);
+
+        fSoftStarts.Write(s);
+        fSoftEnds.Write(s);
+
+        s->WriteLEFloat(fOcclusionSoftValue);
     }
 }
 
-void    plEAXSourceSettings::SetRoomParams( int16_t room, int16_t roomHF, bool roomAuto, bool roomHFAuto )
+void    plEAXSourceSettings::SetRoomParams(int16_t room, int16_t roomHF, bool roomAuto, bool roomHFAuto)
 {
     fRoom = room;
     fRoomHF = roomHF;
@@ -524,11 +521,11 @@ void    plEAXSourceSettings::SetRoomParams( int16_t room, int16_t roomHF, bool r
     fDirtyParams |= kRoom;
 }
 
-void    plEAXSourceSettings::Enable( bool e )
+void    plEAXSourceSettings::Enable(bool e)
 {
     fEnabled = e;
-    if( !e )
-    {
+
+    if (!e) {
 #ifdef EAX_SDK_AVAILABLE
         fRoom = EAXBUFFER_MINROOM;
         fRoomHF = EAXBUFFER_MINROOMHF;
@@ -554,13 +551,13 @@ void    plEAXSourceSettings::Enable( bool e )
     }
 }
 
-void    plEAXSourceSettings::SetOutsideVolHF( int16_t vol )
+void    plEAXSourceSettings::SetOutsideVolHF(int16_t vol)
 {
     fOutsideVolHF = vol;
     fDirtyParams |= kOutsideVolHF;
 }
 
-void    plEAXSourceSettings::SetFactors( float airAbsorption, float roomRolloff, float doppler, float rolloff )
+void    plEAXSourceSettings::SetFactors(float airAbsorption, float roomRolloff, float doppler, float rolloff)
 {
     fAirAbsorptionFactor = airAbsorption;
     fRoomRolloffFactor = roomRolloff;
@@ -569,31 +566,29 @@ void    plEAXSourceSettings::SetFactors( float airAbsorption, float roomRolloff,
     fDirtyParams |= kFactors;
 }
 
-void    plEAXSourceSettings::SetOcclusionSoftValue( float value )
+void    plEAXSourceSettings::SetOcclusionSoftValue(float value)
 {
-    if( fOcclusionSoftValue != value )
-    {
+    if (fOcclusionSoftValue != value) {
         fOcclusionSoftValue = value;
-        IRecalcSofts( kOcclusion );
+        IRecalcSofts(kOcclusion);
         fDirtyParams |= kOcclusion;
     }
 }
 
-void    plEAXSourceSettings::IRecalcSofts( uint8_t whichOnes )
+void    plEAXSourceSettings::IRecalcSofts(uint8_t whichOnes)
 {
     float    percent, invPercent;
 
-    if( whichOnes & kOcclusion )
-    {
+    if (whichOnes & kOcclusion) {
         percent = fOcclusionSoftValue;
         invPercent = 1.f - percent;
 
-        int16_t       occ = (int16_t)( ( (float)fSoftStarts.GetOcclusion() * invPercent ) + ( (float)fSoftEnds.GetOcclusion() * percent ) );
-        float    lfRatio = (float)( ( fSoftStarts.GetOcclusionLFRatio() * invPercent ) + ( fSoftEnds.GetOcclusionLFRatio() * percent ) );
-        float    roomRatio = (float)( ( fSoftStarts.GetOcclusionRoomRatio() * invPercent ) + ( fSoftEnds.GetOcclusionRoomRatio() * percent ) );
-        float    directRatio = (float)( ( fSoftStarts.GetOcclusionDirectRatio() * invPercent ) + ( fSoftEnds.GetOcclusionDirectRatio() * percent ) );
+        int16_t       occ = (int16_t)(((float)fSoftStarts.GetOcclusion() * invPercent) + ((float)fSoftEnds.GetOcclusion() * percent));
+        float    lfRatio = (float)((fSoftStarts.GetOcclusionLFRatio() * invPercent) + (fSoftEnds.GetOcclusionLFRatio() * percent));
+        float    roomRatio = (float)((fSoftStarts.GetOcclusionRoomRatio() * invPercent) + (fSoftEnds.GetOcclusionRoomRatio() * percent));
+        float    directRatio = (float)((fSoftStarts.GetOcclusionDirectRatio() * invPercent) + (fSoftEnds.GetOcclusionDirectRatio() * percent));
 
-        fCurrSoftValues.SetOcclusion( occ, lfRatio, roomRatio, directRatio );
+        fCurrSoftValues.SetOcclusion(occ, lfRatio, roomRatio, directRatio);
     }
 }
 
@@ -602,7 +597,7 @@ void    plEAXSourceSettings::IRecalcSofts( uint8_t whichOnes )
 //// Source Soft Settings ////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-void    plEAXSourceSoftSettings::Reset( void )
+void    plEAXSourceSoftSettings::Reset(void)
 {
     fOcclusion = 0;
     fOcclusionLFRatio = 0.25f;
@@ -610,23 +605,23 @@ void    plEAXSourceSoftSettings::Reset( void )
     fOcclusionDirectRatio = 1.f;
 }
 
-void    plEAXSourceSoftSettings::Read( hsStream *s )
+void    plEAXSourceSoftSettings::Read(hsStream* s)
 {
-    s->ReadLE( &fOcclusion );
-    s->ReadLE( &fOcclusionLFRatio );
-    s->ReadLE( &fOcclusionRoomRatio );
-    s->ReadLE( &fOcclusionDirectRatio );
+    s->ReadLE(&fOcclusion);
+    s->ReadLE(&fOcclusionLFRatio);
+    s->ReadLE(&fOcclusionRoomRatio);
+    s->ReadLE(&fOcclusionDirectRatio);
 }
 
-void    plEAXSourceSoftSettings::Write( hsStream *s )
+void    plEAXSourceSoftSettings::Write(hsStream* s)
 {
-    s->WriteLE( fOcclusion );
-    s->WriteLE( fOcclusionLFRatio );
-    s->WriteLE( fOcclusionRoomRatio );
-    s->WriteLE( fOcclusionDirectRatio );
+    s->WriteLE(fOcclusion);
+    s->WriteLE(fOcclusionLFRatio);
+    s->WriteLE(fOcclusionRoomRatio);
+    s->WriteLE(fOcclusionDirectRatio);
 }
 
-void    plEAXSourceSoftSettings::SetOcclusion( int16_t occ, float lfRatio, float roomRatio, float directRatio )
+void    plEAXSourceSoftSettings::SetOcclusion(int16_t occ, float lfRatio, float roomRatio, float directRatio)
 {
     fOcclusion = occ;
     fOcclusionLFRatio = lfRatio;
@@ -637,9 +632,9 @@ void    plEAXSourceSoftSettings::SetOcclusion( int16_t occ, float lfRatio, float
 //// Constructor/Destructor //////////////////////////////////////////////////
 
 plEAXSource::plEAXSource()
-{   
+{
     fInit = false;
-    
+
 }
 
 plEAXSource::~plEAXSource()
@@ -649,65 +644,66 @@ plEAXSource::~plEAXSource()
 
 //// Init/Release ////////////////////////////////////////////////////////////
 
-void    plEAXSource::Init( plDSoundBuffer *parent )
+void    plEAXSource::Init(plDSoundBuffer* parent)
 {
     fInit = true;
     // Init some default params
     plEAXSourceSettings defaultParams;
-    SetFrom( &defaultParams, parent->GetSource() );
+    SetFrom(&defaultParams, parent->GetSource());
 }
 
-void    plEAXSource::Release( void )
+void    plEAXSource::Release(void)
 {
     fInit = false;
 }
 
-bool    plEAXSource::IsValid( void ) const
+bool    plEAXSource::IsValid(void) const
 {
     return true;
 }
 
 //// SetFrom /////////////////////////////////////////////////////////////////
 
-void    plEAXSource::SetFrom( plEAXSourceSettings *settings, unsigned source, bool force )
+void    plEAXSource::SetFrom(plEAXSourceSettings* settings, unsigned source, bool force)
 {
     uint32_t dirtyParams;
-    if(source == 0 || !fInit) 
-        return;
 
-    if( force )
+    if (source == 0 || !fInit) {
+        return;
+    }
+
+    if (force) {
         dirtyParams = plEAXSourceSettings::kAll;
-    else
+    } else {
         dirtyParams = settings->fDirtyParams;
-    
+    }
+
     // Do the params
 #ifdef EAX_SDK_AVAILABLE
-    if( dirtyParams & plEAXSourceSettings::kRoom )
-    {
+
+    if (dirtyParams & plEAXSourceSettings::kRoom) {
         SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_ROOM, &settings->fRoom, sizeof(settings->fRoom));
         SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_ROOMHF, &settings->fRoomHF, sizeof(settings->fRoomHF));
     }
 
-    if( dirtyParams & plEAXSourceSettings::kOutsideVolHF )
-    {
+    if (dirtyParams & plEAXSourceSettings::kOutsideVolHF) {
         SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_OUTSIDEVOLUMEHF, &settings->fOutsideVolHF, sizeof(settings->fOutsideVolHF));
     }
-    
-    if( dirtyParams & plEAXSourceSettings::kFactors )
-    {
+
+    if (dirtyParams & plEAXSourceSettings::kFactors) {
         SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_DOPPLERFACTOR, &settings->fDopplerFactor, sizeof(settings->fDopplerFactor));
         SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_ROLLOFFFACTOR, &settings->fRolloffFactor, sizeof(settings->fRolloffFactor));
         SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_ROOMROLLOFFFACTOR, &settings->fRoomRolloffFactor, sizeof(settings->fRoomRolloffFactor));
         SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_AIRABSORPTIONFACTOR, &settings->fAirAbsorptionFactor, sizeof(settings->fAirAbsorptionFactor));
     }
 
-    if( dirtyParams & plEAXSourceSettings::kOcclusion )
-    {
+    if (dirtyParams & plEAXSourceSettings::kOcclusion) {
         SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_OCCLUSION, &settings->GetCurrSofts().fOcclusion, sizeof(settings->GetCurrSofts().fOcclusion));
         SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_OCCLUSIONLFRATIO, &settings->GetCurrSofts().fOcclusionLFRatio, sizeof(settings->GetCurrSofts().fOcclusionLFRatio));
         SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_OCCLUSIONROOMRATIO, &settings->GetCurrSofts().fOcclusionRoomRatio, sizeof(settings->GetCurrSofts().fOcclusionRoomRatio));
         SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_OCCLUSIONDIRECTRATIO, &settings->GetCurrSofts().fOcclusionDirectRatio, sizeof(settings->GetCurrSofts().fOcclusionDirectRatio));
     }
+
 #endif /* EAX_SDK_AVAILABLE */
 
     settings->ClearDirtyParams();
@@ -715,28 +711,29 @@ void    plEAXSource::SetFrom( plEAXSourceSettings *settings, unsigned source, bo
     // Do all the flags in one pass
 #ifdef EAX_SDK_AVAILABLE
     DWORD   flags;
-    
 
-    if( GetSourceEAXProperty( source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_FLAGS, &flags, sizeof( DWORD )) ) 
-    {
-        if( settings->GetRoomAuto() )
+
+    if (GetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_FLAGS, &flags, sizeof(DWORD))) {
+        if (settings->GetRoomAuto()) {
             flags |= EAXBUFFERFLAGS_ROOMAUTO;
-        else
+        } else {
             flags &= ~EAXBUFFERFLAGS_ROOMAUTO;
+        }
 
-        if( settings->GetRoomHFAuto() )
+        if (settings->GetRoomHFAuto()) {
             flags |= EAXBUFFERFLAGS_ROOMHFAUTO;
-        else
+        } else {
             flags &= ~EAXBUFFERFLAGS_ROOMHFAUTO;
+        }
 
-        if( SetSourceEAXProperty( source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_FLAGS, &flags, sizeof( DWORD ) ) ) 
-        {
+        if (SetSourceEAXProperty(source, DSPROPSETID_EAX_BufferProperties, DSPROPERTY_EAXBUFFER_FLAGS, &flags, sizeof(DWORD))) {
             return; // All worked, return here
-        }   
-        
+        }
+
         // Flag setting failed somehow
-        hsAssert( false, "Unable to set EAX buffer flags" );
+        hsAssert(false, "Unable to set EAX buffer flags");
     }
+
 #endif /* EAX_SDK_AVAILABLE */
 }
 

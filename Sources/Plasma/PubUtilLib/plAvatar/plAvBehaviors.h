@@ -54,29 +54,27 @@ class plArmatureBrain;
 class plDebugText;
 
 
-class plArmatureBehavior
-{
+class plArmatureBehavior {
 public:
     plArmatureBehavior();
     virtual ~plArmatureBehavior();
 
-    void Init(plAGAnim *anim, bool loop, plArmatureBrain *brain, plArmatureModBase *armature,  uint8_t index);
+    void Init(plAGAnim* anim, bool loop, plArmatureBrain* brain, plArmatureModBase* armature,  uint8_t index);
     virtual void Process(double time, float elapsed);
     virtual void SetStrength(float val, float rate = 0.f); // default instant change
     virtual float GetStrength();
     virtual void Rewind();
-    void DumpDebug(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt);
+    void DumpDebug(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt);
 
-    enum
-    {
+    enum {
         kBehaviorFlagNotifyOnStop = 0x01,
     };
     uint32_t fFlags;
-    
+
 protected:
-    plAGAnimInstance *fAnim;
-    plArmatureModBase *fArmature;
-    plArmatureBrain *fBrain;
+    plAGAnimInstance* fAnim;
+    plArmatureModBase* fArmature;
+    plArmatureBrain* fBrain;
     plTimedValue<float> fStrength;
     uint8_t fIndex;
 

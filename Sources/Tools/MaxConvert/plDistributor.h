@@ -93,8 +93,7 @@ class plDistTree;
 // use that to make our clusters, without bogging Max down with adding and
 // deleting a gazillion INodes.
 
-class plDistribInstance
-{
+class plDistribInstance {
 public:
     INode*          fNode;
     Matrix3         fNodeTM;
@@ -110,12 +109,10 @@ public:
     Mesh*           fMesh;
 };
 
-class plDistribInstTab : public Tab<plDistribInstance>
-{
+class plDistribInstTab : public Tab<plDistribInstance> {
 };
 
-class plMeshCache
-{
+class plMeshCache {
 public:
     Mesh*       fMesh;
     Point3      fFlex;
@@ -123,15 +120,12 @@ public:
     plMeshCache() {}
 };
 
-class plMeshCacheTab : public Tab<plMeshCache>
-{
+class plMeshCacheTab : public Tab<plMeshCache> {
 };
 
-class plDistributor
-{
+class plDistributor {
 public:
-    enum ColorChan
-    {
+    enum ColorChan {
         kRed                        = 0x1,
         kGreen                      = 0x2,
         kBlue                       = 0x4,
@@ -146,20 +140,17 @@ public:
         kMaxRedGreen                = kMax | kRed | kGreen,
         kMaxRedGreenTimesAlpha      = kMaxRedGreen | kAlpha
     };
-    enum 
-    {
+    enum {
         kLockNone       = 0x0,
         kLockX          = 0x1,
         kLockY          = 0x2,
         kLockZ          = 0x4
     };
-    enum
-    {
+    enum {
         kWgtMapChan         = 66,
         kNormMapChan        = 67
     };
-    enum IsoType
-    {
+    enum IsoType {
         kIsoNone,
         kIsoLow,
         kIsoMedium,
@@ -167,8 +158,7 @@ public:
 
         kIsoMax = kIsoHigh
     };
-    enum ConformType
-    {
+    enum ConformType {
         kConformNone,
         kConformAll,
         kConformHeight,
@@ -190,7 +180,7 @@ protected:
     IsoType             fIsolation;
     ConformType         fConformity;
     BOOL                fFaceNormals;
-    
+
     float               fSpacing;
     float               fRndPosRadius;
 
@@ -217,7 +207,7 @@ protected:
 
     float               fPolarBunch;
 
-    ULONG               fScaleLock;             
+    ULONG               fScaleLock;
     Point3              fScaleLo;
     Point3              fScaleHi;
 
@@ -256,7 +246,7 @@ protected:
     BOOL                INeedMeshTree() const;
     void                IMakeMeshTree() const;
     void                IFindFaceSet(const Box3& box, Tab<int32_t>& faces) const;
-    BOOL                IProjectVertex(const Point3& pt, const Point3& dir, float maxDist, Tab<int32_t>&faces, Point3& projPt) const;
+    BOOL                IProjectVertex(const Point3& pt, const Point3& dir, float maxDist, Tab<int32_t>& faces, Point3& projPt) const;
     BOOL                IConform(Matrix3& l2w, int iRepNode, plMeshCacheTab& cache, int& iCache) const;
     BOOL                IConformHeight(Matrix3& l2w, int iRepNode, plMeshCacheTab& cache, int& iCache) const;
     BOOL                IConformAll(Matrix3& l2w, int iRepNode, plMeshCacheTab& cache, int& iCache) const;
@@ -296,8 +286,12 @@ public:
     plDistributor();
     virtual ~plDistributor();
 
-    void                SetTheInterface(Interface* i) { fInterface = i; }
-    Interface*          GetTheInterface() const { return fInterface; }
+    void                SetTheInterface(Interface* i) {
+        fInterface = i;
+    }
+    Interface*          GetTheInterface() const {
+        return fInterface;
+    }
 
     BOOL                Distribute(INode* surfNode, plDistribInstTab& replicants, plMeshCacheTab& cache, plExportProgressBar& bar) const;
 
@@ -307,115 +301,254 @@ public:
 
     void                ClearReplicateNodes();
     void                AddReplicateNode(INode* node);
-    int                 GetNumReplicateNodes() const { return fRepNodes.Count(); }
-    INode*              GetReplicateNode(int i) const { return fRepNodes[i]; }
+    int                 GetNumReplicateNodes() const {
+        return fRepNodes.Count();
+    }
+    INode*              GetReplicateNode(int i) const {
+        return fRepNodes[i];
+    }
 
-    INode*              GetSurfaceNode() const { return fSurfNode; }
+    INode*              GetSurfaceNode() const {
+        return fSurfNode;
+    }
 
-    void                SetSpacing(float f) { fSpacing = f; }
-    float               GetSpacing() const { return fSpacing; }
+    void                SetSpacing(float f) {
+        fSpacing = f;
+    }
+    float               GetSpacing() const {
+        return fSpacing;
+    }
 
-    void                SetSpacingRange(float f) { fRndPosRadius = f; }
-    float               GetSpacingRange() const { return fRndPosRadius; }
+    void                SetSpacingRange(float f) {
+        fRndPosRadius = f;
+    }
+    float               GetSpacingRange() const {
+        return fRndPosRadius;
+    }
 
-    void                SetAlignmentVec(const Point3& v) { fAlignVec = v; }
-    Point3              GetAlignmentVec() const { return fAlignVec; }
+    void                SetAlignmentVec(const Point3& v) {
+        fAlignVec = v;
+    }
+    Point3              GetAlignmentVec() const {
+        return fAlignVec;
+    }
 
-    void                SetAlignmentWeight(float w) { fAlignWgt = w / 100.f; }
-    float               GetAlignmentWeight() const { return fAlignWgt * 100.f; }
+    void                SetAlignmentWeight(float w) {
+        fAlignWgt = w / 100.f;
+    }
+    float               GetAlignmentWeight() const {
+        return fAlignWgt * 100.f;
+    }
 
     void                SetPolarRange(float deg);
-    float               GetPolarRange() const { return hsRadiansToDegrees(fPolarRange); }
+    float               GetPolarRange() const {
+        return hsRadiansToDegrees(fPolarRange);
+    }
 
-    void                SetAzimuthRange(float deg) { fAzimuthRange = hsDegreesToRadians(deg); }
-    float               GetAzimuthRange() const { return hsRadiansToDegrees(fAzimuthRange); }
+    void                SetAzimuthRange(float deg) {
+        fAzimuthRange = hsDegreesToRadians(deg);
+    }
+    float               GetAzimuthRange() const {
+        return hsRadiansToDegrees(fAzimuthRange);
+    }
 
-    void                SetOverallProb(float percent) { fOverallProb = percent/100.f; }
-    float               GetOverallProb() const { return fOverallProb * 100.f; }
+    void                SetOverallProb(float percent) {
+        fOverallProb = percent / 100.f;
+    }
+    float               GetOverallProb() const {
+        return fOverallProb * 100.f;
+    }
 
-    void                SetAngleProbVec(const Point3& v) { fAngProbVec = v; }
-    Point3              GetAngleProbVec() const { return fAngProbVec; }
+    void                SetAngleProbVec(const Point3& v) {
+        fAngProbVec = v;
+    }
+    Point3              GetAngleProbVec() const {
+        return fAngProbVec;
+    }
 
-    void                SetAngleProbHi(float deg) { fAngProbHi = deg; }
-    float               GetAngleProbHi() const { return fAngProbHi; }
+    void                SetAngleProbHi(float deg) {
+        fAngProbHi = deg;
+    }
+    float               GetAngleProbHi() const {
+        return fAngProbHi;
+    }
 
-    void                SetAngleProbLo(float deg) { fAngProbLo = deg; }
-    float               GetAngleProbLo() const { return fAngProbLo; }
+    void                SetAngleProbLo(float deg) {
+        fAngProbLo = deg;
+    }
+    float               GetAngleProbLo() const {
+        return fAngProbLo;
+    }
 
-    void                SetAngleProbTransition(float deg) { fAngProbTrans = deg; }
-    float               GetAngleProbTransition() const { return fAngProbTrans; }
+    void                SetAngleProbTransition(float deg) {
+        fAngProbTrans = deg;
+    }
+    float               GetAngleProbTransition() const {
+        return fAngProbTrans;
+    }
 
-    void                SetMinAltitude(float feet) { fAltProbLo = feet; }
-    float               GetMinAltitude() const { return fAltProbLo; }
+    void                SetMinAltitude(float feet) {
+        fAltProbLo = feet;
+    }
+    float               GetMinAltitude() const {
+        return fAltProbLo;
+    }
 
-    void                SetMaxAltitude(float feet) { fAltProbHi = feet; }
-    float               GetMaxAltitude() const { return fAltProbHi; }
+    void                SetMaxAltitude(float feet) {
+        fAltProbHi = feet;
+    }
+    float               GetMaxAltitude() const {
+        return fAltProbHi;
+    }
 
-    void                SetAltitudeTransition(float feet) { fAltProbTrans = feet; }
-    float               GetAltitudeTransition() const { return fAltProbTrans; }
+    void                SetAltitudeTransition(float feet) {
+        fAltProbTrans = feet;
+    }
+    float               GetAltitudeTransition() const {
+        return fAltProbTrans;
+    }
 
-    void                SetPolarBunch(float b) { fPolarBunch = b/100.f; }
-    float               GetPolarBunch() const { return fPolarBunch * 100.f; }
+    void                SetPolarBunch(float b) {
+        fPolarBunch = b / 100.f;
+    }
+    float               GetPolarBunch() const {
+        return fPolarBunch * 100.f;
+    }
 
-    void                SetScaleRange(const Point3& lo, const Point3& hi) { fScaleLo = lo; fScaleHi = hi; }
-    Point3              GetScaleRangeMin() const { return fScaleLo; }
-    Point3              GetScaleRangeMax() const { return fScaleHi; }
+    void                SetScaleRange(const Point3& lo, const Point3& hi) {
+        fScaleLo = lo;
+        fScaleHi = hi;
+    }
+    Point3              GetScaleRangeMin() const {
+        return fScaleLo;
+    }
+    Point3              GetScaleRangeMax() const {
+        return fScaleHi;
+    }
 
     void                SetProbabilityBitmapTex(BitmapTex* t);
-    BitmapTex*          GetProbabilityBitmapTex() const { return fProbBitmapTex; }
+    BitmapTex*          GetProbabilityBitmapTex() const {
+        return fProbBitmapTex;
+    }
 
     void                SetProbabilityLayerTex(plLayerTex* t);
-    plLayerTex*         GetProbabilityLayerTex() const { return fProbLayerTex; }
+    plLayerTex*         GetProbabilityLayerTex() const {
+        return fProbLayerTex;
+    }
 
-    void                SetProbabilityChan(ColorChan c) { fProbColorChan = c; }
-    ColorChan           GetProbabilityChan() const { return fProbColorChan; }
+    void                SetProbabilityChan(ColorChan c) {
+        fProbColorChan = c;
+    }
+    ColorChan           GetProbabilityChan() const {
+        return fProbColorChan;
+    }
 
-    void                SetProbabilityRemapFromLo(float f) { fProbRemapFromLo = f / 255.f; }
-    float               GetProbabilityRemapFromLo() const { return fProbRemapFromLo * 255.f; }
+    void                SetProbabilityRemapFromLo(float f) {
+        fProbRemapFromLo = f / 255.f;
+    }
+    float               GetProbabilityRemapFromLo() const {
+        return fProbRemapFromLo * 255.f;
+    }
 
-    void                SetProbabilityRemapFromHi(float f) { fProbRemapFromHi = f / 255.f; }
-    float               GetProbabilityRemapFromHi() const { return fProbRemapFromHi * 255.f; }
+    void                SetProbabilityRemapFromHi(float f) {
+        fProbRemapFromHi = f / 255.f;
+    }
+    float               GetProbabilityRemapFromHi() const {
+        return fProbRemapFromHi * 255.f;
+    }
 
-    void                SetProbabilityRemapToLo(float f) { fProbRemapToLo = f / 255.f; }
-    float               GetProbabilityRemapToLo() const { return fProbRemapToLo * 255.f; }
+    void                SetProbabilityRemapToLo(float f) {
+        fProbRemapToLo = f / 255.f;
+    }
+    float               GetProbabilityRemapToLo() const {
+        return fProbRemapToLo * 255.f;
+    }
 
-    void                SetProbabilityRemapToHi(float f) { fProbRemapToHi = f / 255.f; }
-    float               GetProbabilityRemapToHi() const { return fProbRemapToHi * 255.f; }
+    void                SetProbabilityRemapToHi(float f) {
+        fProbRemapToHi = f / 255.f;
+    }
+    float               GetProbabilityRemapToHi() const {
+        return fProbRemapToHi * 255.f;
+    }
 
     // We don't really know what fades are, they're just something we're handed that
     // we stamp on every distribInstance we generate. See plDistribComponent.h.
-    void                SetFade(const Box3& fade) { fFade = fade; }
-    Box3                GetFade() const { return fFade; }
+    void                SetFade(const Box3& fade) {
+        fFade = fade;
+    }
+    Box3                GetFade() const {
+        return fFade;
+    }
 
-    void                SetBone(INode* b) { fBone = b; }
-    INode*              GetBone() const { return fBone; }
+    void                SetBone(INode* b) {
+        fBone = b;
+    }
+    INode*              GetBone() const {
+        return fBone;
+    }
 
-    void                SetRigid(BOOL b) { fRigid = b; }
-    BOOL                GetRigid() const { return fRigid; }
+    void                SetRigid(BOOL b) {
+        fRigid = b;
+    }
+    BOOL                GetRigid() const {
+        return fRigid;
+    }
 
-    void                SetScaleLock(ULONG f) { fScaleLock = f; }
-    ULONG               GetScaleLock() const { return fScaleLock; }
+    void                SetScaleLock(ULONG f) {
+        fScaleLock = f;
+    }
+    ULONG               GetScaleLock() const {
+        return fScaleLock;
+    }
 
-    void                SetDistTree(plDistTree* dt) { fDistTree = dt; }
-    plDistTree*         GetDistTree() const { return fDistTree; }
+    void                SetDistTree(plDistTree* dt) {
+        fDistTree = dt;
+    }
+    plDistTree*         GetDistTree() const {
+        return fDistTree;
+    }
 
-    void                SetIsolation(IsoType t) { fIsolation = t; }
-    IsoType             GetIsolation() const { return fIsolation; }
+    void                SetIsolation(IsoType t) {
+        fIsolation = t;
+    }
+    IsoType             GetIsolation() const {
+        return fIsolation;
+    }
 
-    void                SetConformity(ConformType t) { fConformity = t; }
-    ConformType         GetConformity() const { return fConformity; }
+    void                SetConformity(ConformType t) {
+        fConformity = t;
+    }
+    ConformType         GetConformity() const {
+        return fConformity;
+    }
 
-    void                SetMaxConform(float feet) { fMaxConform = feet; }
-    float               GetMaxConform() const { return fMaxConform; }
+    void                SetMaxConform(float feet) {
+        fMaxConform = feet;
+    }
+    float               GetMaxConform() const {
+        return fMaxConform;
+    }
 
-    void                SetMinOffset(float feet) { fOffsetMin = feet; }
-    float               GetMinOffset() const { return fOffsetMin; }
+    void                SetMinOffset(float feet) {
+        fOffsetMin = feet;
+    }
+    float               GetMinOffset() const {
+        return fOffsetMin;
+    }
 
-    void                SetMaxOffset(float feet) { fOffsetMax = feet; }
-    float               GetMaxOffset() const { return fOffsetMax; }
+    void                SetMaxOffset(float feet) {
+        fOffsetMax = feet;
+    }
+    float               GetMaxOffset() const {
+        return fOffsetMax;
+    }
 
-    void                SetFaceNormals(BOOL on=true) { fFaceNormals = on; }
-    BOOL                GetFaceNormals() const { return fFaceNormals; }
+    void                SetFaceNormals(BOOL on = true) {
+        fFaceNormals = on;
+    }
+    BOOL                GetFaceNormals() const {
+        return fFaceNormals;
+    }
 };
 
 #endif // plDistributor_inc

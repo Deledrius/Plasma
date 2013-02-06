@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCore/Private/pnAcLog.cpp
-*   
+*
 ***/
 
 #include "../Pch.h"
@@ -56,7 +56,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 //===========================================================================
-void CDECL LogMsg (ELogSeverity severity, const char format[], ...) {
+void CDECL LogMsg(ELogSeverity severity, const char format[], ...)
+{
     ASSERT(format);
 
     va_list args;
@@ -66,7 +67,8 @@ void CDECL LogMsg (ELogSeverity severity, const char format[], ...) {
 }
 
 //===========================================================================
-void CDECL LogMsg (ELogSeverity severity, const wchar_t format[], ...) {
+void CDECL LogMsg(ELogSeverity severity, const wchar_t format[], ...)
+{
     ASSERT(format);
 
     va_list args;
@@ -76,7 +78,8 @@ void CDECL LogMsg (ELogSeverity severity, const wchar_t format[], ...) {
 }
 
 //===========================================================================
-void LogMsgV (ELogSeverity severity, const char format[], va_list args) {
+void LogMsgV(ELogSeverity severity, const char format[], va_list args)
+{
     ASSERT(format);
 
     char msg[1024];
@@ -86,7 +89,8 @@ void LogMsgV (ELogSeverity severity, const char format[], va_list args) {
 }
 
 //===========================================================================
-void LogMsgV (ELogSeverity severity, const wchar_t format[], va_list args) {
+void LogMsgV(ELogSeverity severity, const wchar_t format[], va_list args)
+{
     ASSERT(format);
     ASSERT(args);
 
@@ -100,7 +104,8 @@ void LogMsgV (ELogSeverity severity, const wchar_t format[], va_list args) {
 
 //============================================================================
 #ifdef HS_DEBUGGING
-void LogMsgDebug (const char  format[], ...) {
+void LogMsgDebug(const char  format[], ...)
+{
     ASSERT(format);
 
     va_list args;
@@ -112,7 +117,8 @@ void LogMsgDebug (const char  format[], ...) {
 
 //============================================================================
 #ifdef HS_DEBUGGING
-void LogMsgDebug (const wchar_t format[], ...) {
+void LogMsgDebug(const wchar_t format[], ...)
+{
     ASSERT(format);
 
     va_list args;

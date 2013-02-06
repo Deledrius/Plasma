@@ -44,11 +44,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class pfObjectFlocker;
 
-class plObjectFlockerComponent : public plComponent
-{
+class plObjectFlockerComponent : public plComponent {
 public:
-    enum
-    {
+    enum {
         kBoidObject,
         kNumBoids,
         kGoalStrength,
@@ -66,9 +64,9 @@ public:
     };
 
     plObjectFlockerComponent();
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
     virtual bool DeInit(plMaxNode* node, plErrorMsg* pErrMsg);
 
 protected:

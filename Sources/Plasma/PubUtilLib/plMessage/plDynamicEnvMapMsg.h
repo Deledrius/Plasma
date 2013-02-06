@@ -51,8 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class hsResMgr;
 
-class plDynamicEnvMapMsg : public plMessage
-{
+class plDynamicEnvMapMsg : public plMessage {
 public:
     enum {
         kReRender       = 0x1,
@@ -70,7 +69,7 @@ public:
     float            fHither;
     float            fYon;
     float            fFogStart;
-    hsColorRGBA         fColor;         
+    hsColorRGBA         fColor;
     float            fRefresh;
 
 public:
@@ -78,8 +77,8 @@ public:
     plDynamicEnvMapMsg(const plKey& rcv) : plMessage(nil, rcv, nil), fCmd(0) {}
     virtual ~plDynamicEnvMapMsg() {}
 
-    CLASSNAME_REGISTER( plDynamicEnvMapMsg );
-    GETINTERFACE_ANY( plDynamicEnvMapMsg, plMessage );
+    CLASSNAME_REGISTER(plDynamicEnvMapMsg);
+    GETINTERFACE_ANY(plDynamicEnvMapMsg, plMessage);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);

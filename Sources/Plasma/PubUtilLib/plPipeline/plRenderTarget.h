@@ -65,134 +65,163 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsGDeviceRef;
 class plCubicRenderTarget;
 
-class plRenderTarget : public plBitmap
-{
+class plRenderTarget : public plBitmap {
     friend class plCubicRenderTarget;
 
-    protected:
+protected:
 
-        uint16_t      fWidth, fHeight;
+    uint16_t      fWidth, fHeight;
 
-        union
-        {
-            struct 
-            {
-                uint16_t      fLeft, fTop, fRight, fBottom;
-            } fAbsolute;
-            struct 
-            {
-                float    fLeft, fTop, fRight, fBottom;
-            } fProportional;
-        } fViewport;
+    union {
+        struct {
+            uint16_t      fLeft, fTop, fRight, fBottom;
+        } fAbsolute;
+        struct {
+            float    fLeft, fTop, fRight, fBottom;
+        } fProportional;
+    } fViewport;
 
-        bool        fApplyTexQuality;
-        bool        fProportionalViewport;
-        uint8_t     fZDepth, fStencilDepth;
+    bool        fApplyTexQuality;
+    bool        fProportionalViewport;
+    uint8_t     fZDepth, fStencilDepth;
 
-        plCubicRenderTarget* fParent;
+    plCubicRenderTarget* fParent;
 
-        virtual void SetKey(plKey k);
+    virtual void SetKey(plKey k);
 
-        virtual uint32_t  Read( hsStream *s );
-        virtual uint32_t  Write( hsStream *s );
-    public:
+    virtual uint32_t  Read(hsStream* s);
+    virtual uint32_t  Write(hsStream* s);
+public:
 
-        CLASSNAME_REGISTER( plRenderTarget );
-        GETINTERFACE_ANY( plRenderTarget, plBitmap );
+    CLASSNAME_REGISTER(plRenderTarget);
+    GETINTERFACE_ANY(plRenderTarget, plBitmap);
 
-        plRenderTarget()
-            : fWidth(0), fHeight(0), fZDepth(0), fStencilDepth(0), fApplyTexQuality(false),
-              fProportionalViewport(true), fParent(nullptr)
-        {
-            fFlags = 0;
-            fPixelSize = 0;
-            SetViewport( 0, 0, 1.f, 1.f );
-            plPipeResReq::Request();
-        }
+    plRenderTarget()
+        : fWidth(0), fHeight(0), fZDepth(0), fStencilDepth(0), fApplyTexQuality(false),
+          fProportionalViewport(true), fParent(nullptr) {
+        fFlags = 0;
+        fPixelSize = 0;
+        SetViewport(0, 0, 1.f, 1.f);
+        plPipeResReq::Request();
+    }
 
-        plRenderTarget( uint16_t flags, uint16_t width, uint16_t height, uint8_t bitDepth, uint8_t zDepth = 0xff, uint8_t stencilDepth = 0xff )
-        {
-            fWidth = width;
-            fHeight = height;
-            fPixelSize = bitDepth;
-            fZDepth = ( zDepth != 0xff ) ? zDepth : (bitDepth > 16 ? 24 : 16);
-            fStencilDepth = ( stencilDepth != 0xff ) ? stencilDepth : 0;
+    plRenderTarget(uint16_t flags, uint16_t width, uint16_t height, uint8_t bitDepth, uint8_t zDepth = 0xff, uint8_t stencilDepth = 0xff) {
+        fWidth = width;
+        fHeight = height;
+        fPixelSize = bitDepth;
+        fZDepth = (zDepth != 0xff) ? zDepth : (bitDepth > 16 ? 24 : 16);
+        fStencilDepth = (stencilDepth != 0xff) ? stencilDepth : 0;
 
-            fFlags = flags;
-            fParent = nil;
+        fFlags = flags;
+        fParent = nil;
 
-            hsAssert( fFlags & (kIsTexture|kIsOffscreen), "Cannot perform this on an on-screen RenderTarget" );
-            fApplyTexQuality = false;
-            fProportionalViewport = false;
-            SetViewport( 0, 0, width, height );
+        hsAssert(fFlags & (kIsTexture | kIsOffscreen), "Cannot perform this on an on-screen RenderTarget");
+        fApplyTexQuality = false;
+        fProportionalViewport = false;
+        SetViewport(0, 0, width, height);
 
-            plPipeResReq::Request();
-        }
+        plPipeResReq::Request();
+    }
 
-        // Render-to-Screen constructor
-        plRenderTarget( uint16_t flags, float left, float top, float right, float bottom, uint8_t bitDepth, uint8_t zDepth = 0xff, uint8_t stencilDepth = 0xff )
-        {
-            fWidth = 0; // Can't really set these, at least not yet
-            fHeight = 0;
-            fPixelSize = bitDepth;
-            fZDepth = ( zDepth != 0xff ) ? zDepth : 16;
-            fStencilDepth = ( stencilDepth != 0xff ) ? stencilDepth : 0;
+    // Render-to-Screen constructor
+    plRenderTarget(uint16_t flags, float left, float top, float right, float bottom, uint8_t bitDepth, uint8_t zDepth = 0xff, uint8_t stencilDepth = 0xff) {
+        fWidth = 0; // Can't really set these, at least not yet
+        fHeight = 0;
+        fPixelSize = bitDepth;
+        fZDepth = (zDepth != 0xff) ? zDepth : 16;
+        fStencilDepth = (stencilDepth != 0xff) ? stencilDepth : 0;
 
-            fFlags = flags;
-            fParent = nil;
+        fFlags = flags;
+        fParent = nil;
 
-            hsAssert( !( fFlags & (kIsTexture|kIsOffscreen) ), "Cannot perform this on an offscreen RenderTarget" );
-            fApplyTexQuality = false;
-            fProportionalViewport = true;
-            SetViewport( left, top, right, bottom );
+        hsAssert(!(fFlags & (kIsTexture | kIsOffscreen)), "Cannot perform this on an offscreen RenderTarget");
+        fApplyTexQuality = false;
+        fProportionalViewport = true;
+        SetViewport(left, top, right, bottom);
 
-            plPipeResReq::Request();
-        }
+        plPipeResReq::Request();
+    }
 
-        virtual ~plRenderTarget() {}
+    virtual ~plRenderTarget() {}
 
-        virtual void            SetViewport( uint16_t left, uint16_t top, uint16_t right, uint16_t bottom )
-        {
-            ASSERT_ABSOLUTE;
-            fViewport.fAbsolute.fLeft = left; 
-            fViewport.fAbsolute.fTop = top; 
-            fViewport.fAbsolute.fRight = right; 
-            fViewport.fAbsolute.fBottom = bottom;
-        }
+    virtual void            SetViewport(uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
+        ASSERT_ABSOLUTE;
+        fViewport.fAbsolute.fLeft = left;
+        fViewport.fAbsolute.fTop = top;
+        fViewport.fAbsolute.fRight = right;
+        fViewport.fAbsolute.fBottom = bottom;
+    }
 
-        virtual void            SetViewport( float left, float top, float right, float bottom )
-        {
-            ASSERT_PROPORTIONAL;
-            fViewport.fProportional.fLeft = left; 
-            fViewport.fProportional.fTop = top; 
-            fViewport.fProportional.fRight = right; 
-            fViewport.fProportional.fBottom = bottom;
-        }
+    virtual void            SetViewport(float left, float top, float right, float bottom) {
+        ASSERT_PROPORTIONAL;
+        fViewport.fProportional.fLeft = left;
+        fViewport.fProportional.fTop = top;
+        fViewport.fProportional.fRight = right;
+        fViewport.fProportional.fBottom = bottom;
+    }
 
-        uint16_t  GetWidth( void ) const { return fWidth; }
-        uint16_t  GetHeight( void ) const { return fHeight; }
-        uint8_t   GetZDepth( void ) { return fZDepth; }
-        uint8_t   GetStencilDepth( void ) { return fStencilDepth; }
+    uint16_t  GetWidth(void) const {
+        return fWidth;
+    }
+    uint16_t  GetHeight(void) const {
+        return fHeight;
+    }
+    uint8_t   GetZDepth(void) {
+        return fZDepth;
+    }
+    uint8_t   GetStencilDepth(void) {
+        return fStencilDepth;
+    }
 
-        uint16_t      GetVPLeft( void )   { ASSERT_ABSOLUTE; return fViewport.fAbsolute.fLeft; }
-        uint16_t      GetVPTop( void )    { ASSERT_ABSOLUTE; return fViewport.fAbsolute.fTop; }
-        uint16_t      GetVPRight( void )  { ASSERT_ABSOLUTE; return fViewport.fAbsolute.fRight; }
-        uint16_t      GetVPBottom( void ) { ASSERT_ABSOLUTE; return fViewport.fAbsolute.fBottom; }
+    uint16_t      GetVPLeft(void)   {
+        ASSERT_ABSOLUTE;
+        return fViewport.fAbsolute.fLeft;
+    }
+    uint16_t      GetVPTop(void)    {
+        ASSERT_ABSOLUTE;
+        return fViewport.fAbsolute.fTop;
+    }
+    uint16_t      GetVPRight(void)  {
+        ASSERT_ABSOLUTE;
+        return fViewport.fAbsolute.fRight;
+    }
+    uint16_t      GetVPBottom(void) {
+        ASSERT_ABSOLUTE;
+        return fViewport.fAbsolute.fBottom;
+    }
 
-        float    GetVPLeftProp( void )   { ASSERT_PROPORTIONAL; return fViewport.fProportional.fLeft; }
-        float    GetVPTopProp( void )    { ASSERT_PROPORTIONAL; return fViewport.fProportional.fTop; }
-        float    GetVPRightProp( void )  { ASSERT_PROPORTIONAL; return fViewport.fProportional.fRight; }
-        float    GetVPBottomProp( void ) { ASSERT_PROPORTIONAL; return fViewport.fProportional.fBottom; }
+    float    GetVPLeftProp(void)   {
+        ASSERT_PROPORTIONAL;
+        return fViewport.fProportional.fLeft;
+    }
+    float    GetVPTopProp(void)    {
+        ASSERT_PROPORTIONAL;
+        return fViewport.fProportional.fTop;
+    }
+    float    GetVPRightProp(void)  {
+        ASSERT_PROPORTIONAL;
+        return fViewport.fProportional.fRight;
+    }
+    float    GetVPBottomProp(void) {
+        ASSERT_PROPORTIONAL;
+        return fViewport.fProportional.fBottom;
+    }
 
-        bool        ViewIsProportional( void ) const { return fProportionalViewport; }
+    bool        ViewIsProportional(void) const {
+        return fProportionalViewport;
+    }
 
-        plCubicRenderTarget *GetParent( void ) const { return fParent; }
+    plCubicRenderTarget* GetParent(void) const {
+        return fParent;
+    }
 
-        virtual uint32_t  GetTotalSize( void ) const { return fWidth * fHeight * ( fPixelSize >> 3 ); }
+    virtual uint32_t  GetTotalSize(void) const {
+        return fWidth * fHeight * (fPixelSize >> 3);
+    }
 
-        virtual bool MsgReceive(plMessage* msg);
+    virtual bool MsgReceive(plMessage* msg);
 
-        virtual void SetVisRegionName(char *name){} // override to set vis region names for anyone who cares
+    virtual void SetVisRegionName(char* name) {} // override to set vis region names for anyone who cares
 };
 
 

@@ -52,13 +52,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pyGlueHelpers.h"
 #include <vector>
 
-class pyDrawControl
-{
+class pyDrawControl {
 protected:
     pyDrawControl() {};
 
 public:
-    static void AddPlasmaMethods(std::vector<PyMethodDef> &methods);
+    static void AddPlasmaMethods(std::vector<PyMethodDef>& methods);
     //static void AddPlasmaConstantsClasses(PyObject* m);
 
     // static python functions

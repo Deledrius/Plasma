@@ -56,8 +56,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plKey;
 class pyKey;
 
-class pyGUIControlDragBar : public pyGUIControl
-{
+class pyGUIControlDragBar : public pyGUIControl {
 protected:
     pyGUIControlDragBar(): pyGUIControl() {} // for python glue only, do NOT call
     pyGUIControlDragBar(pyKey& gckey);
@@ -68,17 +67,17 @@ public:
 
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptGUIControlDragBar);
-    static PyObject *New(pyKey& gckey);
-    static PyObject *New(plKey objkey);
+    static PyObject* New(pyKey& gckey);
+    static PyObject* New(plKey objkey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGUIControlDragBar object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGUIControlDragBar); // converts a PyObject to a pyGUIControlDragBar (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     static bool IsGUIControlDragBar(pyKey& gckey);
 
-    virtual void    Anchor( void );
-    virtual void    Unanchor( void );
+    virtual void    Anchor(void);
+    virtual void    Unanchor(void);
     virtual bool    IsAnchored();
 
 };

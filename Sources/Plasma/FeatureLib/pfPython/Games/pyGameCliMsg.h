@@ -54,8 +54,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class pfGameCliMsg;
 
-class pyGameCliMsg
-{
+class pyGameCliMsg {
 protected:
     pfGameCliMsg* message;
 
@@ -83,8 +82,7 @@ public:
     // a "base class" for each game's messages. Anything under kCli2Srv_NumGameMsgIds keeps their normal type
     // (and is exposed to python here), but anything above it has the message code look at the game type and
     // return the "message type" indicating what game the message is from
-    enum pyGameCliMsgType
-    {
+    enum pyGameCliMsgType {
         kPyGameCliMsgTypeStart = kCli2Srv_NumGameMsgIds,
         kPyGameCliTTTMsg, // Tick Tack Toe game messages
         kPyGameCliHeekMsg, // Heek game messages
@@ -96,8 +94,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyGameCliPlayerJoinedMsg : public pyGameCliMsg
-{
+class pyGameCliPlayerJoinedMsg : public pyGameCliMsg {
 protected:
     pyGameCliPlayerJoinedMsg();
     pyGameCliPlayerJoinedMsg(pfGameCliMsg* msg);
@@ -115,8 +112,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyGameCliPlayerLeftMsg : public pyGameCliMsg
-{
+class pyGameCliPlayerLeftMsg : public pyGameCliMsg {
 protected:
     pyGameCliPlayerLeftMsg();
     pyGameCliPlayerLeftMsg(pfGameCliMsg* msg);
@@ -134,8 +130,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyGameCliInviteFailedMsg : public pyGameCliMsg
-{
+class pyGameCliInviteFailedMsg : public pyGameCliMsg {
 protected:
     pyGameCliInviteFailedMsg();
     pyGameCliInviteFailedMsg(pfGameCliMsg* msg);
@@ -156,8 +151,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyGameCliOwnerChangeMsg : public pyGameCliMsg
-{
+class pyGameCliOwnerChangeMsg : public pyGameCliMsg {
 protected:
     pyGameCliOwnerChangeMsg();
     pyGameCliOwnerChangeMsg(pfGameCliMsg* msg);

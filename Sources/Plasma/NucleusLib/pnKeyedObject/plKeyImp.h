@@ -44,21 +44,22 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plKey.h"
 #include "hsTemplates.h"
-#include "plUoid.h"  
+#include "plUoid.h"
 #include "hsBitVector.h"
 #include "plRefFlags.h"
 
 //------------------------------------
 // plKey is a handle to a keyedObject
 //------------------------------------
-class plKeyImp : public plKeyData 
-{
+class plKeyImp : public plKeyData {
 public:
     plKeyImp();
-    plKeyImp(plUoid, uint32_t pos,uint32_t len);
+    plKeyImp(plUoid, uint32_t pos, uint32_t len);
     virtual ~plKeyImp();
 
-    virtual const plUoid&   GetUoid() const { return fUoid; }
+    virtual const plUoid&   GetUoid() const {
+        return fUoid;
+    }
     virtual const plString& GetName() const;
 
     virtual hsKeyedObject*  GetObjectPtr();
@@ -66,7 +67,9 @@ public:
     virtual hsKeyedObject*  VerifyLoaded();
 
     // called before writing to disk so that static keys can have faster lookups (int compare instead of string compare)
-    void SetObjectID(uint32_t id) {fUoid.SetObjectID(id);}
+    void SetObjectID(uint32_t id) {
+        fUoid.SetObjectID(id);
+    }
 
     //----------------------
     // I/O
@@ -78,8 +81,12 @@ public:
     // For when you need to skip over a key in a stream
     static void SkipRead(hsStream* s);
 
-    uint32_t GetStartPos() const  { return fStartPos; } // for ResMgr to read the Objects
-    uint32_t GetDataLen() const   { return fDataLen;  } // for ResMgr to read the Objects
+    uint32_t GetStartPos() const  {
+        return fStartPos;    // for ResMgr to read the Objects
+    }
+    uint32_t GetDataLen() const   {
+        return fDataLen;     // for ResMgr to read the Objects
+    }
 
     //----------------------
     // Allow a keyed object to behave as if it has an active ref when in fact the object
@@ -117,35 +124,65 @@ public:
 
     uint32_t  GetNumClones();
     plKey   GetCloneByIdx(uint32_t idx);
-    plKey   GetCloneOwner() { return fCloneOwner; }
+    plKey   GetCloneOwner() {
+        return fCloneOwner;
+    }
 
     void NotifyCreated();
     void ISetupNotify(plRefMsg* msg, plRefFlags::Type flags); // Setup notifcations for reference, don't send anything.
 
     void        AddRef(plKeyImp* key) const;
-    uint16_t      GetNumRefs() const { return fRefs.GetCount(); }
-    plKeyImp*   GetRef(int i) const { return fRefs[i]; }
-    void        RemoveRef(plKeyImp *key) const;
+    uint16_t      GetNumRefs() const {
+        return fRefs.GetCount();
+    }
+    plKeyImp*   GetRef(int i) const {
+        return fRefs[i];
+    }
+    void        RemoveRef(plKeyImp* key) const;
 
-    virtual uint16_t      GetActiveRefs() const           { return fNumActiveRefs; }
-    virtual uint16_t      GetNumNotifyCreated() const     { return fNotifyCreated.GetCount(); }
-    virtual plRefMsg*   GetNotifyCreated(int i) const   { return fNotifyCreated[i]; }
-    virtual const hsBitVector& GetActiveBits() const    { return fActiveRefs; }
+    virtual uint16_t      GetActiveRefs() const           {
+        return fNumActiveRefs;
+    }
+    virtual uint16_t      GetNumNotifyCreated() const     {
+        return fNotifyCreated.GetCount();
+    }
+    virtual plRefMsg*   GetNotifyCreated(int i) const   {
+        return fNotifyCreated[i];
+    }
+    virtual const hsBitVector& GetActiveBits() const    {
+        return fActiveRefs;
+    }
 
 protected:
     void        AddNotifyCreated(plRefMsg* msg, plRefFlags::Type flags);
     void        ClearNotifyCreated();
-    uint16_t      GetNumNotifyCreated() { return fNotifyCreated.GetCount(); }
-    plRefMsg*   GetNotifyCreated(int i) { return fNotifyCreated[i]; }
+    uint16_t      GetNumNotifyCreated() {
+        return fNotifyCreated.GetCount();
+    }
+    plRefMsg*   GetNotifyCreated(int i) {
+        return fNotifyCreated[i];
+    }
     void        RemoveNotifyCreated(int i);
 
-    uint16_t      IncActiveRefs() { return ++fNumActiveRefs; }
-    uint16_t      DecActiveRefs() { return fNumActiveRefs ? --fNumActiveRefs : 0; }
+    uint16_t      IncActiveRefs() {
+        return ++fNumActiveRefs;
+    }
+    uint16_t      DecActiveRefs() {
+        return fNumActiveRefs ? --fNumActiveRefs : 0;
+    }
 
-    bool    IsActiveRef(int i) const            { return fActiveRefs.IsBitSet(i) != 0; }
-    void    SetActiveRef(int i, bool on=true) { fActiveRefs.SetBit(i, on); }
-    bool    IsNotified(int i) const             { return fNotified.IsBitSet(i) != 0; }
-    void    SetNotified(int i, bool on=true)  { fNotified.SetBit(i, on); }
+    bool    IsActiveRef(int i) const            {
+        return fActiveRefs.IsBitSet(i) != 0;
+    }
+    void    SetActiveRef(int i, bool on = true) {
+        fActiveRefs.SetBit(i, on);
+    }
+    bool    IsNotified(int i) const             {
+        return fNotified.IsBitSet(i) != 0;
+    }
+    void    SetNotified(int i, bool on = true)  {
+        fNotified.SetBit(i, on);
+    }
 
     void SatisfyPending(plRefMsg* msg) const;
     void SatisfyPending() const;
@@ -160,7 +197,7 @@ protected:
 
     // These fields are the ones actually saved to disk
     plUoid fUoid;
-    uint32_t fStartPos;   // where I live in the Datafile  
+    uint32_t fStartPos;   // where I live in the Datafile
     uint32_t fDataLen;    // Length in the Datafile
 
     // Following used by hsResMgr to notify on defered load or when a passive ref is destroyed.

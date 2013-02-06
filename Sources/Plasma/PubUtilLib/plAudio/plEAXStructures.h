@@ -44,13 +44,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define plEAXStructures_h_inc
 
 typedef struct _EAXVECTOR {
-        float x;
-        float y;
-        float z;
+    float x;
+    float y;
+    float z;
 } EAXVECTOR;
 
-typedef struct _EAXREVERBPROPERTIES
-{
+typedef struct _EAXREVERBPROPERTIES {
     unsigned long ulEnvironment;
     float flEnvironmentSize;
     float flEnvironmentDiffusion;

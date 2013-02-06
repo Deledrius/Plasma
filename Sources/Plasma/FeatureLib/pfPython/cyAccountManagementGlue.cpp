@@ -70,8 +70,8 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtCreatePlayer, args, "Params: playerName, avata
     char* playerName;
     char* avatarShape;
     char* invitation;
-    if (!PyArg_ParseTuple(args, "ssz", &playerName, &avatarShape, &invitation))
-    {
+
+    if (!PyArg_ParseTuple(args, "ssz", &playerName, &avatarShape, &invitation)) {
         PyErr_SetString(PyExc_TypeError, "PtCreatePlayer expects three strings");
         PYTHON_RETURN_ERROR;
     }
@@ -85,79 +85,64 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtCreatePlayerW, args, "Params: playerName, avat
     PyObject* playerNameObj;
     PyObject* avatarShapeObj;
     PyObject* invitationObj;
-    if (!PyArg_ParseTuple(args, "OOO", &playerNameObj, &avatarShapeObj, &invitationObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "OOO", &playerNameObj, &avatarShapeObj, &invitationObj)) {
         PyErr_SetString(PyExc_TypeError, "PtCreatePlayerW expects three unicode strings");
         PYTHON_RETURN_ERROR;
     }
 
     std::wstring playerName, avatarShape, invitation;
 
-    if (PyUnicode_Check(playerNameObj))
-    {
+    if (PyUnicode_Check(playerNameObj)) {
         int strLen = PyUnicode_GetSize(playerNameObj);
         wchar_t* text = new wchar_t[strLen + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)playerNameObj, text, strLen);
         text[strLen] = L'\0';
         playerName = text;
         delete [] text;
-    }
-    else if (PyString_Check(playerNameObj))
-    {
+    } else if (PyString_Check(playerNameObj)) {
         // we'll allow this, just in case something goes weird
         char* text = PyString_AsString(playerNameObj);
         wchar_t* temp = hsStringToWString(text);
         playerName = temp;
         delete [] temp;
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtCreatePlayerW expects three unicode strings");
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyUnicode_Check(avatarShapeObj))
-    {
+    if (PyUnicode_Check(avatarShapeObj)) {
         int strLen = PyUnicode_GetSize(avatarShapeObj);
         wchar_t* text = new wchar_t[strLen + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)avatarShapeObj, text, strLen);
         text[strLen] = L'\0';
         avatarShape = text;
         delete [] text;
-    }
-    else if (PyString_Check(avatarShapeObj))
-    {
+    } else if (PyString_Check(avatarShapeObj)) {
         // we'll allow this, just in case something goes weird
         char* text = PyString_AsString(avatarShapeObj);
         wchar_t* temp = hsStringToWString(text);
         avatarShape = temp;
         delete [] temp;
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtCreatePlayerW expects three unicode strings");
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyUnicode_Check(invitationObj))
-    {
+    if (PyUnicode_Check(invitationObj)) {
         int strLen = PyUnicode_GetSize(invitationObj);
         wchar_t* text = new wchar_t[strLen + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)invitationObj, text, strLen);
         text[strLen] = L'\0';
         invitation = text;
         delete [] text;
-    }
-    else if (PyString_Check(invitationObj))
-    {
+    } else if (PyString_Check(invitationObj)) {
         // we'll allow this, just in case something goes weird
         char* text = PyString_AsString(invitationObj);
         wchar_t* temp = hsStringToWString(text);
         invitation = temp;
         delete [] temp;
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtCreatePlayerW expects three unicode strings");
         PYTHON_RETURN_ERROR;
     }
@@ -169,8 +154,8 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtCreatePlayerW, args, "Params: playerName, avat
 PYTHON_GLOBAL_METHOD_DEFINITION(PtDeletePlayer, args, "Params: playerInt\nDeletes a player associated with the current account")
 {
     unsigned playerInt = 0;
-    if (!PyArg_ParseTuple(args, "I", &playerInt))
-    {
+
+    if (!PyArg_ParseTuple(args, "I", &playerInt)) {
         PyErr_SetString(PyExc_TypeError, "PtDeletePlayer expects a unsigned int");
         PYTHON_RETURN_ERROR;
     }
@@ -182,8 +167,8 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtDeletePlayer, args, "Params: playerInt\nDelete
 PYTHON_GLOBAL_METHOD_DEFINITION(PtSetActivePlayer, args, "Params: playerInt\nSets the active player associated with the current account")
 {
     unsigned playerInt = 0;
-    if (!PyArg_ParseTuple(args, "I", &playerInt))
-    {
+
+    if (!PyArg_ParseTuple(args, "I", &playerInt)) {
         PyErr_SetString(PyExc_TypeError, "PtSetActivePlayer expects a unsigned int");
         PYTHON_RETURN_ERROR;
     }
@@ -200,8 +185,8 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtIsActivePlayerSet, "Returns whether or 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtUpgradeVisitorToExplorer, args, "Params: playerInt\nUpgrades the player to explorer status")
 {
     unsigned playerInt = 0;
-    if (!PyArg_ParseTuple(args, "I", &playerInt))
-    {
+
+    if (!PyArg_ParseTuple(args, "I", &playerInt)) {
         PyErr_SetString(PyExc_TypeError, "PtUpgradeVisitorToExplorer expects a unsigned int");
         PYTHON_RETURN_ERROR;
     }
@@ -213,8 +198,8 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtUpgradeVisitorToExplorer, args, "Params: playe
 PYTHON_GLOBAL_METHOD_DEFINITION(PtChangePassword, args, "Params: password\nChanges the current account's password")
 {
     char* password = nil;
-    if (!PyArg_ParseTuple(args, "s", &password))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &password)) {
         PyErr_SetString(PyExc_TypeError, "PtChangePassword expects a string");
         PYTHON_RETURN_ERROR;
     }
@@ -223,7 +208,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtChangePassword, args, "Params: password\nChang
     PYTHON_RETURN_NONE;
 }
 
-void cyAccountManagement::AddPlasmaMethods(std::vector<PyMethodDef> &methods)
+void cyAccountManagement::AddPlasmaMethods(std::vector<PyMethodDef>& methods)
 {
     PYTHON_GLOBAL_METHOD_NOARGS(methods, PtIsSubscriptionActive);
     PYTHON_GLOBAL_METHOD_NOARGS(methods, PtGetAccountPlayerList);
@@ -237,7 +222,7 @@ void cyAccountManagement::AddPlasmaMethods(std::vector<PyMethodDef> &methods)
     PYTHON_GLOBAL_METHOD(methods, PtChangePassword);
 }
 
-void cyAccountManagement::AddPlasmaConstantsClasses(PyObject *m)
+void cyAccountManagement::AddPlasmaConstantsClasses(PyObject* m)
 {
     PYTHON_ENUM_START(PtAccountUpdateType);
     PYTHON_ENUM_ELEMENT(PtAccountUpdateType, kCreatePlayer,     plAccountUpdateMsg::kCreatePlayer);

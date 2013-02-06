@@ -87,13 +87,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plStatusLog/plStatusLog.h"
 
 // The static single instance, allocated on demand by GetInstance()
-plAvatarMgr     *plAvatarMgr::fInstance = nil;
+plAvatarMgr*     plAvatarMgr::fInstance = nil;
 
 // CTOR
 plAvatarMgr::plAvatarMgr()
 {
     fLog = plStatusLogMgr::GetInstance().CreateStatusLog(40, "Avatar.log", plStatusLog::kFilledBackground | plStatusLog::kAlignToTop | plStatusLog::kTimestamp);
-    fLog->AddLine("Initalized avatar mgr"); 
+    fLog->AddLine("Initalized avatar mgr");
 }
 
 // DTOR
@@ -106,25 +106,27 @@ plAvatarMgr::~plAvatarMgr()
 }
 
 // GETINSTANCE
-plAvatarMgr * plAvatarMgr::GetInstance()
+plAvatarMgr* plAvatarMgr::GetInstance()
 {
-    if(!fInstance)
-    {
+    if (!fInstance) {
         fInstance = new plAvatarMgr;
         fInstance->RegisterAs(kAvatarMgr_KEY);
         fInstance->Ref();
     }
+
     return fInstance;
 }
 
 // SHUTDOWN
 void plAvatarMgr::ShutDown()
 {
-    if(fInstance)
-    {
+    if (fInstance) {
         fInstance->UnRef();
-        if(fInstance)
+
+        if (fInstance) {
             fInstance->UnRegister();
+        }
+
         fInstance = nil;
     }
 }
@@ -140,48 +142,48 @@ void plAvatarMgr::IReset()
     fMaintainersMarkers.SetCountAndZero(0);
 
     plCoopMap::iterator acIt = fActiveCoops.begin();
-    while (acIt != fActiveCoops.end())
-    {
+
+    while (acIt != fActiveCoops.end()) {
         plCoopCoordinator* deadCoop = acIt->second;
         delete deadCoop;
         acIt++;
     }
+
     fActiveCoops.clear();
 }
 
-plKey plAvatarMgr::LoadPlayer(const char *name, const char *account)
+plKey plAvatarMgr::LoadPlayer(const char* name, const char* account)
 {
     return LoadAvatar(name, account, true, nil, nil);
 }
 
-plKey plAvatarMgr::LoadPlayer(const char *name, const char *account, const char *linkInName)
+plKey plAvatarMgr::LoadPlayer(const char* name, const char* account, const char* linkInName)
 {
     // what we'd like to do is turn the linkInName into a spawn point key and
     // put that into the plLoadAvatarMsg, which is already set up to handle
     // initial spawn points.
     // however, that will require that we can handle waiting for our spawn point to load,
     // so we're goin to do this the "old way" for now.
-    
+
     plArmatureMod::SetSpawnPointOverride(linkInName);
     return LoadAvatar(name, account, true, nil, nil);
 }
 
 
-plKey plAvatarMgr::LoadAvatar(const char *name, const char *accountName, bool isPlayer, plKey spawnPoint, plAvTask *initialTask, const char *userStr /*=nil*/)
+plKey plAvatarMgr::LoadAvatar(const char* name, const char* accountName, bool isPlayer, plKey spawnPoint, plAvTask* initialTask, const char* userStr /*=nil*/)
 {
     // *** account is currently unused. the idea is that eventually an NPC will
     // *** be able to use a customization account
     plKey result = nil;
     plKey requestor = GetKey(); // avatar manager is always the requestor for avatar loads
-    plNetClientMgr *netMgr = plNetClientMgr::GetInstance();
+    plNetClientMgr* netMgr = plNetClientMgr::GetInstance();
 
-    if(netMgr)      // can't clone without the net manager
-    {
+    if (netMgr) {   // can't clone without the net manager
         hsAssert(name, "name required by LoadPlayer fxn");
-        netMgr->DebugMsg("Local: Loading player %s", name); 
+        netMgr->DebugMsg("Local: Loading player %s", name);
 
         // look up player by key name provided by user.
-        // this string search should be replaced with some other method of 
+        // this string search should be replaced with some other method of
         // avatar selection and key lookup.
 
         // Get the location for the player first
@@ -200,27 +202,28 @@ plKey plAvatarMgr::LoadAvatar(const char *name, const char *accountName, bool is
 #endif
 
         plString theName = name;
-        if ( loc == maleLoc )
-            theName = "Male";
 
-        if (loc.IsValid())
-        {
+        if (loc == maleLoc) {
+            theName = "Male";
+        }
+
+        if (loc.IsValid()) {
             plUoid uID(loc, plSceneObject::Index(), theName);
-            plLoadAvatarMsg *cloneMsg = new plLoadAvatarMsg (uID, requestor, 0, isPlayer, spawnPoint, initialTask, userStr);
+            plLoadAvatarMsg* cloneMsg = new plLoadAvatarMsg(uID, requestor, 0, isPlayer, spawnPoint, initialTask, userStr);
             result =  cloneMsg->GetCloneKey();
-            
+
             // the clone message is automatically addressed to the net client manager
             // we'll receive the message back (or a similar message) when the clone is loaded
             cloneMsg->Send();
         }
     }
+
     return result;
 }
 
 void plAvatarMgr::UnLoadAvatar(const plKey& avatarKey, bool isPlayer, bool netPropagate) const
 {
-    if (avatarKey)
-    {
+    if (avatarKey) {
         plKey requestor = GetKey();
         plLoadAvatarMsg* msg = new plLoadAvatarMsg(avatarKey, requestor, 0, isPlayer, false);
 
@@ -235,19 +238,18 @@ void plAvatarMgr::UnLoadAvatar(const plKey& avatarKey, bool isPlayer, bool netPr
 void plAvatarMgr::PropagateLocalPlayer(int spawnPoint)
 {
     plKey playerKey = plNetClientMgr::GetInstance()->GetLocalPlayerKey();
-    if(playerKey)
-    {
+
+    if (playerKey) {
         plKey requestor = GetKey();
         bool isPlayer = true;
         bool isLoading = true;
-        plLoadAvatarMsg *msg = new plLoadAvatarMsg(playerKey, requestor, 0, isPlayer, isLoading);
+        plLoadAvatarMsg* msg = new plLoadAvatarMsg(playerKey, requestor, 0, isPlayer, isLoading);
 
-        if (spawnPoint >= 0)
-        {
-            const plSpawnModifier * spawn = GetSpawnPoint(spawnPoint);
-            if ( spawn )
-            {
-                const plSceneObject * spawnObj = spawn->GetTarget(0);
+        if (spawnPoint >= 0) {
+            const plSpawnModifier* spawn = GetSpawnPoint(spawnPoint);
+
+            if (spawn) {
+                const plSceneObject* spawnObj = spawn->GetTarget(0);
                 msg->SetSpawnPoint(spawnObj->GetKey());
             }
         }
@@ -264,16 +266,17 @@ void plAvatarMgr::PropagateLocalPlayer(int spawnPoint)
 bool plAvatarMgr::UnPropagateLocalPlayer()
 {
     plKey playerKey = plNetClientMgr::GetInstance()->GetLocalPlayerKey();
-    if(playerKey)
-    {
+
+    if (playerKey) {
         plKey requestor = GetKey();
         bool isPlayer = true;
         bool isLoading = false;
-        plLoadAvatarMsg *msg = new plLoadAvatarMsg(playerKey, requestor, 0, isPlayer, isLoading);
+        plLoadAvatarMsg* msg = new plLoadAvatarMsg(playerKey, requestor, 0, isPlayer, isLoading);
         msg->SetBCastFlag(plMessage::kLocalPropagate, false);
         msg->Send();
         return true;
     }
+
     return false;
 }
 
@@ -281,36 +284,36 @@ bool plAvatarMgr::UnPropagateLocalPlayer()
 void plAvatarMgr::UnLoadLocalPlayer()
 {
     plKey playerKey = plNetClientMgr::GetInstance()->GetLocalPlayerKey();
-    if(playerKey)
-    {
+
+    if (playerKey) {
         plKey mgrKey = GetKey();
         bool isPlayer = true;
         bool isLoading = false;
-        plLoadAvatarMsg *msg = new plLoadAvatarMsg(playerKey, mgrKey, 0, isPlayer, isLoading);
+        plLoadAvatarMsg* msg = new plLoadAvatarMsg(playerKey, mgrKey, 0, isPlayer, isLoading);
         msg->Send();
     }
 }
 
 // MSGRECEIVE
-bool plAvatarMgr::MsgReceive(plMessage *msg)
+bool plAvatarMgr::MsgReceive(plMessage* msg)
 {
-    plLoadAvatarMsg *cloneM = plLoadAvatarMsg::ConvertNoRef(msg);
-    if(cloneM)
-    {
+    plLoadAvatarMsg* cloneM = plLoadAvatarMsg::ConvertNoRef(msg);
+
+    if (cloneM) {
         // The only way we get clone messages is if we (or our remote counterparts)
         // requested them.
-        if(cloneM->GetIsLoading())
-        {
+        if (cloneM->GetIsLoading()) {
             IFinishLoadingAvatar(cloneM);
         } else {
             IFinishUnloadingAvatar(cloneM);
         }
+
         return true;
     }
 
     plLoadCloneMsg* pCloneMsg = plLoadCloneMsg::ConvertNoRef(msg);
-    if (pCloneMsg)
-    {
+
+    if (pCloneMsg) {
         pCloneMsg->Ref();
         fCloneMsgQueue.Append(pCloneMsg);
         plgDispatch::Dispatch()->RegisterForExactType(plEvalMsg::Index(), GetKey());
@@ -318,35 +321,36 @@ bool plAvatarMgr::MsgReceive(plMessage *msg)
     }
 
     plEvalMsg* pEval = plEvalMsg::ConvertNoRef(msg);
-    if (pEval)
-    {
-        for (int i = fCloneMsgQueue.Count() - 1; i > -1; i--)
-        {
+
+    if (pEval) {
+        for (int i = fCloneMsgQueue.Count() - 1; i > -1; i--) {
             plArmatureMod* pAvatar = FindAvatarByPlayerID(fCloneMsgQueue[i]->GetUserData());
-            if (pAvatar && pAvatar->GetKey()->ObjectIsLoaded())
-            {   
+
+            if (pAvatar && pAvatar->GetKey()->ObjectIsLoaded()) {
                 pAvatar->MsgReceive(fCloneMsgQueue[i]);
                 fCloneMsgQueue[i]->UnRef();
                 fCloneMsgQueue.Remove(i);
             }
         }
-        if (fCloneMsgQueue.Count() == 0)
+
+        if (fCloneMsgQueue.Count() == 0) {
             plgDispatch::Dispatch()->UnRegisterForExactType(plEvalMsg::Index(), GetKey());
-        
+        }
+
         return true;
     }
-    plAvCoopMsg *coopM = plAvCoopMsg::ConvertNoRef(msg);
-    if(coopM)
-    {
+
+    plAvCoopMsg* coopM = plAvCoopMsg::ConvertNoRef(msg);
+
+    if (coopM) {
         return HandleCoopMsg(coopM);
     }
 
-    plNotifyMsg *notifyM = plNotifyMsg::ConvertNoRef(msg);
-    if(notifyM)
-    {
-        if(proEventData * evt = notifyM->FindEventRecord(proEventData::kCoop))
-        {
-            proCoopEventData *coopE = static_cast<proCoopEventData *>(evt);
+    plNotifyMsg* notifyM = plNotifyMsg::ConvertNoRef(msg);
+
+    if (notifyM) {
+        if (proEventData* evt = notifyM->FindEventRecord(proEventData::kCoop)) {
+            proCoopEventData* coopE = static_cast<proCoopEventData*>(evt);
             return IPassMessageToActiveCoop(msg, coopE->fID, coopE->fSerial);
         }
     }
@@ -354,30 +358,30 @@ bool plAvatarMgr::MsgReceive(plMessage *msg)
     return false;
 }
 
-bool plAvatarMgr::HandleCoopMsg(plAvCoopMsg *msg)
+bool plAvatarMgr::HandleCoopMsg(plAvCoopMsg* msg)
 {
     plAvCoopMsg::Command cmd = msg->fCommand;
-    
+
     uint32_t id = msg->fInitiatorID;
     uint16_t serial = msg->fInitiatorSerial;
 
-    if(cmd == plAvCoopMsg::kStartNew)
-    {
+    if (cmd == plAvCoopMsg::kStartNew) {
         // Currently, there's nothing that removes these coop coordinators when
         // they're done.  Since I can't think of a good way to figure out when
         // they're done, I'm just going to clear them every time a new one starts.
         // With the current usage, you should only get one at a time anyway -Colin
         plCoopMap::iterator it = fActiveCoops.begin();
-        while (it != fActiveCoops.end())
-        {
+
+        while (it != fActiveCoops.end()) {
             plCoopCoordinator* deadCoop = it->second;
             delete deadCoop;
             it++;
         }
+
         fActiveCoops.clear();
 
         // start a new coop
-        plCoopCoordinator *coord = msg->fCoordinator;
+        plCoopCoordinator* coord = msg->fCoordinator;
         plCoopMap::value_type newVal(id, coord);
         fActiveCoops.insert(newVal);
         coord->Run();
@@ -388,32 +392,35 @@ bool plAvatarMgr::HandleCoopMsg(plAvCoopMsg *msg)
     }
 }
 
-bool plAvatarMgr::HandleNotifyMsg(plNotifyMsg *msg)
+bool plAvatarMgr::HandleNotifyMsg(plNotifyMsg* msg)
 {
-    proCoopEventData *ed = static_cast<proCoopEventData *>(msg->FindEventRecord(proEventData::kCoop));
-    if(ed)
-    {
+    proCoopEventData* ed = static_cast<proCoopEventData*>(msg->FindEventRecord(proEventData::kCoop));
+
+    if (ed) {
         uint32_t id = ed->fID;
         uint16_t serial = ed->fSerial;
         return IPassMessageToActiveCoop(msg, id, serial);
     }
+
     return false;
 }
 
-bool plAvatarMgr::IPassMessageToActiveCoop(plMessage *msg, uint32_t id, uint16_t serial)
+bool plAvatarMgr::IPassMessageToActiveCoop(plMessage* msg, uint32_t id, uint16_t serial)
 {
     plCoopMap::iterator i = fActiveCoops.find(id);
-    while(i != fActiveCoops.end() && (*i).first == id)
-    {
-        plCoopCoordinator *coord = (*i).second;
-        if(coord->GetInitiatorSerial() == serial && coord->IsActiveForReal() )
-        {
+
+    while (i != fActiveCoops.end() && (*i).first == id) {
+        plCoopCoordinator* coord = (*i).second;
+
+        if (coord->GetInitiatorSerial() == serial && coord->IsActiveForReal()) {
             // this is the one
             coord->MsgReceive(msg);
             return true;
         }
+
         i++;
     }
+
     return false;
 }
 
@@ -421,40 +428,42 @@ bool plAvatarMgr::IsACoopRunning()
 {
     bool isRunning = false;
     plCoopMap::iterator it = fActiveCoops.begin();
-    while (it != fActiveCoops.end())
-    {
+
+    while (it != fActiveCoops.end()) {
         plCoopCoordinator* aCoop = it->second;
-        if (aCoop->IsActiveForReal())
+
+        if (aCoop->IsActiveForReal()) {
             isRunning = true;
+        }
+
         it++;
     }
+
     return isRunning;
 }
 
 
-void plAvatarMgr::IFinishLoadingAvatar(plLoadAvatarMsg *cloneMsg)
+void plAvatarMgr::IFinishLoadingAvatar(plLoadAvatarMsg* cloneMsg)
 {
     plKey avatarKey = cloneMsg->GetCloneKey();
     plUoid playerUoid = avatarKey->GetUoid();
-    const plArmatureMod *armature = FindAvatar(avatarKey);
+    const plArmatureMod* armature = FindAvatar(avatarKey);
 
     // we're going to re-send the clone message to the loaded avatar so he can get
     // any necessary details from it.
     cloneMsg->ClearReceivers();     // don't want it coming back to us
     cloneMsg->Ref();                // or going away
 
-    if(armature)
-    {
+    if (armature) {
         cloneMsg->AddReceiver(armature->GetKey());
         cloneMsg->Send();
     } else {
         IDeferInit(avatarKey, cloneMsg);        // we'll send this message when the armature mod loads.
     }
 
-    if( cloneMsg->GetIsPlayer() )
-    {
+    if (cloneMsg->GetIsPlayer()) {
         // notify everyone who cares that a new player has arrived
-        // *** might want to move this to the human brain so we can make sure the 
+        // *** might want to move this to the human brain so we can make sure the
         // *** avatar is sufficiently initialized before anyone accesses him
         bool isLocal = cloneMsg->GetOriginatingPlayerID() == plNetClientMgr::GetInstance()->GetPlayerID();
         plPlayerPageMsg* pageM = new plPlayerPageMsg;
@@ -473,41 +482,43 @@ void plAvatarMgr::IFinishLoadingAvatar(plLoadAvatarMsg *cloneMsg)
 }
 
 // IFINISHUNLOADINGAVATAR
-void plAvatarMgr::IFinishUnloadingAvatar(plLoadAvatarMsg *cloneMsg)
+void plAvatarMgr::IFinishUnloadingAvatar(plLoadAvatarMsg* cloneMsg)
 {
     // Note: in the corresponding FinishLoading, above, we give the incoming avatar
     // a look at the message that spawned him. When unloading, however, he doesn't get
     // that benefit because I don't think he'll actually be around to receive it.
     // *** need to test that theory....but it's not a problem for now.
-    if( cloneMsg->GetIsPlayer() )
-    {
+    if (cloneMsg->GetIsPlayer()) {
         plKey avatar = cloneMsg->GetCloneKey();
 
         bool isLocal = cloneMsg->GetOriginatingPlayerID() == plNetClientMgr::GetInstance()->GetPlayerID();
-        plPlayerPageMsg *pageM = new plPlayerPageMsg;
+        plPlayerPageMsg* pageM = new plPlayerPageMsg;
         pageM->SetBCastFlag(plMessage::kBCastByExactType);
         pageM->fLocallyOriginated = isLocal;
         pageM->fPlayer = avatar;
         pageM->fUnload = true;
         pageM->fClientID = cloneMsg->GetOriginatingPlayerID();
-        if (plNetClientMgr::GetInstance()->RemotePlayerKeys().size() == 0)
+
+        if (plNetClientMgr::GetInstance()->RemotePlayerKeys().size() == 0) {
             pageM->fLastOut = true;
+        }
+
         pageM->Send();
     }
 
     // check on this...can it be subsumed by plPlayerPageMsg ?
-    plMemberUpdateMsg *mu = new plMemberUpdateMsg;
+    plMemberUpdateMsg* mu = new plMemberUpdateMsg;
     mu->Send();
 }
 
 
 // IDEFERINIT
-void plAvatarMgr::IDeferInit(plKey playerSOKey, plMessage *initMsg)
+void plAvatarMgr::IDeferInit(plKey playerSOKey, plMessage* initMsg)
 {
-    plMessage *existing = fDeferredInits[playerSOKey];      // okay to use this form because we're going
-                                                            // to do the add either way
-    if(existing)
-    {
+    plMessage* existing = fDeferredInits[playerSOKey];      // okay to use this form because we're going
+
+    // to do the add either way
+    if (existing) {
         hsStatusMessage("Avatar was registered twice for init. Discarding initial init message.");
         existing->UnRef();
     }
@@ -520,20 +531,17 @@ void plAvatarMgr::IDeferInit(plKey playerSOKey, plMessage *initMsg)
 void plAvatarMgr::ISendDeferredInit(plKey avatarSOKey)
 {
     // get armaturemod
-    const plArmatureMod * armature = FindAvatar(avatarSOKey);
+    const plArmatureMod* armature = FindAvatar(avatarSOKey);
 
-    if(armature)
-    {
+    if (armature) {
         DeferredInits::iterator i = fDeferredInits.find(avatarSOKey);
         bool found = (i != fDeferredInits.end());
 
-        if(i != fDeferredInits.end())
-        {
-            plMessage * initMsg = (*i).second;
+        if (i != fDeferredInits.end()) {
+            plMessage* initMsg = (*i).second;
             hsAssert(initMsg, "Tried to init avatar, but found nil initialization message.");
-            
-            if(initMsg)
-            {
+
+            if (initMsg) {
                 initMsg->AddReceiver(armature->GetKey());
                 initMsg->Send();
             }
@@ -543,45 +551,40 @@ void plAvatarMgr::ISendDeferredInit(plKey avatarSOKey)
 
 
 // ADDSEEKPOINT
-void plAvatarMgr::AddSeekPoint(plSeekPointMod *seekPoint)
+void plAvatarMgr::AddSeekPoint(plSeekPointMod* seekPoint)
 {
-    if(seekPoint)
-    {
+    if (seekPoint) {
         plString name = seekPoint->GetTarget(0)->GetKey()->GetName();
-        plSeekPointMod *alreadyThere = FindSeekPoint(name);
+        plSeekPointMod* alreadyThere = FindSeekPoint(name);
 
         /// hsAssert( ! alreadyThere, "Tried to add a seek point with duplicate name. Ignoring second seek point.");
 
-        if ( ! alreadyThere)
-        {
+        if (! alreadyThere) {
             fSeekPoints[name] = seekPoint;
         }
     }
 }
 
 // REMOVESEEKPOINT
-void plAvatarMgr::RemoveSeekPoint(plSeekPointMod *seekPoint)
+void plAvatarMgr::RemoveSeekPoint(plSeekPointMod* seekPoint)
 {
-    if(seekPoint)
-    {
+    if (seekPoint) {
         plString name = seekPoint->GetTarget(0)->GetKey()->GetName();
 
         plSeekPointMap::iterator found = fSeekPoints.find(name);
 
-        if(found != fSeekPoints.end())
-        {
+        if (found != fSeekPoints.end()) {
             fSeekPoints.erase(found);
         }
     }
 }
 
 // FINDSEEKPOINT
-plSeekPointMod * plAvatarMgr::FindSeekPoint(const plString &name)
+plSeekPointMod* plAvatarMgr::FindSeekPoint(const plString& name)
 {
     plSeekPointMap::iterator found = fSeekPoints.find(name);
-    
-    if (found == fSeekPoints.end())
-    {
+
+    if (found == fSeekPoints.end()) {
         return nil;
     } else {
         return (*found).second;
@@ -589,33 +592,29 @@ plSeekPointMod * plAvatarMgr::FindSeekPoint(const plString &name)
 }
 
 // ADDONESHOT
-void plAvatarMgr::AddOneShot(plOneShotMod *oneshot)
+void plAvatarMgr::AddOneShot(plOneShotMod* oneshot)
 {
-    if(oneshot)
-    {
+    if (oneshot) {
         plString name = oneshot->GetTarget(0)->GetKey()->GetName();
-        plOneShotMod *alreadyThere = FindOneShot(name);
+        plOneShotMod* alreadyThere = FindOneShot(name);
 
 
-        if ( ! alreadyThere)
-        {
+        if (! alreadyThere) {
             fOneShots[name] = oneshot;
         }
     }
 }
 
 // REMOVEONESHOT
-void plAvatarMgr::RemoveOneShot(plOneShotMod *oneshot)
+void plAvatarMgr::RemoveOneShot(plOneShotMod* oneshot)
 {
     plOneShotMap::iterator i = fOneShots.begin();
 
-    while (i != fOneShots.end())
-    {
+    while (i != fOneShots.end()) {
         plString name = i->first;
-        plOneShotMod *thisOneshot = i->second;
+        plOneShotMod* thisOneshot = i->second;
 
-        if(oneshot == thisOneshot)
-        {
+        if (oneshot == thisOneshot) {
             fOneShots.erase(i++);
         } else {
             ++i;
@@ -624,12 +623,11 @@ void plAvatarMgr::RemoveOneShot(plOneShotMod *oneshot)
 }
 
 // FINDONESHOT
-plOneShotMod *plAvatarMgr::FindOneShot(const plString &name)
+plOneShotMod* plAvatarMgr::FindOneShot(const plString& name)
 {
     plOneShotMap::iterator found = fOneShots.find(name);
 
-    if (found == fOneShots.end())
-    {
+    if (found == fOneShots.end()) {
         return nil;
     } else {
         return found->second;
@@ -637,42 +635,45 @@ plOneShotMod *plAvatarMgr::FindOneShot(const plString &name)
 }
 
 // ADDAVATAR
-void plAvatarMgr::AddAvatar(plArmatureMod *avatar)
+void plAvatarMgr::AddAvatar(plArmatureMod* avatar)
 {
     // we shouldn't really need to ref this, as every time we access this object we will be checking it, and we don't care too much if it gets
     // pulled out from under us
     fAvatars.push_back(avatar->GetKey());
-    plSceneObject *avatarSO = avatar->GetTarget(0);
+    plSceneObject* avatarSO = avatar->GetTarget(0);
     hsAssert(avatarSO, "Adding avatar, but it hasn't been attached to a scene object yet.");
-    if(avatarSO)
-    {
+
+    if (avatarSO) {
         plKey soKey = avatarSO->GetKey();
         ISendDeferredInit(soKey);
     }
 }
 
 // REMOVEAVATAR
-void plAvatarMgr::RemoveAvatar(plArmatureMod *avatar)
+void plAvatarMgr::RemoveAvatar(plArmatureMod* avatar)
 {
-    if (avatar)
-    {
+    if (avatar) {
         plAvatarVec::iterator tail = std::remove(fAvatars.begin(), fAvatars.end(), avatar->GetKey());
-        if(tail != fAvatars.end())
+
+        if (tail != fAvatars.end()) {
             fAvatars.erase(tail);
+        }
     }
 }
 
 plArmatureMod* plAvatarMgr::GetLocalAvatar()
 {
-    plNetClientApp * app = plNetClientApp::GetInstance();
-    if(app)
-    {
+    plNetClientApp* app = plNetClientApp::GetInstance();
+
+    if (app) {
         plKey key = app->GetLocalPlayerKey();
-        if (key && key->ObjectIsLoaded())
-        {
+
+        if (key && key->ObjectIsLoaded()) {
             plSceneObject* so = plSceneObject::ConvertNoRef(key->GetObjectPtr());
-            if (so)
+
+            if (so) {
                 return const_cast<plArmatureMod*>((plArmatureMod*)so->GetModifierByType(plArmatureMod::Index()));
+            }
         }
     }
 
@@ -681,113 +682,126 @@ plArmatureMod* plAvatarMgr::GetLocalAvatar()
 
 plKey plAvatarMgr::GetLocalAvatarKey()
 {
-    plArmatureMod *avatar = GetLocalAvatar();
-    if (avatar)
+    plArmatureMod* avatar = GetLocalAvatar();
+
+    if (avatar) {
         return avatar->GetKey();
+    }
 
     return nil;
 }
 
-plArmatureMod *plAvatarMgr::GetFirstRemoteAvatar()
+plArmatureMod* plAvatarMgr::GetFirstRemoteAvatar()
 {
-    plNetClientApp * app = plNetClientApp::GetInstance();
-    if(app)
-    {
-        plArmatureMod *localAvatar = GetLocalAvatar();
-        
+    plNetClientApp* app = plNetClientApp::GetInstance();
+
+    if (app) {
+        plArmatureMod* localAvatar = GetLocalAvatar();
+
         plAvatarVec::iterator it;
-        for (it = fAvatars.begin(); it != fAvatars.end(); ++it)
-        {
+
+        for (it = fAvatars.begin(); it != fAvatars.end(); ++it) {
             plArmatureMod* armature = plArmatureMod::ConvertNoRef((*it)->ObjectIsLoaded());
-            if(armature && (armature != localAvatar))
+
+            if (armature && (armature != localAvatar)) {
                 return armature;
+            }
         }
     }
-    
+
     return nil;
 }
 
 plArmatureMod* plAvatarMgr::FindAvatar(plKey& avatarKey)
 {
-    plSceneObject *so = plSceneObject::ConvertNoRef(avatarKey->ObjectIsLoaded());
-    if (so)
+    plSceneObject* so = plSceneObject::ConvertNoRef(avatarKey->ObjectIsLoaded());
+
+    if (so) {
         return const_cast<plArmatureMod*>((plArmatureMod*)so->GetModifierByType(plArmatureMod::Index()));
-    
+    }
+
     return nil;
 }
 
 plArmatureMod* plAvatarMgr::FindAvatarByPlayerID(uint32_t pid)
 {
     plAvatarVec::iterator it;
-    for (it = fAvatars.begin(); it != fAvatars.end(); ++it)
-    {
+
+    for (it = fAvatars.begin(); it != fAvatars.end(); ++it) {
         plArmatureMod* armature = plArmatureMod::ConvertNoRef((*it)->ObjectIsLoaded());
-        if (armature && (armature->GetKey()->GetUoid().GetClonePlayerID() == pid))
+
+        if (armature && (armature->GetKey()->GetUoid().GetClonePlayerID() == pid)) {
             return armature;
+        }
     }
+
     return nil;
 }
 
-plArmatureMod *plAvatarMgr::FindAvatarByModelName(char *name)
+plArmatureMod* plAvatarMgr::FindAvatarByModelName(char* name)
 {
     plAvatarVec::iterator it;
-    for (it = fAvatars.begin(); it != fAvatars.end(); ++it)
-    {
+
+    for (it = fAvatars.begin(); it != fAvatars.end(); ++it) {
         plArmatureMod* armature = plArmatureMod::ConvertNoRef((*it)->ObjectIsLoaded());
-        if (armature && (!armature->GetTarget(0)->GetKeyName().Compare(name)))
+
+        if (armature && (!armature->GetTarget(0)->GetKeyName().Compare(name))) {
             return armature;
+        }
     }
-    
+
     return nil;
 }
 
 void plAvatarMgr::FindAllAvatarsByModelName(const char* name, plArmatureModPtrVec& outVec)
 {
     plAvatarVec::iterator it;
-    for (it = fAvatars.begin(); it != fAvatars.end(); ++it)
-    {
+
+    for (it = fAvatars.begin(); it != fAvatars.end(); ++it) {
         plArmatureMod* armature = plArmatureMod::ConvertNoRef((*it)->ObjectIsLoaded());
-        if (armature && (!armature->GetTarget(0)->GetKeyName().Compare(name)))
+
+        if (armature && (!armature->GetTarget(0)->GetKeyName().Compare(name))) {
             outVec.push_back(armature);
+        }
     }
 }
 
 // ADDSPAWNPOINT
-void plAvatarMgr::AddSpawnPoint(plSpawnModifier *spawn)
+void plAvatarMgr::AddSpawnPoint(plSpawnModifier* spawn)
 {
     fSpawnPoints.push_back(spawn);
 }
 
 // REMOVESPAWNPOINT
-void plAvatarMgr::RemoveSpawnPoint(plSpawnModifier *spawn)
+void plAvatarMgr::RemoveSpawnPoint(plSpawnModifier* spawn)
 {
     plSpawnVec::iterator found = std::find(fSpawnPoints.begin(), fSpawnPoints.end(), spawn);
 
-    if(found != fSpawnPoints.end())
-    {
+    if (found != fSpawnPoints.end()) {
         fSpawnPoints.erase(found);
     }
 }
 
 // GETSPAWNPOINT
-const plSpawnModifier * plAvatarMgr::GetSpawnPoint(int i)
+const plSpawnModifier* plAvatarMgr::GetSpawnPoint(int i)
 {
-    if(i < fSpawnPoints.size())
-    {
+    if (i < fSpawnPoints.size()) {
         return fSpawnPoints[i];
-    } else return nil;
+    } else {
+        return nil;
+    }
 }
 
-int plAvatarMgr::FindSpawnPoint( const char *name ) const
+int plAvatarMgr::FindSpawnPoint(const char* name) const
 {
     int i;
 
-    for( i = 0; i < fSpawnPoints.size(); i++ )
-    {
-        if( fSpawnPoints[ i ] != nil && 
-            ( fSpawnPoints[ i ]->GetKey()->GetUoid().GetObjectName().Find( name ) >= 0 ||
-              fSpawnPoints[ i ]->GetTarget(0)->GetKeyName().Find( name ) >= 0 ))
+    for (i = 0; i < fSpawnPoints.size(); i++) {
+        if (fSpawnPoints[ i ] != nil &&
+                (fSpawnPoints[ i ]->GetKey()->GetUoid().GetObjectName().Find(name) >= 0 ||
+                 fSpawnPoints[ i ]->GetTarget(0)->GetKeyName().Find(name) >= 0)) {
             return i;
+        }
     }
 
     return -1;
@@ -795,26 +809,31 @@ int plAvatarMgr::FindSpawnPoint( const char *name ) const
 
 int plAvatarMgr::WarpPlayerToAnother(bool iMove, uint32_t remoteID)
 {
-    plNetTransport &mgr = plNetClientMgr::GetInstance()->TransportMgr();
-    plNetTransportMember *mbr = mgr.GetMember(mgr.FindMember(remoteID));
+    plNetTransport& mgr = plNetClientMgr::GetInstance()->TransportMgr();
+    plNetTransportMember* mbr = mgr.GetMember(mgr.FindMember(remoteID));
 
-    if (!mbr)
+    if (!mbr) {
         return plCCRError::kCantFindPlayer;
-    
-    if (!mbr->GetAvatarKey())
+    }
+
+    if (!mbr->GetAvatarKey()) {
         return plCCRError::kPlayerNotInAge;
+    }
 
-    plSceneObject *remoteSO = plSceneObject::ConvertNoRef(mbr->GetAvatarKey()->ObjectIsLoaded());
-    plSceneObject *localSO = plSceneObject::ConvertNoRef(plNetClientMgr::GetInstance()->GetLocalPlayer());
+    plSceneObject* remoteSO = plSceneObject::ConvertNoRef(mbr->GetAvatarKey()->ObjectIsLoaded());
+    plSceneObject* localSO = plSceneObject::ConvertNoRef(plNetClientMgr::GetInstance()->GetLocalPlayer());
 
-    if (!remoteSO)
+    if (!remoteSO) {
         return plCCRError::kCantFindPlayer;
-    if (!localSO)
-        return plCCRError::kNilLocalAvatar;
+    }
 
-    plWarpMsg *warp = new plWarpMsg(nil, (iMove ? localSO->GetKey() : remoteSO->GetKey()), 
-        plWarpMsg::kFlushTransform, (iMove ? remoteSO->GetLocalToWorld() : localSO->GetLocalToWorld()));
-    
+    if (!localSO) {
+        return plCCRError::kNilLocalAvatar;
+    }
+
+    plWarpMsg* warp = new plWarpMsg(nil, (iMove ? localSO->GetKey() : remoteSO->GetKey()),
+                                    plWarpMsg::kFlushTransform, (iMove ? remoteSO->GetLocalToWorld() : localSO->GetLocalToWorld()));
+
     warp->SetBCastFlag(plMessage::kNetPropagate);
     plgDispatch::MsgSend(warp);
 
@@ -823,15 +842,17 @@ int plAvatarMgr::WarpPlayerToAnother(bool iMove, uint32_t remoteID)
 
 int plAvatarMgr::WarpPlayerToXYZ(float x, float y, float z)
 {
-    plSceneObject *localSO = plSceneObject::ConvertNoRef(plNetClientMgr::GetInstance()->GetLocalPlayer());
-    if (!localSO)
+    plSceneObject* localSO = plSceneObject::ConvertNoRef(plNetClientMgr::GetInstance()->GetLocalPlayer());
+
+    if (!localSO) {
         return plCCRError::kNilLocalAvatar;
+    }
 
     hsMatrix44 m = localSO->GetLocalToWorld();
     hsVector3 v(x, y, z);
     m.SetTranslate(&v);
 
-    plWarpMsg *warp = new plWarpMsg(nil, localSO->GetKey(), plWarpMsg::kFlushTransform, m);
+    plWarpMsg* warp = new plWarpMsg(nil, localSO->GetKey(), plWarpMsg::kFlushTransform, m);
     warp->SetBCastFlag(plMessage::kNetPropagate);
     plgDispatch::MsgSend(warp);
 
@@ -840,18 +861,20 @@ int plAvatarMgr::WarpPlayerToXYZ(float x, float y, float z)
 
 int plAvatarMgr::WarpPlayerToXYZ(int pid, float x, float y, float z)
 {
-    plNetClientMgr* nc=plNetClientMgr::GetInstance();
-    plNetTransportMember* mbr=nc->TransportMgr().GetMember(nc->TransportMgr().FindMember(pid));
-    plSceneObject *player = plSceneObject::ConvertNoRef(mbr && mbr->GetAvatarKey() ? 
-        mbr->GetAvatarKey()->ObjectIsLoaded() : nil);
-    if (!player)
+    plNetClientMgr* nc = plNetClientMgr::GetInstance();
+    plNetTransportMember* mbr = nc->TransportMgr().GetMember(nc->TransportMgr().FindMember(pid));
+    plSceneObject* player = plSceneObject::ConvertNoRef(mbr && mbr->GetAvatarKey() ?
+                            mbr->GetAvatarKey()->ObjectIsLoaded() : nil);
+
+    if (!player) {
         return plCCRError::kNilLocalAvatar;
+    }
 
     hsMatrix44 m = player->GetLocalToWorld();
     hsVector3 v(x, y, z);
     m.SetTranslate(&v);
 
-    plWarpMsg *warp = new plWarpMsg(nil, player->GetKey(), 0, m);
+    plWarpMsg* warp = new plWarpMsg(nil, player->GetKey(), 0, m);
     warp->SetBCastFlag(plMessage::kNetPropagate);
     plgDispatch::MsgSend(warp);
 
@@ -859,78 +882,77 @@ int plAvatarMgr::WarpPlayerToXYZ(int pid, float x, float y, float z)
 }
 
 // ADD maintainers marker
-void plAvatarMgr::AddMaintainersMarker(plMaintainersMarkerModifier *mm)
+void plAvatarMgr::AddMaintainersMarker(plMaintainersMarkerModifier* mm)
 {
     fMaintainersMarkers.Append(mm);
 }
 
 // REMOVE maintainers marker
-void plAvatarMgr::RemoveMaintainersMarker(plMaintainersMarkerModifier *mm)
+void plAvatarMgr::RemoveMaintainersMarker(plMaintainersMarkerModifier* mm)
 {
-    for (int i = 0; i < fMaintainersMarkers.Count(); i++)
-    {
-        if (fMaintainersMarkers[i] == mm)
+    for (int i = 0; i < fMaintainersMarkers.Count(); i++) {
+        if (fMaintainersMarkers[i] == mm) {
             fMaintainersMarkers.Remove(i);
+        }
     }
 }
 
 void plAvatarMgr::PointToDniCoordinate(hsPoint3 pt, plDniCoordinateInfo* ret)
 {
     int count = fMaintainersMarkers.Count();
+
     //  plDniCoordinateInfo ret = new plDniCoordinateInfo;
-    if (count > 0)
-    {   
+    if (count > 0) {
 
         // find the closest maintainers marker
         int nearestIndex = 0;
-        if (count > 1)
-        {
-            for (int i = 0; i < fMaintainersMarkers.Count(); i++)
-            {
-                if (fMaintainersMarkers[i]->GetTarget(0))
-                {
+
+        if (count > 1) {
+            for (int i = 0; i < fMaintainersMarkers.Count(); i++) {
+                if (fMaintainersMarkers[i]->GetTarget(0)) {
                     hsVector3 testDist(fMaintainersMarkers[i]->GetTarget(0)->GetCoordinateInterface()->GetLocalToWorld().GetTranslate() - pt);
-                    hsVector3 baseDist(fMaintainersMarkers[nearestIndex]->GetTarget(0)->GetCoordinateInterface()->GetLocalToWorld().GetTranslate() - pt);  
-                    if (testDist.MagnitudeSquared() < baseDist.MagnitudeSquared())
+                    hsVector3 baseDist(fMaintainersMarkers[nearestIndex]->GetTarget(0)->GetCoordinateInterface()->GetLocalToWorld().GetTranslate() - pt);
+
+                    if (testDist.MagnitudeSquared() < baseDist.MagnitudeSquared()) {
                         nearestIndex = i;
+                    }
                 }
             }
         }
+
         // convert the marker position to Dni coordinates
         int status = fMaintainersMarkers[nearestIndex]->GetCalibrated();
 
-        switch (status)
-        {
-        case  plMaintainersMarkerModifier::kBroken:
-            {
+        switch (status) {
+        case  plMaintainersMarkerModifier::kBroken: {
                 plRandom rnd;
                 rnd.SetSeed((int)(hsTimer::GetSeconds()));
-                rnd.RandRangeI(1,999);
-                ret->SetHSpans( rnd.RandRangeI(1,999) );
-                ret->SetVSpans( rnd.RandRangeI(1,999) );
-                ret->SetTorans( rnd.RandRangeI(1,62500) );
+                rnd.RandRangeI(1, 999);
+                ret->SetHSpans(rnd.RandRangeI(1, 999));
+                ret->SetVSpans(rnd.RandRangeI(1, 999));
+                ret->SetTorans(rnd.RandRangeI(1, 62500));
             }
             break;
-        case plMaintainersMarkerModifier::kRepaired:
-            {
+
+        case plMaintainersMarkerModifier::kRepaired: {
                 ret->SetHSpans(0);
                 ret->SetVSpans(0);
                 ret->SetTorans(0);
             }
             break;
-        case plMaintainersMarkerModifier::kCalibrated:
-            {
+
+        case plMaintainersMarkerModifier::kCalibrated: {
                 // this is the real deal here:
                 // vertical spans:
                 hsPoint3 retPoint = fMaintainersMarkers[nearestIndex]->GetTarget(0)->GetCoordinateInterface()->GetLocalToWorld().GetTranslate();
-                ret->SetVSpans( ((int)(pt.fZ - retPoint.fZ) / 16) );
+                ret->SetVSpans(((int)(pt.fZ - retPoint.fZ) / 16));
 
                 // horizontal spans:
 
                 // zero out the z axis...
                 retPoint.fZ = pt.fZ = 0.0f;
                 hsVector3 hSpanVec(retPoint - pt);
-                ret->SetHSpans( (int)hSpanVec.Magnitude() / 16) ;
+                ret->SetHSpans((int)hSpanVec.Magnitude() / 16) ;
 
                 // torans
                 hsVector3 zeroVec = fMaintainersMarkers[nearestIndex]->GetTarget(0)->GetCoordinateInterface()->GetLocalToWorld().GetAxis(hsMatrix44::kView);
@@ -944,14 +966,15 @@ void plAvatarMgr::PointToDniCoordinate(hsPoint3 pt, plDniCoordinateInfo* ret)
                 float dotRight = retVec * zeroRight;
 
                 float deg = acosf(dotView);
-                deg*=(180/3.141592);
+                deg *= (180 / 3.141592);
+
                 // account for being > 180
-                if (dotRight < 0.0f) 
-                {
+                if (dotRight < 0.0f) {
                     deg = 360.f - deg;
                 }
+
                 // convert it to dni radians (torans)
-                deg*=173.61;
+                deg *= 173.61;
                 ret->SetTorans((int)deg);
             }
             break;
@@ -963,8 +986,8 @@ void plAvatarMgr::PointToDniCoordinate(hsPoint3 pt, plDniCoordinateInfo* ret)
 void plAvatarMgr::GetDniCoordinate(plDniCoordinateInfo* ret)
 {
     plSceneObject* localSO = plSceneObject::ConvertNoRef(plNetClientMgr::GetInstance()->GetLocalPlayer());
-    if (localSO)
-    {   
+
+    if (localSO) {
         hsPoint3 pos = localSO->GetCoordinateInterface()->GetLocalToWorld().GetTranslate();
         PointToDniCoordinate(pos, ret);
     }
@@ -972,28 +995,26 @@ void plAvatarMgr::GetDniCoordinate(plDniCoordinateInfo* ret)
 
 // OfferLinkingBook ---------------------------------------------------------------
 // ----------
-void plAvatarMgr::OfferLinkingBook(plKey hostKey, plKey guestKey, plMessage *linkMsg, plKey replyKey)
+void plAvatarMgr::OfferLinkingBook(plKey hostKey, plKey guestKey, plMessage* linkMsg, plKey replyKey)
 {
-    if(hostKey != nil && guestKey != nil)
-    {
-        const plArmatureMod *hostAv = FindAvatar(hostKey);
-        const plArmatureMod *guestAv = FindAvatar(guestKey);
+    if (hostKey != nil && guestKey != nil) {
+        const plArmatureMod* hostAv = FindAvatar(hostKey);
+        const plArmatureMod* guestAv = FindAvatar(guestKey);
 
         hsAssert(hostAv && guestAv, "Offering linking book: host or guest missing.");
 
-        if(hostAv && guestAv)
-        {
+        if (hostAv && guestAv) {
 
             // make the host brain
-            plAvBrainCoop * brainH = new plAvBrainCoop(plAvBrainGeneric::kExitNormal, 3.0, 3.0, plAvBrainGeneric::kMoveRelative, guestKey);
+            plAvBrainCoop* brainH = new plAvBrainCoop(plAvBrainGeneric::kExitNormal, 3.0, 3.0, plAvBrainGeneric::kMoveRelative, guestKey);
 
-            plAnimStage *hostOffer = new plAnimStage("BookOffer", plAnimStage::kNotifyAdvance);     // autoforward, autoadvance
+            plAnimStage* hostOffer = new plAnimStage("BookOffer", plAnimStage::kNotifyAdvance);     // autoforward, autoadvance
             // repeats until the guest brain tells us that it's done
-            plAnimStage *hostIdle = new plAnimStage("BookOfferIdle", plAnimStage::kNotifyEnter, plAnimStage::kForwardAuto, plAnimStage::kBackNone,
+            plAnimStage* hostIdle = new plAnimStage("BookOfferIdle", plAnimStage::kNotifyEnter, plAnimStage::kForwardAuto, plAnimStage::kBackNone,
                                                     plAnimStage::kAdvanceNone, plAnimStage::kRegressNone, -1);
 
-            plAnimStage *hostFinish = new plAnimStage("BookOfferFinish", plAnimStage::kNotifyAdvance);  // autoforward, autoadvance
-            
+            plAnimStage* hostFinish = new plAnimStage("BookOfferFinish", plAnimStage::kNotifyAdvance);  // autoforward, autoadvance
+
             brainH->AddStage(hostOffer);
             brainH->AddStage(hostIdle);
             brainH->AddStage(hostFinish);
@@ -1003,19 +1024,19 @@ void plAvatarMgr::OfferLinkingBook(plKey hostKey, plKey guestKey, plMessage *lin
 
 
             // make the guest brain
-            plAvBrainCoop * brainG = new plAvBrainCoop(plAvBrainGeneric::kExitNormal, 3.0, 3.0, plAvBrainGeneric::kMoveRelative,
-                                                       hostID, (uint16_t)hostSerial, hostKey);
+            plAvBrainCoop* brainG = new plAvBrainCoop(plAvBrainGeneric::kExitNormal, 3.0, 3.0, plAvBrainGeneric::kMoveRelative,
+                    hostID, (uint16_t)hostSerial, hostKey);
 
-            plAnimStage *guestAccept = new plAnimStage("BookAccept", plAnimStage::kNotifyAdvance);
-            plAnimStage *guestAcceptIdle = new plAnimStage("BookAcceptIdle", plAnimStage::kNotifyEnter, plAnimStage::kForwardAuto, plAnimStage::kBackNone,
-                                                           plAnimStage::kAdvanceNone, plAnimStage::kRegressNone, -1);
-            
+            plAnimStage* guestAccept = new plAnimStage("BookAccept", plAnimStage::kNotifyAdvance);
+            plAnimStage* guestAcceptIdle = new plAnimStage("BookAcceptIdle", plAnimStage::kNotifyEnter, plAnimStage::kForwardAuto, plAnimStage::kBackNone,
+                    plAnimStage::kAdvanceNone, plAnimStage::kRegressNone, -1);
+
             brainG->AddStage(guestAccept);
             brainG->AddStage(guestAcceptIdle);
-            plCoopCoordinator *coord = new plCoopCoordinator(hostKey, guestKey, brainH, brainG, "Convergence", 1, 1, linkMsg, true);
+            plCoopCoordinator* coord = new plCoopCoordinator(hostKey, guestKey, brainH, brainG, "Convergence", 1, 1, linkMsg, true);
 
 
-            plAvCoopMsg *coMg = new plAvCoopMsg(hostKey, coord);
+            plAvCoopMsg* coMg = new plAvCoopMsg(hostKey, coord);
             coMg->SetBCastFlag(plMessage::kNetPropagate);
             coMg->SetBCastFlag(plMessage::kNetForce);
 

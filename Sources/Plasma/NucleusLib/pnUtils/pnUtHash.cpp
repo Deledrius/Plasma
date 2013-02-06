@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtHash.cpp
-*   
+*
 ***/
 
 #include "pnUtHash.h"
@@ -89,4 +89,4 @@ const uint32_t CHashValue::s_hashTable[] = {
     0x4f23137b, 0x9dfd6434, 0xd1e25d94, 0xbad4c88a, 0x0746edf9, 0x8103a9aa, 0xc8c73617, 0xe0f2759a,
     0x00161c79, 0xd4545360, 0x1763cc5b, 0x296361fa, 0xbc35858d, 0xdaed5e93, 0x0b9d0aed, 0x01c45a64,
 };
-    
+

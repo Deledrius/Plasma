@@ -52,14 +52,12 @@ class hsResMgr;
 // Basically, I just made this class because I couldn't stand duplicating
 // all the code and strings for plOneShotMsg and plAvOneShotMsg. - Colin
 //
-class plOneShotCallbacks : public hsRefCnt
-{
+class plOneShotCallbacks : public hsRefCnt {
 public:
-    class plOneShotCallback
-    {
+    class plOneShotCallback {
     public:
-        plOneShotCallback(const plString &marker, plKey &receiver, int16_t user) :
-          fMarker(marker), fReceiver(receiver) , fUser(user) {}
+        plOneShotCallback(const plString& marker, plKey& receiver, int16_t user) :
+            fMarker(marker), fReceiver(receiver) , fUser(user) {}
 
         plString fMarker;
         plKey fReceiver;
@@ -73,11 +71,11 @@ public:
     plOneShotCallbacks();
     ~plOneShotCallbacks();
 
-    void AddCallback(const plString &marker, plKey &receiver, int16_t user=0);
+    void AddCallback(const plString& marker, plKey& receiver, int16_t user = 0);
     int GetNumCallbacks();
     plOneShotCallback& GetCallback(int i);
 
-    // IO 
+    // IO
     void Read(hsStream* stream, hsResMgr* mgr);
     void Write(hsStream* stream, hsResMgr* mgr);
 };

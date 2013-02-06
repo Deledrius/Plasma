@@ -62,8 +62,7 @@ class plClothingItem;
 class plArmatureMod;
 class plMorphSequence;
 
-class cyAvatar
-{
+class cyAvatar {
 protected:
     plKey           fSender;
     hsTArray<plKey> fRecvr;
@@ -71,13 +70,13 @@ protected:
 
     virtual const plArmatureMod* IFindArmatureMod(plKey avObj);
     virtual plKey IFindArmatureModKey(plKey avObj);
-    
+
 // XX   static bool IEnterGenericMode(const char *enterAnim, const char *idleAnim, const char *exitAnim, bool autoExit);
 // XX   static bool IExitTopmostGenericMode();
 
 protected:
     cyAvatar() {}
-    cyAvatar(plKey sender,plKey recvr=nil);
+    cyAvatar(plKey sender, plKey recvr = nil);
 
 public:
 
@@ -88,35 +87,37 @@ public:
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a cyAvatar object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(cyAvatar); // converts a PyObject to a cyAvatar (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
-    static void AddPlasmaMethods(std::vector<PyMethodDef> &methods);
-    static void AddPlasmaConstantsClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
+    static void AddPlasmaMethods(std::vector<PyMethodDef>& methods);
+    static void AddPlasmaConstantsClasses(PyObject* m);
 
     // setters
-    void SetSender(plKey &sender);
-    void AddRecvr(plKey &recvr);
-    virtual void SetNetForce(bool state) { fNetForce = state; }
+    void SetSender(plKey& sender);
+    void AddRecvr(plKey& recvr);
+    virtual void SetNetForce(bool state) {
+        fNetForce = state;
+    }
 
     // oneShot Avatar (must already be there)
-    virtual void OneShot(pyKey &seekKey, float duration, bool usePhysics,
-                   const plString &animName, bool drivable, bool reversible);
+    virtual void OneShot(pyKey& seekKey, float duration, bool usePhysics,
+                         const plString& animName, bool drivable, bool reversible);
 
-    // oneShot Avatar 
-    virtual void RunBehavior(pyKey &behKey, bool netForce, bool netProp);
+    // oneShot Avatar
+    virtual void RunBehavior(pyKey& behKey, bool netForce, bool netProp);
     virtual void RunBehaviorAndReply(pyKey& behKey, pyKey& replyKey, bool netForce, bool netProp);
 
     // for the multistage behaviors
-    virtual void NextStage(pyKey &behKey, float transTime, bool setTime, float newTime,
-                        bool setDirection, bool isForward, bool netForce);
-    virtual void PreviousStage(pyKey &behKey, float transTime, bool setTime, float newTime,
-                        bool setDirection, bool isForward, bool netForce);
-    virtual void GoToStage(pyKey &behKey, int32_t stage, float transTime, bool setTime, float newTime,
-                        bool setDirection, bool isForward, bool netForce);
+    virtual void NextStage(pyKey& behKey, float transTime, bool setTime, float newTime,
+                           bool setDirection, bool isForward, bool netForce);
+    virtual void PreviousStage(pyKey& behKey, float transTime, bool setTime, float newTime,
+                               bool setDirection, bool isForward, bool netForce);
+    virtual void GoToStage(pyKey& behKey, int32_t stage, float transTime, bool setTime, float newTime,
+                           bool setDirection, bool isForward, bool netForce);
 
     // static behavior functions:
-    static void SetLoopCount(pyKey &behKey, int32_t stage, int32_t loopCount, bool netForce);
+    static void SetLoopCount(pyKey& behKey, int32_t stage, int32_t loopCount, bool netForce);
 
-    virtual void SetSenderKey(pyKey &pKey);
+    virtual void SetSenderKey(pyKey& pKey);
 
     // seek Avatar (must already be there)
     //virtual void Seek(pyKey &seekKey, float duration, bool usePhysics);
@@ -124,7 +125,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetAvatarClothingGroup
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return what clothing group the avatar is in
     //
@@ -133,7 +134,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetEntireClothingList
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return a list of the wearable items for this avatar of that clothing_type
     //
@@ -142,7 +143,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetClosetClothingList
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return a list of the wearable items for this avatar of that clothing_type
     //
@@ -151,16 +152,16 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetAvatarClothingList
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return a list of items being worn by this avatar
     //
     virtual std::vector<PyObject*> GetAvatarClothingList();
-    
+
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetWardrobeClothingList
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return a list of items that are in the avatars closet
     //
@@ -174,9 +175,9 @@ public:
     //
     //  PURPOSE    : To add a clothing item to the avatar's wardrobe (closet)
     //
-    virtual void AddWardrobeClothingItem(const char* clothing_name,pyColor& tint1,pyColor& tint2);
-    
-    
+    virtual void AddWardrobeClothingItem(const char* clothing_name, pyColor& tint1, pyColor& tint2);
+
+
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetUniqueMeshList
@@ -200,7 +201,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetMatchingClothingItem
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return the clothing item that matches this one
     //
@@ -209,7 +210,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : WearClothingItem
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Wear a particular piece of clothing based on name of clothing item
     //             : returns 0, if clothing item was not found
@@ -219,7 +220,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : RemoveClothingItem
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Remove (take off) a particular piece of clothing based on name of clothing item
     //             : returns 0, if clothing item was not found
@@ -229,7 +230,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : TintClothingItem
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Tint a clothing item, i.e. change the color of it
     //
@@ -249,7 +250,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : WearClothingItem
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Wear a particular piece of clothing based on name of clothing item
     //             : returns 0, if clothing item was not found
@@ -259,7 +260,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : RemoveClothingItem
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Remove (take off) a particular piece of clothing based on name of clothing item
     //             : returns 0, if clothing item was not found
@@ -269,7 +270,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : TintClothingItem
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Tint a clothing item, i.e. change the color of it
     //
@@ -289,7 +290,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetClothingItemParameterString
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Get the custom parameter string for a clothing item
     //
@@ -298,7 +299,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetTintClothingItem
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Get the tint a clothing item, i.e. change the color of it
     //
@@ -307,7 +308,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetTintClothingItem
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Get the tint a clothing item, i.e. change the color of it
     //
@@ -316,7 +317,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : TintSkin
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Tint the skin of the player's avatar
     //
@@ -324,7 +325,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : TintSkinU
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Tint the skin of the player's avatar with optional update flag
     //
@@ -333,14 +334,14 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetTintSkin
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Get the tint of the skin of the player's avatar
     //
     virtual PyObject* GetTintSkin();
 
     virtual plMorphSequence* LocalMorphSequence();
-    
+
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : SetMorph
@@ -361,7 +362,7 @@ public:
     //  PURPOSE    : Returns the current morph value of the specific layer of clothing
     //
     virtual float GetMorph(const char* clothing_name, uint8_t layer);
-    
+
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : SetSkinBlend
@@ -380,7 +381,7 @@ public:
     //  PURPOSE    : Returns the current layer's skin blend
     //
     virtual float GetSkinBlend(uint8_t layer);
-    
+
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : SaveClothing
@@ -507,7 +508,7 @@ public:
     //             : more specific in future version
     //
     static bool ExitPBMode();
-    
+
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetCurrentMode()
@@ -518,14 +519,14 @@ public:
     //
     int GetCurrentMode();
 
-    
+
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : (En/Dis)ableMovementControls()
     //  PARAMETERS : none
     //
     //  PURPOSE    : Suspend input on the local avatar
-    //            
+    //
     static void EnableMovementControls();
     static void DisableMovementControls();
     static void EnableMouseMovement();
@@ -537,7 +538,7 @@ public:
 
     static bool LocalAvatarRunKeyDown();
     static bool LocalAvatarIsMoving();
-    
+
     static void SetMouseTurnSensitivity(float val);
     static float GetMouseTurnSensitivity();
 
@@ -549,7 +550,7 @@ public:
     //
     //  PURPOSE    : To register for notifies from the avatar for any kind of behavior notify
     //
-    void RegisterForBehaviorNotify(pyKey &selfKey);
+    void RegisterForBehaviorNotify(pyKey& selfKey);
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -558,7 +559,7 @@ public:
     //
     //  PURPOSE    : To remove the registeration for notifies from the avatar
     //
-    void UnRegisterForBehaviorNotify(pyKey &selfKey);
+    void UnRegisterForBehaviorNotify(pyKey& selfKey);
 
     static bool IsCurrentBrainHuman();
 

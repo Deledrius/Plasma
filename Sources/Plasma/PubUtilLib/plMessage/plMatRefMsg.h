@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnMessage/plRefMsg.h"
 
-class plMatRefMsg : public plGenRefMsg
-{
+class plMatRefMsg : public plGenRefMsg {
 public:
     enum {
         kLayer          = 0x1,
@@ -55,10 +54,10 @@ public:
     };
 
     plMatRefMsg() {}
-    plMatRefMsg(const plKey &r, uint8_t flags, int8_t which, int8_t type) : plGenRefMsg(r, flags, which, type) {}
+    plMatRefMsg(const plKey& r, uint8_t flags, int8_t which, int8_t type) : plGenRefMsg(r, flags, which, type) {}
 
-    CLASSNAME_REGISTER( plMatRefMsg );
-    GETINTERFACE_ANY( plMatRefMsg, plGenRefMsg );
+    CLASSNAME_REGISTER(plMatRefMsg);
+    GETINTERFACE_ANY(plMatRefMsg, plGenRefMsg);
 };
 
 #endif // plMatRefMsg_inc

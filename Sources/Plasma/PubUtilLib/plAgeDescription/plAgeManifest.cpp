@@ -68,8 +68,7 @@ plManifestFile::plManifestFile(const plFileName& name, const plFileName& serverP
     fFlags(flags),
     fMd5Checked(md5Now)
 {
-    if (md5Now)
-    {
+    if (md5Now) {
         DoMd5Check();
     }
 }
@@ -80,14 +79,11 @@ plManifestFile::~plManifestFile()
 
 void plManifestFile::DoMd5Check()
 {
-    if (plFileInfo(fName).Exists())
-    {
+    if (plFileInfo(fName).Exists()) {
         plMD5Checksum localFile(fName);
         fIsLocalUpToDate = (localFile == fChecksum);
         fLocalExists = true;
-    }
-    else
-    {
+    } else {
         fIsLocalUpToDate = false;
         fLocalExists = false;
     }
@@ -97,16 +93,18 @@ void plManifestFile::DoMd5Check()
 
 bool plManifestFile::IsLocalUpToDate()
 {
-    if (!fMd5Checked)
+    if (!fMd5Checked) {
         DoMd5Check();
+    }
 
     return fIsLocalUpToDate;
 }
 
 bool plManifestFile::LocalExists()
 {
-    if (!fMd5Checked)
+    if (!fMd5Checked) {
         DoMd5Check();
+    }
 
     return fLocalExists;
 }
@@ -136,24 +134,28 @@ void plManifest::IReset()
     delete [] fAgeName;
 
     int i;
-    for (i = 0; i < fFiles.GetCount(); i++)
+
+    for (i = 0; i < fFiles.GetCount(); i++) {
         delete fFiles[i];
+    }
+
     fFiles.Reset();
 }
 
 //// Read and helpers ////////////////////////////////////////////////////////
 
-class plVersSection : public plInitSectionTokenReader   
-{
+class plVersSection : public plInitSectionTokenReader {
 protected:
     plManifest* fDest;
 
-    virtual const char* GetSectionName() const { return "version"; }
+    virtual const char* GetSectionName() const {
+        return "version";
+    }
 
-    virtual bool IParseToken(const char* token, hsStringTokenizer* tokenizer, uint32_t userData)
-    {
-        if (stricmp(token, "format") == 0)
+    virtual bool IParseToken(const char* token, hsStringTokenizer* tokenizer, uint32_t userData) {
+        if (stricmp(token, "format") == 0) {
             fDest->SetFormatVersion(atoi(tokenizer->next()));
+        }
 
         return true;
     }
@@ -162,15 +164,13 @@ public:
     plVersSection(plManifest* dest) : plInitSectionTokenReader(), fDest(dest) {}
 };
 
-class plGenericSection : public plInitSectionTokenReader    
-{
+class plGenericSection : public plInitSectionTokenReader {
 protected:
     plManifest* fDest;
 
     virtual void AddFile(plManifestFile* file) = 0;
 
-    plManifestFile* IReadManifestFile(const char* token, hsStringTokenizer* tokenizer, uint32_t userData, bool isPage)
-    {
+    plManifestFile* IReadManifestFile(const char* token, hsStringTokenizer* tokenizer, uint32_t userData, bool isPage) {
         char name[256];
         strcpy(name, token);
         uint32_t size = atoi(tokenizer->next());
@@ -178,14 +178,15 @@ protected:
         sum.SetFromHexString(tokenizer->next());
         uint32_t flags = atoi(tokenizer->next());
         uint32_t zippedSize = 0;
-        if (hsCheckBits(flags, plManifestFile::kFlagZipped))
+
+        if (hsCheckBits(flags, plManifestFile::kFlagZipped)) {
             zippedSize = atoi(tokenizer->next());
+        }
 
         return new plManifestFile(name, "", sum, size, zippedSize, flags);
     }
 
-    virtual bool IParseToken(const char* token, hsStringTokenizer* tokenizer, uint32_t userData)
-    {
+    virtual bool IParseToken(const char* token, hsStringTokenizer* tokenizer, uint32_t userData) {
         plManifestFile* file = IReadManifestFile(token, tokenizer, userData, false);
         AddFile(file);
         return true;
@@ -195,14 +196,17 @@ public:
     plGenericSection(plManifest* dest) : plInitSectionTokenReader(), fDest(dest) {}
 };
 
-class plBaseSection : public plGenericSection
-{
+class plBaseSection : public plGenericSection {
 public:
     plBaseSection(plManifest* dest) : plGenericSection(dest) {}
 
 protected:
-    virtual void        AddFile(plManifestFile* file) { fDest->AddFile(file); }
-    virtual const char* GetSectionName() const { return "base"; }
+    virtual void        AddFile(plManifestFile* file) {
+        fDest->AddFile(file);
+    }
+    virtual const char* GetSectionName() const {
+        return "base";
+    }
 };
 
 
@@ -212,18 +216,20 @@ bool plManifest::Read(hsStream* stream)
     plBaseSection   baseReader(this);
 
     plInitSectionReader* readers[] = { &versReader, &baseReader, nil };
-    
+
     plInitFileReader reader(readers, 4096);     // Allow extra long lines
     reader.SetUnhandledSectionReader(&baseReader);
 
-    if (!reader.Open(stream))
+    if (!reader.Open(stream)) {
         return false;
+    }
 
     // Clear out before we read
     IReset();
 
-    if (!reader.Parse())
+    if (!reader.Parse()) {
         return false;
+    }
 
     return true;
 }
@@ -234,18 +240,20 @@ bool plManifest::Read(const char* filename)
     plBaseSection   baseReader(this);
 
     plInitSectionReader* readers[] = { &versReader, &baseReader, nil };
-    
+
     plInitFileReader reader(readers, 4096);     // Allow extra long lines
     reader.SetUnhandledSectionReader(&baseReader);
-    
-    if (!reader.Open(filename))
+
+    if (!reader.Open(filename)) {
         return false;
+    }
 
     // Clear out before we read
     IReset();
 
-    if (!reader.Parse())
+    if (!reader.Parse()) {
         return false;
+    }
 
     return true;
 }

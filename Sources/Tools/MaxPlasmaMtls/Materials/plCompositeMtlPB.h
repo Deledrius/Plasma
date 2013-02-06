@@ -42,8 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef PL_COMPOSITE_MTL_PB_H
 #define PL_COMPOSITE_MTL_PB_H
 
-enum
-{
+enum {
     kCompPasses,
     kCompOn,
     kCompBlend,
@@ -53,8 +52,7 @@ enum
 
 // Make sure to pair up each blend mode with an inverse after it
 // (This way we check for an inverse blend by doing an odd/even check.)
-enum BlendMethod // These should match up in order with the blend strings
-{
+enum BlendMethod { // These should match up in order with the blend strings
     kCompBlendVertexAlpha,
     kCompBlendInverseVtxAlpha,
     kCompBlendVertexIllumRed,
@@ -64,10 +62,9 @@ enum BlendMethod // These should match up in order with the blend strings
     kCompBlendVertexIllumBlue,
     kCompBlendInverseVtxIllumBlue,
     kCompNumBlendMethods
-};  
+};
 
-static char *BlendStrings[] = // Make sure these match up in order with the Blend enum
-{
+static char* BlendStrings[] = { // Make sure these match up in order with the Blend enum
     "Vertex Alpha",
     "Inverse Vtx Alpha",
     "Vertex Illum Red",

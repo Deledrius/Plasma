@@ -52,8 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsRefCnt.h"
 
 
-class hsGDeviceRef : public hsRefCnt
-{
+class hsGDeviceRef : public hsRefCnt {
 protected:
     uint32_t      fFlags;
 
@@ -67,8 +66,16 @@ public:
 
     uint32_t                  fUseTime;       // time stamp when last used - stat gather only
 
-    bool IsDirty() const { return (fFlags & kDirty); }
-    void SetDirty(bool on) { if(on)fFlags |= kDirty; else fFlags &= ~kDirty; }
+    bool IsDirty() const {
+        return (fFlags & kDirty);
+    }
+    void SetDirty(bool on) {
+        if (on) {
+            fFlags |= kDirty;
+        } else {
+            fFlags &= ~kDirty;
+        }
+    }
 
     hsGDeviceRef() : fFlags(0), fUseTime(0) {}
     virtual ~hsGDeviceRef() {}

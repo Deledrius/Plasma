@@ -73,17 +73,16 @@ class plMessage;
     This object can either be a "helper" for Python, or its functionality can be
     recoded in Python.
     */
-class plCoopCoordinator : public hsKeyedObject
-{
+class plCoopCoordinator : public hsKeyedObject {
 public:
     plCoopCoordinator();
     plCoopCoordinator(plKey host, plKey guest,
-                      plAvBrainCoop *hostBrain, plAvBrainCoop *guestBrain,
-                      const plString &synchBone, uint32_t hostOfferStage, uint32_t guestAcceptStage,
-                      plMessage *guestAcceptMsg,
+                      plAvBrainCoop* hostBrain, plAvBrainCoop* guestBrain,
+                      const plString& synchBone, uint32_t hostOfferStage, uint32_t guestAcceptStage,
+                      plMessage* guestAcceptMsg,
                       bool autoStartGuest);
 
-    virtual bool MsgReceive(plMessage *msg);
+    virtual bool MsgReceive(plMessage* msg);
 
     void Run();
 
@@ -93,12 +92,12 @@ public:
     bool IsActiveForReal();
 
     // rtti
-    CLASSNAME_REGISTER( plCoopCoordinator );
-    GETINTERFACE_ANY( plCoopCoordinator, hsKeyedObject);
+    CLASSNAME_REGISTER(plCoopCoordinator);
+    GETINTERFACE_ANY(plCoopCoordinator, hsKeyedObject);
 
     // i/o
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 
 protected:
     void IStartHost();
@@ -112,16 +111,16 @@ protected:
     plKey fHostKey;
     plKey fGuestKey;
 
-    plAvBrainCoop *fHostBrain;
-    plAvBrainCoop *fGuestBrain;
+    plAvBrainCoop* fHostBrain;
+    plAvBrainCoop* fGuestBrain;
 
     uint32_t fInitiatorID;
     uint32_t fInitiatorSerial;
-    
+
     uint32_t  fHostOfferStage;            // when we enter this stage, the offer is ready
     uint32_t  fGuestAcceptStage;          // when we enter this stage, the offer is accepted
 
-    plMessage *fGuestAcceptMsg;         // send this when the guest accepts
+    plMessage* fGuestAcceptMsg;         // send this when the guest accepts
 
     plString fSynchBone;
     bool fAutoStartGuest;

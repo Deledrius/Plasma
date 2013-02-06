@@ -48,8 +48,7 @@ class plComponentBase;
 class plMaxNodeBase;
 class IParamBlock2;
 
-class plResponderGetComp
-{
+class plResponderGetComp {
 public:
     typedef std::vector<Class_ID> ClassIDs;
 
@@ -61,17 +60,17 @@ public:
     // nodeID - ParamID of a reftarg for the node to be put in
     // compID - ParamID of a reftarg for the comp to be put in
     // classIDs - Optional list of component Class_ID's to allow (nil for all)
-    bool GetComp(IParamBlock2 *pb, int nodeID, int compID, ClassIDs *classIDs);
+    bool GetComp(IParamBlock2* pb, int nodeID, int compID, ClassIDs* classIDs);
 
     // Get the comp stored in your PB
     // Set convertTime to true to verify that the node can convert (ie, only use it after PreConvert)
-    plComponentBase *GetSavedComp(IParamBlock2 *pb, int nodeID, int compID, bool convertTime=false);
+    plComponentBase* GetSavedComp(IParamBlock2* pb, int nodeID, int compID, bool convertTime = false);
 
 protected:
-    IParamBlock2 *fPB;
+    IParamBlock2* fPB;
     int fNodeID;
     int fCompID;
-    ClassIDs *fClassIDs;
+    ClassIDs* fClassIDs;
 
     typedef std::set<plMaxNodeBase*> NodeSet;
 
@@ -82,20 +81,19 @@ protected:
     ULONG fLastSoundObj;
 #endif
 
-    void IFindCompsRecur(plMaxNodeBase *node, NodeSet& nodes);
-    void ILoadNodes(plMaxNodeBase *compNode, HWND hDlg);
+    void IFindCompsRecur(plMaxNodeBase* node, NodeSet& nodes);
+    void ILoadNodes(plMaxNodeBase* compNode, HWND hDlg);
 
     static BOOL CALLBACK ForwardDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
     BOOL DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
-class plResponderCompNode
-{
+class plResponderCompNode {
 public:
     typedef std::vector<Class_ID> ClassIDs;
 
 protected:
-    IParamBlock2 *fPB;
+    IParamBlock2* fPB;
     int fNodeID;
     int fCompID;
     int fCompResID;
@@ -116,9 +114,9 @@ public:
     // nodeID - ParamID of a reftarg for the node to be put in
     // compID - ParamID of a reftarg for the comp to be put in
     // classIDs - Optional list of component Class_ID's to allow (nil for all)
-    void Init(IParamBlock2 *pb, int compID, int nodeID, int compResID, int nodeResID, ClassIDs *compCIDs);
+    void Init(IParamBlock2* pb, int compID, int nodeID, int compResID, int nodeResID, ClassIDs* compCIDs);
     void InitDlg(HWND hWnd);
-    
+
     void CompButtonPress(HWND hWnd);
     void NodeButtonPress(HWND hWnd);
 

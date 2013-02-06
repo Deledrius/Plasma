@@ -44,10 +44,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plLogicModBase.h"
 
 plConditionalObject::plConditionalObject() :
-bSatisfied(false),
-fToggle(false),
-fLogicMod(nil),
-fReset(false)
+    bSatisfied(false),
+    fToggle(false),
+    fLogicMod(nil),
+    fReset(false)
 {
 
 }

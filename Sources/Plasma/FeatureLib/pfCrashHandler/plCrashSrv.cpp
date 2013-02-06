@@ -59,8 +59,10 @@ plCrashSrv::plCrashSrv(const char* file)
     // Open the linked memory
     fLinkH = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, file);
     hsAssert(fLinkH, "Failed to open plCrashHandler mapping");
-    if (!fLinkH)
+
+    if (!fLinkH) {
         return;
+    }
 
     // Try to map it
     fLink = (plCrashMemLink*)MapViewOfFile(fLinkH, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(plCrashMemLink));
@@ -69,10 +71,13 @@ plCrashSrv::plCrashSrv(const char* file)
 
 plCrashSrv::~plCrashSrv()
 {
-    if (fLink)
+    if (fLink) {
         UnmapViewOfFile((LPCVOID)fLink);
-    if (fLinkH)
+    }
+
+    if (fLinkH) {
         CloseHandle(fLinkH);
+    }
 }
 
 void plCrashSrv::IHandleCrash()
@@ -85,7 +90,7 @@ void plCrashSrv::IHandleCrash()
                               CREATE_ALWAYS,
                               FILE_ATTRIBUTE_NORMAL,
                               NULL
-    );
+                             );
 
     MINIDUMP_EXCEPTION_INFORMATION e;
     e.ClientPointers = TRUE;
@@ -101,8 +106,10 @@ void plCrashSrv::IHandleCrash()
 
 void plCrashSrv::HandleCrash()
 {
-    if (!fLink)
+    if (!fLink) {
         FATAL("plCrashMemLink is nil!");
+    }
+
     fLink->fSrvReady = true; // mark us as ready to receive crashes
 
 #ifdef HS_BUILD_FOR_WIN32
@@ -114,7 +121,10 @@ void plCrashSrv::HandleCrash()
 #else
     fCrashed->Wait();
 #endif
-    if (fLink->fCrashed)
+
+    if (fLink->fCrashed) {
         IHandleCrash();
+    }
+
     fHandled->Signal(); // Tell CrashCli we handled it
 }

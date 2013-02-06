@@ -66,27 +66,29 @@ uint8_t   plInputManager::bRecenterMouse = 0;
 HWND    plInputManager::fhWnd = nil;
 #define NUM_ACTIONS     17
 
-struct plDIDevice
-{
-    plDIDevice() : fDevice(nil), fCaps(nil) {;}
-    plDIDevice(IDirectInputDevice8* _device) : fCaps(nil) { fDevice = _device;}
+struct plDIDevice {
+    plDIDevice() : fDevice(nil), fCaps(nil) {
+        ;
+    }
+    plDIDevice(IDirectInputDevice8* _device) : fCaps(nil) {
+        fDevice = _device;
+    }
     IDirectInputDevice8*    fDevice;
     DIDEVCAPS*              fCaps;
 };
 
-struct plDInput
-{
+struct plDInput {
     plDInput() :
-    fDInput(nil),
-    fActionFormat(nil)
-    {;}
-    IDirectInput8*          fDInput; 
+        fDInput(nil),
+        fActionFormat(nil) {
+        ;
+    }
+    IDirectInput8*          fDInput;
     hsTArray<plDIDevice*>   fSticks;
     DIACTIONFORMAT*         fActionFormat;
 };
 
-class plDInputMgr 
-{
+class plDInputMgr {
 public:
     plDInputMgr();
     ~plDInputMgr();
@@ -96,7 +98,7 @@ public:
     void AddDevice(IDirectInputDevice8* device);
     void ConfigureDevice();
     virtual bool MsgReceive(plMessage* msg);
-    
+
     // dinput callback functions
     static int __stdcall EnumGamepadCallback(const DIDEVICEINSTANCE* device, void* pRef);
 // I should be using these but they don't work...
@@ -110,18 +112,18 @@ protected:
     HWND                        fhWnd;
 };
 // function pointers to dinput callbacks
-typedef int (__stdcall * Pfunc1) (const DIDEVICEINSTANCE* device, void* pRef);
+typedef int (__stdcall* Pfunc1)(const DIDEVICEINSTANCE* device, void* pRef);
 // I should need these...
 //typedef int (__stdcall * Pfunc2) (const DIDEVICEOBJECTINSTANCE* device, void* pRef);
-//typedef int (__stdcall * Pfunc3) (const struct DIDEVICEINSTANCEA* devInst, struct IDirectInputDevice8* dev, unsigned long why, unsigned long devRemaining, void* pRef); 
+//typedef int (__stdcall * Pfunc3) (const struct DIDEVICEINSTANCEA* devInst, struct IDirectInputDevice8* dev, unsigned long why, unsigned long devRemaining, void* pRef);
 
 
 plInputManager* plInputManager::fInstance = nil;
 
-plInputManager::plInputManager( hsWindowHndl hWnd ) :
-fDInputMgr(nil),
-fInterfaceMgr(nil),
-localeC("C")
+plInputManager::plInputManager(hsWindowHndl hWnd) :
+    fDInputMgr(nil),
+    fInterfaceMgr(nil),
+    localeC("C")
 {
     fhWnd = hWnd;
     fInstance = this;
@@ -131,8 +133,8 @@ localeC("C")
 }
 
 plInputManager::plInputManager() :
-fDInputMgr(nil),
-fInterfaceMgr(nil)
+    fDInputMgr(nil),
+    fInterfaceMgr(nil)
 {
     fInstance = this;
     fActive = false;
@@ -140,27 +142,29 @@ fInterfaceMgr(nil)
     fMouseScale = 1.f;
 }
 
-plInputManager::~plInputManager() 
+plInputManager::~plInputManager()
 {
     fInterfaceMgr->Shutdown();
     fInterfaceMgr = nil;
 
-    for (int i = 0; i < fInputDevices.Count(); i++)
-    {
+    for (int i = 0; i < fInputDevices.Count(); i++) {
         fInputDevices[i]->Shutdown();
         delete(fInputDevices[i]);
     }
-    if (fDInputMgr)
+
+    if (fDInputMgr) {
         delete fDInputMgr;
+    }
 }
 
 //static
 void plInputManager::SetRecenterMouse(bool b)
-{ 
-    if (b)
+{
+    if (b) {
         bRecenterMouse++;
-    else if (bRecenterMouse > 0)
+    } else if (bRecenterMouse > 0) {
         bRecenterMouse--;
+    }
 }
 
 
@@ -172,7 +176,7 @@ void plInputManager::RecenterCursor()
 //  pt.y = ( (rect.bottom - rect.top) / 2 ) / fInstance->fMouseScale;
 //  pt.x = ( (rect.right - rect.left) / 2 ) / fInstance->fMouseScale;
     ClientToScreen(fhWnd, &pt);
-    SetCursorPos( pt.x, pt.y );
+    SetCursorPos(pt.x, pt.y);
 }
 void plInputManager::CreateInterfaceMod(plPipeline* p)
 {
@@ -182,8 +186,7 @@ void plInputManager::CreateInterfaceMod(plPipeline* p)
 
 void plInputManager::InitDInput(hsWindowInst hInst, hsWindowHndl hWnd)
 {
-    if (fUseDInput)
-    {
+    if (fUseDInput) {
         fDInputMgr = new plDInputMgr;
         fDInputMgr->Init(hInst, hWnd);
     }
@@ -191,55 +194,58 @@ void plInputManager::InitDInput(hsWindowInst hInst, hsWindowHndl hWnd)
 
 bool plInputManager::MsgReceive(plMessage* msg)
 {
-    for (int i=0; i<fInputDevices.Count(); i++)
-        if (fInputDevices[i]->MsgReceive(msg))
+    for (int i = 0; i < fInputDevices.Count(); i++)
+        if (fInputDevices[i]->MsgReceive(msg)) {
             return true;
+        }
 
-    if (fDInputMgr)
+    if (fDInputMgr) {
         return fDInputMgr->MsgReceive(msg);
+    }
 
     return hsKeyedObject::MsgReceive(msg);
 }
 
 void plInputManager::Update()
 {
-    if (fDInputMgr)
+    if (fDInputMgr) {
         fDInputMgr->Update();
+    }
 }
 
-void plInputManager::SetMouseScale( float s )
+void plInputManager::SetMouseScale(float s)
 {
-/*  RECT    rect;
-    POINT   currPos;
+    /*  RECT    rect;
+        POINT   currPos;
 
 
-    // Gotta make sure to move the mouse to the correct new position for the scale
-    GetClientRect( fhWnd, &rect );
-    GetCursorPos( &currPos );
-    ScreenToClient( fhWnd, &currPos );
+        // Gotta make sure to move the mouse to the correct new position for the scale
+        GetClientRect( fhWnd, &rect );
+        GetCursorPos( &currPos );
+        ScreenToClient( fhWnd, &currPos );
 
-    float x = (float)currPos.x / rect.right;
-    float y = (float)currPos.y / rect.bottom;
+        float x = (float)currPos.x / rect.right;
+        float y = (float)currPos.y / rect.bottom;
 
-    x *= fMouseScale; y *= fMouseScale;
+        x *= fMouseScale; y *= fMouseScale;
 
-    fMouseScale = s;
+        fMouseScale = s;
 
-    // Refreshes all of the input devices so that they can reset mouse limits, etc
-    RECT rect2 = rect;
-    rect2.right /= fMouseScale;
-    rect2.bottom /= fMouseScale;
-    ::MapWindowPoints( fhWnd, NULL, (POINT *)&rect2, 2 );
-    BOOL ret = ::ClipCursor( &rect );
+        // Refreshes all of the input devices so that they can reset mouse limits, etc
+        RECT rect2 = rect;
+        rect2.right /= fMouseScale;
+        rect2.bottom /= fMouseScale;
+        ::MapWindowPoints( fhWnd, NULL, (POINT *)&rect2, 2 );
+        BOOL ret = ::ClipCursor( &rect );
 
-    // Now move the cursor to the right spot
+        // Now move the cursor to the right spot
 
-    currPos.x = ( x / fMouseScale ) * rect.right;
-    currPos.y = ( y / fMouseScale ) * rect.bottom;
+        currPos.x = ( x / fMouseScale ) * rect.right;
+        currPos.y = ( y / fMouseScale ) * rect.bottom;
 
-    ClientToScreen( fhWnd, &currPos );
-    SetCursorPos( currPos.x, currPos.y );
-*/
+        ClientToScreen( fhWnd, &currPos );
+        SetCursorPos( currPos.x, currPos.y );
+    */
 }
 
 // Sometimes the keyboard driver "helps" us translating a key involved in a key
@@ -247,16 +253,22 @@ void plInputManager::SetMouseScale( float s )
 // the same as the up arrow. This function undoes that translation.
 plKeyDef plInputManager::UntranslateKey(plKeyDef key, bool extended)
 {
-    if (!extended)
-    {
-        if (key == KEY_UP)
+    if (!extended) {
+        if (key == KEY_UP) {
             return KEY_NUMPAD8;
-        if (key == KEY_DOWN)
+        }
+
+        if (key == KEY_DOWN) {
             return KEY_NUMPAD2;
-        if (key == KEY_LEFT)
+        }
+
+        if (key == KEY_LEFT) {
             return KEY_NUMPAD4;
-        if (key == KEY_RIGHT)
+        }
+
+        if (key == KEY_RIGHT) {
             return KEY_NUMPAD6;
+        }
     }
 
     return key;
@@ -265,38 +277,42 @@ plKeyDef plInputManager::UntranslateKey(plKeyDef key, bool extended)
 #if HS_BUILD_FOR_WIN32
 void plInputManager::HandleWin32ControlEvent(UINT message, WPARAM Wparam, LPARAM Lparam, hsWindowHndl hWnd)
 {
-    if( !fhWnd )
+    if (!fhWnd) {
         fhWnd = hWnd;
+    }
 
     bool bExtended;
 
-    switch (message)
-    {
+    switch (message) {
     case SYSKEYDOWN:
-    case KEYDOWN:
-        {
+    case KEYDOWN: {
             bExtended = Lparam >> 24 & 1;
             bool bRepeat = ((Lparam >> 29) & 0xf) != 0;
-            for (int i=0; i<fInputDevices.Count(); i++)
-                fInputDevices[i]->HandleKeyEvent( KEYDOWN, UntranslateKey((plKeyDef)Wparam, bExtended), true, bRepeat ); 
+
+            for (int i = 0; i < fInputDevices.Count(); i++) {
+                fInputDevices[i]->HandleKeyEvent(KEYDOWN, UntranslateKey((plKeyDef)Wparam, bExtended), true, bRepeat);
+            }
         }
         break;
+
     case SYSKEYUP:
-    case KEYUP:
-        {
+    case KEYUP: {
             bExtended = Lparam >> 24 & 1;
-            for (int i=0; i<fInputDevices.Count(); i++)
-                fInputDevices[i]->HandleKeyEvent( KEYUP, UntranslateKey((plKeyDef)Wparam, bExtended), false, false ); 
+
+            for (int i = 0; i < fInputDevices.Count(); i++) {
+                fInputDevices[i]->HandleKeyEvent(KEYUP, UntranslateKey((plKeyDef)Wparam, bExtended), false, false);
+            }
         }
         break;
-    case CHAR_MSG:
-        {
+
+    case CHAR_MSG: {
             wchar_t ch = (wchar_t)Wparam;
 
             // These are handled by KEYUP/KEYDOWN and should not be sent
             // We don't like garbage getting in string fields
-            if (std::iscntrl(ch, localeC))
+            if (std::iscntrl(ch, localeC)) {
                 break;
+            }
 
             BYTE scan = (BYTE)(Lparam >> 16);
             UINT vkey = MapVirtualKey(scan, 1); //MAPVK_VSC_TO_VK
@@ -304,20 +320,23 @@ void plInputManager::HandleWin32ControlEvent(UINT message, WPARAM Wparam, LPARAM
             bExtended = Lparam >> 24 & 1;
             bool bRepeat = ((Lparam >> 29) & 0xf) != 0;
             bool down = !(Lparam >> 31);
- 
-            for (int i=0; i<fInputDevices.Count(); i++)
-                fInputDevices[i]->HandleKeyEvent( CHAR_MSG, (plKeyDef)vkey, down, bRepeat, ch );
+
+            for (int i = 0; i < fInputDevices.Count(); i++) {
+                fInputDevices[i]->HandleKeyEvent(CHAR_MSG, (plKeyDef)vkey, down, bRepeat, ch);
+            }
         }
         break;
-    case MOUSEWHEEL:
-        {
+
+    case MOUSEWHEEL: {
             plMouseEventMsg* pMsg = new plMouseEventMsg;
             int zDelta = GET_WHEEL_DELTA_WPARAM(Wparam);
             pMsg->SetWheelDelta((float)zDelta);
-            if (zDelta < 0)
+
+            if (zDelta < 0) {
                 pMsg->SetButton(kWheelNeg);
-            else
+            } else {
                 pMsg->SetButton(kWheelPos);
+            }
 
             RECT rect;
             GetClientRect(hWnd, &rect);
@@ -327,6 +346,7 @@ void plInputManager::HandleWin32ControlEvent(UINT message, WPARAM Wparam, LPARAM
             pMsg->Send();
         }
         break;
+
     case MOUSEMOVE:
     case L_BUTTONDN:
     case L_BUTTONUP:
@@ -335,12 +355,11 @@ void plInputManager::HandleWin32ControlEvent(UINT message, WPARAM Wparam, LPARAM
     case L_BUTTONDBLCLK:
     case R_BUTTONDBLCLK:
     case M_BUTTONDN:
-    case M_BUTTONUP:
-        {
-            
+    case M_BUTTONUP: {
+
             RECT rect;
             GetClientRect(hWnd, &rect);
-         
+
             plIMouseXEventMsg* pXMsg = new plIMouseXEventMsg;
             plIMouseYEventMsg* pYMsg = new plIMouseYEventMsg;
             plIMouseBEventMsg* pBMsg = new plIMouseBEventMsg;
@@ -353,81 +372,72 @@ void plInputManager::HandleWin32ControlEvent(UINT message, WPARAM Wparam, LPARAM
             // Apply mouse scale
 //          pXMsg->fX *= fMouseScale;
 //          pYMsg->fY *= fMouseScale;
-            
-            if (Wparam & MK_LBUTTON && message != L_BUTTONUP)
-            {
+
+            if (Wparam & MK_LBUTTON && message != L_BUTTONUP) {
                 pBMsg->fButton |= kLeftButtonDown;
-            }
-            else
-            {
+            } else {
                 pBMsg->fButton |= kLeftButtonUp;
             }
-                        
-            if (Wparam & MK_RBUTTON && message != R_BUTTONUP)
-            {
+
+            if (Wparam & MK_RBUTTON && message != R_BUTTONUP) {
                 pBMsg->fButton |= kRightButtonDown;
-            }
-            else
-            {
+            } else {
                 pBMsg->fButton |= kRightButtonUp;
             }
-            
-            if (Wparam & MK_MBUTTON && message != M_BUTTONUP)
-            {
+
+            if (Wparam & MK_MBUTTON && message != M_BUTTONUP) {
                 pBMsg->fButton |= kMiddleButtonDown;
-            }
-            else
-            {
+            } else {
                 pBMsg->fButton |= kMiddleButtonUp;
             }
-            
-            if( message == L_BUTTONDBLCLK )
-                pBMsg->fButton |= kLeftButtonDblClk;        // We send the double clicks separately
-            if( message == R_BUTTONDBLCLK )
-                pBMsg->fButton |= kRightButtonDblClk;
 
-            for (int i=0; i<fInputDevices.Count(); i++)
-            {
+            if (message == L_BUTTONDBLCLK) {
+                pBMsg->fButton |= kLeftButtonDblClk;    // We send the double clicks separately
+            }
+
+            if (message == R_BUTTONDBLCLK) {
+                pBMsg->fButton |= kRightButtonDblClk;
+            }
+
+            for (int i = 0; i < fInputDevices.Count(); i++) {
                 fInputDevices[i]->MsgReceive(pXMsg);
                 fInputDevices[i]->MsgReceive(pYMsg);
                 fInputDevices[i]->MsgReceive(pBMsg);
             }
+
             POINT pt;
-            
-            if (RecenterMouse() && (pXMsg->fX <= 0.1 || pXMsg->fX >= 0.9) )
-            {       
+
+            if (RecenterMouse() && (pXMsg->fX <= 0.1 || pXMsg->fX >= 0.9)) {
                 pt.x = (rect.right - rect.left) / 2;
                 pt.y = HIWORD(Lparam);
                 ClientToScreen(hWnd, &pt);
-                SetCursorPos( pt.x, pt.y );
-            }
-            else
-            if (RecenterMouse() && (pYMsg->fY <= 0.1 || pYMsg->fY >= 0.9) )
-            {       
+                SetCursorPos(pt.x, pt.y);
+            } else if (RecenterMouse() && (pYMsg->fY <= 0.1 || pYMsg->fY >= 0.9)) {
                 pt.y = (rect.bottom - rect.top) / 2;
                 pt.x = LOWORD(Lparam);
                 ClientToScreen(hWnd, &pt);
-                SetCursorPos( pt.x, pt.y );
+                SetCursorPos(pt.x, pt.y);
             }
-            if (RecenterMouse() && Lparam == 0)
-            {
+
+            if (RecenterMouse() && Lparam == 0) {
                 pt.y = (rect.bottom - rect.top) / 2;
                 pt.x = (rect.right - rect.left) / 2;
                 ClientToScreen(hWnd, &pt);
-                SetCursorPos( pt.x, pt.y );
+                SetCursorPos(pt.x, pt.y);
             }
+
             delete(pXMsg);
             delete(pYMsg);
             delete(pBMsg);
 
-            
+
 
         }
         break;
-    case WM_ACTIVATE:
-        {
-            bool activated = ( LOWORD( Wparam ) == WA_INACTIVE ) ? false : true;
-            Activate( activated );
+
+    case WM_ACTIVATE: {
+            bool activated = (LOWORD(Wparam) == WA_INACTIVE) ? false : true;
+            Activate(activated);
         }
         break;
     }
@@ -438,13 +448,14 @@ void plInputManager::HandleWin32ControlEvent(UINT message, WPARAM Wparam, LPARAM
 //// Activate ////////////////////////////////////////////////////////////////
 //  Handles what happens when the app (window) activates/deactivates
 
-void    plInputManager::Activate( bool activating )
+void    plInputManager::Activate(bool activating)
 {
     int     i;
 
 
-    for( i = 0; i < fInputDevices.GetCount(); i++ )
-        fInputDevices[ i ]->HandleWindowActivate( activating, fhWnd );
+    for (i = 0; i < fInputDevices.GetCount(); i++) {
+        fInputDevices[ i ]->HandleWindowActivate(activating, fhWnd);
+    }
 
     fActive = activating;
     fFirstActivated = true;
@@ -452,11 +463,13 @@ void    plInputManager::Activate( bool activating )
 
 //// AddInputDevice //////////////////////////////////////////////////////////
 
-void    plInputManager::AddInputDevice( plInputDevice *pDev )
+void    plInputManager::AddInputDevice(plInputDevice* pDev)
 {
-    fInputDevices.Append( pDev ); 
-    if( fFirstActivated )
-        pDev->HandleWindowActivate( fActive, fhWnd );
+    fInputDevices.Append(pDev);
+
+    if (fFirstActivated) {
+        pDev->HandleWindowActivate(fActive, fhWnd);
+    }
 }
 
 //
@@ -467,27 +480,29 @@ void    plInputManager::AddInputDevice( plInputDevice *pDev )
 
 
 plDInputMgr::plDInputMgr() :
-fDI(nil)
+    fDI(nil)
 {
     fDI = new plDInput;
 }
 
 plDInputMgr::~plDInputMgr()
 {
-    if (fDI)
-    {
-        for (int i = 0; i < fDI->fSticks.Count(); i++)
-        {   
+    if (fDI) {
+        for (int i = 0; i < fDI->fSticks.Count(); i++) {
             plDIDevice* pD = fDI->fSticks[i];
             pD->fDevice->Release();
             delete(pD->fCaps);
             delete(pD);
         }
+
         fDI->fSticks.SetCountAndZero(0);
         delete(fDI->fActionFormat);
         fDI->fDInput->Release();
-        for(int j = 0; j < fInputDevice.Count(); j++)
+
+        for (int j = 0; j < fInputDevice.Count(); j++) {
             delete(fInputDevice[j]);
+        }
+
         fInputDevice.SetCountAndZero(0);
         delete fDI;
     }
@@ -496,14 +511,14 @@ plDInputMgr::~plDInputMgr()
 
 void plDInputMgr::Init(HINSTANCE hInst, HWND hWnd)
 {
-    
-    HRESULT         hr; 
-    hr = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&fDI->fDInput, NULL); 
-    hsAssert(!hr, "failed to initialize directInput!"); 
+
+    HRESULT         hr;
+    hr = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&fDI->fDInput, NULL);
+    hsAssert(!hr, "failed to initialize directInput!");
     // enumerate game controllers
     Pfunc1 fPtr = &plDInputMgr::EnumGamepadCallback;
     int i = 0;
-    
+
 
     // set up the action mapping
     fDI->fActionFormat = new DIACTIONFORMAT;
@@ -517,59 +532,58 @@ void plDInputMgr::Init(HINSTANCE hInst, HWND hWnd)
     fDI->fActionFormat->dwBufferSize  = 16;
     fDI->fActionFormat->lAxisMin      = -1000;
     fDI->fActionFormat->lAxisMax      = 1000;
-    sprintf( fDI->fActionFormat->tszActionMap, "Plasma 2.0 Game Actions" );
+    sprintf(fDI->fActionFormat->tszActionMap, "Plasma 2.0 Game Actions");
 
     // this call should not work:
-    fDI->fDInput->EnumDevices(DI8DEVCLASS_GAMECTRL, fPtr, fDI, DIEDFL_ATTACHEDONLY); 
-    
-    // apply the mapping to the game controller 
+    fDI->fDInput->EnumDevices(DI8DEVCLASS_GAMECTRL, fPtr, fDI, DIEDFL_ATTACHEDONLY);
+
+    // apply the mapping to the game controller
     // this is the correct <but broken> way to apply the action map:
 //  Pfunc3 fPtr3 = &plDInputMgr::EnumSuitableDevices;
 //  hr = fDI->fDInput->EnumDevicesBySemantics(NULL, fDI->fActionFormat, EnumSuitableDevices, fDI, NULL);
 
-    
-    for (i = 0; i < fDI->fSticks.Count(); i++)
-    {
-        fDI->fSticks[i]->fCaps = new DIDEVCAPS; 
+
+    for (i = 0; i < fDI->fSticks.Count(); i++) {
+        fDI->fSticks[i]->fCaps = new DIDEVCAPS;
         fDI->fSticks[i]->fCaps->dwSize = sizeof(DIDEVCAPS);
         hr = fDI->fSticks[i]->fDevice->GetCapabilities(fDI->fSticks[i]->fCaps);
-        hsAssert(!hr, "Unable to acquire devcaps in DInput Device!"); 
+        hsAssert(!hr, "Unable to acquire devcaps in DInput Device!");
         hr = fDI->fSticks[i]->fDevice->Acquire();
-        hsAssert(!hr, "Unable to acquire DInput Device!"); 
+        hsAssert(!hr, "Unable to acquire DInput Device!");
     }
 
     fhWnd = hWnd;
-    
-    for (i = 0; i < fDI->fSticks.Count(); i++)
-        fInputDevice.Append( new plDInputDevice );
+
+    for (i = 0; i < fDI->fSticks.Count(); i++) {
+        fInputDevice.Append(new plDInputDevice);
+    }
 }
 
 void plDInputMgr::Update()
 {
     HRESULT     hr;
- 
-    if (!fDI->fSticks.Count()) 
+
+    if (!fDI->fSticks.Count()) {
         return;
+    }
 
     // Poll the devices to read the current state
-    for (int i = 0; i < fDI->fSticks.Count(); i++)
-    {
-        hr = fDI->fSticks[i]->fDevice->Poll(); 
-        if (FAILED(hr))  
-        {
+    for (int i = 0; i < fDI->fSticks.Count(); i++) {
+        hr = fDI->fSticks[i]->fDevice->Poll();
+
+        if (FAILED(hr)) {
             // Attempt to reacquire joystick
-            while(hr == DIERR_INPUTLOST) 
-            {   
+            while (hr == DIERR_INPUTLOST) {
                 hr = fDI->fSticks[i]->fDevice->Acquire();
                 char str[256];
                 sprintf(str, "DInput Device # %d connection lost - press Ignore to attempt to reacquire!", i);
-                hsAssert(!hr, str); 
+                hsAssert(!hr, str);
             }
         }
-        
-        DIDEVICEOBJECTDATA data; 
+
+        DIDEVICEOBJECTDATA data;
         ULONG size = 1;
-        hr = fDI->fSticks[i]->fDevice->GetDeviceData(sizeof(DIDEVICEOBJECTDATA),&data,&size,0); 
+        hr = fDI->fSticks[i]->fDevice->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), &data, &size, 0);
 
         fInputDevice[i]->Update(&data);
     }
@@ -578,13 +592,15 @@ void plDInputMgr::Update()
 void plDInputMgr::AddDevice(IDirectInputDevice8* device)
 {
     HRESULT hr = device->BuildActionMap(fDI->fActionFormat, NULL, NULL);
-    if (!FAILED(hr))
-        device->SetActionMap( fDI->fActionFormat, NULL, NULL );
+
+    if (!FAILED(hr)) {
+        device->SetActionMap(fDI->fActionFormat, NULL, NULL);
+    }
 }
 
 void plDInputMgr::ConfigureDevice()
 {
-    ::ShowCursor( TRUE );
+    ::ShowCursor(TRUE);
 
     DICOLORSET dics;
     ZeroMemory(&dics, sizeof(DICOLORSET));
@@ -595,65 +611,69 @@ void plDInputMgr::ConfigureDevice()
     dicdp.dwSize = sizeof(dicdp);
     dicdp.dwcUsers       = 1;
     dicdp.lptszUserNames = NULL;
-    
+
     dicdp.dwcFormats     = 1;
     dicdp.lprgFormats    = fDI->fActionFormat;
     dicdp.hwnd           = fhWnd;
     dicdp.lpUnkDDSTarget = NULL;
 
     fDI->fDInput->ConfigureDevices(NULL, &dicdp, DICD_EDIT, NULL);
-    for (int i = 0; i < fDI->fSticks.Count(); i++)
-        fDI->fSticks[i]->fDevice->SetActionMap( fDI->fActionFormat, NULL, DIDSAM_FORCESAVE );
 
-    ::ShowCursor( FALSE );
+    for (int i = 0; i < fDI->fSticks.Count(); i++) {
+        fDI->fSticks[i]->fDevice->SetActionMap(fDI->fActionFormat, NULL, DIDSAM_FORCESAVE);
+    }
+
+    ::ShowCursor(FALSE);
 }
 
 bool plDInputMgr::MsgReceive(plMessage* msg)
 {
     plInputEventMsg* pMsg = plInputEventMsg::ConvertNoRef(msg);
-    if (pMsg && pMsg->fEvent == plInputEventMsg::kConfigure)
-    {
+
+    if (pMsg && pMsg->fEvent == plInputEventMsg::kConfigure) {
         ConfigureDevice();
     }
+
     return false;
 }
 
 // dinput required callback functions:
 
-// enumerate the dinput devices 
+// enumerate the dinput devices
 int __stdcall plDInputMgr::EnumGamepadCallback(const DIDEVICEINSTANCE* device, void* pRef)
 {
     HRESULT hr;
-    
+
     plDInput* pDI = (plDInput*)pRef;
     IDirectInputDevice8* fStick = nil;
     hr = pDI->fDInput->CreateDevice(device->guidInstance, &fStick, NULL);
-    
-    if(!FAILED(hr)) 
-    {
+
+    if (!FAILED(hr)) {
         pDI->fSticks.Append(new plDIDevice(fStick));
-        
+
         // the following code pertaining to the action map shouldn't be here.
-        // in fact this shouldn't work at all according to MS, but this is 
+        // in fact this shouldn't work at all according to MS, but this is
         // currently the only way this works.  Whatever - the correct
         // code is here and commented out in case this ever gets fixed by MS
         // in a future release of dinput.
         HRESULT hr = fStick->BuildActionMap(pDI->fActionFormat, NULL, NULL);
-        if (!FAILED(hr))
-        {
-            hr = fStick->SetActionMap( pDI->fActionFormat, NULL, NULL );
 
-            DIPROPDWORD dipW; 
-            dipW.diph.dwSize        = sizeof(DIPROPDWORD); 
-            dipW.diph.dwHeaderSize  = sizeof(DIPROPHEADER); 
-            dipW.diph.dwHow         = DIPH_DEVICE; 
+        if (!FAILED(hr)) {
+            hr = fStick->SetActionMap(pDI->fActionFormat, NULL, NULL);
+
+            DIPROPDWORD dipW;
+            dipW.diph.dwSize        = sizeof(DIPROPDWORD);
+            dipW.diph.dwHeaderSize  = sizeof(DIPROPHEADER);
+            dipW.diph.dwHow         = DIPH_DEVICE;
             dipW.diph.dwObj         = 0;
             dipW.dwData             = 500; // 5% of axis range for deadzone
 
             hr = fStick->SetProperty(DIPROP_DEADZONE , &dipW.diph);
         }
+
         return DIENUM_CONTINUE;
     }
+
     return DIENUM_STOP;
 }
 
@@ -663,22 +683,22 @@ int __stdcall plDInputMgr::EnumGamepadCallback(const DIDEVICEINSTANCE* device, v
 int __stdcall plDInputMgr::SetAxisRange(const DIDEVICEOBJECTINSTANCE* obj, void* pRef)
 {
     HRESULT hr;
-    DIPROPRANGE diprg; 
+    DIPROPRANGE diprg;
 
-    diprg.diph.dwSize       = sizeof(DIPROPRANGE); 
-    diprg.diph.dwHeaderSize = sizeof(DIPROPHEADER); 
-    diprg.diph.dwHow        = DIPH_BYID; 
-    diprg.diph.dwObj        = obj->dwType; 
-    diprg.lMin              = -100; 
-    diprg.lMax              = +100; 
+    diprg.diph.dwSize       = sizeof(DIPROPRANGE);
+    diprg.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+    diprg.diph.dwHow        = DIPH_BYID;
+    diprg.diph.dwObj        = obj->dwType;
+    diprg.lMin              = -100;
+    diprg.lMax              = +100;
 
     plDInput* pDI = (plDInput*)pRef;
     for (int i = 0; i < pDI->fSticks.Count(); i++)
         hr = pDI->fSticks[i]->fDevice->SetProperty(DIPROP_RANGE, &diprg.diph);
 
-    if(!FAILED(hr)) 
+    if(!FAILED(hr))
         return DIENUM_CONTINUE;
-    
+
     return DIENUM_STOP;
 
 }
@@ -699,8 +719,7 @@ int __stdcall plDInputMgr::EnumSuitableDevices(const struct DIDEVICEINSTANCEA* d
     return DIENUM_STOP;
 }
 */
-DIACTION plDInputMgr::fActionMap[NUM_ACTIONS] =
-{
+DIACTION plDInputMgr::fActionMap[NUM_ACTIONS] = {
     {A_CONTROL_MOVE,            DIAXIS_TPS_MOVE,        0,  "Walk Forward-Backward" ,},
     {A_CONTROL_TURN,            DIAXIS_TPS_TURN,        0,  "Turn Left-Right"       ,},
     {A_CONTROL_MOUSE_X,         DIAXIS_ANY_1,           0,  "Move Camera Left-Right",},

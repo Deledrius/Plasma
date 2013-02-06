@@ -55,8 +55,9 @@ pyHeekGame::pyHeekGame(): pyGameCli() {}
 
 pyHeekGame::pyHeekGame(pfGameCli* client): pyGameCli(client)
 {
-    if (client && (client->GetGameTypeId() != kGameTypeId_Heek))
-        gameClient = nil; // wrong type, just clear it out
+    if (client && (client->GetGameTypeId() != kGameTypeId_Heek)) {
+        gameClient = nil;    // wrong type, just clear it out
+    }
 }
 
 bool pyHeekGame::IsHeekGame(plString& guid)
@@ -72,8 +73,7 @@ void pyHeekGame::JoinCommonHeekGame(pyKey& callbackKey, unsigned gameID)
 
 void pyHeekGame::PlayGame(int position, uint32_t points, std::wstring name)
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmHeek* heek = pfGmHeek::ConvertNoRef(gameClient);
         heek->PlayGame((unsigned)position, (uint32_t)points, name.c_str());
     }
@@ -81,8 +81,7 @@ void pyHeekGame::PlayGame(int position, uint32_t points, std::wstring name)
 
 void pyHeekGame::LeaveGame()
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmHeek* heek = pfGmHeek::ConvertNoRef(gameClient);
         heek->LeaveGame();
     }
@@ -90,8 +89,7 @@ void pyHeekGame::LeaveGame()
 
 void pyHeekGame::Choose(int choice)
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmHeek* heek = pfGmHeek::ConvertNoRef(gameClient);
         heek->Choose((EHeekChoice)choice);
     }
@@ -99,8 +97,7 @@ void pyHeekGame::Choose(int choice)
 
 void pyHeekGame::SequenceFinished(int seq)
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmHeek* heek = pfGmHeek::ConvertNoRef(gameClient);
         heek->SequenceFinished((EHeekSeqFinished)seq);
     }

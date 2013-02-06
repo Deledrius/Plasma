@@ -52,7 +52,7 @@ static const uint8_t ps_GrassShaderCodes[] = {
     0x0,    0x0,    0xe4,   0xb0,
     0x0,    0x0,    0xe4,   0x90,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl ps_GrassShaderDecl("sha/ps_GrassShader.inl", ps_GrassShader, ps_GrassShaderbyteLen, ps_GrassShaderCodes);
 

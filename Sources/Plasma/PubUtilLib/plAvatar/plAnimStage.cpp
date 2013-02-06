@@ -77,92 +77,92 @@ class plAGAnim;
 
 // PLANIMSTAGE default ctor
 plAnimStage::plAnimStage()
-: fAnimName(nil),
-  fNotify(0),
-  fArmature(nil),
-  fBrain(nil),
-  fForwardType(kForwardNone),
-  fBackType(kBackNone),
-  fAdvanceType(kAdvanceNone),
-  fRegressType(kRegressNone),
-  fLoops(0),
-  fAnimInstance(nil),
-  fLocalTime(0.0f),
-  fLength(0.0f),
-  fCurLoop(0),
-  fAttached(false),
-  fDoAdvanceTo(false),
-  fAdvanceTo(0),
-  fDoRegressTo(false),
-  fRegressTo(0),
-  fMod(nil),
-  fSentNotifies(0),
-  fReverseOnIdle(false),
-  fDone(false)
+    : fAnimName(nil),
+      fNotify(0),
+      fArmature(nil),
+      fBrain(nil),
+      fForwardType(kForwardNone),
+      fBackType(kBackNone),
+      fAdvanceType(kAdvanceNone),
+      fRegressType(kRegressNone),
+      fLoops(0),
+      fAnimInstance(nil),
+      fLocalTime(0.0f),
+      fLength(0.0f),
+      fCurLoop(0),
+      fAttached(false),
+      fDoAdvanceTo(false),
+      fAdvanceTo(0),
+      fDoRegressTo(false),
+      fRegressTo(0),
+      fMod(nil),
+      fSentNotifies(0),
+      fReverseOnIdle(false),
+      fDone(false)
 {
 }
 
-plAnimStage::plAnimStage(const char *animName, uint8_t notify)
-: fNotify(notify),
-  fArmature(nil),
-  fBrain(nil),
-  fForwardType(kForwardAuto),       // different from default
-  fBackType(kBackNone),
-  fAdvanceType(kAdvanceAuto),       // different from default
-  fRegressType(kRegressNone),
-  fLoops(0),
-  fAnimInstance(nil),
-  fLocalTime(0.0f),
-  fLength(0.0f),
-  fCurLoop(0),
-  fAttached(false),
-  fDoAdvanceTo(false),
-  fAdvanceTo(0),
-  fDoRegressTo(false),
-  fRegressTo(0),
-  fMod(nil),
-  fSentNotifies(0),
-  fReverseOnIdle(false),
-  fDone(false)
+plAnimStage::plAnimStage(const char* animName, uint8_t notify)
+    : fNotify(notify),
+      fArmature(nil),
+      fBrain(nil),
+      fForwardType(kForwardAuto),       // different from default
+      fBackType(kBackNone),
+      fAdvanceType(kAdvanceAuto),       // different from default
+      fRegressType(kRegressNone),
+      fLoops(0),
+      fAnimInstance(nil),
+      fLocalTime(0.0f),
+      fLength(0.0f),
+      fCurLoop(0),
+      fAttached(false),
+      fDoAdvanceTo(false),
+      fAdvanceTo(0),
+      fDoRegressTo(false),
+      fRegressTo(0),
+      fMod(nil),
+      fSentNotifies(0),
+      fReverseOnIdle(false),
+      fDone(false)
 {
     fAnimName = hsStrcpy(animName);
 }
 
 
 // PLANIMSTAGE canonical ctor
-plAnimStage::plAnimStage(const char *animName,
+plAnimStage::plAnimStage(const char* animName,
                          uint8_t notify,
                          ForwardType forward,
                          BackType back,
                          AdvanceType advance,
                          RegressType regress,
                          int loops)
-: fArmature(nil),
-  fBrain(nil),
-  fNotify(notify),
-  fForwardType(forward),
-  fBackType(back),
-  fAdvanceType(advance),
-  fRegressType(regress),
-  fLoops(loops),
-  fAnimInstance(nil),
-  fLocalTime(0.0f),
-  fLength(0.0f),
-  fCurLoop(0),
-  fAttached(false),
-  fDoAdvanceTo(false),
-  fAdvanceTo(0),
-  fDoRegressTo(false),
-  fRegressTo(0),
-  fMod(nil),
-  fSentNotifies(0),
-  fReverseOnIdle(false),
-  fDone(false)
+    : fArmature(nil),
+      fBrain(nil),
+      fNotify(notify),
+      fForwardType(forward),
+      fBackType(back),
+      fAdvanceType(advance),
+      fRegressType(regress),
+      fLoops(loops),
+      fAnimInstance(nil),
+      fLocalTime(0.0f),
+      fLength(0.0f),
+      fCurLoop(0),
+      fAttached(false),
+      fDoAdvanceTo(false),
+      fAdvanceTo(0),
+      fDoRegressTo(false),
+      fRegressTo(0),
+      fMod(nil),
+      fSentNotifies(0),
+      fReverseOnIdle(false),
+      fDone(false)
 {
     fAnimName = hsStrcpy(animName);
 }
 
-plAnimStage::plAnimStage(const char *animName,
+plAnimStage::plAnimStage(const char* animName,
                          uint8_t notify,
                          ForwardType forward,
                          BackType back,
@@ -173,27 +173,27 @@ plAnimStage::plAnimStage(const char *animName,
                          int advanceTo,
                          bool doRegressTo,
                          int regressTo)
-: fArmature(nil),
-  fBrain(nil),
-  fNotify(notify),
-  fForwardType(forward),
-  fBackType(back),
-  fAdvanceType(advance),
-  fRegressType(regress),
-  fLoops(loops),
-  fAnimInstance(nil),
-  fLocalTime(0.0f),
-  fLength(0.0f),
-  fCurLoop(0),
-  fAttached(false),
-  fDoAdvanceTo(doAdvanceTo),
-  fAdvanceTo(advanceTo),
-  fDoRegressTo(doRegressTo),
-  fRegressTo(regressTo),
-  fMod(nil),
-  fSentNotifies(0),
-  fReverseOnIdle(false),
-  fDone(false)
+    : fArmature(nil),
+      fBrain(nil),
+      fNotify(notify),
+      fForwardType(forward),
+      fBackType(back),
+      fAdvanceType(advance),
+      fRegressType(regress),
+      fLoops(loops),
+      fAnimInstance(nil),
+      fLocalTime(0.0f),
+      fLength(0.0f),
+      fCurLoop(0),
+      fAttached(false),
+      fDoAdvanceTo(doAdvanceTo),
+      fAdvanceTo(advanceTo),
+      fDoRegressTo(doRegressTo),
+      fRegressTo(regressTo),
+      fMod(nil),
+      fSentNotifies(0),
+      fReverseOnIdle(false),
+      fDone(false)
 {
     fAnimName = hsStrcpy(animName);
 }
@@ -201,8 +201,9 @@ plAnimStage::plAnimStage(const char *animName,
 // PLANIMSTAGE dtor
 plAnimStage::~plAnimStage()
 {
-    if(fAnimName)
+    if (fAnimName) {
         delete[] fAnimName;
+    }
 
     hsAssert(fAnimInstance == nil, "plAnimStage still has anim instance during destruction. (that's bad.)");
     // we could delete the animation instance here, but it should have been deleted already...
@@ -239,7 +240,7 @@ const plAnimStage& plAnimStage::operator=(const plAnimStage& src)
 
 // attach --------------------------------------------------------------------------------------------------------
 // -------
-plAGAnimInstance * plAnimStage::Attach(plArmatureMod *armature, plArmatureBrain *brain, float initialBlend, double time)
+plAGAnimInstance* plAnimStage::Attach(plArmatureMod* armature, plArmatureBrain* brain, float initialBlend, double time)
 {
     // NOTE: you need to be able to detach an animstage and then re-attach it and have
     // it wind up in exactly the same state it was in before - for loading and saving.
@@ -247,20 +248,18 @@ plAGAnimInstance * plAnimStage::Attach(plArmatureMod *armature, plArmatureBrain 
     fSentNotifies = 0;
     fArmature = armature;
 
-    if(fAnimInstance)
-    {
+    if (fAnimInstance) {
         fAnimInstance->SetBlend(initialBlend);
     } else {
-        plAGAnim *anim = armature->FindCustomAnim(fAnimName);
+        plAGAnim* anim = armature->FindCustomAnim(fAnimName);
 
-        if(anim)
-        {
+        if (anim) {
             fLength = anim->GetEnd();
             fAnimInstance = armature->AttachAnimationBlended(anim, initialBlend);
             fAnimInstance->SetCurrentTime(fLocalTime);
 #ifdef DEBUG_MULTISTAGE
             char sbuf[256];
-            sprintf(sbuf,"AnimStage::Attach - attaching stage %s",fAnimName);
+            sprintf(sbuf, "AnimStage::Attach - attaching stage %s", fAnimName);
             plAvatarMgr::GetInstance()->GetLog()->AddLine(sbuf);
 #endif
         } else {
@@ -273,8 +272,7 @@ plAGAnimInstance * plAnimStage::Attach(plArmatureMod *armature, plArmatureBrain 
         }
     }
 
-    if(fAnimInstance)
-    {
+    if (fAnimInstance) {
         fAnimInstance->Stop();      // we'll be setting the time directly.
         fAnimatedHandle = (fAnimInstance->GetAnimation()->GetChannel("Handle") != nil);
         fAttached = true;
@@ -282,39 +280,37 @@ plAGAnimInstance * plAnimStage::Attach(plArmatureMod *armature, plArmatureBrain 
         // have faded in yet.
         // XXX ISendNotify(kNotifyEnter, proEventData::kEnterStage, armature, brain);
     }
-        
+
     return fAnimInstance;
 }
 
 // SENDNOTIFY
-bool plAnimStage::ISendNotify(uint32_t notifyMask, uint32_t notifyType, plArmatureMod *armature, plArmatureBrain *brain)
+bool plAnimStage::ISendNotify(uint32_t notifyMask, uint32_t notifyType, plArmatureMod* armature, plArmatureBrain* brain)
 {
     // make sure the user has requested this type of notify
-    if(fNotify & notifyMask)
-    {
+    if (fNotify & notifyMask) {
         plKey avKey = armature->GetTarget(0)->GetKey();
-        if (fMod)
+
+        if (fMod) {
             avKey = fMod->GetKey();
-        plNotifyMsg *msg = new plNotifyMsg();
+        }
+
+        plNotifyMsg* msg = new plNotifyMsg();
         msg->SetSender(avKey);
 
-        if (fMod)
-        {
+        if (fMod) {
             msg->SetBCastFlag(plMessage::kNetPropagate, fMod->NetProp());
             msg->SetBCastFlag(plMessage::kNetForce, fMod->NetForce());
-        }
-        else
-        {
+        } else {
             msg->SetBCastFlag(plMessage::kNetPropagate, false);
             msg->SetBCastFlag(plMessage::kNetForce, false);
         }
 
-        plAvBrainGeneric *genBrain = plAvBrainGeneric::ConvertNoRef(brain);
+        plAvBrainGeneric* genBrain = plAvBrainGeneric::ConvertNoRef(brain);
         int stageNum = genBrain ? genBrain->GetStageNum(this) : -1;
         msg->AddMultiStageEvent(stageNum, notifyType, armature->GetTarget(0)->GetKey());
 
-        if (! genBrain->RelayNotifyMsg(msg) )
-        {
+        if (! genBrain->RelayNotifyMsg(msg)) {
             msg->UnRef();   // couldn't send; destroy...
         }
 
@@ -325,49 +321,53 @@ bool plAnimStage::ISendNotify(uint32_t notifyMask, uint32_t notifyType, plArmatu
 }
 
 // DETACH
-bool plAnimStage::Detach(plArmatureMod *armature)
+bool plAnimStage::Detach(plArmatureMod* armature)
 {
 
     bool result = false;
 
 #ifdef DEBUG_MULTISTAGE
     char sbuf[256];
-    sprintf(sbuf,"AnimStage::Detach - detaching stage %s",fAnimName);
+    sprintf(sbuf, "AnimStage::Detach - detaching stage %s", fAnimName);
     plAvatarMgr::GetInstance()->GetLog()->AddLine(sbuf);
 #endif
+
 //  hsStatusMessageF("Detaching plAnimStage <%s>", fAnimName);
-    if(fArmature) {
+    if (fArmature) {
         fArmature = nil;
 
-        if(fAnimInstance) {
+        if (fAnimInstance) {
             armature->DetachAnimation(fAnimInstance);       // detach instantly
             fAnimInstance = nil;
             result =  true;
         }
+
 #ifdef DEBUG_MULTISTAGE
     } else {
         char sbuf[256];
-        sprintf(sbuf,"AnimStage::Detach: stage already detached");
+        sprintf(sbuf, "AnimStage::Detach: stage already detached");
         plAvatarMgr::GetInstance()->GetLog()->AddLine(sbuf);
 #endif
 //      hsStatusMessageF("Detach: stage already detached.");
     }
-    
+
     fBrain = nil;
     fAttached = false;
     return result;
 }
 
-void plAnimStage::Reset(double time, plArmatureMod *avMod, bool atStart)
+void plAnimStage::Reset(double time, plArmatureMod* avMod, bool atStart)
 {
-    if(atStart)
+    if (atStart) {
         SetLocalTime(0.0f, true);
-    else
+    } else {
         SetLocalTime(fLength, true);
+    }
+
     avMod->GetRootAnimator()->Reset(time);
 }
 
-void plAnimStage::ResetAtTime(double globalTime, float localTime, plArmatureMod *avMod)
+void plAnimStage::ResetAtTime(double globalTime, float localTime, plArmatureMod* avMod)
 {
     SetLocalTime(localTime, true);
     avMod->GetRootAnimator()->Reset(globalTime);
@@ -377,12 +377,11 @@ void plAnimStage::ResetAtTime(double globalTime, float localTime, plArmatureMod 
 // MoveRelative ------------------------------
 // -------------
 // A true result means that the stage is done.
-bool plAnimStage::MoveRelative(double time, float delta, float &overage, plArmatureMod *avMod)
+bool plAnimStage::MoveRelative(double time, float delta, float& overage, plArmatureMod* avMod)
 {
     bool result;        // true means the stage is done
 
-    if(fLocalTime == 0.0f && delta >= 0.0f && !hsCheckBits(fSentNotifies, kNotifyEnter))
-    {
+    if (fLocalTime == 0.0f && delta >= 0.0f && !hsCheckBits(fSentNotifies, kNotifyEnter)) {
         // we send the "enter" notify if we're at the start and either moving forward
         // or standing still.
         ISendNotify(kNotifyEnter, proEventData::kEnterStage, avMod, fBrain);
@@ -390,20 +389,18 @@ bool plAnimStage::MoveRelative(double time, float delta, float &overage, plArmat
     }
 
     // aborting...
-    if( fAdvanceType == kAdvanceOnMove && (avMod->HasMovementFlag() || avMod->ExitModeKeyDown()))
-    {   // special case: advance when any key is pressed, regardless of position in stage.
+    if (fAdvanceType == kAdvanceOnMove && (avMod->HasMovementFlag() || avMod->ExitModeKeyDown())) {
+        // special case: advance when any key is pressed, regardless of position in stage.
         ISendNotify(kNotifyAdvance, proEventData::kAdvanceNextStage, avMod, fBrain);
         result = true;
     } else {
-        if(delta == 0.0f)
-        {
+        if (delta == 0.0f) {
             return false;
-        }   
-        else
-        if(delta < 0.0f)
+        } else if (delta < 0.0f) {
             result = IMoveBackward(time, delta, overage, avMod);
-        else
+        } else {
             result = IMoveForward(time, delta, overage, avMod);
+        }
     }
 
     return result;
@@ -411,10 +408,9 @@ bool plAnimStage::MoveRelative(double time, float delta, float &overage, plArmat
 
 // IMoveBackward ------------------------------------------------------------------------------
 // --------------
-bool plAnimStage::IMoveBackward(double time, float delta, float &overrun, plArmatureMod *avMod)
+bool plAnimStage::IMoveBackward(double time, float delta, float& overrun, plArmatureMod* avMod)
 {
-    if (fLocalTime <= 0 && fRegressType == kRegressNone)
-    {
+    if (fLocalTime <= 0 && fRegressType == kRegressNone) {
         // If we're at the beginning, but not allowed to regress, we don't want to keep processing
         // (and firing triggers).
         return false;
@@ -426,30 +422,29 @@ bool plAnimStage::IMoveBackward(double time, float delta, float &overrun, plArma
 
     // If we don't have this animation, just pretend to have worked.
     // Otherwise, we crash the client.
-    if (!fAnimInstance)
-    {
+    if (!fAnimInstance) {
         hsAssert(false, "AnimInstance nil");
         return true;
     }
 
     // This must be here before we set the local time.
-    if (fAnimInstance->GetTimeConvert())
+    if (fAnimInstance->GetTimeConvert()) {
         fAnimInstance->GetTimeConvert()->Backwards();
+    }
 
-    if(target < 0)
-    {
+    if (target < 0) {
         SetLocalTime(0);                // animation to beginning
         avMod->GetRootAGMod()->Apply(time);             // move avatar to beginning
-        if(loopsRemain)
-        {
+
+        if (loopsRemain) {
             // If a callback is on the last frame, it'll get triggered twice. Once for setting
             // the anim at the end, and once when we play again. So we don't fire callbacks here.
             SetLocalTime(fLength, true);        // animation wraps to end
 
             avMod->GetRootAnimator()->Reset(time);          // reset the root animator at the end
             fCurLoop = infiniteLoop ? 0 : fCurLoop - 1;
-            target = fLength - (fmodf(-target, fLength));   // modularize negative number to discard 
-                                                            // extra loops (only one allowed)
+            target = fLength - (fmodf(-target, fLength));   // modularize negative number to discard
+            // extra loops (only one allowed)
         } else {
             // overrun = target + fLength;
             // now we want to make sure that overrun goes negative when appropriate, rather than modularizing
@@ -461,7 +456,7 @@ bool plAnimStage::IMoveBackward(double time, float delta, float &overrun, plArma
 
     overrun = 0.0f;
     fLocalTime = target;
-        
+
     fAnimInstance->SetCurrentTime(fLocalTime);
     return false;   // not done
 }
@@ -470,34 +465,32 @@ bool plAnimStage::IMoveBackward(double time, float delta, float &overrun, plArma
 // IMoveForward ------------------------------------------------------------------------------
 // -------------
 // It's currently not supported to advance the animation by more than its length in one frame.
-// It wouldn't be too hard to add, but it clutters things up and it hasn't been shown to 
+// It wouldn't be too hard to add, but it clutters things up and it hasn't been shown to
 // be necessary.
-bool plAnimStage::IMoveForward(double time, float delta, float &overrun, plArmatureMod *avMod)
+bool plAnimStage::IMoveForward(double time, float delta, float& overrun, plArmatureMod* avMod)
 {
-    if (fLocalTime >= fLength && fAdvanceType == kAdvanceNone)
-    {
+    if (fLocalTime >= fLength && fAdvanceType == kAdvanceNone) {
         // If we're at the end, but not allowed to advance, we don't want to keep processing
         // (and firing triggers).
         return false;
     }
-    
+
     // first get the target time in local time, ignoring overruns
     float target = fLocalTime + delta;
 
     // If we don't have this animation, just pretend to have worked.
     // Otherwise, we crash the client.
-    if (!fAnimInstance)
-    {
+    if (!fAnimInstance) {
         hsAssert(false, "AnimInstance nil");
         return true;
     }
 
-    if (fAnimInstance->GetTimeConvert())
+    if (fAnimInstance->GetTimeConvert()) {
         fAnimInstance->GetTimeConvert()->Forewards();
-    
+    }
 
-    if (target > fLength)
-    {
+
+    if (target > fLength) {
         // we're going to the end for sure, so do that first
         SetLocalTime(fLength);
         // we're going to swap in a new animation before the next eval, so force
@@ -508,8 +501,8 @@ bool plAnimStage::IMoveForward(double time, float delta, float &overrun, plArmat
 
         // are there *any* loops to be had?
         bool loopsRemain = fCurLoop < fLoops || fLoops == -1;
-        if(loopsRemain)
-        {
+
+        if (loopsRemain) {
             SetLocalTime(0.0f, true);                               // animation back to beginning
             avMod->GetRootAnimator()->Reset(time);              // reset the root animator's frame cache
             fCurLoop++;
@@ -524,24 +517,23 @@ bool plAnimStage::IMoveForward(double time, float delta, float &overrun, plArmat
 
     overrun = 0.0f;
     fLocalTime = target;
-    
+
     avMod->GetRootAGMod()->Apply(time);
     fAnimInstance->SetCurrentTime(fLocalTime);
     return false;   // not done
 }
 
-bool plAnimStage::ITryAdvance(plArmatureMod *avMod)
+bool plAnimStage::ITryAdvance(plArmatureMod* avMod)
 {
     bool stageDone = false;
 
 
     // hsStatusMessageF("Sending advance message for stage <%s>\n", fAnimName);
-    if(fAdvanceType == kAdvanceAuto || fAdvanceType == kAdvanceOnMove) {
+    if (fAdvanceType == kAdvanceAuto || fAdvanceType == kAdvanceOnMove) {
         stageDone = true;
     }
 
-    if(!hsCheckBits(fSentNotifies, kNotifyAdvance))
-    {
+    if (!hsCheckBits(fSentNotifies, kNotifyAdvance)) {
         // we send the advance message at the point where we *would* advance, whether
         // or not we actually do. this is misleading but better suited to actual current usage.
         // we may want to rename this to "ReachedStageEnd"
@@ -553,7 +545,7 @@ bool plAnimStage::ITryAdvance(plArmatureMod *avMod)
 }
 
 
-bool plAnimStage::ITryRegress(plArmatureMod *avMod)
+bool plAnimStage::ITryRegress(plArmatureMod* avMod)
 {
     bool stageDone = false;
 
@@ -563,15 +555,16 @@ bool plAnimStage::ITryRegress(plArmatureMod *avMod)
     ISendNotify(kNotifyRegress, proEventData::kRegressPrevStage, avMod, fBrain);
 
     // hsStatusMessageF("Sending regress message for stage <%s>\n", fAnimName);
-    if(fRegressType == kRegressAuto) {
+    if (fRegressType == kRegressAuto) {
         stageDone = true;
     }
+
     return stageDone;
 }
 
 
 // GETANIMNAME
-const char * plAnimStage::GetAnimName()
+const char* plAnimStage::GetAnimName()
 {
     return fAnimName;
 }
@@ -655,9 +648,10 @@ void plAnimStage::SetNumLoops(int loops)
     // It's been like this for ages, so I'm not touching it until a break shows a problem.
     //
     //hsAssert(loops < fCurLoop, "Setting loopcount below current loop");
-    if(loops >= fCurLoop) {
+    if (loops >= fCurLoop) {
         fCurLoop = loops;
     }
+
     fLoops = loops;
 }
 
@@ -683,8 +677,10 @@ float plAnimStage::GetLocalTime()
 void plAnimStage::SetLocalTime(float time, bool noCallbacks /* = false */)
 {
     fLocalTime = time;
-    if(fAnimInstance)
+
+    if (fAnimInstance) {
         fAnimInstance->SetCurrentTime(time, noCallbacks);
+    }
 }
 
 // GETLENGTH
@@ -708,8 +704,7 @@ void plAnimStage::SetIsAttached(bool status)
 // GETNEXTSTAGE
 int plAnimStage::GetNextStage(int curStage)
 {
-    if(fDoAdvanceTo)
-    {
+    if (fDoAdvanceTo) {
         return fAdvanceTo;
     } else {
         return curStage + 1;
@@ -719,8 +714,7 @@ int plAnimStage::GetNextStage(int curStage)
 // GETPREVSTAGE
 int plAnimStage::GetPrevStage(int curStage)
 {
-    if(fDoRegressTo)
-    {
+    if (fDoRegressTo) {
         return fRegressTo;
     } else {
         return curStage - 1;
@@ -728,14 +722,14 @@ int plAnimStage::GetPrevStage(int curStage)
 }
 
 // DUMPDEBUG
-void plAnimStage::DumpDebug(bool active, int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt)
+void plAnimStage::DumpDebug(bool active, int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt)
 {
     std::string str;
 
     str += fAnimName;
     str += " ";
 
-    if(fLoops) {
+    if (fLoops) {
         sprintf(strBuf, "loop(%d/%d)", fCurLoop, fLoops);
         str += strBuf;
     }
@@ -743,18 +737,19 @@ void plAnimStage::DumpDebug(bool active, int &x, int &y, int lineHeight, char *s
     sprintf(strBuf, "time: (%f/%f)", fLocalTime, fLength);
     str += strBuf;
 
-    if(active)
+    if (active) {
         debugTxt.DrawString(x, y, str.c_str(), 0, 255, 0);
-    else if(fAnimInstance)
+    } else if (fAnimInstance) {
         debugTxt.DrawString(x, y, str.c_str());
-    else
+    } else {
         debugTxt.DrawString(x, y, str.c_str(), 255, 255, 0);
+    }
 
     y += lineHeight;
 }
 
 // READ
-void plAnimStage::Read(hsStream *stream, hsResMgr *mgr)
+void plAnimStage::Read(hsStream* stream, hsResMgr* mgr)
 {
     delete [] fAnimName;
     fAnimName = stream->ReadSafeString();
@@ -771,7 +766,7 @@ void plAnimStage::Read(hsStream *stream, hsResMgr *mgr)
     fRegressTo = stream->ReadLE32();
 }
 
-void plAnimStage::Write(hsStream *stream, hsResMgr *mgr)
+void plAnimStage::Write(hsStream* stream, hsResMgr* mgr)
 {
     stream->WriteSafeString(fAnimName);
     stream->WriteByte(fNotify);
@@ -789,7 +784,7 @@ void plAnimStage::Write(hsStream *stream, hsResMgr *mgr)
 
 
 // SAVEAUX
-void plAnimStage::SaveAux(hsStream *stream, hsResMgr *mgr)
+void plAnimStage::SaveAux(hsStream* stream, hsResMgr* mgr)
 {
     stream->WriteLEScalar(fLocalTime);
     stream->WriteLEScalar(fLength);
@@ -799,7 +794,7 @@ void plAnimStage::SaveAux(hsStream *stream, hsResMgr *mgr)
 }
 
 // LOADAUX
-void plAnimStage::LoadAux(hsStream *stream, hsResMgr *mgr, double time)
+void plAnimStage::LoadAux(hsStream* stream, hsResMgr* mgr, double time)
 {
     fLocalTime = stream->ReadLEScalar();
     fLength = stream->ReadLEScalar();

@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "HeadSpin.h"
 
 #if HS_BUILD_FOR_WIN32
-class hsGDDrawDllLoad
-{
+class hsGDDrawDllLoad {
 private:
     HMODULE     fD3DDll;
 

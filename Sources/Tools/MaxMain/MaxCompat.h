@@ -59,7 +59,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #   define ENUMDEPENDENTS(maxObject, proc) \
         maxObject->EnumDependents(proc);
 
-    typedef TCHAR MCHAR;
+typedef TCHAR MCHAR;
 #else
 #   define BMMCOLOR(x, y, z, w) \
         BMM_Color_64(x, y, z, w);

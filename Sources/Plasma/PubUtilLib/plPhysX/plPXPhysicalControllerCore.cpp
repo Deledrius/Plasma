@@ -77,11 +77,9 @@ int plPXPhysicalControllerCore::fPXControllersMax = 0;
 #define kPhysZOffset ((kCCTZOffset + (kPhysHeightCorrection / 2)) - 0.05f)
 #define kAvatarMass 200.0f
 
-static class PXControllerHitReport : public NxUserControllerHitReport
-{
+static class PXControllerHitReport : public NxUserControllerHitReport {
 public:
-    virtual NxControllerAction onShapeHit(const NxControllerShapeHit& hit)
-    {
+    virtual NxControllerAction onShapeHit(const NxControllerShapeHit& hit) {
         plPXPhysicalControllerCore* controller = (plPXPhysicalControllerCore*)hit.controller->getUserData();
         NxActor& actor = hit.shape->getActor();
         plPXPhysical* phys = (plPXPhysical*)actor.userData;
@@ -100,18 +98,15 @@ public:
 #endif PLASMA_EXTERNAL_RELEASE
 
         // If the avatar hit a movable physical, apply some force to it.
-        if (actor.isDynamic())
-        {
-            if (!actor.readBodyFlag(NX_BF_KINEMATIC) && !actor.readBodyFlag(NX_BF_FROZEN))
-            {
+        if (actor.isDynamic()) {
+            if (!actor.readBodyFlag(NX_BF_KINEMATIC) && !actor.readBodyFlag(NX_BF_FROZEN)) {
                 // Don't apply force when standing on top of an object.
-                if (normal.fZ < 0.85f)
-                {
+                if (normal.fZ < 0.85f) {
                     hsVector3 velocity = controller->GetLinearVelocity();
                     velocity.fZ = 0.0f;
                     float length = velocity.Magnitude();
-                    if (length > 0)
-                    {
+
+                    if (length > 0) {
                         // Only allow horizontal pushes for now
                         NxVec3 hitDir = hit.worldPos - hit.controller->getPosition();
                         hitDir.z = 0.0f;
@@ -123,8 +118,10 @@ public:
 
                         // Get hit actors speed along the hitDir
                         float hitProj = actor.getLinearVelocity().dot(hitDir);
-                        if (hitProj > 0)
+
+                        if (hitProj > 0) {
                             length -= hitProj;
+                        }
 
                         length *= kAvatarMass;
 
@@ -134,45 +131,43 @@ public:
                     }
                 }
             }
-        }
-        else  // else if the avatar hit a static
-        {
+        } else { // else if the avatar hit a static
             controller->fMovementStrategy->AddContactNormals(normal);
             return NX_ACTION_NONE;
         }
-        if (phys && phys->GetProperty(plSimulationInterface::kAvAnimPushable))
-        {
+
+        if (phys && phys->GetProperty(plSimulationInterface::kAvAnimPushable)) {
             hsQuat inverseRotation = controller->fLocalRotation.Inverse();
             hsVector3 normal = plPXConvert::Vector(hit.worldNormal);
             controller->SetPushingPhysical(phys);
             controller->SetFacingPushingPhysical((inverseRotation.Rotate(&kAvatarForward).InnerProduct(normal) < 0 ? true : false));
         }
+
         return NX_ACTION_NONE;
     }
-    virtual NxControllerAction onControllerHit(const NxControllersHit& hit)
-    {
+    virtual NxControllerAction onControllerHit(const NxControllersHit& hit) {
         return NX_ACTION_NONE;
     }
 } gControllerHitReport;
 
 plPhysicalControllerCore* plPhysicalControllerCore::Create(plKey ownerSO, float height, float width, bool human)
 {
-    if (!plPXPhysicalControllerCore::fPXControllersMax || gControllers.size() < plPXPhysicalControllerCore::fPXControllersMax)
-    {
+    if (!plPXPhysicalControllerCore::fPXControllersMax || gControllers.size() < plPXPhysicalControllerCore::fPXControllersMax) {
         float radius = width / 2.0f;
         float realHeight = height - width;
         return new plPXPhysicalControllerCore(ownerSO, realHeight, radius, human);
     }
+
     return nil;
 }
 
 plPXPhysicalControllerCore::plPXPhysicalControllerCore(plKey ownerSO, float height, float radius, bool human)
     : plPhysicalControllerCore(ownerSO, height, radius),
-    fController(nil),
-    fActor(nil),
-    fProxyGen(nil),
-    fKinematicCCT(true),
-    fHuman(human)
+      fController(nil),
+      fActor(nil),
+      fProxyGen(nil),
+      fKinematicCCT(true),
+      fHuman(human)
 {
     ICreateController(fLocalPosition);
     fActor->raiseActorFlag(NX_AF_DISABLE_COLLISION);
@@ -181,22 +176,23 @@ plPXPhysicalControllerCore::plPXPhysicalControllerCore(plKey ownerSO, float heig
 plPXPhysicalControllerCore::~plPXPhysicalControllerCore()
 {
     int numControllers = gControllers.size();
-    for (int i = 0; i < numControllers; ++i)
-    {
-        if (gControllers[i] == this)
-        {
-            gControllers.erase(gControllers.begin()+i);
+
+    for (int i = 0; i < numControllers; ++i) {
+        if (gControllers[i] == this) {
+            gControllers.erase(gControllers.begin() + i);
             break;
         }
     }
+
     IDeleteController();
 
     // Release any queued messages we may have
     int numMsgs = fQueuedCollideMsgs.size();
-    if (numMsgs)
-    {
-        for (int i = 0; i < numMsgs; ++i)
+
+    if (numMsgs) {
+        for (int i = 0; i < numMsgs; ++i) {
             delete fQueuedCollideMsgs[i];
+        }
 
         fQueuedCollideMsgs.clear();
     }
@@ -206,18 +202,14 @@ plPXPhysicalControllerCore::~plPXPhysicalControllerCore()
 
 void plPXPhysicalControllerCore::Enable(bool enable)
 {
-    if (fEnabled != enable)
-    {
+    if (fEnabled != enable) {
         fEnabled = enable;
-        if (fEnabled)
-        {
+
+        if (fEnabled) {
             // Defer until the next physics update.
             fEnableChanged = true;
-        }
-        else
-        {
-            if (!fKinematicCCT)
-            {
+        } else {
+            if (!fKinematicCCT) {
                 // Dynamic controllers are forced kinematic
                 fActor->raiseBodyFlag(NX_BF_KINEMATIC);
                 NxShape* shape = fActor->getShapes()[0];
@@ -227,10 +219,9 @@ void plPXPhysicalControllerCore::Enable(bool enable)
     }
 }
 
-void plPXPhysicalControllerCore::SetSubworld(plKey world) 
+void plPXPhysicalControllerCore::SetSubworld(plKey world)
 {
-    if (fWorldKey != world)
-    {
+    if (fWorldKey != world) {
         SimLog("Changing subworlds!");
 
         // Inform detectors in the old world that we are leaving
@@ -240,16 +231,17 @@ void plPXPhysicalControllerCore::SetSubworld(plKey world)
         // We need our real global location here, not the interpolated location
         fLocalRotation.MakeMatrix(&fLastGlobalLoc);
         fLastGlobalLoc.SetTranslate(&fLocalPosition);
-        if (fWorldKey)
-        {
+
+        if (fWorldKey) {
             hsMatrix44 prevSubL2W;
             fPrevSubworldW2L.GetInverse(&prevSubL2W);
             fLastGlobalLoc = prevSubL2W * fLastGlobalLoc;
         }
+
         // Update our scene object so the change isn't wiped out
         plSceneObject* so = plSceneObject::ConvertNoRef(fOwner->ObjectIsLoaded());
-        if (so)
-        {
+
+        if (so) {
             hsMatrix44 globalLocInv;
             fLastGlobalLoc.GetInverse(&globalLocInv);
             so->SetTransform(fLastGlobalLoc, globalLocInv);
@@ -259,15 +251,13 @@ void plPXPhysicalControllerCore::SetSubworld(plKey world)
         // Update Local Position and rotation
         fWorldKey = world;
         const plCoordinateInterface* subworldCI = GetSubworldCI();
-        if (subworldCI)
-        {
+
+        if (subworldCI) {
             fPrevSubworldW2L = subworldCI->GetWorldToLocal();
             hsMatrix44 l2s = fPrevSubworldW2L * fLastGlobalLoc;
             l2s.GetTranslate(&fLocalPosition);
             fLocalRotation.SetFromMatrix44(l2s);
-        }
-        else
-        {
+        } else {
             fPrevSubworldW2L.Reset();
             fLastGlobalLoc.GetTranslate(&fLocalPosition);
             fLocalRotation.SetFromMatrix44(fLastGlobalLoc);
@@ -287,16 +277,17 @@ void plPXPhysicalControllerCore::GetState(hsPoint3& pos, float& zRot)
     fLocalRotation.NormalizeIfNeeded();
     fLocalRotation.GetAngleAxis(&zRot, (hsVector3*)&pos);
 
-    if (pos.fZ < 0)
-        zRot = (2 * float(M_PI)) - zRot; // axis is backwards, so reverse the angle too
+    if (pos.fZ < 0) {
+        zRot = (2 * float(M_PI)) - zRot;    // axis is backwards, so reverse the angle too
+    }
 
     pos = fLocalPosition;
 }
 void plPXPhysicalControllerCore::SetState(const hsPoint3& pos, float zRot)
 {
     plSceneObject* so = plSceneObject::ConvertNoRef(fOwner->ObjectIsLoaded());
-    if (so)
-    {
+
+    if (so) {
         hsQuat worldRot;
         hsVector3 zAxis(0.f, 0.f, 1.f);
         worldRot.SetAngleAxis(zRot, zAxis);
@@ -307,11 +298,12 @@ void plPXPhysicalControllerCore::SetState(const hsPoint3& pos, float zRot)
 
         // Localize new position and rotation to global coords if we're in a subworld
         const plCoordinateInterface* ci = GetSubworldCI();
-        if (ci)
-        {
+
+        if (ci) {
             const hsMatrix44& subworldL2W = ci->GetLocalToWorld();
             l2w = subworldL2W * l2w;
         }
+
         l2w.GetInverse(&w2l);
         so->SetTransform(l2w, w2l);
         so->FlushTransform();
@@ -320,8 +312,7 @@ void plPXPhysicalControllerCore::SetState(const hsPoint3& pos, float zRot)
 
 void plPXPhysicalControllerCore::SetMovementStrategy(plMovementStrategy* strategy)
 {
-    if (fKinematicCCT != strategy->IsKinematic())
-    {
+    if (fKinematicCCT != strategy->IsKinematic()) {
         IDeleteController();
         fKinematicCCT = !fKinematicCCT;
         ICreateController(fLocalPosition);
@@ -337,34 +328,30 @@ void plPXPhysicalControllerCore::SetGlobalLoc(const hsMatrix44& l2w)
     // Update our local position and rotation
     hsPoint3 prevPosition = fLocalPosition;
     const plCoordinateInterface* subworldCI = GetSubworldCI();
-    if (subworldCI)
-    {
+
+    if (subworldCI) {
         hsMatrix44 l2s = fPrevSubworldW2L * l2w;
 
         l2s.GetTranslate(&fLocalPosition);
         fLocalRotation.SetFromMatrix44(l2s);
-    }
-    else
-    {
+    } else {
         l2w.GetTranslate(&fLocalPosition);
         fLocalRotation.SetFromMatrix44(l2w);
     }
 
     fLastLocalPosition = fLocalPosition;
 
-    if (fProxyGen)
-    {
+    if (fProxyGen) {
         hsMatrix44 w2l;
         l2w.GetInverse(&w2l);
         fProxyGen->SetTransform(l2w, w2l);
     }
 
     // Update the physical position
-    if (fKinematicCCT)
-    {
+    if (fKinematicCCT) {
         hsVector3 disp(&fLocalPosition, &prevPosition);
-        if (disp.Magnitude() > 2.f)
-        {
+
+        if (disp.Magnitude() > 2.f) {
             // Teleport the underlying actor most of the way
             disp.Normalize();
             disp *= 0.001f;
@@ -376,65 +363,71 @@ void plPXPhysicalControllerCore::SetGlobalLoc(const hsMatrix44& l2w)
 
         NxExtendedVec3 extPos(fLocalPosition.fX, fLocalPosition.fY, fLocalPosition.fZ + kCCTZOffset);
         fController->setPosition(extPos);
-    }
-    else
-    {
+    } else {
         NxVec3 pos(fLocalPosition.fX, fLocalPosition.fY, fLocalPosition.fZ + kPhysZOffset);
-        if (fActor->readBodyFlag(NX_BF_KINEMATIC))
+
+        if (fActor->readBodyFlag(NX_BF_KINEMATIC)) {
             fActor->moveGlobalPosition(pos);
-        else
+        } else {
             fActor->setGlobalPosition(pos);
+        }
     }
 }
 
 void plPXPhysicalControllerCore::GetPositionSim(hsPoint3& pos)
 {
-    if (fKinematicCCT)
-    {
+    if (fKinematicCCT) {
         const NxExtendedVec3& extPos = fController->getPosition();
         pos.Set((float)extPos.x, (float)extPos.y, (float)extPos.z - kCCTZOffset);
-    }
-    else
-    {
+    } else {
         NxVec3 nxPos = fActor->getGlobalPosition();
         pos.Set(nxPos.x, nxPos.y, nxPos.z - kPhysZOffset);
     }
 }
 
-void plPXPhysicalControllerCore::Move(hsVector3 displacement, unsigned int collideWith, unsigned int &collisionResults)
+void plPXPhysicalControllerCore::Move(hsVector3 displacement, unsigned int collideWith, unsigned int& collisionResults)
 {
     NxU32 colFlags = 0;
 
     fController->move(plPXConvert::Vector(displacement), collideWith, 0.00001f, colFlags);
 
     collisionResults = 0;
-    if (colFlags & NXCC_COLLISION_DOWN)
+
+    if (colFlags & NXCC_COLLISION_DOWN) {
         collisionResults |= kBottom;
-    if (colFlags & NXCC_COLLISION_UP)
+    }
+
+    if (colFlags & NXCC_COLLISION_UP) {
         collisionResults |= kTop;
-    if (colFlags & NXCC_COLLISION_SIDES)
+    }
+
+    if (colFlags & NXCC_COLLISION_SIDES) {
         collisionResults |= kSides;
+    }
 }
 
 void plPXPhysicalControllerCore::SetLinearVelocitySim(const hsVector3& linearVel)
 {
-    if (!fKinematicCCT)
-    {
+    if (!fKinematicCCT) {
         NxVec3 vel = plPXConvert::Vector(linearVel);
         fActor->setLinearVelocity(vel);
     }
 }
 
 int plPXPhysicalControllerCore::SweepControllerPath(const hsPoint3& startPos, const hsPoint3& endPos, bool vsDynamics, bool vsStatics,
-                            uint32_t& vsSimGroups, std::vector<plControllerSweepRecord>& hits)
+        uint32_t& vsSimGroups, std::vector<plControllerSweepRecord>& hits)
 {
     NxSweepQueryHit queryHit[10];
 
     unsigned int flags = NX_SF_ALL_HITS;
-    if (vsDynamics)
+
+    if (vsDynamics) {
         flags |= NX_SF_DYNAMICS;
-    if (vsStatics)
+    }
+
+    if (vsStatics) {
         flags |= NX_SF_STATICS;
+    }
 
     NxVec3 vec;
     vec.x = endPos.fX - startPos.fX;
@@ -453,16 +446,15 @@ int plPXPhysicalControllerCore::SweepControllerPath(const hsPoint3& startPos, co
     capsule.p1 = capsule.p0;
     capsule.p1.z = capsule.p1.z + height;
 
-    NxScene *scene = plSimulationMgr::GetInstance()->GetScene(fWorldKey);
+    NxScene* scene = plSimulationMgr::GetInstance()->GetScene(fWorldKey);
     int numHits = scene->linearCapsuleSweep(capsule, vec, flags, nil, 10, queryHit, nil, vsSimGroups);
-    if (numHits)
-    {
-        for (int i = 0; i < numHits; ++i)
-        {
+
+    if (numHits) {
+        for (int i = 0; i < numHits; ++i) {
             plControllerSweepRecord currentHit;
             currentHit.ObjHit = (plPhysical*)queryHit[i].hitShape->getActor().userData;
-            if (currentHit.ObjHit)
-            {
+
+            if (currentHit.ObjHit) {
                 currentHit.Point = plPXConvert::Point(queryHit[i].point);
                 currentHit.Normal = plPXConvert::Vector(queryHit[i].normal);
                 hits.push_back(currentHit);
@@ -476,8 +468,10 @@ int plPXPhysicalControllerCore::SweepControllerPath(const hsPoint3& startPos, co
 void plPXPhysicalControllerCore::LeaveAge()
 {
     SetPushingPhysical(nil);
-    if (fWorldKey)
+
+    if (fWorldKey) {
         SetSubworld(nil);
+    }
 
     // Disable all collisions
     fActor->raiseActorFlag(NX_AF_DISABLE_COLLISION);
@@ -497,30 +491,31 @@ plDrawableSpans* plPXPhysicalControllerCore::CreateProxy(hsGMaterial* mat, hsTAr
     bool blended = ((mat->GetLayer(0)->GetBlendFlags() & hsGMatState::kBlendMask));
     float radius = fRadius;
     myDraw = plDrawableGenerator::GenerateSphericalDrawable(fLocalPosition, radius,
-        mat, fLastGlobalLoc, blended,
-        nil, &idx, myDraw);
+             mat, fLastGlobalLoc, blended,
+             nil, &idx, myDraw);
 
-/*
-    plSceneObject* so = plSceneObject::ConvertNoRef(fOwner->ObjectIsLoaded());
-    if (so)
-    {
-        bool blended = ((mat->GetLayer(0)->GetBlendFlags() & hsGMatState::kBlendMask));
+    /*
+        plSceneObject* so = plSceneObject::ConvertNoRef(fOwner->ObjectIsLoaded());
+        if (so)
+        {
+            bool blended = ((mat->GetLayer(0)->GetBlendFlags() & hsGMatState::kBlendMask));
 
-        myDraw = plDrawableGenerator::GenerateConicalDrawable(fRadius*10, fHeight*10,
-            mat, so->GetLocalToWorld(), blended,
-            nil, &idx, myDraw);
-    }
-*/
+            myDraw = plDrawableGenerator::GenerateConicalDrawable(fRadius*10, fHeight*10,
+                mat, so->GetLocalToWorld(), blended,
+                nil, &idx, myDraw);
+        }
+    */
     return myDraw;
 }
 
 void plPXPhysicalControllerCore::AddDynamicHit(plPXPhysical* phys)
 {
     int numHits = fDynamicHits.size();
-    for (int i = 0; i < numHits; ++i)
-    {
-        if (fDynamicHits[i] == phys)
+
+    for (int i = 0; i < numHits; ++i) {
+        if (fDynamicHits[i] == phys) {
             return;
+        }
     }
 
     fDynamicHits.push_back(phys);
@@ -530,11 +525,13 @@ void plPXPhysicalControllerCore::Apply(float delSecs)
 {
     plPXPhysicalControllerCore* controller;
     int numControllers = gControllers.size();
-    for (int i = 0; i < numControllers; ++i)
-    {
+
+    for (int i = 0; i < numControllers; ++i) {
         controller = gControllers[i];
-        if (gRebuildCache && controller->fController)
+
+        if (gRebuildCache && controller->fController) {
             controller->fController->reportSceneChanged();
+        }
 
 #ifndef PLASMA_EXTERNAL_RELEASE
         controller->fDbgCollisionInfo.SetCount(0);
@@ -553,15 +550,18 @@ void plPXPhysicalControllerCore::Update(int numSubSteps, float alpha)
 
     plPXPhysicalControllerCore* controller;
     int numControllers = gControllers.size();
-    for (int i = 0; i < numControllers; ++i)
-    {
+
+    for (int i = 0; i < numControllers; ++i) {
         controller = gControllers[i];
 
         controller->IUpdate(numSubSteps, alpha);
 
 #ifndef PLASMA_EXTERNAL_RELEASE
-        if (fDebugDisplay)
+
+        if (fDebugDisplay) {
             controller->IDrawDebugDisplay();
+        }
+
 #endif
     }
 }
@@ -569,24 +569,29 @@ void plPXPhysicalControllerCore::UpdateNonPhysical(float alpha)
 {
     plPXPhysicalControllerCore* controller;
     int numControllers = gControllers.size();
-    for (int i = 0; i < numControllers; ++i)
-    {
+
+    for (int i = 0; i < numControllers; ++i) {
         controller = gControllers[i];
         controller->IUpdateNonPhysical(alpha);
     }
 }
 
-void plPXPhysicalControllerCore::RebuildCache() { gRebuildCache = true; }
+void plPXPhysicalControllerCore::RebuildCache()
+{
+    gRebuildCache = true;
+}
 
 plPXPhysicalControllerCore* plPXPhysicalControllerCore::GetController(NxActor& actor)
 {
     plPXPhysicalControllerCore* controller;
     int numControllers = gControllers.size();
-    for (int i = 0; i < numControllers; ++i)
-    {
+
+    for (int i = 0; i < numControllers; ++i) {
         controller = gControllers[i];
-        if (controller->fActor == &actor)
+
+        if (controller->fActor == &actor) {
             return controller;
+        }
     }
 
     return nil;
@@ -596,11 +601,13 @@ bool plPXPhysicalControllerCore::AnyControllersInThisWorld(plKey world)
 {
     plPXPhysicalControllerCore* controller;
     int numControllers = gControllers.size();
-    for (int i = 0; i < numControllers; ++i)
-    {
+
+    for (int i = 0; i < numControllers; ++i) {
         controller = gControllers[i];
-        if (controller->GetSubworld() == world)
+
+        if (controller->GetSubworld() == world) {
             return true;
+        }
     }
 
     return false;
@@ -610,11 +617,13 @@ int plPXPhysicalControllerCore::GetNumberOfControllersInThisSubWorld(plKey world
     int count = 0;
     plPXPhysicalControllerCore* controller;
     int numControllers = gControllers.size();
-    for (int i = 0; i < numControllers; ++i)
-    {
+
+    for (int i = 0; i < numControllers; ++i) {
         controller = gControllers[i];
-        if (controller->GetSubworld() == world)
+
+        if (controller->GetSubworld() == world) {
             ++count;
+        }
     }
 
     return count;
@@ -624,13 +633,12 @@ int plPXPhysicalControllerCore::GetControllersInThisSubWorld(plKey world, int ma
     int count = 0;
     plPXPhysicalControllerCore* controller;
     int numControllers = gControllers.size();
-    for (int i = 0; i < numControllers; ++i)
-    {
+
+    for (int i = 0; i < numControllers; ++i) {
         controller = gControllers[i];
-        if (controller->GetSubworld() == world)
-        {
-            if (count < maxToReturn)
-            {
+
+        if (controller->GetSubworld() == world) {
+            if (count < maxToReturn) {
                 bufferout[count] = controller;
                 ++count;
             }
@@ -640,15 +648,17 @@ int plPXPhysicalControllerCore::GetControllersInThisSubWorld(plKey world, int ma
     return count;
 }
 
-int plPXPhysicalControllerCore::NumControllers() { return gControllers.size(); }
+int plPXPhysicalControllerCore::NumControllers()
+{
+    return gControllers.size();
+}
 
 void plPXPhysicalControllerCore::IHandleEnableChanged()
 {
     // Defered enable
     fEnableChanged = false;
 
-    if (!fKinematicCCT)
-    {
+    if (!fKinematicCCT) {
         // Restore dynamic controller
         fActor->clearBodyFlag(NX_BF_KINEMATIC);
         NxShape* shape = fActor->getShapes()[0];
@@ -656,13 +666,14 @@ void plPXPhysicalControllerCore::IHandleEnableChanged()
     }
 
     // Enable actor collisions
-    if (fActor->readActorFlag(NX_AF_DISABLE_COLLISION))
+    if (fActor->readActorFlag(NX_AF_DISABLE_COLLISION)) {
         fActor->clearActorFlag(NX_AF_DISABLE_COLLISION);
+    }
 }
 
 void plPXPhysicalControllerCore::IInformDetectors(bool entering)
 {
-    static const NxU32 kDetectorFlag = 1<<plSimDefs::kGroupDetector;
+    static const NxU32 kDetectorFlag = 1 << plSimDefs::kGroupDetector;
     static const int kNumShapes = 30;
 
     DetectorLog("Informing from plPXPhysicalControllerCore::IInformDetectors");
@@ -672,11 +683,11 @@ void plPXPhysicalControllerCore::IInformDetectors(bool entering)
     GetWorldSpaceCapsule(capsule);
     NxScene* scene = plSimulationMgr::GetInstance()->GetScene(fWorldKey);
     int numCollided = scene->overlapCapsuleShapes(capsule, NX_ALL_SHAPES, kNumShapes, shapes, NULL, kDetectorFlag, NULL, true);
-    for (int i = 0; i < numCollided; ++i)
-    {
+
+    for (int i = 0; i < numCollided; ++i) {
         plPXPhysical* physical = (plPXPhysical*)shapes[i]->getActor().userData;
-        if (physical && physical->DoReportOn(plSimDefs::kGroupAvatar))
-        {
+
+        if (physical && physical->DoReportOn(plSimDefs::kGroupAvatar)) {
             plCollideMsg* msg = new plCollideMsg();
             msg->fOtherKey = fOwner;
             msg->fEntering = entering;
@@ -694,8 +705,7 @@ void plPXPhysicalControllerCore::ICreateController(const hsPoint3& pos)
 {
     NxScene* scene = plSimulationMgr::GetInstance()->GetScene(fWorldKey);
 
-    if (fKinematicCCT)
-    {
+    if (fKinematicCCT) {
         // Use PhysX character controller
         NxCapsuleControllerDesc desc;
         desc.position.x     = pos.fX;
@@ -727,15 +737,14 @@ void plPXPhysicalControllerCore::ICreateController(const hsPoint3& pos)
         float kineRadius = fRadius + kCCTSkinWidth;
         float kineHeight = fHeight;
         NxCapsuleShape* capShape = shape->isCapsule();
-        if (fHuman)
-        {
+
+        if (fHuman) {
             kineHeight += kPhysHeightCorrection;
             capShape->setLocalPosition(NxVec3(0.0f, (kPhysHeightCorrection / 2.0f), 0.0f));
         }
+
         capShape->setDimensions(kineRadius, kineHeight);
-    }
-    else
-    {
+    } else {
         // Use dynamic actor for the character controller
         NxCapsuleShapeDesc capDesc;
         capDesc.materialIndex = plSimulationMgr::GetInstance()->GetMaterialIdx(scene, 0.0f, 0.0f);
@@ -747,10 +756,9 @@ void plPXPhysicalControllerCore::ICreateController(const hsPoint3& pos)
         bodyDesc.flags = NX_BF_DISABLE_GRAVITY;
         bodyDesc.flags |= NX_BF_FROZEN_ROT;
 
-        if (fEnabled)
+        if (fEnabled) {
             capDesc.group = plSimDefs::kGroupAvatar;
-        else
-        {
+        } else {
             bodyDesc.flags |= NX_BF_KINEMATIC;
             capDesc.group = plSimDefs::kGroupAvatarKinematic;
         }
@@ -786,13 +794,10 @@ void plPXPhysicalControllerCore::ICreateController(const hsPoint3& pos)
 }
 void plPXPhysicalControllerCore::IDeleteController()
 {
-    if (fKinematicCCT)
-    {
+    if (fKinematicCCT) {
         gControllerMgr.releaseController(*fController);
         fController = nil;
-    }
-    else
-    {
+    } else {
         NxScene* scene = plSimulationMgr::GetInstance()->GetScene(fWorldKey);
         scene->releaseActor(*fActor);
     }
@@ -804,11 +809,13 @@ void plPXPhysicalControllerCore::IDeleteController()
 void plPXPhysicalControllerCore::IDispatchQueuedMsgs()
 {
     int numMsgs = fQueuedCollideMsgs.size();
-    if (numMsgs)
-    {
+
+    if (numMsgs) {
         plSimulationMgr* simMgr = plSimulationMgr::GetInstance();
-        for (int i = 0; i < numMsgs; ++i)
+
+        for (int i = 0; i < numMsgs; ++i) {
             simMgr->AddCollisionMsg(fQueuedCollideMsgs[i]);
+        }
 
         fQueuedCollideMsgs.clear();
     }
@@ -816,17 +823,16 @@ void plPXPhysicalControllerCore::IDispatchQueuedMsgs()
 void plPXPhysicalControllerCore::IProcessDynamicHits()
 {
     int numHits = fDynamicHits.size();
-    if (numHits)
-    {
+
+    if (numHits) {
         plPXPhysical* phys;
         plSimulationMgr* simMgr = plSimulationMgr::GetInstance();
-        for (int i = 0; i < numHits; ++i)
-        {
+
+        for (int i = 0; i < numHits; ++i) {
             phys = fDynamicHits[i];
 
             // If this is the local avatar, we need to take ownership of this dynamic if we haven't already
-            if (fLOSDB == plSimDefs::kLOSDBLocalAvatar && !phys->IsLocallyOwned() && !phys->GetProperty(plSimulationInterface::kNoOwnershipChange))
-            {
+            if (fLOSDB == plSimDefs::kLOSDBLocalAvatar && !phys->IsLocallyOwned() && !phys->GetProperty(plSimulationInterface::kNoOwnershipChange)) {
                 plSynchedObject* obj = plSynchedObject::ConvertNoRef(phys->GetObjectKey()->ObjectIsLoaded());
                 obj->SetNetGroupConstant(plNetGroup::kNetGroupLocalPhysicals);
 
@@ -840,6 +846,7 @@ void plPXPhysicalControllerCore::IProcessDynamicHits()
             phys->ApplyHitForce();
             simMgr->ConsiderSynch(phys, nil);
         }
+
         fDynamicHits.clear();
     }
 }
@@ -849,7 +856,7 @@ void plPXPhysicalControllerCore::IProcessDynamicHits()
 
 void plPXPhysicalControllerCore::IDrawDebugDisplay()
 {
-    plDebugText &debugTxt = plDebugText::Instance();
+    plDebugText& debugTxt = plDebugText::Instance();
     plString debugString;
     int y = 10;     // Initial draw position
     int x = 10;
@@ -861,20 +868,19 @@ void plPXPhysicalControllerCore::IDrawDebugDisplay()
 
     // Only display avatar collisions if any exist...
     int collisionCount = fDbgCollisionInfo.GetCount();
-    if (collisionCount > 0)
-    {
+
+    if (collisionCount > 0) {
         debugTxt.DrawString(x, y, "Avatar Collisions:");
         y += lineHeight;
 
-        for (int i = 0; i < collisionCount; i++)
-        {
+        for (int i = 0; i < collisionCount; i++) {
             hsVector3 normal = fDbgCollisionInfo[i].fNormal;
             const char* overlapStr = fDbgCollisionInfo[i].fOverlap ? "yes" : "no";
             float angle = hsRadiansToDegrees(acos(normal * hsVector3(0, 0, 1)));
             debugString = plString::Format("\tObj: %s, Normal: (%.2f, %.2f, %.2f), Angle(%.1f), Overlap(%s)",
-                    fDbgCollisionInfo[i].fSO->GetKeyName().c_str(),
-                    normal.fX, normal.fY, normal.fZ, angle,
-                    overlapStr);
+                                           fDbgCollisionInfo[i].fSO->GetKeyName().c_str(),
+                                           normal.fX, normal.fY, normal.fZ, angle,
+                                           overlapStr);
             debugTxt.DrawString(x, y, debugString.c_str());
             y += lineHeight;
         }

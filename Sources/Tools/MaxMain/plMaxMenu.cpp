@@ -73,8 +73,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 const ActionTableId kActionId = 0x54162b7c;
 
 
-enum
-{
+enum {
     kActionSaveSel,
     kActionMerge,
     kActionComponent,
@@ -90,8 +89,7 @@ enum
     kActionExport,
 };
 
-static ActionDescription spActions[] = 
-{
+static ActionDescription spActions[] = {
     {
         kActionSaveSel,         // ActionId identifies action for callback execution (within table)
         IDS_ACT1_DESC,          // Action description for display in ui customization
@@ -175,8 +173,7 @@ static ActionDescription spActions[] =
 // callback for action exection
 bool DoAction(int id)
 {
-    switch(id)
-    {
+    switch (id) {
     case kActionSaveSel:
         plSaveSelected();
         return true;
@@ -250,11 +247,11 @@ plActionTableMgr theActionTableMgr(actionInfo, DoAction);
 //////////////////////////////////////////////////////////////////////////////
 // Menu Creation Junk
 
-MenuContextId kMyMenuContextId=0xcff95f6c;  //<random number>
-static char *kMenuName = "Plasma";
+MenuContextId kMyMenuContextId = 0xcff95f6c; //<random number>
+static char* kMenuName = "Plasma";
 static int kMenuVersion = 11;   // Increment this number if you add an entry to the menu
 
-extern TCHAR *GetString(int id);
+extern TCHAR* GetString(int id);
 
 void AddPlasmaExportMenu()
 {
@@ -267,17 +264,18 @@ void AddPlasmaExportMenu()
 
     // Make sure our action isn't already in the menu
     TSTR ourName = GetString(IDS_PLASMA_EXPORT);
-    for (i = 0; i < fileMenu->NumItems(); i++)
-    {
+
+    for (i = 0; i < fileMenu->NumItems(); i++) {
         IMenuItem* fileMenuItem = fileMenu->GetItem(i);
         const TSTR& title = fileMenuItem->GetTitle();
-        if (title == ourName)
+
+        if (title == ourName) {
             plasmaExportFound = true;
+        }
 
         // KLUDGE - MaxAss didn't define the file submenu with an accelerator.
         // This fixes it.
-        if (title == (CStr)"MAX File Operations")
-        {
+        if (title == (CStr)"MAX File Operations") {
             fileMenuItem->SetUseCustomTitle(true);
             bool custom = fileMenuItem->GetUseCustomTitle();
             fileMenuItem->SetTitle("MAX File Opera&tions");
@@ -286,26 +284,24 @@ void AddPlasmaExportMenu()
         }
     }
 
-    if (!plasmaExportFound)
-    {
+    if (!plasmaExportFound) {
         // Menu item isn't there, add it
-        for (i = 0; i < fileMenu->NumItems(); i++)
-        {
+        for (i = 0; i < fileMenu->NumItems(); i++) {
             IMenuItem* fileMenuItem = fileMenu->GetItem(i);
             const TSTR& title = fileMenuItem->GetTitle();
+
             // We want to add it after the "Export Selected" menu item
-            if (title == (CStr)"Export Selected...")
-            {
+            if (title == (CStr)"Export Selected...") {
                 ActionTable* pActionTable = GetCOREInterface()->GetActionManager()->FindTable(kActionId);
-                if (!pActionTable)
-                {
+
+                if (!pActionTable) {
                     hsAssert(0, "Action table not found");
                     return;
                 }
 
                 IMenuItem* menuItem = GetIMenuItem();
                 menuItem->SetActionItem(pActionTable->GetAction(kActionExport));
-                fileMenu->AddItem(menuItem, i+1);
+                fileMenu->AddItem(menuItem, i + 1);
 
                 pMenuMan->UpdateMenuBar();
 
@@ -326,32 +322,33 @@ void plCreateMenu()
 
     // Is the Max menu version the most recent?
     bool wrongVersion = GetPrivateProfileIntW(L"Menu", L"Version", 0, plMaxConfig::GetPluginIni().AsString().ToWchar()) < kMenuVersion;
-    if (wrongVersion)
-    {
+
+    if (wrongVersion) {
         // Delete the old version of the menu
-        IMenu *oldMenu = pMenuMan->FindMenu(kMenuName);
-        if (oldMenu)
+        IMenu* oldMenu = pMenuMan->FindMenu(kMenuName);
+
+        if (oldMenu) {
             pMenuMan->UnRegisterMenu(oldMenu);
+        }
 
         // Update the menu version
         wchar_t buf[12];
         snwprintf(buf, arrsize(buf), L"%d", kMenuVersion);
         WritePrivateProfileStringW(L"Menu", L"Version", buf, plMaxConfig::GetPluginIni().AsString().ToWchar());
     }
-    
-    if (wrongVersion || newlyRegistered)
-    {
-        IMenu *pMainMenu = pMenuMan->GetMainMenuBar();
-        if (!pMainMenu)
-        {
+
+    if (wrongVersion || newlyRegistered) {
+        IMenu* pMainMenu = pMenuMan->GetMainMenuBar();
+
+        if (!pMainMenu) {
             hsAssert(0, "Main menu not found");
             return;
         }
 
         // Get our action table
         ActionTable* pActionTable = GetCOREInterface()->GetActionManager()->FindTable(kActionId);
-        if (!pActionTable)
-        {
+
+        if (!pActionTable) {
             hsAssert(0, "Action table not found");
             return;
         }
@@ -367,7 +364,7 @@ void plCreateMenu()
         // Add the menu items
         //
         IMenuItem* pMenuItem;
- 
+
 #if MAX_VERSION_MAJOR >= 12
         // Add the export action to the menu
         pMenuItem = GetIMenuItem();
@@ -394,7 +391,7 @@ void plCreateMenu()
         pMenuItem = GetIMenuItem();
         pMenuItem->ActAsSeparator();
         pPlasmaMenu->AddItem(pMenuItem);
-    
+
         // Add the component manager to the menu
         pMenuItem = GetIMenuItem();
         pMenuItem->SetActionItem(pActionTable->GetAction(kActionComponent));
@@ -460,10 +457,10 @@ void plCreateMenu()
         pMenuMan->UpdateMenuBar();
 
         // Save the dang menu, in case Max crashes
-        const char *uiDir = GetCOREInterface()->GetDir(APP_UI_DIR);
+        const char* uiDir = GetCOREInterface()->GetDir(APP_UI_DIR);
         char path[MAX_PATH];
         sprintf(path, "%s\\%s", uiDir, "MaxMenus.mnu");
-        
+
         pMenuMan->SaveMenuFile(path);
     }
 

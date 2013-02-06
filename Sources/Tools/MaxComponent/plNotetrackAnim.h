@@ -45,18 +45,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMaxAnimUtils.h"
 
 // WIP wrapper class to make plMaxAnimUtils easier to use.
-class plAnimInfo
-{
+class plAnimInfo {
 protected:
-    SegmentMap *fSegMap;
-    SegmentSpec *fAnimSpec;
+    SegmentMap* fSegMap;
+    SegmentSpec* fAnimSpec;
     SegmentMap::iterator fLoopIt;
     SegmentMap::iterator fMarkerIt;
     SegmentMap::iterator fStopPointIt;
 
 public:
     plAnimInfo() : fSegMap(NULL), fAnimSpec(NULL) {}
-    plAnimInfo(SegmentMap *segMap, const plString &animName);
+    plAnimInfo(SegmentMap* segMap, const plString& animName);
 
     plString GetAnimName();
     float GetAnimStart();
@@ -64,32 +63,33 @@ public:
     float GetAnimInitial();
 
     plString GetNextLoopName();
-    float GetLoopStart(const plString &loopName);
-    float GetLoopEnd(const plString &loopName);
+    float GetLoopStart(const plString& loopName);
+    float GetLoopEnd(const plString& loopName);
 
     plString GetNextMarkerName();
-    float GetMarkerTime(const plString &markerName);
+    float GetMarkerTime(const plString& markerName);
 
     float GetNextStopPoint();   // Returns -1 on last stop point
-    bool IsSuppressed(const plString &animName);
+    bool IsSuppressed(const plString& animName);
 };
 
-class plNotetrackAnim
-{
+class plNotetrackAnim {
 protected:
-    SegmentMap *fSegMap;
+    SegmentMap* fSegMap;
     SegmentMap::iterator fAnimIt;
 
     plNotetrackAnim();
 
 public:
-    plNotetrackAnim(Animatable *anim, plErrorMsg *pErrMsg);
+    plNotetrackAnim(Animatable* anim, plErrorMsg* pErrMsg);
     ~plNotetrackAnim();
 
-    bool HasNotetracks() { return (fSegMap != NULL); }
+    bool HasNotetracks() {
+        return (fSegMap != NULL);
+    }
 
     plString GetNextAnimName();
-    plAnimInfo GetAnimInfo(const plString &animName);
+    plAnimInfo GetAnimInfo(const plString& animName);
 };
 
 #endif //PL_NOTETRACK_ANIM

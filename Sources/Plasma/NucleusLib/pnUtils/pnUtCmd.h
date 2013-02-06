@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtCmd.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNUTILS_PRIVATE_PNUTCMD_H
@@ -97,40 +97,40 @@ enum ECmdError {
 
 struct CmdArgDef {
     unsigned        flags;
-    const wchar_t *   name;   // must be compile-time constant
+    const wchar_t*    name;   // must be compile-time constant
     unsigned        id;
 };
 
 class CCmdParser {
-    class CICmdParser * fParser;
+    class CICmdParser* fParser;
 
-    static void DispatchError (const wchar_t str[], ECmdError errorCode, const wchar_t arg[], const wchar_t value[], void * param);
-    static bool DispatchExtra (const wchar_t str[], void * param);
+    static void DispatchError(const wchar_t str[], ECmdError errorCode, const wchar_t arg[], const wchar_t value[], void* param);
+    static bool DispatchExtra(const wchar_t str[], void* param);
 
 protected:
-    CCmdParser ();
-    void Initialize (const CmdArgDef def[], unsigned defCount);
+    CCmdParser();
+    void Initialize(const CmdArgDef def[], unsigned defCount);
 
 public:
-    CCmdParser (const CmdArgDef def[], unsigned defCount);
-    virtual ~CCmdParser ();
+    CCmdParser(const CmdArgDef def[], unsigned defCount);
+    virtual ~CCmdParser();
 
-    bool          GetBool (unsigned id) const;
-    bool          GetBool (const wchar_t name[]) const;
-    float         GetFloat (unsigned id) const;
-    float         GetFloat (const wchar_t name[]) const;
-    int           GetInt (unsigned id) const;
-    int           GetInt (const wchar_t name[]) const;
-    const wchar_t * GetString (unsigned id) const;
-    const wchar_t * GetString (const wchar_t name[]) const;
-    unsigned      GetUnsigned (unsigned id) const;
-    unsigned      GetUnsigned (const wchar_t name[]) const;
-    bool          IsSpecified (unsigned id) const;
-    bool          IsSpecified (const wchar_t name[]) const;
+    bool          GetBool(unsigned id) const;
+    bool          GetBool(const wchar_t name[]) const;
+    float         GetFloat(unsigned id) const;
+    float         GetFloat(const wchar_t name[]) const;
+    int           GetInt(unsigned id) const;
+    int           GetInt(const wchar_t name[]) const;
+    const wchar_t* GetString(unsigned id) const;
+    const wchar_t* GetString(const wchar_t name[]) const;
+    unsigned      GetUnsigned(unsigned id) const;
+    unsigned      GetUnsigned(const wchar_t name[]) const;
+    bool          IsSpecified(unsigned id) const;
+    bool          IsSpecified(const wchar_t name[]) const;
 
-    virtual void  OnError (const wchar_t str[], ECmdError errorCode, const wchar_t arg[], const wchar_t value[]);
-    virtual bool  OnExtra (const wchar_t str[]);
+    virtual void  OnError(const wchar_t str[], ECmdError errorCode, const wchar_t arg[], const wchar_t value[]);
+    virtual bool  OnExtra(const wchar_t str[]);
 
-    bool          Parse (const wchar_t cmdLine[] = nil);
+    bool          Parse(const wchar_t cmdLine[] = nil);
 };
 #endif

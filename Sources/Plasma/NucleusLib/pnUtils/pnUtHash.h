@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtHash.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNUTILS_PRIVATE_PNUTHASH_H
@@ -101,45 +101,69 @@ private:
 
     uint32_t m_result;
 
-    inline void Construct () { m_result = 0x325d1eae; }
+    inline void Construct() {
+        m_result = 0x325d1eae;
+    }
 
 public:
-    static uint32_t LookupHashBits (unsigned value) { ASSERT(value < 0x100); return s_hashTable[value]; }
+    static uint32_t LookupHashBits(unsigned value) {
+        ASSERT(value < 0x100);
+        return s_hashTable[value];
+    }
 
-    inline CHashValue () { Construct() ; }
-    inline CHashValue (const CHashValue & source) { m_result = source.m_result; }
-    inline CHashValue (const void * data, unsigned bytes) { Construct(); Hash(data, bytes); }
-    inline CHashValue & operator= (const CHashValue & source) { m_result = source.m_result; return *this; }
-    inline bool operator== (const CHashValue & source) const { return (m_result == source.m_result); }
+    inline CHashValue() {
+        Construct() ;
+    }
+    inline CHashValue(const CHashValue& source) {
+        m_result = source.m_result;
+    }
+    inline CHashValue(const void* data, unsigned bytes) {
+        Construct();
+        Hash(data, bytes);
+    }
+    inline CHashValue& operator= (const CHashValue& source) {
+        m_result = source.m_result;
+        return *this;
+    }
+    inline bool operator== (const CHashValue& source) const {
+        return (m_result == source.m_result);
+    }
 
-    inline uint32_t GetHash () const { return m_result; }
+    inline uint32_t GetHash() const {
+        return m_result;
+    }
 
-    forceinline void Hash   (const void * data, unsigned bytes);
-    forceinline void Hash8  (unsigned data);
-    forceinline void Hash16 (unsigned data);
-    forceinline void Hash32 (unsigned data);
+    forceinline void Hash(const void* data, unsigned bytes);
+    forceinline void Hash8(unsigned data);
+    forceinline void Hash16(unsigned data);
+    forceinline void Hash32(unsigned data);
 
 };
 
 //===========================================================================
-void CHashValue::Hash (const void * data, unsigned bytes) {
-    for (const uint8_t * curr = (const uint8_t *)data, * term = curr + bytes; curr != term; ++curr)
+void CHashValue::Hash(const void* data, unsigned bytes)
+{
+    for (const uint8_t* curr = (const uint8_t*)data, * term = curr + bytes; curr != term; ++curr) {
         Hash8(*curr);
+    }
 }
 
 //===========================================================================
-void CHashValue::Hash8 (unsigned data) {
+void CHashValue::Hash8(unsigned data)
+{
     m_result += s_hashTable[m_result >> 24] ^ (m_result >> 6) ^ s_hashTable[data & 0xff];
 }
 
 //===========================================================================
-void CHashValue::Hash16 (unsigned data) {
+void CHashValue::Hash16(unsigned data)
+{
     Hash8(data);
     Hash8(data >> 8);
 }
 
 //===========================================================================
-void CHashValue::Hash32 (unsigned data) {
+void CHashValue::Hash32(unsigned data)
+{
     Hash8(data);
     Hash8(data >> 8);
     Hash8(data >> 16);
@@ -165,47 +189,53 @@ private:
 public:
     THashLink() : m_hash(0) { }
 
-    inline bool IsLinked () const;
-    inline T * Next ();
-    inline const T * Next () const;
-    inline T * Prev ();
-    inline const T * Prev () const;
-    inline void Unlink ();
+    inline bool IsLinked() const;
+    inline T* Next();
+    inline const T* Next() const;
+    inline T* Prev();
+    inline const T* Prev() const;
+    inline void Unlink();
 };
 
 //===========================================================================
 template<class T>
-bool THashLink<T>::IsLinked () const {
+bool THashLink<T>::IsLinked() const
+{
     return m_linkToFull.IsLinked();
 }
 
 //===========================================================================
 template<class T>
-T * THashLink<T>::Next () {
+T* THashLink<T>::Next()
+{
     return m_linkToFull.Next();
 }
 
 //===========================================================================
 template<class T>
-const T * THashLink<T>::Next () const {
+const T* THashLink<T>::Next() const
+{
     return m_linkToFull.Next();
 }
 
 //===========================================================================
 template<class T>
-T * THashLink<T>::Prev () {
+T* THashLink<T>::Prev()
+{
     return m_linkToFull.Prev();
 }
 
 //===========================================================================
 template<class T>
-const T * THashLink<T>::Prev () const {
+const T* THashLink<T>::Prev() const
+{
     return m_linkToFull.Prev();
 }
 
 //===========================================================================
 template<class T>
-void THashLink<T>::Unlink () {
+void THashLink<T>::Unlink()
+{
     m_linkToFull.Unlink();
     m_linkToSlot.Unlink();
 }
@@ -231,43 +261,44 @@ private:
     unsigned           m_slotMask;  // always set to a power of two minus one
     unsigned           m_slotMaxCount;
 
-    inline bool CheckGrowTable (LIST(T) * slotList);
-    inline const THashLink<T> & GetLink (const T * object) const;
-    inline THashLink<T> & GetLink (T * object);
-    inline void SetSlotCount (unsigned count);
+    inline bool CheckGrowTable(LIST(T) * slotList);
+    inline const THashLink<T>& GetLink(const T* object) const;
+    inline THashLink<T>& GetLink(T* object);
+    inline void SetSlotCount(unsigned count);
 
 protected:
-    inline unsigned GetHash (const T * object) const;
-    inline unsigned & GetHash (T * object);
-    inline const LIST(T) & GetSlotList (unsigned hash) const;
-    inline LIST(T) & GetSlotList (unsigned hash);
-    inline void SetLinkOffset (int linkOffset, unsigned maxSize);
-    inline void SetSlotMaxCount (unsigned count);
+    inline unsigned GetHash(const T* object) const;
+    inline unsigned& GetHash(T* object);
+    inline const LIST(T)& GetSlotList(unsigned hash) const;
+    inline LIST(T)& GetSlotList(unsigned hash);
+    inline void SetLinkOffset(int linkOffset, unsigned maxSize);
+    inline void SetSlotMaxCount(unsigned count);
 
 public:
-    inline TBaseHashTable ();
-    inline TBaseHashTable (const TBaseHashTable<T> & source);
-    inline TBaseHashTable<T> & operator= (const TBaseHashTable<T> & source);
+    inline TBaseHashTable();
+    inline TBaseHashTable(const TBaseHashTable<T>& source);
+    inline TBaseHashTable<T>& operator= (const TBaseHashTable<T>& source);
 
-    inline void Add (T * object, unsigned hash);
-    inline void Clear ();
-    inline void Delete (T * object);
-    inline T * Head ();
-    inline const T * Head () const;
-    inline T * Next (const T * object);
-    inline const T * Next (const T * object) const;
-    inline void Order (T * linkedObject, ELinkType linkType, T * existingObject);
-    inline T * Prev (const T * object);
-    inline const T * Prev (const T * object) const;
-    inline T * Tail ();
-    inline const T * Tail () const;
-    inline void Unlink (T * object);
+    inline void Add(T* object, unsigned hash);
+    inline void Clear();
+    inline void Delete(T* object);
+    inline T* Head();
+    inline const T* Head() const;
+    inline T* Next(const T* object);
+    inline const T* Next(const T* object) const;
+    inline void Order(T* linkedObject, ELinkType linkType, T* existingObject);
+    inline T* Prev(const T* object);
+    inline const T* Prev(const T* object) const;
+    inline T* Tail();
+    inline const T* Tail() const;
+    inline void Unlink(T* object);
 
 };
 
 //===========================================================================
 template<class T>
-TBaseHashTable<T>::TBaseHashTable () {
+TBaseHashTable<T>::TBaseHashTable()
+{
     m_slotMask     = 0;
     m_slotMaxCount = kDefaultSlotMaxCount;
     // more initialization done during call to SetLinkOffset()
@@ -275,7 +306,8 @@ TBaseHashTable<T>::TBaseHashTable () {
 
 //===========================================================================
 template<class T>
-TBaseHashTable<T>::TBaseHashTable (const TBaseHashTable<T> & source) {
+TBaseHashTable<T>::TBaseHashTable(const TBaseHashTable<T>& source)
+{
 #ifdef HS_DEBUGGING
     FATAL("No copy constructor");
 #endif
@@ -284,7 +316,8 @@ TBaseHashTable<T>::TBaseHashTable (const TBaseHashTable<T> & source) {
 
 //===========================================================================
 template<class T>
-TBaseHashTable<T> & TBaseHashTable<T>::operator= (const TBaseHashTable<T> & source) {
+TBaseHashTable<T>& TBaseHashTable<T>::operator= (const TBaseHashTable<T>& source)
+{
 #ifdef HS_DEBUGGING
     FATAL("No assignment operator");
 #endif
@@ -293,12 +326,15 @@ TBaseHashTable<T> & TBaseHashTable<T>::operator= (const TBaseHashTable<T> & sour
 
 //===========================================================================
 template<class T>
-void TBaseHashTable<T>::Add (T * object, unsigned hash) {
+void TBaseHashTable<T>::Add(T* object, unsigned hash)
+{
     GetHash(object) = hash;
 
     LIST(T) * list = &GetSlotList(hash);
-    if (CheckGrowTable(list))
+
+    if (CheckGrowTable(list)) {
         list = &GetSlotList(hash);
+    }
 
     m_fullList.Link(object);
     list->Link(object);
@@ -306,18 +342,24 @@ void TBaseHashTable<T>::Add (T * object, unsigned hash) {
 
 //===========================================================================
 template<class T>
-bool TBaseHashTable<T>::CheckGrowTable (LIST(T) * list) {
+bool TBaseHashTable<T>::CheckGrowTable(LIST(T) * list)
+{
 
     unsigned nextCount = (m_slotMask + 1) * 2;
-    if (nextCount > m_slotMaxCount)
+
+    if (nextCount > m_slotMaxCount) {
         return false;
+    }
 
     unsigned listCount = 0;
-    for (T * curr = list->Head(); curr; curr = list->Next(curr))
-        ++listCount;
 
-    if (listCount + 1 < kGrowOnListSize)
+    for (T* curr = list->Head(); curr; curr = list->Next(curr)) {
+        ++listCount;
+    }
+
+    if (listCount + 1 < kGrowOnListSize) {
         return false;
+    }
 
     SetSlotCount(nextCount);
 
@@ -326,99 +368,115 @@ bool TBaseHashTable<T>::CheckGrowTable (LIST(T) * list) {
 
 //===========================================================================
 template<class T>
-void TBaseHashTable<T>::Clear () {
+void TBaseHashTable<T>::Clear()
+{
     m_fullList.Clear();
 }
 
 //===========================================================================
 template<class T>
-void TBaseHashTable<T>::Delete (T * object) {
+void TBaseHashTable<T>::Delete(T* object)
+{
     delete object;
 }
 
 //===========================================================================
 template<class T>
-unsigned TBaseHashTable<T>::GetHash (const T * object) const {
+unsigned TBaseHashTable<T>::GetHash(const T* object) const
+{
     return GetLink(object).m_hash;
 }
 
 //===========================================================================
 template<class T>
-unsigned & TBaseHashTable<T>::GetHash (T * object) {
+unsigned& TBaseHashTable<T>::GetHash(T* object)
+{
     return GetLink(object).m_hash;
 }
 
 //===========================================================================
 template<class T>
-const THashLink<T> & TBaseHashTable<T>::GetLink (const T * object) const {
-    return *(const THashLink<T> *)((const uint8_t *)object + m_linkOffset);
+const THashLink<T>& TBaseHashTable<T>::GetLink(const T* object) const
+{
+    return *(const THashLink<T>*)((const uint8_t*)object + m_linkOffset);
 }
 
 //===========================================================================
 template<class T>
-THashLink<T> & TBaseHashTable<T>::GetLink (T * object) {
-    return *(THashLink<T> *)((uint8_t *)object + m_linkOffset);
+THashLink<T>& TBaseHashTable<T>::GetLink(T* object)
+{
+    return *(THashLink<T>*)((uint8_t*)object + m_linkOffset);
 }
 
 //===========================================================================
 template<class T>
-const LIST(T) & TBaseHashTable<T>::GetSlotList (unsigned hash) const {
+const LIST(T)& TBaseHashTable<T>::GetSlotList(unsigned hash) const
+{
     return m_slotListArray[hash & m_slotMask];
 }
 
 //===========================================================================
 template<class T>
-LIST(T) & TBaseHashTable<T>::GetSlotList (unsigned hash) {
+LIST(T)& TBaseHashTable<T>::GetSlotList(unsigned hash)
+{
     return m_slotListArray[hash & m_slotMask];
 }
 
 //===========================================================================
 template<class T>
-T * TBaseHashTable<T>::Head () {
+T* TBaseHashTable<T>::Head()
+{
     return m_fullList.Head();
 }
 
 //===========================================================================
 template<class T>
-const T * TBaseHashTable<T>::Head () const {
+const T* TBaseHashTable<T>::Head() const
+{
     return m_fullList.Head();
 }
 
 //===========================================================================
 template<class T>
-T * TBaseHashTable<T>::Next (const T * object) {
+T* TBaseHashTable<T>::Next(const T* object)
+{
     return m_fullList.Next(object);
 }
 
 //===========================================================================
 template<class T>
-const T * TBaseHashTable<T>::Next (const T * object) const {
+const T* TBaseHashTable<T>::Next(const T* object) const
+{
     return m_fullList.Next(object);
 }
 
 //===========================================================================
 template<class T>
-void TBaseHashTable<T>::Order (T * linkedObject, ELinkType linkType, T * existingObject) {
-    THashLink<T> & link = GetLink(linkedObject);
+void TBaseHashTable<T>::Order(T* linkedObject, ELinkType linkType, T* existingObject)
+{
+    THashLink<T>& link = GetLink(linkedObject);
     ASSERT(link.m_linkToFull.IsLinked());
     m_fullList.Link(linkedObject, linkType, existingObject);
 }
 
 //===========================================================================
 template<class T>
-T * TBaseHashTable<T>::Prev (const T * object) {
+T* TBaseHashTable<T>::Prev(const T* object)
+{
     return m_fullList.Prev(object);
 }
 
 //===========================================================================
 template<class T>
-const T * TBaseHashTable<T>::Prev (const T * object) const {
+const T* TBaseHashTable<T>::Prev(const T* object) const
+{
     return m_fullList.Prev(object);
 }
 
 //===========================================================================
 template<class T>
-void TBaseHashTable<T>::SetLinkOffset (int linkOffset, unsigned maxSize) {
+void TBaseHashTable<T>::SetLinkOffset(int linkOffset, unsigned maxSize)
+{
     ASSERT(!m_fullList.Head());
     ASSERT(!m_slotListArray.Count());
     ASSERT(!m_slotMask);
@@ -429,7 +487,11 @@ void TBaseHashTable<T>::SetLinkOffset (int linkOffset, unsigned maxSize) {
     if (!m_slotMask) {
         // http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
         uint32_t v = maxSize - 1;
-        v |= v >> 1; v |= v >> 2; v |= v >> 4; v |= v >> 8; v |= v >> 16;
+        v |= v >> 1;
+        v |= v >> 2;
+        v |= v >> 4;
+        v |= v >> 8;
+        v |= v >> 16;
         v++;
 
         SetSlotCount(max(kSlotMinCount, v));
@@ -438,46 +500,57 @@ void TBaseHashTable<T>::SetLinkOffset (int linkOffset, unsigned maxSize) {
 
 //===========================================================================
 template<class T>
-void TBaseHashTable<T>::SetSlotCount (unsigned count) {
+void TBaseHashTable<T>::SetSlotCount(unsigned count)
+{
     ASSERT(!(count & (count - 1)));  // power of two
     ASSERT(count >= 2);
-    
-    if (count == m_slotMask + 1)
+
+    if (count == m_slotMask + 1) {
         return;
+    }
+
     m_slotMask = count - 1;
 
     m_slotListArray.ZeroCount();
     m_slotListArray.SetCount(count);
-    for (unsigned loop = 0; loop < count; ++loop)
+
+    for (unsigned loop = 0; loop < count; ++loop) {
         m_slotListArray[loop].SetLinkOffset(m_linkOffset + offsetof(THashLink<T>, m_linkToSlot));
+    }
 
-    for (T * curr = Head(); curr; curr = Next(curr))
-        GetSlotList(GetHash(curr)).Link(curr);           
+    for (T* curr = Head(); curr; curr = Next(curr)) {
+        GetSlotList(GetHash(curr)).Link(curr);
+    }
 }
 
 //===========================================================================
 template<class T>
-void TBaseHashTable<T>::SetSlotMaxCount (unsigned count) {
-    if (count)
+void TBaseHashTable<T>::SetSlotMaxCount(unsigned count)
+{
+    if (count) {
         m_slotMaxCount = max(kSlotMinCount, count);
+    }
 }
 
 //===========================================================================
 template<class T>
-T * TBaseHashTable<T>::Tail () {
+T* TBaseHashTable<T>::Tail()
+{
     return m_fullList.Tail();
 }
 
 //===========================================================================
 template<class T>
-const T * TBaseHashTable<T>::Tail () const {
+const T* TBaseHashTable<T>::Tail() const
+{
     return m_fullList.Tail();
 }
 
 //===========================================================================
 template<class T>
-void TBaseHashTable<T>::Unlink (T * object) {
-    THashLink<T> & link = GetLink(object);
+void TBaseHashTable<T>::Unlink(T* object)
+{
+    THashLink<T>& link = GetLink(object);
     link.Unlink();
 }
 
@@ -492,71 +565,84 @@ template<class T, class K>
 class THashTable : public TBaseHashTable<T> {
 
 public:
-    inline void Add (T * object);
-    inline void Add (T * object, unsigned hash);
-    inline T * Find (const K & key);
-    inline T * FindNext (const K & key, T * object);
-    inline const T * Find (const K & key) const;
-    inline const T * FindNext (const K & key, const T * object) const;
-    inline T * Unduplicate (T * object, const K & key);
-    
+    inline void Add(T* object);
+    inline void Add(T* object, unsigned hash);
+    inline T* Find(const K& key);
+    inline T* FindNext(const K& key, T* object);
+    inline const T* Find(const K& key) const;
+    inline const T* FindNext(const K& key, const T* object) const;
+    inline T* Unduplicate(T* object, const K& key);
+
 };
 
 //===========================================================================
 template<class T, class K>
-inline void THashTable<T,K>::Add (T * object) {
+inline void THashTable<T, K>::Add(T* object)
+{
     TBaseHashTable<T>::Add(object, object->GetHash());
 }
 
 //===========================================================================
 template<class T, class K>
-inline void THashTable<T,K>::Add (T * object, unsigned hash) {
+inline void THashTable<T, K>::Add(T* object, unsigned hash)
+{
     TBaseHashTable<T>::Add(object, hash);
 }
 
 //===========================================================================
 template<class T, class K>
-T * THashTable<T,K>::Find (const K & key) {
-    return (T *)((const THashTable<T,K> *)this)->Find(key);
+T* THashTable<T, K>::Find(const K& key)
+{
+    return (T*)((const THashTable<T, K>*)this)->Find(key);
 }
 
 //===========================================================================
 template<class T, class K>
-T * THashTable<T,K>::FindNext (const K & key, T * object) {
-    return (T *)((const THashTable<T,K> *)this)->FindNext(key, object);
+T* THashTable<T, K>::FindNext(const K& key, T* object)
+{
+    return (T*)((const THashTable<T, K>*)this)->FindNext(key, object);
 }
 
 //===========================================================================
 template<class T, class K>
-const T * THashTable<T,K>::Find (const K & key) const {
+const T* THashTable<T, K>::Find(const K& key) const
+{
     unsigned        hash     = key.GetHash();
     const LIST(T) & slotList = this->GetSlotList(hash);
-    for (const T * curr = slotList.Head(); curr; curr = slotList.Next(curr))
-        if ((this->GetHash(curr) == hash) && (*curr == key))
+
+    for (const T* curr = slotList.Head(); curr; curr = slotList.Next(curr))
+        if ((this->GetHash(curr) == hash) && (*curr == key)) {
             return curr;
+        }
+
     return nil;
 }
 
 //===========================================================================
 template<class T, class K>
-const T * THashTable<T,K>::FindNext (const K & key, const T * object) const {
+const T* THashTable<T, K>::FindNext(const K& key, const T* object) const
+{
     unsigned        hash     = key.GetHash();
     const LIST(T) & slotList = this->GetSlotList(hash);
-    for (const T * curr = slotList.Next(object); curr; curr = slotList.Next(curr))
-        if ((this->GetHash(curr) == hash) && (*curr == key))
+
+    for (const T* curr = slotList.Next(object); curr; curr = slotList.Next(curr))
+        if ((this->GetHash(curr) == hash) && (*curr == key)) {
             return curr;
+        }
+
     return nil;
 }
 
 //===========================================================================
 template<class T, class K>
-T * THashTable<T,K>::Unduplicate (T * object, const K & key) {
-    T * existing = Find(key);
+T* THashTable<T, K>::Unduplicate(T* object, const K& key)
+{
+    T* existing = Find(key);
+
     if (existing) {
         delete object;
         return existing;
-    }
-    else {
+    } else {
         Add(object);
         return object;
     }
@@ -570,16 +656,17 @@ T * THashTable<T,K>::Unduplicate (T * object, const K & key) {
 ***/
 
 template<class T, class K, int linkOffset, unsigned maxSize>
-class THashTableDecl : public THashTable<T,K> {
+class THashTableDecl : public THashTable<T, K> {
 
 public:
-    inline THashTableDecl ();
+    inline THashTableDecl();
 
 };
 
 //===========================================================================
 template<class T, class K, int linkOffset, unsigned maxSize>
-THashTableDecl<T,K,linkOffset,maxSize>::THashTableDecl () {
+THashTableDecl<T, K, linkOffset, maxSize>::THashTableDecl()
+{
     this->SetLinkOffset(linkOffset, maxSize);
     this->SetSlotMaxCount(maxSize);
 }
@@ -594,17 +681,21 @@ THashTableDecl<T,K,linkOffset,maxSize>::THashTableDecl () {
 template <class T>
 class THashKeyVal {
 public:
-    THashKeyVal () : m_value(0) { }
-    THashKeyVal (const T & value) : m_value(value) { }
-    bool operator== (const THashKeyVal & rhs) const {
+    THashKeyVal() : m_value(0) { }
+    THashKeyVal(const T& value) : m_value(value) { }
+    bool operator== (const THashKeyVal& rhs) const {
         return m_value == rhs.m_value;
     }
-    unsigned GetHash () const {
+    unsigned GetHash() const {
         CHashValue hash(&m_value, sizeof(m_value));
         return hash.GetHash();
     }
-    const T & GetValue () const { return m_value; }
-    void SetValue (const T & value) { m_value = value; }
+    const T& GetValue() const {
+        return m_value;
+    }
+    void SetValue(const T& value) {
+        m_value = value;
+    }
 
 protected:
     T m_value;
@@ -621,48 +712,48 @@ protected:
 template<class C>
 class THashKeyStrBase {
 public:
-    const C * GetString () const {
+    const C* GetString() const {
         return m_str;
     }
 
 protected:
-    THashKeyStrBase () : m_str(nil) { }
-    THashKeyStrBase (const C str[]) : m_str(str) { }
-    virtual ~THashKeyStrBase () { }
+    THashKeyStrBase() : m_str(nil) { }
+    THashKeyStrBase(const C str[]) : m_str(str) { }
+    virtual ~THashKeyStrBase() { }
 
-    const C * m_str;
+    const C* m_str;
 };
 
 //===========================================================================
 template<class C>
 class THashKeyStrCmp : public THashKeyStrBase<C> {
 public:
-    bool operator== (const THashKeyStrCmp & rhs) const {
+    bool operator== (const THashKeyStrCmp& rhs) const {
         return StrCmp(this->m_str, rhs.m_str) == 0;
     }
-    unsigned GetHash () const {
+    unsigned GetHash() const {
         return StrHash(this->m_str);
     }
 
 protected:
-    THashKeyStrCmp () { }
-    THashKeyStrCmp (const C str[]) : THashKeyStrBase<C>(str) { }
+    THashKeyStrCmp() { }
+    THashKeyStrCmp(const C str[]) : THashKeyStrBase<C>(str) { }
 };
 
 //===========================================================================
 template<class C>
 class THashKeyStrCmpI : public THashKeyStrBase<C> {
 public:
-    bool operator== (const THashKeyStrCmpI & rhs) const {
+    bool operator== (const THashKeyStrCmpI& rhs) const {
         return StrCmpI(this->m_str, rhs.m_str) == 0;
     }
-    unsigned GetHash () const {
+    unsigned GetHash() const {
         return StrHashI(this->m_str);
     }
 protected:
 
-    THashKeyStrCmpI () { }
-    THashKeyStrCmpI (const C str[]) : THashKeyStrBase<C>(str) { }
+    THashKeyStrCmpI() { }
+    THashKeyStrCmpI(const C str[]) : THashKeyStrBase<C>(str) { }
 };
 
 
@@ -675,9 +766,9 @@ protected:
 template <class C, class T>
 class THashKeyStrPtr : public T {
 public:
-    THashKeyStrPtr () { }
-    THashKeyStrPtr (const C str[]) : T(str) { }
-    void SetString (const C str[]) {
+    THashKeyStrPtr() { }
+    THashKeyStrPtr(const C str[]) : T(str) { }
+    void SetString(const C str[]) {
         this->m_str = str;
     }
 };
@@ -697,20 +788,25 @@ typedef THashKeyStrPtr< char, THashKeyStrCmpI<char> >   CHashKeyStrPtrCharI;
 template <class C, class T>
 class THashKeyStr : public T {
 public:
-    THashKeyStr () { }
-    THashKeyStr (const C str[]) { SetString(str); }
-    THashKeyStr (const THashKeyStr &);              // intentionally unimplemented
-    THashKeyStr & operator= (const THashKeyStr &);  // intentionally unimplemented
-    ~THashKeyStr () {
+    THashKeyStr() { }
+    THashKeyStr(const C str[]) {
+        SetString(str);
+    }
+    THashKeyStr(const THashKeyStr&);                // intentionally unimplemented
+    THashKeyStr& operator= (const THashKeyStr&);    // intentionally unimplemented
+    ~THashKeyStr() {
         SetString(nil);
     }
-    void SetString (const C str[]) {  // deprecated
-        if (this->m_str)
-            free(const_cast<C *>(this->m_str));
-        if (str)
+    void SetString(const C str[]) {   // deprecated
+        if (this->m_str) {
+            free(const_cast<C*>(this->m_str));
+        }
+
+        if (str) {
             this->m_str = StrDup(str);
-        else
+        } else {
             this->m_str = nil;
+        }
     }
 };
 

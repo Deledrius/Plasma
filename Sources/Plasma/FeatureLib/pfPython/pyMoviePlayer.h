@@ -53,25 +53,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class pyColor;
 
-class pyMoviePlayer
-{
+class pyMoviePlayer {
 protected:
     char*   fMovieName;
     plKey   fSelfKey;
 
     pyMoviePlayer(): fMovieName(nil), fSelfKey(nil) {} // only used by python glue, do NOT call
-    pyMoviePlayer(const char* movieName,pyKey& selfKey);
+    pyMoviePlayer(const char* movieName, pyKey& selfKey);
 public:
     ~pyMoviePlayer();
 
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptMoviePlayer);
-    static PyObject *New(const char* movieName, pyKey& selfKey);
+    static PyObject* New(const char* movieName, pyKey& selfKey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyMoviePlayer object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyMoviePlayer); // converts a PyObject to a pyMoviePlayer (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
-    static void AddPlasmaConstantsClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
+    static void AddPlasmaConstantsClasses(PyObject* m);
 
     void MakeMovie(const char* movieName, pyKey& selfKey); // only used by python glue, do NOT call
 

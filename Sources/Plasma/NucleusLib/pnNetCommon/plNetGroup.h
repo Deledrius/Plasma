@@ -46,47 +46,66 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plUoid.h"
 #include "hsStream.h"
 
-class plNetGroupId
-{
+class plNetGroupId {
 private:
-   enum NetGroupConstants
-   {
-      kNetGroupConstant = 0x01,
-      kNetGroupLocal    = 0x02,
-   };
-   
-   plLocation fId;
-   uint8_t fFlags;
-   std::string  fDesc;      // description of room
+    enum NetGroupConstants {
+        kNetGroupConstant = 0x01,
+        kNetGroupLocal    = 0x02,
+    };
+
+    plLocation fId;
+    uint8_t fFlags;
+    std::string  fDesc;      // description of room
 public:
 
-   plNetGroupId() : fFlags(0) {}
-   plNetGroupId(const plLocation& id, const uint8_t flags) : fId(id), fFlags(flags) {  }
-   plNetGroupId(const plLocation& id) : fId(id), fFlags(0) {  }
-   
-   bool IsConstant() { return (fFlags & kNetGroupConstant) != 0; }
-   void SetConstant(bool constantGroup) { fFlags &= constantGroup ? kNetGroupConstant : 0; }
-   
-   plLocation& Room() { return fId; }
-   const char* GetDesc() const { return fDesc.c_str();   }
-   void SetDesc(const char* c) { fDesc = c; }
-   
-   bool operator==(const plNetGroupId& netGroup) const { return fId == netGroup.fId; }
-   bool operator!=(const plNetGroupId& netGroup) const { return fId != netGroup.fId; }
-   bool operator<(const plNetGroupId& netGroup) const { return fId < netGroup.fId; }
-   
-   // read and write to hsStream
-   void Write(hsStream *s) const { fId.Write(s); s->WriteLE(fFlags); }
-   void Read(hsStream *s) { fId.Read(s); s->LogReadLE(&fFlags,"GroupId Flags"); }
+    plNetGroupId() : fFlags(0) {}
+    plNetGroupId(const plLocation& id, const uint8_t flags) : fId(id), fFlags(flags) {  }
+    plNetGroupId(const plLocation& id) : fId(id), fFlags(0) {  }
+
+    bool IsConstant() {
+        return (fFlags & kNetGroupConstant) != 0;
+    }
+    void SetConstant(bool constantGroup) {
+        fFlags &= constantGroup ? kNetGroupConstant : 0;
+    }
+
+    plLocation& Room() {
+        return fId;
+    }
+    const char* GetDesc() const {
+        return fDesc.c_str();
+    }
+    void SetDesc(const char* c) {
+        fDesc = c;
+    }
+
+    bool operator==(const plNetGroupId& netGroup) const {
+        return fId == netGroup.fId;
+    }
+    bool operator!=(const plNetGroupId& netGroup) const {
+        return fId != netGroup.fId;
+    }
+    bool operator<(const plNetGroupId& netGroup) const {
+        return fId < netGroup.fId;
+    }
+
+    // read and write to hsStream
+    void Write(hsStream* s) const {
+        fId.Write(s);
+        s->WriteLE(fFlags);
+    }
+    void Read(hsStream* s) {
+        fId.Read(s);
+        s->LogReadLE(&fFlags, "GroupId Flags");
+    }
 };
 
-namespace plNetGroup
-{
-    extern plNetGroupId kNetGroupLocalPlayer;
-    extern plNetGroupId kNetGroupRemotePlayer;
-    extern plNetGroupId kNetGroupUnknown;
-    extern plNetGroupId kNetGroupLocalPhysicals;
-    extern plNetGroupId kNetGroupRemotePhysicals;
+namespace plNetGroup {
+extern plNetGroupId kNetGroupLocalPlayer;
+extern plNetGroupId kNetGroupRemotePlayer;
+extern plNetGroupId kNetGroupUnknown;
+extern plNetGroupId kNetGroupLocalPhysicals;
+extern plNetGroupId kNetGroupRemotePhysicals;
 }
 
 #endif  // plNetGroup_h

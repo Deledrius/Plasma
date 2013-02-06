@@ -74,195 +74,232 @@ class plDrawableSpans;
 //// plSpan Class Definition /////////////////////////////////////////////////
 //  Represents the generic span for any kind of drawableMatter derivative.
 
-class plSpan
-{
-    public:
-        enum {
-            // Renumber these the next time we bump major version #s (no reason to do it now)
-            kPropNoDraw         = 0x001,
-            kPropNoShadowCast   = 0x002,
-            kPropFacesSortable  = 0x004,
-            kPropVolatile       = 0x008,        // Means that the vertices for this span are volatile
-            kWaterHeight        = 0x010,        // Vtx Z value doesn't mean vtx pos, use fWaterHeight
-            kPropRunTimeLight   = 0x020,        // Enable dynamic lighting
-            kPropReverseSort    = 0x040,        // Sort front to back instead of back to front
-            kPropHasPermaLights = 0x080,        // Has a list of permanently assigned lights.
-            kPropHasPermaProjs  = 0x100,        // Has a list of permanently assigned projectors.
-            // Lighting types
-            kLiteMaterial           = 0x000,    // Default
-            kLiteVtxPreshaded       = 0x200,    // For particle systems, gives us vtx alpha
-            kLiteVtxNonPreshaded    = 0x400,    // Runtime lit, gives us vtx alpha
-            kLiteProjection         = 0x800,
-            kLiteShadowErase        = 0x1000,
-            kLiteShadow             = 0x2000,
-            kLiteMask               = kLiteMaterial 
-                                    | kLiteVtxPreshaded
-                                    | kLiteVtxNonPreshaded 
-                                    | kLiteProjection
-                                    | kLiteShadowErase
-                                    | kLiteShadow,  // Mask for all types
+class plSpan {
+public:
+    enum {
+        // Renumber these the next time we bump major version #s (no reason to do it now)
+        kPropNoDraw         = 0x001,
+        kPropNoShadowCast   = 0x002,
+        kPropFacesSortable  = 0x004,
+        kPropVolatile       = 0x008,        // Means that the vertices for this span are volatile
+        kWaterHeight        = 0x010,        // Vtx Z value doesn't mean vtx pos, use fWaterHeight
+        kPropRunTimeLight   = 0x020,        // Enable dynamic lighting
+        kPropReverseSort    = 0x040,        // Sort front to back instead of back to front
+        kPropHasPermaLights = 0x080,        // Has a list of permanently assigned lights.
+        kPropHasPermaProjs  = 0x100,        // Has a list of permanently assigned projectors.
+        // Lighting types
+        kLiteMaterial           = 0x000,    // Default
+        kLiteVtxPreshaded       = 0x200,    // For particle systems, gives us vtx alpha
+        kLiteVtxNonPreshaded    = 0x400,    // Runtime lit, gives us vtx alpha
+        kLiteProjection         = 0x800,
+        kLiteShadowErase        = 0x1000,
+        kLiteShadow             = 0x2000,
+        kLiteMask               = kLiteMaterial
+                                  | kLiteVtxPreshaded
+                                  | kLiteVtxNonPreshaded
+                                  | kLiteProjection
+                                  | kLiteShadowErase
+                                  | kLiteShadow,  // Mask for all types
 
-            kPropMatHasSpecular = 0x10000,      // Shortcut for efficiency; means the span's material has specular checked on it
-            kPropProjAsVtx      = 0x20000,      // Force projected lights to act as vertex lights
-            kPropSkipProjection = 0x40000,      // Just skip projected lights entirely
-            kPropNoShadow       = 0x80000,      // Never cast a shadow on this.
-            kPropForceShadow    = 0x100000,     // Force casting a shadow, even if the pipeline thinks it'll look bad.
-            kPropDisableNormal  = 0x200000,     // Not a member of the normal vis-set
-            kPropCharacter      = 0x400000,     // Is a member of the character vis-set
-            kPartialSort        = 0x800000,
-            kVisLOS             = 0x1000000
+        kPropMatHasSpecular = 0x10000,      // Shortcut for efficiency; means the span's material has specular checked on it
+        kPropProjAsVtx      = 0x20000,      // Force projected lights to act as vertex lights
+        kPropSkipProjection = 0x40000,      // Just skip projected lights entirely
+        kPropNoShadow       = 0x80000,      // Never cast a shadow on this.
+        kPropForceShadow    = 0x100000,     // Force casting a shadow, even if the pipeline thinks it'll look bad.
+        kPropDisableNormal  = 0x200000,     // Not a member of the normal vis-set
+        kPropCharacter      = 0x400000,     // Is a member of the character vis-set
+        kPartialSort        = 0x800000,
+        kVisLOS             = 0x1000000
 
-        };
-        enum plSpanType {
-            kSpan               = 0x0,
-            kVertexSpan         = 0x1,
-            kIcicleSpan         = 0x2,
-            kParticleSpan       = 0x8,
-            kParticleSet        = 0x10
-        };
+    };
+    enum plSpanType {
+        kSpan               = 0x0,
+        kVertexSpan         = 0x1,
+        kIcicleSpan         = 0x2,
+        kParticleSpan       = 0x8,
+        kParticleSet        = 0x10
+    };
 
-        uint16_t              fTypeMask; // For safe casting. Or it with the type you want to cast to, don't check equality
-        uint16_t              fSubType; // Or'ed from plDrawable::plDrawableSubType
-        uint32_t              fMaterialIdx;       // Index into drawable's material array
-        hsMatrix44          fLocalToWorld;
-        hsMatrix44          fWorldToLocal;
-        uint32_t              fBaseMatrix;
-        uint8_t               fNumMatrices;
-        uint16_t              fLocalUVWChans;
-        uint16_t              fMaxBoneIdx;
-        uint16_t              fPenBoneIdx;
-        uint32_t              fProps;
-        hsBounds3Ext        fLocalBounds;
-        hsBounds3Ext        fWorldBounds;
-        plFogEnvironment    *fFogEnvironment;
+    uint16_t              fTypeMask; // For safe casting. Or it with the type you want to cast to, don't check equality
+    uint16_t              fSubType; // Or'ed from plDrawable::plDrawableSubType
+    uint32_t              fMaterialIdx;       // Index into drawable's material array
+    hsMatrix44          fLocalToWorld;
+    hsMatrix44          fWorldToLocal;
+    uint32_t              fBaseMatrix;
+    uint8_t               fNumMatrices;
+    uint16_t              fLocalUVWChans;
+    uint16_t              fMaxBoneIdx;
+    uint16_t              fPenBoneIdx;
+    uint32_t              fProps;
+    hsBounds3Ext        fLocalBounds;
+    hsBounds3Ext        fWorldBounds;
+    plFogEnvironment*    fFogEnvironment;
 
-        // Use setter/getters below.
-        float            fMinDist;
-        float            fMaxDist;
+    // Use setter/getters below.
+    float            fMinDist;
+    float            fMaxDist;
 
-        float            fWaterHeight;
+    float            fWaterHeight;
 
-        hsBitVector         fVisSet;
-        hsBitVector         fVisNot;
+    hsBitVector         fVisSet;
+    hsBitVector         fVisNot;
 
-        mutable plAccessSnapShot*           fSnapShot;
+    mutable plAccessSnapShot*           fSnapShot;
 
 //      mutable hsBitVector                 fLightBits;
-        mutable hsTArray<plLightInfo*>      fLights;
-        mutable hsTArray<float>          fLightStrengths;
-        mutable hsTArray<float>          fLightScales;
-        mutable hsTArray<plLightInfo*>      fProjectors;
-        mutable hsTArray<float>          fProjStrengths;
-        mutable hsTArray<float>          fProjScales;
+    mutable hsTArray<plLightInfo*>      fLights;
+    mutable hsTArray<float>          fLightStrengths;
+    mutable hsTArray<float>          fLightScales;
+    mutable hsTArray<plLightInfo*>      fProjectors;
+    mutable hsTArray<float>          fProjStrengths;
+    mutable hsTArray<float>          fProjScales;
 
-        mutable hsBitVector                 fShadowBits;
-        mutable hsBitVector                 fShadowSlaveBits;
+    mutable hsBitVector                 fShadowBits;
+    mutable hsBitVector                 fShadowSlaveBits;
 
-        mutable hsTArray<plAuxSpan*>        fAuxSpans;
+    mutable hsTArray<plAuxSpan*>        fAuxSpans;
 
-        hsTArray<plLightInfo*>              fPermaLights;
-        hsTArray<plLightInfo*>              fPermaProjs;
+    hsTArray<plLightInfo*>              fPermaLights;
+    hsTArray<plLightInfo*>              fPermaProjs;
 
 #ifdef HS_DEBUGGING
-        plKey               fOwnerKey;      // DEBUG ONLY--drawInterface owner key
+    plKey               fOwnerKey;      // DEBUG ONLY--drawInterface owner key
 #endif
 
-        plSpan();
+    plSpan();
 
-        const hsBitVector& GetShadowSlaves() const { return fShadowSlaveBits; }
-        void            AddShadowSlave(int iSlave) const { fShadowSlaveBits.SetBit(iSlave); }
+    const hsBitVector& GetShadowSlaves() const {
+        return fShadowSlaveBits;
+    }
+    void            AddShadowSlave(int iSlave) const {
+        fShadowSlaveBits.SetBit(iSlave);
+    }
 
-        void            SetShadowBit(uint32_t idx) const { fShadowBits.SetBit(idx); }
-        void            ClearShadowBits() const { fShadowBits.Clear(); }
-        bool            IsShadowBitSet(uint32_t idx) const { return fShadowBits.IsBitSet(idx); }
-        void            ClearLights() const;
+    void            SetShadowBit(uint32_t idx) const {
+        fShadowBits.SetBit(idx);
+    }
+    void            ClearShadowBits() const {
+        fShadowBits.Clear();
+    }
+    bool            IsShadowBitSet(uint32_t idx) const {
+        return fShadowBits.IsBitSet(idx);
+    }
+    void            ClearLights() const;
 
-        void            AddLight( plLightInfo* li, float strength, float scale, bool proj ) const;
+    void            AddLight(plLightInfo* li, float strength, float scale, bool proj) const;
 
-        hsTArray<plLightInfo*>& GetLightList(bool proj) const { return proj ? fProjectors : fLights; }
+    hsTArray<plLightInfo*>& GetLightList(bool proj) const {
+        return proj ? fProjectors : fLights;
+    }
 
-        uint32_t          GetNumLights(bool proj) const { return proj ? fProjectors.GetCount() : fLights.GetCount(); }
-        plLightInfo*    GetLight(int i, bool proj) const { return proj ? fProjectors[i] : fLights[i]; }
-        float        GetLightStrength(int i, bool proj) const { return proj ? fProjStrengths[i] : fLightStrengths[i]; }
-        float        GetLightScale(int i, bool proj) const { return proj ? fProjScales[i] : fLightScales[i]; }
-        
-        void            AddPermaLight(plLightInfo* li, bool proj);
-        void            RemovePermaLight(plLightInfo* li, bool proj);
+    uint32_t          GetNumLights(bool proj) const {
+        return proj ? fProjectors.GetCount() : fLights.GetCount();
+    }
+    plLightInfo*    GetLight(int i, bool proj) const {
+        return proj ? fProjectors[i] : fLights[i];
+    }
+    float        GetLightStrength(int i, bool proj) const {
+        return proj ? fProjStrengths[i] : fLightStrengths[i];
+    }
+    float        GetLightScale(int i, bool proj) const {
+        return proj ? fProjScales[i] : fLightScales[i];
+    }
 
-        const hsBitVector& GetVisSet() const { return fVisSet; }
-        const hsBitVector& GetVisNot() const { return fVisNot; }
-        void            SetVisBit(uint32_t w, bool on) { fVisSet.SetBit(w, on); }
-        void            SetVisNot(uint32_t w, bool on) { fVisNot.SetBit(w, on); }
+    void            AddPermaLight(plLightInfo* li, bool proj);
+    void            RemovePermaLight(plLightInfo* li, bool proj);
 
-        void            RemoveAuxSpan(plAuxSpan* aux);
-        void            AddAuxSpan(plAuxSpan* aux);
-        int             GetNumAuxSpans() const { return fAuxSpans.GetCount(); }
-        plAuxSpan*      GetAuxSpan(int i) const { return fAuxSpans[i]; }
+    const hsBitVector& GetVisSet() const {
+        return fVisSet;
+    }
+    const hsBitVector& GetVisNot() const {
+        return fVisNot;
+    }
+    void            SetVisBit(uint32_t w, bool on) {
+        fVisSet.SetBit(w, on);
+    }
+    void            SetVisNot(uint32_t w, bool on) {
+        fVisNot.SetBit(w, on);
+    }
 
-        virtual void    Read( hsStream* stream );
-        virtual void    Write( hsStream* stream );
+    void            RemoveAuxSpan(plAuxSpan* aux);
+    void            AddAuxSpan(plAuxSpan* aux);
+    int             GetNumAuxSpans() const {
+        return fAuxSpans.GetCount();
+    }
+    plAuxSpan*      GetAuxSpan(int i) const {
+        return fAuxSpans[i];
+    }
 
-        virtual bool    CanMergeInto( plSpan* other );
-        virtual void    MergeInto( plSpan* other );
-        virtual void    Destroy( void );
+    virtual void    Read(hsStream* stream);
+    virtual void    Write(hsStream* stream);
 
-        void            SetMinDist(float minDist) { fMinDist = minDist; }
-        void            SetMaxDist(float maxDist) { fMaxDist = maxDist; }
-        float        GetMinDist() const { return fMinDist; }
-        float        GetMaxDist() const { return fMaxDist; }
+    virtual bool    CanMergeInto(plSpan* other);
+    virtual void    MergeInto(plSpan* other);
+    virtual void    Destroy(void);
+
+    void            SetMinDist(float minDist) {
+        fMinDist = minDist;
+    }
+    void            SetMaxDist(float maxDist) {
+        fMaxDist = maxDist;
+    }
+    float        GetMinDist() const {
+        return fMinDist;
+    }
+    float        GetMaxDist() const {
+        return fMaxDist;
+    }
 };
 
 //// plVertexSpan Definition
-// All span types which are based on vertices derive from this. That's 
+// All span types which are based on vertices derive from this. That's
 // currently all span types.
-class plVertexSpan : public plSpan
-{
+class plVertexSpan : public plSpan {
 public:
 
-        // Stuff internal
-        uint32_t          fGroupIdx;      // Which buffer group, i.e. which vertex format
+    // Stuff internal
+    uint32_t          fGroupIdx;      // Which buffer group, i.e. which vertex format
 
-        uint32_t          fVBufferIdx;    // Which vertex buffer in group
-        uint32_t          fCellIdx;       // Cell index inside the vertex buffer
-        uint32_t          fCellOffset;    // Offset inside the cell
-        uint32_t          fVStartIdx;     // Start vertex # in the actual interlaced buffer
-        uint32_t          fVLength;       // Length of this span in the buffer
+    uint32_t          fVBufferIdx;    // Which vertex buffer in group
+    uint32_t          fCellIdx;       // Cell index inside the vertex buffer
+    uint32_t          fCellOffset;    // Offset inside the cell
+    uint32_t          fVStartIdx;     // Start vertex # in the actual interlaced buffer
+    uint32_t          fVLength;       // Length of this span in the buffer
 
-        plVertexSpan();
+    plVertexSpan();
 
-        virtual void    Read( hsStream* stream );
-        virtual void    Write( hsStream* stream );
+    virtual void    Read(hsStream* stream);
+    virtual void    Write(hsStream* stream);
 
-        virtual bool    CanMergeInto( plSpan* other );
-        virtual void    MergeInto( plSpan* other );
+    virtual bool    CanMergeInto(plSpan* other);
+    virtual void    MergeInto(plSpan* other);
 };
 
 //// plIcicle Class Definition ///////////////////////////////////////////////
 //  Represents the generic span for a set of triangles to be drawn.
 
-class plIcicle : public plVertexSpan
-{
-    public:
+class plIcicle : public plVertexSpan {
+public:
 
-        uint32_t          fIBufferIdx;    // Which index buffer in group
-        uint32_t          fIStartIdx;     // Redundant, since all spans are contiguous. Here for debugging
-        uint32_t          fILength;       // Length of this span in the buffer
-        // The index into the indexbuffer ref. This can be different from fIStartIdx if spans get
-        // culled, then we pack the non-culled index spans into the beginning of the index buffer ref,
-        // so we can still put them all out with a single DIP call.
-        mutable uint32_t  fIPackedIdx;    
+    uint32_t          fIBufferIdx;    // Which index buffer in group
+    uint32_t          fIStartIdx;     // Redundant, since all spans are contiguous. Here for debugging
+    uint32_t          fILength;       // Length of this span in the buffer
+    // The index into the indexbuffer ref. This can be different from fIStartIdx if spans get
+    // culled, then we pack the non-culled index spans into the beginning of the index buffer ref,
+    // so we can still put them all out with a single DIP call.
+    mutable uint32_t  fIPackedIdx;
 
-        // Run-time-only stuff
-        plGBufferTriangle   *fSortData; // Indices & center points for sorting tris in this span (optional)
+    // Run-time-only stuff
+    plGBufferTriangle*   fSortData; // Indices & center points for sorting tris in this span (optional)
 
-        plIcicle();
+    plIcicle();
 
-        virtual void    Read( hsStream* stream );
-        virtual void    Write( hsStream* stream );
+    virtual void    Read(hsStream* stream);
+    virtual void    Write(hsStream* stream);
 
-        virtual bool    CanMergeInto( plSpan* other );
-        virtual void    MergeInto( plSpan* other );
-        virtual void    Destroy( void );
+    virtual bool    CanMergeInto(plSpan* other);
+    virtual void    MergeInto(plSpan* other);
+    virtual void    Destroy(void);
 };
 
 //// plParticleSpan Class Definition /////////////////////////////////////////
@@ -272,59 +309,61 @@ class plIcicle : public plVertexSpan
 
 class plParticleEmitter;
 class plParticleSet;
-class plParticleSpan : public plIcicle
-{
-    public:
+class plParticleSpan : public plIcicle {
+public:
 
-        plParticleEmitter*  fSource;    // Source emitter, used to get array of plParticleCores
-        uint32_t              fNumParticles;
-        uint32_t              fSortCount;
-        uint32_t              fSrcSpanIdx;
+    plParticleEmitter*  fSource;    // Source emitter, used to get array of plParticleCores
+    uint32_t              fNumParticles;
+    uint32_t              fSortCount;
+    uint32_t              fSrcSpanIdx;
 
-        plParticleSet*      fParentSet;
+    plParticleSet*      fParentSet;
 
-        plParticleSpan();
+    plParticleSpan();
 
-        virtual void    Read( hsStream* stream ) { /*plParticleSpans don't read in!*/ }
-        virtual void    Write( hsStream* stream ) { /*plParticleSpans don't write out!*/ }
+    virtual void    Read(hsStream* stream) {
+        /*plParticleSpans don't read in!*/
+    }
+    virtual void    Write(hsStream* stream) {
+        /*plParticleSpans don't write out!*/
+    }
 
-        virtual bool    CanMergeInto( plSpan* other );
-        virtual void    MergeInto( plSpan* other );
-        virtual void    Destroy( void );
+    virtual bool    CanMergeInto(plSpan* other);
+    virtual void    MergeInto(plSpan* other);
+    virtual void    Destroy(void);
 };
 
 //// plParticleSet Class Definition //////////////////////////////////////////
-//  Represents a collection of dynamic plParticleSpans collected into one 
+//  Represents a collection of dynamic plParticleSpans collected into one
 //  space, for rendering batches of particles.
 
-class plParticleSet
-{
-    public:
+class plParticleSet {
+public:
 
-        uint32_t      fRefCount;      // Delete if this gets to 0
-        uint32_t      fDIEntry;       // Our false DIIndices entry index
+    uint32_t      fRefCount;      // Delete if this gets to 0
+    uint32_t      fDIEntry;       // Our false DIIndices entry index
 
-        uint32_t      fGroupIdx;      // Which buffer group, i.e. which vertex format
-        uint8_t       fFormat;
+    uint32_t      fGroupIdx;      // Which buffer group, i.e. which vertex format
+    uint8_t       fFormat;
 
-        uint32_t      fVBufferIdx;
-        uint32_t      fCellIdx;
-        uint32_t      fCellOffset;
-        uint32_t      fVStartIdx;
-        uint32_t      fVLength;       // Total v.b. length that all the icicles can take up       uint32_t      fIBufferIdx;
-        uint32_t      fIBufferIdx;
-        uint32_t      fIStartIdx;     // Start index buffer position
-        uint32_t      fILength;       // Total i.b. length that all the icicles can take up
+    uint32_t      fVBufferIdx;
+    uint32_t      fCellIdx;
+    uint32_t      fCellOffset;
+    uint32_t      fVStartIdx;
+    uint32_t      fVLength;       // Total v.b. length that all the icicles can take up       uint32_t      fIBufferIdx;
+    uint32_t      fIBufferIdx;
+    uint32_t      fIStartIdx;     // Start index buffer position
+    uint32_t      fILength;       // Total i.b. length that all the icicles can take up
 
-        uint32_t          fNumSpans;
-        hsGMaterial*    fMaterial;
+    uint32_t          fNumSpans;
+    hsGMaterial*    fMaterial;
 
-        uint32_t      fNextVStartIdx;
-        uint32_t      fNextCellOffset;
-        uint32_t      fNextIStartIdx;
+    uint32_t      fNextVStartIdx;
+    uint32_t      fNextCellOffset;
+    uint32_t      fNextIStartIdx;
 
-        plParticleSet();
-        ~plParticleSet();
+    plParticleSet();
+    ~plParticleSet();
 };
 
 #endif // _plSpans_h

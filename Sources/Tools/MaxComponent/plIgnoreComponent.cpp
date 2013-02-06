@@ -72,15 +72,14 @@ void DummyCodeIncludeFuncIgnore() {}
 //
 
 //Class that accesses the paramblock below.
-class plIgnoreComponent : public plComponent
-{
+class plIgnoreComponent : public plComponent {
 public:
     plIgnoreComponent();
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    bool SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
     virtual void CollectNonDrawables(INodeTab& nonDrawables);
 };
@@ -88,8 +87,7 @@ public:
 //Max desc stuff necessary below.
 CLASS_DESC(plIgnoreComponent, gIgnoreDesc, "Ignore",  "Ignore", COMP_TYPE_IGNORE, Class_ID(0x48326288, 0x528a3dea))
 
-enum
-{
+enum {
     kIgnoreMeCheckBx
 };
 
@@ -100,9 +98,9 @@ ParamBlockDesc2 gIgnoreBk
     IDD_COMP_IGNORE, IDS_COMP_IGNORES, 0, 0, NULL,
 
     kIgnoreMeCheckBx,  _T("Ignore"), TYPE_BOOL,         0, 0,
-        p_default,  TRUE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_IGNORE_CKBX,
-        end,
+    p_default,  TRUE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_IGNORE_CKBX,
+    end,
 
     end
 );
@@ -115,23 +113,23 @@ plIgnoreComponent::plIgnoreComponent()
 
 void plIgnoreComponent::CollectNonDrawables(INodeTab& nonDrawables)
 {
-    if (fCompPB->GetInt(kIgnoreMeCheckBx))
-    {
+    if (fCompPB->GetInt(kIgnoreMeCheckBx)) {
         AddTargetsToList(nonDrawables);
     }
 }
 
 // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plIgnoreComponent::SetupProperties(plMaxNode *pNode,  plErrorMsg *pErrMsg)
+bool plIgnoreComponent::SetupProperties(plMaxNode* pNode,  plErrorMsg* pErrMsg)
 {
-    if (fCompPB->GetInt(kIgnoreMeCheckBx))
+    if (fCompPB->GetInt(kIgnoreMeCheckBx)) {
         pNode->SetCanConvert(false);
+    }
 
     return true;
 }
 
-bool plIgnoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plIgnoreComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
@@ -143,8 +141,7 @@ bool plIgnoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 //
 
 //Class that accesses the paramblock below.
-class plIgnoreLiteComponent : public plComponent
-{
+class plIgnoreLiteComponent : public plComponent {
 public:
     enum {
         kSelectedOnly
@@ -161,43 +158,46 @@ public:
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    bool SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg) { return true; }
+    bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg) {
+        return true;
+    }
 
-    bool PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg) { return true; }
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg) { return true; }
+    bool PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg) {
+        return true;
+    }
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg) {
+        return true;
+    }
 };
 
 
-class plIgnoreLiteProc : public ParamMap2UserDlgProc
-{
+class plIgnoreLiteProc : public ParamMap2UserDlgProc {
 public:
-    BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (msg)
-        {
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        switch (msg) {
 
         case WM_COMMAND:
-            if( (HIWORD(wParam) == BN_CLICKED) && (LOWORD(wParam) == IDC_COMP_IGNORELITE_ON) )
-            {
+            if ((HIWORD(wParam) == BN_CLICKED) && (LOWORD(wParam) == IDC_COMP_IGNORELITE_ON)) {
                 plIgnoreLiteComponent* ilc = (plIgnoreLiteComponent*)map->GetParamBlock()->GetOwner();
                 ilc->SetState(plIgnoreLiteComponent::kTurnOn);
 
                 return TRUE;
             }
-            if( (HIWORD(wParam) == BN_CLICKED) && (LOWORD(wParam) == IDC_COMP_IGNORELITE_OFF) )
-            {
+
+            if ((HIWORD(wParam) == BN_CLICKED) && (LOWORD(wParam) == IDC_COMP_IGNORELITE_OFF)) {
                 plIgnoreLiteComponent* ilc = (plIgnoreLiteComponent*)map->GetParamBlock()->GetOwner();
                 ilc->SetState(plIgnoreLiteComponent::kTurnOff);
 
                 return TRUE;
             }
-            if( (HIWORD(wParam) == BN_CLICKED) && (LOWORD(wParam) == IDC_COMP_IGNORELITE_TOGGLE) )
-            {
+
+            if ((HIWORD(wParam) == BN_CLICKED) && (LOWORD(wParam) == IDC_COMP_IGNORELITE_TOGGLE)) {
                 plIgnoreLiteComponent* ilc = (plIgnoreLiteComponent*)map->GetParamBlock()->GetOwner();
                 ilc->SetState(plIgnoreLiteComponent::kToggle);
 
                 return TRUE;
             }
+
             break;
         }
 
@@ -212,15 +212,15 @@ static plIgnoreLiteProc gIgnoreLiteProc;
 CLASS_DESC(plIgnoreLiteComponent, gIgnoreLiteDesc, "Control Max Light", "ControlLite", COMP_TYPE_IGNORE, IGNORELITE_CID)
 
 ParamBlockDesc2 gIgnoreLiteBk
-(   
- plComponent::kBlkComp, _T("IgnoreLite"), 0, &gIgnoreLiteDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
+(
+    plComponent::kBlkComp, _T("IgnoreLite"), 0, &gIgnoreLiteDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_IGNORELITE, IDS_COMP_IGNORELITES, 0, 0, &gIgnoreLiteProc,
 
     plIgnoreLiteComponent::kSelectedOnly,  _T("SelectedOnly"), TYPE_BOOL,       0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_IGNORELITE_SELECTED,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_IGNORELITE_SELECTED,
+    end,
 
     end
 );
@@ -237,26 +237,29 @@ void plIgnoreLiteComponent::SetState(LightState s)
 
     int numTarg = NumTargets();
     int i;
-    for( i = 0; i < numTarg; i++ )
-    {
-        plMaxNodeBase* targ = GetTarget(i);
-        if( targ )
-        {
-            if( selectedOnly && !targ->Selected() )
-                continue;
 
-            Object *obj = targ->EvalWorldState(TimeValue(0)).obj;
-            if (obj && (obj->SuperClassID() == SClass_ID(LIGHT_CLASS_ID))) 
-            {
+    for (i = 0; i < numTarg; i++) {
+        plMaxNodeBase* targ = GetTarget(i);
+
+        if (targ) {
+            if (selectedOnly && !targ->Selected()) {
+                continue;
+            }
+
+            Object* obj = targ->EvalWorldState(TimeValue(0)).obj;
+
+            if (obj && (obj->SuperClassID() == SClass_ID(LIGHT_CLASS_ID))) {
                 LightObject* liObj = (LightObject*)obj;
-                switch( s )
-                {
+
+                switch (s) {
                 case kTurnOn:
                     liObj->SetUseLight(true);
                     break;
+
                 case kTurnOff:
                     liObj->SetUseLight(false);
                     break;
+
                 case kToggle:
                     liObj->SetUseLight(!liObj->GetUseLight());
                     break;
@@ -273,15 +276,14 @@ void plIgnoreLiteComponent::SetState(LightState s)
 //
 
 //Class that accesses the paramblock below.
-class plBarneyComponent : public plComponent
-{
+class plBarneyComponent : public plComponent {
 public:
     plBarneyComponent();
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    bool SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 //Max desc stuff necessary below.
@@ -289,7 +291,7 @@ CLASS_DESC(plBarneyComponent, gBarneyDesc, "Barney",  "Barney", COMP_TYPE_IGNORE
 
 ParamBlockDesc2 gBarneyBk
 (
- plComponent::kBlkComp, _T("Barney"), 0, &gBarneyDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
+    plComponent::kBlkComp, _T("Barney"), 0, &gBarneyDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_BARNEY, IDS_COMP_BARNEYS, 0, 0, NULL,
 
@@ -304,14 +306,14 @@ plBarneyComponent::plBarneyComponent()
 
 // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plBarneyComponent::SetupProperties(plMaxNode *pNode,  plErrorMsg *pErrMsg)
+bool plBarneyComponent::SetupProperties(plMaxNode* pNode,  plErrorMsg* pErrMsg)
 {
     pNode->SetCanConvert(false);
     pNode->SetIsBarney(true);
     return true;
 }
 
-bool plBarneyComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plBarneyComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
@@ -324,16 +326,14 @@ bool plBarneyComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 //
 
 //Class that accesses the paramblock below.
-class plNoShowComponent : public plComponent
-{
+class plNoShowComponent : public plComponent {
 public:
-    enum
-    {
+    enum {
         kShowable,
         kAffectDraw,
         kAffectPhys
     };
-    
+
 
 public:
     plNoShowComponent();
@@ -342,8 +342,8 @@ public:
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    bool SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 const Class_ID COMP_NOSHOW_CID(0x41cb2b85, 0x615932c6);
@@ -358,19 +358,19 @@ ParamBlockDesc2 gNoShowBk
     IDD_COMP_NOSHOW, IDS_COMP_NOSHOW, 0, 0, NULL,
 
     plNoShowComponent::kShowable,  _T("Showable"), TYPE_BOOL,       0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_NOSHOW_SHOWABLE,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_NOSHOW_SHOWABLE,
+    end,
 
     plNoShowComponent::kAffectDraw,  _T("AffectDraw"), TYPE_BOOL,       0, 0,
-        p_default,  TRUE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_NOSHOW_AFFECTDRAW,
-        end,
+    p_default,  TRUE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_NOSHOW_AFFECTDRAW,
+    end,
 
     plNoShowComponent::kAffectPhys,  _T("AffectPhys"), TYPE_BOOL,       0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_NOSHOW_AFFECTPHYS,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_NOSHOW_AFFECTPHYS,
+    end,
 
     end
 );
@@ -383,54 +383,59 @@ plNoShowComponent::plNoShowComponent()
 
 // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plNoShowComponent::SetupProperties(plMaxNode *pNode,  plErrorMsg *pErrMsg)
+bool plNoShowComponent::SetupProperties(plMaxNode* pNode,  plErrorMsg* pErrMsg)
 {
-    if( !fCompPB->GetInt(kShowable) )
-    {
-        if( fCompPB->GetInt(kAffectDraw) )
+    if (!fCompPB->GetInt(kShowable)) {
+        if (fCompPB->GetInt(kAffectDraw)) {
             pNode->SetDrawable(false);
-        if( fCompPB->GetInt(kAffectPhys) )
+        }
+
+        if (fCompPB->GetInt(kAffectPhys)) {
             pNode->SetPhysical(false);
+        }
     }
 
     return true;
 }
 
-bool plNoShowComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plNoShowComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plSceneObject* obj = node->GetSceneObject();
-    if( !obj )
-        return true;
 
-    if( fCompPB->GetInt(kShowable) )
-    {
-        if( fCompPB->GetInt(kAffectDraw) )
-        {
+    if (!obj) {
+        return true;
+    }
+
+    if (fCompPB->GetInt(kShowable)) {
+        if (fCompPB->GetInt(kAffectDraw)) {
             plEnableMsg* eMsg = new plEnableMsg(nil, plEnableMsg::kDisable, plEnableMsg::kDrawable);
             eMsg->AddReceiver(obj->GetKey());
             eMsg->Send();
         }
-        if( fCompPB->GetInt(kAffectPhys) )
-        {
+
+        if (fCompPB->GetInt(kAffectPhys)) {
             hsAssert(0, "Who uses this?");
 //          plEventGroupEnableMsg* pMsg = new plEventGroupEnableMsg;
 //          pMsg->SetFlags(plEventGroupEnableMsg::kCollideOff | plEventGroupEnableMsg::kReportOff);
 //          pMsg->AddReceiver(obj->GetKey());
 //          pMsg->Send();
         }
+
 #if 0
         plDrawInterface* di = node->GetDrawInterface();
-        if( di && 
-        {
-            di->SetProperty(plDrawInterface::kDisable, true);
+
+        if (di && {
+        di->SetProperty(plDrawInterface::kDisable, true);
         }
 #endif
     }
+
     return true;
 }
-void plNoShowComponent::CollectNonDrawables(INodeTab& nonDrawables) 
-{ 
-    if( fCompPB->GetInt(kAffectDraw) )
-        AddTargetsToList(nonDrawables); 
+void plNoShowComponent::CollectNonDrawables(INodeTab& nonDrawables)
+{
+    if (fCompPB->GetInt(kAffectDraw)) {
+        AddTargetsToList(nonDrawables);
+    }
 }
 

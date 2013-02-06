@@ -45,15 +45,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class Point3;
 
-class plTriObjectTab : public Tab<TriObject*>
-{
+class plTriObjectTab : public Tab<TriObject*> {
 };
 
 
-class plDicer
-{
+class plDicer {
 protected:
-    
+
     int         fMaxFaces;
     Point3      fMaxSize;
 

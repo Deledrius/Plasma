@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetProtocol/Private/Protocols/Srv2Score/pnNpSrv2Score.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNNETPROTOCOL_PRIVATE_PROTOCOLS_SRV2SCORE_PNNPSRV2SCORE_H
@@ -148,7 +148,7 @@ struct Srv2Score_ScoreGetRanks : SrvMsgHeader {
 *
 ***/
 
-struct Score2Srv_ScoreCreateReply : SrvMsgHeader { 
+struct Score2Srv_ScoreCreateReply : SrvMsgHeader {
     uint32_t   scoreId;
     uint32_t   createdTime;
 };
@@ -178,8 +178,8 @@ struct Score2Srv_ScoreGetRanksReply : SrvMsgHeader {
 *
 ***/
 
-bool Srv2ScoreValidateConnect (
-    AsyncNotifySocketListen *   listen,
-    Srv2Score_ConnData *        connectPtr
+bool Srv2ScoreValidateConnect(
+    AsyncNotifySocketListen*    listen,
+    Srv2Score_ConnData*         connectPtr
 );
 

@@ -59,32 +59,33 @@ void DummyCodeIncludeFuncTemplate()
 {
 }
 
-static const char *GetPBString(IParamBlock2 *pb, ParamID id)
+static const char* GetPBString(IParamBlock2* pb, ParamID id)
 {
-    const char *str = pb->GetStr(id, 0);
-    if (str && *str == '\0')
+    const char* str = pb->GetStr(id, 0);
+
+    if (str && *str == '\0') {
         return nil;
+    }
+
     return str;
 }
 
-class plTemplateComponent : public plComponent
-{
+class plTemplateComponent : public plComponent {
 protected:
-    const char* IGetAgeName(plMaxNode *node);
+    const char* IGetAgeName(plMaxNode* node);
 
 public:
     plTemplateComponent();
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 CLASS_DESC(plTemplateComponent, gTemplateDesc, "Template", "CloneTemplate", "Clone", Class_ID(0x6742590b, 0x14fd2135))
 
-enum
-{
+enum {
     kTemplateName
 };
 
@@ -102,14 +103,14 @@ plTemplateComponent::plTemplateComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-const char* plTemplateComponent::IGetAgeName(plMaxNode *node)
+const char* plTemplateComponent::IGetAgeName(plMaxNode* node)
 {
     uint32_t numComps = node->NumAttachedComponents();
-    for (uint32_t i = 0; i < numComps; i++)
-    {
+
+    for (uint32_t i = 0; i < numComps; i++) {
         plComponentBase* comp = node->GetAttachedComponent(i);
-        if (comp->ClassID() == PAGEINFO_CID)
-        {
+
+        if (comp->ClassID() == PAGEINFO_CID) {
             plPageInfoComponent* pageInfo = (plPageInfoComponent*)comp;
             return pageInfo->GetAgeName();
         }
@@ -122,23 +123,26 @@ const char* plTemplateComponent::IGetAgeName(plMaxNode *node)
 
 // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plTemplateComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plTemplateComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     const char* ageName = IGetAgeName(node);
-    if (!ageName)
+
+    if (!ageName) {
         return false;
+    }
 
 #if 0
-    const char *templateName = node->GetName();
-    plKey roomKey = plPluginResManager::ResMgr()->NameToLoc(ageName, "District", "BuiltIn", (uint32_t)-1);
+    const char* templateName = node->GetName();
+    plKey roomKey = plPluginResManager::ResMgr()->NameToLoc(ageName, "District", "BuiltIn", (uint32_t) - 1);
 
     // Set this object and all its children to be in the special template age
     node->SetRoomKey(roomKey);
-    for (int i = 0; i < node->NumberOfChildren(); i++)
-    {
+
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
         plMaxNode* childNode = (plMaxNode*)node->GetChildNode(i);
         childNode->SetRoomKey(roomKey);
     }
+
 #endif
 
     // We need a coordinate interface so we can move to the clone position
@@ -149,17 +153,18 @@ bool plTemplateComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
     return true;
 }
 
-bool plTemplateComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plTemplateComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if (node->GetSceneObject())
+    if (node->GetSceneObject()) {
         node->GetSceneObject()->SetSynchFlagsBit(plSynchedObject::kAllStateIsVolatile);
+    }
 
-    for (int i = 0; i < node->NumberOfChildren(); i++)
-    {
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
         plMaxNode* childNode = (plMaxNode*)node->GetChildNode(i);
 
-        if (childNode->GetSceneObject())
+        if (childNode->GetSceneObject()) {
             childNode->GetSceneObject()->SetSynchFlagsBit(plSynchedObject::kAllStateIsVolatile);
+        }
     }
 
     return true;
@@ -170,15 +175,14 @@ bool plTemplateComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 
 #include "plModifier/plCloneSpawnModifier.h"
 
-class plSpawnComponent : public plComponent
-{
+class plSpawnComponent : public plComponent {
 public:
     plSpawnComponent();
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 CLASS_DESC(plSpawnComponent, gSpawnDesc, "Instance", "CloneInst", "Clone", Class_ID(0x5702450d, 0x2c636131))
@@ -190,8 +194,8 @@ ParamBlockDesc2 gSpawnBlk
     IDD_COMP_TEMPLATE, IDS_COMP_CLONE_INST, 0, 0, NULL,
 
     kTemplateName,  _T("name"),     TYPE_STRING,    0, 0,
-        p_ui,       TYPE_EDITBOX, IDC_NAME,
-        end,
+    p_ui,       TYPE_EDITBOX, IDC_NAME,
+    end,
 
     end
 );
@@ -205,26 +209,27 @@ plSpawnComponent::plSpawnComponent()
 
 // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plSpawnComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plSpawnComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if (!GetPBString(fCompPB, kTemplateName))
-    {
+    if (!GetPBString(fCompPB, kTemplateName)) {
         pErrMsg->Set(true, "Clone Instance Component", "Clone Instance component on node %s can't convert because it doesn't have a name", node->GetName());
         pErrMsg->Set(false);
         return false;
     }
-    
+
     // We need a coordinate interface to find the point to warp the clone to.
     node->SetForceLocal(true);
 
     return true;
 }
 
-bool plSpawnComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plSpawnComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    const char *templateName = GetPBString(fCompPB, kTemplateName);
-    if (!templateName)
+    const char* templateName = GetPBString(fCompPB, kTemplateName);
+
+    if (!templateName) {
         return false;
+    }
 
     plCloneSpawnModifier* mod = new plCloneSpawnModifier;
     mod->SetExportTime();

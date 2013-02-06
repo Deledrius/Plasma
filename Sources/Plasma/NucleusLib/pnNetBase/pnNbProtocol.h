@@ -61,7 +61,7 @@ enum ENetProtocol {
 
     // For test applications
     kNetProtocolDebug               = 1,
-    
+
     // Client connections
     kNetProtocolCli2GateKeeper      = 2,
     kNetProtocolCli2Unused_02       = 3,
@@ -84,6 +84,6 @@ enum ENetProtocol {
 // NetProtocolToString as well.  Unfortunately, the compiler
 // cannot enforce this since the protocol values are not
 // numerically sequential.
-const wchar_t * NetProtocolToString (ENetProtocol protocol);
+const wchar_t* NetProtocolToString(ENetProtocol protocol);
 
 #endif // pnNbProtocol_inc

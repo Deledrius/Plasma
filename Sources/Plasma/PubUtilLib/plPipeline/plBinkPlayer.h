@@ -53,80 +53,118 @@ struct IDirect3DTexture9;
 class plMessage;
 struct IDirectSound8;
 
-class plBinkPlayer
-{
-    public:
+class plBinkPlayer {
+public:
 
-        plBinkPlayer() : fFileName(nil) { }
-        ~plBinkPlayer() { delete [] fFileName; }
+    plBinkPlayer() : fFileName(nil) { }
+    ~plBinkPlayer() {
+        delete [] fFileName;
+    }
 
-        static bool Init( hsWindowHndl hWnd) { return true; }
-        static bool DeInit() { return true; }
+    static bool Init(hsWindowHndl hWnd) {
+        return true;
+    }
+    static bool DeInit() {
+        return true;
+    }
 
-        static void SetForeGroundTrack(uint32_t t) { }
-        static void SetBackGroundTrack(uint32_t t) { }
-        static uint32_t GetForeGroundTrack() { }
-        static uint32_t GetBackGroundTrack() { }
+    static void SetForeGroundTrack(uint32_t t) { }
+    static void SetBackGroundTrack(uint32_t t) { }
+    static uint32_t GetForeGroundTrack() { }
+    static uint32_t GetBackGroundTrack() { }
 
-        void SetDefaults() { }
+    void SetDefaults() { }
 
-        bool Start(plPipeline* pipe, hsWindowHndl hWnd) { return false; }
+    bool Start(plPipeline* pipe, hsWindowHndl hWnd) {
+        return false;
+    }
 
-        bool NextFrame() {
-            // we have reached the end
-            return Stop();
+    bool NextFrame() {
+        // we have reached the end
+        return Stop();
+    }
+
+    bool Pause(bool on) {
+        return false;
+    }
+
+    bool Stop() {
+        for (int i = 0; i < fCallbacks.GetCount(); i++) {
+            fCallbacks[i]->Send();
         }
 
-        bool Pause(bool on) { return false; }
+        fCallbacks.Reset();
+        delete [] fFileName;
+        fFileName = nil;
+        return false;
+    }
 
-        bool Stop() {
-            for (int i = 0; i < fCallbacks.GetCount(); i++)
-                fCallbacks[i]->Send();
-            fCallbacks.Reset();
-            delete [] fFileName;
-            fFileName = nil;
-            return false;
-        }
+    void SetFileName(const char* filename) {
+        delete [] fFileName;
+        fFileName = hsStrcpy(filename);
+    }
+    void SetColor(const hsColorRGBA& c) { }
+    void SetPosition(float x, float y) { }
+    void SetScale(float x, float y) { }
+    void SetVolume(float v) { }
+    void SetForeVolume(float v) { }
+    void SetBackVolume(float v) { }
 
-        void SetFileName(const char* filename) {
-            delete [] fFileName;
-            fFileName = hsStrcpy(filename);
-        }
-        void SetColor(const hsColorRGBA& c) { }
-        void SetPosition(float x, float y) { }
-        void SetScale(float x, float y) { }
-        void SetVolume(float v) { }
-        void SetForeVolume(float v) { }
-        void SetBackVolume(float v) { }
+    void SetPosition(const hsPoint2& p) { }
+    void SetScale(const hsPoint2& s) { }
 
-        void SetPosition(const hsPoint2& p) { }
-        void SetScale(const hsPoint2& s) { }
+    const char* GetFileName() const {
+        return fFileName;
+    }
+    const hsColorRGBA GetColor() const {
+        return hsColorRGBA();
+    }
+    const hsPoint2 GetPosition() const {
+        return hsPoint2();
+    }
+    const hsPoint2 GetScale() const {
+        return hsPoint2();
+    }
+    float GetBackVolume() const {
+        return 0.0f;
+    }
+    float GetForeVolume() const {
+        return 0.0f;
+    }
 
-        const char* GetFileName() const { return fFileName; }
-        const hsColorRGBA GetColor() const { return hsColorRGBA(); }
-        const hsPoint2 GetPosition() const { return hsPoint2(); }
-        const hsPoint2 GetScale() const { return hsPoint2(); }
-        float GetBackVolume() const { return 0.0f; }
-        float GetForeVolume() const { return 0.0f; }
+    void AddCallback(plMessage* msg) {
+        hsRefCnt_SafeRef(msg);
+        fCallbacks.Append(msg);
+    }
+    uint32_t GetNumCallbacks() const {
+        return 0;
+    }
+    plMessage* GetCallback(int i) const {
+        return nil;
+    }
 
-        void AddCallback(plMessage* msg) { hsRefCnt_SafeRef(msg); fCallbacks.Append(msg); }
-        uint32_t GetNumCallbacks() const { return 0; }
-        plMessage* GetCallback(int i) const { return nil; }
+    void SetFadeFromTime(float secs) { }
+    void SetFadeFromColor(hsColorRGBA c) { }
 
-        void SetFadeFromTime(float secs) { }
-        void SetFadeFromColor(hsColorRGBA c) { }
+    void SetFadeToTime(float secs) { }
+    void SetFadeToColor(hsColorRGBA c) { }
 
-        void SetFadeToTime(float secs) { }
-        void SetFadeToColor(hsColorRGBA c) { }
+    float GetFadeFromTime() const {
+        return 0.0f;
+    }
+    hsColorRGBA GetFadeFromColor() const {
+        return hsColorRGBA();
+    }
+    float GetFadeToTime() const {
+        return 0.0f;
+    }
+    hsColorRGBA GetFadeToColor() const {
+        return hsColorRGBA();
+    }
 
-        float GetFadeFromTime() const { return 0.0f; }
-        hsColorRGBA GetFadeFromColor() const { return hsColorRGBA(); }
-        float GetFadeToTime() const { return 0.0f; }
-        hsColorRGBA GetFadeToColor() const { return hsColorRGBA(); }
-
-    private:
-        char* fFileName;
-        hsTArray<plMessage*> fCallbacks;
+private:
+    char* fFileName;
+    hsTArray<plMessage*> fCallbacks;
 };
 
 #endif // plBinkPlayer_inc

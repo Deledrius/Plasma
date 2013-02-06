@@ -43,8 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plRipVSConsts_inc
 #define plRipVSConsts_inc
 
-class plRipVSConsts
-{
+class plRipVSConsts {
 public:
     float        fC1U;
     float        fC2U;

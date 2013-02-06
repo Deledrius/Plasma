@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plWaveSetBase;
 
-class plDynaTorpedoVSMgr : public plDynaTorpedoMgr
-{
+class plDynaTorpedoVSMgr : public plDynaTorpedoMgr {
 public:
     enum {
         kRefWaveSetBase     = kRefNextAvailable
@@ -67,8 +66,8 @@ public:
     plDynaTorpedoVSMgr();
     virtual ~plDynaTorpedoVSMgr();
 
-    CLASSNAME_REGISTER( plDynaTorpedoVSMgr );
-    GETINTERFACE_ANY( plDynaTorpedoVSMgr, plDynaTorpedoMgr );
+    CLASSNAME_REGISTER(plDynaTorpedoVSMgr);
+    GETINTERFACE_ANY(plDynaTorpedoVSMgr, plDynaTorpedoMgr);
 
     virtual bool MsgReceive(plMessage* msg);
 

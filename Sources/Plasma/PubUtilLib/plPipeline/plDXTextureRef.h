@@ -63,62 +63,66 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plBitmap;
 
-class plDXTextureRef : public plDXDeviceRef
-{
-    public:
-        enum Flags
-        {
-            kExternData         = 0x00000002,   // fData points to user data, don't delete
-            kRenderTarget       = 0x00000004,   // Created via a render target
-            kCubicMap           = 0x00000008,   // Texture is really a cubic map texture
-            kPerspProjection    = 0x00000010,   // Perspective projection
-            kOrthoProjection    = 0x00000020,   // Orthogonal projection
-            kProjection         = kPerspProjection | kOrthoProjection,
-            kOffscreenRT        = 0x00000040,   // Offscreen renderTarget. Never used as an actual texture,
-                                                // but handy to still have it as a textureRef
-            kUVWNormal          = 0x00000080,   // Use the normal as the UVW src
-            kAutoGenMipmap      = 0x00000100    // DirectX should generate mip levels for us
-        };
+class plDXTextureRef : public plDXDeviceRef {
+public:
+    enum Flags {
+        kExternData         = 0x00000002,   // fData points to user data, don't delete
+        kRenderTarget       = 0x00000004,   // Created via a render target
+        kCubicMap           = 0x00000008,   // Texture is really a cubic map texture
+        kPerspProjection    = 0x00000010,   // Perspective projection
+        kOrthoProjection    = 0x00000020,   // Orthogonal projection
+        kProjection         = kPerspProjection | kOrthoProjection,
+        kOffscreenRT        = 0x00000040,   // Offscreen renderTarget. Never used as an actual texture,
+        // but handy to still have it as a textureRef
+        kUVWNormal          = 0x00000080,   // Use the normal as the UVW src
+        kAutoGenMipmap      = 0x00000100    // DirectX should generate mip levels for us
+    };
 
-        IDirect3DBaseTexture9   *fD3DTexture;
-        D3DFORMAT               fFormatType;    // Format of the D3D texture object
+    IDirect3DBaseTexture9*   fD3DTexture;
+    D3DFORMAT               fFormatType;    // Format of the D3D texture object
 
-        uint32_t      fMMLvs;         // Number of mipmap levels
-        uint32_t      fMaxWidth;      // Width of the highest mipmap level
-        uint32_t      fMaxHeight;     // Height of the highest mipmap level (no pun intended)
-        uint32_t      fNumPix;        // total num texels in all mip levels
-        uint32_t      fDataSize;      // size of fData[0..n] in bytes
-        uint32_t*     fLevelSizes;    // fLevelSize[i] == size in bytes of level i
-        //uint32_t        fCurrLOD;       // Current LOD setting for this texture
+    uint32_t      fMMLvs;         // Number of mipmap levels
+    uint32_t      fMaxWidth;      // Width of the highest mipmap level
+    uint32_t      fMaxHeight;     // Height of the highest mipmap level (no pun intended)
+    uint32_t      fNumPix;        // total num texels in all mip levels
+    uint32_t      fDataSize;      // size of fData[0..n] in bytes
+    uint32_t*     fLevelSizes;    // fLevelSize[i] == size in bytes of level i
+    //uint32_t        fCurrLOD;       // Current LOD setting for this texture
 
-        plBitmap    *fOwner;
+    plBitmap*    fOwner;
 
-        void*       fData;          // for reloading
+    void*       fData;          // for reloading
 
-        uint32_t      GetFlags() const { return fFlags; }
-        void        SetFlags( uint32_t flag ) { fFlags = flag; }
+    uint32_t      GetFlags() const {
+        return fFlags;
+    }
+    void        SetFlags(uint32_t flag) {
+        fFlags = flag;
+    }
 
-        plDXTextureRef& Set( D3DFORMAT tp, uint32_t ml, uint32_t mw, uint32_t mh, uint32_t np, uint32_t sz, uint32_t manSize, uint32_t* lSz, void* pd, bool ed=false, bool renderTarget = false );
+    plDXTextureRef& Set(D3DFORMAT tp, uint32_t ml, uint32_t mw, uint32_t mh, uint32_t np, uint32_t sz, uint32_t manSize, uint32_t* lSz, void* pd, bool ed = false, bool renderTarget = false);
 
-        plDXTextureRef( D3DFORMAT tp, uint32_t ml, uint32_t mw, uint32_t mh, uint32_t np, uint32_t sz, uint32_t manSize, uint32_t* lSz, void* pd, bool ed=false, bool renderTarget = false );
-        virtual ~plDXTextureRef();
+    plDXTextureRef(D3DFORMAT tp, uint32_t ml, uint32_t mw, uint32_t mh, uint32_t np, uint32_t sz, uint32_t manSize, uint32_t* lSz, void* pd, bool ed = false, bool renderTarget = false);
+    virtual ~plDXTextureRef();
 
-        void            Link( plDXTextureRef **back ) { plDXDeviceRef::Link( (plDXDeviceRef **)back ); }
-        plDXTextureRef  *GetNext( void ) { return (plDXTextureRef *)fNext; }
+    void            Link(plDXTextureRef** back) {
+        plDXDeviceRef::Link((plDXDeviceRef**)back);
+    }
+    plDXTextureRef*  GetNext(void) {
+        return (plDXTextureRef*)fNext;
+    }
 
-        void    Release( void );
+    void    Release(void);
 };
 
-class plDXCubeTextureRef : public plDXTextureRef
-{
-    public:
-        void    *fFaceData[ 5 ];            // First face is in the inherited fData
+class plDXCubeTextureRef : public plDXTextureRef {
+public:
+    void*    fFaceData[ 5 ];            // First face is in the inherited fData
 
-        plDXCubeTextureRef( D3DFORMAT tp, uint32_t ml, uint32_t mw, uint32_t mh, uint32_t np, uint32_t sz, uint32_t manSize, uint32_t* lSz, void* pd, bool ed=false, bool renderTarget = false ) :
-                            plDXTextureRef( tp, ml, mw, mh, np, sz, manSize, lSz, pd, ed, renderTarget )
-        {
+    plDXCubeTextureRef(D3DFORMAT tp, uint32_t ml, uint32_t mw, uint32_t mh, uint32_t np, uint32_t sz, uint32_t manSize, uint32_t* lSz, void* pd, bool ed = false, bool renderTarget = false) :
+        plDXTextureRef(tp, ml, mw, mh, np, sz, manSize, lSz, pd, ed, renderTarget) {
 
-        }
+    }
 };
 
 #endif // _plDXTextureRef_h

@@ -49,11 +49,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 PYTHON_GLOBAL_METHOD_DEFINITION(PtSetGamma2, args, "Params: gamma\nSet the gamma with gamma2 rules")
 {
     float gamma;
-    if (!PyArg_ParseTuple(args, "f", &gamma))
-    {
+
+    if (!PyArg_ParseTuple(args, "f", &gamma)) {
         PyErr_SetString(PyExc_TypeError, "PtSetGamma2 expects a float");
         PYTHON_RETURN_ERROR;
     }
+
     pyDrawControl::SetGamma2(gamma);
     PYTHON_RETURN_NONE;
 }
@@ -61,11 +62,12 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtSetGamma2, args, "Params: gamma\nSet the gamma
 PYTHON_GLOBAL_METHOD_DEFINITION(PtSetShadowVisDistance, args, "Params: distance\nSet the maximum shadow visibility distance")
 {
     float distance;
-    if (!PyArg_ParseTuple(args, "f", &distance))
-    {
+
+    if (!PyArg_ParseTuple(args, "f", &distance)) {
         PyErr_SetString(PyExc_TypeError, "PtSetShadowVisDistance expects a float");
         PYTHON_RETURN_ERROR;
     }
+
     pyDrawControl::SetShadowVisDistance(distance);
     PYTHON_RETURN_NONE;
 }
@@ -102,11 +104,12 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtIsMouseInverted, "Is the mouse currentl
 PYTHON_GLOBAL_METHOD_DEFINITION(PtSetClickToTurn, args, "Params: state\nTurns on click-to-turn")
 {
     char stateFlag;
-    if (!PyArg_ParseTuple(args, "b", &stateFlag))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &stateFlag)) {
         PyErr_SetString(PyExc_TypeError, "PtSetClickToTurn expects a boolean");
         PYTHON_RETURN_ERROR;
     }
+
     pyDrawControl::SetClickToTurn(stateFlag != 0);
     PYTHON_RETURN_NONE;
 }
@@ -121,7 +124,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtIsClickToTurn, "Is click-to-turn on?")
 // AddPlasmaMethods - the python method definitions
 //
 
-void pyDrawControl::AddPlasmaMethods(std::vector<PyMethodDef> &methods)
+void pyDrawControl::AddPlasmaMethods(std::vector<PyMethodDef>& methods)
 {
     PYTHON_GLOBAL_METHOD(methods, PtSetGamma2);
     PYTHON_GLOBAL_METHOD(methods, PtSetShadowVisDistance);

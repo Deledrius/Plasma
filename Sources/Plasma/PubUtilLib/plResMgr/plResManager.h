@@ -61,14 +61,15 @@ class plDispatch;
 // loading ages up-to-date.
 typedef void(*plProgressProc)(plKey key);
 
-class plResManager : public hsResMgr
-{
+class plResManager : public hsResMgr {
 public:
     plResManager();
     virtual ~plResManager();
 
     // If the ResManager has already been initialized, you should call Reset after setting this
-    void SetDataPath(const plFileName& path) { fDataPath = path; }
+    void SetDataPath(const plFileName& path) {
+        fDataPath = path;
+    }
 
     // Mainly for external tools.
     void                AddSinglePage(const plFileName& path);
@@ -78,7 +79,7 @@ public:
     //---------------------------
     //  Load and Unload
     //---------------------------
-    virtual void        Load  (const plKey& objKey);        // places on list to be loaded
+    virtual void        Load(const plKey& objKey);          // places on list to be loaded
     virtual bool        Unload(const plKey& objKey);        // Unregisters (deletes) an object, Return true if successful
     virtual plKey       CloneKey(const plKey& objKey);
 
@@ -92,7 +93,7 @@ public:
     void                GetLocationStrings(const plLocation& loc, plString* ageBuffer, plString* pageBuffer) const;
 
     //---------------------------
-    //  Establish reference linkage 
+    //  Establish reference linkage
     //---------------------------
     virtual bool   AddViaNotify(const plKey& key, plRefMsg* msg, plRefFlags::Type flags);
     virtual bool   AddViaNotify(plRefMsg* msg, plRefFlags::Type flags); // msg->fRef->GetKey() == sentKey
@@ -104,13 +105,13 @@ public:
     //  Reding and Writing keys
     //---------------------------
     // Read a Key in, and Notify me when the Object is loaded
-    virtual plKey ReadKeyNotifyMe(hsStream* stream, plRefMsg* retMsg, plRefFlags::Type flags); 
+    virtual plKey ReadKeyNotifyMe(hsStream* stream, plRefMsg* retMsg, plRefFlags::Type flags);
     // Just read the Key data in and find a match in the registry and return it.
-    virtual plKey ReadKey(hsStream* stream); 
+    virtual plKey ReadKey(hsStream* stream);
 
     // For convenience you can write a key using the KeyedObject or the Key...same result
-    virtual void WriteKey(hsStream* s, hsKeyedObject* obj); 
-    virtual void WriteKey(hsStream* s, const plKey& key); 
+    virtual void WriteKey(hsStream* s, hsKeyedObject* obj);
+    virtual void WriteKey(hsStream* s, const plKey& key);
 
     //---------------------------
     //  Reding and Writing Objects directly
@@ -177,7 +178,7 @@ protected:
 
     virtual plKey   ReRegister(const plString& nm, const plUoid& uoid);
     virtual bool    ReadObject(plKeyImp* key); // plKeys call this when needed
-    virtual bool    IReadObject(plKeyImp* pKey, hsStream *stream);  
+    virtual bool    IReadObject(plKeyImp* pKey, hsStream* stream);
 
     plCreatable*    IReadCreatable(hsStream* s) const;
     plKey           ICloneKey(const plUoid& objUoid, uint32_t playerID, uint32_t cloneID);
@@ -227,7 +228,7 @@ protected:
     HeldAgeKeyMap   fHeldAgeKeys;
     plProgressProc  fProgressProc;
 
-    plResManagerHelper  *fMyHelper;
+    plResManagerHelper*  fMyHelper;
 
     bool    fLogReadTimes;
 

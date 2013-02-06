@@ -59,74 +59,86 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
  *  splitting, and joining path components.
  *  \sa plFileInfo
  */
-class plFileName
-{
+class plFileName {
 public:
     /** Construct an empty filename. */
     plFileName() { }
 
     /** Construct a filename from the UTF-8 character data in \a cstr. */
-    plFileName(const char *cstr) : fName(cstr) { }
+    plFileName(const char* cstr) : fName(cstr) { }
 
     /** Construct a filename from the plString argument \a copy. */
-    plFileName(const plString &copy) : fName(copy) { }
+    plFileName(const plString& copy) : fName(copy) { }
 
     /** Copy constructor. */
-    plFileName(const plFileName &copy) : fName(copy.fName) { }
+    plFileName(const plFileName& copy) : fName(copy.fName) { }
 
     /** Assignment operator.  Same as plFileName(const char *). */
-    plFileName &operator=(const char *cstr)
-    {
-        fName.operator=(cstr);
+    plFileName& operator=(const char* cstr) {
+        fName.operator = (cstr);
         return *this;
     }
 
     /** Assignment operator.  Same as plFileName(const plString &). */
-    plFileName &operator=(const plString &copy)
-    {
-        fName.operator=(copy);
+    plFileName& operator=(const plString& copy) {
+        fName.operator = (copy);
         return *this;
     }
 
     /** Assignment operator.  Same as plFileName(const plFileName &). */
-    plFileName &operator=(const plFileName &copy)
-    {
-        fName.operator=(copy.fName);
+    plFileName& operator=(const plFileName& copy) {
+        fName.operator = (copy.fName);
         return *this;
     }
 
     /** Comparison operator. */
-    bool operator==(const char *other) const { return fName.operator==(other); }
+    bool operator==(const char* other) const {
+        return fName.operator == (other);
+    }
 
     /** Comparison operator. */
-    bool operator==(const plFileName &other) const { return fName.operator==(other.fName); }
+    bool operator==(const plFileName& other) const {
+        return fName.operator == (other.fName);
+    }
 
     /** Inverse of operator==(const char *other) const. */
-    bool operator!=(const char *other) const { return fName.operator!=(other); }
+    bool operator!=(const char* other) const {
+        return fName.operator != (other);
+    }
 
     /** Inverse of operator==(const plFileName &other) const. */
-    bool operator!=(const plFileName &other) const { return fName.operator!=(other.fName); }
+    bool operator!=(const plFileName& other) const {
+        return fName.operator != (other.fName);
+    }
 
     /** Operator overload for use in containers which depend on \c std::less. */
-    bool operator<(const plFileName &other) const { return fName.Compare(other.fName) < 0; }
+    bool operator<(const plFileName& other) const {
+        return fName.Compare(other.fName) < 0;
+    }
 
     /** Functor which compares two filenames case-insensitively for sorting. */
-    struct less_i
-    {
-        bool operator()(const plFileName &_L, const plFileName &_R) const
-        { return _L.fName.Compare(_R.fName, plString::kCaseInsensitive) < 0; }
+    struct less_i {
+        bool operator()(const plFileName& _L, const plFileName& _R) const {
+            return _L.fName.Compare(_R.fName, plString::kCaseInsensitive) < 0;
+        }
     };
 
     /** Return whether this filename is valid (not empty). */
-    bool IsValid() const { return !fName.IsEmpty(); }
+    bool IsValid() const {
+        return !fName.IsEmpty();
+    }
 
     /** Return the length of the filename string (UTF-8). */
-    size_t GetSize() const { return fName.GetSize(); }
+    size_t GetSize() const {
+        return fName.GetSize();
+    }
 
     /** Convert the filename to a string.  This does not resolve relative
      *  paths or normalize slashes, it just returns the stored name string.
      */
-    const plString &AsString() const { return fName; }
+    const plString& AsString() const {
+        return fName;
+    }
 
     /** Return the name portion of the path (including extension).
      *  For example:
@@ -172,33 +184,39 @@ public:
      *  For example:
      *  <pre>plFileName::Join("C:\\Path", "Filename.ext") => "C:\\Path\\Filename.ext"</pre>
      */
-    static plFileName Join(const plFileName &base, const plFileName &path);
+    static plFileName Join(const plFileName& base, const plFileName& path);
 
     /** Join three path components together with the correct path separator.
      *  \todo Make this more efficient.
      */
-    static plFileName Join(const plFileName &base, const plFileName &path,
-                           const plFileName& path2)
-    { return Join(Join(base, path), path2); }
+    static plFileName Join(const plFileName& base, const plFileName& path,
+                           const plFileName& path2) {
+        return Join(Join(base, path), path2);
+    }
 
     /** Join four path components together with the correct path separator.
      *  \todo Make this more efficient.
      */
-    static plFileName Join(const plFileName &base, const plFileName &path,
-                           const plFileName& path2, const plFileName &path3)
-    { return Join(Join(Join(base, path), path2), path3); }
+    static plFileName Join(const plFileName& base, const plFileName& path,
+                           const plFileName& path2, const plFileName& path3) {
+        return Join(Join(Join(base, path), path2), path3);
+    }
 
     /** Append UTF-8 data from a C-style string pointer to the end of this
      *  filename object.  Not to be confused with Join() -- do not use this
      *  for joining path components, or you will be shot by Zrax.
      */
-    plFileName &operator+=(const char *cstr) { return operator=(fName + cstr); }
+    plFileName& operator+=(const char* cstr) {
+        return operator=(fName + cstr);
+    }
 
     /** Append the string \a str to the end of this filename object.
      *  Not to be confused with Join() -- do not use this for joining path
      *  components, or you will be shot by Zrax.
      */
-    plFileName &operator+=(const plString &str) { return operator=(fName + str); }
+    plFileName& operator+=(const plString& str) {
+        return operator=(fName + str);
+    }
 
 private:
     plString fName;
@@ -214,22 +232,25 @@ private:
  *  plFileName::Join() -- do not use this for joining path components, or you
  *  will be shot by Zrax.
  */
-inline plFileName operator+(const plFileName &left, const char *right)
-{ return left.AsString() + right; }
+inline plFileName operator+(const plFileName& left, const char* right)
+{
+    return left.AsString() + right;
+}
 
 /** Concatentate a plFileName with a string constant.  Not to be confused with
  *  plFileName::Join() -- do not use this for joining path components, or you
  *  will be shot by Zrax.
  */
-inline plFileName operator+(const char *left, const plFileName &right)
-{ return left + right.AsString(); }
+inline plFileName operator+(const char* left, const plFileName& right)
+{
+    return left + right.AsString();
+}
 
 
 /** Structure to get information about a file by name.
  *  \sa plFileName
  */
-class plFileInfo
-{
+class plFileInfo {
 public:
     /** Construct an invalid plFileInfo which points to no file. */
     plFileInfo()
@@ -238,31 +259,47 @@ public:
     /** Construct a plFileInfo and fill it with info about the specified
      *  file, if it exists.
      */
-    explicit plFileInfo(const plFileName &filename);
+    explicit plFileInfo(const plFileName& filename);
 
     /** Retrieve the filename associated with this info structure. */
-    const plFileName &FileName() const { return fName; }
+    const plFileName& FileName() const {
+        return fName;
+    }
 
     /** Return whether the plFileInfo has been initialized. */
-    bool IsValid() const { return fName.IsValid(); }
+    bool IsValid() const {
+        return fName.IsValid();
+    }
 
     /** Determine whether the file exists on the filesystem. */
-    bool Exists() const { return (fFlags & kEntryExists); }
+    bool Exists() const {
+        return (fFlags & kEntryExists);
+    }
 
     /** Returns the size of the file on the disk, in bytes. */
-    int64_t FileSize() const { return fFileSize; }
+    int64_t FileSize() const {
+        return fFileSize;
+    }
 
     /** Returns the creation time of the file. */
-    uint64_t CreateTime() const { return fCreateTime; }
+    uint64_t CreateTime() const {
+        return fCreateTime;
+    }
 
     /** Returns the last modification time of the file. */
-    uint64_t ModifyTime() const { return fModifyTime; }
+    uint64_t ModifyTime() const {
+        return fModifyTime;
+    }
 
     /** Returns \p true if this file is a directory. */
-    bool IsDirectory() const { return (fFlags & kIsDirectory); }
+    bool IsDirectory() const {
+        return (fFlags & kIsDirectory);
+    }
 
     /** Returns \p true if this file is a regular file. */
-    bool IsFile() const { return (fFlags & kIsNormalFile); }
+    bool IsFile() const {
+        return (fFlags & kIsNormalFile);
+    }
 
 private:
     plFileName fName;
@@ -270,74 +307,73 @@ private:
     uint64_t fCreateTime, fModifyTime;
 
     enum {
-        kEntryExists    = (1<<0),
-        kIsDirectory    = (1<<1),
-        kIsNormalFile   = (1<<2),
+        kEntryExists    = (1 << 0),
+        kIsDirectory    = (1 << 1),
+        kIsNormalFile   = (1 << 2),
     };
     uint32_t fFlags;
 };
 
 
-namespace plFileSystem
-{
-    /** Get the current working directory of the application. */
-    plFileName GetCWD();
+namespace plFileSystem {
+/** Get the current working directory of the application. */
+plFileName GetCWD();
 
-    /** Change the current working directory. */
-    bool SetCWD(const plFileName &cwd);
+/** Change the current working directory. */
+bool SetCWD(const plFileName& cwd);
 
-    /** Open a file using the correct platform fopen API. */
-    FILE *Open(const plFileName &filename, const char *mode);
+/** Open a file using the correct platform fopen API. */
+FILE* Open(const plFileName& filename, const char* mode);
 
-    /** Delete a file from the filesystem. */
-    bool Unlink(const plFileName &filename);
+/** Delete a file from the filesystem. */
+bool Unlink(const plFileName& filename);
 
-    /** Move or rename a file. */
-    bool Move(const plFileName &from, const plFileName &to);
+/** Move or rename a file. */
+bool Move(const plFileName& from, const plFileName& to);
 
-    /** Copy a file to a new location. */
-    bool Copy(const plFileName &from, const plFileName &to);
+/** Copy a file to a new location. */
+bool Copy(const plFileName& from, const plFileName& to);
 
-    /** Create a directory.  If \a checkParents is \p true, this will also
-     *  check the whole path and create any parent directories as needed.
-     */
-    bool CreateDir(const plFileName &dir, bool checkParents = false);
+/** Create a directory.  If \a checkParents is \p true, this will also
+ *  check the whole path and create any parent directories as needed.
+ */
+bool CreateDir(const plFileName& dir, bool checkParents = false);
 
-    /** Fetch a list of files contained in the supplied \a path.
-     *  If \a pattern is specified (e.g. "*.tmp"), use that to filter
-     *  matches.  Otherwise, all files in the path will be returned.
-     *  Note that returned filenames include the provided path -- to
-     *  get only the filename, call .GetFileName() on an entry.
-     */
-    std::vector<plFileName> ListDir(const plFileName &path,
-                                    const char *pattern = nullptr);
+/** Fetch a list of files contained in the supplied \a path.
+ *  If \a pattern is specified (e.g. "*.tmp"), use that to filter
+ *  matches.  Otherwise, all files in the path will be returned.
+ *  Note that returned filenames include the provided path -- to
+ *  get only the filename, call .GetFileName() on an entry.
+ */
+std::vector<plFileName> ListDir(const plFileName& path,
+                                const char* pattern = nullptr);
 
-    /** Fetch a list of subdirectories in the specified \a path.
-     *  The returned list does not include the "." or ".." entries.
-     */
-    std::vector<plFileName> ListSubdirs(const plFileName &path);
+/** Fetch a list of subdirectories in the specified \a path.
+ *  The returned list does not include the "." or ".." entries.
+ */
+std::vector<plFileName> ListSubdirs(const plFileName& path);
 
-    /** Get the User's data directory.  If it doesn't exist, this will
-     *  create it.
-     */
-    plFileName GetUserDataPath();
+/** Get the User's data directory.  If it doesn't exist, this will
+ *  create it.
+ */
+plFileName GetUserDataPath();
 
-    /** Get the Init script direcotory.  If it doesn't exist, this will
-     *  create it. */
-    plFileName GetInitPath();
+/** Get the Init script direcotory.  If it doesn't exist, this will
+ *  create it. */
+plFileName GetInitPath();
 
-    /** Get the Log output directory.  If it doesn't exist, this will
-     *  create it. */
-    plFileName GetLogPath();
+/** Get the Log output directory.  If it doesn't exist, this will
+ *  create it. */
+plFileName GetLogPath();
 
-    /** Get the full path and filename of the current process. */
-    plFileName GetCurrentAppPath();
+/** Get the full path and filename of the current process. */
+plFileName GetCurrentAppPath();
 
-    /** Create a temporary filename.  If path is specified, the returned
-     *  filename will be relative to the supplied path -- otherwise, the
-     *  system temp path is used.
-     */
-    plFileName GetTempFilename(const char *prefix = "tmp", const plFileName &path = "");
+/** Create a temporary filename.  If path is specified, the returned
+ *  filename will be relative to the supplied path -- otherwise, the
+ *  system temp path is used.
+ */
+plFileName GetTempFilename(const char* prefix = "tmp", const plFileName& path = "");
 }
 
 #endif // plFileSystem_Defined

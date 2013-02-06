@@ -49,23 +49,37 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #pragma hdrstop
 
 /////////
-class ComponentMgrClassDesc : public ClassDesc
-{
+class ComponentMgrClassDesc : public ClassDesc {
 public:
-    int             IsPublic()              { return FALSE; }
-    void*           Create(BOOL loading)    { return &plComponentMgr::Inst(); }
-    const TCHAR*    ClassName()             { return _T("Component Mgr"); }
-    SClass_ID       SuperClassID()          { return UTILITY_CLASS_ID; }
-    Class_ID        ClassID()               { return COMPONENT_MGR_CID; }
-    const TCHAR*    Category()              { return _T(""); }
+    int             IsPublic()              {
+        return FALSE;
+    }
+    void*           Create(BOOL loading)    {
+        return &plComponentMgr::Inst();
+    }
+    const TCHAR*    ClassName()             {
+        return _T("Component Mgr");
+    }
+    SClass_ID       SuperClassID()          {
+        return UTILITY_CLASS_ID;
+    }
+    Class_ID        ClassID()               {
+        return COMPONENT_MGR_CID;
+    }
+    const TCHAR*    Category()              {
+        return _T("");
+    }
 };
 
 static ComponentMgrClassDesc theComponentMgrCD;
-ClassDesc* GetComponentMgrDesc() { return &theComponentMgrCD; }
+ClassDesc* GetComponentMgrDesc()
+{
+    return &theComponentMgrCD;
+}
 
 /////////////
 
-plComponentMgr &plComponentMgr::Inst()
+plComponentMgr& plComponentMgr::Inst()
 {
     static plComponentMgr theInstance;
     return theInstance;
@@ -76,12 +90,11 @@ uint32_t plComponentMgr::Count()
     return fDescs.size();
 }
 
-ClassDesc *plComponentMgr::Get(uint32_t i)
+ClassDesc* plComponentMgr::Get(uint32_t i)
 {
-    if (i < fDescs.size())
+    if (i < fDescs.size()) {
         return fDescs[i];
-    else
-    {
+    } else {
         hsAssert(0, "Component index out of range");
         return nil;
     }
@@ -89,25 +102,24 @@ ClassDesc *plComponentMgr::Get(uint32_t i)
 
 uint32_t plComponentMgr::FindClassID(Class_ID id)
 {
-    for (unsigned int i = 0; i < fDescs.size(); i++)
-    {
-        if (fDescs[i]->ClassID() == id)
+    for (unsigned int i = 0; i < fDescs.size(); i++) {
+        if (fDescs[i]->ClassID() == id) {
             return i;
+        }
     }
 
     return -1;
 }
 
-int IDescCompare(ClassDesc *desc1, ClassDesc *desc2);
+int IDescCompare(ClassDesc* desc1, ClassDesc* desc2);
 
-void plComponentMgr::Register(ClassDesc *desc)
+void plComponentMgr::Register(ClassDesc* desc)
 {
     // Organize desc's by category and name
     std::vector<ClassDesc*>::iterator it;
-    for (it = fDescs.begin(); it != fDescs.end(); it++) 
-    {
-        if (IDescCompare(desc, (*it)) < 0)
-        {
+
+    for (it = fDescs.begin(); it != fDescs.end(); it++) {
+        if (IDescCompare(desc, (*it)) < 0) {
             fDescs.insert(it, desc);
             return;
         }
@@ -117,17 +129,16 @@ void plComponentMgr::Register(ClassDesc *desc)
     fDescs.push_back(desc);
 }
 
-int IDescCompare(ClassDesc *desc1, ClassDesc *desc2)
+int IDescCompare(ClassDesc* desc1, ClassDesc* desc2)
 {
-    const char *cat1 = desc1->Category() ? desc1->Category() : "";
-    const char *cat2 = desc2->Category() ? desc2->Category() : "";
+    const char* cat1 = desc1->Category() ? desc1->Category() : "";
+    const char* cat2 = desc2->Category() ? desc2->Category() : "";
     int cmp = strcmp(cat1, cat2);
-    
+
     // Only compare name if categories are the same
-    if (cmp == 0)
-    {
-        const char *name1 = desc1->ClassName() ? desc1->ClassName() : "";
-        const char *name2 = desc2->ClassName() ? desc2->ClassName() : "";
+    if (cmp == 0) {
+        const char* name1 = desc1->ClassName() ? desc1->ClassName() : "";
+        const char* name2 = desc2->ClassName() ? desc2->ClassName() : "";
 
         return strcmp(name1, name2);
     }

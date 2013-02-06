@@ -42,4 +42,4 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class INode;
 class Interface;
 
-void RemoveBiped(INode *bipRoot, Interface *theInterface);
+void RemoveBiped(INode* bipRoot, Interface* theInterface);

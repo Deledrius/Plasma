@@ -44,13 +44,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnModifier/plSingleModifier.h"
 
-class plCloneSpawnModifier : public plSingleModifier
-{
+class plCloneSpawnModifier : public plSingleModifier {
 protected:
     char* fTemplateName;
     bool fExportTime;
 
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return true; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return true;
+    }
 
 public:
     plCloneSpawnModifier();
@@ -59,16 +60,18 @@ public:
     CLASSNAME_REGISTER(plCloneSpawnModifier);
     GETINTERFACE_ANY(plCloneSpawnModifier, plSingleModifier);
 
-    virtual void Read(hsStream *s, hsResMgr *mgr);
-    virtual void Write(hsStream *s, hsResMgr *mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
     virtual void SetTarget(plSceneObject* so);
 
-    void SetTemplateName(const char *templateName);
+    void SetTemplateName(const char* templateName);
 
     // Set this to true at export time so the clone mod won't try to make a
     // clone when it's attached
-    void SetExportTime() { fExportTime = true; }
+    void SetExportTime() {
+        fExportTime = true;
+    }
 
     // Console backdoor
     static plKey SpawnClone(const plString& cloneName, const plString& cloneAge, const hsMatrix44& pos, plKey requestor);

@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plAVIFileInfo;
 
-class plLayerAVI : public plLayerMovie
-{
+class plLayerAVI : public plLayerMovie {
 protected:
 
     plAVIFileInfo*              fAVIInfo;
@@ -64,8 +63,8 @@ public:
     plLayerAVI();
     virtual ~plLayerAVI();
 
-    CLASSNAME_REGISTER( plLayerAVI );
-    GETINTERFACE_ANY( plLayerAVI, plLayerMovie );
+    CLASSNAME_REGISTER(plLayerAVI);
+    GETINTERFACE_ANY(plLayerAVI, plLayerMovie);
 
 };
 

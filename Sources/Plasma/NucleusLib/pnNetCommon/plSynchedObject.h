@@ -53,33 +53,29 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /////////////////////////////////////
 class hsStream;
 class plDirtyNotifier;
-class plSynchedObject : public hsKeyedObject
-{
+class plSynchedObject : public hsKeyedObject {
 public:
-    enum LocallyOwnedAnswer
-    {
-        kNo=false,
-        kYes=true
+    enum LocallyOwnedAnswer {
+        kNo = false,
+        kYes = true
     };
 
-    enum Flags  
-    {
+    enum Flags {
         kDontDirty              = 0x1,
         kSendReliably           = 0x2,      // object wants reliable send
         kHasConstantNetGroup    = 0x4,      // has a constant net group.
         kDontSynchGameMessages  = 0x8,      // don't send/recv game actions
         kExcludePersistentState = 0x10,     // don't send SDL state msgs to server, check exclude list
-        kExcludeAllPersistentState=0x20,    // don't send ANY type of SDL state
+        kExcludeAllPersistentState = 0x20,  // don't send ANY type of SDL state
         kLocalOnly              = (kExcludeAllPersistentState | kDontSynchGameMessages),    // localOnly in all respects
         kHasVolatileState       = 0x40,     // server won't save this state on shutdown
         kAllStateIsVolatile      = 0x80
     };
 
-    enum SDLSendFlags   
-    {
+    enum SDLSendFlags {
         kBCastToClients         = 0x1,
         kForceFullSend          = 0x2,
-        kSkipLocalOwnershipCheck= 0x4,
+        kSkipLocalOwnershipCheck = 0x4,
         kSendImmediately        = 0x8,
         kDontPersistOnServer    = 0x10,     // for an SDL bcast msg which is used for synching only, not persisting
         kUseRelevanceRegions    = 0x20,
@@ -87,15 +83,18 @@ public:
         kIsAvatarState          = 0x80,
     };
 
-    struct StateDefn
-    {
+    struct StateDefn {
         plKey   fObjKey;
         uint32_t  fSendFlags;
         std::string fSDLName;
 
-        plSynchedObject* GetObject() const { return plSynchedObject::ConvertNoRef(fObjKey->ObjectIsLoaded()); }
-        StateDefn() : fObjKey(nil),fSendFlags(0) {}
-        StateDefn(plKey k, uint32_t f, const char* sdlName) : fObjKey(k),fSendFlags(f) { fSDLName=sdlName; }
+        plSynchedObject* GetObject() const {
+            return plSynchedObject::ConvertNoRef(fObjKey->ObjectIsLoaded());
+        }
+        StateDefn() : fObjKey(nil), fSendFlags(0) {}
+        StateDefn(plKey k, uint32_t f, const char* sdlName) : fObjKey(k), fSendFlags(f) {
+            fSDLName = sdlName;
+        }
     };
 
 private:
@@ -115,42 +114,64 @@ private:
     bool IOKToDirty(const char* SDLStateName) const;
     SDLStateList::const_iterator IFindInSDLStateList(const SDLStateList& list, const char* sdlName) const;
 protected:
-    bool IOKToNetwork(const char* sdlName, uint32_t* synchFlags) const;   
+    bool IOKToNetwork(const char* sdlName, uint32_t* synchFlags) const;
 public:
     plSynchedObject();
     virtual ~plSynchedObject();
 
-    CLASSNAME_REGISTER( plSynchedObject );
-    GETINTERFACE_ANY( plSynchedObject, hsKeyedObject);
+    CLASSNAME_REGISTER(plSynchedObject);
+    GETINTERFACE_ANY(plSynchedObject, hsKeyedObject);
 
     virtual bool MsgReceive(plMessage* msg);
-    
+
     // getters
-    int GetSynchFlags() const { return fSynchFlags; }
-    plNetGroupId GetNetGroup() const { return fNetGroup; };
+    int GetSynchFlags() const {
+        return fSynchFlags;
+    }
+    plNetGroupId GetNetGroup() const {
+        return fNetGroup;
+    };
     plNetGroupId GetEffectiveNetGroup() const;
-    
+
     // setters
-    void SetSynchFlagsBit(uint32_t f) { fSynchFlags |= f; }
+    void SetSynchFlagsBit(uint32_t f) {
+        fSynchFlags |= f;
+    }
     virtual void SetNetGroupConstant(plNetGroupId netGroup);
-    virtual void SetNetGroup(plNetGroupId netGroup) { fNetGroup = netGroup; }   
+    virtual void SetNetGroup(plNetGroupId netGroup) {
+        fNetGroup = netGroup;
+    }
     plNetGroupId SelectNetGroup(plKey groupKey);
 
-    virtual bool DirtySynchState(const char* sdlName, uint32_t sendFlags);      
+    virtual bool DirtySynchState(const char* sdlName, uint32_t sendFlags);
     void SendSDLStateMsg(const char* SDLStateName, uint32_t synchFlags);  // don't use, only for net code
 
-    void ClearSynchFlagsBit(uint32_t f) { fSynchFlags &= ~f; }
+    void ClearSynchFlagsBit(uint32_t f) {
+        fSynchFlags &= ~f;
+    }
 
-    // static 
-    static bool GetSynchDisabled() { return fSynchStateStack.size() ? fSynchStateStack.back() : true; }
-    static void PushSynchDisabled(bool b) { fSynchStateStack.push_back(b); }
+    // static
+    static bool GetSynchDisabled() {
+        return fSynchStateStack.size() ? fSynchStateStack.back() : true;
+    }
+    static void PushSynchDisabled(bool b) {
+        fSynchStateStack.push_back(b);
+    }
     static bool PopSynchDisabled();
-    static plSynchedObject* GetStaticSynchedObject() { return fStaticSynchedObj; }
-    static int32_t GetNumDirtyStates() { return fDirtyStates.size(); }
-    static plSynchedObject::StateDefn* GetDirtyState(int32_t i) { return &fDirtyStates[i]; }
-    static void ClearDirtyState(std::vector<StateDefn>& carryOver) { fDirtyStates=carryOver; } 
+    static plSynchedObject* GetStaticSynchedObject() {
+        return fStaticSynchedObj;
+    }
+    static int32_t GetNumDirtyStates() {
+        return fDirtyStates.size();
+    }
+    static plSynchedObject::StateDefn* GetDirtyState(int32_t i) {
+        return &fDirtyStates[i];
+    }
+    static void ClearDirtyState(std::vector<StateDefn>& carryOver) {
+        fDirtyStates = carryOver;
+    }
 
-    // IO 
+    // IO
 //  void SendCreationMsg(double secs);
 //  void SendDestructionMsg(double secs) ;
 
@@ -158,14 +179,30 @@ public:
     virtual void    Write(hsStream* s, hsResMgr* mgr);
 
     int IsLocallyOwned() const;     // returns yes/no/maybe
-    
+
     // disable net synching only
-    bool IsNetSynched() const { return (fSynchFlags & kDontSynchGameMessages)==0; }
-    void SetNetSynched(bool b) { if (!b) fSynchFlags |= kDontSynchGameMessages; else fSynchFlags &= ~kDontSynchGameMessages;    }
+    bool IsNetSynched() const {
+        return (fSynchFlags & kDontSynchGameMessages) == 0;
+    }
+    void SetNetSynched(bool b) {
+        if (!b) {
+            fSynchFlags |= kDontSynchGameMessages;
+        } else {
+            fSynchFlags &= ~kDontSynchGameMessages;
+        }
+    }
 
     // disable net synching AND persisting
-    bool IsLocalOnly() const { return (fSynchFlags & kLocalOnly)==0;    }
-    void SetLocalOnly(bool b) { if (b) fSynchFlags |= kLocalOnly; else fSynchFlags &= ~kLocalOnly;  }
+    bool IsLocalOnly() const {
+        return (fSynchFlags & kLocalOnly) == 0;
+    }
+    void SetLocalOnly(bool b) {
+        if (b) {
+            fSynchFlags |= kLocalOnly;
+        } else {
+            fSynchFlags &= ~kLocalOnly;
+        }
+    }
 
     // disable particular types of persistence
     void AddToSDLExcludeList(const char*);
@@ -193,7 +230,7 @@ private:
     NumSynchedValuesType fNumSynchedValues;
 
     // array of friends
-    plSynchedValueBase** fSynchedValueFriends;  
+    plSynchedValueBase** fSynchedValueFriends;
     NumSynchedValuesType fNumSynchedValueFriends;
 
     // dirty callback notifiers
@@ -201,18 +238,22 @@ private:
 
     void IAppendSynchedValueAddrOffset(AddrOffsetType synchedValueAddrOffset);
     void IAppendSynchedValueFriend(plSynchedValueBase* v);
-    plSynchedValueBase* IGetSynchedValue(NumSynchedValuesType i) const
-        { return (plSynchedValueBase*)((int32_t)this + (fSynchedValueAddrOffsets[i]<<2)); }
-    plSynchedValueBase* IGetSynchedValueFriend(NumSynchedValuesType i) const
-        { return fSynchedValueFriends[i]; }
+    plSynchedValueBase* IGetSynchedValue(NumSynchedValuesType i) const {
+        return (plSynchedValueBase*)((int32_t)this + (fSynchedValueAddrOffsets[i] << 2));
+    }
+    plSynchedValueBase* IGetSynchedValueFriend(NumSynchedValuesType i) const {
+        return fSynchedValueFriends[i];
+    }
 
 public:
-    int32_t GetNumSynchedValues() const { return fNumSynchedValues+fNumSynchedValueFriends; }
+    int32_t GetNumSynchedValues() const {
+        return fNumSynchedValues + fNumSynchedValueFriends;
+    }
     plSynchedValueBase* GetSynchedValue(int i) const;
 
-    uint8_t RegisterSynchedValue(plSynchedValueBase* v); 
+    uint8_t RegisterSynchedValue(plSynchedValueBase* v);
     bool RemoveSynchedValue(plSynchedValueBase* v);       // handles SVFriends too
-    void RegisterSynchedValueFriend(plSynchedValueBase* v); 
+    void RegisterSynchedValueFriend(plSynchedValueBase* v);
 #endif
 
 #ifdef USE_DIRTY_NOTIFIERS
@@ -226,40 +267,50 @@ public:
 //
 // helper class to set dirty tracking on/off within scope
 //
-class plSynchEnabler
-{
+class plSynchEnabler {
 public:
-    plSynchEnabler(bool enable) { plSynchedObject::PushSynchDisabled(!enable); }
-    ~plSynchEnabler() { plSynchedObject::PopSynchDisabled(); }
+    plSynchEnabler(bool enable) {
+        plSynchedObject::PushSynchDisabled(!enable);
+    }
+    ~plSynchEnabler() {
+        plSynchedObject::PopSynchDisabled();
+    }
 };
 
 #ifdef USE_DIRTY_NOTIFIERS
 ///////////////////////////////////
-// plDirtyNotifier - When a synchedObj 
+// plDirtyNotifier - When a synchedObj
 // gets dirty, this callback will be called.
 ///////////////////////////////////
-class plDirtyNotifier
-{
+class plDirtyNotifier {
 protected:
     plKey fSynchedObjKey;
     void* fUserData;
-public: 
-    plDirtyNotifier() : fSynchedObjKey(nil),fUserData(nil) {}
-    virtual ~plDirtyNotifier()
-    {
-        if (fSynchedObjKey)
-        {
+public:
+    plDirtyNotifier() : fSynchedObjKey(nil), fUserData(nil) {}
+    virtual ~plDirtyNotifier() {
+        if (fSynchedObjKey) {
             plSynchedObject* so = plSynchedObject::ConvertNoRef(fSynchedObjKey->ObjectIsLoaded());
-            if (so)
+
+            if (so) {
                 so->RemoveDirtyNotifier(this);
+            }
         }
     }
-    
-    void SetSynchedObjKey(plKey k) { fSynchedObjKey=k; }    // should be set
-    void SetUserData(void* v) { fUserData=v;}               // optional 
 
-    plKey   GetSynchedObjKey() { return fSynchedObjKey; }
-    void*   GetUserData() { return fUserData;}
+    void SetSynchedObjKey(plKey k) {
+        fSynchedObjKey = k;    // should be set
+    }
+    void SetUserData(void* v) {
+        fUserData = v;   // optional
+    }
+
+    plKey   GetSynchedObjKey() {
+        return fSynchedObjKey;
+    }
+    void*   GetUserData() {
+        return fUserData;
+    }
 
     // override
     virtual void Callback() = 0;
@@ -271,10 +322,10 @@ public:
 //
 
 #ifdef USE_SYNCHED_VALUES
-#define SYNCHED_VALUE(type)             plSynchedValue<type>    
-#define SYNCHED_TARRAY(type)            plSynchedTArray<type>   
-#define SYNCHED_VALUE_FRIEND(type)      plSynchedValueFriend<type>  
-#define SYNCHED_TARRAY_FRIEND(type)     plSynchedTArrayFriend<type> 
+#define SYNCHED_VALUE(type)             plSynchedValue<type>
+#define SYNCHED_TARRAY(type)            plSynchedTArray<type>
+#define SYNCHED_VALUE_FRIEND(type)      plSynchedValueFriend<type>
+#define SYNCHED_TARRAY_FRIEND(type)     plSynchedTArrayFriend<type>
 #else
 #define SYNCHED_VALUE(type)             type
 #define SYNCHED_TARRAY(type)            hsTArray<type>

@@ -68,8 +68,7 @@ class plRenderTarget;
 
 class plLightProxy;
 
-class plLightInfo : public plObjInterface
-{
+class plLightInfo : public plObjInterface {
 public:
     enum {
         kDisable            = 0x0,  // prop 0 is always disable, declared in plObjInterface
@@ -87,8 +86,7 @@ public:
 
         kNumProps
     };
-    enum LIRefType
-    {
+    enum LIRefType {
         kProjection = 0,
         k_OBSOLECTE_REF_0, // OLD
         k_OBSOLECTE_REF_1, // OLD
@@ -146,8 +144,10 @@ protected:
     virtual void                IMakeIsect() = 0;
     virtual plVolumeIsect*      IGetIsect() = 0;
     virtual void                IRefresh();
-    
-    virtual const hsMatrix44&   IGetWorldToProj() const { return fWorldToProj; }
+
+    virtual const hsMatrix44&   IGetWorldToProj() const {
+        return fWorldToProj;
+    }
 
     void                        IAddVisRegion(plVisRegion* reg);
     void                        IRemoveVisRegion(plVisRegion* reg);
@@ -159,48 +159,105 @@ public:
     plLightInfo();
     virtual ~plLightInfo();
 
-    CLASSNAME_REGISTER( plLightInfo );
-    GETINTERFACE_ANY( plLightInfo, plObjInterface );
+    CLASSNAME_REGISTER(plLightInfo);
+    GETINTERFACE_ANY(plLightInfo, plObjInterface);
 
     void SetDeviceRef(hsGDeviceRef* ref);
-    hsGDeviceRef* GetDeviceRef() const { return fDeviceRef; }
+    hsGDeviceRef* GetDeviceRef() const {
+        return fDeviceRef;
+    }
 
     // Dirty state is local to this machine, so shouldn't be in the network synchronized properties.
-    bool    IsDirty() const { return 0 != (fVolFlags & kVolDirty); }
-    void    SetDirty(bool on=true) { if(on)fVolFlags |= kVolDirty; else fVolFlags &= ~kVolDirty; }    
+    bool    IsDirty() const {
+        return 0 != (fVolFlags & kVolDirty);
+    }
+    void    SetDirty(bool on = true) {
+        if (on) {
+            fVolFlags |= kVolDirty;
+        } else {
+            fVolFlags &= ~kVolDirty;
+        }
+    }
 
-    bool    IsEmpty() const { return 0 != (fVolFlags & kVolEmpty); }
-    void    SetEmpty(bool on=true) { if(on)fVolFlags |= kVolEmpty; else fVolFlags &= ~kVolEmpty; }
+    bool    IsEmpty() const {
+        return 0 != (fVolFlags & kVolEmpty);
+    }
+    void    SetEmpty(bool on = true) {
+        if (on) {
+            fVolFlags |= kVolEmpty;
+        } else {
+            fVolFlags &= ~kVolEmpty;
+        }
+    }
 
-    bool    IsZero() const { return 0 != (fVolFlags & kVolZero); }
-    void    SetZero(bool on) { if(on)fVolFlags |= kVolZero; else fVolFlags &= ~kVolZero; }
+    bool    IsZero() const {
+        return 0 != (fVolFlags & kVolZero);
+    }
+    void    SetZero(bool on) {
+        if (on) {
+            fVolFlags |= kVolZero;
+        } else {
+            fVolFlags &= ~kVolZero;
+        }
+    }
 
     inline bool     IsIdle() const;
 
-    bool    OverAll() const { return GetProperty(kLPOverAll); }
+    bool    OverAll() const {
+        return GetProperty(kLPOverAll);
+    }
 
-    bool IsShadowCaster() const { return GetProperty(kLPCastShadows); }
-    void SetShadowCaster(bool on) { SetProperty(kLPCastShadows, on); }
+    bool IsShadowCaster() const {
+        return GetProperty(kLPCastShadows);
+    }
+    void SetShadowCaster(bool on) {
+        SetProperty(kLPCastShadows, on);
+    }
 
-    void Refresh() { if( IsDirty() ) { IRefresh(); SetDirty(false); } }
+    void Refresh() {
+        if (IsDirty()) {
+            IRefresh();
+            SetDirty(false);
+        }
+    }
     virtual void GetStrengthAndScale(const hsBounds3Ext& bnd, float& strength, float& scale) const;
 
-    bool AffectsBound(const hsBounds3Ext& bnd) { return IGetIsect() ? IGetIsect()->Test(bnd) != kVolumeCulled : true; }
+    bool AffectsBound(const hsBounds3Ext& bnd) {
+        return IGetIsect() ? IGetIsect()->Test(bnd) != kVolumeCulled : true;
+    }
     void GetAffectedForced(const plSpaceTree* space, hsBitVector& list, bool charac);
     void GetAffected(const plSpaceTree* space, hsBitVector& list, bool charac);
     const hsTArray<int16_t>& GetAffected(plSpaceTree* space, const hsTArray<int16_t>& visList, hsTArray<int16_t>& litList, bool charac);
-    bool InVisSet(const hsBitVector& visSet) const { return fVisSet.Overlap(visSet); }
-    bool InVisNot(const hsBitVector& visNot) const { return fVisNot.Overlap(visNot); }
+    bool InVisSet(const hsBitVector& visSet) const {
+        return fVisSet.Overlap(visSet);
+    }
+    bool InVisNot(const hsBitVector& visNot) const {
+        return fVisNot.Overlap(visNot);
+    }
 
-    void SetAmbient(const hsColorRGBA& c) { fAmbient = c; SetDirty(); }
-    void SetDiffuse(const hsColorRGBA& c) { fDiffuse = c; SetDirty(); }
+    void SetAmbient(const hsColorRGBA& c) {
+        fAmbient = c;
+        SetDirty();
+    }
+    void SetDiffuse(const hsColorRGBA& c) {
+        fDiffuse = c;
+        SetDirty();
+    }
     void SetSpecular(const hsColorRGBA& c);
 
-    const hsColorRGBA& GetAmbient() const { return fAmbient; }
-    const hsColorRGBA& GetDiffuse() const { return fDiffuse; }
-    const hsColorRGBA& GetSpecular() const { return fSpecular; }
+    const hsColorRGBA& GetAmbient() const {
+        return fAmbient;
+    }
+    const hsColorRGBA& GetDiffuse() const {
+        return fDiffuse;
+    }
+    const hsColorRGBA& GetSpecular() const {
+        return fSpecular;
+    }
 
-    plLayerInterface*   GetProjection() const { return fProjection; }
+    plLayerInterface*   GetProjection() const {
+        return fProjection;
+    }
 
     virtual void SetProperty(int prop, bool on);
 
@@ -210,9 +267,13 @@ public:
     virtual const hsMatrix44& GetLightToWorld() const;
     virtual const hsMatrix44& GetWorldToLight() const;
 
-    virtual int32_t   GetNumProperties() const { return kNumProps; }
+    virtual int32_t   GetNumProperties() const {
+        return kNumProps;
+    }
 
-    const plSoftVolume* GetSoftVolume() const { return fSoftVolume; }
+    const plSoftVolume* GetSoftVolume() const {
+        return fSoftVolume;
+    }
 
     virtual hsVector3 GetNegativeWorldDirection(const hsPoint3& pos) const = 0;
 
@@ -221,15 +282,25 @@ public:
 
     virtual bool        MsgReceive(plMessage* msg);
 
-    virtual void        Unlink( void );
-    virtual void        Link( plLightInfo **back );
-    virtual plLightInfo *GetNext( void ) { return fNextDevPtr; }
-    virtual bool        IsLinked( void ) { return ( fNextDevPtr != nil || fPrevDevPtr != nil ) ? true : false; }
+    virtual void        Unlink(void);
+    virtual void        Link(plLightInfo** back);
+    virtual plLightInfo* GetNext(void) {
+        return fNextDevPtr;
+    }
+    virtual bool        IsLinked(void) {
+        return (fNextDevPtr != nil || fPrevDevPtr != nil) ? true : false;
+    }
 
     // New shadow
-    void                ClearSlaveBits() { fSlaveBits.Clear(); }
-    void                SetSlaveBit(int which) { fSlaveBits.SetBit(which); }
-    const hsBitVector&  GetSlaveBits() const { return fSlaveBits; }
+    void                ClearSlaveBits() {
+        fSlaveBits.Clear();
+    }
+    void                SetSlaveBit(int which) {
+        fSlaveBits.SetBit(which);
+    }
+    const hsBitVector&  GetSlaveBits() const {
+        return fSlaveBits;
+    }
 
     // These two should only be called internally and on export/convert
     virtual plKey GetSceneNode() const;
@@ -238,36 +309,40 @@ public:
     void                SetLocalToLight(const hsMatrix44& l2lt, const hsMatrix44& lt2l);
 
     // Visualization
-    virtual plDrawableSpans*    CreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo) { return addTo; }
+    virtual plDrawableSpans*    CreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo) {
+        return addTo;
+    }
 
 };
 
-class plDirectionalLightInfo : public plLightInfo
-{
+class plDirectionalLightInfo : public plLightInfo {
 protected:
 
     virtual void                IMakeIsect() {}
-    virtual plVolumeIsect*      IGetIsect() { return nil; }
+    virtual plVolumeIsect*      IGetIsect() {
+        return nil;
+    }
 
 public:
     plDirectionalLightInfo();
     virtual ~plDirectionalLightInfo();
 
-    CLASSNAME_REGISTER( plDirectionalLightInfo );
-    GETINTERFACE_ANY( plDirectionalLightInfo, plLightInfo );
+    CLASSNAME_REGISTER(plDirectionalLightInfo);
+    GETINTERFACE_ANY(plDirectionalLightInfo, plLightInfo);
 
     virtual void GetStrengthAndScale(const hsBounds3Ext& bnd, float& strength, float& scale) const;
 
     hsVector3 GetWorldDirection() const;
-    virtual hsVector3 GetNegativeWorldDirection(const hsPoint3& pos) const { return -GetWorldDirection(); }
+    virtual hsVector3 GetNegativeWorldDirection(const hsPoint3& pos) const {
+        return -GetWorldDirection();
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
 };
 
-class plLimitedDirLightInfo : public plDirectionalLightInfo
-{
+class plLimitedDirLightInfo : public plDirectionalLightInfo {
 protected:
 
     float                    fWidth;
@@ -277,7 +352,9 @@ protected:
     plParallelIsect*            fParPlanes;
 
     virtual void                IMakeIsect();
-    virtual plVolumeIsect*      IGetIsect() { return fParPlanes; }
+    virtual plVolumeIsect*      IGetIsect() {
+        return fParPlanes;
+    }
 
     virtual void                IRefresh();
 
@@ -285,18 +362,30 @@ public:
     plLimitedDirLightInfo();
     virtual ~plLimitedDirLightInfo();
 
-    CLASSNAME_REGISTER( plLimitedDirLightInfo );
-    GETINTERFACE_ANY( plLimitedDirLightInfo, plDirectionalLightInfo );
+    CLASSNAME_REGISTER(plLimitedDirLightInfo);
+    GETINTERFACE_ANY(plLimitedDirLightInfo, plDirectionalLightInfo);
 
     virtual void GetStrengthAndScale(const hsBounds3Ext& bnd, float& strength, float& scale) const;
 
-    float GetWidth() const { return fWidth; }
-    float GetHeight() const { return fHeight; }
-    float GetDepth() const { return fDepth; }
+    float GetWidth() const {
+        return fWidth;
+    }
+    float GetHeight() const {
+        return fHeight;
+    }
+    float GetDepth() const {
+        return fDepth;
+    }
 
-    void SetWidth(float w) { fWidth = w; }
-    void SetHeight(float h) { fHeight = h; }
-    void SetDepth(float d) { fDepth = d; }
+    void SetWidth(float w) {
+        fWidth = w;
+    }
+    void SetHeight(float h) {
+        fHeight = h;
+    }
+    void SetDepth(float d) {
+        fDepth = d;
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -305,8 +394,7 @@ public:
     virtual plDrawableSpans*    CreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo);
 };
 
-class plOmniLightInfo : public plLightInfo
-{
+class plOmniLightInfo : public plLightInfo {
 protected:
     // Omni and spot
     float            fAttenConst;
@@ -317,7 +405,9 @@ protected:
     plSphereIsect*              fSphere;
 
     virtual void                IMakeIsect();
-    virtual plVolumeIsect*      IGetIsect() { return fSphere; }
+    virtual plVolumeIsect*      IGetIsect() {
+        return fSphere;
+    }
 
     virtual void                IRefresh();
 
@@ -326,26 +416,50 @@ public:
     plOmniLightInfo();
     virtual ~plOmniLightInfo();
 
-    CLASSNAME_REGISTER( plOmniLightInfo );
-    GETINTERFACE_ANY( plOmniLightInfo, plLightInfo );
+    CLASSNAME_REGISTER(plOmniLightInfo);
+    GETINTERFACE_ANY(plOmniLightInfo, plLightInfo);
 
     virtual void GetStrengthAndScale(const hsBounds3Ext& bnd, float& strength, float& scale) const;
 
     virtual hsVector3 GetNegativeWorldDirection(const hsPoint3& pos) const;
 
-    bool        IsAttenuated() const { return (fAttenLinear != 0)||(fAttenQuadratic != 0) || ( fAttenCutoff != 0 ); }
+    bool        IsAttenuated() const {
+        return (fAttenLinear != 0) || (fAttenQuadratic != 0) || (fAttenCutoff != 0);
+    }
     float    GetRadius() const;
 
-    float    GetConstantAttenuation() const { return fAttenConst; }
-    float    GetLinearAttenuation() const { return fAttenLinear; }
-    float    GetQuadraticAttenuation() const { return fAttenQuadratic; }
-    float    GetCutoffAttenuation() const { return fAttenCutoff; }
-    hsPoint3    GetWorldPosition() const { return fLightToWorld.GetTranslate(); }
+    float    GetConstantAttenuation() const {
+        return fAttenConst;
+    }
+    float    GetLinearAttenuation() const {
+        return fAttenLinear;
+    }
+    float    GetQuadraticAttenuation() const {
+        return fAttenQuadratic;
+    }
+    float    GetCutoffAttenuation() const {
+        return fAttenCutoff;
+    }
+    hsPoint3    GetWorldPosition() const {
+        return fLightToWorld.GetTranslate();
+    }
 
-    void        SetConstantAttenuation(float a) { fAttenConst = a; SetDirty(true); }
-    void        SetLinearAttenuation(float a) { fAttenLinear = a; SetDirty(true); }
-    void        SetQuadraticAttenuation(float a) { fAttenQuadratic = a; SetDirty(true); }
-    void        SetCutoffAttenuation( float a ) { fAttenCutoff = a; SetDirty( true ); }
+    void        SetConstantAttenuation(float a) {
+        fAttenConst = a;
+        SetDirty(true);
+    }
+    void        SetLinearAttenuation(float a) {
+        fAttenLinear = a;
+        SetDirty(true);
+    }
+    void        SetQuadraticAttenuation(float a) {
+        fAttenQuadratic = a;
+        SetDirty(true);
+    }
+    void        SetCutoffAttenuation(float a) {
+        fAttenCutoff = a;
+        SetDirty(true);
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -355,8 +469,7 @@ public:
 
 };
 
-class plSpotLightInfo : public plOmniLightInfo
-{
+class plSpotLightInfo : public plOmniLightInfo {
 protected:
     // Valid only for spot
     float            fFalloff;
@@ -370,7 +483,9 @@ protected:
     plConeIsect*        fCone;
 
     virtual void                IMakeIsect();
-    virtual plVolumeIsect*      IGetIsect() { return fCone; }
+    virtual plVolumeIsect*      IGetIsect() {
+        return fCone;
+    }
 
     virtual void                IRefresh();
 
@@ -378,21 +493,38 @@ public:
     plSpotLightInfo();
     virtual ~plSpotLightInfo();
 
-    CLASSNAME_REGISTER( plSpotLightInfo );
-    GETINTERFACE_ANY( plSpotLightInfo, plOmniLightInfo );
+    CLASSNAME_REGISTER(plSpotLightInfo);
+    GETINTERFACE_ANY(plSpotLightInfo, plOmniLightInfo);
 
     virtual void GetStrengthAndScale(const hsBounds3Ext& bnd, float& strength, float& scale) const;
 
     hsVector3 GetWorldDirection() const;
-    virtual hsVector3 GetNegativeWorldDirection(const hsPoint3& pos) const { return -GetWorldDirection(); }
+    virtual hsVector3 GetNegativeWorldDirection(const hsPoint3& pos) const {
+        return -GetWorldDirection();
+    }
 
-    void SetFalloff(float f) { fFalloff = f; SetDirty(true); }
-    void SetSpotInner(float rads) { fSpotInner = rads; SetDirty(true); }
-    void SetSpotOuter(float rads) { fSpotOuter = rads; SetDirty(true); }
+    void SetFalloff(float f) {
+        fFalloff = f;
+        SetDirty(true);
+    }
+    void SetSpotInner(float rads) {
+        fSpotInner = rads;
+        SetDirty(true);
+    }
+    void SetSpotOuter(float rads) {
+        fSpotOuter = rads;
+        SetDirty(true);
+    }
 
-    float GetFalloff() const { return fFalloff; }
-    float GetSpotInner() const { return fSpotInner; }
-    float GetSpotOuter() const { return fSpotOuter; }
+    float GetFalloff() const {
+        return fFalloff;
+    }
+    float GetSpotInner() const {
+        return fSpotInner;
+    }
+    float GetSpotOuter() const {
+        return fSpotOuter;
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -404,14 +536,17 @@ public:
 
 inline bool plLightInfo::IsIdle() const
 {
-    if( GetProperty(kDisable) )
+    if (GetProperty(kDisable)) {
         return true;
+    }
 
-    if( IsZero() )
+    if (IsZero()) {
         return true;
+    }
 
-    if( IsEmpty() )
+    if (IsEmpty()) {
         return true;
+    }
 
     return false;
 }

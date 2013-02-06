@@ -52,8 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCli.h"
 
-class pyHeekGame : public pyGameCli
-{
+class pyHeekGame : public pyGameCli {
 protected:
     pyHeekGame();
     pyHeekGame(pfGameCli* client);

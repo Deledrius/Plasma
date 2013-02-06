@@ -53,19 +53,18 @@ class hsResMgr;
 // make themselves visible (or reclaim resources used
 // to make themselves visible). This message should only
 // be sent out by the core system.
-class plProxyDrawMsg : public plMessage
-{
+class plProxyDrawMsg : public plMessage {
 protected:
     uint16_t      fProxyFlags;
 
 public:
     plProxyDrawMsg();
     plProxyDrawMsg(uint16_t flags); // for broadcast
-    plProxyDrawMsg(plKey &rcv, uint16_t flags); // send yourself an ack
+    plProxyDrawMsg(plKey& rcv, uint16_t flags); // send yourself an ack
     ~plProxyDrawMsg();
 
-    CLASSNAME_REGISTER( plProxyDrawMsg );
-    GETINTERFACE_ANY( plProxyDrawMsg, plMessage );
+    CLASSNAME_REGISTER(plProxyDrawMsg);
+    GETINTERFACE_ANY(plProxyDrawMsg, plMessage);
 
     enum {
         kCreate         = 0x1,
@@ -80,16 +79,20 @@ public:
         kCoordinate     = 0x100,
         kCamera         = 0x200,
 
-        kAllTypes       = kLight 
-                        | kPhysical 
-                        | kOccluder
-                        | kAudible
-                        | kCoordinate
-                        | kCamera
+        kAllTypes       = kLight
+                          | kPhysical
+                          | kOccluder
+                          | kAudible
+                          | kCoordinate
+                          | kCamera
     };
 
-    uint16_t  GetProxyFlags() const { return fProxyFlags; }
-    void    SetProxyFlags(uint16_t f) { fProxyFlags = f; }
+    uint16_t  GetProxyFlags() const {
+        return fProxyFlags;
+    }
+    void    SetProxyFlags(uint16_t f) {
+        fProxyFlags = f;
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);

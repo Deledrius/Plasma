@@ -45,10 +45,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 // Types
 //
-typedef struct {float x, y, z, w;} gemQuat; /* Quaternion */
+typedef struct {
+    float x, y, z, w;
+} gemQuat; /* Quaternion */
 
 enum QuatPart {X, Y, Z, W};
- 
+
 typedef gemQuat HVect; /* Homogeneous 3D vector */
 
 typedef float HMatrix[4][4]; /* Right-handed, for column vectors */
@@ -66,8 +68,8 @@ typedef struct {
 //
 float polar_decomp(const HMatrix M, HMatrix Q, HMatrix S);
 HVect spect_decomp(const HMatrix S, HMatrix U);
-gemQuat snuggle(gemQuat q, HVect *k);
-void decomp_affine(const HMatrix A, gemAffineParts *parts);
-void invert_affine(gemAffineParts *parts, gemAffineParts *inverse);
+gemQuat snuggle(gemQuat q, HVect* k);
+void decomp_affine(const HMatrix A, gemAffineParts* parts);
+void invert_affine(gemAffineParts* parts, gemAffineParts* inverse);
 
 #endif

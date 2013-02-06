@@ -47,30 +47,36 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plArmatureUpdateMsg;
 
-class plDynaRippleMgr : public plDynaDecalMgr
-{
+class plDynaRippleMgr : public plDynaDecalMgr {
 protected:
     hsVector3                   fInitUVW;
     hsVector3                   fFinalUVW;
 
-    virtual bool        IRippleFromShape(const plPrintShape* shape, bool force=false);
+    virtual bool        IRippleFromShape(const plPrintShape* shape, bool force = false);
 
     virtual int         INewDecal();
 public:
     plDynaRippleMgr();
     virtual ~plDynaRippleMgr();
 
-    CLASSNAME_REGISTER( plDynaRippleMgr );
-    GETINTERFACE_ANY( plDynaRippleMgr, plDynaDecalMgr );
+    CLASSNAME_REGISTER(plDynaRippleMgr);
+    GETINTERFACE_ANY(plDynaRippleMgr, plDynaDecalMgr);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     virtual bool MsgReceive(plMessage* msg);
 
-    void SetUVWAnim(const hsVector3& init, const hsVector3& final) { fInitUVW = init; fFinalUVW = final; }
-    const hsVector3& GetInitUVW() const { return fInitUVW; }
-    const hsVector3& GetFinalUVW() const { return fFinalUVW; }
+    void SetUVWAnim(const hsVector3& init, const hsVector3& final) {
+        fInitUVW = init;
+        fFinalUVW = final;
+    }
+    const hsVector3& GetInitUVW() const {
+        return fInitUVW;
+    }
+    const hsVector3& GetFinalUVW() const {
+        return fFinalUVW;
+    }
 };
 
 

@@ -70,15 +70,13 @@ void DummyCodeIncludeFuncGrassShader()
 {
 }
 
-class GrassCompDlgProc : public ParamMap2UserDlgProc
-{
+class GrassCompDlgProc : public ParamMap2UserDlgProc {
 public:
     GrassCompDlgProc() {}
     ~GrassCompDlgProc() {}
 
 protected:
-    void ISetToWave(int wave, HWND hWnd, IParamBlock2 *pb, IParamMap2 *map)
-    {
+    void ISetToWave(int wave, HWND hWnd, IParamBlock2* pb, IParamMap2* map) {
         HWND cbox = GetDlgItem(hWnd, IDC_GRASS_WAVE);
         SendMessage(cbox, CB_SETCURSEL, wave, 0);
         pb->SetValue(ParamID(plGrassComponent::kWave), 0, wave);
@@ -92,17 +90,16 @@ protected:
     }
 
 public:
-    BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         int id = LOWORD(wParam);
         int code = HIWORD(wParam);
 
-        IParamBlock2 *pb = map->GetParamBlock();
+        IParamBlock2* pb = map->GetParamBlock();
         HWND cbox = NULL;
 
         int selection;
-        switch (msg)
-        {
+
+        switch (msg) {
         case WM_INITDIALOG:
             cbox = GetDlgItem(hWnd, IDC_GRASS_WAVE);
             SendMessage(cbox, CB_ADDSTRING, 0, (LPARAM)"1");
@@ -117,26 +114,28 @@ public:
         case WM_COMMAND:
         case CC_SPINNER_CHANGE:
             int wave = SendMessage(GetDlgItem(hWnd, IDC_GRASS_WAVE), CB_GETCURSEL, 0, 0);
-            if (id == IDC_GRASS_WAVE)
-            {
-                if (wave != pb->GetInt(ParamID(plGrassComponent::kWave)))
+
+            if (id == IDC_GRASS_WAVE) {
+                if (wave != pb->GetInt(ParamID(plGrassComponent::kWave))) {
                     ISetToWave(wave, hWnd, pb, map);
-            }
-            else if (id == IDC_GRASS_DIST_X || id == IDC_GRASS_DIST_X_SPIN)
+                }
+            } else if (id == IDC_GRASS_DIST_X || id == IDC_GRASS_DIST_X_SPIN) {
                 pb->SetValue(plGrassComponent::kDistXTab, 0, pb->GetFloat(ParamID(plGrassComponent::kDistX)), wave);
-            else if (id == IDC_GRASS_DIST_Y || id == IDC_GRASS_DIST_Y_SPIN)
+            } else if (id == IDC_GRASS_DIST_Y || id == IDC_GRASS_DIST_Y_SPIN) {
                 pb->SetValue(plGrassComponent::kDistYTab, 0, pb->GetFloat(ParamID(plGrassComponent::kDistY)), wave);
-            else if (id == IDC_GRASS_DIST_Z || id == IDC_GRASS_DIST_Z_SPIN)
+            } else if (id == IDC_GRASS_DIST_Z || id == IDC_GRASS_DIST_Z_SPIN) {
                 pb->SetValue(plGrassComponent::kDistZTab, 0, pb->GetFloat(ParamID(plGrassComponent::kDistZ)), wave);
-            else if (id == IDC_GRASS_DIR_X || id == IDC_GRASS_DIR_X_SPIN)
+            } else if (id == IDC_GRASS_DIR_X || id == IDC_GRASS_DIR_X_SPIN) {
                 pb->SetValue(plGrassComponent::kDirXTab, 0, pb->GetFloat(ParamID(plGrassComponent::kDirX)), wave);
-            else if (id == IDC_GRASS_DIR_Y || id == IDC_GRASS_DIR_Y_SPIN)
+            } else if (id == IDC_GRASS_DIR_Y || id == IDC_GRASS_DIR_Y_SPIN) {
                 pb->SetValue(plGrassComponent::kDirYTab, 0, pb->GetFloat(ParamID(plGrassComponent::kDirY)), wave);
-            else if (id == IDC_GRASS_SPEED || id == IDC_GRASS_SPEED_SPIN)
+            } else if (id == IDC_GRASS_SPEED || id == IDC_GRASS_SPEED_SPIN) {
                 pb->SetValue(plGrassComponent::kSpeedTab, 0, pb->GetFloat(ParamID(plGrassComponent::kSpeed)), wave);
+            }
 
             return TRUE;
         }
+
         return FALSE;
     }
     void DeleteThis() {}
@@ -155,80 +154,80 @@ ParamBlockDesc2 gGrassBk
 
 
     plGrassComponent::kWave, _T("Wave"), TYPE_INT, 0, 0,
-        p_default, 0,
-        end,
+    p_default, 0,
+    end,
 
     plGrassComponent::kDistX, _T("DistX"), TYPE_FLOAT, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
-        IDC_GRASS_DIST_X, IDC_GRASS_DIST_X_SPIN, 0.1,
-        end,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
+    IDC_GRASS_DIST_X, IDC_GRASS_DIST_X_SPIN, 0.1,
+    end,
 
     plGrassComponent::kDistY, _T("DistY"), TYPE_FLOAT, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
-        IDC_GRASS_DIST_Y, IDC_GRASS_DIST_Y_SPIN, 0.1,
-        end,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
+    IDC_GRASS_DIST_Y, IDC_GRASS_DIST_Y_SPIN, 0.1,
+    end,
 
     plGrassComponent::kDistZ, _T("DistZ"), TYPE_FLOAT, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
-        IDC_GRASS_DIST_Z, IDC_GRASS_DIST_Z_SPIN, 0.1,
-        end,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
+    IDC_GRASS_DIST_Z, IDC_GRASS_DIST_Z_SPIN, 0.1,
+    end,
 
     plGrassComponent::kDirX, _T("DirX"), TYPE_FLOAT, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
-        IDC_GRASS_DIR_X, IDC_GRASS_DIR_X_SPIN, 0.1,
-        end,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
+    IDC_GRASS_DIR_X, IDC_GRASS_DIR_X_SPIN, 0.1,
+    end,
 
     plGrassComponent::kDirY, _T("DirY"), TYPE_FLOAT, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
-        IDC_GRASS_DIR_Y, IDC_GRASS_DIR_Y_SPIN, 0.1,
-        end,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
+    IDC_GRASS_DIR_Y, IDC_GRASS_DIR_Y_SPIN, 0.1,
+    end,
 
     plGrassComponent::kSpeed, _T("Speed"), TYPE_FLOAT, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
-        IDC_GRASS_SPEED, IDC_GRASS_SPEED_SPIN, 0.1,
-        end,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    p_ui, TYPE_SPINNER, EDITTYPE_FLOAT,
+    IDC_GRASS_SPEED, IDC_GRASS_SPEED_SPIN, 0.1,
+    end,
 
-        plGrassComponent::kDistXTab, _T("DistXTab"), TYPE_FLOAT_TAB, plGrassShaderMod::kNumWaves, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        end,
+    plGrassComponent::kDistXTab, _T("DistXTab"), TYPE_FLOAT_TAB, plGrassShaderMod::kNumWaves, 0, 0,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    end,
 
     plGrassComponent::kDistYTab, _T("DistYTab"), TYPE_FLOAT_TAB, plGrassShaderMod::kNumWaves, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        end,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    end,
 
     plGrassComponent::kDistZTab, _T("DistZTab"), TYPE_FLOAT_TAB, plGrassShaderMod::kNumWaves, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        end,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    end,
 
     plGrassComponent::kDirXTab, _T("DirXTab"), TYPE_FLOAT_TAB, plGrassShaderMod::kNumWaves, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        end,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    end,
 
     plGrassComponent::kDirYTab, _T("DirYTab"), TYPE_FLOAT_TAB, plGrassShaderMod::kNumWaves, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        end,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    end,
 
     plGrassComponent::kSpeedTab, _T("SpeedTab"), TYPE_FLOAT_TAB, plGrassShaderMod::kNumWaves, 0, 0,
-        p_default, 0.0,
-        p_range, -10.0, 10.0,
-        end,
+    p_default, 0.0,
+    p_range, -10.0, 10.0,
+    end,
 
     end
 );
@@ -239,7 +238,7 @@ plGrassComponent::plGrassComponent() : fShader(nil)
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plGrassComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plGrassComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fShader = new plGrassShaderMod();
 
@@ -250,8 +249,8 @@ bool plGrassComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
     plKey modKey = hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), fShader, node->GetLocation(), loadMask);
 
     int i;
-    for (i = 0; i < plGrassShaderMod::kNumWaves; i++)
-    {
+
+    for (i = 0; i < plGrassShaderMod::kNumWaves; i++) {
         fShader->fWaves[i].fDistX = fCompPB->GetFloat(ParamID(kDistXTab), 0, i);
         fShader->fWaves[i].fDistY = fCompPB->GetFloat(ParamID(kDistYTab), 0, i);
         fShader->fWaves[i].fDistZ = fCompPB->GetFloat(ParamID(kDistZTab), 0, i);
@@ -266,7 +265,7 @@ bool plGrassComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
     return true;
 }
 
-bool plGrassComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plGrassComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plObjRefMsg* refMsg = new plObjRefMsg(node->GetKey(), plRefMsg::kOnRequest, -1, plObjRefMsg::kModifier);
     hsgResMgr::ResMgr()->AddViaNotify(fShader->GetKey(), refMsg, plRefFlags::kActiveRef);
@@ -280,8 +279,10 @@ bool plGrassComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 
 bool plGrassComponent::DeInit(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if( fShader )
+    if (fShader) {
         fShader->GetKey()->UnRefObject();
+    }
+
     fShader = nil;
 
     return true;
@@ -289,35 +290,41 @@ bool plGrassComponent::DeInit(plMaxNode* node, plErrorMsg* pErrMsg)
 
 plGrassShaderMod* plGrassComponent::GetShader(INode* node)
 {
-    if( !node )
+    if (!node) {
         return nil;
+    }
 
-    plComponentBase *comp = ((plMaxNodeBase*)node)->ConvertToComponent();
-    if( !comp )
+    plComponentBase* comp = ((plMaxNodeBase*)node)->ConvertToComponent();
+
+    if (!comp) {
         return nil;
+    }
 
-    if( comp->ClassID() != GRASS_COMPONENT_CLASS_ID )
+    if (comp->ClassID() != GRASS_COMPONENT_CLASS_ID) {
         return nil;
+    }
 
-    plGrassComponent *shader = (plGrassComponent*)comp;
+    plGrassComponent* shader = (plGrassComponent*)comp;
     return shader->fShader;
 }
 
 plGrassShaderMod* plGrassComponent::GetShaderNode(plMaxNode* node)
 {
-    if( !node )
+    if (!node) {
         return nil;
+    }
 
     int n = node->NumAttachedComponents();
     int i;
-    for( i = 0; i < n; i++ )
-    {
+
+    for (i = 0; i < n; i++) {
         plComponentBase* comp = node->GetAttachedComponent(i);
-        if( comp && (comp->ClassID() == GRASS_COMPONENT_CLASS_ID) )
-        {
+
+        if (comp && (comp->ClassID() == GRASS_COMPONENT_CLASS_ID)) {
             plGrassComponent* shader = (plGrassComponent*)comp;
             return shader->fShader;
         }
     }
+
     return nil;
 }

@@ -63,11 +63,9 @@ class hsStream;
 
 //// plLocation //////////////////////////////////////////////////////////////
 
-class plLocation
-{
+class plLocation {
 public:
-    enum LocFlags
-    {
+    enum LocFlags {
         kLocalOnly  = 0x1,  // Set if nothing in the room saves state.
         kVolatile   = 0x2,  // Set is nothing in the room persists when the server exits.
         kReserved   = 0x4,
@@ -79,8 +77,7 @@ protected:
     uint32_t fSequenceNumber;
     uint16_t fFlags;
 
-    enum 
-    {
+    enum {
         kGlobalFixedLocIdx = 0,     // Fixed keys go here, think of as "global,fixed,keys"
         kSceneViewerLocIdx = 1,
 
@@ -98,10 +95,14 @@ protected:
         kInvalidLocIdx = 0xffffffff
     };
 
-    plLocation(uint32_t seqNum, uint16_t flags=0) : fFlags(flags) { Set(seqNum); }
+    plLocation(uint32_t seqNum, uint16_t flags = 0) : fFlags(flags) {
+        Set(seqNum);
+    }
 
 public:
-    plLocation() { Invalidate(); }
+    plLocation() {
+        Invalidate();
+    }
     plLocation(const plLocation& toCopyFrom);
     ~plLocation() {}
 
@@ -110,24 +111,33 @@ public:
     bool      IsReserved() const;
     bool      IsItinerant() const;
     void      Set(uint32_t seqNum);
-    uint32_t  GetSequenceNumber() const { return fSequenceNumber; }
+    uint32_t  GetSequenceNumber() const {
+        return fSequenceNumber;
+    }
     bool      IsVirtual() const;
 
-    void      SetFlags(uint16_t flags) { fFlags |= flags; }
-    uint16_t  GetFlags() const { return fFlags; }
+    void      SetFlags(uint16_t flags) {
+        fFlags |= flags;
+    }
+    uint16_t  GetFlags() const {
+        return fFlags;
+    }
 
     void    Read(hsStream* s);
     void    Write(hsStream* s) const;
 
-    bool operator==(const plLocation& loc) const
-    {
+    bool operator==(const plLocation& loc) const {
         // Ignore the itinerant flag when comparing, because
         return (fSequenceNumber == loc.fSequenceNumber) &&
                ((fFlags & ~kItinerant) == (loc.fFlags & ~kItinerant));
     }
-    bool operator!=(const plLocation& loc) const { return !(loc == *this); }
+    bool operator!=(const plLocation& loc) const {
+        return !(loc == *this);
+    }
     plLocation& operator=(const plLocation& loc);
-    bool operator<(const plLocation& loc ) const { return fSequenceNumber < loc.fSequenceNumber; }
+    bool operator<(const plLocation& loc) const {
+        return fSequenceNumber < loc.fSequenceNumber;
+    }
 
     // THIS SHOULD BE FOR DEBUGGING ONLY <hint hint>
     plString StringIze() const;  // Format to displayable string.
@@ -146,19 +156,28 @@ public:
 
 //// plUoid //////////////////////////////////////////////////////////////////
 
-class plUoid
-{
+class plUoid {
 public:
-    plUoid() { Invalidate(); }
-    plUoid(const plLocation& location, uint16_t classType, const plString& objectName, const plLoadMask& m=plLoadMask::kAlways);
+    plUoid() {
+        Invalidate();
+    }
+    plUoid(const plLocation& location, uint16_t classType, const plString& objectName, const plLoadMask& m = plLoadMask::kAlways);
     plUoid(plFixedKeyId fixedKey);
     plUoid(const plUoid& src);
     ~plUoid();
 
-    const plLocation&   GetLocation() const { return fLocation; }
-    uint16_t            GetClassType() const { return fClassType; }
-    const plString&     GetObjectName() const { return fObjectName; }
-    const plLoadMask&   GetLoadMask() const { return fLoadMask; }
+    const plLocation&   GetLocation() const {
+        return fLocation;
+    }
+    uint16_t            GetClassType() const {
+        return fClassType;
+    }
+    const plString&     GetObjectName() const {
+        return fObjectName;
+    }
+    const plLoadMask&   GetLoadMask() const {
+        return fLoadMask;
+    }
 
     void Read(hsStream* s);
     void Write(hsStream* s) const;
@@ -168,23 +187,38 @@ public:
 
     plUoid& operator=(const plUoid& u);
     bool  operator==(const plUoid& u) const;
-    bool  operator!=(const plUoid& u) const { return !operator==(u); }
+    bool  operator!=(const plUoid& u) const {
+        return !operator==(u);
+    }
 
-    bool  IsClone() const             { return fCloneID != 0; }
-    uint32_t  GetClonePlayerID() const    { return fClonePlayerID; }
-    uint32_t  GetCloneID() const          { return fCloneID; }
-    void    SetClone(uint32_t playerID, uint32_t cloneID) { hsAssert(cloneID < 0xffff, "Clone id too high"); fCloneID = uint16_t(cloneID); fClonePlayerID = playerID; }
+    bool  IsClone() const             {
+        return fCloneID != 0;
+    }
+    uint32_t  GetClonePlayerID() const    {
+        return fClonePlayerID;
+    }
+    uint32_t  GetCloneID() const          {
+        return fCloneID;
+    }
+    void    SetClone(uint32_t playerID, uint32_t cloneID) {
+        hsAssert(cloneID < 0xffff, "Clone id too high");
+        fCloneID = uint16_t(cloneID);
+        fClonePlayerID = playerID;
+    }
 
-    uint32_t GetObjectID() const { return fObjectID; }
+    uint32_t GetObjectID() const {
+        return fObjectID;
+    }
     // Export time only.  Only plRegistryKeyList should call this.
-    void SetObjectID(uint32_t id) { fObjectID = id; }
+    void SetObjectID(uint32_t id) {
+        fObjectID = id;
+    }
 
     // THIS SHOULD BE FOR DEBUGGING ONLY <hint hint>
     plString StringIze() const;  // Format to displayable string
 
 protected:
-    enum ContentsFlags  // for read/write functions
-    {
+    enum ContentsFlags { // for read/write functions
         kHasCloneIDs    = 0x1,
         kHasLoadMask    = 0x2,
     };

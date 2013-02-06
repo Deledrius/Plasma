@@ -47,11 +47,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pfKI.h"
 
-REGISTER_CREATABLE( pfKI );
+REGISTER_CREATABLE(pfKI);
 
 #include "pfPlayerBookMod.h"
 
-REGISTER_CREATABLE( pfPlayerBookMod );
+REGISTER_CREATABLE(pfPlayerBookMod);
 
 
 #endif // pfKICreatable_inc

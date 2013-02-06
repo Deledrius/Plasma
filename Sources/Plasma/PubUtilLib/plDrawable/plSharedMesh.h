@@ -52,51 +52,48 @@ class hsStream;
 class hsResMgr;
 class plMorphDataSet;
 
-class plSharedMesh : public hsKeyedObject
-{
+class plSharedMesh : public hsKeyedObject {
 public:
-    enum 
-    {
+    enum {
         kDontSaveMorphState = 0x1,  // Don't save state (duh). Used for a morph that only has global layers
         kLayer0GlobalToMod  = 0x2   // This mesh's weight for layer 0 should be applied to all meshes on
-                                    // the same morph mod.
+                              // the same morph mod.
     };
 
-    hsTArray<plGeometrySpan *>fSpans;
-    hsTArray<const plSceneObject *> fActiveInstances;
-    plMorphDataSet *fMorphSet;
+    hsTArray<plGeometrySpan*>fSpans;
+    hsTArray<const plSceneObject*> fActiveInstances;
+    plMorphDataSet* fMorphSet;
     uint8_t fFlags;
-    
+
     plSharedMesh();
     ~plSharedMesh();
-    
-    void CreateInstance(plSceneObject *so, uint8_t boneIndex);
-    void RemoveInstance(plSceneObject *so);
-    
-    CLASSNAME_REGISTER( plSharedMesh );
-    GETINTERFACE_ANY( plSharedMesh, hsKeyedObject );
-    
-    virtual bool MsgReceive(plMessage* msg);  
+
+    void CreateInstance(plSceneObject* so, uint8_t boneIndex);
+    void RemoveInstance(plSceneObject* so);
+
+    CLASSNAME_REGISTER(plSharedMesh);
+    GETINTERFACE_ANY(plSharedMesh, hsKeyedObject);
+
+    virtual bool MsgReceive(plMessage* msg);
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
-    virtual void Write(hsStream* s, hsResMgr* mgr); 
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 };
 
-class plSharedMeshBCMsg : public plMessage
-{
+class plSharedMeshBCMsg : public plMessage {
 public:
-    plDrawableSpans *fDraw;
-    plSharedMesh *fMesh;
+    plDrawableSpans* fDraw;
+    plSharedMesh* fMesh;
     bool fIsAdding;
-    
+
     plSharedMeshBCMsg();
     ~plSharedMeshBCMsg() {}
-    
-    CLASSNAME_REGISTER( plSharedMeshBCMsg );
-    GETINTERFACE_ANY( plSharedMeshBCMsg, plMessage );
+
+    CLASSNAME_REGISTER(plSharedMeshBCMsg);
+    GETINTERFACE_ANY(plSharedMeshBCMsg, plMessage);
 
     virtual void Read(hsStream* s, hsResMgr* mgr) {}
-    virtual void Write(hsStream* s, hsResMgr* mgr) {}       
+    virtual void Write(hsStream* s, hsResMgr* mgr) {}
 };
 
 

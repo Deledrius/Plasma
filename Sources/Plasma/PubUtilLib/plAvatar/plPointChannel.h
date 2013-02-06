@@ -72,8 +72,7 @@ class plControllerCacheInfo;
 // PLPOINTCHANNEL
 /////////////////
 // A source of animated hsPoint3 data
-class plPointChannel : public plAGChannel
-{
+class plPointChannel : public plAGChannel {
 protected:
     hsPoint3 fResult;
 
@@ -82,44 +81,45 @@ public:
     virtual ~plPointChannel();
 
     // AG PROTOCOL
-    virtual const hsPoint3 & Value(double time);
-    virtual void Value(hsPoint3 &point, double time);
+    virtual const hsPoint3& Value(double time);
+    virtual void Value(hsPoint3& point, double time);
 
     // combine it (allocates combine object)
-    virtual plAGChannel * MakeCombine(plAGChannel * channelB);
+    virtual plAGChannel* MakeCombine(plAGChannel* channelB);
 
     // blend it (allocates blend object)
-    virtual plAGChannel * MakeBlend(plAGChannel * channelB, plScalarChannel * channelBias, int blendPriority);
+    virtual plAGChannel* MakeBlend(plAGChannel* channelB, plScalarChannel* channelBias, int blendPriority);
 
     // const eval at time zero
-    virtual plAGChannel * MakeZeroState();
+    virtual plAGChannel* MakeZeroState();
     // make a timeScale instance
-    virtual plAGChannel * MakeTimeScale(plScalarChannel *timeSource);
+    virtual plAGChannel* MakeTimeScale(plScalarChannel* timeSource);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plPointChannel );
-    GETINTERFACE_ANY( plPointChannel, plAGChannel );
+    CLASSNAME_REGISTER(plPointChannel);
+    GETINTERFACE_ANY(plPointChannel, plAGChannel);
 };
 
 //////////////////
 // PLPOINTCONSTANT
 //////////////////
 // A point source that just keeps handing out the same point
-class plPointConstant : public plPointChannel
-{
+class plPointConstant : public plPointChannel {
 public:
     plPointConstant();
-    plPointConstant(const hsPoint3 &point);
+    plPointConstant(const hsPoint3& point);
     virtual ~plPointConstant();
 
-    void Set(const hsPoint3 &the_Point) { fResult = the_Point; }
+    void Set(const hsPoint3& the_Point) {
+        fResult = the_Point;
+    }
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plPointConstant );
-    GETINTERFACE_ANY( plPointConstant, plPointChannel );
+    CLASSNAME_REGISTER(plPointConstant);
+    GETINTERFACE_ANY(plPointConstant, plPointChannel);
 
-    void Read(hsStream *stream, hsResMgr *mgr);
-    void Write(hsStream *stream, hsResMgr *mgr);
+    void Read(hsStream* stream, hsResMgr* mgr);
+    void Write(hsStream* stream, hsResMgr* mgr);
 };
 
 ////////////////////
@@ -127,71 +127,81 @@ public:
 ////////////////////
 // Adapts the time scale before passing it to the next channel in line.
 // Use to instance animations while allowing each instance to run at different speeds.
-class plPointTimeScale : public plPointChannel
-{
+class plPointTimeScale : public plPointChannel {
 protected:
-    plScalarChannel *fTimeSource;
-    plPointChannel *fChannelIn;
+    plScalarChannel* fTimeSource;
+    plPointChannel* fChannelIn;
 
 public:
     plPointTimeScale();
-    plPointTimeScale(plPointChannel *channel, plScalarChannel *timeSource);
+    plPointTimeScale(plPointChannel* channel, plScalarChannel* timeSource);
     virtual ~plPointTimeScale();
 
     virtual bool IsStoppedAt(double time);
-    virtual const hsPoint3 & Value(double time);
+    virtual const hsPoint3& Value(double time);
 
-    virtual plAGChannel * Detach(plAGChannel * channel);
+    virtual plAGChannel* Detach(plAGChannel* channel);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plPointTimeScale );
-    GETINTERFACE_ANY( plPointTimeScale, plPointChannel );
+    CLASSNAME_REGISTER(plPointTimeScale);
+    GETINTERFACE_ANY(plPointTimeScale, plPointChannel);
 };
 
 // PLPOINTBLEND
 ///////////////
 // Combines two point sources into one
-class plPointBlend : public plPointChannel
-{
+class plPointBlend : public plPointChannel {
 public:
     plPointBlend();
-    plPointBlend(plPointChannel *channelA, plPointChannel *channelB, plScalarChannel *channelBias);
+    plPointBlend(plPointChannel* channelA, plPointChannel* channelB, plScalarChannel* channelBias);
     virtual ~plPointBlend();
 
-    plAGChannel * Remove(plAGChannel *srceToRemove);
+    plAGChannel* Remove(plAGChannel* srceToRemove);
 
-    const plPointChannel * GetPointChannelA() const { return fPointA; }
-    void SetPointChannelA(plPointChannel *the_PointA) { fPointA = the_PointA; }
+    const plPointChannel* GetPointChannelA() const {
+        return fPointA;
+    }
+    void SetPointChannelA(plPointChannel* the_PointA) {
+        fPointA = the_PointA;
+    }
 
-    const plPointChannel * GetPointChannelB() const { return fPointB; }
-    void SetPointChannelB(plPointChannel *the_PointB) { fPointB = the_PointB; }
+    const plPointChannel* GetPointChannelB() const {
+        return fPointB;
+    }
+    void SetPointChannelB(plPointChannel* the_PointB) {
+        fPointB = the_PointB;
+    }
 
-    const plScalarChannel * GetChannelBias() const { return fChannelBias; }
-    void SetChannelBias(plScalarChannel * channel) { fChannelBias = channel; }
+    const plScalarChannel* GetChannelBias() const {
+        return fChannelBias;
+    }
+    void SetChannelBias(plScalarChannel* channel) {
+        fChannelBias = channel;
+    }
 
     //float GetBlend() const { return fBlend; }
     //void SetBlend(float the_blend) { fBlend = the_blend; }
     virtual bool IsStoppedAt(double time);
 
     // AG PROTOCOL
-    virtual const hsPoint3 &Value(double time);
+    virtual const hsPoint3& Value(double time);
 
     // remove the specified channel from our graph
-    virtual plAGChannel * Detach(plAGChannel * channel);
+    virtual plAGChannel* Detach(plAGChannel* channel);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plPointBlend );
-    GETINTERFACE_ANY( plPointBlend, plPointChannel );
+    CLASSNAME_REGISTER(plPointBlend);
+    GETINTERFACE_ANY(plPointBlend, plPointChannel);
 
 protected:
-    plPointChannel *fPointA;
-    plPointChannel *fPointB;
-    plScalarChannel *fChannelBias;
+    plPointChannel* fPointA;
+    plPointChannel* fPointB;
+    plScalarChannel* fChannelBias;
 };
 
 // BLENDPOINTS
 // Handy little function to share with others.
-hsPoint3 BlendPoints(hsPoint3 &pointA, hsPoint3 &pointB, float blend);
+hsPoint3 BlendPoints(hsPoint3& pointA, hsPoint3& pointB, float blend);
 
 
 ///////////////////////////
@@ -199,101 +209,95 @@ hsPoint3 BlendPoints(hsPoint3 &pointA, hsPoint3 &pointB, float blend);
 ///////////////////////////
 
 // converts a plController-style animation into a plPointChannel
-class plPointControllerChannel : public plPointChannel
-{
+class plPointControllerChannel : public plPointChannel {
 protected:
-    plController *fController;
-    
+    plController* fController;
+
 public:
     // xTORs
     plPointControllerChannel();
-    plPointControllerChannel(plController *controller);
+    plPointControllerChannel(plController* controller);
     virtual ~plPointControllerChannel();
-    
+
     // AG PROTOCOL
-    virtual const hsPoint3 & Value(double time);
-    virtual const hsPoint3 & Value(double time, plControllerCacheInfo *cache);
-    
-    virtual plAGChannel * MakeCacheChannel(plAnimTimeConvert *atc);     
-    
+    virtual const hsPoint3& Value(double time);
+    virtual const hsPoint3& Value(double time, plControllerCacheInfo* cache);
+
+    virtual plAGChannel* MakeCacheChannel(plAnimTimeConvert* atc);
+
     // PLASMA PROTOCOL
     // rtti
-    CLASSNAME_REGISTER( plPointControllerChannel );
-    GETINTERFACE_ANY( plPointControllerChannel, plPointChannel );
-    
+    CLASSNAME_REGISTER(plPointControllerChannel);
+    GETINTERFACE_ANY(plPointControllerChannel, plPointChannel);
+
     // persistence
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
-    virtual void Read(hsStream *s, hsResMgr *mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
 };
 
 ////////////////////////////////
 // PLPOINTCONTROLLERCACHECHANNEL
 ////////////////////////////////
 // Same as plPointController, but with caching info
-class plPointControllerCacheChannel : public plPointChannel
-{
+class plPointControllerCacheChannel : public plPointChannel {
 protected:
-    plControllerCacheInfo *fCache;
-    plPointControllerChannel *fControllerChannel;
-    
+    plControllerCacheInfo* fCache;
+    plPointControllerChannel* fControllerChannel;
+
 public:
     plPointControllerCacheChannel();
-    plPointControllerCacheChannel(plPointControllerChannel *channel, plControllerCacheInfo *cache);
+    plPointControllerCacheChannel(plPointControllerChannel* channel, plControllerCacheInfo* cache);
     virtual ~plPointControllerCacheChannel();
-    
-    virtual const hsPoint3 & Value(double time, bool peek = false);
 
-    virtual plAGChannel * Detach(plAGChannel * channel);
-    
+    virtual const hsPoint3& Value(double time, bool peek = false);
+
+    virtual plAGChannel* Detach(plAGChannel* channel);
+
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plPointControllerCacheChannel );
-    GETINTERFACE_ANY( plPointControllerCacheChannel, plPointChannel );
-    
+    CLASSNAME_REGISTER(plPointControllerCacheChannel);
+    GETINTERFACE_ANY(plPointControllerCacheChannel, plPointChannel);
+
     // Created at runtime only, so no Read/Write
 };
 
 ////////////////////////////
-// 
+//
 // Channel Applicator classes
 
-class plPointChannelApplicator : public plAGApplicator
-{
+class plPointChannelApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plPointChannelApplicator );
-    GETINTERFACE_ANY( plPointChannelApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plPointChannelApplicator);
+    GETINTERFACE_ANY(plPointChannelApplicator, plAGApplicator);
 };
 
-class plLightDiffuseApplicator : public plAGApplicator
-{
+class plLightDiffuseApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plLightDiffuseApplicator );
-    GETINTERFACE_ANY( plLightDiffuseApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plLightDiffuseApplicator);
+    GETINTERFACE_ANY(plLightDiffuseApplicator, plAGApplicator);
 };
 
-class plLightAmbientApplicator : public plAGApplicator
-{
+class plLightAmbientApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plLightAmbientApplicator );
-    GETINTERFACE_ANY( plLightAmbientApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plLightAmbientApplicator);
+    GETINTERFACE_ANY(plLightAmbientApplicator, plAGApplicator);
 };
 
-class plLightSpecularApplicator : public plAGApplicator
-{
+class plLightSpecularApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plLightSpecularApplicator );
-    GETINTERFACE_ANY( plLightSpecularApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plLightSpecularApplicator);
+    GETINTERFACE_ANY(plLightSpecularApplicator, plAGApplicator);
 };
 
 

@@ -48,13 +48,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 // Detects an anim event (marker, begin, end) and sends out a notification.
 //
-class plAnimEventModifier : public plSingleModifier
-{
+class plAnimEventModifier : public plSingleModifier {
 protected:
     hsTArray<plKey> fReceivers;// Keys to notify when the anim event happens
     plMessage* fCallback;       // The callback setup message we send when the anim loads
 
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return false; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return false;
+    }
 
     void ISendNotify(bool triggered);
     bool fDisabled;
@@ -71,8 +72,12 @@ public:
     virtual bool MsgReceive(plMessage* msg);
 
     // Export only
-    void SetReceivers(hsTArray<plKey>& receivers) { fReceivers = receivers; }
-    void SetCallback(plMessage* callback) { fCallback = callback; }
+    void SetReceivers(hsTArray<plKey>& receivers) {
+        fReceivers = receivers;
+    }
+    void SetCallback(plMessage* callback) {
+        fCallback = callback;
+    }
 };
 
 #endif // plAnimEventModifier_h_inc

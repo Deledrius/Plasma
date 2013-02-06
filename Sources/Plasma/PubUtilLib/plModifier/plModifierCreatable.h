@@ -47,20 +47,20 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plSpawnModifier.h"
 
-REGISTER_CREATABLE( plSpawnModifier );
+REGISTER_CREATABLE(plSpawnModifier);
 
 #include "plLogicModifier.h"
 
-REGISTER_CREATABLE( plLogicModifier );
+REGISTER_CREATABLE(plLogicModifier);
 
 #include "plResponderModifier.h"
 
-REGISTER_CREATABLE( plResponderModifier );
-REGISTER_CREATABLE( plResponderEnableMsg );
+REGISTER_CREATABLE(plResponderModifier);
+REGISTER_CREATABLE(plResponderEnableMsg);
 
 #include "plAxisAnimModifier.h"
 
-REGISTER_CREATABLE( plAxisAnimModifier );
+REGISTER_CREATABLE(plAxisAnimModifier);
 
 #include "plExcludeRegionModifier.h"
 REGISTER_CREATABLE(plExcludeRegionModifier);

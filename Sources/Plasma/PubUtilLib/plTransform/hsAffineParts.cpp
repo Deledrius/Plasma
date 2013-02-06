@@ -50,39 +50,39 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 inline void QuatTo3Vectors(const hsQuat& q, hsVector3* const v)
 {
-    v[0][0] = 1.0f - 2.0f*q.fY*q.fY - 2.0f*q.fZ*q.fZ;
-    v[0][1] = 2.0f*q.fX*q.fY - 2.0f*q.fW*q.fZ;
-    v[0][2] = 2.0f*q.fX*q.fZ + 2.0f*q.fW*q.fY;
+    v[0][0] = 1.0f - 2.0f * q.fY * q.fY - 2.0f * q.fZ * q.fZ;
+    v[0][1] = 2.0f * q.fX * q.fY - 2.0f * q.fW * q.fZ;
+    v[0][2] = 2.0f * q.fX * q.fZ + 2.0f * q.fW * q.fY;
 
-    v[1][0] = 2.0f*q.fX*q.fY + 2.0f*q.fW*q.fZ;
-    v[1][1] = 1.0f - 2.0f*q.fX*q.fX - 2.0f*q.fZ*q.fZ;
-    v[1][2] = 2.0f*q.fY*q.fZ - 2.0f*q.fW*q.fX;
+    v[1][0] = 2.0f * q.fX * q.fY + 2.0f * q.fW * q.fZ;
+    v[1][1] = 1.0f - 2.0f * q.fX * q.fX - 2.0f * q.fZ * q.fZ;
+    v[1][2] = 2.0f * q.fY * q.fZ - 2.0f * q.fW * q.fX;
 
-    v[2][0] = 2.0f*q.fX*q.fZ - 2.0f*q.fW*q.fY;
-    v[2][1] = 2.0f*q.fY*q.fZ + 2.0f*q.fW*q.fX;
-    v[2][2] = 1.0f - 2.0f*q.fX*q.fX - 2.0f*q.fY*q.fY;
+    v[2][0] = 2.0f * q.fX * q.fZ - 2.0f * q.fW * q.fY;
+    v[2][1] = 2.0f * q.fY * q.fZ + 2.0f * q.fW * q.fX;
+    v[2][2] = 1.0f - 2.0f * q.fX * q.fX - 2.0f * q.fY * q.fY;
 }
 
 inline void QuatTo3VectorsTranspose(const hsQuat& q, hsVector3* const v)
 {
-    v[0][0] = 1.0f - 2.0f*q.fY*q.fY - 2.0f*q.fZ*q.fZ;
-    v[1][0] = 2.0f*q.fX*q.fY - 2.0f*q.fW*q.fZ;
-    v[2][0] = 2.0f*q.fX*q.fZ + 2.0f*q.fW*q.fY;
+    v[0][0] = 1.0f - 2.0f * q.fY * q.fY - 2.0f * q.fZ * q.fZ;
+    v[1][0] = 2.0f * q.fX * q.fY - 2.0f * q.fW * q.fZ;
+    v[2][0] = 2.0f * q.fX * q.fZ + 2.0f * q.fW * q.fY;
 
-    v[0][1] = 2.0f*q.fX*q.fY + 2.0f*q.fW*q.fZ;
-    v[1][1] = 1.0f - 2.0f*q.fX*q.fX - 2.0f*q.fZ*q.fZ;
-    v[2][1] = 2.0f*q.fY*q.fZ - 2.0f*q.fW*q.fX;
+    v[0][1] = 2.0f * q.fX * q.fY + 2.0f * q.fW * q.fZ;
+    v[1][1] = 1.0f - 2.0f * q.fX * q.fX - 2.0f * q.fZ * q.fZ;
+    v[2][1] = 2.0f * q.fY * q.fZ - 2.0f * q.fW * q.fX;
 
-    v[0][2] = 2.0f*q.fX*q.fZ - 2.0f*q.fW*q.fY;
-    v[1][2] = 2.0f*q.fY*q.fZ + 2.0f*q.fW*q.fX;
-    v[2][2] = 1.0f - 2.0f*q.fX*q.fX - 2.0f*q.fY*q.fY;
+    v[0][2] = 2.0f * q.fX * q.fZ - 2.0f * q.fW * q.fY;
+    v[1][2] = 2.0f * q.fY * q.fZ + 2.0f * q.fW * q.fX;
+    v[2][2] = 1.0f - 2.0f * q.fX * q.fX - 2.0f * q.fY * q.fY;
 }
 
 //
 // Constructors
 // Convert from Gems struct for now
 //
-hsAffineParts::hsAffineParts(gemAffineParts *ap)
+hsAffineParts::hsAffineParts(gemAffineParts* ap)
 {
     AP_SET((*this), (*ap));
 }
@@ -100,10 +100,10 @@ hsAffineParts::hsAffineParts()
 //
 void hsAffineParts::Reset()
 {
-    fT.Set(0,0,0);
+    fT.Set(0, 0, 0);
     fQ.Identity();
     fU.Identity();
-    fK.Set(1,1,1);
+    fK.Set(1, 1, 1);
     fF = 1.0;
 }
 
@@ -126,7 +126,7 @@ plProfile_CreateTimer("ComposeInv", "Affine", ComposeInv);
 //      U is the stretch matrix.
 //      K is the scale factor matrix.
 //
-void hsAffineParts::ComposeMatrix(hsMatrix44 *out) const
+void hsAffineParts::ComposeMatrix(hsMatrix44* out) const
 {
     plProfile_BeginTiming(Compose);
 #ifndef PL_OPTIMIZE_COMPOSE
@@ -149,14 +149,14 @@ void hsAffineParts::ComposeMatrix(hsMatrix44 *out) const
     // Build flip matrix
 //  hsAssert(fF == 1.0 || fF == -1.0, "Invalid flip portion of affine parts");
     hsMatrix44 F;
-    if (fF==-1.0)
-    {
+
+    if (fF == -1.0) {
         hsVector3 s;
-        s.Set(-1,-1,-1);
+        s.Set(-1, -1, -1);
         F.MakeScaleMat(&s);
-    }
-    else
+    } else {
         F.Reset();
+    }
 
     // Build translate matrix
     hsMatrix44 T;
@@ -194,7 +194,7 @@ void hsAffineParts::ComposeMatrix(hsMatrix44 *out) const
     //      |U01    U11 U21 0|
     //      |U02    U12 U22 0|, where Uij is from matrix U
     //
-    // So, K * Ut = 
+    // So, K * Ut =
     //      |Sx*U00 Sx*U10  Sx*U20  0|
     //      |Sy*U01 Sy*U11  Sy*U21  0|
     //      |Sz*U02 Sz*U12  Sz*U22  0|
@@ -211,7 +211,7 @@ void hsAffineParts::ComposeMatrix(hsMatrix44 *out) const
     //      | R1 dot UKc0   R1 dot UKc1 R1 dot UKc2     0|
     //      | R2 dot UKc0   R2 dot UKc1 R2 dot UKc2     0|, where UKci is column i from UK
     //
-    // if f is -1, we negate the matrix we have so far, else we don't. We can 
+    // if f is -1, we negate the matrix we have so far, else we don't. We can
     // accomplish this cleanly by just negating the scale vector S if f == -1.
     //
     // Since the translate is last, we can just stuff it into the 4th column.
@@ -230,14 +230,13 @@ void hsAffineParts::ComposeMatrix(hsMatrix44 *out) const
     int i, j;
 
     hsVector3 UKt[3];
-    for( i = 0; i < 3; i++ )
-    {
-        for( j = 0; j < 3; j++ )
-        {
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
             // SU[j] = (fK.fX * U[j].fX, fK.fY * U[j].fY, fK.fZ * U[j].fZ)
-            UKt[j][i] = U[i].fX * fK.fX * U[j].fX 
-                + U[i].fY * fK.fY * U[j].fY 
-                + U[i].fZ * fK.fZ * U[j].fZ;
+            UKt[j][i] = U[i].fX * fK.fX * U[j].fX
+                        + U[i].fY * fK.fY * U[j].fY
+                        + U[i].fZ * fK.fZ * U[j].fZ;
         }
     }
 
@@ -245,10 +244,9 @@ void hsAffineParts::ComposeMatrix(hsMatrix44 *out) const
     QuatTo3Vectors(fQ, R);
 
     float f = fF < 0 ? -1.f : 1.f;
-    for( i = 0; i < 3; i++ )
-    {
-        for( j = 0; j < 3; j++ )
-        {
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
             out->fMap[i][j] = R[i].InnerProduct(UKt[j]) * f;
         }
 
@@ -263,7 +261,7 @@ void hsAffineParts::ComposeMatrix(hsMatrix44 *out) const
     plProfile_EndTiming(Compose);
 }
 
-void hsAffineParts::ComposeInverseMatrix(hsMatrix44 *out) const
+void hsAffineParts::ComposeInverseMatrix(hsMatrix44* out) const
 {
     plProfile_BeginTiming(Compose);
 #ifndef PL_OPTIMIZE_COMPOSE
@@ -274,7 +272,7 @@ void hsAffineParts::ComposeInverseMatrix(hsMatrix44 *out) const
     // Build scale factor matrix
     hsMatrix44 K;
     hsVector3 invK;
-    invK.Set(hsInvert(fK.fX),hsInvert(fK.fY),hsInvert(fK.fZ));
+    invK.Set(hsInvert(fK.fX), hsInvert(fK.fY), hsInvert(fK.fZ));
     K.MakeScaleMat(&invK);
 
     // Build Utranspose matrix
@@ -288,18 +286,18 @@ void hsAffineParts::ComposeInverseMatrix(hsMatrix44 *out) const
     // Build flip matrix
 //  hsAssert(fF == 1.0 || fF == -1.0, "Invalid flip portion of affine parts");
     hsMatrix44 F;
-    if (fF==-1.0)
-    {
+
+    if (fF == -1.0) {
         hsVector3 s;
-        s.Set(-1,-1,-1);
+        s.Set(-1, -1, -1);
         F.MakeScaleMat(&s);
-    }
-    else
+    } else {
         F.Reset();
+    }
 
     // Build translate matrix
     hsMatrix44 T;
-    T.MakeTranslateMat(&-fT);
+    T.MakeTranslateMat(& -fT);
 
     //
     // Concat mats
@@ -331,7 +329,7 @@ void hsAffineParts::ComposeInverseMatrix(hsMatrix44 *out) const
     //      |U01    U11 U21 0|
     //      |U02    U12 U22 0|, where Uij is from matrix U
     //
-    // So, Ut * K = 
+    // So, Ut * K =
     //      |U00*Sx     U10*Sy  U20*Sz  0|
     //      |U01*Sx     U11*Sy  U21*Sz  0|
     //      |U02*Sx     U12*Sy  U22*Sz  0|
@@ -346,10 +344,10 @@ void hsAffineParts::ComposeInverseMatrix(hsMatrix44 *out) const
     // Again we'll stuff the flip into the scale.
     //
     // Now, because the T is on the other end of the concat (closest
-    // to the vertex), we can't just stuff it in. If Mr is the 
+    // to the vertex), we can't just stuff it in. If Mr is the
     // rotation part of the final matrix (Ut * K * U * R * F), then
     // the translation components M[i][3] = Mr[i] dot T.
-    //      
+    //
     //
     hsVector3 Ut[3];
     QuatTo3VectorsTranspose(fU.Conjugate(), Ut);
@@ -357,21 +355,20 @@ void hsAffineParts::ComposeInverseMatrix(hsMatrix44 *out) const
     int i, j;
 
     hsVector3 invK;
-    invK.Set(hsInvert(fK.fX),hsInvert(fK.fY),hsInvert(fK.fZ));
+    invK.Set(hsInvert(fK.fX), hsInvert(fK.fY), hsInvert(fK.fZ));
     hsVector3 UK[3];
-    for( i = 0; i < 3; i++ )
-    {
-        for( j = 0; j < 3; j++ )
-        {
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
             // SUt[i] = (Ut[i].fX * invK.fX, Ut[i].fY * invK.fY, Ut[i].fZ * invK.fZ)
             // So SUt[i].InnerProduct(Ut[j]) ==
-            //      Ut[i].fX * invK.fX * Ut[j].fX 
-            //          + Ut[i].fY * invK.fY * Ut[j].fY 
-            //          + Ut[i].fZ * invK.fZ * Ut[j].fZ 
+            //      Ut[i].fX * invK.fX * Ut[j].fX
+            //          + Ut[i].fY * invK.fY * Ut[j].fY
+            //          + Ut[i].fZ * invK.fZ * Ut[j].fZ
 
             UK[i][j] = Ut[i].fX * invK.fX * Ut[j].fX
-                + Ut[i].fY * invK.fY * Ut[j].fY
-                + Ut[i].fZ * invK.fZ * Ut[j].fZ;
+                       + Ut[i].fY * invK.fY * Ut[j].fY
+                       + Ut[i].fZ * invK.fZ * Ut[j].fZ;
         }
     }
 
@@ -379,10 +376,9 @@ void hsAffineParts::ComposeInverseMatrix(hsMatrix44 *out) const
     QuatTo3VectorsTranspose(fQ.Conjugate(), Rt);
 
     float f = fF < 0 ? -1.f : 1.f;
-    for( i = 0; i < 3; i++ )
-    {
-        for( j = 0; j < 3; j++ )
-        {
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
             out->fMap[i][j] = UK[i].InnerProduct(Rt[j]) * f;
         }
 
@@ -401,13 +397,13 @@ void hsAffineParts::ComposeInverseMatrix(hsMatrix44 *out) const
 // Given 2 affineparts structs and a p value (between 0-1),
 // compute a new affine parts.
 //
-void hsAffineParts::SetFromInterp(const hsAffineParts &ap1, const hsAffineParts &ap2, float p)
+void hsAffineParts::SetFromInterp(const hsAffineParts& ap1, const hsAffineParts& ap2, float p)
 {
-    hsAssert(p>=0.0 && p<=1.0, "Interpolate param must be 0-1");
+    hsAssert(p >= 0.0 && p <= 1.0, "Interpolate param must be 0-1");
 
 #if 0
     // Debug
-    float rad1,rad2, rad3;
+    float rad1, rad2, rad3;
     hsVector3 axis1, axis2, axis3;
     k1->fQ.GetAngleAxis(&rad1, &axis1);
     k2->fQ.GetAngleAxis(&rad2, &axis2);
@@ -420,7 +416,7 @@ void hsAffineParts::SetFromInterp(const hsAffineParts &ap1, const hsAffineParts 
 //
 // Read
 //
-void hsAffineParts::Read(hsStream *stream)
+void hsAffineParts::Read(hsStream* stream)
 {
     fT.Read(stream);
     fQ.Read(stream);
@@ -432,7 +428,7 @@ void hsAffineParts::Read(hsStream *stream)
 //
 // Write
 //
-void hsAffineParts::Write(hsStream *stream)
+void hsAffineParts::Write(hsStream* stream)
 {
     fT.Write(stream);
     fQ.Write(stream);

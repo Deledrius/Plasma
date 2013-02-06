@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pfMessage/pfGameScoreMsg.h"
 #include "pyGlueHelpers.h"
 
-class pyGameScoreMsg
-{
+class pyGameScoreMsg {
 protected:
     pfGameScoreMsg* fMsg;
 
@@ -55,14 +54,12 @@ protected:
     { }
 
     pyGameScoreMsg(pfGameScoreMsg* msg)
-        : fMsg(msg)
-    {
+        : fMsg(msg) {
         hsRefCnt_SafeRef(msg);
     }
 
 public:
-    virtual ~pyGameScoreMsg()
-    {
+    virtual ~pyGameScoreMsg() {
         hsRefCnt_SafeUnRef(fMsg);
     }
 
@@ -79,8 +76,7 @@ public:
     static void AddPlasmaClasses(PyObject* m);
 };
 
-class pyGameScoreListMsg : public pyGameScoreMsg
-{
+class pyGameScoreListMsg : public pyGameScoreMsg {
     pyGameScoreListMsg()
         : pyGameScoreMsg()
     { }
@@ -103,8 +99,7 @@ public:
     PyObject* GetScore(size_t idx) const;
 };
 
-class pyGameScoreTransferMsg : public pyGameScoreMsg
-{
+class pyGameScoreTransferMsg : public pyGameScoreMsg {
     pyGameScoreTransferMsg()
         : pyGameScoreMsg()
     { }
@@ -125,8 +120,7 @@ public:
     PyObject* GetSourceScore() const;
 };
 
-class pyGameScoreUpdateMsg : public pyGameScoreMsg
-{
+class pyGameScoreUpdateMsg : public pyGameScoreMsg {
     pyGameScoreUpdateMsg()
         : pyGameScoreMsg()
     { }

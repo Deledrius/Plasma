@@ -65,28 +65,32 @@ plSimulationInterface::~plSimulationInterface()
 
 void plSimulationInterface::ISetSceneNode(plKey newNode)
 {
-    if (fPhysical)
+    if (fPhysical) {
         fPhysical->SetSceneNode(newNode);
+    }
 }
 
 void plSimulationInterface::SetProperty(int prop, bool on)
 {
     plObjInterface::SetProperty(prop, on);      // set the property locally
 
-    if (fPhysical)
+    if (fPhysical) {
         fPhysical->SetProperty(prop, on ? true : false);
+    }
 }
 
 void plSimulationInterface::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l)
 {
-    if (fPhysical)
+    if (fPhysical) {
         fPhysical->SetTransform(l2w, w2l);
+    }
 }
 
 void plSimulationInterface::ClearLinearVelocity()
 {
-    if (fPhysical)
+    if (fPhysical) {
         fPhysical->ClearLinearVelocity();
+    }
 }
 
 void plSimulationInterface::Read(hsStream* s, hsResMgr* mgr)
@@ -116,16 +120,14 @@ void plSimulationInterface::Write(hsStream* s, hsResMgr* mgr)
 
 void plSimulationInterface::ReleaseData()
 {
-    plPhysical *physical = fPhysical;
+    plPhysical* physical = fPhysical;
 
-    if (physical)
-    {
+    if (physical) {
         // To get rid of our data, we need to release our active ref and tell the SceneNode
         // to dump it. It will autodestruct after those two active refs are released, unless
         // someone else has a ref on it as well (in which case we don't want to be nuking it
         // anyway).
-        if (physical->GetSceneNode())
-        {
+        if (physical->GetSceneNode()) {
             plKey nodeKey = physical->GetSceneNode();
 
             nodeKey->Release(physical->GetKey());
@@ -138,61 +140,58 @@ void plSimulationInterface::ReleaseData()
 bool plSimulationInterface::MsgReceive(plMessage* msg)
 {
     plIntRefMsg* intRefMsg = plIntRefMsg::ConvertNoRef(msg);
-    if (intRefMsg)
-    {
-        switch (intRefMsg->fType)
-        {
+
+    if (intRefMsg) {
+        switch (intRefMsg->fType) {
         case plIntRefMsg::kPhysical:
-            if (intRefMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove))
-            {
+            if (intRefMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                 plPhysical* phys = plPhysical::ConvertNoRef(intRefMsg->GetRef());
+
                 // *** for some reason, we sometimes get a null pointer here
                 // *** if we do, we're just going to ignore it for now
-                if (phys)
-                {
+                if (phys) {
                     hsAssert(phys == fPhysical, "Removing Physical I don't have");
                     fPhysical = nil;
                 }
-            }
-            else
-            {
+            } else {
                 fPhysical = plPhysical::ConvertNoRef(intRefMsg->GetRef());
             }
+
             return true;
         }
     }
 
     plEnableMsg* pEnableMsg = plEnableMsg::ConvertNoRef(msg);
-    if (pEnableMsg)
-    {
+
+    if (pEnableMsg) {
         SetProperty(kDisable, pEnableMsg->Cmd(kDisable));
         SetProperty(kPinned, pEnableMsg->Cmd(kDisable));
         return true;
     }
 
     plWarpMsg* pWarpMsg = plWarpMsg::ConvertNoRef(msg);
-    if (pWarpMsg)
-    {
-        if (fPhysical)
-        {
+
+    if (pWarpMsg) {
+        if (fPhysical) {
             hsMatrix44 l2w = pWarpMsg->GetTransform();
             hsMatrix44 inv;
             l2w.GetInverse(&inv);
             SetTransform(l2w, inv);
-            if (pWarpMsg->GetWarpFlags() & plWarpMsg::kZeroVelocity)
-            {
+
+            if (pWarpMsg->GetWarpFlags() & plWarpMsg::kZeroVelocity) {
                 ClearLinearVelocity();
             }
         }
     }
 
     plSimulationMsg* pSimMsg = plSimulationMsg::ConvertNoRef(msg);
-    if (pSimMsg)
-    {
-        if (fPhysical)
+
+    if (pSimMsg) {
+        if (fPhysical) {
             fPhysical->MsgReceive(pSimMsg);
+        }
     }
-    
+
     return plObjInterface::MsgReceive(msg);
 }
 

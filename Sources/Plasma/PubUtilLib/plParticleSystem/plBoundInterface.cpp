@@ -59,7 +59,7 @@ void plBoundInterface::ReleaseData()
     fBounds = nil;
 }
 
-void plBoundInterface::Init(plConvexVolume *bounds)
+void plBoundInterface::Init(plConvexVolume* bounds)
 {
     ReleaseData();
     fBounds = bounds;
@@ -69,10 +69,11 @@ void plBoundInterface::Init(plConvexVolume *bounds)
 // anything ever makes use of it (and if nothing does, this saves us on some needless matrix
 // copying). Should we make use of the disabled prop, this function should just store the l2w
 // matrix, but not send an update to fBounds.
-void plBoundInterface::SetTransform(const hsMatrix44 &l2w, const hsMatrix44&w2l)
+void plBoundInterface::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l)
 {
-    if (fBounds != nil)
+    if (fBounds != nil) {
         fBounds->Update(l2w);
+    }
 }
 
 void plBoundInterface::Read(hsStream* s, hsResMgr* mgr)

@@ -330,7 +330,7 @@ static const uint8_t vs_WaveDec2Lay11Codes[] = {
     0x1,    0x0,    0xf,    0xe0,
     0xb,    0x0,    0xe4,   0x80,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl vs_WaveDec2Lay11Decl("sha/vs_WaveDec2Lay11.inl", vs_WaveDec2Lay11, vs_WaveDec2Lay11byteLen, vs_WaveDec2Lay11Codes);
 

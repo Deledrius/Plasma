@@ -55,8 +55,9 @@ pyTTTGame::pyTTTGame(): pyGameCli() {}
 
 pyTTTGame::pyTTTGame(pfGameCli* client): pyGameCli(client)
 {
-    if (client && (client->GetGameTypeId() != kGameTypeId_TicTacToe))
-        gameClient = nil; // wrong type, just clear it out
+    if (client && (client->GetGameTypeId() != kGameTypeId_TicTacToe)) {
+        gameClient = nil;    // wrong type, just clear it out
+    }
 }
 
 bool pyTTTGame::IsTTTGame(plString& guid)
@@ -81,8 +82,7 @@ void pyTTTGame::JoinCommonTTTGame(pyKey& callbackKey, unsigned gameID, unsigned 
 
 void pyTTTGame::MakeMove(unsigned row, unsigned col)
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmTicTacToe* ttt = pfGmTicTacToe::ConvertNoRef(gameClient);
         ttt->MakeMove(row, col);
     }
@@ -90,8 +90,7 @@ void pyTTTGame::MakeMove(unsigned row, unsigned col)
 
 void pyTTTGame::ShowBoard()
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmTicTacToe* ttt = pfGmTicTacToe::ConvertNoRef(gameClient);
         ttt->ShowBoard();
     }

@@ -49,33 +49,34 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsResMgr.h"
 #include "pnNetCommon/plSDLTypes.h"
 
-plLayerInterface::plLayerInterface() 
-:   fUnderLay(nil),
-    fOverLay(nil),
-    fState(nil), 
-    fTransform(nil), 
-    fPreshadeColor(nil),
-    fRuntimeColor(nil),
-    fAmbientColor(nil),
-    fOpacity(nil),
-    fTexture(nil),
-    fUVWSrc(nil),
-    fLODBias(nil),
-    fSpecularColor(nil),
-    fSpecularPower(nil),
-    fOwnedChannels(0),
-    fPassThruChannels(0),
-    fVertexShader(nil),
-    fPixelShader(nil),
-    fBumpEnvXfm(nil)
+plLayerInterface::plLayerInterface()
+    :   fUnderLay(nil),
+        fOverLay(nil),
+        fState(nil),
+        fTransform(nil),
+        fPreshadeColor(nil),
+        fRuntimeColor(nil),
+        fAmbientColor(nil),
+        fOpacity(nil),
+        fTexture(nil),
+        fUVWSrc(nil),
+        fLODBias(nil),
+        fSpecularColor(nil),
+        fSpecularPower(nil),
+        fOwnedChannels(0),
+        fPassThruChannels(0),
+        fVertexShader(nil),
+        fPixelShader(nil),
+        fBumpEnvXfm(nil)
 {
 
 }
 
 plLayerInterface::~plLayerInterface()
 {
-    if( fUnderLay )
+    if (fUnderLay) {
         Detach(fUnderLay);
+    }
 
     delete fState;
     delete fPreshadeColor;
@@ -86,7 +87,7 @@ plLayerInterface::~plLayerInterface()
     delete fTransform;
 
     delete fTexture;
-    
+
     delete fUVWSrc;
     delete fLODBias;
     delete fSpecularPower;
@@ -100,8 +101,10 @@ plLayerInterface::~plLayerInterface()
 void plLayerInterface::ISetPassThru(uint32_t chans)
 {
     fPassThruChannels |= chans;
-    if( fOverLay )
+
+    if (fOverLay) {
         fOverLay->ISetPassThru(chans);
+    }
 
     // Since plLayerAnimation is the only derived class that uses its
     // fPassThruChannels info, it's the only one that actually saves
@@ -131,22 +134,25 @@ void plLayerInterface::ISetPassThru(uint32_t chans)
 //      been Eval'd.
 void plLayerInterface::ClaimChannels(uint32_t chans)
 {
-    if( fOverLay )
+    if (fOverLay) {
         fOverLay->ISetPassThru(chans);
+    }
+
     fPassThruChannels &= ~chans;
     DirtySynchState(kSDLLayer, 0);
 }
 
 uint32_t plLayerInterface::Eval(double secs, uint32_t frame, uint32_t ignore)
 {
-    if( fUnderLay )
+    if (fUnderLay) {
         return fUnderLay->Eval(secs, frame, ignore);
+    }
 
     return uint32_t(0);
 }
 
 // Export Only
-void plLayerInterface::AttachViaNotify(plLayerInterface *prev)
+void plLayerInterface::AttachViaNotify(plLayerInterface* prev)
 {
     plLayRefMsg* refMsg = new plLayRefMsg(GetKey(), plRefMsg::kOnCreate, 0, plLayRefMsg::kUnderLay);
     hsgResMgr::ResMgr()->AddViaNotify(prev->GetKey(), refMsg, plRefFlags::kActiveRef);
@@ -154,59 +160,74 @@ void plLayerInterface::AttachViaNotify(plLayerInterface *prev)
 
 plLayerInterface* plLayerInterface::Attach(plLayerInterface* prev)
 {
-    if( !prev )
+    if (!prev) {
         return this;
+    }
 
-    if( fUnderLay == prev )
+    if (fUnderLay == prev) {
         return this;
+    }
 
-    if( fUnderLay )
-    {
+    if (fUnderLay) {
         fUnderLay->Attach(prev);
         prev = fUnderLay;
     }
 
-    if( !OwnChannel(kState) )
+    if (!OwnChannel(kState)) {
         fState = prev->fState;
+    }
 
-    if( !OwnChannel(kPreshadeColor) )
+    if (!OwnChannel(kPreshadeColor)) {
         fPreshadeColor = prev->fPreshadeColor;
+    }
 
-    if( !OwnChannel( kRuntimeColor ) )
+    if (!OwnChannel(kRuntimeColor)) {
         fRuntimeColor = prev->fRuntimeColor;
+    }
 
-    if( !OwnChannel(kAmbientColor) )
+    if (!OwnChannel(kAmbientColor)) {
         fAmbientColor = prev->fAmbientColor;
+    }
 
-    if( !OwnChannel( kSpecularColor ) )
+    if (!OwnChannel(kSpecularColor)) {
         fSpecularColor = prev->fSpecularColor;
+    }
 
-    if( !OwnChannel(kOpacity) )
+    if (!OwnChannel(kOpacity)) {
         fOpacity = prev->fOpacity;
+    }
 
-    if( !OwnChannel(kTransform) )
+    if (!OwnChannel(kTransform)) {
         fTransform = prev->fTransform;
+    }
 
-    if( !OwnChannel(kTexture) )
+    if (!OwnChannel(kTexture)) {
         fTexture = prev->fTexture;
+    }
 
-    if( !OwnChannel(kUVWSrc) )
+    if (!OwnChannel(kUVWSrc)) {
         fUVWSrc = prev->fUVWSrc;
+    }
 
-    if( !OwnChannel(kLODBias) )
+    if (!OwnChannel(kLODBias)) {
         fLODBias = prev->fLODBias;
+    }
 
-    if( !OwnChannel(kSpecularPower) )
+    if (!OwnChannel(kSpecularPower)) {
         fSpecularPower = prev->fSpecularPower;
+    }
 
-    if( !OwnChannel(kVertexShader) )
+    if (!OwnChannel(kVertexShader)) {
         fVertexShader = prev->fVertexShader;
+    }
 
-    if( !OwnChannel(kPixelShader) )
+    if (!OwnChannel(kPixelShader)) {
         fPixelShader = prev->fPixelShader;
+    }
 
-    if( !OwnChannel(kBumpEnvXfm) )
+    if (!OwnChannel(kBumpEnvXfm)) {
         fBumpEnvXfm = prev->fBumpEnvXfm;
+    }
 
     fUnderLay = prev;
     prev->fOverLay = this;
@@ -216,39 +237,62 @@ plLayerInterface* plLayerInterface::Attach(plLayerInterface* prev)
 
 void plLayerInterface::IUnthread()
 {
-    if( fUnderLay )
-    {
-        if( !OwnChannel(kState) )
+    if (fUnderLay) {
+        if (!OwnChannel(kState)) {
             fState = nil;
-        if( !OwnChannel(kPreshadeColor) )
+        }
+
+        if (!OwnChannel(kPreshadeColor)) {
             fPreshadeColor = nil;
-        if( !OwnChannel( kRuntimeColor ) )
+        }
+
+        if (!OwnChannel(kRuntimeColor)) {
             fRuntimeColor = nil;
-        if( !OwnChannel(kAmbientColor) )
+        }
+
+        if (!OwnChannel(kAmbientColor)) {
             fAmbientColor = nil;
-        if( !OwnChannel( kSpecularColor ) )
+        }
+
+        if (!OwnChannel(kSpecularColor)) {
             fSpecularColor = nil;
-        if( !OwnChannel(kOpacity) )
+        }
+
+        if (!OwnChannel(kOpacity)) {
             fOpacity = nil;
-        if( !OwnChannel(kTransform) )
+        }
+
+        if (!OwnChannel(kTransform)) {
             fTransform = nil;
-        if( !OwnChannel(kTexture) )
+        }
+
+        if (!OwnChannel(kTexture)) {
             fTexture = nil;
+        }
 
-        if( !OwnChannel(kUVWSrc) )
+        if (!OwnChannel(kUVWSrc)) {
             fUVWSrc = nil;
-        if( !OwnChannel(kLODBias) )
+        }
+
+        if (!OwnChannel(kLODBias)) {
             fLODBias = nil;
-        if( !OwnChannel(kSpecularPower) )
+        }
+
+        if (!OwnChannel(kSpecularPower)) {
             fSpecularPower = nil;
+        }
 
-        if( !OwnChannel(kVertexShader) )
+        if (!OwnChannel(kVertexShader)) {
             fVertexShader = nil;
-        if( !OwnChannel(kPixelShader) )
-            fPixelShader = nil;
+        }
 
-        if( !OwnChannel(kBumpEnvXfm) )
+        if (!OwnChannel(kPixelShader)) {
+            fPixelShader = nil;
+        }
+
+        if (!OwnChannel(kBumpEnvXfm)) {
             fBumpEnvXfm = nil;
+        }
 
         fUnderLay->fOverLay = nil;
         fUnderLay = nil;
@@ -267,11 +311,11 @@ void plLayerInterface::IUnthread()
 // Return value is new TOP of stack. li is now top of a separate stack.
 plLayerInterface* plLayerInterface::Detach(plLayerInterface* li)
 {
-    if( li == this )
+    if (li == this) {
         return nil;
+    }
 
-    if( li == fUnderLay )
-    {
+    if (li == fUnderLay) {
         IUnthread();
         return this;
     }
@@ -283,10 +327,10 @@ plLayerInterface* plLayerInterface::Detach(plLayerInterface* li)
 
 // Remove:
 // If we are the one being removed, break our links to underlay
-//      and then just return underlay, since it doesn't even know 
+//      and then just return underlay, since it doesn't even know
 //      about our existence (so it doesn't need to know about the remove).
 // If our underlay is the one being removed, we need to unthread it from
-//      its underlay (if any), and then thread ourselves onto the underlay's 
+//      its underlay (if any), and then thread ourselves onto the underlay's
 //      former underlay.
 // If it's not us, and not our underlay, just pass it to our underlay and let
 //      it deal.
@@ -296,9 +340,8 @@ plLayerInterface* plLayerInterface::Remove(plLayerInterface* li)
 {
     plLayerInterface* under = fUnderLay;
 
-    if( li == this )
-    {
-        
+    if (li == this) {
+
         IUnthread();
 
         return under;
@@ -306,8 +349,7 @@ plLayerInterface* plLayerInterface::Remove(plLayerInterface* li)
 
     // This is an error, because it means we're being asked
     // to detach from something we aren't attached to.
-    if( !under )
-    {
+    if (!under) {
         hsAssert(false, "Detaching from unknown layerinterface");
         return this;
     }
@@ -321,7 +363,7 @@ plLayerInterface* plLayerInterface::Remove(plLayerInterface* li)
     return this;
 }
 
-plLayerInterface *plLayerInterface::GetAttached()
+plLayerInterface* plLayerInterface::GetAttached()
 {
     return fUnderLay;
 }
@@ -330,10 +372,12 @@ void plLayerInterface::Read(hsStream* s, hsResMgr* mgr)
 {
     plSynchedObject::Read(s, mgr);
 
-    plLayRefMsg* refMsg = new plLayRefMsg(GetKey(), plRefMsg::kOnCreate, 0, plLayRefMsg::kUnderLay);    
-    plKey key = mgr->ReadKeyNotifyMe(s,refMsg, plRefFlags::kActiveRef);
-    if( key && !fUnderLay )
+    plLayRefMsg* refMsg = new plLayRefMsg(GetKey(), plRefMsg::kOnCreate, 0, plLayRefMsg::kUnderLay);
+    plKey key = mgr->ReadKeyNotifyMe(s, refMsg, plRefFlags::kActiveRef);
+
+    if (key && !fUnderLay) {
         Attach(plLayer::DefaultLayer());
+    }
 
     // Temporary setting default netgroup by our key.
     SetNetGroup(SelectNetGroup(GetKey()));
@@ -349,27 +393,26 @@ void plLayerInterface::Write(hsStream* s, hsResMgr* mgr)
 bool plLayerInterface::MsgReceive(plMessage* msg)
 {
     plLayRefMsg* refMsg = plLayRefMsg::ConvertNoRef(msg);
-    if( refMsg )
-    {
-        switch( refMsg->fType )
-        {
-        case plLayRefMsg::kUnderLay:
-            {
+
+    if (refMsg) {
+        switch (refMsg->fType) {
+        case plLayRefMsg::kUnderLay: {
                 plLayerInterface* underLay = plLayerInterface::ConvertNoRef(refMsg->GetRef());
-                if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-                {
-                    if( fUnderLay )
+
+                if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+                    if (fUnderLay) {
                         Detach(fUnderLay);
+                    }
 
                     Attach(underLay);
-                }
-                else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-                {
+                } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                     Detach(fUnderLay);
                 }
+
                 return true;
             }
         }
     }
+
     return plSynchedObject::MsgReceive(msg);
 }

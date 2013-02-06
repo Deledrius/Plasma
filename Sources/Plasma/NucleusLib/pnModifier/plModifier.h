@@ -56,8 +56,7 @@ class plCoordinateInterface;
 class plAudioInterface;
 struct hsMatrix44;
 
-class plModifier : public plSynchedObject
-{
+class plModifier : public plSynchedObject {
 protected:
 
     plDrawInterface*            IGetTargetDrawInterface(int iTarg) const;
@@ -75,15 +74,15 @@ public:
     plModifier();
     virtual ~plModifier();
 
-    CLASSNAME_REGISTER( plModifier );
-    GETINTERFACE_ANY( plModifier, plSynchedObject );
+    CLASSNAME_REGISTER(plModifier);
+    GETINTERFACE_ANY(plModifier, plSynchedObject);
 
     virtual bool MsgReceive(plMessage* msg);
 
     virtual int GetNumTargets() const = 0;
     virtual plSceneObject* GetTarget(int iTarg) const = 0;
     virtual void AddTarget(plSceneObject* so) = 0;
-    virtual void RemoveTarget(plSceneObject* so) = 0; 
+    virtual void RemoveTarget(plSceneObject* so) = 0;
 
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l) {}
 

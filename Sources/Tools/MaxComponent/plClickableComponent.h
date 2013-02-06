@@ -44,14 +44,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #define CLICKABLE_CID Class_ID(0x1a5f6892, 0x7b434188)
 
-class plClickableComponent : public plActivatorBaseComponent
-{
+class plClickableComponent : public plActivatorBaseComponent {
 public:
     plClickableComponent();
 
-    bool PreConvert(plMaxNode *node, plErrorMsg* pErrMsg);
+    bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
     bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
     virtual void CollectNonDrawables(INodeTab& nonDrawables);
 

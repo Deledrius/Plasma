@@ -55,26 +55,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Constructor/Destructor //////////////////////////////////////////////////
 
-plCachedFileReader::plCachedFileReader(const plFileName &path,
+plCachedFileReader::plCachedFileReader(const plFileName& path,
                                        plAudioCore::ChannelSelect whichChan)
-        : fFilename(path), fFileHandle(nil), fCurPosition(0)
+    : fFilename(path), fFileHandle(nil), fCurPosition(0)
 {
     hsAssert(path.IsValid(), "Invalid path specified in plCachedFileReader");
 
     /// Open the file as a plain binary stream
     fFileHandle = plFileSystem::Open(path, "rb");
-    if (fFileHandle != nil)
-    {
+
+    if (fFileHandle != nil) {
         if (fread(&fHeader, 1, sizeof(plWAVHeader), fFileHandle)
-                != sizeof(plWAVHeader))
-        {
+                != sizeof(plWAVHeader)) {
             IError("Invalid WAV file header in plCachedFileReader");
             return;
         }
 
         // Check format
-        if (fHeader.fFormatTag != kPCMFormatTag)
-        {
+        if (fHeader.fFormatTag != kPCMFormatTag) {
             IError("Invalid format in plCachedFileReader");
             return;
         }
@@ -93,13 +91,13 @@ plCachedFileReader::~plCachedFileReader()
     }
 }
 
-void plCachedFileReader::IError(const char *msg)
+void plCachedFileReader::IError(const char* msg)
 {
     hsAssert(false, msg);
     Close();
 }
 
-plWAVHeader &plCachedFileReader::GetHeader()
+plWAVHeader& plCachedFileReader::GetHeader()
 {
     hsAssert(IsValid(), "GetHeader() called on an invalid cache file");
 
@@ -108,8 +106,7 @@ plWAVHeader &plCachedFileReader::GetHeader()
 
 void plCachedFileReader::Close()
 {
-    if (fFileHandle != nil)
-    {
+    if (fFileHandle != nil) {
         fclose(fFileHandle);
         fFileHandle = nil;
     }
@@ -140,7 +137,7 @@ bool plCachedFileReader::SetPosition(uint32_t numBytes)
     return !fseek(fFileHandle, sizeof(plWAVHeader) + fCurPosition, SEEK_SET);
 }
 
-bool plCachedFileReader::Read(uint32_t numBytes, void *buffer)
+bool plCachedFileReader::Read(uint32_t numBytes, void* buffer)
 {
     hsAssert(IsValid(), "Read() called on an invalid cache file");
 
@@ -160,7 +157,7 @@ uint32_t plCachedFileReader::NumBytesLeft()
     return fDataLength - fCurPosition;
 }
 
-bool plCachedFileReader::OpenForWriting(const plFileName &path, plWAVHeader &header)
+bool plCachedFileReader::OpenForWriting(const plFileName& path, plWAVHeader& header)
 {
     hsAssert(path.IsValid(), "Invalid path specified in plCachedFileReader");
 
@@ -172,11 +169,9 @@ bool plCachedFileReader::OpenForWriting(const plFileName &path, plWAVHeader &hea
     /// Open the file as a plain binary stream
     fFileHandle = plFileSystem::Open(path, "wb");
 
-    if (fFileHandle != nil)
-    {
+    if (fFileHandle != nil) {
         if (fwrite(&fHeader, 1, sizeof(plWAVHeader), fFileHandle)
-                != sizeof(plWAVHeader))
-        {
+                != sizeof(plWAVHeader)) {
             IError("Could not write WAV file header in plCachedFileReader");
             return false;
         }

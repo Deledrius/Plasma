@@ -46,25 +46,36 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsTemplates.h"
 #include "hsBitVector.h"
 
-class plSoundMsg : public plMessageWithCallbacks
-{
+class plSoundMsg : public plMessageWithCallbacks {
 private:
-    void IInit() { fLoop=false; fPlaying = false; fBegin=fEnd=fTime=fRepeats=0; fSpeed = 0.f; fVolume = 0.f; fIndex = -1; fNameStr = 0; fFadeType = kLinear; }
+    void IInit() {
+        fLoop = false;
+        fPlaying = false;
+        fBegin = fEnd = fTime = fRepeats = 0;
+        fSpeed = 0.f;
+        fVolume = 0.f;
+        fIndex = -1;
+        fNameStr = 0;
+        fFadeType = kLinear;
+    }
 public:
     plSoundMsg()
-        : plMessageWithCallbacks(nil, nil, nil) { IInit(); }
-    plSoundMsg(const plKey &s, 
-                const plKey &r, 
-                const double* t)
-        : plMessageWithCallbacks(s, r, t) { IInit(); }
+        : plMessageWithCallbacks(nil, nil, nil) {
+        IInit();
+    }
+    plSoundMsg(const plKey& s,
+               const plKey& r,
+               const double* t)
+        : plMessageWithCallbacks(s, r, t) {
+        IInit();
+    }
     ~plSoundMsg();
 
-    CLASSNAME_REGISTER( plSoundMsg );
-    GETINTERFACE_ANY( plSoundMsg, plMessageWithCallbacks );
+    CLASSNAME_REGISTER(plSoundMsg);
+    GETINTERFACE_ANY(plSoundMsg, plMessageWithCallbacks);
 
-    enum ModCmds
-    {
-        kPlay=0,
+    enum ModCmds {
+        kPlay = 0,
         kStop,
         kSetLooping,
         kUnSetLooping,
@@ -91,8 +102,12 @@ public:
 
     hsBitVector     fCmd;
 
-    bool Cmd(int n) const { return fCmd.IsBitSet(n); }
-    void SetCmd(int n) { fCmd.SetBit(n); }
+    bool Cmd(int n) const {
+        return fCmd.IsBitSet(n);
+    }
+    void SetCmd(int n) {
+        fCmd.SetBit(n);
+    }
     void ClearCmd();
 
     double   fBegin;
@@ -103,11 +118,10 @@ public:
     int      fIndex;
     int      fRepeats;
     bool     fPlaying;
-    uint32_t   fNameStr;  
+    uint32_t   fNameStr;
     float fVolume;   // Range: 0 - silence, 1.f - loudest
 
-    enum FadeType
-    {
+    enum FadeType {
         kLinear,
         kLogarithmic,
         kExponential

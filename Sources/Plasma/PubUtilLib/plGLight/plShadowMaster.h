@@ -57,8 +57,7 @@ class plLightInfo;
 class plShadowCastMsg;
 
 
-class plShadowMaster : public plObjInterface
-{
+class plShadowMaster : public plObjInterface {
 public:
     // Props inc by 1 (bit shift in bitvector).
     enum plDrawProperties {
@@ -121,14 +120,16 @@ public:
     plShadowMaster();
     virtual ~plShadowMaster();
 
-    CLASSNAME_REGISTER( plShadowMaster );
-    GETINTERFACE_ANY( plShadowMaster, plObjInterface );
+    CLASSNAME_REGISTER(plShadowMaster);
+    GETINTERFACE_ANY(plShadowMaster, plObjInterface);
 
     virtual bool MsgReceive(plMessage* msg);
 
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l) {}
 
-    int32_t       GetNumProperties() const { return kNumProps; }
+    int32_t       GetNumProperties() const {
+        return kNumProps;
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -140,29 +141,57 @@ public:
     void Activate() const;
 
     // These should only be useful on scene conversion.
-    float GetAttenDist() const { return fAttenDist; }
-    void SetAttenDist(float d) { fAttenDist = d; }
+    float GetAttenDist() const {
+        return fAttenDist;
+    }
+    void SetAttenDist(float d) {
+        fAttenDist = d;
+    }
 
-    float GetMaxDist() const { return fMaxDist; }
-    float GetMinDist() const { return fMinDist; }
+    float GetMaxDist() const {
+        return fMaxDist;
+    }
+    float GetMinDist() const {
+        return fMinDist;
+    }
     void SetMaxDist(float m);
 
-    uint32_t GetMaxSize() const { return fMaxSize; }
-    uint32_t GetMinSize() const { return fMinSize; }
-    void SetMaxSize(uint32_t s) { fMaxSize = s; }
-    void SetMinSize(uint32_t s) { fMinSize = s; }
+    uint32_t GetMaxSize() const {
+        return fMaxSize;
+    }
+    uint32_t GetMinSize() const {
+        return fMinSize;
+    }
+    void SetMaxSize(uint32_t s) {
+        fMaxSize = s;
+    }
+    void SetMinSize(uint32_t s) {
+        fMinSize = s;
+    }
 
-    float GetPower() const { return fPower; }
-    void SetPower(float f) { fPower = f; }
+    float GetPower() const {
+        return fPower;
+    }
+    void SetPower(float f) {
+        fPower = f;
+    }
 
     static void SetGlobalMaxSize(uint32_t s) ;
-    static uint32_t GetGlobalMaxSize() { return fGlobalMaxSize; }
+    static uint32_t GetGlobalMaxSize() {
+        return fGlobalMaxSize;
+    }
 
-    static void SetGlobalMaxDist(float s) { fGlobalMaxDist = s; }
-    static float GetGlobalMaxDist() { return fGlobalMaxDist; }
+    static void SetGlobalMaxDist(float s) {
+        fGlobalMaxDist = s;
+    }
+    static float GetGlobalMaxDist() {
+        return fGlobalMaxDist;
+    }
 
     static void SetGlobalShadowQuality(float s);
-    static float GetGlobalShadowQuality() { return fGlobalVisParm; }
+    static float GetGlobalShadowQuality() {
+        return fGlobalVisParm;
+    }
 };
 
 

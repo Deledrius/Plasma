@@ -48,16 +48,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plControlDefinition.h"
 #include "hsTemplates.h"
 
-class plInputMap
-{
+class plInputMap {
 public:
     static CommandConvert   fCmdConvert[];
     static ControlEventCode ConvertCharToControlCode(const char* c);
-    static const char       *ConvertControlCodeToString( ControlEventCode code );
+    static const char*       ConvertControlCodeToString(ControlEventCode code);
 };
 
-class plMouseMap : public plInputMap
-{
+class plMouseMap : public plInputMap {
 public:
     ~plMouseMap();
     hsTArray<plMouseInfo*> fMap;

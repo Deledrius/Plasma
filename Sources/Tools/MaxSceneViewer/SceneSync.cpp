@@ -108,8 +108,10 @@ void SceneSync::IShutdown()
 bool SceneSync::CreateClientData()
 {
     char path[MAX_PATH];
-    if (!GetOutputDir(path))
+
+    if (!GetOutputDir(path)) {
         return false;
+    }
 
     char datPath[MAX_PATH];
     sprintf(datPath, "%sdat", path);
@@ -124,8 +126,9 @@ bool SceneSync::CreateClientData()
     plConvert::Instance().Convert();
 
     // If convert failed, fail too
-    if (msg.IsBogus())
+    if (msg.IsBogus()) {
         return false;
+    }
 
     // Clear the dirty flags since everything is fresh
     IClearDirtyRecur((plMaxNode*)GetCOREInterface()->GetRootNode());
@@ -142,7 +145,7 @@ bool SceneSync::CreateClientData()
     getcwd(oldCWD, MAX_PATH);
     chdir(path);
 
-    hsAssert( false, "YOU NEED TO FIX ME" );
+    hsAssert(false, "YOU NEED TO FIX ME");
 //  hsgResMgr::ResMgr()->Write();
 
     // TEMP
@@ -153,7 +156,7 @@ bool SceneSync::CreateClientData()
     // TEMP
     hsMaterialConverter::Instance().FreeMaterialCache(path);
 
-    hsAssert( false, "YOU NEED TO FIX ME" );
+    hsAssert(false, "YOU NEED TO FIX ME");
 //  hsgResMgr::ResMgr()->PageOutConverted();
     hsgResMgr::Reset();
 
@@ -168,21 +171,19 @@ bool SceneSync::IsClientRunning()
 void SceneSync::IShutdownClient()
 {
     hsNamedPipeStream outStream(hsNamedPipeStream::kThrowOnError, 500);
-    try
-    {
-        if (outStream.Open(fPipeName, "w"))
-        {
+
+    try {
+        if (outStream.Open(fPipeName, "w")) {
             // Signal the Client
             fUpdateSignal->Signal();
 
-            if (outStream.WaitForClientConnect())
+            if (outStream.WaitForClientConnect()) {
                 outStream.WriteByte(ClientUpdate::kShutdown);
+            }
 
             outStream.Close();
         }
-    }
-    catch (hsNamedPipeStream*)
-    {
+    } catch (hsNamedPipeStream*) {
         hsAssert(0, "Error writing to pipe");
         outStream.Close();
     }
@@ -193,43 +194,46 @@ void SceneSync::SetUpdateFreq(int freq)
     fUpdateFreq = freq;
 
     // If the client is running, change it's update freq
-    if (IsClientRunning())
-    {
+    if (IsClientRunning()) {
         // Kill the old timer
-        if (fTimerID != 0)
-        {
+        if (fTimerID != 0) {
             KillTimer(NULL, fTimerID);
             fTimerID = 0;
         }
 
         // Create a new timer
-        if (fUpdateFreq != -1)
+        if (fUpdateFreq != -1) {
             fTimerID = SetTimer(NULL, 0, fUpdateFreq, ITimerProc);
+        }
     }
 }
 
-bool SceneSync::BeginClientSync(const char *semaphoreName, const char *pipeName)
+bool SceneSync::BeginClientSync(const char* semaphoreName, const char* pipeName)
 {
     char path[MAX_PATH];
-    if (!GetOutputDir(path))
+
+    if (!GetOutputDir(path)) {
         return false;
+    }
 
     char datPath[MAX_PATH];
     sprintf(datPath, "%sdat", path);
 
     // Load the saved rooms and their keys (but not objects)
-    hsAssert( false, "YOU NEED TO FIX ME" );
+    hsAssert(false, "YOU NEED TO FIX ME");
 //  hsgResMgr::ResMgr()->ForceLoadDirectory(datPath, true/*false*/); // TEMP
 
     // Set the keys in the plMaxNodes.  Also, delete Plasma objects for any
     // plMaxNodes that can't be found (must have been deleted).
     IReadNodeMap(path);
 
-    if (!fSceneWatcher)
+    if (!fSceneWatcher) {
         IStartWatching(true);
+    }
 
-    if (fUpdateFreq != -1)
+    if (fUpdateFreq != -1) {
         fTimerID = SetTimer(NULL, 0, fUpdateFreq, ITimerProc);
+    }
 
 //  Update();
 
@@ -242,28 +246,26 @@ bool SceneSync::BeginClientSync(const char *semaphoreName, const char *pipeName)
 
 void SceneSync::EndClientSync(bool abort)
 {
-    if (fTimerID != 0 || fUpdateSignal)
-    {
+    if (fTimerID != 0 || fUpdateSignal) {
         KillTimer(NULL, fTimerID);
         fTimerID = 0;
 
-        if (!abort)
-        {
+        if (!abort) {
             SaveResMgr();
             IShutdownClient();
-        }
-        else
-        {
+        } else {
             // Delete files so we won't try to run with this possibly corrupted data
             char path[MAX_PATH];
-            if (GetOutputDir(path))
+
+            if (GetOutputDir(path)) {
                 IDeletePath(path);
+            }
         }
 
         delete fUpdateSignal;
         fUpdateSignal = nil;
 
-    hsAssert( false, "YOU NEED TO FIX ME" );
+        hsAssert(false, "YOU NEED TO FIX ME");
 //      hsgResMgr::ResMgr()->PageOutConverted();
 //      hsgResMgr::Reset();
     }
@@ -271,22 +273,23 @@ void SceneSync::EndClientSync(bool abort)
 
 #include "../pnKeyedObject/plKey.h"
 
-void SceneSync::IClearDirtyRecur(plMaxNode *node)
+void SceneSync::IClearDirtyRecur(plMaxNode* node)
 {
     node->SetDirty(plMaxNode::kAllDirty, false);
 
-    for (int i = 0; i < node->NumberOfChildren(); i++)
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
         IClearDirtyRecur((plMaxNode*)node->GetChildNode(i));
+    }
 }
 
-void SceneSync::IDeletePath(const char *path)
+void SceneSync::IDeletePath(const char* path)
 {
     // Remove any files in the dat directory
     char datPath[MAX_PATH];
     sprintf(datPath, "%sdat\\", path);
     hsFolderIterator folder(datPath);
-    while (folder.NextFile())
-    {
+
+    while (folder.NextFile()) {
         char file[MAX_PATH];
         folder.GetPathAndName(file);
         DeleteFile(file);
@@ -297,8 +300,8 @@ void SceneSync::IDeletePath(const char *path)
 
     // Remove any files in the root dir
     folder.SetPath(path);
-    while (folder.NextFile())
-    {
+
+    while (folder.NextFile()) {
         char file[MAX_PATH];
         folder.GetPathAndName(file);
         DeleteFile(file);
@@ -309,23 +312,29 @@ bool SceneSync::SaveResMgr()
 {
     // Get the output directory for the current file
     char path[MAX_PATH];
-    if (!GetOutputDir(path))
+
+    if (!GetOutputDir(path)) {
         return false;
+    }
 
     IWriteNodeMap(path);
-    
+
     return true;
 }
 
-bool SceneSync::GetOutputDir(char *buf)
+bool SceneSync::GetOutputDir(char* buf)
 {
-    const char *path = plMaxConfig::GetClientPath();
-    if (!path)
-        return false;
+    const char* path = plMaxConfig::GetClientPath();
 
-    const char *file = GetCOREInterface()->GetCurFileName();
-    if (!file || *file == '\0')
+    if (!path) {
         return false;
+    }
+
+    const char* file = GetCOREInterface()->GetCurFileName();
+
+    if (!file || *file == '\0') {
+        return false;
+    }
 
     char filecpy[_MAX_FNAME];
     _splitpath(file, nil, nil, filecpy, nil);
@@ -349,8 +358,7 @@ bool SceneSync::IStartWatching(bool forceWatch)
     // Ref all the nodes in the scene if:
     // a) we are being forced to watch (starting SceneViewer)
     // b) there is previously saved data for this scene (we need to keep up to date)
-    if (forceWatch || CanLoadOldResMgr())
-    {
+    if (forceWatch || CanLoadOldResMgr()) {
         fSceneWatcher = new SceneWatcher;
     }
 
@@ -359,8 +367,9 @@ bool SceneSync::IStartWatching(bool forceWatch)
 
 bool SceneSync::IStopWatching()
 {
-    if (!fSceneWatcher)
+    if (!fSceneWatcher) {
         return true;
+    }
 
     delete fSceneWatcher;
     fSceneWatcher = nil;
@@ -368,18 +377,21 @@ bool SceneSync::IStopWatching()
     return true;
 }
 
-static const char *kKeysFile = "NodeMap.dat";
+static const char* kKeysFile = "NodeMap.dat";
 
 bool SceneSync::CanLoadOldResMgr()
 {
     char path[MAX_PATH];
-    if (!GetOutputDir(path))
+
+    if (!GetOutputDir(path)) {
         return false;
+    }
+
     strcat(path, kKeysFile);
 
     hsUNIXStream s;
-    if (s.Open(path))
-    {
+
+    if (s.Open(path)) {
         s.Close();
         return true;
     }
@@ -387,18 +399,20 @@ bool SceneSync::CanLoadOldResMgr()
     return false;
 }
 
-static void IGetNodes(std::vector<plMaxNode*>& nodes, plMaxNode *curNode=nil)
+static void IGetNodes(std::vector<plMaxNode*>& nodes, plMaxNode* curNode = nil)
 {
-    if (!curNode)
+    if (!curNode) {
         curNode = (plMaxNode*)GetCOREInterface()->GetRootNode();
-    else
+    } else {
         nodes.push_back(curNode);
+    }
 
-    for (int i = 0; i < curNode->NumberOfChildren(); i++)
-    {
-        plMaxNode *childNode = (plMaxNode*)curNode->GetChildNode(i);
-        if (childNode)
+    for (int i = 0; i < curNode->NumberOfChildren(); i++) {
+        plMaxNode* childNode = (plMaxNode*)curNode->GetChildNode(i);
+
+        if (childNode) {
             IGetNodes(nodes, childNode);
+        }
     }
 }
 
@@ -408,15 +422,17 @@ static void IGetNodes(std::vector<plMaxNode*>& nodes, plMaxNode *curNode=nil)
 // It is used to figure out the plKey associated with a particular node, which
 // will be needed if the node's data needs to be deleted out of the Plasma scene.
 //
-bool SceneSync::IWriteNodeMap(const char *dir)
+bool SceneSync::IWriteNodeMap(const char* dir)
 {
     char path[MAX_PATH];
     strcpy(path, dir);
     strcat(path, kKeysFile);
 
     hsUNIXStream s;
-    if (!s.Open(path, "wb"))
+
+    if (!s.Open(path, "wb")) {
         return false;
+    }
 
     int numWritten = 0;
     s.WriteSwap32(numWritten);
@@ -425,12 +441,11 @@ bool SceneSync::IWriteNodeMap(const char *dir)
     IGetNodes(nodes);
 
     int numNodes = nodes.size();
-    for (int i = 0; i < numNodes; i++)
-    {
-        plMaxNode *node = nodes[i];
 
-        if (node->GetKey())
-        {
+    for (int i = 0; i < numNodes; i++) {
+        plMaxNode* node = nodes[i];
+
+        if (node->GetKey()) {
             s.WriteSwap32(node->GetHandle());
             node->GetKey()->GetUoid().Write(&s);
 
@@ -448,23 +463,24 @@ bool SceneSync::IWriteNodeMap(const char *dir)
 
 #include "../MaxMain/plMaxNodeData.h"
 
-bool SceneSync::IReadNodeMap(const char *dir)
+bool SceneSync::IReadNodeMap(const char* dir)
 {
     char path[MAX_PATH];
     strcpy(path, dir);
     strcat(path, kKeysFile);
 
     hsUNIXStream s;
-    if (!s.Open(path, "rb"))
+
+    if (!s.Open(path, "rb")) {
         return false;
+    }
 
     int numWritten = s.ReadSwap32();
 
-    for (int i = 0; i < numWritten; i++)
-    {
+    for (int i = 0; i < numWritten; i++) {
         // Read in the node handle and get the actual node
         ULONG handle = s.ReadSwap32();
-        plMaxNode *node = (plMaxNode*)GetCOREInterface()->GetINodeByHandle(handle);
+        plMaxNode* node = (plMaxNode*)GetCOREInterface()->GetINodeByHandle(handle);
 
         // Read in the Uoid and get the key
         plUoid uoid;
@@ -473,22 +489,20 @@ bool SceneSync::IReadNodeMap(const char *dir)
 
         // A node with that handle wasn't found, it must have been deleted.
         // Delete it from the Plasma scene.
-        if (!node)
-        {
-    hsAssert( false, "YOU NEED TO FIX ME" );
+        if (!node) {
+            hsAssert(false, "YOU NEED TO FIX ME");
 //          hsgResMgr::ResMgr()->RemoveObject(key);
-        }
-        else
-        {
+        } else {
             // Save the node's key in the node data
-            plMaxNodeData *dat = node->GetMaxNodeData();
+            plMaxNodeData* dat = node->GetMaxNodeData();
+
             // Allocate the node data if it doesn't have any
-            if (!dat)
-            {
+            if (!dat) {
                 plMaxNodeData data;
                 node->SetMaxNodeData(&data);
                 dat = node->GetMaxNodeData();
             }
+
             dat->SetKey(key);
             dat->SetSceneObject(plSceneObject::ConvertNoRef(key->GetObjectPtr()));
             node->CanConvert();
@@ -505,32 +519,30 @@ bool SceneSync::IReadNodeMap(const char *dir)
 bool SceneSync::Update()
 {
     // If there are no dirty nodes, and nothing was deleted, return now
-    if (!fSceneWatcher || (!fSceneWatcher->AnyDirty() && !fSceneWatcher->AnyDeleted()))
+    if (!fSceneWatcher || (!fSceneWatcher->AnyDirty() && !fSceneWatcher->AnyDeleted())) {
         return false;
+    }
 
     std::vector<plUoid> delUoids;
 
     // If any nodes were deleted, remove them from the ResManager
-    if (fSceneWatcher->AnyDeleted())
-    {
+    if (fSceneWatcher->AnyDeleted()) {
         SceneWatcher::KeyList& deleted = fSceneWatcher->GetDeleted();
 
-        for (int i = 0; i < deleted.size(); i++)
-        {
+        for (int i = 0; i < deleted.size(); i++) {
             delUoids.push_back(deleted[i]->GetUoid());
-    hsAssert( false, "YOU NEED TO FIX ME" );
+            hsAssert(false, "YOU NEED TO FIX ME");
 //          hsgResMgr::ResMgr()->RemoveObject(deleted[i]);
         }
 
         deleted.clear();
     }
 
-    hsAssert( false, "YOU NEED TO FIX ME" );
+    hsAssert(false, "YOU NEED TO FIX ME");
 //  hsgResMgr::ResMgr()->SaveNewKeys(true);
 
     // If any nodes are dirty, reconvert them
-    if (fSceneWatcher->AnyDirty())
-    {
+    if (fSceneWatcher->AnyDirty()) {
         // Go through all the referenced nodes and put all the ones that need to be
         // reconverted in a list
         SceneWatcher::NodeSet dirtyNodes;
@@ -539,18 +551,19 @@ bool SceneSync::Update()
         // Delete the SceneObjects for all the dirty nodes, and put them in a list
         // that we can send to the converter
         hsTArray<plMaxNode*> nodes;
-        for (SceneWatcher::NodeSet::iterator it = dirtyNodes.begin(); it != dirtyNodes.end(); it++)
-        {
+
+        for (SceneWatcher::NodeSet::iterator it = dirtyNodes.begin(); it != dirtyNodes.end(); it++) {
             // If the material is dirty, tell the material converter to release
             // it's ref, so it will be recreated.
-            if ((*it)->GetDirty(plMaxNode::kMatDirty))
+            if ((*it)->GetDirty(plMaxNode::kMatDirty)) {
                 hsMaterialConverter::Instance().ClearDoneMaterials(*it);
+            }
 
             plKey key = (*it)->GetKey();
-            if (key)
-            {
+
+            if (key) {
                 delUoids.push_back(key->GetUoid());
-    hsAssert( false, "YOU NEED TO FIX ME" );
+                hsAssert(false, "YOU NEED TO FIX ME");
 //              hsgResMgr::ResMgr()->RemoveObject(key);
             }
 
@@ -571,34 +584,33 @@ bool SceneSync::Update()
     //
     // Sort the new keys
     //
-    hsAssert( false, "YOU NEED TO FIX ME" );
+    hsAssert(false, "YOU NEED TO FIX ME");
 //  const plUpdatableResManager::KeyList& keys = hsgResMgr::ResMgr()->GetNewKeys();
     std::vector<plKey> newKeys;// = keys;
     plKeyRefSort::Sort(&newKeys);
 
 #if 0
     hsStatusMessage("New Keys (Sorted):\n");
-    for (int x = 0; x < newKeys.size(); x++)
-    {
+
+    for (int x = 0; x < newKeys.size(); x++) {
         hsStatusMessage("  ");
         hsStatusMessage(newKeys[x]->GetName());
         hsStatusMessage("\n");
     }
+
 #endif
 
     //
     // Write out the data to the client
     //
     hsNamedPipeStream outStream(hsNamedPipeStream::kThrowOnError);
-    try
-    {
-        if (outStream.Open(fPipeName, "w"))
-        {
+
+    try {
+        if (outStream.Open(fPipeName, "w")) {
             // Signal the Client
             fUpdateSignal->Signal();
 
-            if (outStream.WaitForClientConnect())
-            {
+            if (outStream.WaitForClientConnect()) {
                 outStream.WriteByte(ClientUpdate::kUpdate);
 
                 int i;
@@ -606,66 +618,63 @@ bool SceneSync::Update()
                 // Write out the deleted Uoids
                 int numUoids = delUoids.size();
                 outStream.WriteSwap32(numUoids);
-                for (i = 0; i < numUoids; i++)
-                {
+
+                for (i = 0; i < numUoids; i++) {
                     delUoids[i].Write(&outStream);
                 }
 
-                hsAssert( false, "NEED TO FIX ME!" );
+                hsAssert(false, "NEED TO FIX ME!");
 //              hsgResMgr::ResMgr()->WriteChangedSpans(&outStream);
 
                 // Write out the new keys (and objects)
                 int numKeys = newKeys.size();
                 outStream.WriteSwap32(numKeys);
-                for (i = 0; i < numKeys; i++)
-                {
+
+                for (i = 0; i < numKeys; i++) {
                     plKey key = newKeys[i];
-                    if (key && key->GetObjectPtr())
+
+                    if (key && key->GetObjectPtr()) {
                         hsgResMgr::ResMgr()->WriteCreatable(&outStream, key->GetObjectPtr());
+                    }
                 }
             }
 
             outStream.Close();
         }
-    }
-    catch (...)
-    {
+    } catch (...) {
         hsAssert(0, "Error writing to pipe");
         outStream.Close();
 
         EndClientSync(true);
     }
 
-                hsAssert( false, "NEED TO FIX ME!" );
+    hsAssert(false, "NEED TO FIX ME!");
 //  hsgResMgr::ResMgr()->SaveNewKeys(false);
 
     return true;
 }
 
-void SceneSync::INotify(void *param, NotifyInfo *info)
+void SceneSync::INotify(void* param, NotifyInfo* info)
 {
-    SceneSync &inst = SceneSync::Instance();
+    SceneSync& inst = SceneSync::Instance();
 
     int code = info->intcode;
 
     // Need to save the current state
     if (code == NOTIFY_SYSTEM_PRE_RESET ||
-        code == NOTIFY_SYSTEM_PRE_NEW ||
-        code == NOTIFY_FILE_PRE_OPEN ||
-        code == NOTIFY_PRE_EXPORT)
-    {
+            code == NOTIFY_SYSTEM_PRE_NEW ||
+            code == NOTIFY_FILE_PRE_OPEN ||
+            code == NOTIFY_PRE_EXPORT) {
         inst.IStopWatching();
     }
     // Need to load the saved state
     else if (code == NOTIFY_FILE_POST_OPEN ||
-            code == NOTIFY_POST_EXPORT ||
-            code == NOTIFY_EXPORT_FAILED)
-    {
+             code == NOTIFY_POST_EXPORT ||
+             code == NOTIFY_EXPORT_FAILED) {
         inst.IStartWatching();
     }
     // Need to save the current state and cleanup
-    else if (code == NOTIFY_SYSTEM_SHUTDOWN)
-    {
+    else if (code == NOTIFY_SYSTEM_SHUTDOWN) {
         inst.SaveResMgr();
         inst.IStopWatching();
         inst.IShutdown();

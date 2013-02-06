@@ -75,7 +75,7 @@ class plOneShotCallbacks;
 /** \class plAGAnimInstance
     Whenever we attach an animation to a scene object hierarchy, we
     create an activation record -- a plAGAnimInstance -- that remembers
-    all the ephemeral state associated with animation 
+    all the ephemeral state associated with animation
     Since animations have many channels and may involve blend operations,
     one of the primary responsibilities of this class is to keep track of
     all the animation node graphs that were created by the invocation of
@@ -84,8 +84,7 @@ class plOneShotCallbacks;
 class plAGAnimInstance {
 public:
     /** Used for the fade commands to select what to fade. */
-    enum
-    {
+    enum {
         kFadeBlend,     /// Fade the blend strength
         kFadeAmp,       /// Fade the amplitude
     } FadeType;
@@ -97,21 +96,29 @@ public:
         This attaches the animation channels to the channels of
         the master modifier and creates all the bookkeeping structures
         necessary to undo it later. */
-    plAGAnimInstance(plAGAnim * anim, plAGMasterMod * master, float blend, uint16_t blendPriority, bool cache, bool useAmplitude);
+    plAGAnimInstance(plAGAnim* anim, plAGMasterMod* master, float blend, uint16_t blendPriority, bool cache, bool useAmplitude);
 
     /** Destructor. Removes the animation from the scene objects it's attached to. */
     virtual ~plAGAnimInstance();
 
     /** Returns the animation that this instance mediates. */
-    const plAGAnim * GetAnimation() { return fAnimation; };
+    const plAGAnim* GetAnimation() {
+        return fAnimation;
+    };
 
     /** Returns the timeconvert object that controls the progress of time
         in this animation. */
-    plAnimTimeConvert *GetTimeConvert() { return fTimeConvert; }
+    plAnimTimeConvert* GetTimeConvert() {
+        return fTimeConvert;
+    }
 
     /** Set the speed of the animation. This is expressed as a fraction of
         the speed with which the animation was defined. */
-    void SetSpeed(float speed) { if (fTimeConvert) fTimeConvert->SetSpeed(speed); };
+    void SetSpeed(float speed) {
+        if (fTimeConvert) {
+            fTimeConvert->SetSpeed(speed);
+        }
+    };
 
     // \{
     /**
@@ -143,14 +150,14 @@ public:
     void SetLoop(bool status);
 
     /** Interpret and respond to an animation command message. /sa plAnimCmdMsg */
-    bool HandleCmd(plAnimCmdMsg *msg);
+    bool HandleCmd(plAnimCmdMsg* msg);
 
     /** Start playback of the animation. You may optionally provide the a world
         time, which is needed for synchronizing the animation's timeline
         with the global timeline. If timeNow is -1 (the default,) the system
         time will be polled */
     void Start(double worldTimeNow = -1);
-    
+
     /** Stop playback of the animation. */
     void Stop();
 
@@ -160,13 +167,13 @@ public:
         that occur between the current time and the target time. */
     void SetCurrentTime(float newLocalTime, bool jump = false);
 
-    /** Move the playback head by the specified relative amount within 
+    /** Move the playback head by the specified relative amount within
         the animation. This may cause looping. If the beginning or end
         of the animation is reached an looping is not on, the movement
         will pin.
         \param jump if true, don't look for callbacks between old time and TRACKED_NEW */
     void SeekRelative(float delta, bool jump);
-    
+
     /** Gradually fade the blend strength or amplitude of the animation.
         \param goal is the desired blend strength
         \param rate is in blend units per second
@@ -177,16 +184,16 @@ public:
         Extremely useful for situations where the controlling logic
         is terminating immediately but you want the animation to fade
         out gradually.
-        \deprecated 
+        \deprecated
     */
     void FadeAndDetach(float goal, float rate);
 
     /** Has the animation terminated of natural causes?
-        Primarily used to see if an animation has played all the 
+        Primarily used to see if an animation has played all the
         way to the end, but will also return true if the animation
         was stopped with a stop command */
     bool IsFinished();
-    
+
     /** Is the animation playback head positioned at the end. */
     bool IsAtEnd();
 
@@ -202,7 +209,7 @@ public:
         Typically called by the master mod prior to destructing the instance. */
     void DetachChannels();
 
-    /** Prune any unused branches out of the animation graph; add any 
+    /** Prune any unused branches out of the animation graph; add any
         newly active branches back in. */
     void Optimize();
 
@@ -210,27 +217,29 @@ public:
         May include the effects of looping or wraparound.
         If the local time passes the end of the animation, the returned
         time will be pinned appropriately. */
-    double WorldToAnimTime(double foo) { return (fTimeConvert ? fTimeConvert->WorldToAnimTimeNoUpdate(foo) : 0); };
+    double WorldToAnimTime(double foo) {
+        return (fTimeConvert ? fTimeConvert->WorldToAnimTimeNoUpdate(foo) : 0);
+    };
 
     /** Attach a sequence of callback messages to the animation instance.
         Messages are each associated with a specific (local) time
         in the animation and will be sent when playback passes that time. */
-    void AttachCallbacks(plOneShotCallbacks *callbacks);
-    
-    void ProcessFade(float elapsed);             // process any outstanding fades    
+    void AttachCallbacks(plOneShotCallbacks* callbacks);
+
+    void ProcessFade(float elapsed);             // process any outstanding fades
     void SearchForGlobals(); // Util function to setup SDL channels
 protected:
     /** Set up bookkeeping for a fade. */
     void ISetupFade(float goal, float rate, bool detach, uint8_t type);
 
-    void IRegisterDetach(const plString &channelName, plAGChannel *channel);
+    void IRegisterDetach(const plString& channelName, plAGChannel* channel);
 
-    const plAGAnim * fAnimation;
-    plAGMasterMod * fMaster;
+    const plAGAnim* fAnimation;
+    plAGMasterMod* fMaster;
 
-    std::map<plString, plAGChannelApplicator *, plString::less_i> fChannels;
+    std::map<plString, plAGChannelApplicator*, plString::less_i> fChannels;
 
-    typedef std::multimap<plString, plAGChannel *> plDetachMap;
+    typedef std::multimap<plString, plAGChannel*> plDetachMap;
     plDetachMap fManualDetachChannels;
 
     std::vector<plAGChannel*> fCleanupChannels;
@@ -240,18 +249,18 @@ protected:
     plScalarConstant fAmplitude;    // for animation scaling
 
     // Each activation gets its own timeline.
-    plAnimTimeConvert       *fTimeConvert;
+    plAnimTimeConvert*       fTimeConvert;
 
     bool                fFadeBlend;         /// we are fading the blend
     float            fFadeBlendGoal;     /// what blend level we're trying to reach
     float            fFadeBlendRate;     /// how fast are we fading in blend units per second (1 blend unit = full)
     bool                fFadeDetach;        /// detach after fade is finished? (only used for blend fades)
-    
+
     bool                fFadeAmp;           /// we are fading the amplitude
-    float            fFadeAmpGoal;       /// amplitude we're trying to reach 
+    float            fFadeAmpGoal;       /// amplitude we're trying to reach
     float            fFadeAmpRate;       /// how faster we're fading in blend units per second
 
-    float ICalcFade(bool &fade, float curVal, float goal, float rate, float elapsed);
+    float ICalcFade(bool& fade, float curVal, float goal, float rate, float elapsed);
 
 };
 
@@ -263,8 +272,8 @@ protected:
 extern plString gGlobalAnimName;
 extern plString gGlobalChannelName;
 
-void RegisterAGAlloc(plAGChannel *object, const char *chanName, const char *animName, uint16_t classIndex);
-void UnRegisterAGAlloc(plAGChannel *object);
+void RegisterAGAlloc(plAGChannel* object, const char* chanName, const char* animName, uint16_t classIndex);
+void UnRegisterAGAlloc(plAGChannel* object);
 void DumpAGAllocs();
 
 #endif // TRACK_AG_ALLOCS

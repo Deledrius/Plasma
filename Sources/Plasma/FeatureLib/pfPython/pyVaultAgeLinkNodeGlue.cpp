@@ -57,11 +57,12 @@ PYTHON_DEFAULT_DEALLOC_DEFINITION(ptVaultAgeLinkNode)
 PYTHON_INIT_DEFINITION(ptVaultAgeLinkNode, args, keywords)
 {
     int n = 0;
-    if (!PyArg_ParseTuple(args, "|i", &n))
-    {
+
+    if (!PyArg_ParseTuple(args, "|i", &n)) {
         PyErr_SetString(PyExc_TypeError, "__init__ expects an optional int");
         PYTHON_RETURN_INIT_ERROR;
     }
+
     // we don't really do anything? Not according to the associated constructor. Odd...
     PYTHON_RETURN_INIT_OK;
 }
@@ -74,11 +75,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultAgeLinkNode, getAgeInfo)
 PYTHON_METHOD_DEFINITION(ptVaultAgeLinkNode, setLocked, args)
 {
     char stateFlag;
-    if (!PyArg_ParseTuple(args, "b", &stateFlag))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &stateFlag)) {
         PyErr_SetString(PyExc_TypeError, "setLocked expects a boolean");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetLocked(stateFlag != 0);
     PYTHON_RETURN_NONE;
 }
@@ -91,11 +93,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultAgeLinkNode, getLocked)
 PYTHON_METHOD_DEFINITION(ptVaultAgeLinkNode, setVolatile, args)
 {
     char stateFlag;
-    if (!PyArg_ParseTuple(args, "b", &stateFlag))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &stateFlag)) {
         PyErr_SetString(PyExc_TypeError, "setVolatile expects a boolean");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetVolatile(stateFlag != 0);
     PYTHON_RETURN_NONE;
 }
@@ -108,23 +111,22 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultAgeLinkNode, getVolatile)
 PYTHON_METHOD_DEFINITION(ptVaultAgeLinkNode, addSpawnPoint, args)
 {
     PyObject* spawnPtObj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &spawnPtObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &spawnPtObj)) {
         PyErr_SetString(PyExc_TypeError, "addSpawnPoint expects a ptSpawnPointInfo or a ptSpawnPointInfoRef");
         PYTHON_RETURN_ERROR;
     }
-    if (pySpawnPointInfo::Check(spawnPtObj))
-    {
+
+    if (pySpawnPointInfo::Check(spawnPtObj)) {
         pySpawnPointInfo* spawnPt = pySpawnPointInfo::ConvertFrom(spawnPtObj);
         self->fThis->AddSpawnPoint(*spawnPt);
         PYTHON_RETURN_NONE;
-    }
-    else if (pySpawnPointInfoRef::Check(spawnPtObj))
-    {
+    } else if (pySpawnPointInfoRef::Check(spawnPtObj)) {
         pySpawnPointInfoRef* spawnPt = pySpawnPointInfoRef::ConvertFrom(spawnPtObj);
         self->fThis->AddSpawnPointRef(*spawnPt);
         PYTHON_RETURN_NONE;
     }
+
     PyErr_SetString(PyExc_TypeError, "addSpawnPoint expects a ptSpawnPointInfo or a ptSpawnPointInfoRef");
     PYTHON_RETURN_ERROR;
 }
@@ -132,29 +134,26 @@ PYTHON_METHOD_DEFINITION(ptVaultAgeLinkNode, addSpawnPoint, args)
 PYTHON_METHOD_DEFINITION(ptVaultAgeLinkNode, removeSpawnPoint, args)
 {
     PyObject* spawnPtObj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &spawnPtObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &spawnPtObj)) {
         PyErr_SetString(PyExc_TypeError, "removeSpawnPoint expects a ptSpawnPointInfo, a ptSpawnPointInfoRef, or a string");
         PYTHON_RETURN_ERROR;
     }
-    if (pySpawnPointInfo::Check(spawnPtObj))
-    {
+
+    if (pySpawnPointInfo::Check(spawnPtObj)) {
         pySpawnPointInfo* spawnPt = pySpawnPointInfo::ConvertFrom(spawnPtObj);
         self->fThis->RemoveSpawnPoint(*spawnPt);
         PYTHON_RETURN_NONE;
-    }
-    else if (pySpawnPointInfoRef::Check(spawnPtObj))
-    {
+    } else if (pySpawnPointInfoRef::Check(spawnPtObj)) {
         pySpawnPointInfoRef* spawnPt = pySpawnPointInfoRef::ConvertFrom(spawnPtObj);
         self->fThis->RemoveSpawnPointRef(*spawnPt);
         PYTHON_RETURN_NONE;
-    }
-    else if (PyString_Check(spawnPtObj))
-    {
+    } else if (PyString_Check(spawnPtObj)) {
         char* spawnPt = PyString_AsString(spawnPtObj);
         self->fThis->RemoveSpawnPointByName(spawnPt);
         PYTHON_RETURN_NONE;
     }
+
     PyErr_SetString(PyExc_TypeError, "removeSpawnPoint expects a ptSpawnPointInfo, a ptSpawnPointInfoRef, or a string");
     PYTHON_RETURN_ERROR;
 }
@@ -162,11 +161,12 @@ PYTHON_METHOD_DEFINITION(ptVaultAgeLinkNode, removeSpawnPoint, args)
 PYTHON_METHOD_DEFINITION(ptVaultAgeLinkNode, hasSpawnPoint, args)
 {
     char* name;
-    if (!PyArg_ParseTuple(args, "s", &name))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &name)) {
         PyErr_SetString(PyExc_TypeError, "hasSpawnPoint expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_BOOL(self->fThis->HasSpawnPoint(name));
 }
 
@@ -181,36 +181,42 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultAgeLinkNode, asAgeLinkStruct)
 }
 
 PYTHON_START_METHODS_TABLE(ptVaultAgeLinkNode)
-    PYTHON_METHOD_NOARGS(ptVaultAgeLinkNode, getAgeInfo, "Returns the ageInfo as a ptAgeInfoStruct"),
-    PYTHON_METHOD(ptVaultAgeLinkNode, setLocked, "Params: state\nSets whether the link is locked or not"),
-    PYTHON_METHOD_NOARGS(ptVaultAgeLinkNode, getLocked, "Returns whether the link is locked or not"),
-    PYTHON_METHOD(ptVaultAgeLinkNode, setVolatile, "Params: state\nSets the state of the volitility of the link"),
-    PYTHON_METHOD_NOARGS(ptVaultAgeLinkNode, getVolatile, "Returns whether the link is volatile or not"),
-    PYTHON_METHOD(ptVaultAgeLinkNode, addSpawnPoint, "Params: point\nAdds the specified ptSpawnPointInfo or ptSpawnPointInfoRef"),
-    PYTHON_METHOD(ptVaultAgeLinkNode, removeSpawnPoint, "Params: point\nRemoves the specified spawn point based on a ptSpawnPointInfo, ptSpawnPointInfoRef, or string"),
-    PYTHON_METHOD(ptVaultAgeLinkNode, hasSpawnPoint, "Params: spawnPtName\nReturns true if this link has the specified spawn point"),
-    PYTHON_METHOD_NOARGS(ptVaultAgeLinkNode, getSpawnPoints, "Returns a list of ptSpawnPointInfo objects"),
-    PYTHON_METHOD_NOARGS(ptVaultAgeLinkNode, asAgeLinkStruct, "Returns this ptVaultAgeLinkNode as a ptAgeLinkStruct"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptVaultAgeLinkNode, getAgeInfo, "Returns the ageInfo as a ptAgeInfoStruct"),
+                     PYTHON_METHOD(ptVaultAgeLinkNode, setLocked, "Params: state\nSets whether the link is locked or not"),
+                     PYTHON_METHOD_NOARGS(ptVaultAgeLinkNode, getLocked, "Returns whether the link is locked or not"),
+                     PYTHON_METHOD(ptVaultAgeLinkNode, setVolatile, "Params: state\nSets the state of the volitility of the link"),
+                     PYTHON_METHOD_NOARGS(ptVaultAgeLinkNode, getVolatile, "Returns whether the link is volatile or not"),
+                     PYTHON_METHOD(ptVaultAgeLinkNode, addSpawnPoint, "Params: point\nAdds the specified ptSpawnPointInfo or ptSpawnPointInfoRef"),
+                     PYTHON_METHOD(ptVaultAgeLinkNode, removeSpawnPoint, "Params: point\nRemoves the specified spawn point based on a ptSpawnPointInfo, ptSpawnPointInfoRef, or string"),
+                     PYTHON_METHOD(ptVaultAgeLinkNode, hasSpawnPoint, "Params: spawnPtName\nReturns true if this link has the specified spawn point"),
+                     PYTHON_METHOD_NOARGS(ptVaultAgeLinkNode, getSpawnPoints, "Returns a list of ptSpawnPointInfo objects"),
+                     PYTHON_METHOD_NOARGS(ptVaultAgeLinkNode, asAgeLinkStruct, "Returns this ptVaultAgeLinkNode as a ptAgeLinkStruct"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVaultAgeLinkNode, pyVaultNode, "Params: n=0\nPlasma vault age link node");
 
 // required functions for PyObject interoperability
-PyObject *pyVaultAgeLinkNode::New(RelVaultNode* nfsNode)
+PyObject* pyVaultAgeLinkNode::New(RelVaultNode* nfsNode)
 {
-    ptVaultAgeLinkNode *newObj = (ptVaultAgeLinkNode*)ptVaultAgeLinkNode_type.tp_new(&ptVaultAgeLinkNode_type, NULL, NULL);
-    if (newObj->fThis->fNode)
+    ptVaultAgeLinkNode* newObj = (ptVaultAgeLinkNode*)ptVaultAgeLinkNode_type.tp_new(&ptVaultAgeLinkNode_type, NULL, NULL);
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->DecRef();
+    }
+
     newObj->fThis->fNode = nfsNode;
-    if (newObj->fThis->fNode)
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->IncRef();
+    }
+
     return (PyObject*)newObj;
 }
 
-PyObject *pyVaultAgeLinkNode::New(int n /* =0 */)
+PyObject* pyVaultAgeLinkNode::New(int n /* =0 */)
 {
-    ptVaultAgeLinkNode *newObj = (ptVaultAgeLinkNode*)ptVaultAgeLinkNode_type.tp_new(&ptVaultAgeLinkNode_type, NULL, NULL);
+    ptVaultAgeLinkNode* newObj = (ptVaultAgeLinkNode*)ptVaultAgeLinkNode_type.tp_new(&ptVaultAgeLinkNode_type, NULL, NULL);
     // oddly enough, nothing to do here
     return (PyObject*)newObj;
 }
@@ -222,7 +228,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptVaultAgeLinkNode, pyVaultAgeLinkNode)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyVaultAgeLinkNode::AddPlasmaClasses(PyObject *m)
+void pyVaultAgeLinkNode::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptVaultAgeLinkNode);

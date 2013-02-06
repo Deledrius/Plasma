@@ -52,8 +52,7 @@ class plParticleSystem;
 // anything it needs to compute that will be the same for all particles.
 // Not a lot of context to go on to begin with, but this will let that
 // expand without any interface changes.
-class plParticleContext
-{
+class plParticleContext {
 public:
     plPipeline*         fPipeline;
     plParticleSystem*   fSystem;
@@ -65,19 +64,18 @@ public:
 // This is just a collection of arrays and strides that a plParticleEffect object will reference and modify
 // in the course of doing its job.
 
-class plEffectTargetInfo
-{
+class plEffectTargetInfo {
 public:
     // uint8_t arrays. Declared as type uint8_t so that adding the stride to the pointer is guaranteed to advance
     // the exact number of bytes.
-    uint8_t *fPos;
-    uint8_t *fVelocity;
-    uint8_t *fInvMass;
-    uint8_t *fAcceleration;
-    uint8_t *fColor;
-    uint8_t *fRadsPerSec;
-    uint8_t *fMiscFlags;
-    
+    uint8_t* fPos;
+    uint8_t* fVelocity;
+    uint8_t* fInvMass;
+    uint8_t* fAcceleration;
+    uint8_t* fColor;
+    uint8_t* fRadsPerSec;
+    uint8_t* fMiscFlags;
+
     uint32_t fPosStride;
     uint32_t fVelocityStride;
     uint32_t fInvMassStride;
@@ -89,7 +87,7 @@ public:
     plParticleContext   fContext;
     uint32_t              fNumValidParticles;
     uint32_t              fFirstNewParticle;
-    
+
     // We're going to need some sort of connectivity data for constraint satisfaction, but at least we have
     // a system that allows that to be added in smoothly when it's needed, so for now, let's get the main
     // goop working.

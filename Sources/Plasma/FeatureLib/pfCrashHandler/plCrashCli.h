@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 struct plCrashMemLink;
 
-class plCrashCli : public plCrashBase
-{
+class plCrashCli : public plCrashBase {
     plCrashMemLink* fLink;
 
 #ifdef HS_BUILD_FOR_WIN32

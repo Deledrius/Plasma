@@ -54,28 +54,30 @@ class hsResMgr;
 // Used for trigger arbitration.
 // Should not set the NetPropagate bcast flag, since it originates on the gameServer.
 //
-class plServerReplyMsg : public plMessage
-{
+class plServerReplyMsg : public plMessage {
     int fType;
 public:
 
-    enum
-    {
+    enum {
         kUnInit = -1,
         kDeny,
         kAffirm,
     };
 
-    void SetType(int t) { fType = t; }
-    int GetType() { return fType; }
+    void SetType(int t) {
+        fType = t;
+    }
+    int GetType() {
+        return fType;
+    }
 
     plServerReplyMsg() : fType(kUnInit) { }
-    plServerReplyMsg(const plKey &s, const plKey &r, const double* t) : plMessage(s,r,t), fType(kUnInit) { }
+    plServerReplyMsg(const plKey& s, const plKey& r, const double* t) : plMessage(s, r, t), fType(kUnInit) { }
 
-    CLASSNAME_REGISTER( plServerReplyMsg );
-    GETINTERFACE_ANY( plServerReplyMsg, plMessage );
+    CLASSNAME_REGISTER(plServerReplyMsg);
+    GETINTERFACE_ANY(plServerReplyMsg, plMessage);
 
-    // IO 
+    // IO
     void Read(hsStream* stream, hsResMgr* mgr);
     void Write(hsStream* stream, hsResMgr* mgr);
 

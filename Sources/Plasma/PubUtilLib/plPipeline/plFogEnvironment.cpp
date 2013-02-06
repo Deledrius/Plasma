@@ -57,14 +57,14 @@ plFogEnvironment::plFogEnvironment()
     fType = kNoFog;
 }
 
-plFogEnvironment::plFogEnvironment( float start, float end, float density, hsColorRGBA &color )
+plFogEnvironment::plFogEnvironment(float start, float end, float density, hsColorRGBA& color)
 {
-    Set( start, end, density, &color );
+    Set(start, end, density, &color);
 }
 
-plFogEnvironment::plFogEnvironment( FogType type, float end, float density, hsColorRGBA &color )
+plFogEnvironment::plFogEnvironment(FogType type, float end, float density, hsColorRGBA& color)
 {
-    SetExp( type, end, density, &color );
+    SetExp(type, end, density, &color);
 }
 
 plFogEnvironment::~plFogEnvironment()
@@ -73,60 +73,60 @@ plFogEnvironment::~plFogEnvironment()
 
 //// Set /////////////////////////////////////////////////////////////////////
 
-void    plFogEnvironment::Set( float start, float end, float density, const hsColorRGBA *color )
+void    plFogEnvironment::Set(float start, float end, float density, const hsColorRGBA* color)
 {
-    if( density <= 0.f )
-    {
+    if (density <= 0.f) {
         fType = kNoFog;
         fStart = 0.f;
         fEnd = 0.f;
         fDensity = 0.f;
-    }
-    else
-    {
+    } else {
         fType = kLinearFog;
         fStart = start;
         fEnd = end;
         fDensity = density;
     }
-    if( color != nil )
+
+    if (color != nil) {
         fColor = *color;
+    }
 }
 
-void    plFogEnvironment::SetExp( FogType type, float end, float density, const hsColorRGBA *color )
+void    plFogEnvironment::SetExp(FogType type, float end, float density, const hsColorRGBA* color)
 {
-    hsAssert( type == kExpFog || type == kExp2Fog, "Invalid fog type passed to plFogEnvironment" );
-    if( density <= 0.f )
-    {
+    hsAssert(type == kExpFog || type == kExp2Fog, "Invalid fog type passed to plFogEnvironment");
+
+    if (density <= 0.f) {
         fType = kNoFog;
         fStart = 0.f;
         fEnd = 0.f;
         fDensity = 0.f;
-    }
-    else
-    {
+    } else {
         fType = type;
         fStart = 0.0f;
         fEnd = end;
         fDensity = density;
     }
-    if( color != nil )
+
+    if (color != nil) {
         fColor = *color;
+    }
 }
 
 //// GetParameters ///////////////////////////////////////////////////////////
 //  Gets the parameters. Sets start to 0 if the type is not linear (can be
 //  nil).
 
-void    plFogEnvironment::GetParameters( float *start, float *end, float *density, hsColorRGBA *color )
+void    plFogEnvironment::GetParameters(float* start, float* end, float* density, hsColorRGBA* color)
 {
-    hsAssert( fType != kLinearFog || start != nil, "Trying to get non-linear paramters on linear fog!" );
-    hsAssert( end != nil && density != nil && color != nil, "Bad pointer to plFogEnvironment::GetParameters()" );
+    hsAssert(fType != kLinearFog || start != nil, "Trying to get non-linear paramters on linear fog!");
+    hsAssert(end != nil && density != nil && color != nil, "Bad pointer to plFogEnvironment::GetParameters()");
 
-    if( fType == kLinearFog )
+    if (fType == kLinearFog) {
         *start = fStart;
-    else if( start != nil )
+    } else if (start != nil) {
         *start = 0.0f;
+    }
 
     *end = fEnd;
     *density = fDensity;
@@ -139,27 +139,27 @@ void    plFogEnvironment::GetParameters( float *start, float *end, float *densit
 //  scale our end value out by the density. The whole formula is:
 //      pipelineEnd = ( end - start ) / density + start
 
-void    plFogEnvironment::GetPipelineParams( float *start, float *end, hsColorRGBA *color )
+void    plFogEnvironment::GetPipelineParams(float* start, float* end, hsColorRGBA* color)
 {
 //  hsAssert( fType == kLinearFog, "Getting linear pipeline params on non-linear fog!" );
 
     *color = fColor;
-    switch(fType)
-    {
+
+    switch (fType) {
     case kLinearFog:
         *start = fStart;
         *end = (fEnd - fStart) / fDensity + fStart;
         break;
-    case kExpFog:
-        {
+
+    case kExpFog: {
             plConst(float) kKnee(0.0f);
             *start = fEnd * kKnee;
             *end = (fEnd - *start) / fDensity + *start;
         }
         break;
+
     default:
-    case kExp2Fog:
-        {
+    case kExp2Fog: {
             plConst(float) kKnee(0.3f);
             *start = fEnd * kKnee;
             *end = (fEnd - *start) / fDensity + *start;
@@ -172,43 +172,43 @@ void    plFogEnvironment::GetPipelineParams( float *start, float *end, hsColorRG
 //  Gets exp/exp^2 pipeline (DX8) specific parameters. Basically massages our
 //  interface values into values that DX8 can use. In this case, we're going
 //  to modulate the density by the end value so that it actually ends at the
-//  right spot. 
+//  right spot.
 
-void    plFogEnvironment::GetPipelineParams( float *density, hsColorRGBA *color )
+void    plFogEnvironment::GetPipelineParams(float* density, hsColorRGBA* color)
 {
-    const float ln256       = logf( 256.f );
-    const float sqrtLn256   = sqrtf( ln256 );
+    const float ln256       = logf(256.f);
+    const float sqrtLn256   = sqrtf(ln256);
 
-    
-    hsAssert( fType == kExpFog || fType == kExp2Fog, "Getting non-linear pipeline params on linear fog!" );
 
-    *density = ( ( fType == kExpFog ) ? ln256: sqrtLn256 ) * fDensity / fEnd;
+    hsAssert(fType == kExpFog || fType == kExp2Fog, "Getting non-linear pipeline params on linear fog!");
+
+    *density = ((fType == kExpFog) ? ln256 : sqrtLn256) * fDensity / fEnd;
     *color = fColor;
 }
 
 //// Read ////////////////////////////////////////////////////////////////////
 
-void    plFogEnvironment::Read( hsStream *s, hsResMgr *mgr )
+void    plFogEnvironment::Read(hsStream* s, hsResMgr* mgr)
 {
-    hsKeyedObject::Read( s, mgr );
+    hsKeyedObject::Read(s, mgr);
 
     fType = s->ReadByte();
     fStart = s->ReadLEFloat();
     fEnd = s->ReadLEFloat();
     fDensity = s->ReadLEFloat();
-    fColor.Read( s );
+    fColor.Read(s);
 }
 
 //// Write ///////////////////////////////////////////////////////////////////
 
-void    plFogEnvironment::Write( hsStream *s, hsResMgr *mgr )
+void    plFogEnvironment::Write(hsStream* s, hsResMgr* mgr)
 {
-    hsKeyedObject::Write( s, mgr );
+    hsKeyedObject::Write(s, mgr);
 
-    s->WriteByte( fType );
-    s->WriteLEFloat( fStart );
-    s->WriteLEFloat( fEnd );
-    s->WriteLEFloat( fDensity );
-    fColor.Write( s );
+    s->WriteByte(fType);
+    s->WriteLEFloat(fStart);
+    s->WriteLEFloat(fEnd);
+    s->WriteLEFloat(fDensity);
+    fColor.Write(s);
 }
 

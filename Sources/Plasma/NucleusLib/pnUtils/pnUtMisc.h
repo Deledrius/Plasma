@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtMisc.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNUTILS_PRIVATE_PNUTMISC_H
@@ -57,8 +57,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *
 ***/
 
-void ModuleSetInstance (void * instance);
-void * ModuleGetInstance ();
+void ModuleSetInstance(void* instance);
+void* ModuleGetInstance();
 
 
 /*****************************************************************************
@@ -67,7 +67,7 @@ void * ModuleGetInstance ();
 *
 ***/
 
-const wchar_t * AppGetCommandLine ();
+const wchar_t* AppGetCommandLine();
 
 
 /*****************************************************************************
@@ -77,8 +77,8 @@ const wchar_t * AppGetCommandLine ();
 ***/
 
 // used to dump the internal state of a module
-typedef void (CDECL * FStateDump)(
-    void *      param,
+typedef void (CDECL* FStateDump)(
+    void*       param,
     const wchar_t fmt[],
     ...
 );

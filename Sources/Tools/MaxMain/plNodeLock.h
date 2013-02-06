@@ -43,8 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plNodeLock_inc
 #define plNodeLock_inc
 
-class plNodeLock
-{
+class plNodeLock {
 protected:
     void        ISetLockRecur(INode* node, BOOL on);
 
@@ -53,7 +52,9 @@ public:
     ~plNodeLock() {}
 
     void        Lock(BOOL on = true); // on = true locks, on = false unlocks
-    void        Unlock() { Lock(false); }
+    void        Unlock() {
+        Lock(false);
+    }
 };
 
 #endif // plNodeLock_inc

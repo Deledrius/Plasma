@@ -54,8 +54,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class pyColor;
 
-class pyGUIControlMultiLineEdit : public pyGUIControl
-{
+class pyGUIControlMultiLineEdit : public pyGUIControl {
 protected:
     pyGUIControlMultiLineEdit(): pyGUIControl() {} // used by python glue, do NOT call
     pyGUIControlMultiLineEdit(pyKey& gckey);
@@ -64,55 +63,55 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptGUIControlMultiLineEdit);
-    static PyObject *New(pyKey& gckey);
-    static PyObject *New(plKey objkey);
+    static PyObject* New(pyKey& gckey);
+    static PyObject* New(plKey objkey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGUIControlMultiLineEdit object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGUIControlMultiLineEdit); // converts a PyObject to a pyGUIControlMultiLineEdit (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
-    static void AddPlasmaConstantsClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
+    static void AddPlasmaConstantsClasses(PyObject* m);
 
     static bool IsGUIControlMultiLineEdit(pyKey& gckey);
 
-    virtual void    Clickable( void );
-    virtual void    Unclickable( void );
-    virtual void    SetScrollPosition( int32_t topLine );
+    virtual void    Clickable(void);
+    virtual void    Unclickable(void);
+    virtual void    SetScrollPosition(int32_t topLine);
     virtual int32_t GetScrollPosition();
     virtual bool    IsAtEnd();
-    virtual void    MoveCursor( int32_t dir );
-    virtual void    ClearBuffer( void );
-    virtual void    SetText( const char *asciiText );
-    virtual void    SetTextW( const wchar_t *asciiText );
-    virtual const char* GetText( void );        // returns a python string object
-    virtual const wchar_t* GetTextW( void );
-    virtual void    SetEncodedBuffer( PyObject* buffer_object );
-    virtual void    SetEncodedBufferW( PyObject* buffer_object );
+    virtual void    MoveCursor(int32_t dir);
+    virtual void    ClearBuffer(void);
+    virtual void    SetText(const char* asciiText);
+    virtual void    SetTextW(const wchar_t* asciiText);
+    virtual const char* GetText(void);          // returns a python string object
+    virtual const wchar_t* GetTextW(void);
+    virtual void    SetEncodedBuffer(PyObject* buffer_object);
+    virtual void    SetEncodedBufferW(PyObject* buffer_object);
     virtual const char* GetEncodedBuffer();
     virtual const wchar_t* GetEncodedBufferW();
     virtual uint32_t  GetBufferSize();
-    
+
     virtual void    SetBufferLimit(int32_t limit);
     virtual int32_t   GetBufferLimit();
 
-    virtual void    InsertChar( char c );
-    virtual void    InsertCharW( wchar_t c );
-    virtual void    InsertString( const char *string );
-    virtual void    InsertStringW( const wchar_t *string );
-    virtual void    InsertColor( pyColor& color );
-    virtual void    InsertStyle( uint8_t fontStyle );
-    virtual void    DeleteChar( void );
+    virtual void    InsertChar(char c);
+    virtual void    InsertCharW(wchar_t c);
+    virtual void    InsertString(const char* string);
+    virtual void    InsertStringW(const wchar_t* string);
+    virtual void    InsertColor(pyColor& color);
+    virtual void    InsertStyle(uint8_t fontStyle);
+    virtual void    DeleteChar(void);
 
-    virtual void    Lock( void );
-    virtual void    Unlock( void );
-    virtual bool    IsLocked( void );
+    virtual void    Lock(void);
+    virtual void    Unlock(void);
+    virtual bool    IsLocked(void);
 
     virtual void    EnableScrollControl();
     virtual void    DisableScrollControl();
 
-    virtual void    DeleteLinesFromTop( int lines );
+    virtual void    DeleteLinesFromTop(int lines);
 
     virtual uint32_t  GetFontSize();
-    virtual void    SetFontSize( uint32_t fontsize );
+    virtual void    SetFontSize(uint32_t fontsize);
 };
 
 #endif // _pyGUIControlMultiLineEdit_h_

@@ -58,25 +58,24 @@ float plInterestingModifier::fInterestWeight     = 1.0f;
 
 bool plInterestingModifier::IEval(double secs, float del, uint32_t dirty)
 {
-    for (int i=0; i < GetNumTargets(); i++)
-    {
-        if( GetTarget(i) && GetTarget(i)->GetDrawInterface() )
-        {
+    for (int i = 0; i < GetNumTargets(); i++) {
+        if (GetTarget(i) && GetTarget(i)->GetDrawInterface()) {
             const hsBounds3Ext& targBnd = GetTarget(i)->GetDrawInterface()->GetWorldBounds();
-            if( targBnd.GetType() == kBoundsNormal )
-            {
+
+            if (targBnd.GetType() == kBoundsNormal) {
                 plInterestingModMsg* pMsg = new plInterestingModMsg;
-                pMsg->fPos= GetTarget(i)->GetDrawInterface()->GetWorldBounds().GetCenter();
+                pMsg->fPos = GetTarget(i)->GetDrawInterface()->GetWorldBounds().GetCenter();
                 pMsg->fSize = GetTarget(i)->GetDrawInterface()->GetWorldBounds().GetMaxDim();
                 pMsg->fRadius = fInterestRadius;
                 pMsg->fWeight = fInterestWeight;
                 pMsg->fObj = GetTarget(i)->GetKey();
                 pMsg->fType = GetType();
-                pMsg->SetBCastFlag( plMessage::kPropagateToModifiers );
-                plgDispatch::MsgSend( pMsg );
+                pMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
+                plgDispatch::MsgSend(pMsg);
             }
         }
     }
+
     return true;
 }
 

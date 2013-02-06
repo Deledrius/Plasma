@@ -61,8 +61,8 @@ PYTHON_INIT_DEFINITION(ptPlayer, args, keywords)
     PyObject* secondObj = NULL; // can be a string or a uint32_t
     PyObject* thirdObj = NULL; // uint32_t
     PyObject* fourthObj = NULL; // float
-    if (!PyArg_ParseTuple(args, "OO|OO", &firstObj, &secondObj, &thirdObj, &fourthObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "OO|OO", &firstObj, &secondObj, &thirdObj, &fourthObj)) {
         PyErr_SetString(PyExc_TypeError, "__init__ expects one of two argument lists: (ptKey, string, unsigned long, float) or (string, unsigned long)");
         PYTHON_RETURN_INIT_ERROR;
     }
@@ -72,10 +72,8 @@ PYTHON_INIT_DEFINITION(ptPlayer, args, keywords)
     uint32_t pid = -1;
     float distSeq = -1;
 
-    if (pyKey::Check(firstObj))
-    {
-        if (!(PyString_CheckEx(secondObj) && PyNumber_Check(thirdObj) && PyFloat_Check(fourthObj)))
-        {
+    if (pyKey::Check(firstObj)) {
+        if (!(PyString_CheckEx(secondObj) && PyNumber_Check(thirdObj) && PyFloat_Check(fourthObj))) {
             PyErr_SetString(PyExc_TypeError, "__init__ expects one of two argument lists: (ptKey, string, unsigned long, float) or (string, unsigned long)");
             PYTHON_RETURN_INIT_ERROR;
         }
@@ -86,8 +84,8 @@ PYTHON_INIT_DEFINITION(ptPlayer, args, keywords)
         distSeq = (float)PyFloat_AsDouble(fourthObj);
     } else if (PyString_CheckEx(firstObj)) {
         name = PyString_AsStringEx(firstObj);
-        if (!PyNumber_Check(secondObj) || thirdObj  || fourthObj)
-        {
+
+        if (!PyNumber_Check(secondObj) || thirdObj  || fourthObj) {
             PyErr_SetString(PyExc_TypeError, "__init__ expects one of two argument lists: (ptKey, string, unsigned long, float) or (string, unsigned long)");
             PYTHON_RETURN_INIT_ERROR;
         }
@@ -104,33 +102,35 @@ PYTHON_INIT_DEFINITION(ptPlayer, args, keywords)
 
 PYTHON_RICH_COMPARE_DEFINITION(ptPlayer, obj1, obj2, compareType)
 {
-    if ((obj1 == Py_None) || (obj2 == Py_None) || !pyPlayer::Check(obj1) || !pyPlayer::Check(obj2))
-    {
+    if ((obj1 == Py_None) || (obj2 == Py_None) || !pyPlayer::Check(obj1) || !pyPlayer::Check(obj2)) {
         // if they aren't the same type, they don't match, obviously (we also never equal none)
-        if (compareType == Py_EQ)
+        if (compareType == Py_EQ) {
             PYTHON_RCOMPARE_FALSE;
-        else if (compareType == Py_NE)
+        } else if (compareType == Py_NE) {
             PYTHON_RCOMPARE_TRUE;
-        else
-        {
+        } else {
             PyErr_SetString(PyExc_NotImplementedError, "invalid comparison for a ptPlayer object");
             PYTHON_RCOMPARE_ERROR;
         }
     }
-    pyPlayer *player1 = pyPlayer::ConvertFrom(obj1);
-    pyPlayer *player2 = pyPlayer::ConvertFrom(obj2);
-    if (compareType == Py_EQ)
-    {
-        if ((*player1) == (*player2))
+
+    pyPlayer* player1 = pyPlayer::ConvertFrom(obj1);
+    pyPlayer* player2 = pyPlayer::ConvertFrom(obj2);
+
+    if (compareType == Py_EQ) {
+        if ((*player1) == (*player2)) {
             PYTHON_RCOMPARE_TRUE;
+        }
+
+        PYTHON_RCOMPARE_FALSE;
+    } else if (compareType == Py_NE) {
+        if ((*player1) != (*player2)) {
+            PYTHON_RCOMPARE_TRUE;
+        }
+
         PYTHON_RCOMPARE_FALSE;
     }
-    else if (compareType == Py_NE)
-    {
-        if ((*player1) != (*player2))
-            PYTHON_RCOMPARE_TRUE;
-        PYTHON_RCOMPARE_FALSE;
-    }
+
     PyErr_SetString(PyExc_NotImplementedError, "invalid comparison for a ptPlayer object");
     PYTHON_RCOMPARE_ERROR;
 }
@@ -161,12 +161,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptPlayer, isServer)
 }
 
 PYTHON_START_METHODS_TABLE(ptPlayer)
-    PYTHON_METHOD_NOARGS(ptPlayer, getPlayerName, "Returns the name of the player"),
-    PYTHON_METHOD_NOARGS(ptPlayer, getPlayerID, "Returns the unique player ID"),
-    PYTHON_METHOD_NOARGS(ptPlayer, getDistanceSq, "Returns the distance to remote player from local player"),
-    PYTHON_METHOD_NOARGS(ptPlayer, isCCR, "Is this player a CCR?"),
-    PYTHON_METHOD_NOARGS(ptPlayer, isServer, "Is this player a server?"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptPlayer, getPlayerName, "Returns the name of the player"),
+                     PYTHON_METHOD_NOARGS(ptPlayer, getPlayerID, "Returns the unique player ID"),
+                     PYTHON_METHOD_NOARGS(ptPlayer, getDistanceSq, "Returns the distance to remote player from local player"),
+                     PYTHON_METHOD_NOARGS(ptPlayer, isCCR, "Is this player a CCR?"),
+                     PYTHON_METHOD_NOARGS(ptPlayer, isServer, "Is this player a server?"),
+                     PYTHON_END_METHODS_TABLE;
 
 // type structure definition
 #define ptPlayer_COMPARE        PYTHON_NO_COMPARE
@@ -180,23 +180,23 @@ PYTHON_END_METHODS_TABLE;
 PLASMA_CUSTOM_TYPE(ptPlayer, "Params: avkey,name,playerID,distanceSq\nAnd optionally __init__(name,playerID)");
 
 // required functions for PyObject interoperability
-PyObject *pyPlayer::New(pyKey& avKey, const char* pname, uint32_t pid, float distsq)
+PyObject* pyPlayer::New(pyKey& avKey, const char* pname, uint32_t pid, float distsq)
 {
-    ptPlayer *newObj = (ptPlayer*)ptPlayer_type.tp_new(&ptPlayer_type, NULL, NULL);
+    ptPlayer* newObj = (ptPlayer*)ptPlayer_type.tp_new(&ptPlayer_type, NULL, NULL);
     newObj->fThis->Init(avKey.getKey(), pname, pid, distsq);
     return (PyObject*)newObj;
 }
 
-PyObject *pyPlayer::New(plKey avKey, const char* pname, uint32_t pid, float distsq)
+PyObject* pyPlayer::New(plKey avKey, const char* pname, uint32_t pid, float distsq)
 {
-    ptPlayer *newObj = (ptPlayer*)ptPlayer_type.tp_new(&ptPlayer_type, NULL, NULL);
+    ptPlayer* newObj = (ptPlayer*)ptPlayer_type.tp_new(&ptPlayer_type, NULL, NULL);
     newObj->fThis->Init(avKey, pname, pid, distsq);
     return (PyObject*)newObj;
 }
 
-PyObject *pyPlayer::New(const char* pname, uint32_t pid)
+PyObject* pyPlayer::New(const char* pname, uint32_t pid)
 {
-    ptPlayer *newObj = (ptPlayer*)ptPlayer_type.tp_new(&ptPlayer_type, NULL, NULL);
+    ptPlayer* newObj = (ptPlayer*)ptPlayer_type.tp_new(&ptPlayer_type, NULL, NULL);
     newObj->fThis->Init(nil, pname, pid, -1);
     return (PyObject*)newObj;
 }
@@ -208,7 +208,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptPlayer, pyPlayer)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyPlayer::AddPlasmaClasses(PyObject *m)
+void pyPlayer::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptPlayer);

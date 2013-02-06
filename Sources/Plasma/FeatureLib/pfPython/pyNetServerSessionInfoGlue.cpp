@@ -59,11 +59,12 @@ PYTHON_INIT_DEFINITION(ptNetServerSessionInfo, args, keywords)
 PYTHON_METHOD_DEFINITION(ptNetServerSessionInfo, setServerName, args)
 {
     char* name;
-    if (!PyArg_ParseTuple(args, "s", &name))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &name)) {
         PyErr_SetString(PyExc_TypeError, "setServerName expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetServerName(name);
     PYTHON_RETURN_NONE;
 }
@@ -71,11 +72,12 @@ PYTHON_METHOD_DEFINITION(ptNetServerSessionInfo, setServerName, args)
 PYTHON_METHOD_DEFINITION(ptNetServerSessionInfo, setServerType, args)
 {
     unsigned char serverType;
-    if (!PyArg_ParseTuple(args, "b", &serverType))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &serverType)) {
         PyErr_SetString(PyExc_TypeError, "setServerType expects an unsigned 8-bit int");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetServerType(serverType);
     PYTHON_RETURN_NONE;
 }
@@ -83,11 +85,12 @@ PYTHON_METHOD_DEFINITION(ptNetServerSessionInfo, setServerType, args)
 PYTHON_METHOD_DEFINITION(ptNetServerSessionInfo, setServerAddr, args)
 {
     char* addr;
-    if (!PyArg_ParseTuple(args, "s", &addr))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &addr)) {
         PyErr_SetString(PyExc_TypeError, "setServerAddr expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetServerAddr(addr);
     PYTHON_RETURN_NONE;
 }
@@ -95,11 +98,12 @@ PYTHON_METHOD_DEFINITION(ptNetServerSessionInfo, setServerAddr, args)
 PYTHON_METHOD_DEFINITION(ptNetServerSessionInfo, setServerPort, args)
 {
     unsigned short port;
-    if (!PyArg_ParseTuple(args, "h", &port))
-    {
+
+    if (!PyArg_ParseTuple(args, "h", &port)) {
         PyErr_SetString(PyExc_TypeError, "setServerPort expects a unsigned short");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetServerPort(port);
     PYTHON_RETURN_NONE;
 }
@@ -107,11 +111,12 @@ PYTHON_METHOD_DEFINITION(ptNetServerSessionInfo, setServerPort, args)
 PYTHON_METHOD_DEFINITION(ptNetServerSessionInfo, setServerGuid, args)
 {
     char* guid;
-    if (!PyArg_ParseTuple(args, "s", &guid))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &guid)) {
         PyErr_SetString(PyExc_TypeError, "setServerGuid expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetServerGuid(guid);
     PYTHON_RETURN_NONE;
 }
@@ -167,22 +172,22 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfo, getServerGuid)
 }
 
 PYTHON_START_METHODS_TABLE(ptNetServerSessionInfo)
-    PYTHON_METHOD(ptNetServerSessionInfo, setServerName, "Params: name\nUNKNOWN"),
-    PYTHON_METHOD(ptNetServerSessionInfo, setServerType, "Params: type\nUNKNOWN"),
-    PYTHON_METHOD(ptNetServerSessionInfo, setServerAddr, "Params: addr\nUNKNOWN"),
-    PYTHON_METHOD(ptNetServerSessionInfo, setServerPort, "Params: port\nUNKNOWN"),
-    PYTHON_METHOD(ptNetServerSessionInfo, setServerGuid, "Params: guid\nUNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, hasServerName, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, hasServerType, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, hasServerAddr, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, hasServerPort, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, hasServerGuid, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, getServerName, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, getServerType, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, getServerAddr, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, getServerPort, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, getServerGuid, "UNKNOWN"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptNetServerSessionInfo, setServerName, "Params: name\nUNKNOWN"),
+              PYTHON_METHOD(ptNetServerSessionInfo, setServerType, "Params: type\nUNKNOWN"),
+              PYTHON_METHOD(ptNetServerSessionInfo, setServerAddr, "Params: addr\nUNKNOWN"),
+              PYTHON_METHOD(ptNetServerSessionInfo, setServerPort, "Params: port\nUNKNOWN"),
+              PYTHON_METHOD(ptNetServerSessionInfo, setServerGuid, "Params: guid\nUNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, hasServerName, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, hasServerType, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, hasServerAddr, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, hasServerPort, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, hasServerGuid, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, getServerName, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, getServerType, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, getServerAddr, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, getServerPort, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfo, getServerGuid, "UNKNOWN"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptNetServerSessionInfo, "Basic server session info class");
@@ -190,9 +195,9 @@ PLASMA_DEFAULT_TYPE(ptNetServerSessionInfo, "Basic server session info class");
 // required functions for PyObject interoperability
 PYTHON_CLASS_NEW_IMPL(ptNetServerSessionInfo, pyNetServerSessionInfo)
 
-PyObject *pyNetServerSessionInfo::New(const plNetServerSessionInfo &info)
+PyObject* pyNetServerSessionInfo::New(const plNetServerSessionInfo& info)
 {
-    ptNetServerSessionInfo *newObj = (ptNetServerSessionInfo*)ptNetServerSessionInfo_type.tp_new(&ptNetServerSessionInfo_type, NULL, NULL);
+    ptNetServerSessionInfo* newObj = (ptNetServerSessionInfo*)ptNetServerSessionInfo_type.tp_new(&ptNetServerSessionInfo_type, NULL, NULL);
     newObj->fThis->fInfo = info;
     return (PyObject*)newObj;
 }
@@ -204,7 +209,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptNetServerSessionInfo, pyNetServerSessionInfo)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyNetServerSessionInfo::AddPlasmaClasses(PyObject *m)
+void pyNetServerSessionInfo::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptNetServerSessionInfo);
@@ -222,11 +227,12 @@ PYTHON_NO_INIT_DEFINITION(ptNetServerSessionInfoRef)
 PYTHON_METHOD_DEFINITION(ptNetServerSessionInfoRef, setServerName, args)
 {
     char* name;
-    if (!PyArg_ParseTuple(args, "s", &name))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &name)) {
         PyErr_SetString(PyExc_TypeError, "setServerName expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetServerName(name);
     PYTHON_RETURN_NONE;
 }
@@ -234,11 +240,12 @@ PYTHON_METHOD_DEFINITION(ptNetServerSessionInfoRef, setServerName, args)
 PYTHON_METHOD_DEFINITION(ptNetServerSessionInfoRef, setServerType, args)
 {
     unsigned char serverType;
-    if (!PyArg_ParseTuple(args, "b", &serverType))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &serverType)) {
         PyErr_SetString(PyExc_TypeError, "setServerType expects an unsigned 8-bit int");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetServerType(serverType);
     PYTHON_RETURN_NONE;
 }
@@ -246,11 +253,12 @@ PYTHON_METHOD_DEFINITION(ptNetServerSessionInfoRef, setServerType, args)
 PYTHON_METHOD_DEFINITION(ptNetServerSessionInfoRef, setServerAddr, args)
 {
     char* addr;
-    if (!PyArg_ParseTuple(args, "s", &addr))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &addr)) {
         PyErr_SetString(PyExc_TypeError, "setServerAddr expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetServerAddr(addr);
     PYTHON_RETURN_NONE;
 }
@@ -258,11 +266,12 @@ PYTHON_METHOD_DEFINITION(ptNetServerSessionInfoRef, setServerAddr, args)
 PYTHON_METHOD_DEFINITION(ptNetServerSessionInfoRef, setServerPort, args)
 {
     unsigned short port;
-    if (!PyArg_ParseTuple(args, "h", &port))
-    {
+
+    if (!PyArg_ParseTuple(args, "h", &port)) {
         PyErr_SetString(PyExc_TypeError, "setServerPort expects a unsigned short");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetServerPort(port);
     PYTHON_RETURN_NONE;
 }
@@ -270,11 +279,12 @@ PYTHON_METHOD_DEFINITION(ptNetServerSessionInfoRef, setServerPort, args)
 PYTHON_METHOD_DEFINITION(ptNetServerSessionInfoRef, setServerGuid, args)
 {
     char* guid;
-    if (!PyArg_ParseTuple(args, "s", &guid))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &guid)) {
         PyErr_SetString(PyExc_TypeError, "setServerGuid expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetServerGuid(guid);
     PYTHON_RETURN_NONE;
 }
@@ -330,30 +340,30 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfoRef, getServerGuid)
 }
 
 PYTHON_START_METHODS_TABLE(ptNetServerSessionInfoRef)
-    PYTHON_METHOD(ptNetServerSessionInfoRef, setServerName, "Params: name\nUNKNOWN"),
-    PYTHON_METHOD(ptNetServerSessionInfoRef, setServerType, "Params: type\nUNKNOWN"),
-    PYTHON_METHOD(ptNetServerSessionInfoRef, setServerAddr, "Params: addr\nUNKNOWN"),
-    PYTHON_METHOD(ptNetServerSessionInfoRef, setServerPort, "Params: port\nUNKNOWN"),
-    PYTHON_METHOD(ptNetServerSessionInfoRef, setServerGuid, "Params: guid\nUNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, hasServerName, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, hasServerType, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, hasServerAddr, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, hasServerPort, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, hasServerGuid, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, getServerName, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, getServerType, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, getServerAddr, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, getServerPort, "UNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, getServerGuid, "UNKNOWN"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptNetServerSessionInfoRef, setServerName, "Params: name\nUNKNOWN"),
+              PYTHON_METHOD(ptNetServerSessionInfoRef, setServerType, "Params: type\nUNKNOWN"),
+              PYTHON_METHOD(ptNetServerSessionInfoRef, setServerAddr, "Params: addr\nUNKNOWN"),
+              PYTHON_METHOD(ptNetServerSessionInfoRef, setServerPort, "Params: port\nUNKNOWN"),
+              PYTHON_METHOD(ptNetServerSessionInfoRef, setServerGuid, "Params: guid\nUNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, hasServerName, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, hasServerType, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, hasServerAddr, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, hasServerPort, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, hasServerGuid, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, getServerName, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, getServerType, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, getServerAddr, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, getServerPort, "UNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptNetServerSessionInfoRef, getServerGuid, "UNKNOWN"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptNetServerSessionInfoRef, "Basic server session info class");
 
 // required functions for PyObject interoperability
-PyObject *pyNetServerSessionInfoRef::New(plNetServerSessionInfo &info)
+PyObject* pyNetServerSessionInfoRef::New(plNetServerSessionInfo& info)
 {
-    ptNetServerSessionInfoRef *newObj = (ptNetServerSessionInfoRef*)ptNetServerSessionInfoRef_type.tp_new(&ptNetServerSessionInfoRef_type, NULL, NULL);
+    ptNetServerSessionInfoRef* newObj = (ptNetServerSessionInfoRef*)ptNetServerSessionInfoRef_type.tp_new(&ptNetServerSessionInfoRef_type, NULL, NULL);
     newObj->fThis->fInfo = info;
     return (PyObject*)newObj;
 }
@@ -365,7 +375,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptNetServerSessionInfoRef, pyNetServerSessionInfo
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyNetServerSessionInfoRef::AddPlasmaClasses(PyObject *m)
+void pyNetServerSessionInfoRef::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptNetServerSessionInfoRef);

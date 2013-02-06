@@ -44,11 +44,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "hsGeometry3.h"
 
-hsNoiseFunc::hsNoiseFunc() 
+hsNoiseFunc::hsNoiseFunc()
 {
 }
 
-hsNoiseFunc::~hsNoiseFunc() 
+hsNoiseFunc::~hsNoiseFunc()
 {
 }
 
@@ -58,7 +58,7 @@ void hsNoiseFunc::Seed(uint32_t s)
 }
 
 hsTableNoise::hsTableNoise()
-: fTable(nil), fTableLen(0)
+    : fTable(nil), fTableLen(0)
 {
 }
 
@@ -72,19 +72,22 @@ void hsTableNoise::SetTable(int len, float* arr)
     fTableLen = len;
 
     delete [] fTable;
-    if( !len )
-    {
+
+    if (!len) {
         fTable = nil;
         return;
     }
 
-    fTable = new float[len+2];
+    fTable = new float[len + 2];
 
     int i;
-    for( i = 0; i < len; i++ )
+
+    for (i = 0; i < len; i++) {
         fTable[i] = arr[i];
-    fTable[i++] = fTable[i-1];
-    fTable[i++] = fTable[i-1];
+    }
+
+    fTable[i++] = fTable[i - 1];
+    fTable[i++] = fTable[i - 1];
 
 }
 
@@ -95,18 +98,19 @@ float hsTableNoise::Noise(float lo, float hi, float t)
     float r = float(rand()) / float(RAND_MAX);
     r = lo + (hi - lo) * r;
 
-    if( t < 0 )
+    if (t < 0) {
         t = 0;
-    else if( t > 1.f )
+    } else if (t > 1.f) {
         t = 1.f;
+    }
 
     float tIdx = t * fTableLen;
     uint32_t idx = uint32_t(tIdx);
     float frac = tIdx - float(idx);
-    hsAssert((idx >= 0)&&(idx <= fTableLen), "Noise parm t out of range [0..1]");
+    hsAssert((idx >= 0) && (idx <= fTableLen), "Noise parm t out of range [0..1]");
 
-    float scale = fTable[idx] + (fTable[idx+1] - fTable[idx]) * frac;
-    
+    float scale = fTable[idx] + (fTable[idx + 1] - fTable[idx]) * frac;
+
     r *= scale;
 
     return r;
@@ -121,8 +125,8 @@ float hsTableNoise::NoisePoint(const hsPoint3& p, float lo, float hi, float t)
     uint32_t sZ = *((uint32_t*)&p.fZ);
 
     uint32_t sAll = ((((sX & 0x07800000) >> 16) | ((sX & 0x007fffff) >> 17)) << 20)
-                | ((((sY & 0x07800000) >> 16) | ((sY & 0x007fffff) >> 17)) << 10)
-                | ((((sZ & 0x07800000) >> 16) | ((sZ & 0x007fffff) >> 17))      );
+                    | ((((sY & 0x07800000) >> 16) | ((sY & 0x007fffff) >> 17)) << 10)
+                    | ((((sZ & 0x07800000) >> 16) | ((sZ & 0x007fffff) >> 17)));
 
     const uint32_t kExp = 0x3f800000;
     const uint32_t kMsk = 0x007fffff;
@@ -138,18 +142,19 @@ float hsTableNoise::NoisePoint(const hsPoint3& p, float lo, float hi, float t)
 
     r = lo + (hi - lo) * r;
 
-    if( t < 0 )
+    if (t < 0) {
         t = 0;
-    else if( t > 1.f )
+    } else if (t > 1.f) {
         t = 1.f;
+    }
 
     float tIdx = t * fTableLen;
     uint32_t idx = uint32_t(tIdx);
     float frac = tIdx - float(idx);
-    hsAssert((idx >= 0)&&(idx <= fTableLen), "Noise parm t out of range [0..1]");
+    hsAssert((idx >= 0) && (idx <= fTableLen), "Noise parm t out of range [0..1]");
 
-    float scale = fTable[idx] + (fTable[idx+1] - fTable[idx]) * frac;
-    
+    float scale = fTable[idx] + (fTable[idx + 1] - fTable[idx]) * frac;
+
     r *= scale;
 
     return r;

@@ -49,56 +49,55 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 bool plExportErrorMsg::Show()
 {
     // If bogus, and we have something to show, show it
-    if( GetBogus() && (GetMsg()[0] != 0 || GetLabel()[0] != 0))
-    {
+    if (GetBogus() && (GetMsg()[0] != 0 || GetLabel()[0] != 0)) {
         hsMessageBox(GetMsg(), GetLabel(), hsMessageBoxNormal/*|hsMessageBoxIconError*/);
     }
+
     return GetBogus();
 }
 bool plExportErrorMsg::Ask()
 {
-    if( GetBogus() )
-    {
+    if (GetBogus()) {
         return hsMBoxYes == hsMessageBox(GetMsg(), GetLabel(), hsMessageBoxYesNo/*|hsMessageBoxIconExclamation*/);
     }
+
     return false;
 }
 
 bool plExportErrorMsg::CheckAndAsk()
 {
-    if( GetBogus() )
-    {
+    if (GetBogus()) {
         strncat(GetMsg(), " - File corruption possible - ABORT?", 255);
-        if( Ask() )
-        {
+
+        if (Ask()) {
             sprintf(GetMsg(), "!Abort at user response to error!");
             Check();
         }
     }
+
     return GetBogus();
 }
 
 bool plExportErrorMsg::CheckAskOrCancel()
 {
-    if( GetBogus() )
-    {
+    if (GetBogus()) {
         strncat(GetMsg(), " - ABORT? (Cancel to mute warnings)", 255);
         int ret = hsMessageBox(GetMsg(), GetLabel(), hsMessageBoxYesNoCancel/*|hsMessageBoxIconExclamation*/);
-        if( hsMBoxYes == ret )
-        {
+
+        if (hsMBoxYes == ret) {
             sprintf(GetMsg(), "!Abort at user response to error!");
             Check();
-        }
-        else if( hsMBoxCancel == ret )
+        } else if (hsMBoxCancel == ret) {
             return 1;
+        }
     }
+
     return false;
 }
 
 bool plExportErrorMsg::CheckAndShow()
 {
-    if ( GetBogus() )
-    {
+    if (GetBogus()) {
         Show();
         Check();
     }
@@ -108,8 +107,7 @@ bool plExportErrorMsg::CheckAndShow()
 
 bool plExportErrorMsg::Check()
 {
-    if( GetBogus() )
-    {
+    if (GetBogus()) {
         strncat(GetMsg(), " !Output File Corrupt!", 255);
         IDebugThrow();
     }
@@ -119,10 +117,9 @@ bool plExportErrorMsg::Check()
 
 void plExportErrorMsg::Quit()
 {
-    if( GetBogus() )
-    {
+    if (GetBogus()) {
         SetBogus(false);
-        hsThrow( *this );
+        hsThrow(*this);
     }
 }
 
@@ -130,9 +127,7 @@ void plExportErrorMsg::IDebugThrow()
 {
     try {
         DebugBreakIfDebuggerPresent();
-    }
-    catch(...)
-    {
-        hsThrow( *this );
+    } catch (...) {
+        hsThrow(*this);
     }
 }

@@ -53,25 +53,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsStream;
 
-struct plSpawnPointInfo
-{
+struct plSpawnPointInfo {
     plString fTitle;         // friendly title for GUIs
     plString fSpawnPt;       // name of spawn point in dataset
     plString fCameraStack;
-    plSpawnPointInfo(){}
-    plSpawnPointInfo( const plSpawnPointInfo & other ) { (*this)=other; }
-    plSpawnPointInfo( const plString & title, const plString & spawnPt )
-        : fTitle( title ), fSpawnPt( spawnPt ) {}
-    plString GetTitle() const { return fTitle; }
-    void    SetTitle( const plString & v ) { fTitle=v; }
-    plString GetName() const { return fSpawnPt; }
-    void    SetName( const plString & v ) { fSpawnPt = v; }
-    plString GetCameraStack() const { return fCameraStack; }
-    void    SetCameraStack( const plString & v ) { fCameraStack=v; }
+    plSpawnPointInfo() {}
+    plSpawnPointInfo(const plSpawnPointInfo& other) {
+        (*this) = other;
+    }
+    plSpawnPointInfo(const plString& title, const plString& spawnPt)
+        : fTitle(title), fSpawnPt(spawnPt) {}
+    plString GetTitle() const {
+        return fTitle;
+    }
+    void    SetTitle(const plString& v) {
+        fTitle = v;
+    }
+    plString GetName() const {
+        return fSpawnPt;
+    }
+    void    SetName(const plString& v) {
+        fSpawnPt = v;
+    }
+    plString GetCameraStack() const {
+        return fCameraStack;
+    }
+    void    SetCameraStack(const plString& v) {
+        fCameraStack = v;
+    }
     void    Reset();
-    void    Read( hsStream * s );
-    void    ReadOld( hsStream * s );
-    void    Write( hsStream * s ) const;
+    void    Read(hsStream* s);
+    void    ReadOld(hsStream* s);
+    void    Write(hsStream* s) const;
     plString AsString() const;
 };
 typedef std::vector<plSpawnPointInfo>   plSpawnPointVec;

@@ -53,7 +53,7 @@ template <class T> class hsExpander {
 private:
     int32_t       fNumPost;
     int32_t       fNumPostAlloc;
-    T*            fArray; 
+    T*            fArray;
 
     int32_t       fGrowBy; // default = 0, to double
     int32_t       fMinSize; // default = 1, min == 1
@@ -66,38 +66,68 @@ private:
 public:
     enum { kMissingIndex = -1 };
 
-                hsExpander(int32_t minSize = 1, int32_t growBy = 0);
+    hsExpander(int32_t minSize = 1, int32_t growBy = 0);
     virtual     ~hsExpander();
 
-    hsExpander<T>& operator=(const hsExpander<T>&orig) { return Copy(orig); }
+    hsExpander<T>& operator=(const hsExpander<T>& orig) {
+        return Copy(orig);
+    }
     hsExpander<T>& Copy(const hsExpander<T>& orig);
 
-    void      SetCount(int cnt) { if( cnt >= fNumPostAlloc )IExpand(cnt); fNumPost = cnt; }
-    int32_t   GetCount() const { return fNumPost; }
-    bool      Empty() const { return GetCount() == 0; }
+    void      SetCount(int cnt) {
+        if (cnt >= fNumPostAlloc) {
+            IExpand(cnt);
+        }
+
+        fNumPost = cnt;
+    }
+    int32_t   GetCount() const {
+        return fNumPost;
+    }
+    bool      Empty() const {
+        return GetCount() == 0;
+    }
     const T&  Get(int32_t index) const;
     int32_t   Get(int32_t index, int32_t count, T data[]) const;
     int32_t   Find(const T&) const;   // returns kMissingIndex if not found
 
     void        SetArray(T* a, int32_t cnt);
-    T*          GetArray() { return fArray; }
-    T&          operator[]( int32_t index );
+    T*          GetArray() {
+        return fArray;
+    }
+    T&          operator[](int32_t index);
     int32_t     Append(const T&); // returns t's index
     T*          Append();
-    int32_t     Push(const T& t) { return Append(t); }
-    T*          Push() { return Append(); }
-    T*          Top() { return fNumPost ? fArray + fNumPost-1 : nil; }
+    int32_t     Push(const T& t) {
+        return Append(t);
+    }
+    T*          Push() {
+        return Append();
+    }
+    T*          Top() {
+        return fNumPost ? fArray + fNumPost - 1 : nil;
+    }
     int32_t     Pop(T* t); // returns count of remaining
     int32_t     Pop();
     void        Reset();    // clears out everything
 
-    T&          Head() { return fArray[0]; }
-    T&          Tail() { return fArray[fNumPost-1]; }
-    T&          Current() { return fArray[fCurrent]; }
+    T&          Head() {
+        return fArray[0];
+    }
+    T&          Tail() {
+        return fArray[fNumPost - 1];
+    }
+    T&          Current() {
+        return fArray[fCurrent];
+    }
     void        First();
     void        Last();
-    void        Plus() { ++fCurrent; }
-    bool        More() { return (fCurrent < fNumPost); }
+    void        Plus() {
+        ++fCurrent;
+    }
+    bool        More() {
+        return (fCurrent < fNumPost);
+    }
 };
 
 template <class T>
@@ -105,8 +135,11 @@ hsExpander<T>& hsExpander<T>::Copy(const hsExpander<T>& orig)
 {
     SetCount(orig.GetCount());
     int i;
-    for( i = 0; i < GetCount(); i++ )
+
+    for (i = 0; i < GetCount(); i++) {
         fArray[i] = orig.fArray[i];
+    }
+
     return *this;
 }
 
@@ -114,8 +147,11 @@ template <class T>
 void hsExpander<T>::SetArray(T* a, int32_t cnt)
 {
     delete [] fArray;
-    if( a )
+
+    if (a) {
         fArray = a;
+    }
+
     fNumPost = fNumPostAlloc = cnt;
 }
 
@@ -123,15 +159,23 @@ template <class T>
 void hsExpander<T>::IExpand(int newSize)
 {
     int32_t newPostAlloc = fNumPostAlloc;
-    if( !newPostAlloc )
+
+    if (!newPostAlloc) {
         newPostAlloc++;
-    while( newPostAlloc <= newSize )
+    }
+
+    while (newPostAlloc <= newSize) {
         newPostAlloc = fGrowBy ? newPostAlloc + fGrowBy : newPostAlloc << 1;
+    }
+
     T* newArray = new T[newPostAlloc];
     int i;
-    for( i = 0; i < fNumPost; i++ )
+
+    for (i = 0; i < fNumPost; i++) {
         newArray[i] = fArray[i];
-    delete [] (fArray);
+    }
+
+    delete [](fArray);
     fArray = newArray;
     fNumPostAlloc = newPostAlloc;
 }
@@ -142,12 +186,12 @@ hsExpander<T>::hsExpander(int32_t minSize, int32_t growBy)
     hsThrowIfBadParam(minSize < 0);
     hsThrowIfBadParam(growBy < 0);
 
-    fMinSize = minSize+1;
+    fMinSize = minSize + 1;
     fGrowBy = growBy;
-    
+
     fArray  = new T[fMinSize];
     fNumPostAlloc = fMinSize;
-    
+
     fNumPost = 0;
 }
 
@@ -157,30 +201,30 @@ hsExpander<T>::~hsExpander()
     delete [] fArray;
 }
 
-template <class T> 
+template <class T>
 void hsExpander<T>::First()
-{ 
-    fCurrent = 0; 
-}
-
-template <class T> 
-void hsExpander<T>::Last()
-{ 
-    fCurrent = fNumPost-1; 
-}
-
-template <class T> 
-T& hsExpander<T>::operator[]( int32_t index )
 {
-    hsDebugCode(hsThrowIfBadParam((index < 0)||(index >= fNumPost));)
+    fCurrent = 0;
+}
+
+template <class T>
+void hsExpander<T>::Last()
+{
+    fCurrent = fNumPost - 1;
+}
+
+template <class T>
+T& hsExpander<T>::operator[](int32_t index)
+{
+    hsDebugCode(hsThrowIfBadParam((index < 0) || (index >= fNumPost));)
 
     return fArray[index];
 }
 
-template <class T> 
-const T& hsExpander<T>::Get( int32_t index ) const
+template <class T>
+const T& hsExpander<T>::Get(int32_t index) const
 {
-    hsDebugCode(hsThrowIfBadParam((index < 0)||(index >= fNumPost));)
+    hsDebugCode(hsThrowIfBadParam((index < 0) || (index >= fNumPost));)
 
     return fArray[index];
 }
@@ -188,15 +232,19 @@ const T& hsExpander<T>::Get( int32_t index ) const
 template <class T>
 int32_t hsExpander<T>::Get(int32_t index, int32_t count, T data[]) const
 {
-    if( count > 0 )
-    {   hsThrowIfNilParam(data);
-        hsThrowIfBadParam((index < 0)||(index >= fNumPost));
+    if (count > 0) {
+        hsThrowIfNilParam(data);
+        hsThrowIfBadParam((index < 0) || (index >= fNumPost));
 
-        if (index + count > fNumPost)
+        if (index + count > fNumPost) {
             count = fNumPost - index;
-        for (int i = 0; i < count; i++)
+        }
+
+        for (int i = 0; i < count; i++) {
             data[i] = fArray[i + index];
+        }
     }
+
     return count;
 }
 
@@ -204,8 +252,10 @@ template <class T>
 int32_t hsExpander<T>::Find(const T& obj) const
 {
     for (int i = 0; i < fNumPost; i++)
-        if (fArray[i] == obj)
+        if (fArray[i] == obj) {
             return i;
+        }
+
     return kMissingIndex;
 }
 
@@ -213,8 +263,11 @@ template <class T>
 int32_t hsExpander<T>::Append(const T& obj)
 {
     hsAssert(!(fNumPost >= fNumPostAlloc), "Must be less");
-    if( fNumPost == fNumPostAlloc-1 )
+
+    if (fNumPost == fNumPostAlloc - 1) {
         IExpand(fNumPostAlloc);
+    }
+
     fArray[fNumPost] = obj;
     return fNumPost++;
 }
@@ -223,18 +276,24 @@ template <class T>
 T* hsExpander<T>::Append()
 {
     hsAssert(!(fNumPost >= fNumPostAlloc), "Must be less");
-    if( fNumPost == fNumPostAlloc-1 )
+
+    if (fNumPost == fNumPostAlloc - 1) {
         IExpand(fNumPostAlloc);
+    }
+
     return fArray + fNumPost++;
 }
 
 template <class T>
-int32_t hsExpander<T>::Pop(T*t)
+int32_t hsExpander<T>::Pop(T* t)
 {
     hsThrowIfBadParam(Empty());
     --fNumPost;
-    if( t )
+
+    if (t) {
         *t = fArray[fNumPost];
+    }
+
     return GetCount();
 }
 
@@ -261,7 +320,7 @@ private:
     int32_t       fNumPost;
     int32_t       fNumPreAlloc;
     int32_t       fNumPostAlloc;
-    T*            fArray; 
+    T*            fArray;
 
     int32_t       fGrowBy; // default = 0, to double
     int32_t       fMinSize; // default = 1, min == 1
@@ -275,45 +334,66 @@ private:
 public:
     enum { kMissingIndex = -1 };
 
-                hsBiExpander(int32_t minSize = 1, int32_t growBy = 0);
+    hsBiExpander(int32_t minSize = 1, int32_t growBy = 0);
     virtual     ~hsBiExpander();
 
-    int32_t       GetFirst() const { return -fNumPre; }
-    int32_t       GetCount() const { return fNumPre + fNumPost; }
-    bool          Empty() const { return GetCount() == 0; }
+    int32_t       GetFirst() const {
+        return -fNumPre;
+    }
+    int32_t       GetCount() const {
+        return fNumPre + fNumPost;
+    }
+    bool          Empty() const {
+        return GetCount() == 0;
+    }
     const T&      Get(int32_t index) const;
     int32_t       Get(int32_t index, int32_t count, T data[]) const;
     int32_t       Find(const T&) const;   // returns kMissingIndex if not found
 
-    void          SetArray(T* a, int32_t cnt, int32_t numPre=0);
-    T**           GetArray() { return fArray - fNumPre; }
-    T&            operator[]( int32_t index );
+    void          SetArray(T* a, int32_t cnt, int32_t numPre = 0);
+    T**           GetArray() {
+        return fArray - fNumPre;
+    }
+    T&            operator[](int32_t index);
     T*            Append(); // returns t's index
     T*            Push(); // returns t's index
     int32_t       Append(const T&); // returns t's index
     int32_t       Push(const T&); // returns t's index
-    int32_t       Pop(T*t = nil) { return PopHead(t); } // returns count of remaining
-    int32_t       PopHead(T*t = nil); // returns count of remaining
-    int32_t       PopTail(T*t = nil); // returns count of remaining
+    int32_t       Pop(T* t = nil) {
+        return PopHead(t);    // returns count of remaining
+    }
+    int32_t       PopHead(T* t = nil); // returns count of remaining
+    int32_t       PopTail(T* t = nil); // returns count of remaining
     void          Reset();    // clears out everything
 
-    T&          Head() { return fArray[-fNumPre]; }
-    T&          Tail() { return fArray[fNumPost-1]; }
-    T&          Current() { return fArray[fCurrent]; }
+    T&          Head() {
+        return fArray[-fNumPre];
+    }
+    T&          Tail() {
+        return fArray[fNumPost - 1];
+    }
+    T&          Current() {
+        return fArray[fCurrent];
+    }
     void        First();
     void        Last();
-    void        Plus() { ++fCurrent; }
-    void        Minus() { --fCurrent; }
-    bool        More() { return (fCurrent < fNumPost)&&(fCurrent >= -fNumPre); }
+    void        Plus() {
+        ++fCurrent;
+    }
+    void        Minus() {
+        --fCurrent;
+    }
+    bool        More() {
+        return (fCurrent < fNumPost) && (fCurrent >= -fNumPre);
+    }
 };
 
 template <class T>
 void hsBiExpander<T>::SetArray(T* a, int32_t cnt, int32_t numPre)
 {
-    if( !numPre )
+    if (!numPre) {
         Reset();
-    else
-    {
+    } else {
         fNumPreAlloc = fNumPre = numPre;
         fNumPostAlloc = fNumPost = cnt - numPre;
         fArray = a + numPre;
@@ -325,28 +405,36 @@ void hsBiExpander<T>::IExpand(int newSize, bool towardEnd)
 {
     int32_t newPreAlloc = fNumPreAlloc;
     int32_t newPostAlloc = fNumPostAlloc;
-    if( towardEnd )
-    {
-        if( !newPostAlloc )
+
+    if (towardEnd) {
+        if (!newPostAlloc) {
             newPostAlloc++;
-        while( newPostAlloc <= newSize )
+        }
+
+        while (newPostAlloc <= newSize) {
             newPostAlloc = fGrowBy ? newPostAlloc + fGrowBy : newPostAlloc << 1;
-    }
-    else
-    {
-        if( !newPreAlloc )
+        }
+    } else {
+        if (!newPreAlloc) {
             newPreAlloc++;
-        while( newPreAlloc <= newSize )
+        }
+
+        while (newPreAlloc <= newSize) {
             newPreAlloc = fGrowBy ? newPreAlloc + fGrowBy : newPreAlloc << 1;
+        }
     }
+
     T* newArray = new T[newPreAlloc + newPostAlloc];
     newArray += newPreAlloc;
     int i;
-    for( i = -fNumPre; i < fNumPost; i++ )
+
+    for (i = -fNumPre; i < fNumPost; i++) {
         newArray[i] = fArray[i];
-//  HSMemory::BlockMove(fArray-fNumPre, newArray-fNumPre, 
+    }
+
+//  HSMemory::BlockMove(fArray-fNumPre, newArray-fNumPre,
 //      (fNumPre+fNumPost)*sizeof(*fArray));
-    delete [] (fArray-fNumPreAlloc);
+    delete [](fArray - fNumPreAlloc);
     fArray = newArray;
     fNumPreAlloc = newPreAlloc;
     fNumPostAlloc = newPostAlloc;
@@ -358,46 +446,46 @@ hsBiExpander<T>::hsBiExpander(int32_t minSize, int32_t growBy)
     hsThrowIfBadParam(minSize < 0);
     hsThrowIfBadParam(growBy < 0);
 
-    fMinSize = minSize+1;
+    fMinSize = minSize + 1;
     fGrowBy = growBy;
-    
+
     fArray  = new T[fMinSize << 1];
     fNumPreAlloc = fNumPostAlloc = fMinSize;
     fArray += fNumPreAlloc;
-    
+
     fNumPre = fNumPost = 0;
 }
 
 template <class T>
 hsBiExpander<T>::~hsBiExpander()
 {
-    delete [] (fArray - fNumPreAlloc);
+    delete [](fArray - fNumPreAlloc);
 }
 
-template <class T> 
+template <class T>
 void hsBiExpander<T>::First()
-{ 
-    fCurrent = -fNumPre; 
-}
-
-template <class T> 
-void hsBiExpander<T>::Last()
-{ 
-    fCurrent = fNumPost-1; 
-}
-
-template <class T> 
-T& hsBiExpander<T>::operator[]( int32_t index )
 {
-    hsDebugCode(hsThrowIfBadParam((index < -fNumPre)||(index >= fNumPost));)
+    fCurrent = -fNumPre;
+}
+
+template <class T>
+void hsBiExpander<T>::Last()
+{
+    fCurrent = fNumPost - 1;
+}
+
+template <class T>
+T& hsBiExpander<T>::operator[](int32_t index)
+{
+    hsDebugCode(hsThrowIfBadParam((index < -fNumPre) || (index >= fNumPost));)
 
     return fArray[index];
 }
 
-template <class T> 
-const T& hsBiExpander<T>::Get( int32_t index ) const
+template <class T>
+const T& hsBiExpander<T>::Get(int32_t index) const
 {
-    hsDebugCode(hsThrowIfBadParam((index < -fNumPre)||(index >= fNumPost));)
+    hsDebugCode(hsThrowIfBadParam((index < -fNumPre) || (index >= fNumPost));)
 
     return fArray[index];
 }
@@ -405,15 +493,19 @@ const T& hsBiExpander<T>::Get( int32_t index ) const
 template <class T>
 int32_t hsBiExpander<T>::Get(int32_t index, int32_t count, T data[]) const
 {
-    if( count > 0 )
-    {   hsThrowIfNilParam(data);
-        hsThrowIfBadParam((index < -fNumPre)||(index >= fNumPost));
+    if (count > 0) {
+        hsThrowIfNilParam(data);
+        hsThrowIfBadParam((index < -fNumPre) || (index >= fNumPost));
 
-        if (index + count > fNumPost)
+        if (index + count > fNumPost) {
             count = fNumPost - index;
-        for (int i = 0; i < count; i++)
+        }
+
+        for (int i = 0; i < count; i++) {
             data[i] = fArray[i + index];
+        }
     }
+
     return count;
 }
 
@@ -421,8 +513,10 @@ template <class T>
 int32_t hsBiExpander<T>::Find(const T& obj) const
 {
     for (int i = -fNumPre; i < fNumPost; i++)
-        if (fArray[i] == obj)
+        if (fArray[i] == obj) {
             return i;
+        }
+
     return kMissingIndex;
 }
 
@@ -430,8 +524,11 @@ template <class T>
 T* hsBiExpander<T>::Append()
 {
     hsAssert(!(fNumPost >= fNumPostAlloc), "Must be less");
-    if( fNumPost == fNumPostAlloc-1 )
+
+    if (fNumPost == fNumPostAlloc - 1) {
         IExpand(fNumPostAlloc, true);
+    }
+
     return fArray + fNumPost++;
 }
 
@@ -439,8 +536,11 @@ template <class T>
 T* hsBiExpander<T>::Push()
 {
     hsAssert(!(fNumPre >= fNumPreAlloc), "Must be less");
-    if( ++fNumPre == fNumPreAlloc )
+
+    if (++fNumPre == fNumPreAlloc) {
         IExpand(fNumPreAlloc, false);
+    }
+
     return fArray - fNumPre;
 }
 
@@ -448,8 +548,11 @@ template <class T>
 int32_t hsBiExpander<T>::Append(const T& obj)
 {
     hsAssert(!(fNumPost >= fNumPostAlloc), "Must be less");
-    if( fNumPost == fNumPostAlloc-1 )
+
+    if (fNumPost == fNumPostAlloc - 1) {
         IExpand(fNumPostAlloc, true);
+    }
+
     fArray[fNumPost] = obj;
     return fNumPost++;
 }
@@ -458,29 +561,38 @@ template <class T>
 int32_t hsBiExpander<T>::Push(const T& obj)
 {
     hsAssert(!(fNumPre >= fNumPreAlloc), "Must be less");
-    if( ++fNumPre == fNumPreAlloc )
+
+    if (++fNumPre == fNumPreAlloc) {
         IExpand(fNumPreAlloc, false);
+    }
+
     fArray[-fNumPre] = obj;
     return -fNumPre;
 }
 
 template <class T>
-int32_t hsBiExpander<T>::PopHead(T*t)
+int32_t hsBiExpander<T>::PopHead(T* t)
 {
     hsThrowIfBadParam(Empty());
-    if( t )
+
+    if (t) {
         *t = fArray[-fNumPre];
+    }
+
     --fNumPre;
     return GetCount();
 }
 
 template <class T>
-int32_t hsBiExpander<T>::PopTail(T*t)
+int32_t hsBiExpander<T>::PopTail(T* t)
 {
     hsThrowIfBadParam(Empty());
     --fNumPost;
-    if( t )
+
+    if (t) {
         *t = fArray[fNumPost];
+    }
+
     return GetCount();
 }
 

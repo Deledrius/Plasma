@@ -57,8 +57,9 @@ pyVarSyncGame::pyVarSyncGame(): pyGameCli() {}
 
 pyVarSyncGame::pyVarSyncGame(pfGameCli* client): pyGameCli(client)
 {
-    if (client && (client->GetGameTypeId() != kGameTypeId_VarSync))
-        gameClient = nil; // wrong type, just clear it out
+    if (client && (client->GetGameTypeId() != kGameTypeId_VarSync)) {
+        gameClient = nil;    // wrong type, just clear it out
+    }
 }
 
 bool pyVarSyncGame::IsVarSyncGame(plString& guid)
@@ -76,8 +77,7 @@ void pyVarSyncGame::JoinCommonVarSyncGame(pyKey& callbackKey)
 
 void pyVarSyncGame::SetStringVar(unsigned long id, std::wstring val)
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmVarSync* vsync = pfGmVarSync::ConvertNoRef(gameClient);
         vsync->SetStringVar(id, val.c_str());
     }
@@ -85,8 +85,7 @@ void pyVarSyncGame::SetStringVar(unsigned long id, std::wstring val)
 
 void pyVarSyncGame::SetNumericVar(unsigned long id, double val)
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmVarSync* vsync = pfGmVarSync::ConvertNoRef(gameClient);
         vsync->SetNumericVar(id, val);
     }
@@ -94,8 +93,7 @@ void pyVarSyncGame::SetNumericVar(unsigned long id, double val)
 
 void pyVarSyncGame::RequestAllVars()
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmVarSync* vsync = pfGmVarSync::ConvertNoRef(gameClient);
         vsync->RequestAllVars();
     }
@@ -103,8 +101,7 @@ void pyVarSyncGame::RequestAllVars()
 
 void pyVarSyncGame::CreateStringVar(std::wstring name, std::wstring val)
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmVarSync* vsync = pfGmVarSync::ConvertNoRef(gameClient);
         vsync->CreateStringVar(name.c_str(), val.c_str());
     }
@@ -112,8 +109,7 @@ void pyVarSyncGame::CreateStringVar(std::wstring name, std::wstring val)
 
 void pyVarSyncGame::CreateNumericVar(std::wstring name, double val)
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         pfGmVarSync* vsync = pfGmVarSync::ConvertNoRef(gameClient);
         vsync->CreateNumericVar(name.c_str(), val);
     }

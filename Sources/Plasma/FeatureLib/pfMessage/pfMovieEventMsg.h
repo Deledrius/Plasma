@@ -45,11 +45,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plMessage.h"
 #include "plFileSystem.h"
 
-class pfMovieEventMsg : public plMessage
-{
+class pfMovieEventMsg : public plMessage {
 public:
-    enum Reason
-    {
+    enum Reason {
         kMovieDone,
     };
     Reason fReason;
@@ -57,14 +55,12 @@ public:
 
     plFileName fMovieName;
 
-    pfMovieEventMsg(const plFileName& movieName, Reason reason=kMovieDone) : plMessage(nil, nil, nil)
-    {
+    pfMovieEventMsg(const plFileName& movieName, Reason reason = kMovieDone) : plMessage(nil, nil, nil) {
         fReason = reason;
         fMovieName = movieName;
     }
 
-    pfMovieEventMsg() : plMessage(nil, nil, nil), fReason(kMovieDone)
-    {
+    pfMovieEventMsg() : plMessage(nil, nil, nil), fReason(kMovieDone) {
     }
 
 

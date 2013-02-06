@@ -56,7 +56,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //// pfLocalizationMgr Functions /////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-pfLocalizationMgr   *pfLocalizationMgr::fInstance = nil;
+pfLocalizationMgr*   pfLocalizationMgr::fInstance = nil;
 
 //// Constructor/Destructor //////////////////////////////////////////
 
@@ -73,10 +73,11 @@ pfLocalizationMgr::~pfLocalizationMgr()
 
 //// Initialize //////////////////////////////////////////////////////
 
-void pfLocalizationMgr::Initialize(const plFileName & dataPath)
+void pfLocalizationMgr::Initialize(const plFileName& dataPath)
 {
-    if (fInstance)
+    if (fInstance) {
         return;
+    }
 
     fInstance = new pfLocalizationMgr();
     pfLocalizationDataMgr::Initialize(dataPath); // set up the data manager
@@ -86,8 +87,7 @@ void pfLocalizationMgr::Initialize(const plFileName & dataPath)
 
 void pfLocalizationMgr::Shutdown()
 {
-    if (fInstance)
-    {
+    if (fInstance) {
         pfLocalizationDataMgr::Shutdown(); // make sure the subtitle data manager is shut down
         delete fInstance;
     }
@@ -95,12 +95,12 @@ void pfLocalizationMgr::Shutdown()
 
 //// GetString ///////////////////////////////////////////////////////
 
-plString pfLocalizationMgr::GetString(const plString & path, const std::vector<plString> & args)
+plString pfLocalizationMgr::GetString(const plString& path, const std::vector<plString>& args)
 {
     return pfLocalizationDataMgr::Instance().GetElement(path) % args;
 }
 
-plString pfLocalizationMgr::GetString(const plString & path)
+plString pfLocalizationMgr::GetString(const plString& path)
 {
     std::vector<plString> args; // blank args so that % signs are still handled correctly
     return pfLocalizationDataMgr::Instance().GetElement(path) % args;

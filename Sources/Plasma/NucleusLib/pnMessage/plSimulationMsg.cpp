@@ -41,12 +41,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *==LICENSE==*/
 #include "plSimulationMsg.h"
 
-void plSimulationMsg::Read(hsStream* stream, hsResMgr *mgr)
+void plSimulationMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     IMsgRead(stream, mgr);
 }
 
-void plSimulationMsg::Write(hsStream* stream, hsResMgr *mgr)
+void plSimulationMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     IMsgWrite(stream, mgr);
 }

@@ -43,14 +43,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class Mtl;
 class IParamBlock2;
 
-namespace plPickMaterialMap
-{
-    bool PickTexmap(IParamBlock2 *pb, int id);
-    Mtl *PickMaterial(unsigned int flags);
+namespace plPickMaterialMap {
+bool PickTexmap(IParamBlock2* pb, int id);
+Mtl* PickMaterial(unsigned int flags);
 };
 
-struct plPickMaterialInfo
-{
-    Mtl *fMtl;
+struct plPickMaterialInfo {
+    Mtl* fMtl;
     unsigned int fFlags;
 };

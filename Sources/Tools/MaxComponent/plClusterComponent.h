@@ -57,16 +57,13 @@ class plClusterGroup;
 
 #include <vector>
 
-class plDistribCompTab : public Tab<plDistribComponent*>
-{
+class plDistribCompTab : public Tab<plDistribComponent*> {
 };
 
-class plBox3Tab : public Tab<Box3>
-{
+class plBox3Tab : public Tab<Box3> {
 };
 
-class plClusterComponent : public plComponent
-{
+class plClusterComponent : public plComponent {
 public:
     enum {
         kClusters       = 0,
@@ -101,7 +98,7 @@ protected:
 
     void            ISetupRenderDependencies();
     void            IAssignRenderDependencies(hsRadixSortElem*& prevStart, hsRadixSortElem*& prevEnd,
-                                                   hsRadixSortElem*& currStart, hsRadixSortElem*& currEnd);
+            hsRadixSortElem*& currStart, hsRadixSortElem*& currEnd);
 
     BOOL            IBuildNodeTab(plDistribInstTab& nodes, plErrorMsg* pErrMsg, plExportProgressBar& bar);
     void            IClearNodeTab();
@@ -124,7 +121,9 @@ protected:
 
 public:
     plClusterComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     void    Clear();
     BOOL    Cluster(plErrorMsg* pErrMsg);
@@ -135,12 +134,24 @@ public:
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    int             GetNumGroups() { if (fSetupDone) return fClusterGroups.size(); return 0; }
-    plClusterGroup *GetGroup(int index) { if (fSetupDone) return fClusterGroups[index]; return nil; }
+    int             GetNumGroups() {
+        if (fSetupDone) {
+            return fClusterGroups.size();
+        }
+
+        return 0;
+    }
+    plClusterGroup* GetGroup(int index) {
+        if (fSetupDone) {
+            return fClusterGroups[index];
+        }
+
+        return nil;
+    }
 
 };
 

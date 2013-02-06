@@ -44,13 +44,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plResponderModifier.h"
 
 // static vars
-char plResponderSDLModifier::kStrCurState[]="curState";
-char plResponderSDLModifier::kStrEnabled[]="enabled";
-char plResponderSDLModifier::kStrCurCommand[]="curCommand";
-char plResponderSDLModifier::kStrNetRequest[]="netRequest";
-char plResponderSDLModifier::kStrCompletedEvents[]="completedEvents";
-char plResponderSDLModifier::kStrPlayerKey[]="playerKey";
-char plResponderSDLModifier::kStrTriggerer[]="triggerer";
+char plResponderSDLModifier::kStrCurState[] = "curState";
+char plResponderSDLModifier::kStrEnabled[] = "enabled";
+char plResponderSDLModifier::kStrCurCommand[] = "curCommand";
+char plResponderSDLModifier::kStrNetRequest[] = "netRequest";
+char plResponderSDLModifier::kStrCompletedEvents[] = "completedEvents";
+char plResponderSDLModifier::kStrPlayerKey[] = "playerKey";
+char plResponderSDLModifier::kStrTriggerer[] = "triggerer";
 
 plKey plResponderSDLModifier::GetStateOwnerKey() const
 {
@@ -67,19 +67,19 @@ void plResponderSDLModifier::IPutCurrentStateIn(plStateDataRecord* dstState)
 
     dstState->FindVar(kStrCurState)->Set((int)fResponder->fCurState);
     dstState->FindVar(kStrEnabled)->Set(fResponder->fEnabled);
-    
-    dstState->FindVar(kStrCurCommand)->Set((int)fResponder->fCurCommand);   
+
+    dstState->FindVar(kStrCurCommand)->Set((int)fResponder->fCurCommand);
     dstState->FindVar(kStrNetRequest)->Set(fResponder->fNetRequest);
 
     int i;
-    int num=fResponder->fCompletedEvents.GetNumBitVectors();
+    int num = fResponder->fCompletedEvents.GetNumBitVectors();
     dstState->FindVar(kStrCompletedEvents)->Alloc(num);
-    for(i=0;i<num; i++)
-    {
+
+    for (i = 0; i < num; i++) {
         int ev = fResponder->fCompletedEvents.GetBitVector(i);
         dstState->FindVar(kStrCompletedEvents)->Set(ev, i);
     }
-    
+
     dstState->FindVar(kStrPlayerKey)->Set(fResponder->fPlayerKey);
     dstState->FindVar(kStrTriggerer)->Set(fResponder->fTriggerer);
 }
@@ -102,61 +102,47 @@ void plResponderSDLModifier::ISetCurrentStateFrom(const plStateDataRecord* srcSt
     plStateDataRecord::SimpleVarsList vars;
     int numVars = srcState->GetUsedVars(&vars);
 
-    for (int i = 0; i < numVars; i++)
-    {
-        if (vars[i]->IsNamed(kStrCurState))
-        {
+    for (int i = 0; i < numVars; i++) {
+        if (vars[i]->IsNamed(kStrCurState)) {
             vars[i]->Get(&curState);
-        }
-        else if (vars[i]->IsNamed(kStrEnabled))
-        {
+        } else if (vars[i]->IsNamed(kStrEnabled)) {
             vars[i]->Get(&enabled);
-        }
-        else if (vars[i]->IsNamed(kStrCurCommand))
-        {
+        } else if (vars[i]->IsNamed(kStrCurCommand)) {
             vars[i]->Get(&curCommand);
-        }
-        else if (vars[i]->IsNamed(kStrNetRequest))
-        {
-            vars[i]->Get(&netRequest);          
-        }
-        else if (vars[i]->IsNamed(kStrCompletedEvents))
-        {
+        } else if (vars[i]->IsNamed(kStrNetRequest)) {
+            vars[i]->Get(&netRequest);
+        } else if (vars[i]->IsNamed(kStrCompletedEvents)) {
             int numEvents = vars[i]->GetCount();
             completedEvents.SetNumBitVectors(numEvents);
 
-            for (int j = 0; j < numEvents; j++)
-            {
+            for (int j = 0; j < numEvents; j++) {
                 int bv;
                 vars[i]->Get(&bv, j);
                 completedEvents.SetBitVector(j, bv);
             }
-        }
-        else if (vars[i]->IsNamed(kStrPlayerKey))
-        {
+        } else if (vars[i]->IsNamed(kStrPlayerKey)) {
             vars[i]->Get(&playerKey);
-        }
-        else if (vars[i]->IsNamed(kStrTriggerer))
-        {
+        } else if (vars[i]->IsNamed(kStrTriggerer)) {
             vars[i]->Get(&triggerer);
-        }
-        else
-        {
+        } else {
             hsAssert(false, "Unknown var name");
         }
     }
 
-    if (numVars)
-    {
+    if (numVars) {
         bool stateValid = (curState >= 0 && curState < fResponder->fStates.Count());
         hsAssert(stateValid, "Received invalid responder state");
-        if (!stateValid)
+
+        if (!stateValid) {
             return;
+        }
 
         bool cmdValid = curCommand == -1 || (curCommand >= 0 && curCommand < fResponder->fStates[curState].fCmds.Count());
         hsAssert(stateValid, "Received invalid responder command");
-        if (!cmdValid)
+
+        if (!cmdValid) {
             return;
+        }
 
         // Could try to validate the completed events, but if someone hacked that
         // all they could do is set events that we don't look at

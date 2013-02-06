@@ -65,12 +65,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include <NxCapsule.h>
 static plPhysical* GetPhysical(plSceneObject* obj)
 {
-    if (obj)
-    {
+    if (obj) {
         const plSimulationInterface* si = obj->GetSimulationInterface();
-        if (si)
+
+        if (si) {
             return si->GetPhysical();
+        }
     }
+
     return nil;
 }
 
@@ -91,10 +93,11 @@ void plExcludeRegionModifier::Read(hsStream* stream, hsResMgr* mgr)
     plSingleModifier::Read(stream, mgr);
 
     int numPoints = stream->ReadLE32();
-    for (int i = 0; i < numPoints; i++)
-    {
+
+    for (int i = 0; i < numPoints; i++) {
         fSafePoints.push_back(mgr->ReadKey(stream));
     }
+
     fSeek = stream->ReadBool();
     fSeekTime = stream->ReadLEScalar();
 }
@@ -105,10 +108,11 @@ void plExcludeRegionModifier::Write(hsStream* stream, hsResMgr* mgr)
 
     int numPoints = fSafePoints.size();
     stream->WriteLE32(numPoints);
-    for (int i = 0; i < numPoints; i++)
-    {
-        mgr->WriteKey(stream,fSafePoints[i]);
+
+    for (int i = 0; i < numPoints; i++) {
+        mgr->WriteKey(stream, fSafePoints[i]);
     }
+
     stream->WriteBool(fSeek);
     stream->WriteLEScalar(fSeekTime);
 }
@@ -116,65 +120,61 @@ void plExcludeRegionModifier::Write(hsStream* stream, hsResMgr* mgr)
 void plExcludeRegionModifier::ISetPhysicalState(bool cleared)
 {
     plPhysical* phys = GetPhysical(GetTarget());
-    if (phys)
-    {
+
+    if (phys) {
         phys->ExcludeRegionHack(cleared);
 
-        if (cleared)
-        {
+        if (cleared) {
             phys->AddLOSDB(plSimDefs::kLOSDBUIBlockers);
-            if (HasFlag(kBlockCameras))
+
+            if (HasFlag(kBlockCameras)) {
                 phys->AddLOSDB(plSimDefs::kLOSDBCameraBlockers);
-        }
-        else
-        {
+            }
+        } else {
             phys->RemoveLOSDB(plSimDefs::kLOSDBUIBlockers);
-            if (HasFlag(kBlockCameras))
+
+            if (HasFlag(kBlockCameras)) {
                 phys->RemoveLOSDB(plSimDefs::kLOSDBCameraBlockers);
+            }
         }
     }
 }
 
 bool plExcludeRegionModifier::MsgReceive(plMessage* msg)
 {
-    plExcludeRegionMsg *exclMsg = plExcludeRegionMsg::ConvertNoRef(msg);
-    if (exclMsg)
-    {
-        if (exclMsg->GetCmd() == plExcludeRegionMsg::kClear)
-        {
+    plExcludeRegionMsg* exclMsg = plExcludeRegionMsg::ConvertNoRef(msg);
+
+    if (exclMsg) {
+        if (exclMsg->GetCmd() == plExcludeRegionMsg::kClear) {
             DetectorLogSpecial("Clearing exclude region %s", GetKeyName().c_str());
             IMoveAvatars();
             fContainedAvatars.Reset();
             ISetPhysicalState(true);
-        }
-        else if (exclMsg->GetCmd() == plExcludeRegionMsg::kRelease)
-        {
+        } else if (exclMsg->GetCmd() == plExcludeRegionMsg::kRelease) {
             DetectorLogSpecial("Releasing exclude region %s", GetKeyName().c_str());
             ISetPhysicalState(false);
         }
 
         GetTarget()->DirtySynchState(kSDLXRegion, exclMsg->fSynchFlags);
-    
+
         return true;
     }
 
     // Avatar entering or exiting our volume.  Only the owner of the SO logs this since
     // it does all the moving at clear time.
-    plCollideMsg *collideMsg = plCollideMsg::ConvertNoRef(msg);
-    
-    if (collideMsg)
-    {
-        if (collideMsg->fEntering)
-        {
+    plCollideMsg* collideMsg = plCollideMsg::ConvertNoRef(msg);
+
+    if (collideMsg) {
+        if (collideMsg->fEntering) {
             //DetectorLogSpecial("Avatar enter exclude region %s",GetKeyName().c_str());
             fContainedAvatars.Append(collideMsg->fOtherKey);
-        }
-        else
-        {
+        } else {
             //DetectorLogSpecial("Avatar exit exclude region %s",GetKeyName().c_str());
             int idx = fContainedAvatars.Find(collideMsg->fOtherKey);
-            if (idx != fContainedAvatars.kMissingIndex)
+
+            if (idx != fContainedAvatars.kMissingIndex) {
                 fContainedAvatars.Remove(idx);
+            }
         }
 
         return true;
@@ -185,23 +185,23 @@ bool plExcludeRegionModifier::MsgReceive(plMessage* msg)
 
 void plExcludeRegionModifier::AddTarget(plSceneObject* so)
 {
-    if (so)
-    {
+    if (so) {
         delete fSDLModifier;
         fSDLModifier = new plExcludeRegionSDLModifier(this);
         so->AddModifier(fSDLModifier);
     }
+
     plSingleModifier::SetTarget(so);
 }
 
-void plExcludeRegionModifier::RemoveTarget( plSceneObject *so )
+void plExcludeRegionModifier::RemoveTarget(plSceneObject* so)
 {
-    if (so && fSDLModifier)
-    {
+    if (so && fSDLModifier) {
         so->RemoveModifier(fSDLModifier);
         delete fSDLModifier;
         fSDLModifier = nil;
     }
+
     plSingleModifier::RemoveTarget(so);
 }
 
@@ -216,22 +216,22 @@ int plExcludeRegionModifier::IFindClosestSafePoint(plKey avatar)
     int closestIdx = -1;
 
     plSceneObject* avObj = plSceneObject::ConvertNoRef(avatar->GetObjectPtr());
-    if (!avObj)
+
+    if (!avObj) {
         return -1;
+    }
 
     hsVector3 avPos;
     avObj->GetCoordinateInterface()->GetLocalToWorld().GetTranslate(&avPos);
 
-    for (int i = 0; i < fSafePoints.size(); i++)
-    {
+    for (int i = 0; i < fSafePoints.size(); i++) {
         plSceneObject* safeObj = plSceneObject::ConvertNoRef(fSafePoints[i]->GetObjectPtr());
         hsVector3 safePos;
         safeObj->GetCoordinateInterface()->GetLocalToWorld().GetTranslate(&safePos);
 
         float dist = (safePos - avPos).Magnitude();
 
-        if (dist < closestDist || closestIdx == -1)
-        {
+        if (dist < closestDist || closestIdx == -1) {
             closestDist = dist;
             closestIdx = i;
         }
@@ -244,29 +244,31 @@ int plExcludeRegionModifier::IFindClosestSafePoint(plKey avatar)
 bool plExcludeRegionModifier::ICheckSubworlds(plKey avatar)
 {
     plSceneObject* avObj = plSceneObject::ConvertNoRef(avatar->GetObjectPtr());
-    if (avObj)
-    {
+
+    if (avObj) {
         // get the avatar modifier
-        const plArmatureMod *avMod = (plArmatureMod*)avObj->GetModifierByType(plArmatureMod::Index());
-        if (avMod)
-        {
+        const plArmatureMod* avMod = (plArmatureMod*)avObj->GetModifierByType(plArmatureMod::Index());
+
+        if (avMod) {
             // get the avatar controller
             plPhysicalControllerCore* avController = avMod->GetController();
-            if (avController)
-            {
+
+            if (avController) {
                 // get physical of the detector region
                 plPhysical* phys = GetPhysical(GetTarget());
-                if (phys)
-                {
+
+                if (phys) {
                     // are they in the same subworld?
-                    if ( phys->GetWorldKey() == avController->GetSubworld() )
+                    if (phys->GetWorldKey() == avController->GetSubworld()) {
                         return true;
-                    else
+                    } else {
                         return false;
+                    }
                 }
             }
         }
     }
+
     return false;
 }
 
@@ -296,32 +298,31 @@ void plExcludeRegionModifier::IMoveAvatars()
         }
     }
     */
-    
-    plPXPhysical* phys =(plPXPhysical*) GetPhysical(GetTarget());
-    if (phys)
-    {
+
+    plPXPhysical* phys = (plPXPhysical*) GetPhysical(GetTarget());
+
+    if (phys) {
         plKey DetectorWorldKey = phys->GetWorldKey();
         int numControllers = plPXPhysicalControllerCore::GetNumberOfControllersInThisSubWorld(phys->GetWorldKey());
-        if (numControllers > 0)
-        {
+
+        if (numControllers > 0) {
             plPXPhysicalControllerCore** controllers = new plPXPhysicalControllerCore*[numControllers];
 
             int actualCount = plPXPhysicalControllerCore::GetControllersInThisSubWorld(phys->GetWorldKey(), numControllers, controllers);
-            
-            for (int i=0;i<actualCount;i++)
-            {   
+
+            for (int i = 0; i < actualCount; i++) {
                 NxCapsule cap;
                 controllers[i]->GetWorldSpaceCapsule(cap);
-                if(phys->OverlapWithCapsule(cap))
-                {
+
+                if (phys->OverlapWithCapsule(cap)) {
                     plSceneObject* so = plSceneObject::ConvertNoRef(controllers[i]->GetOwner()->ObjectIsLoaded());
                     const plArmatureMod* constAvMod = (plArmatureMod*)so->GetModifierByType(plArmatureMod::Index());
-                    if(constAvMod)
-                    {
-                        plAvBrainGeneric *curGenBrain = (plAvBrainGeneric *)constAvMod->FindBrainByClass(plAvBrainGeneric::Index());
+
+                    if (constAvMod) {
+                        plAvBrainGeneric* curGenBrain = (plAvBrainGeneric*)constAvMod->FindBrainByClass(plAvBrainGeneric::Index());
+
                         // *** warning; if there's more than one generic brain active, this will only look at the first
-                        if (curGenBrain  && curGenBrain->GetType() == plAvBrainGeneric::kLadder)
-                        {
+                        if (curGenBrain  && curGenBrain->GetType() == plAvBrainGeneric::kLadder) {
                             plAvBrainGenericMsg* pMsg = new plAvBrainGenericMsg(
                                 nil,
                                 constAvMod->GetKey(),
@@ -334,12 +335,10 @@ void plExcludeRegionModifier::IMoveAvatars()
                                 0.0
                             );
                             pMsg->Send();
-                        }
-                        else
-                        {
+                        } else {
                             int closestIdx = IFindClosestSafePoint(controllers[i]->GetOwner());
-                            if (closestIdx != -1)
-                            {
+
+                            if (closestIdx != -1) {
                                 plAvSeekMsg* msg = new plAvSeekMsg;
                                 msg->SetBCastFlag(plMessage::kPropagateToModifiers);
                                 msg->AddReceiver(controllers[i]->GetOwner());
@@ -376,11 +375,11 @@ static const char* kXRegionSDLCleared = "cleared";
 void plExcludeRegionSDLModifier::IPutCurrentStateIn(plStateDataRecord* dstState)
 {
     plSimpleStateVariable* var = dstState->FindVar(kXRegionSDLCleared);
-    if (var)
-    {
+
+    if (var) {
         plPhysical* phys = GetPhysical(GetTarget());
-        if (phys)
-        {
+
+        if (phys) {
             //bool cleared = phys->GetGroup() == plSimDefs::kGroupStatic;
             bool cleared = phys->GetGroup() == plSimDefs::kGroupExcludeRegion;
             var->Set(cleared);
@@ -391,8 +390,8 @@ void plExcludeRegionSDLModifier::IPutCurrentStateIn(plStateDataRecord* dstState)
 void plExcludeRegionSDLModifier::ISetCurrentStateFrom(const plStateDataRecord* srcState)
 {
     plSimpleStateVariable* var = srcState->FindVar(kXRegionSDLCleared);
-    if (var)
-    {
+
+    if (var) {
         bool cleared;
         var->Get(&cleared);
 

@@ -133,47 +133,48 @@ struct hsCpuId {
 
 template <typename func_ptr>
 struct hsFunctionDispatcher {
-    hsFunctionDispatcher(func_ptr fpu, func_ptr sse1=0, func_ptr sse2=0, func_ptr sse3=0, func_ptr ssse3=0, func_ptr sse41=0, func_ptr sse42=0, func_ptr avx=0) {
+    hsFunctionDispatcher(func_ptr fpu, func_ptr sse1 = 0, func_ptr sse2 = 0, func_ptr sse3 = 0, func_ptr ssse3 = 0, func_ptr sse41 = 0, func_ptr sse42 = 0, func_ptr avx = 0) {
         hsAssert(fpu, "FPU fallback function required.");
         const hsCpuId& cpu = hsCpuId::instance();
 #ifdef HS_AVX
+
         if (cpu.has_avx && avx) {
             call = avx;
         } else
 #endif
 #ifdef HS_SSE42
-        if (cpu.has_sse42 && sse42) {
-            call = sse42;
-        } else
+            if (cpu.has_sse42 && sse42) {
+                call = sse42;
+            } else
 #endif
 #ifdef HS_SSE41
-        if (cpu.has_sse41 && sse41) {
-            call = sse41;
-        } else
+                if (cpu.has_sse41 && sse41) {
+                    call = sse41;
+                } else
 #endif
 #ifdef HS_SSSE3
-        if (cpu.has_ssse3 && ssse3) {
-            call = ssse3;
-        } else
+                    if (cpu.has_ssse3 && ssse3) {
+                        call = ssse3;
+                    } else
 #endif
 #ifdef HS_SSE3
-        if (cpu.has_sse3 && sse3) {
-            call = sse3;
-        } else
+                        if (cpu.has_sse3 && sse3) {
+                            call = sse3;
+                        } else
 #endif
 #ifdef HS_SSE2
-        if (cpu.has_sse2 && sse2) {
-            call = sse2;
-        } else
+                            if (cpu.has_sse2 && sse2) {
+                                call = sse2;
+                            } else
 #endif
 #ifdef HS_SSE1
-        if (cpu.has_sse1 && sse1) {
-            call = sse1;
-        } else
+                                if (cpu.has_sse1 && sse1) {
+                                    call = sse1;
+                                } else
 #endif
-        {
-            call = fpu;
-        }
+                                {
+                                    call = fpu;
+                                }
     };
     func_ptr call;
 };

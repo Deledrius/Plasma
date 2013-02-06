@@ -52,33 +52,51 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plKey;
 class hsStream;
 class hsResMgr;
-class plLoadAgeMsg : public plMessage
-{
+class plLoadAgeMsg : public plMessage {
 protected:
     char* fAgeFilename;             // the age to load/unload
     plUUID fAgeGuid;
     bool fUnload;         // true if we want to unload the age
     int fPlayerID;
 public:
-    plLoadAgeMsg() : fAgeFilename(nil), fUnload(false), fPlayerID(-1){ }
-    virtual ~plLoadAgeMsg() { delete [] fAgeFilename;  }
+    plLoadAgeMsg() : fAgeFilename(nil), fUnload(false), fPlayerID(-1) { }
+    virtual ~plLoadAgeMsg() {
+        delete [] fAgeFilename;
+    }
 
-    CLASSNAME_REGISTER( plLoadAgeMsg );
-    GETINTERFACE_ANY( plLoadAgeMsg, plMessage );
+    CLASSNAME_REGISTER(plLoadAgeMsg);
+    GETINTERFACE_ANY(plLoadAgeMsg, plMessage);
 
-    void SetAgeFilename(const char* a) { delete [] fAgeFilename; fAgeFilename=a?hsStrcpy(a):nil; }
-    char* GetAgeFilename() const { return fAgeFilename; }
+    void SetAgeFilename(const char* a) {
+        delete [] fAgeFilename;
+        fAgeFilename = a ? hsStrcpy(a) : nil;
+    }
+    char* GetAgeFilename() const {
+        return fAgeFilename;
+    }
 
-    void SetAgeGuid( const plUUID * v ) { fAgeGuid.CopyFrom( v ); }
-    const plUUID * GetAgeGuid() const { return &fAgeGuid; }
+    void SetAgeGuid(const plUUID* v) {
+        fAgeGuid.CopyFrom(v);
+    }
+    const plUUID* GetAgeGuid() const {
+        return &fAgeGuid;
+    }
 
-    void SetLoading(bool l) { fUnload=!l; }
-    bool GetLoading() const { return !fUnload; }
+    void SetLoading(bool l) {
+        fUnload = !l;
+    }
+    bool GetLoading() const {
+        return !fUnload;
+    }
 
-    void SetPlayerID(int p) { fPlayerID=p; }
-    int GetPlayerID() const { return fPlayerID; }
-    
-    // IO 
+    void SetPlayerID(int p) {
+        fPlayerID = p;
+    }
+    int GetPlayerID() const {
+        return fPlayerID;
+    }
+
+    // IO
     void Read(hsStream* stream, hsResMgr* mgr);
     void Write(hsStream* stream, hsResMgr* mgr);
 
@@ -90,32 +108,40 @@ public:
 // Internal msg, sent by NetClientMgr to unload an age when linking out.
 // Should not be used for other purposes
 //
-class plLinkOutUnloadMsg : public plLoadAgeMsg
-{
+class plLinkOutUnloadMsg : public plLoadAgeMsg {
 public:
-    plLinkOutUnloadMsg() { fUnload=true; }
+    plLinkOutUnloadMsg() {
+        fUnload = true;
+    }
 
-    CLASSNAME_REGISTER( plLinkOutUnloadMsg );
-    GETINTERFACE_ANY( plLinkOutUnloadMsg, plLoadAgeMsg );   
+    CLASSNAME_REGISTER(plLinkOutUnloadMsg);
+    GETINTERFACE_ANY(plLinkOutUnloadMsg, plLoadAgeMsg);
 };
 
 //
-// Internal msg, used by NetClientMgr. 
+// Internal msg, used by NetClientMgr.
 // (we send another to the avatar that linked)
 // Not meant to go over the wire.
 //
-class plLinkInDoneMsg : public plMessage
-{
+class plLinkInDoneMsg : public plMessage {
 public:
 
-    CLASSNAME_REGISTER( plLinkInDoneMsg );
-    GETINTERFACE_ANY( plLinkInDoneMsg, plMessage ); 
+    CLASSNAME_REGISTER(plLinkInDoneMsg);
+    GETINTERFACE_ANY(plLinkInDoneMsg, plMessage);
 
-    void Read(hsStream* stream, hsResMgr* mgr) { IMsgRead(stream, mgr); }
-    void Write(hsStream* stream, hsResMgr* mgr) { IMsgWrite(stream, mgr);   }
+    void Read(hsStream* stream, hsResMgr* mgr) {
+        IMsgRead(stream, mgr);
+    }
+    void Write(hsStream* stream, hsResMgr* mgr) {
+        IMsgWrite(stream, mgr);
+    }
 
-    void ReadVersion(hsStream* stream, hsResMgr* mgr) { IMsgRead(stream, mgr);  };
-    void WriteVersion(hsStream* stream, hsResMgr* mgr) {  IMsgWrite(stream, mgr);   };
+    void ReadVersion(hsStream* stream, hsResMgr* mgr) {
+        IMsgRead(stream, mgr);
+    };
+    void WriteVersion(hsStream* stream, hsResMgr* mgr) {
+        IMsgWrite(stream, mgr);
+    };
 
 };
 

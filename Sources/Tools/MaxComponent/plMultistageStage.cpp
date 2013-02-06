@@ -65,13 +65,15 @@ plBaseStage::~plBaseStage()
 
 BOOL plBaseStage::IStaticDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    if (msg == WM_INITDIALOG)
+    if (msg == WM_INITDIALOG) {
         SetWindowLong(hDlg, GWL_USERDATA, lParam);
+    }
 
-    plBaseStage *stage = (plBaseStage*)GetWindowLong(hDlg, GWL_USERDATA);
+    plBaseStage* stage = (plBaseStage*)GetWindowLong(hDlg, GWL_USERDATA);
 
-    if (!stage)
+    if (!stage) {
         return FALSE;
+    }
 
     return stage->IDlgProc(hDlg, msg, wParam, lParam);
 }
@@ -84,22 +86,25 @@ BOOL plBaseStage::IDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 HWND plBaseStage::ICreateDlg(int dialogID, char* title)
 {
     return GetCOREInterface()->AddRollupPage(hInstance,
-                                            MAKEINTRESOURCE(dialogID),
-                                            IStaticDlgProc,
-                                            title,
-                                            (LPARAM)this);
+            MAKEINTRESOURCE(dialogID),
+            IStaticDlgProc,
+            title,
+            (LPARAM)this);
 }
 
 void plBaseStage::IDestroyDlg(HWND hDlg)
 {
-    if (hDlg)
+    if (hDlg) {
         GetCOREInterface()->DeleteRollupPage(hDlg);
+    }
 }
 
 const char* plBaseStage::GetName()
 {
-    if (!fName)
+    if (!fName) {
         fName = hsStrcpy("DefaultName");
+    }
+
     return fName;
 }
 
@@ -109,14 +114,14 @@ void plBaseStage::SetName(const char* name)
     fName = hsStrcpy(name);
 }
 
-void plBaseStage::Read(hsStream *stream)
+void plBaseStage::Read(hsStream* stream)
 {
     stream->ReadLE16();
     delete [] fName;
     fName = stream->ReadSafeString();
 }
 
-void plBaseStage::Write(hsStream *stream)
+void plBaseStage::Write(hsStream* stream)
 {
     stream->WriteLE16(1);
     stream->WriteSafeString(fName);
@@ -154,7 +159,7 @@ plStandardStage::~plStandardStage()
     delete [] fAnimName;
 }
 
-void plStandardStage::Read(hsStream *stream)
+void plStandardStage::Read(hsStream* stream)
 {
     plBaseStage::Read(stream);
 
@@ -170,8 +175,8 @@ void plStandardStage::Read(hsStream *stream)
     fStageRegress = stream->ReadByte();
     fNotify = stream->ReadByte();
     fUseGlobalCoord = stream->ReadBool();
-    if(version > 1)
-    {
+
+    if (version > 1) {
         // these guys were added in version 2
         fDoAdvanceTo = stream->ReadBool();
         fAdvanceTo = stream->ReadLE32();
@@ -180,7 +185,7 @@ void plStandardStage::Read(hsStream *stream)
     }
 }
 
-void plStandardStage::Write(hsStream *stream)
+void plStandardStage::Write(hsStream* stream)
 {
     plBaseStage::Write(stream);
 
@@ -225,64 +230,56 @@ void plStandardStage::DestroyDlg()
 
 BOOL plStandardStage::IDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
-    case WM_COMMAND:
-        {
+    switch (msg) {
+    case WM_COMMAND: {
             int code = HIWORD(wParam);
             int id = LOWORD(wParam);
 
             // Combo changed
-            if (code == CBN_SELCHANGE)
-            {
+            if (code == CBN_SELCHANGE) {
                 int sel = ComboBox_GetCurSel((HWND)lParam);
                 int type = ComboBox_GetItemData((HWND)lParam, sel);
 
-                if (id == IDC_FORWARD_COMBO)
+                if (id == IDC_FORWARD_COMBO) {
                     fForward = type;
-                else if (id == IDC_BACKWARD)
+                } else if (id == IDC_BACKWARD) {
                     fBackward = type;
-                else if (id == IDC_ADVANCE)
+                } else if (id == IDC_ADVANCE) {
                     fStageAdvance = type;
-                else if (id == IDC_REGRESS)
+                } else if (id == IDC_REGRESS) {
                     fStageRegress = type;
+                }
 
                 SetSaveRequiredFlag();
 
                 return TRUE;
             }
             // Button clicked or checkbox checked
-            else if (code == BN_CLICKED)
-            {
+            else if (code == BN_CLICKED) {
                 bool isChecked = (Button_GetCheck((HWND)lParam) == BST_CHECKED);
-                if (id == IDC_LOOP_FOREVER)
-                {
+
+                if (id == IDC_LOOP_FOREVER) {
                     fLoopForever = isChecked;
 
-                    ISpinnerControl *spin = GetISpinner(GetDlgItem(fDlg, IDC_NUM_LOOPS_SPIN));
+                    ISpinnerControl* spin = GetISpinner(GetDlgItem(fDlg, IDC_NUM_LOOPS_SPIN));
                     spin->Enable(!fLoopForever);
-                }
-                else if (id == IDC_GLOBAL_COORD)
-                {
+                } else if (id == IDC_GLOBAL_COORD) {
                     fUseGlobalCoord = isChecked;
-                }
-                else if (id == IDC_CHECK_ENTER)
+                } else if (id == IDC_CHECK_ENTER) {
                     SetBit(fNotify, plAnimStage::kNotifyEnter, isChecked);
-                else if (id == IDC_CHECK_LOOP)
+                } else if (id == IDC_CHECK_LOOP) {
                     SetBit(fNotify, plAnimStage::kNotifyLoop, isChecked);
-                else if (id == IDC_CHECK_ADVANCE)
+                } else if (id == IDC_CHECK_ADVANCE) {
                     SetBit(fNotify, plAnimStage::kNotifyAdvance, isChecked);
-                else if (id == IDC_CHECK_REGRESS)
+                } else if (id == IDC_CHECK_REGRESS) {
                     SetBit(fNotify, plAnimStage::kNotifyRegress, isChecked);
-                else if (id == IDC_DO_ADVANCE_TO)
-                {
+                } else if (id == IDC_DO_ADVANCE_TO) {
                     fDoAdvanceTo = isChecked;
-                    ISpinnerControl *spin = GetISpinner(GetDlgItem(fDlg, IDC_ADVANCE_STAGE_SPIN));
+                    ISpinnerControl* spin = GetISpinner(GetDlgItem(fDlg, IDC_ADVANCE_STAGE_SPIN));
                     spin->Enable(fDoAdvanceTo);
-                } else if (id == IDC_DO_REGRESS_TO)
-                {
+                } else if (id == IDC_DO_REGRESS_TO) {
                     fDoRegressTo = isChecked;
-                    ISpinnerControl *spin = GetISpinner(GetDlgItem(fDlg, IDC_REGRESS_STAGE_SPIN));
+                    ISpinnerControl* spin = GetISpinner(GetDlgItem(fDlg, IDC_REGRESS_STAGE_SPIN));
                     spin->Enable(fDoRegressTo);
                 }
 
@@ -293,12 +290,11 @@ BOOL plStandardStage::IDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam
         }
         break;
 
-    // Num loops spinner changed
-    case CC_SPINNER_CHANGE:
-        {
+        // Num loops spinner changed
+    case CC_SPINNER_CHANGE: {
             ISpinnerControl* spin = (ISpinnerControl*)lParam;
-            if (LOWORD(wParam) == IDC_NUM_LOOPS_SPIN)
-            {
+
+            if (LOWORD(wParam) == IDC_NUM_LOOPS_SPIN) {
                 fNumLoops = spin->GetIVal();
             } else if (LOWORD(wParam) == IDC_ADVANCE_STAGE_SPIN) {
                 fAdvanceTo = spin->GetIVal();
@@ -311,15 +307,16 @@ BOOL plStandardStage::IDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam
         }
         break;
 
-    // Anim name changed
+        // Anim name changed
     case WM_CUSTEDIT_ENTER:
-        if (LOWORD(wParam) == IDC_ANIM_NAME)
-        {
+        if (LOWORD(wParam) == IDC_ANIM_NAME) {
             IGetAnimName();
             return TRUE;
         }
+
         break;
     }
+
     return FALSE;
 }
 
@@ -329,8 +326,7 @@ void plStandardStage::IGetAnimName()
     char buf[256];
     edit->GetText(buf, sizeof(buf));
 
-    if (strcmp(buf, fAnimName) != 0)
-    {
+    if (strcmp(buf, fAnimName) != 0) {
         delete [] fAnimName;
         fAnimName = hsStrcpy(buf);
 
@@ -338,49 +334,44 @@ void plStandardStage::IGetAnimName()
     }
 }
 
-struct NameType
-{
+struct NameType {
     const char* name;
     int type;
 };
 
-static NameType gForward[] =
-{
+static NameType gForward[] = {
     { "None",       plAnimStage::kForwardNone },
     { "Keyboard",   plAnimStage::kForwardKey },
     { "Automatic",  plAnimStage::kForwardAuto }
 };
 
-static NameType gBackward[] =
-{
+static NameType gBackward[] = {
     { "None",       plAnimStage::kBackNone },
     { "Keyboard",   plAnimStage::kBackKey },
     { "Automatic",  plAnimStage::kBackAuto }
 };
 
-static NameType gAdvance[] =
-{
+static NameType gAdvance[] = {
     { "None",       plAnimStage::kAdvanceNone },
-    { "Auto At End",plAnimStage::kAdvanceAuto }
+    { "Auto At End", plAnimStage::kAdvanceAuto }
 };
 
-static NameType gRegress[] =
-{
+static NameType gRegress[] = {
     { "None",       plAnimStage::kRegressNone },
-    { "Auto At End",plAnimStage::kRegressAuto }
+    { "Auto At End", plAnimStage::kRegressAuto }
 };
 
 static void LoadCombo(HWND hCombo, NameType* nameInt, int size, int curVal)
 {
     int num = size / sizeof(NameType);
 
-    for (int i = 0; i < num; i++)
-    {
+    for (int i = 0; i < num; i++) {
         int idx = ComboBox_AddString(hCombo, nameInt[i].name);
         ComboBox_SetItemData(hCombo, idx, nameInt[i].type);
 
-        if (nameInt[i].type == curVal)
+        if (nameInt[i].type == curVal) {
             ComboBox_SetCurSel(hCombo, idx);
+        }
     }
 }
 
@@ -401,44 +392,50 @@ void plStandardStage::IInitDlg()
     HWND hRegress = GetDlgItem(fDlg, IDC_REGRESS);
     LoadCombo(hRegress, gRegress, sizeof(gRegress), fStageRegress);
 
-    CheckDlgButton(fDlg, IDC_CHECK_ENTER, (fNotify & plAnimStage::kNotifyEnter) ? BST_CHECKED : BST_UNCHECKED); 
-    CheckDlgButton(fDlg, IDC_CHECK_LOOP, (fNotify & plAnimStage::kNotifyLoop) ? BST_CHECKED : BST_UNCHECKED); 
-    CheckDlgButton(fDlg, IDC_CHECK_ADVANCE, (fNotify & plAnimStage::kNotifyAdvance) ? BST_CHECKED : BST_UNCHECKED); 
-    CheckDlgButton(fDlg, IDC_CHECK_REGRESS, (fNotify & plAnimStage::kNotifyRegress) ? BST_CHECKED : BST_UNCHECKED); 
+    CheckDlgButton(fDlg, IDC_CHECK_ENTER, (fNotify & plAnimStage::kNotifyEnter) ? BST_CHECKED : BST_UNCHECKED);
+    CheckDlgButton(fDlg, IDC_CHECK_LOOP, (fNotify & plAnimStage::kNotifyLoop) ? BST_CHECKED : BST_UNCHECKED);
+    CheckDlgButton(fDlg, IDC_CHECK_ADVANCE, (fNotify & plAnimStage::kNotifyAdvance) ? BST_CHECKED : BST_UNCHECKED);
+    CheckDlgButton(fDlg, IDC_CHECK_REGRESS, (fNotify & plAnimStage::kNotifyRegress) ? BST_CHECKED : BST_UNCHECKED);
 
-    ISpinnerControl *spin = SetupIntSpinner(fDlg, IDC_NUM_LOOPS_SPIN, IDC_NUM_LOOPS_EDIT, 0, 10000, fNumLoops);
+    ISpinnerControl* spin = SetupIntSpinner(fDlg, IDC_NUM_LOOPS_SPIN, IDC_NUM_LOOPS_EDIT, 0, 10000, fNumLoops);
 
-    CheckDlgButton(fDlg, IDC_LOOP_FOREVER, fLoopForever ? BST_CHECKED : BST_UNCHECKED); 
-    if (fLoopForever)
+    CheckDlgButton(fDlg, IDC_LOOP_FOREVER, fLoopForever ? BST_CHECKED : BST_UNCHECKED);
+
+    if (fLoopForever) {
         spin->Disable();
+    }
 
     spin = SetupIntSpinner(fDlg, IDC_ADVANCE_STAGE_SPIN, IDC_ADVANCE_STAGE_EDIT, -1, 100, fAdvanceTo);
     CheckDlgButton(fDlg, IDC_DO_ADVANCE_TO, fDoAdvanceTo ? BST_CHECKED : BST_UNCHECKED);
-    if (! fDoAdvanceTo)
+
+    if (! fDoAdvanceTo) {
         spin->Disable();
+    }
 
     spin = SetupIntSpinner(fDlg, IDC_REGRESS_STAGE_SPIN, IDC_REGRESS_STAGE_EDIT, -1, 100, fRegressTo);
     CheckDlgButton(fDlg, IDC_DO_REGRESS_TO, fDoRegressTo ? BST_CHECKED : BST_UNCHECKED);
-    if (! fDoRegressTo)
-        spin->Disable();
 
-    CheckDlgButton(fDlg, IDC_GLOBAL_COORD, fUseGlobalCoord ? BST_CHECKED : BST_UNCHECKED); 
+    if (! fDoRegressTo) {
+        spin->Disable();
+    }
+
+    CheckDlgButton(fDlg, IDC_GLOBAL_COORD, fUseGlobalCoord ? BST_CHECKED : BST_UNCHECKED);
 }
 
 plAnimStage* plStandardStage::CreateStage()
 {
     int loopCount = fLoopForever ? -1 : fNumLoops;
     plAnimStage* stage = new plAnimStage(fAnimName,
-                                        fNotify,
-                                        (plAnimStage::ForwardType)fForward,
-                                        (plAnimStage::BackType)fBackward,
-                                        (plAnimStage::AdvanceType)fStageAdvance,
-                                        (plAnimStage::RegressType)fStageRegress,
-                                        loopCount,
-                                        fDoAdvanceTo,
-                                        fAdvanceTo,
-                                        fDoRegressTo,
-                                        fRegressTo);
+                                         fNotify,
+                                         (plAnimStage::ForwardType)fForward,
+                                         (plAnimStage::BackType)fBackward,
+                                         (plAnimStage::AdvanceType)fStageAdvance,
+                                         (plAnimStage::RegressType)fStageRegress,
+                                         loopCount,
+                                         fDoAdvanceTo,
+                                         fAdvanceTo,
+                                         fDoRegressTo,
+                                         fRegressTo);
 
     return stage;
 }

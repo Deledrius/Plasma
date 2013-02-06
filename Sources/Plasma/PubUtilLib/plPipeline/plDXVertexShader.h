@@ -50,8 +50,7 @@ struct IDirect3DDevice9;
 class plShader;
 class plDXPipeline;
 
-class plDXVertexShader : public plDXShader
-{
+class plDXVertexShader : public plDXShader {
 protected:
     IDirect3DVertexShader9* fHandle;
     hsTArray<DWORD>&    IMakeDecl(hsTArray<DWORD>& decl) const;
@@ -64,7 +63,9 @@ public:
     virtual ~plDXVertexShader();
 
     virtual void    Release();
-    void            Link(plDXVertexShader** back) { plDXDeviceRef::Link((plDXDeviceRef**)back); }
+    void            Link(plDXVertexShader** back) {
+        plDXDeviceRef::Link((plDXDeviceRef**)back);
+    }
 
     bool            VerifyFormat(uint8_t format) const;
     IDirect3DVertexShader9* GetShader(plDXPipeline* pipe);

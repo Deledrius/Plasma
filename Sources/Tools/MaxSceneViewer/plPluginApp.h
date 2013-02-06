@@ -46,14 +46,13 @@ class plPluginClient;
 //
 // Plugin app class.  Creates and destroys the client, leaves the resmanager
 //
-class plPluginApp : public plApp
-{
+class plPluginApp : public plApp {
 protected:
-    plPluginClient *fClient;
+    plPluginClient* fClient;
 
 public:
     plPluginApp() : fClient(NULL) {}
 
-    virtual plClient *Startup(char *CmdLine);
+    virtual plClient* Startup(char* CmdLine);
     virtual void Shutdown();
 };

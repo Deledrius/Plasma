@@ -54,8 +54,7 @@ struct hsMatrix44;
 class hsBounds3Ext;
 
 
-class plAudioInterface : public plObjInterface
-{
+class plAudioInterface : public plObjInterface {
 public:
     // Props inc by 1 (bit shift in bitvector).
     enum plAudioProperties {
@@ -70,24 +69,26 @@ protected:
 
     void ISetAudible(plAudible* aud);
     void IRemoveAudible(plAudible* aud);
-    
+
     virtual void    ISetOwner(plSceneObject* owner);
     virtual void    ISetSceneNode(plKey node);
-    
+
     friend class plSceneObject;
 
 public:
     plAudioInterface();
     ~plAudioInterface();
 
-    CLASSNAME_REGISTER( plAudioInterface );
-    GETINTERFACE_ANY( plAudioInterface, plObjInterface );
+    CLASSNAME_REGISTER(plAudioInterface);
+    GETINTERFACE_ANY(plAudioInterface, plObjInterface);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     void          SetProperty(int prop, bool on);
-    int32_t       GetNumProperties() const { return kNumProps; }
+    int32_t       GetNumProperties() const {
+        return kNumProps;
+    }
 
     plSound*    GetSound(int i) const;
     int         GetNumSounds() const;
@@ -95,15 +96,17 @@ public:
     virtual bool MsgReceive(plMessage* msg);
 
     // for export only!!!!!
-    plAudible* GetAudible() const { return fAudible; }
+    plAudible* GetAudible() const {
+        return fAudible;
+    }
     /// don't call this otherwise!
-    
+
     // Transform settable only, if you want it get it from the coordinate interface.
     void        SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);
 
-    virtual void    ReleaseData( void );
-    void SetSoundFilename(int index, const char *filename, bool isCompressed);
-    int GetSoundIndex(const char *keyname);
+    virtual void    ReleaseData(void);
+    void SetSoundFilename(int index, const char* filename, bool isCompressed);
+    int GetSoundIndex(const char* keyname);
 };
 
 

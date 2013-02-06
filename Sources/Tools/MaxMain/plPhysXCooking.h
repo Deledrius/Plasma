@@ -51,26 +51,26 @@ class NxUtilLib;
 class NxVec3;
 class hsVectorStream;
 
-class plPhysXCooking
-{
+class plPhysXCooking {
 public:
     static void Init();
     static void Shutdown();
 
     static hsVectorStream* CookTrimesh(int nVerts, hsPoint3* verts, int nFaces, uint16_t* faces);
     static bool TestIfConvex(NxConvexMesh* convexMesh, int nVerts, hsPoint3* verts);
-    static hsVectorStream* CookHull(int nVerts, hsPoint3* verts,bool inflate);
+    static hsVectorStream* CookHull(int nVerts, hsPoint3* verts, bool inflate);
     static bool IsPointInsideHull(hsPlane3* hull, int nPlanes, const hsPoint3& pos);
-    static inline bool ITestPlane(const hsPoint3 &pos, const hsPlane3 &plane)
-    {
+    static inline bool ITestPlane(const hsPoint3& pos, const hsPlane3& plane) {
         float dis = plane.fN.InnerProduct(pos);
         dis += plane.fD;
-        if( dis > 0.f ) 
-            return false;   
+
+        if (dis > 0.f) {
+            return false;
+        }
 
         return true;
     };
-    static void PCA(const NxVec3* points,int numPoints, NxMat33& out);
+    static void PCA(const NxVec3* points, int numPoints, NxMat33& out);
     static NxUtilLib* fUtilLib;
     static bool fSkipErrors;
     static hsVectorStream* IMakePolytope(const plMaxMeshExtractor::NeutralMesh& inMesh);

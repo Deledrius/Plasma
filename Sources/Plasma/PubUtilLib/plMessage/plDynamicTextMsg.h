@@ -54,8 +54,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plDynamicTextMap;
 
-class plDynamicTextMsg : public plMessage
-{
+class plDynamicTextMsg : public plMessage {
     friend class plDynamicTextMap;
 
 protected:
@@ -72,26 +71,33 @@ protected:
     hsColorRGBA fColor;
 
     // String
-    wchar_t     *fString;
+    wchar_t*     fString;
 
     // Mipmap
     plKey       fImageKey;
 
     // Misc flags field
     uint32_t    fFlags;
-    
+
     bool        fBlockRGB;
     int16_t     fLineSpacing;
 
 public:
-    plDynamicTextMsg() : plMessage( nil, nil, nil ) { fCmd = 0; fString = nil; fImageKey = nil; fFlags = 0; fBlockRGB = false; }
-    ~plDynamicTextMsg() { delete [] fString; }
+    plDynamicTextMsg() : plMessage(nil, nil, nil) {
+        fCmd = 0;
+        fString = nil;
+        fImageKey = nil;
+        fFlags = 0;
+        fBlockRGB = false;
+    }
+    ~plDynamicTextMsg() {
+        delete [] fString;
+    }
 
-    CLASSNAME_REGISTER( plDynamicTextMsg );
-    GETINTERFACE_ANY( plDynamicTextMsg, plMessage );
+    CLASSNAME_REGISTER(plDynamicTextMsg);
+    GETINTERFACE_ANY(plDynamicTextMsg, plMessage);
 
-    enum Commands
-    {
+    enum Commands {
         kClear              = 0x0001,
         kSetTextColor       = 0x0002,
         kSetFont            = 0x0004,
@@ -112,33 +118,40 @@ public:
         kStringCmds         = kSetFont | kDrawString | kDrawClippedString | kDrawWrappedString,
         kRectCmds           = kFillRect | kFrameRect | kDrawClippedString | kDrawWrappedString | kDrawClippedImage,
         kPosCmds            = kSetFont | kDrawClippedString | kDrawWrappedString | kDrawImage | kDrawClippedImage,
-        kFlagCmds           = kSetFont | kDrawImage | kSetJustify | kDrawClippedImage 
+        kFlagCmds           = kSetFont | kDrawImage | kSetJustify | kDrawClippedImage
     };
 
     // Commands
-    void    ClearToColor( hsColorRGBA &c ) { fCmd |= kClear; fClearColor = c; }
-    void    Flush( void ) { fCmd |= kFlush; }
-    void    PurgeImage( void ) { fCmd |= kPurgeImage; }
+    void    ClearToColor(hsColorRGBA& c) {
+        fCmd |= kClear;
+        fClearColor = c;
+    }
+    void    Flush(void) {
+        fCmd |= kFlush;
+    }
+    void    PurgeImage(void) {
+        fCmd |= kPurgeImage;
+    }
 
     // The following are mutually exclusive commands 'cause they share some parameters
-    void    SetTextColor( hsColorRGBA &c, bool blockRGB = false );
-    void    SetFont( const char *face, int16_t size, bool isBold = false );
-    void    SetLineSpacing( int16_t spacing );
-    void    FillRect( uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, hsColorRGBA &c );
-    void    FrameRect( uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, hsColorRGBA &c );
-    void    DrawString( int16_t x, int16_t y, const char *text );
-    void    DrawString( int16_t x, int16_t y, const wchar_t *text );
-    void    DrawClippedString( int16_t x, int16_t y, uint16_t clipLeft, uint16_t clipTop, uint16_t clipRight, uint16_t clipBottom, const char *text );
-    void    DrawClippedString( int16_t x, int16_t y, uint16_t clipLeft, uint16_t clipTop, uint16_t clipRight, uint16_t clipBottom, const wchar_t *text );
-    void    DrawWrappedString( int16_t x, int16_t y, uint16_t wrapWidth, uint16_t wrapHeight, const char *text );
-    void    DrawWrappedString( int16_t x, int16_t y, uint16_t wrapWidth, uint16_t wrapHeight, const wchar_t *text );
-    void    DrawImage( int16_t x, int16_t y, plKey &image, bool respectAlpha = false );
-    void    DrawClippedImage( int16_t x, int16_t y, plKey &image, uint16_t clipX, uint16_t clipY, uint16_t clipWidth, uint16_t clipHeight, bool respectAlpha = false );
-    void    SetJustify( uint8_t justifyFlags );
+    void    SetTextColor(hsColorRGBA& c, bool blockRGB = false);
+    void    SetFont(const char* face, int16_t size, bool isBold = false);
+    void    SetLineSpacing(int16_t spacing);
+    void    FillRect(uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, hsColorRGBA& c);
+    void    FrameRect(uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, hsColorRGBA& c);
+    void    DrawString(int16_t x, int16_t y, const char* text);
+    void    DrawString(int16_t x, int16_t y, const wchar_t* text);
+    void    DrawClippedString(int16_t x, int16_t y, uint16_t clipLeft, uint16_t clipTop, uint16_t clipRight, uint16_t clipBottom, const char* text);
+    void    DrawClippedString(int16_t x, int16_t y, uint16_t clipLeft, uint16_t clipTop, uint16_t clipRight, uint16_t clipBottom, const wchar_t* text);
+    void    DrawWrappedString(int16_t x, int16_t y, uint16_t wrapWidth, uint16_t wrapHeight, const char* text);
+    void    DrawWrappedString(int16_t x, int16_t y, uint16_t wrapWidth, uint16_t wrapHeight, const wchar_t* text);
+    void    DrawImage(int16_t x, int16_t y, plKey& image, bool respectAlpha = false);
+    void    DrawClippedImage(int16_t x, int16_t y, plKey& image, uint16_t clipX, uint16_t clipY, uint16_t clipWidth, uint16_t clipHeight, bool respectAlpha = false);
+    void    SetJustify(uint8_t justifyFlags);
     // IO
     void Read(hsStream* stream, hsResMgr* mgr);
     void Write(hsStream* stream, hsResMgr* mgr);
-    
+
     // WriteVersion writes the current version of this creatable and ReadVersion will read in
     // any previous version.
     virtual void ReadVersion(hsStream* s, hsResMgr* mgr);

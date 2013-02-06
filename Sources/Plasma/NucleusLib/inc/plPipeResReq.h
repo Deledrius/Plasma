@@ -50,8 +50,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define PIPELOG(a)
 #endif // PIPERES_VERBOSE
 
-class plPipeResReq
-{
+class plPipeResReq {
 protected:
     bool  fReq;
 
@@ -61,9 +60,18 @@ protected:
 
 public:
 
-    static void Request() { PIPELOG("Request"); Instance().fReq = true; }
-    static bool Check() { PIPELOG("Check"); return Instance().fReq; }
-    static void Clear() { PIPELOG("Clear"); Instance().fReq = false; }
+    static void Request() {
+        PIPELOG("Request");
+        Instance().fReq = true;
+    }
+    static bool Check() {
+        PIPELOG("Check");
+        return Instance().fReq;
+    }
+    static void Clear() {
+        PIPELOG("Clear");
+        Instance().fReq = false;
+    }
 };
 
 #endif // plPipeResReq_inc

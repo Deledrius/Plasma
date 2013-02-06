@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtMisc.cpp
-*   
+*
 ***/
 
 #include "pnUtMisc.h"
@@ -54,7 +54,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *
 ***/
 
-static void * s_moduleInstance;
+static void* s_moduleInstance;
 
 
 /*****************************************************************************
@@ -64,12 +64,14 @@ static void * s_moduleInstance;
 ***/
 
 //============================================================================
-void ModuleSetInstance (void * instance) {
+void ModuleSetInstance(void* instance)
+{
     s_moduleInstance = instance;
 }
 
 //============================================================================
-void * ModuleGetInstance () {
+void* ModuleGetInstance()
+{
     return s_moduleInstance;
 }
 
@@ -82,10 +84,12 @@ void * ModuleGetInstance () {
 
 //============================================================================
 #if HS_BUILD_FOR_WIN32
-BOOL WINAPI PreDllMain (HANDLE handle, DWORD reason, LPVOID) {
+BOOL WINAPI PreDllMain(HANDLE handle, DWORD reason, LPVOID)
+{
     if (reason == DLL_PROCESS_ATTACH) {
         ModuleSetInstance(handle);
     }
+
     return true;
 }
 #endif

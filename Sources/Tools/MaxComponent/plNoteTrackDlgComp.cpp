@@ -51,13 +51,14 @@ void plComponentNoteTrackDlg::ICacheNoteTrack()
 {
     DeleteCache();
 
-    plComponentBase *comp = (plComponentBase*)fOwner;
-    
+    plComponentBase* comp = (plComponentBase*)fOwner;
+
     std::vector<Animatable*> targets;
-    for (int i = 0; i < comp->NumTargets(); i++)
-    {
-        if (comp->GetTarget(i))
+
+    for (int i = 0; i < comp->NumTargets(); i++) {
+        if (comp->GetTarget(i)) {
             targets.push_back((Animatable*)comp->GetTarget(i));
+        }
     }
 
     fSegMap = GetSharedAnimSegmentMap(targets, nil);

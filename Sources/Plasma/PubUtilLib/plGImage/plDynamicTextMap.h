@@ -87,157 +87,185 @@ struct hsMatrix44;
 //// Class Definition /////////////////////////////////////////////////////////
 
 class plFont;
-class plDynamicTextMap : public plMipmap
-{
-    protected:
+class plDynamicTextMap : public plMipmap {
+protected:
 
-        uint16_t      fVisWidth, fVisHeight;
+    uint16_t      fVisWidth, fVisHeight;
 
-        virtual uint32_t  Read( hsStream *s );
-        virtual uint32_t  Write( hsStream *s );
+    virtual uint32_t  Read(hsStream* s);
+    virtual uint32_t  Write(hsStream* s);
 
-    public:
-        //// Public Flags ////
+public:
+    //// Public Flags ////
 
-        enum Justify
-        {
-            kLeftJustify = 0,
-            kCenter,
-            kRightJustify
-        };
+    enum Justify {
+        kLeftJustify = 0,
+        kCenter,
+        kRightJustify
+    };
 
-        //// Public Data /////
-        
-        
-        //// Public Members ////
+    //// Public Data /////
 
 
-        plDynamicTextMap();
-        plDynamicTextMap( uint32_t width, uint32_t height, bool hasAlpha = false, uint32_t extraWidth = 0, uint32_t extraHeight = 0 );
-        virtual ~plDynamicTextMap();
-
-        CLASSNAME_REGISTER( plDynamicTextMap );
-        GETINTERFACE_ANY( plDynamicTextMap, plMipmap );
+    //// Public Members ////
 
 
-        void            Create( uint32_t width, uint32_t height, bool hasAlpha, uint32_t extraWidth = 0, uint32_t extraHeight = 0 );
-        void            SetNoCreate( uint32_t width, uint32_t height, bool hasAlpha );
+    plDynamicTextMap();
+    plDynamicTextMap(uint32_t width, uint32_t height, bool hasAlpha = false, uint32_t extraWidth = 0, uint32_t extraHeight = 0);
+    virtual ~plDynamicTextMap();
 
-        virtual void    Reset( void );
-
-        virtual void    Read( hsStream *s, hsResMgr *mgr ) { hsKeyedObject::Read( s, mgr ); this->Read( s ); }
-        virtual void    Write( hsStream *s, hsResMgr *mgr ) { hsKeyedObject::Write( s, mgr ); this->Write( s ); }
-
-        virtual uint8_t   GetNumLevels( void ) const { return 1; }
-
-        virtual void        Colorize( void ) { ; }
-        virtual plMipmap    *Clone( void );
-        virtual void        CopyFrom( plMipmap *source );
+    CLASSNAME_REGISTER(plDynamicTextMap);
+    GETINTERFACE_ANY(plDynamicTextMap, plMipmap);
 
 
-        /// Operations to perform on the text block
+    void            Create(uint32_t width, uint32_t height, bool hasAlpha, uint32_t extraWidth = 0, uint32_t extraHeight = 0);
+    void            SetNoCreate(uint32_t width, uint32_t height, bool hasAlpha);
 
-        bool    IsValid() { return IIsValid(); }
+    virtual void    Reset(void);
 
-        // allow the user of the DynaTextMap that they are done with the image... for now
-        // ... the fImage will be re-created on the next operation that requires the image
-        void    PurgeImage();
+    virtual void    Read(hsStream* s, hsResMgr* mgr) {
+        hsKeyedObject::Read(s, mgr);
+        this->Read(s);
+    }
+    virtual void    Write(hsStream* s, hsResMgr* mgr) {
+        hsKeyedObject::Write(s, mgr);
+        this->Write(s);
+    }
 
-        void    ClearToColor( hsColorRGBA &color );
+    virtual uint8_t   GetNumLevels(void) const {
+        return 1;
+    }
 
-        enum FontFlags
-        {
-            kFontBold       = 0x01,
-            kFontItalic     = 0x02,
-            kFontShadowed   = 0x04
-        };
+    virtual void        Colorize(void) {
+        ;
+    }
+    virtual plMipmap*    Clone(void);
+    virtual void        CopyFrom(plMipmap* source);
 
-        void    SetFont( const char *face, uint16_t size, uint8_t fontFlags = 0, bool antiAliasRGB = true );
-        void    SetFont( const wchar_t *face, uint16_t size, uint8_t fontFlags = 0, bool antiAliasRGB = true );
-        void    SetLineSpacing( int16_t spacing );
-        void    SetTextColor( hsColorRGBA &color, bool blockRGB = false );
-        void    SetJustify( Justify j );
 
-        void    DrawString( uint16_t x, uint16_t y, const char *text );
-        void    DrawString( uint16_t x, uint16_t y, const wchar_t *text );
-        void    DrawClippedString( int16_t x, int16_t y, const char *text, uint16_t width, uint16_t height );
-        void    DrawClippedString( int16_t x, int16_t y, const wchar_t *text, uint16_t width, uint16_t height );
-        void    DrawClippedString( int16_t x, int16_t y, const char *text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height );
-        void    DrawClippedString( int16_t x, int16_t y, const wchar_t *text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height );
-        void    DrawWrappedString( uint16_t x, uint16_t y, const char *text, uint16_t width, uint16_t height, uint16_t *lastX = nil, uint16_t *lastY = nil );
-        void    DrawWrappedString( uint16_t x, uint16_t y, const wchar_t *text, uint16_t width, uint16_t height, uint16_t *lastX = nil, uint16_t *lastY = nil );
-        uint16_t  CalcStringWidth( const char *text, uint16_t *height = nil );
-        uint16_t  CalcStringWidth( const wchar_t *text, uint16_t *height = nil );
-        void    CalcWrappedStringSize( const char *text, uint16_t *width, uint16_t *height, uint32_t *firstClippedChar = nil, uint16_t *maxAscent = nil, uint16_t *lastX = nil, uint16_t *lastY = nil );
-        void    CalcWrappedStringSize( const wchar_t *text, uint16_t *width, uint16_t *height, uint32_t *firstClippedChar = nil, uint16_t *maxAscent = nil, uint16_t *lastX = nil, uint16_t *lastY = nil );
-        void    FillRect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA &color );
-        void    FrameRect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA &color );
-        void    SetFirstLineIndent( int16_t indent );
+    /// Operations to perform on the text block
 
-        enum DrawMethods
-        {
-            kImgNoAlpha,        // Just copy color data, force alpha to full if present
-            kImgBlend,          // Blend color onto dest using src alpha, keep dest alpha
-            kImgSprite          // Copy color data and alphas
-        };
-        void    DrawImage( uint16_t x, uint16_t y, plMipmap *image, DrawMethods method = kImgNoAlpha );
-        void    DrawClippedImage( uint16_t x, uint16_t y, plMipmap *image, uint16_t srcClipX, uint16_t srcClipY, 
-                                uint16_t srcClipWidth, uint16_t srcClipHeight, DrawMethods method = kImgNoAlpha );
+    bool    IsValid() {
+        return IIsValid();
+    }
 
-        void    FlushToHost( void );
+    // allow the user of the DynaTextMap that they are done with the image... for now
+    // ... the fImage will be re-created on the next operation that requires the image
+    void    PurgeImage();
 
-        bool    MsgReceive( plMessage *msg );
+    void    ClearToColor(hsColorRGBA& color);
 
-        uint16_t  GetVisibleWidth( void ) { return fVisWidth; }
-        uint16_t  GetVisibleHeight( void ) { return fVisHeight; }
+    enum FontFlags {
+        kFontBold       = 0x01,
+        kFontItalic     = 0x02,
+        kFontShadowed   = 0x04
+    };
 
-        // Since the dynamic text can actually create a texture bigger than you were expecting,
-        // you want to be able to apply a layer texture transform that will compensate. This
-        // function will give you that transform. Just feed it into plLayer->SetTransform().
+    void    SetFont(const char* face, uint16_t size, uint8_t fontFlags = 0, bool antiAliasRGB = true);
+    void    SetFont(const wchar_t* face, uint16_t size, uint8_t fontFlags = 0, bool antiAliasRGB = true);
+    void    SetLineSpacing(int16_t spacing);
+    void    SetTextColor(hsColorRGBA& color, bool blockRGB = false);
+    void    SetJustify(Justify j);
 
-        hsMatrix44  GetLayerTransform( void );
+    void    DrawString(uint16_t x, uint16_t y, const char* text);
+    void    DrawString(uint16_t x, uint16_t y, const wchar_t* text);
+    void    DrawClippedString(int16_t x, int16_t y, const char* text, uint16_t width, uint16_t height);
+    void    DrawClippedString(int16_t x, int16_t y, const wchar_t* text, uint16_t width, uint16_t height);
+    void    DrawClippedString(int16_t x, int16_t y, const char* text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height);
+    void    DrawClippedString(int16_t x, int16_t y, const wchar_t* text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height);
+    void    DrawWrappedString(uint16_t x, uint16_t y, const char* text, uint16_t width, uint16_t height, uint16_t* lastX = nil, uint16_t* lastY = nil);
+    void    DrawWrappedString(uint16_t x, uint16_t y, const wchar_t* text, uint16_t width, uint16_t height, uint16_t* lastX = nil, uint16_t* lastY = nil);
+    uint16_t  CalcStringWidth(const char* text, uint16_t* height = nil);
+    uint16_t  CalcStringWidth(const wchar_t* text, uint16_t* height = nil);
+    void    CalcWrappedStringSize(const char* text, uint16_t* width, uint16_t* height, uint32_t* firstClippedChar = nil, uint16_t* maxAscent = nil, uint16_t* lastX = nil, uint16_t* lastY = nil);
+    void    CalcWrappedStringSize(const wchar_t* text, uint16_t* width, uint16_t* height, uint32_t* firstClippedChar = nil, uint16_t* maxAscent = nil, uint16_t* lastX = nil, uint16_t* lastY = nil);
+    void    FillRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA& color);
+    void    FrameRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA& color);
+    void    SetFirstLineIndent(int16_t indent);
 
-        void    SetInitBuffer( uint32_t *buffer );
+    enum DrawMethods {
+        kImgNoAlpha,        // Just copy color data, force alpha to full if present
+        kImgBlend,          // Blend color onto dest using src alpha, keep dest alpha
+        kImgSprite          // Copy color data and alphas
+    };
+    void    DrawImage(uint16_t x, uint16_t y, plMipmap* image, DrawMethods method = kImgNoAlpha);
+    void    DrawClippedImage(uint16_t x, uint16_t y, plMipmap* image, uint16_t srcClipX, uint16_t srcClipY,
+                             uint16_t srcClipWidth, uint16_t srcClipHeight, DrawMethods method = kImgNoAlpha);
 
-        // Gets for font values
-        Justify     GetFontJustify( void ) const { return fJustify; }
-        const char  *GetFontFace( void ) const { return fFontFace; }
-        uint16_t      GetFontSize( void ) const { return fFontSize; }
-        bool        GetFontAARGB( void ) const { return fFontAntiAliasRGB; }
-        hsColorRGBA GetFontColor( void ) const { return fFontColor; }
-        bool        GetFontBlockRGB( void ) const { return fFontBlockRGB; }
-        int16_t       GetLineSpacing( void ) const { return fLineSpacing; }
+    void    FlushToHost(void);
 
-        plFont      *GetCurrFont( void ) const { return fCurrFont; }
+    bool    MsgReceive(plMessage* msg);
 
-        virtual void    Swap( plDynamicTextMap *other );
+    uint16_t  GetVisibleWidth(void) {
+        return fVisWidth;
+    }
+    uint16_t  GetVisibleHeight(void) {
+        return fVisHeight;
+    }
 
-    protected:
+    // Since the dynamic text can actually create a texture bigger than you were expecting,
+    // you want to be able to apply a layer texture transform that will compensate. This
+    // function will give you that transform. Just feed it into plLayer->SetTransform().
 
-        //// Protected Members ////
+    hsMatrix44  GetLayerTransform(void);
 
-        bool        IIsValid( void );
-        void        IClearFromBuffer( uint32_t *clearBuffer );
+    void    SetInitBuffer(uint32_t* buffer);
 
-        uint32_t      *IAllocateOSSurface( uint16_t width, uint16_t height );
-        void        IDestroyOSSurface( void );
+    // Gets for font values
+    Justify     GetFontJustify(void) const {
+        return fJustify;
+    }
+    const char*  GetFontFace(void) const {
+        return fFontFace;
+    }
+    uint16_t      GetFontSize(void) const {
+        return fFontSize;
+    }
+    bool        GetFontAARGB(void) const {
+        return fFontAntiAliasRGB;
+    }
+    hsColorRGBA GetFontColor(void) const {
+        return fFontColor;
+    }
+    bool        GetFontBlockRGB(void) const {
+        return fFontBlockRGB;
+    }
+    int16_t       GetLineSpacing(void) const {
+        return fLineSpacing;
+    }
 
-        bool        fHasAlpha, fShadowed;
+    plFont*      GetCurrFont(void) const {
+        return fCurrFont;
+    }
 
-        Justify     fJustify;
-        char        *fFontFace;
-        uint16_t      fFontSize;
-        uint8_t       fFontFlags;
-        bool        fFontAntiAliasRGB;
-        hsColorRGBA fFontColor;
-        bool        fFontBlockRGB;
-        int16_t       fLineSpacing;
+    virtual void    Swap(plDynamicTextMap* other);
 
-        plFont      *fCurrFont;
+protected:
 
-        uint32_t      *fInitBuffer;
-        
-        bool        fHasCreateBeenCalled;
+    //// Protected Members ////
+
+    bool        IIsValid(void);
+    void        IClearFromBuffer(uint32_t* clearBuffer);
+
+    uint32_t*      IAllocateOSSurface(uint16_t width, uint16_t height);
+    void        IDestroyOSSurface(void);
+
+    bool        fHasAlpha, fShadowed;
+
+    Justify     fJustify;
+    char*        fFontFace;
+    uint16_t      fFontSize;
+    uint8_t       fFontFlags;
+    bool        fFontAntiAliasRGB;
+    hsColorRGBA fFontColor;
+    bool        fFontBlockRGB;
+    int16_t       fLineSpacing;
+
+    plFont*      fCurrFont;
+
+    uint32_t*      fInitBuffer;
+
+    bool        fHasCreateBeenCalled;
 };
 
 

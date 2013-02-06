@@ -67,16 +67,16 @@ plAudioFileReader* plAudioFileReader::CreateReader(const plFileName& path, plAud
 {
     plString ext = path.GetFileExt();
 
-    if (type == kStreamWAV)
-    {
+    if (type == kStreamWAV) {
         bool isWav = (ext.CompareI("wav") == 0);
+
         // We want to stream a wav off disk, but this is a compressed file.
-        // Get the uncompressed path. Ignore the requested channel, since it 
+        // Get the uncompressed path. Ignore the requested channel, since it
         // will have already been split into two files if that is necessary.
-        if (!isWav)
-        {
+        if (!isWav) {
             plFileName cachedPath = IGetCachedPath(path, whichChan);
-            plAudioFileReader *r =  new plCachedFileReader(cachedPath, plAudioCore::kAll);
+            plAudioFileReader* r =  new plCachedFileReader(cachedPath, plAudioCore::kAll);
+
             if (!r->IsValid()) {
                 // So we tried to play a cached file and it didn't exist
                 // Oops... we should cache it now
@@ -84,16 +84,17 @@ plAudioFileReader* plAudioFileReader::CreateReader(const plFileName& path, plAud
                 ICacheFile(path, true, whichChan);
                 r = new plCachedFileReader(cachedPath, plAudioCore::kAll);
             }
+
             return r;
         }
-        
-        plAudioFileReader *r =  new plFastWAV(path, whichChan);
+
+        plAudioFileReader* r =  new plFastWAV(path, whichChan);
         return r;
-    }
-    else if (type == kStreamRAM)
+    } else if (type == kStreamRAM) {
         return new plBufferedFileReader(path, whichChan);
-    else if (type == kStreamNative)
+    } else if (type == kStreamNative) {
         return new plOGGCodec(path, whichChan);
+    }
 
     return nil;
 }
@@ -113,13 +114,15 @@ plFileName plAudioFileReader::IGetCachedPath(const plFileName& path, plAudioCore
     // Create the directory first
     plFileSystem::CreateDir(cachedPath);
 
-    const char *suffix = "";
-    if (whichChan == plAudioCore::kLeft)
+    const char* suffix = "";
+
+    if (whichChan == plAudioCore::kLeft) {
         suffix = "-Left.tmp";
-    else if (whichChan == plAudioCore::kRight)
+    } else if (whichChan == plAudioCore::kRight) {
         suffix = "-Right.tmp";
-    else if (whichChan == plAudioCore::kAll)
+    } else if (whichChan == plAudioCore::kAll) {
         suffix = ".tmp";
+    }
 
     // Get the path to the cached version of the file, without the extension
     return plFileName::Join(cachedPath, path.GetFileNameNoExt() + suffix);
@@ -128,17 +131,18 @@ plFileName plAudioFileReader::IGetCachedPath(const plFileName& path, plAudioCore
 void plAudioFileReader::ICacheFile(const plFileName& path, bool noOverwrite, plAudioCore::ChannelSelect whichChan)
 {
     plFileName cachedPath = IGetCachedPath(path, whichChan);
-    if (!noOverwrite || !plFileInfo(cachedPath).Exists())
-    {
+
+    if (!noOverwrite || !plFileInfo(cachedPath).Exists()) {
         plAudioFileReader* reader = plAudioFileReader::CreateReader(path, whichChan, kStreamNative);
-        if (!reader || !reader->IsValid())
-        {
+
+        if (!reader || !reader->IsValid()) {
             delete reader;
             return;
         }
+
         plAudioFileReader* writer = CreateWriter(cachedPath, reader->GetHeader());
-        if (!writer || !writer->IsValid())
-        {
+
+        if (!writer || !writer->IsValid()) {
             delete reader;
             delete writer;
             return;
@@ -146,12 +150,13 @@ void plAudioFileReader::ICacheFile(const plFileName& path, bool noOverwrite, plA
 
         uint8_t buffer[4096];
         uint32_t numLeft;
-        while ((numLeft = reader->NumBytesLeft()) > 0)
-        {
+
+        while ((numLeft = reader->NumBytesLeft()) > 0) {
             uint32_t toRead = (numLeft < sizeof(buffer)) ? numLeft : sizeof(buffer);
             reader->Read(toRead, buffer);
             writer->Write(toRead, buffer);
         }
+
         writer->Close();
 
         delete writer;
@@ -161,13 +166,10 @@ void plAudioFileReader::ICacheFile(const plFileName& path, bool noOverwrite, plA
 
 void plAudioFileReader::CacheFile(const plFileName& path, bool splitChannels, bool noOverwrite)
 {
-    if (splitChannels)
-    {
+    if (splitChannels) {
         ICacheFile(path, noOverwrite, plAudioCore::kLeft);
         ICacheFile(path, noOverwrite, plAudioCore::kRight);
-    }
-    else
-    {
+    } else {
         ICacheFile(path, noOverwrite, plAudioCore::kAll);
     }
 }

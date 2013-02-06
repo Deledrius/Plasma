@@ -58,14 +58,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Class Definition ////////////////////////////////////////////////////////
 
-class plCachedFileReader : public plAudioFileReader
-{
+class plCachedFileReader : public plAudioFileReader {
 public:
-    plCachedFileReader(const plFileName &path,
-                    plAudioCore::ChannelSelect whichChan = plAudioCore::kAll);
+    plCachedFileReader(const plFileName& path,
+                       plAudioCore::ChannelSelect whichChan = plAudioCore::kAll);
     virtual ~plCachedFileReader();
 
-    virtual plWAVHeader &GetHeader();
+    virtual plWAVHeader& GetHeader();
 
     virtual void    Close();
 
@@ -73,27 +72,28 @@ public:
     virtual float   GetLengthInSecs();
 
     virtual bool    SetPosition(uint32_t numBytes);
-    virtual bool    Read(uint32_t numBytes, void *buffer);
+    virtual bool    Read(uint32_t numBytes, void* buffer);
     virtual uint32_t  NumBytesLeft();
 
-    virtual bool    OpenForWriting(const plFileName &path, plWAVHeader &header);
-    virtual uint32_t  Write(uint32_t bytes, void *buffer);
+    virtual bool    OpenForWriting(const plFileName& path, plWAVHeader& header);
+    virtual uint32_t  Write(uint32_t bytes, void* buffer);
 
-    virtual bool    IsValid() { return fFileHandle != nil; }
+    virtual bool    IsValid() {
+        return fFileHandle != nil;
+    }
 
 protected:
-    enum
-    {
+    enum {
         kPCMFormatTag = 1
     };
 
     plFileName      fFilename;
-    FILE *          fFileHandle;
+    FILE*           fFileHandle;
     plWAVHeader     fHeader;
     uint32_t        fDataLength;
     uint32_t        fCurPosition;
 
-    void IError(const char *msg);
+    void IError(const char* msg);
 };
 
 #endif //_plcachedfilereader_h

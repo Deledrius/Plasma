@@ -49,12 +49,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsGeometry3.h"
 
 
-class plLOSHitMsg : public plMessage
-{
+class plLOSHitMsg : public plMessage {
 protected:
 
 public:
-    
+
     plKey               fObj;
     hsPoint3            fHitPoint;
     bool                fNoHit;
@@ -64,17 +63,18 @@ public:
     float               fDistance;
 
     plLOSHitMsg();
-    plLOSHitMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t);
-    ~plLOSHitMsg(){;}
+    plLOSHitMsg(const plKey& s,
+                const plKey& r,
+                const double* t);
+    ~plLOSHitMsg() {
+        ;
+    }
 
-    CLASSNAME_REGISTER( plLOSHitMsg );
-    GETINTERFACE_ANY( plLOSHitMsg, plMessage );
+    CLASSNAME_REGISTER(plLOSHitMsg);
+    GETINTERFACE_ANY(plLOSHitMsg, plMessage);
 
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fObj = mgr->ReadKey(stream);
         fHitPoint.Read(stream);
@@ -83,8 +83,7 @@ public:
         stream->ReadLE(&fHitFlags);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         mgr->WriteKey(stream, fObj);
         fHitPoint.Write(stream);

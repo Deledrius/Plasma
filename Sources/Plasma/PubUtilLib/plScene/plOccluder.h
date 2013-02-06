@@ -55,8 +55,7 @@ class plDrawableSpans;
 class hsGMaterial;
 class plVisRegion;
 
-class plOccluder : public plObjInterface
-{
+class plOccluder : public plObjInterface {
 public:
     enum {
         kDisable        = 0x0,
@@ -83,7 +82,9 @@ protected:
     virtual float            IComputeSurfaceArea();
     virtual void                IComputeBounds();
 
-    virtual hsTArray<plCullPoly>& IGetLocalPolyList() { return fPolys; }
+    virtual hsTArray<plCullPoly>& IGetLocalPolyList() {
+        return fPolys;
+    }
 
     virtual void    ISetSceneNode(plKey node);
 
@@ -94,27 +95,41 @@ public:
     plOccluder();
     virtual ~plOccluder();
 
-    CLASSNAME_REGISTER( plOccluder );
-    GETINTERFACE_ANY( plOccluder, plObjInterface);
+    CLASSNAME_REGISTER(plOccluder);
+    GETINTERFACE_ANY(plOccluder, plObjInterface);
 
     virtual bool        MsgReceive(plMessage* msg);
 
-    virtual float GetPriority() const { return fPriority; }
+    virtual float GetPriority() const {
+        return fPriority;
+    }
 
-    bool InVisSet(const hsBitVector& visSet) const { return fVisSet.Overlap(visSet); }
-    bool InVisNot(const hsBitVector& visNot) const { return fVisNot.Overlap(visNot); }
+    bool InVisSet(const hsBitVector& visSet) const {
+        return fVisSet.Overlap(visSet);
+    }
+    bool InVisNot(const hsBitVector& visNot) const {
+        return fVisNot.Overlap(visNot);
+    }
 
-    virtual const hsBounds3Ext& GetWorldBounds() const { return fWorldBounds; }
+    virtual const hsBounds3Ext& GetWorldBounds() const {
+        return fWorldBounds;
+    }
 
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);
     virtual const hsMatrix44& GetLocalToWorld() const;
     virtual const hsMatrix44& GetWorldToLocal() const;
 
     virtual void SetPolyList(const hsTArray<plCullPoly>& list);
-    virtual const hsTArray<plCullPoly>& GetWorldPolyList() const { return fPolys; }
-    virtual const hsTArray<plCullPoly>& GetLocalPolyList() const { return fPolys; }
+    virtual const hsTArray<plCullPoly>& GetWorldPolyList() const {
+        return fPolys;
+    }
+    virtual const hsTArray<plCullPoly>& GetLocalPolyList() const {
+        return fPolys;
+    }
 
-    virtual int32_t   GetNumProperties() const { return kNumProps; }
+    virtual int32_t   GetNumProperties() const {
+        return kNumProps;
+    }
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);
@@ -126,11 +141,12 @@ public:
     virtual void ComputeFromPolys();
 
     // These two should only be called internally and on export/convert
-    virtual plKey GetSceneNode() const { return fSceneNode; }
+    virtual plKey GetSceneNode() const {
+        return fSceneNode;
+    }
 };
 
-class plMobileOccluder : public plOccluder
-{
+class plMobileOccluder : public plOccluder {
 protected:
     hsMatrix44              fLocalToWorld;
     hsMatrix44              fWorldToLocal;
@@ -141,23 +157,31 @@ protected:
 
     virtual void            IComputeBounds();
 
-    virtual hsTArray<plCullPoly>& IGetLocalPolyList() { return fOrigPolys; }
+    virtual hsTArray<plCullPoly>& IGetLocalPolyList() {
+        return fOrigPolys;
+    }
 
 public:
 
     plMobileOccluder();
     virtual ~plMobileOccluder();
 
-    CLASSNAME_REGISTER( plMobileOccluder );
-    GETINTERFACE_ANY( plMobileOccluder, plOccluder );
+    CLASSNAME_REGISTER(plMobileOccluder);
+    GETINTERFACE_ANY(plMobileOccluder, plOccluder);
 
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);
-    virtual const hsMatrix44& GetLocalToWorld() const { return fLocalToWorld; }
-    virtual const hsMatrix44& GetWorldToLocal() const { return fWorldToLocal; }
+    virtual const hsMatrix44& GetLocalToWorld() const {
+        return fLocalToWorld;
+    }
+    virtual const hsMatrix44& GetWorldToLocal() const {
+        return fWorldToLocal;
+    }
 
     virtual void SetPolyList(const hsTArray<plCullPoly>& list);
 
-    virtual const hsTArray<plCullPoly>& GetLocalPolyList() const { return fOrigPolys; }
+    virtual const hsTArray<plCullPoly>& GetLocalPolyList() const {
+        return fOrigPolys;
+    }
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);

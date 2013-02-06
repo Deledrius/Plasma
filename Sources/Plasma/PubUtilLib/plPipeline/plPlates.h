@@ -59,194 +59,231 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 //// plPlate Class Definition ////////////////////////////////////////////////
-//  plPlate is the actual plate object that represents one plate on the 
+//  plPlate is the actual plate object that represents one plate on the
 //  screen. It has a transform matrix (which includes position, scale and
 //  rotation), a material, a depth value and a color that is applied to all
-//  four corners. All plates are parallelograms. 
+//  four corners. All plates are parallelograms.
 
 class plPlateManager;
 class hsGMaterial;
 class plMipmap;
 class plBitmap;
 
-class plPlate
-{
+class plPlate {
     friend class plPlateManager;
 
-    protected:
-        
-        hsMatrix44      fXformMatrix;
-        hsGMaterial     *fMaterial;
-        plMipmap        *fMipmap;
-        float        fDepth, fOpacity;
-        uint32_t          fFlags;
-        char            fTitle[ 64 ];
+protected:
 
-        plPlate         *fNext;
-        plPlate         **fPrevPtr;
+    hsMatrix44      fXformMatrix;
+    hsGMaterial*     fMaterial;
+    plMipmap*        fMipmap;
+    float        fDepth, fOpacity;
+    uint32_t          fFlags;
+    char            fTitle[ 64 ];
 
-        plPlate         **fOwningHandle;
+    plPlate*         fNext;
+    plPlate**         fPrevPtr;
 
-        static uint32_t   fMagicUniqueKeyInt;
+    plPlate**         fOwningHandle;
 
-        plPlate( plPlate** owningHandle );
-        virtual ~plPlate();
+    static uint32_t   fMagicUniqueKeyInt;
 
-        void    ILink( plPlate **back );
+    plPlate(plPlate** owningHandle);
+    virtual ~plPlate();
 
-        void    IUnlink( void )
-        {
-            hsAssert( fPrevPtr, "Plate not in list" );
-            if( fNext )
-                fNext->fPrevPtr = fPrevPtr;
-            *fPrevPtr = fNext;
+    void    ILink(plPlate** back);
 
-            fNext = nil;
-            fPrevPtr = nil;
+    void    IUnlink(void) {
+        hsAssert(fPrevPtr, "Plate not in list");
+
+        if (fNext) {
+            fNext->fPrevPtr = fPrevPtr;
         }
 
-        void ISetResourceAlphas(uint32_t colorKey);
+        *fPrevPtr = fNext;
 
-    public:
+        fNext = nil;
+        fPrevPtr = nil;
+    }
 
-        enum 
-        {
-            kFlagVisible        = 0x00000001,
-            kFlagLocalMaterial  = 0x00000002,
-            kFlagIsAGraph       = 0x00000004
-        };
+    void ISetResourceAlphas(uint32_t colorKey);
 
-        /// Basic properties
+public:
 
-        void    SetTransform( hsMatrix44 &matrix, bool reSort = true );
-        void    SetMaterial( hsGMaterial *material );
-        void    SetTexture(plBitmap *texture); // Creates a new single layer material to use the texture.
-        void    SetTitle( const char *title ) { if( title != nil ) strncpy( fTitle, title, sizeof( fTitle ) ); else fTitle[ 0 ] = 0; }
+    enum {
+        kFlagVisible        = 0x00000001,
+        kFlagLocalMaterial  = 0x00000002,
+        kFlagIsAGraph       = 0x00000004
+    };
 
-        hsGMaterial     *GetMaterial( void ) { return fMaterial; }
-        hsMatrix44      &GetTransform( void ) { return fXformMatrix; }
-        const char      *GetTitle( void ) { return fTitle; }
-        uint32_t          GetFlags( void ) { return fFlags; }
-        const plMipmap  *GetMipmap( void ) { return fMipmap; }
+    /// Basic properties
 
-        void    SetVisible( bool vis ) { if( vis ) fFlags |= kFlagVisible; else fFlags &= ~kFlagVisible; }
-        bool    IsVisible( void );
+    void    SetTransform(hsMatrix44& matrix, bool reSort = true);
+    void    SetMaterial(hsGMaterial* material);
+    void    SetTexture(plBitmap* texture); // Creates a new single layer material to use the texture.
+    void    SetTitle(const char* title) {
+        if (title != nil) {
+            strncpy(fTitle, title, sizeof(fTitle));
+        } else {
+            fTitle[ 0 ] = 0;
+        }
+    }
 
-        void    SetOpacity( float opacity = 1.f );
+    hsGMaterial*     GetMaterial(void) {
+        return fMaterial;
+    }
+    hsMatrix44&      GetTransform(void) {
+        return fXformMatrix;
+    }
+    const char*      GetTitle(void) {
+        return fTitle;
+    }
+    uint32_t          GetFlags(void) {
+        return fFlags;
+    }
+    const plMipmap*  GetMipmap(void) {
+        return fMipmap;
+    }
 
-        plPlate *GetNext( void ) { return fNext; }
+    void    SetVisible(bool vis) {
+        if (vis) {
+            fFlags |= kFlagVisible;
+        } else {
+            fFlags &= ~kFlagVisible;
+        }
+    }
+    bool    IsVisible(void);
+
+    void    SetOpacity(float opacity = 1.f);
+
+    plPlate* GetNext(void) {
+        return fNext;
+    }
 
 
-        /// Helper functions
-        
-        void    SetDepth( float depth) { fDepth = depth; }
-        void    SetPosition( float x, float y, float z = -1.0f );
-        void    SetSize( float width, float height, bool adjustByAspectRatio = false );
+    /// Helper functions
 
-        plMipmap        *CreateMaterial( uint32_t width, uint32_t height, bool withAlpha, plMipmap* texture = NULL );
-        void            CreateFromResource( const char *resName );
-        void            ReloadFromResource( const char *resName );
+    void    SetDepth(float depth) {
+        fDepth = depth;
+    }
+    void    SetPosition(float x, float y, float z = -1.0f);
+    void    SetSize(float width, float height, bool adjustByAspectRatio = false);
+
+    plMipmap*        CreateMaterial(uint32_t width, uint32_t height, bool withAlpha, plMipmap* texture = NULL);
+    void            CreateFromResource(const char* resName);
+    void            ReloadFromResource(const char* resName);
 };
 
 //// plGraphPlate Class Definition ///////////////////////////////////////////
 //  A derivation of plPlate that maintains a procedural texture which displays
 //  a scrolling graph of data.
 
-class plGraphPlate : public plPlate
-{
-    protected:
-        uint32_t          fBGHexColor, fAxesHexColor, fGraphHexColor;
-        std::vector<uint32_t> fDataHexColors;
-        uint32_t          fMin, fMax, fLabelMin, fLabelMax;
-        std::vector<int32_t>  fLastValues;
-        std::vector<std::string>    fLabelText;
+class plGraphPlate : public plPlate {
+protected:
+    uint32_t          fBGHexColor, fAxesHexColor, fGraphHexColor;
+    std::vector<uint32_t> fDataHexColors;
+    uint32_t          fMin, fMax, fLabelMin, fLabelMax;
+    std::vector<int32_t>  fLastValues;
+    std::vector<std::string>    fLabelText;
 
-        uint32_t      IMakePow2( uint32_t value );
-        void        IDrawNumber( uint32_t number, uint32_t *dataPtr, uint32_t stride, uint32_t color );
-        void        IDrawDigit( char digit, uint32_t *dataPtr, uint32_t stride, uint32_t color );
+    uint32_t      IMakePow2(uint32_t value);
+    void        IDrawNumber(uint32_t number, uint32_t* dataPtr, uint32_t stride, uint32_t color);
+    void        IDrawDigit(char digit, uint32_t* dataPtr, uint32_t stride, uint32_t color);
 
-    public:
-        plGraphPlate( plPlate **owningHandle );
-        virtual ~plGraphPlate();
+public:
+    plGraphPlate(plPlate** owningHandle);
+    virtual ~plGraphPlate();
 
-        void    SetDataRange( uint32_t min, uint32_t max, uint32_t width );
-        void    SetDataLabels( uint32_t min, uint32_t max );
-        void    SetLabelText(const char *text1, const char *text2 = nil, const char *text3 = nil, const char *text4 = nil );
-        void    SetLabelText( const std::vector<std::string> & text );
-        void    ClearData( void );
+    void    SetDataRange(uint32_t min, uint32_t max, uint32_t width);
+    void    SetDataLabels(uint32_t min, uint32_t max);
+    void    SetLabelText(const char* text1, const char* text2 = nil, const char* text3 = nil, const char* text4 = nil);
+    void    SetLabelText(const std::vector<std::string>& text);
+    void    ClearData(void);
 
-        void    AddData( int32_t value, int32_t value2 = -1, int32_t value3 = -1, int32_t value4 = -1 );
-        void    AddData( std::vector<int32_t> values );
+    void    AddData(int32_t value, int32_t value2 = -1, int32_t value3 = -1, int32_t value4 = -1);
+    void    AddData(std::vector<int32_t> values);
 
-        void    SetColors( uint32_t bgHexColor = 0x80000000, uint32_t axesHexColor = 0xffffffff, uint32_t dataHexColor = 0xff00ff00, uint32_t graphHexColor = 0x80ff0000 );
-        void    SetDataColors( uint32_t hexColor1 = 0xff00ff00, uint32_t hexColor2 = 0xff0000ff, uint32_t hexColor3 = 0xffffff00, uint32_t hexColor4 = 0xffff00ff );
-        void    SetDataColors( const std::vector<uint32_t> & hexColors );
+    void    SetColors(uint32_t bgHexColor = 0x80000000, uint32_t axesHexColor = 0xffffffff, uint32_t dataHexColor = 0xff00ff00, uint32_t graphHexColor = 0x80ff0000);
+    void    SetDataColors(uint32_t hexColor1 = 0xff00ff00, uint32_t hexColor2 = 0xff0000ff, uint32_t hexColor3 = 0xffffff00, uint32_t hexColor4 = 0xffff00ff);
+    void    SetDataColors(const std::vector<uint32_t>& hexColors);
 
-        const char      *GetLabelText( int i ) { return fLabelText[ i ].c_str(); }
-        uint32_t        GetDataColor( int i ) { return fDataHexColors[ i ]; }
-        uint32_t        GetNumLabels() { return fLabelText.size(); }
-        uint32_t        GetNumColors() { return fDataHexColors.size(); }
+    const char*      GetLabelText(int i) {
+        return fLabelText[ i ].c_str();
+    }
+    uint32_t        GetDataColor(int i) {
+        return fDataHexColors[ i ];
+    }
+    uint32_t        GetNumLabels() {
+        return fLabelText.size();
+    }
+    uint32_t        GetNumColors() {
+        return fDataHexColors.size();
+    }
 };
 
 //// plPlateManager Class Definition /////////////////////////////////////////
-//  This class handles all the plates--it keeps track of all the plates, 
+//  This class handles all the plates--it keeps track of all the plates,
 //  creates and destroys them, and draws them when the pipeline tells it to.
 
 class plPipeline;
 
-class plPlateManager
-{
+class plPlateManager {
     friend class plPlate;
 
-    private:
+private:
 
-        static plPlateManager   *fInstance;
+    static plPlateManager*   fInstance;
 
-    protected:
+protected:
 
-        plPlate     *fPlates;
-        plPipeline  *fOwner;
-        bool        fCreatedSucessfully;
+    plPlate*     fPlates;
+    plPipeline*  fOwner;
+    bool        fCreatedSucessfully;
 
-        plPlateManager( plPipeline *pipe ) 
-        {
-            fInstance = this;
-            fPlates = nil;
-            fOwner = pipe;
-            fCreatedSucessfully = true;
-        }
+    plPlateManager(plPipeline* pipe) {
+        fInstance = this;
+        fPlates = nil;
+        fOwner = pipe;
+        fCreatedSucessfully = true;
+    }
 
-        virtual void    IDrawToDevice( plPipeline *pipe ) = 0;
+    virtual void    IDrawToDevice(plPipeline* pipe) = 0;
 
-        void            IResortPlate( plPlate *plate, bool fromCurrent );
+    void            IResortPlate(plPlate* plate, bool fromCurrent);
 
-    public:
+public:
 
-        virtual ~plPlateManager();
-        
-        static plPlateManager   &Instance( void ) { return *fInstance; }
-        static bool InstanceValid( void ) { return fInstance != nil; }
+    virtual ~plPlateManager();
 
-        void        CreatePlate( plPlate **handle );
-        void        CreatePlate( plPlate **handle, float width, float height );
-        void        CreatePlate( plPlate **handle, float x, float y, float width, float height );
+    static plPlateManager&   Instance(void) {
+        return *fInstance;
+    }
+    static bool InstanceValid(void) {
+        return fInstance != nil;
+    }
 
-        void        CreateGraphPlate( plGraphPlate **handle );
+    void        CreatePlate(plPlate** handle);
+    void        CreatePlate(plPlate** handle, float width, float height);
+    void        CreatePlate(plPlate** handle, float x, float y, float width, float height);
 
-        void        DestroyPlate( plPlate *plate );
+    void        CreateGraphPlate(plGraphPlate** handle);
 
-        void        SetPlateScreenPos( plPlate *plate, uint32_t x, uint32_t y );
-        void        SetPlatePixelSize( plPlate *plate, uint32_t pWidth, uint32_t pHeight );
+    void        DestroyPlate(plPlate* plate);
 
-        uint32_t      GetPipeWidth( void );
-        uint32_t      GetPipeHeight( void );
-        void        DrawToDevice( plPipeline *pipe );
+    void        SetPlateScreenPos(plPlate* plate, uint32_t x, uint32_t y);
+    void        SetPlatePixelSize(plPlate* plate, uint32_t pWidth, uint32_t pHeight);
 
-        bool        IsValid( void ) { return fCreatedSucessfully; }
+    uint32_t      GetPipeWidth(void);
+    uint32_t      GetPipeHeight(void);
+    void        DrawToDevice(plPipeline* pipe);
+
+    bool        IsValid(void) {
+        return fCreatedSucessfully;
+    }
 };
 
 // Sets the hInstance that we load our resources from.  A SceneViewer hack.
-void SetHInstance(void *instance);
+void SetHInstance(void* instance);
 
 #endif //_plPlates_h
 

@@ -62,11 +62,10 @@ void DummyCodeIncludeFuncExcludeRegion() {}
 
 CLASS_DESC(plExcludeRegionComponent, gExcludeRegionDesc, "Exclude Region", "ExclRegion", COMP_TYPE_MISC, XREGION_CID)
 
-enum
-{
+enum {
     kXRegionSafePoints,
     kXRegionInitiallyCleared,
-    kXRegionSmartSeek,  
+    kXRegionSmartSeek,
     kXRegionBlockCameras,
 };
 
@@ -77,21 +76,21 @@ ParamBlockDesc2 gExcludeRegionBlock
     IDD_COMP_XREGION, IDS_COMP_XREGION, 0, 0, NULL,
 
     kXRegionSafePoints,     _T("safePoints"),   TYPE_INODE_TAB, 0,      0, 0,
-        p_ui,           TYPE_NODELISTBOX, IDC_LIST_SAFE, IDC_ADD_SAFE, 0, IDC_DEL_SAFE,
-        p_classID,      Class_ID(DUMMY_CLASS_ID, 0),
-        end,
+    p_ui,           TYPE_NODELISTBOX, IDC_LIST_SAFE, IDC_ADD_SAFE, 0, IDC_DEL_SAFE,
+    p_classID,      Class_ID(DUMMY_CLASS_ID, 0),
+    end,
 
     kXRegionInitiallyCleared,   _T("initiallyCleared"), TYPE_BOOL,              0, 0,
-        p_ui,           TYPE_SINGLECHEKBOX, IDC_CLEARED,
-        end,
+    p_ui,           TYPE_SINGLECHEKBOX, IDC_CLEARED,
+    end,
 
     kXRegionSmartSeek,  _T("smartSeek"), TYPE_BOOL,             0, 0,
-        p_ui,           TYPE_SINGLECHEKBOX, IDC_SMARTSEEK   ,
-        end,
+    p_ui,           TYPE_SINGLECHEKBOX, IDC_SMARTSEEK   ,
+    end,
 
     kXRegionBlockCameras,   _T("blockCameras"), TYPE_BOOL,              0, 0,
-        p_ui,           TYPE_SINGLECHEKBOX, IDC_CAMERA_LOS,
-        end,
+    p_ui,           TYPE_SINGLECHEKBOX, IDC_CAMERA_LOS,
+    end,
     end
 );
 
@@ -101,44 +100,45 @@ plExcludeRegionComponent::plExcludeRegionComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-plKey plExcludeRegionComponent::GetKey(plMaxNode *node)
+plKey plExcludeRegionComponent::GetKey(plMaxNode* node)
 {
     XRegionKeys::iterator it = fXRegionKeys.find(node);
-    if (it != fXRegionKeys.end())
+
+    if (it != fXRegionKeys.end()) {
         return it->second;
+    }
 
     return nil;
 }
 
-bool plExcludeRegionComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plExcludeRegionComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fXRegionKeys.clear();
 
     fIsValid = false;
 
     int count = fCompPB->Count(kXRegionSafePoints);
-    for (int i = 0; i < count; i++)
-    {
-        plMaxNode *safeNode = (plMaxNode*)fCompPB->GetINode(kXRegionSafePoints, 0, i);
-        if (safeNode)
-        {
+
+    for (int i = 0; i < count; i++) {
+        plMaxNode* safeNode = (plMaxNode*)fCompPB->GetINode(kXRegionSafePoints, 0, i);
+
+        if (safeNode) {
             fIsValid = true;
             // Force the dummies to local so we get the right coords
             safeNode->SetForceLocal(true);
         }
     }
 
-    if (!fIsValid)
-    {
+    if (!fIsValid) {
         pErrMsg->Set(true, "Exclude Region Warning",
-                    "Node %s : No safe points specified, exclude region will not be created.\n",
-                    node->GetName()).Show();
+                     "Node %s : No safe points specified, exclude region will not be created.\n",
+                     node->GetName()).Show();
         pErrMsg->Set(false);
 
         return false;
     }
 
-    plPhysicalProps *physProps = node->GetPhysicalProps();
+    plPhysicalProps* physProps = node->GetPhysicalProps();
 
     physProps->SetBoundsType(plSimDefs::kHullBounds, node, pErrMsg);
     // removed letting exclude regions have weight... there is no need and it causes PhysX to crash!
@@ -146,21 +146,19 @@ bool plExcludeRegionComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErr
     physProps->SetMass(0.f, node, pErrMsg);
     physProps->SetPinned(true, node, pErrMsg);
 
-    if (fCompPB->GetInt(kXRegionInitiallyCleared))
-    {
+    if (fCompPB->GetInt(kXRegionInitiallyCleared)) {
         physProps->SetGroup(plSimDefs::kGroupStatic, node, pErrMsg);
         physProps->SetLOSBlockUI(true, node, pErrMsg);
-        if (fCompPB->GetInt(kXRegionBlockCameras))
+
+        if (fCompPB->GetInt(kXRegionBlockCameras)) {
             physProps->SetLOSBlockCamera(true, node, pErrMsg);
-    }
-    else
-    {
+        }
+    } else {
         physProps->SetGroup(plSimDefs::kGroupDetector, node, pErrMsg);
-        physProps->SetReportGroup(1<<plSimDefs::kGroupAvatar, node, pErrMsg);
+        physProps->SetReportGroup(1 << plSimDefs::kGroupAvatar, node, pErrMsg);
     }
 
-    if (!plPhysicCoreComponent::SetupProperties(node, pErrMsg))
-    {
+    if (!plPhysicCoreComponent::SetupProperties(node, pErrMsg)) {
         fIsValid = false;
         return false;
     }
@@ -170,49 +168,51 @@ bool plExcludeRegionComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErr
     return true;
 }
 
-bool plExcludeRegionComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plExcludeRegionComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if (!fIsValid)
+    if (!fIsValid) {
         return false;
+    }
 
-    if (!plPhysicCoreComponent::PreConvert(node, pErrMsg))
-    {
+    if (!plPhysicCoreComponent::PreConvert(node, pErrMsg)) {
         fIsValid = false;
         return false;
     }
 
-    plExcludeRegionModifier *mod = new plExcludeRegionModifier;
+    plExcludeRegionModifier* mod = new plExcludeRegionModifier;
     plKey key = node->AddModifier(mod, IGetUniqueName(node));
     fXRegionKeys[node] = key;
 
     return true;
 }
 
-bool plExcludeRegionComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plExcludeRegionComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if (!fIsValid)
+    if (!fIsValid) {
         return false;
+    }
 
-    if (!plPhysicCoreComponent::Convert(node, pErrMsg))
-    {
+    if (!plPhysicCoreComponent::Convert(node, pErrMsg)) {
         fIsValid = false;
         return false;
     }
 
-    plExcludeRegionModifier *mod = plExcludeRegionModifier::ConvertNoRef(fXRegionKeys[node]->GetObjectPtr());
+    plExcludeRegionModifier* mod = plExcludeRegionModifier::ConvertNoRef(fXRegionKeys[node]->GetObjectPtr());
 
-    if (fCompPB->GetInt(kXRegionSmartSeek))
+    if (fCompPB->GetInt(kXRegionSmartSeek)) {
         mod->UseSmartSeek();
+    }
 
-    if (fCompPB->GetInt(kXRegionBlockCameras))
+    if (fCompPB->GetInt(kXRegionBlockCameras)) {
         mod->SetBlockCameras(true);
+    }
 
     int count = fCompPB->Count(kXRegionSafePoints);
-    for (int i = 0; i < count; i++)
-    {
-        plMaxNode *safePoint = (plMaxNode*)fCompPB->GetINode(kXRegionSafePoints, 0, i);
-        if (safePoint)
-        {
+
+    for (int i = 0; i < count; i++) {
+        plMaxNode* safePoint = (plMaxNode*)fCompPB->GetINode(kXRegionSafePoints, 0, i);
+
+        if (safePoint) {
             plKey pKey = safePoint->GetKey();
             mod->AddSafePoint(pKey);
         }
@@ -221,8 +221,8 @@ bool plExcludeRegionComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     return true;
 }
 
-bool plExcludeRegionComponent::DeInit(plMaxNode *node, plErrorMsg *pErrMsg)       
-{ 
+bool plExcludeRegionComponent::DeInit(plMaxNode* node, plErrorMsg* pErrMsg)
+{
     fXRegionKeys.clear();
 
     return true;

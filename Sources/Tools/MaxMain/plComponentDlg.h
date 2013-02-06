@@ -46,36 +46,35 @@ class plMaxNode;
 
 #include <maxversion.h>
 #if MAX_VERSION_MAJOR >= 9
-    struct NotifyInfo;
+struct NotifyInfo;
 #else
-    // Max headers are more minimalistic in pre-9 maxes
+// Max headers are more minimalistic in pre-9 maxes
 #   include <notify.h>
 #endif
 
-class plComponentDlg
-{
+class plComponentDlg {
 protected:
     friend class plComponentUtil;
-    
+
     HWND fhDlg;
     HMENU fCompMenu;
     HMENU fTypeMenu;
-    
-    Interface *fInterface;
+
+    Interface* fInterface;
     POINT fSmallestSize;
     RECT fLastRect;
-    
+
     // The node we're currently editing the comment for
-    plMaxNode *fCommentNode;
+    plMaxNode* fCommentNode;
 
     std::vector<Class_ID> fHiddenComps;
 
 public:
     ~plComponentDlg();
-    static plComponentDlg &Instance();
+    static plComponentDlg& Instance();
 
     void Open();
-    
+
     void SelectComponentTargs(INodeTab& nodes);
 
 protected:
@@ -84,15 +83,15 @@ protected:
     static BOOL CALLBACK ForwardDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
     BOOL DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
-    void IPositionControls(RECT *newRect, int edge);
+    void IPositionControls(RECT* newRect, int edge);
     enum { kResizeX = 1, kResizeY = 2, kMoveX = 4, kMoveY = 8 };
-    void IPositionControl(HWND hControl, int hDiff, int wDiff=0, int flags=kMoveY);
+    void IPositionControl(HWND hControl, int hDiff, int wDiff = 0, int flags = kMoveY);
 
-    HTREEITEM IAddLeaf(HWND hTree, HTREEITEM hParent, const char *text, LPARAM lParam);
+    HTREEITEM IAddLeaf(HWND hTree, HTREEITEM hParent, const char* text, LPARAM lParam);
     // Search for an item in the tree by name, but only in the children of hParent
-    HTREEITEM IFindTreeItem(HWND hTree, const char *name, HTREEITEM hParent);
-    HTREEITEM IAddComponent(HWND hTree, plMaxNode *node);
-    void IAddComponentsRecur(HWND hTree, plMaxNode *node);
+    HTREEITEM IFindTreeItem(HWND hTree, const char* name, HTREEITEM hParent);
+    HTREEITEM IAddComponent(HWND hTree, plMaxNode* node);
+    void IAddComponentsRecur(HWND hTree, plMaxNode* node);
     void ICreateMenu();
 
     bool IIsComponent(LPARAM lParam);
@@ -100,24 +99,24 @@ protected:
 
     void IAttachTreeSelection();
     void ISelectTreeSelection();
-    plMaxNode *IGetTreeSelection();
-    plMaxNode *ITreeItemToNode(HWND hTree, HTREEITEM hItem);
-    void IDeleteComponent(plMaxNode *component);
+    plMaxNode* IGetTreeSelection();
+    plMaxNode* ITreeItemToNode(HWND hTree, HTREEITEM hItem);
+    void IDeleteComponent(plMaxNode* component);
 
     void IGetComponentsRecur(HWND hTree, HTREEITEM hItem, INodeTab& nodes);
 
     void ICreateRightClickMenu();
     void IOpenRightClickMenu();
 
-    HTREEITEM ISearchTree(HWND hTree, LPARAM lParam, HTREEITEM hCur=TVGN_ROOT);
+    HTREEITEM ISearchTree(HWND hTree, LPARAM lParam, HTREEITEM hCur = TVGN_ROOT);
     void IRefreshTree();
-    
+
     void IRemoveUnusedComps();
 
-    static void INotify(void *param, NotifyInfo *info);
+    static void INotify(void* param, NotifyInfo* info);
 
     // To syncronize with plComponentUtil when a name is changed
-    void IUpdateNodeName(plMaxNode *node);
+    void IUpdateNodeName(plMaxNode* node);
 
     void IGetComment();
 

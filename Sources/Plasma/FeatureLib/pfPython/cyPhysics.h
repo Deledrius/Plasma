@@ -57,35 +57,40 @@ class pyPoint3;
 class pyVector3;
 class pyMatrix44;
 
-class cyPhysics
-{
+class cyPhysics {
 protected:
     plKey           fSender;
     hsTArray<plKey> fRecvr;
     bool            fNetForce;
 
-    cyPhysics(plKey sender=nil,plKey recvr=nil);
+    cyPhysics(plKey sender = nil, plKey recvr = nil);
 
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptPhysics);
-    static PyObject *New(PyObject *sender = nil, PyObject *recvr = nil);
+    static PyObject* New(PyObject* sender = nil, PyObject* recvr = nil);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a cyPhysics object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(cyPhysics); // converts a PyObject to a cyPhysics (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     // setters
-    void SetSender(plKey &sender);
-    void AddRecvr(plKey &recvr);
+    void SetSender(plKey& sender);
+    void AddRecvr(plKey& recvr);
 
-    virtual void SetNetForce(bool state) { fNetForce = state; }
+    virtual void SetNetForce(bool state) {
+        fNetForce = state;
+    }
 
     // Enable physics (must already be there)
     virtual void EnableT(bool state);
-    virtual void Enable() { EnableT(true); }
-    virtual void Disable() { EnableT(false); }
-    
+    virtual void Enable() {
+        EnableT(true);
+    }
+    virtual void Disable() {
+        EnableT(false);
+    }
+
     virtual void EnableCollision();
     virtual void DisableCollision();
 
@@ -135,9 +140,9 @@ public:
     // Shift the center of mass of the given object by the given
     // amount in the given direction.
     virtual void ShiftMass(pyVector3& offset);
-    
+
     virtual void Suppress(bool doSuppress);
-    
+
     //Set the Linear Velocity of the Object
     virtual void SetLinearVelocity(pyVector3& velocity);
     virtual void SetAngularVelocity(pyVector3& angVel);

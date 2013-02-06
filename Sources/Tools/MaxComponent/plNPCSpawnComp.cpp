@@ -60,8 +60,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 void DummyCodeIncludFuncNPCSpawn() {}
 
 // DON'T delete from this enum. Just add _DEAD to the end of the name
-enum
-{
+enum {
     kModelName,         // v1
     kAccountName,       // v1
     kAutoSpawn,         // v1
@@ -70,16 +69,15 @@ enum
 /** \class plNPCSpawnComp
     Simply creates a plNPCSpawnMod and applies it to the scene node.
 */
-class plNPCSpawnComp : public plActivatorBaseComponent
-{
+class plNPCSpawnComp : public plActivatorBaseComponent {
 public:
     plNPCSpawnComp();
 
-    plKey GetNPCSpawnKey(plMaxNode *node);
+    plKey GetNPCSpawnKey(plMaxNode* node);
 
-    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode* node,plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
 private:
     // per-instance registry of all the modifiers that were created by this component
@@ -89,16 +87,15 @@ private:
 };
 
 // Max class descriptor.
-CLASS_DESC(plNPCSpawnComp, gNPCSpawnDesc, "NPC Spawner", "NPC Spawner", COMP_TYPE_AVATAR, NPC_SPAWN_CLASS_ID )
+CLASS_DESC(plNPCSpawnComp, gNPCSpawnDesc, "NPC Spawner", "NPC Spawner", COMP_TYPE_AVATAR, NPC_SPAWN_CLASS_ID)
 
 // GETNPCSPAWNKEY
 // The idea here is to allow access to all the modifiers that
 // were created by a given npc spawner component.
-plKey GetNPCSpawnModKey(plComponentBase *npcSpawnComp, plMaxNodeBase *target)
+plKey GetNPCSpawnModKey(plComponentBase* npcSpawnComp, plMaxNodeBase* target)
 {
-    if (npcSpawnComp->ClassID() == NPC_SPAWN_CLASS_ID)
-    {
-        plNPCSpawnComp *comp = (plNPCSpawnComp*)npcSpawnComp;
+    if (npcSpawnComp->ClassID() == NPC_SPAWN_CLASS_ID) {
+        plNPCSpawnComp* comp = (plNPCSpawnComp*)npcSpawnComp;
         return comp->GetNPCSpawnKey((plMaxNode*)target);
     }
 
@@ -115,18 +112,18 @@ ParamBlockDesc2 gNPCSpawnBlock
 
     //params
     kModelName, _T("ModelName"),    TYPE_STRING,    0, 0,
-        p_ui,   TYPE_EDITBOX, IDC_NPC_SPAWN_MODEL_TEXT_BOX,
-        end,
+    p_ui,   TYPE_EDITBOX, IDC_NPC_SPAWN_MODEL_TEXT_BOX,
+    end,
 
     //params
     kAccountName,   _T("AccountName"),  TYPE_STRING,    0, 0,
-        p_ui,   TYPE_EDITBOX, IDC_NPC_SPAWN_ACCOUNT_TEXT_BOX,
-        end,
+    p_ui,   TYPE_EDITBOX, IDC_NPC_SPAWN_ACCOUNT_TEXT_BOX,
+    end,
 
     kAutoSpawn, _T("AutoSpawn"), TYPE_BOOL, 0,  0,
-        p_default, FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_NPC_SPAWN_AUTOSPAWN_BOOL,
-        end,
+    p_default, FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_NPC_SPAWN_AUTOSPAWN_BOOL,
+    end,
 
     end
 );
@@ -138,10 +135,11 @@ plNPCSpawnComp::plNPCSpawnComp()
 }
 
 // GETNPCSPAWNKEY
-plKey plNPCSpawnComp::GetNPCSpawnKey(plMaxNode *node)
+plKey plNPCSpawnComp::GetNPCSpawnKey(plMaxNode* node)
 {
-    if (fMods.find(node) != fMods.end())
+    if (fMods.find(node) != fMods.end()) {
         return fMods[node]->GetKey();
+    }
 
     return nil;
 }
@@ -149,43 +147,41 @@ plKey plNPCSpawnComp::GetNPCSpawnKey(plMaxNode *node)
 // ISVALID
 bool plNPCSpawnComp::IIsValid()
 {
-    const char *modelName = fCompPB->GetStr(kModelName);
+    const char* modelName = fCompPB->GetStr(kModelName);
     // account name is optional (for the moment)
     //const char *account = fCompPB->GetStr(kAccountName);
     return (modelName && *modelName != '\0');
 }
 
 // SETUPPROPERTIES
-bool plNPCSpawnComp::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plNPCSpawnComp::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fMods.clear();          // clear out our cache of modifiers (used for interfacing to python & responder)
 
-    if (IIsValid())
-    {
+    if (IIsValid()) {
         node->SetForceLocal(true);
         return true;
-    }
-    else
-    {
-        if (pErrMsg->Set(true, "NPC Spawner", "NPC Spawn component on '%s' has no animation name, and will not be included in the export. Abort this export?", node->GetName()).Ask())
+    } else {
+        if (pErrMsg->Set(true, "NPC Spawner", "NPC Spawn component on '%s' has no animation name, and will not be included in the export. Abort this export?", node->GetName()).Ask()) {
             pErrMsg->Set(true, "", "");
-        else
-            pErrMsg->Set(false); // Don't want to abort
+        } else {
+            pErrMsg->Set(false);    // Don't want to abort
+        }
+
         return false;
     }
 }
 
 // PRECONVERT
 // We actually do the convert here so we're around for responder & python fixup
-bool plNPCSpawnComp::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plNPCSpawnComp::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if (IIsValid())
-    {
-        const char *modelName = fCompPB->GetStr(kModelName);
-        const char *accountName = fCompPB->GetStr(kAccountName);
+    if (IIsValid()) {
+        const char* modelName = fCompPB->GetStr(kModelName);
+        const char* accountName = fCompPB->GetStr(kAccountName);
         bool autoSpawn = fCompPB->GetInt(kAutoSpawn) ? true : false;
 
-        plNPCSpawnMod *mod = new plNPCSpawnMod(modelName, accountName, autoSpawn);
+        plNPCSpawnMod* mod = new plNPCSpawnMod(modelName, accountName, autoSpawn);
         fMods[node] = mod;
 
         // this is used by the python file modifier to figure out which component we're coming from
@@ -199,23 +195,24 @@ bool plNPCSpawnComp::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
 // CONVERT
 // We just attach to the scene object here. Not sure why we didn't do it at convert time;
 // I'm cribbing from Colin's modifications to the one shot component.
-bool plNPCSpawnComp::Convert(plMaxNode* node, plErrorMsg *pErrMsg)
+bool plNPCSpawnComp::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     modmap::iterator i = fMods.find(node);
 
-    if (i != fMods.end())
-    {
-        plNPCSpawnMod *mod = ((*i).second);
+    if (i != fMods.end()) {
+        plNPCSpawnMod* mod = ((*i).second);
 
         // let's make a notification message that we'll use to notify interested parties
         // when we actually do our spawn.
-        plNotifyMsg *notify = new plNotifyMsg();
+        plNotifyMsg* notify = new plNotifyMsg();
         hsTArray<plKey> receivers;
         IGetReceivers(node, receivers);
         notify->SetSender(mod->GetKey());
         notify->SetState(1.0f);
-        for (int i = 0; i < receivers.Count(); i++)
+
+        for (int i = 0; i < receivers.Count(); i++) {
             notify->AddReceiver(receivers[i]);
+        }
 
         mod->SetNotify(notify);
 

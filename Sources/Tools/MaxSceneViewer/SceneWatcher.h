@@ -52,8 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plMaxNode;
 
-class SceneWatcher : public ReferenceMaker
-{
+class SceneWatcher : public ReferenceMaker {
 public:
     typedef std::vector<plMaxNode*> NodeList;
     typedef std::set<plMaxNode*>    NodeSet;
@@ -72,14 +71,16 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     // ReferenceMaker functions
     //
-    RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, 
-        PartID& partID, RefMessage message);
+    RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
+                               PartID& partID, RefMessage message);
 
     int NumRefs();
     RefTargetHandle GetReference(int i);
     void SetReference(int i, RefTargetHandle rtarg);
 
-    BOOL IsRealDependency(ReferenceTarget *rtarg) { return FALSE; }
+    BOOL IsRealDependency(ReferenceTarget* rtarg) {
+        return FALSE;
+    }
 
     // Get all the nodes we're watching
     const NodeList& GetWatchNodes();
@@ -92,18 +93,18 @@ public:
     KeyList& GetDeleted();
 
 protected:
-    void IAddRef(plMaxNode *node);
-    void IRemoveRef(plMaxNode *node);
+    void IAddRef(plMaxNode* node);
+    void IRemoveRef(plMaxNode* node);
 
-    void IAddNodeRecur(plMaxNode *node);
+    void IAddNodeRecur(plMaxNode* node);
 
     // Helpers for GetDirtyNodes
-    void IGetDependents(plMaxNode *node, NodeSet& nodes);
-    void IGetLogicDependents(plMaxNode *node, NodeSet& nodes);
+    void IGetDependents(plMaxNode* node, NodeSet& nodes);
+    void IGetLogicDependents(plMaxNode* node, NodeSet& nodes);
 
     void ISetDirty();
 
-    static void INotify(void *param, NotifyInfo *info);
+    static void INotify(void* param, NotifyInfo* info);
 };
 
 #endif //SCENE_WATCHER_H

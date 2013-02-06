@@ -74,7 +74,7 @@ void DummyCodeIncludeFuncXImposter()
 CLASS_DESC(plXImposterComp, gXImposterDesc, "X-Form",  "X-Form", COMP_TYPE_DISTRIBUTOR, XIMPOSTER_COMP_CID)
 
 ParamBlockDesc2 gXImposterBk
-(   
+(
     plComponent::kBlkComp, _T("X-Form"), 0, &gXImposterDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_XFORM, IDS_COMP_XFORMS, 0, 0, NULL,
@@ -98,24 +98,29 @@ bool plXImposterComp::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 const Class_ID FORCE_CTT_COMP_CID(0x30ee73b7, 0x4cdd551b);
 
-class plForceCTTComp : public plComponent
-{
+class plForceCTTComp : public plComponent {
 public:
     plForceCTTComp();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)     { return true; }
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg) { return true; }
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)     {
+        return true;
+    }
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg) {
+        return true;
+    }
 };
 
 //Max desc stuff necessary below.
 CLASS_DESC(plForceCTTComp, gForceCTTDesc, "ForceClick2Turn",  "ForceCTT", COMP_TYPE_MISC, FORCE_CTT_COMP_CID)
 
 ParamBlockDesc2 gForceCTTBk
-(   
+(
     plComponent::kBlkComp, _T("ForceCTT"), 0, &gForceCTTDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_FORCE_CTT, IDS_COMP_FORCE_CTT, 0, 0, NULL,
@@ -140,11 +145,9 @@ bool plForceCTTComp::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 // The filter inheritance component doesn't have anything to do with the XImposter, but there's
 // plenty of space here, so blow me.
 
-class plFilterInheritComp : public plComponent
-{
+class plFilterInheritComp : public plComponent {
 public:
-    enum
-    {
+    enum {
         kActive,
         kNoX,
         kNoY,
@@ -152,7 +155,9 @@ public:
     };
 public:
     plFilterInheritComp();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
@@ -167,29 +172,26 @@ public:
 
     bool    Bail(plMaxNode* node, const char* msg, plErrorMsg* pErrMsg);
 
-    virtual void AddTarget(plMaxNodeBase *target);
-    virtual void DeleteTarget(plMaxNodeBase *target);
+    virtual void AddTarget(plMaxNodeBase* target);
+    virtual void DeleteTarget(plMaxNodeBase* target);
     virtual void DeleteAllTargets();
 };
 
-class FilterInheritCompDlgProc : public ParamMap2UserDlgProc
-{
+class FilterInheritCompDlgProc : public ParamMap2UserDlgProc {
 protected:
-    void ISetTransEnable(IParamMap2* map)
-    {
+    void ISetTransEnable(IParamMap2* map) {
         IParamBlock2* pb = map->GetParamBlock();
-        if( !pb->GetInt(plFilterInheritComp::kActive) )
-        {
+
+        if (!pb->GetInt(plFilterInheritComp::kActive)) {
             map->Enable(plFilterInheritComp::kNoX, FALSE);
             map->Enable(plFilterInheritComp::kNoY, FALSE);
             map->Enable(plFilterInheritComp::kNoZ, FALSE);
-        }
-        else
-        {
+        } else {
             map->Enable(plFilterInheritComp::kNoX, TRUE);
             map->Enable(plFilterInheritComp::kNoY, TRUE);
             map->Enable(plFilterInheritComp::kNoZ, TRUE);
         }
+
         plFilterInheritComp* comp = (plFilterInheritComp*)map->GetParamBlock()->GetOwner();
         comp->SetMaxInherit();
     }
@@ -197,17 +199,17 @@ public:
     FilterInheritCompDlgProc() {}
     ~FilterInheritCompDlgProc() {}
 
-    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (msg)
-        {
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        switch (msg) {
         case WM_INITDIALOG:
             ISetTransEnable(map);
             break;
-        case WM_COMMAND: 
+
+        case WM_COMMAND:
             ISetTransEnable(map);
             break;
         }
+
         return FALSE;
     }
     void DeleteThis() {}
@@ -219,30 +221,30 @@ static FilterInheritCompDlgProc gFilterInheritCompDlgProc;
 CLASS_DESC(plFilterInheritComp, gFilterInheritDesc, "Filter Inherit",  "FiltInherit", COMP_TYPE_MISC, FILTERINHERIT_COMP_CID)
 
 ParamBlockDesc2 gFilterInheritBk
-(   
+(
     plComponent::kBlkComp, _T("FilterInherit"), 0, &gFilterInheritDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_FILTERINHERIT, IDS_COMP_FILTER, 0, 0, &gFilterInheritCompDlgProc,
 
     plFilterInheritComp::kActive,   _T("Active"),   TYPE_BOOL,      0, 0,
-        p_default,  TRUE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_FILTER_ACTIVE,
-        end,
+    p_default,  TRUE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_FILTER_ACTIVE,
+    end,
 
     plFilterInheritComp::kNoX,  _T("NoX"),  TYPE_BOOL,      0, 0,
-        p_default,  TRUE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_FILTER_NOX,
-        end,
+    p_default,  TRUE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_FILTER_NOX,
+    end,
 
     plFilterInheritComp::kNoY,  _T("NoY"),  TYPE_BOOL,      0, 0,
-        p_default,  TRUE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_FILTER_NOY,
-        end,
+    p_default,  TRUE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_FILTER_NOY,
+    end,
 
     plFilterInheritComp::kNoZ,  _T("NoZ"),  TYPE_BOOL,      0, 0,
-        p_default,  TRUE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_FILTER_NOZ,
-        end,
+    p_default,  TRUE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_FILTER_NOZ,
+    end,
 
     end
 );
@@ -255,11 +257,13 @@ plFilterInheritComp::plFilterInheritComp()
 
 bool plFilterInheritComp::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if( !fCompPB->GetInt(kActive) )
+    if (!fCompPB->GetInt(kActive)) {
         return true;
+    }
 
-    if( node->GetParentNode()->IsRootNode() )
+    if (node->GetParentNode()->IsRootNode()) {
         return true;
+    }
 
     node->SetFilterInherit(true);
     node->SetForceLocal(true);
@@ -299,33 +303,35 @@ bool plFilterInheritComp::Bail(plMaxNode* node, const char* msg, plErrorMsg* pEr
 
 bool plFilterInheritComp::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if( !fCompPB->GetInt(kActive) )
+    if (!fCompPB->GetInt(kActive)) {
         return true;
+    }
 
-    if( node->GetParentNode()->IsRootNode() )
+    if (node->GetParentNode()->IsRootNode()) {
         return true;
+    }
 
     plSceneObject* so = node->GetSceneObject();
-    if( !so )
-    {
+
+    if (!so) {
         return Bail(node, "Error finding scene object for filtered inheritance", pErrMsg);
     }
 
     const plCoordinateInterface* co = so->GetCoordinateInterface();
-    if( !co )
-    {
+
+    if (!co) {
         return Bail(node, "Error setting filtered inheritance - no coordinate interface", pErrMsg);
     }
-    
+
     plFilterCoordInterface* filt = plFilterCoordInterface::ConvertNoRef(const_cast<plCoordinateInterface*>(co));
-    if( !filt )
-    {
+
+    if (!filt) {
         return Bail(node, "Error setting filtered inheritance - wrong coordinate interface", pErrMsg);
     }
 
     const plSimulationInterface* si = so->GetSimulationInterface();
-    if (si)
-    {
+
+    if (si) {
         plPhysical* phys = si->GetPhysical();
         // tell the physical not to send transforms back -- they'll be wrong if it tries to compose w/a subworld
         // this rules out using transform filters on dynamically simulated objects....
@@ -333,12 +339,18 @@ bool plFilterInheritComp::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
     }
 
     uint32_t mask = plFilterCoordInterface::kNoRotation;
-    if( fCompPB->GetInt(kNoX) )
+
+    if (fCompPB->GetInt(kNoX)) {
         mask |= plFilterCoordInterface::kNoTransX;
-    if( fCompPB->GetInt(kNoY) )
+    }
+
+    if (fCompPB->GetInt(kNoY)) {
         mask |= plFilterCoordInterface::kNoTransY;
-    if( fCompPB->GetInt(kNoZ) )
+    }
+
+    if (fCompPB->GetInt(kNoZ)) {
         mask |= plFilterCoordInterface::kNoTransZ;
+    }
 
     plMaxNode* parent = (plMaxNode*)node->GetParentNode();
     hsMatrix44 parL2W = parent->GetLocalToWorld44(TimeValue(0));
@@ -348,36 +360,41 @@ bool plFilterInheritComp::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 
     // See the matching KillMaxInherit() in SetupProperties().
     SetMaxInherit(node);
-    
+
     return true;
 }
 
 bool plFilterInheritComp::SetMaxInherit(plMaxNodeBase* targ)
 {
-    if( !fCompPB->GetInt(kActive) )
+    if (!fCompPB->GetInt(kActive)) {
         return KillMaxInherit(targ);
+    }
 
     DWORD mask = INHERIT_ROT_X
-        | INHERIT_ROT_Y
-        | INHERIT_ROT_Z
-        | INHERIT_SCL_X
-        | INHERIT_SCL_Y
-        | INHERIT_SCL_Z;
+                 | INHERIT_ROT_Y
+                 | INHERIT_ROT_Z
+                 | INHERIT_SCL_X
+                 | INHERIT_SCL_Y
+                 | INHERIT_SCL_Z;
 
-    if( fCompPB->GetInt(kNoX) )
+    if (fCompPB->GetInt(kNoX)) {
         mask |= INHERIT_POS_X;
-    if( fCompPB->GetInt(kNoY) )
+    }
+
+    if (fCompPB->GetInt(kNoY)) {
         mask |= INHERIT_POS_Y;
-    if( fCompPB->GetInt(kNoZ) )
+    }
+
+    if (fCompPB->GetInt(kNoZ)) {
         mask |= INHERIT_POS_Z;
+    }
 
     // Max documentation is a big fat liar
     mask = ~mask;
 
-    if( targ )
-    {
+    if (targ) {
         targ->GetTMController()->SetInheritanceFlags(mask, true);
-        targ->GetTMController()->NotifyDependents(FOREVER,0,REFMSG_CHANGE);
+        targ->GetTMController()->NotifyDependents(FOREVER, 0, REFMSG_CHANGE);
     }
 
     return true;
@@ -385,36 +402,43 @@ bool plFilterInheritComp::SetMaxInherit(plMaxNodeBase* targ)
 
 bool plFilterInheritComp::SetMaxInherit()
 {
-    if( !fCompPB->GetInt(kActive) )
+    if (!fCompPB->GetInt(kActive)) {
         return KillMaxInherit();
+    }
 
     DWORD mask = INHERIT_ROT_X
-        | INHERIT_ROT_Y
-        | INHERIT_ROT_Z
-        | INHERIT_SCL_X
-        | INHERIT_SCL_Y
-        | INHERIT_SCL_Z;
+                 | INHERIT_ROT_Y
+                 | INHERIT_ROT_Z
+                 | INHERIT_SCL_X
+                 | INHERIT_SCL_Y
+                 | INHERIT_SCL_Z;
 
-    if( fCompPB->GetInt(kNoX) )
+    if (fCompPB->GetInt(kNoX)) {
         mask |= INHERIT_POS_X;
-    if( fCompPB->GetInt(kNoY) )
+    }
+
+    if (fCompPB->GetInt(kNoY)) {
         mask |= INHERIT_POS_Y;
-    if( fCompPB->GetInt(kNoZ) )
+    }
+
+    if (fCompPB->GetInt(kNoZ)) {
         mask |= INHERIT_POS_Z;
+    }
 
     // Max documentation is a big fat liar
     mask = ~mask;
 
     int i;
-    for( i = 0; i < NumTargets(); i++ )
-    {
+
+    for (i = 0; i < NumTargets(); i++) {
         plMaxNodeBase* targ = GetTarget(i);
-        if( targ )
-        {
+
+        if (targ) {
             targ->GetTMController()->SetInheritanceFlags(mask, true);
-            targ->GetTMController()->NotifyDependents(FOREVER,0,REFMSG_CHANGE);
+            targ->GetTMController()->NotifyDependents(FOREVER, 0, REFMSG_CHANGE);
         }
     }
+
     return true;
 }
 
@@ -424,7 +448,7 @@ bool plFilterInheritComp::KillMaxInherit(plMaxNodeBase* targ)
     DWORD mask = ~0;
 
     targ->GetTMController()->SetInheritanceFlags(mask, true);
-    targ->GetTMController()->NotifyDependents(FOREVER,0,REFMSG_CHANGE);
+    targ->GetTMController()->NotifyDependents(FOREVER, 0, REFMSG_CHANGE);
 
     return true;
 }
@@ -432,25 +456,26 @@ bool plFilterInheritComp::KillMaxInherit(plMaxNodeBase* targ)
 bool plFilterInheritComp::KillMaxInherit()
 {
     int i;
-    for( i = 0; i < NumTargets(); i++ )
-    {
+
+    for (i = 0; i < NumTargets(); i++) {
         plMaxNodeBase* targ = GetTarget(i);
-        if( targ )
-        {
+
+        if (targ) {
             KillMaxInherit(targ);
         }
     }
+
     return true;
 }
 
-void plFilterInheritComp::AddTarget(plMaxNodeBase *target)
+void plFilterInheritComp::AddTarget(plMaxNodeBase* target)
 {
     plComponentBase::AddTarget(target);
 
     SetMaxInherit();
 }
 
-void plFilterInheritComp::DeleteTarget(plMaxNodeBase *target)
+void plFilterInheritComp::DeleteTarget(plMaxNodeBase* target)
 {
     plComponentBase::DeleteTarget(target);
 

@@ -46,20 +46,19 @@ class plMaxNode;
 
 #define CAMERACMD_CID Class_ID(0x6edb72d1, 0xd8a1f43)
 
-class plCameraCmdComponent : public plComponent
-{
+class plCameraCmdComponent : public plComponent {
 public:
 protected:
-    
+
 public:
     plCameraCmdComponent();
 
     // Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    bool PreConvert(plMaxNode *node, plErrorMsg* pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
 };
 

@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 //////////////////////////////////////////////////////////////////////
 
-class pyGrassShader
-{
+class pyGrassShader {
 private:
     plKey fShaderKey;
 
@@ -65,16 +64,16 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptGrassShader);
-    static PyObject *New(plKey key);
+    static PyObject* New(plKey key);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGrassShader object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGrassShader); // converts a PyObject to a pyGrassShader (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     void SetKey(plKey key);
 
-    void SetWaveDistortion(int waveNum, const std::vector<float> & distortion);
-    void SetWaveDirection(int waveNum, const std::vector<float> & direction);
+    void SetWaveDistortion(int waveNum, const std::vector<float>& distortion);
+    void SetWaveDirection(int waveNum, const std::vector<float>& direction);
     void SetWaveSpeed(int waveNum, float speed);
 
     std::vector<float> GetWaveDistortion(int waveNum) const;

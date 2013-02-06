@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/Apps/plUruLauncher/plLauncherCallback.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_APPS_PLURULAUNCHER_PLLAUNCHERCALLBACK_H
@@ -62,7 +62,7 @@ struct PatchInfo {
     unsigned progressStage;
 };
 
-typedef void (*launcherCallback)(int status, void *param);
+typedef void (*launcherCallback)(int status, void* param);
 typedef void (*setTextCallback)(const char text[]);
 typedef void (*setStatusTextCallback)(const char text[]);
 typedef void (*setTimeRemainingCallback)(unsigned seconds);
@@ -79,11 +79,11 @@ struct plLauncherInfo {
     launcherCallback terminateCallback;
     launcherCallback progressCallback;
     launcherCallback exitCallback;
-    setTextCallback             SetText; 
+    setTextCallback             SetText;
     setStatusTextCallback       SetStatusText;
     setTimeRemainingCallback    SetTimeRemaining;
     setBytesRemainingCallback   SetBytesRemaining;
-    
+
     PatchInfo patchInfo;
     DWORD returnCode;       // used so we can pass a new process id back to gametap. That way gametap wont think uru has exited when the patcher quits.
 };
@@ -95,8 +95,8 @@ struct plLauncherInfo {
 *
 ***/
 
-void SetProgress (unsigned progress) ;
-void SetText (const char text[]);
-void SetStatusText (const char text[]);
+void SetProgress(unsigned progress) ;
+void SetText(const char text[]);
+void SetStatusText(const char text[]);
 void SetTimeRemaining(unsigned seconds);
 void SetBytesRemaining(unsigned bytes);

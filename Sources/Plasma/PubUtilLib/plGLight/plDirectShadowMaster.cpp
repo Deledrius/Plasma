@@ -66,40 +66,45 @@ plDirectShadowMaster::~plDirectShadowMaster()
 {
     fIsectPool.SetCount(fIsectPool.GetNumAlloc());
     int i;
-    for( i = 0; i < fIsectPool.GetCount(); i++ )
+
+    for (i = 0; i < fIsectPool.GetCount(); i++) {
         delete fIsectPool[i];
+    }
 }
 
 plShadowSlave* plDirectShadowMaster::INewSlave(const plShadowCaster* caster)
 {
-    if( caster->GetPerspective() )
+    if (caster->GetPerspective()) {
         return new plPerspDirSlave;
-    
+    }
+
     return new plDirectShadowSlave;
 }
 
 plShadowSlave* plDirectShadowMaster::INextSlave(const plShadowCaster* caster)
 {
-    if( !caster->GetPerspective() )
+    if (!caster->GetPerspective()) {
         return plShadowMaster::INextSlave(caster);
+    }
 
     int iSlave = fPerspSlavePool.GetCount();
-    fPerspSlavePool.ExpandAndZero(iSlave+1);
+    fPerspSlavePool.ExpandAndZero(iSlave + 1);
     plShadowSlave* slave = fPerspSlavePool[iSlave];
-    if( !slave )
-    {
+
+    if (!slave) {
         fPerspSlavePool[iSlave] = slave = INewSlave(caster);
     }
+
     return slave;
 }
 
 plShadowSlave* plDirectShadowMaster::IRecycleSlave(plShadowSlave* slave)
 {
-    if( fSlavePool.GetCount() && (fSlavePool[fSlavePool.GetCount()-1] == slave) )
-        fSlavePool.SetCount(fSlavePool.GetCount()-1);
-    else
-    if( fPerspSlavePool.GetCount() && (fPerspSlavePool[fPerspSlavePool.GetCount()-1] == slave) )
-        fPerspSlavePool.SetCount(fPerspSlavePool.GetCount()-1);
+    if (fSlavePool.GetCount() && (fSlavePool[fSlavePool.GetCount() - 1] == slave)) {
+        fSlavePool.SetCount(fSlavePool.GetCount() - 1);
+    } else if (fPerspSlavePool.GetCount() && (fPerspSlavePool[fPerspSlavePool.GetCount() - 1] == slave)) {
+        fPerspSlavePool.SetCount(fPerspSlavePool.GetCount() - 1);
+    }
 
     return nil;
 }
@@ -169,11 +174,12 @@ void plDirectShadowMaster::IComputeProjections(plShadowCastMsg* castMsg, plShado
 void plDirectShadowMaster::IComputeISect(const hsBounds3Ext& casterBnd, plShadowSlave* slave) const
 {
     int iIsect = fIsectPool.GetCount();
-    fIsectPool.ExpandAndZero(iIsect+1);
-    if( !fIsectPool[iIsect] )
-    {
+    fIsectPool.ExpandAndZero(iIsect + 1);
+
+    if (!fIsectPool[iIsect]) {
         fIsectPool[iIsect] = new plBoundsIsect;
     }
+
     plBoundsIsect* isect = fIsectPool[iIsect];
 
     const hsBounds3Ext& wBnd = slave->fWorldBounds;
@@ -192,11 +198,11 @@ void plDirectShadowMaster::IComputeBounds(const hsBounds3Ext& casterBnd, plShado
 
     hsBounds3Ext bnd = casterBnd;
     bnd.Transform(&slave->fWorldToLight);
-    
+
     hsPoint3 farPt = bnd.GetCenter();
 
     farPt.fZ += slave->fAttenDist;
-    
+
     bnd.Union(&farPt);
 
     bnd.Transform(&slave->fLightToWorld);

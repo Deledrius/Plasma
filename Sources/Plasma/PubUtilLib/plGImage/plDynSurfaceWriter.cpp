@@ -82,7 +82,7 @@ plDynSurfaceWriter::plWinSurface::plWinSurface()
     fBitmap = nil;
     fFont = nil;
     fBits = nil;
-    fTextColor = RGB( 255, 255, 255 );
+    fTextColor = RGB(255, 255, 255);
     fWidth = fHeight = 0;
 
     fSaveNum = 0;
@@ -98,10 +98,10 @@ plDynSurfaceWriter::plWinSurface::~plWinSurface()
     Release();
 }
 
-void    plDynSurfaceWriter::plWinSurface::Allocate( uint16_t w, uint16_t h )
+void    plDynSurfaceWriter::plWinSurface::Allocate(uint16_t w, uint16_t h)
 {
     int         i;
-    BITMAPINFO  *bmi;
+    BITMAPINFO*  bmi;
 
 
     Release();
@@ -110,96 +110,114 @@ void    plDynSurfaceWriter::plWinSurface::Allocate( uint16_t w, uint16_t h )
     fHeight = h;
 
     /// Initialize a bitmap info struct to describe our surface
-    if( IBitsPerPixel() == 8 )
-        bmi = (BITMAPINFO *)( new uint8_t[ sizeof( BITMAPINFOHEADER ) + sizeof( RGBQUAD ) * 256 ] );
-    else
+    if (IBitsPerPixel() == 8) {
+        bmi = (BITMAPINFO*)(new uint8_t[ sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * 256 ]);
+    } else {
         bmi = new BITMAPINFO;
+    }
 
-    memset( &bmi->bmiHeader, 0, sizeof( BITMAPINFOHEADER ) );
-    bmi->bmiHeader.biSize = sizeof( BITMAPINFOHEADER );
+    memset(&bmi->bmiHeader, 0, sizeof(BITMAPINFOHEADER));
+    bmi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bmi->bmiHeader.biWidth = (int)fWidth;
     bmi->bmiHeader.biHeight = -(int)fHeight;
     bmi->bmiHeader.biPlanes = 1;
     bmi->bmiHeader.biCompression = BI_RGB;
     bmi->bmiHeader.biBitCount = IBitsPerPixel();
-    if( IBitsPerPixel() == 8 )
-    {
+
+    if (IBitsPerPixel() == 8) {
         // Set up map for grayscale bitmap
-        for( i = 0; i < 256; i++ )
-        {
+        for (i = 0; i < 256; i++) {
             bmi->bmiColors[ i ].rgbRed = i;
             bmi->bmiColors[ i ].rgbGreen = i;
             bmi->bmiColors[ i ].rgbBlue = i;
             bmi->bmiColors[ i ].rgbReserved = i;
         }
     }
-    
-    /// Create a screen-compatible DC
-    fDC = CreateCompatibleDC( nil );
-    if( fDC == nil )
-    {
-        char msg[ 256 ];
-        FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nil, GetLastError(), MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), msg, sizeof( msg ), nil );
-        char *ret = strrchr( msg, '\n' );
-        if( ret != nil )
-            *ret = 0;
 
-        plStatusLog::AddLineS( "pipeline.log", 0xffff0000, "Unable to allocate DC for dynamic text map (%s, %d DCs allocated already)", msg, sNumDCsAllocated );
-        if (IBitsPerPixel() == 8 )
+    /// Create a screen-compatible DC
+    fDC = CreateCompatibleDC(nil);
+
+    if (fDC == nil) {
+        char msg[ 256 ];
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nil, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), msg, sizeof(msg), nil);
+        char* ret = strrchr(msg, '\n');
+
+        if (ret != nil) {
+            *ret = 0;
+        }
+
+        plStatusLog::AddLineS("pipeline.log", 0xffff0000, "Unable to allocate DC for dynamic text map (%s, %d DCs allocated already)", msg, sNumDCsAllocated);
+
+        if (IBitsPerPixel() == 8) {
             delete [] bmi;
-        else
+        } else {
             delete bmi;
+        }
+
         return;
     }
+
     sNumDCsAllocated++;
 
     /// Create a bitmap using the DC and the bitmapInfo struct we filled out
-    fBitmap = CreateDIBSection( fDC, bmi, DIB_RGB_COLORS, (void **)&fBits, nil, 0 );
-    if( fBitmap == nil )
-    {
-        char msg[ 256 ];
-        FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nil, GetLastError(), MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), msg, sizeof( msg ), nil );
-        char *ret = strrchr( msg, '\n' );
-        if( ret != nil )
-            *ret = 0;
+    fBitmap = CreateDIBSection(fDC, bmi, DIB_RGB_COLORS, (void**)&fBits, nil, 0);
 
-        plStatusLog::AddLineS( "pipeline.log", 0xffff0000, "Unable to allocate RGB DIB section for dynamic text map (%s, %d bitmaps allocated already)", msg, sNumBitmapsAllocated );
-        if (IBitsPerPixel() == 8 )
+    if (fBitmap == nil) {
+        char msg[ 256 ];
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nil, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), msg, sizeof(msg), nil);
+        char* ret = strrchr(msg, '\n');
+
+        if (ret != nil) {
+            *ret = 0;
+        }
+
+        plStatusLog::AddLineS("pipeline.log", 0xffff0000, "Unable to allocate RGB DIB section for dynamic text map (%s, %d bitmaps allocated already)", msg, sNumBitmapsAllocated);
+
+        if (IBitsPerPixel() == 8) {
             delete [] bmi;
-        else
+        } else {
             delete bmi;
+        }
+
         return;
     }
+
     sNumBitmapsAllocated++;
 
     /// Set up some basic props
-    SetMapMode( fDC, MM_TEXT );
-    SetBkMode( fDC, TRANSPARENT );
-    SetTextAlign( fDC, TA_TOP | TA_LEFT );
+    SetMapMode(fDC, MM_TEXT);
+    SetBkMode(fDC, TRANSPARENT);
+    SetTextAlign(fDC, TA_TOP | TA_LEFT);
 
-    fSaveNum = SaveDC( fDC );
-    
-    SelectObject( fDC, fBitmap );
+    fSaveNum = SaveDC(fDC);
 
-    if (IBitsPerPixel() == 8 )
+    SelectObject(fDC, fBitmap);
+
+    if (IBitsPerPixel() == 8) {
         delete [] bmi;
-    else
+    } else {
         delete bmi;
+    }
 }
 
-void    plDynSurfaceWriter::plWinSurface::Release( void )
+void    plDynSurfaceWriter::plWinSurface::Release(void)
 {
-    if( fBitmap != nil )
+    if (fBitmap != nil) {
         sNumBitmapsAllocated--;
-    if( fDC != nil )
-        sNumDCsAllocated--;
+    }
 
-    if( fSaveNum != 0 )
-        RestoreDC( fDC, fSaveNum );
+    if (fDC != nil) {
+        sNumDCsAllocated--;
+    }
+
+    if (fSaveNum != 0) {
+        RestoreDC(fDC, fSaveNum);
+    }
+
     fSaveNum = 0;
 
-    DeleteObject( fBitmap );
-    DeleteDC( fDC );
+    DeleteObject(fBitmap);
+    DeleteDC(fDC);
 
     fDC = nil;
     fBitmap = nil;
@@ -215,75 +233,81 @@ void    plDynSurfaceWriter::plWinSurface::Release( void )
     fFontBlockedRGB = false;
 }
 
-bool    plDynSurfaceWriter::plWinSurface::WillFit( uint16_t w, uint16_t h )
+bool    plDynSurfaceWriter::plWinSurface::WillFit(uint16_t w, uint16_t h)
 {
-    if( fWidth >= w && fHeight >= h )
+    if (fWidth >= w && fHeight >= h) {
         return true;
+    }
+
     return false;
 }
 
-static int      SafeStrCmp( const char *str1, const char *str2 )
+static int      SafeStrCmp(const char* str1, const char* str2)
 {
-    if( str1 == nil && str2 == nil )
+    if (str1 == nil && str2 == nil) {
         return -1;
-    if( str1 != nil && str2 != nil )
-        return strcmp( str1, str2 );
+    }
+
+    if (str1 != nil && str2 != nil) {
+        return strcmp(str1, str2);
+    }
+
     return -1;
 }
 
-bool    plDynSurfaceWriter::plWinSurface::FontMatches( const char *face, uint16_t size, uint8_t flags, bool aaRGB )
+bool    plDynSurfaceWriter::plWinSurface::FontMatches(const char* face, uint16_t size, uint8_t flags, bool aaRGB)
 {
-    if( SafeStrCmp( face, fFontFace ) == 0 && fFontSize == size && 
-        fFontFlags == flags && fFontAntiAliasRGB == aaRGB )
+    if (SafeStrCmp(face, fFontFace) == 0 && fFontSize == size &&
+            fFontFlags == flags && fFontAntiAliasRGB == aaRGB) {
         return true;
-    
+    }
+
     return false;
 }
 
-void    plDynSurfaceWriter::plWinSurface::SetFont( const char *face, uint16_t size, uint8_t flags, bool aaRGB )
+void    plDynSurfaceWriter::plWinSurface::SetFont(const char* face, uint16_t size, uint8_t flags, bool aaRGB)
 {
     delete [] fFontFace;
-    fFontFace = ( face != nil ) ? hsStrcpy( face ) : nil;
+    fFontFace = (face != nil) ? hsStrcpy(face) : nil;
     fFontSize = size;
     fFontFlags = flags;
     fFontAntiAliasRGB = aaRGB;
 
     bool hadAFont = false;
-    if( fFont != nil )
-    {
+
+    if (fFont != nil) {
         hadAFont = true;
-        plWinFontCache::GetInstance().FreeFont( fFont );    
+        plWinFontCache::GetInstance().FreeFont(fFont);
         fFont = nil;
     }
 
-    if( face == nil )
+    if (face == nil) {
         return;
+    }
 
-    bool    bold = ( fFontFlags & plDynSurfaceWriter::kFontBold ) ? true : false;
-    bool    italic = ( fFontFlags & plDynSurfaceWriter::kFontItalic ) ? true : false;
+    bool    bold = (fFontFlags & plDynSurfaceWriter::kFontBold) ? true : false;
+    bool    italic = (fFontFlags & plDynSurfaceWriter::kFontItalic) ? true : false;
 
-    int nHeight = -MulDiv( size, GetDeviceCaps( fDC, LOGPIXELSY ), 72 );
-    fFont = plWinFontCache::GetInstance().GetMeAFont( face, nHeight, bold ? FW_BOLD : FW_NORMAL, italic, 
-                                                        fFontAntiAliasRGB ? ANTIALIASED_QUALITY : DEFAULT_QUALITY );
-    if( fFont == nil && fFontAntiAliasRGB )
-    {
+    int nHeight = -MulDiv(size, GetDeviceCaps(fDC, LOGPIXELSY), 72);
+    fFont = plWinFontCache::GetInstance().GetMeAFont(face, nHeight, bold ? FW_BOLD : FW_NORMAL, italic,
+            fFontAntiAliasRGB ? ANTIALIASED_QUALITY : DEFAULT_QUALITY);
+
+    if (fFont == nil && fFontAntiAliasRGB) {
         static bool warnedCantAntiAlias = false;
 
         // Creation of font failed; could be that we can't do anti-aliasing? Try not doing it...
-        if( !warnedCantAntiAlias )
-        {
-            plStatusLog::AddLineS( "pipeline.log", "WARNING: Cannot allocate anti-aliased font. Falling back to non-anti-aliased. This will be the only warning" );
+        if (!warnedCantAntiAlias) {
+            plStatusLog::AddLineS("pipeline.log", "WARNING: Cannot allocate anti-aliased font. Falling back to non-anti-aliased. This will be the only warning");
             warnedCantAntiAlias = true;
         }
 
-        fFont = plWinFontCache::GetInstance().GetMeAFont( face, nHeight, bold ? FW_BOLD : FW_NORMAL, italic, 
-                                                            fFontAntiAliasRGB ? ANTIALIASED_QUALITY : DEFAULT_QUALITY );
+        fFont = plWinFontCache::GetInstance().GetMeAFont(face, nHeight, bold ? FW_BOLD : FW_NORMAL, italic,
+                fFontAntiAliasRGB ? ANTIALIASED_QUALITY : DEFAULT_QUALITY);
     }
 
-    if( fFont == nil )
-    {
-        hsAssert( false, "Cannot create Windows font for plDynSurfaceWriter" );
-        plStatusLog::AddLineS( "pipeline.log", "ERROR: Cannot allocate font for RGB surface! (face: %s, size: %d %s %s)", face, nHeight, bold ? "bold" : "", italic ? "italic" : "" );
+    if (fFont == nil) {
+        hsAssert(false, "Cannot create Windows font for plDynSurfaceWriter");
+        plStatusLog::AddLineS("pipeline.log", "ERROR: Cannot allocate font for RGB surface! (face: %s, size: %d %s %s)", face, nHeight, bold ? "bold" : "", italic ? "italic" : "");
 
         delete [] fFontFace;
         fFontFace = nil;
@@ -291,15 +315,16 @@ void    plDynSurfaceWriter::plWinSurface::SetFont( const char *face, uint16_t si
         return;
     }
 
-    if( SelectObject( fDC, fFont ) == nil && hadAFont )
-    {
+    if (SelectObject(fDC, fFont) == nil && hadAFont) {
         char msg[ 256 ];
-        FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nil, GetLastError(), MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), msg, sizeof( msg ), nil );
-        char *ret = strrchr( msg, '\n' );
-        if( ret != nil )
-            *ret = 0;
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nil, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), msg, sizeof(msg), nil);
+        char* ret = strrchr(msg, '\n');
 
-        plStatusLog::AddLineS( "pipeline.log", 0xffff0000, "SelectObject() FAILED (%s)", msg );
+        if (ret != nil) {
+            *ret = 0;
+        }
+
+        plStatusLog::AddLineS("pipeline.log", 0xffff0000, "SelectObject() FAILED (%s)", msg);
     }
 
 }
@@ -312,47 +337,39 @@ bool    plDynSurfaceWriter::fForceSharedSurfaces = false;
 bool    plDynSurfaceWriter::fOSDetected = false;
 bool    plDynSurfaceWriter::fOSCanShareSurfaces = false;
 
-bool    plDynSurfaceWriter::CanHandleLotsOfThem( void )
+bool    plDynSurfaceWriter::CanHandleLotsOfThem(void)
 {
-    if( fOSDetected )
+    if (fOSDetected) {
         return fOSCanShareSurfaces;
+    }
 
     fOSDetected = true;
 
 #if HS_BUILD_FOR_WIN32
     OSVERSIONINFO   versionInfo;
-    memset( &versionInfo, 0, sizeof( versionInfo ) );
-    versionInfo.dwOSVersionInfoSize = sizeof( versionInfo );
+    memset(&versionInfo, 0, sizeof(versionInfo));
+    versionInfo.dwOSVersionInfoSize = sizeof(versionInfo);
 
-    if( GetVersionEx( &versionInfo ) )
-    {
-        plStatusLog::AddLineS( "pipeline.log", "OS version detection results:" );
-        plStatusLog::AddLineS( "pipeline.log", "   Version: %d.%d", versionInfo.dwMajorVersion, versionInfo.dwMinorVersion );
-        plStatusLog::AddLineS( "pipeline.log", "   Build #: %d", versionInfo.dwBuildNumber );
-        plStatusLog::AddLineS( "pipeline.log", "   Platform ID: %d", versionInfo.dwPlatformId );
+    if (GetVersionEx(&versionInfo)) {
+        plStatusLog::AddLineS("pipeline.log", "OS version detection results:");
+        plStatusLog::AddLineS("pipeline.log", "   Version: %d.%d", versionInfo.dwMajorVersion, versionInfo.dwMinorVersion);
+        plStatusLog::AddLineS("pipeline.log", "   Build #: %d", versionInfo.dwBuildNumber);
+        plStatusLog::AddLineS("pipeline.log", "   Platform ID: %d", versionInfo.dwPlatformId);
 
-        if( versionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT )
-        {
-            if( fForceSharedSurfaces )
-            {
-                plStatusLog::AddLineS( "pipeline.log", "Detected NT-based platform, but sharing surfaces due to override" );
+        if (versionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) {
+            if (fForceSharedSurfaces) {
+                plStatusLog::AddLineS("pipeline.log", "Detected NT-based platform, but sharing surfaces due to override");
                 fOSCanShareSurfaces = false;
-            }
-            else
-            {
-                plStatusLog::AddLineS( "pipeline.log", "Detected NT-based platform, allowing separate surfaces" );
+            } else {
+                plStatusLog::AddLineS("pipeline.log", "Detected NT-based platform, allowing separate surfaces");
                 fOSCanShareSurfaces = true;
             }
-        }
-        else
-        {
-            plStatusLog::AddLineS( "pipeline.log", "Detected non-NT-based platform: sharing surfaces" );
+        } else {
+            plStatusLog::AddLineS("pipeline.log", "Detected non-NT-based platform: sharing surfaces");
             fOSCanShareSurfaces = false;
         }
-    }
-    else
-    {
-        plStatusLog::AddLineS( "pipeline.log", "OS version detection failed" );
+    } else {
+        plStatusLog::AddLineS("pipeline.log", "OS version detection failed");
         fOSCanShareSurfaces = false;
     }
 
@@ -372,14 +389,14 @@ plDynSurfaceWriter::~plDynSurfaceWriter()
     Reset();
 }
 
-plDynSurfaceWriter::plDynSurfaceWriter( plDynamicTextMap *target, uint32_t flags )
+plDynSurfaceWriter::plDynSurfaceWriter(plDynamicTextMap* target, uint32_t flags)
 {
     IInit();
     fFlags = flags;
-    SwitchTarget( target );
+    SwitchTarget(target);
 }
 
-void    plDynSurfaceWriter::IInit( void )
+void    plDynSurfaceWriter::IInit(void)
 {
     fCurrTarget = 0;
     fJustify = kLeftJustify;
@@ -392,7 +409,7 @@ void    plDynSurfaceWriter::IInit( void )
 
 //// Reset ////////////////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::Reset( void )
+void    plDynSurfaceWriter::Reset(void)
 {
 #if HS_BUILD_FOR_WIN32
     fRGBSurface.Release();
@@ -414,72 +431,72 @@ void    plDynSurfaceWriter::Reset( void )
 //// FlushToTarget ////////////////////////////////////////////////////////////
 //  Flushes all ops to the target.
 
-void    plDynSurfaceWriter::FlushToTarget( void )
+void    plDynSurfaceWriter::FlushToTarget(void)
 {
     int     x, y;
 
 
-    if( fCurrTarget != nil && !fFlushed )
-    {
+    if (fCurrTarget != nil && !fFlushed) {
 #if HS_BUILD_FOR_WIN32
         // Flush the GDI so we can grab the bits
         GdiFlush();
 
-        uint32_t *destBits = (uint32_t *)fCurrTarget->GetImage();
+        uint32_t* destBits = (uint32_t*)fCurrTarget->GetImage();
 
         // Are we merging in the alpha bits?
-        if( fFlags & kSupportAlpha )
-        {
+        if (fFlags & kSupportAlpha) {
             // Yup, munge 'em
-            uint32_t  *srcRGBBits = fRGBSurface.GetBits();
-            uint8_t   *srcAlphaBits = fAlphaSurface.GetBits();
+            uint32_t*  srcRGBBits = fRGBSurface.GetBits();
+            uint8_t*   srcAlphaBits = fAlphaSurface.GetBits();
             uint32_t  destWidth = fCurrTarget->GetWidth();
 
-            for( y = 0; y < fCurrTarget->GetHeight(); y++ )
-            {
-                for( x = 0; x < destWidth; x++ )
-                    destBits[ x ] = ( srcRGBBits[ x ] & 0x00ffffff ) | ( (uint32_t)srcAlphaBits[ x ] << 24 );
+            for (y = 0; y < fCurrTarget->GetHeight(); y++) {
+                for (x = 0; x < destWidth; x++) {
+                    destBits[ x ] = (srcRGBBits[ x ] & 0x00ffffff) | ((uint32_t)srcAlphaBits[ x ] << 24);
+                }
 
                 destBits += destWidth;
                 srcRGBBits += fRGBSurface.fWidth;
                 srcAlphaBits += fAlphaSurface.fWidth;
             }
-        }
-        else
-        {
+        } else {
             // Nope, just a 24-bit copy and set alphas to ff
-            uint32_t  *srcBits = fRGBSurface.GetBits();
+            uint32_t*  srcBits = fRGBSurface.GetBits();
             uint32_t  destWidth = fCurrTarget->GetWidth();
 
-            for( y = 0; y < fCurrTarget->GetHeight(); y++ )
-            {
-                memcpy( destBits, srcBits, destWidth * sizeof( uint32_t ) );
+            for (y = 0; y < fCurrTarget->GetHeight(); y++) {
+                memcpy(destBits, srcBits, destWidth * sizeof(uint32_t));
 
                 // Fill in 0xff
-                for( x = 0; x < destWidth; x++ )
+                for (x = 0; x < destWidth; x++) {
                     destBits[ x ] |= 0xff000000;
+                }
 
                 destBits += destWidth;
                 srcBits += fRGBSurface.fWidth;
             }
         }
+
 #endif
     }
+
     fFlushed = true;
 }
 
 //// SwitchTarget /////////////////////////////////////////////////////////////
-//  Switches targets. Will flush to old target before switching. Also, if 
-//  kDiscard isn't specified, will copy contents of new target to working 
+//  Switches targets. Will flush to old target before switching. Also, if
+//  kDiscard isn't specified, will copy contents of new target to working
 //  surface.
 
-void    plDynSurfaceWriter::SwitchTarget( plDynamicTextMap *target )
+void    plDynSurfaceWriter::SwitchTarget(plDynamicTextMap* target)
 {
-    if( target == fCurrTarget )
+    if (target == fCurrTarget) {
         return;
+    }
 
-    if( !fFlushed )
+    if (!fFlushed) {
         FlushToTarget();
+    }
 
     fCurrTarget = target;
     fFlushed = true;        // Will force a copy next IEnsureSurfaceUpdated()
@@ -487,33 +504,28 @@ void    plDynSurfaceWriter::SwitchTarget( plDynamicTextMap *target )
     // Make sure our surfaces fit
     bool hadToAllocate = false;
 #if HS_BUILD_FOR_WIN32
-    if( target != nil )
-    {
-        if( !fRGBSurface.WillFit( (uint16_t)(target->GetWidth()), (uint16_t)(target->GetHeight()) ) )
-        {
-            fRGBSurface.Allocate( (uint16_t)(target->GetWidth()), (uint16_t)(target->GetHeight()) );
+
+    if (target != nil) {
+        if (!fRGBSurface.WillFit((uint16_t)(target->GetWidth()), (uint16_t)(target->GetHeight()))) {
+            fRGBSurface.Allocate((uint16_t)(target->GetWidth()), (uint16_t)(target->GetHeight()));
             hadToAllocate = true;
         }
 
-        if( fFlags & kSupportAlpha )
-        {
-            if( !fAlphaSurface.WillFit( (uint16_t)(target->GetWidth()), (uint16_t)(target->GetHeight()) ) ) 
-            {
-                fAlphaSurface.Allocate( (uint16_t)(target->GetWidth()), (uint16_t)(target->GetHeight()) );
+        if (fFlags & kSupportAlpha) {
+            if (!fAlphaSurface.WillFit((uint16_t)(target->GetWidth()), (uint16_t)(target->GetHeight()))) {
+                fAlphaSurface.Allocate((uint16_t)(target->GetWidth()), (uint16_t)(target->GetHeight()));
                 hadToAllocate = true;
             }
         }
-    }
-    else
-    {
+    } else {
         fRGBSurface.Release();
         fAlphaSurface.Release();
         hadToAllocate = true;
     }
+
 #endif
 
-    if( hadToAllocate )
-    {
+    if (hadToAllocate) {
         delete [] fFontFace;
         fFontFace = nil;
         fFontSize = 0;
@@ -524,7 +536,7 @@ void    plDynSurfaceWriter::SwitchTarget( plDynamicTextMap *target )
 //// IEnsureSurfaceUpdated ////////////////////////////////////////////////////
 //  Makes sure our surfaces are ready to write to.
 
-void    plDynSurfaceWriter::IEnsureSurfaceUpdated( void )
+void    plDynSurfaceWriter::IEnsureSurfaceUpdated(void)
 {
     uint32_t  x, y;
 
@@ -533,23 +545,20 @@ void    plDynSurfaceWriter::IEnsureSurfaceUpdated( void )
     // which means we want to copy from our target before we start drawing.
     // If we've already drawn, then we won't be flushed and we don't want
     // to be copying over what we've already drawn
-    if( fCurrTarget != nil && fFlushed )
-    {
-        uint32_t *srcBits = (uint32_t *)fCurrTarget->GetImage();
+    if (fCurrTarget != nil && fFlushed) {
+        uint32_t* srcBits = (uint32_t*)fCurrTarget->GetImage();
 
 #if HS_BUILD_FOR_WIN32
+
         // Are we merging in the alpha bits?
-        if( fFlags & kSupportAlpha )
-        {
+        if (fFlags & kSupportAlpha) {
             // Yup, de-munge 'em
-            uint32_t  *destRGBBits = fRGBSurface.GetBits();
-            uint8_t   *destAlphaBits = fAlphaSurface.GetBits();
+            uint32_t*  destRGBBits = fRGBSurface.GetBits();
+            uint8_t*   destAlphaBits = fAlphaSurface.GetBits();
             uint32_t  srcWidth = fCurrTarget->GetWidth();
 
-            for( y = 0; y < fCurrTarget->GetHeight(); y++ )
-            {
-                for( x = 0; x < srcWidth; x++ )
-                {
+            for (y = 0; y < fCurrTarget->GetHeight(); y++) {
+                for (x = 0; x < srcWidth; x++) {
                     destRGBBits[ x ] = srcBits[ x ];    // Windows GDI probably doesn't care about the alpha bits here. Hopefully...
                     destAlphaBits[ x ] = (uint8_t)(srcBits[ x ] >> 24);
                 }
@@ -558,45 +567,48 @@ void    plDynSurfaceWriter::IEnsureSurfaceUpdated( void )
                 destRGBBits += fRGBSurface.fWidth;
                 destAlphaBits += fAlphaSurface.fWidth;
             }
-        }
-        else
-        {
+        } else {
             // Nope, just do a straight memcopy
-            uint32_t  *destBits = fRGBSurface.GetBits();
+            uint32_t*  destBits = fRGBSurface.GetBits();
             uint32_t  srcWidth = fCurrTarget->GetWidth();
 
-            for( y = 0; y < fCurrTarget->GetHeight(); y++ )
-            {
-                memcpy( destBits, srcBits, srcWidth * sizeof( uint32_t ) );
+            for (y = 0; y < fCurrTarget->GetHeight(); y++) {
+                memcpy(destBits, srcBits, srcWidth * sizeof(uint32_t));
 
                 srcBits += srcWidth;
                 destBits += fRGBSurface.fWidth;
             }
-        }       
+        }
+
 #endif
 
         // ALSO, we need to re-update our settings, since different targets
         // can have different fonts or justifications
-        ISetFont( fCurrTarget->GetFontFace(), fCurrTarget->GetFontSize(), 0/*fCurrTarget->GetWriterFontFlags()*/, fCurrTarget->GetFontAARGB() );
-        SetJustify( (Justify)fCurrTarget->GetFontJustify() );
+        ISetFont(fCurrTarget->GetFontFace(), fCurrTarget->GetFontSize(), 0/*fCurrTarget->GetWriterFontFlags()*/, fCurrTarget->GetFontAARGB());
+        SetJustify((Justify)fCurrTarget->GetFontJustify());
         hsColorRGBA col = fCurrTarget->GetFontColor();
-        ISetTextColor( col, fCurrTarget->GetFontBlockRGB() );
+        ISetTextColor(col, fCurrTarget->GetFontBlockRGB());
 
         fFlushed = false;
     }
 }
 
-bool    plDynSurfaceWriter::IsValid( void ) const
+bool    plDynSurfaceWriter::IsValid(void) const
 {
-    if( fCurrTarget == nil )
+    if (fCurrTarget == nil) {
         return false;
+    }
 
 #if HS_BUILD_FOR_WIN32
-    if( fRGBSurface.fDC == nil || fRGBSurface.fBitmap == nil )
-        return false;
 
-    if( ( fFlags & kSupportAlpha ) && ( fAlphaSurface.fDC == nil || fAlphaSurface.fBitmap == nil ) )
+    if (fRGBSurface.fDC == nil || fRGBSurface.fBitmap == nil) {
         return false;
+    }
+
+    if ((fFlags & kSupportAlpha) && (fAlphaSurface.fDC == nil || fAlphaSurface.fBitmap == nil)) {
+        return false;
+    }
+
 #endif
 
     return true;
@@ -657,10 +669,11 @@ void    plDynSurfaceWriter::SetBitsFromBuffer( uint32_t *clearBuffer, uint16_t w
 
 //// ClearToColor /////////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::ClearToColor( hsColorRGBA &color )
+void    plDynSurfaceWriter::ClearToColor(hsColorRGBA& color)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return;
+    }
 
     IEnsureSurfaceUpdated();
 
@@ -672,48 +685,55 @@ void    plDynSurfaceWriter::ClearToColor( hsColorRGBA &color )
     // Flush the GDI first, so it doesn't decide to overwrite us later
     GdiFlush();
 
-    uint32_t *rgbBits = fRGBSurface.GetBits();
-    for( i = 0; i < fRGBSurface.fWidth * fRGBSurface.fHeight; i++ )
+    uint32_t* rgbBits = fRGBSurface.GetBits();
+
+    for (i = 0; i < fRGBSurface.fWidth * fRGBSurface.fHeight; i++) {
         rgbBits[ i ] = hexColor;
-
-    if( fFlags & kSupportAlpha )
-    {
-        uint8_t *alphaBits = fAlphaSurface.GetBits(), alpha = (uint8_t)(hexColor >> 24);
-
-        for( i = 0; i < fAlphaSurface.fWidth * fAlphaSurface.fHeight; i++ )
-            alphaBits[ i ] = alpha;
     }
+
+    if (fFlags & kSupportAlpha) {
+        uint8_t* alphaBits = fAlphaSurface.GetBits(), alpha = (uint8_t)(hexColor >> 24);
+
+        for (i = 0; i < fAlphaSurface.fWidth * fAlphaSurface.fHeight; i++) {
+            alphaBits[ i ] = alpha;
+        }
+    }
+
 #endif
 }
 
 //// SetFont //////////////////////////////////////////////////////////////////
 //  OS-specific. Load the given font for drawing the text with.
 
-void    plDynSurfaceWriter::SetFont( const char *face, uint16_t size, uint8_t fontFlags, bool antiAliasRGB )
+void    plDynSurfaceWriter::SetFont(const char* face, uint16_t size, uint8_t fontFlags, bool antiAliasRGB)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return;
+    }
 
     IEnsureSurfaceUpdated();
 
-    ISetFont( face, size, fontFlags, antiAliasRGB );
+    ISetFont(face, size, fontFlags, antiAliasRGB);
 }
 
 //// ISetFont /////////////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::ISetFont( const char *face, uint16_t size, uint8_t fontFlags, bool antiAliasRGB )
+void    plDynSurfaceWriter::ISetFont(const char* face, uint16_t size, uint8_t fontFlags, bool antiAliasRGB)
 {
-    fFlags = ( fFlags & ~kFontShadowed ) | ( fontFlags & kFontShadowed );
+    fFlags = (fFlags & ~kFontShadowed) | (fontFlags & kFontShadowed);
 
 #if HS_BUILD_FOR_WIN32
-    if( !fRGBSurface.FontMatches( face, size, fontFlags, antiAliasRGB ) )
-        fRGBSurface.SetFont( face, size, fontFlags, antiAliasRGB );
 
-    if( fFlags & kSupportAlpha )
-    {
-        if( !fAlphaSurface.FontMatches( face, size, fontFlags, !antiAliasRGB ) )
-            fAlphaSurface.SetFont( face, size, fontFlags, !antiAliasRGB );
+    if (!fRGBSurface.FontMatches(face, size, fontFlags, antiAliasRGB)) {
+        fRGBSurface.SetFont(face, size, fontFlags, antiAliasRGB);
     }
+
+    if (fFlags & kSupportAlpha) {
+        if (!fAlphaSurface.FontMatches(face, size, fontFlags, !antiAliasRGB)) {
+            fAlphaSurface.SetFont(face, size, fontFlags, !antiAliasRGB);
+        }
+    }
+
 #endif
 }
 
@@ -724,18 +744,19 @@ void    plDynSurfaceWriter::ISetFont( const char *face, uint16_t size, uint8_t f
 //  case you want plenty of block color in your RGB channel because it'll get
 //  alpha-ed out by the alpha channel.
 
-void    plDynSurfaceWriter::SetTextColor( hsColorRGBA &color, bool blockRGB )
+void    plDynSurfaceWriter::SetTextColor(hsColorRGBA& color, bool blockRGB)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return;
+    }
 
     IEnsureSurfaceUpdated();
-    ISetTextColor( color, blockRGB );
+    ISetTextColor(color, blockRGB);
 }
 
 //// IRefreshTextColor ////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::ISetTextColor( hsColorRGBA &color, bool blockRGB )
+void    plDynSurfaceWriter::ISetTextColor(hsColorRGBA& color, bool blockRGB)
 {
 #if HS_BUILD_FOR_WIN32
 
@@ -743,228 +764,268 @@ void    plDynSurfaceWriter::ISetTextColor( hsColorRGBA &color, bool blockRGB )
     int g = (int)(color.g * 255.f);
     int b = (int)(color.b * 255.f);
 
-    fRGBSurface.fTextColor = RGB( r, g, b );
-    if( fFlags & kSupportAlpha )
-    {
+    fRGBSurface.fTextColor = RGB(r, g, b);
+
+    if (fFlags & kSupportAlpha) {
         int a = (int)(color.a * 255.f);
-        fAlphaSurface.fTextColor = RGB( a, a, a );
+        fAlphaSurface.fTextColor = RGB(a, a, a);
     }
 
     fFontBlockedRGB = blockRGB;
 
-    if( fFontBlockedRGB && !( fFlags & kFontShadowed ) )
-    {
-        ::SetBkColor( fRGBSurface.fDC, fRGBSurface.fTextColor );
-        ::SetBkMode( fRGBSurface.fDC, OPAQUE );
+    if (fFontBlockedRGB && !(fFlags & kFontShadowed)) {
+        ::SetBkColor(fRGBSurface.fDC, fRGBSurface.fTextColor);
+        ::SetBkMode(fRGBSurface.fDC, OPAQUE);
+    } else {
+        ::SetBkMode(fRGBSurface.fDC, TRANSPARENT);
     }
-    else
-        ::SetBkMode( fRGBSurface.fDC, TRANSPARENT );
 
-    ::SetTextColor( fRGBSurface.fDC, fRGBSurface.fTextColor );
-    
-    if( fFlags & kSupportAlpha )
-        ::SetTextColor( fAlphaSurface.fDC, fAlphaSurface.fTextColor );
+    ::SetTextColor(fRGBSurface.fDC, fRGBSurface.fTextColor);
+
+    if (fFlags & kSupportAlpha) {
+        ::SetTextColor(fAlphaSurface.fDC, fAlphaSurface.fTextColor);
+    }
+
 #endif
 }
 
 //// SetJustify ///////////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::SetJustify( Justify j )
+void    plDynSurfaceWriter::SetJustify(Justify j)
 {
     fJustify = j;
 }
 
 //// IRefreshOSJustify ////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::IRefreshOSJustify( void )
+void    plDynSurfaceWriter::IRefreshOSJustify(void)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return;
+    }
 
 #if HS_BUILD_FOR_WIN32
     uint32_t justMode;
-    switch( fJustify )
-    {
-        case kLeftJustify:  justMode = TA_LEFT; break;
-        case kCenter:       justMode = TA_CENTER; break;
-        case kRightJustify: justMode = TA_RIGHT; break;
+
+    switch (fJustify) {
+    case kLeftJustify:
+        justMode = TA_LEFT;
+        break;
+
+    case kCenter:
+        justMode = TA_CENTER;
+        break;
+
+    case kRightJustify:
+        justMode = TA_RIGHT;
+        break;
     }
-    ::SetTextAlign( fRGBSurface.fDC, justMode );
-    if( fFlags & kSupportAlpha )
-        ::SetTextAlign( fAlphaSurface.fDC, justMode );
+
+    ::SetTextAlign(fRGBSurface.fDC, justMode);
+
+    if (fFlags & kSupportAlpha) {
+        ::SetTextAlign(fAlphaSurface.fDC, justMode);
+    }
+
 #endif
 }
 
 //// DrawString ///////////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::DrawString( uint16_t x, uint16_t y, const char *text )
+void    plDynSurfaceWriter::DrawString(uint16_t x, uint16_t y, const char* text)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return;
+    }
 
     IEnsureSurfaceUpdated();
 
     IRefreshOSJustify();
 
 #if HS_BUILD_FOR_WIN32
-    if( fFlags & kFontShadowed )
-    {
-        ::SetTextColor( fRGBSurface.fDC, RGB( 0, 0, 0 ) );
-        ::TextOut( fRGBSurface.fDC, x + 1, y + 1, text, strlen( text ) );
 
-        ::SetTextColor( fRGBSurface.fDC, fRGBSurface.fTextColor );
-        ::TextOut( fRGBSurface.fDC, x, y, text, strlen( text ) );
+    if (fFlags & kFontShadowed) {
+        ::SetTextColor(fRGBSurface.fDC, RGB(0, 0, 0));
+        ::TextOut(fRGBSurface.fDC, x + 1, y + 1, text, strlen(text));
 
-        if( fFlags & kSupportAlpha )
-        {
-            ::TextOut( fAlphaSurface.fDC, x + 1, y + 1, text, strlen( text ) );
-            ::TextOut( fAlphaSurface.fDC, x, y, text, strlen( text ) );
+        ::SetTextColor(fRGBSurface.fDC, fRGBSurface.fTextColor);
+        ::TextOut(fRGBSurface.fDC, x, y, text, strlen(text));
+
+        if (fFlags & kSupportAlpha) {
+            ::TextOut(fAlphaSurface.fDC, x + 1, y + 1, text, strlen(text));
+            ::TextOut(fAlphaSurface.fDC, x, y, text, strlen(text));
+        }
+    } else {
+        ::TextOut(fRGBSurface.fDC, x, y, text, strlen(text));
+
+        if (fFlags & kSupportAlpha) {
+            ::TextOut(fAlphaSurface.fDC, x, y, text, strlen(text));
         }
     }
-    else
-    {
-        ::TextOut( fRGBSurface.fDC, x, y, text, strlen( text ) );
-        if( fFlags & kSupportAlpha )
-            ::TextOut( fAlphaSurface.fDC, x, y, text, strlen( text ) );
-    }
 
 #endif
 }
 
 //// DrawClippedString ////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::DrawClippedString( int16_t x, int16_t y, const char *text, uint16_t width, uint16_t height )
+void    plDynSurfaceWriter::DrawClippedString(int16_t x, int16_t y, const char* text, uint16_t width, uint16_t height)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return;
+    }
 
     IEnsureSurfaceUpdated();
 
     IRefreshOSJustify();
 
 #if HS_BUILD_FOR_WIN32
-    
-    RECT    r;
-    ::SetRect( &r, x, y, x + width, y + height );
 
-    if( fJustify == kRightJustify )
+    RECT    r;
+    ::SetRect(&r, x, y, x + width, y + height);
+
+    if (fJustify == kRightJustify) {
         x += width - 1;
-    else if( fJustify == kCenter )
+    } else if (fJustify == kCenter) {
         x += width >> 1;
-
-    if( fFlags & kFontShadowed )
-    {
-        ::SetTextColor( fRGBSurface.fDC, RGB( 0, 0, 0 ) );
-
-        ::OffsetRect( &r, 1, 1 );
-        ::ExtTextOut( fRGBSurface.fDC, x + 1, y + 1, ETO_CLIPPED, &r, text, strlen( text ), nil );
-        if( fFlags & kSupportAlpha )
-            ::ExtTextOut( fAlphaSurface.fDC, x + 1, y + 1, ETO_CLIPPED, &r, text, strlen( text ), nil );
-        ::OffsetRect( &r, -1, -1 );
-
-        ::SetTextColor( fRGBSurface.fDC, fRGBSurface.fTextColor );
     }
 
-    ::ExtTextOut( fRGBSurface.fDC, x, y, ETO_CLIPPED, &r, text, strlen( text ), nil );
-    if( fFlags & kSupportAlpha )
-        ::ExtTextOut( fAlphaSurface.fDC, x, y, ETO_CLIPPED, &r, text, strlen( text ), nil );
-    
+    if (fFlags & kFontShadowed) {
+        ::SetTextColor(fRGBSurface.fDC, RGB(0, 0, 0));
+
+        ::OffsetRect(&r, 1, 1);
+        ::ExtTextOut(fRGBSurface.fDC, x + 1, y + 1, ETO_CLIPPED, &r, text, strlen(text), nil);
+
+        if (fFlags & kSupportAlpha) {
+            ::ExtTextOut(fAlphaSurface.fDC, x + 1, y + 1, ETO_CLIPPED, &r, text, strlen(text), nil);
+        }
+
+        ::OffsetRect(&r, -1, -1);
+
+        ::SetTextColor(fRGBSurface.fDC, fRGBSurface.fTextColor);
+    }
+
+    ::ExtTextOut(fRGBSurface.fDC, x, y, ETO_CLIPPED, &r, text, strlen(text), nil);
+
+    if (fFlags & kSupportAlpha) {
+        ::ExtTextOut(fAlphaSurface.fDC, x, y, ETO_CLIPPED, &r, text, strlen(text), nil);
+    }
+
 #endif
 }
 
 //// DrawClippedString ////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::DrawClippedString( int16_t x, int16_t y, const char *text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height )
+void    plDynSurfaceWriter::DrawClippedString(int16_t x, int16_t y, const char* text, uint16_t clipX, uint16_t clipY, uint16_t width, uint16_t height)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return;
+    }
 
     IEnsureSurfaceUpdated();
 
     IRefreshOSJustify();
 
 #if HS_BUILD_FOR_WIN32
-    
+
     RECT    r;
-    ::SetRect( &r, clipX, clipY, clipX + width, clipY + height );
+    ::SetRect(&r, clipX, clipY, clipX + width, clipY + height);
 
-    if( fFlags & kFontShadowed )
-    {
-        ::SetTextColor( fRGBSurface.fDC, RGB( 0, 0, 0 ) );
+    if (fFlags & kFontShadowed) {
+        ::SetTextColor(fRGBSurface.fDC, RGB(0, 0, 0));
 
-        ::OffsetRect( &r, 1, 1 );
-        ::ExtTextOut( fRGBSurface.fDC, x + 1, y + 1, ETO_CLIPPED, &r, text, strlen( text ), nil );
-        if( fFlags & kSupportAlpha )
-            ::ExtTextOut( fAlphaSurface.fDC, x + 1, y + 1, ETO_CLIPPED, &r, text, strlen( text ), nil );
-        ::OffsetRect( &r, -1, -1 );
+        ::OffsetRect(&r, 1, 1);
+        ::ExtTextOut(fRGBSurface.fDC, x + 1, y + 1, ETO_CLIPPED, &r, text, strlen(text), nil);
 
-        ::SetTextColor( fRGBSurface.fDC, fRGBSurface.fTextColor );
+        if (fFlags & kSupportAlpha) {
+            ::ExtTextOut(fAlphaSurface.fDC, x + 1, y + 1, ETO_CLIPPED, &r, text, strlen(text), nil);
+        }
+
+        ::OffsetRect(&r, -1, -1);
+
+        ::SetTextColor(fRGBSurface.fDC, fRGBSurface.fTextColor);
     }
 
-    ::ExtTextOut( fRGBSurface.fDC, x, y, ETO_CLIPPED, &r, text, strlen( text ), nil );
-    if( fFlags & kSupportAlpha )
-        ::ExtTextOut( fAlphaSurface.fDC, x, y, ETO_CLIPPED, &r, text, strlen( text ), nil );
+    ::ExtTextOut(fRGBSurface.fDC, x, y, ETO_CLIPPED, &r, text, strlen(text), nil);
+
+    if (fFlags & kSupportAlpha) {
+        ::ExtTextOut(fAlphaSurface.fDC, x, y, ETO_CLIPPED, &r, text, strlen(text), nil);
+    }
 
 #endif
 }
 
 //// DrawWrappedString ////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::DrawWrappedString( uint16_t x, uint16_t y, const char *text, uint16_t width, uint16_t height )
+void    plDynSurfaceWriter::DrawWrappedString(uint16_t x, uint16_t y, const char* text, uint16_t width, uint16_t height)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return;
+    }
 
     IEnsureSurfaceUpdated();
 
 #if HS_BUILD_FOR_WIN32
-    
+
     RECT    r;
-    ::SetRect( &r, x, y, x + width, y + height );
+    ::SetRect(&r, x, y, x + width, y + height);
 
     UINT    format = DT_TOP | DT_NOPREFIX | DT_WORDBREAK;
-    switch( fJustify )
-    {
-        case kLeftJustify:  format |= DT_LEFT; break;
-        case kCenter:       format |= DT_CENTER; break;
-        case kRightJustify: format |= DT_RIGHT; break;
+
+    switch (fJustify) {
+    case kLeftJustify:
+        format |= DT_LEFT;
+        break;
+
+    case kCenter:
+        format |= DT_CENTER;
+        break;
+
+    case kRightJustify:
+        format |= DT_RIGHT;
+        break;
     }
 
-    if( fFlags & kFontShadowed )
-    {
-        ::SetTextColor( fRGBSurface.fDC, RGB( 0, 0, 0 ) );
+    if (fFlags & kFontShadowed) {
+        ::SetTextColor(fRGBSurface.fDC, RGB(0, 0, 0));
 
-        ::OffsetRect( &r, 1, 1 );
-        ::DrawText( fRGBSurface.fDC, text, strlen( text ), &r, format );
-        if( fFlags & kSupportAlpha )
-            ::DrawText( fAlphaSurface.fDC, text, strlen( text ), &r, format );
-        ::OffsetRect( &r, -1, -1 );
+        ::OffsetRect(&r, 1, 1);
+        ::DrawText(fRGBSurface.fDC, text, strlen(text), &r, format);
 
-        ::SetTextColor( fRGBSurface.fDC, fRGBSurface.fTextColor );
+        if (fFlags & kSupportAlpha) {
+            ::DrawText(fAlphaSurface.fDC, text, strlen(text), &r, format);
+        }
+
+        ::OffsetRect(&r, -1, -1);
+
+        ::SetTextColor(fRGBSurface.fDC, fRGBSurface.fTextColor);
     }
 
-    ::DrawText( fRGBSurface.fDC, text, strlen( text ), &r, format );
-    if( fFlags & kSupportAlpha )
-        ::DrawText( fAlphaSurface.fDC, text, strlen( text ), &r, format );
+    ::DrawText(fRGBSurface.fDC, text, strlen(text), &r, format);
+
+    if (fFlags & kSupportAlpha) {
+        ::DrawText(fAlphaSurface.fDC, text, strlen(text), &r, format);
+    }
 
 #endif
 }
 
 //// CalcStringWidth //////////////////////////////////////////////////////////
 
-uint16_t      plDynSurfaceWriter::CalcStringWidth( const char *text, uint16_t *height )
+uint16_t      plDynSurfaceWriter::CalcStringWidth(const char* text, uint16_t* height)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return 0;
+    }
 
     IEnsureSurfaceUpdated();
 
 #if HS_BUILD_FOR_WIN32
     SIZE size;
-    ::GetTextExtentPoint32( fRGBSurface.fDC, text, strlen( text ), &size );
+    ::GetTextExtentPoint32(fRGBSurface.fDC, text, strlen(text), &size);
 
-    if( height != nil )
+    if (height != nil) {
         *height = (uint16_t)size.cy;
+    }
 
     return (uint16_t)size.cx;
 #else
@@ -974,62 +1035,74 @@ uint16_t      plDynSurfaceWriter::CalcStringWidth( const char *text, uint16_t *h
 
 //// CalcWrappedStringSize ////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::CalcWrappedStringSize( const char *text, uint16_t *width, uint16_t *height )
+void    plDynSurfaceWriter::CalcWrappedStringSize(const char* text, uint16_t* width, uint16_t* height)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return;
+    }
 
     IEnsureSurfaceUpdated();
 
 #if HS_BUILD_FOR_WIN32
 
     RECT    r;
-    ::SetRect( &r, 0, 0, *width, 0 );
+    ::SetRect(&r, 0, 0, *width, 0);
 
     UINT    format = DT_TOP | DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT;
-    switch( fJustify )
-    {
-        case kLeftJustify:  format |= DT_LEFT; break;
-        case kCenter:       format |= DT_CENTER; break;
-        case kRightJustify: format |= DT_RIGHT; break;
+
+    switch (fJustify) {
+    case kLeftJustify:
+        format |= DT_LEFT;
+        break;
+
+    case kCenter:
+        format |= DT_CENTER;
+        break;
+
+    case kRightJustify:
+        format |= DT_RIGHT;
+        break;
     }
 
-    ::DrawText( fRGBSurface.fDC, text, strlen( text ), &r, format );
+    ::DrawText(fRGBSurface.fDC, text, strlen(text), &r, format);
 
     *width = (uint16_t)(r.right);
-    if( height != nil )
+
+    if (height != nil) {
         *height = (uint16_t)r.bottom;
+    }
+
 #endif
 }
 
 //// FillRect /////////////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::FillRect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA &color )
+void    plDynSurfaceWriter::FillRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA& color)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return;
+    }
 
     IEnsureSurfaceUpdated();
 
 #if HS_BUILD_FOR_WIN32
 
     RECT    rc;
-    ::SetRect( &rc, x, y, x + width, y + height );
+    ::SetRect(&rc, x, y, x + width, y + height);
 
     int r = (int)(color.r * 255.f);
     int g = (int)(color.g * 255.f);
     int b = (int)(color.b * 255.f);
     int a = (int)(color.a * 255.f);
 
-    HBRUSH brush = ::CreateSolidBrush( RGB( r, g, b ) );
-    ::FillRect( fRGBSurface.fDC, &rc, brush );
-    ::DeleteObject( brush );
+    HBRUSH brush = ::CreateSolidBrush(RGB(r, g, b));
+    ::FillRect(fRGBSurface.fDC, &rc, brush);
+    ::DeleteObject(brush);
 
-    if( fFlags & kSupportAlpha )
-    {
-        brush = ::CreateSolidBrush( RGB( a, a, a ) );
-        ::FillRect( fAlphaSurface.fDC, &rc, brush );
-        ::DeleteObject( brush );
+    if (fFlags & kSupportAlpha) {
+        brush = ::CreateSolidBrush(RGB(a, a, a));
+        ::FillRect(fAlphaSurface.fDC, &rc, brush);
+        ::DeleteObject(brush);
     }
 
 #endif
@@ -1037,32 +1110,32 @@ void    plDynSurfaceWriter::FillRect( uint16_t x, uint16_t y, uint16_t width, ui
 
 //// FrameRect ////////////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::FrameRect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA &color )
+void    plDynSurfaceWriter::FrameRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, hsColorRGBA& color)
 {
-    if( !IsValid() )
+    if (!IsValid()) {
         return;
+    }
 
     IEnsureSurfaceUpdated();
 
 #if HS_BUILD_FOR_WIN32
 
     RECT    rc;
-    ::SetRect( &rc, x, y, x + width, y + height );
+    ::SetRect(&rc, x, y, x + width, y + height);
 
     int r = (int)(color.r * 255.f);
     int g = (int)(color.g * 255.f);
     int b = (int)(color.b * 255.f);
     int a = (int)(color.a * 255.f);
 
-    HBRUSH brush = ::CreateSolidBrush( RGB( r, g, b ) );
-    ::FrameRect( fRGBSurface.fDC, &rc, brush );
-    ::DeleteObject( brush );
+    HBRUSH brush = ::CreateSolidBrush(RGB(r, g, b));
+    ::FrameRect(fRGBSurface.fDC, &rc, brush);
+    ::DeleteObject(brush);
 
-    if( fFlags & kSupportAlpha )
-    {
-        brush = ::CreateSolidBrush( RGB( a, a, a ) );
-        ::FrameRect( fAlphaSurface.fDC, &rc, brush );
-        ::DeleteObject( brush );
+    if (fFlags & kSupportAlpha) {
+        brush = ::CreateSolidBrush(RGB(a, a, a));
+        ::FrameRect(fAlphaSurface.fDC, &rc, brush);
+        ::DeleteObject(brush);
     }
 
 #endif
@@ -1101,9 +1174,9 @@ void    plDynSurfaceWriter::DrawImage( uint16_t x, uint16_t y, plMipmap *image, 
 
 //// DrawClippedImage /////////////////////////////////////////////////////////
 
-void    plDynSurfaceWriter::DrawClippedImage( uint16_t x, uint16_t y, plMipmap *image, 
-                                            uint16_t srcClipX, uint16_t srcClipY, 
-                                            uint16_t srcClipWidth, uint16_t srcClipHeight, 
+void    plDynSurfaceWriter::DrawClippedImage( uint16_t x, uint16_t y, plMipmap *image,
+                                            uint16_t srcClipX, uint16_t srcClipY,
+                                            uint16_t srcClipWidth, uint16_t srcClipHeight,
                                             bool respectAlpha )
 {
     if( !IsValid() )

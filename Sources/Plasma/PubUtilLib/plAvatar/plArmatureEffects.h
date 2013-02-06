@@ -56,12 +56,11 @@ class plRandomSoundMod;
 /** \class plArmatureEffects
     Passes key avatar events to external effects generators.
     Currently used for footstep sounds only, but should eventually
-    generalize to water splashes, etc. 
+    generalize to water splashes, etc.
     More to come...*/
-class plArmatureEffectsMgr : public hsKeyedObject
-{
+class plArmatureEffectsMgr : public hsKeyedObject {
 protected:
-    hsTArray<plArmatureEffect *> fEffects;
+    hsTArray<plArmatureEffect*> fEffects;
     bool fEnabled;
 
 public:
@@ -69,22 +68,21 @@ public:
     plArmatureEffectsMgr() : fArmature(nil), fEnabled(true) {}
     virtual ~plArmatureEffectsMgr() {}
 
-    CLASSNAME_REGISTER( plArmatureEffectsMgr );
-    GETINTERFACE_ANY( plArmatureEffectsMgr, hsKeyedObject );
+    CLASSNAME_REGISTER(plArmatureEffectsMgr);
+    GETINTERFACE_ANY(plArmatureEffectsMgr, hsKeyedObject);
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
-    virtual void Write(hsStream* s, hsResMgr* mgr); 
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
     virtual bool MsgReceive(plMessage* msg);
 
     uint32_t GetNumEffects();
-    plArmatureEffect *GetEffect(uint32_t num);
+    plArmatureEffect* GetEffect(uint32_t num);
     void ResetEffects();
 
-    plArmatureMod *fArmature;
+    plArmatureMod* fArmature;
 
-    enum
-    {
+    enum {
         kFootDirt,
         kFootPuddle,
         kFootWater,
@@ -106,36 +104,33 @@ public:
         kFootSwimming,
         kMaxSurface,
         kFootNoSurface = kMaxSurface,
-    };  
-    static const char *SurfaceStrings[];
+    };
+    static const char* SurfaceStrings[];
 };
 
-class plArmatureEffect : public hsKeyedObject
-{
+class plArmatureEffect : public hsKeyedObject {
 public:
     plArmatureEffect() {}
     ~plArmatureEffect() {}
 
-    CLASSNAME_REGISTER( plArmatureEffect );
-    GETINTERFACE_ANY( plArmatureEffect, hsKeyedObject );
+    CLASSNAME_REGISTER(plArmatureEffect);
+    GETINTERFACE_ANY(plArmatureEffect, hsKeyedObject);
 
     virtual bool HandleTrigger(plMessage* msg) = 0;
     virtual void Reset() {}
 };
 
-class plArmatureEffectFootSurface
-{
+class plArmatureEffectFootSurface {
 public:
     uint8_t fID;
     plKey fTrigger;
 };
 
-class plArmatureEffectFootSound : public plArmatureEffect
-{
+class plArmatureEffectFootSound : public plArmatureEffect {
 protected:
-    hsTArray<plArmatureEffectFootSurface *> fSurfaces;
+    hsTArray<plArmatureEffectFootSurface*> fSurfaces;
     hsBitVector fActiveSurfaces;
-    plRandomSoundMod *fMods[plArmatureEffectsMgr::kMaxSurface];
+    plRandomSoundMod* fMods[plArmatureEffectsMgr::kMaxSurface];
 
     uint32_t IFindSurfaceByTrigger(plKey trigger);
 
@@ -143,19 +138,18 @@ public:
     plArmatureEffectFootSound();
     ~plArmatureEffectFootSound();
 
-    CLASSNAME_REGISTER( plArmatureEffectFootSound );
-    GETINTERFACE_ANY( plArmatureEffectFootSound, plArmatureEffect );
+    CLASSNAME_REGISTER(plArmatureEffectFootSound);
+    GETINTERFACE_ANY(plArmatureEffectFootSound, plArmatureEffect);
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
-    virtual void Write(hsStream* s, hsResMgr* mgr); 
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
     virtual bool MsgReceive(plMessage* msg);
     virtual bool HandleTrigger(plMessage* msg);
     virtual void Reset();
     void SetFootType(uint8_t);
 
-    enum
-    {
+    enum {
         kFootTypeShoe,
         kFootTypeBare,
     };

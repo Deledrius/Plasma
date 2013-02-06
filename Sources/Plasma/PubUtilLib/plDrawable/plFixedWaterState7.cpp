@@ -89,7 +89,7 @@ void plFixedWaterState7::Set(const plFixedWaterState7& t, float secs)
     fEnvRefresh.Set(t.fEnvRefresh, secs);
     fEnvRadius.Set(t.fEnvRadius, secs);
 
-    
+
 }
 
 void plFixedWaterState7::WaveState::Read(hsStream* s)

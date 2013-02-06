@@ -70,54 +70,58 @@ plRandomCommandMod::~plRandomCommandMod()
 // return how many are left to choose from
 int plRandomCommandMod::IExcludeSelections(int ncmds)
 {
-    if( fMode & kCoverall )
-    {
+    if (fMode & kCoverall) {
         int nLeft = ncmds;
 
         fExcluded.SetBit(fCurrent);
 
         // Count how many haven't been played.
         int i;
-        for( i = ncmds-1; i >= 0; --i )
-        {
-            if( fExcluded.IsBitSet(i) )
+
+        for (i = ncmds - 1; i >= 0; --i) {
+            if (fExcluded.IsBitSet(i)) {
                 nLeft--;
+            }
         }
 
         // If we're out of cmds, and OneCycle is set,
         // we're out of cmds until the next play.
         // Go ahead and reset for that.
-        // If we're out and OneCycle isn't set, then go ahead 
+        // If we're out and OneCycle isn't set, then go ahead
         // and set up for a new cycle.
-        if( !nLeft )
-        {
+        if (!nLeft) {
             fExcluded.Clear();
-            if( fMode & kNoRepeats )
-                fExcluded.SetBit(fCurrent);
 
-            if( fMode & kOneCycle )
+            if (fMode & kNoRepeats) {
+                fExcluded.SetBit(fCurrent);
+            }
+
+            if (fMode & kOneCycle) {
                 return 0;
+            }
 
             nLeft = ncmds;
-            if( ( fMode & kNoRepeats ) && ncmds > 1 )
+
+            if ((fMode & kNoRepeats) && ncmds > 1) {
                 nLeft--;
+            }
         }
 
         return nLeft;
     }
+
     double currTime = hsTimer::GetSysSeconds();
     fExcluded.Clear();
     int i;
-    for( i = 0; i < fEndTimes.GetCount(); i++ )
-    {
-        if( fEndTimes[i] > currTime )
-        {
+
+    for (i = 0; i < fEndTimes.GetCount(); i++) {
+        if (fEndTimes[i] > currTime) {
             ncmds--;
             fExcluded.SetBit(i);
         }
     }
-    if( fMode & kNoRepeats )
-    {
+
+    if (fMode & kNoRepeats) {
         ncmds--;
         fExcluded.SetBit(fCurrent);
         return ncmds;
@@ -132,84 +136,91 @@ float plRandomCommandMod::IGetDelay(float len) const
 
     float delay = fMinDelay + (fMaxDelay - fMinDelay) * r;
 
-    if( fMode & kDelayFromEnd )
+    if (fMode & kDelayFromEnd) {
         delay += len;
+    }
 
-    if( delay < 0 )
+    if (delay < 0) {
         delay = fmodf(len, -delay);
+    }
 
     return delay;
 }
 
 bool plRandomCommandMod::ISelectNext(int ncmds)
 {
-    if( fMode & kSequential )
-    {
-        if( ++fCurrent >= ncmds )
-        {
-            if( fMode & kOneCycle )
-            {
+    if (fMode & kSequential) {
+        if (++fCurrent >= ncmds) {
+            if (fMode & kOneCycle) {
                 fCurrent = -1;
                 return false;
             }
+
             fCurrent = 0;
         }
+
         return true;
     }
+
     float r = float(rand() * kRandNormalize);
 
     int nSelect = ncmds;
-    
-    if( fCurrent >= 0 )
+
+    if (fCurrent >= 0) {
         nSelect = IExcludeSelections(ncmds);
+    }
 
-    if( !nSelect )
+    if (!nSelect) {
         return false;
+    }
 
-    int nth = int(r * (float(nSelect)-1.e-3f));
-    
+    int nth = int(r * (float(nSelect) - 1.e-3f));
+
     int iNext = 0;
     int i;
-    for( i = 0; i < ncmds; i++ )
-    {
-        if( !fExcluded.IsBitSet(i) )
-        {
-            if( !nth-- )
-            {
+
+    for (i = 0; i < ncmds; i++) {
+        if (!fExcluded.IsBitSet(i)) {
+            if (!nth--) {
                 iNext = i;
                 break;
             }
         }
     }
+
     fCurrent = iNext;
 
     return true;
 }
 
-void plRandomCommandMod::IStart() 
-{ 
-    if( !IStopped() )
+void plRandomCommandMod::IStart()
+{
+    if (!IStopped()) {
         return;
+    }
 
-    fState &= ~kStopped; 
+    fState &= ~kStopped;
     IPlayNextIfMaster();
 }
 
-void plRandomCommandMod::IStop() 
-{ 
-    fState |= kStopped; 
+void plRandomCommandMod::IStop()
+{
+    fState |= kStopped;
 }
 
 void plRandomCommandMod::IPlayNextIfMaster()
 {
-    if( !fTarget )
+    if (!fTarget) {
         IRetry(2.f);
-    
-    if( fTarget->IsLocallyOwned() == plSynchedObject::kNo )     // if this object is a proxy, it should just wait for network cmds 
-        return;
+    }
 
-    if( IStopped() )
+    if (fTarget->IsLocallyOwned() == plSynchedObject::kNo) {    // if this object is a proxy, it should just wait for network cmds
         return;
+    }
+
+    if (IStopped()) {
+        return;
+    }
 
     IPlayNext();
 }
@@ -220,35 +231,38 @@ bool plRandomCommandMod::MsgReceive(plMessage* msg)
     // could overinterpret set loop points to limit range of
     // cmds we use to a window of the total set.
     plAnimCmdMsg* anim = plAnimCmdMsg::ConvertNoRef(msg);
-    if( anim )
-    {
-        if( anim->GetSender() != GetKey() )
-        {
+
+    if (anim) {
+        if (anim->GetSender() != GetKey()) {
 #if 0
-            hsStatusMessageF("someone triggered me, remote=%d\n", 
-                msg->HasBCastFlag(plMessage::kNetNonLocal));
+            hsStatusMessageF("someone triggered me, remote=%d\n",
+                             msg->HasBCastFlag(plMessage::kNetNonLocal));
 #endif
-            if( anim->Cmd(plAnimCmdMsg::kContinue) )
+
+            if (anim->Cmd(plAnimCmdMsg::kContinue)) {
                 IStart();
-            if( anim->Cmd(plAnimCmdMsg::kStop) )
-                IStop();
-            if( anim->Cmd(plAnimCmdMsg::kToggleState) )
-            {
-                if( IStopped() )
-                    IStart();
-                else
-                    IStop();
             }
-        }
-        else
-        {
-            
+
+            if (anim->Cmd(plAnimCmdMsg::kStop)) {
+                IStop();
+            }
+
+            if (anim->Cmd(plAnimCmdMsg::kToggleState)) {
+                if (IStopped()) {
+                    IStart();
+                } else {
+                    IStop();
+                }
+            }
+        } else {
+
 #if 0
-            hsStatusMessageF("play next if master, remote=%d\n", 
-                msg->HasBCastFlag(plMessage::kNetNonLocal));
+            hsStatusMessageF("play next if master, remote=%d\n",
+                             msg->HasBCastFlag(plMessage::kNetNonLocal));
 #endif
             IPlayNextIfMaster();
         }
+
         return true;
     }
 
@@ -261,8 +275,9 @@ void plRandomCommandMod::IReset()
     fCurrent = -1;
     fExcluded.Clear();
 
-    if( !IStopped() )
+    if (!IStopped()) {
         IRetry(0);
+    }
 }
 
 void plRandomCommandMod::Read(hsStream* s, hsResMgr* mgr)

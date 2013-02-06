@@ -94,24 +94,22 @@ class plVisMgr;
 class plViewTransform;
 
 
-struct PipelineParams
-{
+struct PipelineParams {
     PipelineParams():
-    Width(DEFAULT_WIDTH),
-    Height(DEFAULT_HEIGHT),
-    Windowed(DEFAULT_WINDOWED),
-    ColorDepth(DEFAULT_COLORDEPTH),
-    AntiAliasingAmount(DEFAULT_ANTIALIASAMOUNT),
-    AnisotropicLevel(DEFAULT_ANISOLEVEL),
-    TextureQuality(DEFAULT_TEXTUREQUALITY),
-    VideoQuality(DEFAULT_VIDEOQUALITY),
-    Shadows(DEFAULT_SHADOWS),
-    PlanarReflections(DEFAULT_PLANARREFLECTIONS),
+        Width(DEFAULT_WIDTH),
+        Height(DEFAULT_HEIGHT),
+        Windowed(DEFAULT_WINDOWED),
+        ColorDepth(DEFAULT_COLORDEPTH),
+        AntiAliasingAmount(DEFAULT_ANTIALIASAMOUNT),
+        AnisotropicLevel(DEFAULT_ANISOLEVEL),
+        TextureQuality(DEFAULT_TEXTUREQUALITY),
+        VideoQuality(DEFAULT_VIDEOQUALITY),
+        Shadows(DEFAULT_SHADOWS),
+        PlanarReflections(DEFAULT_PLANARREFLECTIONS),
 #ifndef PLASMA_EXTERNAL_RELEASE
-    ForceSecondMonitor(false),
+        ForceSecondMonitor(false),
 #endif // PLASMA_EXTERNAL_RELEASE
-    VSync(false)
-    {
+        VSync(false) {
     }
 
     int Width;
@@ -130,20 +128,18 @@ struct PipelineParams
 #endif // PLASMA_EXTERNAL_RELEASE
 };
 
-class plDisplayMode
-{
+class plDisplayMode {
 public:
     int Width;
     int Height;
     int ColorDepth;
 };
 
-class plPipeline : public plCreatable
-{
+class plPipeline : public plCreatable {
 public:
 
-    CLASSNAME_REGISTER( plPipeline );
-    GETINTERFACE_ANY( plPipeline, plCreatable );
+    CLASSNAME_REGISTER(plPipeline);
+    GETINTERFACE_ANY(plPipeline, plCreatable);
 
     // Typical 3D device
     //
@@ -151,12 +147,12 @@ public:
     // visList is write only. On output, visList is UNSORTED visible spans.
     // Called once per scene render (maybe multiple times per frame).
     // Returns true if rendering should proceed.
-    virtual bool                        PreRender(plDrawable* drawable, hsTArray<int16_t>& visList, plVisMgr* visMgr=nil) = 0;
+    virtual bool                        PreRender(plDrawable* drawable, hsTArray<int16_t>& visList, plVisMgr* visMgr = nil) = 0;
     // PrepForRender - perform any processing on the drawable data nessecary before rendering.
     // visList is read only. On input, visList is SORTED visible spans, and is ALL spans which will be drawn this render.
-    // Called once per scene render. 
+    // Called once per scene render.
     // Returns true if rendering should proceed.
-    virtual bool                        PrepForRender(plDrawable* drawable, hsTArray<int16_t>& visList, plVisMgr* visMgr=nil) = 0;
+    virtual bool                        PrepForRender(plDrawable* drawable, hsTArray<int16_t>& visList, plVisMgr* visMgr = nil) = 0;
     // Render - draw the drawable to the current render target.
     // visList is read only. On input, visList is SORTED visible spans. May not be the complete list of visible spans
     // for this drawable.
@@ -168,9 +164,9 @@ public:
     // Draw - Convenience wrapper for standalone renders. Calls PreRender, PrepForRender, Render. Currently for internal
     // use only, but may prove useful for procedurals (render to texture).
     virtual void                        Draw(plDrawable* d) = 0;
-    
+
     // Device-specific ref creation. Includes buffers and fonts
-    virtual plTextFont                  *MakeTextFont( char *face, uint16_t size ) = 0;
+    virtual plTextFont*                  MakeTextFont(char* face, uint16_t size) = 0;
 
     // Create and/or Refresh geometry buffers
     virtual void            CheckVertexBufferRef(plGBufferGroup* owner, uint32_t idx) = 0;
@@ -179,17 +175,16 @@ public:
     virtual bool            OpenAccess(plAccessSpan& dst, plDrawableSpans* d, const plVertexSpan* span, bool readOnly) = 0;
     virtual bool            CloseAccess(plAccessSpan& acc) = 0;
 
-    virtual void            CheckTextureRef(plLayerInterface* lay) = 0;     
+    virtual void            CheckTextureRef(plLayerInterface* lay) = 0;
 
     // Default fog settings
-    virtual void                        SetDefaultFogEnviron( plFogEnvironment *fog ) = 0;
-    virtual const plFogEnvironment      &GetDefaultFogEnviron( void ) const = 0;
+    virtual void                        SetDefaultFogEnviron(plFogEnvironment* fog) = 0;
+    virtual const plFogEnvironment&      GetDefaultFogEnviron(void) const = 0;
 
     virtual void                        RegisterLight(plLightInfo* light) = 0;
     virtual void                        UnRegisterLight(plLightInfo* light) = 0;
 
-    enum RenderTargetFlags
-    {
+    enum RenderTargetFlags {
         kRTMainScreen       = 0x0000,
         kRTOffscreen        = 0x0001,
         kRTTexture          = 0x0002,
@@ -197,8 +192,7 @@ public:
         kRTOrthoProjected   = 0x0008,
         kRTProjected        = kRTPerspProjected | kRTOrthoProjected
     };
-    enum RenderStateSettings 
-    {
+    enum RenderStateSettings {
         kRenderNormal           = 0x0,
         kRenderProjection       = 0x1,
         kRenderShadow           = 0x2,
@@ -215,18 +209,18 @@ public:
     virtual void                        PushRenderRequest(plRenderRequest* req) = 0;
     virtual void                        PopRenderRequest(plRenderRequest* req) = 0;
 
-    virtual void                        ClearRenderTarget( plDrawable* d ) = 0; // nil d reverts to ClearRenderTarget(nil, nil).
+    virtual void                        ClearRenderTarget(plDrawable* d) = 0;   // nil d reverts to ClearRenderTarget(nil, nil).
     virtual void                        ClearRenderTarget(const hsColorRGBA* col = nil, const float* depth = nil) = 0; // col/depth are overrides for current default.
-    virtual void                        SetClear(const hsColorRGBA* col=nil, const float* depth=nil) = 0; // sets the default clear for current render target.
+    virtual void                        SetClear(const hsColorRGBA* col = nil, const float* depth = nil) = 0; // sets the default clear for current render target.
     virtual hsColorRGBA                 GetClearColor() const = 0;
     virtual float                       GetClearDepth() const = 0;
-    virtual hsGDeviceRef                *MakeRenderTargetRef( plRenderTarget *owner ) = 0;
-    virtual void                        PushRenderTarget( plRenderTarget *target ) = 0;
-    virtual plRenderTarget              *PopRenderTarget( void ) = 0;
+    virtual hsGDeviceRef*                MakeRenderTargetRef(plRenderTarget* owner) = 0;
+    virtual void                        PushRenderTarget(plRenderTarget* target) = 0;
+    virtual plRenderTarget*              PopRenderTarget(void) = 0;
 
     virtual bool                        BeginRender() = 0;
     virtual bool                        EndRender() = 0;
-    virtual void                        RenderScreenElements( void ) = 0;
+    virtual void                        RenderScreenElements(void) = 0;
 
     virtual bool                        BeginDrawable(plDrawable* d) = 0;
     virtual bool                        EndDrawable(plDrawable* d) = 0;
@@ -238,45 +232,44 @@ public:
     virtual uint32_t                    Width() const = 0;
     virtual uint32_t                    Height() const = 0;
     virtual uint32_t                    ColorDepth() const = 0;
-    virtual void                        Resize( uint32_t width, uint32_t height ) = 0;
+    virtual void                        Resize(uint32_t width, uint32_t height) = 0;
 
     // Culling. Might be used in Update before bothering to do any serious computation.
     virtual bool                        TestVisibleWorld(const hsBounds3Ext& wBnd) = 0;
     virtual bool                        TestVisibleWorld(const plSceneObject* sObj) = 0;
     virtual bool                        HarvestVisible(plSpaceTree* space, hsTArray<int16_t>& visList) = 0;
     virtual bool                        SubmitOccluders(const hsTArray<const plCullPoly*>& polyList) = 0;
-    
-    virtual void                        SetDebugFlag( uint32_t flag, bool on ) = 0;
-    virtual bool                        IsDebugFlagSet( uint32_t flag ) const = 0;
+
+    virtual void                        SetDebugFlag(uint32_t flag, bool on) = 0;
+    virtual bool                        IsDebugFlagSet(uint32_t flag) const = 0;
     virtual void                        SetMaxCullNodes(uint16_t n) = 0; // Debug/analysis only
     virtual uint16_t                    GetMaxCullNodes() const = 0; // Debug/analysis only
 
     // Properties
-    enum Properties
-    {
-        kPropDontDeleteTextures     = 0x00000001            // Keeps the pipeline from deleting textures on 
-                                                            // MakeTextureRef, regardless of the kUserOwnsBitmap flag
+    enum Properties {
+        kPropDontDeleteTextures     = 0x00000001            // Keeps the pipeline from deleting textures on
+                                      // MakeTextureRef, regardless of the kUserOwnsBitmap flag
     };
 
     virtual bool                        CheckResources() = 0; // Do we need to call LoadResources?
     virtual void                        LoadResources() = 0;
 
-    virtual void                        SetProperty( uint32_t prop, bool on ) = 0;
-    virtual bool                        GetProperty( uint32_t prop ) const = 0;
+    virtual void                        SetProperty(uint32_t prop, bool on) = 0;
+    virtual bool                        GetProperty(uint32_t prop) const = 0;
     virtual uint32_t                    GetMaxLayersAtOnce() const = 0;
 
     // Drawable type mask
-    virtual void                        SetDrawableTypeMask( uint32_t mask ) = 0;
-    virtual uint32_t                    GetDrawableTypeMask( void ) const = 0;
-    virtual void                        SetSubDrawableTypeMask( uint32_t mask ) = 0;
-    virtual uint32_t                    GetSubDrawableTypeMask( void ) const = 0;
+    virtual void                        SetDrawableTypeMask(uint32_t mask) = 0;
+    virtual uint32_t                    GetDrawableTypeMask(void) const = 0;
+    virtual void                        SetSubDrawableTypeMask(uint32_t mask) = 0;
+    virtual uint32_t                    GetSubDrawableTypeMask(void) const = 0;
 
     // View state
     virtual hsPoint3                    GetViewPositionWorld() const = 0;
     virtual hsVector3                   GetViewAcrossWorld() const = 0;
     virtual hsVector3                   GetViewUpWorld() const = 0;
     virtual hsVector3                   GetViewDirWorld() const = 0;
-    virtual void                        GetViewAxesWorld(hsVector3 axes[3] /* ac,up,at */ ) const = 0;
+    virtual void                        GetViewAxesWorld(hsVector3 axes[3] /* ac,up,at */) const = 0;
 
     virtual void                        GetFOV(float& fovX, float& fovY) const = 0;
     virtual void                        SetFOV(float fovX, float fovY) = 0;
@@ -287,8 +280,8 @@ public:
     virtual void                        GetDepth(float& hither, float& yon) const = 0;
     virtual void                        SetDepth(float hither, float yon) = 0;
 
-    virtual void                        SetZBiasScale( float scale ) = 0;
-    virtual float                       GetZBiasScale( void ) const = 0;
+    virtual void                        SetZBiasScale(float scale) = 0;
+    virtual float                       GetZBiasScale(void) const = 0;
 
     virtual const hsMatrix44&           GetWorldToCamera() const = 0;
     virtual const hsMatrix44&           GetCameraToWorld() const = 0;
@@ -299,11 +292,11 @@ public:
 
     virtual const plViewTransform&      GetViewTransform() const = 0;
 
-    virtual void                        ScreenToWorldPoint( int n, uint32_t stride, int32_t *scrX, int32_t *scrY, 
-                                                    float dist, uint32_t strideOut, hsPoint3 *worldOut ) = 0;
+    virtual void                        ScreenToWorldPoint(int n, uint32_t stride, int32_t* scrX, int32_t* scrY,
+            float dist, uint32_t strideOut, hsPoint3* worldOut) = 0;
 
-    virtual void                        RefreshMatrices( void ) = 0;
-    virtual void                        RefreshScreenMatrices( void ) = 0;
+    virtual void                        RefreshMatrices(void) = 0;
+    virtual void                        RefreshScreenMatrices(void) = 0;
 
     // Overrides, always push returns whatever is necessary to restore on pop.
     virtual hsGMaterial*                PushOverrideMaterial(hsGMaterial* mat) = 0;
@@ -331,28 +324,40 @@ public:
     // These all return true if the gamma was successfully set.
     virtual bool                        SetGamma(float eR, float eG, float eB) = 0;
     virtual bool                        SetGamma(const uint16_t* const tabR, const uint16_t* const tabG, const uint16_t* const tabB) = 0; // len table = 256.
-    virtual bool                        SetGamma(float e) { return SetGamma(e, e, e); }
-    virtual bool                        SetGamma(const uint16_t* const table) { return SetGamma(table, table, table); } 
+    virtual bool                        SetGamma(float e) {
+        return SetGamma(e, e, e);
+    }
+    virtual bool                        SetGamma(const uint16_t* const table) {
+        return SetGamma(table, table, table);
+    }
 
     // flipVertical is for the AVI writer, which wants it's frames upside down
-    virtual bool                        CaptureScreen( plMipmap *dest, bool flipVertical = false, uint16_t desiredWidth = 0, uint16_t desiredHeight = 0 ) = 0;
+    virtual bool                        CaptureScreen(plMipmap* dest, bool flipVertical = false, uint16_t desiredWidth = 0, uint16_t desiredHeight = 0) = 0;
 
     // Returns an un-named (GetKey()==nil) mipmap same dimensions as targ. You are responsible for deleting said mipMap.
     virtual plMipmap*                   ExtractMipMap(plRenderTarget* targ) = 0;
 
     /// Error handling
-    virtual const char                  *GetErrorString( void ) = 0;
+    virtual const char*                  GetErrorString(void) = 0;
 
     // info about current rendering device
-    virtual void GetSupportedDisplayModes(std::vector<plDisplayMode> *res, int ColorDepth = 32 ) = 0;
+    virtual void GetSupportedDisplayModes(std::vector<plDisplayMode>* res, int ColorDepth = 32) = 0;
     virtual int GetMaxAnisotropicSamples() = 0;
     virtual int GetMaxAntiAlias(int Width, int Height, int ColorDepth) = 0;
-    int GetDesktopWidth() { return fDesktopParams.Width; }
-    int GetDesktopHeight() { return fDesktopParams.Height; }
-    int GetDesktopColorDepth() { return fDesktopParams.ColorDepth; }
-    PipelineParams *GetDefaultParams() { return &fDefaultPipeParams; }
+    int GetDesktopWidth() {
+        return fDesktopParams.Width;
+    }
+    int GetDesktopHeight() {
+        return fDesktopParams.Height;
+    }
+    int GetDesktopColorDepth() {
+        return fDesktopParams.ColorDepth;
+    }
+    PipelineParams* GetDefaultParams() {
+        return &fDefaultPipeParams;
+    }
 
-    virtual void ResetDisplayDevice(int Width, int Height, int ColorDepth, bool Windowed, int NumAASamples, int MaxAnisotropicSamples, bool vSync = false  ) = 0;
+    virtual void ResetDisplayDevice(int Width, int Height, int ColorDepth, bool Windowed, int NumAASamples, int MaxAnisotropicSamples, bool vSync = false) = 0;
     static PipelineParams fDefaultPipeParams;
     static PipelineParams fInitialPipeParams;
     plDisplayMode fDesktopParams;

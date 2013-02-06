@@ -49,22 +49,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plPipeline/plDebugText.h"
 
-plArmatureBehavior::plArmatureBehavior() : fAnim(nil), fArmature(nil), fBrain(nil), fIndex((uint8_t)-1), fFlags(0) {}
+plArmatureBehavior::plArmatureBehavior() : fAnim(nil), fArmature(nil), fBrain(nil), fIndex((uint8_t) - 1), fFlags(0) {}
 
-plArmatureBehavior::~plArmatureBehavior() 
+plArmatureBehavior::~plArmatureBehavior()
 {
-    if (fAnim)
+    if (fAnim) {
         fAnim->Detach();
+    }
 }
 
-void plArmatureBehavior::Init(plAGAnim *anim, bool loop, plArmatureBrain *brain, plArmatureModBase *armature, uint8_t index)
+void plArmatureBehavior::Init(plAGAnim* anim, bool loop, plArmatureBrain* brain, plArmatureModBase* armature, uint8_t index)
 {
     fArmature = armature;
     fBrain = brain;
     fIndex = index;
     fStrength.Set(0);
-    if (anim)
-    {   
+
+    if (anim) {
         fAnim = fArmature->AttachAnimationBlended(anim, 0, 0, true);
         fAnim->SetLoop(loop);
     }
@@ -77,17 +78,22 @@ void plArmatureBehavior::Process(double time, float elapsed)
 void plArmatureBehavior::SetStrength(float val, float rate /* = 0.f */)
 {
     float oldStrength = GetStrength();
-    if (rate == 0)
-        fStrength.Set(val);
-    else
-        fStrength.Set(val, fabs(val - oldStrength) / rate);
 
-    if (fAnim)
+    if (rate == 0) {
+        fStrength.Set(val);
+    } else {
+        fStrength.Set(val, fabs(val - oldStrength) / rate);
+    }
+
+    if (fAnim) {
         fAnim->Fade(val, rate);
-    if (val > 0 && oldStrength == 0)
+    }
+
+    if (val > 0 && oldStrength == 0) {
         IStart();
-    else if (val == 0 && oldStrength > 0)
+    } else if (val == 0 && oldStrength > 0) {
         IStop();
+    }
 }
 
 float plArmatureBehavior::GetStrength()
@@ -97,43 +103,43 @@ float plArmatureBehavior::GetStrength()
 
 void plArmatureBehavior::Rewind()
 {
-    if (fAnim)
+    if (fAnim) {
         fAnim->SetCurrentTime(0.0f, true);
+    }
 }
 
-void plArmatureBehavior::DumpDebug(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt)
+void plArmatureBehavior::DumpDebug(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt)
 {
     float strength = GetStrength();
-    const char *onOff = strength > 0 ? "on" : "off";
+    const char* onOff = strength > 0 ? "on" : "off";
     char blendBar[11] = "||||||||||";
     int bars = (int)min(10 * strength, 10);
     blendBar[bars] = '\0';
 
-    if (fAnim)
-    {
+    if (fAnim) {
         plString animName = fAnim->GetName();
-        float time = fAnim->GetTimeConvert()->CurrentAnimTime();    
+        float time = fAnim->GetTimeConvert()->CurrentAnimTime();
         sprintf(strBuf, "%20s %3s time: %5.2f %s", animName.c_str(), onOff, time, blendBar);
-    }
-    else
+    } else {
         sprintf(strBuf, "         Behavior %2d %3s %s", fIndex, onOff, blendBar);
+    }
 
     debugTxt.DrawString(x, y, strBuf);
-    y += lineHeight; 
+    y += lineHeight;
 }
 
 
 void plArmatureBehavior::IStart()
 {
-    if (fAnim) 
-    {           
+    if (fAnim) {
         fAnim->SetCurrentTime(0.0f, true);
         fAnim->Start();
     }
 }
-    
+
 void plArmatureBehavior::IStop()
 {
-    if (fFlags & kBehaviorFlagNotifyOnStop)
+    if (fFlags & kBehaviorFlagNotifyOnStop) {
         fBrain->OnBehaviorStop(fIndex);
+    }
 }

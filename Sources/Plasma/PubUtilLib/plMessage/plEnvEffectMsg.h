@@ -49,67 +49,81 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsResMgr;
 
 
-class plEnvEffectMsg : public plMessage
-{
+class plEnvEffectMsg : public plMessage {
 
     bool fEnable;
 
 public:
-    plEnvEffectMsg(){ SetBCastFlag(plMessage::kPropagateToModifiers); }
-    
-    plEnvEffectMsg(const plKey* s, 
-                    const plKey* r, 
-                    const double* t){SetBCastFlag(plMessage::kPropagateToModifiers);}
+    plEnvEffectMsg() {
+        SetBCastFlag(plMessage::kPropagateToModifiers);
+    }
 
-    ~plEnvEffectMsg(){;}
+    plEnvEffectMsg(const plKey* s,
+                   const plKey* r,
+                   const double* t) {
+        SetBCastFlag(plMessage::kPropagateToModifiers);
+    }
 
-    CLASSNAME_REGISTER( plEnvEffectMsg );
-    GETINTERFACE_ANY( plEnvEffectMsg, plMessage );
-    
-    bool Enabled() { return fEnable; }
-    void Enable(bool b) { fEnable = b; }
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    ~plEnvEffectMsg() {
+        ;
+    }
+
+    CLASSNAME_REGISTER(plEnvEffectMsg);
+    GETINTERFACE_ANY(plEnvEffectMsg, plMessage);
+
+    bool Enabled() {
+        return fEnable;
+    }
+    void Enable(bool b) {
+        fEnable = b;
+    }
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         stream->ReadSwap(&fEnable);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         stream->WriteSwap(fEnable);
     }
 };
 
 
-class plEnvAudioEffectMsg : public plEnvEffectMsg
-{
+class plEnvAudioEffectMsg : public plEnvEffectMsg {
     uint32_t fPreset;
 
 public:
-    plEnvAudioEffectMsg(){SetBCastFlag(plMessage::kPropagateToModifiers);}
-    plEnvAudioEffectMsg(const plKey* s, 
-                    const plKey* r, 
-                    const double* t){SetBCastFlag(plMessage::kPropagateToModifiers);}
-    
-    ~plEnvAudioEffectMsg(){;}
+    plEnvAudioEffectMsg() {
+        SetBCastFlag(plMessage::kPropagateToModifiers);
+    }
+    plEnvAudioEffectMsg(const plKey* s,
+                        const plKey* r,
+                        const double* t) {
+        SetBCastFlag(plMessage::kPropagateToModifiers);
+    }
 
-    CLASSNAME_REGISTER( plEnvAudioEffectMsg );
-    GETINTERFACE_ANY( plEnvAudioEffectMsg, plEnvEffectMsg );
-    
-    uint32_t GetEffect() { return fPreset; }
-    void SetEffect(uint32_t i) { fPreset = i; }
+    ~plEnvAudioEffectMsg() {
+        ;
+    }
 
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    CLASSNAME_REGISTER(plEnvAudioEffectMsg);
+    GETINTERFACE_ANY(plEnvAudioEffectMsg, plEnvEffectMsg);
+
+    uint32_t GetEffect() {
+        return fPreset;
+    }
+    void SetEffect(uint32_t i) {
+        fPreset = i;
+    }
+
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plEnvEffectMsg::Read(stream, mgr);
         stream->ReadSwap(&fPreset);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plEnvEffectMsg::Write(stream, mgr);
         stream->WriteSwap(fPreset);
     }

@@ -51,8 +51,7 @@ struct hsPoint3;
 struct hsVector3;
 class plGeometrySpan;
 
-class plAccMeshSmooth
-{
+class plAccMeshSmooth {
 public:
     enum {
         kNone               = 0x0,
@@ -62,8 +61,7 @@ public:
     };
 
 protected:
-    struct VtxAccum
-    {
+    struct VtxAccum {
         hsPoint3        fPos;
         hsVector3       fNorm;
         hsColorRGBA     fDiffuse;
@@ -100,8 +98,12 @@ public:
 
     void        Smooth(hsTArray<plGeometrySpan*>& sets);
 
-    void        SetFlags(uint32_t f) { fFlags = f; }
-    uint32_t      GetFlags() const { return fFlags; }
+    void        SetFlags(uint32_t f) {
+        fFlags = f;
+    }
+    uint32_t      GetFlags() const {
+        return fFlags;
+    }
 };
 
 #endif // plAccMeshSmooth_inc

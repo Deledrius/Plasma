@@ -55,8 +55,7 @@ class hsResMgr;
 class plShadowMaster;
 class plRenderMsg;
 
-class plShadowCaster : public plMultiModifier
-{
+class plShadowCaster : public plMultiModifier {
 public:
     enum {
         kNone           = 0x0,
@@ -64,10 +63,14 @@ public:
         kPerspective    = 0x2,
         kLimitRes       = 0x4
     };
-    class DrawSpan
-    {
+    class DrawSpan {
     public:
-        DrawSpan& Set(plDrawableSpans* dr, const plSpan* sp, uint32_t idx) { fDraw = (dr); fSpan = (sp); fIndex = (idx); return *this; }
+        DrawSpan& Set(plDrawableSpans* dr, const plSpan* sp, uint32_t idx) {
+            fDraw = (dr);
+            fSpan = (sp);
+            fIndex = (idx);
+            return *this;
+        }
 
         plDrawableSpans*    fDraw;
         const plSpan*       fSpan;
@@ -102,41 +105,85 @@ protected:
     bool IOnRenderMsg(plRenderMsg* msg);
 
     friend class plDXPipeline;
-    static void SetCanShadowCast(bool b) { fCanShadowCast = b; }
+    static void SetCanShadowCast(bool b) {
+        fCanShadowCast = b;
+    }
 public:
     plShadowCaster();
     virtual ~plShadowCaster();
 
-    CLASSNAME_REGISTER( plShadowCaster );
-    GETINTERFACE_ANY( plShadowCaster, plMultiModifier );
-    
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return true; }
+    CLASSNAME_REGISTER(plShadowCaster);
+    GETINTERFACE_ANY(plShadowCaster, plMultiModifier);
+
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return true;
+    }
 
     virtual bool MsgReceive(plMessage* msg);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    float MaxOpacity() const { return fMaxOpacity; }
-    const hsTArray<DrawSpan>& Spans() const { return fSpans; }
+    float MaxOpacity() const {
+        return fMaxOpacity;
+    }
+    const hsTArray<DrawSpan>& Spans() const {
+        return fSpans;
+    }
 
-    bool    GetSelfShadow() const { return 0 != (fCastFlags & kSelfShadow); }
-    void    SetSelfShadow(bool on) { if(on) fCastFlags |= kSelfShadow; else fCastFlags &= ~kSelfShadow; }
+    bool    GetSelfShadow() const {
+        return 0 != (fCastFlags & kSelfShadow);
+    }
+    void    SetSelfShadow(bool on) {
+        if (on) {
+            fCastFlags |= kSelfShadow;
+        } else {
+            fCastFlags &= ~kSelfShadow;
+        }
+    }
 
-    bool    GetPerspective() const { return 0 != (fCastFlags & kPerspective); }
-    void    SetPerspective(bool on) { if(on) fCastFlags |= kPerspective; else fCastFlags &= ~kPerspective; }
+    bool    GetPerspective() const {
+        return 0 != (fCastFlags & kPerspective);
+    }
+    void    SetPerspective(bool on) {
+        if (on) {
+            fCastFlags |= kPerspective;
+        } else {
+            fCastFlags &= ~kPerspective;
+        }
+    }
 
-    bool    GetLimitRes() const { return 0 != (fCastFlags & kLimitRes); }
-    void    SetLimitRes(bool on) { if(on) fCastFlags |= kLimitRes; else fCastFlags &= ~kLimitRes; }
+    bool    GetLimitRes() const {
+        return 0 != (fCastFlags & kLimitRes);
+    }
+    void    SetLimitRes(bool on) {
+        if (on) {
+            fCastFlags |= kLimitRes;
+        } else {
+            fCastFlags &= ~kLimitRes;
+        }
+    }
 
-    float GetAttenScale() const { return fAttenScale; }
-    void SetAttenScale(float s) { fAttenScale = s; }
+    float GetAttenScale() const {
+        return fAttenScale;
+    }
+    void SetAttenScale(float s) {
+        fAttenScale = s;
+    }
 
-    float GetBlurScale() const { return fBlurScale; }
-    void SetBlurScale(float s) { fBlurScale = s; }
+    float GetBlurScale() const {
+        return fBlurScale;
+    }
+    void SetBlurScale(float s) {
+        fBlurScale = s;
+    }
 
-    float GetBoost() const { return fBoost; }
-    void SetBoost(float s) { fBoost = s; }
+    float GetBoost() const {
+        return fBoost;
+    }
+    void SetBoost(float s) {
+        fBoost = s;
+    }
 
     // These are usually handled internally, activating on read and deactivating
     // on destruct. Made public in case they need to be manually handled, like
@@ -144,12 +191,22 @@ public:
     void Deactivate() const;
     void Activate() const;
 
-    static void DisableShadowCast(bool on=true) { fShadowCastDisabled = on; }
-    static void EnableShadowCast(bool on=true) { fShadowCastDisabled = !on; }
-    static void ToggleShadowCast() { fShadowCastDisabled = !fShadowCastDisabled; }
-    static bool ShadowCastDisabled() { return !CanShadowCast() || fShadowCastDisabled; }
+    static void DisableShadowCast(bool on = true) {
+        fShadowCastDisabled = on;
+    }
+    static void EnableShadowCast(bool on = true) {
+        fShadowCastDisabled = !on;
+    }
+    static void ToggleShadowCast() {
+        fShadowCastDisabled = !fShadowCastDisabled;
+    }
+    static bool ShadowCastDisabled() {
+        return !CanShadowCast() || fShadowCastDisabled;
+    }
 
-    static bool CanShadowCast() { return fCanShadowCast; }
+    static bool CanShadowCast() {
+        return fCanShadowCast;
+    }
 };
 
 typedef plShadowCaster::DrawSpan plShadowCastSpan;

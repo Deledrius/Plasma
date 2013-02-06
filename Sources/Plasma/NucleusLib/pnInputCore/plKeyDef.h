@@ -71,8 +71,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // for win32:
 
-enum plKeyDef
-{
+enum plKeyDef {
     KEY_A               = 'A',
     KEY_B               = 'B',
     KEY_C               = 'C',
@@ -177,8 +176,7 @@ enum plKeyDef
 #elif HS_BUILD_FOR_UNIX
 
 /* This is a total hack (for now) */
-enum plKeyDef
-{
+enum plKeyDef {
     KEY_A               = 0xffffffff,
     KEY_B               = 0xffffffff,
     KEY_C               = 0xffffffff,

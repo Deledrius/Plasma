@@ -45,64 +45,87 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plErrorMsg;
 class plMaxNode;
 
-class plPhysicalProps
-{
+class plPhysicalProps {
 public:
     //
     // Set canIgnore to true if it is OK for someone else's setting to override yours
     // If any of the Set functions return false, there was a conflict and the export will be aborted.
     //
-    bool SetGroup(uint32_t group, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
-    bool SetReportGroup(uint32_t notifyGroup, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
-    bool SetMass(float mass, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
-    bool SetFriction(float friction, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
-    bool SetRestitution(float restitution, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
+    bool SetGroup(uint32_t group, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+    bool SetReportGroup(uint32_t notifyGroup, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+    bool SetMass(float mass, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+    bool SetFriction(float friction, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+    bool SetRestitution(float restitution, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
     // From plBoundsType
-    bool SetBoundsType(int boundsType, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
+    bool SetBoundsType(int boundsType, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
     // An alternate node for the physical to be created from
-    bool SetProxyNode(plMaxNode *proxyNode, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
+    bool SetProxyNode(plMaxNode* proxyNode, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
     // If you're going to pin a node and set its mass greater than zero, do the pin first.
     // That way it will not be flagged as movable.
-    bool SetPinned(bool pinned, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
+    bool SetPinned(bool pinned, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
     /** Allow line-of-sight-checks to pass through this object.
         Set to true if you don't want this object to block LOS probes.
         Set to false if you do want this object to block LOS probes. */
-    bool SetAlignToOwner(bool alignToOwner, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
+    bool SetAlignToOwner(bool alignToOwner, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
 
-    bool SetCameraAvoidFlag(bool allowLOS, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
+    bool SetCameraAvoidFlag(bool allowLOS, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
 
 //  bool SetAllowLOS(bool allowLOS, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
 //  bool SetCameraLOSFlag(bool allowLOS, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
 //  bool SetUILOSFlag(bool allowLOS, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
 
     // New LOS Types....
-    bool SetLOSBlockCamera(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore = false);
-    bool SetLOSBlockUI(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore = false);
-    bool SetLOSUIItem(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore = false);
-    bool SetLOSBlockCustom(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore = false);
-    bool SetLOSShootable(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore= false);
-    bool SetLOSAvatarWalkable(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore= false);
-    bool SetLOSSwimRegion(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore = false);
-    
+    bool SetLOSBlockCamera(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+    bool SetLOSBlockUI(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+    bool SetLOSUIItem(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+    bool SetLOSBlockCustom(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+    bool SetLOSShootable(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+    bool SetLOSAvatarWalkable(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+    bool SetLOSSwimRegion(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+
     bool SetSubworld(plMaxNode* subworld);
-    bool SetPhysAnim(bool anim, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore=false);
-    void SetStartInactive(int on)   { fStartInactive = on; };
-    void SetNoSynchronize(int on)   { fNoSynchronize = on; };
-    void SetAvAnimPushable(int on)  { fAvAnimPushable = on; };
+    bool SetPhysAnim(bool anim, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore = false);
+    void SetStartInactive(int on)   {
+        fStartInactive = on;
+    };
+    void SetNoSynchronize(int on)   {
+        fNoSynchronize = on;
+    };
+    void SetAvAnimPushable(int on)  {
+        fAvAnimPushable = on;
+    };
 
-    bool IsUsed() { return fUsed; }
+    bool IsUsed() {
+        return fUsed;
+    }
 
-    uint32_t      GetGroup()          { return fGroup; }
-    uint32_t      GetReportGroup()    { return fReportGroup; }
-    float       GetMass()           { return fMass; }
-    float       GetFriction()       { return fFriction; }
-    float       GetRestitution()    { return fRestitution; }
-    int         GetBoundsType()     { return fBoundsType; }
-    plMaxNode*  GetProxyNode()      { return fProxyNode; }
+    uint32_t      GetGroup()          {
+        return fGroup;
+    }
+    uint32_t      GetReportGroup()    {
+        return fReportGroup;
+    }
+    float       GetMass()           {
+        return fMass;
+    }
+    float       GetFriction()       {
+        return fFriction;
+    }
+    float       GetRestitution()    {
+        return fRestitution;
+    }
+    int         GetBoundsType()     {
+        return fBoundsType;
+    }
+    plMaxNode*  GetProxyNode()      {
+        return fProxyNode;
+    }
     bool        GetPinned();
     bool        GetCameraAvoid();
     bool        GetAlignToOwner();
-    plMaxNode*  GetSubworld()   { return fSubworld; }
+    plMaxNode*  GetSubworld()   {
+        return fSubworld;
+    }
     bool        GetPhysAnim();
 
 
@@ -115,9 +138,15 @@ public:
     bool        GetLOSAvatarWalkable();
     bool        GetLOSSwimRegion();
 
-    int         GetStartInactive()  { return fStartInactive; };
-    int         GetNoSynchronize()  { return fNoSynchronize; };
-    int         GetAvAnimPushable() { return fAvAnimPushable; };
+    int         GetStartInactive()  {
+        return fStartInactive;
+    };
+    int         GetNoSynchronize()  {
+        return fNoSynchronize;
+    };
+    int         GetAvAnimPushable() {
+        return fAvAnimPushable;
+    };
 
 protected:
     bool fUsed;
@@ -129,7 +158,7 @@ protected:
     float fFriction;
     float fRestitution;
     int fBoundsType;
-    plMaxNode *fProxyNode;
+    plMaxNode* fProxyNode;
     uint32_t fFlags;
     plMaxNode* fSubworld;
     int fStartInactive;
@@ -137,23 +166,20 @@ protected:
     int fAvAnimPushable;
 
     bool IGetFlagParam(int flagType);
-    bool ISetFlagParam(bool val, int flagType, int type, bool canIgnore, plMaxNode *node, plErrorMsg *errMsg);
+    bool ISetFlagParam(bool val, int flagType, int type, bool canIgnore, plMaxNode* node, plErrorMsg* errMsg);
 
     // Because VC++ sucks, this has to be inlined.
-    template <class T> bool ISetParam(T& ourVal, T& theirVal, int type, bool otherCanIgnore, plMaxNode *node, plErrorMsg *errMsg)
-    {
+    template <class T> bool ISetParam(T& ourVal, T& theirVal, int type, bool otherCanIgnore, plMaxNode* node, plErrorMsg* errMsg) {
         fUsed = true;
 
-        if (ourVal != theirVal)
-        {
-            if (CanIgnore(type))
-            {
+        if (ourVal != theirVal) {
+            if (CanIgnore(type)) {
                 ourVal = theirVal;
-                if (!otherCanIgnore)
+
+                if (!otherCanIgnore) {
                     SetCanIgnore(type, false);
-            }
-            else if (!otherCanIgnore)
-            {
+                }
+            } else if (!otherCanIgnore) {
                 IDisplayErrorMsg(node, errMsg);
                 fUsed = false;
                 return false;
@@ -166,7 +192,7 @@ protected:
     void SetCanIgnore(uint32_t type, bool canIgnore);
     bool CanIgnore(uint32_t type);
 
-    void IDisplayErrorMsg(plMaxNode *node, plErrorMsg *errMsg);
+    void IDisplayErrorMsg(plMaxNode* node, plErrorMsg* errMsg);
 
     // Only plMaxNodeData can create these
     plPhysicalProps();

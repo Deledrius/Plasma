@@ -47,90 +47,90 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plAGAnim.h"
 
-REGISTER_CREATABLE( plAGAnim );
-REGISTER_CREATABLE( plATCAnim );
-REGISTER_CREATABLE( plEmoteAnim );
-REGISTER_CREATABLE( plAgeGlobalAnim );
+REGISTER_CREATABLE(plAGAnim);
+REGISTER_CREATABLE(plATCAnim);
+REGISTER_CREATABLE(plEmoteAnim);
+REGISTER_CREATABLE(plAgeGlobalAnim);
 
 #include "plAGChannel.h"
 
-REGISTER_NONCREATABLE( plAGChannel );
-REGISTER_NONCREATABLE( plAGApplicator );
+REGISTER_NONCREATABLE(plAGChannel);
+REGISTER_NONCREATABLE(plAGApplicator);
 
 #include "plMatrixChannel.h"
 
-REGISTER_CREATABLE( plMatrixChannel );
-REGISTER_CREATABLE( plMatrixConstant );
-REGISTER_CREATABLE( plMatrixTimeScale );
-REGISTER_CREATABLE( plMatrixBlend );
-REGISTER_CREATABLE( plMatrixControllerChannel );
-REGISTER_CREATABLE( plMatrixControllerCacheChannel );
-REGISTER_CREATABLE( plQuatPointCombine );
-REGISTER_CREATABLE( plMatrixChannelApplicator );
-REGISTER_CREATABLE( plMatrixDelayedCorrectionApplicator );
-REGISTER_CREATABLE( plMatrixDifferenceApp );
+REGISTER_CREATABLE(plMatrixChannel);
+REGISTER_CREATABLE(plMatrixConstant);
+REGISTER_CREATABLE(plMatrixTimeScale);
+REGISTER_CREATABLE(plMatrixBlend);
+REGISTER_CREATABLE(plMatrixControllerChannel);
+REGISTER_CREATABLE(plMatrixControllerCacheChannel);
+REGISTER_CREATABLE(plQuatPointCombine);
+REGISTER_CREATABLE(plMatrixChannelApplicator);
+REGISTER_CREATABLE(plMatrixDelayedCorrectionApplicator);
+REGISTER_CREATABLE(plMatrixDifferenceApp);
 
 #include "plPointChannel.h"
 
-REGISTER_CREATABLE( plPointChannel );
-REGISTER_CREATABLE( plPointConstant );
-REGISTER_CREATABLE( plPointBlend );
-REGISTER_CREATABLE( plPointTimeScale );
-REGISTER_CREATABLE( plPointControllerChannel );
-REGISTER_CREATABLE( plPointControllerCacheChannel );
-REGISTER_CREATABLE( plPointChannelApplicator );
-REGISTER_CREATABLE( plLightDiffuseApplicator );
-REGISTER_CREATABLE( plLightAmbientApplicator );
-REGISTER_CREATABLE( plLightSpecularApplicator );
+REGISTER_CREATABLE(plPointChannel);
+REGISTER_CREATABLE(plPointConstant);
+REGISTER_CREATABLE(plPointBlend);
+REGISTER_CREATABLE(plPointTimeScale);
+REGISTER_CREATABLE(plPointControllerChannel);
+REGISTER_CREATABLE(plPointControllerCacheChannel);
+REGISTER_CREATABLE(plPointChannelApplicator);
+REGISTER_CREATABLE(plLightDiffuseApplicator);
+REGISTER_CREATABLE(plLightAmbientApplicator);
+REGISTER_CREATABLE(plLightSpecularApplicator);
 
 #include "plQuatChannel.h"
 
-REGISTER_CREATABLE( plQuatChannel );
-REGISTER_CREATABLE( plQuatConstant );
-REGISTER_CREATABLE( plQuatBlend );
-REGISTER_CREATABLE( plQuatTimeScale );
-REGISTER_CREATABLE( plQuatChannelApplicator );
+REGISTER_CREATABLE(plQuatChannel);
+REGISTER_CREATABLE(plQuatConstant);
+REGISTER_CREATABLE(plQuatBlend);
+REGISTER_CREATABLE(plQuatTimeScale);
+REGISTER_CREATABLE(plQuatChannelApplicator);
 
 #include "plScalarChannel.h"
-REGISTER_CREATABLE( plScalarChannel );
-REGISTER_CREATABLE( plScalarConstant );
-REGISTER_CREATABLE( plScalarTimeScale );
-REGISTER_CREATABLE( plScalarBlend );
-REGISTER_CREATABLE( plScalarControllerChannel );
-REGISTER_CREATABLE( plScalarControllerCacheChannel );
-REGISTER_CREATABLE( plScalarChannelApplicator );
-REGISTER_CREATABLE( plSpotInnerApplicator );
-REGISTER_CREATABLE( plSpotOuterApplicator );
-REGISTER_CREATABLE( plATCChannel );
-REGISTER_CREATABLE( plScalarSDLChannel );
-REGISTER_CREATABLE( plOmniApplicator );
-REGISTER_CREATABLE( plOmniSqApplicator );
-REGISTER_CREATABLE( plOmniCutoffApplicator );
+REGISTER_CREATABLE(plScalarChannel);
+REGISTER_CREATABLE(plScalarConstant);
+REGISTER_CREATABLE(plScalarTimeScale);
+REGISTER_CREATABLE(plScalarBlend);
+REGISTER_CREATABLE(plScalarControllerChannel);
+REGISTER_CREATABLE(plScalarControllerCacheChannel);
+REGISTER_CREATABLE(plScalarChannelApplicator);
+REGISTER_CREATABLE(plSpotInnerApplicator);
+REGISTER_CREATABLE(plSpotOuterApplicator);
+REGISTER_CREATABLE(plATCChannel);
+REGISTER_CREATABLE(plScalarSDLChannel);
+REGISTER_CREATABLE(plOmniApplicator);
+REGISTER_CREATABLE(plOmniSqApplicator);
+REGISTER_CREATABLE(plOmniCutoffApplicator);
 
 #include "plAGModifier.h"
-REGISTER_CREATABLE( plAGModifier );
+REGISTER_CREATABLE(plAGModifier);
 
 #include "plAGMasterMod.h"
-REGISTER_CREATABLE( plAGMasterMod );
+REGISTER_CREATABLE(plAGMasterMod);
 
 #include "plSeekPointMod.h"
-REGISTER_CREATABLE( plSeekPointMod );
+REGISTER_CREATABLE(plSeekPointMod);
 
 #include "plOneShotMod.h"
-REGISTER_CREATABLE( plOneShotMod );
+REGISTER_CREATABLE(plOneShotMod);
 
 #include "plMultistageBehMod.h"
-REGISTER_CREATABLE( plMultistageBehMod );
+REGISTER_CREATABLE(plMultistageBehMod);
 
 #include "plArmatureMod.h"
-REGISTER_CREATABLE( plArmatureModBase );
-REGISTER_CREATABLE( plArmatureMod );
-REGISTER_CREATABLE( plArmatureLODMod );
+REGISTER_CREATABLE(plArmatureModBase);
+REGISTER_CREATABLE(plArmatureMod);
+REGISTER_CREATABLE(plArmatureLODMod);
 
 #include "plArmatureEffects.h"
-REGISTER_CREATABLE( plArmatureEffectsMgr );
-REGISTER_NONCREATABLE( plArmatureEffect );
-REGISTER_CREATABLE( plArmatureEffectFootSound );
+REGISTER_CREATABLE(plArmatureEffectsMgr);
+REGISTER_NONCREATABLE(plArmatureEffect);
+REGISTER_CREATABLE(plArmatureEffectFootSound);
 
 #include "plAvBrain.h"
 REGISTER_NONCREATABLE(plArmatureBrain);
@@ -142,7 +142,7 @@ REGISTER_CREATABLE(plAvBrainHuman);
 REGISTER_CREATABLE(plAvBrainDrive);
 
 #include "plAvLadderModifier.h"
-REGISTER_CREATABLE( plAvLadderMod );
+REGISTER_CREATABLE(plAvLadderMod);
 
 #include "plAvatarClothing.h"
 REGISTER_CREATABLE(plClothingItem);
@@ -154,59 +154,59 @@ REGISTER_CREATABLE(plClothingMgr);
 REGISTER_CREATABLE(plAvBrainGeneric);
 
 #include "plAvatarTasks.h"
-REGISTER_NONCREATABLE( plAvTask );
-REGISTER_CREATABLE( plAvAnimTask );
-REGISTER_CREATABLE( plAvSeekTask )
-REGISTER_CREATABLE( plAvOneShotTask );
-REGISTER_CREATABLE( plAvOneShotLinkTask );
+REGISTER_NONCREATABLE(plAvTask);
+REGISTER_CREATABLE(plAvAnimTask);
+REGISTER_CREATABLE(plAvSeekTask)
+REGISTER_CREATABLE(plAvOneShotTask);
+REGISTER_CREATABLE(plAvOneShotLinkTask);
 
 #include "plAnimStage.h"
-REGISTER_CREATABLE( plAnimStage );
+REGISTER_CREATABLE(plAnimStage);
 
 #include "plAvTaskSeek.h"
-REGISTER_CREATABLE( plAvTaskSeek );
+REGISTER_CREATABLE(plAvTaskSeek);
 
 #include "plAGMasterSDLModifier.h"
-REGISTER_CREATABLE( plAGMasterSDLModifier );
+REGISTER_CREATABLE(plAGMasterSDLModifier);
 
 #include "plAvatarSDLModifier.h"
-REGISTER_CREATABLE( plAvatarSDLModifier );
-REGISTER_CREATABLE( plAvatarPhysicalSDLModifier );
+REGISTER_CREATABLE(plAvatarSDLModifier);
+REGISTER_CREATABLE(plAvatarPhysicalSDLModifier);
 
 #include "plClothingSDLModifier.h"
-REGISTER_CREATABLE( plClothingSDLModifier );
+REGISTER_CREATABLE(plClothingSDLModifier);
 
 #include "plAvatarMgr.h"
-REGISTER_NONCREATABLE( plAvatarMgr );
+REGISTER_NONCREATABLE(plAvatarMgr);
 
 #include "plNPCSpawnMod.h"
-REGISTER_CREATABLE( plNPCSpawnMod );
+REGISTER_CREATABLE(plNPCSpawnMod);
 
 #include "plAvBrainSwim.h"
-REGISTER_CREATABLE( plAvBrainSwim );
+REGISTER_CREATABLE(plAvBrainSwim);
 
 #include "plAvBrainClimb.h"
-REGISTER_CREATABLE( plAvBrainClimb );
+REGISTER_CREATABLE(plAvBrainClimb);
 
 #include "plAvBrainCoop.h"
-REGISTER_CREATABLE( plAvBrainCoop );
+REGISTER_CREATABLE(plAvBrainCoop);
 
 #include "plCoopCoordinator.h"
-REGISTER_CREATABLE( plCoopCoordinator );
+REGISTER_CREATABLE(plCoopCoordinator);
 
 #include "plAvTaskBrain.h"
-REGISTER_CREATABLE( plAvTaskBrain );
+REGISTER_CREATABLE(plAvTaskBrain);
 
 #include "plSittingModifier.h"
-REGISTER_CREATABLE( plSittingModifier );
+REGISTER_CREATABLE(plSittingModifier);
 
 #include "plSwimRegion.h"
-REGISTER_CREATABLE( plSwimRegionInterface );
-REGISTER_CREATABLE( plSwimCircularCurrentRegion );
-REGISTER_CREATABLE( plSwimStraightCurrentRegion );
+REGISTER_CREATABLE(plSwimRegionInterface);
+REGISTER_CREATABLE(plSwimCircularCurrentRegion);
+REGISTER_CREATABLE(plSwimStraightCurrentRegion);
 
 #include "plAvBrainCritter.h"
-REGISTER_CREATABLE( plAvBrainCritter );
+REGISTER_CREATABLE(plAvBrainCritter);
 
 #include "plAvBrainRideAnimatedPhysical.h"
 REGISTER_CREATABLE(plAvBrainRideAnimatedPhysical)

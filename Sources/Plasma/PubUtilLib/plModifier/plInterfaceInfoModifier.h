@@ -47,24 +47,31 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plKey.h"
 #include "hsTemplates.h"
 
-class plInterfaceInfoModifier : public plSingleModifier
-{
+class plInterfaceInfoModifier : public plSingleModifier {
 protected:
-    
+
     hsTArray<plKey> fKeyList;
-    virtual bool IEval(double secs, float del, uint32_t dirty){ return true; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return true;
+    }
 public:
 
-    plInterfaceInfoModifier(); 
+    plInterfaceInfoModifier();
     ~plInterfaceInfoModifier();
 
-    CLASSNAME_REGISTER( plInterfaceInfoModifier );
-    GETINTERFACE_ANY( plInterfaceInfoModifier, plSingleModifier );
+    CLASSNAME_REGISTER(plInterfaceInfoModifier);
+    GETINTERFACE_ANY(plInterfaceInfoModifier, plSingleModifier);
 
-    void AddRefdKey(plKey &k) { fKeyList.Append(k); }
+    void AddRefdKey(plKey& k) {
+        fKeyList.Append(k);
+    }
 
-    int GetNumReferencedKeys() const { return fKeyList.Count(); }
-    plKey GetReferencedKey(int i) const { return fKeyList[i]; }
+    int GetNumReferencedKeys() const {
+        return fKeyList.Count();
+    }
+    plKey GetReferencedKey(int i) const {
+        return fKeyList[i];
+    }
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 };

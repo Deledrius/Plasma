@@ -61,7 +61,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pfConditional/plObjectInBoxConditionalObject.h"
 
 
-plLogicModifier::plLogicModifier() 
+plLogicModifier::plLogicModifier()
 {
     fMyCursor = plCursorChangeMsg::kCursorUp;
 }
@@ -77,138 +77,138 @@ plLogicModifier::~plLogicModifier()
 // in boxes) are okay or not.
 bool plLogicModifier::VerifyConditions(plMessage* msg)
 {
-    for (int i = 0; i < fConditionList.Count(); i++)
-    {
-        if (!fConditionList[i]->Verify(msg))
+    for (int i = 0; i < fConditionList.Count(); i++) {
+        if (!fConditionList[i]->Verify(msg)) {
             return false;
+        }
     }
+
     return true;
 }
 
 bool plLogicModifier::MsgReceive(plMessage* msg)
 {
     bool retVal = false;
-    
+
     // read messages:
     plCondRefMsg* pCondMsg = plCondRefMsg::ConvertNoRef(msg);
-    if (pCondMsg)
-    {
-        plConditionalObject* pCond = plConditionalObject::ConvertNoRef( pCondMsg->GetRef() );
-        if (pCond && (pCondMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace)))
-        {
-            if (fConditionList.Count() <= pCondMsg->fWhich)
+
+    if (pCondMsg) {
+        plConditionalObject* pCond = plConditionalObject::ConvertNoRef(pCondMsg->GetRef());
+
+        if (pCond && (pCondMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace))) {
+            if (fConditionList.Count() <= pCondMsg->fWhich) {
                 fConditionList.ExpandAndZero(pCondMsg->fWhich + 1);
-            
+            }
+
             fConditionList[pCondMsg->fWhich] = pCond;
             pCond->SetLogicMod(this);
 
-            if (pCond->HasFlag(plConditionalObject::kLocalElement))
+            if (pCond->HasFlag(plConditionalObject::kLocalElement)) {
                 SetFlag(kLocalElement);
+            }
         }
+
         retVal = true;
     }
+
     plTimerCallbackMsg* pTMsg = plTimerCallbackMsg::ConvertNoRef(msg);
-    if (pTMsg)
-    {
+
+    if (pTMsg) {
         bool netRequest = msg->HasBCastFlag(plMessage::kNetNonLocal);
         Trigger(netRequest);
     }
 
     plActivatorMsg* pActivateMsg = plActivatorMsg::ConvertNoRef(msg);
-    
-    if (pActivateMsg)
-    {
+
+    if (pActivateMsg) {
 //      if (pActivateMsg->fTriggerType == plActivatorMsg::kUnPickedTrigger)
         {
 //          UnTrigger();
 //          return true;
         }
 //      else
-        {   
-            bool ignore=false;
+        {
+            bool ignore = false;
 
             // Ignore collision activations by remote players
-            if (pActivateMsg->fTriggerType==plActivatorMsg::kCollideEnter  || 
-            pActivateMsg->fTriggerType==plActivatorMsg::kCollideExit || 
-            pActivateMsg->fTriggerType==plActivatorMsg::kCollideContact)
-            {
-                if (plNetClientApp::GetInstance()->IsRemotePlayerKey(pActivateMsg->fHitterObj))
-                    ignore=true;
+            if (pActivateMsg->fTriggerType == plActivatorMsg::kCollideEnter  ||
+                    pActivateMsg->fTriggerType == plActivatorMsg::kCollideExit ||
+                    pActivateMsg->fTriggerType == plActivatorMsg::kCollideContact) {
+                if (plNetClientApp::GetInstance()->IsRemotePlayerKey(pActivateMsg->fHitterObj)) {
+                    ignore = true;
+                }
             }
 
-            if (!ignore)
-            {       
-                for (int i = 0; i < fConditionList.Count(); i++)
-                {
-                    if (fConditionList[i]->MsgReceive(msg))
+            if (!ignore) {
+                for (int i = 0; i < fConditionList.Count(); i++) {
+                    if (fConditionList[i]->MsgReceive(msg)) {
                         return true;
+                    }
                 }
             }
         }
     }
 
     plNotifyMsg* pNotify = plNotifyMsg::ConvertNoRef(msg);
-    if (pNotify)
-    {
-        for (int i = 0; i < fConditionList.Count(); i++)
-        {
-            if (fConditionList[i]->MsgReceive(msg))
+
+    if (pNotify) {
+        for (int i = 0; i < fConditionList.Count(); i++) {
+            if (fConditionList[i]->MsgReceive(msg)) {
                 return true;
+            }
         }
     }
 
     plFakeOutMsg* pFakeMsg = plFakeOutMsg::ConvertNoRef(msg);
-    if (pFakeMsg)
-    {
+
+    if (pFakeMsg) {
         plCursorChangeMsg* pMsg = 0;
-        if ((VerifyConditions(pFakeMsg) && fMyCursor) && !Disabled())
+
+        if ((VerifyConditions(pFakeMsg) && fMyCursor) && !Disabled()) {
             pMsg = new plCursorChangeMsg(fMyCursor, 1);
-        else
-        {
+        } else {
 #ifndef PLASMA_EXTERNAL_RELEASE
+
             // try to determine the reasons for not displaying cursor
-            if (plSceneInputInterface::fShowLOS)
-            {
-                if ( Disabled() )
-                {
+            if (plSceneInputInterface::fShowLOS) {
+                if (Disabled()) {
                     DetectorLogRed("%s: LogicMod is disabled", GetKeyName().c_str());
-                }
-                else
-                {
-                    for (int i = 0; i < fConditionList.Count(); i++)
-                    {
-                        if (!fConditionList[i]->Verify(msg))
-                        {
-                            if ( plObjectInBoxConditionalObject::ConvertNoRef(fConditionList[i]) )
+                } else {
+                    for (int i = 0; i < fConditionList.Count(); i++) {
+                        if (!fConditionList[i]->Verify(msg)) {
+                            if (plObjectInBoxConditionalObject::ConvertNoRef(fConditionList[i])) {
                                 DetectorLogRed("%s: LogicMod InRegion conditional not met", fConditionList[i]->GetKeyName().c_str());
-                            else if ( plFacingConditionalObject::ConvertNoRef(fConditionList[i]) )
+                            } else if (plFacingConditionalObject::ConvertNoRef(fConditionList[i])) {
                                 DetectorLogRed("%s: LogicMod Facing conditional not met", fConditionList[i]->GetKeyName().c_str());
-                            else
+                            } else {
                                 DetectorLogRed("%s: LogicMod <unknown> conditional not met", fConditionList[i]->GetKeyName().c_str());
+                            }
                         }
                     }
                 }
             }
+
 #endif  // PLASMA_EXTERNAL_RELEASE
             pMsg = new plCursorChangeMsg(plCursorChangeMsg::kNullCursor, 1);
         }
-        
-        pMsg->AddReceiver( pFakeMsg->GetSender() );
+
+        pMsg->AddReceiver(pFakeMsg->GetSender());
         pMsg->SetSender(GetKey());
         plgDispatch::MsgSend(pMsg);
 
         return true;
     }
 
-    return (plLogicModBase::MsgReceive(msg));   
+    return (plLogicModBase::MsgReceive(msg));
 }
 
 void plLogicModifier::RequestTrigger(bool netRequest)
 {
-    for (int i = 0; i < fConditionList.Count(); i++)
-    {
-        if (!fConditionList[i]->Satisfied())
+    for (int i = 0; i < fConditionList.Count(); i++) {
+        if (!fConditionList[i]->Satisfied()) {
             return;
+        }
     }
 
     plLogicModBase::RequestTrigger(netRequest);
@@ -216,14 +216,15 @@ void plLogicModifier::RequestTrigger(bool netRequest)
 
 void plLogicModifier::PreTrigger(bool netRequest)
 {
-    if (!IEvalCounter())
-        return;
-
-    if (fTimer)
-    {
-        plgTimerCallbackMgr::NewTimer( fTimer, new plTimerCallbackMsg( GetKey() ) );
+    if (!IEvalCounter()) {
         return;
     }
+
+    if (fTimer) {
+        plgTimerCallbackMgr::NewTimer(fTimer, new plTimerCallbackMsg(GetKey()));
+        return;
+    }
+
     plLogicModBase::PreTrigger(netRequest);
 }
 
@@ -231,8 +232,10 @@ void plLogicModifier::PreTrigger(bool netRequest)
 void plLogicModifier::Reset(bool bCounterReset)
 {
     plLogicModBase::Reset(bCounterReset);
-    for (int i = 0; i < fConditionList.Count(); i++)
+
+    for (int i = 0; i < fConditionList.Count(); i++) {
         fConditionList[i]->Reset();
+    }
 }
 
 void plLogicModifier::Read(hsStream* stream, hsResMgr* mgr)
@@ -242,11 +245,12 @@ void plLogicModifier::Read(hsStream* stream, hsResMgr* mgr)
     int n = stream->ReadLE32();
     fConditionList.SetCountAndZero(n);
     int i;
-    for(i = 0; i < n; i++ )
-    {   
+
+    for (i = 0; i < n; i++) {
         refMsg = new plCondRefMsg(GetKey(), i);
-        mgr->ReadKeyNotifyMe(stream,refMsg, plRefFlags::kActiveRef);
+        mgr->ReadKeyNotifyMe(stream, refMsg, plRefFlags::kActiveRef);
     }
+
     fMyCursor = stream->ReadLE32();
 }
 
@@ -254,28 +258,34 @@ void plLogicModifier::Write(hsStream* stream, hsResMgr* mgr)
 {
     plLogicModBase::Write(stream, mgr);
     stream->WriteLE32(fConditionList.GetCount());
-    for( int i = 0; i < fConditionList.GetCount(); i++ )
+
+    for (int i = 0; i < fConditionList.GetCount(); i++) {
         mgr->WriteKey(stream, fConditionList[i]);
+    }
+
     stream->WriteLE32(fMyCursor);
 }
 
 void plLogicModifier::AddCondition(plConditionalObject* c)
 {
-    plGenRefMsg *msg= new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1);
-    hsgResMgr::ResMgr()->AddViaNotify(c->GetKey(), msg, plRefFlags::kActiveRef); 
+    plGenRefMsg* msg = new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1);
+    hsgResMgr::ResMgr()->AddViaNotify(c->GetKey(), msg, plRefFlags::kActiveRef);
 
-    fConditionList.Append(c); 
+    fConditionList.Append(c);
     c->SetLogicMod(this);
-    if (c->HasFlag(plConditionalObject::kLocalElement))
+
+    if (c->HasFlag(plConditionalObject::kLocalElement)) {
         SetFlag(kLocalElement);
+    }
 }
 
 void plLogicModifier::VolumeIgnoreExtraEnters(bool ignore /* = true */)
 {
-    for (int curCondition = 0; curCondition < fConditionList.GetCount(); ++curCondition)
-    {
+    for (int curCondition = 0; curCondition < fConditionList.GetCount(); ++curCondition) {
         plVolumeSensorConditionalObject* condition = plVolumeSensorConditionalObject::ConvertNoRef(fConditionList[curCondition]);
-        if (condition)
+
+        if (condition) {
             condition->IgnoreExtraEnters(ignore);
+        }
     }
 }

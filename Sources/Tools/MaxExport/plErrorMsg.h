@@ -44,10 +44,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #define PL_ERR_MSG_MAX_MSG 2048
 
-class plErrorMsg
-{
+class plErrorMsg {
 public:
-    static plErrorMsg *GetNull();
+    static plErrorMsg* GetNull();
 
     plErrorMsg(const char* label, const char* msg);
     plErrorMsg(bool bogus = false);
@@ -59,44 +58,74 @@ public:
     plErrorMsg(bool bogus, const char* label, const char* format, float f);
     virtual ~plErrorMsg() { }
 
-    plErrorMsg &Set(const char* label, const char* msg);
-    plErrorMsg &Set(bool bogus = false);
-    plErrorMsg &Set(bool bogus, const char* label, const char* msg);
-    plErrorMsg &Set(bool bogus, const char* label, const char* format, const char* str);
-    plErrorMsg &Set(bool bogus, const char* label, const char* format, const char* str1, const char* str2);
-    plErrorMsg &Set(bool bogus, const char* label, const char* format, int n);
-    plErrorMsg &Set(bool bogus, const char* label, const char* format, int n, int m);
-    plErrorMsg &Set(bool bogus, const char* label, const char* format, float f);
+    plErrorMsg& Set(const char* label, const char* msg);
+    plErrorMsg& Set(bool bogus = false);
+    plErrorMsg& Set(bool bogus, const char* label, const char* msg);
+    plErrorMsg& Set(bool bogus, const char* label, const char* format, const char* str);
+    plErrorMsg& Set(bool bogus, const char* label, const char* format, const char* str1, const char* str2);
+    plErrorMsg& Set(bool bogus, const char* label, const char* format, int n);
+    plErrorMsg& Set(bool bogus, const char* label, const char* format, int n, int m);
+    plErrorMsg& Set(bool bogus, const char* label, const char* format, float f);
 
-    bool IsBogus() { return GetBogus(); }
+    bool IsBogus() {
+        return GetBogus();
+    }
     // Ask - If condition is true and user says yes to displayed query, return true, else false
-    virtual bool Ask() { return false; }
+    virtual bool Ask() {
+        return false;
+    }
 
     // CheckAndAsk - If condition is true and user says YES, throw self.  Only asks if condition is true.
     // Returns true if condition is true but user says no, else false.
-    virtual bool CheckAndAsk() { return false; }
+    virtual bool CheckAndAsk() {
+        return false;
+    }
 
-     // CheckAskOrCancel - If condition is true ( if YES, throw, else if NO return 0, else (CANCEL) return 1
-    virtual bool CheckAskOrCancel() { return false; }
+    // CheckAskOrCancel - If condition is true ( if YES, throw, else if NO return 0, else (CANCEL) return 1
+    virtual bool CheckAskOrCancel() {
+        return false;
+    }
 
     // Show - If condition is true, displays message, returns true
-    virtual bool Show() { return false; } 
+    virtual bool Show() {
+        return false;
+    }
 
     // CheckAndShow - If condition is true, shows message box then throws self, else return false
-    virtual bool CheckAndShow() { return false; }
+    virtual bool CheckAndShow() {
+        return false;
+    }
 
     // Check - If condition was true, throws self, else return false
-    virtual bool Check() { return false; }
+    virtual bool Check() {
+        return false;
+    }
 
-     // Quit - If condition, quietly just throw with no message
+    // Quit - If condition, quietly just throw with no message
     virtual void Quit() { }
 
 protected:
-    void SetBogus(bool b)   { fBogus = b; }
+    void SetBogus(bool b)   {
+        fBogus = b;
+    }
 
-    bool GetBogus()         { return fBogus; }
-    char *GetLabel()            { if (!fBogus) *fLabel = 0; return fLabel; }
-    char *GetMsg()              { if (!fBogus) *fMsg = 0; return fMsg; }
+    bool GetBogus()         {
+        return fBogus;
+    }
+    char* GetLabel()            {
+        if (!fBogus) {
+            *fLabel = 0;
+        }
+
+        return fLabel;
+    }
+    char* GetMsg()              {
+        if (!fBogus) {
+            *fMsg = 0;
+        }
+
+        return fMsg;
+    }
 
 private:
     bool        fBogus;
@@ -105,7 +134,7 @@ private:
 
 private:
     // No assignment operator
-    plErrorMsg &operator=(const plErrorMsg &msg);
+    plErrorMsg& operator=(const plErrorMsg& msg);
 };
 
 #endif

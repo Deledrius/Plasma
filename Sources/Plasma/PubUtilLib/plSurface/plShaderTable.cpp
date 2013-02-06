@@ -92,7 +92,7 @@ using namespace plShaderID;
 
 
 plShaderTableInst::plShaderTableInst()
-:   fFlags(0)
+    :   fFlags(0)
 {
 }
 

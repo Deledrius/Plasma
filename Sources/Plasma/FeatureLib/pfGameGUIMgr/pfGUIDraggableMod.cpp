@@ -62,7 +62,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 pfGUIDraggableMod::pfGUIDraggableMod()
 {
-    SetFlag( kWantsInterest );
+    SetFlag(kWantsInterest);
     fDragging = false;
 }
 
@@ -72,93 +72,92 @@ pfGUIDraggableMod::~pfGUIDraggableMod()
 
 //// IEval ///////////////////////////////////////////////////////////////////
 
-bool    pfGUIDraggableMod::IEval( double secs, float del, uint32_t dirty )
+bool    pfGUIDraggableMod::IEval(double secs, float del, uint32_t dirty)
 {
-    return pfGUIControlMod::IEval( secs, del, dirty );
+    return pfGUIControlMod::IEval(secs, del, dirty);
 }
 
 //// MsgReceive //////////////////////////////////////////////////////////////
 
-bool    pfGUIDraggableMod::MsgReceive( plMessage *msg )
+bool    pfGUIDraggableMod::MsgReceive(plMessage* msg)
 {
-    return pfGUIControlMod::MsgReceive( msg );
+    return pfGUIControlMod::MsgReceive(msg);
 }
 
 //// Read/Write //////////////////////////////////////////////////////////////
 
-void    pfGUIDraggableMod::Read( hsStream *s, hsResMgr *mgr )
+void    pfGUIDraggableMod::Read(hsStream* s, hsResMgr* mgr)
 {
     pfGUIControlMod::Read(s, mgr);
 }
 
-void    pfGUIDraggableMod::Write( hsStream *s, hsResMgr *mgr )
+void    pfGUIDraggableMod::Write(hsStream* s, hsResMgr* mgr)
 {
-    pfGUIControlMod::Write( s, mgr );
+    pfGUIControlMod::Write(s, mgr);
 }
 
 //// UpdateBounds ////////////////////////////////////////////////////////////
 
-void    pfGUIDraggableMod::UpdateBounds( hsMatrix44 *invXformMatrix, bool force )
+void    pfGUIDraggableMod::UpdateBounds(hsMatrix44* invXformMatrix, bool force)
 {
-    pfGUIControlMod::UpdateBounds( invXformMatrix, force );
+    pfGUIControlMod::UpdateBounds(invXformMatrix, force);
     fBoundsValid = false;
 }
 
 //// HandleMouseDown/Up //////////////////////////////////////////////////////
 
-void    pfGUIDraggableMod::HandleMouseDown( hsPoint3 &mousePt, uint8_t modifiers )
+void    pfGUIDraggableMod::HandleMouseDown(hsPoint3& mousePt, uint8_t modifiers)
 {
-    if( !fDragging )
-    {
+    if (!fDragging) {
         fLastMousePt = mousePt;
         fOrigCenter = fScreenCenter;
 
         fDragging = true;
         fDragOffset = fScreenCenter - mousePt;
 
-        SetObjectCenter( mousePt.fX + fDragOffset.fX, mousePt.fY + fDragOffset.fY );
+        SetObjectCenter(mousePt.fX + fDragOffset.fX, mousePt.fY + fDragOffset.fY);
 
-        HandleExtendedEvent( kStartingDrag );
+        HandleExtendedEvent(kStartingDrag);
     }
 }
 
-void    pfGUIDraggableMod::HandleMouseUp( hsPoint3 &mousePt, uint8_t modifiers )
+void    pfGUIDraggableMod::HandleMouseUp(hsPoint3& mousePt, uint8_t modifiers)
 {
-    if( fDragging )
-    {
+    if (fDragging) {
         fLastMousePt = mousePt;
         fDragging = false;
-        SetObjectCenter( mousePt.fX + fDragOffset.fX, mousePt.fY + fDragOffset.fY );
+        SetObjectCenter(mousePt.fX + fDragOffset.fX, mousePt.fY + fDragOffset.fY);
 
         DoSomething();
 
-        if( HasFlag( kAlwaysSnapBackToStart ) )
-            SetObjectCenter( fOrigCenter.fX, fOrigCenter.fY );
+        if (HasFlag(kAlwaysSnapBackToStart)) {
+            SetObjectCenter(fOrigCenter.fX, fOrigCenter.fY);
+        }
     }
 }
 
-void    pfGUIDraggableMod::HandleMouseDrag( hsPoint3 &mousePt, uint8_t modifiers )
+void    pfGUIDraggableMod::HandleMouseDrag(hsPoint3& mousePt, uint8_t modifiers)
 {
-    if( fDragging )
-    {
+    if (fDragging) {
         fLastMousePt = mousePt;
 
-        SetObjectCenter( mousePt.fX + fDragOffset.fX, mousePt.fY + fDragOffset.fY );
+        SetObjectCenter(mousePt.fX + fDragOffset.fX, mousePt.fY + fDragOffset.fY);
 
-        if( HasFlag( kReportDragging ) )
-            HandleExtendedEvent( kDragging );
+        if (HasFlag(kReportDragging)) {
+            HandleExtendedEvent(kDragging);
+        }
     }
 }
 
 //// IGetDesiredCursor ///////////////////////////////////////////////////////
 
-uint32_t      pfGUIDraggableMod::IGetDesiredCursor( void ) const
+uint32_t      pfGUIDraggableMod::IGetDesiredCursor(void) const
 {
     // if we are anchored, then no cursors that say we can move
-    if( fDragging )
-    {
-        if( HasFlag( kHideCursorWhileDragging ) )
+    if (fDragging) {
+        if (HasFlag(kHideCursorWhileDragging)) {
             return plInputInterface::kCursorHidden;
+        }
 
         return plInputInterface::kCursor4WayDragging;
     }
@@ -166,16 +165,18 @@ uint32_t      pfGUIDraggableMod::IGetDesiredCursor( void ) const
     return plInputInterface::kCursor4WayDraggable;
 }
 
-void    pfGUIDraggableMod::StopDragging( bool cancel )
+void    pfGUIDraggableMod::StopDragging(bool cancel)
 {
-    if( fDragging )
-    {
+    if (fDragging) {
         fDragging = false;
-        if( cancel )
-            HandleExtendedEvent( kCancelled );
 
-        if( HasFlag( kAlwaysSnapBackToStart ) )
-            SetObjectCenter( fOrigCenter.fX, fOrigCenter.fY );
+        if (cancel) {
+            HandleExtendedEvent(kCancelled);
+        }
+
+        if (HasFlag(kAlwaysSnapBackToStart)) {
+            SetObjectCenter(fOrigCenter.fX, fOrigCenter.fY);
+        }
     }
 }
 

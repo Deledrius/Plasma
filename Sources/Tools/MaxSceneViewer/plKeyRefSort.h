@@ -47,18 +47,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // A really crappy sort of a list of keys from the most referenced key to the least.
 // This allows you to write out and read in the keys without having to worry about
 // one referencing another that isn't loaded yet (ie, in the SceneViewer)
-class plKeyRefSort
-{
+class plKeyRefSort {
 protected:
-    class KeyRefs
-    {
+    class KeyRefs {
     public:
         plKey fKey;
         int fNumRefs;
         KeyRefs() : fKey(nil), fNumRefs(-1) {}
         KeyRefs(plKey key, int numRefs) : fKey(key), fNumRefs(numRefs) {}
-        bool operator== (const plKey key)
-        {
+        bool operator== (const plKey key) {
             return (fKey == key);
         }
     };

@@ -60,13 +60,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // should only be created from C++ side
 pyVaultPlayerInfoListNode::pyVaultPlayerInfoListNode(RelVaultNode* nfsNode)
-: pyVaultFolderNode(nfsNode)
+    : pyVaultFolderNode(nfsNode)
 {
 }
 
 //create from the Python side
 pyVaultPlayerInfoListNode::pyVaultPlayerInfoListNode(int n)
-: pyVaultFolderNode(n)
+    : pyVaultFolderNode(n)
 {
     fNode->SetNodeType(plVault::kNodeType_PlayerInfoList);
 }
@@ -74,34 +74,39 @@ pyVaultPlayerInfoListNode::pyVaultPlayerInfoListNode(int n)
 //==================================================================
 // class RelVaultNode : public plVaultFolderNode
 //
-bool pyVaultPlayerInfoListNode::HasPlayer( uint32_t playerID )
+bool pyVaultPlayerInfoListNode::HasPlayer(uint32_t playerID)
 {
-    if (!fNode)
+    if (!fNode) {
         return false;
+    }
 
-    NetVaultNode * templateNode = new NetVaultNode;
+    NetVaultNode* templateNode = new NetVaultNode;
     templateNode->IncRef();
     templateNode->SetNodeType(plVault::kNodeType_PlayerInfo);
     VaultPlayerInfoNode access(templateNode);
     access.SetPlayerId(playerID);
-    
-    RelVaultNode * rvn = fNode->GetChildNodeIncRef(templateNode, 1);
-    if (rvn)
+
+    RelVaultNode* rvn = fNode->GetChildNodeIncRef(templateNode, 1);
+
+    if (rvn) {
         rvn->DecRef();
-    
+    }
+
     templateNode->DecRef();
     return (rvn != nil);
 }
 
-bool pyVaultPlayerInfoListNode::AddPlayer( uint32_t playerID )
+bool pyVaultPlayerInfoListNode::AddPlayer(uint32_t playerID)
 {
-    if (HasPlayer(playerID))
+    if (HasPlayer(playerID)) {
         return true;
-        
-    if (!fNode)
+    }
+
+    if (!fNode) {
         return false;
-        
-    NetVaultNode * templateNode = new NetVaultNode;
+    }
+
+    NetVaultNode* templateNode = new NetVaultNode;
     templateNode->IncRef();
     templateNode->SetNodeType(plVault::kNodeType_PlayerInfo);
     VaultPlayerInfoNode access(templateNode);
@@ -109,58 +114,64 @@ bool pyVaultPlayerInfoListNode::AddPlayer( uint32_t playerID )
 
     ARRAY(unsigned) nodeIds;
     VaultLocalFindNodes(templateNode, &nodeIds);
-    
-    if (!nodeIds.Count())
+
+    if (!nodeIds.Count()) {
         VaultFindNodesAndWait(templateNode, &nodeIds);
-        
-    if (nodeIds.Count())
+    }
+
+    if (nodeIds.Count()) {
         VaultAddChildNodeAndWait(fNode->GetNodeId(), nodeIds[0], VaultGetPlayerId());
-        
+    }
+
     templateNode->DecRef();
     return nodeIds.Count() != 0;
 }
 
-void pyVaultPlayerInfoListNode::RemovePlayer( uint32_t playerID )
+void pyVaultPlayerInfoListNode::RemovePlayer(uint32_t playerID)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
+    }
 
-    NetVaultNode * templateNode = new NetVaultNode;
+    NetVaultNode* templateNode = new NetVaultNode;
     templateNode->IncRef();
     templateNode->SetNodeType(plVault::kNodeType_PlayerInfo);
     VaultPlayerInfoNode access(templateNode);
     access.SetPlayerId(playerID);
 
-    if (RelVaultNode * rvn = fNode->GetChildNodeIncRef(templateNode, 1)) {
+    if (RelVaultNode* rvn = fNode->GetChildNodeIncRef(templateNode, 1)) {
         VaultRemoveChildNode(fNode->GetNodeId(), rvn->GetNodeId(), nil, nil);
         rvn->DecRef();
     }
-    
+
     templateNode->DecRef();
 }
 
-PyObject * pyVaultPlayerInfoListNode::GetPlayer( uint32_t playerID )
+PyObject* pyVaultPlayerInfoListNode::GetPlayer(uint32_t playerID)
 {
-    if (!fNode)
+    if (!fNode) {
         PYTHON_RETURN_NONE;
+    }
 
-    NetVaultNode * templateNode = new NetVaultNode;
+    NetVaultNode* templateNode = new NetVaultNode;
     templateNode->IncRef();
     templateNode->SetNodeType(plVault::kNodeType_PlayerInfo);
     VaultPlayerInfoNode access(templateNode);
     access.SetPlayerId(playerID);
 
-    PyObject * result = nil;
-    if (RelVaultNode * rvn = fNode->GetChildNodeIncRef(templateNode, 1)) {
+    PyObject* result = nil;
+
+    if (RelVaultNode* rvn = fNode->GetChildNodeIncRef(templateNode, 1)) {
         result = pyVaultPlayerInfoNode::New(rvn);
         rvn->DecRef();
     }
-    
+
     templateNode->DecRef();
-    
-    if (!result)
+
+    if (!result) {
         PYTHON_RETURN_NONE;
-        
+    }
+
     return result;
 }
 

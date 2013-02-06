@@ -54,13 +54,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // should only be created from C++ side
 pyVaultAgeInfoListNode::pyVaultAgeInfoListNode(RelVaultNode* nfsNode)
-: pyVaultFolderNode(nfsNode)
+    : pyVaultFolderNode(nfsNode)
 {
 }
 
 //create from the Python side
 pyVaultAgeInfoListNode::pyVaultAgeInfoListNode(int n)
-: pyVaultFolderNode(n)
+    : pyVaultFolderNode(n)
 {
     fNode->SetNodeType(plVault::kNodeType_AgeInfoList);
 }
@@ -71,27 +71,30 @@ pyVaultAgeInfoListNode::pyVaultAgeInfoListNode(int n)
 //
 bool pyVaultAgeInfoListNode::HasAge(uint32_t ageID)
 {
-    if (!fNode)
+    if (!fNode) {
         return false;
-        
+    }
+
     hsAssert(false, "eric, implement me");
     return false;
 }
 
-bool pyVaultAgeInfoListNode::AddAge( uint32_t ageID )
+bool pyVaultAgeInfoListNode::AddAge(uint32_t ageID)
 {
-    if (!fNode)
+    if (!fNode) {
         return false;
-        
+    }
+
     hsAssert(false, "eric, implement me");
     return false;
 }
 
-void pyVaultAgeInfoListNode::RemoveAge( uint32_t ageID )
+void pyVaultAgeInfoListNode::RemoveAge(uint32_t ageID)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
-        
+    }
+
     hsAssert(false, "eric, implement me");
 }
 

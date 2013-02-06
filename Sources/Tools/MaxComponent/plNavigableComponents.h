@@ -51,8 +51,7 @@ template<class T> class hsTArray;
 
 #define NAV_LADDER_CID Class_ID(0x6b010148, 0x47cc7464)
 
-class plAvLadderComponent : public plComponent
-{
+class plAvLadderComponent : public plComponent {
 public:
     typedef hsTArray<plKey> LadderModKeys;
 
@@ -62,13 +61,15 @@ protected:
 public:
     plAvLadderComponent();
 
-    bool SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool DeInit(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool DeInit(plMaxNode* node, plErrorMsg* pErrMsg);
 
     // Call after PreConvert
-    const LadderModKeys& GetLadderModKeys() { return fKeys; }
+    const LadderModKeys& GetLadderModKeys() {
+        return fKeys;
+    }
 
     virtual void CollectNonDrawables(INodeTab& nonDrawables);
 };

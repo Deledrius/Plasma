@@ -44,7 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define plFactory_inc
 
 #ifdef PLFACTORY_PRIVATE
-    #include "hsTemplates.h"
+#include "hsTemplates.h"
 #endif
 #include "hsRefCnt.h"
 #include "HeadSpin.h"
@@ -54,8 +54,7 @@ class plCreatable;
 class hsStream;
 class hsResMgr;
 
-class plFactory : public hsRefCnt
-{
+class plFactory : public hsRefCnt {
 #ifdef PLFACTORY_PRIVATE
 private:
     hsTArray<plCreator*>        fCreators;
@@ -99,7 +98,7 @@ public:
     // Don't call this unless you're a DLL being initialized.
     static void         SetTheFactory(plFactory* fac);
 
-    static const char   *GetNameOfClass(uint16_t type);
+    static const char*   GetNameOfClass(uint16_t type);
 
 #ifdef HS_DEBUGGING
     void                IValidate(uint16_t keyIndex);

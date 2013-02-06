@@ -50,36 +50,55 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plSceneObject;
 class plSingleModMsg;
 
-class plSingleModifier : public plModifier
-{
+class plSingleModifier : public plModifier {
 protected:
     plSceneObject*  fTarget;
     hsBitVector     fFlags;
 
     virtual bool IEval(double secs, float del, uint32_t dirty) = 0;
-    
+
 public:
     plSingleModifier();
     virtual ~plSingleModifier();
 
-    CLASSNAME_REGISTER( plSingleModifier );
-    GETINTERFACE_ANY( plSingleModifier, plModifier );
-    
+    CLASSNAME_REGISTER(plSingleModifier);
+    GETINTERFACE_ANY(plSingleModifier, plModifier);
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    virtual int GetNumTargets() const { return 1; }
-    virtual plSceneObject* GetTarget(int iTarg) const {return fTarget;}
-    virtual void AddTarget(plSceneObject* so) {SetTarget(so);}
-    virtual void RemoveTarget(plSceneObject* so) {fTarget = 0;} 
+    virtual int GetNumTargets() const {
+        return 1;
+    }
+    virtual plSceneObject* GetTarget(int iTarg) const {
+        return fTarget;
+    }
+    virtual void AddTarget(plSceneObject* so) {
+        SetTarget(so);
+    }
+    virtual void RemoveTarget(plSceneObject* so) {
+        fTarget = 0;
+    }
 
 
-    virtual plSceneObject* GetTarget() const { return fTarget; }
-    virtual void SetTarget(plSceneObject* so) { fTarget = so; }
+    virtual plSceneObject* GetTarget() const {
+        return fTarget;
+    }
+    virtual void SetTarget(plSceneObject* so) {
+        fTarget = so;
+    }
 
-    bool HasFlag(int f) const { return fFlags.IsBitSet(f); }
-    plSingleModifier& SetFlag(int f) { fFlags.SetBit(f); return *this; }
-    plSingleModifier& ClearFlag(int f) { fFlags.ClearBit(f); return *this; }
+    bool HasFlag(int f) const {
+        return fFlags.IsBitSet(f);
+    }
+    plSingleModifier& SetFlag(int f) {
+        fFlags.SetBit(f);
+        return *this;
+    }
+    plSingleModifier& ClearFlag(int f) {
+        fFlags.ClearBit(f);
+        return *this;
+    }
 
 };
 

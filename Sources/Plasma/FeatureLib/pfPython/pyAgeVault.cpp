@@ -71,19 +71,22 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plNetTransport/plNetTransportMember.h"
 #include "plSDL/plSDL.h"
 
-pyAgeVault::pyAgeVault() {
+pyAgeVault::pyAgeVault()
+{
 }
 
-pyAgeVault::~pyAgeVault() {
+pyAgeVault::~pyAgeVault()
+{
 }
 
 //////////////////////////////////////////////////
 
 PyObject* pyAgeVault::GetAgeInfo()
 {
-    RelVaultNode * rvn = VaultGetAgeInfoNodeIncRef();
+    RelVaultNode* rvn = VaultGetAgeInfoNodeIncRef();
+
     if (rvn) {
-        PyObject * result = pyVaultAgeInfoNode::New(rvn);
+        PyObject* result = pyVaultAgeInfoNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -92,11 +95,12 @@ PyObject* pyAgeVault::GetAgeInfo()
     PYTHON_RETURN_NONE;
 }
 
-PyObject* pyAgeVault::GetAgeDevicesFolder( void )
+PyObject* pyAgeVault::GetAgeDevicesFolder(void)
 {
-    RelVaultNode * rvn = VaultGetAgeDevicesFolderIncRef();
+    RelVaultNode* rvn = VaultGetAgeDevicesFolderIncRef();
+
     if (rvn) {
-        PyObject * result = pyVaultFolderNode::New(rvn);
+        PyObject* result = pyVaultFolderNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -105,11 +109,12 @@ PyObject* pyAgeVault::GetAgeDevicesFolder( void )
     PYTHON_RETURN_NONE;
 }
 
-PyObject* pyAgeVault::GetSubAgesFolder( void )
+PyObject* pyAgeVault::GetSubAgesFolder(void)
 {
-    RelVaultNode * rvn = VaultGetAgeSubAgesFolderIncRef();
+    RelVaultNode* rvn = VaultGetAgeSubAgesFolderIncRef();
+
     if (rvn) {
-        PyObject * result = pyVaultFolderNode::New(rvn);
+        PyObject* result = pyVaultFolderNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -118,11 +123,12 @@ PyObject* pyAgeVault::GetSubAgesFolder( void )
     PYTHON_RETURN_NONE;
 }
 
-PyObject* pyAgeVault::GetChronicleFolder( void )
+PyObject* pyAgeVault::GetChronicleFolder(void)
 {
-    RelVaultNode * rvn = VaultGetAgeChronicleFolderIncRef();
+    RelVaultNode* rvn = VaultGetAgeChronicleFolderIncRef();
+
     if (rvn) {
-        PyObject * result = pyVaultFolderNode::New(rvn);
+        PyObject* result = pyVaultFolderNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -131,11 +137,12 @@ PyObject* pyAgeVault::GetChronicleFolder( void )
     PYTHON_RETURN_NONE;
 }
 
-PyObject* pyAgeVault::GetBookshelfFolder ( void )
+PyObject* pyAgeVault::GetBookshelfFolder(void)
 {
-    RelVaultNode * rvn = VaultAgeGetBookshelfFolderIncRef();
+    RelVaultNode* rvn = VaultAgeGetBookshelfFolderIncRef();
+
     if (rvn) {
-        PyObject * result = pyVaultFolderNode::New(rvn);
+        PyObject* result = pyVaultFolderNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -144,11 +151,12 @@ PyObject* pyAgeVault::GetBookshelfFolder ( void )
     PYTHON_RETURN_NONE;
 }
 
-PyObject* pyAgeVault::GetPeopleIKnowAboutFolder( void )
+PyObject* pyAgeVault::GetPeopleIKnowAboutFolder(void)
 {
-    RelVaultNode * rvn = VaultGetAgePeopleIKnowAboutFolderIncRef();
+    RelVaultNode* rvn = VaultGetAgePeopleIKnowAboutFolderIncRef();
+
     if (rvn) {
-        PyObject * result = pyVaultFolderNode::New(rvn);
+        PyObject* result = pyVaultFolderNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -160,9 +168,10 @@ PyObject* pyAgeVault::GetPeopleIKnowAboutFolder( void )
 
 PyObject* pyAgeVault::GetPublicAgesFolder(void)
 {
-    RelVaultNode * rvn = VaultGetAgePublicAgesFolderIncRef();
+    RelVaultNode* rvn = VaultGetAgePublicAgesFolderIncRef();
+
     if (rvn) {
-        PyObject * result = pyVaultFolderNode::New(rvn);
+        PyObject* result = pyVaultFolderNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -171,11 +180,12 @@ PyObject* pyAgeVault::GetPublicAgesFolder(void)
     PYTHON_RETURN_NONE;
 }
 
-PyObject* pyAgeVault::GetSubAgeLink( const pyAgeInfoStruct & info )
+PyObject* pyAgeVault::GetSubAgeLink(const pyAgeInfoStruct& info)
 {
-    RelVaultNode * rvn = VaultFindAgeSubAgeLinkIncRef(info.GetAgeInfo());
+    RelVaultNode* rvn = VaultFindAgeSubAgeLinkIncRef(info.GetAgeInfo());
+
     if (rvn) {
-        PyObject * result = pyVaultAgeLinkNode::New(rvn);
+        PyObject* result = pyVaultAgeLinkNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -184,67 +194,69 @@ PyObject* pyAgeVault::GetSubAgeLink( const pyAgeInfoStruct & info )
     PYTHON_RETURN_NONE;
 }
 
-plUUID pyAgeVault::GetAgeGuid( void )
+plUUID pyAgeVault::GetAgeGuid(void)
 {
-    RelVaultNode * rvn = VaultGetAgeInfoNodeIncRef();
+    RelVaultNode* rvn = VaultGetAgeInfoNodeIncRef();
+
     if (rvn) {
         VaultAgeInfoNode ageInfo(rvn);
         plUUID uuid = ageInfo.GetAgeInstanceGuid();
         rvn->DecRef();
         return uuid;
     }
+
     return kNilUuid;
 }
 
 
 ///////////////
 // Chronicle
-PyObject* pyAgeVault::FindChronicleEntry( const char * entryName )
+PyObject* pyAgeVault::FindChronicleEntry(const char* entryName)
 {
     wchar_t wEntryName[kMaxVaultNodeStringLength];
     StrToUnicode(wEntryName, entryName, arrsize(wEntryName));
-    
-    if (RelVaultNode * rvn = VaultFindAgeChronicleEntryIncRef(wEntryName)) {
-        PyObject * result = pyVaultChronicleNode::New(rvn);
+
+    if (RelVaultNode* rvn = VaultFindAgeChronicleEntryIncRef(wEntryName)) {
+        PyObject* result = pyVaultChronicleNode::New(rvn);
         rvn->DecRef();
         return result;
     }
-    
+
     // just return a None object
     PYTHON_RETURN_NONE;
 }
 
-void pyAgeVault::AddChronicleEntry( const char * name, uint32_t type, const char * value )
+void pyAgeVault::AddChronicleEntry(const char* name, uint32_t type, const char* value)
 {
-    wchar_t * wEntryName = StrDupToUnicode(name);
-    wchar_t * wEntryValue = StrDupToUnicode(value);
-    
+    wchar_t* wEntryName = StrDupToUnicode(name);
+    wchar_t* wEntryValue = StrDupToUnicode(value);
+
     VaultAddAgeChronicleEntry(wEntryName, type, wEntryValue);
-    
+
     free(wEntryName);
     free(wEntryValue);
 }
 
 // AGE DEVICES. AKA IMAGERS, WHATEVER.
 // Add a new device.
-void pyAgeVault::AddDevice( const char * deviceName, PyObject * cbObject, uint32_t cbContext )
+void pyAgeVault::AddDevice(const char* deviceName, PyObject* cbObject, uint32_t cbContext)
 {
-    pyVaultNode::pyVaultNodeOperationCallback * cb = new pyVaultNode::pyVaultNodeOperationCallback( cbObject );
-    cb->VaultOperationStarted( cbContext );
+    pyVaultNode::pyVaultNodeOperationCallback* cb = new pyVaultNode::pyVaultNodeOperationCallback(cbObject);
+    cb->VaultOperationStarted(cbContext);
 
     wchar_t wStr[MAX_PATH];
     StrToUnicode(wStr, deviceName, arrsize(wStr));
 
-    if (RelVaultNode * rvn = VaultAgeAddDeviceAndWaitIncRef(wStr)) {
+    if (RelVaultNode* rvn = VaultAgeAddDeviceAndWaitIncRef(wStr)) {
         cb->SetNode(rvn);
         rvn->DecRef();
     }
 
-    cb->VaultOperationComplete( cbContext, cb->GetNode() ? hsOK : hsFail);  // cbHolder deletes itself here.
+    cb->VaultOperationComplete(cbContext, cb->GetNode() ? hsOK : hsFail);   // cbHolder deletes itself here.
 }
 
 // Remove a device.
-void pyAgeVault::RemoveDevice( const char * deviceName )
+void pyAgeVault::RemoveDevice(const char* deviceName)
 {
     wchar_t wStr[MAX_PATH];
     StrToUnicode(wStr, deviceName, arrsize(wStr));
@@ -253,7 +265,7 @@ void pyAgeVault::RemoveDevice( const char * deviceName )
 }
 
 // True if device exists in age.
-bool pyAgeVault::HasDevice( const char * deviceName )
+bool pyAgeVault::HasDevice(const char* deviceName)
 {
     wchar_t wStr[MAX_PATH];
     StrToUnicode(wStr, deviceName, arrsize(wStr));
@@ -261,13 +273,13 @@ bool pyAgeVault::HasDevice( const char * deviceName )
     return VaultAgeHasDevice(wStr);
 }
 
-PyObject * pyAgeVault::GetDevice( const char * deviceName )
+PyObject* pyAgeVault::GetDevice(const char* deviceName)
 {
     wchar_t wStr[MAX_PATH];
     StrToUnicode(wStr, deviceName, arrsize(wStr));
 
-    if (RelVaultNode * rvn = VaultAgeGetDeviceIncRef(wStr)) {
-        PyObject * result = pyVaultTextNoteNode::New(rvn);
+    if (RelVaultNode* rvn = VaultAgeGetDeviceIncRef(wStr)) {
+        PyObject* result = pyVaultTextNoteNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -276,31 +288,31 @@ PyObject * pyAgeVault::GetDevice( const char * deviceName )
 }
 
 // Sets the inbox associated with a device.
-void pyAgeVault::SetDeviceInbox( const char * deviceName, const char * inboxName, PyObject * cbObject, uint32_t cbContext )
+void pyAgeVault::SetDeviceInbox(const char* deviceName, const char* inboxName, PyObject* cbObject, uint32_t cbContext)
 {
-    pyVaultNode::pyVaultNodeOperationCallback * cb = new pyVaultNode::pyVaultNodeOperationCallback( cbObject );
-    cb->VaultOperationStarted( cbContext );
+    pyVaultNode::pyVaultNodeOperationCallback* cb = new pyVaultNode::pyVaultNodeOperationCallback(cbObject);
+    cb->VaultOperationStarted(cbContext);
 
     wchar_t wDev[MAX_PATH];
     StrToUnicode(wDev, deviceName, arrsize(wDev));
     wchar_t wInb[MAX_PATH];
     StrToUnicode(wInb, inboxName, arrsize(wInb));
-    
-    if (RelVaultNode * rvn = VaultAgeSetDeviceInboxAndWaitIncRef(wDev, wInb)) {
+
+    if (RelVaultNode* rvn = VaultAgeSetDeviceInboxAndWaitIncRef(wDev, wInb)) {
         cb->SetNode(rvn);
         rvn->DecRef();
     }
 
-    cb->VaultOperationComplete( cbContext, cb->GetNode() ? hsOK : hsFail ); // cbHolder deletes itself here.
+    cb->VaultOperationComplete(cbContext, cb->GetNode() ? hsOK : hsFail);   // cbHolder deletes itself here.
 }
 
-PyObject * pyAgeVault::GetDeviceInbox( const char * deviceName )
+PyObject* pyAgeVault::GetDeviceInbox(const char* deviceName)
 {
     wchar_t wStr[MAX_PATH];
     StrToUnicode(wStr, deviceName, arrsize(wStr));
 
-    if (RelVaultNode * rvn = VaultAgeGetDeviceInboxIncRef(wStr)) {
-        PyObject * result = pyVaultTextNoteNode::New(rvn);
+    if (RelVaultNode* rvn = VaultAgeGetDeviceInboxIncRef(wStr)) {
+        PyObject* result = pyVaultTextNoteNode::New(rvn);
         rvn->DecRef();
         return result;
     }
@@ -308,34 +320,37 @@ PyObject * pyAgeVault::GetDeviceInbox( const char * deviceName )
     PYTHON_RETURN_NONE;
 }
 
-PyObject * pyAgeVault::GetAgeSDL() const
+PyObject* pyAgeVault::GetAgeSDL() const
 {
-    plStateDataRecord * rec = new plStateDataRecord;
+    plStateDataRecord* rec = new plStateDataRecord;
+
     if (!VaultAgeGetAgeSDL(rec)) {
         delete rec;
         PYTHON_RETURN_NONE;
+    } else {
+        return pySDLStateDataRecord::New(rec);
     }
-    else {
-        return pySDLStateDataRecord::New( rec );
-    }   
 }
 
-void pyAgeVault::UpdateAgeSDL( pySDLStateDataRecord & pyrec )
+void pyAgeVault::UpdateAgeSDL(pySDLStateDataRecord& pyrec)
 {
-    plStateDataRecord * rec = pyrec.GetRec();
-    if ( !rec )
+    plStateDataRecord* rec = pyrec.GetRec();
+
+    if (!rec) {
         return;
-        
+    }
+
     VaultAgeUpdateAgeSDL(rec);
 }
 
-PyObject* pyAgeVault::FindNode( pyVaultNode* templateNode ) const
+PyObject* pyAgeVault::FindNode(pyVaultNode* templateNode) const
 {
-    if (RelVaultNode * rvn = VaultGetAgeNodeIncRef()) {
-        RelVaultNode * find = rvn->GetChildNodeIncRef(templateNode->fNode, 1);
+    if (RelVaultNode* rvn = VaultGetAgeNodeIncRef()) {
+        RelVaultNode* find = rvn->GetChildNodeIncRef(templateNode->fNode, 1);
         rvn->DecRef();
+
         if (find) {
-            PyObject * result = pyVaultNode::New(find);
+            PyObject* result = pyVaultNode::New(find);
             find->DecRef();
             return result;
         }

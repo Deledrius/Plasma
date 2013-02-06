@@ -54,8 +54,7 @@ class plStatusLog;
 class hsStream;
 class plProfileVar;
 
-class plProfileManagerFull
-{
+class plProfileManagerFull {
 public:
     typedef std::set<plString, plString::less_i> GroupSet;
 
@@ -69,8 +68,7 @@ protected:
     std::vector<plGraphPlate*> fGraphs;
     plGraphPlate* fDetailGraph;
 
-    struct detailVar
-    {
+    struct detailVar {
         plProfileVar* var;
         int32_t min;
         int32_t max;
@@ -82,7 +80,7 @@ protected:
     plProfileVar* fShowLaps;
     uint32_t fMinLap; // For Display
 
-    void IPrintGroup(hsStream* s, const char* groupName, bool printTitle=false);
+    void IPrintGroup(hsStream* s, const char* groupName, bool printTitle = false);
     void ILogStats();
 
     plProfileVar* IFindTimer(const char* name);
@@ -101,13 +99,22 @@ public:
     void ShowGroup(const char* groupName);
     void ShowNextGroup();
 
-    struct LapPair { const char* group; const char* varName; };
+    struct LapPair {
+        const char* group;
+        const char* varName;
+    };
     typedef std::vector<LapPair> LapNames;
     void GetLaps(LapNames& lapNames);
     void ShowLaps(const char* groupName, const char* varName);
-    void SetMinLap(int m) { fMinLap = m; };
-    void PageDownLaps() { fMinLap += 40; }
-    void PageUpLaps() { fMinLap = (fMinLap < 40) ? 0 : fMinLap - 40;}
+    void SetMinLap(int m) {
+        fMinLap = m;
+    };
+    void PageDownLaps() {
+        fMinLap += 40;
+    }
+    void PageUpLaps() {
+        fMinLap = (fMinLap < 40) ? 0 : fMinLap - 40;
+    }
 
     void CreateGraph(const char* varName, uint32_t min, uint32_t max);
 

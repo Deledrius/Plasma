@@ -51,8 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plAvBrainCritter;
 
 // abstract base class for all AI-related messages
-class plAIMsg : public plMessage
-{
+class plAIMsg : public plMessage {
 public:
     plAIMsg();
     plAIMsg(const plKey& sender, const plKey& receiver);
@@ -63,12 +62,15 @@ public:
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    void BrainUserString(const std::string& userStr) {fBrainUserStr = userStr;}
-    std::string BrainUserString() const {return fBrainUserStr;}
+    void BrainUserString(const std::string& userStr) {
+        fBrainUserStr = userStr;
+    }
+    std::string BrainUserString() const {
+        return fBrainUserStr;
+    }
 
     // enum for all messages to make things easier for people that use us
-    enum
-    {
+    enum {
         kAIMsg_Unknown,
         kAIMsg_BrainCreated,
         kAIMsg_ArrivedAtGoal,
@@ -80,23 +82,29 @@ private:
 
 // message spammed to anyone listening so they can grab the brain's key and talk to it
 // does NOT get net-propped
-class plAIBrainCreatedMsg : public plAIMsg
-{
+class plAIBrainCreatedMsg : public plAIMsg {
 public:
-    plAIBrainCreatedMsg(): plAIMsg() {SetBCastFlag(plMessage::kBCastByExactType);}
-    plAIBrainCreatedMsg(const plKey& sender): plAIMsg(sender, nil) {SetBCastFlag(plMessage::kBCastByExactType);}
+    plAIBrainCreatedMsg(): plAIMsg() {
+        SetBCastFlag(plMessage::kBCastByExactType);
+    }
+    plAIBrainCreatedMsg(const plKey& sender): plAIMsg(sender, nil) {
+        SetBCastFlag(plMessage::kBCastByExactType);
+    }
 
     CLASSNAME_REGISTER(plAIBrainCreatedMsg);
     GETINTERFACE_ANY(plAIBrainCreatedMsg, plAIMsg);
 
-    virtual void Read(hsStream* stream, hsResMgr* mgr) {plAIMsg::Read(stream, mgr);}
-    virtual void Write(hsStream* stream, hsResMgr* mgr) {plAIMsg::Write(stream, mgr);}
+    virtual void Read(hsStream* stream, hsResMgr* mgr) {
+        plAIMsg::Read(stream, mgr);
+    }
+    virtual void Write(hsStream* stream, hsResMgr* mgr) {
+        plAIMsg::Write(stream, mgr);
+    }
 };
 
 // message sent when the brain arrives at it's specified goal
 // does NOT get net-propped
-class plAIArrivedAtGoalMsg : public plAIMsg
-{
+class plAIArrivedAtGoalMsg : public plAIMsg {
 public:
     plAIArrivedAtGoalMsg(): plAIMsg(), fGoal(0, 0, 0) {}
     plAIArrivedAtGoalMsg(const plKey& sender, const plKey& receiver): plAIMsg(sender, receiver), fGoal(0, 0, 0) {}
@@ -107,8 +115,12 @@ public:
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    void Goal(hsPoint3 goal) {fGoal = goal;}
-    hsPoint3 Goal() const {return fGoal;}
+    void Goal(hsPoint3 goal) {
+        fGoal = goal;
+    }
+    hsPoint3 Goal() const {
+        return fGoal;
+    }
 
 private:
     hsPoint3 fGoal;

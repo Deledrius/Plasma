@@ -48,58 +48,55 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // When adding to the compiled table, make sure
 // you add the include in plShaderTable.cpp, or you'll
 // compile fine but have a nil shader (FFP) at runtime.
-namespace plShaderID
-{
-    enum ID
-    {
-        Unregistered = 0,
-            vs_WaveFixedFin6,   //OBSOLETE
-            ps_WaveFixed,
-            vs_CompCosines,
-            ps_CompCosines,     //OBSOLETE
-            vs_ShoreLeave6,     //OBSOLETE
-            ps_ShoreLeave6,
-            vs_WaveRip,         //OBSOLETE
-            ps_WaveRip,
-            vs_WaveDec1Lay,     //OBSOLETE
-            vs_WaveDec2Lay11,   //OBSOLETE
-            vs_WaveDec2Lay12,   //OBSOLETE
-            vs_WaveDecEnv,      //OBSOLETE
-            ps_CbaseAbase,
-            ps_CalphaAbase,
-            ps_CalphaAMult,
-            ps_CalphaAadd,
-            ps_CaddAbase,
-            ps_CaddAMult,
-            ps_CaddAAdd,
-            ps_CmultAbase,
-            ps_CmultAMult,
-            ps_CmultAAdd,
-            ps_WaveDecEnv,
-            vs_WaveGraph2,
-            ps_WaveGraph,
-            vs_WaveGridFin,     //OBSOLETE
-            ps_WaveGrid,        //OBSOLETE
-            vs_BiasNormals,
-            ps_BiasNormals,
-            vs_ShoreLeave7,
-            vs_WaveRip7,
-            ps_MoreCosines,
-            vs_WaveDec1Lay_7,
-            vs_WaveDec2Lay11_7,
-            vs_WaveDec2Lay12_7,
-            vs_WaveDecEnv_7,
-            vs_WaveFixedFin7,
-            vs_GrassShader,
-            ps_GrassShader,
+namespace plShaderID {
+enum ID {
+    Unregistered = 0,
+    vs_WaveFixedFin6,   //OBSOLETE
+    ps_WaveFixed,
+    vs_CompCosines,
+    ps_CompCosines,     //OBSOLETE
+    vs_ShoreLeave6,     //OBSOLETE
+    ps_ShoreLeave6,
+    vs_WaveRip,         //OBSOLETE
+    ps_WaveRip,
+    vs_WaveDec1Lay,     //OBSOLETE
+    vs_WaveDec2Lay11,   //OBSOLETE
+    vs_WaveDec2Lay12,   //OBSOLETE
+    vs_WaveDecEnv,      //OBSOLETE
+    ps_CbaseAbase,
+    ps_CalphaAbase,
+    ps_CalphaAMult,
+    ps_CalphaAadd,
+    ps_CaddAbase,
+    ps_CaddAMult,
+    ps_CaddAAdd,
+    ps_CmultAbase,
+    ps_CmultAMult,
+    ps_CmultAAdd,
+    ps_WaveDecEnv,
+    vs_WaveGraph2,
+    ps_WaveGraph,
+    vs_WaveGridFin,     //OBSOLETE
+    ps_WaveGrid,        //OBSOLETE
+    vs_BiasNormals,
+    ps_BiasNormals,
+    vs_ShoreLeave7,
+    vs_WaveRip7,
+    ps_MoreCosines,
+    vs_WaveDec1Lay_7,
+    vs_WaveDec2Lay11_7,
+    vs_WaveDec2Lay12_7,
+    vs_WaveDecEnv_7,
+    vs_WaveFixedFin7,
+    vs_GrassShader,
+    ps_GrassShader,
 
-            kNumShaders
-    };
+    kNumShaders
+};
 };
 
 
-class plShaderDecl
-{
+class plShaderDecl {
 protected:
     const plShaderID::ID    fID;
     const uint32_t            fbyteLen;
@@ -110,17 +107,23 @@ public:
     plShaderDecl(const char* const fname, plShaderID::ID id = plShaderID::Unregistered, uint32_t byteLen = 0, const uint8_t* const codes = 0L) : fID(id), fbyteLen(byteLen), fCodes(codes), fFileName(fname) {}
     // Data (fCodes) is never deleted, It points to memory compiled in.
 
-    plShaderID::ID GetID() const { return fID; }
-    uint32_t GetByteLen() const { return fbyteLen; }
-    const uint8_t* GetCodes() const { return fCodes; }
-    const char* GetFileName() const { return fFileName; }
+    plShaderID::ID GetID() const {
+        return fID;
+    }
+    uint32_t GetByteLen() const {
+        return fbyteLen;
+    }
+    const uint8_t* GetCodes() const {
+        return fCodes;
+    }
+    const char* GetFileName() const {
+        return fFileName;
+    }
 };
 
-class plShaderTableInst
-{
+class plShaderTableInst {
 protected:
-    enum
-    {
+    enum {
         kLoadFromFile       = 0x1
     };
 
@@ -130,14 +133,26 @@ protected:
 
     plShaderTableInst();
 
-    bool LoadFromFile() const { return 0 != (fFlags & kLoadFromFile); }
-    void SetLoadFromFile(bool on) { if(on) fFlags |= kLoadFromFile; else fFlags &= ~kLoadFromFile; }
+    bool LoadFromFile() const {
+        return 0 != (fFlags & kLoadFromFile);
+    }
+    void SetLoadFromFile(bool on) {
+        if (on) {
+            fFlags |= kLoadFromFile;
+        } else {
+            fFlags &= ~kLoadFromFile;
+        }
+    }
 
-    const plShaderDecl* Decl(plShaderID::ID id) const { return fTable[id]; }
+    const plShaderDecl* Decl(plShaderID::ID id) const {
+        return fTable[id];
+    }
 
     void Register(const plShaderDecl* decl);
 
-    bool IsRegistered(plShaderID::ID id) const { return (id == 0) || ((id < plShaderID::kNumShaders) && fTable[id]); }
+    bool IsRegistered(plShaderID::ID id) const {
+        return (id == 0) || ((id < plShaderID::kNumShaders) && fTable[id]);
+    }
 
 public:
     virtual ~plShaderTableInst();
@@ -145,31 +160,43 @@ public:
     friend class plShaderTable;
 };
 
-class plShaderTable
-{
+class plShaderTable {
 protected:
     static plShaderTableInst* fInst;
 
     static plShaderTableInst& IMakeInstance();
 
-    static plShaderTableInst& Instance() { return fInst ? *fInst : IMakeInstance(); }
+    static plShaderTableInst& Instance() {
+        return fInst ? *fInst : IMakeInstance();
+    }
 
 public:
 
-    static bool LoadFromFile() { return Instance().LoadFromFile(); }
-    static void SetLoadFromFile(bool on) { Instance().SetLoadFromFile(on); }
-    
-    static const plShaderDecl* Decl(plShaderID::ID id) { return Instance().Decl(id); }
+    static bool LoadFromFile() {
+        return Instance().LoadFromFile();
+    }
+    static void SetLoadFromFile(bool on) {
+        Instance().SetLoadFromFile(on);
+    }
 
-    static void Register(const plShaderDecl* decl) { Instance().Register(decl); }
+    static const plShaderDecl* Decl(plShaderID::ID id) {
+        return Instance().Decl(id);
+    }
 
-    static bool IsRegistered(plShaderID::ID id) { return Instance().IsRegistered(id); }
+    static void Register(const plShaderDecl* decl) {
+        Instance().Register(decl);
+    }
+
+    static bool IsRegistered(plShaderID::ID id) {
+        return Instance().IsRegistered(id);
+    }
 };
 
-class plShaderRegister
-{
+class plShaderRegister {
 public:
-    plShaderRegister(const plShaderDecl* decl) { plShaderTable::Register(decl); }
+    plShaderRegister(const plShaderDecl* decl) {
+        plShaderTable::Register(decl);
+    }
 };
 
 

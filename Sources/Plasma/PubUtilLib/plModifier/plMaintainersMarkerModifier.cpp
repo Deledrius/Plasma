@@ -57,13 +57,13 @@ void plMaintainersMarkerModifier::RemoveTarget(plSceneObject* so)
     plAvatarMgr::GetInstance()->RemoveMaintainersMarker(this);
 }
 
-void plMaintainersMarkerModifier::Read(hsStream *stream, hsResMgr *mgr)
+void plMaintainersMarkerModifier::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMultiModifier::Read(stream, mgr);
     stream->ReadLE(&fCalibrated);
 }
 
-void plMaintainersMarkerModifier::Write(hsStream *stream, hsResMgr *mgr)
+void plMaintainersMarkerModifier::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMultiModifier::Write(stream, mgr);
     stream->WriteLE(fCalibrated);

@@ -58,11 +58,12 @@ pyCluster::pyCluster(pyKey& key)
 
 void pyCluster::SetVisible(bool visible)
 {
-    if (fClusterKey)
-    {
+    if (fClusterKey) {
         plClusterGroup* clusterGroup = plClusterGroup::ConvertNoRef(fClusterKey->ObjectIsLoaded());
-        if (clusterGroup)
+
+        if (clusterGroup) {
             clusterGroup->SetVisible(visible);
+        }
     }
 }
 

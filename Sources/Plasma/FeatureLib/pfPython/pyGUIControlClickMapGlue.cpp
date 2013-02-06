@@ -54,19 +54,19 @@ PYTHON_DEFAULT_DEALLOC_DEFINITION(ptGUIControlClickMap)
 
 PYTHON_INIT_DEFINITION(ptGUIControlClickMap, args, keywords)
 {
-    PyObject *keyObject = NULL;
-    if (!PyArg_ParseTuple(args, "O", &keyObject))
-    {
-        PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
-        PYTHON_RETURN_INIT_ERROR;
-    }
-    if (!pyKey::Check(keyObject))
-    {
+    PyObject* keyObject = NULL;
+
+    if (!PyArg_ParseTuple(args, "O", &keyObject)) {
         PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
         PYTHON_RETURN_INIT_ERROR;
     }
 
-    pyKey *key = pyKey::ConvertFrom(keyObject);
+    if (!pyKey::Check(keyObject)) {
+        PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
+        PYTHON_RETURN_INIT_ERROR;
+    }
+
+    pyKey* key = pyKey::ConvertFrom(keyObject);
     self->fThis->setKey(key->getKey());
 
     PYTHON_RETURN_INIT_OK;
@@ -88,25 +88,25 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGUIControlClickMap, getLastMouseDragPoint)
 }
 
 PYTHON_START_METHODS_TABLE(ptGUIControlClickMap)
-    PYTHON_METHOD_NOARGS(ptGUIControlClickMap, getLastMousePoint, "Returns the last point the mouse was at"),
-    PYTHON_METHOD_NOARGS(ptGUIControlClickMap, getLastMouseUpPoint, "Returns the last point the mouse was released at"),
-    PYTHON_METHOD_NOARGS(ptGUIControlClickMap, getLastMouseDragPoint, "Returns the last point the mouse was dragged to"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGUIControlClickMap, getLastMousePoint, "Returns the last point the mouse was at"),
+                     PYTHON_METHOD_NOARGS(ptGUIControlClickMap, getLastMouseUpPoint, "Returns the last point the mouse was released at"),
+                     PYTHON_METHOD_NOARGS(ptGUIControlClickMap, getLastMouseDragPoint, "Returns the last point the mouse was dragged to"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGUIControlClickMap, pyGUIControl, "Params: ctrlKey\nPlasma GUI control Click Map");
 
 // required functions for PyObject interoperability
-PyObject *pyGUIControlClickMap::New(pyKey& gckey)
+PyObject* pyGUIControlClickMap::New(pyKey& gckey)
 {
-    ptGUIControlClickMap *newObj = (ptGUIControlClickMap*)ptGUIControlClickMap_type.tp_new(&ptGUIControlClickMap_type, NULL, NULL);
+    ptGUIControlClickMap* newObj = (ptGUIControlClickMap*)ptGUIControlClickMap_type.tp_new(&ptGUIControlClickMap_type, NULL, NULL);
     newObj->fThis->fGCkey = gckey.getKey();
     return (PyObject*)newObj;
 }
 
-PyObject *pyGUIControlClickMap::New(plKey objkey)
+PyObject* pyGUIControlClickMap::New(plKey objkey)
 {
-    ptGUIControlClickMap *newObj = (ptGUIControlClickMap*)ptGUIControlClickMap_type.tp_new(&ptGUIControlClickMap_type, NULL, NULL);
+    ptGUIControlClickMap* newObj = (ptGUIControlClickMap*)ptGUIControlClickMap_type.tp_new(&ptGUIControlClickMap_type, NULL, NULL);
     newObj->fThis->fGCkey = objkey;
     return (PyObject*)newObj;
 }
@@ -118,7 +118,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptGUIControlClickMap, pyGUIControlClickMap)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyGUIControlClickMap::AddPlasmaClasses(PyObject *m)
+void pyGUIControlClickMap::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptGUIControlClickMap);

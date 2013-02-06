@@ -47,21 +47,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class Animatable;
 class IParamBlock2;
 
-class plNoteTrackDlg
-{
+class plNoteTrackDlg {
 protected:
     // Derived class needs to set these
     HWND fhAnim;
     HWND fhLoop;
-    IParamBlock2 *fPB;
+    IParamBlock2* fPB;
     int fAnimID;
     int fLoopID;
-    Animatable *fOwner;
+    Animatable* fOwner;
 
-    SegmentMap *fSegMap;
+    SegmentMap* fSegMap;
 
-    enum
-    {
+    enum {
         kDefault,
         kName,
     };
@@ -70,7 +68,7 @@ public:
     plNoteTrackDlg();
     virtual ~plNoteTrackDlg();
 
-    void Init(HWND hAnim, HWND hLoop, int animID, int loopID, IParamBlock2 *pb, Animatable *owner);
+    void Init(HWND hAnim, HWND hLoop, int animID, int loopID, IParamBlock2* pb, Animatable* owner);
     void Load();
 
     void AnimChanged();
@@ -86,7 +84,7 @@ protected:
     void ILoadAnims();
     void ILoadLoops();
 
-    const char *IGetSel(HWND hCombo);
+    const char* IGetSel(HWND hCombo);
 };
 
 

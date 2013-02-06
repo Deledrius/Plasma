@@ -63,8 +63,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 extern HINSTANCE hInstance;
 
-class plExportDlgImp : public plExportDlg
-{
+class plExportDlgImp : public plExportDlg {
 protected:
     HWND fDlg;          // Handle to the setup dialog
     bool fPreshade;
@@ -97,12 +96,22 @@ public:
 
     virtual void Show();
 
-    virtual bool IsExporting() { return fExporting; }
-    virtual bool IsAutoExporting() { return fAutoExporting; }
+    virtual bool IsExporting() {
+        return fExporting;
+    }
+    virtual bool IsAutoExporting() {
+        return fAutoExporting;
+    }
 
-    virtual bool GetDoPreshade() { return fPreshade; }
-    virtual bool GetPhysicalsOnly() { return fPhysicalsOnly; }
-    virtual bool GetDoLightMap() { return fLightMap; }
+    virtual bool GetDoPreshade() {
+        return fPreshade;
+    }
+    virtual bool GetPhysicalsOnly() {
+        return fPhysicalsOnly;
+    }
+    virtual bool GetDoLightMap() {
+        return fLightMap;
+    }
     virtual const char* GetExportPage();
 
     virtual void StartAutoExport();
@@ -153,27 +162,30 @@ BOOL plExportDlgImp::ForwardDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM l
 
 const char* plExportDlgImp::GetExportPage()
 {
-    if (fExportPage[0] == '\0')
+    if (fExportPage[0] == '\0') {
         return nil;
-    else
+    } else {
         return fExportPage;
+    }
 }
 
 typedef std::set<plComponentBase*> CompSet;
 
 static void GetPagesRecur(plMaxNode* node, CompSet& comps)
 {
-    if (!node)
+    if (!node) {
         return;
+    }
 
     plComponentBase* comp = node->ConvertToComponent();
-    if (comp && (comp->ClassID() == ROOM_CID || comp->ClassID() == PAGEINFO_CID))
-    {
+
+    if (comp && (comp->ClassID() == ROOM_CID || comp->ClassID() == PAGEINFO_CID)) {
         comps.insert(comp);
     }
 
-    for (int i = 0; i < node->NumberOfChildren(); i++)
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
         GetPagesRecur((plMaxNode*)node->GetChildNode(i), comps);
+    }
 }
 
 static const char* kAllPages = "(All Pages)";
@@ -200,7 +212,7 @@ void plExportDlgImp::IInitDlg(HWND hDlg)
     CheckDlgButton(hDlg, IDC_LIGHTMAP_CHECK, fLightMap ? BST_CHECKED : BST_UNCHECKED);
 
     char buf[256];
-    sprintf(buf, "Last export took %d:%02d", fLastExportTime/60, fLastExportTime%60);
+    sprintf(buf, "Last export took %d:%02d", fLastExportTime / 60, fLastExportTime % 60);
     SetDlgItemText(hDlg, IDC_LAST_EXPORT, buf);
 
     SetWindowPos(hDlg, NULL, fXPos, fYPos, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
@@ -215,22 +227,21 @@ void plExportDlgImp::IInitDlg(HWND hDlg)
 
     CompSet comps;
     GetPagesRecur((plMaxNode*)GetCOREInterface()->GetRootNode(), comps);
-    for (CompSet::iterator it = comps.begin(); it != comps.end(); it++)
-    {
+
+    for (CompSet::iterator it = comps.begin(); it != comps.end(); it++) {
         const char* page = LocCompGetPage(*it);
-        if (page)
-        {
+
+        if (page) {
             int idx = ComboBox_AddString(hPages, page);
-            if (!strcmp(page, fExportPage))
-            {
+
+            if (!strcmp(page, fExportPage)) {
                 foundPage = true;
                 ComboBox_SetCurSel(hPages, idx);
             }
         }
     }
 
-    if (!foundPage)
-    {
+    if (!foundPage) {
         fExportPage[0] = '\0';
         ComboBox_SetCurSel(hPages, 0);
     }
@@ -245,75 +256,62 @@ void plExportDlgImp::IInitDlg(HWND hDlg)
 
 BOOL plExportDlgImp::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
+    switch (msg) {
     case WM_INITDIALOG:
         IInitDlg(hDlg);
         return TRUE;
 
-    case WM_COMMAND:
-        {
+    case WM_COMMAND: {
             int cmd = HIWORD(wParam);
             int resID = LOWORD(wParam);
 
-            if (cmd == BN_CLICKED)
-            {
-                if (resID == IDCANCEL)
-                {
+            if (cmd == BN_CLICKED) {
+                if (resID == IDCANCEL) {
                     IDestroy();
                     return TRUE;
-                }
-                else if (resID == IDC_EXPORT)
-                {
+                } else if (resID == IDC_EXPORT) {
                     IDoExport();
                     return TRUE;
-                }
-                else if (resID == IDC_PRESHADE_CHECK)
-                {
+                } else if (resID == IDC_PRESHADE_CHECK) {
                     fPreshade = (IsDlgButtonChecked(hDlg, IDC_PRESHADE_CHECK) == BST_CHECKED);
                     return TRUE;
-                }
-                else if (resID == IDC_PHYSICAL_CHECK)
-                {
+                } else if (resID == IDC_PHYSICAL_CHECK) {
                     fPhysicalsOnly = (IsDlgButtonChecked(hDlg, IDC_PHYSICAL_CHECK) == BST_CHECKED);
                     return TRUE;
-                }
-                else if (resID == IDC_LIGHTMAP_CHECK)
-                {
+                } else if (resID == IDC_LIGHTMAP_CHECK) {
                     fLightMap = (IsDlgButtonChecked(hDlg, IDC_LIGHTMAP_CHECK) == BST_CHECKED);
                     return TRUE;
-                }
-                else if (resID == IDC_DIR)
-                {
+                } else if (resID == IDC_DIR) {
                     // Get a new client path
                     plFileName path = plMaxConfig::GetClientPath(true);
-                    if (path.IsValid())
+
+                    if (path.IsValid()) {
                         SetDlgItemText(hDlg, IDC_CLIENT_PATH, path.AsString().c_str());
+                    }
+
                     return TRUE;
-                }
-                else if (resID == IDC_RADIO_FILE || resID == IDC_RADIO_DIR)
-                {
+                } else if (resID == IDC_RADIO_FILE || resID == IDC_RADIO_DIR) {
                     IGetRadio(hDlg);
                     return TRUE;
-                }
-                else if (resID == IDC_BROWSE_EXPORT)
-                {
+                } else if (resID == IDC_BROWSE_EXPORT) {
                     fExportSourceDir = plBrowseFolder::GetFolder(fExportSourceDir,
-                                              "Choose the source directory",
-                                              hDlg);
+                                       "Choose the source directory",
+                                       hDlg);
                     SetDlgItemTextW(hDlg, IDC_EXPORT_PATH, fExportSourceDir.AsString().ToWchar());
                     return TRUE;
                 }
-            }
-            else if (cmd == CBN_SELCHANGE && resID == IDC_PAGE_COMBO)
-            {
+            } else if (cmd == CBN_SELCHANGE && resID == IDC_PAGE_COMBO) {
                 int sel = ComboBox_GetCurSel((HWND)lParam);
+
                 // If the user selected a page, save it
-                if (sel != 0 && sel != CB_ERR)
+                if (sel != 0 && sel != CB_ERR) {
                     ComboBox_GetText((HWND)lParam, fExportPage, sizeof(fExportPage));
+                }
                 // Else, clear it (export all pages)
-                else
+                else {
                     fExportPage[0] = '\0';
+                }
+
                 return TRUE;
             }
         }
@@ -346,15 +344,15 @@ void plExportDlgImp::IDoExport()
     // For export time stats
     DWORD exportTime = timeGetTime();
 
-    if (fExportFile)
+    if (fExportFile) {
         IExportCurrentFile(exportPath.AsString().c_str());
-    else
-    {
+    } else {
         std::vector<plFileName> sources = plFileSystem::ListDir(fExportSourceDir, "*.max");
-        for (auto iter = sources.begin(); iter != sources.end(); ++iter)
-        {
-            if (GetCOREInterface()->LoadFromFile(iter->AsString().c_str()))
+
+        for (auto iter = sources.begin(); iter != sources.end(); ++iter) {
+            if (GetCOREInterface()->LoadFromFile(iter->AsString().c_str())) {
                 IExportCurrentFile(exportPath.AsString().c_str());
+            }
         }
     }
 
@@ -367,8 +365,7 @@ void plExportDlgImp::IDoExport()
 
 void plExportDlgImp::IDestroy()
 {
-    if (fDlg)
-    {
+    if (fDlg) {
         // Save the window pos
         RECT rect;
         GetWindowRect(fDlg, &rect);
@@ -382,16 +379,17 @@ void plExportDlgImp::IDestroy()
 
 void plExportDlgImp::Show()
 {
-    if (!fDlg)
+    if (!fDlg) {
         fDlg = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_EXPORT), GetCOREInterface()->GetMAXHWnd(), ForwardDlgProc);
+    }
 }
 
 static bool IsExcluded(const plFileName& fileName, std::vector<plFileName>& excludeFiles)
 {
-    for (int i = 0; i < excludeFiles.size(); i++)
-    {
-        if (fileName == excludeFiles[i])
+    for (int i = 0; i < excludeFiles.size(); i++) {
+        if (fileName == excludeFiles[i]) {
             return true;
+        }
     }
 
     return false;
@@ -406,7 +404,7 @@ static bool AutoExportDir(const char* inputDir, const char* outputDir, const plF
 
     char outputLog[MAX_PATH];
     sprintf(outputLog, "%s\\AutoExport.log", outputDir);
-    
+
     char doneDir[MAX_PATH];
     sprintf(doneDir, "%s\\Done\\", inputDir);
     CreateDirectory(doneDir, NULL);
@@ -415,32 +413,34 @@ static bool AutoExportDir(const char* inputDir, const char* outputDir, const plF
     TheManager->SetSilentMode(TRUE);
 
     std::vector<plFileName> sources = plFileSystem::ListDir(inputDir, "*.max");
-    for (auto iter = sources.begin(); iter != sources.end(); ++iter)
-    {
-        if (IsExcluded(iter->GetFileName(), excludeFiles))
+
+    for (auto iter = sources.begin(); iter != sources.end(); ++iter) {
+        if (IsExcluded(iter->GetFileName(), excludeFiles)) {
             continue;
+        }
 
         // If we're doing grouped files, and this isn't one, keep looking
-        if (groupFiles.IsValid() && groupFiles != iter->GetFileName())
+        if (groupFiles.IsValid() && groupFiles != iter->GetFileName()) {
             continue;
+        }
 
         hsUNIXStream log;
-        if (log.Open(outputLog, "ab"))
-        {
+
+        if (log.Open(outputLog, "ab")) {
             log.WriteFmt("%s\r\n", iter->GetFileName().c_str());
             log.Close();
         }
 
-        if (GetCOREInterface()->LoadFromFile(iter->AsString().c_str()))
-        {
+        if (GetCOREInterface()->LoadFromFile(iter->AsString().c_str())) {
             plFileSystem::Move(*iter, plFileName::Join(inputDir, "Done", iter->GetFileName()));
 
             GetCOREInterface()->ExportToFile(outputFileName, TRUE);
             exportedFile = true;
 
             // If we're not doing grouped files, this is it, we exported our one file
-            if (!groupFiles.IsValid())
+            if (!groupFiles.IsValid()) {
                 break;
+            }
         }
     }
 
@@ -452,12 +452,12 @@ static void ShutdownMax()
 {
     // If we're auto-exporting, write out a file to let the build scripts know
     // we're done writing to disk, and if we don't exit soon we probably crashed
-    if (plExportDlg::Instance().IsAutoExporting())
-    {
+    if (plExportDlg::Instance().IsAutoExporting()) {
         hsUNIXStream s;
         s.Open("log\\AutoExportDone.txt", "wb");
         s.Close();
     }
+
     GetCOREInterface()->FlushUndoBuffer();
     SetSaveRequiredFlag(FALSE);
     PostMessage(GetCOREInterface()->GetMAXHWnd(), WM_CLOSE, 0, 0);
@@ -470,8 +470,8 @@ static void GetFileNameSection(const char* configFile, const char* keyName, std:
 
     char* seps = ",";
     char* token = strtok(source, seps);
-    while (token != NULL)
-    {
+
+    while (token != NULL) {
         strings.push_back(token);
         token = strtok(NULL, seps);
     }
@@ -489,8 +489,9 @@ void plExportDlgImp::StartAutoExport()
     char outputDir[MAX_PATH];
     GetPrivateProfileString("Settings", "MaxOutputDir", "", outputDir, sizeof(outputDir), configFile);
 
-    if (inputDir[0] == '\0' || outputDir == '\0')
+    if (inputDir[0] == '\0' || outputDir == '\0') {
         return;
+    }
 
     fAutoExporting = true;
 
@@ -507,18 +508,15 @@ void plExportDlgImp::StartAutoExport()
     std::vector<plFileName> groupedFiles;
     GetFileNameSection(configFile, "GroupedFiles", groupedFiles);
 
-    for (int i = 0; i < groupedFiles.size(); i++)
-    {
-        if (AutoExportDir(inputDir, outputDir, groupedFiles[i], excludeFiles))
-        {
+    for (int i = 0; i < groupedFiles.size(); i++) {
+        if (AutoExportDir(inputDir, outputDir, groupedFiles[i], excludeFiles)) {
             ShutdownMax();
             fAutoExporting = false;
             return;
         }
     }
 
-    if (AutoExportDir(inputDir, outputDir, "", excludeFiles))
-    {
+    if (AutoExportDir(inputDir, outputDir, "", excludeFiles)) {
         ShutdownMax();
         fAutoExporting = false;
         return;

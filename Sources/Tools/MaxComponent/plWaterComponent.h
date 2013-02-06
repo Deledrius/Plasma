@@ -59,8 +59,7 @@ class plDynamicCamMap;
 
 class plWaveSet7;
 
-class plWaterComponent : public plComponent
-{
+class plWaterComponent : public plComponent {
 public:
     enum {
         kRefObject,
@@ -70,7 +69,7 @@ public:
         kWaterOpac, // Scalar
         kSpecularTint,  // Color
         kRippleScale, // determines ripple scale
-        
+
         kDepthOpac, // Depth at which overall opacity reaches 100% in feet
         kDepthRefl, // Depth at which reflection strength reaches 100% in feet
         kDepthWave, // Depth at which geometric wave height reaches 100% in feet
@@ -93,12 +92,12 @@ public:
 
         kEdgeOpac,
         kEdgeRadius,
-        
+
         kEnvRefresh,
 
         kGeoAngleDev,
         kTexAngleDev,
-        
+
         kGeoMinLen,
         kGeoMaxLen,
         kGeoAmpOverLen,
@@ -139,13 +138,17 @@ protected:
     bool            IReadRefObject(plMaxNodeBase* node, plFixedWaterState7& ws);
     bool            IMakeWaveSet(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    plWaveSetBase*  IGetWaveSet() const { return (plWaveSetBase*)fWaveSet; } // fWaveSet set in SetupProperties pass.
+    plWaveSetBase*  IGetWaveSet() const {
+        return (plWaveSetBase*)fWaveSet;    // fWaveSet set in SetupProperties pass.
+    }
 
     float        IGetWaterHeight();
 
 public:
     plWaterComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
@@ -154,7 +157,9 @@ public:
     virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
     virtual bool DeInit(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual int GetMinCap() { return plQuality::kPS_1_1; }
+    virtual int GetMinCap() {
+        return plQuality::kPS_1_1;
+    }
 
     // This works anytime.
     static float GetWaterHeight(INode* node); // node is component node.
@@ -168,8 +173,7 @@ public:
     IOResult    Load(ILoad* iLoad);
 };
 
-class plShoreComponent : public plComponent
-{
+class plShoreComponent : public plComponent {
 public:
     enum {
         kWaveSet
@@ -177,7 +181,9 @@ public:
 protected:
 public:
     plShoreComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
@@ -185,11 +191,12 @@ public:
     virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
     virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual int GetMinCap() { return plQuality::kPS_1_1; }
+    virtual int GetMinCap() {
+        return plQuality::kPS_1_1;
+    }
 };
 
-class plWDecalComponent : public plComponent
-{
+class plWDecalComponent : public plComponent {
 public:
     enum {
         kWaveSet,
@@ -198,7 +205,9 @@ public:
 protected:
 public:
     plWDecalComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
@@ -206,11 +215,12 @@ public:
     virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
     virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual int GetMinCap() { return plQuality::kPS_1_1; }
+    virtual int GetMinCap() {
+        return plQuality::kPS_1_1;
+    }
 };
 
-class plEnvMapComponent : public plComponent
-{
+class plEnvMapComponent : public plComponent {
 public:
     enum {
         kVisSets,
@@ -227,8 +237,7 @@ public:
     };
 
     // Map types
-    enum
-    {
+    enum {
         kMapCubic,
         kMapSingle,
     };
@@ -240,7 +249,9 @@ protected:
 
 public:
     plEnvMapComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.

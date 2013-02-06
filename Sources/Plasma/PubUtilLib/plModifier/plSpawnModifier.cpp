@@ -90,12 +90,12 @@ void plSpawnModifier::RemoveTarget(plSceneObject* so)
     plAvatarMgr::GetInstance()->RemoveSpawnPoint(this);
 }
 
-void plSpawnModifier::Read(hsStream *stream, hsResMgr *mgr)
+void plSpawnModifier::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMultiModifier::Read(stream, mgr);
 }
 
-void plSpawnModifier::Write(hsStream *stream, hsResMgr *mgr)
+void plSpawnModifier::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMultiModifier::Write(stream, mgr);
 }

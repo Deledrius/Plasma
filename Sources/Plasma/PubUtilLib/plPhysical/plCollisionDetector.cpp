@@ -79,17 +79,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 plArmatureMod* plCollisionDetector::IGetAvatarModifier(plKey key)
 {
     plSceneObject* avObj = plSceneObject::ConvertNoRef(key->ObjectIsLoaded());
-    if (avObj)
-    {
+
+    if (avObj) {
         // search through its modifiers to see if one of them is an avatar modifier
         plArmatureMod* avMod = nil;
-        for (int i = 0; i < avObj->GetNumModifiers(); i++)
-        {
+
+        for (int i = 0; i < avObj->GetNumModifiers(); i++) {
             const plModifier* mod = avObj->GetModifier(i);
             // see if it is an avatar mod base class
             avMod = const_cast<plArmatureMod*>(plArmatureMod::ConvertNoRef(mod));
-            if (avMod)
+
+            if (avMod) {
                 return avMod;
+            }
         }
     }
 
@@ -107,115 +109,118 @@ bool plCollisionDetector::MsgReceive(plMessage* msg)
 {
     plCollideMsg* pCollMsg = plCollideMsg::ConvertNoRef(msg);
 
-    if (pCollMsg)
-    {
+    if (pCollMsg) {
         // If the avatar is disabled (flying around), don't trigger
-        if (IIsDisabledAvatar(pCollMsg->fOtherKey))
+        if (IIsDisabledAvatar(pCollMsg->fOtherKey)) {
             return false;
+        }
 
-        if (fType & kTypeBump) 
-        {
-            if (!fBumped && !fTriggered)
-            {
-                for (int i = 0; i < fReceivers.Count(); i++)
-                {
+        if (fType & kTypeBump) {
+            if (!fBumped && !fTriggered) {
+                for (int i = 0; i < fReceivers.Count(); i++) {
                     plActivatorMsg* pMsg = new plActivatorMsg;
-                    pMsg->AddReceiver( fReceivers[i] );
+                    pMsg->AddReceiver(fReceivers[i]);
 
-                    if (fProxyKey)
+                    if (fProxyKey) {
                         pMsg->fHiteeObj = fProxyKey;
-                    else
+                    } else {
                         pMsg->fHiteeObj = GetTarget()->GetKey();
+                    }
+
                     pMsg->fHitterObj = pCollMsg->fOtherKey;
                     pMsg->SetSender(GetKey());
-                    pMsg->SetTriggerType( plActivatorMsg::kCollideContact );
-                    plgDispatch::MsgSend( pMsg );
+                    pMsg->SetTriggerType(plActivatorMsg::kCollideContact);
+                    plgDispatch::MsgSend(pMsg);
                 }
+
                 fBumped = true;
                 fTriggered = true;
                 plgDispatch::Dispatch()->RegisterForExactType(plEvalMsg::Index(), GetKey());
                 return true;
             }
-            if (fTriggered)
-            {
+
+            if (fTriggered) {
                 fBumped = true;
                 return true;
             }
+
             return false;
         }
 
-        for (int i = 0; i < fReceivers.Count(); i++)
-        {
+        for (int i = 0; i < fReceivers.Count(); i++) {
             plActivatorMsg* pMsg = new plActivatorMsg;
-            pMsg->AddReceiver( fReceivers[i] );
-            if (fProxyKey)
+            pMsg->AddReceiver(fReceivers[i]);
+
+            if (fProxyKey) {
                 pMsg->fHiteeObj = fProxyKey;
-            else
+            } else {
                 pMsg->fHiteeObj = GetTarget()->GetKey();
+            }
+
             pMsg->fHitterObj = pCollMsg->fOtherKey;
             pMsg->SetSender(GetKey());
-            
-            if (fType & kTypeEnter && pCollMsg->fEntering)
-            {
-                pMsg->SetTriggerType( plActivatorMsg::kCollideEnter );
-                plgDispatch::MsgSend( pMsg );
-                continue;
-            }
-            if (fType & kTypeUnEnter && pCollMsg->fEntering)
-            {
-                pMsg->SetTriggerType( plActivatorMsg::kEnterUnTrigger );
-                plgDispatch::MsgSend( pMsg );
-                continue;
-            }
-            if(fType & kTypeExit && !pCollMsg->fEntering)
-            {
-                pMsg->SetTriggerType( plActivatorMsg::kCollideExit );
-                plgDispatch::MsgSend( pMsg );
-                continue;
-            }
-            if(fType & kTypeUnExit && !pCollMsg->fEntering)
-            {
-                pMsg->SetTriggerType( plActivatorMsg::kExitUnTrigger );
-                plgDispatch::MsgSend( pMsg );
-                continue;
-            }
-            if (fType & kTypeAny)
-            {
-                pMsg->SetTriggerType( plActivatorMsg::kCollideContact );
-                plgDispatch::MsgSend( pMsg );
+
+            if (fType & kTypeEnter && pCollMsg->fEntering) {
+                pMsg->SetTriggerType(plActivatorMsg::kCollideEnter);
+                plgDispatch::MsgSend(pMsg);
                 continue;
             }
 
-            delete (pMsg);
+            if (fType & kTypeUnEnter && pCollMsg->fEntering) {
+                pMsg->SetTriggerType(plActivatorMsg::kEnterUnTrigger);
+                plgDispatch::MsgSend(pMsg);
+                continue;
+            }
+
+            if (fType & kTypeExit && !pCollMsg->fEntering) {
+                pMsg->SetTriggerType(plActivatorMsg::kCollideExit);
+                plgDispatch::MsgSend(pMsg);
+                continue;
+            }
+
+            if (fType & kTypeUnExit && !pCollMsg->fEntering) {
+                pMsg->SetTriggerType(plActivatorMsg::kExitUnTrigger);
+                plgDispatch::MsgSend(pMsg);
+                continue;
+            }
+
+            if (fType & kTypeAny) {
+                pMsg->SetTriggerType(plActivatorMsg::kCollideContact);
+                plgDispatch::MsgSend(pMsg);
+                continue;
+            }
+
+            delete(pMsg);
         }
+
         return true;
     }
 
     plEvalMsg* pEval = plEvalMsg::ConvertNoRef(msg);
-    if (pEval)
-    {
-        if (!fBumped && fTriggered)
-        {
+
+    if (pEval) {
+        if (!fBumped && fTriggered) {
             plgDispatch::Dispatch()->UnRegisterForExactType(plEvalMsg::Index(), GetKey());
-            for (int i = 0; i < fReceivers.Count(); i++)
-            {
+
+            for (int i = 0; i < fReceivers.Count(); i++) {
                 plActivatorMsg* pMsg = new plActivatorMsg;
-                pMsg->AddReceiver( fReceivers[i] );
-                if (fProxyKey)
+                pMsg->AddReceiver(fReceivers[i]);
+
+                if (fProxyKey) {
                     pMsg->fHiteeObj = fProxyKey;
-                else
+                } else {
                     pMsg->fHiteeObj = GetTarget()->GetKey();
+                }
+
                 pMsg->SetSender(GetKey());
-                pMsg->SetTriggerType( plActivatorMsg::kCollideUnTrigger );
-                plgDispatch::MsgSend( pMsg );
+                pMsg->SetTriggerType(plActivatorMsg::kCollideUnTrigger);
+                plgDispatch::MsgSend(pMsg);
                 fTriggered = false;
             }
-        }
-        else
-        if (fTriggered && fBumped)
-        {
+        } else if (fTriggered && fBumped) {
             fBumped = false;
         }
+
         return true;
     }
 
@@ -241,19 +246,22 @@ void plCollisionDetector::Write(hsStream* stream, hsResMgr* mgr)
 
 plCameraRegionDetector::~plCameraRegionDetector()
 {
-    for (plCameraMsgVec::iterator it = fMessages.begin(); it != fMessages.end(); ++it)
+    for (plCameraMsgVec::iterator it = fMessages.begin(); it != fMessages.end(); ++it) {
         hsRefCnt_SafeUnRef(*it);
+    }
 }
 
 void plCameraRegionDetector::ISendTriggerMsg()
 {
-    for (plCameraMsgVec::iterator it = fMessages.begin(); it != fMessages.end(); ++it)
-    {
+    for (plCameraMsgVec::iterator it = fMessages.begin(); it != fMessages.end(); ++it) {
         plCameraMsg* msg = *it;
-        if (fIsInside)
+
+        if (fIsInside) {
             msg->SetCmd(plCameraMsg::kEntering);
-        else
+        } else {
             msg->ClearCmd(plCameraMsg::kEntering);
+        }
+
         msg->SendAndKeep();
     }
 }
@@ -261,18 +269,20 @@ void plCameraRegionDetector::ISendTriggerMsg()
 bool plCameraRegionDetector::MsgReceive(plMessage* msg)
 {
     plCollideMsg* pCollMsg = plCollideMsg::ConvertNoRef(msg);
-    if (pCollMsg)
-    {
-        // camera collisions are only for the local player
-        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != pCollMsg->fOtherKey)
-            return true;
 
-        if (!fWaitingForEval)
+    if (pCollMsg) {
+        // camera collisions are only for the local player
+        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != pCollMsg->fOtherKey) {
+            return true;
+        }
+
+        if (!fWaitingForEval) {
             IRegisterForEval();
+        }
 
         fEntering = (pCollMsg->fEntering != 0);
 
- #ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
+#ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
         fLastStep = plSimulationMgr::GetInstance()->GetStepCount();
 #endif
         return true;
@@ -285,8 +295,8 @@ void plCameraRegionDetector::Read(hsStream* stream, hsResMgr* mgr)
     plDetectorModifier::Read(stream, mgr);
     int n = stream->ReadLE32();
     fMessages.resize(n);
-    for(size_t i = 0; i < n; i++ )
-    {   
+
+    for (size_t i = 0; i < n; i++) {
         plCameraMsg* pMsg =  plCameraMsg::ConvertNoRef(mgr->ReadCreatable(stream));
         fMessages[i] = pMsg;
     }
@@ -296,27 +306,31 @@ void plCameraRegionDetector::Write(hsStream* stream, hsResMgr* mgr)
 {
     plDetectorModifier::Write(stream, mgr);
     stream->WriteLE32(fMessages.size());
-    for(plCameraMsgVec::iterator it = fMessages.begin(); it != fMessages.end(); ++it)
-        mgr->WriteCreatable( stream, *it );
+
+    for (plCameraMsgVec::iterator it = fMessages.begin(); it != fMessages.end(); ++it) {
+        mgr->WriteCreatable(stream, *it);
+    }
 
 }
 
 void plCameraRegionDetector::IHandleEval(plEvalMsg*)
 {
 #ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-    if (plSimulationMgr::GetInstance()->GetStepCount() - fLastStep > 1)
-    {
+
+    if (plSimulationMgr::GetInstance()->GetStepCount() - fLastStep > 1) {
 #endif
-        if (fIsInside != fEntering)
-        {
+
+        if (fIsInside != fEntering) {
             fIsInside = fEntering;
             DetectorLog("%s CameraRegion: %s", fIsInside ? "Entering" : "Exiting", GetKeyName().c_str());
             ISendTriggerMsg();
         }
+
         plgDispatch::Dispatch()->UnRegisterForExactType(plEvalMsg::Index(), GetKey());
         fWaitingForEval = false;
 #ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
     }
+
 #endif
 }
 
@@ -329,16 +343,17 @@ void plCameraRegionDetector::IHandleEval(plEvalMsg*)
 void plObjectInVolumeDetector::ITrigger(plKey hitter, bool entering)
 {
 #ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-    for (bookKeepingList::iterator it = fCollisionList.begin(); it != fCollisionList.end(); ++it)
-    {
+
+    for (bookKeepingList::iterator it = fCollisionList.begin(); it != fCollisionList.end(); ++it) {
         plCollisionBookKeepingInfo* collisionInfo = *it;
-        if (collisionInfo->fHitter == hitter)
-        {
+
+        if (collisionInfo->fHitter == hitter) {
             collisionInfo->fEntering = entering;
             collisionInfo->fLastStep = plSimulationMgr::GetInstance()->GetStepCount();
             return;
         }
     }
+
 #endif
 
     plCollisionBookKeepingInfo* collisionInfo = new plCollisionBookKeepingInfo(hitter, entering);
@@ -361,10 +376,12 @@ void plObjectInVolumeDetector::ISendTriggerMsg(plKey hitter, bool entering)
     activatorMsg->AddReceivers(fReceivers);
     activatorMsg->fHiteeObj = fProxyKey ? fProxyKey : GetTarget()->GetKey();
     activatorMsg->fHitterObj = hitter;
-    if (entering)
+
+    if (entering) {
         activatorMsg->SetTriggerType(plActivatorMsg::kVolumeEnter);
-    else
+    } else {
         activatorMsg->SetTriggerType(plActivatorMsg::kVolumeExit);
+    }
 
     plgDispatch::MsgSend(activatorMsg);
 }
@@ -372,26 +389,30 @@ void plObjectInVolumeDetector::ISendTriggerMsg(plKey hitter, bool entering)
 bool plObjectInVolumeDetector::MsgReceive(plMessage* msg)
 {
     plCollideMsg* pCollMsg = plCollideMsg::ConvertNoRef(msg);
-    if (pCollMsg)
-    {
-        // If the avatar is disabled (flying around), don't trigger
-        if (IIsDisabledAvatar(pCollMsg->fOtherKey))
-            return false;
 
-        if (!fWaitingForEval)
+    if (pCollMsg) {
+        // If the avatar is disabled (flying around), don't trigger
+        if (IIsDisabledAvatar(pCollMsg->fOtherKey)) {
+            return false;
+        }
+
+        if (!fWaitingForEval) {
             IRegisterForEval();
+        }
 
         ITrigger(pCollMsg->fOtherKey, (pCollMsg->fEntering != 0));
         return true;
     }
 
     plEvalMsg* pEvalMsg = plEvalMsg::ConvertNoRef(msg);
-    if (pEvalMsg)
+
+    if (pEvalMsg) {
         IHandleEval(pEvalMsg);
+    }
 
     plPlayerPageMsg* pageMsg = plPlayerPageMsg::ConvertNoRef(msg);
-    if (pageMsg && pageMsg->fUnload)
-    {
+
+    if (pageMsg && pageMsg->fUnload) {
         ITrigger(pageMsg->fPlayer, false);
     }
 
@@ -401,25 +422,22 @@ bool plObjectInVolumeDetector::MsgReceive(plMessage* msg)
 void plObjectInVolumeDetector::IHandleEval(plEvalMsg*)
 {
     bookKeepingList::iterator it = fCollisionList.begin();
-    while (it != fCollisionList.end())
-    {
+
+    while (it != fCollisionList.end()) {
         plCollisionBookKeepingInfo* collisionInfo = *it;
 #ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-        if (plSimulationMgr::GetInstance()->GetStepCount() - collisionInfo->fLastStep > 1)
-        {
+
+        if (plSimulationMgr::GetInstance()->GetStepCount() - collisionInfo->fLastStep > 1) {
 #endif // USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
             ResidentSet::iterator j = fCurrentResidents.find(collisionInfo->fHitter);
             bool wasInside = j != fCurrentResidents.end();
-            if (collisionInfo->fEntering != wasInside)
-            {
-                if (collisionInfo->fEntering)
-                {
+
+            if (collisionInfo->fEntering != wasInside) {
+                if (collisionInfo->fEntering) {
                     fCurrentResidents.insert(collisionInfo->fHitter);
                     DetectorLog("%s: Sending Volume Enter ActivatorMsg", GetKeyName().c_str());
                     ISendTriggerMsg(collisionInfo->fHitter, true);
-                }
-                else
-                {
+                } else {
                     fCurrentResidents.erase(j);
                     DetectorLog("%s: Sending Volume Exit ActivatorMsg", GetKeyName().c_str());
                     ISendTriggerMsg(collisionInfo->fHitter, false);
@@ -429,11 +447,10 @@ void plObjectInVolumeDetector::IHandleEval(plEvalMsg*)
             delete collisionInfo;
 #ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
             it = fCollisionList.erase(it);
-        }
-        else
-        {
+        } else {
             ++it;
         }
+
 #else
             ++it;
 #endif // USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
@@ -444,10 +461,11 @@ void plObjectInVolumeDetector::SetTarget(plSceneObject* so)
 {
     plCollisionDetector::SetTarget(so);
 
-    if (so)
+    if (so) {
         plgDispatch::Dispatch()->RegisterForExactType(plPlayerPageMsg::Index(), GetKey());
-    else
+    } else {
         plgDispatch::Dispatch()->UnRegisterForExactType(plPlayerPageMsg::Index(), GetKey());
+    }
 }
 
 void plObjectInVolumeDetector::Read(hsStream* stream, hsResMgr* mgr)
@@ -488,8 +506,7 @@ void plObjectInVolumeAndFacingDetector::ICheckForTrigger()
     plSceneObject* avatar = armMod ? armMod->GetTarget(0) : nil;
     plSceneObject* target = GetTarget();
 
-    if (armMod && target)
-    {
+    if (armMod && target) {
         hsVector3 playerView = avatar->GetCoordinateInterface()->GetLocalToWorld().GetAxis(hsMatrix44::kView);
         hsVector3 objView = target->GetCoordinateInterface()->GetLocalToWorld().GetAxis(hsMatrix44::kView);
 
@@ -501,25 +518,24 @@ void plObjectInVolumeAndFacingDetector::ICheckForTrigger()
         bool facing = dot >= fFacingTolerance;
 
         bool movingForward = false;
-        if (fNeedWalkingForward)
-        {
+
+        if (fNeedWalkingForward) {
             // And are we walking towards it?
             plArmatureBrain* abrain =  armMod->FindBrainByClass(plAvBrainHuman::Index()); //armMod->GetCurrentBrain();
             plAvBrainHuman* brain = plAvBrainHuman::ConvertNoRef(abrain);
-            if (brain && brain->IsMovingForward() && brain->fWalkingStrategy->IsOnGround())
-                movingForward = true;
-        }
-        else
-            movingForward = true;
 
-        if (facing && movingForward && !fTriggered)
-        {
+            if (brain && brain->IsMovingForward() && brain->fWalkingStrategy->IsOnGround()) {
+                movingForward = true;
+            }
+        } else {
+            movingForward = true;
+        }
+
+        if (facing && movingForward && !fTriggered) {
             DetectorLog("%s: Trigger InVolume&Facing", GetKeyName().c_str());
             fTriggered = true;
             ISendTriggerMsg(avatar->GetKey(), true);
-        }
-        else if (!facing && fTriggered)
-        {
+        } else if (!facing && fTriggered) {
             DetectorLog("%s: Untrigger InVolume&Facing", GetKeyName().c_str());
             fTriggered = false;
             ISendTriggerMsg(avatar->GetKey(), false);
@@ -531,30 +547,28 @@ bool plObjectInVolumeAndFacingDetector::MsgReceive(plMessage* msg)
 {
     // Avatar is entering or exiting our detector box
     plCollideMsg* collMsg = plCollideMsg::ConvertNoRef(msg);
-    if (collMsg)
-    {
+
+    if (collMsg) {
         // make sure this is the local player... the notify will be the thing that propagates over the network
-        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != collMsg->fOtherKey)
+        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != collMsg->fOtherKey) {
             return true;
+        }
 
         // If the avatar is disabled (flying around), don't trigger
-        if (IIsDisabledAvatar(collMsg->fOtherKey))
+        if (IIsDisabledAvatar(collMsg->fOtherKey)) {
             return false;
+        }
 
         fAvatarInVolume = (collMsg->fEntering != 0);
 
-        if (fAvatarInVolume)
-        {
+        if (fAvatarInVolume) {
             plgDispatch::Dispatch()->RegisterForExactType(plEvalMsg::Index(), GetKey());
             ICheckForTrigger();
-        }
-        else
-        {
+        } else {
             plgDispatch::Dispatch()->UnRegisterForExactType(plEvalMsg::Index(), GetKey());
 
             // Avatar is leaving the volume, make sure to untrigger if we haven't already
-            if (fTriggered)
-            {
+            if (fTriggered) {
                 fTriggered = false;
                 ISendTriggerMsg(plNetClientApp::GetInstance()->GetLocalPlayerKey(), false);
             }
@@ -565,8 +579,8 @@ bool plObjectInVolumeAndFacingDetector::MsgReceive(plMessage* msg)
 
     // Avatar is inside our detector box, so every frame we check if we need to trigger
     plEvalMsg* evalMsg = plEvalMsg::ConvertNoRef(msg);
-    if (evalMsg)
-    {
+
+    if (evalMsg) {
         ICheckForTrigger();
         return true;
     }
@@ -605,33 +619,29 @@ bool plSubworldRegionDetector::MsgReceive(plMessage* msg)
 {
     plCollideMsg* pCollMsg = plCollideMsg::ConvertNoRef(msg);
 
-    if (pCollMsg)
-    {   
-        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != pCollMsg->fOtherKey)
+    if (pCollMsg) {
+        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != pCollMsg->fOtherKey) {
             return true;
+        }
 
         plArmatureMod* avMod = IGetAvatarModifier(pCollMsg->fOtherKey);
-        if (avMod)
-        {
+
+        if (avMod) {
             DetectorLog("%s subworld detector %s", pCollMsg->fEntering ? "Entering" : "Exiting", GetKeyName().c_str());
 
             if ((pCollMsg->fEntering && !fOnExit) ||
-                (!pCollMsg->fEntering && fOnExit))
-            {
-                if (fSub)
-                {
+                    (!pCollMsg->fEntering && fOnExit)) {
+                if (fSub) {
                     plSceneObject* SO = plSceneObject::ConvertNoRef(fSub->ObjectIsLoaded());
-                    if (SO)
-                    {
+
+                    if (SO) {
                         DetectorLogSpecial("Switching to subworld %s", fSub->GetName().c_str());
 
                         plKey nilKey;
                         plSubWorldMsg* msg = new plSubWorldMsg(GetKey(), avMod->GetKey(), fSub);
                         msg->Send();
                     }
-                }
-                else
-                {
+                } else {
                     DetectorLogSpecial("Switching to main subworld");
                     plSubWorldMsg* msg = new plSubWorldMsg(GetKey(), avMod->GetKey(), nil);
                     msg->Send();
@@ -664,27 +674,27 @@ void plSubworldRegionDetector::Write(hsStream* stream, hsResMgr* mgr)
 ///////////////////////////////////
 bool plPanicLinkRegion::MsgReceive(plMessage* msg)
 {
-    if (plCollideMsg* pCollMsg = plCollideMsg::ConvertNoRef(msg))
-    {
-        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != pCollMsg->fOtherKey)
+    if (plCollideMsg* pCollMsg = plCollideMsg::ConvertNoRef(msg)) {
+        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != pCollMsg->fOtherKey) {
             return true;
+        }
 
-        if (pCollMsg->fEntering)
-        {
+        if (pCollMsg->fEntering) {
             plArmatureMod* avMod = IGetAvatarModifier(pCollMsg->fOtherKey);
-            if (avMod)
-            {
-                if (avMod->IsLinkedIn())
-                {
+
+            if (avMod) {
+                if (avMod->IsLinkedIn()) {
                     hsPoint3 pos;
-                    if (avMod->GetController())
-                    {
+
+                    if (avMod->GetController()) {
                         avMod->GetController()->GetPositionSim(pos);
                         DetectorLogSpecial("Avatar is panic linking. Position %f,%f,%f and is %s", pos.fX, pos.fY, pos.fZ, avMod->GetController()->IsEnabled() ? "enabled" : "disabled");
                     }
+
                     avMod->PanicLink(fPlayLinkOutAnim);
-                } else
+                } else {
                     DetectorLogRed("PANIC LINK %s before we actually linked in!", GetKey()->GetName().c_str());
+                }
             }
         }
 
@@ -716,38 +726,41 @@ void plPanicLinkRegion::Write(hsStream* stream, hsResMgr* mgr)
 
 // ctor default
 plSimpleRegionSensor::plSimpleRegionSensor()
-: fEnterMsg(nil), fExitMsg(nil)
+    : fEnterMsg(nil), fExitMsg(nil)
 {
 }
 
 // ctor canonical
-plSimpleRegionSensor::plSimpleRegionSensor(plMessage *enterMsg, plMessage *exitMsg)
-: fEnterMsg(enterMsg), fExitMsg(exitMsg)
+plSimpleRegionSensor::plSimpleRegionSensor(plMessage* enterMsg, plMessage* exitMsg)
+    : fEnterMsg(enterMsg), fExitMsg(exitMsg)
 {
 }
 
 // dtor
 plSimpleRegionSensor::~plSimpleRegionSensor()
 {
-    if(fEnterMsg)
+    if (fEnterMsg) {
         fEnterMsg->UnRef();
-    if(fExitMsg)
+    }
+
+    if (fExitMsg) {
         fExitMsg->UnRef();
+    }
 }
 
 // WRITE
-void plSimpleRegionSensor::Write(hsStream *stream, hsResMgr *mgr)
+void plSimpleRegionSensor::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Write(stream, mgr);
-    if(fEnterMsg)
-    {
+
+    if (fEnterMsg) {
         stream->WriteBool(true);
         mgr->WriteCreatable(stream, fEnterMsg);
     } else {
         stream->WriteBool(false);
     }
-    if(fExitMsg)
-    {
+
+    if (fExitMsg) {
         stream->WriteBool(true);
         mgr->WriteCreatable(stream, fExitMsg);
     } else {
@@ -756,18 +769,17 @@ void plSimpleRegionSensor::Write(hsStream *stream, hsResMgr *mgr)
 }
 
 // READ
-void plSimpleRegionSensor::Read(hsStream *stream, hsResMgr *mgr)
+void plSimpleRegionSensor::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Read(stream, mgr);
-    if(stream->ReadBool())
-    {
+
+    if (stream->ReadBool()) {
         fEnterMsg = plMessage::ConvertNoRef(mgr->ReadCreatable(stream));
     } else {
         fEnterMsg = nil;
     }
 
-    if(stream->ReadBool())
-    {
+    if (stream->ReadBool()) {
         fExitMsg = plMessage::ConvertNoRef(mgr->ReadCreatable(stream));
         hsAssert(fExitMsg, "Corrupted plSimpleRegionSensor during read.");
     } else {
@@ -776,39 +788,37 @@ void plSimpleRegionSensor::Read(hsStream *stream, hsResMgr *mgr)
 }
 
 // MSGRECEIVE
-bool plSimpleRegionSensor::MsgReceive(plMessage *msg)
+bool plSimpleRegionSensor::MsgReceive(plMessage* msg)
 {
     plCollideMsg* pCollMsg = plCollideMsg::ConvertNoRef(msg);
 
-    if (pCollMsg)
-    {
+    if (pCollMsg) {
         // make sure this is the local player... the notify will be the thing that propagates over the network
-        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != pCollMsg->fOtherKey)
+        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != pCollMsg->fOtherKey) {
             return true;
+        }
 
         plKey theThingWhatDoneHitUs = pCollMsg->fOtherKey;
-        
-        if(pCollMsg->fEntering)
-        {
-            if(fEnterMsg)
-            {
+
+        if (pCollMsg->fEntering) {
+            if (fEnterMsg) {
                 fEnterMsg->ClearReceivers();
                 fEnterMsg->AddReceiver(theThingWhatDoneHitUs);
                 fEnterMsg->Ref();
                 fEnterMsg->Send();
             }
-        } 
-        else {
-            if(fExitMsg)
-            {
+        } else {
+            if (fExitMsg) {
                 fExitMsg->ClearReceivers();
                 fExitMsg->AddReceiver(theThingWhatDoneHitUs);
                 fExitMsg->Ref();
                 fExitMsg->Send();
             }
         }
+
         return true;
     }
+
     return plSingleModifier::MsgReceive(msg);
 }
 
@@ -821,7 +831,7 @@ bool plSimpleRegionSensor::IEval(double secs, float del, uint32_t dirty)
 //////////////////////////////////////////////////////////////////////////////
 
 // Nuke the Read/Write functions on the next file format change
-void plSwimDetector::Write(hsStream *stream, hsResMgr *mgr)
+void plSwimDetector::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSimpleRegionSensor::Write(stream, mgr);
 
@@ -830,7 +840,7 @@ void plSwimDetector::Write(hsStream *stream, hsResMgr *mgr)
     stream->WriteLEScalar(0);
 }
 
-void plSwimDetector::Read(hsStream *stream, hsResMgr *mgr)
+void plSwimDetector::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSimpleRegionSensor::Read(stream, mgr);
 
@@ -838,72 +848,68 @@ void plSwimDetector::Read(hsStream *stream, hsResMgr *mgr)
     stream->ReadLEScalar();
     stream->ReadLEScalar();
 }
-bool plSwimDetector::MsgReceive(plMessage *msg)
+bool plSwimDetector::MsgReceive(plMessage* msg)
 {
     plCollideMsg* pCollMsg = plCollideMsg::ConvertNoRef(msg);
 
-    if (pCollMsg)
-    {
-        //removed local player check because this will apply the brain to the local 
+    if (pCollMsg) {
+        //removed local player check because this will apply the brain to the local
         //controller of the foreign avatar which we still want.
         //and if we prop swim state by notify messages we still have a chance of missing it from players
         //who were in the region before we linked in
         plKey theThingWhatDoneHitUs = pCollMsg->fOtherKey;
-        if(pCollMsg->fEntering)
-        {
-            if(fEnterMsg)
-            {
+
+        if (pCollMsg->fEntering) {
+            if (fEnterMsg) {
                 fEnterMsg->ClearReceivers();
                 fEnterMsg->AddReceiver(theThingWhatDoneHitUs);
                 fEnterMsg->Ref();
                 fEnterMsg->Send();
             }
-        } 
-        else {
-        if(fExitMsg)
-            {
+        } else {
+            if (fExitMsg) {
                 fExitMsg->ClearReceivers();
                 fExitMsg->AddReceiver(theThingWhatDoneHitUs);
                 fExitMsg->Ref();
                 fExitMsg->Send();
             }
         }
+
         return true;
     }
+
     return plSimpleRegionSensor::MsgReceive(msg);
 }
-bool    plRidingAnimatedPhysicalDetector::MsgReceive(plMessage *msg)
+bool    plRidingAnimatedPhysicalDetector::MsgReceive(plMessage* msg)
 {
-    
+
     plCollideMsg* pCollMsg = plCollideMsg::ConvertNoRef(msg);
 
-    if (pCollMsg)
-    {
-        //removed local player check because this will apply the brain to the local 
+    if (pCollMsg) {
+        //removed local player check because this will apply the brain to the local
         //controller of the foreign avatar which we still want.
         //and if we prop  state by notify messages we still have a chance of missing it from players
         //who were in the region before we linked in
         plKey theThingWhatDoneHitUs = pCollMsg->fOtherKey;
-        if(pCollMsg->fEntering)
-        {
-            if(fEnterMsg)
-            {
+
+        if (pCollMsg->fEntering) {
+            if (fEnterMsg) {
                 fEnterMsg->ClearReceivers();
                 fEnterMsg->AddReceiver(theThingWhatDoneHitUs);
                 fEnterMsg->Ref();
                 fEnterMsg->Send();
             }
-        } 
-        else {
-        if(fExitMsg)
-            {
+        } else {
+            if (fExitMsg) {
                 fExitMsg->ClearReceivers();
                 fExitMsg->AddReceiver(theThingWhatDoneHitUs);
                 fExitMsg->Ref();
                 fExitMsg->Send();
             }
         }
+
         return true;
     }
+
     return plSimpleRegionSensor::MsgReceive(msg);
 }

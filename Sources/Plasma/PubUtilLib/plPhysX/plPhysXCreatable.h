@@ -59,10 +59,10 @@ REGISTER_CREATABLE(plPXPhysical);
 
 
 #include "plLOSDispatch.h"
-REGISTER_CREATABLE( plLOSDispatch );
+REGISTER_CREATABLE(plLOSDispatch);
 
 #include "plSimulationMgr.h"
-REGISTER_CREATABLE( plSimulationMgr );
+REGISTER_CREATABLE(plSimulationMgr);
 
 //#include "plVehicleModifier.h"
 //REGISTER_CREATABLE(plVehicleModifier);

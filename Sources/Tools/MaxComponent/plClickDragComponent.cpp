@@ -89,8 +89,7 @@ void DummyCodeIncludeFuncClickDrag() {}
 CLASS_DESC(plClickDragComponent, gClickDragDesc, "Dragable",  "Dragable", COMP_TYPE_DETECTOR, CLICK_DRAG_CID)
 
 
-enum
-{
+enum {
     kClickDragDirectional,
     kClickDragDegrees,
     kClickDragUseProxy,
@@ -112,21 +111,18 @@ enum
     kClikDragEnabled,
 };
 
-class plClickDragComponentProc : public ParamMap2UserDlgProc
-{
+class plClickDragComponentProc : public ParamMap2UserDlgProc {
 protected:
     plComponentNoteTrackDlg fNoteTrackDlgX;
     plComponentNoteTrackDlg fNoteTrackDlgY;
-    IParamBlock2 *fPB;
+    IParamBlock2* fPB;
 
 public:
-    BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (msg)
-        {
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        switch (msg) {
         case WM_INITDIALOG:
             fPB = map->GetParamBlock();
-            
+
             fNoteTrackDlgX.Init(GetDlgItem(hWnd, IDC_COMP_CLICK_DRAG_ANIMX),
                                 nil,
                                 kClickDragAnimX,
@@ -137,7 +133,7 @@ public:
             fNoteTrackDlgX.Load();
 
             EnableWindow(GetDlgItem(hWnd, IDC_COMP_CLICK_DRAG_ANIMX), true);
-            
+
             fNoteTrackDlgY.Init(GetDlgItem(hWnd, IDC_COMP_CLICK_DRAG_ANIM_Y),
                                 nil,
                                 kClickDragAnimY,
@@ -151,23 +147,23 @@ public:
             return TRUE;
 
         case WM_COMMAND:
-            if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_COMP_CLICK_DRAG_ANIMX)
-            {
+            if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_COMP_CLICK_DRAG_ANIMX) {
                 fNoteTrackDlgX.AnimChanged();
                 return TRUE;
             }
-            if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_COMP_CLICK_DRAG_ANIM_Y)
-            {
+
+            if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_COMP_CLICK_DRAG_ANIM_Y) {
                 fNoteTrackDlgY.AnimChanged();
                 return TRUE;
             }
+
             break;
         }
-        return false;   
+
+        return false;
     }
 
-    void DeleteThis()
-    {
+    void DeleteThis() {
         fNoteTrackDlgX.DeleteCache();
         fNoteTrackDlgY.DeleteCache();
     }
@@ -176,80 +172,80 @@ static plClickDragComponentProc gClickDragComponentProc;
 
 ParamBlockDesc2 gClickDragBlock
 (
-    
+
     plComponent::kBlkComp, _T("ClickDragComp"), 0, &gClickDragDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_DETECTOR_CLICK_DRAGGABLE, IDS_COMP_DETECTOR_CLICK_DRAGGABLE, 0, 0, &gClickDragComponentProc,
 
     kClickDragDirectional,      _T("directional"),      TYPE_BOOL,              0, 0,
-        p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_OMNI,
-        end,
+    p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_OMNI,
+    end,
 
-    kClickDragDegrees, _T("degrees"),   TYPE_INT,   P_ANIMATABLE, 0,    
-        p_range, 1, 180,
-        p_default, 180,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT, 
-        IDC_COMP_CLICK_DRAG_DEG,    IDC_COMP_CLICK_DRAG_DEGSPIN, SPIN_AUTOSCALE,
-        end,
+    kClickDragDegrees, _T("degrees"),   TYPE_INT,   P_ANIMATABLE, 0,
+    p_range, 1, 180,
+    p_default, 180,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_INT,
+    IDC_COMP_CLICK_DRAG_DEG,    IDC_COMP_CLICK_DRAG_DEGSPIN, SPIN_AUTOSCALE,
+    end,
 
     kClickDragUseProxy,     _T("useProxy"),     TYPE_BOOL,              0, 0,
-        p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_USEPROXYPHYS,
-        p_enable_ctrls, 1, kClickDragProxy,
-        end,
+    p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_USEPROXYPHYS,
+    p_enable_ctrls, 1, kClickDragProxy,
+    end,
 
     kClickDragProxy, _T("proxyPrimitave"),  TYPE_INODE,     0, 0,
-        p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_CLICK_DRAG_PROXY,
-        p_sclassID,  GEOMOBJECT_CLASS_ID,
-        p_prompt, IDS_COMP_PHYS_CHOSEN_BASE,
-        end,
+    p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_CLICK_DRAG_PROXY,
+    p_sclassID,  GEOMOBJECT_CLASS_ID,
+    p_prompt, IDS_COMP_PHYS_CHOSEN_BASE,
+    end,
 
     kClickDragProxyRegion, _T("proxyRegion"),   TYPE_INODE,     0, 0,
-        p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_CLICK_DRAG_PROXYREGION,
-        p_sclassID,  GEOMOBJECT_CLASS_ID,
-        p_prompt, IDS_COMP_PHYS_CHOSEN_BASE,
-        end,
+    p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_CLICK_DRAG_PROXYREGION,
+    p_sclassID,  GEOMOBJECT_CLASS_ID,
+    p_prompt, IDS_COMP_PHYS_CHOSEN_BASE,
+    end,
 
 
     kClickDragUseX,     _T("useXAnim"),     TYPE_BOOL,              0, 0,
-        p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_USEX,
-        end,
-    
+    p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_USEX,
+    end,
+
     kClickDragAnimX,    _T("XanimName"),        TYPE_STRING,    0, 0,
-        end,
+    end,
 
     kClickDragUseY,     _T("useYAnim"),     TYPE_BOOL,              0, 0,
-        p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_USEYANIM,
-        end,
-    
+    p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_USEYANIM,
+    end,
+
     kClickDragAnimY,    _T("YanimName"),        TYPE_STRING,    0, 0,
-        end,
+    end,
 
     kClickDragUseLoopX,     _T("useLoopXAnim"),     TYPE_BOOL,              0, 0,
-        p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_USE_LOOPX,
-        end,
-    
+    p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_USE_LOOPX,
+    end,
+
     kClickDragUseLoopY,     _T("useLoopYAnim"),     TYPE_BOOL,              0, 0,
-        p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_USE_LOOPY,
-        end,
+    p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_USE_LOOPY,
+    end,
 
     kClickDragAllOrNothing,     _T("allOrNot"),     TYPE_BOOL,              0, 0,
-        p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_ALLORNOT,
-        end,
+    p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CLICK_DRAG_ALLORNOT,
+    end,
 
     kClickDragOneShot,      _T("oneshot"),      TYPE_BOOL,              0, 0,
-        p_ui,               TYPE_SINGLECHEKBOX, IDC_ONESHOT,
-        end,
+    p_ui,               TYPE_SINGLECHEKBOX, IDC_ONESHOT,
+    end,
 
     kClikDragBoundsType,    _T("BoundingConditions"),       TYPE_INT,       0, 0,
-        p_ui,       TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
-        p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
-        p_default, plSimDefs::kHullBounds,
-        end,
+    p_ui,       TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
+    p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
+    p_default, plSimDefs::kHullBounds,
+    end,
 
     kClikDragEnabled,       _T("enabled"),      TYPE_BOOL,          0, 0,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_ENABLE,
-        p_default, TRUE,
-        end,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_ENABLE,
+    p_default, TRUE,
+    end,
 
     end
 );
@@ -268,8 +264,10 @@ const plClickDragComponent::LogicKeys& plClickDragComponent::GetAxisKeys()
 plKey plClickDragComponent::GetAxisKey(plMaxNode* node)
 {
     LogicKeys::const_iterator it = fAxisKeys.find(node);
-    if (it != fAxisKeys.end())
+
+    if (it != fAxisKeys.end()) {
         return(it->second);
+    }
 
     return nil;
 }
@@ -277,118 +275,126 @@ plKey plClickDragComponent::GetAxisKey(plMaxNode* node)
 void plClickDragComponent::CollectNonDrawables(INodeTab& nonDrawables)
 {
     INode* boundsNode = fCompPB->GetINode(kClickDragProxy);
-    if(boundsNode && fCompPB->GetInt(kClickDragUseProxy))
+
+    if (boundsNode && fCompPB->GetInt(kClickDragUseProxy)) {
         nonDrawables.Append(1, &boundsNode);
+    }
 
     boundsNode = fCompPB->GetINode(kClickDragProxyRegion);
-    if(boundsNode )
+
+    if (boundsNode) {
         nonDrawables.Append(1, &boundsNode);
+    }
 
 }
 
 // Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plClickDragComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plClickDragComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
 
     plActivatorBaseComponent::SetupProperties(node, pErrMsg);
 
     // Phys Props for the Clickable itself.
-    plMaxNode *boundsNode = nil;
+    plMaxNode* boundsNode = nil;
     boundsNode = (plMaxNode*)fCompPB->GetINode(kClickDragProxy);
-    if(boundsNode && fCompPB->GetInt(kClickDragUseProxy))
-        if(boundsNode->CanConvert())
-        {
+
+    if (boundsNode && fCompPB->GetInt(kClickDragUseProxy))
+        if (boundsNode->CanConvert()) {
             boundsNode->SetDrawable(false);
-            plPhysicalProps *physProps = boundsNode->GetPhysicalProps();
+            plPhysicalProps* physProps = boundsNode->GetPhysicalProps();
+
             // only if movable will it have mass (then it will keep track of movements in PhysX)
-            if ( boundsNode->IsMovable() || boundsNode->IsTMAnimatedRecur() )
+            if (boundsNode->IsMovable() || boundsNode->IsTMAnimatedRecur()) {
                 physProps->SetMass(1.0, boundsNode, pErrMsg);
-            physProps->SetGroup( plSimDefs::kGroupStatic, boundsNode, pErrMsg);
+            }
+
+            physProps->SetGroup(plSimDefs::kGroupStatic, boundsNode, pErrMsg);
 //          physProps->SetReportGroup( plPhysicsGroups::kLocalAvatars, boundsNode, pErrMsg);
             physProps->SetBoundsType(fCompPB->GetInt(kClikDragBoundsType), boundsNode, pErrMsg);
+        } else {
+            pErrMsg->Set(true, "Clickable Sensor Warning", "The Clickable %s has a Proxy Surface %s that was Ignored.\nThe Sensors geometry will be used instead.", node->GetName(), boundsNode->GetName()).Show();
+            pErrMsg->Set(false);
         }
-        else
-        {
-                pErrMsg->Set(true, "Clickable Sensor Warning", "The Clickable %s has a Proxy Surface %s that was Ignored.\nThe Sensors geometry will be used instead.", node->GetName(), boundsNode->GetName()).Show();
-                pErrMsg->Set(false);
-        }
-    else
-    {   
-        
-        plPhysicalProps *physProps = node->GetPhysicalProps();
+    else {
+
+        plPhysicalProps* physProps = node->GetPhysicalProps();
+
         // only if movable will it have mass (then it will keep track of movements in PhysX)
-        if ( node->IsMovable() || node->IsTMAnimatedRecur() )
+        if (node->IsMovable() || node->IsTMAnimatedRecur()) {
             physProps->SetMass(1.0, node, pErrMsg);
-        physProps->SetGroup( plSimDefs::kGroupStatic, node, pErrMsg);
+        }
+
+        physProps->SetGroup(plSimDefs::kGroupStatic, node, pErrMsg);
 //      physProps->SetReportGroup( plPhysicsGroups::kLocalAvatars, node, pErrMsg);
         //node->GetPhysicalProps()->SetAllCollideGroups(0);
         physProps->SetBoundsType(fCompPB->GetInt(kClikDragBoundsType), node, pErrMsg);
     }
+
     // Phys Properties for the auto-generated Detector Region...
     boundsNode = nil;
     boundsNode = (plMaxNode*)fCompPB->GetINode(kClickDragProxyRegion);
-    if(boundsNode)
-    {
-        if(boundsNode->CanConvert())
-        {
-            plPhysicalProps *physPropsDetector = boundsNode->GetPhysicalProps();
+
+    if (boundsNode) {
+        if (boundsNode->CanConvert()) {
+            plPhysicalProps* physPropsDetector = boundsNode->GetPhysicalProps();
 //          physPropsDetector->SetAllowLOS(true, boundsNode, pErrMsg);
             physPropsDetector->SetProxyNode(boundsNode, node, pErrMsg);
             physPropsDetector->SetBoundsType(plSimDefs::kHullBounds, boundsNode, pErrMsg);
-            // only if movable will it have mass (then it will keep track of movements in PhysX)
-            if ( boundsNode->IsMovable() || boundsNode->IsTMAnimated() )
-                physPropsDetector->SetMass(1.0, boundsNode, pErrMsg);
 
-            physPropsDetector->SetGroup( plSimDefs::kGroupDetector, boundsNode, pErrMsg );
+            // only if movable will it have mass (then it will keep track of movements in PhysX)
+            if (boundsNode->IsMovable() || boundsNode->IsTMAnimated()) {
+                physPropsDetector->SetMass(1.0, boundsNode, pErrMsg);
+            }
+
+            physPropsDetector->SetGroup(plSimDefs::kGroupDetector, boundsNode, pErrMsg);
             //boundsNode->GetPhysicalProps()->SetAllCollideGroups(0);
-            physPropsDetector->SetReportGroup( 1<<plSimDefs::kGroupAvatar, boundsNode, pErrMsg );
+            physPropsDetector->SetReportGroup(1 << plSimDefs::kGroupAvatar, boundsNode, pErrMsg);
         }
-    }
-    else
-    {
+    } else {
         pErrMsg->Set(true, "Clickable Sensor Error", "The Clickable Sensor %s has a Required Region that is missing.\nThe Export will be aborted", node->GetName()).Show();
 //      pErrMsg->Set(false);
         return false;
     }
-    
+
     fAxisKeys.clear();
     return true;
 }
 
-bool plClickDragComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plClickDragComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plActivatorBaseComponent::PreConvert(node, pErrMsg);
-    plLogicModifier *logic = plLogicModifier::ConvertNoRef(fLogicModKeys[node]->GetObjectPtr());
+    plLogicModifier* logic = plLogicModifier::ConvertNoRef(fLogicModKeys[node]->GetObjectPtr());
 
-    if (fCompPB->GetInt(kClickDragOneShot))
+    if (fCompPB->GetInt(kClickDragOneShot)) {
         logic->SetFlag(plLogicModBase::kOneShot);
+    }
 
     plLocation loc = node->GetLocation();
-    plSceneObject *obj = node->GetSceneObject();
+    plSceneObject* obj = node->GetSceneObject();
 
     // do the same thing for axis animation controllers.
     plAxisAnimModifier* pAxis = new plAxisAnimModifier;
     plKey axisKey = hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), pAxis, loc);
     hsgResMgr::ResMgr()->AddViaNotify(axisKey, new plObjRefMsg(obj->GetKey(), plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier), plRefFlags::kActiveRef);
     logic->AddNotifyReceiver(axisKey);
-    
+
     fAxisKeys[node] = axisKey;
 
     return true;
 }
 
-bool plClickDragComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plClickDragComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plLocation loc = node->GetLocation();
-    plSceneObject *obj = node->GetSceneObject();
-    
+    plSceneObject* obj = node->GetSceneObject();
+
     plKey logicKey = fLogicModKeys[node];
-    plLogicModifier *logic = plLogicModifier::ConvertNoRef(logicKey->GetObjectPtr());
+    plLogicModifier* logic = plLogicModifier::ConvertNoRef(logicKey->GetObjectPtr());
     logic->fMyCursor = plCursorChangeMsg::kCursorOpen;
 
-        // Create the detector
-    plDetectorModifier *detector = nil;
+    // Create the detector
+    plDetectorModifier* detector = nil;
     detector = new plPickingDetector;
 
     // Register the detector
@@ -396,49 +402,46 @@ bool plClickDragComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     hsgResMgr::ResMgr()->AddViaNotify(detectorKey, new plObjRefMsg(obj->GetKey(), plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier), plRefFlags::kActiveRef);
 
     // set up the axis anim controller
-    
+
     plKey axisKey = fAxisKeys[node];
     plAxisAnimModifier* pAxis = plAxisAnimModifier::ConvertNoRef(axisKey->GetObjectPtr());
     // attach the animation controller to the animation objects:
     // find an animation controller:
-    
+
     hsTArray<plKey> receivers;
     IGetReceivers(node, receivers);
-    
+
     int i;
-    for (i = 0; i < receivers.Count(); i++)
+
+    for (i = 0; i < receivers.Count(); i++) {
         pAxis->GetNotify()->AddReceiver(receivers[i]);
+    }
 
     pAxis->SetNotificationKey(logicKey);
     uint32_t count = node->NumAttachedComponents();
     bool bHasAnim = false;
     plAnimComponentBase* pAnim = nil;
 
-    for (i = 0; i < count; i++)
-    {
-        plComponentBase *comp = node->GetAttachedComponent(i);
-        if (comp->ClassID() == ANIM_COMP_CID || comp->ClassID() == ANIM_GROUP_COMP_CID)
-        {
+    for (i = 0; i < count; i++) {
+        plComponentBase* comp = node->GetAttachedComponent(i);
+
+        if (comp->ClassID() == ANIM_COMP_CID || comp->ClassID() == ANIM_GROUP_COMP_CID) {
             pAnim = (plAnimComponentBase*)comp;
             break;
         }
     }
-    if (!pAnim)
-    {
+
+    if (!pAnim) {
         pErrMsg->Set(true, "WARNING", "Object %s has click-drag component attached but NO animation component!", ((INode*)node)->GetName()).Show();
         pErrMsg->Set(false);
-    }
-    else
-    {
-        if (fCompPB->GetInt(kClickDragUseX))
-        {
-            pAxis->SetXAnim( pAnim->GetModKey(node) );
-        }   
-        else // take out this else when we support multiple channels
-        if (fCompPB->GetInt(kClickDragUseY))
-        {
-            pAxis->SetYAnim( pAnim->GetModKey(node) );
-        }
+    } else {
+        if (fCompPB->GetInt(kClickDragUseX)) {
+            pAxis->SetXAnim(pAnim->GetModKey(node));
+        } else // take out this else when we support multiple channels
+            if (fCompPB->GetInt(kClickDragUseY)) {
+                pAxis->SetYAnim(pAnim->GetModKey(node));
+            }
+
         pAxis->SetAllOrNothing(fCompPB->GetInt(kClickDragAllOrNothing));
 
         // add callbacks for beginning and end of animation
@@ -446,7 +449,7 @@ bool plClickDragComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
         pCall1->fEvent = kBegin;
         pCall1->fRepeats = -1;
         pCall1->AddReceiver(axisKey);
-        
+
         plEventCallbackMsg* pCall2 = new plEventCallbackMsg;
         pCall2->fEvent = kEnd;
         pCall2->fRepeats = -1;
@@ -454,28 +457,26 @@ bool plClickDragComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 
         plAnimCmdMsg* pMsg = new plAnimCmdMsg;
         plString tempAnimName = pAnim->GetAnimName();
-        if (tempAnimName.IsNull())
-        {
+
+        if (tempAnimName.IsNull()) {
             //pMsg->SetAnimName(ENTIRE_ANIMATION_NAME);
             pMsg->SetAnimName(pAnim->GetModKey(node)->GetName());
             pAxis->SetAnimLabel(ENTIRE_ANIMATION_NAME);
-        }
-        else
-        {
+        } else {
             //pMsg->SetAnimName(tempAnimName);
             pMsg->SetAnimName(pAnim->GetModKey(node)->GetName());
             pAxis->SetAnimLabel(tempAnimName);
         }
-        
+
 
         pMsg->SetCmd(plAnimCmdMsg::kAddCallbacks);
         pMsg->AddCallback(pCall1);
         pMsg->AddCallback(pCall2);
 
-        hsRefCnt_SafeUnRef( pCall1 );
-        hsRefCnt_SafeUnRef( pCall2 );
+        hsRefCnt_SafeUnRef(pCall1);
+        hsRefCnt_SafeUnRef(pCall2);
 
-        pMsg->AddReceiver( pAnim->GetModKey(node) );
+        pMsg->AddReceiver(pAnim->GetModKey(node));
         plgDispatch::MsgSend(pMsg);
     }
 
@@ -484,10 +485,9 @@ bool plClickDragComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     plPickingDetector* det2 = nil;
     plKey det2Key  = nil;
     plMaxNode* pProxyNode = (plMaxNode*)fCompPB->GetINode(kClickDragProxy);
-    
-    if (pProxyNode && fCompPB->GetInt(kClickDragUseProxy))
-    {
-        
+
+    if (pProxyNode && fCompPB->GetInt(kClickDragUseProxy)) {
+
         // verify that there is a physical proxy attached to this scene object:
         uint32_t count = ((plMaxNodeBase*)pProxyNode)->NumAttachedComponents();
         bool bHasPhys = false;
@@ -505,24 +505,21 @@ bool plClickDragComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
         //          pErrMsg->Set(true, "WARNING", "Object %s listed as draggable component proxy physical for %s but has NO physical component.\n  Please attach a proxyTerrain componet!\n Export will continue but this gadget will not function",pProxyNode->GetName(), ((INode*)node)->GetName()).Show();
         //          pErrMsg->Set(false);
         //      }
-        
 
-        if(pProxyNode->CanConvert())
-        {
+
+        if (pProxyNode->CanConvert()) {
             det2 = new plPickingDetector;
             // Register the detector
             det2Key = hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), det2, loc);
             hsgResMgr::ResMgr()->AddViaNotify(det2Key, new plObjRefMsg(((plMaxNode*)pProxyNode)->GetSceneObject()->GetKey(), plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier), plRefFlags::kActiveRef);
-            hsgResMgr::ResMgr()->AddViaNotify(logicKey, new plObjRefMsg( det2Key, plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier), plRefFlags::kActiveRef);
+            hsgResMgr::ResMgr()->AddViaNotify(logicKey, new plObjRefMsg(det2Key, plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier), plRefFlags::kActiveRef);
             det2->SetProxyKey(node->GetSceneObject()->GetKey());
-        }
-        else
-        {
+        } else {
             pErrMsg->Set(true, "Unknown Error", "Invalid proxy physical detector set for draggable %s.", ((INode*)pProxyNode)->GetName()).Show();
             pErrMsg->Set(false);
             return false;
         }
-    
+
     }
 
 
@@ -533,8 +530,8 @@ bool plClickDragComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 
     // do we have a required region?
     plMaxNode* pProxyRegNode = (plMaxNode*)fCompPB->GetINode(kClickDragProxyRegion);
-    if (pProxyRegNode)
-    {
+
+    if (pProxyRegNode) {
         // verify that there is a physical detector attached to this scene object:
         uint32_t count = ((plMaxNodeBase*)pProxyRegNode)->NumAttachedComponents();
         bool bHasPhys = false;
@@ -552,10 +549,9 @@ bool plClickDragComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
         //          pErrMsg->Set(true, "WARNING", "Object %s listed as draggable component detector region for %s but has NO physical detector component!\n  Please attach a detector componet.\n Export will continue but this gadget will not function",((INode*)pProxyRegNode)->GetName(), ((INode*)node)->GetName()).Show();
         //          pErrMsg->Set(false);
         //      }
-        
 
-        if(pProxyRegNode->CanConvert())
-        {
+
+        if (pProxyRegNode->CanConvert()) {
             // need a player in box condition here...
             // first a detector-any for the box
             plObjectInVolumeDetector* pCDet = new plObjectInVolumeDetector(plCollisionDetector::kTypeAny);
@@ -566,16 +562,12 @@ bool plClickDragComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
             plObjectInBoxConditionalObject* boxCond = new plObjectInBoxConditionalObject;
             plKey boxCondKey = hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), boxCond, loc);
             logic->AddCondition(boxCond);
-        }
-        else
-        {       
+        } else {
             pErrMsg->Set(true, "Problem with region", "Can't convert region component on  %s.  This component will not be exported.\n", ((INode*)pProxyRegNode)->GetName()).Show();
             pErrMsg->Set(false);
             return false;
         }
-    }
-    else
-    {
+    } else {
         pErrMsg->Set(true, "Must specify trigger region", "No required trigger region specified for click-drag component on %s.  This component will not be exported.\n", ((INode*)node)->GetName()).Show();
         pErrMsg->Set(false);
         return false;
@@ -586,38 +578,40 @@ bool plClickDragComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     plFacingConditionalObject* facingCond = new plFacingConditionalObject;
     facingCond->SetDirectional(fCompPB->GetInt(kClickDragDirectional));
     int deg = fCompPB->GetInt(kClickDragDegrees);
-    if (deg > 180)
+
+    if (deg > 180) {
         deg = 180;
+    }
+
     float rad = hsDegreesToRadians(deg);
     facingCond->SetTolerance(cos(rad));
     plKey facingKey = hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), facingCond, loc);
-    
-    
+
+
     // link everything up:
-    if (det2) // set up the remote detector (if any)
-    {
+    if (det2) { // set up the remote detector (if any)
         activatorCond->SetActivatorKey(det2Key);
         det2->AddLogicObj(logicKey);
-    }
-    else
-    {
+    } else {
         detector->AddLogicObj(logicKey);     // send messages to this logic component
         activatorCond->SetActivatorKey(detectorKey); // Tells the activator condition to look for stimulus from the detector
     }
+
     logic->AddCondition(activatorCond); // add this activator condition
     logic->AddCondition(facingCond);
     logic->SetDisabled(fCompPB->GetInt(kClikDragEnabled) == 0);
 
-    
+
     // If this is for the SceneViewer, set the local only flag since the read function will never be called
-    if (plConvert::Instance().IsForSceneViewer())
+    if (plConvert::Instance().IsForSceneViewer()) {
         logic->SetLocalOnly(true);
+    }
 
     return true;
 }
 
-bool plClickDragComponent::DeInit( plMaxNode *node, plErrorMsg *pErrMsg )
+bool plClickDragComponent::DeInit(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fAxisKeys.clear();
-    return plActivatorBaseComponent::DeInit( node, pErrMsg ); 
+    return plActivatorBaseComponent::DeInit(node, pErrMsg);
 }

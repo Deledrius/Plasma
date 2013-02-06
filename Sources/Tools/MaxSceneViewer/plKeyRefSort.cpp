@@ -51,16 +51,17 @@ int plKeyRefSort::CountRefsRecur(plKey key, std::vector<plKey>& traversedKeys)
 {
     int numRefs = 0;
 
-    if (std::find(traversedKeys.begin(), traversedKeys.end(), key) == traversedKeys.end())
-    {
+    if (std::find(traversedKeys.begin(), traversedKeys.end(), key) == traversedKeys.end()) {
         traversedKeys.push_back(key);
 
         plKeyImp* iKey = (plKeyImp*)key;
-        for (int i = 0; i < iKey->GetNumRefs(); i++)
-        {
+
+        for (int i = 0; i < iKey->GetNumRefs(); i++) {
             plKey refKey = iKey->GetRef(i);
-            if (std::find(fKeys->begin(), fKeys->end(), refKey) != fKeys->end())
+
+            if (std::find(fKeys->begin(), fKeys->end(), refKey) != fKeys->end()) {
                 numRefs++;
+            }
 
             numRefs += CountRefsRecur(refKey, traversedKeys);
         }
@@ -70,11 +71,9 @@ int plKeyRefSort::CountRefsRecur(plKey key, std::vector<plKey>& traversedKeys)
 }
 
 
-class RefComp
-{
+class RefComp {
 public:
-    bool operator() (plKey key1, plKey key2) const
-    {
+    bool operator()(plKey key1, plKey key2) const {
         std::vector<plKeyRefSort::KeyRefs>::iterator it1 = std::find(plKeyRefSort::fNumRefs.begin(), plKeyRefSort::fNumRefs.end(), key1);
         std::vector<plKeyRefSort::KeyRefs>::iterator it2 = std::find(plKeyRefSort::fNumRefs.begin(), plKeyRefSort::fNumRefs.end(), key2);
 
@@ -89,8 +88,8 @@ void plKeyRefSort::Sort(std::vector<plKey>* keys)
     fNumRefs.resize(numKeys);
 
     int i;
-    for (i = 0; i < numKeys; i++)
-    {
+
+    for (i = 0; i < numKeys; i++) {
         plKey curKey = (*keys)[i];
 
         std::vector<plKey> traversedKeys;

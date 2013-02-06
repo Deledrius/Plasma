@@ -60,155 +60,193 @@ class pfGUIDialogProc;
 class pfGUIListElement;
 class pfGUIColorScheme;
 
-class pfGUIDialogMod : public plSingleModifier
-{
-    private:
-        pfGUIDialogMod  *fNext, **fPrevPtr;
+class pfGUIDialogMod : public plSingleModifier {
+private:
+    pfGUIDialogMod*  fNext, ** fPrevPtr;
 
-    protected:
+protected:
 
-        uint32_t      fTagID;     // 0 if none
+    uint32_t      fTagID;     // 0 if none
 
-        uint32_t      fVersion;   // Nice for syncing to C++ code
+    uint32_t      fVersion;   // Nice for syncing to C++ code
 
-        plPostEffectMod             *fRenderMod;
-        bool                        fEnabled;
-        char                        fName[ 128 ];
-        hsTArray<pfGUIControlMod *> fControls;
-        pfGUIControlMod             *fControlOfInterest;
-        pfGUIControlMod             *fFocusCtrl;
-        pfGUIControlMod             *fMousedCtrl;   // Which one is the mouse over?
-        pfGUIColorScheme            *fColorScheme;
+    plPostEffectMod*             fRenderMod;
+    bool                        fEnabled;
+    char                        fName[ 128 ];
+    hsTArray<pfGUIControlMod*> fControls;
+    pfGUIControlMod*             fControlOfInterest;
+    pfGUIControlMod*             fFocusCtrl;
+    pfGUIControlMod*             fMousedCtrl;   // Which one is the mouse over?
+    pfGUIColorScheme*            fColorScheme;
 
-        pfGUIDialogProc             *fHandler;
-        plKey                       fProcReceiver;      // Non-nil means we handle everything by creating notify messages and sending them to this key
+    pfGUIDialogProc*             fHandler;
+    plKey                       fProcReceiver;      // Non-nil means we handle everything by creating notify messages and sending them to this key
 
-        hsTArray<pfGUIListElement *>    fDragElements;
-        bool                            fDragMode, fDragReceptive;
-        pfGUIControlMod                 *fDragTarget;
-        pfGUIControlMod                 *fDragSource;
+    hsTArray<pfGUIListElement*>    fDragElements;
+    bool                            fDragMode, fDragReceptive;
+    pfGUIControlMod*                 fDragTarget;
+    pfGUIControlMod*                 fDragSource;
 
-        plKey           fSceneNodeKey;
-
-
-        virtual bool IEval( double secs, float del, uint32_t dirty ); // called only by owner object's Eval()
-
-        void    IHandleDrag( hsPoint3 &mousePt, pfGameGUIMgr::EventType event, uint8_t modifiers );
-
-    public:
-
-        enum
-        {
-            kRenderModRef = 0,
-            kControlRef,
-            kRefDerviedStart
-        };
-
-        enum Flags
-        {
-            kModal,
-            kDerivedFlagsStart
-        };
-
-        pfGUIDialogMod();
-        virtual ~pfGUIDialogMod();
-
-        CLASSNAME_REGISTER( pfGUIDialogMod );
-        GETINTERFACE_ANY( pfGUIDialogMod, plSingleModifier );
+    plKey           fSceneNodeKey;
 
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    virtual bool IEval(double secs, float del, uint32_t dirty);   // called only by owner object's Eval()
 
-        void        SetSceneNodeKey( plKey &key ) { fSceneNodeKey = key; }
-        plKey       GetSceneNodeKey( void );
+    void    IHandleDrag(hsPoint3& mousePt, pfGameGUIMgr::EventType event, uint8_t modifiers);
 
-        virtual void    SetEnabled( bool e );
-        bool            IsEnabled( void ) { return fEnabled; }
+public:
 
-        const char  *GetName( void ) { return fName; }
+    enum {
+        kRenderModRef = 0,
+        kControlRef,
+        kRefDerviedStart
+    };
 
-        void        ScreenToWorldPoint( float x, float y, float z, hsPoint3 &outPt );
-        hsPoint3    WorldToScreenPoint( const hsPoint3 &inPt );
+    enum Flags {
+        kModal,
+        kDerivedFlagsStart
+    };
 
-        virtual bool    HandleMouseEvent( pfGameGUIMgr::EventType event, float mouseX, float mouseY, uint8_t modifiers );
-        bool            HandleKeyEvent( pfGameGUIMgr::EventType event, plKeyDef key, uint8_t modifiers );
-        bool            HandleKeyPress( wchar_t key, uint8_t modifiers );
-        void            UpdateInterestingThings( float mouseX, float mouseY, uint8_t modifiers, bool modalPreset );
+    pfGUIDialogMod();
+    virtual ~pfGUIDialogMod();
 
-        void            SetControlOfInterest( pfGUIControlMod *c );
-        pfGUIControlMod *GetControlOfInterest( void ) const { return fControlOfInterest; }
-        uint32_t          GetDesiredCursor( void ) const;
+    CLASSNAME_REGISTER(pfGUIDialogMod);
+    GETINTERFACE_ANY(pfGUIDialogMod, plSingleModifier);
 
-        void        UpdateAspectRatio( void );
-        void        UpdateAllBounds( void );
-        void        RefreshAllControls( void );
 
-        void            AddControl( pfGUIControlMod *ctrl );
-        uint32_t          GetNumControls( void ) { return fControls.GetCount(); }
-        pfGUIControlMod *GetControl( uint32_t idx ) { return fControls[ idx ]; }
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        pfGUIColorScheme    *GetColorScheme( void ) const { return fColorScheme; }
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-        void    LinkToList( pfGUIDialogMod **prevPtr )
-        {
-            fNext = *prevPtr;
-            if( *prevPtr )
-                (*prevPtr)->fPrevPtr = &fNext;
-            fPrevPtr = prevPtr;
-            *prevPtr = this;
+    void        SetSceneNodeKey(plKey& key) {
+        fSceneNodeKey = key;
+    }
+    plKey       GetSceneNodeKey(void);
+
+    virtual void    SetEnabled(bool e);
+    bool            IsEnabled(void) {
+        return fEnabled;
+    }
+
+    const char*  GetName(void) {
+        return fName;
+    }
+
+    void        ScreenToWorldPoint(float x, float y, float z, hsPoint3& outPt);
+    hsPoint3    WorldToScreenPoint(const hsPoint3& inPt);
+
+    virtual bool    HandleMouseEvent(pfGameGUIMgr::EventType event, float mouseX, float mouseY, uint8_t modifiers);
+    bool            HandleKeyEvent(pfGameGUIMgr::EventType event, plKeyDef key, uint8_t modifiers);
+    bool            HandleKeyPress(wchar_t key, uint8_t modifiers);
+    void            UpdateInterestingThings(float mouseX, float mouseY, uint8_t modifiers, bool modalPreset);
+
+    void            SetControlOfInterest(pfGUIControlMod* c);
+    pfGUIControlMod* GetControlOfInterest(void) const {
+        return fControlOfInterest;
+    }
+    uint32_t          GetDesiredCursor(void) const;
+
+    void        UpdateAspectRatio(void);
+    void        UpdateAllBounds(void);
+    void        RefreshAllControls(void);
+
+    void            AddControl(pfGUIControlMod* ctrl);
+    uint32_t          GetNumControls(void) {
+        return fControls.GetCount();
+    }
+    pfGUIControlMod* GetControl(uint32_t idx) {
+        return fControls[ idx ];
+    }
+
+    pfGUIColorScheme*    GetColorScheme(void) const {
+        return fColorScheme;
+    }
+
+    void    LinkToList(pfGUIDialogMod** prevPtr) {
+        fNext = *prevPtr;
+
+        if (*prevPtr) {
+            (*prevPtr)->fPrevPtr = &fNext;
         }
 
-        void    Unlink( void )
-        {
-            if( fNext )
-                fNext->fPrevPtr = fPrevPtr;
-            *fPrevPtr = fNext;
+        fPrevPtr = prevPtr;
+        *prevPtr = this;
+    }
 
-            fPrevPtr = nil;
-            fNext = nil;
+    void    Unlink(void) {
+        if (fNext) {
+            fNext->fPrevPtr = fPrevPtr;
         }
 
-        void            SetFocus( pfGUIControlMod *ctrl );
-        void            Show( void );
-        void            ShowNoReset( void );
-        void            Hide( void );
-        bool            IsVisible( void ) { return IsEnabled(); }
+        *fPrevPtr = fNext;
 
-        pfGUIControlMod *GetFocus( void ) { return fFocusCtrl; }
+        fPrevPtr = nil;
+        fNext = nil;
+    }
 
-        pfGUIDialogMod  *GetNext( void ) { return fNext; }
-        uint32_t          GetTagID( void ) { return fTagID; }
-        pfGUIControlMod *GetControlFromTag( uint32_t tagID );
+    void            SetFocus(pfGUIControlMod* ctrl);
+    void            Show(void);
+    void            ShowNoReset(void);
+    void            Hide(void);
+    bool            IsVisible(void) {
+        return IsEnabled();
+    }
 
-        void            SetHandler( pfGUIDialogProc *hdlr );
-        pfGUIDialogProc *GetHandler( void ) const { return fHandler; }
+    pfGUIControlMod* GetFocus(void) {
+        return fFocusCtrl;
+    }
 
-        plPostEffectMod *GetRenderMod( void ) const { return fRenderMod; }
+    pfGUIDialogMod*  GetNext(void) {
+        return fNext;
+    }
+    uint32_t          GetTagID(void) {
+        return fTagID;
+    }
+    pfGUIControlMod* GetControlFromTag(uint32_t tagID);
 
-        // This sets the handler for the dialog and ALL of its controls
-        void            SetHandlerForAll( pfGUIDialogProc *hdlr );
+    void            SetHandler(pfGUIDialogProc* hdlr);
+    pfGUIDialogProc* GetHandler(void) const {
+        return fHandler;
+    }
 
-        // Just a little macro-type thing here
-        void            SetControlHandler( uint32_t tagID, pfGUIDialogProc *hdlr );
+    plPostEffectMod* GetRenderMod(void) const {
+        return fRenderMod;
+    }
 
-        /// Methods for doing drag & drop of listElements
+    // This sets the handler for the dialog and ALL of its controls
+    void            SetHandlerForAll(pfGUIDialogProc* hdlr);
 
-        void    ClearDragList( void );
-        void    AddToDragList( pfGUIListElement *e );
-        void    EnterDragMode( pfGUIControlMod *source );
+    // Just a little macro-type thing here
+    void            SetControlHandler(uint32_t tagID, pfGUIDialogProc* hdlr);
 
-        uint32_t  GetVersion( void ) const { return fVersion; }
+    /// Methods for doing drag & drop of listElements
 
-        // Export only
-        void        SetRenderMod( plPostEffectMod *mod ) { fRenderMod = mod; }
-        void        SetName( const char *name ) { hsStrncpy( fName, name, sizeof( fName ) - 1 ); }
-        void        AddControlOnExport( pfGUIControlMod *ctrl );
-        void        SetTagID( uint32_t id ) { fTagID = id; }
-        void        SetProcReceiver( plKey key ) { fProcReceiver = key; }
-        void        SetVersion( uint32_t version ) { fVersion = version; }
+    void    ClearDragList(void);
+    void    AddToDragList(pfGUIListElement* e);
+    void    EnterDragMode(pfGUIControlMod* source);
+
+    uint32_t  GetVersion(void) const {
+        return fVersion;
+    }
+
+    // Export only
+    void        SetRenderMod(plPostEffectMod* mod) {
+        fRenderMod = mod;
+    }
+    void        SetName(const char* name) {
+        hsStrncpy(fName, name, sizeof(fName) - 1);
+    }
+    void        AddControlOnExport(pfGUIControlMod* ctrl);
+    void        SetTagID(uint32_t id) {
+        fTagID = id;
+    }
+    void        SetProcReceiver(plKey key) {
+        fProcReceiver = key;
+    }
+    void        SetVersion(uint32_t version) {
+        fVersion = version;
+    }
 };
 
 #endif // _pfGUIDialogMod_h

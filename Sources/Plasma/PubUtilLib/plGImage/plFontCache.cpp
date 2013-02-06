@@ -66,11 +66,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 const char* plFontCache::kCustFontExtension = ".prf";
 
 
-plFontCache *plFontCache::fInstance = nil;
+plFontCache* plFontCache::fInstance = nil;
 
 plFontCache::plFontCache()
 {
-    RegisterAs( kFontCache_KEY );
+    RegisterAs(kFontCache_KEY);
     fInstance = this;
 }
 
@@ -80,65 +80,63 @@ plFontCache::~plFontCache()
     fInstance = nil;
 }
 
-plFontCache &plFontCache::GetInstance( void )
+plFontCache& plFontCache::GetInstance(void)
 {
     return *fInstance;
 }
 
-void    plFontCache::Clear( void )
+void    plFontCache::Clear(void)
 {
 }
 
-plFont  *plFontCache::GetFont( const char *face, uint8_t size, uint32_t fontFlags )
+plFont*  plFontCache::GetFont(const char* face, uint8_t size, uint32_t fontFlags)
 {
-    uint32_t  i, currIdx = (uint32_t)-1;
+    uint32_t  i, currIdx = (uint32_t) - 1;
     int     currDeltaSize = 100000;
     char    toFind[ 256 ];
 
 
-    strcpy( toFind, face );
-    strlwr( toFind );
-    for( i = 0; i < fCache.GetCount(); i++ )
-    {
-        char thisOne[ 256 ];
-        strcpy( thisOne, fCache[ i ]->GetFace() );
-        strlwr( thisOne );
+    strcpy(toFind, face);
+    strlwr(toFind);
 
-        if( strncmp( thisOne, toFind, strlen( toFind ) ) == 0 &&
-            ( fCache[ i ]->GetFlags() == fontFlags ) )
-        {
+    for (i = 0; i < fCache.GetCount(); i++) {
+        char thisOne[ 256 ];
+        strcpy(thisOne, fCache[ i ]->GetFace());
+        strlwr(thisOne);
+
+        if (strncmp(thisOne, toFind, strlen(toFind)) == 0 &&
+                (fCache[ i ]->GetFlags() == fontFlags)) {
             int delta = fCache[ i ]->GetSize() - size;
-            if( delta < 0 )
+
+            if (delta < 0) {
                 delta = -delta;
-            if( delta < currDeltaSize )
-            {
+            }
+
+            if (delta < currDeltaSize) {
                 currDeltaSize = delta;
                 currIdx = i;
             }
         }
     }
 
-    if( currIdx != (uint32_t)-1 )
-    {
+    if (currIdx != (uint32_t) - 1) {
         //if( currDeltaSize > 0 )
         //  plStatusLog::AddLineS( "pipeline.log", "Warning: plFontCache is matching %s %d (requested %s %d)", fCache[ currIdx ]->GetFace(), fCache[ currIdx ]->GetSize(), face, size );
         return fCache[ currIdx ];
     }
 
-    // If we failed, it's possible we have a face saved as "Times", for example, and someone's 
+    // If we failed, it's possible we have a face saved as "Times", for example, and someone's
     // asking for "Times New Roman", so strip all but the first uint16_t from our font and try the search again
-    char *c = strchr( toFind, ' ' );
-    if( c != nil )
-    {
+    char* c = strchr(toFind, ' ');
+
+    if (c != nil) {
         *c = 0;
-        return GetFont( toFind, size, fontFlags );
-    }
-    else if( fontFlags != 0 )
-    {
+        return GetFont(toFind, size, fontFlags);
+    } else if (fontFlags != 0) {
         // Hmm, well ok, just to be nice, try without our flags
-        plFont *f = GetFont( toFind, size, 0 );
-        if( f != nil )
-        {
+        plFont* f = GetFont(toFind, size, 0);
+
+        if (f != nil) {
             //plStatusLog::AddLineS( "pipeline.log", "Warning: plFontCache is substituting %s %d regular (flags 0x%x could not be matched)", f->GetFace(), f->GetSize(), fontFlags );
             return f;
         }
@@ -148,36 +146,37 @@ plFont  *plFontCache::GetFont( const char *face, uint8_t size, uint32_t fontFlag
     return nil;
 }
 
-void plFontCache::LoadCustomFonts( const plFileName &dir )
+void plFontCache::LoadCustomFonts(const plFileName& dir)
 {
     fCustFontDir = dir;
     ILoadCustomFonts();
 }
 
-void plFontCache::ILoadCustomFonts( void )
+void plFontCache::ILoadCustomFonts(void)
 {
-    if (!fCustFontDir.IsValid())
+    if (!fCustFontDir.IsValid()) {
         return;
+    }
 
     // Iterate through all the custom fonts in our dir
     std::vector<plFileName> fonts = plFileSystem::ListDir(fCustFontDir, "*.p2f");
-    for (auto iter = fonts.begin(); iter != fonts.end(); ++iter)
-    {
-        plFont *font = new plFont;
-        if (!font->LoadFromP2FFile(*iter))
+
+    for (auto iter = fonts.begin(); iter != fonts.end(); ++iter) {
+        plFont* font = new plFont;
+
+        if (!font->LoadFromP2FFile(*iter)) {
             delete font;
-        else
-        {
+        } else {
             plString keyName;
-            if (font->GetKey() == nil)
-            {
-                keyName = plString::Format( "%s-%d", font->GetFace(), font->GetSize() );
-                hsgResMgr::ResMgr()->NewKey( keyName, font, plLocation::kGlobalFixedLoc );
+
+            if (font->GetKey() == nil) {
+                keyName = plString::Format("%s-%d", font->GetFace(), font->GetSize());
+                hsgResMgr::ResMgr()->NewKey(keyName, font, plLocation::kGlobalFixedLoc);
             }
 
-            hsgResMgr::ResMgr()->AddViaNotify( font->GetKey(),
-                                               new plGenRefMsg( GetKey(), plRefMsg::kOnCreate, 0, -1 ),
-                                               plRefFlags::kActiveRef );
+            hsgResMgr::ResMgr()->AddViaNotify(font->GetKey(),
+                                              new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, -1),
+                                              plRefFlags::kActiveRef);
 
             //plStatusLog::AddLineS( "pipeline.log", "FontCache: Added custom font %s", keyName.c_str() );
 
@@ -185,24 +184,24 @@ void plFontCache::ILoadCustomFonts( void )
     }
 }
 
-bool    plFontCache::MsgReceive( plMessage* pMsg )
+bool    plFontCache::MsgReceive(plMessage* pMsg)
 {
-    plGenRefMsg *ref = plGenRefMsg::ConvertNoRef( pMsg );
-    if( ref != nil )
-    {
-        if( ref->GetContext() & ( plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace ) )
-        {
-            fCache.Append( plFont::ConvertNoRef( ref->GetRef() ) );
+    plGenRefMsg* ref = plGenRefMsg::ConvertNoRef(pMsg);
+
+    if (ref != nil) {
+        if (ref->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+            fCache.Append(plFont::ConvertNoRef(ref->GetRef()));
+        } else {
+            plFont* font = plFont::ConvertNoRef(ref->GetRef());
+            uint32_t idx = fCache.Find(font);
+
+            if (idx != fCache.kMissingIndex) {
+                fCache.Remove(idx);
+            }
         }
-        else
-        {
-            plFont *font = plFont::ConvertNoRef( ref->GetRef() );
-            uint32_t idx = fCache.Find( font );
-            if( idx != fCache.kMissingIndex )
-                fCache.Remove( idx );
-        }
+
         return true;
     }
 
-    return hsKeyedObject::MsgReceive( pMsg );
+    return hsKeyedObject::MsgReceive(pMsg);
 }

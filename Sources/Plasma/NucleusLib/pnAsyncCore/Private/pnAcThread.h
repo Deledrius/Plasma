@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCore/Private/pnAcThread.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNASYNCCORE_PRIVATE_PNACTHREAD_H
@@ -58,7 +58,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 // for IoWaitId/TimerCreate/TimerUpdate
-const unsigned kAsyncTimeInfinite = (unsigned) -1;
+const unsigned kAsyncTimeInfinite = (unsigned) - 1;
 
 #ifdef   _MSC_VER
 #define  THREADCALL __stdcall
@@ -67,21 +67,21 @@ const unsigned kAsyncTimeInfinite = (unsigned) -1;
 #endif
 
 struct AsyncThread;
-typedef unsigned (THREADCALL * FAsyncThreadProc)(AsyncThread * thread);
+typedef unsigned(THREADCALL* FAsyncThreadProc)(AsyncThread* thread);
 
 
 // Threads are also allowed to set the workTimeMs field of their
 // structure to a nonzero value for "on", and IO_TIME_INFINITE for
 // "off" to avoid the overhead of calling these functions. Note
 // that this function may not be called for the main thread. I
-// suggest that application code not worry that timeMs might 
-// "accidentally" equal the IO_TIME_INFINITE value, as it only 
+// suggest that application code not worry that timeMs might
+// "accidentally" equal the IO_TIME_INFINITE value, as it only
 // happens for one millisecond every 49 days.
 struct AsyncThread {
     LINK(AsyncThread)   link;
     FAsyncThreadProc    proc;
-    void *              handle;
-    void *              argument;
+    void*               handle;
+    void*               argument;
     unsigned            workTimeMs;
     wchar_t             name[16];
 };
@@ -92,14 +92,14 @@ struct AsyncThread {
 *
 ***/
 
-void * AsyncThreadCreate (
+void* AsyncThreadCreate(
     FAsyncThreadProc    proc,
-    void *              argument,
+    void*               argument,
     const wchar_t       name[]
 );
 
 // This function should ONLY be called during shutdown while waiting for things to expire
-void AsyncSleep (unsigned sleepMs);
+void AsyncSleep(unsigned sleepMs);
 
 
 /*****************************************************************************
@@ -120,27 +120,27 @@ const unsigned kThreadTaskMaxThreads = 1000;
 struct AsyncThreadTaskList;
 
 typedef void (* FAsyncThreadTask)(
-    void *                  param, 
+    void*                   param,
     ENetError               error
 );
 
 
-void AsyncThreadTaskInitialize (unsigned threads);
-void AsyncThreadTaskDestroy ();
+void AsyncThreadTaskInitialize(unsigned threads);
+void AsyncThreadTaskDestroy();
 
-unsigned AsyncThreadTaskGetThreadCount ();
-void AsyncThreadTaskSetThreadCount (unsigned threads);
+unsigned AsyncThreadTaskGetThreadCount();
+void AsyncThreadTaskSetThreadCount(unsigned threads);
 
-AsyncThreadTaskList * AsyncThreadTaskListCreate ();
-void AsyncThreadTaskListDestroy (
-    AsyncThreadTaskList *   taskList,
+AsyncThreadTaskList* AsyncThreadTaskListCreate();
+void AsyncThreadTaskListDestroy(
+    AsyncThreadTaskList*    taskList,
     ENetError               error
 );
 
-void AsyncThreadTaskAdd (
-    AsyncThreadTaskList *   taskList,
+void AsyncThreadTaskAdd(
+    AsyncThreadTaskList*    taskList,
     FAsyncThreadTask        callback,
-    void *                  param,
+    void*                   param,
     const wchar_t             debugStr[],
     EThreadTaskPriority     priority = kThreadTaskPriorityNormal
 );

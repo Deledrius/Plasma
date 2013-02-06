@@ -47,14 +47,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 void plRelevanceRegion::Read(hsStream* s, hsResMgr* mgr)
 {
     plObjInterface::Read(s, mgr);
-    
+
     mgr->ReadKeyNotifyMe(s, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, 0), plRefFlags::kActiveRef);
-    
+
     // Added to the manager when read in.
     // Removed when paged out, due to passive ref.
-    if (plRelevanceMgr::Instance())
-    {
-        plGenRefMsg *msg = new plGenRefMsg(plRelevanceMgr::Instance()->GetKey(), plRefMsg::kOnCreate, -1, -1);
+    if (plRelevanceMgr::Instance()) {
+        plGenRefMsg* msg = new plGenRefMsg(plRelevanceMgr::Instance()->GetKey(), plRefMsg::kOnCreate, -1, -1);
         hsgResMgr::ResMgr()->AddViaNotify(GetKey(), msg, plRefFlags::kPassiveRef);
     }
 }
@@ -62,26 +61,25 @@ void plRelevanceRegion::Read(hsStream* s, hsResMgr* mgr)
 void plRelevanceRegion::Write(hsStream* s, hsResMgr* mgr)
 {
     plObjInterface::Write(s, mgr);
-    
+
     mgr->WriteKey(s, fRegion);
 }
 
 bool plRelevanceRegion::MsgReceive(plMessage* msg)
 {
-    plGenRefMsg *genMsg = plGenRefMsg::ConvertNoRef(msg);
-    if (genMsg)
-    {
-        plRegionBase *base = plRegionBase::ConvertNoRef(genMsg->GetRef());
-        if( genMsg->GetContext() & (plRefMsg::kOnCreate) )
-        {
+    plGenRefMsg* genMsg = plGenRefMsg::ConvertNoRef(msg);
+
+    if (genMsg) {
+        plRegionBase* base = plRegionBase::ConvertNoRef(genMsg->GetRef());
+
+        if (genMsg->GetContext() & (plRefMsg::kOnCreate)) {
             fRegion = base;
-        }
-        else if( genMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-        {
+        } else if (genMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
             fRegion = nil;
         }
+
         return true;
-    }           
+    }
 
     return plObjInterface::MsgReceive(msg);
 }
@@ -89,8 +87,9 @@ bool plRelevanceRegion::MsgReceive(plMessage* msg)
 
 void plRelevanceRegion::SetMgrIndex(uint32_t index)
 {
-    if (fMgrIdx != (uint32_t)-1)
+    if (fMgrIdx != (uint32_t) - 1) {
         fRegionsICareAbout.SetBit(fMgrIdx, false);
+    }
 
     fMgrIdx = index;
     fRegionsICareAbout.SetBit(index, true); // I care about myself. Awww...

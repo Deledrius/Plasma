@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plKey;
 class plBulletMsg;
 
-class plDynaTorpedoMgr : public plDynaRippleMgr
-{
+class plDynaTorpedoMgr : public plDynaRippleMgr {
 protected:
 
     virtual bool IHandleShot(plBulletMsg* bull);
@@ -58,8 +57,8 @@ public:
     plDynaTorpedoMgr();
     virtual ~plDynaTorpedoMgr();
 
-    CLASSNAME_REGISTER( plDynaTorpedoMgr );
-    GETINTERFACE_ANY( plDynaTorpedoMgr, plDynaRippleMgr );
+    CLASSNAME_REGISTER(plDynaTorpedoMgr);
+    GETINTERFACE_ANY(plDynaTorpedoMgr, plDynaRippleMgr);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
 

@@ -54,7 +54,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 void plResCollector::Collect()
 {
-    Interface *ip = GetCOREInterface();
+    Interface* ip = GetCOREInterface();
 
     // Get the directory to copy files to
     char path[MAX_PATH];
@@ -62,32 +62,36 @@ void plResCollector::Collect()
                         "Choose a folder to copy the resources to",
                         path,
                         NULL);
-    if (!strcmp(path, ""))
+
+    if (!strcmp(path, "")) {
         return;
+    }
 
     // Make sure the directory ends with a slash
-    if (path[strlen(path)-1] != '\\' && path[strlen(path)-1] != '/')
+    if (path[strlen(path) - 1] != '\\' && path[strlen(path) - 1] != '/') {
         strcat(path, "\\");
+    }
 
     // Make a list of all the textures
     TexNameSet texNames;
     plMtlCollector::GetAllTextures(texNames);
 
     plExportProgressBar bar;
-    bar.Start("Copy Files", texNames.size()+1);
+    bar.Start("Copy Files", texNames.size() + 1);
 
     // Copy each texture to the output directory
     TexNameSet::iterator it = texNames.begin();
-    for (; it != texNames.end(); it++)
-    {
+
+    for (; it != texNames.end(); it++) {
         plString texName = *it;
 
-        char outpath[MAX_PATH], name[_MAX_FNAME+_MAX_EXT], ext[_MAX_EXT];
+        char outpath[MAX_PATH], name[_MAX_FNAME + _MAX_EXT], ext[_MAX_EXT];
         _splitpath(texName.c_str(), NULL, NULL, name, ext);
         strcat(name, ext);
 
-        if (bar.Update(name))
+        if (bar.Update(name)) {
             return;
+        }
 
         strcpy(outpath, path);
         strcat(outpath, name);
@@ -99,15 +103,18 @@ void plResCollector::Collect()
     TSTR& maxFile = ip->GetCurFileName();
     TSTR& filePath =  ip->GetCurFilePath();
 
-    if (!strcmp(maxFile, ""))
+    if (!strcmp(maxFile, "")) {
         return;
+    }
 
-    if (bar.Update(maxFile))
+    if (bar.Update(maxFile)) {
         return;
+    }
 
     // If we need to save, do it now
-    if (IsSaveRequired())
+    if (IsSaveRequired()) {
         ip->SaveToFile(filePath);
+    }
 
     // Copy the max file to the output directory
     strcat(path, maxFile);

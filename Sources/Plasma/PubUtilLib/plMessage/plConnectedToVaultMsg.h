@@ -49,17 +49,22 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 class hsResMgr;
 class hsStream;
-class plConnectedToVaultMsg : public plMessage
-{
+class plConnectedToVaultMsg : public plMessage {
 public:
-   CLASSNAME_REGISTER( plConnectedToVaultMsg );
-   GETINTERFACE_ANY( plConnectedToVaultMsg, plMessage );
+    CLASSNAME_REGISTER(plConnectedToVaultMsg);
+    GETINTERFACE_ANY(plConnectedToVaultMsg, plMessage);
 
-   plConnectedToVaultMsg() { SetBCastFlag(kBCastByType);   }
+    plConnectedToVaultMsg() {
+        SetBCastFlag(kBCastByType);
+    }
 
-   // IO 
-   void Read(hsStream* stream, hsResMgr* mgr) { plMessage::IMsgRead(stream, mgr); }
-   void Write(hsStream* stream, hsResMgr* mgr)  {   plMessage::IMsgWrite(stream, mgr); }
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
+        plMessage::IMsgRead(stream, mgr);
+    }
+    void Write(hsStream* stream, hsResMgr* mgr)  {
+        plMessage::IMsgWrite(stream, mgr);
+    }
 };
 
 #endif      // plConnectedToVaultMsg

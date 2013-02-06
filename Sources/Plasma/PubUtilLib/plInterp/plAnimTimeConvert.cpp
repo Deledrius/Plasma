@@ -61,31 +61,33 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 plAnimTimeConvert::plAnimTimeConvert()
-:   fCurrentAnimTime(0),
-    fLastEvalWorldTime(0),
-    fBegin(0),
-    fEnd(0),
-    fLoopEnd(0),
-    fLoopBegin(0),
-    fSpeed(1.f),
-    fFlags(0),
-    fOwner(nil),
-    fEaseInCurve(nil),
-    fEaseOutCurve(nil),
-    fSpeedEaseCurve(nil),
-    fCurrentEaseCurve(nil),
-    fInitialBegin(0),
-    fInitialEnd(0),
-    fWrapTime(0)
-    //fDirtyNotifier(nil)
+    :   fCurrentAnimTime(0),
+        fLastEvalWorldTime(0),
+        fBegin(0),
+        fEnd(0),
+        fLoopEnd(0),
+        fLoopBegin(0),
+        fSpeed(1.f),
+        fFlags(0),
+        fOwner(nil),
+        fEaseInCurve(nil),
+        fEaseOutCurve(nil),
+        fSpeedEaseCurve(nil),
+        fCurrentEaseCurve(nil),
+        fInitialBegin(0),
+        fInitialEnd(0),
+        fWrapTime(0)
+        //fDirtyNotifier(nil)
 {
 }
 
 plAnimTimeConvert::~plAnimTimeConvert()
 {
     int i;
-    for( i = 0; i < fCallbackMsgs.GetCount(); i++ )
+
+    for (i = 0; i < fCallbackMsgs.GetCount(); i++) {
         hsRefCnt_SafeUnRef(fCallbackMsgs[i]);
+    }
 
     delete fEaseInCurve;
     delete fEaseOutCurve;
@@ -95,55 +97,57 @@ plAnimTimeConvert::~plAnimTimeConvert()
     IClearAllStates();
 }
 
-void plAnimTimeConvert::Init(plATCAnim *anim, plAGAnimInstance *instance, plAGMasterMod *master)
+void plAnimTimeConvert::Init(plATCAnim* anim, plAGAnimInstance* instance, plAGMasterMod* master)
 {
-        // Set up our eval callbacks
-    plAGInstanceCallbackMsg *instMsg;
-    instMsg = new plAGInstanceCallbackMsg(master->GetKey(), kStart); 
-    instMsg->fInstance = instance;
-    AddCallback(instMsg);
-    hsRefCnt_SafeUnRef(instMsg);    
-    instMsg = new plAGInstanceCallbackMsg(master->GetKey(), kStop); 
+    // Set up our eval callbacks
+    plAGInstanceCallbackMsg* instMsg;
+    instMsg = new plAGInstanceCallbackMsg(master->GetKey(), kStart);
     instMsg->fInstance = instance;
     AddCallback(instMsg);
     hsRefCnt_SafeUnRef(instMsg);
-    instMsg = new plAGInstanceCallbackMsg(master->GetKey(), kSingleFrameAdjust); 
+    instMsg = new plAGInstanceCallbackMsg(master->GetKey(), kStop);
     instMsg->fInstance = instance;
     AddCallback(instMsg);
     hsRefCnt_SafeUnRef(instMsg);
-    
+    instMsg = new plAGInstanceCallbackMsg(master->GetKey(), kSingleFrameAdjust);
+    instMsg->fInstance = instance;
+    AddCallback(instMsg);
+    hsRefCnt_SafeUnRef(instMsg);
+
     SetOwner(master);
     ClearFlags();
 
-    for (int i = 0; i < anim->NumStopPoints(); i++)
+    for (int i = 0; i < anim->NumStopPoints(); i++) {
         GetStopPoints().Append(anim->GetStopPoint(i));
-    
+    }
+
     SetBegin(anim->GetStart());
     SetEnd(anim->GetEnd());
     fInitialBegin = fBegin;
     fInitialEnd = fEnd;
-    
-    if (anim->GetInitial() != -1)
+
+    if (anim->GetInitial() != -1) {
         SetCurrentAnimTime(anim->GetInitial());
-    else 
+    } else {
         SetCurrentAnimTime(anim->GetStart());
+    }
+
     SetLoopPoints(anim->GetLoopStart(), anim->GetLoopEnd());
     Loop(anim->GetLoop());
     SetSpeed(1.f);
-    SetEase(true, anim->GetEaseInType(), anim->GetEaseInMin(), 
-                         anim->GetEaseInMax(), anim->GetEaseInLength()); 
-    SetEase(false, anim->GetEaseOutType(), anim->GetEaseOutMin(), 
-                         anim->GetEaseOutMax(), anim->GetEaseOutLength());
+    SetEase(true, anim->GetEaseInType(), anim->GetEaseInMin(),
+            anim->GetEaseInMax(), anim->GetEaseInLength());
+    SetEase(false, anim->GetEaseOutType(), anim->GetEaseOutMin(),
+            anim->GetEaseOutMax(), anim->GetEaseOutLength());
 
     // set up our time converter based on the animation's specs...
     // ... after we've set all of its other state values.
-    if (anim->GetAutoStart())
-    {
+    if (anim->GetAutoStart()) {
         plSynchEnabler ps(true);    // enable dirty tracking so that autostart will send out a state update
         Start();
-    }
-    else
+    } else {
         InitStop();
+    }
 }
 
 //
@@ -151,36 +155,46 @@ void plAnimTimeConvert::Init(plATCAnim *anim, plAGAnimInstance *instance, plAGMa
 //
 void plAnimTimeConvert::SetCurrentEaseCurve(int x)
 {
-    switch(x)
-    {
+    switch (x) {
     default:
         hsAssert(false, "invalid arg to SetCurrentEaseCurve");
         break;
+
     case kEaseNone:
-        fCurrentEaseCurve=nil;
+        fCurrentEaseCurve = nil;
         break;
+
     case kEaseIn:
-        fCurrentEaseCurve=fEaseInCurve;
+        fCurrentEaseCurve = fEaseInCurve;
         break;
+
     case kEaseOut:
-        fCurrentEaseCurve=fEaseOutCurve;
+        fCurrentEaseCurve = fEaseOutCurve;
         break;
+
     case kEaseSpeed:
-        fCurrentEaseCurve=fSpeedEaseCurve;
+        fCurrentEaseCurve = fSpeedEaseCurve;
         break;
     }
 }
 
 int plAnimTimeConvert::GetCurrentEaseCurve() const
 {
-    if (fCurrentEaseCurve==nil)
+    if (fCurrentEaseCurve == nil) {
         return kEaseNone;
-    if (fCurrentEaseCurve==fEaseInCurve)
+    }
+
+    if (fCurrentEaseCurve == fEaseInCurve) {
         return kEaseIn;
-    if (fCurrentEaseCurve==fEaseOutCurve)
+    }
+
+    if (fCurrentEaseCurve == fEaseOutCurve) {
         return kEaseOut;
-    if (fCurrentEaseCurve==fSpeedEaseCurve)
+    }
+
+    if (fCurrentEaseCurve == fSpeedEaseCurve) {
         return kEaseSpeed;
+    }
 
     hsAssert(false, "unknown ease curve");
     return 0;
@@ -191,22 +205,20 @@ int plAnimTimeConvert::GetCurrentEaseCurve() const
 //
 void plAnimTimeConvert::ResizeStates(int cnt)
 {
-    while (fStates.size() > cnt)
-    {
+    while (fStates.size() > cnt) {
         delete fStates.back();
         fStates.pop_back();
     }
 
-    while (cnt>fStates.size())
-    {
+    while (cnt > fStates.size()) {
         fStates.push_back(new plATCState);
     }
 
-    hsAssert(fStates.size()==cnt, "state resize mismatch");
+    hsAssert(fStates.size() == cnt, "state resize mismatch");
 }
 
 void plAnimTimeConvert::ResetWrap()
-{ 
+{
     fBegin = fInitialBegin;
     fEnd = fInitialEnd;
     Forewards();
@@ -214,33 +226,37 @@ void plAnimTimeConvert::ResetWrap()
     fFlags &= (~kWrap & ~kNeedsReset);
 }
 
-float plAnimTimeConvert::ICalcEaseTime(const plATCEaseCurve *curve, double start, double end)
+float plAnimTimeConvert::ICalcEaseTime(const plATCEaseCurve* curve, double start, double end)
 {
     start -= curve->fBeginWorldTime;
     end -= curve->fBeginWorldTime;
 
     // Clamp to the curve's range
-    if (start < 0)
+    if (start < 0) {
         start = 0;
-    if (end > curve->fLength)
+    }
+
+    if (end > curve->fLength) {
         end = curve->fLength;
+    }
 
 
     float delSecs = 0;
 
-    if (start < curve->fLength)
-    {   
+    if (start < curve->fLength) {
         // Redundant eval... but only when easing.
         delSecs = curve->PositionGivenTime((float)end) - curve->PositionGivenTime((float)start);
     }
+
     return delSecs;
 }
 
 void plAnimTimeConvert::IClearSpeedEase()
 {
-    
-    if (fCurrentEaseCurve == fSpeedEaseCurve)
+
+    if (fCurrentEaseCurve == fSpeedEaseCurve) {
         fCurrentEaseCurve = nil;
+    }
 
     delete fSpeedEaseCurve;
     fSpeedEaseCurve = nil;
@@ -249,69 +265,67 @@ void plAnimTimeConvert::IClearSpeedEase()
 void plAnimTimeConvert::ICheckTimeCallbacks(float frameStart, float frameStop)
 {
     int i;
-    for( i = fCallbackMsgs.GetCount()-1; i >= 0; --i )
-    {
-        if (fCallbackMsgs[i]->fEvent == kTime)
-        {
-            if( ITimeInFrame(fCallbackMsgs[i]->fEventTime, frameStart, frameStop) )
+
+    for (i = fCallbackMsgs.GetCount() - 1; i >= 0; --i) {
+        if (fCallbackMsgs[i]->fEvent == kTime) {
+            if (ITimeInFrame(fCallbackMsgs[i]->fEventTime, frameStart, frameStop)) {
                 ISendCallback(i);
+            }
+        } else if (fCallbackMsgs[i]->fEvent == kBegin && ITimeInFrame(fBegin, frameStart, frameStop)) {
+            ISendCallback(i);
+        } else if (fCallbackMsgs[i]->fEvent == kEnd && ITimeInFrame(fEnd, frameStart, frameStop)) {
+            ISendCallback(i);
         }
-        else if (fCallbackMsgs[i]->fEvent == kBegin && ITimeInFrame(fBegin, frameStart, frameStop) )
-            ISendCallback(i);
-        else if (fCallbackMsgs[i]->fEvent == kEnd && ITimeInFrame(fEnd, frameStart, frameStop) )
-            ISendCallback(i);
 
     }
 }
 
 bool plAnimTimeConvert::ITimeInFrame(float secs, float start, float stop)
 {
-    if (secs == start && secs == stop)
+    if (secs == start && secs == stop) {
         return true;
-    if( IsBackwards() )
-    {
-        if( start < stop )
-        {
+    }
+
+    if (IsBackwards()) {
+        if (start < stop) {
             // We've just wrapped. Careful to exclude markers outside current loop.
-            if( ((secs <= start) && (secs >= fLoopBegin))
-                || ((secs >= stop) && (secs <= fLoopEnd)) )
+            if (((secs <= start) && (secs >= fLoopBegin))
+                    || ((secs >= stop) && (secs <= fLoopEnd))) {
                 return true;
+            }
+        } else {
+            if ((secs <= start) && (secs >= stop)) {
+                return true;
+            }
         }
-        else
-        {
-            if( (secs <= start) && (secs >= stop) )
+    } else {
+        if (start > stop) {
+            // We've just wrapped. Careful to exclude markers outside current loop.
+            if (((secs >= start) && (secs <= fLoopEnd))
+                    || ((secs <= stop) && (secs >= fLoopBegin))) {
                 return true;
+            }
+        } else {
+            if ((secs >= start) && (secs <= stop)) {
+                return true;
+            }
         }
     }
-    else
-    {
-        if( start > stop )
-        {
-            // We've just wrapped. Careful to exclude markers outside current loop.
-            if( ((secs >= start) && (secs <= fLoopEnd))
-                || ((secs <= stop) && (secs >= fLoopBegin)) )
-                return true;
-        }
-        else
-        {
-            if( (secs >= start) && (secs <= stop) )
-                return true;
-        }
-    }
+
     return false;
 }
 
 void plAnimTimeConvert::ISendCallback(int i)
 {
     // Check if callbacks are disabled this frame (i.e. when we're loading in state)
-    if (fFlags & kNoCallbacks)
+    if (fFlags & kNoCallbacks) {
         return;
+    }
 
     // send callback if msg is local or if we are the local master
     if (!fCallbackMsgs[i]->HasBCastFlag(plMessage::kNetPropagate) ||
-        !fOwner || fOwner->IsLocallyOwned()==plSynchedObject::kYes)
-    {
-        plEventCallbackMsg *temp = fCallbackMsgs[i];
+            !fOwner || fOwner->IsLocallyOwned() == plSynchedObject::kYes) {
+        plEventCallbackMsg* temp = fCallbackMsgs[i];
 
         fCallbackMsgs[i]->SetSender(fOwner ? fOwner->GetKey() : nil);
 
@@ -319,48 +333,52 @@ void plAnimTimeConvert::ISendCallback(int i)
         plgDispatch::MsgSend(fCallbackMsgs[i]);
 
         // No more repeats, remove this callback from our list
-        if (fCallbackMsgs[i]->fRepeats == 0)
-        {
+        if (fCallbackMsgs[i]->fRepeats == 0) {
             hsRefCnt_SafeUnRef(fCallbackMsgs[i]);
             fCallbackMsgs.Remove(i);
         }
         // If this isn't infinite, decrement the number of repeats
-        else if (fCallbackMsgs[i]->fRepeats > 0)
+        else if (fCallbackMsgs[i]->fRepeats > 0) {
             fCallbackMsgs[i]->fRepeats--;
+        }
     }
 }
 
 plAnimTimeConvert& plAnimTimeConvert::IStop(double time, float animTime)
 {
-    if( IsStopped() )
+    if (IsStopped()) {
         return *this;
+    }
 
     IClearSpeedEase(); // If we had one queued up, clear it. It will automatically take effect when we start
     SetFlag(kEasingIn, false);
     SetFlag(kStopped, true);
-    if (fFlags & kNeedsReset)
+
+    if (fFlags & kNeedsReset) {
         ResetWrap();
+    }
 
     IProcessStateChange(time, animTime);
 
     int i;
-    for( i = fCallbackMsgs.GetCount()-1; i >= 0; --i )
-    {
-        if (fCallbackMsgs[i]->fEvent == kStop)
-        {
+
+    for (i = fCallbackMsgs.GetCount() - 1; i >= 0; --i) {
+        if (fCallbackMsgs[i]->fEvent == kStop) {
             ISendCallback(i);
         }
     }
+
     return *this;
 }
 
 plAnimTimeConvert& plAnimTimeConvert::IProcessStateChange(double worldTime, float animTime /* = -1 */)
 {
-    if (fStates.size() > 0 && worldTime < fStates.front()->fStartWorldTime)
-        return *this; // Sorry... state saves only work in the forward direction
+    if (fStates.size() > 0 && worldTime < fStates.front()->fStartWorldTime) {
+        return *this;    // Sorry... state saves only work in the forward direction
+    }
 
     fLastStateChange = worldTime;
-    plATCState *state = new plATCState;
+    plATCState* state = new plATCState;
 
     state->fStartWorldTime = fLastStateChange;
     state->fStartAnimTime = (animTime < 0 ? WorldToAnimTimeNoUpdate(fLastStateChange) : animTime);
@@ -371,21 +389,21 @@ plAnimTimeConvert& plAnimTimeConvert::IProcessStateChange(double worldTime, floa
     state->fLoopEnd = fLoopEnd;
     state->fSpeed = fSpeed;
     state->fWrapTime = fWrapTime;
-    state->fEaseCurve = (fCurrentEaseCurve == nil ? nil : fCurrentEaseCurve->Clone());  
+    state->fEaseCurve = (fCurrentEaseCurve == nil ? nil : fCurrentEaseCurve->Clone());
 
     fStates.push_front(state);
     IFlushOldStates();
 
-    const char* sdlName=nil;
-    if (plLayerAnimation::ConvertNoRef(fOwner))
-        sdlName=kSDLLayer;
-    else
-    if (plAGMasterMod::ConvertNoRef(fOwner))
-        sdlName=kSDLAGMaster;
-    else
-    {
+    const char* sdlName = nil;
+
+    if (plLayerAnimation::ConvertNoRef(fOwner)) {
+        sdlName = kSDLLayer;
+    } else if (plAGMasterMod::ConvertNoRef(fOwner)) {
+        sdlName = kSDLAGMaster;
+    } else {
         hsAssert(false, "unknown sdl owner");
     }
+
     fOwner->DirtySynchState(sdlName, 0);        // Send SDL state update to server
 
     return *this;
@@ -395,20 +413,20 @@ plAnimTimeConvert& plAnimTimeConvert::IProcessStateChange(double worldTime, floa
 // Where "out-of-date" means, "More than 1 frame old"
 void plAnimTimeConvert::IFlushOldStates()
 {
-    plATCState *state;
+    plATCState* state;
     plATCStateList::const_iterator i = fStates.begin();
     uint32_t count = 0;
 
-    for (; i != fStates.end(); i++)
-    {
+    for (; i != fStates.end(); i++) {
         count++;
         state = *i;
-        if (fLastEvalWorldTime - hsTimer::GetDelSysSeconds() >= state->fStartWorldTime)
+
+        if (fLastEvalWorldTime - hsTimer::GetDelSysSeconds() >= state->fStartWorldTime) {
             break;
+        }
     }
 
-    while (fStates.size() > count)
-    {
+    while (fStates.size() > count) {
         delete fStates.back();
         fStates.pop_back();
     }
@@ -416,56 +434,59 @@ void plAnimTimeConvert::IFlushOldStates()
 
 void plAnimTimeConvert::IClearAllStates()
 {
-    while (fStates.size() > 0)
-    {
+    while (fStates.size() > 0) {
         delete fStates.back();
         fStates.pop_back();
     }
 }
 
-plATCState *plAnimTimeConvert::IGetState(double wSecs) const
+plATCState* plAnimTimeConvert::IGetState(double wSecs) const
 {
-    plATCState *state;
+    plATCState* state;
     plATCStateList::const_iterator i = fStates.begin();
 
-    for (; i != fStates.end(); i++)
-    {
+    for (; i != fStates.end(); i++) {
         state = *i;
-        if (wSecs >= state->fStartWorldTime)
+
+        if (wSecs >= state->fStartWorldTime) {
             return state;
+        }
     }
 
     return nil;
 }
 
-plATCState *plAnimTimeConvert::IGetLatestState() const
+plATCState* plAnimTimeConvert::IGetLatestState() const
 {
     return fStates.front();
 }
 
-void plAnimTimeConvert::SetOwner(plSynchedObject* o) 
-{ 
-    fOwner = o; 
+void plAnimTimeConvert::SetOwner(plSynchedObject* o)
+{
+    fOwner = o;
 }
 
-bool plAnimTimeConvert::IIsStoppedAt(const double &wSecs, const uint32_t &flags, 
-                                       const plATCEaseCurve *curve) const       
+bool plAnimTimeConvert::IIsStoppedAt(const double& wSecs, const uint32_t& flags,
+                                     const plATCEaseCurve* curve) const
 {
-    if (flags & kStopped)
-        return !(flags & kForcedMove); // If someone called SetCurrentAnimTime(), we need to say we moved.
+    if (flags & kStopped) {
+        return !(flags & kForcedMove);    // If someone called SetCurrentAnimTime(), we need to say we moved.
+    }
 
     return false;
 }
 
 bool plAnimTimeConvert::IsStoppedAt(double wSecs) const
 {
-    if (wSecs > fLastStateChange)
+    if (wSecs > fLastStateChange) {
         return IIsStoppedAt(wSecs, fFlags, fCurrentEaseCurve);
+    }
 
-    plATCState *state = IGetState(wSecs);
+    plATCState* state = IGetState(wSecs);
 
-    if ( !state )
+    if (!state) {
         return true;
+    }
 
     return IIsStoppedAt(wSecs, state->fFlags, state->fEaseCurve);
 }
@@ -476,146 +497,125 @@ float plAnimTimeConvert::WorldToAnimTime(double wSecs)
     double d = wSecs - fLastEvalWorldTime;
     float f = fCurrentAnimTime;
 
-    if (wSecs < fLastStateChange)
-    {
+    if (wSecs < fLastStateChange) {
         fCurrentAnimTime = IWorldToAnimTimeBeforeState(wSecs);
         fLastEvalWorldTime = wSecs;
         return fCurrentAnimTime;
     }
 
-    if (fLastEvalWorldTime <= fLastStateChange) // Crossing into the latest state
-    {
+    if (fLastEvalWorldTime <= fLastStateChange) { // Crossing into the latest state
         fLastEvalWorldTime = fLastStateChange;
         fCurrentAnimTime = IGetLatestState()->fStartAnimTime;
     }
 
-    if( (fFlags & kStopped) || (wSecs == fLastEvalWorldTime) )
-    {
-        if (fFlags & kForcedMove)
-        {
+    if ((fFlags & kStopped) || (wSecs == fLastEvalWorldTime)) {
+        if (fFlags & kForcedMove) {
             int i;
-            for( i = fCallbackMsgs.GetCount()-1; i >= 0; --i )
-            {
-                if (fCallbackMsgs[i]->fEvent == kSingleFrameEval)
-                {
+
+            for (i = fCallbackMsgs.GetCount() - 1; i >= 0; --i) {
+                if (fCallbackMsgs[i]->fEvent == kSingleFrameEval) {
                     ISendCallback(i);
                 }
-            }   
+            }
         }
+
         fFlags &= ~kForcedMove;
         fLastEvalWorldTime = wSecs;
-        
+
         return fCurrentAnimTime;
     }
+
     float note = fCurrentAnimTime - f;
     float secs = 0, delSecs = 0;
 
-    if (fCurrentEaseCurve != nil)
-    {
+    if (fCurrentEaseCurve != nil) {
         delSecs += ICalcEaseTime(fCurrentEaseCurve, fLastEvalWorldTime, wSecs);
-        if (wSecs > fCurrentEaseCurve->GetEndWorldTime())
-        {
-            if (fFlags & kEasingIn)
+
+        if (wSecs > fCurrentEaseCurve->GetEndWorldTime()) {
+            if (fFlags & kEasingIn) {
                 delSecs += float(wSecs - fCurrentEaseCurve->GetEndWorldTime()) * fSpeed;
+            }
 
             IClearSpeedEase();
-            
+
             fCurrentEaseCurve = nil;
         }
-    }
-    else 
-    {
+    } else {
         // The easy case... playing the animation at a constant speed.
         delSecs = float(wSecs - fLastEvalWorldTime) * fSpeed;
     }
-    
-    if (fFlags & kBackwards)
+
+    if (fFlags & kBackwards) {
         delSecs = -delSecs;
-    
+    }
+
     secs = fCurrentAnimTime + delSecs;
-    // At this point, "secs" is the pre-wrapped (before looping) anim time. 
+    // At this point, "secs" is the pre-wrapped (before looping) anim time.
     // "delSecs" is the change in anim time
-    
+
     // if our speed is < 0, then checking for the kBackwards flag isn't enough
     // so we base our decision on the direction of the actual change we've computed.
     bool forewards = delSecs >= 0;
 
-    if (fFlags & kLoop)
-    {
+    if (fFlags & kLoop) {
         bool wrapped = false;
 
-        if (forewards)
-        {
-            if (IGetLatestState()->fStartAnimTime > fLoopEnd)
-            {
+        if (forewards) {
+            if (IGetLatestState()->fStartAnimTime > fLoopEnd) {
                 // Our animation started past the loop. Play to the end.
-                if (secs > fEnd)
-                {
+                if (secs > fEnd) {
                     secs = fEnd;
                     IStop(wSecs, secs);
                 }
-            }
-            else
-            {
-                if (secs > fLoopEnd)
-                {
+            } else {
+                if (secs > fLoopEnd) {
                     secs = fmodf(secs - fLoopBegin, fLoopEnd - fLoopBegin) + fLoopBegin;
                     wrapped = true;
                 }
-            }   
-        }
-        else
-        {
-            if (IGetLatestState()->fStartAnimTime < fLoopBegin)
-            {
-                if (secs < fBegin)
-                {
+            }
+        } else {
+            if (IGetLatestState()->fStartAnimTime < fLoopBegin) {
+                if (secs < fBegin) {
                     secs = fBegin;
                     IStop(wSecs, secs);
                 }
-            }
-            else
-            {
-                if (secs < fLoopBegin)
-                {
+            } else {
+                if (secs < fLoopBegin) {
                     secs = fLoopEnd - fmodf(fLoopEnd - secs, fLoopEnd - fLoopBegin);
                     wrapped = true;
                 }
-            }               
-        }       
+            }
+        }
 
-        if (fFlags & kWrap)
-        {
+        if (fFlags & kWrap) {
             // possible options, representing each line:
             // 1. We wrapped around the the beginning of the anim, so stop at the wrap point if we're past it.
             // 2. Same as #1, but in the backwards case.
             // 3. We started before the wrap point, now we're after it. Stop.
             // 4. Same as #3, backwards.
             if (((wrapped && (forewards && secs >= fWrapTime)) ||
-                            (!forewards && secs <= fWrapTime)) ||
-                (forewards && fCurrentAnimTime < fWrapTime && secs >= fWrapTime) ||
-                (!forewards && fCurrentAnimTime > fWrapTime && secs <= fWrapTime))
-            {
+                    (!forewards && secs <= fWrapTime)) ||
+                    (forewards && fCurrentAnimTime < fWrapTime && secs >= fWrapTime) ||
+                    (!forewards && fCurrentAnimTime > fWrapTime && secs <= fWrapTime)) {
                 secs = fWrapTime;
                 IStop(wSecs, secs);
-            }               
-        }       
-    }
-    else // Not looping
-    {
-        if ((secs < fBegin) || (secs > fEnd))
-        {
+            }
+        }
+    } else { // Not looping
+        if ((secs < fBegin) || (secs > fEnd)) {
             secs = forewards ? fEnd : fBegin;
             IStop(wSecs, secs);
         }
     }
-    
+
     ICheckTimeCallbacks(fCurrentAnimTime, secs);
-    
+
     fLastEvalWorldTime = wSecs;
-    if (fEaseOutCurve != nil && !(fFlags & kEasingIn) && wSecs >= fEaseOutCurve->GetEndWorldTime())
+
+    if (fEaseOutCurve != nil && !(fFlags & kEasingIn) && wSecs >= fEaseOutCurve->GetEndWorldTime()) {
         IStop(wSecs, secs);
-    
+    }
+
     return fCurrentAnimTime = secs;
 }
 
@@ -624,101 +624,83 @@ float plAnimTimeConvert::WorldToAnimTimeNoUpdate(double wSecs) const
     return IWorldToAnimTimeNoUpdate(wSecs, IGetState(wSecs));
 }
 
-float plAnimTimeConvert::IWorldToAnimTimeNoUpdate(double wSecs, plATCState *state)
+float plAnimTimeConvert::IWorldToAnimTimeNoUpdate(double wSecs, plATCState* state)
 {
     //hsAssert(wSecs >= fLastEvalWorldTime, "Tried to eval a time that's earlier than the last eval time.");
-    if (state == nil)
+    if (state == nil) {
         return 0;
-    
-    if (state->fFlags & kStopped)
-        return state->fStartAnimTime;
-    
-    float secs = 0, delSecs = 0;
-    
-    if (state->fEaseCurve != nil)
-    {
-        delSecs += ICalcEaseTime(state->fEaseCurve, state->fStartWorldTime, wSecs);
-        if (wSecs > state->fEaseCurve->GetEndWorldTime())
-        {
-            if (state->fFlags & kEasingIn)
-                delSecs += float(wSecs - state->fEaseCurve->GetEndWorldTime()) * state->fSpeed;
-        }
     }
-    else 
-    {
+
+    if (state->fFlags & kStopped) {
+        return state->fStartAnimTime;
+    }
+
+    float secs = 0, delSecs = 0;
+
+    if (state->fEaseCurve != nil) {
+        delSecs += ICalcEaseTime(state->fEaseCurve, state->fStartWorldTime, wSecs);
+
+        if (wSecs > state->fEaseCurve->GetEndWorldTime()) {
+            if (state->fFlags & kEasingIn) {
+                delSecs += float(wSecs - state->fEaseCurve->GetEndWorldTime()) * state->fSpeed;
+            }
+        }
+    } else {
         // The easy case... playing the animation at a constant speed.
         delSecs = float(wSecs - state->fStartWorldTime) * state->fSpeed;
     }
-    
-    if (state->fFlags & kBackwards)
+
+    if (state->fFlags & kBackwards) {
         delSecs = -delSecs;
-    
+    }
+
     secs = state->fStartAnimTime + delSecs;
-    // At this point, "secs" is the pre-wrapped (before looping) anim time. 
+    // At this point, "secs" is the pre-wrapped (before looping) anim time.
     // "delSecs" is the change in anim time
     bool forewards = delSecs >= 0;
 
-    if (state->fFlags & kLoop)
-    {
+    if (state->fFlags & kLoop) {
         bool wrapped = false;
 
-        if (forewards)
-        {
-            if (state->fStartAnimTime > state->fLoopEnd)
-            {
+        if (forewards) {
+            if (state->fStartAnimTime > state->fLoopEnd) {
                 // Our animation started past the loop. Play to the end.
-                if (secs > state->fEnd)
-                {
+                if (secs > state->fEnd) {
                     secs = state->fEnd;
                 }
-            }
-            else
-            {
-                if (secs > state->fLoopEnd)
-                {
+            } else {
+                if (secs > state->fLoopEnd) {
                     secs = fmodf(secs - state->fLoopBegin, state->fLoopEnd - state->fLoopBegin) + state->fLoopBegin;
                     wrapped = true;
                 }
-            }   
-        }
-        else
-        {
-            if (state->fStartAnimTime < state->fLoopBegin)
-            {
-                if (secs < state->fBegin)
-                {
+            }
+        } else {
+            if (state->fStartAnimTime < state->fLoopBegin) {
+                if (secs < state->fBegin) {
                     secs = state->fBegin;
                 }
-            }
-            else
-            {
-                if (secs < state->fLoopBegin)
-                {
+            } else {
+                if (secs < state->fLoopBegin) {
                     secs = state->fLoopEnd - fmodf(state->fLoopEnd - secs, state->fLoopEnd - state->fLoopBegin);
                     wrapped = true;
                 }
-            }               
+            }
         }
 
-        if (state->fFlags & kWrap)
-        {
+        if (state->fFlags & kWrap) {
             if (((wrapped && (forewards && secs >= state->fWrapTime)) ||
-                (!forewards && secs <= state->fWrapTime)) ||
-                (forewards && state->fStartAnimTime < state->fWrapTime && secs >= state->fWrapTime) ||
-                (!forewards && state->fStartAnimTime > state->fWrapTime && secs <= state->fWrapTime))
-            {
+                    (!forewards && secs <= state->fWrapTime)) ||
+                    (forewards && state->fStartAnimTime < state->fWrapTime && secs >= state->fWrapTime) ||
+                    (!forewards && state->fStartAnimTime > state->fWrapTime && secs <= state->fWrapTime)) {
                 secs = state->fWrapTime;
-            }                   
-        }       
-    }
-    else
-    {
-        if ((secs < state->fBegin) || (secs > state->fEnd))
-        {
+            }
+        }
+    } else {
+        if ((secs < state->fBegin) || (secs > state->fEnd)) {
             secs = forewards ? state->fEnd : state->fBegin;
         }
     }
-    
+
     return secs;
 }
 
@@ -731,29 +713,29 @@ void plAnimTimeConvert::SetCurrentAnimTime(float s, bool jump /* = false */)
 {
     // We're setting the anim value for whenever we last evaluated.
     fFlags |= kForcedMove;
-    if (!jump)
+
+    if (!jump) {
         ICheckTimeCallbacks(fCurrentAnimTime, s);
+    }
+
     fCurrentAnimTime = s;
     int i;
-    for( i = fCallbackMsgs.GetCount()-1; i >= 0; --i )
-    {
-        if (fCallbackMsgs[i]->fEvent == kSingleFrameAdjust)
-        {
+
+    for (i = fCallbackMsgs.GetCount() - 1; i >= 0; --i) {
+        if (fCallbackMsgs[i]->fEvent == kSingleFrameAdjust) {
             ISendCallback(i);
         }
-    }   
+    }
+
     IProcessStateChange(hsTimer::GetSysSeconds(), fCurrentAnimTime);
 }
 
-void plAnimTimeConvert::SetEase(bool easeIn, uint8_t type, float minLength, float maxLength, float normLength) 
-{ 
-    if (easeIn)
-    {
+void plAnimTimeConvert::SetEase(bool easeIn, uint8_t type, float minLength, float maxLength, float normLength)
+{
+    if (easeIn) {
         delete fEaseInCurve;
         fEaseInCurve = plATCEaseCurve::CreateEaseCurve(type, minLength, maxLength, normLength, 0, fSpeed);
-    }
-    else
-    {
+    } else {
         delete fEaseOutCurve;
         fEaseOutCurve = plATCEaseCurve::CreateEaseCurve(type, minLength, maxLength, normLength, fSpeed, 0);
     }
@@ -765,80 +747,92 @@ float plAnimTimeConvert::GetBestStopDist(float min, float max, float norm, float
 {
     float bestTime = -1;
     float bestDist = -1;
-    if (fStopPoints.GetCount() == 0)
+
+    if (fStopPoints.GetCount() == 0) {
         return norm;
+    }
 
     float curTime;
     float curDist;
 
     int i;
-    for (i = 0; i < fStopPoints.GetCount(); i++)
-    {
+
+    for (i = 0; i < fStopPoints.GetCount(); i++) {
         float stop = fStopPoints.Get(i);
 
-        if (IsLooped())
-        {
+        if (IsLooped()) {
             float loopDist;
-            if (IsBackwards())
-            {
+
+            if (IsBackwards()) {
                 if ((time >= fLoopBegin && stop < fLoopBegin) ||
-                    (time < fLoopBegin && stop > fLoopBegin))
+                        (time < fLoopBegin && stop > fLoopBegin)) {
                     continue;
+                }
+
                 loopDist = -(fLoopEnd - fLoopBegin);
-            }
-            else
-            {
+            } else {
                 if ((time <= fLoopEnd && stop > fLoopEnd) ||
-                    (time > fLoopEnd && stop < fLoopEnd))
-                    continue; // we'll never reach it.
+                        (time > fLoopEnd && stop < fLoopEnd)) {
+                    continue;    // we'll never reach it.
+                }
+
                 loopDist = fLoopEnd - fLoopBegin;
             }
-            if (stop <= fLoopEnd && stop >= fLoopBegin)
-            {
-                while (true)
-                {
-                    curTime = stop - time;
-                    if (IsBackwards())
-                        curTime = -curTime;
 
-                    if (curTime > max)
+            if (stop <= fLoopEnd && stop >= fLoopBegin) {
+                while (true) {
+                    curTime = stop - time;
+
+                    if (IsBackwards()) {
+                        curTime = -curTime;
+                    }
+
+                    if (curTime > max) {
                         break;
+                    }
 
                     curDist = curTime - norm;
-                    if (curDist < 0)
-                        curDist = -curDist;
 
-                    if (curTime >= min && curTime <= max && (bestDist == -1 || bestDist > curDist))
-                    {
+                    if (curDist < 0) {
+                        curDist = -curDist;
+                    }
+
+                    if (curTime >= min && curTime <= max && (bestDist == -1 || bestDist > curDist)) {
                         bestDist = curDist;
                         bestTime = curTime;
                     }
+
                     stop += loopDist;
                 }
 
                 continue;
             }
         }
-        
+
         curTime = stop - time;
-        if (IsBackwards())
+
+        if (IsBackwards()) {
             curTime = -curTime;
+        }
 
         curDist = curTime - norm;
-        if (curDist < 0)
-            curDist = -curDist;
 
-        if (curTime >= min && curTime <= max && (bestDist == -1 || bestDist > curDist))
-        {
+        if (curDist < 0) {
+            curDist = -curDist;
+        }
+
+        if (curTime >= min && curTime <= max && (bestDist == -1 || bestDist > curDist)) {
             bestDist = curDist;
             bestTime = curTime;
         }
     }
-    
+
     hsStatusMessageF("found stop point %f\n", bestTime);
 
-    if (bestTime == -1)
+    if (bestTime == -1) {
         bestTime = norm;
+    }
+
     return bestTime;
 }
 
@@ -847,37 +841,35 @@ void plAnimTimeConvert::SetSpeed(float goal, float rate /* = 0 */)
 {
     float curSpeed = fSpeed;
     fSpeed = goal;
-    
 
-    if (rate == 0)
-    {
+
+    if (rate == 0) {
         IClearSpeedEase();
         fCurrentEaseCurve = nil;
 
     }
     // Skip if we're either stopped or stopping. We'll take the new speed into account next time we start up.
-    else if ((fFlags & kEasingIn)) 
-    {
+    else if ((fFlags & kEasingIn)) {
         double curTime = hsTimer::GetSysSeconds();
-        if (fCurrentEaseCurve != nil)
-        {
+
+        if (fCurrentEaseCurve != nil) {
             double easeTime = curTime - fCurrentEaseCurve->fBeginWorldTime;
             curSpeed = fCurrentEaseCurve->VelocityGivenTime((float)easeTime);
         }
-        if (fSpeedEaseCurve != nil)
-        {
+
+        if (fSpeedEaseCurve != nil) {
             fSpeedEaseCurve->RecalcToSpeed(curSpeed, goal);
             fSpeedEaseCurve->SetLengthOnRate(rate);
-        }
-        else
-        {
+        } else {
             float length;
             length = (goal - curSpeed) / rate;
-            if (length < 0)
-                length = -length;
 
-            fSpeedEaseCurve = plATCEaseCurve::CreateEaseCurve(plAnimEaseTypes::kConstAccel, length, length, length, 
-                                                              curSpeed, goal);
+            if (length < 0) {
+                length = -length;
+            }
+
+            fSpeedEaseCurve = plATCEaseCurve::CreateEaseCurve(plAnimEaseTypes::kConstAccel, length, length, length,
+                              curSpeed, goal);
         }
 
         fSpeedEaseCurve->fBeginWorldTime = curTime;
@@ -911,17 +903,18 @@ void plAnimTimeConvert::Read(hsStream* s, hsResMgr* mgr)
     fCallbackMsgs.SetCountAndZero(count);
 
     int i;
-    for (i = 0; i < count; i++)
-    {
+
+    for (i = 0; i < count; i++) {
         plEventCallbackMsg* msg = plEventCallbackMsg::ConvertNoRef(mgr->ReadCreatable(s));
         fCallbackMsgs[i] = msg;
     }
 
     count = s->ReadLE32();
-    for (i = 0; i < count; i++)
-    {
+
+    for (i = 0; i < count; i++) {
         fStopPoints.Append(s->ReadLEScalar());
     }
+
     IProcessStateChange(0, fBegin);
 }
 
@@ -947,135 +940,143 @@ void plAnimTimeConvert::Write(hsStream* s, hsResMgr* mgr)
     // save out other non-synched important data
     s->WriteLE32(fCallbackMsgs.Count());
     int i;
-    for (i = 0; i < fCallbackMsgs.Count(); i++)
+
+    for (i = 0; i < fCallbackMsgs.Count(); i++) {
         mgr->WriteCreatable(s, fCallbackMsgs[i]);
+    }
 
     s->WriteLE32(fStopPoints.GetCount());
-    for (i = 0; i < fStopPoints.GetCount(); i++)
-    {
+
+    for (i = 0; i < fStopPoints.GetCount(); i++) {
         s->WriteLEScalar(fStopPoints.Get(i));
     }
 }
 
-plAnimTimeConvert& plAnimTimeConvert::InitStop() 
-{ 
+plAnimTimeConvert& plAnimTimeConvert::InitStop()
+{
     return IStop(hsTimer::GetSysSeconds(), fCurrentAnimTime);
 }
 
-plAnimTimeConvert& plAnimTimeConvert::Stop(bool on) 
-{ 
-    if( on )
+plAnimTimeConvert& plAnimTimeConvert::Stop(bool on)
+{
+    if (on) {
         return Stop();
-    else
+    } else {
         return Start();
+    }
 }
 
-plAnimTimeConvert& plAnimTimeConvert::Stop(double stopTime) 
-{   
-    if( IsStopped() || (fEaseOutCurve != nil && !(fFlags & kEasingIn)) )
+plAnimTimeConvert& plAnimTimeConvert::Stop(double stopTime)
+{
+    if (IsStopped() || (fEaseOutCurve != nil && !(fFlags & kEasingIn))) {
         return *this;
+    }
 
-    if (stopTime < 0)
+    if (stopTime < 0) {
         stopTime = hsTimer::GetSysSeconds();
+    }
+
     float stopAnimTime = WorldToAnimTimeNoUpdate(stopTime);
-    
+
     SetFlag(kEasingIn, false);
 
-    if( fEaseOutCurve == nil )
-    {
+    if (fEaseOutCurve == nil) {
         return IStop(stopTime, fCurrentAnimTime);
     }
 
     float currSpeed;
-    if (fCurrentEaseCurve == nil || stopTime >= fCurrentEaseCurve->GetEndWorldTime())
+
+    if (fCurrentEaseCurve == nil || stopTime >= fCurrentEaseCurve->GetEndWorldTime()) {
         currSpeed = fSpeed;
-    else
+    } else {
         currSpeed = fCurrentEaseCurve->VelocityGivenTime((float)(stopTime - fCurrentEaseCurve->fBeginWorldTime));
+    }
 
     fEaseOutCurve->RecalcToSpeed(currSpeed > fSpeed ? currSpeed : fSpeed, 0);
     fEaseOutCurve->SetLengthOnDistance(GetBestStopDist(fEaseOutCurve->GetMinDistance(), fEaseOutCurve->GetMaxDistance(),
-                                                       fEaseOutCurve->GetNormDistance(), stopAnimTime));
+                                       fEaseOutCurve->GetNormDistance(), stopAnimTime));
     fEaseOutCurve->fBeginWorldTime = stopTime - fEaseOutCurve->TimeGivenVelocity(currSpeed);
 
     fCurrentEaseCurve = fEaseOutCurve;
-    
+
     return IProcessStateChange(stopTime);
 }
 
-plAnimTimeConvert& plAnimTimeConvert::Start(double startTime) 
-{ 
-    // If start has not been called since the last stop, kEasingIn will not be set 
-    if( (fFlags & kEasingIn) && (startTime == fLastStateChange) )
+plAnimTimeConvert& plAnimTimeConvert::Start(double startTime)
+{
+    // If start has not been called since the last stop, kEasingIn will not be set
+    if ((fFlags & kEasingIn) && (startTime == fLastStateChange)) {
         return *this;
+    }
 
-    SetFlag(kEasingIn, true);   
+    SetFlag(kEasingIn, true);
 
-    if (startTime < 0)
+    if (startTime < 0) {
         startTime = hsTimer::GetSysSeconds();
-    
-    if (fEaseInCurve != nil)
-    {
-        float currSpeed;
-        if (fCurrentEaseCurve == nil || startTime >= fCurrentEaseCurve->GetEndWorldTime())
-            currSpeed = 0;
-        else
-            currSpeed = fCurrentEaseCurve->VelocityGivenTime((float)(startTime - fCurrentEaseCurve->fBeginWorldTime));
+    }
 
-        if (currSpeed <= fSpeed)
-        {
+    if (fEaseInCurve != nil) {
+        float currSpeed;
+
+        if (fCurrentEaseCurve == nil || startTime >= fCurrentEaseCurve->GetEndWorldTime()) {
+            currSpeed = 0;
+        } else {
+            currSpeed = fCurrentEaseCurve->VelocityGivenTime((float)(startTime - fCurrentEaseCurve->fBeginWorldTime));
+        }
+
+        if (currSpeed <= fSpeed) {
             fEaseInCurve->RecalcToSpeed(0, fSpeed);
             fEaseInCurve->fBeginWorldTime = startTime - fEaseInCurve->TimeGivenVelocity(currSpeed);
 
             fCurrentEaseCurve = fEaseInCurve;
-            
-        }
-        else
-        {   // We eased out in the middle of a speed change, but were told to start again before slowing past
+
+        } else {
+            // We eased out in the middle of a speed change, but were told to start again before slowing past
             // the target speed, so the "ease in" is really a slow down.
             SetSpeed(fSpeed, fEaseInCurve->fSpeed / fEaseInCurve->fLength);
         }
     }
-    
+
     // check for a start callback
     int i;
-    for( i = fCallbackMsgs.GetCount()-1; i >= 0; --i )
-    {
-        if (fCallbackMsgs[i]->fEvent == kStart)
-        {
+
+    for (i = fCallbackMsgs.GetCount() - 1; i >= 0; --i) {
+        if (fCallbackMsgs[i]->fEvent == kStart) {
             ISendCallback(i);
         }
     }
 
     SetFlag(kStopped, false);
-    if (fFlags & kBackwards)
-    {
-        if (fCurrentAnimTime == fBegin)
+
+    if (fFlags & kBackwards) {
+        if (fCurrentAnimTime == fBegin) {
             return IProcessStateChange(startTime, fEnd);
-    }
-    else
-    {
-        if (fCurrentAnimTime == fEnd)
+        }
+    } else {
+        if (fCurrentAnimTime == fEnd) {
             return IProcessStateChange(startTime, fBegin);
+        }
     }
+
     return IProcessStateChange(startTime);
 }
 
-plAnimTimeConvert& plAnimTimeConvert::Backwards(bool on) 
+plAnimTimeConvert& plAnimTimeConvert::Backwards(bool on)
 {
     return on ? Backwards() : Forewards();
 }
 
-plAnimTimeConvert& plAnimTimeConvert::Backwards() 
-{ 
-    if( IsBackwards() )
+plAnimTimeConvert& plAnimTimeConvert::Backwards()
+{
+    if (IsBackwards()) {
         return *this;
+    }
 
     // check for a reverse callback
     int i;
-    for( i = fCallbackMsgs.GetCount()-1; i >= 0; --i )
-    {
-        if (fCallbackMsgs[i]->fEvent == kReverse)
-        {
+
+    for (i = fCallbackMsgs.GetCount() - 1; i >= 0; --i) {
+        if (fCallbackMsgs[i]->fEvent == kReverse) {
             ISendCallback(i);
         }
     }
@@ -1088,59 +1089,55 @@ plAnimTimeConvert& plAnimTimeConvert::Backwards()
     return *this;
 }
 
-plAnimTimeConvert& plAnimTimeConvert::Forewards() 
-{ 
-    if( !IsBackwards() )
+plAnimTimeConvert& plAnimTimeConvert::Forewards()
+{
+    if (!IsBackwards()) {
         return *this;
-    
+    }
+
     // check for a reverse callback
     int i;
-    for( i = fCallbackMsgs.GetCount()-1; i >= 0; --i )
-    {
-        if (fCallbackMsgs[i]->fEvent == kReverse)
-        {
+
+    for (i = fCallbackMsgs.GetCount() - 1; i >= 0; --i) {
+        if (fCallbackMsgs[i]->fEvent == kReverse) {
             ISendCallback(i);
         }
     }
-    
-    SetFlag(kBackwards, false); 
-    
+
+    SetFlag(kBackwards, false);
+
     // Record state changes
     IProcessStateChange(hsTimer::GetSysSeconds(), fCurrentAnimTime);
-    
+
     return *this;
 }
 
-plAnimTimeConvert& plAnimTimeConvert::Loop(bool on) 
-{ 
-    SetFlag(kLoop, on); 
-    
+plAnimTimeConvert& plAnimTimeConvert::Loop(bool on)
+{
+    SetFlag(kLoop, on);
+
     // Record state changes
     IProcessStateChange(hsTimer::GetSysSeconds(), fCurrentAnimTime);
-    
+
     return *this;
 }
 
 plAnimTimeConvert& plAnimTimeConvert::PlayToTime(float time)
 {
     fFlags |= kNeedsReset;
-    if (fCurrentAnimTime > time)
-    {
-        if (fFlags & kLoop)
-        {
+
+    if (fCurrentAnimTime > time) {
+        if (fFlags & kLoop) {
             fWrapTime = time;
             fFlags |= kWrap;
-        }
-        else
-        {
+        } else {
             fBegin = time;
             Backwards();
         }
-    }
-    else
-    {
+    } else {
         fEnd = time;
     }
+
     Start();
 
     return *this;
@@ -1154,174 +1151,188 @@ plAnimTimeConvert& plAnimTimeConvert::PlayToPercentage(float percent)
 void plAnimTimeConvert::RemoveCallback(plEventCallbackMsg* pMsg)
 {
     int idx = fCallbackMsgs.Find(pMsg);
-    if( idx != fCallbackMsgs.kMissingIndex )
-    {
+
+    if (idx != fCallbackMsgs.kMissingIndex) {
         hsRefCnt_SafeUnRef(fCallbackMsgs[idx]);
         fCallbackMsgs.Remove(idx);
     }
 }
-    
+
 bool plAnimTimeConvert::HandleCmd(plAnimCmdMsg* modMsg)
 {
-    if (fFlags & kNeedsReset)
+    if (fFlags & kNeedsReset) {
         ResetWrap();
+    }
 
     // The net msg screener is already checking for callbacks,
     // I'm just being extra safe.
-    if (!modMsg->HasBCastFlag(plMessage::kNetCreatedRemotely))
-    {
-        if( modMsg->Cmd(plAnimCmdMsg::kAddCallbacks) )
-        {
+    if (!modMsg->HasBCastFlag(plMessage::kNetCreatedRemotely)) {
+        if (modMsg->Cmd(plAnimCmdMsg::kAddCallbacks)) {
             int i;
-            for( i = 0; i < modMsg->GetNumCallbacks(); i++ )
-            {
+
+            for (i = 0; i < modMsg->GetNumCallbacks(); i++) {
                 AddCallback(plEventCallbackMsg::ConvertNoRef(modMsg->GetEventCallback(i)));
             }
         }
-        if( modMsg->Cmd(plAnimCmdMsg::kRemoveCallbacks) )
-        {
+
+        if (modMsg->Cmd(plAnimCmdMsg::kRemoveCallbacks)) {
             int i;
-            for( i = 0; i < modMsg->GetNumCallbacks(); i++ )
-            {
+
+            for (i = 0; i < modMsg->GetNumCallbacks(); i++) {
                 RemoveCallback(modMsg->GetEventCallback(i));
             }
         }
     }
 
-    if( modMsg->Cmd(plAnimCmdMsg::kSetBackwards) )
-    {
+    if (modMsg->Cmd(plAnimCmdMsg::kSetBackwards)) {
         Backwards();
     }
-    if( modMsg->Cmd(plAnimCmdMsg::kSetForewards) )
-    {   
+
+    if (modMsg->Cmd(plAnimCmdMsg::kSetForewards)) {
         Forewards();
     }
-    
-    if( modMsg->Cmd(plAnimCmdMsg::kStop) )
+
+    if (modMsg->Cmd(plAnimCmdMsg::kStop)) {
         Stop();
+    }
 
-    if( modMsg->Cmd(plAnimCmdMsg::kSetLooping) )
+    if (modMsg->Cmd(plAnimCmdMsg::kSetLooping)) {
         Loop();
+    }
 
-    if( modMsg->Cmd(plAnimCmdMsg::kUnSetLooping) )
+    if (modMsg->Cmd(plAnimCmdMsg::kUnSetLooping)) {
         NoLoop();
+    }
 
-    if (modMsg->Cmd(plAnimCmdMsg::kSetBegin))
-    {
-        if (modMsg->fBegin >= fInitialBegin)
+    if (modMsg->Cmd(plAnimCmdMsg::kSetBegin)) {
+        if (modMsg->fBegin >= fInitialBegin) {
             SetBegin(modMsg->fBegin);
-        else
+        } else {
             SetBegin(fInitialBegin);
+        }
     }
 
-    if (modMsg->Cmd(plAnimCmdMsg::kSetEnd))
-    {
-        if (modMsg->fEnd <= fInitialEnd)
+    if (modMsg->Cmd(plAnimCmdMsg::kSetEnd)) {
+        if (modMsg->fEnd <= fInitialEnd) {
             SetEnd(modMsg->fEnd);
-        else
+        } else {
             SetEnd(fInitialEnd);
+        }
     }
 
-    if (fBegin > fEnd)
-    {
+    if (fBegin > fEnd) {
         fBegin = fInitialBegin;
         fEnd = fInitialEnd;
     }
 
-    if( modMsg->Cmd(plAnimCmdMsg::kSetLoopEnd) )
+    if (modMsg->Cmd(plAnimCmdMsg::kSetLoopEnd)) {
         SetLoopEnd(modMsg->fLoopEnd);
-
-    if( modMsg->Cmd(plAnimCmdMsg::kSetLoopBegin) )
-        SetLoopBegin(modMsg->fLoopBegin);
-
-    if( modMsg->Cmd(plAnimCmdMsg::kSetSpeed) )
-        SetSpeed(modMsg->fSpeed, modMsg->fSpeedChangeRate);
-
-    if( modMsg->Cmd(plAnimCmdMsg::kGoToTime) )
-    {
-        if (modMsg->fTime < fBegin)
-            SetCurrentAnimTime(fBegin, true);
-        else if (modMsg->fTime > fEnd)
-            SetCurrentAnimTime(fEnd, true);
-        else
-            SetCurrentAnimTime(modMsg->fTime, true);    
     }
 
-    if ( modMsg->Cmd(plAnimCmdMsg::kGoToPercent) )
-        SetCurrentAnimTime(fBegin + (fEnd - fBegin) * modMsg->fTime);
+    if (modMsg->Cmd(plAnimCmdMsg::kSetLoopBegin)) {
+        SetLoopBegin(modMsg->fLoopBegin);
+    }
 
-    if( modMsg->Cmd(plAnimCmdMsg::kGoToBegin) )
-        SetCurrentAnimTime(fBegin, true);
+    if (modMsg->Cmd(plAnimCmdMsg::kSetSpeed)) {
+        SetSpeed(modMsg->fSpeed, modMsg->fSpeedChangeRate);
+    }
 
-    if( modMsg->Cmd(plAnimCmdMsg::kGoToEnd) )
-        SetCurrentAnimTime(fEnd, true);
-
-    if( modMsg->Cmd(plAnimCmdMsg::kGoToLoopBegin) )
-        SetCurrentAnimTime(fLoopBegin, true);
-
-    if( modMsg->Cmd(plAnimCmdMsg::kGoToLoopEnd) )
-        SetCurrentAnimTime(fLoopEnd, true);
-
-    if( modMsg->Cmd(plAnimCmdMsg::kToggleState) )
-    {
-        if( IsStopped() )
-        {
-            Start();
+    if (modMsg->Cmd(plAnimCmdMsg::kGoToTime)) {
+        if (modMsg->fTime < fBegin) {
+            SetCurrentAnimTime(fBegin, true);
+        } else if (modMsg->fTime > fEnd) {
+            SetCurrentAnimTime(fEnd, true);
+        } else {
+            SetCurrentAnimTime(modMsg->fTime, true);
         }
-        else
-        {
+    }
+
+    if (modMsg->Cmd(plAnimCmdMsg::kGoToPercent)) {
+        SetCurrentAnimTime(fBegin + (fEnd - fBegin) * modMsg->fTime);
+    }
+
+    if (modMsg->Cmd(plAnimCmdMsg::kGoToBegin)) {
+        SetCurrentAnimTime(fBegin, true);
+    }
+
+    if (modMsg->Cmd(plAnimCmdMsg::kGoToEnd)) {
+        SetCurrentAnimTime(fEnd, true);
+    }
+
+    if (modMsg->Cmd(plAnimCmdMsg::kGoToLoopBegin)) {
+        SetCurrentAnimTime(fLoopBegin, true);
+    }
+
+    if (modMsg->Cmd(plAnimCmdMsg::kGoToLoopEnd)) {
+        SetCurrentAnimTime(fLoopEnd, true);
+    }
+
+    if (modMsg->Cmd(plAnimCmdMsg::kToggleState)) {
+        if (IsStopped()) {
+            Start();
+        } else {
             Stop();
         }
     }
-    if( modMsg->Cmd(plAnimCmdMsg::kContinue) )
-    {
+
+    if (modMsg->Cmd(plAnimCmdMsg::kContinue)) {
         Start();
     }
-    if( modMsg->Cmd(plAnimCmdMsg::kIncrementForward) )
-    {
-        if (fCurrentAnimTime == fEnd)
+
+    if (modMsg->Cmd(plAnimCmdMsg::kIncrementForward)) {
+        if (fCurrentAnimTime == fEnd) {
             return true;
+        }
+
         double currTime = hsTimer::GetSysSeconds();
         float newTime = fCurrentAnimTime + hsTimer::GetDelSysSeconds();
-        if (newTime > fEnd)
-        {
+
+        if (newTime > fEnd) {
             newTime = fEnd;
         }
+
         Forewards();
         SetCurrentAnimTime(newTime);
     }
-    if( modMsg->Cmd(plAnimCmdMsg::kIncrementBackward) )
-    {
-        if (fCurrentAnimTime == fBegin)
+
+    if (modMsg->Cmd(plAnimCmdMsg::kIncrementBackward)) {
+        if (fCurrentAnimTime == fBegin) {
             return true;
+        }
+
         double currTime = hsTimer::GetSysSeconds();
         float newTime = fCurrentAnimTime - hsTimer::GetDelSysSeconds();
-        if (newTime < fBegin)
-        {
+
+        if (newTime < fBegin) {
             newTime = fBegin;
         }
+
         Backwards();
         SetCurrentAnimTime(newTime);
     }
 
-    if (modMsg->Cmd(plAnimCmdMsg::kPlayToTime))
+    if (modMsg->Cmd(plAnimCmdMsg::kPlayToTime)) {
         PlayToTime(modMsg->fTime);
+    }
 
-    if (modMsg->Cmd(plAnimCmdMsg::kPlayToPercentage))
+    if (modMsg->Cmd(plAnimCmdMsg::kPlayToPercentage)) {
         PlayToPercentage(modMsg->fTime);
+    }
 
     // Basically, simulate what would happen if we played the animation
-    if (modMsg->Cmd(plAnimCmdMsg::kFastForward))
-    {
-        if (IsForewards())
+    if (modMsg->Cmd(plAnimCmdMsg::kFastForward)) {
+        if (IsForewards()) {
             SetCurrentAnimTime(fEnd, true);
-        else
+        } else {
             SetCurrentAnimTime(fBegin, true);
+        }
+
         // but if it should continue to play, statr it.
-        if (IsLooped())
+        if (IsLooped()) {
             Start();
+        }
     }
-    
+
     return true;
 }
 
@@ -1333,10 +1344,10 @@ void plAnimTimeConvert::AddCallback(plEventCallbackMsg* pMsg)
 
 void plAnimTimeConvert::ClearCallbacks()
 {
-    for (int i = 0; i<fCallbackMsgs.Count(); i++)
-    {
+    for (int i = 0; i < fCallbackMsgs.Count(); i++) {
         hsRefCnt_SafeUnRef(fCallbackMsgs[i]);
     }
+
     fCallbackMsgs.Reset();
 }
 
@@ -1347,7 +1358,7 @@ void plAnimTimeConvert::EnableCallbacks(bool val)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-void plATCState::Read(hsStream *s, hsResMgr *mgr)
+void plATCState::Read(hsStream* s, hsResMgr* mgr)
 {
     fStartWorldTime = s->ReadLEDouble();
     fStartAnimTime = s->ReadLEScalar();
@@ -1358,11 +1369,13 @@ void plATCState::Read(hsStream *s, hsResMgr *mgr)
     fLoopEnd = s->ReadLEScalar();
     fSpeed = s->ReadLEScalar();
     fWrapTime = s->ReadLEScalar();
-    if (s->ReadBool())
+
+    if (s->ReadBool()) {
         fEaseCurve = plATCEaseCurve::ConvertNoRef(mgr->ReadCreatable(s));
+    }
 }
 
-void plATCState::Write(hsStream *s, hsResMgr *mgr)
+void plATCState::Write(hsStream* s, hsResMgr* mgr)
 {
     s->WriteLEDouble(fStartWorldTime);
     s->WriteLEScalar(fStartAnimTime);
@@ -1373,13 +1386,13 @@ void plATCState::Write(hsStream *s, hsResMgr *mgr)
     s->WriteLEScalar(fLoopEnd);
     s->WriteLEScalar(fSpeed);
     s->WriteLEScalar(fWrapTime);
-    if (fEaseCurve != nil)
-    {
+
+    if (fEaseCurve != nil) {
         s->WriteBool(true);
         mgr->WriteCreatable(s, fEaseCurve);
-    }
-    else
+    } else {
         s->WriteBool(false);
+    }
 }
 
 

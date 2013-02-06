@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // In-memory only
 // Erase function lets you cut a chunk out of the middle of the stream
 //
-class hsVectorStream : public hsStream
-{
+class hsVectorStream : public hsStream {
 protected:
     std::vector<uint8_t> fVector;
     uint32_t fEnd;    // End of file (one past the last byte)
@@ -60,11 +59,17 @@ public:
     hsVectorStream(uint32_t chunkSize);
     virtual ~hsVectorStream();
 
-    virtual bool      Open(const plFileName &, const char *) { hsAssert(0, "hsVectorStream::Open Not Implemented"); return false; }
-    virtual bool      Close()             { hsAssert(0, "hsVectorStream::Close Not Implemented"); return false; }
-    
+    virtual bool      Open(const plFileName&, const char*) {
+        hsAssert(0, "hsVectorStream::Open Not Implemented");
+        return false;
+    }
+    virtual bool      Close()             {
+        hsAssert(0, "hsVectorStream::Close Not Implemented");
+        return false;
+    }
+
     virtual bool      AtEnd();
-    virtual uint32_t  Read(uint32_t byteCount, void * buffer);
+    virtual uint32_t  Read(uint32_t byteCount, void* buffer);
     virtual uint32_t  Write(uint32_t byteCount, const void* buffer);
     virtual void      Skip(uint32_t deltaByteCount);
     virtual void      Rewind();
@@ -80,9 +85,11 @@ public:
     virtual void    Erase(uint32_t bytes);
     // A pointer to the beginning of the data in the stream.  This is only valid
     // until someone modifies the stream.
-    const void      *GetData();
+    const void*      GetData();
     // In case you want to try and be efficient with your memory allocations
-    void Reserve(uint32_t bytes) { fVector.reserve(bytes); }
+    void Reserve(uint32_t bytes) {
+        fVector.reserve(bytes);
+    }
 };
 
 #endif // _hsSTLStream_h_inc_

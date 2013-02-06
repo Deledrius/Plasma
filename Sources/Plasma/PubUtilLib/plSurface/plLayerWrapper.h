@@ -47,25 +47,25 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsGLayer;
 
-class plLayerWrapper : public plLayerInterface
-{
+class plLayerWrapper : public plLayerInterface {
 protected:
 public:
 
     plLayerWrapper();
 
-    CLASSNAME_REGISTER( plLayerWrapper );
-    GETINTERFACE_ANY( plLayerWrapper, plLayerInterface );
-    
+    CLASSNAME_REGISTER(plLayerWrapper);
+    GETINTERFACE_ANY(plLayerWrapper, plLayerInterface);
+
     virtual void            Init(const plLayerInterface* prev) {} // Init(layer) currently handles all this
     void                    Init(hsGLayer* lay);
 
-    virtual uint32_t          Eval(double secs, uint32_t frame, uint32_t dirty, plLayerInterface* prev)
-    {
+    virtual uint32_t          Eval(double secs, uint32_t frame, uint32_t dirty, plLayerInterface* prev) {
         return dirty;
     }
 
-    virtual bool            MsgReceive(plMessage* msg) { return plLayerInterface::MsgReceive(msg); }
+    virtual bool            MsgReceive(plMessage* msg) {
+        return plLayerInterface::MsgReceive(msg);
+    }
 };
 
 #endif // plLayerWrapper_inc

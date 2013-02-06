@@ -63,25 +63,25 @@ REGISTER_CREATABLE(plMipmap);
 
 
 HINSTANCE   gInstance;
-char        *gCommandLine = nil;
+char*        gCommandLine = nil;
 HWND        gMainWindow = nil;
 
-BOOL CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+BOOL CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 
-int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    HACCEL  accelTable = LoadAccelerators( hInstance, MAKEINTRESOURCE( IDR_ACCELERATOR1 ) );
+    HACCEL  accelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
 
 
-    gCommandLine = (char *)lpCmdLine;
+    gCommandLine = (char*)lpCmdLine;
 
     gInstance = hInstance;
 
-    plResManager *rMgr = new plResManager;
-    hsgResMgr::Init( rMgr );
+    plResManager* rMgr = new plResManager;
+    hsgResMgr::Init(rMgr);
 
-    DialogBox( gInstance, MAKEINTRESOURCE( IDD_MAINDIALOG ), nil, WndProc );
+    DialogBox(gInstance, MAKEINTRESOURCE(IDD_MAINDIALOG), nil, WndProc);
 
     hsgResMgr::Shutdown();
 

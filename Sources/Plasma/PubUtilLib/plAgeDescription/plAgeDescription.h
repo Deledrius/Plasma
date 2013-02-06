@@ -54,47 +54,52 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 class hsStream;
 
-class plAgePage
-{
-    protected:
-        plString    fName;
-        uint32_t    fSeqSuffix;
-        uint8_t     fFlags;
+class plAgePage {
+protected:
+    plString    fName;
+    uint32_t    fSeqSuffix;
+    uint8_t     fFlags;
 
-    public:
+public:
 
-        static const uint32_t kInvalidSeqSuffix;
+    static const uint32_t kInvalidSeqSuffix;
 
-        enum Flags
-        {
-            kPreventAutoLoad    = 0x01,
-            kLoadIfSDLPresent   = 0x02,
-            kIsLocalOnly        = 0x04,
-            kIsVolatile         = 0x08,
-        };
+    enum Flags {
+        kPreventAutoLoad    = 0x01,
+        kLoadIfSDLPresent   = 0x02,
+        kIsLocalOnly        = 0x04,
+        kIsVolatile         = 0x08,
+    };
 
-        plAgePage( const plString &name, uint32_t seqSuffix, uint8_t flags );
-        plAgePage( const plString &stringFrom );
-        plAgePage( const plAgePage &src );
-        plAgePage();
+    plAgePage(const plString& name, uint32_t seqSuffix, uint8_t flags);
+    plAgePage(const plString& stringFrom);
+    plAgePage(const plAgePage& src);
+    plAgePage();
 
-        plString    GetName( void ) const { return fName; }
-        uint32_t    GetSeqSuffix( void ) const { return fSeqSuffix; }
-        uint8_t     GetFlags( void ) const { return fFlags; }
+    plString    GetName(void) const {
+        return fName;
+    }
+    uint32_t    GetSeqSuffix(void) const {
+        return fSeqSuffix;
+    }
+    uint8_t     GetFlags(void) const {
+        return fFlags;
+    }
 
-        void        SetSeqSuffix( uint32_t s ) { fSeqSuffix = s; }
-        void        SetFlags(uint8_t f, bool on=true);
+    void        SetSeqSuffix(uint32_t s) {
+        fSeqSuffix = s;
+    }
+    void        SetFlags(uint8_t f, bool on = true);
 
-        bool        SetFromString( const plString &string );
-        plString    GetAsString( void ) const;
+    bool        SetFromString(const plString& string);
+    plString    GetAsString(void) const;
 
-        plAgePage &operator=( const plAgePage &src );
+    plAgePage& operator=(const plAgePage& src);
 };
 
 // Derived from plInitSectionTokenReader so we can do nifty things with reading the files
 
-class plAgeDescription : public plInitSectionTokenReader
-{
+class plAgeDescription : public plInitSectionTokenReader {
 private:
 
     plString    fName;
@@ -110,98 +115,136 @@ private:
 
     int32_t   fSeqPrefix;
     uint32_t  fReleaseVersion;    // 0 for pre-release, 1+ for actual released ages
-    
+
     static const char* fCommonPages[];
 
-    void    IInit( void );
-    void    IDeInit( void );
+    void    IInit(void);
+    void    IDeInit(void);
 
     // Overload for plInitSectionTokenReader
-    virtual bool        IParseToken( const char *token, hsStringTokenizer *tokenizer, uint32_t userData );
+    virtual bool        IParseToken(const char* token, hsStringTokenizer* tokenizer, uint32_t userData);
 
 public:
     static char kAgeDescPath[];
 
     plAgeDescription();
-    plAgeDescription( const plFileName &fileNameToReadFrom );
-    plAgeDescription( const plAgeDescription &src )
-    {
+    plAgeDescription(const plFileName& fileNameToReadFrom);
+    plAgeDescription(const plAgeDescription& src) {
         IInit();
-        CopyFrom( src );
+        CopyFrom(src);
     }
     ~plAgeDescription();
 
-    bool ReadFromFile( const plFileName &fileNameToReadFrom );
+    bool ReadFromFile(const plFileName& fileNameToReadFrom);
     void Read(hsStream* stream);
     void Write(hsStream* stream) const;
 
     // Overload for plInitSectionTokenReader
-    virtual const char  *GetSectionName( void ) const;
+    virtual const char*  GetSectionName(void) const;
 
-    plString    GetAgeName( void ) const { return fName; }
-    void        SetAgeNameFromPath( const plFileName &path );
-    void        SetAgeName(const plString& ageName) { fName = ageName; }
+    plString    GetAgeName(void) const {
+        return fName;
+    }
+    void        SetAgeNameFromPath(const plFileName& path);
+    void        SetAgeName(const plString& ageName) {
+        fName = ageName;
+    }
 
     // Page list
     void    ClearPageList();
-    void    RemovePage( const plString &page );
-    void    AppendPage( const plString &name, int seqSuffix = -1, uint8_t flags = 0 );
+    void    RemovePage(const plString& page);
+    void    AppendPage(const plString& name, int seqSuffix = -1, uint8_t flags = 0);
 
-    void        SeekFirstPage( void );
-    plAgePage   *GetNextPage( void );
-    int         GetNumPages() const { return fPages.GetCount(); }
-    plAgePage   *FindPage( const plString &name ) const;
+    void        SeekFirstPage(void);
+    plAgePage*   GetNextPage(void);
+    int         GetNumPages() const {
+        return fPages.GetCount();
+    }
+    plAgePage*   FindPage(const plString& name) const;
     bool FindLocation(const plLocation& loc) const;
-    plLocation  CalcPageLocation( const plString &page ) const;
+    plLocation  CalcPageLocation(const plString& page) const;
 
     // Getters
-    short GetStartMonth() const { return fStart.GetMonth(); }
-    short GetStartDay() const { return fStart.GetDay(); }
-    short GetStartYear() const { return fStart.GetYear(); }
-    short GetStartHour() const { return fStart.GetHour(); }
-    short GetStartMinute() const { return fStart.GetMinute(); }
-    short GetStartSecond() const { return fStart.GetSecond(); }
-    short GetMaxCapacity() const { return fMaxCapacity; }
-    short GetLingerTime() const { return fLingerTime;}
+    short GetStartMonth() const {
+        return fStart.GetMonth();
+    }
+    short GetStartDay() const {
+        return fStart.GetDay();
+    }
+    short GetStartYear() const {
+        return fStart.GetYear();
+    }
+    short GetStartHour() const {
+        return fStart.GetHour();
+    }
+    short GetStartMinute() const {
+        return fStart.GetMinute();
+    }
+    short GetStartSecond() const {
+        return fStart.GetSecond();
+    }
+    short GetMaxCapacity() const {
+        return fMaxCapacity;
+    }
+    short GetLingerTime() const {
+        return fLingerTime;
+    }
 
-    float   GetDayLength() const { return fDayLength; }
+    float   GetDayLength() const {
+        return fDayLength;
+    }
 
-    int32_t   GetSequencePrefix( void ) const { return fSeqPrefix; }
-    uint32_t  GetReleaseVersion( void ) const { return fReleaseVersion; }
-    bool    IsGlobalAge( void ) const { return ( fSeqPrefix < 0 ) ? true : false; }
+    int32_t   GetSequencePrefix(void) const {
+        return fSeqPrefix;
+    }
+    uint32_t  GetReleaseVersion(void) const {
+        return fReleaseVersion;
+    }
+    bool    IsGlobalAge(void) const {
+        return (fSeqPrefix < 0) ? true : false;
+    }
 
     // Setters
-    bool SetStart(short year, short month, short day, short hour, short minute, short second)
-        { return fStart.SetTime(year,month,day,hour,minute,second); }
+    bool SetStart(short year, short month, short day, short hour, short minute, short second) {
+        return fStart.SetTime(year, month, day, hour, minute, second);
+    }
 
-    void SetDayLength(const float l) { fDayLength = l; }
-    void SetMaxCapacity(const short m) { fMaxCapacity=m; }
-    void SetLingerTime(const short v) { fLingerTime=v;}
-    void SetSequencePrefix( int32_t p ) { fSeqPrefix = p; }
-    void SetReleaseVersion( uint32_t v ) { fReleaseVersion = v; }
+    void SetDayLength(const float l) {
+        fDayLength = l;
+    }
+    void SetMaxCapacity(const short m) {
+        fMaxCapacity = m;
+    }
+    void SetLingerTime(const short v) {
+        fLingerTime = v;
+    }
+    void SetSequencePrefix(int32_t p) {
+        fSeqPrefix = p;
+    }
+    void SetReleaseVersion(uint32_t v) {
+        fReleaseVersion = v;
+    }
 
     // calculations
     double GetAgeElapsedDays(plUnifiedTime earthCurrentTime) const;
-    double GetAgeElapsedSeconds(const plUnifiedTime & earthCurrentTime) const;
+    double GetAgeElapsedSeconds(const plUnifiedTime& earthCurrentTime) const;
     int GetAgeTimeOfDaySecs(const plUnifiedTime& earthCurrentTime) const;
     float GetAgeTimeOfDayPercent(const plUnifiedTime& earthCurrentTime) const;
-    
+
     // Static functions for the available common pages
-    enum CommonPages
-    {
+    enum CommonPages {
         kTextures = 0,
         kGlobal,
         kNumCommonPages
     };
 
-    static const char *GetCommonPage( int pageType );
+    static const char* GetCommonPage(int pageType);
 
-    void    AppendCommonPages( void );
+    void    AppendCommonPages(void);
     void    CopyFrom(const plAgeDescription& other);
 
-    plAgeDescription &operator=( const plAgeDescription &src )
-    {
-        CopyFrom( src );
+    plAgeDescription& operator=(const plAgeDescription& src) {
+        CopyFrom(src);
         return *this;
     }
 };

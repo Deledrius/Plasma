@@ -46,28 +46,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plPhysical.h"
 #include "hsGeometry3.h"
 
-class plPhysicsSoundMgr
-{
+class plPhysicsSoundMgr {
 public:
     void AddContact(plPhysical* phys1, plPhysical* phys2, const hsPoint3& hitPoint, const hsVector3& hitNormal);
     void Update();
 
 private:
-    enum EventType
-    {
+    enum EventType {
         kSlide,
         kContact,
         kEndSlide
     };
 
-    enum EventStopType
-    {
+    enum EventStopType {
         kStopFromImpact = 0,
         kStopFromEndSlide = 2
     };
 
-    class CollidePair
-    {
+    class CollidePair {
     public:
         plKey firstPhysKey;
         plKey secondPhysKey;
@@ -85,7 +81,7 @@ private:
     void IStopCollision(const CollidePair& cp);
     void IUpdateCollision(const CollidePair& cp);
     void IProcessSlide(plPhysicalSndGroup* sndA, plPhysicalSndGroup* sndB, float strength);
-    
+
     typedef std::set<CollidePair> CollideSet;
     CollideSet fPrevCollisions;
     CollideSet fCurCollisions;

@@ -75,65 +75,70 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Class Definition /////////////////////////////////////////////////////////
 
-class plDetailCurveCtrl
-{
-    protected:
+class plDetailCurveCtrl {
+protected:
 
-        HWND    fHWnd;
+    HWND    fHWnd;
 
-        HDC     fDblDC;
-        HBITMAP fDblBitmap;
-        HBRUSH  fWhiteBrush, fBlueBrush;
-        HPEN    fBluePen, fLiteBluePen;
-        
-        RECT    fStartDragPt, fEndDragPt;
+    HDC     fDblDC;
+    HBITMAP fDblBitmap;
+    HBRUSH  fWhiteBrush, fBlueBrush;
+    HPEN    fBluePen, fLiteBluePen;
 
-        bool    fDraggingStart, fDraggingEnd;
-        bool    fCanDragStart, fCanDragEnd;
+    RECT    fStartDragPt, fEndDragPt;
 
-        int     fNumLevels;
-        float   fStartPercent, fEndPercent;
-        float   fStartOpac, fEndOpac;
+    bool    fDraggingStart, fDraggingEnd;
+    bool    fCanDragStart, fCanDragEnd;
 
-        void    IInitDblBuffer( void );
-        void    IRefreshDblBuffer( void );
-        void    IDrawCurve( HDC hDC, bool clampToInts, int cornerX, int cornerY, SIZE *bgndSize );
+    int     fNumLevels;
+    float   fStartPercent, fEndPercent;
+    float   fStartOpac, fEndOpac;
 
-        float   IXlateDistToValue( float dist, bool clampToInts );
-        float   IXlateDistToX( float dist, bool clampToInts );
-        float   IXlateXToDist( float howFar );
-        void    IXlateValuesToClientPt( float x, float y, POINT *pt, int cornerX, int cornerY, SIZE *bgndSize );
-        void    IMapMouseToValues( int x, int y, bool mapToStart );
+    void    IInitDblBuffer(void);
+    void    IRefreshDblBuffer(void);
+    void    IDrawCurve(HDC hDC, bool clampToInts, int cornerX, int cornerY, SIZE* bgndSize);
 
-        void    ISendDraggedMessage( bool itWasTheStartPoint );
+    float   IXlateDistToValue(float dist, bool clampToInts);
+    float   IXlateDistToX(float dist, bool clampToInts);
+    float   IXlateXToDist(float howFar);
+    void    IXlateValuesToClientPt(float x, float y, POINT* pt, int cornerX, int cornerY, SIZE* bgndSize);
+    void    IMapMouseToValues(int x, int y, bool mapToStart);
 
-        static HINSTANCE    fInstance;
-        static int          fClassRefCnt;
-        static HBITMAP      fBgndImage;
-        static HFONT        fFont;
+    void    ISendDraggedMessage(bool itWasTheStartPoint);
+
+    static HINSTANCE    fInstance;
+    static int          fClassRefCnt;
+    static HBITMAP      fBgndImage;
+    static HFONT        fFont;
 
 #ifdef MCN_TWO_GRAPH_MODE
-        static HBITMAP      fBgndImage2;
-        static bool         fXAsMipmapLevel;
+    static HBITMAP      fBgndImage2;
+    static bool         fXAsMipmapLevel;
 #endif
 
-        static void IRegisterCtrl( HINSTANCE instance );
-        static void IUnregisterCtrl( void );
+    static void IRegisterCtrl(HINSTANCE instance);
+    static void IUnregisterCtrl(void);
 
-        static LRESULT CALLBACK IWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
+    static LRESULT CALLBACK IWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
-    public:
+public:
 
-        plDetailCurveCtrl( HWND parentWnd, WPARAM id, RECT *clientRect, HINSTANCE instance = NULL );
-        ~plDetailCurveCtrl();
+    plDetailCurveCtrl(HWND parentWnd, WPARAM id, RECT* clientRect, HINSTANCE instance = NULL);
+    ~plDetailCurveCtrl();
 
-        void    SetStartPoint( float percentLevel, float opacity );
-        void    SetEndPoint( float percentLevel, float opacity );
-        void    SetNumLevels( int numLevels );
+    void    SetStartPoint(float percentLevel, float opacity);
+    void    SetEndPoint(float percentLevel, float opacity);
+    void    SetNumLevels(int numLevels);
 
-        void    GetStartPoint( float &percent, float &opacity ) { percent = fStartPercent; opacity = fStartOpac; }
-        void    GetEndPoint( float &percent, float &opacity ) { percent = fEndPercent; opacity = fEndOpac; }
+    void    GetStartPoint(float& percent, float& opacity) {
+        percent = fStartPercent;
+        opacity = fStartOpac;
+    }
+    void    GetEndPoint(float& percent, float& opacity) {
+        percent = fEndPercent;
+        opacity = fEndOpac;
+    }
 
 };
 

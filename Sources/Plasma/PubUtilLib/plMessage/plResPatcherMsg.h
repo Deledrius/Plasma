@@ -51,23 +51,34 @@ class plResPatcherMsg : public plMessage {
     char* fError;
 
 public:
-    plResPatcherMsg() : fSuccess(true), fError(nil) { SetBCastFlag(kBCastByExactType); }
-    plResPatcherMsg(bool success, const char* error) : fSuccess(success) 
-    {
+    plResPatcherMsg() : fSuccess(true), fError(nil) {
         SetBCastFlag(kBCastByExactType);
-        fError = hsStrcpy(error); 
     }
-    
-    ~plResPatcherMsg() { delete[] fError; }
+    plResPatcherMsg(bool success, const char* error) : fSuccess(success) {
+        SetBCastFlag(kBCastByExactType);
+        fError = hsStrcpy(error);
+    }
+
+    ~plResPatcherMsg() {
+        delete[] fError;
+    }
 
     CLASSNAME_REGISTER(plResPatcherMsg);
     GETINTERFACE_ANY(plResPatcherMsg, plMessage);
-    
-    void Read (hsStream *, hsResMgr *) { FATAL("What the hell are you doing?"); }
-    void Write (hsStream *, hsResMgr *) { FATAL("What the hell are you doing?"); }
 
-    const char* GetError() const { return fError; }
-    bool Success() const { return fSuccess; }
+    void Read(hsStream*, hsResMgr*) {
+        FATAL("What the hell are you doing?");
+    }
+    void Write(hsStream*, hsResMgr*) {
+        FATAL("What the hell are you doing?");
+    }
+
+    const char* GetError() const {
+        return fError;
+    }
+    bool Success() const {
+        return fSuccess;
+    }
 };
 
 

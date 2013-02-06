@@ -48,21 +48,53 @@ struct hsWide {
     int32_t   fHi;
     uint32_t  fLo;
 
-    hsWide* Set(int32_t lo) { fLo = lo; if (lo < 0) fHi = -1L; else fHi = 0; return this; }
-    hsWide* Set(int32_t hi, uint32_t lo) { fHi = hi; fLo = lo; return this; }
+    hsWide* Set(int32_t lo) {
+        fLo = lo;
 
-    inline bool   IsNeg() const { return fHi < 0; }
-    inline bool   IsPos() const { return fHi > 0 || (fHi == 0 && fLo != 0); }
-    inline bool   IsZero() const { return fHi == 0 && fLo == 0; }
+        if (lo < 0) {
+            fHi = -1L;
+        } else {
+            fHi = 0;
+        }
+
+        return this;
+    }
+    hsWide* Set(int32_t hi, uint32_t lo) {
+        fHi = hi;
+        fLo = lo;
+        return this;
+    }
+
+    inline bool   IsNeg() const {
+        return fHi < 0;
+    }
+    inline bool   IsPos() const {
+        return fHi > 0 || (fHi == 0 && fLo != 0);
+    }
+    inline bool   IsZero() const {
+        return fHi == 0 && fLo == 0;
+    }
     inline bool   IsWide() const;
 
 
-    bool operator==(const hsWide& b) const { return fHi == b.fHi && fLo == b.fLo; }
-    bool operator<(const hsWide& b) const { return fHi < b.fHi || (fHi == b.fHi && fLo < b.fLo); }
-    bool operator>( const hsWide& b) const { return fHi > b.fHi || (fHi == b.fHi && fLo > b.fLo); }
-    bool operator!=( const hsWide& b) const { return !( *this == b); }
-    bool operator<=(const hsWide& b) const { return !(*this > b); }
-    bool operator>=(const hsWide& b) const { return !(*this < b); }
+    bool operator==(const hsWide& b) const {
+        return fHi == b.fHi && fLo == b.fLo;
+    }
+    bool operator<(const hsWide& b) const {
+        return fHi < b.fHi || (fHi == b.fHi && fLo < b.fLo);
+    }
+    bool operator>(const hsWide& b) const {
+        return fHi > b.fHi || (fHi == b.fHi && fLo > b.fLo);
+    }
+    bool operator!=(const hsWide& b) const {
+        return !(*this == b);
+    }
+    bool operator<=(const hsWide& b) const {
+        return !(*this > b);
+    }
+    bool operator>=(const hsWide& b) const {
+        return !(*this < b);
+    }
 
     inline hsWide*  Negate();
     inline hsWide*  Add(int32_t scaler);
@@ -87,9 +119,10 @@ struct hsWide {
     int32_t   Sqrt() const;
     int32_t   CubeRoot() const;
 
-    double  AsDouble() const { return fHi * double(65536) * double(65536) + fLo; }
-    hsWide* Set(double d) 
-    { 
+    double  AsDouble() const {
+        return fHi * double(65536) * double(65536) + fLo;
+    }
+    hsWide* Set(double d) {
         int32_t hi = int32_t(d / double(65536) / double(65536));
         int32_t lo = int32_t(d - double(hi));
         return Set(hi, lo);
@@ -105,33 +138,36 @@ const hsWide kNegInfinity64 = { static_cast<int32_t>(kNegInfinity32), 0 };
 #define TOP2BITS(n) (uint32_t(n) >> 30)
 #define TOP3BITS(n) (uint32_t(n) >> 29)
 
-    #define hsSignalMathOverflow()
-    #define hsSignalMathUnderflow()
+#define hsSignalMathOverflow()
+#define hsSignalMathUnderflow()
 
 #define WIDE_ISNEG(hi, lo)                      (int32_t(hi) < 0)
 #define WIDE_LESSTHAN(hi, lo, hi2, lo2)             ((hi) < (hi2) || (hi) == (hi2) && (lo) < (lo2))
 #define WIDE_SHIFTLEFT(outH, outL, inH, inL, shift)     do { (outH) = ((inH) << (shift)) | ((inL) >> (32 - (shift))); (outL) = (inL) << (shift); } while (0)
-#define WIDE_NEGATE(hi, lo)                     do { (hi) = ~(hi); if (((lo) = -int32_t(lo)) == 0) (hi) += 1; } while (0) 
+#define WIDE_NEGATE(hi, lo)                     do { (hi) = ~(hi); if (((lo) = -int32_t(lo)) == 0) (hi) += 1; } while (0)
 #define WIDE_ADDPOS(hi, lo, scaler)             do { uint32_t tmp = (lo) + (scaler); if (tmp < (lo)) (hi) += 1; (lo) = tmp; } while (0)
-#define WIDE_SUBWIDE(hi, lo, subhi, sublo)          do { (hi) -= (subhi); if ((lo) < (sublo)) (hi) -= 1; (lo) -= (sublo); } while (0) 
+#define WIDE_SUBWIDE(hi, lo, subhi, sublo)          do { (hi) -= (subhi); if ((lo) < (sublo)) (hi) -= 1; (lo) -= (sublo); } while (0)
 
 /////////////////////// Inline implementations ///////////////////////
 
 inline hsWide* hsWide::Negate()
 {
     WIDE_NEGATE(fHi, fLo);
-    
+
     return this;
 }
 
 inline hsWide* hsWide::Add(int32_t scaler)
 {
-    if (scaler >= 0)
+    if (scaler >= 0) {
         WIDE_ADDPOS(fHi, fLo, scaler);
-    else
-    {   scaler = -scaler;
-        if (fLo < uint32_t(scaler))
+    } else {
+        scaler = -scaler;
+
+        if (fLo < uint32_t(scaler)) {
             fHi--;
+        }
+
         fLo -= scaler;
     }
 
@@ -143,8 +179,11 @@ inline hsWide* hsWide::Add(const hsWide* a)
     uint32_t  newLo = fLo + a->fLo;
 
     fHi += a->fHi;
-    if (newLo < (fLo | a->fLo))
+
+    if (newLo < (fLo | a->fLo)) {
         fHi++;
+    }
+
     fLo = newLo;
 
     return this;

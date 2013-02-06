@@ -49,42 +49,57 @@ class pyPoint3;
 class pyVector3;
 
 
-class pyMatrix44
-{
+class pyMatrix44 {
 protected:
-    pyMatrix44() { fMatrix.Reset(); }
+    pyMatrix44() {
+        fMatrix.Reset();
+    }
     pyMatrix44(const hsMatrix44& other) : fMatrix(other) { }
 
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptMatrix44);
     PYTHON_CLASS_NEW_DEFINITION;
-    static PyObject *New(const hsMatrix44 &obj);
+    static PyObject* New(const hsMatrix44& obj);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyMatrix44 object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyMatrix44); // converts a PyObject to a pyMatrix44 (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     hsMatrix44      fMatrix;
 
     // operator methods
-    PyObject* operator*(const pyMatrix44& b) const { return pyMatrix44::New(fMatrix * b.fMatrix); } // returns pyMatrix44
+    PyObject* operator*(const pyMatrix44& b) const {
+        return pyMatrix44::New(fMatrix * b.fMatrix);    // returns pyMatrix44
+    }
     PyObject* operator*(const pyVector3& p) const;
     PyObject* operator*(const pyPoint3& p) const;
 
     // other methods
-    PyObject* Copy() const { return pyMatrix44::New(fMatrix); } // returns pyMatrix44
+    PyObject* Copy() const {
+        return pyMatrix44::New(fMatrix);    // returns pyMatrix44
+    }
     void Translate(const pyVector3& v);
     void Scale(const pyVector3& v);
-    void Rotate(int axis, float radians) { fMatrix.Rotate(axis, radians); }
-    void Reset() { fMatrix.Reset(); }
+    void Rotate(int axis, float radians) {
+        fMatrix.Rotate(axis, radians);
+    }
+    void Reset() {
+        fMatrix.Reset();
+    }
     void MakeTranslateMat(const pyVector3& trans);
     void MakeScaleMat(const pyVector3& scale);
-    void MakeRotateMat(int axis, float radians) { fMatrix.MakeRotateMat(axis, radians); }
+    void MakeRotateMat(int axis, float radians) {
+        fMatrix.MakeRotateMat(axis, radians);
+    }
     void Make(const pyPoint3& from, const pyPoint3& at, const pyVector3& up);
     void MakeUpPreserving(const pyPoint3& from, const pyPoint3& at, const pyVector3& up);
-    bool GetParity() const { return fMatrix.GetParity(); }
-    float GetDeterminant() const { return fMatrix.GetDeterminant(); }
+    bool GetParity() const {
+        return fMatrix.GetParity();
+    }
+    float GetDeterminant() const {
+        return fMatrix.GetDeterminant();
+    }
     PyObject* GetInverse(PyObject* inverse) const; // returns (and accepts) pyMatrix44
     PyObject* GetTranspose(PyObject* inverse) const; // returns (and accepts) pyMatrix44
     PyObject* GetAdjoint(PyObject* adjoint) const; // returns (and accepts) pyMatrix44

@@ -43,7 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 //  plBSDiffBuffer - A utility class for writing and applying a difference
 //                  buffer--i.e. a buffer containing a series of modifications
-//                  that will modify an old data buffer to match a new one. 
+//                  that will modify an old data buffer to match a new one.
 //                  It's a useful utility class when doing binary file
 //                  patching, for example, as you can write out the changes
 //                  to this class, get back a data buffer suitable for writing,
@@ -53,7 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //                  plDiffBuffer. It is based on bsdiff-4.1 from BSD
 //                  Linux (http://www.daemonology.org/bsdiff). It's *extremely*
 //                  hard to read code (written by a PhD), but it works well. The
-//                  original BSD code has been modified to have the bzip2 pipes 
+//                  original BSD code has been modified to have the bzip2 pipes
 //                  it used to compress data removed. It has also been converted
 //                  to work a C++ utility class.
 //
@@ -71,55 +71,55 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //// Class Definition ////////////////////////////////////////////////////////
 
 class hsRAMStream;
-class plBSDiffBuffer
-{
-    protected:
+class plBSDiffBuffer {
+protected:
 
-        bool            fWriting;
-        uint32_t        fNewLength, fPatchLength;
-        unsigned char*  fPatchBuffer;
+    bool            fWriting;
+    uint32_t        fNewLength, fPatchLength;
+    unsigned char*  fPatchBuffer;
 
-    public:
+public:
 
-        plBSDiffBuffer( uint32_t newLength, uint32_t oldLength = 0 );       // Constructor for writing new buffers. oldLength isn't required but helpful for optimizations
-        plBSDiffBuffer( void *buffer, uint32_t length );  // Constructor for applying a given diff set
-                                                        // to an old buffer
-        virtual ~plBSDiffBuffer();
-
-
-        /// Creation/write functions
-
-        //  Diff() creates the diff buffer from the new and old. 
-        uint32_t  Diff( uint32_t oldLength, void *oldBuffer, uint32_t newLength, void *newBuffer );
-
-        // GetBuffer() will copy the diff stream into a new buffer and return it. You are responsible for freeing the buffer.
-        void    GetBuffer( uint32_t &length, void *&bufferPtr );
+    plBSDiffBuffer(uint32_t newLength, uint32_t oldLength = 0);         // Constructor for writing new buffers. oldLength isn't required but helpful for optimizations
+    plBSDiffBuffer(void* buffer, uint32_t length);    // Constructor for applying a given diff set
+    // to an old buffer
+    virtual ~plBSDiffBuffer();
 
 
-        /// Apply functions
+    /// Creation/write functions
 
-        // Apply() is another way to call Patch().
-        uint32_t  Apply( uint32_t oldLength, void *oldBuffer, uint32_t &newLength, void *&newBuffer )
-        { return Patch(oldLength, oldBuffer, newLength, newBuffer); };
+    //  Diff() creates the diff buffer from the new and old.
+    uint32_t  Diff(uint32_t oldLength, void* oldBuffer, uint32_t newLength, void* newBuffer);
 
-        // Patch() will take this diff buffer and apply it to the given old buffer,
-        // allocating and producing a new buffer. You are responsible for freeing the new buffer.
-        uint32_t  Patch( uint32_t oldLength, void *oldBuffer, uint32_t &newLength, void *&newBuffer );
+    // GetBuffer() will copy the diff stream into a new buffer and return it. You are responsible for freeing the buffer.
+    void    GetBuffer(uint32_t& length, void*& bufferPtr);
 
-    private:
-        
-        uint32_t  IReadUnsignedint8_t(unsigned char *buf);
-        void    IWriteUnsignedint8_t(uint32_t x,unsigned char *buf);
-        void    ISafeMemcpy(unsigned char *dest, unsigned char *src, size_t nBytes,
-                            unsigned char *destend, unsigned char *srcend);
-        void    ISplit(int32_t *I,int32_t *V,uint32_t start,uint32_t len,uint32_t h);
-        void    IQSuffixSort(int32_t *I,int32_t *V,unsigned char *old,uint32_t oldsize);
-        uint32_t  IMatchLen( unsigned char *oldBuffer, uint32_t oldLength,
-                           unsigned char *newBuffer, uint32_t newLength);
-        uint32_t  ISearch( int32_t *I,
-                         unsigned char *oldBuffer, uint32_t oldLength,
-                         unsigned char *newBuffer, uint32_t newLength,
-                         uint32_t st, uint32_t en, int32_t *pos);
+
+    /// Apply functions
+
+    // Apply() is another way to call Patch().
+    uint32_t  Apply(uint32_t oldLength, void* oldBuffer, uint32_t& newLength, void*& newBuffer) {
+        return Patch(oldLength, oldBuffer, newLength, newBuffer);
+    };
+
+    // Patch() will take this diff buffer and apply it to the given old buffer,
+    // allocating and producing a new buffer. You are responsible for freeing the new buffer.
+    uint32_t  Patch(uint32_t oldLength, void* oldBuffer, uint32_t& newLength, void*& newBuffer);
+
+private:
+
+    uint32_t  IReadUnsignedint8_t(unsigned char* buf);
+    void    IWriteUnsignedint8_t(uint32_t x, unsigned char* buf);
+    void    ISafeMemcpy(unsigned char* dest, unsigned char* src, size_t nBytes,
+                        unsigned char* destend, unsigned char* srcend);
+    void    ISplit(int32_t* I, int32_t* V, uint32_t start, uint32_t len, uint32_t h);
+    void    IQSuffixSort(int32_t* I, int32_t* V, unsigned char* old, uint32_t oldsize);
+    uint32_t  IMatchLen(unsigned char* oldBuffer, uint32_t oldLength,
+                        unsigned char* newBuffer, uint32_t newLength);
+    uint32_t  ISearch(int32_t* I,
+                      unsigned char* oldBuffer, uint32_t oldLength,
+                      unsigned char* newBuffer, uint32_t newLength,
+                      uint32_t st, uint32_t en, int32_t* pos);
 
 
 };

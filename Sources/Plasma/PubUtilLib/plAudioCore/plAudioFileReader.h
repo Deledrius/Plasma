@@ -58,39 +58,41 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plFileName;
 class plUnifiedTime;
 class plWAVHeader;
-class plAudioFileReader
-{
+class plAudioFileReader {
 public:
     virtual ~plAudioFileReader() {}
-    virtual plWAVHeader &GetHeader( void ) = 0;
+    virtual plWAVHeader& GetHeader(void) = 0;
 
-    enum StreamType
-    {
+    enum StreamType {
         kStreamRAM,     // Stream from a WAV loaded into RAM
         kStreamWAV,     // Stream from a WAV on disk
         kStreamNative,  // Stream from the native type (ie, an Ogg on disk)
     };
 
-    virtual void    Open(){}
-    virtual void    Close( void ) = 0;
+    virtual void    Open() {}
+    virtual void    Close(void) = 0;
 
-    virtual uint32_t  GetDataSize( void ) = 0;
-    virtual float   GetLengthInSecs( void ) = 0;
+    virtual uint32_t  GetDataSize(void) = 0;
+    virtual float   GetLengthInSecs(void) = 0;
 
-    virtual bool    SetPosition( uint32_t numBytes ) = 0;
-    virtual bool    Read( uint32_t numBytes, void *buffer ) = 0;
-    virtual uint32_t  NumBytesLeft( void ) = 0;
+    virtual bool    SetPosition(uint32_t numBytes) = 0;
+    virtual bool    Read(uint32_t numBytes, void* buffer) = 0;
+    virtual uint32_t  NumBytesLeft(void) = 0;
 
-    virtual bool    OpenForWriting( const plFileName& path, plWAVHeader &header ) { return false; }
-    virtual uint32_t  Write( uint32_t bytes, void *buffer ) { return 0; }
+    virtual bool    OpenForWriting(const plFileName& path, plWAVHeader& header) {
+        return false;
+    }
+    virtual uint32_t  Write(uint32_t bytes, void* buffer) {
+        return 0;
+    }
 
-    virtual bool    IsValid( void ) = 0;
+    virtual bool    IsValid(void) = 0;
 
     static plAudioFileReader* CreateReader(const plFileName& path, plAudioCore::ChannelSelect whichChan = plAudioCore::kAll, StreamType type = kStreamWAV);
     static plAudioFileReader* CreateWriter(const plFileName& path, plWAVHeader& header);
 
     // Decompresses a compressed file to the cache directory
-    static void CacheFile(const plFileName& path, bool splitChannels=false, bool noOverwrite=false);
+    static void CacheFile(const plFileName& path, bool splitChannels = false, bool noOverwrite = false);
 
 protected:
     static plFileName IGetCachedPath(const plFileName& path, plAudioCore::ChannelSelect whichChan);

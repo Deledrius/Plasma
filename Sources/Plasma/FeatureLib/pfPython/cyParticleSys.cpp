@@ -55,41 +55,44 @@ cyParticleSys::cyParticleSys(plKey sender, plKey recvr)
 }
 
 // setters
-void cyParticleSys::SetSender(plKey &sender)
+void cyParticleSys::SetSender(plKey& sender)
 {
     fSender = sender;
 }
 
-void cyParticleSys::AddRecvr(plKey &recvr)
+void cyParticleSys::AddRecvr(plKey& recvr)
 {
-    if ( recvr != nil )
+    if (recvr != nil) {
         fRecvr.Append(recvr);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 //  Function   : ISendParticleSysMsg
-//  PARAMETERS : 
+//  PARAMETERS :
 //
 //  PURPOSE    : send the message to the Particle System
 //
 void cyParticleSys::ISendParticleSysMsg(uint32_t param, float value)
 {
     plParticleUpdateMsg* pMsg = new plParticleUpdateMsg(fSender, nil, nil, param, value);
+
     // check if this needs to be network forced to all clients
-    if (fNetForce )
-    {
+    if (fNetForce) {
         // set the network propagate flag to make sure it gets to the other clients
         pMsg->SetBCastFlag(plMessage::kNetPropagate);
         pMsg->SetBCastFlag(plMessage::kNetForce);
     }
+
     pMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
     // add all our receivers to the message receiver list
     int i;
-    for ( i=0; i<fRecvr.Count(); i++ )
-    {
+
+    for (i = 0; i < fRecvr.Count(); i++) {
         pMsg->AddReceiver(fRecvr[i]);
     }
+
     plgDispatch::MsgSend(pMsg);
 }
 
@@ -99,60 +102,60 @@ void cyParticleSys::ISendParticleSysMsg(uint32_t param, float value)
 //
 void cyParticleSys::SetParticlesPerSecond(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamParticlesPerSecond,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamParticlesPerSecond, value);
 }
 
 void cyParticleSys::SetInitPitchRange(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamInitPitchRange,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamInitPitchRange, value);
 }
 
 void cyParticleSys::SetInitYawRange(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamInitYawRange,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamInitYawRange, value);
 }
 
 void cyParticleSys::SetVelMin(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamVelMin,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamVelMin, value);
 }
 
 void cyParticleSys::SetVelMax(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamVelMax,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamVelMax, value);
 }
 
 void cyParticleSys::SetXSize(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamXSize,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamXSize, value);
 }
 
 void cyParticleSys::SetYSize(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamYSize,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamYSize, value);
 }
 
 void cyParticleSys::SetScaleMin(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamScaleMin,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamScaleMin, value);
 }
 
 void cyParticleSys::SetScaleMax(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamScaleMax,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamScaleMax, value);
 }
 
 void cyParticleSys::SetGenLife(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamGenLife,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamGenLife, value);
 }
 
 void cyParticleSys::SetPartLifeMin(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamPartLifeMin,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamPartLifeMin, value);
 }
 
 void cyParticleSys::SetPartLifeMax(float value)
 {
-    ISendParticleSysMsg(plParticleUpdateMsg::kParamPartLifeMax,value);
+    ISendParticleSysMsg(plParticleUpdateMsg::kParamPartLifeMax, value);
 }

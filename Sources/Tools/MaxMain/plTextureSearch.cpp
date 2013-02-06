@@ -61,8 +61,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifdef MAXASS_AVAILABLE
 #   include "../../AssetMan/PublicInterface/MaxAssInterface.h"
 
-    // Not a class member so we don't have to make everyone who uses this know about AssetMan
-    static jvUniqueId gAssetID;
+// Not a class member so we don't have to make everyone who uses this know about AssetMan
+static jvUniqueId gAssetID;
 #endif
 
 // Avoids including all the component stuff
@@ -84,8 +84,7 @@ plTextureSearch& plTextureSearch::Instance()
 
 void plTextureSearch::Toggle()
 {
-    if (!fDlg)
-    {
+    if (!fDlg) {
         fDlg = CreateDialog(hInstance,
                             MAKEINTRESOURCE(IDD_FIND_TEXTURE),
                             GetCOREInterface()->GetMAXHWnd(),
@@ -107,9 +106,7 @@ void plTextureSearch::Toggle()
 
         GetCOREInterface()->RegisterDlgWnd(fDlg);
         ShowWindow(fDlg, SW_SHOW);
-    }
-    else
-    {
+    } else {
         DestroyWindow(fDlg);
         fDlg = NULL;
     }
@@ -123,53 +120,43 @@ BOOL plTextureSearch::ForwardDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM 
 
 BOOL plTextureSearch::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
+    switch (msg) {
     case WM_ACTIVATE:
-        if (LOWORD(wParam) == WA_INACTIVE)
+        if (LOWORD(wParam) == WA_INACTIVE) {
             plMaxAccelerators::Enable();
-        else
+        } else {
             plMaxAccelerators::Disable();
+        }
+
         return TRUE;
 
     case WM_COMMAND:
-        if (HIWORD(wParam) == BN_CLICKED)
-        {
+        if (HIWORD(wParam) == BN_CLICKED) {
             int id = LOWORD(wParam);
-            if (id == IDCANCEL)
-            {
+
+            if (id == IDCANCEL) {
                 Toggle();
                 return TRUE;
-            }
-            else if (id == IDC_UPDATE_BUTTON)
-            {
+            } else if (id == IDC_UPDATE_BUTTON) {
                 IUpdateTextures(kUpdateLoadList);
                 return TRUE;
-            }
-            else if (id == IDC_REPLACE_ALL_BUTTON)
-            {
-                if (hsMessageBox("Are you sure?", "Confirmation", hsMessageBoxYesNo) == hsMBoxYes)
-                {
+            } else if (id == IDC_REPLACE_ALL_BUTTON) {
+                if (hsMessageBox("Are you sure?", "Confirmation", hsMessageBoxYesNo) == hsMBoxYes) {
                     IUpdateTextures(kUpdateReplace);
                 }
+
                 return TRUE;
-            }
-            else if (id == IDC_SET_ALL_BUTTON)
-            {
-                if (hsMessageBox("Are you sure?", "Confirmation", hsMessageBoxYesNo) == hsMBoxYes)
-                {
+            } else if (id == IDC_SET_ALL_BUTTON) {
+                if (hsMessageBox("Are you sure?", "Confirmation", hsMessageBoxYesNo) == hsMBoxYes) {
                     IUpdateTextures(kUpdateSetSize);
                 }
+
                 return TRUE;
-            }
-            else if (id == IDC_REPLACE_BUTTON)
-            {
+            } else if (id == IDC_REPLACE_BUTTON) {
                 IPickReplaceTexture();
                 return TRUE;
             }
-        }
-        else if (HIWORD(wParam) == EN_CHANGE && LOWORD(wParam) == IDC_FIND_EDIT)
-        {
+        } else if (HIWORD(wParam) == EN_CHANGE && LOWORD(wParam) == IDC_FIND_EDIT) {
             bool findText = (SendDlgItemMessage(hDlg, IDC_FIND_EDIT, EM_LINELENGTH, 0, 0) > 0);
             bool replace = (fFileName[0] != '\0');
 
@@ -178,17 +165,17 @@ BOOL plTextureSearch::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 
             return TRUE;
         }
+
         break;
 
-    case WM_NOTIFY:
-        {
+    case WM_NOTIFY: {
             NMHDR* nmhdr = (NMHDR*)lParam;
+
             // User double-clicked a material in the texture list
-            if (nmhdr->idFrom == IDC_TEXTURE_LIST && nmhdr->code == NM_DBLCLK)
-            {
+            if (nmhdr->idFrom == IDC_TEXTURE_LIST && nmhdr->code == NM_DBLCLK) {
                 NMITEMACTIVATE* itema = (NMITEMACTIVATE*)lParam;
-                if (itema->iItem != -1)
-                {
+
+                if (itema->iItem != -1) {
                     // Get the material the user clicked on
                     HWND hList = GetDlgItem(fDlg, IDC_TEXTURE_LIST);
                     LV_ITEM item;
@@ -201,8 +188,8 @@ BOOL plTextureSearch::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
                     // Make sure the material is still in the scene (paranoid check)
                     MtlSet mtls;
                     plMtlCollector::GetMtls(&mtls, nil, plMtlCollector::kPlasmaOnly | plMtlCollector::kNoMultiMtl);
-                    if (mtls.find(mtl) != mtls.end())
-                    {
+
+                    if (mtls.find(mtl) != mtls.end()) {
                         // Put the material in the current slot of the material editor
                         IMtlEditInterface* mtlInterface = GetMtlEditInterface();
                         int slot = mtlInterface->GetActiveMtlSlot();
@@ -222,7 +209,9 @@ BOOL plTextureSearch::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 static int FloorPow2(int value)
 {
     int v;
+
     for (v = 1; v <= value; v <<= 1);
+
     return v >> 1;
 }
 
@@ -243,8 +232,7 @@ void plTextureSearch::IUpdateTextures(plTextureSearch::Update update)
     HWND hCombo = GetDlgItem(fDlg, IDC_SIZE_COMBO);
 
     // If we're updating the size, get whatever the user selected
-    if (update == kUpdateSetSize)
-    {
+    if (update == kUpdateSetSize) {
         int sel = ComboBox_GetCurSel(hCombo);
         uint32_t data = ComboBox_GetItemData(hCombo, sel);
         sizeX = LOWORD(data);
@@ -252,38 +240,35 @@ void plTextureSearch::IUpdateTextures(plTextureSearch::Update update)
     }
 
     MtlSet::iterator it = mtls.begin();
-    for (; it != mtls.end(); it++)
-    {
-        Mtl *mtl = (*it);
+
+    for (; it != mtls.end(); it++) {
+        Mtl* mtl = (*it);
 
         LayerSet layers;
         plMtlCollector::GetMtlLayers(mtl, layers);
 
         LayerSet::iterator layerIt = layers.begin();
-        for (; layerIt != layers.end(); layerIt++)
-        {
-            plPlasmaMAXLayer *layer = (*layerIt);
+
+        for (; layerIt != layers.end(); layerIt++) {
+            plPlasmaMAXLayer* layer = (*layerIt);
 
             int numBitmaps = layer->GetNumBitmaps();
 
-            for (int i = 0; i < numBitmaps; i++)
-            {
-                PBBitmap *pbbm = layer->GetPBBitmap(i);
-                if (pbbm)
-                {
-                    const char *name = pbbm->bi.Filename();
-                    if (name && *name != '\0')
-                    {
+            for (int i = 0; i < numBitmaps; i++) {
+                PBBitmap* pbbm = layer->GetPBBitmap(i);
+
+                if (pbbm) {
+                    const char* name = pbbm->bi.Filename();
+
+                    if (name && *name != '\0') {
                         char buf[256];
                         strncpy(buf, name, sizeof(buf));
                         strlwr(buf);
 
                         // If we don't have a search string, or we do and it was
                         // found in the texture name, add the texture to the list.
-                        if (searchStr[0] == '\0' || strstr(buf, searchStr))
-                        {
-                            if (update == kUpdateLoadList)
-                            {
+                        if (searchStr[0] == '\0' || strstr(buf, searchStr)) {
+                            if (update == kUpdateLoadList) {
                                 LVITEM item = {0};
                                 item.mask = LVIF_TEXT | LVIF_PARAM;
                                 item.pszText = mtl->GetName();
@@ -294,19 +279,15 @@ void plTextureSearch::IUpdateTextures(plTextureSearch::Update update)
                                 ListView_SetItemText(hList, idx, 2, (char*)name);
 
                                 // If size is uninitialized or the same as the last, keep size
-                                if ((sizeX == -1 && sizeY == -1) || (sizeX == pbbm->bi.Width() && sizeY == pbbm->bi.Height()))
-                                {
+                                if ((sizeX == -1 && sizeY == -1) || (sizeX == pbbm->bi.Width() && sizeY == pbbm->bi.Height())) {
                                     sizeX = pbbm->bi.Width();
                                     sizeY = pbbm->bi.Height();
                                 }
                                 // Otherwise clear it
-                                else
-                                {
+                                else {
                                     sizeX = sizeY = 0;
                                 }
-                            }
-                            else if (update == kUpdateReplace)
-                            {
+                            } else if (update == kUpdateReplace) {
 #ifdef MAXASS_AVAILABLE
                                 layer->SetBitmapAssetId(gAssetID, i);
 #endif
@@ -314,9 +295,7 @@ void plTextureSearch::IUpdateTextures(plTextureSearch::Update update)
                                 BitmapInfo info;
                                 info.SetName(fFileName);
                                 layer->SetBitmap(&info, i);
-                            }
-                            else if (update == kUpdateSetSize)
-                            {
+                            } else if (update == kUpdateSetSize) {
                                 layer->SetExportSize(sizeX, sizeY);
                             }
                         }
@@ -326,21 +305,18 @@ void plTextureSearch::IUpdateTextures(plTextureSearch::Update update)
         }
     }
 
-    if (update == kUpdateLoadList)
-    {
+    if (update == kUpdateLoadList) {
         HWND hButton = GetDlgItem(fDlg, IDC_SET_ALL_BUTTON);
         ComboBox_ResetContent(hCombo);
 
         // If all bitmaps are the same size, enable resizing
-        if (sizeX != -1 && sizeX != 0)
-        {
+        if (sizeX != -1 && sizeX != 0) {
             sizeX = FloorPow2(sizeX);
             sizeY = FloorPow2(sizeY);
 
             char buf[256];
 
-            while (sizeX >= 4 && sizeY >= 4)
-            {
+            while (sizeX >= 4 && sizeY >= 4) {
                 sprintf(buf, "%d x %d", sizeX, sizeY);
                 int idx = ComboBox_AddString(hCombo, buf);
                 ComboBox_SetItemData(hCombo, idx, MAKELPARAM(sizeX, sizeY));
@@ -353,17 +329,17 @@ void plTextureSearch::IUpdateTextures(plTextureSearch::Update update)
 
             EnableWindow(hCombo, TRUE);
             EnableWindow(hButton, TRUE);
-        }
-        else
-        {
+        } else {
             EnableWindow(hCombo, FALSE);
             EnableWindow(hButton, FALSE);
         }
     }
 
     int autoSizeType = LVSCW_AUTOSIZE;
-    if (ListView_GetItemCount(hList) == 0)
+
+    if (ListView_GetItemCount(hList) == 0) {
         autoSizeType = LVSCW_AUTOSIZE_USEHEADER;
+    }
 
     ListView_SetColumnWidth(hList, 0, autoSizeType);
     ListView_SetColumnWidth(hList, 1, autoSizeType);
@@ -377,12 +353,10 @@ void plTextureSearch::IPickReplaceTexture()
     // if we have the assetman plug-in, then try to use it, unless shift is held down
 #ifdef MAXASS_AVAILABLE
     MaxAssInterface* maxAssInterface = GetMaxAssInterface();
-    if (maxAssInterface && !(GetKeyState(VK_SHIFT) & 0x8000))
-    {
+
+    if (maxAssInterface && !(GetKeyState(VK_SHIFT) & 0x8000)) {
         maxAssInterface->OpenBitmapDlg(gAssetID, fFileName, sizeof(fFileName));
-    }
-    else
-    {
+    } else {
         gAssetID.SetEmpty();
 #endif
         BitmapInfo bi;
@@ -390,16 +364,14 @@ void plTextureSearch::IPickReplaceTexture()
         strcpy(fFileName, bi.Filename());
 #ifdef MAXASS_AVAILABLE
     }
+
 #endif
 
-    if (fFileName[0] == '\0')
-    {
+    if (fFileName[0] == '\0') {
         SetDlgItemText(fDlg, IDC_REPLACE_BUTTON, "(none)");
         EnableWindow(GetDlgItem(fDlg, IDC_REPLACE_ALL_BUTTON), FALSE);
-    }
-    else
-    {
-        char fname[_MAX_FNAME+_MAX_EXT], ext[_MAX_EXT];
+    } else {
+        char fname[_MAX_FNAME + _MAX_EXT], ext[_MAX_EXT];
         _splitpath(fFileName, NULL, NULL, fname, ext);
         strcat(fname, ext);
 

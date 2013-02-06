@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 plLocalization::Language plLocalization::fLanguage = plLocalization::kEnglish;
 
-const char* plLocalization::fLangTags[] =
-{
+const char* plLocalization::fLangTags[] = {
     "_eng", // kEnglish
     "_fre", // kFrench
     "_ger", // kGerman
@@ -56,8 +55,7 @@ const char* plLocalization::fLangTags[] =
 };
 const int kLangTagLen = 4;
 
-const char* plLocalization::fLangNames[] =
-{
+const char* plLocalization::fLangNames[] = {
     "English", // kEnglish
     "French",  // kFrench
     "German",  // kGerman
@@ -66,8 +64,7 @@ const char* plLocalization::fLangNames[] =
     "Japanese" // kJapanese
 };
 
-bool plLocalization::fUsesUnicode[] =
-{
+bool plLocalization::fUsesUnicode[] = {
     false,  // kEnglish
     false,  // kFrench
     false,  // kGerman
@@ -76,8 +73,7 @@ bool plLocalization::fUsesUnicode[] =
     true    // kJapanese
 };
 
-plLocalization::encodingTypes plLocalization::fUnicodeEncoding[] =
-{
+plLocalization::encodingTypes plLocalization::fUnicodeEncoding[] = {
     Enc_Unencoded,  // kEnglish
     Enc_Unencoded,  // kFrench
     Enc_Unencoded,  // kGerman
@@ -90,12 +86,12 @@ plFileName plLocalization::IGetLocalized(const plFileName& name, Language lang)
 {
     int underscore = name.AsString().FindLast('_');
 
-    if (underscore >= 0)
-    {
+    if (underscore >= 0) {
         plString langTag = name.AsString().Substr(underscore, kLangTagLen);
 
-        if (langTag == fLangTags[kEnglish])
+        if (langTag == fLangTags[kEnglish]) {
             return name.AsString().Left(underscore) + fLangTags[lang];
+        }
     }
 
     return "";
@@ -103,40 +99,45 @@ plFileName plLocalization::IGetLocalized(const plFileName& name, Language lang)
 
 plFileName plLocalization::ExportGetLocalized(const plFileName& name, int lang)
 {
-    plFileName localizedName = IGetLocalized(name, Language(lang+1));
-    if (plFileInfo(localizedName).Exists())
+    plFileName localizedName = IGetLocalized(name, Language(lang + 1));
+
+    if (plFileInfo(localizedName).Exists()) {
         return localizedName;
+    }
 
     return "";
 }
 
-std::string plLocalization::LocalToString(const std::vector<std::string> & localizedText)
+std::string plLocalization::LocalToString(const std::vector<std::string>& localizedText)
 {
     std::string retVal = "";
-    for (int i=0; i<localizedText.size(); i++)
-    {
-        if (i > kNumLanguages-1)
+
+    for (int i = 0; i < localizedText.size(); i++) {
+        if (i > kNumLanguages - 1) {
             break;
+        }
+
         std::string langHeader = "$";
         std::string langName = GetLanguageName((Language)i);
-        langHeader += langName.substr(0,2) + "$";
+        langHeader += langName.substr(0, 2) + "$";
         retVal += langHeader + localizedText[i];
     }
+
     return retVal;
 }
 
-std::vector<std::string> plLocalization::StringToLocal(const std::string & localizedText)
+std::vector<std::string> plLocalization::StringToLocal(const std::string& localizedText)
 {
     std::vector<std::string> retVal;
-    wchar_t *temp = hsStringToWString(localizedText.c_str());
+    wchar_t* temp = hsStringToWString(localizedText.c_str());
     std::wstring wLocalizedText = temp;
     delete [] temp;
 
     std::vector<std::wstring> wStringVector = StringToLocal(wLocalizedText);
     int i;
-    for (i=0; i<wStringVector.size(); i++)
-    {
-        char *local = hsWStringToString(wStringVector[i].c_str());
+
+    for (i = 0; i < wStringVector.size(); i++) {
+        char* local = hsWStringToString(wStringVector[i].c_str());
         std::string val = local;
         delete [] local;
         retVal.push_back(val);
@@ -145,53 +146,60 @@ std::vector<std::string> plLocalization::StringToLocal(const std::string & local
     return retVal;
 }
 
-std::vector<std::wstring> plLocalization::StringToLocal(const std::wstring & localizedText)
+std::vector<std::wstring> plLocalization::StringToLocal(const std::wstring& localizedText)
 {
     std::vector<std::wstring> tags;
     std::vector<int> tagLocs;
     std::vector<int> sortedTagLocs;
     std::vector<std::wstring> retVal;
     int i;
-    for (i=0; i<kNumLanguages; i++)
-    {
+
+    for (i = 0; i < kNumLanguages; i++) {
         std::wstring tag = L"$";
         std::string temp = GetLanguageName((Language)i);
-        wchar_t *wTemp = hsStringToWString(temp.c_str());
+        wchar_t* wTemp = hsStringToWString(temp.c_str());
         std::wstring langName = wTemp;
         delete [] wTemp;
-        
-        tag += langName.substr(0,2) + L"$";
+
+        tag += langName.substr(0, 2) + L"$";
         tags.push_back(tag);
         tagLocs.push_back(localizedText.find(tag));
         sortedTagLocs.push_back(i);
         retVal.push_back(L"");
     }
-    for (i=0; i<kNumLanguages-1; i++)
-    {
-        for (int j=i; j<kNumLanguages; j++)
-        {
-            if (tagLocs[sortedTagLocs[i]] > tagLocs[sortedTagLocs[j]])
-                sortedTagLocs[i]^=sortedTagLocs[j]^=sortedTagLocs[i]^=sortedTagLocs[j]; // swap the contents (yes, it works)
+
+    for (i = 0; i < kNumLanguages - 1; i++) {
+        for (int j = i; j < kNumLanguages; j++) {
+            if (tagLocs[sortedTagLocs[i]] > tagLocs[sortedTagLocs[j]]) {
+                sortedTagLocs[i] ^= sortedTagLocs[j] ^= sortedTagLocs[i] ^= sortedTagLocs[j];    // swap the contents (yes, it works)
+            }
         }
     }
+
     // now sortedTagLocs has the indexes of tagLocs sorted from smallest loc to highest loc
     bool noTags = true;
-    for (i=0; i<kNumLanguages; i++)
-    {
+
+    for (i = 0; i < kNumLanguages; i++) {
         int lang = sortedTagLocs[i]; // the language we are extracting
-        if (tagLocs[lang] != -1)
-        {
+
+        if (tagLocs[lang] != -1) {
             noTags = false; // at least one tag was found in the text
             int startLoc = tagLocs[lang] + tags[lang].length();
             int endLoc;
-            if (i+1 == kNumLanguages)
+
+            if (i + 1 == kNumLanguages) {
                 endLoc = localizedText.length();
-            else
-                endLoc = tagLocs[sortedTagLocs[i+1]];
-            retVal[lang] = localizedText.substr(startLoc,endLoc-startLoc);
+            } else {
+                endLoc = tagLocs[sortedTagLocs[i + 1]];
+            }
+
+            retVal[lang] = localizedText.substr(startLoc, endLoc - startLoc);
         }
     }
-    if (noTags)
-        retVal[0] = localizedText; // if no tags were in the text, we assume it to be English
+
+    if (noTags) {
+        retVal[0] = localizedText;    // if no tags were in the text, we assume it to be English
+    }
+
     return retVal;
 }

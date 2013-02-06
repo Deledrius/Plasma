@@ -51,7 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plAutoUIBlock.h"
 
 
-plAutoUIBlock::plAutoUIBlock(plComponentClassDesc *cd, int blockID, const char *name, int version)
+plAutoUIBlock::plAutoUIBlock(plComponentClassDesc* cd, int blockID, const char* name, int version)
 {
     fName = hsStrcpy(name);
     fVersion = version;
@@ -64,16 +64,17 @@ int plAutoUIBlock::NumParams()
     return fParams.size();
 }
 
-plAutoUIParam *plAutoUIBlock::GetParam(int idx)
+plAutoUIParam* plAutoUIBlock::GetParam(int idx)
 {
-    if (idx < fParams.size())
+    if (idx < fParams.size()) {
         return fParams[idx];
+    }
 
     hsAssert(0, "Param index out of range");
     return nil;
 }
 
-IParamBlock2 *plAutoUIBlock::CreatePB()
+IParamBlock2* plAutoUIBlock::CreatePB()
 {
     return CreateParameterBlock2(fDesc, nil);
 }

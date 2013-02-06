@@ -59,19 +59,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 plLayer::plLayer()
 {
     fOwnedChannels = kTransform
-                | kPreshadeColor
-                | kRuntimeColor
-                | kAmbientColor
-                | kOpacity
-                | kState
-                | kUVWSrc
-                | kLODBias
-                | kSpecularColor
-                | kSpecularPower
-                | kTexture
-                | kVertexShader
-                | kPixelShader
-                | kBumpEnvXfm;
+                     | kPreshadeColor
+                     | kRuntimeColor
+                     | kAmbientColor
+                     | kOpacity
+                     | kState
+                     | kUVWSrc
+                     | kLODBias
+                     | kSpecularColor
+                     | kSpecularPower
+                     | kTexture
+                     | kVertexShader
+                     | kPixelShader
+                     | kBumpEnvXfm;
 
     fTransform = new hsMatrix44;
     fTransform->Reset();
@@ -81,7 +81,7 @@ plLayer::plLayer()
     fAmbientColor = new hsColorRGBA;
     fSpecularColor = new hsColorRGBA;
     fOpacity = new float;
-    
+
     fState = new hsGMatState;
     fState->Reset();
 
@@ -106,9 +106,9 @@ plLayer::~plLayer()
 {
 }
 
-uint32_t plLayer::Eval(double secs, uint32_t frame, uint32_t ignore) 
-{ 
-    return uint32_t(0); 
+uint32_t plLayer::Eval(double secs, uint32_t frame, uint32_t ignore)
+{
+    return uint32_t(0);
 }
 
 void plLayer::Read(hsStream* s, hsResMgr* mgr)
@@ -119,24 +119,24 @@ void plLayer::Read(hsStream* s, hsResMgr* mgr)
 
     fTransform->Read(s);
     fPreshadeColor->Read(s);
-    fRuntimeColor->Read( s );
+    fRuntimeColor->Read(s);
     fAmbientColor->Read(s);
-    fSpecularColor->Read( s );
+    fSpecularColor->Read(s);
 
     *fUVWSrc = s->ReadLE32();
     *fOpacity = s->ReadLEScalar();
     *fLODBias = s->ReadLEScalar();
     *fSpecularPower = s->ReadLEScalar();
 
-    plLayRefMsg* refMsg = new plLayRefMsg(GetKey(), plRefMsg::kOnCreate, 0, plLayRefMsg::kTexture); 
-    mgr->ReadKeyNotifyMe(s,refMsg, plRefFlags::kActiveRef); 
+    plLayRefMsg* refMsg = new plLayRefMsg(GetKey(), plRefMsg::kOnCreate, 0, plLayRefMsg::kTexture);
+    mgr->ReadKeyNotifyMe(s, refMsg, plRefFlags::kActiveRef);
 
 #if 1 // For read/write shaders
-    refMsg = new plLayRefMsg(GetKey(), plRefMsg::kOnCreate, 0, plLayRefMsg::kVertexShader); 
-    mgr->ReadKeyNotifyMe(s,refMsg, plRefFlags::kActiveRef);
+    refMsg = new plLayRefMsg(GetKey(), plRefMsg::kOnCreate, 0, plLayRefMsg::kVertexShader);
+    mgr->ReadKeyNotifyMe(s, refMsg, plRefFlags::kActiveRef);
 
-    refMsg = new plLayRefMsg(GetKey(), plRefMsg::kOnCreate, 0, plLayRefMsg::kPixelShader);  
-    mgr->ReadKeyNotifyMe(s,refMsg, plRefFlags::kActiveRef);
+    refMsg = new plLayRefMsg(GetKey(), plRefMsg::kOnCreate, 0, plLayRefMsg::kPixelShader);
+    mgr->ReadKeyNotifyMe(s, refMsg, plRefFlags::kActiveRef);
 
     fBumpEnvXfm->Read(s);
 #endif // For read/write shaders
@@ -150,10 +150,10 @@ void plLayer::Write(hsStream* s, hsResMgr* mgr)
 
     fTransform->Write(s);
     fPreshadeColor->Write(s);
-    fRuntimeColor->Write( s );
+    fRuntimeColor->Write(s);
     fAmbientColor->Write(s);
-    fSpecularColor->Write( s );
-    
+    fSpecularColor->Write(s);
+
     s->WriteLE32(*fUVWSrc);
     s->WriteLEScalar(*fOpacity);
     s->WriteLEScalar(*fLODBias);
@@ -170,62 +170,58 @@ void plLayer::Write(hsStream* s, hsResMgr* mgr)
 bool plLayer::MsgReceive(plMessage* msg)
 {
     plLayRefMsg* refMsg = plLayRefMsg::ConvertNoRef(msg);
-    if( refMsg )
-    {
-        switch( refMsg->fType )
-        {
-        case plLayRefMsg::kTexture:
-            {
-                if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-                {
-                    plBitmap *tex = plBitmap::ConvertNoRef(refMsg->GetRef());
+
+    if (refMsg) {
+        switch (refMsg->fType) {
+        case plLayRefMsg::kTexture: {
+                if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+                    plBitmap* tex = plBitmap::ConvertNoRef(refMsg->GetRef());
                     *fTexture = tex;
-                    if( tex )
+
+                    if (tex) {
                         plgDispatch::Dispatch()->RegisterForExactType(plPipeTexMakeMsg::Index(), GetKey());
-                    else
+                    } else {
                         plgDispatch::Dispatch()->UnRegisterForExactType(plPipeTexMakeMsg::Index(), GetKey());
-                }
-                else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-                {
+                    }
+                } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                     *fTexture = nil;
                     plgDispatch::Dispatch()->UnRegisterForExactType(plPipeTexMakeMsg::Index(), GetKey());
                 }
             }
+
             return true;
-        case plLayRefMsg::kVertexShader:
-            {
-                if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-                {
+
+        case plLayRefMsg::kVertexShader: {
+                if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                     plShader* shader = plShader::ConvertNoRef(refMsg->GetRef());
                     *fVertexShader = shader;
-                }
-                else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-                {
+                } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                     *fVertexShader = nil;
                 }
             }
+
             return true;
-        case plLayRefMsg::kPixelShader:
-            {
-                if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-                {
+
+        case plLayRefMsg::kPixelShader: {
+                if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                     plShader* shader = plShader::ConvertNoRef(refMsg->GetRef());
                     *fPixelShader = shader;
-                }
-                else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-                {
+                } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                     *fPixelShader = nil;
                 }
             }
+
             return true;
         }
     }
+
     plPipeTexMakeMsg* texMake = plPipeTexMakeMsg::ConvertNoRef(msg);
-    if( texMake )
-    {
+
+    if (texMake) {
         texMake->Pipeline()->CheckTextureRef(this);
         return true;
     }
+
     return plLayerInterface::MsgReceive(msg);
 }
 
@@ -234,9 +230,9 @@ void plLayer::SetState(const hsGMatState& s)
     *fState = s;
 }
 
-void plLayer::SetTransform(const hsMatrix44& xfm) 
-{ 
-    *fTransform = xfm; 
+void plLayer::SetTransform(const hsMatrix44& xfm)
+{
+    *fTransform = xfm;
 }
 
 void plLayer::SetBumpEnvMatrix(const hsMatrix44& xfm)
@@ -253,14 +249,14 @@ plLayer& plLayer::InitToDefault()
 
     SetRuntimeColor(hsColorRGBA().Set(0.5f, 0.5f, 0.5f, 1.f));
     SetPreshadeColor(hsColorRGBA().Set(0.5f, 0.5f, 0.5f, 1.f));
-    SetAmbientColor(hsColorRGBA().Set(0,0,0,1.f));
+    SetAmbientColor(hsColorRGBA().Set(0, 0, 0, 1.f));
     SetOpacity(1.f);
 
     fTransform->Reset();
 
     SetUVWSrc(0);
     SetLODBias(-1.f);
-    SetSpecularColor( hsColorRGBA().Set(0,0,0,1.f));
+    SetSpecularColor(hsColorRGBA().Set(0, 0, 0, 1.f));
     SetSpecularPower(1.f);
 
     *fVertexShader = nil;
@@ -280,30 +276,30 @@ plLayerInterface* plLayer::DefaultLayer()
 }
 
 //// CloneNoTexture ///////////////////////////////////////////////////////////
-//  Copies all the fields from the original layer given, not including the 
+//  Copies all the fields from the original layer given, not including the
 //  texture
 
-void plLayer::CloneNoTexture( plLayerInterface *original )
+void plLayer::CloneNoTexture(plLayerInterface* original)
 {
-    SetBlendFlags( original->GetBlendFlags() );
-    SetClampFlags( original->GetClampFlags() );
-    SetShadeFlags( original->GetShadeFlags() );
-    SetZFlags( original->GetZFlags() );
-    SetMiscFlags( original->GetMiscFlags() );
-    SetState( original->GetState() );
+    SetBlendFlags(original->GetBlendFlags());
+    SetClampFlags(original->GetClampFlags());
+    SetShadeFlags(original->GetShadeFlags());
+    SetZFlags(original->GetZFlags());
+    SetMiscFlags(original->GetMiscFlags());
+    SetState(original->GetState());
 
-    SetPreshadeColor( original->GetPreshadeColor() );
-    SetRuntimeColor( original->GetRuntimeColor() );
-    SetAmbientColor( original->GetAmbientColor() );
-    SetSpecularColor( original->GetSpecularColor() );
-    SetOpacity( original->GetOpacity() );
-    SetTransform( original->GetTransform() );
-    SetUVWSrc( original->GetUVWSrc() );
-    SetLODBias( original->GetLODBias() );
-    SetSpecularPower( original->GetSpecularPower() );
+    SetPreshadeColor(original->GetPreshadeColor());
+    SetRuntimeColor(original->GetRuntimeColor());
+    SetAmbientColor(original->GetAmbientColor());
+    SetSpecularColor(original->GetSpecularColor());
+    SetOpacity(original->GetOpacity());
+    SetTransform(original->GetTransform());
+    SetUVWSrc(original->GetUVWSrc());
+    SetLODBias(original->GetLODBias());
+    SetSpecularPower(original->GetSpecularPower());
 
-    SetVertexShader( original->GetVertexShader() );
-    SetPixelShader( original->GetPixelShader() );
-    SetBumpEnvMatrix( original->GetBumpEnvMatrix() );
+    SetVertexShader(original->GetVertexShader());
+    SetPixelShader(original->GetPixelShader());
+    SetBumpEnvMatrix(original->GetBumpEnvMatrix());
 }
 

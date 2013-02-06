@@ -47,29 +47,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plSceneObject;
 
-class plFacingConditionalObject : public plConditionalObject
-{
+class plFacingConditionalObject : public plConditionalObject {
 protected:
     float            fTolerance;
     bool                fDirectional;
 
 public:
-    
+
     plFacingConditionalObject();
-    ~plFacingConditionalObject(){;}
-    
-    CLASSNAME_REGISTER( plFacingConditionalObject );
-    GETINTERFACE_ANY( plFacingConditionalObject, plConditionalObject );
-    
+    ~plFacingConditionalObject() {
+        ;
+    }
+
+    CLASSNAME_REGISTER(plFacingConditionalObject);
+    GETINTERFACE_ANY(plFacingConditionalObject, plConditionalObject);
+
     bool MsgReceive(plMessage* msg);
 
-    void SetTolerance(float d) { fTolerance = d; }
-    void SetDirectional(bool d) { fDirectional = d; }
+    void SetTolerance(float d) {
+        fTolerance = d;
+    }
+    void SetDirectional(bool d) {
+        fDirectional = d;
+    }
 
     virtual bool Verify(plMessage* msg);
 
-    void Evaluate(){;}
-    void Reset() { SetSatisfied(true); }
+    void Evaluate() {
+        ;
+    }
+    void Reset() {
+        SetSatisfied(true);
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);

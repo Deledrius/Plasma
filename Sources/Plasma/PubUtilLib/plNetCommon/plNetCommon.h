@@ -116,138 +116,143 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #ifndef PLNETCOMMON_CONSTANTS_ONLY
 
-namespace plNetCommon
+namespace plNetCommon {
+// Topics for plNetMsgVaultTask msg
+namespace VaultTasks {
+enum {
+    kInvalidLow,
+    kCreatePlayer,
+    kDeletePlayer,
+    kGetPlayerList,
+    kCreateNeighborhood,
+    kJoinNeighborhood,
+    kSetAgePublic,
+    kIncPlayerOnlineTime,
+    kEnablePlayer,
+    kRegisterOwnedAge,
+    kUnRegisterOwnedAge,
+    kRegisterVisitAge,
+    kUnRegisterVisitAge,
+    kFriendInvite,
+    kLastVaultTask,
+};
+const char* VaultTaskStr(int taskID);
+}
+
+// Args for plNetMsgVaultTask msg
+namespace VaultTaskArgs {
+enum {
+    kInvalidLow,
+    kHoodTitle,
+    kHoodDesc,
+    kAgePublic,
+    kIntArg1,
+    kIntArg2,
+    kAgeInfoNodeID,
+    kAgeLinkNodeID,
+    kMTStationName,
+    kSpawnPointName,
+    kAgeInfoStruct,
+    kAgeLinkStruct,
+    kAgeFilename,
+    kAgeInstanceGuid,
+    kNodeID,
+    kFriendName,    // Use with key
+    kInviteKey,     // Use with friend
+    kAgeLinkNode,
+};
+}
+
+////////////////////////////////////////////////////////////////
+namespace Accounts {
+namespace Reserved {
+const char* GetReservedAvatarShape(const char* playerName, const char* currShapeName);
+void GetReservedPlayerNames(std::vector<std::string>& out);
+bool IsReservedPlayerName(const char* name);
+}
+}
+
+////////////////////////////////////////////////////////////////
+namespace LinkingRules {
+enum Rules {
+    // Link to public age: Use PLS-MCP load balancing rules. Don't remember this link in KI/vault.
+    kBasicLink,
+    // Link and create a book in the AgesIOwn folder
+    kOriginalBook,
+    // Link to a sub age of current age.
+    kSubAgeBook,
+    // Link using info from my AgesIOwn folder
+    kOwnedBook,
+    // Link using info from my AgesICanVisit folder
+    kVisitBook,
+    // Link to a child age of current age.
+    kChildAgeBook,
+};
+
+inline const char* LinkingRuleStr(int rule)
 {
-    // Topics for plNetMsgVaultTask msg
-    namespace VaultTasks
-    {
-        enum
-        {
-            kInvalidLow,
-            kCreatePlayer,
-            kDeletePlayer,
-            kGetPlayerList,
-            kCreateNeighborhood,
-            kJoinNeighborhood,
-            kSetAgePublic,
-            kIncPlayerOnlineTime,
-            kEnablePlayer,
-            kRegisterOwnedAge,
-            kUnRegisterOwnedAge,
-            kRegisterVisitAge,
-            kUnRegisterVisitAge,
-            kFriendInvite,
-            kLastVaultTask,
-        };
-        const char * VaultTaskStr( int taskID );
+    switch (rule) {
+    case kBasicLink:
+        return "kBasicLink";
+
+    case kOriginalBook:
+        return "kOriginalBook";
+
+    case kSubAgeBook:
+        return "kSubAgeBook";
+
+    case kOwnedBook:
+        return "kOwnedBook";
+
+    case kVisitBook:
+        return "kVisitBook";
+
+    case kChildAgeBook:
+        return "kChildAgeBook";
+
+    default:
+        return "UNKNOWN LINKING RULE";
     }
+}
+}
 
-    // Args for plNetMsgVaultTask msg
-    namespace VaultTaskArgs
-    {
-        enum
-        {
-            kInvalidLow,
-            kHoodTitle,
-            kHoodDesc,
-            kAgePublic,
-            kIntArg1,
-            kIntArg2,
-            kAgeInfoNodeID,
-            kAgeLinkNodeID,
-            kMTStationName,
-            kSpawnPointName,
-            kAgeInfoStruct,
-            kAgeLinkStruct,
-            kAgeFilename,
-            kAgeInstanceGuid,
-            kNodeID,
-            kFriendName,    // Use with key
-            kInviteKey,     // Use with friend
-            kAgeLinkNode,
-        };
+namespace PetitionTypes {
+enum Types {
+    kGeneralHelp = 0,
+    kBug,
+    kFeedback,
+    kExploit,
+    kHarass,
+    kStuck,
+    kTechnical
+};
+}
+
+namespace BuildType {
+enum Types {
+    kUnknown = 0,
+    kDebug,
+    kInternalRelease,
+    kExternalRelease
+};
+
+inline const char* BuildTypeStr(int rule)
+{
+    switch (rule) {
+    case kDebug:
+        return "Dbg";
+
+    case kInternalRelease:
+        return "IntRel";
+
+    case kExternalRelease:
+        return "ExtRel";
+
+    default:
+        return "UNKNOWN";
     }
-
-    ////////////////////////////////////////////////////////////////
-    namespace Accounts
-    {
-        namespace Reserved
-        {
-            const char * GetReservedAvatarShape( const char * playerName, const char * currShapeName );
-            void GetReservedPlayerNames( std::vector<std::string> & out );
-            bool IsReservedPlayerName( const char * name );
-        }
-    }
-
-    ////////////////////////////////////////////////////////////////
-    namespace LinkingRules
-    {
-        enum Rules
-        {
-            // Link to public age: Use PLS-MCP load balancing rules. Don't remember this link in KI/vault.
-            kBasicLink,
-            // Link and create a book in the AgesIOwn folder
-            kOriginalBook,
-            // Link to a sub age of current age.
-            kSubAgeBook,
-            // Link using info from my AgesIOwn folder
-            kOwnedBook,
-            // Link using info from my AgesICanVisit folder
-            kVisitBook,
-            // Link to a child age of current age.
-            kChildAgeBook,
-        };
-
-        inline const char * LinkingRuleStr( int rule )
-        {
-            switch ( rule )
-            {
-            case kBasicLink:            return "kBasicLink";
-            case kOriginalBook:         return "kOriginalBook";
-            case kSubAgeBook:           return "kSubAgeBook";
-            case kOwnedBook:            return "kOwnedBook";
-            case kVisitBook:            return "kVisitBook";
-            case kChildAgeBook:         return "kChildAgeBook";
-            default: return "UNKNOWN LINKING RULE";
-            }
-        }
-    }
-
-    namespace PetitionTypes
-    {
-        enum Types
-        {
-            kGeneralHelp = 0,
-            kBug,
-            kFeedback,
-            kExploit,
-            kHarass,
-            kStuck,
-            kTechnical
-        };
-    }
-
-    namespace BuildType
-    {
-        enum Types
-        {
-            kUnknown = 0,
-            kDebug,
-            kInternalRelease,
-            kExternalRelease
-        };
-
-        inline const char * BuildTypeStr( int rule )
-        {
-            switch ( rule )
-            {
-            case kDebug:                return "Dbg";
-            case kInternalRelease:      return "IntRel";
-            case kExternalRelease:      return "ExtRel";
-            default:                    return "UNKNOWN";
-            }
-        }
-    }
+}
+}
 }
 
 #endif // PLNETCOMMON_CONSTANTS_ONLY

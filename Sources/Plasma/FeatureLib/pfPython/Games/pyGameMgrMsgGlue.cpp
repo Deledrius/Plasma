@@ -76,10 +76,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameMgrMsg, upcastToInviteRevokedMsg)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameMgrMsg)
-    PYTHON_METHOD_NOARGS(ptGameMgrMsg, getType, "Returns the type of the message (see PtGameMgrMsgTypes)"),
-    PYTHON_METHOD_NOARGS(ptGameMgrMsg, upcastToInviteReceivedMsg, "Returns this message as a ptGameMgrInviteReceivedMsg"),
-    PYTHON_METHOD_NOARGS(ptGameMgrMsg, upcastToInviteRevokedMsg, "Returns this message as a ptGameMgrInviteRevokedMsg"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameMgrMsg, getType, "Returns the type of the message (see PtGameMgrMsgTypes)"),
+                     PYTHON_METHOD_NOARGS(ptGameMgrMsg, upcastToInviteReceivedMsg, "Returns this message as a ptGameMgrInviteReceivedMsg"),
+                     PYTHON_METHOD_NOARGS(ptGameMgrMsg, upcastToInviteRevokedMsg, "Returns this message as a ptGameMgrInviteRevokedMsg"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptGameMgrMsg, "Message from the game manager");
@@ -88,7 +88,7 @@ PYTHON_EXPOSE_TYPE_DEFINITION(ptGameMgrMsg, pyGameMgrMsg);
 // required functions for PyObject interoperability
 PyObject* pyGameMgrMsg::New(pfGameMgrMsg* msg)
 {
-    ptGameMgrMsg *newObj = (ptGameMgrMsg*)ptGameMgrMsg_type.tp_new(&ptGameMgrMsg_type, NULL, NULL);
+    ptGameMgrMsg* newObj = (ptGameMgrMsg*)ptGameMgrMsg_type.tp_new(&ptGameMgrMsg_type, NULL, NULL);
     newObj->fThis->message = msg;
     return (PyObject*)newObj;
 }
@@ -140,10 +140,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameMgrInviteReceivedMsg, newGameID)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameMgrInviteReceivedMsg)
-    PYTHON_METHOD_NOARGS(ptGameMgrInviteReceivedMsg, inviterID, "Returns the inviter's ID number"),
-    PYTHON_METHOD_NOARGS(ptGameMgrInviteReceivedMsg, gameTypeID, "Returns the game type ID (as a guid string)"),
-    PYTHON_METHOD_NOARGS(ptGameMgrInviteReceivedMsg, newGameID, "Returns the new game's ID number"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameMgrInviteReceivedMsg, inviterID, "Returns the inviter's ID number"),
+                     PYTHON_METHOD_NOARGS(ptGameMgrInviteReceivedMsg, gameTypeID, "Returns the game type ID (as a guid string)"),
+                     PYTHON_METHOD_NOARGS(ptGameMgrInviteReceivedMsg, newGameID, "Returns the new game's ID number"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGameMgrInviteReceivedMsg, pyGameMgrMsg, "Game manager message when an invite is received");
@@ -151,9 +151,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptGameMgrInviteReceivedMsg, pyGameMgrMsg, "Game manage
 // required functions for PyObject interoperability
 PyObject* pyGameMgrInviteReceivedMsg::New(pfGameMgrMsg* msg)
 {
-    ptGameMgrInviteReceivedMsg *newObj = (ptGameMgrInviteReceivedMsg*)ptGameMgrInviteReceivedMsg_type.tp_new(&ptGameMgrInviteReceivedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_GameMgr_InviteReceived))
+    ptGameMgrInviteReceivedMsg* newObj = (ptGameMgrInviteReceivedMsg*)ptGameMgrInviteReceivedMsg_type.tp_new(&ptGameMgrInviteReceivedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_GameMgr_InviteReceived)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -192,10 +195,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameMgrInviteRevokedMsg, newGameID)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameMgrInviteRevokedMsg)
-    PYTHON_METHOD_NOARGS(ptGameMgrInviteRevokedMsg, inviterID, "Returns the inviter's ID number"),
-    PYTHON_METHOD_NOARGS(ptGameMgrInviteRevokedMsg, gameTypeID, "Returns the game type ID (as a guid string)"),
-    PYTHON_METHOD_NOARGS(ptGameMgrInviteRevokedMsg, newGameID, "Returns the new game's ID number"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameMgrInviteRevokedMsg, inviterID, "Returns the inviter's ID number"),
+                     PYTHON_METHOD_NOARGS(ptGameMgrInviteRevokedMsg, gameTypeID, "Returns the game type ID (as a guid string)"),
+                     PYTHON_METHOD_NOARGS(ptGameMgrInviteRevokedMsg, newGameID, "Returns the new game's ID number"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGameMgrInviteRevokedMsg, pyGameMgrMsg, "Game manager message when an invite is received");
@@ -203,9 +206,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptGameMgrInviteRevokedMsg, pyGameMgrMsg, "Game manager
 // required functions for PyObject interoperability
 PyObject* pyGameMgrInviteRevokedMsg::New(pfGameMgrMsg* msg)
 {
-    ptGameMgrInviteRevokedMsg *newObj = (ptGameMgrInviteRevokedMsg*)ptGameMgrInviteRevokedMsg_type.tp_new(&ptGameMgrInviteRevokedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_GameMgr_InviteRevoked))
+    ptGameMgrInviteRevokedMsg* newObj = (ptGameMgrInviteRevokedMsg*)ptGameMgrInviteRevokedMsg_type.tp_new(&ptGameMgrInviteRevokedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_GameMgr_InviteRevoked)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 

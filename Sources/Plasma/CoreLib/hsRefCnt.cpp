@@ -58,8 +58,9 @@ void hsRefCnt::UnRef()
 {
     hsDebugCode(hsThrowIfFalse(fRefCnt >= 1);)
 
-    if (fRefCnt == 1)   // don't decrement if we call delete
+    if (fRefCnt == 1) { // don't decrement if we call delete
         delete this;
-    else
+    } else {
         --fRefCnt;
+    }
 }

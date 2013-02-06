@@ -55,8 +55,7 @@ class hsRAMStream;
 // server into a temporary directory, secured, and deleted on exit. Puts stuff
 // into plStreamSource for us
 ///////////////////////////////////////////////////////////////////////////////
-class pfSecurePreloader : public hsKeyedObject
-{
+class pfSecurePreloader : public hsKeyedObject {
 private:
 
     static pfSecurePreloader*     fInstance;
@@ -86,11 +85,17 @@ public:
     void PreloadManifest(const NetCliAuthFileInfo manifestEntries[], uint32_t entryCount);
     void PreloadNextFile();
     void FilePreloaded(const plFileName& filename, hsStream* stream);
-   
-    plOperationProgress* GetProgressBar() { return fProgress; }
 
-    static pfSecurePreloader* GetInstance() { return fInstance; }
-    static void SetInstance(pfSecurePreloader* instance) { fInstance = instance; }
+    plOperationProgress* GetProgressBar() {
+        return fProgress;
+    }
+
+    static pfSecurePreloader* GetInstance() {
+        return fInstance;
+    }
+    static void SetInstance(pfSecurePreloader* instance) {
+        fInstance = instance;
+    }
 };
 
 #endif // __pfSecurePreloader_h__

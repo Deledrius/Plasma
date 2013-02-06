@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plRefMsg.h"
 
-class plNodeRefMsg : public plGenRefMsg
-{
+class plNodeRefMsg : public plGenRefMsg {
 public:
     enum {
         kDrawable,
@@ -60,10 +59,10 @@ public:
     };
 
     plNodeRefMsg() {}
-    plNodeRefMsg(const plKey &r, uint8_t flags, int8_t which, int8_t type) : plGenRefMsg(r, flags, which, type) {}
+    plNodeRefMsg(const plKey& r, uint8_t flags, int8_t which, int8_t type) : plGenRefMsg(r, flags, which, type) {}
 
-    CLASSNAME_REGISTER( plNodeRefMsg );
-    GETINTERFACE_ANY( plNodeRefMsg, plGenRefMsg );
+    CLASSNAME_REGISTER(plNodeRefMsg);
+    GETINTERFACE_ANY(plNodeRefMsg, plGenRefMsg);
 };
 
 #endif // plNodeRefMsg_inc

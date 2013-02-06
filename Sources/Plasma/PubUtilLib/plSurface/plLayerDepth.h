@@ -45,14 +45,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plLayer.h"
 
-class plLayerDepth : public plLayer
-{
+class plLayerDepth : public plLayer {
 public:
     plLayerDepth();
     virtual ~plLayerDepth();
 
-    CLASSNAME_REGISTER( plLayerDepth );
-    GETINTERFACE_ANY( plLayerDepth, plLayer );
+    CLASSNAME_REGISTER(plLayerDepth);
+    GETINTERFACE_ANY(plLayerDepth, plLayer);
 
 };
 

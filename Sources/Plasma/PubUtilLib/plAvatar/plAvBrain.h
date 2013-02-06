@@ -62,17 +62,16 @@ class plAvTask;
 class plAvTaskMsg;
 class plDebugText;
 
-class plArmatureBrain : public plCreatable
-{
+class plArmatureBrain : public plCreatable {
 public:
     plArmatureBrain();
     virtual ~plArmatureBrain();
-    
-    CLASSNAME_REGISTER( plArmatureBrain );
-    GETINTERFACE_ANY( plArmatureBrain, plCreatable );   
-    
+
+    CLASSNAME_REGISTER(plArmatureBrain);
+    GETINTERFACE_ANY(plArmatureBrain, plCreatable);
+
     virtual bool Apply(double timeNow, float elapsed);
-    virtual void Activate(plArmatureModBase *armature);
+    virtual void Activate(plArmatureModBase* armature);
     virtual void Deactivate() {}
     virtual void Suspend() {}
     virtual void Resume() {}
@@ -80,23 +79,23 @@ public:
     virtual void OnBehaviorStop(uint8_t index) {}
     virtual bool LeaveAge();
     virtual bool IsRunningTask() const;
-    virtual void QueueTask(plAvTask *task);
-    virtual void DumpToDebugDisplay(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt) {}
-    
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual bool MsgReceive(plMessage *msg);
-    
+    virtual void QueueTask(plAvTask* task);
+    virtual void DumpToDebugDisplay(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt) {}
+
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual bool MsgReceive(plMessage* msg);
+
 protected:
     virtual void IProcessTasks(double time, float elapsed);
-    virtual bool IHandleTaskMsg(plAvTaskMsg *msg);
-        
-    typedef std::deque<plAvTask *> plAvTaskQueue;
+    virtual bool IHandleTaskMsg(plAvTaskMsg* msg);
+
+    typedef std::deque<plAvTask*> plAvTaskQueue;
     plAvTaskQueue           fTaskQueue;                     // FIFO queue of tasks we're working on
-    plAvTask                *fCurTask;                      // the task we're working on right now
-    
-    plArmatureModBase *fArmature;
-    plArmatureMod *fAvMod;
+    plAvTask*                fCurTask;                      // the task we're working on right now
+
+    plArmatureModBase* fArmature;
+    plArmatureMod* fAvMod;
     hsTArray<plArmatureBehavior*> fBehaviors;
 };
 

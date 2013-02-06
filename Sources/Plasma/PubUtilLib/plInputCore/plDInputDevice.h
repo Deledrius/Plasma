@@ -48,18 +48,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 struct DIDEVICEOBJECTDATA;
 
-class plDInputDevice : public plInputDevice
-{
+class plDInputDevice : public plInputDevice {
 public:
     plDInputDevice();
     ~plDInputDevice();
 
-    const char* GetInputName() { return "DInput"; }
-    
+    const char* GetInputName() {
+        return "DInput";
+    }
+
     virtual void Update(DIDEVICEOBJECTDATA* js);
 
 protected:
-    float fX,fY;
+    float fX, fY;
 };
 
 

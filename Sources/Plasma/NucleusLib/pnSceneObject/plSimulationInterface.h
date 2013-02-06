@@ -48,8 +48,7 @@ class plPhysical;
 struct hsMatrix44;
 class hsBounds3Ext;
 
-class plSimulationInterface : public plObjInterface
-{
+class plSimulationInterface : public plObjInterface {
 public:
     // Props inc by 1 (bit shift in bitvector).
     enum plSimulationProperties {
@@ -60,7 +59,7 @@ public:
         kWarp_DEAD,                     // keep moving, no colliding (a pattern is emerging here...)
         kUpright_DEAD,                  // stand upright (mainly for the player)
         kPassive,                       // don't push new positions to sceneobject
-        kRotationForces_DEAD,           // rotate using forces 
+        kRotationForces_DEAD,           // rotate using forces
         kCameraAvoidObject_DEAD,        // camera will try and fly around this obsticle
         kPhysAnim,                      // this object is animated, and the animation can apply force
         kStartInactive,                 // deactive this object at start time. will reactivate when hit
@@ -82,14 +81,16 @@ public:
     plSimulationInterface();
     ~plSimulationInterface();
 
-    CLASSNAME_REGISTER( plSimulationInterface );
-    GETINTERFACE_ANY( plSimulationInterface, plObjInterface );
+    CLASSNAME_REGISTER(plSimulationInterface);
+    GETINTERFACE_ANY(plSimulationInterface, plObjInterface);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
-    
+
     void    SetProperty(int prop, bool on);
-    int32_t   GetNumProperties() const { return kNumProps; }
+    int32_t   GetNumProperties() const {
+        return kNumProps;
+    }
 
     // Transform settable only, if you want it get it from the coordinate interface.
     void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);

@@ -57,8 +57,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #   endif // PLASMA_EXTERNAL_RELEASE
 #endif // HS_BUILD_FOR_WIN32
 
-struct plCrashMemLink
-{
+struct plCrashMemLink {
     bool fCrashed;
     bool fSrvReady;
 #ifdef HS_BUILD_FOR_WIN32

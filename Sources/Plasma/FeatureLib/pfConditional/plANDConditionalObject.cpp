@@ -47,77 +47,81 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnModifier/plLogicModBase.h"
 #include "plMessage/plCondRefMsg.h"
 
-plANDConditionalObject::plANDConditionalObject() 
+plANDConditionalObject::plANDConditionalObject()
 {
-    
+
 }
 
 plANDConditionalObject::~plANDConditionalObject()
 {
-    for (int i = 0; i < fChildren.Count(); i++)
-        delete (fChildren[i]);
+    for (int i = 0; i < fChildren.Count(); i++) {
+        delete(fChildren[i]);
+    }
 }
 
 bool plANDConditionalObject::MsgReceive(plMessage* msg)
 {
     plCondRefMsg* pCondMsg = plCondRefMsg::ConvertNoRef(msg);
-    if (pCondMsg)
-    {
-        fChildren[pCondMsg->fWhich] = plConditionalObject::ConvertNoRef( pCondMsg->GetRef() );
+
+    if (pCondMsg) {
+        fChildren[pCondMsg->fWhich] = plConditionalObject::ConvertNoRef(pCondMsg->GetRef());
         return true;
     }
+
     return plConditionalObject::MsgReceive(msg);
 }
 
 void plANDConditionalObject::Evaluate()
 {
-    if (!Satisfied())
-    {
-        for (int i = 0; i < fChildren.Count(); i++)
-        {
-            if (!fChildren[i]->Satisfied())
+    if (!Satisfied()) {
+        for (int i = 0; i < fChildren.Count(); i++) {
+            if (!fChildren[i]->Satisfied()) {
                 return;
+            }
         }
+
         SetSatisfied(true);
         fLogicMod->RequestTrigger();
-    }
-    else
-    {
-        for (int i = 0; i < fChildren.Count(); i++)
-        {
-            if (fChildren[i]->Satisfied())
+    } else {
+        for (int i = 0; i < fChildren.Count(); i++) {
+            if (fChildren[i]->Satisfied()) {
                 return;
+            }
         }
+
         SetSatisfied(false);
     }
 }
 
 void plANDConditionalObject::Reset()
 {
-    for (int i = 0; i < fChildren.Count(); i++)
+    for (int i = 0; i < fChildren.Count(); i++) {
         fChildren[i]->Reset();
+    }
 }
 
 void plANDConditionalObject::Read(hsStream* stream, hsResMgr* mgr)
 {
     plConditionalObject::Read(stream, mgr);
-    
+
     plCondRefMsg* refMsg;
     int n = stream->ReadLE32();
     fChildren.SetCountAndZero(n);
-    for(int i = 0; i < n; i++ )
-    {   
+
+    for (int i = 0; i < n; i++) {
         refMsg = new plCondRefMsg(GetKey(), i);
-        mgr->ReadKeyNotifyMe(stream,refMsg, plRefFlags::kActiveRef);
-    }   
+        mgr->ReadKeyNotifyMe(stream, refMsg, plRefFlags::kActiveRef);
+    }
 }
 
 void plANDConditionalObject::Write(hsStream* stream, hsResMgr* mgr)
 {
     plConditionalObject::Write(stream, mgr);
-    
+
     stream->WriteLE32(fChildren.GetCount());
-    for( int i = 0; i < fChildren.GetCount(); i++ )
+
+    for (int i = 0; i < fChildren.GetCount(); i++) {
         fChildren[i]->Write(stream, mgr);
+    }
 }
 

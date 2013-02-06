@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetCli/pnNcUtils.cpp
-*   
+*
 ***/
 
 #include "Pch.h"
@@ -56,13 +56,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 //============================================================================
-CInputAccumulator::CInputAccumulator () {
+CInputAccumulator::CInputAccumulator()
+{
     buffer.Reserve(1);
     curr = buffer.Ptr();
 }
 
 //============================================================================
-void CInputAccumulator::Add (unsigned count, const uint8_t * data) {
+void CInputAccumulator::Add(unsigned count, const uint8_t* data)
+{
 //  LogMsg(kLogPerf, L"Adding %u bytes to accumulator %p", count, this);
     unsigned offset =  curr - buffer.Ptr();
     buffer.Add(data, count);
@@ -70,9 +72,12 @@ void CInputAccumulator::Add (unsigned count, const uint8_t * data) {
 }
 
 //============================================================================
-bool CInputAccumulator::Get (unsigned count, void * dest) {
-    if (curr + count > buffer.Term())
+bool CInputAccumulator::Get(unsigned count, void* dest)
+{
+    if (curr + count > buffer.Term()) {
         return false;
+    }
+
 //  LogMsg(kLogPerf, L"Removing %u bytes from accumulator %p", count, this);
     memcpy(dest, curr, count);
     curr += count;
@@ -80,18 +85,21 @@ bool CInputAccumulator::Get (unsigned count, void * dest) {
 }
 
 //============================================================================
-bool CInputAccumulator::Eof () const {
+bool CInputAccumulator::Eof() const
+{
     return curr >= buffer.Ptr() + buffer.Count();
 }
 
 //============================================================================
-void CInputAccumulator::Clear () {
+void CInputAccumulator::Clear()
+{
     buffer.SetCount(0);
     curr = buffer.Ptr();
 }
 
 //============================================================================
-void CInputAccumulator::Compact () {
+void CInputAccumulator::Compact()
+{
     unsigned diff = curr - buffer.Ptr();
     unsigned newCount = buffer.Count() - diff;
     buffer.Move(0, diff, newCount);

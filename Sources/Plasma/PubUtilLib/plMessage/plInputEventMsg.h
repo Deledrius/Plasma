@@ -52,66 +52,22 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plKeyEventMsg;
 class plMouseEventMsg;
 
-class plInputEventMsg : public plMessage
-{
+class plInputEventMsg : public plMessage {
 public:
-    enum
-    {
+    enum {
         kConfigure = 0,
     };
     plInputEventMsg();
-    plInputEventMsg(const plKey &s,
-                      const plKey &r,
-                      const double* t);
+    plInputEventMsg(const plKey& s,
+                    const plKey& r,
+                    const double* t);
 
     ~plInputEventMsg();
 
-    CLASSNAME_REGISTER( plInputEventMsg );
-    GETINTERFACE_ANY( plInputEventMsg, plMessage );
+    CLASSNAME_REGISTER(plInputEventMsg);
+    GETINTERFACE_ANY(plInputEventMsg, plMessage);
 
     int fEvent;
-    
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr);
-    void Write(hsStream* stream, hsResMgr* mgr);
-
-    void ReadVersion(hsStream* s, hsResMgr* mgr);
-    void WriteVersion(hsStream* s, hsResMgr* mgr);
-};
-
-
-class plControlEventMsg : public plInputEventMsg
-{
-private:
-    char*               fCmd;
-protected:
-    
-    ControlEventCode    fControlCode;
-    bool                fControlActivated;
-    hsPoint3            fTurnToPt;
-    float              fControlPct;
-public:
-
-    plControlEventMsg();
-    plControlEventMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t);
-    ~plControlEventMsg();
-
-    CLASSNAME_REGISTER( plControlEventMsg );
-    GETINTERFACE_ANY( plControlEventMsg, plInputEventMsg );
-
-    void SetCmdString(const char* cs)       { delete [] fCmd; fCmd=hsStrcpy(cs); }
-    void SetControlCode(ControlEventCode c) { fControlCode = c; }
-    void SetControlActivated(bool b)      { fControlActivated = b; }
-    void SetTurnToPt(hsPoint3 pt)           { fTurnToPt = pt; }
-    void SetControlPct(float p)          { fControlPct = p; }
-
-    ControlEventCode    GetControlCode()    const { return fControlCode; }
-    bool                ControlActivated()  { return fControlActivated; }
-    hsPoint3            GetTurnToPt()       { return fTurnToPt; }
-    float            GetPct()            { return fControlPct; }
-    char*               GetCmdString()      { return fCmd; }
 
     // IO
     void Read(hsStream* stream, hsResMgr* mgr);
@@ -122,8 +78,69 @@ public:
 };
 
 
-class plKeyEventMsg : public plInputEventMsg
-{
+class plControlEventMsg : public plInputEventMsg {
+private:
+    char*               fCmd;
+protected:
+
+    ControlEventCode    fControlCode;
+    bool                fControlActivated;
+    hsPoint3            fTurnToPt;
+    float              fControlPct;
+public:
+
+    plControlEventMsg();
+    plControlEventMsg(const plKey& s,
+                      const plKey& r,
+                      const double* t);
+    ~plControlEventMsg();
+
+    CLASSNAME_REGISTER(plControlEventMsg);
+    GETINTERFACE_ANY(plControlEventMsg, plInputEventMsg);
+
+    void SetCmdString(const char* cs)       {
+        delete [] fCmd;
+        fCmd = hsStrcpy(cs);
+    }
+    void SetControlCode(ControlEventCode c) {
+        fControlCode = c;
+    }
+    void SetControlActivated(bool b)      {
+        fControlActivated = b;
+    }
+    void SetTurnToPt(hsPoint3 pt)           {
+        fTurnToPt = pt;
+    }
+    void SetControlPct(float p)          {
+        fControlPct = p;
+    }
+
+    ControlEventCode    GetControlCode()    const {
+        return fControlCode;
+    }
+    bool                ControlActivated()  {
+        return fControlActivated;
+    }
+    hsPoint3            GetTurnToPt()       {
+        return fTurnToPt;
+    }
+    float            GetPct()            {
+        return fControlPct;
+    }
+    char*               GetCmdString()      {
+        return fCmd;
+    }
+
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr);
+    void Write(hsStream* stream, hsResMgr* mgr);
+
+    void ReadVersion(hsStream* s, hsResMgr* mgr);
+    void WriteVersion(hsStream* s, hsResMgr* mgr);
+};
+
+
+class plKeyEventMsg : public plInputEventMsg {
 protected:
     wchar_t         fKeyChar;
     plKeyDef        fKeyCode;
@@ -135,35 +152,62 @@ protected:
 
 public:
 
-    
+
     plKeyEventMsg();
-    plKeyEventMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t);
+    plKeyEventMsg(const plKey& s,
+                  const plKey& r,
+                  const double* t);
     ~plKeyEventMsg();
 
-    CLASSNAME_REGISTER( plKeyEventMsg );
-    GETINTERFACE_ANY( plKeyEventMsg, plInputEventMsg );
+    CLASSNAME_REGISTER(plKeyEventMsg);
+    GETINTERFACE_ANY(plKeyEventMsg, plInputEventMsg);
 
-    void SetKeyChar(wchar_t key) { fKeyChar = key; }
-    void SetKeyCode(plKeyDef w) { fKeyCode = w; }
-    void SetKeyDown(bool b)   { fKeyDown = b; }
-    void SetShiftKeyDown(bool b)  { fShiftKeyDown = b; }
-    void SetCtrlKeyDown(bool b)   { fCtrlKeyDown = b; }
-    void SetCapsLockKeyDown(bool b)   { fCapsLockKeyDown = b; }
-    void SetRepeat(bool b)    { fRepeat = b; }
-    
-    wchar_t     GetKeyChar() const         { return fKeyChar; }
-    plKeyDef    GetKeyCode() const         { return fKeyCode; }
-    bool        GetKeyDown() const         { return fKeyDown; }
-    bool        GetShiftKeyDown() const    { return fShiftKeyDown; }
-    bool        GetCtrlKeyDown() const     { return fCtrlKeyDown; }
-    bool        GetCapsLockKeyDown() const { return fCapsLockKeyDown; }
-    bool        GetRepeat() const          { return fRepeat; }
+    void SetKeyChar(wchar_t key) {
+        fKeyChar = key;
+    }
+    void SetKeyCode(plKeyDef w) {
+        fKeyCode = w;
+    }
+    void SetKeyDown(bool b)   {
+        fKeyDown = b;
+    }
+    void SetShiftKeyDown(bool b)  {
+        fShiftKeyDown = b;
+    }
+    void SetCtrlKeyDown(bool b)   {
+        fCtrlKeyDown = b;
+    }
+    void SetCapsLockKeyDown(bool b)   {
+        fCapsLockKeyDown = b;
+    }
+    void SetRepeat(bool b)    {
+        fRepeat = b;
+    }
+
+    wchar_t     GetKeyChar() const         {
+        return fKeyChar;
+    }
+    plKeyDef    GetKeyCode() const         {
+        return fKeyCode;
+    }
+    bool        GetKeyDown() const         {
+        return fKeyDown;
+    }
+    bool        GetShiftKeyDown() const    {
+        return fShiftKeyDown;
+    }
+    bool        GetCtrlKeyDown() const     {
+        return fCtrlKeyDown;
+    }
+    bool        GetCapsLockKeyDown() const {
+        return fCapsLockKeyDown;
+    }
+    bool        GetRepeat() const          {
+        return fRepeat;
+    }
 
     // IO
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Read(stream, mgr);
         stream->ReadLE((int32_t*)&fKeyCode);
         fKeyDown = stream->ReadBOOL();
@@ -173,8 +217,7 @@ public:
         fRepeat = stream->ReadBOOL();
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Write(stream, mgr);
         stream->WriteLE32((int32_t)fKeyCode);
         stream->WriteBOOL(fKeyDown);
@@ -186,8 +229,7 @@ public:
 };
 
 
-class plDebugKeyEventMsg : public plInputEventMsg
-{
+class plDebugKeyEventMsg : public plInputEventMsg {
 protected:
     ControlEventCode    fKeyCode;
     bool                fKeyDown;
@@ -197,32 +239,51 @@ protected:
 
 public:
 
-    
+
     plDebugKeyEventMsg();
-    plDebugKeyEventMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t);
+    plDebugKeyEventMsg(const plKey& s,
+                       const plKey& r,
+                       const double* t);
     ~plDebugKeyEventMsg();
 
-    CLASSNAME_REGISTER( plDebugKeyEventMsg );
-    GETINTERFACE_ANY( plDebugKeyEventMsg, plInputEventMsg );
+    CLASSNAME_REGISTER(plDebugKeyEventMsg);
+    GETINTERFACE_ANY(plDebugKeyEventMsg, plInputEventMsg);
 
-    void SetKeyCode(ControlEventCode w) { fKeyCode = w; }
-    void SetKeyDown(bool b)             { fKeyDown = b; }
-    void SetShiftKeyDown(bool b)        { fShiftKeyDown = b; }
-    void SetCtrlKeyDown(bool b)         { fCtrlKeyDown = b; }
-    void SetCapsLockKeyDown(bool b)     { fCapsLockKeyDown = b; }
+    void SetKeyCode(ControlEventCode w) {
+        fKeyCode = w;
+    }
+    void SetKeyDown(bool b)             {
+        fKeyDown = b;
+    }
+    void SetShiftKeyDown(bool b)        {
+        fShiftKeyDown = b;
+    }
+    void SetCtrlKeyDown(bool b)         {
+        fCtrlKeyDown = b;
+    }
+    void SetCapsLockKeyDown(bool b)     {
+        fCapsLockKeyDown = b;
+    }
 
-    ControlEventCode GetKeyCode() const { return fKeyCode; }
-    bool  GetKeyDown() const            { return fKeyDown; }
-    bool  GetShiftKeyDown() const       { return fShiftKeyDown; }
-    bool  GetCtrlKeyDown() const        { return fCtrlKeyDown; }
-    bool  GetCapsLockKeyDown() const    { return fCapsLockKeyDown; }
+    ControlEventCode GetKeyCode() const {
+        return fKeyCode;
+    }
+    bool  GetKeyDown() const            {
+        return fKeyDown;
+    }
+    bool  GetShiftKeyDown() const       {
+        return fShiftKeyDown;
+    }
+    bool  GetCtrlKeyDown() const        {
+        return fCtrlKeyDown;
+    }
+    bool  GetCapsLockKeyDown() const    {
+        return fCapsLockKeyDown;
+    }
 
 
     // IO
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Read(stream, mgr);
         stream->ReadLE((int32_t*)&fKeyCode);
         fKeyDown = stream->ReadBOOL();
@@ -231,8 +292,7 @@ public:
         fCtrlKeyDown = stream->ReadBOOL();
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Write(stream, mgr);
         stream->WriteLE((int32_t)fKeyCode);
         stream->WriteBOOL(fKeyDown);
@@ -242,32 +302,29 @@ public:
     }
 };
 
-class plIMouseXEventMsg : public plInputEventMsg
-{
+class plIMouseXEventMsg : public plInputEventMsg {
 public:
     float   fX;
     int     fWx;
-    
-    plIMouseXEventMsg() : 
-    fX(0),fWx(0) {}
-    plIMouseXEventMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t) : 
-    fX(0),fWx(0) {}
-    ~plIMouseXEventMsg(){}
 
-    CLASSNAME_REGISTER( plIMouseXEventMsg );
-    GETINTERFACE_ANY( plIMouseXEventMsg, plInputEventMsg );
+    plIMouseXEventMsg() :
+        fX(0), fWx(0) {}
+    plIMouseXEventMsg(const plKey& s,
+                      const plKey& r,
+                      const double* t) :
+        fX(0), fWx(0) {}
+    ~plIMouseXEventMsg() {}
 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    CLASSNAME_REGISTER(plIMouseXEventMsg);
+    GETINTERFACE_ANY(plIMouseXEventMsg, plInputEventMsg);
+
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Read(stream, mgr);
         stream->ReadLE(&fX);
         stream->ReadLE(&fWx);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Write(stream, mgr);
         stream->WriteLE(fX);
         stream->WriteLE(fWx);
@@ -275,71 +332,64 @@ public:
 
 };
 
-class plIMouseYEventMsg : public plInputEventMsg
-{
+class plIMouseYEventMsg : public plInputEventMsg {
 public:
     float   fY;
     int     fWy;
 
-    plIMouseYEventMsg() : 
-    fY(0),fWy(0) {}
-    plIMouseYEventMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t) : 
-    fY(0),fWy(0) {}
-    ~plIMouseYEventMsg(){}
+    plIMouseYEventMsg() :
+        fY(0), fWy(0) {}
+    plIMouseYEventMsg(const plKey& s,
+                      const plKey& r,
+                      const double* t) :
+        fY(0), fWy(0) {}
+    ~plIMouseYEventMsg() {}
 
-    CLASSNAME_REGISTER( plIMouseYEventMsg );
-    GETINTERFACE_ANY( plIMouseYEventMsg, plInputEventMsg );
+    CLASSNAME_REGISTER(plIMouseYEventMsg);
+    GETINTERFACE_ANY(plIMouseYEventMsg, plInputEventMsg);
 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Read(stream, mgr);
         stream->ReadLE(&fY);
         stream->ReadLE(&fWy);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Write(stream, mgr);
         stream->WriteLE(fY);
         stream->WriteLE(fWy);
     }
 
 };
-class plIMouseBEventMsg : public plInputEventMsg
-{
+class plIMouseBEventMsg : public plInputEventMsg {
 public:
     short   fButton;
 
-    plIMouseBEventMsg() : 
-    fButton(0) {}
-    plIMouseBEventMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t) : 
-    fButton(0) {}
-    ~plIMouseBEventMsg(){}
+    plIMouseBEventMsg() :
+        fButton(0) {}
+    plIMouseBEventMsg(const plKey& s,
+                      const plKey& r,
+                      const double* t) :
+        fButton(0) {}
+    ~plIMouseBEventMsg() {}
 
-    CLASSNAME_REGISTER( plIMouseBEventMsg );
-    GETINTERFACE_ANY( plIMouseBEventMsg, plInputEventMsg );
+    CLASSNAME_REGISTER(plIMouseBEventMsg);
+    GETINTERFACE_ANY(plIMouseBEventMsg, plInputEventMsg);
 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Read(stream, mgr);
         stream->ReadLE(&fButton);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Write(stream, mgr);
         stream->WriteLE(fButton);
     }
 
 };
 
-class plMouseEventMsg : public plInputEventMsg
-{
-    
+class plMouseEventMsg : public plInputEventMsg {
+
 protected:
 
     float fXPos;
@@ -353,31 +403,54 @@ protected:
 
 public:
     plMouseEventMsg();
-    plMouseEventMsg(const plKey &s, 
-                    const plKey &r, 
+    plMouseEventMsg(const plKey& s,
+                    const plKey& r,
                     const double* t);
     ~plMouseEventMsg();
 
-    CLASSNAME_REGISTER( plMouseEventMsg );
-    GETINTERFACE_ANY( plMouseEventMsg, plInputEventMsg );
-    
-    void SetXPos(float Xpos) { fXPos = Xpos; };
-    void SetYPos(float Ypos) { fYPos = Ypos; };
-    void SetDX(float dX)       { fDX = dX; }
-    void SetDY(float dY)       { fDY = dY; }
-    void SetButton(short _button) { fButton = _button; }
-    void SetWheelDelta(float d) { fWheelDelta = d; }
-    
-    float GetXPos() { return fXPos; }
-    float GetYPos() { return fYPos; }
-    float GetDX()   { return fDX; }
-    float GetDY()   { return fDY; }
-    float GetWheelDelta() { return fWheelDelta; }
-    short GetButton() { return fButton; }
+    CLASSNAME_REGISTER(plMouseEventMsg);
+    GETINTERFACE_ANY(plMouseEventMsg, plInputEventMsg);
+
+    void SetXPos(float Xpos) {
+        fXPos = Xpos;
+    };
+    void SetYPos(float Ypos) {
+        fYPos = Ypos;
+    };
+    void SetDX(float dX)       {
+        fDX = dX;
+    }
+    void SetDY(float dY)       {
+        fDY = dY;
+    }
+    void SetButton(short _button) {
+        fButton = _button;
+    }
+    void SetWheelDelta(float d) {
+        fWheelDelta = d;
+    }
+
+    float GetXPos() {
+        return fXPos;
+    }
+    float GetYPos() {
+        return fYPos;
+    }
+    float GetDX()   {
+        return fDX;
+    }
+    float GetDY()   {
+        return fDY;
+    }
+    float GetWheelDelta() {
+        return fWheelDelta;
+    }
+    short GetButton() {
+        return fButton;
+    }
 
     // IO
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Read(stream, mgr);
         stream->ReadLE(&fXPos);
         stream->ReadLE(&fYPos);
@@ -387,8 +460,7 @@ public:
         stream->ReadLE(&fWheelDelta);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plInputEventMsg::Write(stream, mgr);
         stream->WriteLE(fXPos);
         stream->WriteLE(fYPos);
@@ -399,19 +471,18 @@ public:
     }
 };
 
-class plAvatarInputStateMsg : public plMessage
-{
+class plAvatarInputStateMsg : public plMessage {
 public:
     uint16_t fState;
 
     plAvatarInputStateMsg() : plMessage(), fState(0) {}
     ~plAvatarInputStateMsg() {}
 
-    CLASSNAME_REGISTER( plAvatarInputStateMsg );
-    GETINTERFACE_ANY( plAvatarInputStateMsg, plMessage );
+    CLASSNAME_REGISTER(plAvatarInputStateMsg);
+    GETINTERFACE_ANY(plAvatarInputStateMsg, plMessage);
 
-    void Read(hsStream *s, hsResMgr *mgr);
-    void Write(hsStream *s, hsResMgr *mgr);
+    void Read(hsStream* s, hsResMgr* mgr);
+    void Write(hsStream* s, hsResMgr* mgr);
 
     void ReadVersion(hsStream* s, hsResMgr* mgr);
     void WriteVersion(hsStream* s, hsResMgr* mgr);

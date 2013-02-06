@@ -48,10 +48,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class pyDniCoordinates;
 class plUUID;
 
-class pyDniInfoSource
-{
+class pyDniInfoSource {
 private:
-    mutable char * fAgeName;
+    mutable char* fAgeName;
 
 protected:
     pyDniInfoSource();
@@ -65,14 +64,14 @@ public:
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyDniInfoSource object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyDniInfoSource); // converts a PyObject to a pyDniInfoSource (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     // current coords of the player in current age as a pyDniCoordinates
-    PyObject* GetAgeCoords( void ); // returns pyDniCoordinates
+    PyObject* GetAgeCoords(void);   // returns pyDniCoordinates
     // current time in current age (tbd)
-    uint32_t          GetAgeTime( void ) const;
+    uint32_t          GetAgeTime(void) const;
     // name of current age
-    const char *    GetAgeName( void ) const;
+    const char*     GetAgeName(void) const;
     // unique identifier for this age instance
     plUUID          GetAgeGuid(void) const;
 };

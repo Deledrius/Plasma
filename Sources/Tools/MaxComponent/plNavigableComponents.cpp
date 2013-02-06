@@ -72,8 +72,7 @@ void DummyCodeIncludeFuncNavigablesRegion() {}
 
 CLASS_DESC(plAvLadderComponent, gAvLadderComponentDesc, "(ex)Ladder Component", "(ex)LadderComp", COMP_TYPE_PHYS_TERRAINS, NAV_LADDER_CID)
 
-enum kAvLadderFields
-{
+enum kAvLadderFields {
     kTypeCombo,
     kLoopsInt,
     kTriggerNode,
@@ -83,23 +82,18 @@ enum kAvLadderFields
     kLadderNode,
 };
 
-class plAvLadderComponentProc : public ParamMap2UserDlgProc
-{
+class plAvLadderComponentProc : public ParamMap2UserDlgProc {
 public:
-    enum kLadderTypesEnums
-    {
+    enum kLadderTypesEnums {
         kReallyBig,
         kFourFeet,
         kTwoFeet,
     };
 
-    BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (msg)
-        {
-        case WM_INITDIALOG:
-            {
-                HWND hLadder = GetDlgItem(hWnd,IDC_COMP_NAV_LADDER_COMBO);
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        switch (msg) {
+        case WM_INITDIALOG: {
+                HWND hLadder = GetDlgItem(hWnd, IDC_COMP_NAV_LADDER_COMBO);
 
                 ComboBox_AddString(hLadder, "Big");
                 ComboBox_AddString(hLadder, "4 feet");
@@ -108,31 +102,33 @@ public:
                 int type = map->GetParamBlock()->GetInt(kTypeCombo);
                 ComboBox_SetCurSel(hLadder, type);
             }
+
             return TRUE;
 
         case WM_COMMAND:
-            if (LOWORD(wParam) == IDC_COMP_NAV_LADDER_COMBO && HIWORD(wParam) == CBN_SELCHANGE)
-            {
+            if (LOWORD(wParam) == IDC_COMP_NAV_LADDER_COMBO && HIWORD(wParam) == CBN_SELCHANGE) {
                 //Util fcn found in plEventGroupRefs files in MaxMain
-                HWND hLadder = GetDlgItem(hWnd,IDC_COMP_NAV_LADDER_COMBO);
+                HWND hLadder = GetDlgItem(hWnd, IDC_COMP_NAV_LADDER_COMBO);
                 int idx = ComboBox_GetCurSel(hLadder);
                 map->GetParamBlock()->SetValue(kTypeCombo, 0, idx);
-/*
-                if (idx == kReallyBig)
-                {
-                    map->Enable(kLoopsInt, TRUE);
-//                  map->Invalidate(kLoopsInt);
-                }
-                else
-                {
-                    map->Enable(kLoopsInt, TRUE);
-//                  map->Invalidate(kLoopsInt);
-                }
-*/
+                /*
+                                if (idx == kReallyBig)
+                                {
+                                    map->Enable(kLoopsInt, TRUE);
+                //                  map->Invalidate(kLoopsInt);
+                                }
+                                else
+                                {
+                                    map->Enable(kLoopsInt, TRUE);
+                //                  map->Invalidate(kLoopsInt);
+                                }
+                */
                 return TRUE;
             }
+
             break;
         }
+
         return FALSE;
     }
 
@@ -146,36 +142,36 @@ ParamBlockDesc2 gAvLadderComponentBlock
 
     IDD_COMP_NAV_LADDER, IDS_COMP_NAV_LADDERS, 0, 0, &gAvLadderComponentProc,
 
-    kTypeCombo, _T("Ladder Type"), TYPE_INT, 0,0,
-        end,
+    kTypeCombo, _T("Ladder Type"), TYPE_INT, 0, 0,
+    end,
 
     kDirectionBool, _T("Climbing Direction"),       TYPE_INT,       0, 0,
-        p_ui,       TYPE_RADIO, 2,  IDC_RADIO_UP,   IDC_RADIO_DOWN,
-        p_vals,                     true,           false,
-        end,
+    p_ui,       TYPE_RADIO, 2,  IDC_RADIO_UP,   IDC_RADIO_DOWN,
+    p_vals,                     true,           false,
+    end,
 
-    kLoopsInt,  _T("BigLadderNumLoop"), TYPE_INT, 0, 0, 
-        p_default, 0,
-        p_range, 0, 500,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_INT,
-        IDC_COMP_NAV_LADDER_LOOPS_EDIT, IDC_COMP_NAV_LADDER_LOOPS_SPIN, 0.4,
-        end,
+    kLoopsInt,  _T("BigLadderNumLoop"), TYPE_INT, 0, 0,
+    p_default, 0,
+    p_range, 0, 500,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_INT,
+    IDC_COMP_NAV_LADDER_LOOPS_EDIT, IDC_COMP_NAV_LADDER_LOOPS_SPIN, 0.4,
+    end,
 
     kTriggerNode, _T("Trigger Node"),   TYPE_INODE,     0, 0,
-        p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_NAV_TRIGGER,
-        //p_sclassID,   GEOMOBJECT_CLASS_ID,
-        p_prompt, IDS_COMP_PHYS_CHOSEN_BASE,
-        //p_accessor, &gPhysCoreAccessor,
-        end,
+    p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_NAV_TRIGGER,
+    //p_sclassID,   GEOMOBJECT_CLASS_ID,
+    p_prompt, IDS_COMP_PHYS_CHOSEN_BASE,
+    //p_accessor, &gPhysCoreAccessor,
+    end,
 
     kLadderNode, _T("ladder"),          TYPE_INODE,     0, 0,
-        p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_NAV_LADDER,
-        end,
+    p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_NAV_LADDER,
+    end,
 
     kEnabled,   _T("enabled"),      TYPE_BOOL,      0, 0,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_ENABLED,
-        p_default, TRUE,
-        end,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_ENABLED,
+    p_default, TRUE,
+    end,
 
     end
 );
@@ -189,26 +185,30 @@ plAvLadderComponent::plAvLadderComponent()
 void plAvLadderComponent::CollectNonDrawables(INodeTab& nonDrawables)
 {
     INode* ladderNode = fCompPB->GetINode(kLadderNode);
-    if( ladderNode )
+
+    if (ladderNode) {
         nonDrawables.Append(1, &ladderNode);
+    }
 
     INode* triggerNode = fCompPB->GetINode(kTriggerNode);
-    if( triggerNode )
+
+    if (triggerNode) {
         nonDrawables.Append(1, &triggerNode);
-    
+    }
+
     AddTargetsToList(nonDrawables);
 }
 
-bool plAvLadderComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAvLadderComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fKeys.Reset();
 
     //
     // Create an invisible blocker for the ladder shape, so the avatar won't fall over the side
     //
-    plMaxNode *ladderNode = (plMaxNode*)fCompPB->GetINode(kLadderNode);
-    if (ladderNode)
-    {
+    plMaxNode* ladderNode = (plMaxNode*)fCompPB->GetINode(kLadderNode);
+
+    if (ladderNode) {
         plPhysicalProps* ladderPhys = ladderNode->GetPhysicalProps();
 //      ladderPhys->SetMass(0, ladderNode, pErrMsg);
         ladderPhys->SetBoundsType(plSimDefs::kHullBounds, ladderNode, pErrMsg);
@@ -217,13 +217,11 @@ bool plAvLadderComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
 
         ladderNode->SetDrawable(false);
         ladderNode->SetForceLocal(true);    // Get a coord interface for facing calculations
-    }
-    else
-    {
+    } else {
         pErrMsg->Set(true,
-                    "Ladder Warning",
-                    "Ladder component %s doesn't have the ladder node set",
-                    GetINode()->GetName()).Show();
+                     "Ladder Warning",
+                     "Ladder component %s doesn't have the ladder node set",
+                     GetINode()->GetName()).Show();
         pErrMsg->Set(false);
         return false;
     }
@@ -231,18 +229,23 @@ bool plAvLadderComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
     //
     // Create a detector region for the node we're attached to
     //
-    plPhysicalProps *physProps = node->GetPhysicalProps();
+    plPhysicalProps* physProps = node->GetPhysicalProps();
 
-    plMaxNode *triggerNode = (plMaxNode*)fCompPB->GetINode(kTriggerNode);
-    if (triggerNode)
+    plMaxNode* triggerNode = (plMaxNode*)fCompPB->GetINode(kTriggerNode);
+
+    if (triggerNode) {
         physProps->SetProxyNode(triggerNode, node, pErrMsg);
+    }
 
     physProps->SetGroup(plSimDefs::kGroupDetector, node, pErrMsg);      // this is a detector
-    physProps->SetReportGroup(1<<plSimDefs::kGroupAvatar, node, pErrMsg);   // only fires on local avatars
+    physProps->SetReportGroup(1 << plSimDefs::kGroupAvatar, node, pErrMsg); // only fires on local avatars
     physProps->SetPinned(true, node, pErrMsg);
+
     // only if movable will it have mass (then it will keep track of movements in PhysX)
-    if ( node->IsMovable() || node->IsTMAnimated() )
-        physProps->SetMass(1.0f, node, pErrMsg);                                        // detectors don't move
+    if (node->IsMovable() || node->IsTMAnimated()) {
+        physProps->SetMass(1.0f, node, pErrMsg);    // detectors don't move
+    }
+
     physProps->SetBoundsType(plSimDefs::kHullBounds, node, pErrMsg);
 
     node->SetForceLocal(true);  // force our seek point to be local
@@ -251,15 +254,19 @@ bool plAvLadderComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
     return true;
 }
 
-bool plAvLadderComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAvLadderComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    plMaxNode *ladderNode = (plMaxNode*)fCompPB->GetINode(kLadderNode);
-    if (!ladderNode)
-        return false;
+    plMaxNode* ladderNode = (plMaxNode*)fCompPB->GetINode(kLadderNode);
 
-    plMaxNode *triggerNode = (plMaxNode*)fCompPB->GetINode(kTriggerNode);
-    if (!triggerNode)
+    if (!ladderNode) {
+        return false;
+    }
+
+    plMaxNode* triggerNode = (plMaxNode*)fCompPB->GetINode(kTriggerNode);
+
+    if (!triggerNode) {
         triggerNode = node;
+    }
 
     // Get a vector pointing from the ladder to the detector, for facing calculations
     Point3 ladderViewMax = ladderNode->GetNodeTM(0).GetTrans() - triggerNode->GetNodeTM(0).GetTrans();
@@ -279,12 +286,12 @@ bool plAvLadderComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
     return true;
 }
 
-bool plAvLadderComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAvLadderComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
-bool plAvLadderComponent::DeInit(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAvLadderComponent::DeInit(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fKeys.Reset();
     return true;

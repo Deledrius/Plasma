@@ -51,96 +51,94 @@ class plScalarController;
 // It gets a change in time, and must do whatever necessary to generate the appropriate number of particles
 // for that timespan
 
-class plParticleGenerator : public plCreatable
-{
+class plParticleGenerator : public plCreatable {
 
 public:
     // returns false if it's done generating particles and is safe to delete.
-    virtual bool AddAutoParticles(plParticleEmitter *emitter, float dt, uint32_t numForced = 0) = 0;
+    virtual bool AddAutoParticles(plParticleEmitter* emitter, float dt, uint32_t numForced = 0) = 0;
 
     virtual void UpdateParam(uint32_t paramID, float paramValue) = 0;
 
-    CLASSNAME_REGISTER( plParticleGenerator );
-    GETINTERFACE_ANY( plParticleGenerator, plCreatable );
+    CLASSNAME_REGISTER(plParticleGenerator);
+    GETINTERFACE_ANY(plParticleGenerator, plCreatable);
 
-    static void ComputeDirection(float pitch, float yaw, hsVector3 &direction);
-    static void ComputePitchYaw(float &pitch, float &yaw, const hsVector3 &dir);
-    static inline float GetRandomVar() { return 2.0f * rand() / RAND_MAX - 1; } // returns a num between +/- 1.0
+    static void ComputeDirection(float pitch, float yaw, hsVector3& direction);
+    static void ComputePitchYaw(float& pitch, float& yaw, const hsVector3& dir);
+    static inline float GetRandomVar() {
+        return 2.0f * rand() / RAND_MAX - 1;    // returns a num between +/- 1.0
+    }
 };
 
-class plSimpleParticleGenerator : public plParticleGenerator
-{
+class plSimpleParticleGenerator : public plParticleGenerator {
 public:
     plSimpleParticleGenerator();
     ~plSimpleParticleGenerator();
-    void Init(float genLife, float partLifeMin, float partLifeMax, float particlesPerSecond, 
-              uint32_t numSources, hsPoint3 *pos, float *initPitch, float *initYaw, float angleRange,
-              float initVelMin, float initVelMax, float xSize, float ySize, 
+    void Init(float genLife, float partLifeMin, float partLifeMax, float particlesPerSecond,
+              uint32_t numSources, hsPoint3* pos, float* initPitch, float* initYaw, float angleRange,
+              float initVelMin, float initVelMax, float xSize, float ySize,
               float scaleMin, float scaleMax,
               float massRange, float radsPerSecRange);
 
-    CLASSNAME_REGISTER( plSimpleParticleGenerator );
-    GETINTERFACE_ANY( plSimpleParticleGenerator, plParticleGenerator);
-    
-    virtual bool AddAutoParticles(plParticleEmitter *emitter, float dt, uint32_t numForced);
+    CLASSNAME_REGISTER(plSimpleParticleGenerator);
+    GETINTERFACE_ANY(plSimpleParticleGenerator, plParticleGenerator);
+
+    virtual bool AddAutoParticles(plParticleEmitter* emitter, float dt, uint32_t numForced);
     virtual void UpdateParam(uint32_t paramID, float paramValue);
 
-    virtual void Read(hsStream* s, hsResMgr *mgr); 
-    virtual void Write(hsStream* s, hsResMgr *mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
 protected:
     float fParticlesPerSecond;
     uint32_t fNumSources;
-    hsPoint3 *fInitPos;
-    float *fInitPitch, *fInitYaw;
+    hsPoint3* fInitPos;
+    float* fInitPitch, *fInitYaw;
     float fAngleRange;
     float fVelMin, fVelMax;
     float fXSize, fYSize, fScaleMin, fScaleMax;
     float fGenLife;  // How long shall we spit out particles from this location? When this time runs out, we stop
-                        // spitting particles, but we don't actually die until all of our particles die naturally.
-                        // (Even the ones that we feel are suffering needlessly.)
+    // spitting particles, but we don't actually die until all of our particles die naturally.
+    // (Even the ones that we feel are suffering needlessly.)
 
     float fPartLifeMin; // lifespan for the particles we generate
     float fPartLifeMax;
 
     float fPartInvMassMin;   // Doing a uniform variant over the inverse mass range (instead of over the mass range
     float fPartInvMassRange; // and then inverting) will favor the low end of the mass range, but then again,
-                                // it's just a freaking game. Note though that fPartInvMassMin == 1.f / massMAX.
+    // it's just a freaking game. Note though that fPartInvMassMin == 1.f / massMAX.
 
     float fPartRadsPerSecRange; // Zero means no rot, otherwise uniform random between [-range..range]
 
     float fParticleSum;
 
-    enum
-    {
+    enum {
         kImmortal   = 0x1,
         kDisabled   = 0x2,
     };
     uint32_t fMiscFlags;
 };
 
-class plOneTimeParticleGenerator : public plParticleGenerator
-{
+class plOneTimeParticleGenerator : public plParticleGenerator {
 public:
 
     plOneTimeParticleGenerator();
     ~plOneTimeParticleGenerator();
-    void Init(float count, hsPoint3 *pointArray, hsVector3 *dirArray, 
+    void Init(float count, hsPoint3* pointArray, hsVector3* dirArray,
               float xSize, float ySize, float scaleMin, float scaleMax, float radsPerSec);
 
-    CLASSNAME_REGISTER( plOneTimeParticleGenerator );
-    GETINTERFACE_ANY( plOneTimeParticleGenerator, plParticleGenerator);
+    CLASSNAME_REGISTER(plOneTimeParticleGenerator);
+    GETINTERFACE_ANY(plOneTimeParticleGenerator, plParticleGenerator);
 
-    virtual bool AddAutoParticles(plParticleEmitter *emitter, float dt, uint32_t numForced = 0);
+    virtual bool AddAutoParticles(plParticleEmitter* emitter, float dt, uint32_t numForced = 0);
     virtual void UpdateParam(uint32_t paramID, float paramValue) {}
 
-    virtual void Read(hsStream* s, hsResMgr *mgr); 
-    virtual void Write(hsStream* s, hsResMgr *mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
 protected:
     float fCount;
-    hsPoint3 *fPosition;
-    hsVector3 *fDirection;
+    hsPoint3* fPosition;
+    hsVector3* fDirection;
     float fXSize, fYSize, fScaleMin, fScaleMax;
     float fPartRadsPerSecRange; // Zero means no rot, otherwise uniform random between [-range..range]
 };

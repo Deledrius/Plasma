@@ -79,8 +79,7 @@ struct D3DEnum_DriverInfo;
 struct D3DEnum_DeviceInfo;
 struct D3DEnum_DriverInfo;
 
-class hsG3DDeviceMode
-{
+class hsG3DDeviceMode {
     enum {
         kNone           = 0x0,
         kDiscarded      = 0x1
@@ -93,7 +92,7 @@ protected:
     uint32_t              fDepth;
 
     hsTArray<uint16_t>    fZStencilDepths;    // Array of supported depth/stencil buffer formats.
-                                            // Each entry is of the form: ( stencil bit count << 8 ) | ( depth bit count )
+    // Each entry is of the form: ( stencil bit count << 8 ) | ( depth bit count )
     hsTArray<uint8_t>     fFSAATypes;         // Array of multisample types supported (each one 2-16)
 
     bool                  fCanRenderToCubics;
@@ -102,38 +101,77 @@ public:
     hsG3DDeviceMode();
     ~hsG3DDeviceMode();
 
-    bool operator< (const hsG3DDeviceMode &mode) const;
+    bool operator< (const hsG3DDeviceMode& mode) const;
 
     void Clear();
 
-    bool     GetDiscarded() const { return 0 != (fFlags & kDiscarded); }
-    uint32_t GetWidth() const { return fWidth; }
-    uint32_t GetHeight() const { return fHeight; }
-    uint32_t GetColorDepth() const { return fDepth; }
-    uint8_t  GetNumZStencilDepths( void ) const { return fZStencilDepths.GetCount(); }
-    uint16_t GetZStencilDepth( uint8_t i ) const { return fZStencilDepths[ i ]; }
-    uint8_t  GetNumFSAATypes( void ) const { return fFSAATypes.GetCount(); }
-    uint8_t  GetFSAAType( uint8_t i ) const { return fFSAATypes[ i ]; }
-    bool     GetCanRenderToCubics( void ) const { return fCanRenderToCubics; }
+    bool     GetDiscarded() const {
+        return 0 != (fFlags & kDiscarded);
+    }
+    uint32_t GetWidth() const {
+        return fWidth;
+    }
+    uint32_t GetHeight() const {
+        return fHeight;
+    }
+    uint32_t GetColorDepth() const {
+        return fDepth;
+    }
+    uint8_t  GetNumZStencilDepths(void) const {
+        return fZStencilDepths.GetCount();
+    }
+    uint16_t GetZStencilDepth(uint8_t i) const {
+        return fZStencilDepths[ i ];
+    }
+    uint8_t  GetNumFSAATypes(void) const {
+        return fFSAATypes.GetCount();
+    }
+    uint8_t  GetFSAAType(uint8_t i) const {
+        return fFSAATypes[ i ];
+    }
+    bool     GetCanRenderToCubics(void) const {
+        return fCanRenderToCubics;
+    }
 
-    void SetDiscarded(bool on=true) { if(on) fFlags |= kDiscarded; else fFlags &= ~kDiscarded; }
-    void SetWidth(uint32_t w) { fWidth = w; }
-    void SetHeight(uint32_t h) { fHeight = h; }
-    void SetColorDepth(uint32_t d) { fDepth = d; }
-    void ClearZStencilDepths( void ) { fZStencilDepths.Reset(); }
-    void AddZStencilDepth( uint16_t depth ) { fZStencilDepths.Append( depth ); }
+    void SetDiscarded(bool on = true) {
+        if (on) {
+            fFlags |= kDiscarded;
+        } else {
+            fFlags &= ~kDiscarded;
+        }
+    }
+    void SetWidth(uint32_t w) {
+        fWidth = w;
+    }
+    void SetHeight(uint32_t h) {
+        fHeight = h;
+    }
+    void SetColorDepth(uint32_t d) {
+        fDepth = d;
+    }
+    void ClearZStencilDepths(void) {
+        fZStencilDepths.Reset();
+    }
+    void AddZStencilDepth(uint16_t depth) {
+        fZStencilDepths.Append(depth);
+    }
 
-    void    ClearFSAATypes( void ) { fFSAATypes.Reset(); }
-    void    AddFSAAType( uint8_t type ) { fFSAATypes.Append( type ); }
+    void    ClearFSAATypes(void) {
+        fFSAATypes.Reset();
+    }
+    void    AddFSAAType(uint8_t type) {
+        fFSAATypes.Append(type);
+    }
 
-    void    SetCanRenderToCubics( bool can ) { fCanRenderToCubics = can; }
+    void    SetCanRenderToCubics(bool can) {
+        fCanRenderToCubics = can;
+    }
 
     void Read(hsStream* s);
     void Write(hsStream* s) const;
 };
 
-class hsG3DDeviceRecord
-{
+class hsG3DDeviceRecord {
 public:
     enum {
         kNone           = 0x0,
@@ -152,18 +190,18 @@ protected:
     uint32_t          fRecordVersion;     /// Version starts at 2 (see .cpp for explanation)
     enum {
         kCurrRecordVersion = 0x0b
-        /// Version history:
-        ///     1 - Initial version (had no version #)
-        ///     2 - Added Z and LOD bias
-        ///     3 - Changed Z and LOD bias to floats, added fog tweaks
-        ///     4 - Changed values for fog tweaks; force reload through version #
-        ///     5 - Same as #4, updated fog end bias to be based solely on fog quantization/bit depth
-        ///     6 - Updated values for the ATI boards, Matrox, and i810
-        ///     7 - Added fog knee tweaks
-        ///     8 - Added support for multiple depth/stencil formats per mode
-        ///     9 - Added multisample types to the mode record
-        ///     A - Added anisotropic sample field
-        ///     B - Added flag for cubic textures support
+                             /// Version history:
+                             ///     1 - Initial version (had no version #)
+                             ///     2 - Added Z and LOD bias
+                             ///     3 - Changed Z and LOD bias to floats, added fog tweaks
+                             ///     4 - Changed values for fog tweaks; force reload through version #
+                             ///     5 - Same as #4, updated fog end bias to be based solely on fog quantization/bit depth
+                             ///     6 - Updated values for the ATI boards, Matrox, and i810
+                             ///     7 - Added fog knee tweaks
+                             ///     8 - Added support for multiple depth/stencil formats per mode
+                             ///     9 - Added multisample types to the mode record
+                             ///     A - Added anisotropic sample field
+                             ///     B - Added flag for cubic textures support
     };
 
     /// Version < 2 Data
@@ -190,8 +228,8 @@ protected:
     float   fFogExpApproxStart;
     float   fFogExp2ApproxStart;
     float   fFogEndBias;    // As a percentage of the max value for fog
-                            // (i.e. for Z fog, it's a percentage of 1 to add on,
-                            // for W fog, it's a percentage of the yon)
+    // (i.e. for Z fog, it's a percentage of 1 to add on,
+    // for W fog, it's a percentage of the yon)
 
     /// Version 7 - Fog Knee values
     float   fFogKnees[ kNumFogTypes ];
@@ -212,64 +250,142 @@ public:
     hsG3DDeviceRecord(const hsG3DDeviceRecord& src);
     hsG3DDeviceRecord& operator=(const hsG3DDeviceRecord& src);
 
-    uint32_t  GetG3DDeviceType() const { return fG3DDeviceType; }
+    uint32_t  GetG3DDeviceType() const {
+        return fG3DDeviceType;
+    }
     const char* GetG3DDeviceTypeName() const;
-    uint32_t  GetG3DHALorHEL() const { return fG3DHALorHEL; }
+    uint32_t  GetG3DHALorHEL() const {
+        return fG3DHALorHEL;
+    }
 
-    uint32_t GetMemoryBytes() const { return fMemoryBytes; }
+    uint32_t GetMemoryBytes() const {
+        return fMemoryBytes;
+    }
 
-    const char* GetDriverDesc() const { return fG3DDriverDesc; }
-    const char* GetDriverName() const { return fG3DDriverName; }
-    const char* GetDriverVersion() const { return fG3DDriverVersion; }
-    const char* GetDeviceDesc() const { return fG3DDeviceDesc; }
+    const char* GetDriverDesc() const {
+        return fG3DDriverDesc;
+    }
+    const char* GetDriverName() const {
+        return fG3DDriverName;
+    }
+    const char* GetDriverVersion() const {
+        return fG3DDriverVersion;
+    }
+    const char* GetDeviceDesc() const {
+        return fG3DDeviceDesc;
+    }
 
-    void SetG3DDeviceType(uint32_t t) { fG3DDeviceType = t; }
-    void SetG3DHALorHEL(uint32_t h) { fG3DHALorHEL = h; }
-    void SetMemoryBytes(uint32_t b) { fMemoryBytes = b; }
+    void SetG3DDeviceType(uint32_t t) {
+        fG3DDeviceType = t;
+    }
+    void SetG3DHALorHEL(uint32_t h) {
+        fG3DHALorHEL = h;
+    }
+    void SetMemoryBytes(uint32_t b) {
+        fMemoryBytes = b;
+    }
 
     void SetDriverDesc(const char* s);
     void SetDriverName(const char* s);
     void SetDriverVersion(const char* s);
     void SetDeviceDesc(const char* s);
 
-    bool    GetCap(uint32_t cap) const { return fCaps.IsBitSet(cap); }
-    void    SetCap(uint32_t cap, bool on=true) { fCaps.SetBit(cap, on); }
+    bool    GetCap(uint32_t cap) const {
+        return fCaps.IsBitSet(cap);
+    }
+    void    SetCap(uint32_t cap, bool on = true) {
+        fCaps.SetBit(cap, on);
+    }
 
-    float   GetZBiasRating( void ) const { return fZBiasRating; }
-    void    SetZBiasRating( float rating ) { fZBiasRating = rating; }
+    float   GetZBiasRating(void) const {
+        return fZBiasRating;
+    }
+    void    SetZBiasRating(float rating) {
+        fZBiasRating = rating;
+    }
 
-    float   GetLODBiasRating( void ) const { return fLODBiasRating; }
-    void    SetLODBiasRating( float rating ) { fLODBiasRating = rating; }
+    float   GetLODBiasRating(void) const {
+        return fLODBiasRating;
+    }
+    void    SetLODBiasRating(float rating) {
+        fLODBiasRating = rating;
+    }
 
-    void    GetFogApproxStarts( float &expApprox, float &exp2Approx ) const { expApprox = fFogExpApproxStart;
-                                                                            exp2Approx = fFogExp2ApproxStart; }
-    void    SetFogApproxStarts( float exp, float exp2 ) { fFogExpApproxStart = exp; 
-                                                                fFogExp2ApproxStart = exp2; }
+    void    GetFogApproxStarts(float& expApprox, float& exp2Approx) const {
+        expApprox = fFogExpApproxStart;
+        exp2Approx = fFogExp2ApproxStart;
+    }
+    void    SetFogApproxStarts(float exp, float exp2) {
+        fFogExpApproxStart = exp;
+        fFogExp2ApproxStart = exp2;
+    }
 
-    float   GetFogEndBias( void ) const { return fFogEndBias; }
-    void    SetFogEndBias( float rating ) { fFogEndBias = rating; }
+    float   GetFogEndBias(void) const {
+        return fFogEndBias;
+    }
+    void    SetFogEndBias(float rating) {
+        fFogEndBias = rating;
+    }
 
-    void    GetFogKneeParams( uint8_t type, float &knee, float &kneeVal ) const { knee = fFogKnees[ type ]; kneeVal = fFogKneeVals[ type ]; }
-    void    SetFogKneeParams( uint8_t type, float knee, float kneeVal ) { fFogKnees[ type ] = knee; fFogKneeVals[ type ] = kneeVal; }
+    void    GetFogKneeParams(uint8_t type, float& knee, float& kneeVal) const {
+        knee = fFogKnees[ type ];
+        kneeVal = fFogKneeVals[ type ];
+    }
+    void    SetFogKneeParams(uint8_t type, float knee, float kneeVal) {
+        fFogKnees[ type ] = knee;
+        fFogKneeVals[ type ] = kneeVal;
+    }
 
-    uint32_t  GetLayersAtOnce() const { return fLayersAtOnce; }
-    void    SetLayersAtOnce(uint32_t n) { fLayersAtOnce = n; }
+    uint32_t  GetLayersAtOnce() const {
+        return fLayersAtOnce;
+    }
+    void    SetLayersAtOnce(uint32_t n) {
+        fLayersAtOnce = n;
+    }
 
-    uint8_t   GetAASetting() const { return fAASetting; }
-    void    SetAASetting( uint8_t s ) { fAASetting = s; }
+    uint8_t   GetAASetting() const {
+        return fAASetting;
+    }
+    void    SetAASetting(uint8_t s) {
+        fAASetting = s;
+    }
 
-    uint8_t   GetMaxAnisotropicSamples( void ) const { return fMaxAnisotropicSamples; }
-    void    SetMaxAnisotropicSamples( uint8_t num ) { fMaxAnisotropicSamples = num; }
+    uint8_t   GetMaxAnisotropicSamples(void) const {
+        return fMaxAnisotropicSamples;
+    }
+    void    SetMaxAnisotropicSamples(uint8_t num) {
+        fMaxAnisotropicSamples = num;
+    }
 
-    void SetDiscarded(bool on=true) { if(on)fFlags |= kDiscarded; else fFlags &= ~kDiscarded; }
-    bool GetDiscarded() const { return 0 != (fFlags & kDiscarded); }
+    void SetDiscarded(bool on = true) {
+        if (on) {
+            fFlags |= kDiscarded;
+        } else {
+            fFlags &= ~kDiscarded;
+        }
+    }
+    bool GetDiscarded() const {
+        return 0 != (fFlags & kDiscarded);
+    }
 
-    void    SetInvalid( bool on = true ) { if( on ) fFlags |= kInvalid; else fFlags &= ~kInvalid; }
-    bool    IsInvalid() const { return 0 != ( fFlags & kInvalid ); }
+    void    SetInvalid(bool on = true) {
+        if (on) {
+            fFlags |= kInvalid;
+        } else {
+            fFlags &= ~kInvalid;
+        }
+    }
+    bool    IsInvalid() const {
+        return 0 != (fFlags & kInvalid);
+    }
 
-    hsTArray<hsG3DDeviceMode>& GetModes() { return fModes; }
+    hsTArray<hsG3DDeviceMode>& GetModes() {
+        return fModes;
+    }
 
-    hsG3DDeviceMode* GetMode(int i) const { return &fModes[i]; }
+    hsG3DDeviceMode* GetMode(int i) const {
+        return &fModes[i];
+    }
 
     void ClearModes();
     void Clear();
@@ -279,16 +395,23 @@ public:
     // of the PC. E.g. if the user changes from 16 bit to TrueColor, the Modes that
     // can window are pretty much flipped. So we'll have to pass in enough info (like
     // the hWnd?) to find out what the current setup is to make sure it's compatible.
-    bool ModeCanWindow(void* ctx, hsG3DDeviceMode* mode) { return false; } 
-    void SetPixelShaderVersion(int major, int minor) { fPixelShaderMajorVer = major; fPixelShaderMinorVer = minor; }
-    void GetPixelShaderVersion(int &major, int &minor) { major = fPixelShaderMajorVer; minor = fPixelShaderMinorVer; }
+    bool ModeCanWindow(void* ctx, hsG3DDeviceMode* mode) {
+        return false;
+    }
+    void SetPixelShaderVersion(int major, int minor) {
+        fPixelShaderMajorVer = major;
+        fPixelShaderMinorVer = minor;
+    }
+    void GetPixelShaderVersion(int& major, int& minor) {
+        major = fPixelShaderMajorVer;
+        minor = fPixelShaderMinorVer;
+    }
 
     void Read(hsStream* s);
     void Write(hsStream* s) const;
 };
 
-class hsG3DDeviceModeRecord
-{
+class hsG3DDeviceModeRecord {
 protected:
     hsG3DDeviceRecord       fDevice;
     hsG3DDeviceMode         fMode;
@@ -300,12 +423,15 @@ public:
     hsG3DDeviceModeRecord(const hsG3DDeviceModeRecord& src);
     hsG3DDeviceModeRecord& operator=(const hsG3DDeviceModeRecord& src);
 
-    const hsG3DDeviceRecord*    GetDevice() const { return &fDevice; }
-    const hsG3DDeviceMode*      GetMode() const { return &fMode; }
+    const hsG3DDeviceRecord*    GetDevice() const {
+        return &fDevice;
+    }
+    const hsG3DDeviceMode*      GetMode() const {
+        return &fMode;
+    }
 };
 
-class hsG3DDeviceSelector : public hsRefCnt
-{
+class hsG3DDeviceSelector : public hsRefCnt {
 public:
     enum {
         kDevTypeUnknown     = 0,
@@ -368,8 +494,7 @@ public:
 
         kNumCaps
     };
-    enum
-    {
+    enum {
         kDefaultWidth   = 800,
         kDefaultHeight  = 600,
         kDefaultDepth   = 32
@@ -384,36 +509,36 @@ protected:
     void ITryDirect3DTnLDevice(D3DEnum_DeviceInfo* devInfo, hsG3DDeviceRecord& srcDevRec);
     void ITryDirect3DTnLDriver(D3DEnum_DriverInfo* drivInfo);
     void ITryDirect3DTnL(hsWinRef winRef);
-    bool IInitDirect3D( void );
+    bool IInitDirect3D(void);
 
 #ifdef HS_SELECT_DX7
     void ITryDirect3DDevice(D3DEnum_DeviceInfo* devInfo, hsG3DDeviceRecord& srcDevRec);
     void ITryDirect3DDriver(D3DEnum_DriverInfo* drivInfo);
     void ITryDirect3D(hsWinRef winRef);
 #endif // HS_SELECT_DX7
-    void IFudgeDirectXDevice( hsG3DDeviceRecord &record,
-                                D3DEnum_DriverInfo *driverInfo, D3DEnum_DeviceInfo *deviceInfo );
-    uint32_t  IAdjustDirectXMemory( uint32_t cardMem );
+    void IFudgeDirectXDevice(hsG3DDeviceRecord& record,
+                             D3DEnum_DriverInfo* driverInfo, D3DEnum_DeviceInfo* deviceInfo);
+    uint32_t  IAdjustDirectXMemory(uint32_t cardMem);
 
-    bool      IGetD3DCardInfo( hsG3DDeviceRecord &record, void *driverInfo, void *deviceInfo,
-                               uint32_t *vendorID, uint32_t *deviceID, char **driverString, char **descString );
+    bool      IGetD3DCardInfo(hsG3DDeviceRecord& record, void* driverInfo, void* deviceInfo,
+                              uint32_t* vendorID, uint32_t* deviceID, char** driverString, char** descString);
 #ifdef HS_SELECT_DX7
-    bool    IGetD3D7CardInfo( hsG3DDeviceRecord &record, void *driverInfo, void *deviceInfo,
-                                uint32_t *vendorID, uint32_t *deviceID, char **driverString, char **descString );
+    bool    IGetD3D7CardInfo(hsG3DDeviceRecord& record, void* driverInfo, void* deviceInfo,
+                             uint32_t* vendorID, uint32_t* deviceID, char** driverString, char** descString);
 #endif // HS_SELECT_DX7
 
-    void        ITryOpenGL( hsWinRef winRef );
-    void        IGetExtOpenGLInfo( hsG3DDeviceRecord &devRec );
-    void        IGetOpenGLModes( hsG3DDeviceRecord &devRec, char *driverName );
-    bool        ITestOpenGLRes( int width, int height, int bitDepth, 
-                                hsG3DDeviceRecord &devRec, char *driverName );
+    void        ITryOpenGL(hsWinRef winRef);
+    void        IGetExtOpenGLInfo(hsG3DDeviceRecord& devRec);
+    void        IGetOpenGLModes(hsG3DDeviceRecord& devRec, char* driverName);
+    bool        ITestOpenGLRes(int width, int height, int bitDepth,
+                               hsG3DDeviceRecord& devRec, char* driverName);
 #ifdef HS_OPEN_GL
 #if HS_BUILD_FOR_WIN32
-    uint32_t      ICreateTempOpenGLContext( HDC hDC, bool makeItFull );
+    uint32_t      ICreateTempOpenGLContext(HDC hDC, bool makeItFull);
 #endif
 #endif
 
-    void    ISetFudgeFactors( uint8_t chipsetID, hsG3DDeviceRecord &record );
+    void    ISetFudgeFactors(uint8_t chipsetID, hsG3DDeviceRecord& record);
 
 public:
     hsG3DDeviceSelector();
@@ -423,15 +548,21 @@ public:
     void RemoveDiscarded();
     void RemoveUnusableDevModes(bool bTough); // Removes modes and devices not allowed supported in release
 
-    bool  Init( void );   // Returns false if couldn't init
-    const char  *GetErrorString( void ) { return fErrorString; }
+    bool  Init(void);     // Returns false if couldn't init
+    const char*  GetErrorString(void) {
+        return fErrorString;
+    }
 
     void Enumerate(hsWinRef winRef);
-    hsTArray<hsG3DDeviceRecord>& GetDeviceRecords() { return fRecords; }
+    hsTArray<hsG3DDeviceRecord>& GetDeviceRecords() {
+        return fRecords;
+    }
 
-    bool GetDefault(hsG3DDeviceModeRecord *dmr);
+    bool GetDefault(hsG3DDeviceModeRecord* dmr);
 
-    hsG3DDeviceRecord* GetRecord(int i) { return &fRecords[i]; }
+    hsG3DDeviceRecord* GetRecord(int i) {
+        return &fRecords[i];
+    }
 
     void Read(hsStream* s);
     void Write(hsStream* s);
@@ -439,7 +570,7 @@ public:
 
 
 #define M3DDEMOINFO 1       /// Always compiled now, but only enabled if
-                            /// WIN_INIT has DemoInfoOutput in it
+/// WIN_INIT has DemoInfoOutput in it
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  Demo Debug File header file stuff
@@ -449,34 +580,41 @@ public:
 
 #include "HeadSpin.h"
 
-class plDemoDebugFile
-{
-    public:
-        plDemoDebugFile() { fDemoDebugFP = nil; fIsOpen = false; fEnabled = false; }
-        ~plDemoDebugFile() { IDDFClose(); }
+class plDemoDebugFile {
+public:
+    plDemoDebugFile() {
+        fDemoDebugFP = nil;
+        fIsOpen = false;
+        fEnabled = false;
+    }
+    ~plDemoDebugFile() {
+        IDDFClose();
+    }
 
-        // Static function to write a string to the DDF
-        static void Write( char *string );
+    // Static function to write a string to the DDF
+    static void Write(char* string);
 
-        // Static function to write two strings to the DDF
-        static void Write( char *string1, char *string2 );
+    // Static function to write two strings to the DDF
+    static void Write(char* string1, char* string2);
 
-        // Static function to write a string and a signed integer value to the DDF
-        static void Write( char *string1, int32_t value );
+    // Static function to write a string and a signed integer value to the DDF
+    static void Write(char* string1, int32_t value);
 
-        // Enables or disables the DDF class
-        static void Enable( bool yes ) { fEnabled = yes; }
+    // Enables or disables the DDF class
+    static void Enable(bool yes) {
+        fEnabled = yes;
+    }
 
-    protected:
-        static bool     fIsOpen;
-        static FILE     *fDemoDebugFP;
-        static bool     fEnabled;
+protected:
+    static bool     fIsOpen;
+    static FILE*     fDemoDebugFP;
+    static bool     fEnabled;
 
-        // Opens the DDF for writing
-        static bool     IDDFOpen( void );
+    // Opens the DDF for writing
+    static bool     IDDFOpen(void);
 
-        // Closes the DDF
-        static void     IDDFClose( void );
+    // Closes the DDF
+    static void     IDDFClose(void);
 };
 
 

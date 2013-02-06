@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plNetGameLib/Private/plNglMisc.cpp
-*   
+*
 ***/
 
 #include "../Pch.h"
@@ -67,19 +67,30 @@ static unsigned s_connSequence;
 ***/
 
 //============================================================================
-unsigned ConnNextSequence () {
-    if (!++s_connSequence)
+unsigned ConnNextSequence()
+{
+    if (!++s_connSequence) {
         ++s_connSequence;
+    }
+
     return s_connSequence;
 }
 
 //============================================================================
-unsigned ConnGetId (ENetProtocol protocol) {
+unsigned ConnGetId(ENetProtocol protocol)
+{
     switch (protocol) {
-        case kNetProtocolCli2Auth: return AuthGetConnId();
-        case kNetProtocolCli2Game: return GameGetConnId();
-        case kNetProtocolCli2File: return FileGetConnId();
-        case kNetProtocolCli2GateKeeper: return GateKeeperGetConnId();
+    case kNetProtocolCli2Auth:
+        return AuthGetConnId();
+
+    case kNetProtocolCli2Game:
+        return GameGetConnId();
+
+    case kNetProtocolCli2File:
+        return FileGetConnId();
+
+    case kNetProtocolCli2GateKeeper:
+        return GateKeeperGetConnId();
         DEFAULT_FATAL(protocol);
     }
 }

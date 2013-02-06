@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMultistageMsg.h"
 #include "hsStream.h"
 
-void plMultistageModMsg::Read(hsStream *stream, hsResMgr *mgr)
+void plMultistageModMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
 
@@ -50,8 +50,8 @@ void plMultistageModMsg::Read(hsStream *stream, hsResMgr *mgr)
     fStageNum = stream->ReadByte();
     fNumLoops = stream->ReadByte();
 }
-    
-void plMultistageModMsg::Write(hsStream *stream, hsResMgr *mgr)
+
+void plMultistageModMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(stream, mgr);
 

@@ -89,22 +89,22 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 extern UserPropMgr gUserPropMgr;
 
 #ifdef HS_DEBUGGING
-#define HS_NO_TRY       
+#define HS_NO_TRY
 #endif
 
 //
 // .MSH export module functions follow:
 //
 
-HSExport2::HSExport2() 
+HSExport2::HSExport2()
 {
 }
 
-HSExport2::~HSExport2() 
+HSExport2::~HSExport2()
 {
 }
 
-int HSExport2::ExtCount() 
+int HSExport2::ExtCount()
 {
     return 2;
 }
@@ -112,31 +112,33 @@ int HSExport2::ExtCount()
 //
 // Extensions supported for import/export modules
 //
-const TCHAR *HSExport2::Ext(int n) 
+const TCHAR* HSExport2::Ext(int n)
 {
-static  char str[64];
-    switch(n) 
-    {
-        case 0:
-            return "";
-        case 1:
-            return "prd";
+    static  char str[64];
+
+    switch (n) {
+    case 0:
+        return "";
+
+    case 1:
+        return "prd";
     }
+
     return _T("");
 }
 
 //
 // Long ASCII description (i.e. "Targa 2.0 Image File")
 //
-const TCHAR *HSExport2::LongDesc() 
+const TCHAR* HSExport2::LongDesc()
 {
     return "Plasma 2.0";
 }
 
 //
-// Short ASCII description (i.e. "Targa")   
+// Short ASCII description (i.e. "Targa")
 //
-const TCHAR *HSExport2::ShortDesc() 
+const TCHAR* HSExport2::ShortDesc()
 {
 #ifdef HS_DEBUGGING
     return "Plasma 2.0 Debug";
@@ -148,7 +150,7 @@ const TCHAR *HSExport2::ShortDesc()
 //
 // ASCII Author name
 //
-const TCHAR *HSExport2::AuthorName() 
+const TCHAR* HSExport2::AuthorName()
 {
     return "Billy Bob";
 }
@@ -156,7 +158,7 @@ const TCHAR *HSExport2::AuthorName()
 //
 // ASCII Copyright message
 //
-const TCHAR *HSExport2::CopyrightMessage() 
+const TCHAR* HSExport2::CopyrightMessage()
 {
     return "Copyright 1997 HeadSpin Technology Inc.";
 }
@@ -164,7 +166,7 @@ const TCHAR *HSExport2::CopyrightMessage()
 //
 // Other message #1
 //
-const TCHAR *HSExport2::OtherMessage1() 
+const TCHAR* HSExport2::OtherMessage1()
 {
     return _T("");
 }
@@ -172,7 +174,7 @@ const TCHAR *HSExport2::OtherMessage1()
 //
 // Other message #2
 //
-const TCHAR *HSExport2::OtherMessage2() 
+const TCHAR* HSExport2::OtherMessage2()
 {
     return _T("");
 }
@@ -180,7 +182,7 @@ const TCHAR *HSExport2::OtherMessage2()
 //
 // Version number * 100 (i.e. v3.01 = 301)
 //
-unsigned int HSExport2::Version() 
+unsigned int HSExport2::Version()
 {
     return 100;
 }
@@ -188,48 +190,51 @@ unsigned int HSExport2::Version()
 //
 // Optional
 //
-void HSExport2::ShowAbout(HWND hWnd) 
+void HSExport2::ShowAbout(HWND hWnd)
 {
 }
 
 // Another little helper class to help write out a list of textures to a log file
-class plTextureLoggerCBack : public plRegistryKeyIterator
-{
+class plTextureLoggerCBack : public plRegistryKeyIterator {
 protected:
     plTextureExportLog* fTELog;
 
 public:
-    plTextureLoggerCBack(plTextureExportLog* teLog) { fTELog = teLog; }
+    plTextureLoggerCBack(plTextureExportLog* teLog) {
+        fTELog = teLog;
+    }
 
-    virtual bool EatKey(const plKey& key)
-    {
+    virtual bool EatKey(const plKey& key) {
         plBitmap* bmap = plBitmap::ConvertNoRef(key->ObjectIsLoaded());
-        if (bmap != nil)
+
+        if (bmap != nil) {
             fTELog->AddTexture(bmap);
+        }
+
         return true;    // Always continue
     }
 };
 
 // Yet another key iterator, this one to call OptimizeDrawables() on each sceneNode
-class plOptimizeIterator : public plRegistryKeyIterator
-{
+class plOptimizeIterator : public plRegistryKeyIterator {
 public:
-    virtual bool EatKey(const plKey& key)
-    {
-        if (key->GetUoid().GetClassType() == plSceneNode::Index())
-        {
+    virtual bool EatKey(const plKey& key) {
+        if (key->GetUoid().GetClassType() == plSceneNode::Index()) {
             plSceneNode* sn = plSceneNode::ConvertNoRef(key->ObjectIsLoaded());
-            if (sn != nil)
+
+            if (sn != nil) {
                 sn->OptimizeDrawables();
+            }
         }
+
         return true;    // Always continue
     }
 };
 
 //
 //
-// 
-int HSExport2::DoExport(const TCHAR *name,ExpInterface *ei,Interface *gi, BOOL suppressPrompts, DWORD options)
+//
+int HSExport2::DoExport(const TCHAR* name, ExpInterface* ei, Interface* gi, BOOL suppressPrompts, DWORD options)
 {
     BOOL backupEnabled = gi->AutoBackupEnabled();
     gi->EnableAutoBackup(FALSE);
@@ -238,7 +243,7 @@ int HSExport2::DoExport(const TCHAR *name,ExpInterface *ei,Interface *gi, BOOL s
     TheManager->SetSilentMode(TRUE);
 
     bool mbSuppressPrompts = hsMessageBox_SuppressPrompts;
-    hsMessageBox_SuppressPrompts = (suppressPrompts)?true:false;
+    hsMessageBox_SuppressPrompts = (suppressPrompts) ? true : false;
 
     // Disable save so we don't crash in export or
     // otherwise screw database.
@@ -256,7 +261,7 @@ int HSExport2::DoExport(const TCHAR *name,ExpInterface *ei,Interface *gi, BOOL s
     // Apparently this was implied by the open dialog, but not if you call Max's ExportToFile() func
     SetCurrentDirectoryW(out_path.AsString().ToWchar());
 
-    // 
+    //
     // Setup ErrorMsg
     //
     // Needs to be outside try/catch so it doesn't stack unwind...
@@ -264,19 +269,24 @@ int HSExport2::DoExport(const TCHAR *name,ExpInterface *ei,Interface *gi, BOOL s
 
     TSTR filename = gi->GetCurFileName();
     hsStrncpy(fName, filename, 128);
-    char *dot = strrchr(fName, '.');
-    if (dot)
+    char* dot = strrchr(fName, '.');
+
+    if (dot) {
         *dot = 0;
+    }
+
     char ErrorLogName[512];
     sprintf(ErrorLogName, "%s%s.err", out_path.AsString().c_str(), fName);
     plExportLogErrorMsg logonly_errorMessage(ErrorLogName);     // This errorMessage just writes it all to a file
 
     // now decide which errorMessage object to use
     plErrorMsg* errorMessage;
-    if (suppressPrompts)
+
+    if (suppressPrompts) {
         errorMessage = &logonly_errorMessage;
-    else
+    } else {
         errorMessage = &hituser_errorMessage;
+    }
 
     // For export time stats
     DWORD exportTime = timeGetTime();
@@ -287,9 +297,8 @@ int HSExport2::DoExport(const TCHAR *name,ExpInterface *ei,Interface *gi, BOOL s
     // Let's get cracking!  Convert the scene...
     //
     plConvertSettings settings;
-    
-    if (plExportDlg::Instance().IsExporting())
-    {
+
+    if (plExportDlg::Instance().IsExporting()) {
         settings.fDoPreshade = plExportDlg::Instance().GetDoPreshade();
         settings.fPhysicalsOnly = plExportDlg::Instance().GetPhysicalsOnly();
         settings.fDoLightMap = plExportDlg::Instance().GetDoLightMap();
@@ -309,8 +318,7 @@ int HSExport2::DoExport(const TCHAR *name,ExpInterface *ei,Interface *gi, BOOL s
     CreateDirectoryW(datPath.AsString().ToWchar(), NULL);
     plPluginResManager::ResMgr()->SetDataPath(datPath);
 
-    if (hsgResMgr::Reset())
-    {
+    if (hsgResMgr::Reset()) {
         plSimulationMgr::Init();
         plAvatarMgr::GetInstance();
 
@@ -325,11 +333,10 @@ int HSExport2::DoExport(const TCHAR *name,ExpInterface *ei,Interface *gi, BOOL s
         // Free the material cache.  This will delete unused materials.
         hsMaterialConverter::Instance().FreeMaterialCache(out_path.AsString().c_str());
 
-        if (convertOK)
-        {
+        if (convertOK) {
             // Optimize the drawables
             plOptimizeIterator  optIterator;
-            plPluginResManager::ResMgr()->IterateKeys( &optIterator );
+            plPluginResManager::ResMgr()->IterateKeys(&optIterator);
 
             // And save.
             plPluginResManager::ResMgr()->WriteAllPages();
@@ -337,11 +344,11 @@ int HSExport2::DoExport(const TCHAR *name,ExpInterface *ei,Interface *gi, BOOL s
             // Write out a texture log file
             char textureLog[MAX_PATH];
             sprintf(textureLog, "log\\exportedTextures_%s.log", fName);
-            plTextureExportLog      textureExportLog( textureLog );
-            plTextureLoggerCBack    loggerCallback( &textureExportLog );
-            
-            plPluginResManager::ResMgr()->IterateKeys( &loggerCallback );
-            
+            plTextureExportLog      textureExportLog(textureLog);
+            plTextureLoggerCBack    loggerCallback(&textureExportLog);
+
+            plPluginResManager::ResMgr()->IterateKeys(&loggerCallback);
+
             textureExportLog.Write();
 
             // Moving this to the end of writing the files out. Yes, this means that any unused mipmaps still get
@@ -365,10 +372,10 @@ int HSExport2::DoExport(const TCHAR *name,ExpInterface *ei,Interface *gi, BOOL s
     // Write a log entry to the Db file name for now
     //----------------------------------------------
     hsUNIXStream dbLog;
-    dbLog.Open(name,"at");
+    dbLog.Open(name, "at");
     char str[256];
     exportTime = (timeGetTime() - exportTime) / 1000;
-    sprintf(str,"Export from Max File \"%s\" on %02d/%02d/%4d took %d:%02d\n",filename,tm.wMonth,tm.wDay,tm.wYear, exportTime/60, exportTime%60);
+    sprintf(str, "Export from Max File \"%s\" on %02d/%02d/%4d took %d:%02d\n", filename, tm.wMonth, tm.wDay, tm.wYear, exportTime / 60, exportTime % 60);
     dbLog.WriteString(str);
     dbLog.Close();
 

@@ -56,7 +56,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 void plLogicModBase::ConsoleTrigger(plKey playerKey)
 {
     // Setup the event data in case this is a OneShot responder that needs it
-    proPickedEventData *ed = new proPickedEventData;
+    proPickedEventData* ed = new proPickedEventData;
     ed->fPicker = playerKey;
     ed->fPicked = nil;
     fNotify->AddEvent(ed);
@@ -74,11 +74,11 @@ void plLogicModBase::ConsoleRequestTrigger()
 }
 
 plLogicModBase::plLogicModBase() :
-fCounter(0),
-fCounterLimit(0),
-fTimer(0.0f),
-fNotify(nil),
-fDisabled(false)
+    fCounter(0),
+    fCounterLimit(0),
+    fTimer(0.0f),
+    fNotify(nil),
+    fDisabled(false)
 {
     fNotify = new plNotifyMsg;
 }
@@ -86,8 +86,8 @@ fDisabled(false)
 plLogicModBase::~plLogicModBase()
 {
     int i;
-    for (i = 0; i < fCommandList.Count(); i++ )
-    {
+
+    for (i = 0; i < fCommandList.Count(); i++) {
         hsRefCnt_SafeUnRef(fCommandList[i]);
     }
 
@@ -101,11 +101,11 @@ void plLogicModBase::AddTarget(plSceneObject* so)
 
 void plLogicModBase::RegisterForMessageType(uint16_t hClass)
 {
-    plgDispatch::Dispatch()->RegisterForExactType( hClass, GetKey() ); 
+    plgDispatch::Dispatch()->RegisterForExactType(hClass, GetKey());
 }
 
 //
-// Update generic shared state (which reflects trigger state) on server 
+// Update generic shared state (which reflects trigger state) on server
 // by sending TestAndSet request.  By locking and unlocking the sharedState,
 // we can guarantee that only one logicMod instance can trigger at a time.
 // The server will confirm or deny our request to lock and set the state.
@@ -116,11 +116,11 @@ void plLogicModBase::IUpdateSharedState(bool triggered) const
     plGenericVar* sv = new plGenericVar("Triggered");
     sv->Value().SetBool(triggered); // attempting to set trig state to true
     ss.AddVar(sv);
-    
+
     bool lock = triggered;
 
     // if unlocking, then the server does not need to store this state, since it's back to its default state
-    ss.SetServerMayDelete(!lock);       
+    ss.SetServerMayDelete(!lock);
 
     plNetMsgTestAndSet ts;
     ts.SetNetProtocol(kNetProtocolCli2Game);
@@ -128,57 +128,53 @@ void plLogicModBase::IUpdateSharedState(bool triggered) const
     ts.ObjectInfo()->SetFromKey(GetKey());
     ts.SetLockRequest(lock);        // if triggering, lock state, else unlock state
     plNetClientApp::GetInstance()->SendMsg(&ts);
-    plNetClientApp::GetInstance()->DebugMsg("\tLM: Attempting to set logic mod shared lock to %s, t=%f\n", 
-        triggered ? "Triggered" : "UnTriggered", hsTimer::GetSysSeconds());
+    plNetClientApp::GetInstance()->DebugMsg("\tLM: Attempting to set logic mod shared lock to %s, t=%f\n",
+                                            triggered ? "Triggered" : "UnTriggered", hsTimer::GetSysSeconds());
 }
 
 bool plLogicModBase::MsgReceive(plMessage* msg)
 {
     // read messages:
     plServerReplyMsg* pSMsg = plServerReplyMsg::ConvertNoRef(msg);
-    if (pSMsg)
-    {
+
+    if (pSMsg) {
         hsAssert(pSMsg->GetType() != plServerReplyMsg::kUnInit, "uninit server reply msg");
 
 #if 1
         plNetClientApp::GetInstance()->DebugMsg("LM: LogicModifier %s recvd trigger request reply:%s, wasRequesting=%d, t=%f\n",
-            GetKeyName().c_str(),
-            pSMsg->GetType() == plServerReplyMsg::kDeny ? "denied" : "confirmed", 
-            HasFlag(kRequestingTrigger), hsTimer::GetSysSeconds());
+                                                GetKeyName().c_str(),
+                                                pSMsg->GetType() == plServerReplyMsg::kDeny ? "denied" : "confirmed",
+                                                HasFlag(kRequestingTrigger), hsTimer::GetSysSeconds());
 #endif
 
-        if (pSMsg->GetType() == plServerReplyMsg::kDeny)
-        {
-            if (HasFlag(kRequestingTrigger))
-            {
+        if (pSMsg->GetType() == plServerReplyMsg::kDeny) {
+            if (HasFlag(kRequestingTrigger)) {
                 plNetClientApp::GetInstance()->DebugMsg("\tLM: Denied, clearing requestingTrigger");
                 ClearFlag(kRequestingTrigger);
-            }
-            else
+            } else {
                 plNetClientApp::GetInstance()->DebugMsg("\tLM: Denied, but not requesting?");
-        }
-        else
-        {
-            bool netRequest=false;    // we're triggering as a result of a local activation
+            }
+        } else {
+            bool netRequest = false;  // we're triggering as a result of a local activation
             PreTrigger(netRequest);
             IUpdateSharedState(false /* untriggering */);
         }
+
         return true;
     }
 
     plEnableMsg* pEnable = plEnableMsg::ConvertNoRef(msg);
-    if (pEnable)
-    {
-        if (pEnable->Cmd(plEnableMsg::kDisable))
+
+    if (pEnable) {
+        if (pEnable->Cmd(plEnableMsg::kDisable)) {
             fDisabled = true;
-        else
-        if (pEnable->Cmd(plEnableMsg::kEnable))
-        {
+        } else if (pEnable->Cmd(plEnableMsg::kEnable)) {
             ClearFlag(kTriggered);
             ClearFlag(kRequestingTrigger);
 
             fDisabled = false;
         }
+
         return true;
     }
 
@@ -187,36 +183,32 @@ bool plLogicModBase::MsgReceive(plMessage* msg)
 
 void plLogicModBase::RequestTrigger(bool netRequest)
 {
-    if (HasFlag(kTriggered))
-    {
+    if (HasFlag(kTriggered)) {
 #if 1
         plNetClientApp::GetInstance()->DebugMsg("LM: %s ignoring RequestTrigger(), already triggered, t=%f\n",
-            GetKeyName().c_str(), hsTimer::GetSysSeconds());
+                                                GetKeyName().c_str(), hsTimer::GetSysSeconds());
 #endif
         return;
     }
 
-    if (HasFlag(kRequestingTrigger))
-    {
+    if (HasFlag(kRequestingTrigger)) {
 #if 1
         plNetClientApp::GetInstance()->DebugMsg("LM: %s ignoring RequestTrigger(), already requesting trigger, t=%f\n",
-            GetKeyName().c_str(), hsTimer::GetSysSeconds());
+                                                GetKeyName().c_str(), hsTimer::GetSysSeconds());
 #endif
 
         return;
     }
-    if ( plNetApp::GetInstance()->GetFlagsBit(plNetClientApp::kLocalTriggers))
-    {
+
+    if (plNetApp::GetInstance()->GetFlagsBit(plNetClientApp::kLocalTriggers)) {
         PreTrigger(false);
-    }
-    else
-    {
+    } else {
         IUpdateSharedState(true /* triggering */);  // request arbitration from server
         SetFlag(kRequestingTrigger);
 
 #if 1
         plNetClientApp::GetInstance()->DebugMsg("LM: %s Setting RequestingTriggert=%f\n",
-            GetKeyName().c_str(), hsTimer::GetSysSeconds());
+                                                GetKeyName().c_str(), hsTimer::GetSysSeconds());
 #endif
 
     }
@@ -227,22 +219,23 @@ void plLogicModBase::RequestTrigger(bool netRequest)
 //
 bool plLogicModBase::IEvalCounter()
 {
-    if (fCounterLimit > 0)
-    {   
+    if (fCounterLimit > 0) {
         fCounter = fCounter + 1;
-        if (fCounter != fCounterLimit)
-        {
+
+        if (fCounter != fCounterLimit) {
             Reset(false);
             return false;
-        }   
+        }
     }
+
     return true;
 }
 
 void plLogicModBase::PreTrigger(bool netRequest)
 {
-    if (fDisabled)
+    if (fDisabled) {
         return;
+    }
 
     Trigger(netRequest);
 }
@@ -251,38 +244,44 @@ void plLogicModBase::Trigger(bool netRequest)
 {
 #if 1
     plNetClientApp::GetInstance()->DebugMsg("LogicModifier %s is triggering, activatorType=%d\n",
-        GetKeyName().c_str(), HasFlag(kTypeActivator));
+                                            GetKeyName().c_str(), HasFlag(kTypeActivator));
 #endif
 
     ClearFlag(kRequestingTrigger);
-    if (!HasFlag(kMultiTrigger))
+
+    if (!HasFlag(kMultiTrigger)) {
         SetFlag(kTriggered);
+    }
+
     fNotify->SetSender(this->GetKey());
     fNotify->SetState(1.0f);
     fNotify->AddActivateEvent(true);
 //  hsRefCnt_SafeRef(fNotify);
-    plgDispatch::MsgSend( fNotify );
+    plgDispatch::MsgSend(fNotify);
     CreateNotifyMsg();
-    if (HasFlag(kOneShot))
+
+    if (HasFlag(kOneShot)) {
         fDisabled = true;
+    }
 }
 
 void plLogicModBase::UnTrigger()
 {
-    if (!HasFlag(kTriggered))
+    if (!HasFlag(kTriggered)) {
         return;
+    }
 
 #ifdef HS_DEBUGGING
     char str[256];
-    sprintf(str, "LogicModifier %s is Un-triggering, activatorType=%d\n", 
-        GetKeyName().c_str(), HasFlag(kTypeActivator));
+    sprintf(str, "LogicModifier %s is Un-triggering, activatorType=%d\n",
+            GetKeyName().c_str(), HasFlag(kTypeActivator));
     plNetClientApp::GetInstance()->DebugMsg(str);
 #endif
     fNotify->SetSender(this->GetKey());
     fNotify->SetState(0.0f);
     fNotify->AddActivateEvent(false);
 //  hsRefCnt_SafeRef(fNotify);
-    plgDispatch::MsgSend( fNotify );
+    plgDispatch::MsgSend(fNotify);
     CreateNotifyMsg();
     Reset(true);
 }
@@ -290,15 +289,19 @@ void plLogicModBase::UnTrigger()
 void plLogicModBase::Reset(bool bCounterReset)
 {
     ClearFlag(kTriggered);
-    if (bCounterReset)
+
+    if (bCounterReset) {
         fCounter = 0;
+    }
 }
 
 void plLogicModBase::CreateNotifyMsg()
-{   
+{
     fNotify = new plNotifyMsg;
-    for (int i = 0; i < fReceiverList.Count(); i++)
+
+    for (int i = 0; i < fReceiverList.Count(); i++) {
         fNotify->AddReceiver(fReceiverList[i]);
+    }
 }
 
 void plLogicModBase::AddNotifyReceiver(plKey receiver)
@@ -312,29 +315,37 @@ void plLogicModBase::Read(hsStream* stream, hsResMgr* mgr)
     plSingleModifier::Read(stream, mgr);
     int n = stream->ReadLE32();
     fCommandList.SetCountAndZero(n);
-    for(int i = 0; i < n; i++ )
-    {   
+
+    for (int i = 0; i < n; i++) {
         plMessage* pMsg =  plMessage::ConvertNoRef(mgr->ReadCreatable(stream));
         fCommandList[i] = pMsg;
     }
-    if (fNotify)
+
+    if (fNotify) {
         delete fNotify;
+    }
+
     plNotifyMsg* pNMsg =  plNotifyMsg::ConvertNoRef(mgr->ReadCreatable(stream));
     fNotify = pNMsg;
 
     fFlags.Read(stream);
     fDisabled = stream->ReadBool();
-    for (int d = 0; d < fNotify->GetNumReceivers(); d++)
+
+    for (int d = 0; d < fNotify->GetNumReceivers(); d++) {
         fReceiverList.Append(fNotify->GetReceiver(d));
+    }
 }
 
 void plLogicModBase::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Write(stream, mgr);
     stream->WriteLE32(fCommandList.GetCount());
-    for(int i = 0; i < fCommandList.GetCount(); i++ )
-        mgr->WriteCreatable( stream, fCommandList[i] );
-    mgr->WriteCreatable( stream, fNotify );
+
+    for (int i = 0; i < fCommandList.GetCount(); i++) {
+        mgr->WriteCreatable(stream, fCommandList[i]);
+    }
+
+    mgr->WriteCreatable(stream, fNotify);
     fFlags.Write(stream);
     stream->WriteBool(fDisabled);
 }

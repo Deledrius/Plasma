@@ -75,17 +75,16 @@ class plOneShotCallbacks;
     operations, such as a blend tree, etc. Each frame it fires
     all its applicators, or (ideally) only those that need to be fired.
     */
-class plAGModifier : public plSingleModifier
-{
+class plAGModifier : public plSingleModifier {
 public:
     /** Default constructor, primarily for the class factory. */
     plAGModifier();
 
-    /** Construct given a name. This name will be used to match up 
+    /** Construct given a name. This name will be used to match up
         incoming channels with this modifier. You may also supply an
         autoApply parameter, which indicates whether this modifier
         should apply itself every frame, or only when explicitly asked to. */
-    plAGModifier(const plString &name, bool autoApply = true);
+    plAGModifier(const plString& name, bool autoApply = true);
 
     /** It's a destructor. Destroys the name passed into the constructor,
         and a bunch of other stuff you don't need to know anything about. */
@@ -94,43 +93,45 @@ public:
     /** Get the name of the channel controlled by this modifier. */
     plString GetChannelName() const;
     /** Change the channel name of the modifier. Will delete the previous
-        name. Will NOT remove any channels that are already attached, so 
+        name. Will NOT remove any channels that are already attached, so
         you could wind up with a modifier named "Fred" and a bunch of
         channels attached to it that were intended for "Lamont." */
-    void SetChannelName(const plString & name);
+    void SetChannelName(const plString& name);
 
     /** Attach a new applicator to our modifier. Will arbitrate with existing
         modifiers if necessary, based on pin type. May destruct existing applicators. */
-    plAGChannel *MergeChannel(plAGApplicator *app, plAGChannel *chan, plScalarChannel *blend,
-                              plAGAnimInstance *anim, int priority);
+    plAGChannel* MergeChannel(plAGApplicator* app, plAGChannel* chan, plScalarChannel* blend,
+                              plAGAnimInstance* anim, int priority);
     /** Remove the given channel. Will also remove the channel's applicator. */
-    bool DetachChannel(plAGChannel * channel);
+    bool DetachChannel(plAGChannel* channel);
 
     /** Set the applicator for a modifier.
         \deprecated */
-    void SetApplicator(plAGApplicator *app);
+    void SetApplicator(plAGApplicator* app);
     /** Get the applicator for a given pintype. Note that an ag modifier can
         only have one applicator of a given pin type attached at a time.
         The exception is for the unknown pin type, which never conflicts
         with any other pin type, including itself. */
-    plAGApplicator *GetApplicator(plAGPinType pin) const;
+    plAGApplicator* GetApplicator(plAGPinType pin) const;
 
     /** Apply the animation for our scene object. */
     void Apply(double time) const;
 
     /** Get the channel tied to our ith applicator */
-    plAGChannel * GetChannel(int i) { return fApps[i]->GetChannel(); }
+    plAGChannel* GetChannel(int i) {
+        return fApps[i]->GetChannel();
+    }
 
     void Enable(bool val);
 
     // PERSISTENCE
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plAGModifier );
-    GETINTERFACE_ANY( plAGModifier, plSingleModifier );
-    
+    CLASSNAME_REGISTER(plAGModifier);
+    GETINTERFACE_ANY(plAGModifier, plSingleModifier);
+
 protected:
     typedef std::vector<plAGApplicator*> plAppTable;
     plAppTable fApps;           // the applicators (with respective channels) that we're applying to our scene object
@@ -142,24 +143,36 @@ protected:
     // APPLYING THE ANIMATION
     virtual bool IEval(double secs, float del, uint32_t dirty);
 
-    virtual bool IHandleCmd(plAnimCmdMsg* modMsg) { return false; } // only plAGMasterMod should handle these
+    virtual bool IHandleCmd(plAnimCmdMsg* modMsg) {
+        return false;    // only plAGMasterMod should handle these
+    }
     virtual void IApplyDynamic() {};    // dummy function required by base class
 
     // INTERNAL ACCESSORS FOR SCENE OBJECT INTERFACES
-    plAudioInterface * LeakAI() const { return IGetTargetAudioInterface(0); };
-    plCoordinateInterface * LeakCI() const { return IGetTargetCoordinateInterface(0); };
-    plDrawInterface * LeakDI() const { return IGetTargetDrawInterface(0); };
-    plSimulationInterface * LeakSI() const { return IGetTargetSimulationInterface(0); };
-    plObjInterface * LeakGI(uint32_t classIdx) const { return IGetTargetGenericInterface(0, classIdx); }
+    plAudioInterface* LeakAI() const {
+        return IGetTargetAudioInterface(0);
+    };
+    plCoordinateInterface* LeakCI() const {
+        return IGetTargetCoordinateInterface(0);
+    };
+    plDrawInterface* LeakDI() const {
+        return IGetTargetDrawInterface(0);
+    };
+    plSimulationInterface* LeakSI() const {
+        return IGetTargetSimulationInterface(0);
+    };
+    plObjInterface* LeakGI(uint32_t classIdx) const {
+        return IGetTargetGenericInterface(0, classIdx);
+    }
 
-    friend plAudioInterface * plAGApplicator::IGetAI(const plAGModifier * modifier) const;
-    friend plCoordinateInterface * plAGApplicator::IGetCI(const plAGModifier * modifier) const;
-    friend plDrawInterface * plAGApplicator::IGetDI(const plAGModifier * modifier) const;
-    friend plSimulationInterface * plAGApplicator::IGetSI(const plAGModifier * modifier) const;
-    friend plObjInterface * plAGApplicator::IGetGI(const plAGModifier * modifier, uint16_t classIdx) const;
+    friend plAudioInterface* plAGApplicator::IGetAI(const plAGModifier* modifier) const;
+    friend plCoordinateInterface* plAGApplicator::IGetCI(const plAGModifier* modifier) const;
+    friend plDrawInterface* plAGApplicator::IGetDI(const plAGModifier* modifier) const;
+    friend plSimulationInterface* plAGApplicator::IGetSI(const plAGModifier* modifier) const;
+    friend plObjInterface* plAGApplicator::IGetGI(const plAGModifier* modifier, uint16_t classIdx) const;
 
 };
-const plModifier * FindModifierByClass(const plSceneObject *obj, int classID);
+const plModifier* FindModifierByClass(const plSceneObject* obj, int classID);
 
 
 #endif

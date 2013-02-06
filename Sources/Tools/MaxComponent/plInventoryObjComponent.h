@@ -58,7 +58,7 @@ class plMaxNode;
     is over an object that can be taken.
 
         member functions:
-            
+
             bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
 
             bool PreConvert(plMaxNode *node, plErrorMsg* pErrMsg);
@@ -75,12 +75,11 @@ class plMaxNode;
 
 
 
-class plInventoryObjComponent : public plClickableComponent
-{
+class plInventoryObjComponent : public plClickableComponent {
 public:
     typedef std::map<plMaxNode*, plKey> LogicKeys;
 protected:
-    
+
     hsTArray<plKey> fReceivers;
     LogicKeys fLogicModKeys;
 
@@ -90,7 +89,7 @@ public:
     /*!
         Herein the ClassDesc2 object that is used extensively by the ParamBlock2
         has gained accessibiltiy.  Auto-Creation of the UI is done here as well.
-    
+
     */
     plInventoryObjComponent();
 
@@ -98,7 +97,7 @@ public:
     // of properties on the MaxNode, as it's still indeterminant.
 
     //! plInventoryObjComponent PreConvert, takes in two variables and return a bool.
-    /*! 
+    /*!
         Calls the function MaybeMakeLocal() and Sets Drawable to false.
 
         Takes in two variables, being:
@@ -109,12 +108,12 @@ public:
         \sa DeleteThis(), plPhysicalCoreComponent(), Convert(), GetParamVals(), MaybeMakeLocal() and FixUpPhysical()
     */
 
-    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    bool PreConvert(plMaxNode *node, plErrorMsg* pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual void AddReceiverKey(plKey key, plMaxNode* node=nil);
+    virtual void AddReceiverKey(plKey key, plMaxNode* node = nil);
     virtual plKey GetLogicKey(plMaxNode* node);
     const LogicKeys& GetLogicKeys();
 

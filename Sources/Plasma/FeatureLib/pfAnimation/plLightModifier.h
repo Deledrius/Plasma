@@ -53,8 +53,7 @@ class plOmniLightInfo;
 class plSpotLightInfo;
 class plLimitedDirLightInfo;
 
-class plLightModifier : public plSimpleModifier
-{
+class plLightModifier : public plSimpleModifier {
 protected:
 
     plController*       fColorCtl;
@@ -70,8 +69,8 @@ public:
     plLightModifier();
     virtual ~plLightModifier();
 
-    CLASSNAME_REGISTER( plLightModifier );
-    GETINTERFACE_ANY( plLightModifier, plSimpleModifier );
+    CLASSNAME_REGISTER(plLightModifier);
+    GETINTERFACE_ANY(plLightModifier, plSimpleModifier);
 
     virtual void AddTarget(plSceneObject* so);
     virtual void RemoveTarget(plSceneObject* so);
@@ -79,19 +78,26 @@ public:
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    virtual bool HasAnima() const { return fColorCtl || fAmbientCtl || fSpecularCtl; }
+    virtual bool HasAnima() const {
+        return fColorCtl || fAmbientCtl || fSpecularCtl;
+    }
 
     // Export only
-    void SetColorCtl(plController* ctl) { fColorCtl = ctl; }
-    void SetAmbientCtl(plController* ctl) { fAmbientCtl = ctl; }
-    void SetSpecularCtl(plController* ctl) { fSpecularCtl = ctl; }
+    void SetColorCtl(plController* ctl) {
+        fColorCtl = ctl;
+    }
+    void SetAmbientCtl(plController* ctl) {
+        fAmbientCtl = ctl;
+    }
+    void SetSpecularCtl(plController* ctl) {
+        fSpecularCtl = ctl;
+    }
 
     virtual void DefaultAnimation();
     virtual float MaxAnimLength(float len) const;
 };
 
-class plOmniModifier : public plLightModifier
-{
+class plOmniModifier : public plLightModifier {
 protected:
 
     plOmniLightInfo*    fOmni;
@@ -106,8 +112,8 @@ public:
     plOmniModifier();
     virtual ~plOmniModifier();
 
-    CLASSNAME_REGISTER( plOmniModifier );
-    GETINTERFACE_ANY( plOmniModifier, plLightModifier );
+    CLASSNAME_REGISTER(plOmniModifier);
+    GETINTERFACE_ANY(plOmniModifier, plLightModifier);
 
     virtual void AddTarget(plSceneObject* so);
     virtual void RemoveTarget(plSceneObject* so);
@@ -115,17 +121,22 @@ public:
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    virtual bool HasAnima() const { return plLightModifier::HasAnima() || fAttenCtl; }
+    virtual bool HasAnima() const {
+        return plLightModifier::HasAnima() || fAttenCtl;
+    }
 
     // Export Only
-    void SetAttenCtl(plController* ctl) { fAttenCtl = ctl; }
-    void SetInitAtten(const hsPoint3& p) { fInitAtten = p; }
+    void SetAttenCtl(plController* ctl) {
+        fAttenCtl = ctl;
+    }
+    void SetInitAtten(const hsPoint3& p) {
+        fInitAtten = p;
+    }
 
     virtual float MaxAnimLength(float len) const;
 };
 
-class plSpotModifier : public plOmniModifier
-{
+class plSpotModifier : public plOmniModifier {
 protected:
 
     plSpotLightInfo*         fSpot;
@@ -140,8 +151,8 @@ public:
     plSpotModifier();
     virtual ~plSpotModifier();
 
-    CLASSNAME_REGISTER( plSpotModifier );
-    GETINTERFACE_ANY( plSpotModifier, plLightModifier );
+    CLASSNAME_REGISTER(plSpotModifier);
+    GETINTERFACE_ANY(plSpotModifier, plLightModifier);
 
     virtual void AddTarget(plSceneObject* so);
     virtual void RemoveTarget(plSceneObject* so);
@@ -149,17 +160,22 @@ public:
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    virtual bool HasAnima() const { return plOmniModifier::HasAnima() || fInnerCtl || fOuterCtl; }
+    virtual bool HasAnima() const {
+        return plOmniModifier::HasAnima() || fInnerCtl || fOuterCtl;
+    }
 
     // Export Only
-    void SetInnerCtl(plController* ctl) { fInnerCtl = ctl; }
-    void SetOuterCtl(plController* ctl) { fOuterCtl = ctl; }
+    void SetInnerCtl(plController* ctl) {
+        fInnerCtl = ctl;
+    }
+    void SetOuterCtl(plController* ctl) {
+        fOuterCtl = ctl;
+    }
 
     virtual float MaxAnimLength(float len) const;
 };
 
-class plLtdDirModifier : public plLightModifier
-{
+class plLtdDirModifier : public plLightModifier {
 protected:
 
     plLimitedDirLightInfo*      fLtdDir;
@@ -175,8 +191,8 @@ public:
     plLtdDirModifier();
     virtual ~plLtdDirModifier();
 
-    CLASSNAME_REGISTER( plLtdDirModifier );
-    GETINTERFACE_ANY( plLtdDirModifier, plLightModifier );
+    CLASSNAME_REGISTER(plLtdDirModifier);
+    GETINTERFACE_ANY(plLtdDirModifier, plLightModifier);
 
     virtual void AddTarget(plSceneObject* so);
     virtual void RemoveTarget(plSceneObject* so);
@@ -184,12 +200,20 @@ public:
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    virtual bool HasAnima() const { return plLightModifier::HasAnima() || fWidthCtl || fHeightCtl || fDepthCtl; }
+    virtual bool HasAnima() const {
+        return plLightModifier::HasAnima() || fWidthCtl || fHeightCtl || fDepthCtl;
+    }
 
     // Export Only
-    void SetWidthCtl(plController* ctl) { fWidthCtl = ctl; }
-    void SetHeightCtl(plController* ctl) { fHeightCtl = ctl; }
-    void SetDepthCtl(plController* ctl) { fDepthCtl = ctl; }
+    void SetWidthCtl(plController* ctl) {
+        fWidthCtl = ctl;
+    }
+    void SetHeightCtl(plController* ctl) {
+        fHeightCtl = ctl;
+    }
+    void SetDepthCtl(plController* ctl) {
+        fDepthCtl = ctl;
+    }
 
     virtual float MaxAnimLength(float len) const;
 };

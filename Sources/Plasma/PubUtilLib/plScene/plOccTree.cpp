@@ -48,14 +48,17 @@ void plOccTree::AddPoly(plPolygon* poly)
 
 void plOccTree::MakeOccTree()
 {
-    if( !fBasePolys.GetCount() )
+    if (!fBasePolys.GetCount()) {
         return;
+    }
 
     ISortBasePolys();
 
     int i;
-    for( i = 0; i < fBasePolys.GetCount(); i++ )
+
+    for (i = 0; i < fBasePolys.GetCount(); i++) {
         fRoot = IAddPolyRecur(fRoot, fBasePolys[i], false);
+    }
 
     fBasePolys.SetCount(0);
 }
@@ -66,25 +69,25 @@ plOccNode* poOccTree::IMakeSubTree(plOccPoly* poly)
     plOccNode* lastNode = nil;
 
     int i;
-    for( i = 0; i < poly->fVerts.GetCount(); i++ )
-    {
-        if( poly->fEdgeFlags[i] & plOccPoly::kEdgeClipped )
+
+    for (i = 0; i < poly->fVerts.GetCount(); i++) {
+        if (poly->fEdgeFlags[i] & plOccPoly::kEdgeClipped) {
             continue;
+        }
 
         nextNode = fNodePool.Append();
         nextNode->fFlags = 0;
         nextNode->fOutChild = nil;
 
-        int j = i+1 < poly->fVerts.GetCount() ? i+1 : 0;
+        int j = i + 1 < poly->fVerts.GetCount() ? i + 1 : 0;
 
         // Need to set the viewplane here. Calc once per base poly and use
         // that for fragments?
         nextNode->Init(poly->fVerts[i], poly->fVerts[j], fViewPos);
 
-        if( nextNode->fInChild = lastChild )
+        if (nextNode->fInChild = lastChild) {
             nextNode->fFlags = plOccNode::kHasInChild;
-        else
-        {
+        } else {
             nextNode->fInChild = fNodePool.Append();
             nextNode->fInChild->Init(poly, false);
         }
@@ -94,8 +97,7 @@ plOccNode* poOccTree::IMakeSubTree(plOccPoly* poly)
 
     // If we have no nextNode, all our edges were clipped. In
     // that case, we'll just return an "out" leaf.
-    if( !nextNode )
-    {
+    if (!nextNode) {
         nextNode = fNodePool.Append();
         nextNode->fFlags = 0;
         nextNode->fInChild = nextNode->fOutChild = nil;
@@ -149,7 +151,7 @@ void plOccNode::Init(plOccPoly* poly)
 //      will return kSplit, but either inPoly or outPoly
 //      will have no vertices. That degenerate poly,
 //      when added to a node, should just be pitched.
-//  
+//
 
 
 
@@ -163,11 +165,11 @@ void plOccNode::Init(plOccPoly* poly)
 // clipping, as those won't generate leaf nodes.
 plOccNode* plOccTree::IAddPolyRecur(plOccNode* node, plOccPoly* poly)
 {
-    if( !poly->fVerts.GetCount() )
+    if (!poly->fVerts.GetCount()) {
         return node;
+    }
 
-    if( !node )
-    {
+    if (!node) {
         return IMakeSubTree(poly);
     }
 
@@ -177,14 +179,15 @@ plOccNode* plOccTree::IAddPolyRecur(plOccNode* node, plOccPoly* poly)
 
     uint32_t test = ITestPoly(node->fPlane, poly, inPoly, outPoly);
 
-    switch( test )
-    {
+    switch (test) {
     case kAllIn:
         node->fInChild = IAddPolyRecur(node->fInChild, poly);
         break;
+
     case kAllOut:
         node->fOutChild = IAddPolyRecur(node->fOutChild, poly);
         break;
+
     case kSplit:
         node->fInChild = IAddPolyRecur(node->fInChild, inPoly);
         node->fOutChild = IAddPolyRecur(node->fOutChild, outPoly);
@@ -196,8 +199,9 @@ plOccNode* plOccTree::IAddPolyRecur(plOccNode* node, plOccPoly* poly)
 
 bool plOccTree::BoundsVisible(const hsBounds3Ext& bnd) const
 {
-    if( !fRoot )
+    if (!fRoot) {
         return true;
+    }
 
     return fRoot->IBoundsVisible(bnd);
 }
@@ -206,27 +210,25 @@ bool plOccTree::BoundsVisible(const hsBounds3Ext& bnd) const
 bool plOccNode::IInChildBoundsVisible(const hsBounds3Ext& bnd) const
 {
     return fInChild
-            ? fInChild->IBoundsVisible(bnd)
-            : false;
+           ? fInChild->IBoundsVisible(bnd)
+           : false;
 }
 
 bool plOccNode::IOutChildBoundsVisible(const hsBounds3Ext& bnd) const
 {
     return fOutChild
-            ? fOutChild->IBoundsVisible(bnd)
-            : true;
+           ? fOutChild->IBoundsVisible(bnd)
+           : true;
 }
 
 bool plOccNode::IBoundsVisible(const hsBounds3Ext& bnd) const
 {
     hsPoint2 depth;
     bnd.TestPlane(fPlane.fNormal, depth);
-    if( depth.fX > fPlane.fDist )
-    {
+
+    if (depth.fX > fPlane.fDist) {
         return IOutChildVisible(bnd);
-    }
-    else if( depth.fY < fPlane.fDist )
-    {
+    } else if (depth.fY < fPlane.fDist) {
         return IInChildVisible(bnd);
     }
 

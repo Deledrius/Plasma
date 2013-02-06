@@ -63,11 +63,11 @@ bool plShadowCaster::fShadowCastDisabled = false;
 bool plShadowCaster::fCanShadowCast = true;
 
 plShadowCaster::plShadowCaster()
-:   fMaxOpacity(0),
-    fCastFlags(0),
-    fAttenScale(1.f),
-    fBlurScale(0.f),
-    fBoost(1.f)
+    :   fMaxOpacity(0),
+        fCastFlags(0),
+        fAttenScale(1.f),
+        fBlurScale(0.f),
+        fBoost(1.f)
 {
 }
 
@@ -86,7 +86,7 @@ void plShadowCaster::Read(hsStream* stream, hsResMgr* mgr)
 //  if( !(fCastFlags & kPerspective) )
 //      fCastFlags |= kPerspective;
 //  else
-        fCastFlags &= ~kPerspective;
+    fCastFlags &= ~kPerspective;
 
     fBoost = stream->ReadLEScalar();
     fAttenScale = stream->ReadLEScalar();
@@ -120,29 +120,29 @@ void plShadowCaster::ICollectAllSpans()
 {
     fSpans.SetCount(0);
     int i;
-    for( i = 0; i < GetNumTargets(); i++ )
-    {
+
+    for (i = 0; i < GetNumTargets(); i++) {
         plSceneObject* so = GetTarget(i);
+
         // Nil target? Shouldn't happen.
-        if( so )
-        {
+        if (so) {
             const plDrawInterface* di = so->GetDrawInterface();
+
             // Nil di- either it hasn't loaded yet, or we've been applied to something that isn't visible (oops).
-            if( di && !di->GetProperty(plDrawInterface::kDisable) )
-            {
+            if (di && !di->GetProperty(plDrawInterface::kDisable)) {
                 int j;
-                for( j = 0; j < di->GetNumDrawables(); j++ )
-                {
+
+                for (j = 0; j < di->GetNumDrawables(); j++) {
                     plDrawableSpans* dr = plDrawableSpans::ConvertNoRef(di->GetDrawable(j));
+
                     // Nil dr - it hasn't loaded yet.
-                    if( dr )
-                    {
+                    if (dr) {
                         plDISpanIndex& diIndex = dr->GetDISpans(di->GetDrawableMeshIndex(j));
-                        if( !diIndex.IsMatrixOnly() )
-                        {
+
+                        if (!diIndex.IsMatrixOnly()) {
                             int k;
-                            for( k = 0; k < diIndex.GetCount(); k++ )
-                            {
+
+                            for (k = 0; k < diIndex.GetCount(); k++) {
                                 const plSpan* span = dr->GetSpan(diIndex[k]);
 //                              if( !(span->fProps & plSpan::kPropNoShadowCast) )
                                 {
@@ -159,12 +159,15 @@ void plShadowCaster::ICollectAllSpans()
 
 bool plShadowCaster::IOnRenderMsg(plRenderMsg* msg)
 {
-    if( ShadowCastDisabled() )
+    if (ShadowCastDisabled()) {
         return true;
+    }
 
     const uint8_t shadowQuality = uint8_t(plShadowMaster::GetGlobalShadowQuality() * 3.9f);
-    if( !GetKey()->GetUoid().GetLoadMask().MatchesQuality(shadowQuality) )
+
+    if (!GetKey()->GetUoid().GetLoadMask().MatchesQuality(shadowQuality)) {
         return true;
+    }
 
     // Don't really like having to gather these guys up every frame,
     // but with the avatar customization, it's all pretty volatile,
@@ -182,22 +185,23 @@ bool plShadowCaster::IOnRenderMsg(plRenderMsg* msg)
     //clear shadowBits of all spans
     fMaxOpacity = 0.f;
     int i;
-    for( i = 0; i < fSpans.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fSpans.GetCount(); i++) {
         hsGMaterial* mat = fSpans[i].fDraw->GetSubMaterial(fSpans[i].fSpan->fMaterialIdx);
-        if( mat )
-        {
+
+        if (mat) {
             plLayerInterface* baseLay = mat->GetLayer(0);
-            if( baseLay && (baseLay->GetOpacity() > fMaxOpacity) )
+
+            if (baseLay && (baseLay->GetOpacity() > fMaxOpacity)) {
                 fMaxOpacity = baseLay->GetOpacity();
+            }
         }
 
         fSpans[i].fSpan->ClearShadowBits();
     }
 
 
-    if( fMaxOpacity > 0 )
-    {
+    if (fMaxOpacity > 0) {
         plShadowCastMsg* cast = new plShadowCastMsg(GetKey(), this, msg->Pipeline());
         cast->Send();
     }
@@ -212,8 +216,8 @@ plProfile_CreateTimer("ShadowCaster", "RenderSetup", ShadowCaster);
 bool plShadowCaster::MsgReceive(plMessage* msg)
 {
     plRenderMsg* rendMsg = plRenderMsg::ConvertNoRef(msg);
-    if( rendMsg )
-    {
+
+    if (rendMsg) {
         plProfile_BeginLap(ShadowCaster, this->GetKey()->GetUoid().GetObjectName().c_str());
         IOnRenderMsg(rendMsg);
         plProfile_EndLap(ShadowCaster, this->GetKey()->GetUoid().GetObjectName().c_str());

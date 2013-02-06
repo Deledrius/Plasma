@@ -66,8 +66,10 @@ uint32_t hsStream::GetPosition() const
 
 void hsStream::SetPosition(uint32_t position)
 {
-    if (position == fPosition)
+    if (position == fPosition) {
         return;
+    }
+
     Rewind();
     Skip(position);
 }
@@ -80,12 +82,10 @@ void hsStream::Truncate()
 uint32_t hsStream::GetSizeLeft()
 {
     uint32_t ret = 0;
-    if (GetPosition() > GetEOF())
-    {
+
+    if (GetPosition() > GetEOF()) {
         hsThrow("Position is beyond EOF");
-    }
-    else
-    {
+    } else {
         ret = GetEOF() - GetPosition();
     }
 
@@ -96,64 +96,67 @@ uint32_t hsStream::GetSizeLeft()
 
 uint32_t hsStream::GetEOF()
 {
-    hsThrow( "GetEOF() unimplemented by subclass of stream");
+    hsThrow("GetEOF() unimplemented by subclass of stream");
     return 0;
 }
 
 void hsStream::CopyToMem(void* mem)
 {
-    hsThrow( "CopyToMem unimplemented by subclass of stream");
+    hsThrow("CopyToMem unimplemented by subclass of stream");
 }
 
 //////////////////////////////////////////////////////////////////////////////////
 
-uint32_t hsStream::WriteFmt(const char * fmt, ...)
+uint32_t hsStream::WriteFmt(const char* fmt, ...)
 {
     va_list av;
-    va_start( av, fmt );
-    uint32_t n = WriteFmtV( fmt, av );
-    va_end( av );
+    va_start(av, fmt);
+    uint32_t n = WriteFmtV(fmt, av);
+    va_end(av);
     return n;
 }
 
-uint32_t hsStream::WriteFmtV(const char * fmt, va_list av)
+uint32_t hsStream::WriteFmtV(const char* fmt, va_list av)
 {
     plString buf = plString::IFormat(fmt, av);
-    return Write( buf.GetSize(), buf.c_str() );
+    return Write(buf.GetSize(), buf.c_str());
 }
 
-uint32_t hsStream::WriteSafeStringLong(const plString &string)
+uint32_t hsStream::WriteSafeStringLong(const plString& string)
 {
     uint32_t len = string.GetSize();
     WriteLE32(len);
-    if (len > 0)
-    {   
-        const char *buffp = string.c_str();
+
+    if (len > 0) {
+        const char* buffp = string.c_str();
         uint32_t i;
-        for (i = 0; i < len; i++)
-        {
+
+        for (i = 0; i < len; i++) {
             WriteByte(~buffp[i]);
         }
+
         return i;
-    }
-    else
+    } else {
         return 0;
+    }
 }
 
-uint32_t hsStream::WriteSafeWStringLong(const plString &string)
+uint32_t hsStream::WriteSafeWStringLong(const plString& string)
 {
     plStringBuffer<uint16_t> wbuff = string.ToUtf16();
     uint32_t len = wbuff.GetSize();
     WriteLE32(len);
-    if (len > 0)
-    {
-        const uint16_t *buffp = wbuff.GetData();
-        for (uint32_t i=0; i<len; i++)
-        {
+
+    if (len > 0) {
+        const uint16_t* buffp = wbuff.GetData();
+
+        for (uint32_t i = 0; i < len; i++) {
             WriteLE16(~buffp[i]);
         }
+
         WriteLE16(static_cast<uint16_t>(0));
     }
+
     return 0;
 }
 
@@ -161,27 +164,27 @@ plString hsStream::ReadSafeStringLong_TEMP()
 {
     plStringBuffer<char> name;
     uint32_t numChars = ReadLE32();
-    if (numChars > 0 && numChars <= GetSizeLeft())
-    {
-        char *buff = name.CreateWritableBuffer(numChars);
+
+    if (numChars > 0 && numChars <= GetSizeLeft()) {
+        char* buff = name.CreateWritableBuffer(numChars);
         Read(numChars, buff);
         buff[numChars] = 0;
 
         // if the high bit is set, flip the bits. Otherwise it's a normal string, do nothing.
-        if (buff[0] & 0x80)
-        {
-            for (int i = 0; i < numChars; i++)
+        if (buff[0] & 0x80) {
+            for (int i = 0; i < numChars; i++) {
                 buff[i] = ~buff[i];
-        }       
+            }
+        }
     }
 
     return name;
 }
 
-char *hsStream::ReadSafeStringLong()
+char* hsStream::ReadSafeStringLong()
 {
     plString name = ReadSafeStringLong_TEMP();
-    char *buff = new char[name.GetSize() + 1];
+    char* buff = new char[name.GetSize() + 1];
     memcpy(buff, name.c_str(), name.GetSize() + 1);
     return buff;
 }
@@ -190,73 +193,79 @@ plString hsStream::ReadSafeWStringLong_TEMP()
 {
     plStringBuffer<uint16_t> retVal;
     uint32_t numChars = ReadLE32();
-    if (numChars > 0 && numChars <= (GetSizeLeft()/2)) // divide by two because each char is two bytes
-    {
-        uint16_t *buff = retVal.CreateWritableBuffer(numChars);
-        for (int i=0; i<numChars; i++)
+
+    if (numChars > 0 && numChars <= (GetSizeLeft() / 2)) { // divide by two because each char is two bytes
+        uint16_t* buff = retVal.CreateWritableBuffer(numChars);
+
+        for (int i = 0; i < numChars; i++) {
             buff[i] = ReadLE16();
+        }
+
         ReadLE16(); // we wrote the null out, read it back in
         buff[numChars] = 0; // But terminate it safely anyway
 
-        if (buff[0]* 0x80)
-        {
-            for (int i=0; i<numChars; i++)
+        if (buff[0] * 0x80) {
+            for (int i = 0; i < numChars; i++) {
                 buff[i] = ~buff[i];
+            }
         }
     }
 
     return plString::FromUtf16(retVal);
 }
 
-wchar_t *hsStream::ReadSafeWStringLong()
+wchar_t* hsStream::ReadSafeWStringLong()
 {
     // Horribly inefficient (convert to UTF-8 and then back to UTF-16), which
     // is why this should go away completely after plString has taken over
     // the world^H^H^H^H^HPlasma
     plStringBuffer<wchar_t> retVal = ReadSafeWStringLong_TEMP().ToWchar();
-    wchar_t *buff = new wchar_t[retVal.GetSize() + 1];
+    wchar_t* buff = new wchar_t[retVal.GetSize() + 1];
     memcpy(buff, retVal.GetData(), retVal.GetSize() + 1);
     return buff;
 }
 
-uint32_t hsStream::WriteSafeString(const plString &string)
+uint32_t hsStream::WriteSafeString(const plString& string)
 {
     int len = string.GetSize();
-    hsAssert(len<0xf000, plString::Format("string len of %d is too long for WriteSafeString %s, use WriteSafeStringLong",
-        len, string.c_str()).c_str() );
+    hsAssert(len < 0xf000, plString::Format("string len of %d is too long for WriteSafeString %s, use WriteSafeStringLong",
+                                            len, string.c_str()).c_str());
 
     WriteLE16(len | 0xf000);
-    if (len > 0)
-    {
+
+    if (len > 0) {
         uint32_t i;
-        const char *buffp = string.c_str();
-        for (i = 0; i < len; i++)
-        {
+        const char* buffp = string.c_str();
+
+        for (i = 0; i < len; i++) {
             WriteByte(~buffp[i]);
         }
+
         return i;
-    }
-    else
+    } else {
         return 0;
+    }
 }
 
-uint32_t hsStream::WriteSafeWString(const plString &string)
+uint32_t hsStream::WriteSafeWString(const plString& string)
 {
     plStringBuffer<uint16_t> wbuff = string.ToUtf16();
     uint32_t len = wbuff.GetSize();
-    hsAssert(len<0xf000, plString::Format("string len of %d is too long for WriteSafeWString, use WriteSafeWStringLong",
-        len).c_str() );
+    hsAssert(len < 0xf000, plString::Format("string len of %d is too long for WriteSafeWString, use WriteSafeWStringLong",
+                                            len).c_str());
 
     WriteLE16(len | 0xf000);
-    if (len > 0)
-    {
-        const uint16_t *buffp = wbuff.GetData();
-        for (uint32_t i=0; i<len; i++)
-        {
+
+    if (len > 0) {
+        const uint16_t* buffp = wbuff.GetData();
+
+        for (uint32_t i = 0; i < len; i++) {
             WriteLE16(~buffp[i]);
         }
+
         WriteLE16(static_cast<uint16_t>(0));
     }
+
     return 0;
 }
 
@@ -268,34 +277,38 @@ plString hsStream::ReadSafeString_TEMP()
 #ifndef REMOVE_ME_SOON
     // Backward compat hack - remove in a week or so (from 6/30/03)
     bool oldFormat = !(numChars & 0xf000);
-    if (oldFormat)
+
+    if (oldFormat) {
         ReadLE16();
+    }
+
 #endif
 
     numChars &= ~0xf000;
     hsAssert(numChars <= GetSizeLeft(), "Bad string");
-    if (numChars > 0 && numChars <= GetSizeLeft())
-    {
-        char *buff = name.CreateWritableBuffer(numChars);
+
+    if (numChars > 0 && numChars <= GetSizeLeft()) {
+        char* buff = name.CreateWritableBuffer(numChars);
         Read(numChars, buff);
         buff[numChars] = 0;
 
         // if the high bit is set, flip the bits. Otherwise it's a normal string, do nothing.
-        if (buff[0] & 0x80)
-        {
+        if (buff[0] & 0x80) {
             int i;
-            for (i = 0; i < numChars; i++)
+
+            for (i = 0; i < numChars; i++) {
                 buff[i] = ~buff[i];
+            }
         }
     }
 
     return name;
 }
 
-char *hsStream::ReadSafeString()
+char* hsStream::ReadSafeString()
 {
     plString name = ReadSafeString_TEMP();
-    char *buff = new char[name.GetSize() + 1];
+    char* buff = new char[name.GetSize() + 1];
     memcpy(buff, name.c_str(), name.GetSize() + 1);
     return buff;
 }
@@ -304,59 +317,71 @@ plString hsStream::ReadSafeWString_TEMP()
 {
     plStringBuffer<uint16_t> retVal;
     uint32_t numChars = ReadLE16();
-    
+
     numChars &= ~0xf000;
-    hsAssert(numChars <= GetSizeLeft()/2, "Bad string");
-    if (numChars > 0 && numChars <= (GetSizeLeft()/2)) // divide by two because each char is two bytes
-    {
-        uint16_t *buff = retVal.CreateWritableBuffer(numChars);
-        for (int i=0; i<numChars; i++)
+    hsAssert(numChars <= GetSizeLeft() / 2, "Bad string");
+
+    if (numChars > 0 && numChars <= (GetSizeLeft() / 2)) { // divide by two because each char is two bytes
+        uint16_t* buff = retVal.CreateWritableBuffer(numChars);
+
+        for (int i = 0; i < numChars; i++) {
             buff[i] = ReadLE16();
+        }
+
         ReadLE16(); // we wrote the null out, read it back in
         buff[numChars] = 0; // But terminate it safely anyway
 
-        if (buff[0]* 0x80)
-        {
-            for (int i=0; i<numChars; i++)
+        if (buff[0] * 0x80) {
+            for (int i = 0; i < numChars; i++) {
                 buff[i] = ~buff[i];
+            }
         }
     }
 
     return plString::FromUtf16(retVal);
 }
 
-wchar_t *hsStream::ReadSafeWString()
+wchar_t* hsStream::ReadSafeWString()
 {
     // Horribly inefficient (convert to UTF-8 and then back to UTF-16), which
     // is why this should go away completely after plString has taken over
     // the world^H^H^H^H^HPlasma
     plStringBuffer<wchar_t> retVal = ReadSafeWString_TEMP().ToWchar();
-    wchar_t *buff = new wchar_t[retVal.GetSize() + 1];
+    wchar_t* buff = new wchar_t[retVal.GetSize() + 1];
     memcpy(buff, retVal.GetData(), retVal.GetSize() + 1);
     return buff;
 }
 
-bool  hsStream::Read4Bytes(void *pv)  // Virtual, faster version in sub classes
+bool  hsStream::Read4Bytes(void* pv)  // Virtual, faster version in sub classes
 {
     int knt = this->Read(sizeof(uint32_t), pv);
-    if (knt != 4)
+
+    if (knt != 4) {
         return false;
+    }
+
     return true;
 }
 
-bool  hsStream::Read12Bytes(void *buffer) // Reads 12 bytes, return true if success
+bool  hsStream::Read12Bytes(void* buffer) // Reads 12 bytes, return true if success
 {
-    int knt = this->Read(12,buffer);
-    if (knt != 12)
+    int knt = this->Read(12, buffer);
+
+    if (knt != 12) {
         return false;
+    }
+
     return true;
 }
 
-bool  hsStream::Read8Bytes(void *buffer)  // Reads 12 bytes, return true if success
+bool  hsStream::Read8Bytes(void* buffer)  // Reads 12 bytes, return true if success
 {
-    int knt = this->Read(8,buffer);
-    if (knt !=8)
+    int knt = this->Read(8, buffer);
+
+    if (knt != 8) {
         return false;
+    }
+
     return true;
 }
 
@@ -387,109 +412,125 @@ uint8_t hsStream::ReadByte()
 
 bool hsStream::AtEnd()
 {
-    hsAssert(0,"No hsStream::AtEnd() implemented for this stream class");
+    hsAssert(0, "No hsStream::AtEnd() implemented for this stream class");
     return false;
 }
 
 bool hsStream::IsTokenSeparator(char c)
 {
-    return (isspace(c) || c==',' || c=='=');
+    return (isspace(c) || c == ',' || c == '=');
 }
 
-bool hsStream::GetToken(char *s, uint32_t maxLen, const char beginComment, const char endComment)
+bool hsStream::GetToken(char* s, uint32_t maxLen, const char beginComment, const char endComment)
 {
     char c;
     char endCom;
-        endCom = endComment;
+    endCom = endComment;
 
-    while( true )
-    {
-        while( !AtEnd() && IsTokenSeparator(c = ReadByte()) )
+    while (true) {
+        while (!AtEnd() && IsTokenSeparator(c = ReadByte())) {
             c = c;
-            ;
-        if( AtEnd() )
-            return false;
+        }
 
-        if( beginComment != c )
+        ;
+
+        if (AtEnd()) {
+            return false;
+        }
+
+        if (beginComment != c) {
             break;
+        }
 
         // skip to end of comment
-        while( !AtEnd() && (endCom != (c = ReadByte())) )
-            c= c;
-            ;
+        while (!AtEnd() && (endCom != (c = ReadByte()))) {
+            c = c;
+        }
+
+        ;
     }
 
     s[0] = c;
     uint32_t k = 1;
-    while( !AtEnd() && !IsTokenSeparator(c = ReadByte()) )
-    {
-        if( k < maxLen )
+
+    while (!AtEnd() && !IsTokenSeparator(c = ReadByte())) {
+        if (k < maxLen) {
             s[k++] = c;
+        }
     }
+
     s[k] = 0;
 
 
-    if( (k > 0)&&!stricmp(s, "skip") )
-    {
+    if ((k > 0) && !stricmp(s, "skip")) {
         int depth = 1;
-        while( depth && GetToken(s, maxLen, beginComment, endCom) )
-        {
-            if( !stricmp(s, "skip") )
+
+        while (depth && GetToken(s, maxLen, beginComment, endCom)) {
+            if (!stricmp(s, "skip")) {
                 depth++;
-            else
-            if( !stricmp(s, "piks") )
+            } else if (!stricmp(s, "piks")) {
                 depth--;
+            }
         }
+
         return GetToken(s, maxLen, beginComment, endCom);
     }
 
     return true;
 }
 
-bool hsStream::ReadLn(char *s, uint32_t maxLen, const char beginComment, const char endComment)
+bool hsStream::ReadLn(char* s, uint32_t maxLen, const char beginComment, const char endComment)
 {
     char c;
     char endCom;
-        endCom = endComment;
+    endCom = endComment;
 
-    while( true )
-    {
-        while( !AtEnd() && strchr("\r\n",c = ReadByte()) )
+    while (true) {
+        while (!AtEnd() && strchr("\r\n", c = ReadByte())) {
             c = c;
-            ;
-        if( AtEnd() )
-            return false;
+        }
 
-        if( beginComment != c )
+        ;
+
+        if (AtEnd()) {
+            return false;
+        }
+
+        if (beginComment != c) {
             break;
+        }
 
         // skip to end of comment
-        while( !AtEnd() && (endCom != (c = ReadByte())) )
-            c= c;
-            ;
+        while (!AtEnd() && (endCom != (c = ReadByte()))) {
+            c = c;
+        }
+
+        ;
     }
 
     s[0] = c;
     uint32_t k = 1;
-    while( !AtEnd() && !strchr("\r\n",c = ReadByte()) )
-    {
-        if( k < maxLen )
+
+    while (!AtEnd() && !strchr("\r\n", c = ReadByte())) {
+        if (k < maxLen) {
             s[k++] = c;
+        }
     }
+
     s[k] = 0;
 
 
-    if( (k > 0)&&!stricmp(s, "skip") )
-    {
+    if ((k > 0) && !stricmp(s, "skip")) {
         int depth = 1;
-        while( depth && ReadLn(s, maxLen, beginComment, endCom) )
-        {
-            if( !stricmp(s, "skip") )
+
+        while (depth && ReadLn(s, maxLen, beginComment, endCom)) {
+            if (!stricmp(s, "skip")) {
                 depth++;
-            else
-            if( !stricmp(s, "piks") )
+            } else if (!stricmp(s, "piks")) {
                 depth--;
+            }
         }
+
         return ReadLn(s, maxLen, beginComment, endCom);
     }
 
@@ -507,8 +548,10 @@ uint16_t hsStream::ReadLE16()
 void hsStream::ReadLE16(int count, uint16_t values[])
 {
     this->Read(count * sizeof(uint16_t), values);
-    for (int i = 0; i < count; i++)
+
+    for (int i = 0; i < count; i++) {
         values[i] = hsToLE16(values[i]);
+    }
 }
 
 uint32_t hsStream::ReadLE32()
@@ -522,8 +565,10 @@ uint32_t hsStream::ReadLE32()
 void hsStream::ReadLE32(int count, uint32_t values[])
 {
     this->Read(count * sizeof(uint32_t), values);
-    for (int i = 0; i < count; i++)
+
+    for (int i = 0; i < count; i++) {
         values[i] = hsToLE32(values[i]);
+    }
 }
 
 uint32_t hsStream::ReadBE32()
@@ -545,8 +590,10 @@ double hsStream::ReadLEDouble()
 void hsStream::ReadLEDouble(int count, double values[])
 {
     this->Read(count * sizeof(double), values);
-    for (int i = 0; i < count; i++)
+
+    for (int i = 0; i < count; i++) {
         values[i] = hsToLEDouble(values[i]);
+    }
 }
 
 
@@ -561,8 +608,10 @@ float hsStream::ReadLEFloat()
 void hsStream::ReadLEFloat(int count, float values[])
 {
     this->Read(count * sizeof(float), values);
-    for (int i = 0; i < count; i++)
+
+    for (int i = 0; i < count; i++) {
         values[i] = hsToLEFloat(values[i]);
+    }
 }
 
 float hsStream::ReadBEFloat()
@@ -604,8 +653,9 @@ void  hsStream::WriteLE16(uint16_t value)
 
 void  hsStream::WriteLE16(int count, const uint16_t values[])
 {
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         this->WriteLE16(values[i]);
+    }
 }
 
 void  hsStream::WriteLE32(uint32_t value)
@@ -616,8 +666,9 @@ void  hsStream::WriteLE32(uint32_t value)
 
 void  hsStream::WriteLE32(int count, const uint32_t values[])
 {
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         this->WriteLE32(values[i]);
+    }
 }
 
 void hsStream::WriteBE32(uint32_t value)
@@ -634,8 +685,9 @@ void hsStream::WriteLEDouble(double value)
 
 void hsStream::WriteLEDouble(int count, const double values[])
 {
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         this->WriteLEDouble(values[i]);
+    }
 }
 
 void hsStream::WriteLEFloat(float value)
@@ -646,8 +698,9 @@ void hsStream::WriteLEFloat(float value)
 
 void hsStream::WriteLEFloat(int count, const float values[])
 {
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         this->WriteLEFloat(values[i]);
+    }
 }
 
 void hsStream::WriteBEFloat(float value)
@@ -667,8 +720,10 @@ uint32_t hsStream::ReadLEAtom(uint32_t* sizePtr)
     uint32_t  tag = this->ReadLE32();
     uint32_t  size = this->ReadLE32();
 
-    if (sizePtr)
+    if (sizePtr) {
         *sizePtr = size;
+    }
+
     return tag;
 }
 
@@ -681,7 +736,7 @@ hsUNIXStream::~hsUNIXStream()
     // Don't Close here, because Sub classes Don't always want that behaviour!
 }
 
-bool hsUNIXStream::Open(const plFileName &name, const char *mode)
+bool hsUNIXStream::Open(const plFileName& name, const char* mode)
 {
     fPosition = 0;
     fRef = plFileSystem::Open(name, mode);
@@ -691,8 +746,11 @@ bool hsUNIXStream::Open(const plFileName &name, const char *mode)
 bool hsUNIXStream::Close()
 {
     int rtn = true;
-    if (fRef)
+
+    if (fRef) {
         rtn = fclose(fRef);
+    }
+
     fRef = nil;
     delete [] fBuff;
     fBuff = nil;
@@ -702,25 +760,29 @@ bool hsUNIXStream::Close()
 
 uint32_t hsUNIXStream::Read(uint32_t bytes,  void* buffer)
 {
-    if (!fRef || !bytes)
+    if (!fRef || !bytes) {
         return 0;
+    }
+
     size_t numItems = ::fread(buffer, 1 /*size*/, bytes /*count*/, fRef);
     fBytesRead += numItems;
     fPosition += numItems;
-    if (numItems < bytes)
-    {
-        if (!feof(fRef))
-        {
+
+    if (numItems < bytes) {
+        if (!feof(fRef)) {
             hsDebugMessage("Error on UNIX Read", ferror(fRef));
         }
     }
+
     return numItems;
 }
 
 bool  hsUNIXStream::AtEnd()
 {
-    if (!fRef)
+    if (!fRef) {
         return 1;
+    }
+
     bool rVal;
     int x = getc(fRef);
     rVal = feof(fRef) != 0;
@@ -730,16 +792,20 @@ bool  hsUNIXStream::AtEnd()
 
 uint32_t hsUNIXStream::Write(uint32_t bytes, const void* buffer)
 {
-    if (!fRef)
+    if (!fRef) {
         return 0;
+    }
+
     fPosition += bytes;
     return fwrite(buffer, bytes, 1, fRef);
 }
 
 void hsUNIXStream::SetPosition(uint32_t position)
 {
-    if (!fRef || (position == fPosition))
+    if (!fRef || (position == fPosition)) {
         return;
+    }
+
     fBytesRead = position;
     fPosition = position;
     (void)::fseek(fRef, position, SEEK_SET);
@@ -747,8 +813,10 @@ void hsUNIXStream::SetPosition(uint32_t position)
 
 void hsUNIXStream::Skip(uint32_t delta)
 {
-    if (!fRef)
+    if (!fRef) {
         return;
+    }
+
     fBytesRead += delta;
     fPosition += delta;
     (void)::fseek(fRef, delta, SEEK_CUR);
@@ -756,8 +824,10 @@ void hsUNIXStream::Skip(uint32_t delta)
 
 void hsUNIXStream::Rewind()
 {
-    if (!fRef)
+    if (!fRef) {
         return;
+    }
+
     fBytesRead = 0;
     fPosition = 0;
     (void)::fseek(fRef, 0, SEEK_SET);
@@ -765,29 +835,34 @@ void hsUNIXStream::Rewind()
 
 void hsUNIXStream::FastFwd()
 {
-    if (!fRef)
+    if (!fRef) {
         return;
+    }
+
     (void)::fseek(fRef, 0, SEEK_END);
     fBytesRead = fPosition = ftell(fRef);
 }
 
 uint32_t  hsUNIXStream::GetEOF()
 {
-    if( !fRef )
+    if (!fRef) {
         return 0;
+    }
 
-    long oldPos = ftell( fRef );
-    (void)::fseek( fRef, 0, SEEK_END );
-    uint32_t end = (uint32_t)ftell( fRef );
-    (void)::fseek( fRef, oldPos, SEEK_SET );
+    long oldPos = ftell(fRef);
+    (void)::fseek(fRef, 0, SEEK_END);
+    uint32_t end = (uint32_t)ftell(fRef);
+    (void)::fseek(fRef, oldPos, SEEK_SET);
 
     return end;
 }
 
 void hsUNIXStream::Truncate()
 {
-    if (!fRef)
+    if (!fRef) {
         return;
+    }
+
     int handle = fileno(fRef);
 #if HS_BUILD_FOR_WIN32
     _chsize(handle, fPosition);
@@ -798,8 +873,10 @@ void hsUNIXStream::Truncate()
 
 void hsUNIXStream::Flush()
 {
-    if (!fRef)
+    if (!fRef) {
         return;
+    }
+
     (void)::fflush(fRef);
 }
 
@@ -810,68 +887,69 @@ plReadOnlySubStream::~plReadOnlySubStream()
 {
 }
 
-void    plReadOnlySubStream::Open( hsStream *base, uint32_t offset, uint32_t length )
+void    plReadOnlySubStream::Open(hsStream* base, uint32_t offset, uint32_t length)
 {
     fBase = base;
     fOffset = offset;
     fLength = length;
 
-    fBase->SetPosition( fOffset );
+    fBase->SetPosition(fOffset);
     IFixPosition();
 }
 
-void    plReadOnlySubStream::IFixPosition( void )
+void    plReadOnlySubStream::IFixPosition(void)
 {
     fPosition = fBase->GetPosition() - fOffset;
 }
 
 bool  plReadOnlySubStream::AtEnd()
 {
-    if( fPosition >= fLength )
+    if (fPosition >= fLength) {
         return true;
+    }
+
     return false;
 }
 
 uint32_t  plReadOnlySubStream::Read(uint32_t byteCount, void* buffer)
 {
-    if( byteCount > GetSizeLeft() )
-    {
+    if (byteCount > GetSizeLeft()) {
         hsThrow("Attempting to read past end of stream");
         byteCount = GetSizeLeft();
     }
 
-    uint32_t read = fBase->Read( byteCount, buffer );
+    uint32_t read = fBase->Read(byteCount, buffer);
     IFixPosition();
     return read;
 }
 
 uint32_t  plReadOnlySubStream::Write(uint32_t byteCount, const void* buffer)
 {
-    hsAssert( false, "Write not allowed on an plReadOnlySubStream" );
+    hsAssert(false, "Write not allowed on an plReadOnlySubStream");
     return 0;
 }
 
 void    plReadOnlySubStream::Skip(uint32_t deltaByteCount)
 {
-    fBase->Skip( deltaByteCount );
+    fBase->Skip(deltaByteCount);
     IFixPosition();
 }
 
 void    plReadOnlySubStream::Rewind()
 {
-    fBase->SetPosition( fOffset );
+    fBase->SetPosition(fOffset);
     IFixPosition();
 }
 
 void    plReadOnlySubStream::FastFwd()
 {
-    fBase->SetPosition( fOffset + fLength );
+    fBase->SetPosition(fOffset + fLength);
     IFixPosition();
 }
 
 void    plReadOnlySubStream::Truncate()
 {
-    hsAssert( false, "Can't truncate a read-only stream" );
+    hsAssert(false, "Can't truncate a read-only stream");
 }
 
 uint32_t  plReadOnlySubStream::GetEOF()
@@ -911,10 +989,11 @@ bool hsRAMStream::AtEnd()
     return (fBytesRead >= fAppender.Count() * fAppender.ElemSize());
 }
 
-uint32_t hsRAMStream::Read(uint32_t byteCount, void * buffer)
+uint32_t hsRAMStream::Read(uint32_t byteCount, void* buffer)
 {
-    if (fBytesRead + byteCount > fAppender.Count() * fAppender.ElemSize())
+    if (fBytesRead + byteCount > fAppender.Count() * fAppender.ElemSize()) {
         byteCount = (fAppender.Count() * fAppender.ElemSize()) - fBytesRead;
+    }
 
     fBytesRead += byteCount;
     fPosition += byteCount;
@@ -963,7 +1042,7 @@ void hsRAMStream::CopyToMem(void* mem)
 
 //////////////////////////////////////////////////////////////////////
 
-uint32_t hsNullStream::Read(uint32_t byteCount, void * buffer)
+uint32_t hsNullStream::Read(uint32_t byteCount, void* buffer)
 {
     hsThrow("hsNullStream: Can't read from this stream!");
     return 0;
@@ -1002,8 +1081,7 @@ bool hsReadOnlyStream::AtEnd()
 
 uint32_t hsReadOnlyStream::Read(uint32_t byteCount, void* buffer)
 {
-    if (fData + byteCount > fStop)
-    {
+    if (fData + byteCount > fStop) {
         hsThrow("Attempting to read past end of stream");
         byteCount = GetSizeLeft();
     }
@@ -1017,7 +1095,7 @@ uint32_t hsReadOnlyStream::Read(uint32_t byteCount, void* buffer)
 
 uint32_t hsReadOnlyStream::Write(uint32_t byteCount, const void* buffer)
 {
-    hsThrow( "can't write to a readonly stream");
+    hsThrow("can't write to a readonly stream");
     return 0;
 }
 
@@ -1026,8 +1104,10 @@ void hsReadOnlyStream::Skip(uint32_t deltaByteCount)
     fBytesRead += deltaByteCount;
     fPosition += deltaByteCount;
     fData += deltaByteCount;
-    if (fData > fStop)
-        hsThrow( "Skip went past end of stream");
+
+    if (fData > fStop) {
+        hsThrow("Skip went past end of stream");
+    }
 }
 
 void hsReadOnlyStream::Rewind()
@@ -1039,27 +1119,30 @@ void hsReadOnlyStream::Rewind()
 
 void hsReadOnlyStream::Truncate()
 {
-    hsThrow( "can't write to a readonly stream");
+    hsThrow("can't write to a readonly stream");
 }
 
 void hsReadOnlyStream::CopyToMem(void* mem)
 {
-    if (fData < fStop)
-        HSMemory::BlockMove(fData, mem, fStop-fData);
+    if (fData < fStop) {
+        HSMemory::BlockMove(fData, mem, fStop - fData);
+    }
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////
 uint32_t hsWriteOnlyStream::Read(uint32_t byteCount, void* buffer)
 {
-    hsThrow( "can't read to a writeonly stream");
+    hsThrow("can't read to a writeonly stream");
     return 0;
 }
 
 uint32_t hsWriteOnlyStream::Write(uint32_t byteCount, const void* buffer)
 {
-    if (fData + byteCount > fStop)
+    if (fData + byteCount > fStop) {
         hsThrow("Write past end of stream");
+    }
+
     HSMemory::BlockMove(buffer, fData, byteCount);
     fData += byteCount;
     fBytesRead += byteCount;
@@ -1083,25 +1166,24 @@ hsQueueStream::~hsQueueStream()
     delete [] fQueue;
 }
 
-uint32_t hsQueueStream::Read(uint32_t byteCount, void * buffer)
+uint32_t hsQueueStream::Read(uint32_t byteCount, void* buffer)
 {
-    hsAssert(fWriteCursor >= 0 && fWriteCursor < fSize,"hsQueueStream: WriteCursor out of range.");
-    hsAssert(fReadCursor >= 0 && fReadCursor < fSize,"hsQueueStream: ReadCursor out of range.");
+    hsAssert(fWriteCursor >= 0 && fWriteCursor < fSize, "hsQueueStream: WriteCursor out of range.");
+    hsAssert(fReadCursor >= 0 && fReadCursor < fSize, "hsQueueStream: ReadCursor out of range.");
 
     int32_t limit, length, total;
-    
+
     limit = fWriteCursor >= fReadCursor ? fWriteCursor : fSize;
-    length = hsMinimum(limit-fReadCursor,byteCount);
-    HSMemory::BlockMove(fQueue+fReadCursor,buffer,length);
+    length = hsMinimum(limit - fReadCursor, byteCount);
+    HSMemory::BlockMove(fQueue + fReadCursor, buffer, length);
     fReadCursor += length;
     fReadCursor %= fSize;
     total = length;
-        
-    if (length < byteCount && limit != fWriteCursor)
-    {
+
+    if (length < byteCount && limit != fWriteCursor) {
         limit = fWriteCursor;
-        length = hsMinimum(limit,byteCount-length);
-        HSMemory::BlockMove(fQueue,static_cast<char*>(buffer)+total,length);
+        length = hsMinimum(limit, byteCount - length);
+        HSMemory::BlockMove(fQueue, static_cast<char*>(buffer) + total, length);
         fReadCursor = length;
         total += length;
     }
@@ -1111,28 +1193,31 @@ uint32_t hsQueueStream::Read(uint32_t byteCount, void * buffer)
 
 uint32_t hsQueueStream::Write(uint32_t byteCount, const void* buffer)
 {
-    hsAssert(fWriteCursor >= 0 && fWriteCursor < fSize,"hsQueueStream: WriteCursor out of range.");
-    hsAssert(fReadCursor >= 0 && fReadCursor < fSize,"hsQueueStream: ReadCursor out of range.");
+    hsAssert(fWriteCursor >= 0 && fWriteCursor < fSize, "hsQueueStream: WriteCursor out of range.");
+    hsAssert(fReadCursor >= 0 && fReadCursor < fSize, "hsQueueStream: ReadCursor out of range.");
 
     int32_t length;
 
-    length = hsMinimum(fSize-fWriteCursor,byteCount);
-    HSMemory::BlockMove(buffer,fQueue+fWriteCursor,length);
-    if (fReadCursor > fWriteCursor)
-    {
+    length = hsMinimum(fSize - fWriteCursor, byteCount);
+    HSMemory::BlockMove(buffer, fQueue + fWriteCursor, length);
+
+    if (fReadCursor > fWriteCursor) {
 #if 0
-        if (fReadCursor < fWriteCursor+length+1)
+
+        if (fReadCursor < fWriteCursor + length + 1) {
             hsStatusMessage("ReadCursor wrapped\n");
+        }
+
 #endif
-        fReadCursor = hsMaximum(fReadCursor,fWriteCursor+length+1);
+        fReadCursor = hsMaximum(fReadCursor, fWriteCursor + length + 1);
         fReadCursor %= fSize;
     }
+
     fWriteCursor += length;
     fWriteCursor %= fSize;
 
-    if (length < byteCount)
-    {
-        Write(byteCount - length,static_cast<const char*>(buffer)+length);
+    if (length < byteCount) {
+        Write(byteCount - length, static_cast<const char*>(buffer) + length);
     }
 
     return byteCount;
@@ -1141,26 +1226,23 @@ uint32_t hsQueueStream::Write(uint32_t byteCount, const void* buffer)
 void hsQueueStream::Skip(uint32_t deltaByteCount)
 {
     int32_t limit, length;
-    
+
     limit = fWriteCursor >= fReadCursor ? fWriteCursor : fSize;
-    length = hsMinimum(limit-fReadCursor,deltaByteCount);
+    length = hsMinimum(limit - fReadCursor, deltaByteCount);
     fReadCursor += length;
 
-    if (length < deltaByteCount && limit != fWriteCursor)
-    {
+    if (length < deltaByteCount && limit != fWriteCursor) {
         limit = fWriteCursor;
-        length = hsMinimum(limit,deltaByteCount-length);
+        length = hsMinimum(limit, deltaByteCount - length);
         fReadCursor = length;
-    }
-    else
-    {
+    } else {
         fReadCursor %= fSize;
-}
+    }
 }
 
 void hsQueueStream::Rewind()
 {
-    fReadCursor = fWriteCursor+1;
+    fReadCursor = fWriteCursor + 1;
     fReadCursor %= fSize;
 }
 
@@ -1182,17 +1264,19 @@ inline void FastByteCopy(void* dest, const void* src, uint32_t bytes)
 {
     // Don't use memcpy if the read is 4 bytes or less, it's faster to just do a
     // direct copy
-    switch (bytes)
-    {
+    switch (bytes) {
     case 4:
         *((uint32_t*)dest) = *((const uint32_t*)src);
         break;
+
     case 2:
         *((uint16_t*)dest) = *((const uint16_t*)src);
         break;
+
     case 1:
         *((uint8_t*)dest) = *((const uint8_t*)src);
         break;
+
     default:
         memcpy(dest, src, bytes);
     }
@@ -1201,18 +1285,18 @@ inline void FastByteCopy(void* dest, const void* src, uint32_t bytes)
 //#define LOG_BUFFERED
 
 hsBufferedStream::hsBufferedStream()
-: fRef(nil)
-, fFileSize(0)
-, fBufferLen(0)
-, fWriteBufferUsed(false)
+    : fRef(nil)
+    , fFileSize(0)
+    , fBufferLen(0)
+    , fWriteBufferUsed(false)
 #ifdef HS_DEBUGGING
-, fBufferHits(0)
-, fBufferMisses(0)
-, fBufferReadIn(0)
-, fBufferReadOut(0)
-, fReadDirect(0)
-, fLastReadPos(0)
-, fCloseReason(nil)
+    , fBufferHits(0)
+    , fBufferMisses(0)
+    , fBufferReadIn(0)
+    , fBufferReadOut(0)
+    , fReadDirect(0)
+    , fLastReadPos(0)
+    , fCloseReason(nil)
 #endif
 {
 }
@@ -1221,8 +1305,10 @@ bool hsBufferedStream::Open(const plFileName& name, const char* mode)
 {
     hsAssert(!fRef, "hsBufferedStream:Open Stream already opened");
     fRef = plFileSystem::Open(name, mode);
-    if (!fRef)
+
+    if (!fRef) {
         return false;
+    }
 
     SetFileRef(fRef);
 
@@ -1239,30 +1325,35 @@ bool hsBufferedStream::Open(const plFileName& name, const char* mode)
 bool hsBufferedStream::Close()
 {
     int rtn = true;
-    if (fRef)
+
+    if (fRef) {
         rtn = fclose(fRef);
+    }
+
     fRef = nil;
 
 #ifdef LOG_BUFFERED
     hsUNIXStream s;
     static bool firstClose = true;
-    if (firstClose)
-    {
+
+    if (firstClose) {
         firstClose = false;
         s.Open("log\\BufferedStream.csv", "wt");
         s.WriteString("File,Hits,Misses,Read In,Read Out,Read Direct,% Wasted,Reason\n");
-    }
-    else
+    } else {
         s.Open("log\\BufferedStream.csv", "at");
+    }
 
     int wasted = 100;
-    if (fBufferReadIn + fReadDirect > 0)
-        wasted -= int((float(fBufferReadOut+fReadDirect) / float(fBufferReadIn+fReadDirect)) * 100.f);
+
+    if (fBufferReadIn + fReadDirect > 0) {
+        wasted -= int((float(fBufferReadOut + fReadDirect) / float(fBufferReadIn + fReadDirect)) * 100.f);
+    }
 
     s.WriteFmt("%s,%d,%d,%u,%u,%u,%d,%s\n",
-        fFilename.c_str(), fBufferHits, fBufferMisses, fBufferReadIn, fBufferReadOut, fReadDirect,
-        wasted,
-        fCloseReason ? fCloseReason : "Unknown");
+               fFilename.c_str(), fBufferHits, fBufferMisses, fBufferReadIn, fBufferReadOut, fReadDirect,
+               wasted,
+               fCloseReason ? fCloseReason : "Unknown");
 
     s.Close();
 #endif // LOG_BUFFERED
@@ -1292,16 +1383,16 @@ void hsBufferedStream::SetFileRef(FILE* ref)
 uint32_t hsBufferedStream::Read(uint32_t bytes, void* buffer)
 {
     hsAssert(fRef, "fRef uninitialized");
-    if (!fRef || bytes == 0)
+
+    if (!fRef || bytes == 0) {
         return 0;
+    }
 
     uint32_t numReadBytes = 0;
 
-    while (bytes > 0 && fPosition < fFileSize)
-    {
+    while (bytes > 0 && fPosition < fFileSize) {
         // First, see if we've got anything in the buffer
-        if (fBufferLen > 0)
-        {
+        if (fBufferLen > 0) {
             // Figure out how much we can copy out of the buffer
             uint32_t bufferPos = fPosition % kBufferSize;
             uint32_t bytesInBuffer = fBufferLen - bufferPos;
@@ -1315,8 +1406,9 @@ uint32_t hsBufferedStream::Read(uint32_t bytes, void* buffer)
             buffer = (void*)(((char*)buffer) + cachedReadSize);
 
             // If we read all the data out of the buffer, set it to empty
-            if ((bufferPos + cachedReadSize) == fBufferLen)
+            if ((bufferPos + cachedReadSize) == fBufferLen) {
                 fBufferLen = 0;
+            }
 
 #ifdef HS_DEBUGGING
             fLastReadPos = fPosition;
@@ -1327,8 +1419,7 @@ uint32_t hsBufferedStream::Read(uint32_t bytes, void* buffer)
 
         // Now see if the remaining read (if any) is the size of the buffer or larger.
         // If it is, read as many complete blocks as possible directly into the output buffer.
-        if (bytes >= kBufferSize && fPosition % kBufferSize == 0)
-        {
+        if (bytes >= kBufferSize && fPosition % kBufferSize == 0) {
             uint32_t directReadSize = bytes - (bytes % kBufferSize);
             hsAssert(ftell(fRef) % kBufferSize == 0 , "read buffer is not in alignment.");
             int amtRead = ::fread(buffer, 1, directReadSize, fRef);
@@ -1343,15 +1434,14 @@ uint32_t hsBufferedStream::Read(uint32_t bytes, void* buffer)
         }
 
         // If we've got bytes left to read and we didn't pass the end of the file, buffer a new block
-        if (bytes > 0 && fPosition < fFileSize)
-        {
+        if (bytes > 0 && fPosition < fFileSize) {
             hsAssert(ftell(fRef) % kBufferSize == 0 , "read buffer is not in alignment.");
             fBufferLen = ::fread(fBuffer, 1, kBufferSize, fRef);
 
 #ifdef HS_DEBUGGING
+
             // If our last read wasn't at the start of the new buffer, it's a miss.
-            if (fLastReadPos != fPosition)
-            {
+            if (fLastReadPos != fPosition) {
                 fBufferMisses++;
                 fBufferHits--;
             }
@@ -1375,18 +1465,17 @@ uint32_t hsBufferedStream::Write(uint32_t bytes, const void* buffer)
 
 bool hsBufferedStream::AtEnd()
 {
-    if (fWriteBufferUsed)
-    {
-        if (!fRef)
+    if (fWriteBufferUsed) {
+        if (!fRef) {
             return true;
+        }
+
         bool rVal;
         int x = getc(fRef);
         rVal = feof(fRef) != 0;
         ungetc(x, fRef);
         return rVal;
-    }
-    else
-    {
+    } else {
         // buffered read
         return fPosition >= fFileSize;
     }
@@ -1394,29 +1483,24 @@ bool hsBufferedStream::AtEnd()
 
 void hsBufferedStream::Skip(uint32_t delta)
 {
-    if (fWriteBufferUsed)
-    {
+    if (fWriteBufferUsed) {
         // buffered write not implemented yet.
         fseek(fRef, delta, SEEK_CUR);
-    }
-    else
-    {
+    } else {
         uint32_t blockStart = ((fPosition + delta) / kBufferSize) * kBufferSize;
 
         // We've got data in the buffer, see if we can just skip in that
-        if (fBufferLen > 0)
-        {
+        if (fBufferLen > 0) {
             int32_t newBufferPos = int32_t(fPosition % kBufferSize) + int32_t(delta);
 
             // If we skipped outside of our buffer, invalidate it
-            if (newBufferPos < 0 || uint32_t(newBufferPos) >= fBufferLen)
-            {
+            if (newBufferPos < 0 || uint32_t(newBufferPos) >= fBufferLen) {
                 fBufferLen = 0;
                 fseek(fRef, blockStart, SEEK_SET);
             }
-        }
-        else
+        } else {
             fseek(fRef, blockStart, SEEK_SET);
+        }
     }
 
     fPosition += delta;
@@ -1424,24 +1508,24 @@ void hsBufferedStream::Skip(uint32_t delta)
 
 void hsBufferedStream::Rewind()
 {
-    if (fWriteBufferUsed)
-    {
+    if (fWriteBufferUsed) {
         // buffered write not implemented yet.
         fseek(fRef, 0, SEEK_SET);
     }
     // If the currently buffered block isn't the first one, invalidate our buffer
-    else if (fPosition >= kBufferSize)
+    else if (fPosition >= kBufferSize) {
         fBufferLen = 0;
+    }
 
     fPosition = 0;
 }
 
 uint32_t hsBufferedStream::GetEOF()
 {
-    if (fWriteBufferUsed)
-    {
-        if (!fRef)
+    if (fWriteBufferUsed) {
+        if (!fRef) {
             return 0;
+        }
 
         long oldPos = ftell(fRef);
         fseek(fRef, 0, SEEK_END);
@@ -1449,9 +1533,9 @@ uint32_t hsBufferedStream::GetEOF()
         fseek(fRef, oldPos, SEEK_SET);
 
         return end;
-    }
-    else
+    } else {
         return fFileSize;
+    }
 }
 
 void hsBufferedStream::Truncate()

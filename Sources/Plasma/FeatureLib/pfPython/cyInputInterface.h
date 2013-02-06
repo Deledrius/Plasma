@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plInputInterface;
 
-class cyInputInterface
-{
+class cyInputInterface {
 protected:
     plInputInterface* fTelescopeInterface;
 
@@ -68,7 +67,7 @@ public:
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a cyInputInterface object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(cyInputInterface); // converts a PyObject to a cyInputInterface (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     // setters
 

@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 const Class_ID FLEXIBILITY_COMP_CID(0x6fec783f, 0x705536d3);
 
-class plFlexibilityComponent : public plComponent
-{
+class plFlexibilityComponent : public plComponent {
 public:
     enum {
         kFlexibility,
@@ -56,15 +55,23 @@ public:
 
 public:
     plFlexibilityComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     Point3 GetFlexibility() const;
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg) { return true; }
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)     { return true; }
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg) { return true; }
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg) {
+        return true;
+    }
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)     {
+        return true;
+    }
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg) {
+        return true;
+    }
 };
 
 #endif // plFlexibilityComponent_inc

@@ -63,143 +63,156 @@ class hsGDeviceRef;
 
 //// Class Definition /////////////////////////////////////////////////////////
 
-class plBitmap : public hsKeyedObject
-{
-    public:
+class plBitmap : public hsKeyedObject {
+public:
 
-        //// Public Flags ////
+    //// Public Flags ////
 
-        enum {
-            kNoSpace,
-            kDirectSpace,
-            kGraySpace,
-            kIndexSpace
+    enum {
+        kNoSpace,
+        kDirectSpace,
+        kGraySpace,
+        kIndexSpace
+    };
+
+    enum Flags {
+        kNoFlag             = 0x0000,
+        kAlphaChannelFlag   = 0x0001,
+        kAlphaBitFlag       = 0x0002,
+        kBumpEnvMap         = 0x0004,
+        kForce32Bit         = 0x0008,
+        kDontThrowAwayImage = 0x0010,   // We can delete the image, but the pipeline can't
+        kForceOneMipLevel   = 0x0020,
+        kNoMaxSize          = 0x0040,
+        kIntensityMap       = 0x0080,
+        kHalfSize           = 0x0100,
+        kUserOwnsBitmap     = 0x0200,
+        kForceRewrite       = 0x0400,
+        kForceNonCompressed = 0x0800,
+        kAutoGenMipmap      = 0x1000,   // prompts DirectX to generate mipmaps for us automagically
+        // For renderTargets:
+        kIsTexture          = 0x1000,
+        kIsOffscreen        = 0x2000,
+        kMainScreen         = 0x0000,   // Exclusive, i.e. no renderTarget flags
+        kIsProjected        = 0x4000,
+        kIsOrtho            = 0x8000
+    };
+
+    //// Public Data /////
+
+    enum {      // Compression format
+        kUncompressed       = 0x0,
+        kDirectXCompression = 0x1,
+        kJPEGCompression    = 0x2
+    };
+
+    struct DirectXInfo {
+        enum {  // Compression type
+            kError          = 0x0,
+            kDXT1           = 0x1,
+            //kDXT2         = 0x2,
+            //kDXT3         = 0x3,
+            //kDXT4         = 0x4,
+            kDXT5           = 0x5
         };
-
-        enum Flags {
-            kNoFlag             = 0x0000,
-            kAlphaChannelFlag   = 0x0001,
-            kAlphaBitFlag       = 0x0002,
-            kBumpEnvMap         = 0x0004,
-            kForce32Bit         = 0x0008,
-            kDontThrowAwayImage = 0x0010,   // We can delete the image, but the pipeline can't
-            kForceOneMipLevel   = 0x0020,
-            kNoMaxSize          = 0x0040,
-            kIntensityMap       = 0x0080,
-            kHalfSize           = 0x0100,
-            kUserOwnsBitmap     = 0x0200,
-            kForceRewrite       = 0x0400,
-            kForceNonCompressed = 0x0800,
-            kAutoGenMipmap      = 0x1000,   // prompts DirectX to generate mipmaps for us automagically
-            // For renderTargets:
-            kIsTexture          = 0x1000,
-            kIsOffscreen        = 0x2000,
-            kMainScreen         = 0x0000,   // Exclusive, i.e. no renderTarget flags
-            kIsProjected        = 0x4000,
-            kIsOrtho            = 0x8000
-        };
-
-        //// Public Data /////
-
-        enum        // Compression format
-        {
-            kUncompressed       = 0x0,
-            kDirectXCompression = 0x1,
-            kJPEGCompression    = 0x2
-        };
-
-        struct DirectXInfo
-        {
-            enum    // Compression type
-            {
-                kError          = 0x0,
-                kDXT1           = 0x1,
-                //kDXT2         = 0x2,
-                //kDXT3         = 0x3,
-                //kDXT4         = 0x4,
-                kDXT5           = 0x5
-            };
-
-            uint8_t       fCompressionType;   
-            uint8_t       fBlockSize;             // In bytes
-        };
-
-        struct UncompressedInfo
-        {
-            enum
-            {
-                kRGB8888 = 0x00,    /// 32-bit 8888 ARGB format
-                kRGB4444 = 0x01,    /// 16-bit 4444 ARGB format
-                kRGB1555 = 0x02,    /// 16-bit 555 RGB format w/ alpha bit
-                kInten8    = 0x03,  /// 8-bit intensity channel (monochrome)
-                kAInten88  = 0x04   /// 8-bit intensity channel w/ 8-bit alpha
-            };
-
-            uint8_t   fType;
-        };
-
-        //// Public Data /////
 
         uint8_t       fCompressionType;
-        union 
-        {
-            DirectXInfo         fDirectXInfo;
-            UncompressedInfo    fUncompressedInfo;
+        uint8_t       fBlockSize;             // In bytes
+    };
+
+    struct UncompressedInfo {
+        enum {
+            kRGB8888 = 0x00,    /// 32-bit 8888 ARGB format
+            kRGB4444 = 0x01,    /// 16-bit 4444 ARGB format
+            kRGB1555 = 0x02,    /// 16-bit 555 RGB format w/ alpha bit
+            kInten8    = 0x03,  /// 8-bit intensity channel (monochrome)
+            kAInten88  = 0x04   /// 8-bit intensity channel w/ 8-bit alpha
         };
 
+        uint8_t   fType;
+    };
 
-        //// Public Members ////
+    //// Public Data /////
 
-        plBitmap();
-        virtual ~plBitmap();
+    uint8_t       fCompressionType;
+    union {
+        DirectXInfo         fDirectXInfo;
+        UncompressedInfo    fUncompressedInfo;
+    };
 
-        CLASSNAME_REGISTER( plBitmap );
-        GETINTERFACE_ANY( plBitmap, hsKeyedObject );
 
-        // Get the total size in bytes
-        virtual uint32_t  GetTotalSize( void ) const = 0;
+    //// Public Members ////
 
-        // Read and write
-        virtual void    Read( hsStream *s, hsResMgr *mgr ) { hsKeyedObject::Read( s, mgr ); this->Read( s ); }
-        virtual void    Write( hsStream *s, hsResMgr *mgr ) { hsKeyedObject::Write( s, mgr ); this->Write( s ); }
+    plBitmap();
+    virtual ~plBitmap();
 
-        uint16_t          GetFlags( void ) const { return fFlags; }
-        void            SetFlags( uint16_t flags ) { fFlags = flags; }
+    CLASSNAME_REGISTER(plBitmap);
+    GETINTERFACE_ANY(plBitmap, hsKeyedObject);
 
-        uint8_t           GetPixelSize( void ) const { return fPixelSize; }
+    // Get the total size in bytes
+    virtual uint32_t  GetTotalSize(void) const = 0;
 
-        bool            IsCompressed( void ) const { return ( fCompressionType == kDirectXCompression ); }
+    // Read and write
+    virtual void    Read(hsStream* s, hsResMgr* mgr) {
+        hsKeyedObject::Read(s, mgr);
+        this->Read(s);
+    }
+    virtual void    Write(hsStream* s, hsResMgr* mgr) {
+        hsKeyedObject::Write(s, mgr);
+        this->Write(s);
+    }
 
-        virtual void            MakeDirty();
-        virtual hsGDeviceRef    *GetDeviceRef( void ) const { return fDeviceRef; }
-        virtual void            SetDeviceRef( hsGDeviceRef *const devRef );
+    uint16_t          GetFlags(void) const {
+        return fFlags;
+    }
+    void            SetFlags(uint16_t flags) {
+        fFlags = flags;
+    }
 
-        static void     SetGlobalLevelChopCount( uint8_t count ) { fGlobalNumLevelsToChop = count; }
-        static uint8_t    GetGlobalLevelChopCount() { return fGlobalNumLevelsToChop; }
+    uint8_t           GetPixelSize(void) const {
+        return fPixelSize;
+    }
 
-        // Compares and sets the modified time for the source texture
-        bool IsSameModifiedTime(uint32_t lowTime, uint32_t highTime);
-        void SetModifiedTime(uint32_t lowTime, uint32_t highTime);
+    bool            IsCompressed(void) const {
+        return (fCompressionType == kDirectXCompression);
+    }
 
-    protected:
+    virtual void            MakeDirty();
+    virtual hsGDeviceRef*    GetDeviceRef(void) const {
+        return fDeviceRef;
+    }
+    virtual void            SetDeviceRef(hsGDeviceRef* const devRef);
 
-        //// Protected Members ////
+    static void     SetGlobalLevelChopCount(uint8_t count) {
+        fGlobalNumLevelsToChop = count;
+    }
+    static uint8_t    GetGlobalLevelChopCount() {
+        return fGlobalNumLevelsToChop;
+    }
 
-        uint8_t           fPixelSize; // 1, 2, 4, 8, 16, (24), 32, 64
-        uint8_t           fSpace;     // no, direct, gray, index
-        uint16_t          fFlags;     // alphachannel | alphabit
+    // Compares and sets the modified time for the source texture
+    bool IsSameModifiedTime(uint32_t lowTime, uint32_t highTime);
+    void SetModifiedTime(uint32_t lowTime, uint32_t highTime);
 
-        mutable hsGDeviceRef    *fDeviceRef;
+protected:
 
-        static uint8_t            fGlobalNumLevelsToChop;
+    //// Protected Members ////
 
-        // The modification time of the source texture.
-        // Used to determine if we can reuse an already converted copy.
-        uint32_t fLowModifiedTime;
-        uint32_t fHighModifiedTime;
+    uint8_t           fPixelSize; // 1, 2, 4, 8, 16, (24), 32, 64
+    uint8_t           fSpace;     // no, direct, gray, index
+    uint16_t          fFlags;     // alphachannel | alphabit
 
-        virtual uint32_t  Read( hsStream *s );
-        virtual uint32_t  Write( hsStream *s );
+    mutable hsGDeviceRef*    fDeviceRef;
+
+    static uint8_t            fGlobalNumLevelsToChop;
+
+    // The modification time of the source texture.
+    // Used to determine if we can reuse an already converted copy.
+    uint32_t fLowModifiedTime;
+    uint32_t fHighModifiedTime;
+
+    virtual uint32_t  Read(hsStream* s);
+    virtual uint32_t  Write(hsStream* s);
 };
 
 #endif // _plBitmap_h

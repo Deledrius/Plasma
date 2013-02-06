@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/FeatureLib/pfGameMgr/pfGameMgrCreatables.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_FEATURELIB_PFGAMEMGR_PFGAMEMGRCREATABLES_H

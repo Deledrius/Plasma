@@ -57,8 +57,7 @@ class pfGameCli;
 class plString;
 class plUUID;
 
-class pyGameCli
-{
+class pyGameCli {
 protected:
     pfGameCli* gameClient;
 

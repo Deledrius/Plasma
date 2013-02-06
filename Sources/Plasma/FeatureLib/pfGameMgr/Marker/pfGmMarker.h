@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/FeatureLib/pfGameMgr/Marker/pfGmMarker.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_FEATURELIB_PFGAMEMGR_MARKER_PFGMMARKER_H
@@ -61,41 +61,41 @@ class pfGmMarker : public pfGameCli {
     // Encapsulate all implementation details such as member fields
     // in an opaque friend class, in this case that's IMarker.
     friend struct IMarker;
-    struct IMarker * internal;
+    struct IMarker* internal;
 
     //========================================================================
     // Required subclass methods
     //--------------------------
-    void Recv           (GameMsgHeader * msg, void * param);
-    void OnPlayerJoined (const Srv2Cli_Game_PlayerJoined & msg);
-    void OnPlayerLeft   (const Srv2Cli_Game_PlayerLeft & msg);
-    void OnInviteFailed (const Srv2Cli_Game_InviteFailed & msg);
-    void OnOwnerChange  (const Srv2Cli_Game_OwnerChange & msg);
+    void Recv(GameMsgHeader* msg, void* param);
+    void OnPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg);
+    void OnPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg);
+    void OnInviteFailed(const Srv2Cli_Game_InviteFailed& msg);
+    void OnOwnerChange(const Srv2Cli_Game_OwnerChange& msg);
     //========================================================================
 
 public:
-    #pragma warning(push, 0)
+#pragma warning(push, 0)
     // These macros produce warnings on W4
     CLASSNAME_REGISTER(pfGmMarker);
     GETINTERFACE_ANY(pfGmMarker, pfGameCli);
-    #pragma warning(pop)
-    
-    pfGmMarker (unsigned gameId, plKey receiver);
-    ~pfGmMarker ();
-    
+#pragma warning(pop)
+
+    pfGmMarker(unsigned gameId, plKey receiver);
+    ~pfGmMarker();
+
     //========================================================================
     // Game methods
     //-------------
-    void StartGame ();
-    void PauseGame ();
-    void ResetGame ();
-    void ChangeGameName (const wchar_t name[]);
-    void ChangeTimeLimit (unsigned long timeLimit);
-    void DeleteGame ();
-    void AddMarker (double x, double y, double z, const wchar_t name[], const wchar_t age[]);
-    void DeleteMarker (unsigned long markerID);
-    void ChangeMarkerName (unsigned long markerID, const wchar_t name[]);
-    void CaptureMarker (unsigned long markerID);
+    void StartGame();
+    void PauseGame();
+    void ResetGame();
+    void ChangeGameName(const wchar_t name[]);
+    void ChangeTimeLimit(unsigned long timeLimit);
+    void DeleteGame();
+    void AddMarker(double x, double y, double z, const wchar_t name[], const wchar_t age[]);
+    void DeleteMarker(unsigned long markerID);
+    void ChangeMarkerName(unsigned long markerID, const wchar_t name[]);
+    void CaptureMarker(unsigned long markerID);
     //========================================================================
 };
 

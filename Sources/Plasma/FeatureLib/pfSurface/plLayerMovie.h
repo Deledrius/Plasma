@@ -50,8 +50,7 @@ class plMessage;
 class hsStream;
 class hsResMgr;
 
-class plLayerMovie : public plLayerAnimation
-{
+class plLayerMovie : public plLayerAnimation {
 protected:
     plFileName                  fMovieName;
 
@@ -63,7 +62,9 @@ protected:
 
     virtual int32_t             ISecsToFrame(float secs) = 0;
 
-    bool                        IGetFault() const { return !fMovieName.IsValid(); }
+    bool                        IGetFault() const {
+        return !fMovieName.IsValid();
+    }
     bool                        ISetFault(const char* errStr);
     bool                        ICheckBitmap();
     bool                        IMovieIsIdle(); // will call IRelease();
@@ -79,25 +80,33 @@ public:
     plLayerMovie();
     virtual ~plLayerMovie();
 
-    CLASSNAME_REGISTER( plLayerMovie );
-    GETINTERFACE_ANY( plLayerMovie, plLayerAnimation );
+    CLASSNAME_REGISTER(plLayerMovie);
+    GETINTERFACE_ANY(plLayerMovie, plLayerAnimation);
 
     virtual uint32_t        Eval(double secs, uint32_t frame, uint32_t ignore);
 
     virtual void            Read(hsStream* s, hsResMgr* mgr);
     virtual void            Write(hsStream* s, hsResMgr* mgr);
 
-    bool                    IsStopped() { return fTimeConvert.IsStopped(); }
+    bool                    IsStopped() {
+        return fTimeConvert.IsStopped();
+    }
 
-    void                    SetMovieName(const plFileName& n) { fMovieName = n; }
-    const plFileName&       GetMovieName() const { return fMovieName; }
+    void                    SetMovieName(const plFileName& n) {
+        fMovieName = n;
+    }
+    const plFileName&       GetMovieName() const {
+        return fMovieName;
+    }
 
     virtual bool            MsgReceive(plMessage* msg);
 
     // Movie specific
     int                     GetWidth() const;
     int                     GetHeight() const;
-    float                   GetLength() const { return fLength; }
+    float                   GetLength() const {
+        return fLength;
+    }
 
     virtual void            DefaultMovie();
 };

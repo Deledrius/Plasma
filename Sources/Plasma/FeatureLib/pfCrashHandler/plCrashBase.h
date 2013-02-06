@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "hsThread.h"
 
-class plCrashBase
-{
+class plCrashBase {
 protected:
     hsSemaphore* fCrashed;
     hsSemaphore* fHandled;

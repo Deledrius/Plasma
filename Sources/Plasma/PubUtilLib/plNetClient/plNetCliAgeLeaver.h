@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plNetClient/plNetCliAgeLeaver.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_PUBUTILLIB_PLNETCLIENT_PLNETCLIAGELEAVER_H
@@ -56,7 +56,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 /*****************************************************************************
 *
-*   
+*
 *
 ***/
 
@@ -70,31 +70,31 @@ enum ENCAgeLeaverNotify {
 
 struct NCAgeLeaveCompleteNotify {
     bool            success;
-    const char *    msg;
+    const char*     msg;
 };
 
 
 typedef void (* FNCAgeLeaverCallback)(
-    plNCAgeLeaver *         leaver,
+    plNCAgeLeaver*          leaver,
     unsigned                type,       // ENCAgeLeaverNotify
-    void *                  notify,
-    void *                  userState
+    void*                   notify,
+    void*                   userState
 );
 
 
-void NCAgeLeaverCreate (
-    plNCAgeLeaver **        leaver,
+void NCAgeLeaverCreate(
+    plNCAgeLeaver**         leaver,
     bool                    quitting,
     bool                    muteSfx,
     FNCAgeLeaverCallback    callback,
-    void *                  userState
+    void*                   userState
 );
-bool NCAgeLeaverMsgReceive (    // returns true of message was processed
-    plNCAgeLeaver *         leaver,
-    plMessage *             msg
+bool NCAgeLeaverMsgReceive(     // returns true of message was processed
+    plNCAgeLeaver*          leaver,
+    plMessage*              msg
 );
-void NCAgeLeaverUpdate (
-    plNCAgeLeaver *         leaver
+void NCAgeLeaverUpdate(
+    plNCAgeLeaver*          leaver
 );
 
 

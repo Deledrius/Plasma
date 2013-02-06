@@ -47,58 +47,59 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plSound;
 struct hsPoint3;
 
-class plRandomSoundModGroup
-{
+class plRandomSoundModGroup {
 public:
     hsBitVector fExcluded;
     int8_t fCurrent;
     uint16_t fNumSounds;
-    uint16_t *fIndices;
+    uint16_t* fIndices;
     int16_t   fGroupedIdx;        // Only used if we point to a groupedSound, in which case fIndices are indices into
-                                // that sound. -1 if unused.
+    // that sound. -1 if unused.
 
     plRandomSoundModGroup();
     ~plRandomSoundModGroup();
 
-    void Read(hsStream *s);
-    void Write(hsStream *s);
+    void Read(hsStream* s);
+    void Write(hsStream* s);
 };
 
-class plRandomSoundMod : public plRandomCommandMod
-{
+class plRandomSoundMod : public plRandomCommandMod {
 protected:
     uint16_t fCurrentGroup;
     uint16_t fNumGroups;
-    plRandomSoundModGroup *fGroups;
+    plRandomSoundModGroup* fGroups;
     std::vector<uint16_t> fActiveList;    // list of sounds we're allowed to choose
     int              fOldPriority;      // old sound priority
     bool            fFirstTimePlay;
-    
+
     virtual void    IPlayNext();
     virtual void    IPlayNextIfMaster();
     virtual void    IStop();
     void            ISetVolume(float volume);
     void            ISetPosition(hsPoint3);
-    plSound         *IGetSoundPtr(); 
-    
+    plSound*         IGetSoundPtr();
+
 public:
     plRandomSoundMod();
     ~plRandomSoundMod();
 
-    CLASSNAME_REGISTER( plRandomSoundMod );
-    GETINTERFACE_ANY( plRandomSoundMod, plRandomCommandMod );
+    CLASSNAME_REGISTER(plRandomSoundMod);
+    GETINTERFACE_ANY(plRandomSoundMod, plRandomCommandMod);
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);
 
     void SetCurrentGroup(uint16_t group);
-        
-    void    ForceSoundLoadState( bool loaded );
+
+    void    ForceSoundLoadState(bool loaded);
     bool    MsgReceive(plMessage* msg);
     float           GetVolume();
 
     // EXPORT ONLY
-    void SetGroupInfo(uint16_t numGroups, plRandomSoundModGroup *groups) { fNumGroups = numGroups; fGroups = groups; }
+    void SetGroupInfo(uint16_t numGroups, plRandomSoundModGroup* groups) {
+        fNumGroups = numGroups;
+        fGroups = groups;
+    }
 };
 
 #endif // plRandomSoundMod_inc

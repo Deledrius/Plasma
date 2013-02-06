@@ -56,21 +56,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plRTProjDirLight.h"
 
-class plRTProjDirLightDesc : public ClassDesc2 
-{
-    public:
-        int             IsPublic()                      { return TRUE; }
-        void*           Create(BOOL loading)            { return new plRTProjDirLight; }
-        const TCHAR*    ClassName()                     { return GetString(IDS_DB_PROJDIR); }
-        SClass_ID       SuperClassID()                  { return LIGHT_CLASS_ID; }
-        Class_ID        ClassID()                       { return RTPDIR_LIGHT_CLASSID; }
-        const TCHAR*    Category()                      { return _T("Plasma RunTime");}
-        const TCHAR*    InternalName()                  { return _T("RTProjDir"); } // returns fixed parsable name (scripter-visible name)
-        HINSTANCE       HInstance()                     { return hInstance; }
+class plRTProjDirLightDesc : public ClassDesc2 {
+public:
+    int             IsPublic()                      {
+        return TRUE;
+    }
+    void*           Create(BOOL loading)            {
+        return new plRTProjDirLight;
+    }
+    const TCHAR*    ClassName()                     {
+        return GetString(IDS_DB_PROJDIR);
+    }
+    SClass_ID       SuperClassID()                  {
+        return LIGHT_CLASS_ID;
+    }
+    Class_ID        ClassID()                       {
+        return RTPDIR_LIGHT_CLASSID;
+    }
+    const TCHAR*    Category()                      {
+        return _T("Plasma RunTime");
+    }
+    const TCHAR*    InternalName()                  {
+        return _T("RTProjDir");    // returns fixed parsable name (scripter-visible name)
+    }
+    HINSTANCE       HInstance()                     {
+        return hInstance;
+    }
 
-        static plRTProjDirLightDesc fStaticDesc;
+    static plRTProjDirLightDesc fStaticDesc;
 
-        static ClassDesc2   *GetDesc( void )        { return &fStaticDesc; }
+    static ClassDesc2*   GetDesc(void)        {
+        return &fStaticDesc;
+    }
 };
 
 #endif  // _plRTProjDirLightClassDesc_h

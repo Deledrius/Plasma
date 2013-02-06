@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plCreatable;
 
-class plCreator
-{
+class plCreator {
 private:
 protected:
 

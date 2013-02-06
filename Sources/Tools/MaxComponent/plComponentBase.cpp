@@ -67,12 +67,12 @@ CreateMouseCallBack* plComponentBase::GetCreateMouseCallBack()
     return NULL;
 }
 
-void plComponentBase::BeginEditParams(IObjParam *ip, ULONG flags, Animatable *prev)
+void plComponentBase::BeginEditParams(IObjParam* ip, ULONG flags, Animatable* prev)
 {
     fClassDesc->BeginEditParams(ip, this, flags, prev);
 }
 
-void plComponentBase::EndEditParams(IObjParam *ip, ULONG flags, Animatable *next)
+void plComponentBase::EndEditParams(IObjParam* ip, ULONG flags, Animatable* next)
 {
     fClassDesc->EndEditParams(ip, this, flags, next);
 }
@@ -82,22 +82,24 @@ int plComponentBase::NumParamBlocks()
     return 2;
 }
 
-IParamBlock2 *plComponentBase::GetParamBlock(int i)
+IParamBlock2* plComponentBase::GetParamBlock(int i)
 {
-    if (i == kRefComp)
+    if (i == kRefComp) {
         return fCompPB;
-    else if (i == kRefTargs)
+    } else if (i == kRefTargs) {
         return fTargsPB;
+    }
 
     return nil;
 }
 
-IParamBlock2 *plComponentBase::GetParamBlockByID(BlockID id)
+IParamBlock2* plComponentBase::GetParamBlockByID(BlockID id)
 {
-    if (fCompPB && fCompPB->ID() == id)
+    if (fCompPB && fCompPB->ID() == id) {
         return fCompPB;
-    else if (fTargsPB && fTargsPB->ID() == id)
+    } else if (fTargsPB && fTargsPB->ID() == id) {
         return fTargsPB;
+    }
 
     return nil;
 }
@@ -108,7 +110,7 @@ int plComponentBase::NumSubs()
     return 1;
 }
 
-Animatable *plComponentBase::SubAnim(int i)
+Animatable* plComponentBase::SubAnim(int i)
 {
     return fCompPB;
 }
@@ -118,16 +120,20 @@ TSTR plComponentBase::SubAnimName(int i)
     return fClassDesc->ClassName();
 }
 
-RefTargetHandle plComponentBase::Clone(RemapDir &remap)
+RefTargetHandle plComponentBase::Clone(RemapDir& remap)
 {
-    plComponentBase *obj = (plComponentBase*)fClassDesc->Create(false);
+    plComponentBase* obj = (plComponentBase*)fClassDesc->Create(false);
     // Do the base clone
     BaseClone(this, obj, remap);
+
     // Copy our references
-    if (fCompPB)
+    if (fCompPB) {
         obj->ReplaceReference(kRefComp, fCompPB->Clone(remap));
-    if (fTargsPB)
+    }
+
+    if (fTargsPB) {
         obj->ReplaceReference(kRefTargs, fTargsPB->Clone(remap));
+    }
 
     return obj;
 }
@@ -140,22 +146,22 @@ void plComponentBase::FreeCaches()
 {
 }
 
-void plComponentBase::GetLocalBoundBox(TimeValue t, INode *node, ViewExp *vpt, Box3 &box)
+void plComponentBase::GetLocalBoundBox(TimeValue t, INode* node, ViewExp* vpt, Box3& box)
 {
-    box.MakeCube(Point3(0,0,0), 0);
+    box.MakeCube(Point3(0, 0, 0), 0);
 }
 
-void plComponentBase::GetWorldBoundBox(TimeValue t, INode *node, ViewExp *vpt, Box3 &box)
+void plComponentBase::GetWorldBoundBox(TimeValue t, INode* node, ViewExp* vpt, Box3& box)
 {
-    box.MakeCube(Point3(0,0,0), 0);
+    box.MakeCube(Point3(0, 0, 0), 0);
 }
 
-int plComponentBase::Display(TimeValue t, INode *node, ViewExp *vpt, int flags)
+int plComponentBase::Display(TimeValue t, INode* node, ViewExp* vpt, int flags)
 {
     return 0;
 }
 
-int plComponentBase::HitTest(TimeValue t, INode *node, int type, int crossing, int flags, IPoint2 *p, ViewExp *vpt)
+int plComponentBase::HitTest(TimeValue t, INode* node, int type, int crossing, int flags, IPoint2* p, ViewExp* vpt)
 {
     return 0;
 }
@@ -167,20 +173,22 @@ int plComponentBase::NumRefs()
 
 RefTargetHandle plComponentBase::GetReference(int i)
 {
-    if (i == kRefComp)
+    if (i == kRefComp) {
         return fCompPB;
-    else if (i == kRefTargs)
+    } else if (i == kRefTargs) {
         return fTargsPB;
+    }
 
     return nil;
 }
 
 void plComponentBase::SetReference(int i, RefTargetHandle rtarg)
 {
-    if (i == kRefTargs)
+    if (i == kRefTargs) {
         fTargsPB = (IParamBlock2*)rtarg;
-    else if (i == kRefComp)
+    } else if (i == kRefComp) {
         fCompPB = (IParamBlock2*)rtarg;
+    }
 }
 
 RefResult plComponentBase::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, PartID& partID, RefMessage message)
@@ -201,59 +209,65 @@ IOResult plComponentBase::Load(ILoad* iload)
 void plComponentBase::AddTargetsToList(INodeTab& list)
 {
     int i;
-    for( i = 0; i < NumTargets(); i++ )
-    {
+
+    for (i = 0; i < NumTargets(); i++) {
         INode* targ = GetTarget(i);
-        if( targ )
+
+        if (targ) {
             list.Append(1, &targ);
+        }
     }
 }
 
 uint32_t plComponentBase::NumTargets()
 {
-    if (fTargsPB)
+    if (fTargsPB) {
         return fTargsPB->Count(kTargs);
+    }
 
     return 0;
 }
 
-plMaxNodeBase *plComponentBase::GetTarget(uint32_t i)
+plMaxNodeBase* plComponentBase::GetTarget(uint32_t i)
 {
-    if (fTargsPB && i < NumTargets())
+    if (fTargsPB && i < NumTargets()) {
         return (plMaxNodeBase*)fTargsPB->GetINode(kTargs, 0, i);
+    }
 
     return nil;
 }
 
-void plComponentBase::AddTarget(plMaxNodeBase *target)
+void plComponentBase::AddTarget(plMaxNodeBase* target)
 {
-    if (!target)
+    if (!target) {
         return;
+    }
 
     // Make sure we don't already ref this
     uint32_t count = fTargsPB->Count(kTargs);
-    for (uint32_t i = 0; i < count; i++)
-    {
-        if (fTargsPB->GetINode(kTargs, 0, i) == target)
+
+    for (uint32_t i = 0; i < count; i++) {
+        if (fTargsPB->GetINode(kTargs, 0, i) == target) {
             return;
+        }
     }
 
     // Add it to our list
     fTargsPB->Append(kTargs, 1, (INode**)&target);
-    
+
     NotifyDependents(FOREVER, (PartID)target, REFMSG_USER_TARGET_ADD);
 }
 
-void plComponentBase::DeleteTarget(plMaxNodeBase *target)
+void plComponentBase::DeleteTarget(plMaxNodeBase* target)
 {
-    if (!target)
+    if (!target) {
         return;
+    }
 
     uint32_t count = fTargsPB->Count(kTargs);
-    for (uint32_t i = 0; i < count; i++)
-    {
-        if (fTargsPB->GetINode(kTargs, 0, i) == target)
-        {
+
+    for (uint32_t i = 0; i < count; i++) {
+        if (fTargsPB->GetINode(kTargs, 0, i) == target) {
             fTargsPB->Delete(kTargs, i, 1);
             NotifyDependents(FOREVER, (PartID)target, REFMSG_USER_TARGET_DELETE);
             return;
@@ -263,24 +277,27 @@ void plComponentBase::DeleteTarget(plMaxNodeBase *target)
 
 void plComponentBase::DeleteAllTargets()
 {
-    while (fTargsPB->Count(kTargs) > 0)
-    {
-        INode *node = fTargsPB->GetINode(kTargs);
-        if (node)
+    while (fTargsPB->Count(kTargs) > 0) {
+        INode* node = fTargsPB->GetINode(kTargs);
+
+        if (node) {
             NotifyDependents(FOREVER, (PartID)node, REFMSG_USER_TARGET_DELETE);
+        }
 
         fTargsPB->Delete(kTargs, 0, 1);
     }
 }
 
-bool plComponentBase::IsTarget(plMaxNodeBase *node)
+bool plComponentBase::IsTarget(plMaxNodeBase* node)
 {
-    if (!node)
+    if (!node) {
         return false;
+    }
 
     for (int i = 0; i < fTargsPB->Count(kTargs); i++)
-        if (fTargsPB->GetINode(kTargs, 0, i) == node)
+        if (fTargsPB->GetINode(kTargs, 0, i) == node) {
             return true;
+        }
 
     return false;
 }
@@ -290,40 +307,45 @@ plString plComponentBase::IGetUniqueName(plMaxNodeBase* target)
     // Make sure we've actually got multiple *used* targets.  (Some could be nil)
     int numUsedTargs = 0;
     int thisTargIdx = -1;
-    for (int i = 0; i < fTargsPB->Count(kTargs); i++)
-    {
+
+    for (int i = 0; i < fTargsPB->Count(kTargs); i++) {
         plMaxNodeBase* thisTarg = (plMaxNodeBase*)fTargsPB->GetINode(kTargs, 0, i);
 
-        if (thisTarg)
+        if (thisTarg) {
             numUsedTargs++;
+        }
 
-        if (thisTarg == target)
+        if (thisTarg == target) {
             thisTargIdx = i;
+        }
 
         // If we've figured out whether or not we have multiple targets, and we
         // found which target this one is, we can break out early
-        if (numUsedTargs > 1 && thisTargIdx != -1)
+        if (numUsedTargs > 1 && thisTargIdx != -1) {
             break;
+        }
     }
 
     hsAssert(thisTargIdx != -1, "Bad target for IGetUniqueName");
 
-    if (numUsedTargs > 1)
+    if (numUsedTargs > 1) {
         return plString::Format("%s_%d", GetINode()->GetName(), thisTargIdx);
-    else
+    } else {
         return plString::FromUtf8(GetINode()->GetName());
+    }
 }
 
-plMaxNodeBase *plComponentBase::GetINode()
+plMaxNodeBase* plComponentBase::GetINode()
 {
     // Go through the reflist looking for RefMakers with a ref to this component.
     // There should only be one INode in this list.
     DependentIterator di(this);
     ReferenceMaker* rm = di.Next();
-    while (rm != nil) 
-    {
-        if (rm->SuperClassID() == BASENODE_CLASS_ID)
+
+    while (rm != nil) {
+        if (rm->SuperClassID() == BASENODE_CLASS_ID) {
             return (plMaxNodeBase*)rm;
+        }
 
         rm = di.Next();
     }
@@ -340,17 +362,19 @@ bool plComponentBase::IsCurMsgLocal()
 {
     // Was the last notification a message propagated up from a target?
     // Ignore it if so.
-    if (fTargsPB->LastNotifyParamID() != -1)
+    if (fTargsPB->LastNotifyParamID() != -1) {
         return false;
+    }
 
     // Was the last notification from a ref in the component PB?  If so, assume
     // it was a propagated message from the ref.  Real changes to that ref
     // parameter will be signalled with a user ref message.
-    if (fCompPB->LastNotifyParamID() != -1)
-    {
+    if (fCompPB->LastNotifyParamID() != -1) {
         ParamID id = fCompPB->LastNotifyParamID();
-        if (is_ref(fCompPB->GetParamDef(id)))
+
+        if (is_ref(fCompPB->GetParamDef(id))) {
             return false;
+        }
     }
 
     return true;
@@ -365,54 +389,58 @@ bool DoesPBReferenceNode(IParamBlock2* pb, INode* node);
 
 static bool CheckRef(ReferenceTarget* targ, INode* node)
 {
-    if (!targ)
+    if (!targ) {
         return false;
-    if (targ->SuperClassID() == BASENODE_CLASS_ID)
-    {
-        if ((INode*)targ == node)
-            return true;
     }
-    else if (targ->SuperClassID() == PARAMETER_BLOCK2_CLASS_ID)
-    {
+
+    if (targ->SuperClassID() == BASENODE_CLASS_ID) {
+        if ((INode*)targ == node) {
+            return true;
+        }
+    } else if (targ->SuperClassID() == PARAMETER_BLOCK2_CLASS_ID) {
         return DoesPBReferenceNode((IParamBlock2*)targ, node);
     }
+
     return false;
 }
 
 static bool DoesPBReferenceNode(IParamBlock2* pb, INode* node)
 {
-    for (int i = 0; i < pb->NumParams(); i++)
-    {
+    for (int i = 0; i < pb->NumParams(); i++) {
         ParamID id = pb->IndextoID(i);
         ParamType2 type = pb->GetParameterType(id);
-        if (type == TYPE_INODE)
-        {
-            if (pb->GetINode(id) == node)
+
+        if (type == TYPE_INODE) {
+            if (pb->GetINode(id) == node) {
                 return true;
-        }
-        if (type == TYPE_INODE_TAB)
-        {
-            for (int iNode = 0; iNode < pb->Count(id); iNode++)
-            {
-                if (pb->GetINode(id, 0, iNode) == node)
-                    return true;
             }
         }
-        if (type == TYPE_REFTARG)
-        {
+
+        if (type == TYPE_INODE_TAB) {
+            for (int iNode = 0; iNode < pb->Count(id); iNode++) {
+                if (pb->GetINode(id, 0, iNode) == node) {
+                    return true;
+                }
+            }
+        }
+
+        if (type == TYPE_REFTARG) {
             ReferenceTarget* targ = pb->GetReferenceTarget(id);
             bool ret = CheckRef(targ, node);
-            if (ret)
+
+            if (ret) {
                 return true;
+            }
         }
-        if (type == TYPE_REFTARG_TAB)
-        {
-            for (int iRef = 0; iRef < pb->Count(id); iRef++)
-            {
+
+        if (type == TYPE_REFTARG_TAB) {
+            for (int iRef = 0; iRef < pb->Count(id); iRef++) {
                 ReferenceTarget* targ = pb->GetReferenceTarget(id, 0, iRef);
                 bool ret = CheckRef(targ, node);
-                if (ret)
+
+                if (ret) {
                     return true;
+                }
             }
         }
     }
@@ -422,38 +450,37 @@ static bool DoesPBReferenceNode(IParamBlock2* pb, INode* node)
 
 bool plComponentBase::DoReferenceNode(INode* node)
 {
-    if (!fCompPB)
+    if (!fCompPB) {
         return false;
+    }
 
     return DoesPBReferenceNode(fCompPB, node);
 }
 
 void plComponentBase::CreateRollups()
 {
-    if (!fCompPB)
+    if (!fCompPB) {
         return;
+    }
 
-    ParamBlockDesc2 *pd = fCompPB->GetDesc();
-    plComponentClassDesc *cd = (plComponentClassDesc*)pd->cd;
+    ParamBlockDesc2* pd = fCompPB->GetDesc();
+    plComponentClassDesc* cd = (plComponentClassDesc*)pd->cd;
 
     // This is a plAutoUIComp, we need to treat it differently
-    if (cd->IsAutoUI())
-    {
-        plAutoUIClassDesc *cd = (plAutoUIClassDesc*)pd->cd;
+    if (cd->IsAutoUI()) {
+        plAutoUIClassDesc* cd = (plAutoUIClassDesc*)pd->cd;
         cd->CreateAutoRollup(fCompPB);
     }
     // We're using a normal param block with auto UI
-    else if (pd->flags & P_AUTO_UI)
-    {
-        if (pd->flags & P_MULTIMAP)
-        {
+    else if (pd->flags & P_AUTO_UI) {
+        if (pd->flags & P_MULTIMAP) {
             int nMaps = pd->map_specs.Count();
-            for (int i = 0; i < nMaps; i++)
-            {
+
+            for (int i = 0; i < nMaps; i++) {
                 ParamBlockDesc2::map_spec spec = pd->map_specs[i];
 
                 // Create the rollout
-                IParamMap2 *map = CreateCPParamMap2(spec.map_id,
+                IParamMap2* map = CreateCPParamMap2(spec.map_id,
                                                     fCompPB,
                                                     GetCOREInterface(),
                                                     hInstance,
@@ -467,11 +494,9 @@ void plComponentBase::CreateRollups()
                 // Save the rollout in the paramblock
                 fCompPB->SetMap(map, spec.map_id);
             }
-        }
-        else
-        {
+        } else {
             // Create the rollout
-            IParamMap2 *map = CreateCPParamMap2(0,
+            IParamMap2* map = CreateCPParamMap2(0,
                                                 fCompPB,
                                                 GetCOREInterface(),
                                                 hInstance,
@@ -492,41 +517,41 @@ void plComponentBase::CreateRollups()
 
 void plComponentBase::DestroyRollups()
 {
-    if (!fCompPB)
+    if (!fCompPB) {
         return;
+    }
 
-    ParamBlockDesc2 *pd = fCompPB->GetDesc();
-    plComponentClassDesc *cd = (plComponentClassDesc*)pd->cd;
+    ParamBlockDesc2* pd = fCompPB->GetDesc();
+    plComponentClassDesc* cd = (plComponentClassDesc*)pd->cd;
 
     // This is a plAutoUIComp, we need to treat it differently
-    if (cd->IsAutoUI())
-    {
-        plAutoUIClassDesc *autoCD = (plAutoUIClassDesc*)pd->cd;
+    if (cd->IsAutoUI()) {
+        plAutoUIClassDesc* autoCD = (plAutoUIClassDesc*)pd->cd;
         autoCD->DestroyAutoRollup();
     }
     // We're using a normal param block with auto UI
-    else if (pd->flags & P_AUTO_UI)
-    {
-        if (pd->flags & P_MULTIMAP)
-        {
+    else if (pd->flags & P_AUTO_UI) {
+        if (pd->flags & P_MULTIMAP) {
             int nMaps = pd->map_specs.Count();
-            for (int i = 0; i < nMaps; i++)
-            {
+
+            for (int i = 0; i < nMaps; i++) {
                 MapID id = pd->map_specs[i].map_id;
                 // Destroy any parammap saved in the rollup
-                IParamMap2 *map = fCompPB->GetMap(id);
+                IParamMap2* map = fCompPB->GetMap(id);
                 fCompPB->SetMap(nil, id);
-                if (map)
+
+                if (map) {
                     DestroyCPParamMap2(map);
+                }
             }
-        }
-        else
-        {
+        } else {
             // Destroy any parammap saved in the rollup
-            IParamMap2 *map = fCompPB->GetMap();
+            IParamMap2* map = fCompPB->GetMap();
             fCompPB->SetMap(nil);
-            if (map)
+
+            if (map) {
                 DestroyCPParamMap2(map);
+            }
         }
     }
 
@@ -535,13 +560,14 @@ void plComponentBase::DestroyRollups()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool INodeHasComponent(plMaxNodeBase *node, plMaxNodeBase *compNode)
+static bool INodeHasComponent(plMaxNodeBase* node, plMaxNodeBase* compNode)
 {
     uint32_t count = node->NumAttachedComponents();
-    for (uint32_t i = 0; i < count; i++)
-    {
-        if (node->GetAttachedComponent(i)->GetINode() == compNode)
+
+    for (uint32_t i = 0; i < count; i++) {
+        if (node->GetAttachedComponent(i)->GetINode() == compNode) {
             return true;
+        }
     }
 
     return false;
@@ -551,31 +577,32 @@ int plSharedComponents(INodeTab& nodes, INodeTab& components)
 {
     components.ZeroCount();
 
-    if (nodes.Count() == 0)
+    if (nodes.Count() == 0) {
         return 0;
+    }
 
-    plMaxNodeBase *firstNode = (plMaxNodeBase*)nodes[0];
+    plMaxNodeBase* firstNode = (plMaxNodeBase*)nodes[0];
     int num = firstNode->NumAttachedComponents();
-    
+
     // Resize the list to it's max size to be more efficient
     components.SetCount(num);
 
     int i;
 
     // Put all the components on the first node into a list
-    for (i = 0; i < num; i++)
+    for (i = 0; i < num; i++) {
         components[i] = firstNode->GetAttachedComponent(i)->GetINode();
+    }
 
     // Delete any components that aren't on all the other nodes
-    for (i = 1; i < nodes.Count(); i++)
-    {
-        plMaxNodeBase *node = (plMaxNodeBase*)nodes[i];
+    for (i = 1; i < nodes.Count(); i++) {
+        plMaxNodeBase* node = (plMaxNodeBase*)nodes[i];
         uint32_t count = node->NumAttachedComponents();
 
-        for (int j = components.Count()-1; j >= 0; j--)
-        {
-            if (!INodeHasComponent(node, (plMaxNodeBase*)components[j]))
+        for (int j = components.Count() - 1; j >= 0; j--) {
+            if (!INodeHasComponent(node, (plMaxNodeBase*)components[j])) {
                 components.Delete(j, 1);
+            }
         }
     }
 
@@ -585,44 +612,45 @@ int plSharedComponents(INodeTab& nodes, INodeTab& components)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-static void UpdateComponentVisibility(plMaxNodeBase *node)
+static void UpdateComponentVisibility(plMaxNodeBase* node)
 {
-    plComponentBase *comp = node->ConvertToComponent();
-    if (comp)
-    {
+    plComponentBase* comp = node->ConvertToComponent();
+
+    if (comp) {
         node->Freeze(TRUE);
         node->Hide(!comp->AllowUnhide());
     }
 
-    for (int i = 0; i < node->NumberOfChildren(); i++)
-    {
-        plMaxNodeBase *childNode = (plMaxNodeBase*)node->GetChildNode(i);
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
+        plMaxNodeBase* childNode = (plMaxNodeBase*)node->GetChildNode(i);
         UpdateComponentVisibility(childNode);
     }
 }
 
-static void UnlinkComponents(plMaxNodeBase *node)
+static void UnlinkComponents(plMaxNodeBase* node)
 {
-    plComponentBase *comp = node->ConvertToComponent();
-    if (comp)
+    plComponentBase* comp = node->ConvertToComponent();
+
+    if (comp) {
         comp->DeleteAllTargets();
-    
-    for (int i = 0; i < node->NumberOfChildren(); i++)
-    {
-        plMaxNodeBase *child = (plMaxNodeBase*)node->GetChildNode(i);
+    }
+
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
+        plMaxNodeBase* child = (plMaxNodeBase*)node->GetChildNode(i);
         UnlinkComponents(child);
     }
 }
 
-static void FindObsoleteComponents(plMaxNodeBase *node, std::vector<plComponentBase*>& obsoleteComps)
+static void FindObsoleteComponents(plMaxNodeBase* node, std::vector<plComponentBase*>& obsoleteComps)
 {
-    plComponentBase *comp = node->ConvertToComponent();
-    if (comp && comp->IsObsolete())
-        obsoleteComps.push_back(comp);
+    plComponentBase* comp = node->ConvertToComponent();
 
-    for (int i = 0; i < node->NumberOfChildren(); i++)
-    {
-        plMaxNodeBase *childNode = (plMaxNodeBase*)node->GetChildNode(i);
+    if (comp && comp->IsObsolete()) {
+        obsoleteComps.push_back(comp);
+    }
+
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
+        plMaxNodeBase* childNode = (plMaxNodeBase*)node->GetChildNode(i);
         FindObsoleteComponents(childNode, obsoleteComps);
     }
 }
@@ -632,47 +660,42 @@ static bool gUpdatingComponents = false;
 #include <set>
 
 
-static void ComponentNotify(void *param, NotifyInfo *info)
+static void ComponentNotify(void* param, NotifyInfo* info)
 {
-    if (info->intcode == NOTIFY_NODE_UNHIDE)
-    {
-        if (!gUpdatingComponents)
-        {
-            plMaxNodeBase *node = (plMaxNodeBase*)info->callParam;
-            plComponentBase *comp = node ? node->ConvertToComponent() : nil;
-            if (comp)
-            {
+    if (info->intcode == NOTIFY_NODE_UNHIDE) {
+        if (!gUpdatingComponents) {
+            plMaxNodeBase* node = (plMaxNodeBase*)info->callParam;
+            plComponentBase* comp = node ? node->ConvertToComponent() : nil;
+
+            if (comp) {
                 node->Hide(!comp->AllowUnhide());
                 node->Freeze(TRUE);
             }
         }
-    }
-    else if (info->intcode == NOTIFY_FILE_POST_OPEN)
-    {
+    } else if (info->intcode == NOTIFY_FILE_POST_OPEN) {
         plComponentShow::Update();
         GetCOREInterface()->ForceCompleteRedraw();
-                                            // Also checking bitmap silent mode, since the export script uses that
-        if (!hsMessageBox_SuppressPrompts && !TheManager->SilentMode())
-        {
+
+        // Also checking bitmap silent mode, since the export script uses that
+        if (!hsMessageBox_SuppressPrompts && !TheManager->SilentMode()) {
             // Get all the obsolete components in the scene
             std::vector<plComponentBase*> obsoleteComps;
             FindObsoleteComponents((plMaxNodeBase*)GetCOREInterface()->GetRootNode(), obsoleteComps);
 
             // For now, just get the categories (could get the component names)
-            std::set<const char *> names;
-            for (int i = 0; i < obsoleteComps.size(); i++)
-            {
-                const char *name = obsoleteComps[i]->GetObjectName();
+            std::set<const char*> names;
+
+            for (int i = 0; i < obsoleteComps.size(); i++) {
+                const char* name = obsoleteComps[i]->GetObjectName();
                 names.insert(name);
             }
 
-            if (obsoleteComps.size() > 0)
-            {
+            if (obsoleteComps.size() > 0) {
                 char buf[1024];
                 strcpy(buf, "Components of the following obsolete types\nwere found in this scene.  Please delete them.\n\n");
-                std::set<const char *>::iterator it = names.begin();
-                for (; it != names.end(); it++)
-                {
+                std::set<const char*>::iterator it = names.begin();
+
+                for (; it != names.end(); it++) {
                     strcat(buf, (*it));
                     strcat(buf, "\n");
                 }
@@ -688,8 +711,7 @@ static void ComponentNotify(void *param, NotifyInfo *info)
     // been prompted to save it, so we can modify the scene by deleting all the component
     // references. -Colin
     else if (info->intcode == NOTIFY_SYSTEM_SHUTDOWN ||
-            info->intcode == NOTIFY_FILE_PRE_OPEN)
-    {
+             info->intcode == NOTIFY_FILE_PRE_OPEN) {
         UnlinkComponents((plMaxNodeBase*)GetCOREInterface()->GetRootNode());
     }
 }

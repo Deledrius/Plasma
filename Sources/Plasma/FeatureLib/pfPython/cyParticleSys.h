@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plKey.h"
 #include "pyGlueHelpers.h"
 
-class cyParticleSys
-{
+class cyParticleSys {
 protected:
     plKey           fSender;
     hsTArray<plKey> fRecvr;
@@ -62,21 +61,23 @@ protected:
 
     void    ISendParticleSysMsg(uint32_t param, float value);
 
-    cyParticleSys(const plKey sender=nil,const plKey recvr=nil);
+    cyParticleSys(const plKey sender = nil, const plKey recvr = nil);
 
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptParticle);
-    static PyObject *New(PyObject *sender = nil, PyObject *recvr = nil);
+    static PyObject* New(PyObject* sender = nil, PyObject* recvr = nil);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a cyParticleSys object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(cyParticleSys); // converts a PyObject to a cyParticleSys (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     // setters
-    void    SetSender(plKey &sender);
-    void    AddRecvr(plKey &recvr);
-    void    SetNetForce(bool state) { fNetForce = state; }
+    void    SetSender(plKey& sender);
+    void    AddRecvr(plKey& recvr);
+    void    SetNetForce(bool state) {
+        fNetForce = state;
+    }
 
     void    SetParticlesPerSecond(float value);
     void    SetInitPitchRange(float value);

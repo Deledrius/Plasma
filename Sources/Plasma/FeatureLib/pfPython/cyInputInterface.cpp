@@ -49,14 +49,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plInputCore/plTelescopeInputInterface.h"
 
 cyInputInterface::cyInputInterface() :
-fTelescopeInterface(nil)
+    fTelescopeInterface(nil)
 {
 }
 
-cyInputInterface::~cyInputInterface() 
+cyInputInterface::~cyInputInterface()
 {
-    if (fTelescopeInterface)
-        hsRefCnt_SafeUnRef( fTelescopeInterface );
+    if (fTelescopeInterface) {
+        hsRefCnt_SafeUnRef(fTelescopeInterface);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -71,14 +72,13 @@ cyInputInterface::~cyInputInterface()
 
 void cyInputInterface::PushTelescopeInterface()
 {
-    if (!fTelescopeInterface)
-    {
+    if (!fTelescopeInterface) {
         fTelescopeInterface = new plTelescopeInputInterface;
         plInputIfaceMgrMsg* pMsg = new plInputIfaceMgrMsg(plInputIfaceMgrMsg::kAddInterface);
         pMsg->SetIFace(fTelescopeInterface);
         pMsg->Send();
     }
-}   
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -89,12 +89,11 @@ void cyInputInterface::PushTelescopeInterface()
 //
 void cyInputInterface::PopTelescope()
 {
-    if (fTelescopeInterface)
-    {
+    if (fTelescopeInterface) {
         plInputIfaceMgrMsg* pMsg = new plInputIfaceMgrMsg(plInputIfaceMgrMsg::kRemoveInterface);
         pMsg->SetIFace(fTelescopeInterface);
         pMsg->Send();
-        hsRefCnt_SafeUnRef( fTelescopeInterface );
+        hsRefCnt_SafeUnRef(fTelescopeInterface);
         fTelescopeInterface = nil;
     }
 }

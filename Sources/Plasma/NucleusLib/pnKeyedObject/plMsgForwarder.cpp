@@ -51,8 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plMessageWithCallbacks.h"
 
 
-class plForwardCallback
-{
+class plForwardCallback {
 public:
     hsTArray<plKey> fOrigReceivers;
     int fNumCallbacks;
@@ -67,8 +66,9 @@ plMsgForwarder::~plMsgForwarder()
 {
     CallbackMap::iterator i = fCallbacks.begin();
 
-    for (; i != fCallbacks.end(); i++)
-        delete (*i).second;
+    for (; i != fCallbacks.end(); i++) {
+        delete(*i).second;
+    }
 }
 
 void plMsgForwarder::Read(hsStream* s, hsResMgr* mgr)
@@ -79,8 +79,8 @@ void plMsgForwarder::Read(hsStream* s, hsResMgr* mgr)
     fForwardKeys.Reset();
     fForwardKeys.Expand(numKeys);
     fForwardKeys.SetCount(numKeys);
-    for (int i = 0; i < numKeys; i++)
-    {
+
+    for (int i = 0; i < numKeys; i++) {
         plKey key = mgr->ReadKey(s);
         fForwardKeys[i] = key;
     }
@@ -92,39 +92,43 @@ void plMsgForwarder::Write(hsStream* s, hsResMgr* mgr)
 
     int numKeys = fForwardKeys.Count();
     s->WriteLE32(numKeys);
-    for (int i = 0; i < numKeys; i++)
+
+    for (int i = 0; i < numKeys; i++) {
         mgr->WriteKey(s, fForwardKeys[i]);
+    }
 }
 
 bool plMsgForwarder::MsgReceive(plMessage* msg)
 {
     // Self destruct messages are for us only
-    plSelfDestructMsg *selfMsg = plSelfDestructMsg::ConvertNoRef(msg);
-    if (selfMsg)
+    plSelfDestructMsg* selfMsg = plSelfDestructMsg::ConvertNoRef(msg);
+
+    if (selfMsg) {
         return hsKeyedObject::MsgReceive(msg);
+    }
 
     // If this is a callback message, it needs to be handled differently
-    if (IForwardCallbackMsg(msg))
+    if (IForwardCallbackMsg(msg)) {
         return true;
+    }
 
     // All other messages are forwarded
     IForwardMsg(msg);
     return true;
 }
 
-bool plMsgForwarder::IForwardCallbackMsg(plMessage *msg)
+bool plMsgForwarder::IForwardCallbackMsg(plMessage* msg)
 {
     // Only process as a callback message if it is one, AND it has callbacks
-    plMessageWithCallbacks *callbackMsg = plMessageWithCallbacks::ConvertNoRef(msg);
-    if (callbackMsg && callbackMsg->GetNumCallbacks() > 0)
-    {
-        for (int i = 0; i < callbackMsg->GetNumCallbacks(); i++)
-        {
-            plEventCallbackMsg *event = callbackMsg->GetEventCallback(i);
+    plMessageWithCallbacks* callbackMsg = plMessageWithCallbacks::ConvertNoRef(msg);
+
+    if (callbackMsg && callbackMsg->GetNumCallbacks() > 0) {
+        for (int i = 0; i < callbackMsg->GetNumCallbacks(); i++) {
+            plEventCallbackMsg* event = callbackMsg->GetEventCallback(i);
             hsAssert(event, "Message forwarder only supports event callback messages");
-            if (event)
-            {
-                plForwardCallback *fc = new plForwardCallback;
+
+            if (event) {
+                plForwardCallback* fc = new plForwardCallback;
                 fc->fNumCallbacks = fForwardKeys.Count();
 
                 // Turn off net propagate the callbacks to us will all be local.  Only the
@@ -132,8 +136,9 @@ bool plMsgForwarder::IForwardCallbackMsg(plMessage *msg)
                 fc->fNetPropogate = (event->HasBCastFlag(plMessage::kNetPropagate) != 0);
                 event->SetBCastFlag(plMessage::kNetPropagate, false);
 
-                for (int j = 0; j < event->GetNumReceivers(); j++)
+                for (int j = 0; j < event->GetNumReceivers(); j++) {
                     fc->fOrigReceivers.Append((plKey)event->GetReceiver(j));
+                }
 
                 event->ClearReceivers();
                 event->AddReceiver(GetKey());
@@ -141,33 +146,34 @@ bool plMsgForwarder::IForwardCallbackMsg(plMessage *msg)
                 fCallbacks[event] = fc;
 
 #if 0
-                hsStatusMessageF("Adding CBMsg, eventSender=%s, eventRemoteMsg=%d\n",                   
-                    event->GetSender() ? event->GetSender()->GetName().c_str() : "nil", fc->fNetPropogate);
+                hsStatusMessageF("Adding CBMsg, eventSender=%s, eventRemoteMsg=%d\n",
+                                 event->GetSender() ? event->GetSender()->GetName().c_str() : "nil", fc->fNetPropogate);
 #endif
             }
         }
+
 #if 0
         hsStatusMessageF("Fwding CBMsg, sender=%s, remoteMsg=%d",
-            msg->GetSender() ? msg->GetSender()->GetName().c_str() : "nil", msg->HasBCastFlag(plMessage::kNetNonLocal));
+                         msg->GetSender() ? msg->GetSender()->GetName().c_str() : "nil", msg->HasBCastFlag(plMessage::kNetNonLocal));
 #endif
         IForwardMsg(callbackMsg);
-        
+
         return true;
     }
 
     // Callback from one of our forward keys.  Don't send the final callback to the original
     // requester until all forward keys have reported in.
-    plEventCallbackMsg *eventMsg = plEventCallbackMsg::ConvertNoRef(msg);
-    if (eventMsg)
-    {
+    plEventCallbackMsg* eventMsg = plEventCallbackMsg::ConvertNoRef(msg);
+
+    if (eventMsg) {
         CallbackMap::const_iterator it = fCallbacks.find(eventMsg);
-        if (it != fCallbacks.end())
-        {
-            plForwardCallback *fc = it->second;
-            if (--fc->fNumCallbacks == 0)
-            {
+
+        if (it != fCallbacks.end()) {
+            plForwardCallback* fc = it->second;
+
+            if (--fc->fNumCallbacks == 0) {
                 hsStatusMessageF("plEventCallbackMsg received, erasing, sender=%s, remoteMsg=%d\n",
-                    msg->GetSender() ? msg->GetSender()->GetName().c_str() : "nil", msg->HasBCastFlag(plMessage::kNetNonLocal));
+                                 msg->GetSender() ? msg->GetSender()->GetName().c_str() : "nil", msg->HasBCastFlag(plMessage::kNetNonLocal));
 
                 fCallbacks.erase(eventMsg);
 
@@ -175,8 +181,9 @@ bool plMsgForwarder::IForwardCallbackMsg(plMessage *msg)
                 bool locallyOwned = (plNetClientApp::GetInstance()->IsLocallyOwned(uoid) != plSynchedObject::kNo);
 
                 // If the callback was originally net propagated, and we own this forwarder, net propagate the callback
-                if (fc->fNetPropogate && locallyOwned)
+                if (fc->fNetPropogate && locallyOwned) {
                     eventMsg->SetBCastFlag(plMessage::kNetPropagate);
+                }
 
                 eventMsg->ClearReceivers();
                 eventMsg->AddReceivers(fc->fOrigReceivers);
@@ -186,25 +193,26 @@ bool plMsgForwarder::IForwardCallbackMsg(plMessage *msg)
 
                 delete fc;
             }
-        }
-        else
-        {
+        } else {
             hsStatusMessageF("! Unknown plEventCallbackMsg received, sender=%s, remoteMsg=%d\n",
-                msg->GetSender() ? msg->GetSender()->GetName().c_str() : "nil", msg->HasBCastFlag(plMessage::kNetNonLocal));
+                             msg->GetSender() ? msg->GetSender()->GetName().c_str() : "nil", msg->HasBCastFlag(plMessage::kNetNonLocal));
             hsAssert(0, "Unknown plEventCallbackMsg received");
         }
+
         return true;
     }
 
     return false;
 }
 
-void plMsgForwarder::IForwardMsg(plMessage *msg)
+void plMsgForwarder::IForwardMsg(plMessage* msg)
 {
     // Back up the message's original receivers
     hsTArray<plKey> oldKeys;
-    for (int i = 0; i < msg->GetNumReceivers(); i++)
+
+    for (int i = 0; i < msg->GetNumReceivers(); i++) {
         oldKeys.Append((plKey)msg->GetReceiver(i));
+    }
 
     // Set to our receivers and send
     hsRefCnt_SafeRef(msg);
@@ -220,6 +228,7 @@ void plMsgForwarder::IForwardMsg(plMessage *msg)
 
 void plMsgForwarder::AddForwardKey(plKey key)
 {
-    if (fForwardKeys.Find(key) == fForwardKeys.kMissingIndex)
+    if (fForwardKeys.Find(key) == fForwardKeys.kMissingIndex) {
         fForwardKeys.Append(key);
+    }
 }

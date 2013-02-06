@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plShader;
 class plDXPipeline;
 
-class plDXShader : public plDXDeviceRef
-{
+class plDXShader : public plDXDeviceRef {
 protected:
     plShader*           fOwner;
     char*               fErrorString;
@@ -65,7 +64,9 @@ public:
     plDXShader(plShader* owner);
     virtual ~plDXShader();
 
-    const char*     GetErrorString() const { return fErrorString; }
+    const char*     GetErrorString() const {
+        return fErrorString;
+    }
     void            SetOwner(plShader* owner);
 };
 

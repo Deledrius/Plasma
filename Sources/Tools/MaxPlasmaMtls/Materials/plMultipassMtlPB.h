@@ -42,8 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef PL_MULTIPASS_MTL_PB_H
 #define PL_MULTIPASS_MTL_PB_H
 
-enum
-{
+enum {
     kMultCount,
     kMultPasses,
     kMultOn,

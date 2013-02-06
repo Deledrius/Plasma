@@ -44,48 +44,55 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 // Initialize a socket for listening
-bool plTcpListenSocket::OpenForListen(plNetAddress & inAddess, int backlogSize)
-{        
+bool plTcpListenSocket::OpenForListen(plNetAddress& inAddess, int backlogSize)
+{
     ErrorClose();
     SetSocket(plNet::NewTCP());
-    
+
     SetReuseAddress();
-    
-    if(plNet::Bind(fSocket, &inAddess.GetAddressInfo()) != 0)
+
+    if (plNet::Bind(fSocket, &inAddess.GetAddressInfo()) != 0) {
         return ErrorClose();
-    
-    if(plNet::Listen(fSocket, backlogSize) != 0)
+    }
+
+    if (plNet::Listen(fSocket, backlogSize) != 0) {
         return ErrorClose();
-    
+    }
+
     return true;
 }
 
 
 // Initialize a socket for listening. non blocking version
-bool plTcpListenSocket::OpenForListenNonBlocking(plNetAddress & inAddess, int backlogSize)
-{        
+bool plTcpListenSocket::OpenForListenNonBlocking(plNetAddress& inAddess, int backlogSize)
+{
     ErrorClose();
     SetSocket(plNet::NewTCP());
-    
+
     SetReuseAddress();
     SetBlocking(false); // so GetIncomingConnection() won't block.
-    
-    if(plNet::Bind(fSocket, &inAddess.GetAddressInfo()) != 0)
+
+    if (plNet::Bind(fSocket, &inAddess.GetAddressInfo()) != 0) {
         return ErrorClose();
-    
-    if(plNet::Listen(fSocket, backlogSize) != 0)
+    }
+
+    if (plNet::Listen(fSocket, backlogSize) != 0) {
         return ErrorClose();
-    
+    }
+
     return true;
 }
 
 
 // Accept an incoming connection
-bool  plTcpListenSocket::GetIncomingConnection(SOCKET & outNewSession, plNetAddress & outAddress)
-{        
+bool  plTcpListenSocket::GetIncomingConnection(SOCKET& outNewSession, plNetAddress& outAddress)
+{
     outNewSession = plNet::Accept(fSocket, &outAddress.GetAddressInfo());
-    if(outNewSession == kBadSocket)
+
+    if (outNewSession == kBadSocket) {
         return false;
+    }
+
     return true;
 }
 

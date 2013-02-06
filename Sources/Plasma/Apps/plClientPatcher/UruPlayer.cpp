@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/Apps/plClientPatcher/UruPlayer.cpp
-*   
+*
 ***/
 
 #include "Pch.h"
@@ -57,17 +57,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *
 ***/
 #ifndef PLASMA_EXTERNAL_RELEASE
-    static const wchar_t s_manifest[] = L"Internal";
-    static const wchar_t s_thinmanifest[] = L"ThinInternal";
+static const wchar_t s_manifest[] = L"Internal";
+static const wchar_t s_thinmanifest[] = L"ThinInternal";
 #else
-    static const wchar_t s_manifest[] = L"External";
-    static const wchar_t s_thinmanifest[] = L"ThinExternal";
+static const wchar_t s_manifest[] = L"External";
+static const wchar_t s_thinmanifest[] = L"ThinExternal";
 #endif
 
-struct ManifestFile
-{
-    ManifestFile(const plFileName &clientName, const plFileName &downloadName, const plString &md5val, int flags, plLauncherInfo *info)
-    {
+struct ManifestFile {
+    ManifestFile(const plFileName& clientName, const plFileName& downloadName, const plString& md5val, int flags, plLauncherInfo* info) {
         filename = clientName;
         zipName = downloadName;
         md5 = md5val;
@@ -81,14 +79,14 @@ struct ManifestFile
     plString md5;
     int flags;
     bool md5failed;
-    plLauncherInfo *info;
+    plLauncherInfo* info;
 };
 
 
 class ProgressStream : public plZlibStream {
 public:
     virtual uint32_t  Write(uint32_t byteCount, const void* buffer);
-    static plLauncherInfo *info;
+    static plLauncherInfo* info;
     static long totalBytes;
     static unsigned progress;
 
@@ -97,7 +95,7 @@ public:
 };
 
 struct ProcessManifestEntryParam {
-    struct ManifestResult * mr;
+    struct ManifestResult* mr;
     unsigned                index;
     static long             totalSize;
     static long             progress;
@@ -108,19 +106,19 @@ struct ProcessManifestEntryParam {
 struct ManifestResult {
     wchar_t                             group[MAX_PATH];
     ARRAY(NetCliFileManifestEntry)      manifest;
-    long *                              indicator;
-    plLauncherInfo *                    info;
+    long*                               indicator;
+    plLauncherInfo*                     info;
 
     hsMutex                             critsect;
     ARRAY(unsigned)                     indices;
 };
 
 
-static void DownloadCallback (
+static void DownloadCallback(
     ENetError           result,
-    void *              param,
-    const plFileName &  filename,
-    hsStream *          writer
+    void*               param,
+    const plFileName&   filename,
+    hsStream*           writer
 );
 
 
@@ -162,7 +160,7 @@ static long s_perf[kNumPerf];
 
 long                ProgressStream::totalBytes;
 unsigned            ProgressStream::progress;
-plLauncherInfo *    ProgressStream::info;
+plLauncherInfo*     ProgressStream::info;
 uint32_t            ProgressStream::startTime = 0;
 long                ProcessManifestEntryParam::progress = 0;
 long                ProcessManifestEntryParam::totalSize = 0;
@@ -214,29 +212,39 @@ static wchar_t s_clientExeName[] = L"plClient.exe";
 ***/
 
 //============================================================================
-static void NetErrorHandler (ENetProtocol protocol, ENetError error) {
+static void NetErrorHandler(ENetProtocol protocol, ENetError error)
+{
 
-    const wchar_t * srv;
+    const wchar_t* srv;
+
     switch (protocol) {
-        case kNetProtocolNil:               srv = L"Notify";        break;
-        case kNetProtocolCli2File:          srv = L"File";          break;
-        case kNetProtocolCli2GateKeeper:    srv = L"GateKeeper";    break;
-            DEFAULT_FATAL(protocol);
-    }
-    
-    switch (error) {
-        case kNetErrConnectFailed: 
-        case kNetErrTimeout:
-            ++s_numConnectFailures; 
+    case kNetProtocolNil:
+        srv = L"Notify";
         break;
 
-        case kNetErrDisconnected:
-            s_patchError = true;
-            break;
+    case kNetProtocolCli2File:
+        srv = L"File";
+        break;
 
-        case kNetErrServerBusy:
-            MessageBox(0, "Due to the high demand, the server is currently busy. Please try again later, or for alternative download options visit: http://www.mystonline.com/play/", "UruLauncher", MB_OK);
-            s_running = false;
+    case kNetProtocolCli2GateKeeper:
+        srv = L"GateKeeper";
+        break;
+        DEFAULT_FATAL(protocol);
+    }
+
+    switch (error) {
+    case kNetErrConnectFailed:
+    case kNetErrTimeout:
+        ++s_numConnectFailures;
+        break;
+
+    case kNetErrDisconnected:
+        s_patchError = true;
+        break;
+
+    case kNetErrServerBusy:
+        MessageBox(0, "Due to the high demand, the server is currently busy. Please try again later, or for alternative download options visit: http://www.mystonline.com/play/", "UruLauncher", MB_OK);
+        s_running = false;
         break;
     }
 
@@ -275,17 +283,18 @@ static void WaitUruExitProc (void * param) {
     CloseHandle( s_pi.hThread );
     CloseHandle( s_pi.hProcess );
 
-    if(exitcode == kExitCodeTerminated) { 
+    if(exitcode == kExitCodeTerminated) {
         info->stopCallback(kStatusOk, nil);     // notify of succesful stop
-    }   
+    }
     else {
-        info->exitCallback(kStatusOk, nil); 
+        info->exitCallback(kStatusOk, nil);
     }
 }
 */
 
 //============================================================================
-static bool MD5Check (const plFileName& filename, const char *md5) {
+static bool MD5Check(const plFileName& filename, const char* md5)
+{
     plMD5Checksum existingMD5(filename);
     plMD5Checksum latestMD5;
 
@@ -294,18 +303,18 @@ static bool MD5Check (const plFileName& filename, const char *md5) {
 }
 
 //============================================================================
-static void DecompressOgg (ManifestFile *mf) {
+static void DecompressOgg(ManifestFile* mf)
+{
     unsigned flags = mf->flags;
-    for(;;)
-    {
+
+    for (;;) {
         // decompress ogg if necessary
-        if ( (hsCheckBits(flags, plManifestFile::kSndFlagCacheSplit) || hsCheckBits(flags, plManifestFile::kSndFlagCacheStereo)) )
-        {
+        if ((hsCheckBits(flags, plManifestFile::kSndFlagCacheSplit) || hsCheckBits(flags, plManifestFile::kSndFlagCacheStereo))) {
             plFileName path = plFileName::Join(s_workingDir, mf->filename);
 
             plAudioFileReader* reader = plAudioFileReader::CreateReader(path, plAudioCore::kAll, plAudioFileReader::kStreamNative);
-            if (!reader)
-            {
+
+            if (!reader) {
                 break;
             }
 
@@ -313,40 +322,46 @@ static void DecompressOgg (ManifestFile *mf) {
             delete reader;
 
             ULARGE_INTEGER freeBytesAvailable, totalNumberOfBytes, neededBytes;
-            if (GetDiskFreeSpaceEx(NULL, &freeBytesAvailable, &totalNumberOfBytes, NULL))
-            {
+
+            if (GetDiskFreeSpaceEx(NULL, &freeBytesAvailable, &totalNumberOfBytes, NULL)) {
                 neededBytes.HighPart = 0;
                 neededBytes.LowPart = size;
 
-                if (neededBytes.QuadPart > freeBytesAvailable.QuadPart)
-                {
+                if (neededBytes.QuadPart > freeBytesAvailable.QuadPart) {
                     //PatcherLog(kInfo, "Not enough disk space (asked for %d bytes)", bytesNeeded);
                     break;
                 }
             }
 
-            if (hsCheckBits(flags, plManifestFile::kSndFlagCacheSplit))
+            if (hsCheckBits(flags, plManifestFile::kSndFlagCacheSplit)) {
                 plAudioFileReader::CacheFile(path, true, true);
-            if (hsCheckBits(flags, plManifestFile::kSndFlagCacheStereo))
+            }
+
+            if (hsCheckBits(flags, plManifestFile::kSndFlagCacheStereo)) {
                 plAudioFileReader::CacheFile(path, false, true);
+            }
         }
+
         break;
     }
 }
 
 //============================================================================
-void Shutdown(plLauncherInfo *info) {
+void Shutdown(plLauncherInfo* info)
+{
     info->SetText("Shutting Down...");
     s_patchError = true;
     s_running = false;
 }
 
 //============================================================================
-static void RequestNextManifestFile () {
+static void RequestNextManifestFile()
+{
     bool success = true;
 
-    if (!manifestQueue.size())
+    if (!manifestQueue.size()) {
         return;
+    }
 
     ManifestFile* nextfile = manifestQueue.front();
     manifestQueue.pop();
@@ -354,16 +369,15 @@ static void RequestNextManifestFile () {
     plFileName path = plFileName::Join(s_workingDir, nextfile->filename);
     plFileSystem::CreateDir(path.StripFileName(), true);
 
-    ProgressStream *writer = new ProgressStream();   // optimization: dont delete and recreate. Doesn't seem to be working currently, ZLibStream is breaking
-    if(!writer->Open(path, "wb"))
-    {
+    ProgressStream* writer = new ProgressStream();   // optimization: dont delete and recreate. Doesn't seem to be working currently, ZLibStream is breaking
+
+    if (!writer->Open(path, "wb")) {
         writer->Close();
         delete writer;
         success = false;
     }
 
-    if(success)
-    {
+    if (success) {
 #ifndef PLASMA_EXTERNAL_RELEASE
         char text[256];
         StrPrintf(text, arrsize(text), "Updating URU...  %s", nextfile->filename.AsString().c_str());
@@ -374,43 +388,42 @@ static void RequestNextManifestFile () {
 }
 
 //============================================================================
-static void DownloadCallback (
+static void DownloadCallback(
     ENetError           result,
-    void *              param,
-    const plFileName &  filename,
-    hsStream *          writer
-) {
+    void*               param,
+    const plFileName&   filename,
+    hsStream*           writer
+)
+{
     s_numConnectFailures = 0;
-    
-    ManifestFile *mf = (ManifestFile *)param;
+
+    ManifestFile* mf = (ManifestFile*)param;
+
     if (IS_NET_ERROR(result) && s_running && !s_patchError) {
         if (result == kNetErrFileNotFound) {
             plString str = plString::Format("File not found on server: %s", filename.AsString().c_str());
             MessageBox(nil, str.c_str(), "URU Launcher", MB_ICONERROR);
             s_patchError = true;
-        }
-        else if (result == kNetErrRemoteShutdown) {
+        } else if (result == kNetErrRemoteShutdown) {
             s_patchError = true;
-        }
-        else {
+        } else {
             // failed, re-queue the file to be downloaded
             // (after rewinding the stream)
             writer->Rewind();
-            plLauncherInfo *info = mf->info;
+            plLauncherInfo* info = mf->info;
             NetCliFileDownloadRequest(filename, writer, DownloadCallback, mf, info->buildId);
             return;
         }
     }
-    
+
     writer->Close();
     delete writer;      // delete our stream
 
     plFileName path = plFileName::Join(s_workingDir, mf->filename);
-    if (s_running)
-    {
+
+    if (s_running) {
         if (!MD5Check(path, mf->md5.c_str())) {
-            if (mf->md5failed)
-            {
+            if (mf->md5failed) {
 #ifdef PLASMA_EXTERNAL_RELEASE
                 MessageBox(nil, s_md5CheckError, "URU Launcher", MB_ICONERROR);
 #else
@@ -420,7 +433,9 @@ static void DownloadCallback (
 #endif // PLASMA_EXTERNAL_RELEASE
                 Shutdown(mf->info);
             }
+
             writer = new ProgressStream();
+
             if (!writer->Open(path, "wb")) {
 #ifdef PLASMA_EXTERNAL_RELEASE
                 MessageBox(nil, s_fileOpenError, "URU Launcher", MB_ICONERROR);
@@ -431,8 +446,9 @@ static void DownloadCallback (
 #endif // PLASMA_EXTERNAL_RELEASE
                 Shutdown(mf->info);
             }
+
             mf->md5failed = true;
-            plLauncherInfo *info = mf->info;
+            plLauncherInfo* info = mf->info;
             NetCliFileDownloadRequest(filename, writer, DownloadCallback, mf, info->buildId);
             return;
         }
@@ -440,10 +456,8 @@ static void DownloadCallback (
 
     AtomicAdd(&s_numFiles, -1);
 
-    if (s_running)
-    {
-        if (!mf->filename.GetFileExt().CompareI("ogg"))
-        {
+    if (s_running) {
+        if (!mf->filename.GetFileExt().CompareI("ogg")) {
             DecompressOgg(mf);
         }
     }
@@ -451,29 +465,28 @@ static void DownloadCallback (
     delete mf;      // delete manifest file entry
 
     // if we are not still running don't request any more file downloads
-    if(s_running)
-    {
-        if(!s_numFiles) {
+    if (s_running) {
+        if (!s_numFiles) {
             s_patchComplete = true;
-        }
-        else
-        {   
+        } else {
             RequestNextManifestFile();
         }
     }
 }
 
 //============================================================================
-static void ProcessManifestEntry (void * param, ENetError error) {
-    ProcessManifestEntryParam * p = (ProcessManifestEntryParam*)param;
+static void ProcessManifestEntry(void* param, ENetError error)
+{
+    ProcessManifestEntryParam* p = (ProcessManifestEntryParam*)param;
 
 #ifndef PLASMA_EXTERNAL_RELEASE
-        char text[256];
-        StrPrintf(text, arrsize(text), "Checking for updates...  %S", p->mr->manifest[p->index].clientName);
-        p->mr->info->SetText(text);
+    char text[256];
+    StrPrintf(text, arrsize(text), "Checking for updates...  %S", p->mr->manifest[p->index].clientName);
+    p->mr->info->SetText(text);
 #endif
     plFileName path = plFileName::Join(s_workingDir, plString::FromWchar(p->mr->manifest[p->index].clientName));
     uint32_t start = (uint32_t)(TimeGetTime() / kTimeIntervalsPerMs);
+
     if (!MD5Check(path, plString::FromWchar(p->mr->manifest[p->index].md5, 32).c_str())) {
         p->mr->critsect.Lock();
         p->mr->indices.Add(p->index);
@@ -483,33 +496,29 @@ static void ProcessManifestEntry (void * param, ENetError error) {
 
     // if we have a file that was cached the MD5 check will be really fast throwing off our approx time remaining.
     uint32_t t = (uint32_t)(TimeGetTime() / kTimeIntervalsPerMs - start);
-    if(t < 25)
-    {
+
+    if (t < 25) {
         // cached file
         AtomicAdd(&ProcessManifestEntryParam::totalSize, -p->mr->manifest[p->index].zipSize);
         p->exists = false;
     }
-    
+
     // p->mr->info->SetBytesRemaining(ProcessManifestEntryParam::totalSize);    // for testing purposes only
-    if(p->exists)
-    {   
+    if (p->exists) {
         AtomicAdd(&ProcessManifestEntryParam::progress, p->mr->manifest[p->index].zipSize);
-    
+
         PatchInfo patchInfo;
         patchInfo.stage = 0;
         patchInfo.progressStage = 0;
         patchInfo.progress = (unsigned)((float)(ProcessManifestEntryParam::progress) / (float)ProcessManifestEntryParam::totalSize * 1000.0f);
         p->mr->info->progressCallback(kStatusPending, &patchInfo);
-        if(ProcessManifestEntryParam::progress > ProcessManifestEntryParam::totalSize)
-        {
+
+        if (ProcessManifestEntryParam::progress > ProcessManifestEntryParam::totalSize) {
             p->mr->info->SetTimeRemaining(0);
-        }
-        else
-        {
-            if(TimeGetTime() / kTimeIntervalsPerMs != ProcessManifestEntryParam::startTime)
-            {
+        } else {
+            if (TimeGetTime() / kTimeIntervalsPerMs != ProcessManifestEntryParam::startTime) {
                 double timeElapsed = (TimeGetTime() / kTimeIntervalsPerMs - ProcessManifestEntryParam::startTime) / 1000;
-                double bytesPerSec = (float)(ProcessManifestEntryParam::progress ) / timeElapsed;
+                double bytesPerSec = (float)(ProcessManifestEntryParam::progress) / timeElapsed;
                 p->mr->info->SetTimeRemaining(bytesPerSec ? (int)((ProcessManifestEntryParam::totalSize - ProcessManifestEntryParam::progress) / bytesPerSec) : 0);
             }
         }
@@ -517,14 +526,15 @@ static void ProcessManifestEntry (void * param, ENetError error) {
 }
 
 //============================================================================
-static void ProcessManifest (void * param) {
+static void ProcessManifest(void* param)
+{
 #ifdef USE_VLD
     VLDEnable();
 #endif
 
     AtomicAdd(&s_perf[kPerfThreadTaskCount], 1);
 
-    ManifestResult * mr = (ManifestResult *)param;
+    ManifestResult* mr = (ManifestResult*)param;
 
     PatchInfo patchInfo;
     patchInfo.stage = 0;
@@ -537,34 +547,34 @@ static void ProcessManifest (void * param) {
     mr->info->SetText(text);
 
     unsigned entryCount = mr->manifest.Count();
-    NetCliFileManifestEntry * manifest = mr->manifest.Ptr();
-    
-    FILE *fd = nil;
+    NetCliFileManifestEntry* manifest = mr->manifest.Ptr();
+
+    FILE* fd = nil;
     ARRAY(ProcessManifestEntryParam) params;
     params.Reserve(mr->manifest.Count());
+
     for (unsigned i = 0; i < entryCount; ++i) {
-        ProcessManifestEntryParam * p = params.New();
+        ProcessManifestEntryParam* p = params.New();
         p->index = i;
         p->mr = mr;
         p->exists = false;
         plFileName path = plFileName::Join(s_workingDir, plString::FromWchar(mr->manifest[i].clientName));
         fd = plFileSystem::Open(path, "r");
-        if (fd)
-        {
+
+        if (fd) {
             p->exists = true;
             p->totalSize += p->mr->manifest[i].zipSize;
             fclose(fd);
         }
     }
-    
+
     ProcessManifestEntryParam::startTime = (double)(TimeGetTime() / kTimeIntervalsPerMs);
-    
-    for (unsigned i = 0; i < entryCount && s_running; ++i){
+
+    for (unsigned i = 0; i < entryCount && s_running; ++i) {
         ProcessManifestEntry(&params[i], kNetSuccess);
     }
-    
-    if(s_running)
-    {
+
+    if (s_running) {
         PatchInfo patchInfo;
         patchInfo.stage = 0;
         patchInfo.progressStage = 0;
@@ -572,10 +582,10 @@ static void ProcessManifest (void * param) {
         mr->info->progressCallback(kStatusPending, &patchInfo);
 
         AtomicAdd(&s_numFiles, mr->indices.Count());
-        if(!s_numFiles || !s_running) {
+
+        if (!s_numFiles || !s_running) {
             s_patchComplete = true;
-        }
-        else {
+        } else {
             mr->info->SetText("Updating URU...");
 
             PatchInfo patchInfo;
@@ -583,11 +593,9 @@ static void ProcessManifest (void * param) {
             patchInfo.progressStage = 0;
             patchInfo.progress = 0;
             mr->info->progressCallback(kStatusPending, &patchInfo);
-            
-            for (unsigned i = 0; i < mr->indices.Count(); ++i) 
-            {
-                if(s_running)
-                {
+
+            for (unsigned i = 0; i < mr->indices.Count(); ++i) {
+                if (s_running) {
                     unsigned index = mr->indices[i];
                     plFileName path = plFileName::Join(s_workingDir, plString::FromWchar(manifest[index].clientName));
                     plFileSystem::CreateDir(path.StripFileName(), true);
@@ -601,7 +609,8 @@ static void ProcessManifest (void * param) {
                     );
 
                     if (i < kMaxManifestFileRequests) {
-                        ProgressStream * stream = new ProgressStream;
+                        ProgressStream* stream = new ProgressStream;
+
                         if (!stream->Open(path, "wb")) {
 #ifdef PLASMA_EXTERNAL_RELEASE
                             MessageBox(nil, s_fileOpenError, "URU Launcher", MB_ICONERROR);
@@ -612,6 +621,7 @@ static void ProcessManifest (void * param) {
 #endif
                             Shutdown(mr->info);
                         }
+
 #ifndef PLASMA_EXTERNAL_RELEASE
                         char text[256];
                         StrPrintf(text, arrsize(text), "Updating URU...  %S", manifest[i].clientName);
@@ -619,8 +629,7 @@ static void ProcessManifest (void * param) {
 #endif
                         // fire off our initial requests. The remaining will be added as files are downloaded
                         NetCliFileDownloadRequest(mf->zipName, stream, DownloadCallback, mf, mr->info->buildId);
-                    }
-                    else {
+                    } else {
                         // queue up this file download
                         manifestQueue.push(mf);
                     }
@@ -628,30 +637,32 @@ static void ProcessManifest (void * param) {
             }
         }
     }
+
     delete mr;
     AtomicAdd(&s_perf[kPerfThreadTaskCount], -1);
 }
 
 //============================================================================
-static void ManifestCallback (
+static void ManifestCallback(
     ENetError                       result,
-    void *                          param,
+    void*                           param,
     const wchar_t                   group[],
     const NetCliFileManifestEntry   manifest[],
     unsigned                        entryCount
-){
+)
+{
     s_numConnectFailures = 0;
 
-    plLauncherInfo * info = (plLauncherInfo *) param;
-    
-    if(!s_running || IS_NET_ERROR(result)) {
+    plLauncherInfo* info = (plLauncherInfo*) param;
+
+    if (!s_running || IS_NET_ERROR(result)) {
         if (s_running && !s_patchError) {
             switch (result) {
-                case kNetErrTimeout:
-                    NetCliFileManifestRequest(ManifestCallback, param, group);
+            case kNetErrTimeout:
+                NetCliFileManifestRequest(ManifestCallback, param, group);
                 break;
-                
-                default: {
+
+            default: {
                     char str[256];
                     StrPrintf(str, arrsize(str), "Failed to download manifest from server");
                     MessageBox(nil, str, "URU Launcher", MB_ICONERROR);
@@ -660,10 +671,11 @@ static void ManifestCallback (
                 break;
             }
         }
+
         return;
     }
-    
-    ManifestResult * mr = new ManifestResult();
+
+    ManifestResult* mr = new ManifestResult();
     StrCopy(mr->group, group, arrsize(mr->group));
     mr->manifest.Set(manifest, entryCount);
     mr->info = info;
@@ -679,45 +691,46 @@ static void ManifestCallback (
     // remove duplicate entries. This can cause some bad problems if not done. It will cause MD5 checks to fail, since it can be writing a file while MD5 checking it.
     ARRAY(NetCliFileManifestEntry) noDuplicates;
     noDuplicates.Reserve(mr->manifest.Count());
-    for(unsigned i = 0; i < entryCount - 1; ++i)
-    {
-        if (mr->manifest[i].clientName != mr->manifest[i+1].clientName)
-        {
+
+    for (unsigned i = 0; i < entryCount - 1; ++i) {
+        if (mr->manifest[i].clientName != mr->manifest[i + 1].clientName) {
             noDuplicates.Add(mr->manifest[i]);
         }
     }
+
     noDuplicates.Add(mr->manifest[entryCount - 1]);
-    
+
     // adjust our array and set data
     mr->manifest.ShrinkBy(mr->manifest.Count() - noDuplicates.Count());
     mr->manifest.Set(noDuplicates.Ptr(), noDuplicates.Count());
-    
+
     (void)_beginthread(ProcessManifest, 0, mr);
 }
 
 //============================================================================
-static void ThinManifestCallback (
+static void ThinManifestCallback(
     ENetError                       result,
-    void *                          param,
+    void*                           param,
     const wchar_t                   group[],
     const NetCliFileManifestEntry   manifest[],
     unsigned                        entryCount
-){
+)
+{
     s_numConnectFailures = 0;
 
-    plLauncherInfo * info = (plLauncherInfo *) param;
+    plLauncherInfo* info = (plLauncherInfo*) param;
     char text[256];
     StrPrintf(text, arrsize(text), "Checking for updates...");
     info->SetText(text);
-    
-    if(!s_running || IS_NET_ERROR(result)) {
+
+    if (!s_running || IS_NET_ERROR(result)) {
         if (s_running && !s_patchError) {
             switch (result) {
-                case kNetErrTimeout:
-                    NetCliFileManifestRequest(ManifestCallback, param, group);
+            case kNetErrTimeout:
+                NetCliFileManifestRequest(ManifestCallback, param, group);
                 break;
-                
-                default: {
+
+            default: {
                     char str[256];
                     StrPrintf(str, arrsize(str), "Failed to download manifest from server");
                     MessageBox(nil, str, "URU Launcher", MB_ICONERROR);
@@ -726,19 +739,25 @@ static void ThinManifestCallback (
                 break;
             }
         }
+
         return;
     }
+
     s_patchComplete = true;
+
     for (unsigned i = 0; i < entryCount; ++i) {
-        if (!s_running)
+        if (!s_running) {
             return;
+        }
 
         plFileName path = plFileName::Join(s_workingDir, plString::FromWchar(manifest[i].clientName));
+
         if (!MD5Check(path, plString::FromWchar(manifest[i].md5, 32).c_str())) {
             s_patchComplete = false;
             NetCliFileManifestRequest(ManifestCallback, info, s_manifest, info->buildId);
             break;
         }
+
         PatchInfo patchInfo;
         patchInfo.stage = 0;
         patchInfo.progressStage = 0;
@@ -760,12 +779,16 @@ static void ThinManifestCallback (
 ***/
 
 //============================================================================
-uint32_t ProgressStream::Write(uint32_t byteCount, const void* buffer) {
-    if(!s_running || s_patchError) 
+uint32_t ProgressStream::Write(uint32_t byteCount, const void* buffer)
+{
+    if (!s_running || s_patchError) {
         return 0;
-    if(!startTime) {
+    }
+
+    if (!startTime) {
         startTime = TimeGetSecondsSince2001Utc();
     }
+
     progress += byteCount;
     float p = (float)progress / (float)totalBytes * 1000;       // progress
 
@@ -773,33 +796,32 @@ uint32_t ProgressStream::Write(uint32_t byteCount, const void* buffer) {
     patchInfo.stage = 1;
     patchInfo.progress = (unsigned) p;
     patchInfo.progressStage = 50;
-    info->progressCallback(kStatusPending, (void *)&patchInfo);
+    info->progressCallback(kStatusPending, (void*)&patchInfo);
 
-    // there seems to, sometimes, be a slight discrepency in progress and totalBytes. 
-    if(progress > totalBytes)
-    {
+    // there seems to, sometimes, be a slight discrepency in progress and totalBytes.
+    if (progress > totalBytes) {
         info->SetBytesRemaining(0);
         info->SetTimeRemaining(0);
-    }
-    else
-    {
+    } else {
         info->SetBytesRemaining(totalBytes - progress);
-        if(TimeGetSecondsSince2001Utc() != startTime)
-        {
-            uint32_t bytesPerSec = (progress ) / (TimeGetSecondsSince2001Utc() - startTime);
+
+        if (TimeGetSecondsSince2001Utc() != startTime) {
+            uint32_t bytesPerSec = (progress) / (TimeGetSecondsSince2001Utc() - startTime);
             info->SetTimeRemaining(bytesPerSec ? (totalBytes - progress) / bytesPerSec : 0);
         }
     }
+
     return plZlibStream::Write(byteCount, buffer);
 }
 
 
 //============================================================================
-static void FileSrvIpAddressCallback (
+static void FileSrvIpAddressCallback(
     ENetError       result,
-    void *          param,
+    void*           param,
     const wchar_t   addr[]
-) {
+)
+{
     NetCliGateKeeperDisconnect();
 
     if (IS_NET_ERROR(result)) {
@@ -809,8 +831,8 @@ static void FileSrvIpAddressCallback (
         s_patchError = true;
         return;
     }
-    
-    plLauncherInfo *info = (plLauncherInfo *) param;
+
+    plLauncherInfo* info = (plLauncherInfo*) param;
 
     // Start connecting to the server
     const char* caddr = hsWStringToString(addr);
@@ -835,36 +857,44 @@ static void FileSrvIpAddressCallback (
 ***/
 
 //============================================================================
-void InitAsyncCore () {
-    if(AtomicAdd(&s_asyncCoreInitCount, 1) > 0)
+void InitAsyncCore()
+{
+    if (AtomicAdd(&s_asyncCoreInitCount, 1) > 0) {
         return;
+    }
+
     AsyncCoreInitialize();
 
     plStatusLog::AddLineS("patcher.log", plProduct::ProductString().c_str());
 }
 
 //============================================================================
-void ShutdownAsyncCore () {
-    if(AtomicAdd(&s_asyncCoreInitCount, -1) > 1)
+void ShutdownAsyncCore()
+{
+    if (AtomicAdd(&s_asyncCoreInitCount, -1) > 1) {
         return;
+    }
+
     ASSERT(s_asyncCoreInitCount >= 0);
-    
-    while (s_perf[kPerfThreadTaskCount])
+
+    while (s_perf[kPerfThreadTaskCount]) {
         AsyncSleep(10);
+    }
 
     AsyncCoreDestroy(30 * 1000);
 }
 
 //============================================================================
 // param = URU_PreparationRequest
-void UruPrepProc (void * param) {
+void UruPrepProc(void* param)
+{
 #ifdef USE_VLD
     VLDEnable();
 #endif
 
     s_running = true;
 
-    plLauncherInfo *info = (plLauncherInfo *) param;
+    plLauncherInfo* info = (plLauncherInfo*) param;
     s_workingDir = plString::FromWchar(info->path);
 
     InitAsyncCore();
@@ -885,29 +915,28 @@ void UruPrepProc (void * param) {
 
     // request a file server ip address
     NetCliGateKeeperFileSrvIpAddressRequest(FileSrvIpAddressCallback, param, true);
-    
+
     do {
         NetClientUpdate();
         AsyncSleep(10);
     } while ((!s_patchComplete && !s_patchError && s_running) || s_perf[kPerfThreadTaskCount]);
-    
-    while (manifestQueue.size())
-    {
+
+    while (manifestQueue.size()) {
         ManifestFile* mf = manifestQueue.front();
         manifestQueue.pop();
         delete mf;
     }
+
     // If s_patchError, we don't wait around for s_numFiles
     // to drop to zero because it never does for reasons
     // I'm not willing to debug at the moment, so we just
     // bail on them.  This causes a race condition with
     // the outstanding file object cancel/deletion and
     // subsequently a memory leak. -eap
-    
+
     if (s_patchError) {
         info->SetText("Exiting...");
-    }
-    else {
+    } else {
         PatchInfo patchInfo;
         patchInfo.stage = 2;
         patchInfo.progressStage = 100;
@@ -917,7 +946,7 @@ void UruPrepProc (void * param) {
 
     ProgressStream::info = nil;
 
-    NetCliFileDisconnect ();
+    NetCliFileDisconnect();
     NetClientUpdate();
 
     // Shutdown the client/server networking subsystem
@@ -927,49 +956,54 @@ void UruPrepProc (void * param) {
 }
 
 //============================================================================
-void PlayerStopProc (void * param) {
+void PlayerStopProc(void* param)
+{
 #ifdef USE_VLD
     VLDEnable();
 #endif
 
     s_running = false;
-    plLauncherInfo *info = (plLauncherInfo *) param;
+    plLauncherInfo* info = (plLauncherInfo*) param;
     //TerminateProcess(s_pi.hProcess, kExitCodeTerminated);
     info->stopCallback(kStatusOk, nil);
 }
 
 //============================================================================
-void PlayerTerminateProc (void * param) {
+void PlayerTerminateProc(void* param)
+{
 #ifdef USE_VLD
     VLDEnable();
 #endif
 
     s_running = false;
-    plLauncherInfo *info = (plLauncherInfo *) param;
+    plLauncherInfo* info = (plLauncherInfo*) param;
     ShutdownAsyncCore();
     info->terminateCallback(kStatusOk, nil);
 }
 
 //============================================================================
-void  UruStartProc (void * param) {
+void  UruStartProc(void* param)
+{
 #ifdef USE_VLD
     VLDEnable();
 #endif
 
-    if(!s_running)
+    if (!s_running) {
         return;
-    
-    plLauncherInfo *info = (plLauncherInfo *) param;
-    
+    }
+
+    plLauncherInfo* info = (plLauncherInfo*) param;
+
     wchar_t workDir[MAX_PATH];
     StrPrintf(workDir, arrsize(workDir), L"%s", info->path);
     //fprintf(stderr, "URUPlayer StartProc gamePath is:%ws\n", workDir);
 
     wchar_t cmdLine[MAX_PATH];
     StrPrintf(cmdLine, arrsize(cmdLine), L"%s\\%s %s", workDir, s_clientExeName, info->cmdLine);
-    
+
     // Create the named event so the client won't restart us (Windows will clean it up when we exit)
     HANDLE hPatcherEvent = CreateEventW(nil, TRUE, FALSE, L"UruPatcherEvent");
+
     if (hPatcherEvent == NULL) {
         info->startCallback(kStatusError, nil);
         return;
@@ -984,37 +1018,36 @@ void  UruStartProc (void * param) {
 
     info->SetText("Launching URU...");
     BOOL success = CreateProcessW(
-        NULL,   
-        cmdLine,
-        NULL,               // plProcessAttributes
-        NULL,               // plThreadAttributes
-        FALSE,              // bInheritHandles
-        0,                  // dwCreationFlags
-        NULL,               // lpEnvironment
-        workDir,            // lpCurrentDirectory
-        &si,
-        &s_pi
-    );
-    
-    if (success)
-    {
+                       NULL,
+                       cmdLine,
+                       NULL,               // plProcessAttributes
+                       NULL,               // plThreadAttributes
+                       FALSE,              // bInheritHandles
+                       0,                  // dwCreationFlags
+                       NULL,               // lpEnvironment
+                       workDir,            // lpCurrentDirectory
+                       &si,
+                       &s_pi
+                   );
+
+    if (success) {
         fprintf(stderr, "%d", GetLastError());
         info->returnCode = s_pi.dwProcessId;
-        CloseHandle( s_pi.hThread );
-        CloseHandle( s_pi.hProcess );
+        CloseHandle(s_pi.hThread);
+        CloseHandle(s_pi.hProcess);
         // This may smooth the visual transition from GameTap to Uru, or it may make it worse.
         WaitForInputIdle(s_pi.hProcess, INFINITE);
         //_beginthread(WaitUruExitProc, 0, param);
 
         // wait for the event to signal (give the client 10 seconds to start up, then die)
         DWORD wait = WaitForSingleObject(hPatcherEvent, 10000);
-        if (wait == WAIT_TIMEOUT)
+
+        if (wait == WAIT_TIMEOUT) {
             info->startCallback(kStatusOk, nil);
-        else
+        } else {
             info->startCallback(kStatusOk, nil);
-    }
-    else
-    {
+        }
+    } else {
         info->startCallback(kStatusError, nil);
     }
 }

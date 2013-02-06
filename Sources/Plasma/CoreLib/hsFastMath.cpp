@@ -48,8 +48,7 @@ const float hsFastMath::kSqrtTwo = sqrt(2.f);
 const float hsFastMath::kInvSqrtTwo = hsInvert(hsFastMath::kSqrtTwo);
 const float hsFastMath::kTwoPI = M_PI * 2.f;
 
-hsPoint2 statCosSinTable[9] = // must match length in inline
-{
+hsPoint2 statCosSinTable[9] = { // must match length in inline
     { 1.f, 0.f },
     { hsFastMath::kInvSqrtTwo, hsFastMath::kInvSqrtTwo },
     { 0.f, 1.f },
@@ -581,61 +580,76 @@ unsigned char statSeedTable[] = {
 float hsFastMath::IATan2OverTwoPi(float y, float x)
 {
     const int tabSize = 16; // pad with one extra because hi can go hi
-    const int tabMax = tabSize-1;
-    static float tab[tabSize+1] = {
-                    0.f,
-                    0.0105947f,
-                    0.0210962f,
-                    0.0314165f,
-                    0.0414762f,
-                    0.0512082f,
-                    0.0605595f,
-                    0.0694914f,
-                    0.0779791f,
-                    0.0860104f,
-                    0.0935835f,
-                    0.100705f,
-                    0.107388f,
-                    0.113651f,
-                    0.119514f,
-                    0.125f,
-                    0 };
+    const int tabMax = tabSize - 1;
+    static float tab[tabSize + 1] = {
+        0.f,
+        0.0105947f,
+        0.0210962f,
+        0.0314165f,
+        0.0414762f,
+        0.0512082f,
+        0.0605595f,
+        0.0694914f,
+        0.0779791f,
+        0.0860104f,
+        0.0935835f,
+        0.100705f,
+        0.107388f,
+        0.113651f,
+        0.119514f,
+        0.125f,
+        0
+    };
 
-    if( (x == 0)&&(y == 0) )
+    if ((x == 0) && (y == 0)) {
         return 0;
+    }
 
     int xNeg, yNeg;
-    if((yNeg = (y < 0)))y = -y;
-    if((xNeg = (x < 0)))x = -x;
+
+    if ((yNeg = (y < 0))) {
+        y = -y;
+    }
+
+    if ((xNeg = (x < 0))) {
+        x = -x;
+    }
+
     bool yBigger = y >= x;
     float div = yBigger ? x / y : y / x;
 
     float fInd = div * tabMax;
     int lo = int(fInd);
-    int hi = lo+1;
+    int hi = lo + 1;
     float frac = fInd - lo;
 
     float res = tab[lo];
     res += frac * (tab[hi] - res);
 
     // now move to proper half quadrant
-    hsAssert((res >= 0)&&(res <= 0.25f), "Lookup atan2 out of bounds");
-    if( yBigger )
+    hsAssert((res >= 0) && (res <= 0.25f), "Lookup atan2 out of bounds");
+
+    if (yBigger) {
         res = 0.25f - res;
-    switch( (yNeg << 1)|xNeg )
-    {
+    }
+
+    switch ((yNeg << 1) | xNeg) {
     case 0:
         break;
+
     case 1:
         res = 0.5f - res;
         break;
+
     case 3:
         res += 0.5f;
         break;
+
     case 2:
         res = 1.f - res;
         break;
     }
+
     return res;
 }
 

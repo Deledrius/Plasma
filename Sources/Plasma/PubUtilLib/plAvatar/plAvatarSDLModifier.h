@@ -47,7 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 //
-// This modifier is responsible for sending and recving 
+// This modifier is responsible for sending and recving
 // an avatar's state
 //
 class plStateDataRecord;
@@ -57,8 +57,7 @@ class plAvBrainGeneric;
 class plAvBrainClimb;
 class plAvBrainDrive;
 
-class plAvatarPhysicalSDLModifier : public plSDLModifier
-{
+class plAvatarPhysicalSDLModifier : public plSDLModifier {
 protected:
     static char kStrPosition[];
     static char kStrRotation[];
@@ -67,26 +66,28 @@ protected:
     void ISetCurrentStateFrom(const plStateDataRecord* srcState);
     void IPutCurrentStateIn(plStateDataRecord* dstState);
 
-    uint32_t IApplyModFlags(uint32_t sendFlags) { return (sendFlags | plSynchedObject::kDontPersistOnServer | plSynchedObject::kIsAvatarState); }
+    uint32_t IApplyModFlags(uint32_t sendFlags) {
+        return (sendFlags | plSynchedObject::kDontPersistOnServer | plSynchedObject::kIsAvatarState);
+    }
 
 public:
-    CLASSNAME_REGISTER( plAvatarPhysicalSDLModifier );
-    GETINTERFACE_ANY( plAvatarPhysicalSDLModifier, plSDLModifier);
-        
-    const char* GetSDLName() const { return kSDLAvatarPhysical; }
+    CLASSNAME_REGISTER(plAvatarPhysicalSDLModifier);
+    GETINTERFACE_ANY(plAvatarPhysicalSDLModifier, plSDLModifier);
+
+    const char* GetSDLName() const {
+        return kSDLAvatarPhysical;
+    }
 
 };
 
-class plAvatarSDLModifier : public plSDLModifier
-{
+class plAvatarSDLModifier : public plSDLModifier {
 protected:
     static char kStrBrainStack[];
     static char kStrInvisibilityLevel[];
 
-    // var labels 
-    struct StandardStageVarNames
-    {
-        static char kStrName[]; 
+    // var labels
+    struct StandardStageVarNames {
+        static char kStrName[];
         static char kStrNumLoops[];
         static char kStrForward[];
         static char kStrBackward[];
@@ -99,13 +100,12 @@ protected:
         static char kStrUseGlobalCoords[];
         static char kStrLocalTime[];
         static char kStrCurrentLoop[];
-        static char kStrIsAttached[];       
+        static char kStrIsAttached[];
     };
 
-    struct GenericBrainVarNames
-    {
-        static char kStrStages[];       
-        static char kStrCurrentStage[];     
+    struct GenericBrainVarNames {
+        static char kStrStages[];
+        static char kStrCurrentStage[];
         static char kStrFreezePhysicalAtEnd[];
         static char kStrCallbackRcvr[];
         static char kStrMovingForward[];
@@ -116,11 +116,10 @@ protected:
         static char kStrFadeOut[];
         static char kStrMoveMode[];
         static char kStrBodyUsage[];
-    }; 
+    };
 
 
-    struct BrainUnionVarNames
-    {
+    struct BrainUnionVarNames {
         static char kGenericBrain[];
         static char kClimbBrain[];
         static char kDriveBrain[];
@@ -132,36 +131,39 @@ protected:
     void ISetCurrentStateFrom(const plStateDataRecord* srcState);
     /** Set the base state for the avatar. This primarily consists of the state of the
         human brain, which is required for all avatars. */
-    void ISetBaseAvatarStateFrom(plArmatureMod *avMod, const plStateDataRecord* src);
+    void ISetBaseAvatarStateFrom(plArmatureMod* avMod, const plStateDataRecord* src);
     /** We found a generic brain in the SDL stream. Build the corresponding brain and attach it. */
-    bool ISetGenericBrainFrom(plArmatureMod *avMod, const plStateDataRecord* srcState);
+    bool ISetGenericBrainFrom(plArmatureMod* avMod, const plStateDataRecord* srcState);
     /** We found a climb brain in the SDL stream. Build the corresponding brain and attach it. */
-    void ISetClimbBrainFrom(plArmatureMod *avMod, const plStateDataRecord* src);
+    void ISetClimbBrainFrom(plArmatureMod* avMod, const plStateDataRecord* src);
     /** We found a drive brain in the SDL stream. Build the corresponding brain and attach it. */
-    void ISetDriveBrainFrom(plArmatureMod *avMod, const plStateDataRecord* src);
+    void ISetDriveBrainFrom(plArmatureMod* avMod, const plStateDataRecord* src);
     /** Generic brains have multiple "stages" parse *one* out of the SDL stream and return it. */
-    plAnimStage * IGetStageFrom(plArmatureMod *avMod, const plStateDataRecord* srcState);
+    plAnimStage* IGetStageFrom(plArmatureMod* avMod, const plStateDataRecord* srcState);
 
     void IPutCurrentStateIn(plStateDataRecord* dstState);
-    void IPutBaseAvatarStateIn(plArmatureMod *avMod, plStateDataRecord* dst);
-    void IPutGenericBrainIn(plArmatureMod *avMod, plAvBrainGeneric *brain, plStateDataRecord* dstState);
-    void IPutClimbBrainIn(plArmatureMod *avMod, plAvBrainClimb *brain, plStateDataRecord* dstState);
-    void IPutDriveBrainIn(plArmatureMod *avMod, plAvBrainDrive *brain, plStateDataRecord* dstState);
-    bool IPutStageIn(plArmatureMod *avMod, plAnimStage *stage, plStateDataRecord* dstState);
-    
-    uint32_t IApplyModFlags(uint32_t sendFlags) { return (sendFlags | plSynchedObject::kDontPersistOnServer | plSynchedObject::kIsAvatarState); }
+    void IPutBaseAvatarStateIn(plArmatureMod* avMod, plStateDataRecord* dst);
+    void IPutGenericBrainIn(plArmatureMod* avMod, plAvBrainGeneric* brain, plStateDataRecord* dstState);
+    void IPutClimbBrainIn(plArmatureMod* avMod, plAvBrainClimb* brain, plStateDataRecord* dstState);
+    void IPutDriveBrainIn(plArmatureMod* avMod, plAvBrainDrive* brain, plStateDataRecord* dstState);
+    bool IPutStageIn(plArmatureMod* avMod, plAnimStage* stage, plStateDataRecord* dstState);
+
+    uint32_t IApplyModFlags(uint32_t sendFlags) {
+        return (sendFlags | plSynchedObject::kDontPersistOnServer | plSynchedObject::kIsAvatarState);
+    }
 
 public:
-    CLASSNAME_REGISTER( plAvatarSDLModifier );
-    GETINTERFACE_ANY( plAvatarSDLModifier, plSDLModifier);
-        
-    const char* GetSDLName() const { return kSDLAvatar; }
+    CLASSNAME_REGISTER(plAvatarSDLModifier);
+    GETINTERFACE_ANY(plAvatarSDLModifier, plSDLModifier);
+
+    const char* GetSDLName() const {
+        return kSDLAvatar;
+    }
 
     // trying a new approach, which is to let the climb brain read its own SDL.
     // this allows us to synch protected data members with either creating a friend
     // relationship or punching a lot of hole's in the object's encapsulation
-    struct ClimbBrainVarNames
-    {
+    struct ClimbBrainVarNames {
         static char kStrCurMode[];
         static char kStrNextMode[];
         static char kStrAllowedDirections[];

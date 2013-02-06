@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plNetGameLib/Private/plNglGateKeeper.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_PUBUTILLIB_PLNETGAMELIB_PRIVATE_PLNGLGATEKEEPER_H
@@ -61,17 +61,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //============================================================================
 // Connect
 //============================================================================
-void NetCliGateKeeperStartConnect (
+void NetCliGateKeeperStartConnect(
     const char*   gateKeeperAddrList[],
     uint32_t      gateKeeperAddrCount
 );
 
-bool NetCliGateKeeperQueryConnected ();
-void NetCliGateKeeperAutoReconnectEnable (bool enable); // is enabled by default
+bool NetCliGateKeeperQueryConnected();
+void NetCliGateKeeperAutoReconnectEnable(bool enable);  // is enabled by default
 
 // Called after the gatekeeper/client connection is encrypted
 typedef void (*FNetCliGateKeeperConnectCallback)();
-void NetCliGateKeeperSetConnectCallback (
+void NetCliGateKeeperSetConnectCallback(
     FNetCliGateKeeperConnectCallback callback
 );
 
@@ -79,8 +79,8 @@ void NetCliGateKeeperSetConnectCallback (
 //============================================================================
 // Disconnect
 //============================================================================
-void NetCliGateKeeperDisconnect ();
-void NetCliGateKeeperUnexpectedDisconnect ();
+void NetCliGateKeeperDisconnect();
+void NetCliGateKeeperUnexpectedDisconnect();
 
 
 //============================================================================
@@ -88,18 +88,18 @@ void NetCliGateKeeperUnexpectedDisconnect ();
 //============================================================================
 typedef void (*FNetCliGateKeeperPingRequestCallback)(
     ENetError   result,
-    void *      param,
+    void*       param,
     unsigned    pingAtMs,
     unsigned    replyAtMs,
     unsigned    payloadBytes,
     const uint8_t  payload[]
 );
-void NetCliGateKeeperPingRequest (
+void NetCliGateKeeperPingRequest(
     unsigned                                pingTimeMs,
     unsigned                                payloadBytes,   // max 64k (pnNetCli enforced upon send)
-    const void *                            payload,
+    const void*                             payload,
     FNetCliGateKeeperPingRequestCallback    callback,
-    void *                                  param
+    void*                                   param
 );
 
 
@@ -108,13 +108,13 @@ void NetCliGateKeeperPingRequest (
 //============================================================================
 typedef void (*FNetCliGateKeeperFileSrvIpAddressRequestCallback)(
     ENetError   result,
-    void *      param,
+    void*       param,
     const wchar_t addr[]
 );
 
-void NetCliGateKeeperFileSrvIpAddressRequest (
+void NetCliGateKeeperFileSrvIpAddressRequest(
     FNetCliGateKeeperFileSrvIpAddressRequestCallback    callback,
-    void *                                              param,
+    void*                                               param,
     bool                                                isPatcher
 );
 
@@ -124,13 +124,13 @@ void NetCliGateKeeperFileSrvIpAddressRequest (
 //============================================================================
 typedef void (*FNetCliGateKeeperAuthSrvIpAddressRequestCallback)(
     ENetError   result,
-    void *      param,
+    void*       param,
     const wchar_t addr[]
 );
 
-void NetCliGateKeeperAuthSrvIpAddressRequest (
+void NetCliGateKeeperAuthSrvIpAddressRequest(
     FNetCliGateKeeperAuthSrvIpAddressRequestCallback    callback,
-    void *                                              param
+    void*                                               param
 );
 
 

@@ -62,22 +62,22 @@ static const char kEncode64[] = {
 #define xx kTerminator
 static const char kDecode64[] = {
 //   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
-    xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,
-    xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,
-    xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,62,xx,63,xx,63,
-    52,53,54,55,56,57,58,59,60,61,xx,xx,xx,xx,xx,xx,
-    xx, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,
-    15,16,17,18,19,20,21,22,23,24,25,xx,xx,xx,xx,xx,
-    xx,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
-    41,42,43,44,45,46,47,48,49,50,51,xx,xx,xx,xx,xx,
-    xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,
-    xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,
-    xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,
-    xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,
-    xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,
-    xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,
-    xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,
-    xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,
+    xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
+    xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
+    xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, 62, xx, 63, xx, 63,
+    52, 53, 54, 55, 56, 57, 58, 59, 60, 61, xx, xx, xx, xx, xx, xx,
+    xx, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, xx, xx, xx, xx, xx,
+    xx, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+    41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, xx, xx, xx, xx, xx,
+    xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
+    xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
+    xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
+    xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
+    xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
+    xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
+    xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
+    xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx,
 };
 #undef xx
 
@@ -91,84 +91,90 @@ static const char kFillchar = '=';
 ***/
 
 //============================================================================
-unsigned Base64Encode (
+unsigned Base64Encode(
     unsigned    srcChars,
     const uint8_t  srcData[],
     unsigned    dstChars,
-    char *      dstData
-) {
+    char*       dstData
+)
+{
     ASSERT(srcData);
     ASSERT(dstChars >= Base64EncodeSize(srcChars));
     ASSERT(dstData);
-    
-    const char * dstBase = dstData;
-    const uint8_t * srcTerm = srcData + srcChars;
+
+    const char* dstBase = dstData;
+    const uint8_t* srcTerm = srcData + srcChars;
+
     for (;;) switch (srcTerm - srcData) {
         case 0:
             *dstData++ = 0;
-        return dstData - dstBase;
+            return dstData - dstBase;
 
         case 1:
-            *dstData++ = kEncode64[ ((srcData[0] >> 2) & 0x3f) ];
-            *dstData++ = kEncode64[ ((srcData[0] << 4) & 0x30) ];
+            *dstData++ = kEncode64[((srcData[0] >> 2) & 0x3f) ];
+            *dstData++ = kEncode64[((srcData[0] << 4) & 0x30) ];
             *dstData++ = kFillchar;
             *dstData++ = kFillchar;
             *dstData++ = 0;
-        return dstData - dstBase;
+            return dstData - dstBase;
 
         case 2:
-            *dstData++ = kEncode64[ ((srcData[0] >> 2) & 0x3f) ];
-            *dstData++ = kEncode64[ ((srcData[0] << 4) & 0x30) + ((srcData[1] >> 4) & 0x0f) ];
-            *dstData++ = kEncode64[ ((srcData[1] << 2) & 0x3c) ];
+            *dstData++ = kEncode64[((srcData[0] >> 2) & 0x3f) ];
+            *dstData++ = kEncode64[((srcData[0] << 4) & 0x30) + ((srcData[1] >> 4) & 0x0f) ];
+            *dstData++ = kEncode64[((srcData[1] << 2) & 0x3c) ];
             *dstData++ = kFillchar;
             *dstData++ = 0;
-        return dstData - dstBase;
+            return dstData - dstBase;
 
         default:
-            *dstData++ = kEncode64[ ((srcData[0] >> 2) & 0x3f) ];
-            *dstData++ = kEncode64[ ((srcData[0] << 4) & 0x30) + ((srcData[1] >> 4) & 0x0f) ];
-            *dstData++ = kEncode64[ ((srcData[1] << 2) & 0x3c) + ((srcData[2] >> 6) & 0x03) ];
-            *dstData++ = kEncode64[ (srcData[2] & 0x3f) ];
+            *dstData++ = kEncode64[((srcData[0] >> 2) & 0x3f) ];
+            *dstData++ = kEncode64[((srcData[0] << 4) & 0x30) + ((srcData[1] >> 4) & 0x0f) ];
+            *dstData++ = kEncode64[((srcData[1] << 2) & 0x3c) + ((srcData[2] >> 6) & 0x03) ];
+            *dstData++ = kEncode64[(srcData[2] & 0x3f) ];
             srcData   += 3;
-        break;
-    }
+            break;
+        }
 }
 
 //============================================================================
-unsigned Base64Decode (
+unsigned Base64Decode(
     unsigned    srcChars,
     const char  srcData[],
     unsigned    dstChars,
-    uint8_t *      dstData
-) {
+    uint8_t*       dstData
+)
+{
     ASSERT(srcData);
     ASSERT(dstChars >= Base64DecodeSize(srcChars, srcData));
     ASSERT(dstData);
 
-    const uint8_t * dstBase = dstData;
-    const char * srcTerm = srcData + srcChars;
+    const uint8_t* dstBase = dstData;
+    const char* srcTerm = srcData + srcChars;
+
     while (srcTerm - srcData >= 4) {
 
-        *dstData++ = (uint8_t) (
-            (kDecode64[srcData[0]] << 2 & 0xfc)
-           +(kDecode64[srcData[1]] >> 4 & 0x03)
-        );
+        *dstData++ = (uint8_t)(
+                         (kDecode64[srcData[0]] << 2 & 0xfc)
+                         + (kDecode64[srcData[1]] >> 4 & 0x03)
+                     );
 
-        if (kDecode64[srcData[2]] == kTerminator)
+        if (kDecode64[srcData[2]] == kTerminator) {
             break;
+        }
 
-        *dstData++ = (uint8_t) (
-            (kDecode64[srcData[1]] << 4 & 0xf0)
-           +(kDecode64[srcData[2]] >> 2 & 0x0f)
-        );
+        *dstData++ = (uint8_t)(
+                         (kDecode64[srcData[1]] << 4 & 0xf0)
+                         + (kDecode64[srcData[2]] >> 2 & 0x0f)
+                     );
 
-        if (kDecode64[srcData[3]] == kTerminator)
+        if (kDecode64[srcData[3]] == kTerminator) {
             break;
+        }
 
-        *dstData++ = (uint8_t) (
-            (kDecode64[srcData[2]] << 6 & 0xc0)
-           +(kDecode64[srcData[3]])
-        );
+        *dstData++ = (uint8_t)(
+                         (kDecode64[srcData[2]] << 6 & 0xc0)
+                         + (kDecode64[srcData[3]])
+                     );
 
         srcData += 4;
     }

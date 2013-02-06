@@ -52,8 +52,7 @@ class plRefMsg;
 class plTimeMsg;
 class plAnimCmdMsg;
 
-class plSimpleModifier : public plModifier
-{
+class plSimpleModifier : public plModifier {
 public:
     enum {
         kStopped        = 0,
@@ -89,19 +88,25 @@ public:
     plSimpleModifier();
     virtual ~plSimpleModifier();
 
-    CLASSNAME_REGISTER( plSimpleModifier );
-    GETINTERFACE_ANY( plSimpleModifier, plModifier);
+    CLASSNAME_REGISTER(plSimpleModifier);
+    GETINTERFACE_ANY(plSimpleModifier, plModifier);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     virtual bool MsgReceive(plMessage* msg);
 
-    virtual int GetNumTargets() const { return fTarget ? 1 : 0; }
-    virtual plSceneObject* GetTarget(int w) const { /* hsAssert(w < GetNumTargets(), "Bad target"); */ return fTarget; }
+    virtual int GetNumTargets() const {
+        return fTarget ? 1 : 0;
+    }
+    virtual plSceneObject* GetTarget(int w) const {
+        /* hsAssert(w < GetNumTargets(), "Bad target"); */ return fTarget;
+    }
     virtual void AddTarget(plSceneObject* so);
     virtual void RemoveTarget(plSceneObject* so);
-    virtual plAnimTimeConvert& GetTimeConvert() { return fTimeConvert;  }
+    virtual plAnimTimeConvert& GetTimeConvert() {
+        return fTimeConvert;
+    }
 
 
 };

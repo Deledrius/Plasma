@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtRef.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNUTILS_PRIVATE_PNUTREF_H
@@ -61,116 +61,120 @@ class AtomicRef {
     bool    zeroed;
 #endif
 public:
-    inline AtomicRef ()
-    : m_ref(0)
-    #ifdef HS_DEBUGGING
-    , zeroed(false)
-    #endif
+    inline AtomicRef()
+        : m_ref(0)
+#ifdef HS_DEBUGGING
+        , zeroed(false)
+#endif
     {}
-    
-    inline void AcknowledgeZeroRef () {
-        #ifdef HS_DEBUGGING
+
+    inline void AcknowledgeZeroRef() {
+#ifdef HS_DEBUGGING
         zeroed = false;
-        #endif
+#endif
     }
 
-    inline long IncRef () {
-        #ifdef HS_DEBUGGING
+    inline long IncRef() {
+#ifdef HS_DEBUGGING
         ASSERT(!zeroed);
-        #endif
+#endif
         long prev = AtomicAdd(&m_ref, 1);
-        #ifdef REFCOUNT_DEBUGGING
-        DEBUG_MSG("Inc %p: %u", this, prev+1);
-        #endif
-        return prev+1;
+#ifdef REFCOUNT_DEBUGGING
+        DEBUG_MSG("Inc %p: %u", this, prev + 1);
+#endif
+        return prev + 1;
     }
-    inline long IncRef (const char tag[]) {
-        #ifdef HS_DEBUGGING
+    inline long IncRef(const char tag[]) {
+#ifdef HS_DEBUGGING
         ASSERT(!zeroed);
-        #endif
+#endif
         long prev = AtomicAdd(&m_ref, 1);
-        #ifdef REFCOUNT_DEBUGGING
-        DEBUG_MSG("Inc %p %s: %u", this, tag, prev+1);
-        #endif
-        return prev+1;
+#ifdef REFCOUNT_DEBUGGING
+        DEBUG_MSG("Inc %p %s: %u", this, tag, prev + 1);
+#endif
+        return prev + 1;
     }
-    inline long IncRef (unsigned n) {
-        #ifdef HS_DEBUGGING
+    inline long IncRef(unsigned n) {
+#ifdef HS_DEBUGGING
         ASSERT(!zeroed);
-        #endif
+#endif
         long prev = AtomicAdd(&m_ref, n);
-        #ifdef REFCOUNT_DEBUGGING
-        DEBUG_MSG("Inc %p: %u", this, prev+n);
-        #endif
-        return prev+n;
+#ifdef REFCOUNT_DEBUGGING
+        DEBUG_MSG("Inc %p: %u", this, prev + n);
+#endif
+        return prev + n;
     }
-    inline long IncRef (unsigned n, const char tag[]) {
-        #ifdef HS_DEBUGGING
+    inline long IncRef(unsigned n, const char tag[]) {
+#ifdef HS_DEBUGGING
         ASSERT(!zeroed);
-        #endif
+#endif
         long prev = AtomicAdd(&m_ref, n);
-        #ifdef REFCOUNT_DEBUGGING
-        DEBUG_MSG("Inc %p %s: %u", this, tag, prev+n);
-        #endif
-        return prev+n;
+#ifdef REFCOUNT_DEBUGGING
+        DEBUG_MSG("Inc %p %s: %u", this, tag, prev + n);
+#endif
+        return prev + n;
     }
 
-    inline long DecRef () {
-        #ifdef HS_DEBUGGING
+    inline long DecRef() {
+#ifdef HS_DEBUGGING
         ASSERT(!zeroed);
-        #endif
+#endif
         long prev;
+
         if ((prev = AtomicAdd(&m_ref, -1)) == 1) {
-            #ifdef HS_DEBUGGING
+#ifdef HS_DEBUGGING
             zeroed = true;
-            #endif
+#endif
             OnZeroRef();
         }
-        #ifdef REFCOUNT_DEBUGGING
-        DEBUG_MSG("Dec %p: %u", this, prev-1);
-        #endif
-        return prev-1;
+
+#ifdef REFCOUNT_DEBUGGING
+        DEBUG_MSG("Dec %p: %u", this, prev - 1);
+#endif
+        return prev - 1;
     }
-    inline long DecRef (const char tag[]) {
-        #ifdef HS_DEBUGGING
+    inline long DecRef(const char tag[]) {
+#ifdef HS_DEBUGGING
         ASSERT(!zeroed);
-        #endif
+#endif
         long prev;
+
         if ((prev = AtomicAdd(&m_ref, -1)) == 1) {
-            #ifdef HS_DEBUGGING
+#ifdef HS_DEBUGGING
             zeroed = true;
-            #endif
+#endif
             OnZeroRef();
         }
-        #ifdef REFCOUNT_DEBUGGING
-        DEBUG_MSG("Dec %p %s: %u", this, tag, prev-1);
-        #endif
-        return prev-1;
+
+#ifdef REFCOUNT_DEBUGGING
+        DEBUG_MSG("Dec %p %s: %u", this, tag, prev - 1);
+#endif
+        return prev - 1;
     }
 
-    inline void TransferRef (
+    inline void TransferRef(
         const char oldTag[],
         const char newTag[]
     ) {
-        #ifdef HS_DEBUGGING
+#ifdef HS_DEBUGGING
         ASSERT(!zeroed);
-        #endif
-        #ifdef REFCOUNT_DEBUGGING
+#endif
+#ifdef REFCOUNT_DEBUGGING
         DEBUG_MSG("Inc %p %s: (xfer)", this, newTag);
         DEBUG_MSG("Dec %p %s: (xfer)", this, oldTag);
-        #endif
+#endif
     }
 
-    inline unsigned GetRefCount () {
+    inline unsigned GetRefCount() {
         return m_ref;
     }
 
-    inline virtual void OnZeroRef () {
+    inline virtual void OnZeroRef() {
         delete this;
     }
 
 protected:
-    inline virtual ~AtomicRef () {
+    inline virtual ~AtomicRef() {
         ASSERT(!m_ref);
     }
 

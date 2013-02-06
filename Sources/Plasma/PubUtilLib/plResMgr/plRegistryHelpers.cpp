@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plRegistryHelpers.h"
 #include "plRegistryNode.h"
 
-plKeyCollector::plKeyCollector( hsTArray<plKey> &keys ) : fKeys( keys )
+plKeyCollector::plKeyCollector(hsTArray<plKey>& keys) : fKeys(keys)
 {
 }
 

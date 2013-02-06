@@ -43,19 +43,20 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMaxWaveUtils.h"
 #include "plAudioCore/plWavFile.h"
 
-SegmentMap *GetWaveSegmentMap(const char *file, plErrorMsg *pErrMsg)
+SegmentMap* GetWaveSegmentMap(const char* file, plErrorMsg* pErrMsg)
 {
     CWaveFile waveFile;
     waveFile.Open(file, nil, WAVEFILE_READ);
     int numMarkers = waveFile.GetNumMarkers();
-    if (numMarkers == 0)
+
+    if (numMarkers == 0) {
         return nil;
+    }
 
-    SegmentMap *segMap = new SegmentMap();
+    SegmentMap* segMap = new SegmentMap();
 
-    for (int i = 0; i < waveFile.GetNumMarkers(); i++)
-    {
-        plSoundMarker *marker = waveFile.GetSoundMarker(i);
+    for (int i = 0; i < waveFile.GetNumMarkers(); i++) {
+        plSoundMarker* marker = waveFile.GetSoundMarker(i);
         GetSegment(marker->fName, (float)(marker->fOffset), segMap, pErrMsg);
     }
 

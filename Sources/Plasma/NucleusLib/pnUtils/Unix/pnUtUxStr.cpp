@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/Unix/pnUtUxStr.cpp
-*   
+*
 ***/
 
 #include "../pnUtStr.h"
@@ -55,7 +55,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // Dummy function to prevent a linker warning complaining about no public symbols if the
 // contents of the file get compiled out via pre-processor
-void UxStrPreventLNK4221Warning () {
+void UxStrPreventLNK4221Warning()
+{
 }
 
 #endif

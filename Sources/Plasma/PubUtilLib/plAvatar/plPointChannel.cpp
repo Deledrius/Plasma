@@ -57,7 +57,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // CTOR
 plPointChannel::plPointChannel()
-: plAGChannel(), fResult(0, 0, 0)
+    : plAGChannel(), fResult(0, 0, 0)
 {
 }
 
@@ -68,37 +68,37 @@ plPointChannel::~plPointChannel()
 
 // VALUE
 // default behaviour is just to return our result (constant value)
-const hsPoint3 & plPointChannel::Value(double time)
+const hsPoint3& plPointChannel::Value(double time)
 {
     return fResult;
 }
 
 // VALUE(point, time)
-void plPointChannel::Value(hsPoint3 &point, double time)
+void plPointChannel::Value(hsPoint3& point, double time)
 {
     point = Value(time);
 }
 
 // MAKECOMBINE
-plAGChannel * plPointChannel::MakeCombine(plAGChannel *channelA)
+plAGChannel* plPointChannel::MakeCombine(plAGChannel* channelA)
 {
     return nil;
 }
 
 // MAKEBLEND
-plAGChannel * plPointChannel::MakeBlend(plAGChannel * channelB, plScalarChannel * channelBias, int blendPriority)
+plAGChannel* plPointChannel::MakeBlend(plAGChannel* channelB, plScalarChannel* channelBias, int blendPriority)
 {
-    return new plPointBlend(this, (plPointChannel *)channelB, channelBias);
+    return new plPointBlend(this, (plPointChannel*)channelB, channelBias);
 }
 
 // MAKEZEROSTATE
-plAGChannel * plPointChannel::MakeZeroState()
+plAGChannel* plPointChannel::MakeZeroState()
 {
     return new plPointConstant(Value(0));
 }
 
 // MAKETIMESCALE
-plAGChannel * plPointChannel::MakeTimeScale(plScalarChannel *timeSource)
+plAGChannel* plPointChannel::MakeTimeScale(plScalarChannel* timeSource)
 {
     return new plPointTimeScale(this, timeSource);
 }
@@ -112,13 +112,13 @@ plAGChannel * plPointChannel::MakeTimeScale(plScalarChannel *timeSource)
 // ctor --------------------------
 // -----
 plPointConstant::plPointConstant()
-: plPointChannel()
+    : plPointChannel()
 {
 }
 
 // ctor -----------------------------------------------
 // -----
-plPointConstant::plPointConstant(const hsPoint3 &point)
+plPointConstant::plPointConstant(const hsPoint3& point)
 {
     fResult = point;
 }
@@ -129,13 +129,13 @@ plPointConstant::~plPointConstant()
 {
 }
 
-void plPointConstant::Read(hsStream *stream, hsResMgr *mgr)
+void plPointConstant::Read(hsStream* stream, hsResMgr* mgr)
 {
     plPointChannel::Read(stream, mgr);
     fResult.Read(stream);
 }
 
-void plPointConstant::Write(hsStream *stream, hsResMgr *mgr)
+void plPointConstant::Write(hsStream* stream, hsResMgr* mgr)
 {
     plPointChannel::Write(stream, mgr);
     fResult.Write(stream);
@@ -153,15 +153,15 @@ void plPointConstant::Write(hsStream *stream, hsResMgr *mgr)
 // ctor ----------------------------
 // -----
 plPointTimeScale::plPointTimeScale()
-: fTimeSource(nil), fChannelIn(nil)
+    : fTimeSource(nil), fChannelIn(nil)
 {
 }
 
 // ctor --------------------------------------------------------------------------------
 // -----
-plPointTimeScale::plPointTimeScale(plPointChannel *channel, plScalarChannel *timeSource)
-: fChannelIn(channel),
-  fTimeSource(timeSource)
+plPointTimeScale::plPointTimeScale(plPointChannel* channel, plScalarChannel* timeSource)
+    : fChannelIn(channel),
+      fTimeSource(timeSource)
 {
 }
 
@@ -180,7 +180,7 @@ bool plPointTimeScale::IsStoppedAt(double time)
 
 // Value --------------------------------------------
 // ------
-const hsPoint3 & plPointTimeScale::Value(double time)
+const hsPoint3& plPointTimeScale::Value(double time)
 {
     fResult = fChannelIn->Value(fTimeSource->Value(time));
 
@@ -189,20 +189,22 @@ const hsPoint3 & plPointTimeScale::Value(double time)
 
 // Detach ---------------------------------------------------
 // -------
-plAGChannel * plPointTimeScale::Detach(plAGChannel * channel)
+plAGChannel* plPointTimeScale::Detach(plAGChannel* channel)
 {
-    plAGChannel *result = this;
-    
+    plAGChannel* result = this;
+
     fChannelIn = plPointChannel::ConvertNoRef(fChannelIn->Detach(channel));
-    
-    if(!fChannelIn || channel == this)
+
+    if (!fChannelIn || channel == this) {
         result = nil;
-    
-    if(result != this)
+    }
+
+    if (result != this) {
         delete this;
-    
+    }
+
     return result;
-    
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -214,18 +216,18 @@ plAGChannel * plPointTimeScale::Detach(plAGChannel * channel)
 // ctor --------------------
 // -----
 plPointBlend::plPointBlend()
-: fPointA(nil),
-  fPointB(nil)
+    : fPointA(nil),
+      fPointB(nil)
 {
 }
 
 // ctor ---------------------------------------------------------------------------------
 // -----
-plPointBlend::plPointBlend(plPointChannel *channelA, plPointChannel *channelB,
-                           plScalarChannel *channelBias)
-: fPointA(channelA),
-  fPointB(channelB),
-  fChannelBias(channelBias)
+plPointBlend::plPointBlend(plPointChannel* channelA, plPointChannel* channelB,
+                           plScalarChannel* channelBias)
+    : fPointA(channelA),
+      fPointB(channelB),
+      fChannelBias(channelBias)
 {
 }
 
@@ -243,58 +245,60 @@ plPointBlend::~plPointBlend()
 bool plPointBlend::IsStoppedAt(double time)
 {
     float blend = fChannelBias->Value(time);
-    if (blend == 0)
+
+    if (blend == 0) {
         return fPointA->IsStoppedAt(time);
-    if (blend == 1)
+    }
+
+    if (blend == 1) {
         return fPointB->IsStoppedAt(time);
+    }
 
     return (fPointA->IsStoppedAt(time) && fPointB->IsStoppedAt(time));
 }
 
 // Value ---------------------------------------
 // ------
-const hsPoint3 &plPointBlend::Value(double time)
+const hsPoint3& plPointBlend::Value(double time)
 {
-    if (fPointA && fPointB)
-    {
+    if (fPointA && fPointB) {
         float curBlend = fChannelBias->Value(time);
-        if(curBlend == 0) {
+
+        if (curBlend == 0) {
             fPointA->Value(fResult, time);
         } else {
-            if(curBlend == 1) {
+            if (curBlend == 1) {
                 fPointB->Value(fResult, time);
             } else {
-                const hsPoint3 &pointA = fPointA->Value(time);
-                const hsPoint3 &pointB = fPointB->Value(time);
+                const hsPoint3& pointA = fPointA->Value(time);
+                const hsPoint3& pointB = fPointB->Value(time);
                 hsPoint3 difference = pointB - pointA;
 
                 difference *= curBlend;
-    
+
                 fResult = pointA + difference;
             }
         }
     } else {
-        if (fPointA)
-        {
+        if (fPointA) {
             fResult = fPointA->Value(time);
         } else {
-            if (fPointB)
-            {
+            if (fPointB) {
                 fResult = fPointA->Value(time);
             }
         }
     }
+
     return fResult;
 }
 
 // Detach ------------------------------------------------------
 // -------
-plAGChannel * plPointBlend::Detach(plAGChannel *remove)
+plAGChannel* plPointBlend::Detach(plAGChannel* remove)
 {
-    plAGChannel *result = this;
+    plAGChannel* result = this;
 
-    if (remove == this)
-    {
+    if (remove == this) {
         result = nil;
     } else  {
         // it's possible that the incoming channel could reside down *all* of our
@@ -302,27 +306,27 @@ plAGChannel * plPointBlend::Detach(plAGChannel *remove)
         fChannelBias = plScalarChannel::ConvertNoRef(fChannelBias->Detach(remove));
         fPointA = plPointChannel::ConvertNoRef(fPointA->Detach(remove));
         fPointB = plPointChannel::ConvertNoRef(fPointB->Detach(remove));
-        if (!fChannelBias)
-        {
+
+        if (!fChannelBias) {
             // No more bias channel, assume it's zero from now on, (a.k.a. We just want channelA)
             result = fPointA;
-        }
-        else
-        {
-            if(!fChannelBias)
+        } else {
+            if (!fChannelBias) {
                 result = fPointA;
-            else if(fPointA && !fPointB)
+            } else if (fPointA && !fPointB) {
                 result = fPointA;
-            else if(fPointB && !fPointA)
+            } else if (fPointB && !fPointA) {
                 result = fPointB;
-            else if(!fPointA && !fPointB)
+            } else if (!fPointA && !fPointB) {
                 result = nil;
-            if(result != this)
-            {
+            }
+
+            if (result != this) {
                 delete this;
             }
         }
     }
+
     return result;
 }
 
@@ -332,47 +336,47 @@ plAGChannel * plPointBlend::Detach(plAGChannel *remove)
 
 // CTOR
 plPointControllerChannel::plPointControllerChannel()
-: fController(nil)
+    : fController(nil)
 {
 }
 
 // CTOR(name, controller)
-plPointControllerChannel::plPointControllerChannel(plController *controller)
-: fController(controller)
+plPointControllerChannel::plPointControllerChannel(plController* controller)
+    : fController(controller)
 {
 }
 
 // ~DTOR()
 plPointControllerChannel::~plPointControllerChannel()
 {
-    if(fController) {
+    if (fController) {
         delete fController;
         fController = nil;
     }
 }
 
 // VALUE(time)
-const hsPoint3 & plPointControllerChannel::Value(double time)
+const hsPoint3& plPointControllerChannel::Value(double time)
 {
     return Value(time, nil);
 }
 
 // VALUE(time)
-const hsPoint3 & plPointControllerChannel::Value(double time, plControllerCacheInfo *cache)
+const hsPoint3& plPointControllerChannel::Value(double time, plControllerCacheInfo* cache)
 {
     fController->Interp((float)time, &fResult, cache);
     return fResult;
 }
 
-plAGChannel *plPointControllerChannel::MakeCacheChannel(plAnimTimeConvert *atc)
+plAGChannel* plPointControllerChannel::MakeCacheChannel(plAnimTimeConvert* atc)
 {
-    plControllerCacheInfo *cache = fController->CreateCache();
+    plControllerCacheInfo* cache = fController->CreateCache();
     cache->SetATC(atc);
     return new plPointControllerCacheChannel(this, cache);
 }
 
 // WRITE(stream, mgr)
-void plPointControllerChannel::Write(hsStream *stream, hsResMgr *mgr)
+void plPointControllerChannel::Write(hsStream* stream, hsResMgr* mgr)
 {
     plPointChannel::Write(stream, mgr);
 
@@ -381,10 +385,10 @@ void plPointControllerChannel::Write(hsStream *stream, hsResMgr *mgr)
 }
 
 // READ(stream, mgr)
-void plPointControllerChannel::Read(hsStream *stream, hsResMgr *mgr)
+void plPointControllerChannel::Read(hsStream* stream, hsResMgr* mgr)
 {
     plPointChannel::Read(stream, mgr);
-    
+
     fController = plController::ConvertNoRef(mgr->ReadCreatable(stream));
 }
 
@@ -394,15 +398,15 @@ void plPointControllerChannel::Read(hsStream *stream, hsResMgr *mgr)
 
 // CTOR
 plPointControllerCacheChannel::plPointControllerCacheChannel()
-: fControllerChannel(nil),
-  fCache(nil)
+    : fControllerChannel(nil),
+      fCache(nil)
 {
 }
 
 // CTOR(name, controller)
-plPointControllerCacheChannel::plPointControllerCacheChannel(plPointControllerChannel *controller, plControllerCacheInfo *cache)
-: fControllerChannel(controller),
-  fCache(cache)
+plPointControllerCacheChannel::plPointControllerCacheChannel(plPointControllerChannel* controller, plControllerCacheInfo* cache)
+    : fControllerChannel(controller),
+      fCache(cache)
 {
 }
 
@@ -414,22 +418,20 @@ plPointControllerCacheChannel::~plPointControllerCacheChannel()
 }
 
 // VALUE(time)
-const hsPoint3 & plPointControllerCacheChannel::Value(double time, bool peek)
+const hsPoint3& plPointControllerCacheChannel::Value(double time, bool peek)
 {
     return fControllerChannel->Value(time, fCache);
 }
 
 // DETACH
-plAGChannel * plPointControllerCacheChannel::Detach(plAGChannel * channel)
+plAGChannel* plPointControllerCacheChannel::Detach(plAGChannel* channel)
 {
-    if(channel == this)
-    {
+    if (channel == this) {
         return nil;
     } else {
-        plAGChannel *result = fControllerChannel->Detach(channel);
-        
-        if(result == fControllerChannel)
-        {
+        plAGChannel* result = fControllerChannel->Detach(channel);
+
+        if (result == fControllerChannel) {
             return this;
         } else {
             // if our controller channel has been detached, then detach ourselves as well.
@@ -442,57 +444,57 @@ plAGChannel * plPointControllerCacheChannel::Detach(plAGChannel * channel)
 //
 // Channel applicators
 
-void plPointChannelApplicator::IApply(const plAGModifier *modifier, double time)
+void plPointChannelApplicator::IApply(const plAGModifier* modifier, double time)
 {
-    plPointChannel *pointChan = plPointChannel::ConvertNoRef(fChannel);
+    plPointChannel* pointChan = plPointChannel::ConvertNoRef(fChannel);
     hsAssert(pointChan, "Invalid channel given to plPointChannelApplicator");
 
-    plCoordinateInterface *CI = IGetCI(modifier);
+    plCoordinateInterface* CI = IGetCI(modifier);
 
     hsMatrix44 l2p = CI->GetLocalToParent();
-    const hsPoint3 &point = pointChan->Value(time);
+    const hsPoint3& point = pointChan->Value(time);
 
     l2p.SetTranslate(&point);
-    
+
     hsMatrix44 p2l;
     l2p.GetInverse(&p2l);
     CI->SetLocalToParent(l2p, p2l);
 }
 
-void plLightDiffuseApplicator::IApply(const plAGModifier *modifier, double time)
+void plLightDiffuseApplicator::IApply(const plAGModifier* modifier, double time)
 {
-    plPointChannel *pointChan = plPointChannel::ConvertNoRef(fChannel);
+    plPointChannel* pointChan = plPointChannel::ConvertNoRef(fChannel);
     hsAssert(pointChan, "Invalid channel given to plLightDiffuseApplicator");
 
-    plLightInfo *li = plLightInfo::ConvertNoRef(IGetGI(modifier, plLightInfo::Index()));
+    plLightInfo* li = plLightInfo::ConvertNoRef(IGetGI(modifier, plLightInfo::Index()));
 
-    const hsPoint3 &point = pointChan->Value(time);
+    const hsPoint3& point = pointChan->Value(time);
     hsColorRGBA color;
     color.Set(point.fX, point.fY, point.fZ, 1.0f);
     li->SetDiffuse(color);
 }
 
-void plLightAmbientApplicator::IApply(const plAGModifier *modifier, double time)
+void plLightAmbientApplicator::IApply(const plAGModifier* modifier, double time)
 {
-    plPointChannel *pointChan = plPointChannel::ConvertNoRef(fChannel);
+    plPointChannel* pointChan = plPointChannel::ConvertNoRef(fChannel);
     hsAssert(pointChan, "Invalid channel given to plLightAmbientApplicator");
 
-    plLightInfo *li = plLightInfo::ConvertNoRef(IGetGI(modifier, plLightInfo::Index()));
+    plLightInfo* li = plLightInfo::ConvertNoRef(IGetGI(modifier, plLightInfo::Index()));
 
-    const hsPoint3 &point = pointChan->Value(time);
+    const hsPoint3& point = pointChan->Value(time);
     hsColorRGBA color;
     color.Set(point.fX, point.fY, point.fZ, 1.0f);
     li->SetAmbient(color);
 }
 
-void plLightSpecularApplicator::IApply(const plAGModifier *modifier, double time)
+void plLightSpecularApplicator::IApply(const plAGModifier* modifier, double time)
 {
-    plPointChannel *pointChan = plPointChannel::ConvertNoRef(fChannel);
+    plPointChannel* pointChan = plPointChannel::ConvertNoRef(fChannel);
     hsAssert(pointChan, "Invalid channel given to plLightSpecularApplicator");
 
-    plLightInfo *li = plLightInfo::ConvertNoRef(IGetGI(modifier, plLightInfo::Index()));
+    plLightInfo* li = plLightInfo::ConvertNoRef(IGetGI(modifier, plLightInfo::Index()));
 
-    const hsPoint3 &point = pointChan->Value(time);
+    const hsPoint3& point = pointChan->Value(time);
     hsColorRGBA color;
     color.Set(point.fX, point.fY, point.fZ, 1.0f);
     li->SetSpecular(color);

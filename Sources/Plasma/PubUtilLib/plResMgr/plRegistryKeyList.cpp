@@ -52,19 +52,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 plRegistryKeyList::~plRegistryKeyList()
 {
     std::for_each(fKeys.begin(), fKeys.end(),
-        [] (plKeyImp* key) { if (!key->ObjectIsLoaded()) delete key; }
-    );
+    [](plKeyImp * key) {
+        if (!key->ObjectIsLoaded()) {
+            delete key;
+        }
+    }
+                 );
 }
 
 plKeyImp* plRegistryKeyList::FindKey(const plString& keyName) const
 {
     auto it = std::find_if(fKeys.begin(), fKeys.end(),
-        [&] (plKeyImp* key) { return key->GetName().CompareI(keyName) == 0; }
-    );
-    if (it != fKeys.end())
+    [&](plKeyImp * key) {
+        return key->GetName().CompareI(keyName) == 0;
+    }
+                          );
+
+    if (it != fKeys.end()) {
         return *it;
-    else
+    } else {
         return nullptr;
+    }
 }
 
 plKeyImp* plRegistryKeyList::FindKey(const plUoid& uoid) const
@@ -72,28 +80,31 @@ plKeyImp* plRegistryKeyList::FindKey(const plUoid& uoid) const
     uint32_t objectID = uoid.GetObjectID();
 
     // Key is dynamic or doesn't know its index.  Do a find by name.
-    if (objectID == 0)
+    if (objectID == 0) {
         return FindKey(uoid.GetObjectName());
+    }
 
     // Direct lookup
-    if (objectID <= fKeys.size())
-    {
+    if (objectID <= fKeys.size()) {
 #ifdef PLASMA_EXTERNAL_RELEASE
-        return fKeys[objectID-1];
+        return fKeys[objectID - 1];
 #else
         // If this is an internal release, our objectIDs might not match
         // because of local data. Verify that we have the right key by
         // name, and if it's wrong, do the slower find-by-name.
-        plKeyImp *keyImp = fKeys[objectID-1];
-        if (keyImp->GetName().CompareI(uoid.GetObjectName()) != 0)
+        plKeyImp* keyImp = fKeys[objectID - 1];
+
+        if (keyImp->GetName().CompareI(uoid.GetObjectName()) != 0) {
             return FindKey(uoid.GetObjectName());
-        else
+        } else {
             return keyImp;
+        }
+
 #endif // PLASMA_EXTERNAL_RELEASE
     }
 
     // If we got here it probably means we just deleted all our keys of the matching type
-    // because no one was using them. No worries. The resManager will catch this and 
+    // because no one was using them. No worries. The resManager will catch this and
     // reload our keys, then try again.
 
     return nullptr;
@@ -103,13 +114,11 @@ bool plRegistryKeyList::IterateKeys(plRegistryKeyIterator* iterator)
 {
     ILock();
 
-    for (auto it = fKeys.begin(); it != fKeys.end(); ++it)
-    {
+    for (auto it = fKeys.begin(); it != fKeys.end(); ++it) {
         plKeyImp* keyImp = *it;
-        if (keyImp)
-        {
-            if (!iterator->EatKey(plKey::Make(keyImp)))
-            {
+
+        if (keyImp) {
+            if (!iterator->EatKey(plKey::Make(keyImp))) {
                 IUnlock();
                 return false;
             }
@@ -125,28 +134,30 @@ void plRegistryKeyList::AddKey(plKeyImp* key, LoadStatus& loadStatusChange)
     loadStatusChange = kNoChange;
 
     hsAssert(fLocked == 0, "Don't currently support adding keys while locked");
-    if (fLocked == 0 && key)
-    {
+
+    if (fLocked == 0 && key) {
         hsAssert(std::find(fKeys.begin(), fKeys.end(), key) == fKeys.end(), "Key already added");
 
         // first key to be added?
-        if (fKeys.empty())
+        if (fKeys.empty()) {
             loadStatusChange = kTypeLoaded;
+        }
 
         // Objects that already have an object ID will be respected.
         // Totally new keys will not have one, but keys from other sources (patches) will.
-        if (key->GetUoid().GetObjectID() == 0)
-        {
+        if (key->GetUoid().GetObjectID() == 0) {
             fKeys.push_back(key);
             key->SetObjectID(fKeys.size());
-        }
-        else
-        {
+        } else {
             uint32_t id = key->GetUoid().GetObjectID();
-            if (fKeys.size() < id)
+
+            if (fKeys.size() < id) {
                 fKeys.resize(id);
+            }
+
             fKeys[id - 1] = key;
         }
+
         ++fReffedKeys;
     }
 }
@@ -157,8 +168,7 @@ bool plRegistryKeyList::SetKeyUnused(plKeyImp* key, LoadStatus& loadStatusChange
 
     // Clones never officially get added to the key list (they're maintained by
     // the original key), so just ignore them
-    if (key->GetUoid().IsClone())
-    {
+    if (key->GetUoid().IsClone()) {
         delete key;
         return true;
     }
@@ -167,30 +177,32 @@ bool plRegistryKeyList::SetKeyUnused(plKeyImp* key, LoadStatus& loadStatusChange
     hsAssert(id <= fKeys.size(), "Bad static key id");
 
     // Fixed Keys will have id == 0. Let's just make sure we have it before we toss it.
-    if (id == 0)
-    {
+    if (id == 0) {
         hsAssert(key->GetUoid().GetLocation() == plLocation::kGlobalFixedLoc, "key id == 0 but not fixed?");
-        if (!FindKey(key->GetName()))
-        {
+
+        if (!FindKey(key->GetName())) {
             hsAssert(false, "Couldn't find fixed key!");
             return false;
         }
-    }
-    else if (id > fKeys.size())
+    } else if (id > fKeys.size()) {
         return false;
+    }
 
     // Got that key, decrement the key counter
     --fReffedKeys;
-    if (fReffedKeys == 0)
+
+    if (fReffedKeys == 0) {
         loadStatusChange = kTypeUnloaded;
+    }
+
     return true;
 }
 
 void plRegistryKeyList::Read(hsStream* s)
 {
     uint32_t keyListLen = s->ReadLE32();
-    if (!fKeys.empty())
-    {
+
+    if (!fKeys.empty()) {
         s->Skip(keyListLen);
         return;
     }
@@ -202,8 +214,7 @@ void plRegistryKeyList::Read(hsStream* s)
     uint32_t numKeys = s->ReadLE32();
     fKeys.reserve(numKeys);
 
-    for (uint32_t i = 0; i < numKeys; ++i)
-    {
+    for (uint32_t i = 0; i < numKeys; ++i) {
         plKeyImp* newKey = new plKeyImp;
         newKey->Read(s);
         fKeys.push_back(newKey);
@@ -223,11 +234,11 @@ void plRegistryKeyList::Write(hsStream* s)
 
     // Write out all our keys with data
     uint32_t keyCount = 0;
-    for (auto it = fKeys.begin(); it != fKeys.end(); ++it)
-    {
+
+    for (auto it = fKeys.begin(); it != fKeys.end(); ++it) {
         plKeyImp* key = *it;
-        if (key->ObjectIsLoaded())
-        {
+
+        if (key->ObjectIsLoaded()) {
             ++keyCount;
             key->Write(s);
         }
@@ -236,7 +247,7 @@ void plRegistryKeyList::Write(hsStream* s)
     // Rewind and write out data size and key count
     uint32_t endPos = s->GetPosition();
     s->SetPosition(beginPos);
-    s->WriteLE32(endPos-beginPos-sizeof(uint32_t));
+    s->WriteLE32(endPos - beginPos - sizeof(uint32_t));
     s->SetPosition(countPos);
     s->WriteLE32(keyCount);
     s->SetPosition(endPos);

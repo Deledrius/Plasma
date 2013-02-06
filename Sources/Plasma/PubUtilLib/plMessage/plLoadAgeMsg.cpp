@@ -45,50 +45,51 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "hsBitVector.h"
 
-void plLoadAgeMsg::Read(hsStream* stream, hsResMgr* mgr)    
-{   
-    plMessage::IMsgRead(stream, mgr);   
+void plLoadAgeMsg::Read(hsStream* stream, hsResMgr* mgr)
+{
+    plMessage::IMsgRead(stream, mgr);
 
     delete [] fAgeFilename;
-    
+
     // read agename
     uint8_t len;
     stream->ReadLE(&len);
-    if (len)
-    {
-        fAgeFilename=new char[len+1];
+
+    if (len) {
+        fAgeFilename = new char[len + 1];
         stream->Read(len, fAgeFilename);
-        fAgeFilename[len]=0;
+        fAgeFilename[len] = 0;
     }
+
     fUnload = stream->ReadBool();
     stream->ReadLE(&fPlayerID);
     fAgeGuid.Read(stream);
 }
 
-void plLoadAgeMsg::Write(hsStream* stream, hsResMgr* mgr)   
-{   
-    plMessage::IMsgWrite(stream, mgr);  
+void plLoadAgeMsg::Write(hsStream* stream, hsResMgr* mgr)
+{
+    plMessage::IMsgWrite(stream, mgr);
 
     // write agename
     uint8_t len = fAgeFilename ? strlen(fAgeFilename) : 0;
     stream->WriteLE(len);
-    if (len)
-    {
+
+    if (len) {
         stream->Write(len, fAgeFilename);
     }
+
     stream->WriteBool(fUnload);
     stream->WriteLE(fPlayerID);
     fAgeGuid.Write(stream);
 }
 
-enum LoadAgeFlags
-{
+enum LoadAgeFlags {
     kLoadAgeAgeName,
     kLoadAgeUnload,
     kLoadAgePlayerID,
     kLoadAgeAgeGuid,
 };
-    
+
 void plLoadAgeMsg::ReadVersion(hsStream* s, hsResMgr* mgr)
 {
     plMessage::IMsgReadVersion(s, mgr);
@@ -96,21 +97,23 @@ void plLoadAgeMsg::ReadVersion(hsStream* s, hsResMgr* mgr)
     hsBitVector contentFlags;
     contentFlags.Read(s);
 
-    if (contentFlags.IsBitSet(kLoadAgeAgeName))
-    {
+    if (contentFlags.IsBitSet(kLoadAgeAgeName)) {
         // read agename
         delete [] fAgeFilename;
         fAgeFilename = s->ReadSafeString();
     }
 
-    if (contentFlags.IsBitSet(kLoadAgeUnload))
+    if (contentFlags.IsBitSet(kLoadAgeUnload)) {
         fUnload = s->ReadBool();
+    }
 
-    if (contentFlags.IsBitSet(kLoadAgePlayerID))
+    if (contentFlags.IsBitSet(kLoadAgePlayerID)) {
         s->ReadLE(&fPlayerID);
+    }
 
-    if (contentFlags.IsBitSet(kLoadAgeAgeGuid))
+    if (contentFlags.IsBitSet(kLoadAgeAgeGuid)) {
         fAgeGuid.Read(s);
+    }
 }
 
 void plLoadAgeMsg::WriteVersion(hsStream* s, hsResMgr* mgr)

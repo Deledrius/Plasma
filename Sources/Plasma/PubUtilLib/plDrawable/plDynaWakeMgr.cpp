@@ -85,7 +85,7 @@ int plDynaWakeMgr::INewDecal()
 }
 
 plDynaWakeMgr::plDynaWakeMgr()
-:
+    :
     fAnimPath(nil),
     fDefaultDir(0.f, 1.f, 0.f),
     fAnimWgt(0),
@@ -135,9 +135,9 @@ void plDynaWakeMgr::Write(hsStream* stream, hsResMgr* mgr)
 hsVector3 plDynaWakeMgr::IGetDirection(const plDynaDecalInfo& info, const hsPoint3& pos) const
 {
     hsVector3 dir = fDefaultDir;
+
     // If we have an animpath, figure a direction based on position here
-    if( fAnimPath )
-    {
+    if (fAnimPath) {
         hsVector3 animDir;
         hsPoint3 p = pos;
         float t = fAnimPath->GetExtremePoint(p);
@@ -153,14 +153,15 @@ hsVector3 plDynaWakeMgr::IGetDirection(const plDynaDecalInfo& info, const hsPoin
     // Now if we want to factor in velocity, we can use (pos - info.fLastPos) / (hsTimer::GetSysSeconds() - info.fLastTime)
     float dt = float(hsTimer::GetSysSeconds() - info.fLastTime);
     const float kMinDt = 1.e-3f;
-    if( (info.fFlags & plDynaDecalInfo::kImmersed) && (dt > kMinDt) )
-    {
+
+    if ((info.fFlags & plDynaDecalInfo::kImmersed) && (dt > kMinDt)) {
         hsVector3 velDir(&pos, &info.fLastPos);
 
         velDir *= 1.f / dt * fVelWgt;
 
         dir += velDir;
     }
+
     hsFastMath::Normalize(dir);
 
     return dir;
@@ -168,8 +169,9 @@ hsVector3 plDynaWakeMgr::IGetDirection(const plDynaDecalInfo& info, const hsPoin
 
 bool plDynaWakeMgr::IRippleFromShape(const plPrintShape* shape, bool force)
 {
-    if( !shape )
+    if (!shape) {
         return false;
+    }
 
     bool retVal = false;
 
@@ -184,8 +186,8 @@ bool plDynaWakeMgr::IRippleFromShape(const plPrintShape* shape, bool force)
     bool longEnough = (dt >= kMinTime);
     hsPoint3 xlate = shapeL2W.GetTranslate();
     bool farEnough = (hsVector3(&info.fLastPos, &xlate).Magnitude() > kMinDist);
-    if( force || longEnough || farEnough )
-    {
+
+    if (force || longEnough || farEnough) {
         hsPoint3 pos = shapeL2W.GetTranslate();
 
         // Base the direction on the unperturbed pos.
@@ -195,16 +197,15 @@ bool plDynaWakeMgr::IRippleFromShape(const plPrintShape* shape, bool force)
         // but we perturb it more if we're just standing still
         hsVector3 randPert(sRand.RandMinusOneToOne(), sRand.RandMinusOneToOne(), 0);
         randPert.Normalize();
-        if( !farEnough )
-        {
+
+        if (!farEnough) {
+            static float kRandPert = 0.05f;
+            randPert *= kRandPert * shape->GetWidth();
+        } else {
             static float kRandPert = 0.05f;
             randPert *= kRandPert * shape->GetWidth();
         }
-        else
-        {
-            static float kRandPert = 0.05f;
-            randPert *= kRandPert * shape->GetWidth();
-        }
+
         pos += randPert;
 
         hsVector3 up(0.f, 0.f, 1.f);
@@ -222,8 +223,11 @@ bool plDynaWakeMgr::IRippleFromShape(const plPrintShape* shape, bool force)
         info.fLastPos = shapeL2W.GetTranslate();
 
         bool hit = ICutoutTargets(t);
-        if( hit )
+
+        if (hit) {
             retVal = true;
+        }
     }
+
     return retVal;
 }

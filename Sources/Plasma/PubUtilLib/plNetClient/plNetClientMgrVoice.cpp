@@ -61,16 +61,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #define SAME_TALK_AND_LISTEN
 
-struct DistSqInfo
-{
+struct DistSqInfo {
     plNetTransportMember* fMbr;
     float fDistSq;
-    DistSqInfo(plNetTransportMember* m, float d) : fMbr(m),fDistSq(d) {}
+    DistSqInfo(plNetTransportMember* m, float d) : fMbr(m), fDistSq(d) {}
 };
 
 bool lessComp(DistSqInfo a, DistSqInfo b)
 {
-    return (a.fDistSq<b.fDistSq);
+    return (a.fDistSq < b.fDistSq);
 }
 
 //
@@ -81,74 +80,70 @@ bool lessComp(DistSqInfo a, DistSqInfo b)
 //
 bool plNetClientMgr::IApplyNewListenList(std::vector<DistSqInfo>& newListenList, bool forceSynch)
 {
-    bool changed=false;
+    bool changed = false;
     int i;
 
     // see if new listen list differs from current one
-    if (forceSynch || newListenList.size() != GetListenList()->GetNumMembers())
-        changed=true;
-    else
-    {
-        for(i=0;i<newListenList.size(); i++)
-        {           
-            if (GetListenList()->FindMember(newListenList[i].fMbr)==-1)
-            {
-                changed=true;
-                break;              
+    if (forceSynch || newListenList.size() != GetListenList()->GetNumMembers()) {
+        changed = true;
+    } else {
+        for (i = 0; i < newListenList.size(); i++) {
+            if (GetListenList()->FindMember(newListenList[i].fMbr) == -1) {
+                changed = true;
+                break;
             }
         }
     }
 
     // set as new listen list
-    if (changed)
-    {   
+    if (changed) {
         DebugMsg("ListenList changed, forceSynch=%d\n", forceSynch);
 
         plNetMsgListenListUpdate llu;
         llu.SetPlayerID(GetPlayerID());
         llu.SetNetProtocol(kNetProtocolCli2Game);
-        
+
         //
         // for each client in the old list, if not in the new list, send a ListenList remove msg
         //
         llu.Receivers()->Clear();
         llu.SetAdding(false);
-        for(i=0;i<GetListenList()->GetNumMembers(); i++)
-        {
-            bool found=false;
-            if (!forceSynch)
-            {           
+
+        for (i = 0; i < GetListenList()->GetNumMembers(); i++) {
+            bool found = false;
+
+            if (!forceSynch) {
                 int j;
-                for(j=0;j<newListenList.size(); j++)
-                {
-                    if (newListenList[j].fMbr==GetListenList()->GetMember(i))
-                    {
-                        found=true;
+
+                for (j = 0; j < newListenList.size(); j++) {
+                    if (newListenList[j].fMbr == GetListenList()->GetMember(i)) {
+                        found = true;
                         break;
                     }
                 }
             }
-            if (found==false)
-            {
+
+            if (found == false) {
                 llu.Receivers()->AddReceiverPlayerID(GetListenList()->GetMember(i)->GetPlayerID());
             }
         }
 
 #ifndef SAME_TALK_AND_LISTEN
-        if (llu.Receivers()->GetNumReceivers())
-        {       
+
+        if (llu.Receivers()->GetNumReceivers()) {
             // DEBUGGING
             int i;
-            for(i=0;i<llu.Receivers()->GetNumReceivers(); i++)
-            {
-                int idx=fTransport.FindMember(llu.Receivers()->GetReceiverClientNum(i));
-                plNetTransportMember* mbr=fTransport.GetMember(idx);
-                DebugMsg("<SEND %s> ListenListUpdate msg, adding=%d\n", 
-                    mbr->AsStdString().c_str(), llu.GetAdding());
+
+            for (i = 0; i < llu.Receivers()->GetNumReceivers(); i++) {
+                int idx = fTransport.FindMember(llu.Receivers()->GetReceiverClientNum(i));
+                plNetTransportMember* mbr = fTransport.GetMember(idx);
+                DebugMsg("<SEND %s> ListenListUpdate msg, adding=%d\n",
+                         mbr->AsStdString().c_str(), llu.GetAdding());
             }
-            
+
             SendMsg(&llu);
         }
+
 #endif
 
         //
@@ -156,31 +151,31 @@ bool plNetClientMgr::IApplyNewListenList(std::vector<DistSqInfo>& newListenList,
         //
         llu.Receivers()->Clear();
         llu.SetAdding(true);
-        for(i=0;i<newListenList.size(); i++)
-        {
-            if (forceSynch || GetListenList()->FindMember(newListenList[i].fMbr)==-1)
-            {
+
+        for (i = 0; i < newListenList.size(); i++) {
+            if (forceSynch || GetListenList()->FindMember(newListenList[i].fMbr) == -1) {
                 // if not in the old list, send a ListenList add msg
                 llu.Receivers()->AddReceiverPlayerID(newListenList[i].fMbr->GetPlayerID());
             }
         }
 
 #ifndef SAME_TALK_AND_LISTEN
-        if (llu.Receivers()->GetNumReceivers())
-        {
+
+        if (llu.Receivers()->GetNumReceivers()) {
             // DEBUGGING
             int i;
-            for(i=0;i<llu.Receivers()->GetNumReceivers(); i++)
-            {
-                int cNum=llu.Receivers()->GetReceiverClientNum(i);
-                int idx=fTransport.FindMember(cNum);
-                plNetTransportMember* mbr=fTransport.GetMember(idx);
-                DebugMsg("<SEND %s> ListenListUpdate msg, adding=%d, cNum=%d\n", 
-                    mbr->AsStdString().c_str(), llu.GetAdding(), cNum);
+
+            for (i = 0; i < llu.Receivers()->GetNumReceivers(); i++) {
+                int cNum = llu.Receivers()->GetReceiverClientNum(i);
+                int idx = fTransport.FindMember(cNum);
+                plNetTransportMember* mbr = fTransport.GetMember(idx);
+                DebugMsg("<SEND %s> ListenListUpdate msg, adding=%d, cNum=%d\n",
+                         mbr->AsStdString().c_str(), llu.GetAdding(), cNum);
             }
 
             SendMsg(&llu);
         }
+
 #endif
 
         //
@@ -190,16 +185,17 @@ bool plNetClientMgr::IApplyNewListenList(std::vector<DistSqInfo>& newListenList,
 #ifdef HS_DEBUGGING
         DebugMsg("New ListenList, size=%d\n", newListenList.size());
 #endif
-        for(i=0;i<newListenList.size(); i++)
-        {
+
+        for (i = 0; i < newListenList.size(); i++) {
             GetListenList()->AddMember(newListenList[i].fMbr);
 #ifdef HS_DEBUGGING
-            DebugMsg("\tLL Member %d, name=%s, cNum=%d, dist=%f\n", 
-                i, newListenList[i].fMbr->AsString().c_str(),
-                newListenList[i].fMbr->GetPlayerID(), newListenList[i].fDistSq);
+            DebugMsg("\tLL Member %d, name=%s, cNum=%d, dist=%f\n",
+                     i, newListenList[i].fMbr->AsString().c_str(),
+                     newListenList[i].fMbr->GetPlayerID(), newListenList[i].fDistSq);
 #endif
         }
-    }       
+    }
+
     return changed;
 }
 //
@@ -210,29 +206,30 @@ bool plNetClientMgr::IApplyNewListenList(std::vector<DistSqInfo>& newListenList,
 //
 bool plNetClientMgr::IUpdateListenList(double secs)
 {
-    if (GetFlagsBit(kDisabled))
+    if (GetFlagsBit(kDisabled)) {
         return false;
-    if (!fLocalPlayerKey || !fLocalPlayerKey->ObjectIsLoaded())
+    }
+
+    if (!fLocalPlayerKey || !fLocalPlayerKey->ObjectIsLoaded()) {
         return false;
-    
+    }
+
     bool changed = false;
-    
-    if (secs - GetListenList()->GetLastUpdateTime()>plNetListenList::kUpdateInterval)
-    {
+
+    if (secs - GetListenList()->GetLastUpdateTime() > plNetListenList::kUpdateInterval) {
         GetListenList()->SetLastUpdateTime(secs);
         std::vector<DistSqInfo> newListenList;
-        
-        switch (fListenListMode)
-        {
-        case kListenList_Forced:
-            {
+
+        switch (fListenListMode) {
+        case kListenList_Forced: {
 #ifdef SAME_TALK_AND_LISTEN
                 SynchTalkList();
 #endif
             }
+
             return true;
-        case kListenList_Distance:
-            {
+
+        case kListenList_Distance: {
                 // Finds the 3 closest players to our local player
                 // Search is unoptimized for now...
 
@@ -240,99 +237,105 @@ bool plNetClientMgr::IUpdateListenList(double secs)
                 plSceneObject* locPlayer = plSceneObject::ConvertNoRef(fLocalPlayerKey->ObjectIsLoaded());
                 hsAssert(locPlayer, "local player is not a sceneObject?");
                 hsAssert(locPlayer->GetCoordinateInterface(), "locPlayer has no coordInterface");
-                hsMatrix44 l2w=locPlayer->GetCoordinateInterface()->GetLocalToWorld();
-                hsPoint3 locPlayerPos=l2w.GetTranslate();
+                hsMatrix44 l2w = locPlayer->GetCoordinateInterface()->GetLocalToWorld();
+                hsPoint3 locPlayerPos = l2w.GetTranslate();
 
                 int i;
-                for(i=0;i<fTransport.GetNumMembers();i++)
-                {
+
+                for (i = 0; i < fTransport.GetNumMembers(); i++) {
                     fTransport.GetMember(i)->SetDistSq(FLT_MAX);
 
-                    if (fTransport.GetMember(i)->IsServer())
-                        continue;
-                    if(VaultAmIgnoringPlayer(fTransport.GetMember(i)->GetPlayerID()))
-                    {           
+                    if (fTransport.GetMember(i)->IsServer()) {
                         continue;
                     }
-                    plKey k=fTransport.GetMember(i)->GetAvatarKey();
+
+                    if (VaultAmIgnoringPlayer(fTransport.GetMember(i)->GetPlayerID())) {
+                        continue;
+                    }
+
+                    plKey k = fTransport.GetMember(i)->GetAvatarKey();
 #if 0
-                    if (!k)
-                    {
-                        DebugMsg("UpdateListenList: Nil avatar key on member %s\n", 
-                            fTransport.GetMember(i)->AsStdString().c_str());
+
+                    if (!k) {
+                        DebugMsg("UpdateListenList: Nil avatar key on member %s\n",
+                                 fTransport.GetMember(i)->AsStdString().c_str());
                     }
+
 #endif
-                    plSceneObject* obj=plSceneObject::ConvertNoRef(k ? k->ObjectIsLoaded() : nil);
-                    if (obj && obj->GetCoordinateInterface())
-                    {
+                    plSceneObject* obj = plSceneObject::ConvertNoRef(k ? k->ObjectIsLoaded() : nil);
+
+                    if (obj && obj->GetCoordinateInterface()) {
 #if 1
                         // compute distSq to me
-                        l2w=obj->GetCoordinateInterface()->GetLocalToWorld();
-                        hsPoint3 pos=l2w.GetTranslate();
+                        l2w = obj->GetCoordinateInterface()->GetLocalToWorld();
+                        hsPoint3 pos = l2w.GetTranslate();
                         float distSq = hsVector3(&pos, &locPlayerPos).MagnitudeSquared();
 
                         fTransport.GetMember(i)->SetDistSq(distSq);
-                        
-                        // I can't listen to players that are more than 50 ft away 
-                        if (distSq>plNetListenList::kMaxListenDistSq)
+
+                        // I can't listen to players that are more than 50 ft away
+                        if (distSq > plNetListenList::kMaxListenDistSq) {
                             continue;
+                        }
+
                         // if we are p2p and member isn't, skip them.
-                        if ( IsPeerToPeer() && !fTransport.GetMember(i)->IsPeerToPeer() )
+                        if (IsPeerToPeer() && !fTransport.GetMember(i)->IsPeerToPeer()) {
                             continue;
+                        }
+
                         // otherwise, we aren't p2p so just update the listen list
                         // normally so it will update in the gui as distance changes.
 #else
-                        float distSq=1;
+                        float distSq = 1;
 #endif
+
                         // if we have < 3 elements in the list, grow the list, or,
                         // if obj is closer than item 3, add it to the list.
                         // keep the list (3) elements sorted.
-                        if (plNetListenList::kMaxListenListSize==-1 ||
-                            newListenList.size()<plNetListenList::kMaxListenListSize ||
-                            (distSq<newListenList[plNetListenList::kMaxListenListSize-1].fDistSq) )
-                        {
+                        if (plNetListenList::kMaxListenListSize == -1 ||
+                                newListenList.size() < plNetListenList::kMaxListenListSize ||
+                                (distSq < newListenList[plNetListenList::kMaxListenListSize - 1].fDistSq)) {
                             DistSqInfo dsi(fTransport.GetMember(i), distSq);
-                            if (plNetListenList::kMaxListenListSize==-1 ||
-                                newListenList.size()<plNetListenList::kMaxListenListSize)
-                            {
-                                newListenList.push_back(dsi);   
+
+                            if (plNetListenList::kMaxListenListSize == -1 ||
+                                    newListenList.size() < plNetListenList::kMaxListenListSize) {
+                                newListenList.push_back(dsi);
+                            } else {
+                                newListenList[plNetListenList::kMaxListenListSize - 1] = dsi;
                             }
-                            else
-                            {
-                                newListenList[plNetListenList::kMaxListenListSize-1]=dsi;
-                            }
-                            if (plNetListenList::kMaxListenListSize!=-1)    // don't need to sort every time in this case
-                            {
+
+                            if (plNetListenList::kMaxListenListSize != -1) { // don't need to sort every time in this case
                                 std::sort(newListenList.begin(), newListenList.end(), lessComp);
                             }
                         }
                     }
-                    if (plNetListenList::kMaxListenListSize==-1 && newListenList.size())
-                    {
+
+                    if (plNetListenList::kMaxListenListSize == -1 && newListenList.size()) {
                         std::sort(newListenList.begin(), newListenList.end(), lessComp);
                     }
                 }
             }
             break;
+
         default:
             break;
-        
+
         }
 
-        hsAssert(plNetListenList::kMaxListenListSize==-1 || newListenList.size()<=plNetListenList::kMaxListenListSize, 
-        "illegal new listenlist size");
-    
-        changed = IApplyNewListenList(newListenList, 
+        hsAssert(plNetListenList::kMaxListenListSize == -1 || newListenList.size() <= plNetListenList::kMaxListenListSize,
+                 "illegal new listenlist size");
+
+        changed = IApplyNewListenList(newListenList,
 #ifdef SAME_TALK_AND_LISTEN
-            false 
+                                      false
 #else
-            GetListenList()->CheckForceSynch()
+                                      GetListenList()->CheckForceSynch()
 #endif
-        );
+                                     );
     }
+
     // update talkList based on listenList
-    if (changed)
-    {
+    if (changed) {
 
 #ifdef SAME_TALK_AND_LISTEN
         SynchTalkList();
@@ -350,8 +353,10 @@ void plNetClientMgr::SynchTalkList()
 {
     GetTalkList()->Clear();
     int i;
-    for(i=0;i<GetListenList()->GetNumMembers(); i++)
+
+    for (i = 0; i < GetListenList()->GetNumMembers(); i++) {
         GetTalkList()->AddMember(GetListenList()->GetMember(i));
+    }
 }
 
 void plNetClientMgr::SetListenListMode(int i)
@@ -364,48 +369,46 @@ void plNetClientMgr::SetListenListMode(int i)
 
 void plNetClientMgr::IHandleNetVoiceListMsg(plNetVoiceListMsg* msg)
 {
-    if (msg->GetCmd() == plNetVoiceListMsg::kForcedListenerMode)
-    {
+    if (msg->GetCmd() == plNetVoiceListMsg::kForcedListenerMode) {
         // first make sure this message applies to us:
         int i;
         bool included = false;
-        for (i = 0; i < msg->GetClientList()->Count(); i++)
-        {   
-            if (msg->GetClientList()->AcquireArray()[i] == NetCommGetPlayer()->playerInt)
-            {   
+
+        for (i = 0; i < msg->GetClientList()->Count(); i++) {
+            if (msg->GetClientList()->AcquireArray()[i] == NetCommGetPlayer()->playerInt) {
                 included = true;
                 break;
             }
         }
-        if (!included)
+
+        if (!included) {
             return;
+        }
+
         SetListenListMode(kListenList_Forced);
+
         // add in the members we receive from python
-        for (i = 0; i < msg->GetClientList()->Count(); i++)
-        {
-            plNetTransportMember **members = nil;
-            plNetClientMgr::GetInstance()->TransportMgr().GetMemberListDistSorted( members );
-                    
-            if( members != nil)
-            {
-                for(int j= 0; j < plNetClientMgr::GetInstance()->TransportMgr().GetNumMembers(); j++ )
-                {
-                    plNetTransportMember *mbr = members[ j ];
-                    if( mbr != nil && mbr->GetAvatarKey() != nil && mbr->GetPlayerID() == msg->GetClientList()->AcquireArray()[i])
-                    {
+        for (i = 0; i < msg->GetClientList()->Count(); i++) {
+            plNetTransportMember** members = nil;
+            plNetClientMgr::GetInstance()->TransportMgr().GetMemberListDistSorted(members);
+
+            if (members != nil) {
+                for (int j = 0; j < plNetClientMgr::GetInstance()->TransportMgr().GetNumMembers(); j++) {
+                    plNetTransportMember* mbr = members[ j ];
+
+                    if (mbr != nil && mbr->GetAvatarKey() != nil && mbr->GetPlayerID() == msg->GetClientList()->AcquireArray()[i]) {
                         plNetClientMgr::GetInstance()->GetListenList()->AddMember(mbr);
                     }
                 }
             }
+
             delete [] members;
         }
-    }
-    else
-    if (msg->GetCmd() == plNetVoiceListMsg::kDistanceMode)
-    {
+    } else if (msg->GetCmd() == plNetVoiceListMsg::kDistanceMode) {
         // again, see that it is us that we care about:
-        if (msg->GetRemovedKey() == GetLocalPlayerKey())
+        if (msg->GetRemovedKey() == GetLocalPlayerKey()) {
             SetListenListMode(kListenList_Distance);
-    }   
-}   
+        }
+    }
+}
 

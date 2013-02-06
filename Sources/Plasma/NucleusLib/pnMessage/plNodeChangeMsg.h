@@ -45,21 +45,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plMessage.h"
 
-class plNodeChangeMsg : public plMessage
-{
+class plNodeChangeMsg : public plMessage {
 protected:
     plKey           fNodeKey;
 
 public:
     plNodeChangeMsg() : fNodeKey(nil) {}
-    plNodeChangeMsg(plKey s, plKey &r, plKey node, double* t=nil)
+    plNodeChangeMsg(plKey s, plKey& r, plKey node, double* t = nil)
         :   plMessage(s, r, t), fNodeKey(node) {}
 
-    CLASSNAME_REGISTER( plNodeChangeMsg );
-    GETINTERFACE_ANY( plNodeChangeMsg, plMessage );
+    CLASSNAME_REGISTER(plNodeChangeMsg);
+    GETINTERFACE_ANY(plNodeChangeMsg, plMessage);
 
-    plKey       GetNodeKey() const { return fNodeKey; }
-    void        SetNodeKey(plKey &k) { fNodeKey = k; }
+    plKey       GetNodeKey() const {
+        return fNodeKey;
+    }
+    void        SetNodeKey(plKey& k) {
+        fNodeKey = k;
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);

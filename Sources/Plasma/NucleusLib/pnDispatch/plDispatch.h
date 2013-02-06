@@ -54,8 +54,7 @@ class hsResMgr;
 class plMessage;
 class plKey;
 
-class plTypeFilter
-{
+class plTypeFilter {
 public:
     plTypeFilter() : fHClass(0) {}
 
@@ -67,8 +66,7 @@ class plMsgWrap;
 
 typedef void (*MsgRecieveCallback)();
 
-class plDispatch : public plDispatchBase
-{
+class plDispatch : public plDispatchBase {
 protected:
 
     hsKeyedObject*                  fOwner;
@@ -89,8 +87,12 @@ protected:
     hsMutex                         fQueuedMsgListMutex; // mutex for above
     bool                            fQueuedMsgOn;       // Turns on or off Queued Messages, Plugins need them off
 
-    hsKeyedObject*                  IGetOwner() { return fOwner; }
-    plKey                           IGetOwnerKey() { return IGetOwner() ? IGetOwner()->GetKey() : nil; }
+    hsKeyedObject*                  IGetOwner() {
+        return fOwner;
+    }
+    plKey                           IGetOwnerKey() {
+        return IGetOwner() ? IGetOwner()->GetKey() : nil;
+    }
     int                             IFindType(uint16_t hClass);
     int                             IFindSender(const plKey& sender);
     bool                            IUnRegisterForExactType(int idx, const plKey& receiver);
@@ -113,8 +115,8 @@ public:
     plDispatch();
     virtual ~plDispatch();
 
-    CLASSNAME_REGISTER( plDispatch );
-    GETINTERFACE_ANY( plDispatch, plCreatable );
+    CLASSNAME_REGISTER(plDispatch);
+    GETINTERFACE_ANY(plDispatch, plCreatable);
 
     virtual void RegisterForType(uint16_t hClass, const plKey& receiver);
     virtual void RegisterForExactType(uint16_t hClass, const plKey& receiver);
@@ -124,20 +126,21 @@ public:
 
     virtual void UnRegisterAll(const plKey& receiver);
 
-    virtual bool    MsgSend(plMessage* msg, bool async=false);
+    virtual bool    MsgSend(plMessage* msg, bool async = false);
     virtual void    MsgQueue(plMessage* msg);   // Used by other thread to Send Messages, they are handled as soon as Practicable
     virtual void    MsgQueueProcess();
-    virtual void    MsgQueueOnOff(bool );     // Turn on or off Queued Messages, if off, uses MsgSend Immediately
+    virtual void    MsgQueueOnOff(bool);      // Turn on or off Queued Messages, if off, uses MsgSend Immediately
 
     virtual bool    SetMsgBuffering(bool on); // On starts deferring msg delivery until buffering is set to off again.
 
     virtual void    BeginShutdown();
 
-    static void SetMsgRecieveCallback(MsgRecieveCallback callback) { fMsgRecieveCallback = callback; }
+    static void SetMsgRecieveCallback(MsgRecieveCallback callback) {
+        fMsgRecieveCallback = callback;
+    }
 };
 
-class plNullDispatch : public plDispatch
-{
+class plNullDispatch : public plDispatch {
 public:
 
     virtual void RegisterForExactType(uint16_t hClass, const plKey& receiver) {}
@@ -147,7 +150,9 @@ public:
     virtual void UnRegisterForType(uint16_t hClass, const plKey& receiver) {}
 
 
-    virtual bool MsgSend(plMessage* msg) { return true; }
+    virtual bool MsgSend(plMessage* msg) {
+        return true;
+    }
     virtual void MsgQueue(plMessage* msg) {}
     virtual void MsgQueueProcess() {}
 

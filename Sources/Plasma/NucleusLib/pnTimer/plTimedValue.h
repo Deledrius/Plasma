@@ -51,8 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // You can then pretty much treat it as normal. To set it to interpolate
 // to a new value over secs seconds, use Set(newVal, secs).
 // For I/O, see plTimedSimple and plTimedCompound.
-template <class T> class plTimedValue
-{
+template <class T> class plTimedValue {
 protected:
     T           fGoal;
     T           fInit;
@@ -61,15 +60,25 @@ protected:
 
 public:
     plTimedValue() {}
-    plTimedValue(const plTimedValue<T>& o) { Set(o, 0.f); }
-    plTimedValue(const T& v) { Set(v, 0.f); }
+    plTimedValue(const plTimedValue<T>& o) {
+        Set(o, 0.f);
+    }
+    plTimedValue(const T& v) {
+        Set(v, 0.f);
+    }
 
-    plTimedValue<T>& operator=(const plTimedValue<T>& o) { return Set(o, 0.f); }
-    plTimedValue<T>& operator=(const T& v) { return Set(v, 0.f); }
+    plTimedValue<T>& operator=(const plTimedValue<T>& o) {
+        return Set(o, 0.f);
+    }
+    plTimedValue<T>& operator=(const T& v) {
+        return Set(v, 0.f);
+    }
 
-    plTimedValue<T>& Set(const T& v, float secs=0);
+    plTimedValue<T>& Set(const T& v, float secs = 0);
 
-    operator T () const { return Value(); }
+    operator T() const {
+        return Value();
+    }
 
     T Value() const;
 
@@ -77,13 +86,19 @@ public:
 
 // Read/Writable version of plTimedValue, for intrinsic types (e.g. int, float, bool).
 // Must be a type that hsStream has an overloaded ReadLE/WriteLE defined.
-template <class T> class plTimedSimple : public plTimedValue<T>
-{
+template <class T> class plTimedSimple : public plTimedValue<T> {
 public:
-    plTimedSimple<T>& operator=(const plTimedValue<T>& o) { return Set(o, 0.f); }
-    plTimedSimple<T>& operator=(const T& v) { return Set(v, 0.f); }
+    plTimedSimple<T>& operator=(const plTimedValue<T>& o) {
+        return Set(o, 0.f);
+    }
+    plTimedSimple<T>& operator=(const T& v) {
+        return Set(v, 0.f);
+    }
 
-    plTimedSimple<T>& Set(const T& v, float secs=0) { plTimedValue<T>::Set(v, secs); return *this; }
+    plTimedSimple<T>& Set(const T& v, float secs = 0) {
+        plTimedValue<T>::Set(v, secs);
+        return *this;
+    }
 
     void Read(hsStream* s);
     void Write(hsStream* s) const;
@@ -91,53 +106,58 @@ public:
 
 // Read/Writable version of plTimedValue, for compound types (e.g. hsVector3, hsColorRGBA).
 // May be any type that has Read(hsStream*)/Write(hsStream*) defined.
-template <class T> class plTimedCompound : public plTimedValue<T>
-{
+template <class T> class plTimedCompound : public plTimedValue<T> {
 public:
-    plTimedCompound<T>& operator=(const plTimedValue<T>& o) { return Set(o, 0.f); }
-    plTimedCompound<T>& operator=(const T& v) { return Set(v, 0.f); }
+    plTimedCompound<T>& operator=(const plTimedValue<T>& o) {
+        return Set(o, 0.f);
+    }
+    plTimedCompound<T>& operator=(const T& v) {
+        return Set(v, 0.f);
+    }
 
-    plTimedCompound<T>& Set(const T& v, float secs=0) { plTimedValue<T>::Set(v, secs); return *this; }
+    plTimedCompound<T>& Set(const T& v, float secs = 0) {
+        plTimedValue<T>::Set(v, secs);
+        return *this;
+    }
 
     void Read(hsStream* s);
     void Write(hsStream* s) const;
 };
 
-template <class T> 
+template <class T>
 plTimedValue<T>& plTimedValue<T>::Set(const T& v, float secs)
 {
-    if( secs <= 0 )
-    {
+    if (secs <= 0) {
         fGoal = fInit = v;
         fInvSecs = 0;
-    }
-    else
-    {
+    } else {
         fInit = Value();
         fStart = hsTimer::GetSysSeconds();
         fInvSecs = 1.f / secs;
         fGoal = v;
     }
+
     return *this;
 }
 
-template <class T> 
+template <class T>
 T plTimedValue<T>::Value() const
 {
-    if( fInvSecs > 0 )
-    {
+    if (fInvSecs > 0) {
         float t = (float)((hsTimer::GetSysSeconds() - fStart) * fInvSecs);
         hsAssert(t >= 0, "Moving back in time");
 
-        if( t < 1.f )
+        if (t < 1.f) {
             return fGoal * t + fInit * (1.f - t);
+        }
 
     }
+
     return fGoal;
 }
 
 
-template <class T> 
+template <class T>
 void plTimedSimple<T>::Read(hsStream* s)
 {
     T val;
@@ -145,14 +165,14 @@ void plTimedSimple<T>::Read(hsStream* s)
     Set(val, 0.f);
 }
 
-template <class T> 
+template <class T>
 void plTimedSimple<T>::Write(hsStream* s) const
 {
     T val = this->Value();
     s->WriteLE(val);
 }
 
-template <class T> 
+template <class T>
 void plTimedCompound<T>::Read(hsStream* s)
 {
     T val;
@@ -160,7 +180,7 @@ void plTimedCompound<T>::Read(hsStream* s)
     Set(val, 0.f);
 }
 
-template <class T> 
+template <class T>
 void plTimedCompound<T>::Write(hsStream* s) const
 {
     T val = this->Value();

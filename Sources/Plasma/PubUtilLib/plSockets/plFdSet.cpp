@@ -53,113 +53,124 @@ plFdSet::plFdSet(void)
 }
 
 
-void plFdSet::SetForSocket(plSocket & in)
+void plFdSet::SetForSocket(plSocket& in)
 {
     SOCKET sck = in.GetSocket();
-    hsAssert(sck>=0, "plFdSet::SetForSocket: socket<0");
-    if ( sck<0 )
+    hsAssert(sck >= 0, "plFdSet::SetForSocket: socket<0");
+
+    if (sck < 0) {
         return;
+    }
+
     FD_SET(sck, &fFds);
     FD_SET(sck, &fErrFds);
-    if(fMaxFd < sck)
+
+    if (fMaxFd < sck) {
         fMaxFd = sck;
+    }
 }
 
-void plFdSet::ClearForSocket(plSocket & in)
+void plFdSet::ClearForSocket(plSocket& in)
 {
     SOCKET sck = in.GetSocket();
-    hsAssert(sck>=0, "plFdSet::ClearForSocket: socket<0");
-    if ( sck<0 )
+    hsAssert(sck >= 0, "plFdSet::ClearForSocket: socket<0");
+
+    if (sck < 0) {
         return;
+    }
+
     FD_CLR(sck, &fFds);
     FD_CLR(sck, &fErrFds);
 }
 
 
-bool plFdSet::IsSetFor(plSocket & in)
+bool plFdSet::IsSetFor(plSocket& in)
 {
     SOCKET sck = in.GetSocket();
-    hsAssert(sck>=0, "plFdSet::IsSetFor: socket<0");
-    if ( sck<0 )
+    hsAssert(sck >= 0, "plFdSet::IsSetFor: socket<0");
+
+    if (sck < 0) {
         return false;
+    }
+
     return (FD_ISSET(sck, &fFds) != 0);
 }
 
-bool plFdSet::IsErrFor(plSocket & in)
+bool plFdSet::IsErrFor(plSocket& in)
 {
     SOCKET sck = in.GetSocket();
-    hsAssert(sck>=0, "plFdSet::IsErrFor: socket<0");
-    if ( sck<0 )
+    hsAssert(sck >= 0, "plFdSet::IsErrFor: socket<0");
+
+    if (sck < 0) {
         return false;
+    }
+
     return (FD_ISSET(sck, &fErrFds) != 0);
 }
 
 
 int plFdSet::WaitForRead(bool shouldZeroFds, unsigned long timeoutMillis)
-{        
-    int ret_val = 0;        
+{
+    int ret_val = 0;
 
-    if(timeoutMillis == kInfinite)                
-    {
-        ret_val = select(fMaxFd+1,&fFds,NULL,&fErrFds,NULL);
-    }
-    else
-    {
+    if (timeoutMillis == kInfinite) {
+        ret_val = select(fMaxFd + 1, &fFds, NULL, &fErrFds, NULL);
+    } else {
         struct timeval tv;
         tv.tv_sec = timeoutMillis  / 1000;
         tv.tv_usec = (timeoutMillis % 1000) * 1000;
-        
-        ret_val = select(fMaxFd+1,&fFds,NULL,&fErrFds,&tv);
+
+        ret_val = select(fMaxFd + 1, &fFds, NULL, &fErrFds, &tv);
     }
-    if (shouldZeroFds) 
+
+    if (shouldZeroFds) {
         ZeroFds();
-    
+    }
+
     return ret_val;
 }
 
 
 int plFdSet::WaitForWrite(bool shouldZeroFds, unsigned long timeoutMillis)
-{        
-    int ret_val = 0;        
+{
+    int ret_val = 0;
 
-    if(timeoutMillis == kInfinite)                
-    {
-        ret_val = select(fMaxFd+1,NULL,&fFds,&fErrFds,NULL);
-    }
-    else
-    {
+    if (timeoutMillis == kInfinite) {
+        ret_val = select(fMaxFd + 1, NULL, &fFds, &fErrFds, NULL);
+    } else {
         timeval tv;
         tv.tv_sec = timeoutMillis  / 1000;
         tv.tv_usec = (timeoutMillis % 1000) * 1000;
-        
-        ret_val = select(fMaxFd+1,NULL,&fFds,&fErrFds,&tv);
+
+        ret_val = select(fMaxFd + 1, NULL, &fFds, &fErrFds, &tv);
     }
-    if (shouldZeroFds) 
+
+    if (shouldZeroFds) {
         ZeroFds();
-    
+    }
+
     return ret_val;
 }
 
 
 int plFdSet::WaitForError(bool shouldZeroFds, unsigned long timeoutMillis)
-{        
-    int ret_val = 0;        
+{
+    int ret_val = 0;
 
-    if(timeoutMillis == kInfinite)                
-    {
-        ret_val = select(fMaxFd+1,NULL,NULL,&fErrFds,NULL);
-    }
-    else
-    {
+    if (timeoutMillis == kInfinite) {
+        ret_val = select(fMaxFd + 1, NULL, NULL, &fErrFds, NULL);
+    } else {
         timeval tv;
         tv.tv_sec = timeoutMillis  / 1000;
         tv.tv_usec = (timeoutMillis % 1000) * 1000;
-        
-        ret_val = select(fMaxFd+1,NULL,NULL,&fErrFds,&tv);
+
+        ret_val = select(fMaxFd + 1, NULL, NULL, &fErrFds, &tv);
     }
-    if (shouldZeroFds) 
+
+    if (shouldZeroFds) {
         ZeroFds();
-    
+    }
+
     return ret_val;
 }
 

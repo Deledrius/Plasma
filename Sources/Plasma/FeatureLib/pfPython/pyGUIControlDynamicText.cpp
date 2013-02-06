@@ -61,38 +61,41 @@ pyGUIControlDynamicText::pyGUIControlDynamicText(plKey objkey) : pyGUIControl(ob
 
 bool pyGUIControlDynamicText::IsGUIControlDynamicText(pyKey& gckey)
 {
-    if ( gckey.getKey() && pfGUIDynDisplayCtrl::ConvertNoRef(gckey.getKey()->ObjectIsLoaded()) )
+    if (gckey.getKey() && pfGUIDynDisplayCtrl::ConvertNoRef(gckey.getKey()->ObjectIsLoaded())) {
         return true;
+    }
+
     return false;
 }
 
 
-    //specific interface functions
+//specific interface functions
 uint32_t pyGUIControlDynamicText::GetNumMaps()
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         // get the pointer to the modifier
         pfGUIDynDisplayCtrl* pdtmod = pfGUIDynDisplayCtrl::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdtmod )
+
+        if (pdtmod) {
             return pdtmod->GetNumMaps();
+        }
     }
+
     return 0;
 }
 
 
 PyObject* pyGUIControlDynamicText::GetMap(uint32_t i)
 {
-    if ( fGCkey )
-    {
+    if (fGCkey) {
         // get the pointer to the modifier
         pfGUIDynDisplayCtrl* pdtmod = pfGUIDynDisplayCtrl::ConvertNoRef(fGCkey->ObjectIsLoaded());
-        if ( pdtmod )
-        {
+
+        if (pdtmod) {
             // get the owner dialog modifier pointer
             plDynamicTextMap* pdyntm = pdtmod->GetMap(i);
-            if ( pdyntm )
-            {
+
+            if (pdyntm) {
                 // create a pythonized Dialog class object (Python will manage it)
                 PyObject* dynTextObj = pyDynamicText::New(pdyntm->GetKey());
                 pyDynamicText* pDynText = pyDynamicText::ConvertFrom(dynTextObj);
@@ -103,8 +106,9 @@ PyObject* pyGUIControlDynamicText::GetMap(uint32_t i)
             }
         }
     }
+
     char errmsg[256];
-    sprintf(errmsg,"DynamicDisplay map number %d could be found on this control...?",i);
+    sprintf(errmsg, "DynamicDisplay map number %d could be found on this control...?", i);
     PyErr_SetString(PyExc_KeyError, errmsg);
     PYTHON_RETURN_ERROR;
 }

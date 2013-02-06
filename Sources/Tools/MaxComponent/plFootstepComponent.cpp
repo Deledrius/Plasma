@@ -74,7 +74,7 @@ CLASS_DESC(plFootstepSoundComponent, gFootstepSoundDesc, "Avatar FootstepSound",
 static plFootstepSoundComponentProc gFootstepSoundComponentProc;
 
 ParamBlockDesc2 gFootstepSoundBk
-(   
+(
 
     plComponent::kBlkComp, _T("FootstepSound"), 0, &gFootstepSoundDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
@@ -82,14 +82,14 @@ ParamBlockDesc2 gFootstepSoundBk
     IDD_COMP_FOOTSTEP_SOUND, IDS_COMP_FOOTSTEP_SOUND, 0, 0, &gFootstepSoundComponentProc,
 
     plFootstepSoundComponent::kSurface, _T("Surface"),      TYPE_INT,   0, 0,
-        p_default, plArmatureEffectsMgr::kFootDirt,
-        end,
+    p_default, plArmatureEffectsMgr::kFootDirt,
+    end,
 
     plFootstepSoundComponent::kSurfaceList, _T("SoundGroups"),  TYPE_INODE_TAB, plArmatureEffectsMgr::kMaxSurface,      0, 0,
-        end,
+    end,
 
     plFootstepSoundComponent::kNodePicker, _T("NodePicker"),    TYPE_INODE,     0, 0,
-        end,
+    end,
 
     end
 );
@@ -100,7 +100,7 @@ plFootstepSoundComponent::plFootstepSoundComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-extern const plArmatureMod * FindArmatureMod(const plSceneObject *obj);
+extern const plArmatureMod* FindArmatureMod(const plSceneObject* obj);
 /*{
     int count = obj->GetNumModifiers();
 
@@ -114,26 +114,26 @@ extern const plArmatureMod * FindArmatureMod(const plSceneObject *obj);
     return nil;
 }*/
 
-bool plFootstepSoundComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plFootstepSoundComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    plGenRefMsg *msg;
-    plArmatureEffectFootSound *effect = new plArmatureEffectFootSound();
-    
+    plGenRefMsg* msg;
+    plArmatureEffectFootSound* effect = new plArmatureEffectFootSound();
+
     // Note: MUST be a hard-coded keyname, since we search for same name in plArmatureMod.cpp
-    hsgResMgr::ResMgr()->NewKey( "FootstepSounds", effect, node->GetLocation());
+    hsgResMgr::ResMgr()->NewKey("FootstepSounds", effect, node->GetLocation());
 
     int i;
-    for (i = 0; i < plArmatureEffectsMgr::kMaxSurface; i++)
-    {
-        plMaxNode *compNode = (plMaxNode*)fCompPB->GetINode(ParamID(kSurfaceList), 0, i);
-        if (compNode)
-        {
-            plRandomSoundComponent *rsComp = (plRandomSoundComponent *)compNode->ConvertToComponent();
-            if (rsComp)
-            {
-                plRandomSoundMod *mod = rsComp->fSoundMods[node];
-                if (mod != nil)
-                {
+
+    for (i = 0; i < plArmatureEffectsMgr::kMaxSurface; i++) {
+        plMaxNode* compNode = (plMaxNode*)fCompPB->GetINode(ParamID(kSurfaceList), 0, i);
+
+        if (compNode) {
+            plRandomSoundComponent* rsComp = (plRandomSoundComponent*)compNode->ConvertToComponent();
+
+            if (rsComp) {
+                plRandomSoundMod* mod = rsComp->fSoundMods[node];
+
+                if (mod != nil) {
                     msg = new plGenRefMsg(effect->GetKey(), plRefMsg::kOnCreate, i, -1);
                     hsgResMgr::ResMgr()->AddViaNotify(mod->GetKey(), msg, plRefFlags::kActiveRef);
                 }
@@ -144,27 +144,27 @@ bool plFootstepSoundComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     // Add it to the scene node's generic list, so that all avatars can access it.
     plNodeRefMsg* nodeRefMsg = new plNodeRefMsg(node->GetRoomKey(), plNodeRefMsg::kOnRequest, -1, plNodeRefMsg::kGeneric);
     hsgResMgr::ResMgr()->AddViaNotify(effect->GetKey(), nodeRefMsg, plRefFlags::kActiveRef);
-    
+
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-BOOL plFootstepSoundComponentProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL plFootstepSoundComponentProc::DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    IParamBlock2 *pb = pm->GetParamBlock();
+    IParamBlock2* pb = pm->GetParamBlock();
     HWND hSurface = GetDlgItem(hWnd, IDC_COMP_FOOTSTEP_SOUND_SURFACE);
     HWND hPick = GetDlgItem(hWnd, IDC_COMP_FOOTSTEP_SOUND_PICK);
-    INode *curPick = nil;
+    INode* curPick = nil;
     int curSurface = 0;
 
-    switch (msg)
-    {
-    case WM_INITDIALOG:
-        {
+    switch (msg) {
+    case WM_INITDIALOG: {
             int i;
-            for (i = 0; i < plArmatureEffectsMgr::kMaxSurface; i++)
+
+            for (i = 0; i < plArmatureEffectsMgr::kMaxSurface; i++) {
                 ComboBox_AddString(hSurface, plArmatureEffectsMgr::SurfaceStrings[i]);
+            }
 
             curSurface = pb->GetInt(ParamID(plFootstepSoundComponent::kSurface));
             ComboBox_SetCurSel(hSurface, curSurface);
@@ -172,29 +172,26 @@ BOOL plFootstepSoundComponentProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWn
             curPick = pb->GetINode(ParamID(plFootstepSoundComponent::kSurfaceList), 0, curSurface);
             Button_SetText(hPick, (curPick == nil ? "None" : curPick->GetName()));
         }
+
         return TRUE;
 
 
     case WM_COMMAND:
-        if (HIWORD(wParam) == BN_CLICKED)
-        {
-            if (LOWORD(wParam) == IDC_COMP_FOOTSTEP_SOUND_PICK)
-            {
+        if (HIWORD(wParam) == BN_CLICKED) {
+            if (LOWORD(wParam) == IDC_COMP_FOOTSTEP_SOUND_PICK) {
                 std::vector<Class_ID> cids;
                 cids.push_back(RANDOM_SOUND_COMPONENT_ID);
-                if (plPick::NodeRefKludge(pb, plFootstepSoundComponent::kNodePicker, &cids, true, false))           
-                {
+
+                if (plPick::NodeRefKludge(pb, plFootstepSoundComponent::kNodePicker, &cids, true, false)) {
                     curPick = pb->GetINode(ParamID(plFootstepSoundComponent::kNodePicker));
                     curSurface = pb->GetInt(ParamID(plFootstepSoundComponent::kSurface));
-                    pb->SetValue(ParamID(plFootstepSoundComponent::kSurfaceList), 0, curPick, curSurface); 
+                    pb->SetValue(ParamID(plFootstepSoundComponent::kSurfaceList), 0, curPick, curSurface);
                     Button_SetText(hPick, (curPick == nil ? "None" : curPick->GetName()));
                 }
-            
+
                 return TRUE;
             }
-        }
-        else if (LOWORD(wParam) == IDC_COMP_FOOTSTEP_SOUND_SURFACE)
-        {
+        } else if (LOWORD(wParam) == IDC_COMP_FOOTSTEP_SOUND_SURFACE) {
             curSurface = ComboBox_GetCurSel(hSurface);
             curPick = pb->GetINode(ParamID(plFootstepSoundComponent::kSurfaceList), 0, curSurface);
             pb->SetValue(ParamID(plFootstepSoundComponent::kSurface), 0, curSurface);

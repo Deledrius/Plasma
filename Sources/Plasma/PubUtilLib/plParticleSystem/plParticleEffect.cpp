@@ -64,13 +64,15 @@ plParticleCollisionEffect::~plParticleCollisionEffect()
 {
 }
 
-void plParticleCollisionEffect::PrepareEffect(const plEffectTargetInfo &target)
+void plParticleCollisionEffect::PrepareEffect(const plEffectTargetInfo& target)
 {
-    if (fBounds == nil)
-    {
-        plBoundInterface *bi = plBoundInterface::ConvertNoRef(fSceneObj->GetGenericInterface(plBoundInterface::Index()));
-        if (bi == nil)
+    if (fBounds == nil) {
+        plBoundInterface* bi = plBoundInterface::ConvertNoRef(fSceneObj->GetGenericInterface(plBoundInterface::Index()));
+
+        if (bi == nil) {
             return;
+        }
+
         fBounds = bi->GetVolume();
     }
 }
@@ -78,22 +80,24 @@ void plParticleCollisionEffect::PrepareEffect(const plEffectTargetInfo &target)
 bool plParticleCollisionEffect::MsgReceive(plMessage* msg)
 {
     plRefMsg* refMsg = plRefMsg::ConvertNoRef(msg);
-    plSceneObject *so;
-    if (refMsg)
-    {
-        if ((so = plSceneObject::ConvertNoRef(refMsg->GetRef())))
-        {
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
+    plSceneObject* so;
+
+    if (refMsg) {
+        if ((so = plSceneObject::ConvertNoRef(refMsg->GetRef()))) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fSceneObj = so;
-            else
+            } else {
                 fSceneObj = nil;
+            }
+
             return true;
         }
     }
+
     return hsKeyedObject::MsgReceive(msg);
 }
 
-void plParticleCollisionEffect::Read(hsStream *s, hsResMgr *mgr)
+void plParticleCollisionEffect::Read(hsStream* s, hsResMgr* mgr)
 {
     hsKeyedObject::Read(s, mgr);
 
@@ -103,7 +107,7 @@ void plParticleCollisionEffect::Read(hsStream *s, hsResMgr *mgr)
     fBounds = nil;
 }
 
-void plParticleCollisionEffect::Write(hsStream *s, hsResMgr *mgr)
+void plParticleCollisionEffect::Write(hsStream* s, hsResMgr* mgr)
 {
     hsKeyedObject::Write(s, mgr);
 
@@ -118,15 +122,16 @@ plParticleCollisionEffectBeat::plParticleCollisionEffectBeat()
 {
 }
 
-bool plParticleCollisionEffectBeat::ApplyEffect(const plEffectTargetInfo &target, int32_t i)
+bool plParticleCollisionEffectBeat::ApplyEffect(const plEffectTargetInfo& target, int32_t i)
 {
     hsAssert(i >= 0, "Use of default argument doesn't make sense for plParticleCollisionEffect");
 
-    if( !fBounds )
+    if (!fBounds) {
         return false;
+    }
 
-    hsPoint3 *currPos = (hsPoint3 *)(target.fPos + i * target.fPosStride);
-    fBounds->ResolvePoint(*currPos);    
+    hsPoint3* currPos = (hsPoint3*)(target.fPos + i * target.fPosStride);
+    fBounds->ResolvePoint(*currPos);
 
     return false;
 }
@@ -137,40 +142,42 @@ plParticleCollisionEffectDie::plParticleCollisionEffectDie()
 {
 }
 
-bool plParticleCollisionEffectDie::ApplyEffect(const plEffectTargetInfo &target, int32_t i)
+bool plParticleCollisionEffectDie::ApplyEffect(const plEffectTargetInfo& target, int32_t i)
 {
     hsAssert(i >= 0, "Use of default argument doesn't make sense for plParticleCollisionEffect");
 
-    if( !fBounds )
+    if (!fBounds) {
         return false;
+    }
 
-    hsPoint3 *currPos = (hsPoint3 *)(target.fPos + i * target.fPosStride);
-    return fBounds->IsInside(*currPos); 
+    hsPoint3* currPos = (hsPoint3*)(target.fPos + i * target.fPosStride);
+    return fBounds->IsInside(*currPos);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 plParticleCollisionEffectBounce::plParticleCollisionEffectBounce()
-:   fBounce(1.f),
-    fFriction(0.f)
+    :   fBounce(1.f),
+        fFriction(0.f)
 {
 }
 
-bool plParticleCollisionEffectBounce::ApplyEffect(const plEffectTargetInfo &target, int32_t i)
+bool plParticleCollisionEffectBounce::ApplyEffect(const plEffectTargetInfo& target, int32_t i)
 {
     hsAssert(i >= 0, "Use of default argument doesn't make sense for plParticleCollisionEffect");
 
-    if( !fBounds )
+    if (!fBounds) {
         return false;
+    }
 
-    hsPoint3* currPos = (hsPoint3 *)(target.fPos + i * target.fPosStride);
+    hsPoint3* currPos = (hsPoint3*)(target.fPos + i * target.fPosStride);
     hsVector3* currVel = (hsVector3*)(target.fVelocity + i * target.fVelocityStride);
-    fBounds->BouncePoint(*currPos, *currVel, fBounce, fFriction);   
+    fBounds->BouncePoint(*currPos, *currVel, fBounce, fFriction);
 
     return false;
 }
 
-void plParticleCollisionEffectBounce::Read(hsStream *s, hsResMgr *mgr)
+void plParticleCollisionEffectBounce::Read(hsStream* s, hsResMgr* mgr)
 {
     plParticleCollisionEffect::Read(s, mgr);
 
@@ -178,7 +185,7 @@ void plParticleCollisionEffectBounce::Read(hsStream *s, hsResMgr *mgr)
     fFriction = s->ReadLEScalar();
 }
 
-void plParticleCollisionEffectBounce::Write(hsStream *s, hsResMgr *mgr)
+void plParticleCollisionEffectBounce::Write(hsStream* s, hsResMgr* mgr)
 {
     plParticleCollisionEffect::Write(s, mgr);
 
@@ -215,9 +222,9 @@ plParticleFadeVolumeEffect::~plParticleFadeVolumeEffect()
 // Now we could fade all around the box, but that's not really what we want, because
 // that means fading particles that are behind us. And in the case where we're looking
 // along an axis, the camera is pushed up against a face of the box (where the axis
-// aligned box is tangent to the inscribed sphere), so we'd actually be fading 
+// aligned box is tangent to the inscribed sphere), so we'd actually be fading
 // particles just in front of the camera. Because of this non-symmetry, we're going to
-// define the Max in a given dimension as the world space value for that dimension 
+// define the Max in a given dimension as the world space value for that dimension
 // FARTHEST from the camera (NOT largest in value). So if the camera is looking
 // in a negative direction in one dimension, the Max will be less than the Min for
 // that dimension.
@@ -238,7 +245,7 @@ const float kFadeFrac = 0.5f;
 const float kFadeParm = 1.f - kFadeFrac * 0.5f;
 const float kInvFadeFrac = 1.f / (kFadeFrac * 0.5f);
 
-void plParticleFadeVolumeEffect::PrepareEffect(const plEffectTargetInfo &target)
+void plParticleFadeVolumeEffect::PrepareEffect(const plEffectTargetInfo& target)
 {
     hsPoint3 viewLoc = target.fContext.fPipeline->GetViewPositionWorld();
     hsVector3 viewDir = target.fContext.fPipeline->GetViewDirWorld();
@@ -267,78 +274,76 @@ void plParticleFadeVolumeEffect::PrepareEffect(const plEffectTargetInfo &target)
 
 bool plParticleFadeVolumeEffect::ApplyEffect(const plEffectTargetInfo& target, int32_t i)
 {
-    hsPoint3 *currPos = (hsPoint3 *)(target.fPos + i * target.fPosStride);
+    hsPoint3* currPos = (hsPoint3*)(target.fPos + i * target.fPosStride);
 
     float parm;
 
     float fade = 1.f;
 
     parm = (currPos->fX - fMin.fX) * fNorm.fX;
-    if( parm < 0 )
-    {
+
+    if (parm < 0) {
         parm -= int(parm);
         currPos->fX = fMax.fX + parm * (fMax.fX - fMin.fX);
         parm += 1.f;
-    }
-    else if( parm > 1.f )
-    {
+    } else if (parm > 1.f) {
         parm -= int(parm);
         currPos->fX = fMin.fX + parm * (fMax.fX - fMin.fX);
     }
-    if( parm > kFadeParm )
-    {
+
+    if (parm > kFadeParm) {
         parm = 1.f - parm;
         parm *= kInvFadeFrac;
-        if( parm < fade )
+
+        if (parm < fade) {
             fade = parm;
+        }
     }
 
     parm = (currPos->fY - fMin.fY) * fNorm.fY;
-    if( parm < 0 )
-    {
+
+    if (parm < 0) {
         parm -= int(parm);
         currPos->fY = fMax.fY + parm * (fMax.fY - fMin.fY);
         parm += 1.f;
-    }
-    else if( parm > 1.f )
-    {
+    } else if (parm > 1.f) {
         parm -= int(parm);
         currPos->fY = fMin.fY + parm * (fMax.fY - fMin.fY);
     }
-    if( parm > kFadeParm )
-    {
+
+    if (parm > kFadeParm) {
         parm = 1.f - parm;
         parm *= kInvFadeFrac;
-        if( parm < fade )
+
+        if (parm < fade) {
             fade = parm;
+        }
     }
 
-    if( !fIgnoreZ )
-    {
+    if (!fIgnoreZ) {
         parm = (currPos->fZ - fMin.fZ) * fNorm.fZ;
-        if( parm < 0 )
-        {
+
+        if (parm < 0) {
             parm -= int(parm);
             currPos->fZ = fMax.fZ + parm * (fMax.fZ - fMin.fZ);
             parm += 1.f;
-        }
-        else if( parm > 1.f )
-        {
+        } else if (parm > 1.f) {
             parm -= int(parm);
             currPos->fZ = fMin.fZ + parm * (fMax.fZ - fMin.fZ);
         }
-        if( parm > kFadeParm )
-        {
+
+        if (parm > kFadeParm) {
             parm = 1.f - parm;
             parm *= kInvFadeFrac;
-            if( parm < fade )
+
+            if (parm < fade) {
                 fade = parm;
+            }
         }
     }
 
-    if( fade < 1.f )
-    {
-        uint32_t *color = (uint32_t *)(target.fColor + i * target.fColorStride);
+    if (fade < 1.f) {
+        uint32_t* color = (uint32_t*)(target.fColor + i * target.fColorStride);
         uint32_t alpha = (uint32_t)((*color >> 24) * fade);
         *color = (*color & 0x00ffffff) | (alpha << 24);
     }
@@ -346,7 +351,7 @@ bool plParticleFadeVolumeEffect::ApplyEffect(const plEffectTargetInfo& target, i
     return false;
 }
 
-void plParticleFadeVolumeEffect::Read(hsStream *s, hsResMgr *mgr)
+void plParticleFadeVolumeEffect::Read(hsStream* s, hsResMgr* mgr)
 {
     hsKeyedObject::Read(s, mgr);
 
@@ -354,7 +359,7 @@ void plParticleFadeVolumeEffect::Read(hsStream *s, hsResMgr *mgr)
     fIgnoreZ = s->ReadBool();
 }
 
-void plParticleFadeVolumeEffect::Write(hsStream *s, hsResMgr *mgr)
+void plParticleFadeVolumeEffect::Write(hsStream* s, hsResMgr* mgr)
 {
     hsKeyedObject::Write(s, mgr);
 
@@ -366,14 +371,14 @@ void plParticleFadeVolumeEffect::Write(hsStream *s, hsResMgr *mgr)
 ////////////////////////////////////////////////////////////////////////
 // Particle wind - Base class first
 plParticleWindEffect::plParticleWindEffect()
-:   fWindVec(0,0,0),
-    fDir(1.f,0,0),
-    fSwirl(0.1f),
-    fConstancy(0),
-    fHorizontal(0),
-    fLastDirSecs(-1.f),
-    fRefDir(0.f,0.f,0.f),
-    fRandDir(1.f,0.f,0.f)
+    :   fWindVec(0, 0, 0),
+        fDir(1.f, 0, 0),
+        fSwirl(0.1f),
+        fConstancy(0),
+        fHorizontal(0),
+        fLastDirSecs(-1.f),
+        fRefDir(0.f, 0.f, 0.f),
+        fRandDir(1.f, 0.f, 0.f)
 {
 }
 
@@ -381,7 +386,7 @@ plParticleWindEffect::~plParticleWindEffect()
 {
 }
 
-void plParticleWindEffect::Read(hsStream *s, hsResMgr *mgr)
+void plParticleWindEffect::Read(hsStream* s, hsResMgr* mgr)
 {
     hsKeyedObject::Read(s, mgr);
 
@@ -394,7 +399,7 @@ void plParticleWindEffect::Read(hsStream *s, hsResMgr *mgr)
     fRandDir = fDir;
 }
 
-void plParticleWindEffect::Write(hsStream *s, hsResMgr *mgr)
+void plParticleWindEffect::Write(hsStream* s, hsResMgr* mgr)
 {
     hsKeyedObject::Write(s, mgr);
 
@@ -410,8 +415,8 @@ void plParticleWindEffect::SetRefDirection(const hsVector3& v)
 {
     fRefDir = v;
     float lenSq = fRefDir.MagnitudeSquared();
-    if( lenSq > 1.e-1f )
-    {
+
+    if (lenSq > 1.e-1f) {
         fDir = fRefDir * hsFastMath::InvSqrtAppr(lenSq);
         fRandDir = fDir;
     }
@@ -419,13 +424,15 @@ void plParticleWindEffect::SetRefDirection(const hsVector3& v)
 
 void plParticleWindEffect::PrepareEffect(const plEffectTargetInfo& target)
 {
-    if( fLastDirSecs != target.fContext.fSecs )
-    {
+    if (fLastDirSecs != target.fContext.fSecs) {
         static plRandom random;
         fRandDir.fX += random.RandMinusOneToOne() * fSwirl;
         fRandDir.fY += random.RandMinusOneToOne() * fSwirl;
-        if( !GetHorizontal() )
+
+        if (!GetHorizontal()) {
             fRandDir.fZ += random.RandMinusOneToOne() * fSwirl;
+        }
+
         hsFastMath::NormalizeAppr(fRandDir);
         fDir = fRandDir + fRefDir;
         hsFastMath::NormalizeAppr(fDir);
@@ -439,11 +446,11 @@ void plParticleWindEffect::PrepareEffect(const plEffectTargetInfo& target)
 ////////////////////////////////////////////////////////////////////////
 // Localized wind (how much wind you're getting depends on where you are
 plParticleLocalWind::plParticleLocalWind()
-:   fScale(0, 0, 0),
-    fSpeed(0),
-    fPhase(0,0,0),
-    fInvScale(0,0,0),
-    fLastPhaseSecs(-1.f)
+    :   fScale(0, 0, 0),
+        fSpeed(0),
+        fPhase(0, 0, 0),
+        fInvScale(0, 0, 0),
+        fLastPhaseSecs(-1.f)
 {
 }
 
@@ -451,7 +458,7 @@ plParticleLocalWind::~plParticleLocalWind()
 {
 }
 
-void plParticleLocalWind::Read(hsStream *s, hsResMgr *mgr)
+void plParticleLocalWind::Read(hsStream* s, hsResMgr* mgr)
 {
     plParticleWindEffect::Read(s, mgr);
 
@@ -459,7 +466,7 @@ void plParticleLocalWind::Read(hsStream *s, hsResMgr *mgr)
     fSpeed = s->ReadLEScalar();
 }
 
-void plParticleLocalWind::Write(hsStream *s, hsResMgr *mgr)
+void plParticleLocalWind::Write(hsStream* s, hsResMgr* mgr)
 {
     plParticleWindEffect::Write(s, mgr);
 
@@ -469,8 +476,7 @@ void plParticleLocalWind::Write(hsStream *s, hsResMgr *mgr)
 
 void plParticleLocalWind::PrepareEffect(const plEffectTargetInfo& target)
 {
-    if( fLastPhaseSecs != target.fContext.fSecs )
-    {
+    if (fLastPhaseSecs != target.fContext.fSecs) {
         plParticleWindEffect::PrepareEffect(target);
 
         fPhase += fDir * fSpeed * target.fContext.fDelSecs;
@@ -486,33 +492,42 @@ void plParticleLocalWind::PrepareEffect(const plEffectTargetInfo& target)
 
 bool plParticleLocalWind::ApplyEffect(const plEffectTargetInfo& target, int32_t i)
 {
-    const hsPoint3& pos = *(hsPoint3 *)(target.fPos + i * target.fPosStride);
+    const hsPoint3& pos = *(hsPoint3*)(target.fPos + i * target.fPosStride);
     hsVector3& vel = *(hsVector3*)(target.fVelocity + i * target.fVelocityStride);
 
     const float kMinToBother = 0;
 
-    float strength = 1.f / ( (1.f + fConstancy) * (1.f + fConstancy) );
+    float strength = 1.f / ((1.f + fConstancy) * (1.f + fConstancy));
     float s, c, t;
     t = (pos[0] - fPhase[0]) * fInvScale[0];
     hsFastMath::SinCosAppr(t, s, c);
     c += fConstancy;
-    if( c <= kMinToBother )
+
+    if (c <= kMinToBother) {
         return false;
+    }
+
     strength *= c;
 
     t = (pos[1] - fPhase[1]) * fInvScale[1];
     hsFastMath::SinCosAppr(t, s, c);
     c += fConstancy;
-    if( c <= kMinToBother )
+
+    if (c <= kMinToBother) {
         return false;
+    }
+
     strength *= c;
 
 #if 0 // if you turn this back on, strength needs to drop by another factor of (1.f + fConstancy)
     t = (pos[2] - fPhase[2]) * fInvScale[2];
     hsFastMath::SinCosAppr(t, s, c);
     c += fConstancy;
-    if( c <= kMinToBother )
+
+    if (c <= kMinToBother) {
         return false;
+    }
+
     strength *= c;
 #endif
 
@@ -527,14 +542,14 @@ bool plParticleLocalWind::ApplyEffect(const plEffectTargetInfo& target, int32_t 
 ////////////////////////////////////////////////////////////////////////
 // Uniform wind - wind changes over time, but not space
 plParticleUniformWind::plParticleUniformWind()
-:   fFreqMin(0.1f),
-    fFreqMax(0.2f),
-    fFreqCurr(0.1f),
-    fFreqRate(0.05f),
+    :   fFreqMin(0.1f),
+        fFreqMax(0.2f),
+        fFreqCurr(0.1f),
+        fFreqRate(0.05f),
 
-    fCurrPhase(0),
-    fLastFreqSecs(-1.f),
-    fCurrentStrength(0)
+        fCurrPhase(0),
+        fLastFreqSecs(-1.f),
+        fCurrentStrength(0)
 {
 }
 
@@ -542,7 +557,7 @@ plParticleUniformWind::~plParticleUniformWind()
 {
 }
 
-void plParticleUniformWind::Read(hsStream *s, hsResMgr *mgr)
+void plParticleUniformWind::Read(hsStream* s, hsResMgr* mgr)
 {
     plParticleWindEffect::Read(s, mgr);
 
@@ -560,7 +575,7 @@ void plParticleUniformWind::Read(hsStream *s, hsResMgr *mgr)
     fFreqCurr = fFreqMin;
 }
 
-void plParticleUniformWind::Write(hsStream *s, hsResMgr *mgr)
+void plParticleUniformWind::Write(hsStream* s, hsResMgr* mgr)
 {
     plParticleWindEffect::Write(s, mgr);
 
@@ -572,18 +587,19 @@ void plParticleUniformWind::Write(hsStream *s, hsResMgr *mgr)
 void plParticleUniformWind::SetFrequencyRange(float minSecsPerCycle, float maxSecsPerCycle)
 {
     const float kMinSecsPerCycle = 1.f;
-    if( minSecsPerCycle < kMinSecsPerCycle )
-        minSecsPerCycle = kMinSecsPerCycle;
-    if( minSecsPerCycle < kMinSecsPerCycle )
-        minSecsPerCycle = kMinSecsPerCycle;
 
-    if( minSecsPerCycle < maxSecsPerCycle )
-    {
+    if (minSecsPerCycle < kMinSecsPerCycle) {
+        minSecsPerCycle = kMinSecsPerCycle;
+    }
+
+    if (minSecsPerCycle < kMinSecsPerCycle) {
+        minSecsPerCycle = kMinSecsPerCycle;
+    }
+
+    if (minSecsPerCycle < maxSecsPerCycle) {
         fFreqMin = 1.f / maxSecsPerCycle;
         fFreqMax = 1.f / minSecsPerCycle;
-    }
-    else
-    {
+    } else {
         fFreqMin = 1.f / minSecsPerCycle;
         fFreqMax = 1.f / maxSecsPerCycle;
     }
@@ -592,8 +608,11 @@ void plParticleUniformWind::SetFrequencyRange(float minSecsPerCycle, float maxSe
 void plParticleUniformWind::SetFrequencyRate(float secsPerCycle)
 {
     const float kMinSecsPerCycle = 1.f;
-    if( secsPerCycle < kMinSecsPerCycle )
+
+    if (secsPerCycle < kMinSecsPerCycle) {
         secsPerCycle = kMinSecsPerCycle;
+    }
+
     fFreqRate = 1.f / secsPerCycle;
 }
 
@@ -602,8 +621,7 @@ void plParticleUniformWind::PrepareEffect(const plEffectTargetInfo& target)
 {
     plParticleWindEffect::PrepareEffect(target);
 
-    if( fLastFreqSecs != target.fContext.fSecs )
-    {
+    if (fLastFreqSecs != target.fContext.fSecs) {
         static plRandom random;
 
         const double kTwoPi = M_PI * 2.0;
@@ -613,29 +631,27 @@ void plParticleUniformWind::PrepareEffect(const plEffectTargetInfo& target)
 
         fFreqCurr += fFreqRate * target.fContext.fDelSecs * random.RandZeroToOne();
 
-        if( fFreqCurr > fFreqMax )
-        {
+        if (fFreqCurr > fFreqMax) {
             fFreqCurr = fFreqMax;
             fFreqRate = -fFreqRate;
-        }
-        else if( fFreqCurr < fFreqMin )
-        {
+        } else if (fFreqCurr < fFreqMin) {
             fFreqCurr = fFreqMin;
             fFreqRate = -fFreqRate;
         }
-        
+
         float phaseDel = (float)(t1 - (fFreqCurr * fLastFreqSecs + fCurrPhase));
         fCurrPhase += phaseDel;
-        
+
         float t = float(fFreqCurr * target.fContext.fSecs + fCurrPhase);
         float s;
         hsFastMath::SinCosAppr(t, s, fCurrentStrength);
         fCurrentStrength += fConstancy;
         fCurrentStrength /= (1.f + fConstancy);
-        
-        if( fCurrentStrength < 0 )
+
+        if (fCurrentStrength < 0) {
             fCurrentStrength = 0;
-        
+        }
+
         fLastFreqSecs = target.fContext.fSecs;
     }
 }
@@ -644,11 +660,11 @@ void plParticleUniformWind::PrepareEffect(const plEffectTargetInfo& target)
 bool plParticleUniformWind::ApplyEffect(const plEffectTargetInfo& target, int32_t i)
 {
     hsVector3& vel = *(hsVector3*)(target.fVelocity + i * target.fVelocityStride);
-    
+
     const float& invMass = *(float*)(target.fInvMass + i * target.fInvMassStride);
-    
+
     vel += fWindVec * (invMass * fCurrentStrength);
-    
+
     return false;
 }
 
@@ -684,42 +700,38 @@ void plParticleFlockEffect::IUpdateDistances(const plEffectTargetInfo& target)
     int i, j;
     int numParticles = hsMinimum(fMaxParticles, target.fNumValidParticles);
 
-    for (i = 0; i < numParticles; i++)
-    {
-        for (j = i + 1; j < numParticles; j++)
-        {
+    for (i = 0; i < numParticles; i++) {
+        for (j = i + 1; j < numParticles; j++) {
             hsVector3 diff((hsPoint3*)(target.fPos + i * target.fPosStride), (hsPoint3*)(target.fPos + j * target.fPosStride));
             fDistSq[i * fMaxParticles + j] = fDistSq[j * fMaxParticles + i] = diff.MagnitudeSquared();
         }
     }
 }
 
-void plParticleFlockEffect::IUpdateInfluences(const plEffectTargetInfo &target)
+void plParticleFlockEffect::IUpdateInfluences(const plEffectTargetInfo& target)
 {
     int i, j;
     int numParticles = hsMinimum(fMaxParticles, target.fNumValidParticles);
-    
-    for (i = 0; i < numParticles; i++)
-    {
+
+    for (i = 0; i < numParticles; i++) {
         int numAvg = 0;
         int numRep = 0;
         fInfluences[i].fAvgVel.Set(0.f, 0.f, 0.f);
         fInfluences[i].fRepDir.Set(0.f, 0.f, 0.f);
 
-        for (j = 0; j < numParticles; j++)
-        {
-            if (i == j)
+        for (j = 0; j < numParticles; j++) {
+            if (i == j) {
                 continue;
+            }
 
             const int distIdx = i * fMaxParticles + j;
-            if (fDistSq[distIdx] > fInfAvgRadSq)
-            {
+
+            if (fDistSq[distIdx] > fInfAvgRadSq) {
                 numAvg++;
                 fInfluences[i].fAvgVel += *(hsVector3*)(target.fVelocity + j * target.fVelocityStride);
             }
 
-            if (fDistSq[distIdx] > fInfRepRadSq)
-            {
+            if (fDistSq[distIdx] > fInfRepRadSq) {
                 numRep++;
                 hsVector3 repDir((hsPoint3*)(target.fPos + i * target.fPosStride), (hsPoint3*)(target.fPos + j * target.fPosStride));
                 repDir.Normalize();
@@ -728,10 +740,13 @@ void plParticleFlockEffect::IUpdateInfluences(const plEffectTargetInfo &target)
 
         }
 
-        if (numAvg > 0)
+        if (numAvg > 0) {
             fInfluences[i].fAvgVel /= (float)numAvg;
-        if (numRep > 0)
+        }
+
+        if (numRep > 0) {
             fInfluences[i].fRepDir /= (float)numRep;
+        }
     }
 }
 
@@ -745,58 +760,59 @@ void plParticleFlockEffect::PrepareEffect(const plEffectTargetInfo& target)
 // Holding off on that until I like the behavior.
 bool plParticleFlockEffect::ApplyEffect(const plEffectTargetInfo& target, int32_t i)
 {
-    if (i >= fMaxParticles)
-        return false; // Don't have the memory to deal with you. Good luck kid...
+    if (i >= fMaxParticles) {
+        return false;    // Don't have the memory to deal with you. Good luck kid...
+    }
 
-    const hsPoint3 &pos = *(hsPoint3*)(target.fPos + i * target.fPosStride);
-    hsVector3 &vel = *(hsVector3*)(target.fVelocity + i * target.fVelocityStride);
-    
+    const hsPoint3& pos = *(hsPoint3*)(target.fPos + i * target.fPosStride);
+    hsVector3& vel = *(hsVector3*)(target.fVelocity + i * target.fVelocityStride);
+
     float curSpeed = vel.Magnitude();
     hsPoint3 goal;
-    if (*(uint32_t*)(target.fMiscFlags + i * target.fMiscFlagsStride) & plParticleExt::kImmortal)
+
+    if (*(uint32_t*)(target.fMiscFlags + i * target.fMiscFlagsStride) & plParticleExt::kImmortal) {
         goal = target.fContext.fSystem->GetTarget(0)->GetLocalToWorld().GetTranslate() + fTargetOffset;
-    else
+    } else {
         goal = fDissenterTarget;
-    
+    }
+
     hsVector3 goalDir;
     hsPoint3 tmp = goal - pos;
     goalDir.Set(&tmp);
     float distSq = goalDir.MagnitudeSquared();
-    
+
     goalDir.Normalize();
-    
+
     float goalStr;
     float maxSpeed;
     float maxSpeedSq;
-    if (distSq <= fGoalDistSq)
-    {       
+
+    if (distSq <= fGoalDistSq) {
         goalStr = fGoalOrbitStr;
-        if (i & 0x1)
+
+        if (i & 0x1) {
             goalDir.Set(goalDir.fY, -goalDir.fX, goalDir.fZ);
-        else
+        } else {
             goalDir.Set(-goalDir.fY, goalDir.fX, goalDir.fZ);
+        }
 
         maxSpeed = fMaxOrbitSpeed;
-    }
-    else if (distSq >= fFullChaseDistSq)
-    {
+    } else if (distSq >= fFullChaseDistSq) {
         goalStr = fGoalChaseStr;
         maxSpeed = fMaxChaseSpeed;
-    }
-    else
-    {
+    } else {
         float pct = (distSq - fGoalDistSq) / (fFullChaseDistSq - fGoalDistSq);
         goalStr = fGoalOrbitStr + (fGoalChaseStr - fGoalOrbitStr) * pct;
         maxSpeed = fMaxOrbitSpeed + (fMaxChaseSpeed - fMaxOrbitSpeed) * pct;
     }
+
     maxSpeedSq = maxSpeed * maxSpeed;
-    
+
     vel += (fInfluences[i].fAvgVel - vel) * (fAvgVelStr * target.fContext.fDelSecs);
     vel += goalDir * (curSpeed * goalStr * target.fContext.fDelSecs);
     vel += fInfluences[i].fRepDir * (curSpeed * fRepDirStr * target.fContext.fDelSecs);
 
-    if (vel.MagnitudeSquared() > maxSpeedSq)
-    {
+    if (vel.MagnitudeSquared() > maxSpeedSq) {
         vel.Normalize();
         vel *= maxSpeed;
     }
@@ -810,14 +826,13 @@ void plParticleFlockEffect::SetMaxParticles(const uint16_t num)
     delete [] fInfluences;
     fMaxParticles = num;
 
-    if (num > 0)
-    {
+    if (num > 0) {
         fDistSq = new float[num * num];
         fInfluences = new plParticleInfluenceInfo[num];
     }
 }
 
-void plParticleFlockEffect::Read(hsStream *s, hsResMgr *mgr)
+void plParticleFlockEffect::Read(hsStream* s, hsResMgr* mgr)
 {
     plParticleEffect::Read(s, mgr);
 
@@ -836,7 +851,7 @@ void plParticleFlockEffect::Read(hsStream *s, hsResMgr *mgr)
     SetMaxParticles((uint16_t)s->ReadLEScalar());
 }
 
-void plParticleFlockEffect::Write(hsStream *s, hsResMgr *mgr)
+void plParticleFlockEffect::Write(hsStream* s, hsResMgr* mgr)
 {
     plParticleEffect::Write(s, mgr);
 
@@ -855,22 +870,24 @@ void plParticleFlockEffect::Write(hsStream *s, hsResMgr *mgr)
     s->WriteLEScalar(fMaxParticles);
 }
 
-bool plParticleFlockEffect::MsgReceive(plMessage *msg)
+bool plParticleFlockEffect::MsgReceive(plMessage* msg)
 {
-    plParticleFlockMsg *flockMsg = plParticleFlockMsg::ConvertNoRef(msg);
-    if (flockMsg)
-    {
-        switch (flockMsg->fCmd)
-        {
+    plParticleFlockMsg* flockMsg = plParticleFlockMsg::ConvertNoRef(msg);
+
+    if (flockMsg) {
+        switch (flockMsg->fCmd) {
         case plParticleFlockMsg::kFlockCmdSetDissentPoint:
             fDissenterTarget.Set(flockMsg->fX, flockMsg->fY, flockMsg->fZ);
             break;
+
         case plParticleFlockMsg::kFlockCmdSetOffset:
             fTargetOffset.Set(flockMsg->fX, flockMsg->fY, flockMsg->fZ);
             break;
+
         default:
             break;
         }
+
         return true;
     }
 
@@ -891,21 +908,21 @@ void plParticleFollowSystemEffect::PrepareEffect(const plEffectTargetInfo& targe
 
 bool plParticleFollowSystemEffect::ApplyEffect(const plEffectTargetInfo& target, int32_t i)
 {
-    if (fEvalThisFrame)
-    {
-        if (i < target.fFirstNewParticle && !fOldW2L.IsIdentity())
-        {
-            hsPoint3 &pos = *(hsPoint3*)(target.fPos + i * target.fPosStride);
+    if (fEvalThisFrame) {
+        if (i < target.fFirstNewParticle && !fOldW2L.IsIdentity()) {
+            hsPoint3& pos = *(hsPoint3*)(target.fPos + i * target.fPosStride);
             pos = target.fContext.fSystem->GetTarget(0)->GetLocalToWorld() * fOldW2L * pos;
         }
     }
+
     return true;
 }
 
 void plParticleFollowSystemEffect::EndEffect(const plEffectTargetInfo& target)
 {
-    if (fEvalThisFrame)
+    if (fEvalThisFrame) {
         fOldW2L = target.fContext.fSystem->GetTarget(0)->GetWorldToLocal();
+    }
 }
 
 

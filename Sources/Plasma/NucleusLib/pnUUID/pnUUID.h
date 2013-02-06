@@ -49,16 +49,16 @@ class hsStream;
 
 extern const class plUUID kNilUuid;
 
-class plUUID
-{
+class plUUID {
     // must be first field in class
 public:
     uint8_t   fData[16];
-    struct Match
-    {
+    struct Match {
         const plUUID* fGuid;
         Match(const plUUID* guid) : fGuid(guid) {}
-        bool operator()(const plUUID* guid) const { return guid->IsEqualTo(fGuid); }
+        bool operator()(const plUUID* guid) const {
+            return guid->IsEqualTo(fGuid);
+        }
     };
 
     plUUID();
@@ -68,7 +68,9 @@ public:
 
     void     Clear();
     bool     IsNull() const;
-    bool     IsSet() const { return !IsNull(); }
+    bool     IsSet() const {
+        return !IsNull();
+    }
     void     CopyFrom(const plUUID* v);
     void     CopyFrom(const plUUID& v);
     int      CompareTo(const plUUID* v) const;
@@ -79,8 +81,12 @@ public:
     void     Read(hsStream* s);
     void     Write(hsStream* s);
 
-    operator bool () const { return !IsNull(); }
-    inline bool operator ! () const { return IsNull(); }
+    operator bool () const {
+        return !IsNull();
+    }
+    inline bool operator !() const {
+        return IsNull();
+    }
 
     bool operator==(const plUUID& other) const {
         return IsEqualTo(&other);
@@ -91,7 +97,9 @@ public:
     bool operator<(const plUUID& other) const {
         return CompareTo(&other) == -1;
     }
-    operator plString (void) const { return AsString(); }
+    operator plString(void) const {
+        return AsString();
+    }
 
     static plUUID Generate();
 };

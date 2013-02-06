@@ -66,7 +66,7 @@ const int SHADER_BLINN  = 2;
 const int SHADER_PLASMA = 3;
 
 // Return shader of given type, using indices above...
-Shader *GetShader(int s);
+Shader* GetShader(int s);
 
 extern AColor black;
 
@@ -76,79 +76,87 @@ extern AColor black;
 
 class Shader {
 public:
-    virtual void Illum(ShadeContext &sc, SIllumParams &ip)=0;
-    virtual void AffectReflMap(ShadeContext &sc, SIllumParams &ip, Color &rcol)=0;
-    virtual void SetShininess(float shininess, float shineStr)=0;
-    virtual float EvalHilite(float x)=0;
+    virtual void Illum(ShadeContext& sc, SIllumParams& ip) = 0;
+    virtual void AffectReflMap(ShadeContext& sc, SIllumParams& ip, Color& rcol) = 0;
+    virtual void SetShininess(float shininess, float shineStr) = 0;
+    virtual float EvalHilite(float x) = 0;
 };
 
 //===========================================================================
-// Phong shader... 
+// Phong shader...
 //===========================================================================
 
 class PhongShader : public Shader {
     float fs;
     float shin_str;
 public:
-    void Illum(ShadeContext &sc, SIllumParams &ip);
-    void AffectReflMap(ShadeContext &sc, SIllumParams &ip, Color &rcol) { rcol *= ip.spec; };
+    void Illum(ShadeContext& sc, SIllumParams& ip);
+    void AffectReflMap(ShadeContext& sc, SIllumParams& ip, Color& rcol) {
+        rcol *= ip.spec;
+    };
     void SetShininess(float shininess, float shineStr) {
-        fs = (float)pow(2.0,shininess*10.0);
+        fs = (float)pow(2.0, shininess * 10.0);
         shin_str = shineStr;
     }
     float EvalHilite(float x) {
-        return shin_str*(float)pow((double)cos(x*M_PI),(double)fs);  
+        return shin_str * (float)pow((double)cos(x * M_PI), (double)fs);
     }
 };
 
 //===========================================================================
-// Blinn shader... 
+// Blinn shader...
 //===========================================================================
 
 class BlinnShader : public Shader {
     float fs;
     float shin_str;
 public:
-    void Illum(ShadeContext &sc, SIllumParams &ip);
-    void AffectReflMap(ShadeContext &sc, SIllumParams &ip, Color &rcol) { rcol *= ip.spec; };
+    void Illum(ShadeContext& sc, SIllumParams& ip);
+    void AffectReflMap(ShadeContext& sc, SIllumParams& ip, Color& rcol) {
+        rcol *= ip.spec;
+    };
     void SetShininess(float shininess, float shineStr) {
-        fs = (float)pow(2.0,shininess*10.0);
+        fs = (float)pow(2.0, shininess * 10.0);
         shin_str = shineStr;
     }
     float EvalHilite(float x) {
-        return shin_str*(float)pow((double)cos(x*M_PI),(double)fs); 
+        return shin_str * (float)pow((double)cos(x * M_PI), (double)fs);
     }
 };
 
 //===========================================================================
-// Metal shader... 
+// Metal shader...
 //===========================================================================
 
 class MetalShader : public Shader {
     float fm2inv, fshin_str;
 public:
-    void Illum(ShadeContext &sc, SIllumParams &ip);
-    void AffectReflMap(ShadeContext &sc, SIllumParams &ip, Color &rcol) { rcol *= ip.diff; };
+    void Illum(ShadeContext& sc, SIllumParams& ip);
+    void AffectReflMap(ShadeContext& sc, SIllumParams& ip, Color& rcol) {
+        rcol *= ip.diff;
+    };
     void SetShininess(float shininess, float shineStr);
     float EvalHilite(float x);
 };
 
 //===========================================================================
-// hsMax layer shader... 
+// hsMax layer shader...
 //===========================================================================
 
 class hsMaxShader : public Shader {
     float fs;
     float shin_str;
 public:
-    void Illum(ShadeContext &sc, SIllumParams &ip);
-    void AffectReflMap(ShadeContext &sc, SIllumParams &ip, Color &rcol) { rcol *= ip.spec; };
+    void Illum(ShadeContext& sc, SIllumParams& ip);
+    void AffectReflMap(ShadeContext& sc, SIllumParams& ip, Color& rcol) {
+        rcol *= ip.spec;
+    };
     void SetShininess(float shininess, float shineStr) {
-        fs = (float)pow(2.0,shininess*10.0);
+        fs = (float)pow(2.0, shininess * 10.0);
         shin_str = shineStr;
     }
     float EvalHilite(float x) {
-        return shin_str*(float)pow((double)cos(x*M_PI),(double)fs);  
+        return shin_str * (float)pow((double)cos(x * M_PI), (double)fs);
     }
 };
 

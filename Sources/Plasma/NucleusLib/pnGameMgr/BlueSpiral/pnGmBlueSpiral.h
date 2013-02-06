@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnGameMgr/BlueSpiral/pnGmBlueSpiral.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNGAMEMGR_BLUESPIRAL_PNGMBLUESPIRAL_H
@@ -96,41 +96,41 @@ enum {
 #pragma pack(push,1)
 //============================================================================
 
-    //========================================================================
-    // Message parameters
-    //========================================================================
-    struct BlueSpiral_CreateParam {
-        // empty
-    };
+//========================================================================
+// Message parameters
+//========================================================================
+struct BlueSpiral_CreateParam {
+    // empty
+};
 
-    //========================================================================
-    // Tic-Tac-Toe message structures
-    //========================================================================
+//========================================================================
+// Tic-Tac-Toe message structures
+//========================================================================
 
-    // Cli2Srv
-    struct Cli2Srv_BlueSpiral_StartGame : GameMsgHeader {
-        // empty
-    };
-    struct Cli2Srv_BlueSpiral_HitCloth : GameMsgHeader {
-        uint8_t clothNum; // the cloth we hit, 0..6
-    };
+// Cli2Srv
+struct Cli2Srv_BlueSpiral_StartGame : GameMsgHeader {
+    // empty
+};
+struct Cli2Srv_BlueSpiral_HitCloth : GameMsgHeader {
+    uint8_t clothNum; // the cloth we hit, 0..6
+};
 
-    // Srv2Cli
-    struct Srv2Cli_BlueSpiral_ClothOrder : GameMsgHeader {
-        uint8_t order[7]; // each value is the cloth to hit, 0..6, the order is the order in the array
-    };
-    struct Srv2Cli_BlueSpiral_SuccessfulHit : GameMsgHeader {
-        // empty
-    };
-    struct Srv2Cli_BlueSpiral_GameWon : GameMsgHeader {
-        // empty
-    };
-    struct Srv2Cli_BlueSpiral_GameOver : GameMsgHeader {
-        // empty
-    };
-    struct Srv2Cli_BlueSpiral_GameStarted : GameMsgHeader {
-        bool startSpin; // if true, start spinning the door thingy
-    };
+// Srv2Cli
+struct Srv2Cli_BlueSpiral_ClothOrder : GameMsgHeader {
+    uint8_t order[7]; // each value is the cloth to hit, 0..6, the order is the order in the array
+};
+struct Srv2Cli_BlueSpiral_SuccessfulHit : GameMsgHeader {
+    // empty
+};
+struct Srv2Cli_BlueSpiral_GameWon : GameMsgHeader {
+    // empty
+};
+struct Srv2Cli_BlueSpiral_GameOver : GameMsgHeader {
+    // empty
+};
+struct Srv2Cli_BlueSpiral_GameStarted : GameMsgHeader {
+    bool startSpin; // if true, start spinning the door thingy
+};
 
 //============================================================================
 // End networked data structures

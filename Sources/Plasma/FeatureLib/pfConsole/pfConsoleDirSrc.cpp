@@ -53,17 +53,20 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 bool pfConsoleDirSrc::ParseDirectory(const plFileName& path, const char* mask /* = L"*.*" */)
 {
-    hsAssert( fEngine != nil, "Cannot do a dir execute without an engine!" );
+    hsAssert(fEngine != nil, "Cannot do a dir execute without an engine!");
 
     std::vector<plFileName> files = plFileSystem::ListDir(path, mask);
-    for (auto iter = files.begin(); iter != files.end(); ++iter)
-    {
+
+    for (auto iter = files.begin(); iter != files.end(); ++iter) {
         plFileName name = iter->GetFileName();
-        if (AlreadyProcessedFile(path, name))
+
+        if (AlreadyProcessedFile(path, name)) {
             continue;
+        }
+
         AddProcessedFile(path, name);
-        if (!fEngine->ExecuteFile(*iter))
-        {
+
+        if (!fEngine->ExecuteFile(*iter)) {
             // Change the following line once we have a better way of reporting
             // errors in the parsing
             plStringStream error, caption;
@@ -86,8 +89,11 @@ bool pfConsoleDirSrc::ParseDirectory(const plFileName& path, const char* mask /*
 void pfConsoleDirSrc::ResetProcessedFiles()
 {
     int i;
-    for(i=0;i<fProcessedFiles.size(); i++)
+
+    for (i = 0; i < fProcessedFiles.size(); i++) {
         delete fProcessedFiles[i];
+    }
+
     fProcessedFiles.clear();
 }
 
@@ -97,15 +103,16 @@ void pfConsoleDirSrc::ResetProcessedFiles()
 //
 bool pfConsoleDirSrc::AlreadyProcessedFile(const plFileName& path, const plFileName& file)
 {
-    if (fCheckProcessedFiles)
-    {
+    if (fCheckProcessedFiles) {
         int i;
-        for (i=0; i<fProcessedFiles.size(); i++)
-        {
-            if (file == fProcessedFiles[i]->fFile && path == fProcessedFiles[i]->fPath)
+
+        for (i = 0; i < fProcessedFiles.size(); i++) {
+            if (file == fProcessedFiles[i]->fFile && path == fProcessedFiles[i]->fPath) {
                 return true;
+            }
         }
     }
+
     return false;
 }
 

@@ -58,8 +58,7 @@ class hsKeyedObject;
 class hsGRenderProcs;
 class hsBaseRenderProc;
 
-class hsConverterUtils
-{
+class hsConverterUtils {
 private:
     hsConverterUtils();
 public: // MSDEV bug
@@ -68,11 +67,11 @@ public:
     static hsConverterUtils& Instance();
     static bool IsReservedKeyword(const char* nodeName);
 
-    void Init(bool save, plErrorMsg *msg);
-    bool IsEnvironHolder(INode *node);
-    bool AutoStartDynamics(INode *node);
-    bool RandomStartDynamics(INode *node);
-    TimeValue GetTime(Interface *gi);
+    void Init(bool save, plErrorMsg* msg);
+    bool IsEnvironHolder(INode* node);
+    bool AutoStartDynamics(INode* node);
+    bool RandomStartDynamics(INode* node);
+    TimeValue GetTime(Interface* gi);
     void StripOffTail(char* path);
     void StripOffPath(char* fileName);
 
@@ -81,20 +80,20 @@ public:
 #if 0
     void MangleRPRefs(hsBaseRenderProc* base, hsGRenderProcs* rp);
 #endif
-    char* MangleReference(char *mangName, const char *nodeName, const char* defRoom="global");
-    char* MangleReference(char *mangName, INode *node, const char* defRoom="global");
-    char* MangleRefWithRoom(char *mangName, const char *nodeName, const char* roomName);
-    char* UnMangleReference(char *dest, const char *name);
-    bool IsMangled(const char *name);
-    int32_t FindNamedSelSetFromName(const char *name);
+    char* MangleReference(char* mangName, const char* nodeName, const char* defRoom = "global");
+    char* MangleReference(char* mangName, INode* node, const char* defRoom = "global");
+    char* MangleRefWithRoom(char* mangName, const char* nodeName, const char* roomName);
+    char* UnMangleReference(char* dest, const char* name);
+    bool IsMangled(const char* name);
+    int32_t FindNamedSelSetFromName(const char* name);
     char* StripMangledReference(char* dest, const char* name);
 
     bool IsInstanced(Object* maxObject);
 
     void CreateNodeSearchCache();
     void DestroyNodeSearchCache();
-    INode* GetINodeByName(const char* name, bool caseSensitive=false);
-    
+    INode* GetINodeByName(const char* name, bool caseSensitive = false);
+
     static const char fTagSeps[];
 
 private:
@@ -107,29 +106,36 @@ private:
         kWarnedNoMoreBitmapLoadErr  = 0x1
     };
 
-    Interface   *fInterface;
-    plErrorMsg  *fErrorMsg;
+    Interface*   fInterface;
+    plErrorMsg*  fErrorMsg;
 
     bool        fSuppressMangling;
     uint32_t    fWarned;
     bool        fSave;
 
-    struct CacheNode
-    {
+    struct CacheNode {
     private:
         INode* fNode;
         const char* fName;
         bool fCaseSensitive;
     public:
-        CacheNode(INode* node=nil) : fNode(node), fName(nil), fCaseSensitive(false) { }
+        CacheNode(INode* node = nil) : fNode(node), fName(nil), fCaseSensitive(false) { }
         CacheNode(const char* name) : fName(name), fNode(nil), fCaseSensitive(false) { }
         ~CacheNode() { }
 
-        INode* GetNode() { return fNode; }
-        const char* GetName() const { return fNode ? fNode->GetName() : fName; }
+        INode* GetNode() {
+            return fNode;
+        }
+        const char* GetName() const {
+            return fNode ? fNode->GetName() : fName;
+        }
 
-        void SetCaseSensitive(bool b) { fCaseSensitive = b; }
-        bool GetCaseSensitive() { return fCaseSensitive; }
+        void SetCaseSensitive(bool b) {
+            fCaseSensitive = b;
+        }
+        bool GetCaseSensitive() {
+            return fCaseSensitive;
+        }
 
         uint32_t GetHash() const;
         bool operator==(const CacheNode& other) const;

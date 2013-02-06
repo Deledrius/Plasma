@@ -58,24 +58,22 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //             : that some event or transition of state has happened on a GUI control
 //
 //
-class pfGUINotifyMsg : public plMessage
-{
+class pfGUINotifyMsg : public plMessage {
 protected:
     plKey       fControlKey;        // who start this mess
     uint32_t      fEvent;             // what was the event that happened
 
 public:
     pfGUINotifyMsg() : plMessage() {}
-    pfGUINotifyMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t) : plMessage(s, r, t) {}
+    pfGUINotifyMsg(const plKey& s,
+                   const plKey& r,
+                   const double* t) : plMessage(s, r, t) {}
     ~pfGUINotifyMsg() {}
 
-    CLASSNAME_REGISTER( pfGUINotifyMsg );
-    GETINTERFACE_ANY( pfGUINotifyMsg, plMessage );
+    CLASSNAME_REGISTER(pfGUINotifyMsg);
+    GETINTERFACE_ANY(pfGUINotifyMsg, plMessage);
 
-    enum GUIEventType
-    {
+    enum GUIEventType {
         kShowHide = 1,      // show or hide change
         kAction,            // button clicked, ListBox click on item, EditBox hit enter
         kValueChanged,      // value changed in control
@@ -83,7 +81,7 @@ public:
         kFocusChange,       // when one of its controls loses focus to another
         kExitMode,          // GUI Exit Mode key was pressed
         kInterestingEvent,  // GUI interesting-ness has changed
-        kSpecialAction,     // meaning depends on control functionality (see below) 
+        kSpecialAction,     // meaning depends on control functionality (see below)
         kEndEventList
     };
 
@@ -114,25 +112,26 @@ public:
 // kTextBox
 // kDragBar
 
-    void SetEvent( plKey &key, uint32_t event)
-    {
+    void SetEvent(plKey& key, uint32_t event) {
         fControlKey = key;
         fEvent = event;
     }
 
-    plKey GetControlKey() { return fControlKey; }
-    uint32_t GetEvent() { return fEvent; }
+    plKey GetControlKey() {
+        return fControlKey;
+    }
+    uint32_t GetEvent() {
+        return fEvent;
+    }
 
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fControlKey = mgr->ReadKey(stream);
         fEvent = stream->ReadLE32();
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         mgr->WriteKey(stream, fControlKey);
         stream->WriteLE32(fEvent);

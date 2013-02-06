@@ -48,15 +48,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plSDL/plSDL.h"
 
 // static vars
-char plMorphSequenceSDLMod::kStrMorphArrayDescName[]="MorphArray";
-char plMorphSequenceSDLMod::kStrWeights[]="weights";
+char plMorphSequenceSDLMod::kStrMorphArrayDescName[] = "MorphArray";
+char plMorphSequenceSDLMod::kStrWeights[] = "weights";
 
-char plMorphSequenceSDLMod::kStrMorphSetDescName[]="MorphSet";
-char plMorphSequenceSDLMod::kStrMesh[]="mesh";
-char plMorphSequenceSDLMod::kStrArrays[]="arrays";
+char plMorphSequenceSDLMod::kStrMorphSetDescName[] = "MorphSet";
+char plMorphSequenceSDLMod::kStrMesh[] = "mesh";
+char plMorphSequenceSDLMod::kStrArrays[] = "arrays";
 
-char plMorphSequenceSDLMod::kStrTargetID[]="targetID";
-char plMorphSequenceSDLMod::kStrMorphs[]="morphs";
+char plMorphSequenceSDLMod::kStrTargetID[] = "targetID";
+char plMorphSequenceSDLMod::kStrMorphs[] = "morphs";
 
 void plMorphSequenceSDLMod::PutCurrentStateIn(plStateDataRecord* dstState)
 {
@@ -65,56 +65,62 @@ void plMorphSequenceSDLMod::PutCurrentStateIn(plStateDataRecord* dstState)
 
 void plMorphSequenceSDLMod::IPutCurrentStateIn(plStateDataRecord* dstState)
 {
-    plSceneObject* sobj=GetTarget();
+    plSceneObject* sobj = GetTarget();
     hsAssert(sobj, "plMorphSequenceSDLMod, nil target");
-    
-    const plMorphSequence *kMorphMod = nil;
+
+    const plMorphSequence* kMorphMod = nil;
     int i, j;
     kMorphMod = plMorphSequence::ConvertNoRef(sobj->GetModifierByType(plMorphSequence::Index()));
-    if (!kMorphMod)
-    {
+
+    if (!kMorphMod) {
         hsAssert(false, "Couldn't find a morph sequence.");
         return;
     }
-    plMorphSequence *morphMod = const_cast<plMorphSequence*>(kMorphMod);
-    
+
+    plMorphSequence* morphMod = const_cast<plMorphSequence*>(kMorphMod);
+
     //dstState->FindVar(kStrTarget)->Set(morphMod->GetKey());
-    
-    plSDStateVariable *morphSD = dstState->FindSDVar(kStrMorphs);
+
+    plSDStateVariable* morphSD = dstState->FindSDVar(kStrMorphs);
     int numMorphs = morphMod->fSharedMeshes.GetCount() + 1; // 1 for the non-sharedMesh morph
     hsTArray<plKey> keys;
-    for (i = 0; i < numMorphs; i++)
-    {
-        if (i == morphMod->fSharedMeshes.GetCount())
-        {
+
+    for (i = 0; i < numMorphs; i++) {
+        if (i == morphMod->fSharedMeshes.GetCount()) {
             // the non-sharedMesh morph
-            if (morphMod->GetNumLayers(nil) != 0)
+            if (morphMod->GetNumLayers(nil) != 0) {
                 keys.Append(nil);
-        }
-        else
-        {
-            if (!(morphMod->fSharedMeshes[i].fMesh->fFlags & plSharedMesh::kDontSaveMorphState))
+            }
+        } else {
+            if (!(morphMod->fSharedMeshes[i].fMesh->fFlags & plSharedMesh::kDontSaveMorphState)) {
                 keys.Append(morphMod->fSharedMeshes[i].fMesh->GetKey());
+            }
         }
     }
-    if (morphSD->GetCount() != keys.GetCount())
+
+    if (morphSD->GetCount() != keys.GetCount()) {
         morphSD->Alloc(keys.GetCount());
-    for (i = 0; i < keys.GetCount(); i++)
-    {
+    }
+
+    for (i = 0; i < keys.GetCount(); i++) {
         plKey meshKey = keys[i];
         morphSD->GetStateDataRecord(i)->FindVar(kStrMesh)->Set(meshKey);
-        
-        plSimpleStateVariable *weights = morphSD->GetStateDataRecord(i)->FindVar(kStrWeights);
+
+        plSimpleStateVariable* weights = morphSD->GetStateDataRecord(i)->FindVar(kStrWeights);
         int numLayers = morphMod->GetNumLayers(meshKey);
-        if (weights->GetCount() != numLayers)
+
+        if (weights->GetCount() != numLayers) {
             weights->Alloc(numLayers);
-        
-        for (j = 0; j < numLayers; j++)
-        {
+        }
+
+        for (j = 0; j < numLayers; j++) {
             int numDeltas = morphMod->GetNumDeltas(j, meshKey);
-            if (numDeltas != 2)
-                continue; // plMorphSequenceSDLMod assumes 2 deltas (pos/neg) per layer, so that we can
-                          // store both in a single byte
+
+            if (numDeltas != 2) {
+                continue;    // plMorphSequenceSDLMod assumes 2 deltas (pos/neg) per layer, so that we can
+            }
+
+            // store both in a single byte
 
             // Translate the range [-1.0, 1.0] into a 0-255 byte
             uint8_t weight = (uint8_t)((1.f + morphMod->GetWeight(j, 0, meshKey) - morphMod->GetWeight(j, 1, meshKey)) * 255 / 2);
@@ -127,57 +133,59 @@ void plMorphSequenceSDLMod::IPutCurrentStateIn(plStateDataRecord* dstState)
 void plMorphSequenceSDLMod::SetCurrentStateFrom(const plStateDataRecord* srcState)
 {
     ISetCurrentStateFrom(srcState);
-}       
+}
 
 void plMorphSequenceSDLMod::ISetCurrentStateFrom(const plStateDataRecord* srcState)
 {
-    plSceneObject* sobj=GetTarget();
+    plSceneObject* sobj = GetTarget();
     hsAssert(sobj, "plMorphSequenceSDLMod, nil target");
 
-    if (srcState->GetDescriptor()->GetName() != kSDLMorphSequence)
-    {
+    if (srcState->GetDescriptor()->GetName() != kSDLMorphSequence) {
         hsAssert(false, "Wrong type of state data record passed into plMorphSequenceSDLMod.");
         return;
-    }   
+    }
 
-    int i, j;   
-    const plMorphSequence *kMorphMod = plMorphSequence::ConvertNoRef(sobj->GetModifierByType(plMorphSequence::Index()));
-    if (!kMorphMod)
-    {
+    int i, j;
+    const plMorphSequence* kMorphMod = plMorphSequence::ConvertNoRef(sobj->GetModifierByType(plMorphSequence::Index()));
+
+    if (!kMorphMod) {
         hsAssert(false, "Couldn't find a morph sequence.");
         return;
     }
-    plMorphSequence *morphMod = const_cast<plMorphSequence*>(kMorphMod);
-    
-    plSDStateVariable *morphSD = srcState->FindSDVar(kStrMorphs);
-    for (i = 0; i < morphSD->GetCount(); i++)
-    {
+
+    plMorphSequence* morphMod = const_cast<plMorphSequence*>(kMorphMod);
+
+    plSDStateVariable* morphSD = srcState->FindSDVar(kStrMorphs);
+
+    for (i = 0; i < morphSD->GetCount(); i++) {
         plKey meshKey;
         morphSD->GetStateDataRecord(i)->FindVar(kStrMesh)->Get(&meshKey);
-        if (meshKey && !meshKey->GetUoid().GetClassType() == plSharedMesh::Index())
+
+        if (meshKey && !meshKey->GetUoid().GetClassType() == plSharedMesh::Index()) {
             continue;
-        
+        }
+
         // meshKey will be nil when dealing with non-sharedMesh data
-        if (meshKey)
+        if (meshKey) {
             hsgResMgr::ResMgr()->AddViaNotify(meshKey, new plGenRefMsg(morphMod->GetKey(), plRefMsg::kOnCreate, -1, -1), plRefFlags::kPassiveRef);
-        
-        plSimpleStateVariable *weights = morphSD->GetStateDataRecord(i)->FindVar(kStrWeights);
+        }
+
+        plSimpleStateVariable* weights = morphSD->GetStateDataRecord(i)->FindVar(kStrWeights);
 
         // Count down so that we do the high index first and the pending state struct
         // of plMorphSequence only has to resize the array once.
-        for (j = weights->GetCount() - 1; j >= 0; j--)
-        {           
+        for (j = weights->GetCount() - 1; j >= 0; j--) {
             uint8_t weight;
             weights->Get(&weight, j);
             float posWeight = weight * 2.f / 255.f - 1.f;
             float negWeight = 0;
 
-            if (posWeight < 0)
-            {
+            if (posWeight < 0) {
                 negWeight = -posWeight;
                 posWeight = 0;
             }
-            morphMod->SetWeight(j, 1, negWeight, meshKey);          
+
+            morphMod->SetWeight(j, 1, negWeight, meshKey);
             morphMod->SetWeight(j, 0, posWeight, meshKey);
         }
     }

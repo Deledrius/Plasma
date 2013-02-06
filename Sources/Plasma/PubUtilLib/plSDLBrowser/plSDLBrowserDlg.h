@@ -50,8 +50,7 @@ class plSimpleStateVariable;
 class plStateDataRecord;
 class plStateVariable;
 class plSDStateVariable;
-class plSDLBrowserDlg : public plDialog
-{
+class plSDLBrowserDlg : public plDialog {
 private:
     bool            fCancelled;
     bool            fModified;
@@ -62,14 +61,20 @@ private:
     plTrackBar      fSDRecSlider;
     plSDStateVariable* fCurSDVar;
     int             fCurComboListBoxPos;
-    
+
     typedef std::vector<plStateDataRecord*> SDRecStack;
     SDRecStack      fStateDataRecStack;
 
-    plStateDataRecord*  IGetCurrentStateDataRec() const { return fStateDataRecStack.back(); }
+    plStateDataRecord*  IGetCurrentStateDataRec() const {
+        return fStateDataRecStack.back();
+    }
     plStateDataRecord*  IGetPreviousStateDataRec() const;
-    bool    IAtTopLevel() const { return fStateDataRecStack.size()==1;  }
-    void    IPushStateDataRec(plStateDataRecord* sd) { fStateDataRecStack.push_back(sd);    }
+    bool    IAtTopLevel() const {
+        return fStateDataRecStack.size() == 1;
+    }
+    void    IPushStateDataRec(plStateDataRecord* sd) {
+        fStateDataRecStack.push_back(sd);
+    }
     plStateDataRecord*  IPopStateDataRec();
     void    IPopulateVarListBox(plStateDataRecord* sd) ;
     void    IAddListBoxVar(plStateVariable* var, int cnt);
@@ -78,9 +83,9 @@ private:
 public:
 
     DECLARE_WINDOWCLASS(plSDLBrowserDialog, plDialog);
-    plSDLBrowserDlg(int inDialogId=IDD_DIALOG_SDLBROWSER);
+    plSDLBrowserDlg(int inDialogId = IDD_DIALOG_SDLBROWSER);
     ~plSDLBrowserDlg();
-    
+
     int Run();
 
     // callbacks
@@ -94,13 +99,22 @@ public:
     void OnSDRecSliderChanged();
 
     // setters
-    void SetReadOnly(bool r) { fReadOnly=r; }
-    void SetStateDataRec(plStateDataRecord* sd) { fStateDataRecStack.clear(); fStateDataRecStack.push_back(sd); }
+    void SetReadOnly(bool r) {
+        fReadOnly = r;
+    }
+    void SetStateDataRec(plStateDataRecord* sd) {
+        fStateDataRecStack.clear();
+        fStateDataRecStack.push_back(sd);
+    }
     void SetDefaults();
-    
+
     // getters
-    bool GetCancelled() const { return fCancelled; }
-    bool GetModified() const { return fModified; }
+    bool GetCancelled() const {
+        return fCancelled;
+    }
+    bool GetModified() const {
+        return fModified;
+    }
 };
 
 #endif  // plSDLBrowserDLG_inc

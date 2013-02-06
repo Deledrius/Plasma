@@ -51,8 +51,7 @@ struct hsPoint3;
 struct hsVector3;
 class plGeometrySpan;
 
-class plAvMeshSmooth
-{
+class plAvMeshSmooth {
 public:
     enum {
         kNone               = 0x0,
@@ -61,8 +60,7 @@ public:
         kSmoothDiffuse      = 0x4
     };
 
-    class XfmSpan
-    {
+    class XfmSpan {
     public:
         plGeometrySpan*     fSpan;
         hsMatrix44          fSpanToNeutral;
@@ -101,8 +99,12 @@ public:
 
     void        Smooth(hsTArray<XfmSpan>& srcSpans, hsTArray<XfmSpan>& dstSpans);
 
-    void        SetFlags(uint32_t f) { fFlags = f; }
-    uint32_t      GetFlags() const { return fFlags; }
+    void        SetFlags(uint32_t f) {
+        fFlags = f;
+    }
+    uint32_t      GetFlags() const {
+        return fFlags;
+    }
 };
 
 #endif // plAvMeshSmooth_inc

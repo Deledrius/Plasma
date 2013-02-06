@@ -53,82 +53,82 @@ class INode;
 
 class UserPropMgr {
 public:
-    enum
-    {
+    enum {
         kMe = 0,
         kParent,
         kRoot
     };
 
     UserPropMgr();  // No Default Constructor!
-    UserPropMgr(Interface *ip);
+    UserPropMgr(Interface* ip);
     ~UserPropMgr();
 
-    NameMaker *nm;
+    NameMaker* nm;
 
-    void SetUserPropFlag(INode *node, const char *name, const bool setFlag, const int32_t hFlag=kMe);
+    void SetUserPropFlag(INode* node, const char* name, const bool setFlag, const int32_t hFlag = kMe);
 
-    void SelectUserPropFlagALL(INode *node, const char *name, const bool flag);
-    void ClearUserProp(INode *node, const char *name, const int32_t hFlag=kMe);
-    void ClearUserPropALL(const char *name, const int32_t hFlag=kMe);
-    void SetUserPropFlagALL(const char *name, const bool setFlag, const int32_t hFlag=kMe);
-    bool GetUserPropFlagALL(const char *name, bool &isSet, const int32_t hFlag=kMe);
+    void SelectUserPropFlagALL(INode* node, const char* name, const bool flag);
+    void ClearUserProp(INode* node, const char* name, const int32_t hFlag = kMe);
+    void ClearUserPropALL(const char* name, const int32_t hFlag = kMe);
+    void SetUserPropFlagALL(const char* name, const bool setFlag, const int32_t hFlag = kMe);
+    bool GetUserPropFlagALL(const char* name, bool& isSet, const int32_t hFlag = kMe);
 
-    bool GetUserProp(INode *node, const char *name, TSTR &value, const int32_t hFlag=kMe);
-    void SetUserProp(INode *node, const char *name, const char *value, const int32_t hFlag=kMe);
-    bool UserPropExists(INode *node, const char *name, const int32_t hFlag=kMe);
+    bool GetUserProp(INode* node, const char* name, TSTR& value, const int32_t hFlag = kMe);
+    void SetUserProp(INode* node, const char* name, const char* value, const int32_t hFlag = kMe);
+    bool UserPropExists(INode* node, const char* name, const int32_t hFlag = kMe);
 
-    bool GetUserPropString(INode *node, const char *name, TSTR &value, const int32_t hFlag=kMe);
-    void SetUserPropString(INode *node, const char *name, const char *value, const int32_t hFlag=kMe);
-    bool GetUserPropFloat(INode *node, const char *name, float &value, const int32_t hFlag=kMe);
-    void SetUserPropFloat(INode *node, const char *name, const float value, const int32_t hFlag=kMe);
-    bool GetUserPropInt(INode *node, const char *name, int &value, const int32_t hFlag=kMe);
-    void SetUserPropInt(INode *node, const char *name, const int value, const int32_t hFlag=kMe);
-    bool GetUserPropStringList(INode *node, const char *name, int &num, TSTR list[]);
-    bool GetUserPropIntList(INode *node, const char *name, int &num, int list[]);
-    bool GetUserPropFloatList(INode *node, const char *name, int &num, float list[]);
+    bool GetUserPropString(INode* node, const char* name, TSTR& value, const int32_t hFlag = kMe);
+    void SetUserPropString(INode* node, const char* name, const char* value, const int32_t hFlag = kMe);
+    bool GetUserPropFloat(INode* node, const char* name, float& value, const int32_t hFlag = kMe);
+    void SetUserPropFloat(INode* node, const char* name, const float value, const int32_t hFlag = kMe);
+    bool GetUserPropInt(INode* node, const char* name, int& value, const int32_t hFlag = kMe);
+    void SetUserPropInt(INode* node, const char* name, const int value, const int32_t hFlag = kMe);
+    bool GetUserPropStringList(INode* node, const char* name, int& num, TSTR list[]);
+    bool GetUserPropIntList(INode* node, const char* name, int& num, int list[]);
+    bool GetUserPropFloatList(INode* node, const char* name, int& num, float list[]);
 
-    bool GetUserPropStringALL(const char *name, TSTR &value, const int32_t hFlag=kMe);
-    void SetUserPropStringALL(const char *name, const char *value, const int32_t hFlag=kMe);
-    bool GetUserPropStringListALL(const char *name, int &num, TSTR list[]);
-    bool GetUserPropIntListALL(const char *name, int &num, int *list);
-    bool GetUserPropFloatListALL(const char *name, int &num, float *list);
+    bool GetUserPropStringALL(const char* name, TSTR& value, const int32_t hFlag = kMe);
+    void SetUserPropStringALL(const char* name, const char* value, const int32_t hFlag = kMe);
+    bool GetUserPropStringListALL(const char* name, int& num, TSTR list[]);
+    bool GetUserPropIntListALL(const char* name, int& num, int* list);
+    bool GetUserPropFloatListALL(const char* name, int& num, float* list);
 
-    bool GetNodeNameALL(TSTR &name);
-    void SetNodeNameALL(const char *name);
+    bool GetNodeNameALL(TSTR& name);
+    void SetNodeNameALL(const char* name);
 
-    void LoadVirtualProps(bool reset=true);
+    void LoadVirtualProps(bool reset = true);
     void DestroyVirtualProps();
     bool IsVirtual();
 
     int GetSelNodeCount();
-    INode *GetSelNode(int i);
+    INode* GetSelNode(int i);
 
-    int GetUserPropCount(INode *node);
-    void GetUserPropBuffer(INode *node, TSTR &buf);
-    void SetUserPropBuffer(INode *node, const TSTR &buf);
+    int GetUserPropCount(INode* node);
+    void GetUserPropBuffer(INode* node, TSTR& buf);
+    void SetUserPropBuffer(INode* node, const TSTR& buf);
 
-    bool IsAlike(INode *node, bool MatchAll=true);
-    int CountAlike(bool MatchAll=true);
-    void DeSelectUnAlike(INode *node=NULL);
+    bool IsAlike(INode* node, bool MatchAll = true);
+    int CountAlike(bool MatchAll = true);
+    void DeSelectUnAlike(INode* node = NULL);
 
-    Interface *GetInterface() { return ip; }
+    Interface* GetInterface() {
+        return ip;
+    }
 
     void OpenQuickTable();
     void CloseQuickTable();
 
 private:
     INode* GetAncestorIfNeeded(INode* node, const int32_t hFlag);
-    void DeSelectWithOut(const char *name, const char *value);
-    void RecursiveSelectAll(INode *node = NULL);
-    int RecursiveCountAlike(INode *node = NULL, bool MatchAll=true);
-    bool IsMatch(const char *val1, const char *val2);
+    void DeSelectWithOut(const char* name, const char* value);
+    void RecursiveSelectAll(INode* node = NULL);
+    int RecursiveCountAlike(INode* node = NULL, bool MatchAll = true);
+    bool IsMatch(const char* val1, const char* val2);
     bool vProps;
     TSTR vbuf;
     TSTR vname;
 
-    class QuickPair
-    {
+    class QuickPair {
     public:
         static void SetBuffer(char* buf);
     protected:
@@ -139,8 +139,12 @@ private:
         QuickPair() : fKey(nil), fVal(nil) { }
         ~QuickPair() { }
 
-        void SetKey(const char* k) { fKey = k; }
-        void SetVal(const char* v) { fVal = v; }
+        void SetKey(const char* k) {
+            fKey = k;
+        }
+        void SetVal(const char* v) {
+            fVal = v;
+        }
 
         uint32_t GetHash() const;
 
@@ -152,9 +156,9 @@ private:
     static const uint32_t kQuickSize;
     INode* fQuickNode;
     void IBuildQuickTable(INode* node);
-    bool ICheckQuickEntry(const char *key, TSTR &value);
+    bool ICheckQuickEntry(const char* key, TSTR& value);
 
-    Interface *ip;
+    Interface* ip;
 
 };
 

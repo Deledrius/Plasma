@@ -47,9 +47,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsResMgr.h"
 
 plPrintShape::plPrintShape()
-:   fWidth(0.5f),
-    fLength(1.f),
-    fHeight(1.f)
+    :   fWidth(0.5f),
+        fLength(1.f),
+        fHeight(1.f)
 {
 }
 

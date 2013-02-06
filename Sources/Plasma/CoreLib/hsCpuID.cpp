@@ -50,13 +50,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "hsCpuID.h"
 
-hsCpuId::hsCpuId() {
-    const unsigned int sse1_flag = 1<<25;
-    const unsigned int sse2_flag = 1<<26;
-    const unsigned int sse3_flag = 1<<0;
-    const unsigned int ssse3_flag = 1<<9;
-    const unsigned int sse41_flag = 1<<19;
-    const unsigned int sse42_flag = 1<<20;
+hsCpuId::hsCpuId()
+{
+    const unsigned int sse1_flag = 1 << 25;
+    const unsigned int sse2_flag = 1 << 26;
+    const unsigned int sse3_flag = 1 << 0;
+    const unsigned int ssse3_flag = 1 << 9;
+    const unsigned int sse41_flag = 1 << 19;
+    const unsigned int sse42_flag = 1 << 20;
     const unsigned int avx_flag = 1 << 28;
 
     unsigned int ax = 0, bx = 0, cx = 0, dx = 0;
@@ -72,21 +73,22 @@ hsCpuId::hsCpuId() {
      *
      * Ref: http://primesieve.googlecode.com/svn-history/r388/trunk/soe/cpuid.h
      */
-    #if defined(MSC_COMPATIBLE)
-      int CPUInfo[4] = {ax, bx, cx, dx};
-      __cpuid(CPUInfo, 0);
+#if defined(MSC_COMPATIBLE)
+    int CPUInfo[4] = {ax, bx, cx, dx};
+    __cpuid(CPUInfo, 0);
 
-      // check if the CPU supports the cpuid instruction.
-      if (CPUInfo[0] != 0) {
+    // check if the CPU supports the cpuid instruction.
+    if (CPUInfo[0] != 0) {
         __cpuid(CPUInfo, 1);
         ax = CPUInfo[0];
         bx = CPUInfo[1];
         cx = CPUInfo[2];
         dx = CPUInfo[3];
-      }
-    #elif defined(GCC_COMPATIBLE)
-      __get_cpuid(1, &ax, &bx, &cx, &dx);
-    #endif
+    }
+
+#elif defined(GCC_COMPATIBLE)
+    __get_cpuid(1, &ax, &bx, &cx, &dx);
+#endif
 
 
     has_sse1    = (dx & sse1_flag)  || false;

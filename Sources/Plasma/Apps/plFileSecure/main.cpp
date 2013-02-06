@@ -46,41 +46,41 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include <ctime>
 #include <string>
 
-void print_version() {
+void print_version()
+{
     puts(plProduct::ProductString().c_str());
     puts("");
 }
 
-void print_help() {
-    puts  ("plFileSecure - Secures Uru files and generates encryption.key files.\n");
+void print_help()
+{
+    puts("plFileSecure - Secures Uru files and generates encryption.key files.\n");
     print_version();
-    puts  ("Usage:");
-    puts  ("\tplFileSecure (<directory> <ext>)|[/generate /default]");
-    puts  ("");
-    puts  ("<directory> <ext>    : The directory and extension of files to secure. Cannot");
+    puts("Usage:");
+    puts("\tplFileSecure (<directory> <ext>)|[/generate /default]");
+    puts("");
+    puts("<directory> <ext>    : The directory and extension of files to secure. Cannot");
     printf("                       be used with /generate. Uses the %s file in\n", plSecureStream::kKeyFilename);
-    puts  ("                       the current directory (or default key if no file exists)");
+    puts("                       the current directory (or default key if no file exists)");
     printf("/generate            : Generates a random key and writes it to a %s\n", plSecureStream::kKeyFilename);
-    puts  ("                       file in the current directory. Cannot be used with");
-    puts  ("                       <directory> <ext>");
+    puts("                       file in the current directory. Cannot be used with");
+    puts("                       <directory> <ext>");
     printf("/default             : If used with /generate, creates a %s file\n", plSecureStream::kKeyFilename);
-    puts  ("                       with the default key. If used with <directory> <ext>, it");
-    puts  ("                       secures with the default key instead of the");
+    puts("                       with the default key. If used with <directory> <ext>, it");
+    puts("                       secures with the default key instead of the");
     printf("                       %s file's key\n", plSecureStream::kKeyFilename);
-    puts  ("");
+    puts("");
 }
 
 void GenerateKey(bool useDefault)
 {
     uint32_t key[4];
-    if (useDefault)
-    {
+
+    if (useDefault) {
         unsigned memSize = min(arrsize(key), arrsize(plSecureStream::kDefaultKey));
         memSize *= sizeof(uint32_t);
         memcpy(key, plSecureStream::kDefaultKey, memSize);
-    }
-    else
-    {
+    } else {
         srand((unsigned)time(nil));
         double randNum = (double)rand() / (double)RAND_MAX; // converts to 0..1
         uint32_t keyNum = (uint32_t)(randNum * (double)0xFFFFFFFF); // multiply it by the max unsigned 32-bit int
@@ -108,101 +108,87 @@ void GenerateKey(bool useDefault)
 void SecureFiles(const plFileName& dir, const plString& ext, uint32_t* key)
 {
     std::vector<plFileName> files = plFileSystem::ListDir(dir, ext.c_str());
-    for (auto iter = files.begin(); iter != files.end(); ++iter)
-    {
+
+    for (auto iter = files.begin(); iter != files.end(); ++iter) {
         printf("securing: %s\n", iter->GetFileName());
         plSecureStream::FileEncrypt(*iter, key);
     }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     bool generatingKey = false;
     bool useDefault = false;
     plFileName directory;
     plString ext;
 
-    if (argc > 1)
-    {
-        for (int i = 1; i < argc; i++)
-        {
+    if (argc > 1) {
+        for (int i = 1; i < argc; i++) {
             std::string arg = argv[i];
-            if ((arg[0] == '-')||(arg[0] == '/'))
-            {
+
+            if ((arg[0] == '-') || (arg[0] == '/')) {
                 // this arg is a flag of some kind
                 arg = arg.substr(1, arg.length()); // trim the dash or slash
-                if ((stricmp(arg.c_str(), "g") == 0) || (stricmp(arg.c_str(), "generate") == 0))
-                {
-                    if (!generatingKey)
+
+                if ((stricmp(arg.c_str(), "g") == 0) || (stricmp(arg.c_str(), "generate") == 0)) {
+                    if (!generatingKey) {
                         generatingKey = true;
-                    else
-                    {
+                    } else {
                         print_help();
                         return 0;
                     }
-                }
-                else if ((stricmp(arg.c_str(), "d") == 0) || (stricmp(arg.c_str(), "default") == 0))
-                {
-                    if (!useDefault)
+                } else if ((stricmp(arg.c_str(), "d") == 0) || (stricmp(arg.c_str(), "default") == 0)) {
+                    if (!useDefault) {
                         useDefault = true;
-                    else
-                    {
+                    } else {
                         print_help();
                         return 0;
                     }
-                }
-                else
-                {
+                } else {
                     print_help();
                     return 0;
                 }
-            }
-            else
-            {
+            } else {
                 // else it is a directory or extension
-                if (!directory.IsValid())
+                if (!directory.IsValid()) {
                     directory = argv[i];
-                else if (ext.IsEmpty())
+                } else if (ext.IsEmpty()) {
                     ext = argv[i];
-                else
-                {
+                } else {
                     print_help();
                     return 0;
                 }
             }
         }
 
-        if (generatingKey && ((directory.IsValid()) || (!ext.IsEmpty())))
-        {
+        if (generatingKey && ((directory.IsValid()) || (!ext.IsEmpty()))) {
             print_help();
             return 0;
         }
-    }
-    else
-    {
+    } else {
         print_help();
         return 0;
     }
 
-    if (generatingKey)
-    {
+    if (generatingKey) {
         GenerateKey(useDefault);
         return 0;
     }
 
     // Make sure ext is a real pattern, or we won't find anything
-    if (ext.CharAt(0) == '.')
+    if (ext.CharAt(0) == '.') {
         ext = "*" + ext;
-    else if (ext.CharAt(0) != '*')
+    } else if (ext.CharAt(0) != '*') {
         ext = "*." + ext;
+    }
 
-    if (useDefault)
+    if (useDefault) {
         SecureFiles(directory, ext, nil);
-    else
-    {
+    } else {
         uint32_t key[4];
         plSecureStream::GetSecureEncryptionKey(plSecureStream::kKeyFilename, key, arrsize(key));
         SecureFiles(directory, ext, key);
     }
+
     return 0;
 }

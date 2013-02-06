@@ -60,8 +60,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 bool plAVIWriter::fInitialized = false;
 
 #if HS_BUILD_FOR_WIN32
-class plAVIWriterImp : public plAVIWriter
-{
+class plAVIWriterImp : public plAVIWriter {
 protected:
     PAVIFILE fFileHandle;
     PAVISTREAM fStreamHandle;
@@ -90,8 +89,7 @@ public:
     virtual void Close();
 };
 #else
-class plAVIWriterImp : public plAVIWriter
-{
+class plAVIWriterImp : public plAVIWriter {
 public:
     plAVIWriterImp();
     virtual ~plAVIWriterImp();
@@ -113,8 +111,7 @@ plAVIWriter& plAVIWriter::Instance()
 {
     static plAVIWriterImp theInstance;
 
-    if (!fInitialized)
-    {
+    if (!fInitialized) {
         theInstance.RegisterAs(kAVIWriter_KEY);
         fInitialized = true;
     }
@@ -158,14 +155,15 @@ bool plAVIWriterImp::MsgReceive(plMessage* msg)
 {
 #if HS_BUILD_FOR_WIN32
     plRenderMsg* renderMsg = plRenderMsg::ConvertNoRef(msg);
-    if (renderMsg)
-    {
+
+    if (renderMsg) {
         plProfile_BeginTiming(AviCapture);
 
         ICaptureFrame(renderMsg->Pipeline());
         plProfile_EndTiming(AviCapture);
 
     }
+
 #endif
 
     return hsKeyedObject::MsgReceive(msg);
@@ -176,29 +174,31 @@ static const int kFramesPerSec = 30;
 bool plAVIWriterImp::Open(const char* fileName, plPipeline* pipeline)
 {
 #if HS_BUILD_FOR_WIN32
+
     // Already writing, fail
-    if (fStreamHandle)
+    if (fStreamHandle) {
         return false;
+    }
 
     fStartTime = hsTimer::GetSysSeconds();
 
     // If we're running in real time, set to frame time
     fOldRealTime = hsTimer::IsRealTime();
-    if (fOldRealTime)
-    {
+
+    if (fOldRealTime) {
         hsTimer::SetRealTime(false);
         hsTimer::SetFrameTimeInc(1.f / kFramesPerSec);
     }
 
     // Open AVI file
     HRESULT err;
-    err = AVIFileOpen(  &fFileHandle,           // returned file pointer
-                        fileName,               // file name
-                        OF_WRITE | OF_CREATE,   // mode to open file with
-                        NULL);                  // use handler determined
+    err = AVIFileOpen(&fFileHandle,             // returned file pointer
+                      fileName,               // file name
+                      OF_WRITE | OF_CREATE,   // mode to open file with
+                      NULL);                  // use handler determined
     hsAssert(err == AVIERR_OK, "Error creating AVI file in plAVIWriter::Open");
-    if (err != AVIERR_OK)
-    {
+
+    if (err != AVIERR_OK) {
         Close();
         return false;
     }
@@ -207,50 +207,49 @@ bool plAVIWriterImp::Open(const char* fileName, plPipeline* pipeline)
     IFillStreamInfo(&streamInfo, pipeline);
 
     // Create a video stream in the file
-    err = AVIFileCreateStream(  fFileHandle,        // file pointer
-                                &fStreamHandle,     // returned stream pointer
-                                &streamInfo );      // stream header
+    err = AVIFileCreateStream(fFileHandle,          // file pointer
+                              &fStreamHandle,     // returned stream pointer
+                              &streamInfo);       // stream header
     hsAssert(err == AVIERR_OK, "Error creating video stream in plAVIWriter::Open");
-    if (err != AVIERR_OK)
-    {
+
+    if (err != AVIERR_OK) {
         Close();
         return false;
     }
 
-    do
-    {
+    do {
         AVICOMPRESSOPTIONS opts;
-        AVICOMPRESSOPTIONS FAR * aopts[1] = {&opts};
+        AVICOMPRESSOPTIONS FAR* aopts[1] = {&opts};
         memset(&opts, 0, sizeof(opts));
 
         BOOL bErr = AVISaveOptions(NULL, ICMF_CHOOSE_DATARATE, 1, &fStreamHandle, (LPAVICOMPRESSOPTIONS FAR*)&aopts);
         hsAssert(bErr, "Error saving stream options in plAVIWriter::Open");
-        if (!bErr)
-        {
+
+        if (!bErr) {
             Close();
             return false;
         }
 
         err = AVIMakeCompressedStream(&fCompressedHandle, fStreamHandle, &opts, NULL);
         hsAssert(err == AVIERR_OK, "Error creating compressed stream in plAVIWriter::Open");
-        if (err != AVIERR_OK)
-        {
+
+        if (err != AVIERR_OK) {
             Close();
             return false;
         }
 
         IFillBitmapInfo(&fBitmapInfo, pipeline);
-        err = AVIStreamSetFormat(   fCompressedHandle, 0, 
-                                    &fBitmapInfo,   // stream format
-                                    fBitmapInfo.biSize);
+        err = AVIStreamSetFormat(fCompressedHandle, 0,
+                                 &fBitmapInfo,   // stream format
+                                 fBitmapInfo.biSize);
     } while (err != AVIERR_OK &&
-            hsMessageBox("Codec unavailable, try again?", "AVI Writer", hsMessageBoxYesNo) == hsMBoxYes);
+             hsMessageBox("Codec unavailable, try again?", "AVI Writer", hsMessageBoxYesNo) == hsMBoxYes);
 
-    if (err != AVIERR_OK)
-    {
+    if (err != AVIERR_OK) {
         Close();
         return false;
     }
+
 #endif
 
     plgDispatch::Dispatch()->RegisterForExactType(plRenderMsg::Index(), GetKey());
@@ -265,20 +264,17 @@ void plAVIWriterImp::Close()
 #if HS_BUILD_FOR_WIN32
     hsTimer::SetRealTime(fOldRealTime);
 
-    if (fStreamHandle)
-    {
+    if (fStreamHandle) {
         AVIStreamClose(fStreamHandle);
         fStreamHandle = nil;
     }
 
-    if (fCompressedHandle)
-    {
+    if (fCompressedHandle) {
         AVIStreamClose(fCompressedHandle);
         fCompressedHandle = nil;
     }
 
-    if (fFileHandle)
-    {
+    if (fFileHandle) {
         AVIFileClose(fFileHandle);
         fFileHandle = nil;
     }
@@ -297,14 +293,14 @@ void plAVIWriterImp::IFillStreamInfo(AVISTREAMINFO* inf, plPipeline* pipeline)
     inf->dwRate = kFramesPerSec;
 
     SetRect(&inf->rcFrame,
-            0,0,
+            0, 0,
             pipeline->Width(),
             pipeline->Height());
 }
 
 void plAVIWriterImp::IFillBitmapInfo(BITMAPINFOHEADER* inf, plPipeline* pipeline)
 {
-    memset(inf,0,sizeof(BITMAPINFOHEADER));
+    memset(inf, 0, sizeof(BITMAPINFOHEADER));
     inf->biSize = sizeof(BITMAPINFOHEADER);
     inf->biPlanes = 1;
     inf->biBitCount = 32;
@@ -327,14 +323,14 @@ bool plAVIWriterImp::ICaptureFrame(plPipeline* pipeline)
     time *= kFramesPerSec;
 
     HRESULT err;
-    err = AVIStreamWrite(   fCompressedHandle,
-                            int(time),
-                            1,
-                            (LPBYTE)frame.GetAddr32(0,0),
-                            frame.GetTotalSize(),
-                            AVIIF_KEYFRAME,
-                            NULL,
-                            NULL);
+    err = AVIStreamWrite(fCompressedHandle,
+                         int(time),
+                         1,
+                         (LPBYTE)frame.GetAddr32(0, 0),
+                         frame.GetTotalSize(),
+                         AVIIF_KEYFRAME,
+                         NULL,
+                         NULL);
 
     return (err == AVIERR_OK);
 }

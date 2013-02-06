@@ -46,15 +46,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 plLocalPlayerIntersectPlaneConditionalObject::plLocalPlayerIntersectPlaneConditionalObject()
 {
-    SetFlag(kLocalElement);     // since it relies on the local player      
+    SetFlag(kLocalElement);     // since it relies on the local player
 }
 
 bool plLocalPlayerIntersectPlaneConditionalObject::MsgReceive(plMessage* msg)
 {
     /*
-    
+
      if our target is within the bounds of the object our logic modifier is attached to...
-    
+
     {
         SetSatisfied(true);
         fLogicMod->RequestTrigger();

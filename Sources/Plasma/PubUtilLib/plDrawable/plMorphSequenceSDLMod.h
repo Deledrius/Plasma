@@ -47,49 +47,52 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "HeadSpin.h"
 
 //
-// This modifier is responsible for sending and recving 
+// This modifier is responsible for sending and recving
 // state for morphed objects.
 //
 
-class plMorphSequenceSDLMod : public plSDLModifier
-{
+class plMorphSequenceSDLMod : public plSDLModifier {
 protected:
     void IPutCurrentStateIn(plStateDataRecord* dstState);
     void ISetCurrentStateFrom(const plStateDataRecord* srcState);
 
-    uint32_t IApplyModFlags(uint32_t sendFlags)
-    {
-        if (fIsAvatar)
+    uint32_t IApplyModFlags(uint32_t sendFlags) {
+        if (fIsAvatar) {
             return (sendFlags | plSynchedObject::kDontPersistOnServer | plSynchedObject::kIsAvatarState);
-        else
+        } else {
             return sendFlags;
+        }
     }
 
     bool fIsAvatar;
 
 public:
-    // var labels   
+    // var labels
     static char kStrMorphArrayDescName[];
-    static char kStrWeights[];  
-    
+    static char kStrWeights[];
+
     static char kStrMorphSetDescName[];
     static char kStrMesh[];
     static char kStrArrays[];
-    
+
     static char kStrTargetID[];
     static char kStrMorphs[];
-    
 
-    CLASSNAME_REGISTER( plMorphSequenceSDLMod );
-    GETINTERFACE_ANY( plMorphSequenceSDLMod, plSDLModifier);
-    
+
+    CLASSNAME_REGISTER(plMorphSequenceSDLMod);
+    GETINTERFACE_ANY(plMorphSequenceSDLMod, plSDLModifier);
+
     plMorphSequenceSDLMod() : fIsAvatar(false) {}
-    
+
     void SetCurrentStateFrom(const plStateDataRecord* srcState);
     void PutCurrentStateIn(plStateDataRecord* dstState);
-    const char* GetSDLName() const { return kSDLMorphSequence; }
+    const char* GetSDLName() const {
+        return kSDLMorphSequence;
+    }
 
-    void SetIsAvatar(bool avatar) { fIsAvatar = avatar; }
+    void SetIsAvatar(bool avatar) {
+        fIsAvatar = avatar;
+    }
 };
 
 #endif  // plMorphSequenceSDLMod_inc

@@ -46,29 +46,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plLayerInterface.h"
 #include "hsGMatState.h"
 
-class plLayerOr : public plLayerInterface
-{
-    protected:
-        hsGMatState         fOringState;
-        bool                fDirty;
+class plLayerOr : public plLayerInterface {
+protected:
+    hsGMatState         fOringState;
+    bool                fDirty;
 
-    public:
-        plLayerOr();
-        virtual ~plLayerOr();
+public:
+    plLayerOr();
+    virtual ~plLayerOr();
 
-        CLASSNAME_REGISTER( plLayerOr );
-        GETINTERFACE_ANY( plLayerOr, plLayerInterface );
+    CLASSNAME_REGISTER(plLayerOr);
+    GETINTERFACE_ANY(plLayerOr, plLayerInterface);
 
-        void    SetBlendFlags( uint32_t f )   { fOringState.fBlendFlags = f; }
-        void    SetClampFlags( uint32_t f )   { fOringState.fClampFlags = f; }
-        void    SetShadeFlags( uint32_t f )   { fOringState.fShadeFlags = f; }
-        void    SetZFlags( uint32_t f )       { fOringState.fZFlags = f; }
-        void    SetMiscFlags( uint32_t f )    { fOringState.fMiscFlags = f; }
-        void    SetState( const hsGMatState& state );
+    void    SetBlendFlags(uint32_t f)   {
+        fOringState.fBlendFlags = f;
+    }
+    void    SetClampFlags(uint32_t f)   {
+        fOringState.fClampFlags = f;
+    }
+    void    SetShadeFlags(uint32_t f)   {
+        fOringState.fShadeFlags = f;
+    }
+    void    SetZFlags(uint32_t f)       {
+        fOringState.fZFlags = f;
+    }
+    void    SetMiscFlags(uint32_t f)    {
+        fOringState.fMiscFlags = f;
+    }
+    void    SetState(const hsGMatState& state);
 
-        virtual plLayerInterface*   Attach(plLayerInterface* prev);
+    virtual plLayerInterface*   Attach(plLayerInterface* prev);
 
-        virtual uint32_t          Eval(double secs, uint32_t frame, uint32_t ignore);
+    virtual uint32_t          Eval(double secs, uint32_t frame, uint32_t ignore);
 };
 
 #endif //_plLayerOr_h

@@ -44,15 +44,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnMessage/plEventCallbackMsg.h"
 
-class plArmatureEffectMsg : public plEventCallbackMsg
-{
+class plArmatureEffectMsg : public plEventCallbackMsg {
 public:
     plArmatureEffectMsg() : plEventCallbackMsg(), fTriggerIdx(-1) {}
-    plArmatureEffectMsg(const plKey &receiver, CallbackEvent e, int idx=0, float t=0, int16_t repeats=-1, uint16_t user=0) :
+    plArmatureEffectMsg(const plKey& receiver, CallbackEvent e, int idx = 0, float t = 0, int16_t repeats = -1, uint16_t user = 0) :
         plEventCallbackMsg(receiver, e, idx, t, repeats, user), fTriggerIdx(-1) {}
 
-    CLASSNAME_REGISTER( plArmatureEffectMsg );
-    GETINTERFACE_ANY( plArmatureEffectMsg, plEventCallbackMsg );
+    CLASSNAME_REGISTER(plArmatureEffectMsg);
+    GETINTERFACE_ANY(plArmatureEffectMsg, plEventCallbackMsg);
 
     // These aren't meant to go across the net, so no IO necessary.
     void Read(hsStream* stream, hsResMgr* mgr) {}
@@ -61,21 +60,20 @@ public:
     int8_t fTriggerIdx;
 };
 
-class plArmatureEffectStateMsg : public plMessage
-{
+class plArmatureEffectStateMsg : public plMessage {
 public:
     plArmatureEffectStateMsg();
     ~plArmatureEffectStateMsg();
-    
-    CLASSNAME_REGISTER( plArmatureEffectStateMsg );
-    GETINTERFACE_ANY( plArmatureEffectStateMsg, plMessage );    
 
-    virtual void Read(hsStream* stream, hsResMgr* mgr); 
-    virtual void Write(hsStream* stream, hsResMgr* mgr); 
+    CLASSNAME_REGISTER(plArmatureEffectStateMsg);
+    GETINTERFACE_ANY(plArmatureEffectStateMsg, plMessage);
+
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     int8_t fSurface;
     bool fAddSurface;
 };
-    
+
 
 #endif

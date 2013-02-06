@@ -49,33 +49,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsResMgr.h"
 
 
-class plApplyAvatarCustomizationsMsg : public plMessage
-{
+class plApplyAvatarCustomizationsMsg : public plMessage {
 public:
-    CLASSNAME_REGISTER( plApplyAvatarCustomizationsMsg );
-    GETINTERFACE_ANY( plApplyAvatarCustomizationsMsg, plMessage );
+    CLASSNAME_REGISTER(plApplyAvatarCustomizationsMsg);
+    GETINTERFACE_ANY(plApplyAvatarCustomizationsMsg, plMessage);
 
-    void    SetCustomizations(const plPlayerCustomizations * value) { fCustomizations=*value;}
-    const plPlayerCustomizations * GetCustomizations() const { return &fCustomizations;}
-    void    SetAvatarKey(plKey * key) { fAvatarKey=key;}
-    const plKey * GetAvatarKey() const { return fAvatarKey;}
+    void    SetCustomizations(const plPlayerCustomizations* value) {
+        fCustomizations = *value;
+    }
+    const plPlayerCustomizations* GetCustomizations() const {
+        return &fCustomizations;
+    }
+    void    SetAvatarKey(plKey* key) {
+        fAvatarKey = key;
+    }
+    const plKey* GetAvatarKey() const {
+        return fAvatarKey;
+    }
 
-    void Read(hsStream * stream, hsResMgr * mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fCustomizations.Read(stream);
         fAvatarKey = mgr->ReadKey(stream);
     }
 
-    void Write(hsStream * stream, hsResMgr * mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         fCustomizations.Write(stream);
-        mgr->WriteKey(stream,fAvatarKey);
+        mgr->WriteKey(stream, fAvatarKey);
     }
 private:
     plPlayerCustomizations  fCustomizations;
-    plKey *                 fAvatarKey;
+    plKey*                  fAvatarKey;
 };
 
 

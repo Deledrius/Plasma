@@ -42,8 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef PL_DECALMTLANIMPB_H
 #define PL_DECALMTLANIMPB_H
 
-enum
-{
+enum {
     kDecalAnimName,
     kDecalAnimAutoStart,
     kDecalAnimLoop,

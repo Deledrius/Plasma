@@ -63,14 +63,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plStatusLog/plStatusLog.h"
 
 uint32_t plDSoundBuffer::fNumBuffers = 0;
-plProfile_CreateCounterNoReset( "Playing", "Sound", SoundPlaying );
-plProfile_CreateCounterNoReset( "Allocated", "Sound", NumAllocated );
+plProfile_CreateCounterNoReset("Playing", "Sound", SoundPlaying);
+plProfile_CreateCounterNoReset("Allocated", "Sound", NumAllocated);
 
 
 //// Constructor/Destructor //////////////////////////////////////////////////
 
-plDSoundBuffer::plDSoundBuffer( uint32_t size, plWAVHeader &bufferDesc, bool enable3D, bool isLooping, bool tryStatic, bool streaming )
-{ 
+plDSoundBuffer::plDSoundBuffer(uint32_t size, plWAVHeader& bufferDesc, bool enable3D, bool isLooping, bool tryStatic, bool streaming)
+{
     fLooping = isLooping;
     fValid = false;
     fBufferDesc = nil;
@@ -81,13 +81,13 @@ plDSoundBuffer::plDSoundBuffer( uint32_t size, plWAVHeader &bufferDesc, bool ena
     fStreaming = streaming;
 
     buffer = 0;
-    source = 0; 
-    for(int i = 0; i < STREAMING_BUFFERS; ++i)
-    {
+    source = 0;
+
+    for (int i = 0; i < STREAMING_BUFFERS; ++i) {
         streamingBuffers[i] = 0;
     }
 
-    IAllocate( size, bufferDesc, enable3D, tryStatic );
+    IAllocate(size, bufferDesc, enable3D, tryStatic);
     fNumBuffers++;
 }
 
@@ -95,47 +95,52 @@ plDSoundBuffer::~plDSoundBuffer()
 {
     IRelease();
     fNumBuffers--;
-    
+
 }
 
 //// IAllocate ///////////////////////////////////////////////////////////////
 
-void    plDSoundBuffer::IAllocate( uint32_t size, plWAVHeader &bufferDesc, bool enable3D, bool tryStatic )
+void    plDSoundBuffer::IAllocate(uint32_t size, plWAVHeader& bufferDesc, bool enable3D, bool tryStatic)
 {
     // Create a DSound buffer description
     fBufferDesc = new plWAVHeader;
     *fBufferDesc = bufferDesc;
 
     fBufferSize = size;
-    
+
     // Do we want to try EAX?
-    if( plgAudioSys::UsingEAX() )
-        fEAXSource.Init( this );
+    if (plgAudioSys::UsingEAX()) {
+        fEAXSource.Init(this);
+    }
 
     fValid = true;
-    plProfile_Inc( NumAllocated );
+    plProfile_Inc(NumAllocated);
 }
 
 //// IRelease ////////////////////////////////////////////////////////////////
 
-void    plDSoundBuffer::IRelease( void )
+void    plDSoundBuffer::IRelease(void)
 {
-    if( IsPlaying() )
+    if (IsPlaying()) {
         Stop();
+    }
 
     // Release stuff
     fEAXSource.Release();
     alSourcei(source, AL_BUFFER, 0);
     alDeleteSources(1, &source);
-    if(buffer)
-        alDeleteBuffers( 1, &buffer );
-    else
+
+    if (buffer) {
+        alDeleteBuffers(1, &buffer);
+    } else {
         alDeleteBuffers(STREAMING_BUFFERS, streamingBuffers);
+    }
+
     source = 0;
     buffer = 0;
 
     alGetError();
-    
+
     memset(streamingBuffers, 0, STREAMING_BUFFERS * sizeof(unsigned));
 
     delete fBufferDesc;
@@ -143,7 +148,7 @@ void    plDSoundBuffer::IRelease( void )
     fBufferSize = 0;
 
     fValid = false;
-    plProfile_Dec( NumAllocated );
+    plProfile_Dec(NumAllocated);
 }
 
 
@@ -156,11 +161,12 @@ void    plDSoundBuffer::IRelease( void )
 int plDSoundBuffer::IGetALFormat(unsigned bitsPerSample, unsigned int numChannels)
 {
     int format = 0;
-    switch(bitsPerSample)
-    {
+
+    switch (bitsPerSample) {
     case 8:
         format = (numChannels == 1) ? AL_FORMAT_MONO8 : AL_FORMAT_STEREO8;
         break;
+
     case 16:
         format = (numChannels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
         break;
@@ -169,15 +175,17 @@ int plDSoundBuffer::IGetALFormat(unsigned bitsPerSample, unsigned int numChannel
     return format;
 }
 
-bool plDSoundBuffer::FillBuffer(void *data, unsigned bytes, plWAVHeader *header) 
+bool plDSoundBuffer::FillBuffer(void* data, unsigned bytes, plWAVHeader* header)
 {
-    if(source)
-    {
+    if (source) {
         alSourcei(source, AL_BUFFER, 0);
         alDeleteSources(1, &source);
     }
-    if(buffer)
+
+    if (buffer) {
         alDeleteBuffers(1, &buffer);
+    }
+
     source = 0;
     buffer = 0;
 
@@ -185,44 +193,46 @@ bool plDSoundBuffer::FillBuffer(void *data, unsigned bytes, plWAVHeader *header)
     ALenum error = alGetError();
     alGenBuffers(1, &buffer);
     error = alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to create sound buffer %d", error);
         return false;
     }
 
-    alBufferData(buffer, format, data, bytes, header->fNumSamplesPerSec );
+    alBufferData(buffer, format, data, bytes, header->fNumSamplesPerSec);
     error = alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to fill sound buffer %d", error);
         return false;
     }
+
     alGenSources(1, &source);
     error = alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to create audio source %d %d", error, source);
         return false;
     }
 
     // Just make it quiet for now
     SetScalarVolume(0);
-    
+
     alSourcef(source, AL_ROLLOFF_FACTOR, 0.3048);
     alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         return false;
     }
 
     alSourcei(source, AL_BUFFER, buffer);
     error = alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to attach buffer to source %d", error);
         return false;
     }
+
     return true;
 }
 
@@ -232,173 +242,184 @@ bool plDSoundBuffer::FillBuffer(void *data, unsigned bytes, plWAVHeader *header)
 //============================================================================
 
 // this function is used when restarting the audio system. It is needed to restart a streaming source from where it left off
-bool plDSoundBuffer::SetupStreamingSource(plAudioFileReader *stream)
+bool plDSoundBuffer::SetupStreamingSource(plAudioFileReader* stream)
 {
     unsigned char data[STREAM_BUFFER_SIZE];
     unsigned int size;
     ALenum error;
-    
-    alGetError();   
+
+    alGetError();
     int numBuffersToQueue = 0;
-    
+
     // fill buffers with data
-    for( int i = 0; i < STREAMING_BUFFERS; i++ )
-    {
+    for (int i = 0; i < STREAMING_BUFFERS; i++) {
         size = stream->NumBytesLeft() < STREAM_BUFFER_SIZE ? stream->NumBytesLeft() : STREAM_BUFFER_SIZE;
-        if(!size)
-        {
-            if(IsLooping())
-            {
+
+        if (!size) {
+            if (IsLooping()) {
                 stream->SetPosition(0);
             }
         }
-    
+
         stream->Read(size, data);
         numBuffersToQueue++;
 
-        alGenBuffers( 1, &streamingBuffers[i] );
+        alGenBuffers(1, &streamingBuffers[i]);
         error = alGetError();
-        if( error != AL_NO_ERROR )
-        {
+
+        if (error != AL_NO_ERROR) {
             plStatusLog::AddLineS("audio.log", "Failed to create sound buffer %d", error);
             return false;
         }
 
         ALenum format = IGetALFormat(fBufferDesc->fBitsPerSample, fBufferDesc->fNumChannels);
-        alBufferData( streamingBuffers[i], format, data, size, fBufferDesc->fNumSamplesPerSec );
-        if( (error = alGetError()) != AL_NO_ERROR )
+        alBufferData(streamingBuffers[i], format, data, size, fBufferDesc->fNumSamplesPerSec);
+
+        if ((error = alGetError()) != AL_NO_ERROR) {
             plStatusLog::AddLineS("audio.log", "alBufferData");
+        }
     }
 
-     // Generate AL Source
-    alGenSources( 1, &source );
+    // Generate AL Source
+    alGenSources(1, &source);
     error = alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to create audio source %d %d", error, source);
         return false;
     }
+
     alSourcei(source, AL_BUFFER, 0);
     SetScalarVolume(0);
-    
-    
+
+
     alSourcef(source, AL_ROLLOFF_FACTOR, 0.3048);
     alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         return false;
     }
 
-    alSourceQueueBuffers( source, numBuffersToQueue, streamingBuffers );
+    alSourceQueueBuffers(source, numBuffersToQueue, streamingBuffers);
     error = alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to queue buffers %d", error);
         return false;
     }
+
     return true;
 }
 
 // this function is used when starting up a streaming sound, as opposed to restarting it due to an audio system restart.
-bool plDSoundBuffer::SetupStreamingSource(void *data, unsigned bytes)
+bool plDSoundBuffer::SetupStreamingSource(void* data, unsigned bytes)
 {
     unsigned char bufferData[STREAM_BUFFER_SIZE];
     unsigned int size;
     ALenum error;
-    char *pData = (char *)data; 
-    
-    alGetError();   
+    char* pData = (char*)data;
+
+    alGetError();
     int numBuffersToQueue = 0;
 
     // fill buffers with data
-    for( int i = 0; i < STREAMING_BUFFERS; i++ )
-    {
+    for (int i = 0; i < STREAMING_BUFFERS; i++) {
         size = bytes < STREAM_BUFFER_SIZE ? bytes : STREAM_BUFFER_SIZE;
-        if(!size)
-            break;  
+
+        if (!size) {
+            break;
+        }
 
         memcpy(bufferData, pData, size);
         pData += size;
-        bytes-= size;
+        bytes -= size;
         numBuffersToQueue++;
 
-        alGenBuffers( 1, &streamingBuffers[i] );
+        alGenBuffers(1, &streamingBuffers[i]);
         error = alGetError();
-        if( error != AL_NO_ERROR )
-        {
+
+        if (error != AL_NO_ERROR) {
             plStatusLog::AddLineS("audio.log", "Failed to create sound buffer %d", error);
             return false;
         }
 
         ALenum format = IGetALFormat(fBufferDesc->fBitsPerSample, fBufferDesc->fNumChannels);
-        alBufferData( streamingBuffers[i], format, bufferData, size, fBufferDesc->fNumSamplesPerSec );
-        if( (error = alGetError()) != AL_NO_ERROR )
+        alBufferData(streamingBuffers[i], format, bufferData, size, fBufferDesc->fNumSamplesPerSec);
+
+        if ((error = alGetError()) != AL_NO_ERROR) {
             plStatusLog::AddLineS("audio.log", "alBufferData");
+        }
     }
 
-     // Generate AL Source
-    alGenSources( 1, &source );
+    // Generate AL Source
+    alGenSources(1, &source);
     error = alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to create audio source %d %d", error, source);
         return false;
     }
+
     alSourcei(source, AL_BUFFER, 0);
     SetScalarVolume(0);
-    
+
     alSourcef(source, AL_ROLLOFF_FACTOR, 0.3048);
     alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         return false;
     }
 
-    alSourceQueueBuffers( source, numBuffersToQueue, streamingBuffers );
+    alSourceQueueBuffers(source, numBuffersToQueue, streamingBuffers);
     error = alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to queue buffers %d", error);
         return false;
     }
+
     return true;
 }
 
 //============================================================================
 int plDSoundBuffer::BuffersProcessed()
 {
-    if(alIsSource(source)==AL_FALSE)
-    {
+    if (alIsSource(source) == AL_FALSE) {
         plStatusLog::AddLineS("audio.log", "BuffersProcessed, source invalid");
         return 0;
     }
+
     ALint processed = 0;
-    alGetSourcei( source, AL_BUFFERS_PROCESSED, &processed );
-    if(alGetError() != AL_NO_ERROR)
-    {
+    alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
+
+    if (alGetError() != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "alGetSourcei failed");
     }
-    
+
     return processed;
 }
 
 //============================================================================
 int plDSoundBuffer::BuffersQueued()
 {
-    if(alIsSource(source)==AL_FALSE) return 0;
+    if (alIsSource(source) == AL_FALSE) {
+        return 0;
+    }
+
     ALint queued = 0;
-    alGetSourcei( source, AL_BUFFERS_QUEUED, &queued );
+    alGetSourcei(source, AL_BUFFERS_QUEUED, &queued);
     alGetError();
-    
+
     return queued;
 
 }
 
-//============================================================================ 
-bool plDSoundBuffer::StreamingFillBuffer(plAudioFileReader *stream)
+//============================================================================
+bool plDSoundBuffer::StreamingFillBuffer(plAudioFileReader* stream)
 {
-    if(!source)
+    if (!source) {
         return false;
+    }
 
     ALenum error;
     ALuint bufferId;
@@ -406,55 +427,50 @@ bool plDSoundBuffer::StreamingFillBuffer(plAudioFileReader *stream)
     int buffersProcessed = BuffersProcessed();
     bool finished = false;
 
-    for(int i = 0; i < buffersProcessed; i++)
-    {
-        alSourceUnqueueBuffers( source, 1, &bufferId );
-        if( (error = alGetError()) != AL_NO_ERROR )
-        {
+    for (int i = 0; i < buffersProcessed; i++) {
+        alSourceUnqueueBuffers(source, 1, &bufferId);
+
+        if ((error = alGetError()) != AL_NO_ERROR) {
             plStatusLog::AddLineS("audio.log", "Failed to unqueue buffer %d", error);
             return false;
         }
 
-        if(!finished)
-        {
-            if(stream->NumBytesLeft() == 0)
-            {
+        if (!finished) {
+            if (stream->NumBytesLeft() == 0) {
                 // if at anytime we run out of data, and we are looping, reset the data stream and continue to fill buffers
-                if(IsLooping())
-                {
+                if (IsLooping()) {
                     stream->SetPosition(0); // we are looping, so reset data stream, and keep filling buffers
-                }
-                else
-                {
+                } else {
                     finished = true;    // no more data, but we could still be playing, so we don't want to stop the sound yet
                 }
             }
 
-            if(!finished)
-            {   unsigned int size = stream->NumBytesLeft() < STREAM_BUFFER_SIZE ? stream->NumBytesLeft() : STREAM_BUFFER_SIZE;
+            if (!finished) {
+                unsigned int size = stream->NumBytesLeft() < STREAM_BUFFER_SIZE ? stream->NumBytesLeft() : STREAM_BUFFER_SIZE;
                 stream->Read(size, data);
 
                 ALenum format = IGetALFormat(fBufferDesc->fBitsPerSample, fBufferDesc->fNumChannels);
-                alBufferData( bufferId, format, data, size, fBufferDesc->fNumSamplesPerSec );
-                if( (error = alGetError()) != AL_NO_ERROR )
-                {
+                alBufferData(bufferId, format, data, size, fBufferDesc->fNumSamplesPerSec);
+
+                if ((error = alGetError()) != AL_NO_ERROR) {
                     plStatusLog::AddLineS("audio.log", "Failed to copy data to sound buffer %d", error);
                     return false;
                 }
 
-                alSourceQueueBuffers( source, 1, &bufferId );
-                if( (error = alGetError()) != AL_NO_ERROR )
-                {
+                alSourceQueueBuffers(source, 1, &bufferId);
+
+                if ((error = alGetError()) != AL_NO_ERROR) {
                     plStatusLog::AddLineS("audio.log", "Failed to queue buffer %d", error);
                     return false;
                 }
             }
         }
     }
-    if(!IsPlaying() && !finished)
-    {
+
+    if (!IsPlaying() && !finished) {
         alSourcePlay(source);
     }
+
     alGetError();
     return true;
 }
@@ -465,12 +481,12 @@ bool plDSoundBuffer::StreamingFillBuffer(plAudioFileReader *stream)
 *
 ***/
 
-bool plDSoundBuffer::GetAvailableBufferId(unsigned *bufferId)
+bool plDSoundBuffer::GetAvailableBufferId(unsigned* bufferId)
 {
-    if(mAvailableBuffers.empty())
-    {
+    if (mAvailableBuffers.empty()) {
         return false;
     }
+
     *bufferId = mAvailableBuffers.front();
     mAvailableBuffers.pop_front();
     return true;
@@ -481,37 +497,37 @@ bool plDSoundBuffer::SetupVoiceSource()
     ALenum error;
     alGetError();
 
-     // Generate AL Buffers
-    alGenBuffers( STREAMING_BUFFERS, streamingBuffers );
+    // Generate AL Buffers
+    alGenBuffers(STREAMING_BUFFERS, streamingBuffers);
     error = alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to create sound buffer %d", error);
         return false;
     }
 
-    for( int i = 0; i < STREAMING_BUFFERS; i++ )
-    {
+    for (int i = 0; i < STREAMING_BUFFERS; i++) {
         mAvailableBuffers.push_back(streamingBuffers[i]);
     }
 
-     // Generate AL Source
-    alGenSources( 1, &source );
+    // Generate AL Source
+    alGenSources(1, &source);
     error = alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to create audio source %d %d", error, source);
         return false;
     }
 
     SetScalarVolume(0);
-    
+
     alSourcef(source, AL_ROLLOFF_FACTOR, 0.3048);
     alGetError();
-    if( error != AL_NO_ERROR )
-    {
+
+    if (error != AL_NO_ERROR) {
         return false;
     }
+
     alSourcei(source, AL_BUFFER, 0);
     alGetError();
     //alSourcei(source, AL_PITCH, 0);
@@ -524,110 +540,124 @@ bool plDSoundBuffer::SetupVoiceSource()
 void plDSoundBuffer::UnQueueVoiceBuffers()
 {
     unsigned buffersProcessed = BuffersProcessed();
-    if(buffersProcessed)
+
+    if (buffersProcessed) {
         plStatusLog::AddLineS("audio.log", "unqueuing buffers %d", buffersProcessed);
-    for(int i = 0; i < buffersProcessed; i++)
-    {
+    }
+
+    for (int i = 0; i < buffersProcessed; i++) {
         ALuint unQueued;
-        alSourceUnqueueBuffers( source, 1, &unQueued );
-        if(alGetError() == AL_NO_ERROR)
-        {
+        alSourceUnqueueBuffers(source, 1, &unQueued);
+
+        if (alGetError() == AL_NO_ERROR) {
             mAvailableBuffers.push_back(unQueued);
-        }
-        else
-        {
+        } else {
             plStatusLog::AddLineS("audio.log", "Failed to unqueue buffer");
         }
     }
 }
 
-//============================================================================ 
-bool plDSoundBuffer::VoiceFillBuffer(void *data, unsigned bytes, unsigned bufferId)
+//============================================================================
+bool plDSoundBuffer::VoiceFillBuffer(void* data, unsigned bytes, unsigned bufferId)
 {
-    if(!source)
+    if (!source) {
         return false;
- 
+    }
+
     ALenum error;
     unsigned int size = bytes < STREAM_BUFFER_SIZE ? bytes : STREAM_BUFFER_SIZE;
 
     ALenum format = IGetALFormat(fBufferDesc->fBitsPerSample, fBufferDesc->fNumChannels);
-    alBufferData( bufferId, format, data, size, fBufferDesc->fNumSamplesPerSec );
-    if( (error = alGetError()) != AL_NO_ERROR )
-    {
+    alBufferData(bufferId, format, data, size, fBufferDesc->fNumSamplesPerSec);
+
+    if ((error = alGetError()) != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to copy data to sound buffer %d", error);
         return false;
     }
-    alSourceQueueBuffers( source, 1, &bufferId );
-    if( (error = alGetError()) != AL_NO_ERROR )
-    {
+
+    alSourceQueueBuffers(source, 1, &bufferId);
+
+    if ((error = alGetError()) != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to queue buffer %d", error);
         return false;
     }
-    if(!IsPlaying())
-    {
+
+    if (!IsPlaying()) {
         alSourcePlay(source);
     }
+
     alGetError();
-    
+
     return true;
 }
 
 //// SetLooping //////////////////////////////////////////////////////////////
 
-void    plDSoundBuffer::SetLooping( bool loop )
+void    plDSoundBuffer::SetLooping(bool loop)
 {
     fLooping = loop;
 }
 
-void plDSoundBuffer::SetMinDistance( int dist )
+void plDSoundBuffer::SetMinDistance(int dist)
 {
     alSourcei(source, AL_REFERENCE_DISTANCE, dist);
     ALenum error;
-    if((error = alGetError()) != AL_NO_ERROR)
+
+    if ((error = alGetError()) != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to set min distance");
+    }
 }
 
-void plDSoundBuffer::SetMaxDistance( int dist )
+void plDSoundBuffer::SetMaxDistance(int dist)
 {
     alSourcei(source, AL_MAX_DISTANCE, dist);
     ALenum error;
-    if((error = alGetError()) != AL_NO_ERROR)
+
+    if ((error = alGetError()) != AL_NO_ERROR) {
         plStatusLog::AddLineS("audio.log", "Failed to set min distance");
+    }
 }
 
 //// Play ////////////////////////////////////////////////////////////////////
 
-void    plDSoundBuffer::Play( void )
+void    plDSoundBuffer::Play(void)
 {
-    if(!source)
+    if (!source) {
         return;
+    }
+
     ALenum error = alGetError();    // clear error
 
     // we dont want openal to loop our streaming buffers, or the buffer will loop back on itself. We will handle looping in the streaming sound
-    if(fLooping && !fStreaming)
+    if (fLooping && !fStreaming) {
         alSourcei(source, AL_LOOPING, AL_TRUE);
-    else
+    } else {
         alSourcei(source, AL_LOOPING, AL_FALSE);
+    }
 
     error = alGetError();
     alSourcePlay(source);
     error = alGetError();
-    if(error != AL_NO_ERROR)
+
+    if (error != AL_NO_ERROR) {
         plStatusLog::AddLineS("voice.log", "Play failed");
-    
-    plProfile_Inc( SoundPlaying );
+    }
+
+    plProfile_Inc(SoundPlaying);
 
 }
 
 //// Stop ////////////////////////////////////////////////////////////////////
 
-void    plDSoundBuffer::Stop( void )
+void    plDSoundBuffer::Stop(void)
 {
-    if(!source)
+    if (!source) {
         return;
+    }
+
     alSourceStop(source);
     alGetError();
-    plProfile_Dec( SoundPlaying );
+    plProfile_Dec(SoundPlaying);
 }
 
 //============================================================================
@@ -676,7 +706,7 @@ void plDSoundBuffer::SetConeOutsideVolume(int vol)
 }
 
 //============================================================================
-void plDSoundBuffer::Rewind() 
+void plDSoundBuffer::Rewind()
 {
     alSourceRewind(source);
     alGetError();
@@ -684,7 +714,7 @@ void plDSoundBuffer::Rewind()
 
 //// IsPlaying ///////////////////////////////////////////////////////////////
 
-bool    plDSoundBuffer::IsPlaying( void )
+bool    plDSoundBuffer::IsPlaying(void)
 {
     ALint state = AL_STOPPED;
     alGetSourcei(source, AL_SOURCE_STATE, &state);
@@ -694,25 +724,25 @@ bool    plDSoundBuffer::IsPlaying( void )
 
 //// IsEAXAccelerated ////////////////////////////////////////////////////////
 
-bool    plDSoundBuffer::IsEAXAccelerated( void ) const
+bool    plDSoundBuffer::IsEAXAccelerated(void) const
 {
     return fEAXSource.IsValid();
 }
 
 //// bytePosToMSecs //////////////////////////////////////////////////////////
 
-uint32_t  plDSoundBuffer::bytePosToMSecs( uint32_t bytePos ) const
+uint32_t  plDSoundBuffer::bytePosToMSecs(uint32_t bytePos) const
 {
     return (uint32_t)(bytePos * 1000 / (float)fBufferDesc->fAvgBytesPerSec);
 }
 
 //// GetBufferBytePos ////////////////////////////////////////////////////////
 
-uint32_t  plDSoundBuffer::GetBufferBytePos( float timeInSecs ) const
+uint32_t  plDSoundBuffer::GetBufferBytePos(float timeInSecs) const
 {
-    hsAssert( fBufferDesc != nil, "Nil buffer description when calling GetBufferBytePos()" );
+    hsAssert(fBufferDesc != nil, "Nil buffer description when calling GetBufferBytePos()");
 
-    uint32_t  uint8_t = (uint32_t)( timeInSecs * (float)fBufferDesc->fNumSamplesPerSec );
+    uint32_t  uint8_t = (uint32_t)(timeInSecs * (float)fBufferDesc->fNumSamplesPerSec);
     uint8_t *= fBufferDesc->fBlockAlign;
 
     return uint8_t;
@@ -720,36 +750,37 @@ uint32_t  plDSoundBuffer::GetBufferBytePos( float timeInSecs ) const
 
 //// GetLengthInBytes ////////////////////////////////////////////////////////
 
-uint32_t  plDSoundBuffer::GetLengthInBytes( void ) const
+uint32_t  plDSoundBuffer::GetLengthInBytes(void) const
 {
     return fBufferSize;
 }
 
 //// SetEAXSettings //////////////////////////////////////////////////////////
 
-void    plDSoundBuffer::SetEAXSettings(  plEAXSourceSettings *settings, bool force )
+void    plDSoundBuffer::SetEAXSettings(plEAXSourceSettings* settings, bool force)
 {
-    fEAXSource.SetFrom( settings, source, force );
+    fEAXSource.SetFrom(settings, source, force);
 }
 
 //// GetBlockAlign ///////////////////////////////////////////////////////////
 
-uint8_t   plDSoundBuffer::GetBlockAlign( void ) const
+uint8_t   plDSoundBuffer::GetBlockAlign(void) const
 {
-    return ( fBufferDesc != nil ) ? fBufferDesc->fBlockAlign : 0;
+    return (fBufferDesc != nil) ? fBufferDesc->fBlockAlign : 0;
 }
 
 //// SetScalarVolume /////////////////////////////////////////////////////////
 // Sets the volume, but on a range from 0 to 1
 
-void    plDSoundBuffer::SetScalarVolume( float volume )
+void    plDSoundBuffer::SetScalarVolume(float volume)
 {
-    if(source)
-    {
+    if (source) {
         ALenum error;
-        alSourcef(source, AL_GAIN, volume); 
-        if((error = alGetError()) != AL_NO_ERROR)
+        alSourcef(source, AL_GAIN, volume);
+
+        if ((error = alGetError()) != AL_NO_ERROR) {
             plStatusLog::AddLineS("audio.log", "failed to set volume on source %d", error);
+        }
     }
 }
 

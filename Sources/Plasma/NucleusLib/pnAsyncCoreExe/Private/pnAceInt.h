@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCoreExe/Private/pnAceInt.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNASYNCCOREEXE_PRIVATE_PNACEINT_H
@@ -60,9 +60,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 // Performance counter functions
-long PerfAddCounter (unsigned id, unsigned n);
-long PerfSubCounter (unsigned id, unsigned n);
-long PerfSetCounter (unsigned id, unsigned n);
+long PerfAddCounter(unsigned id, unsigned n);
+long PerfSubCounter(unsigned id, unsigned n);
+long PerfSetCounter(unsigned id, unsigned n);
 
 
 /*****************************************************************************
@@ -71,7 +71,7 @@ long PerfSetCounter (unsigned id, unsigned n);
 *
 ***/
 
-void DnsDestroy (unsigned exitThreadWaitMs);
+void DnsDestroy(unsigned exitThreadWaitMs);
 
 
 /*****************************************************************************
@@ -80,7 +80,7 @@ void DnsDestroy (unsigned exitThreadWaitMs);
 *
 ***/
 
-void ThreadDestroy (unsigned exitThreadWaitMs);
+void ThreadDestroy(unsigned exitThreadWaitMs);
 
 
 /*****************************************************************************
@@ -89,7 +89,7 @@ void ThreadDestroy (unsigned exitThreadWaitMs);
 *
 ***/
 
-void TimerDestroy (unsigned exitThreadWaitMs);
+void TimerDestroy(unsigned exitThreadWaitMs);
 
 
 /****************************************************************************
@@ -99,70 +99,70 @@ void TimerDestroy (unsigned exitThreadWaitMs);
 ***/
 
 // Core
-typedef void (* FInitialize) ();
-typedef void (* FDestroy) (unsigned exitThreadWaitMs);
-typedef void (* FSignalShutdown) ();
-typedef void (* FWaitForShutdown) ();
-typedef void (* FSleep) (unsigned sleepMs);
+typedef void (* FInitialize)();
+typedef void (* FDestroy)(unsigned exitThreadWaitMs);
+typedef void (* FSignalShutdown)();
+typedef void (* FWaitForShutdown)();
+typedef void (* FSleep)(unsigned sleepMs);
 
 // Sockets
-typedef void (* FAsyncSocketConnect) (
-    AsyncCancelId *         cancelId,
+typedef void (* FAsyncSocketConnect)(
+    AsyncCancelId*          cancelId,
     const plNetAddress&     netAddr,
     FAsyncNotifySocketProc  notifyProc,
-    void *                  param,
-    const void *            sendData,
+    void*                   param,
+    const void*             sendData,
     unsigned                sendBytes,
     unsigned                connectMs,
     unsigned                localPort
 );
 
-typedef void (* FAsyncSocketConnectCancel) (
+typedef void (* FAsyncSocketConnectCancel)(
     FAsyncNotifySocketProc  notifyProc,
     AsyncCancelId           cancelId
 );
 
-typedef void (* FAsyncSocketDisconnect) (
+typedef void (* FAsyncSocketDisconnect)(
     AsyncSocket     sock,
     bool            hardClose
 );
 
-typedef void (* FAsyncSocketDelete) (AsyncSocket sock);
+typedef void (* FAsyncSocketDelete)(AsyncSocket sock);
 
-typedef bool (* FAsyncSocketSend) (
+typedef bool (* FAsyncSocketSend)(
     AsyncSocket     sock,
-    const void *    data,
+    const void*     data,
     unsigned        bytes
 );
 
-typedef bool (* FAsyncSocketWrite) (
+typedef bool (* FAsyncSocketWrite)(
     AsyncSocket     sock,
-    const void *    buffer,
+    const void*     buffer,
     unsigned        bytes,
-    void *          param
+    void*           param
 );
 
-typedef void (* FAsyncSocketSetNotifyProc) (
+typedef void (* FAsyncSocketSetNotifyProc)(
     AsyncSocket             sock,
     FAsyncNotifySocketProc  notifyProc
 );
 
-typedef void (* FAsyncSocketSetBacklogAlloc) (
+typedef void (* FAsyncSocketSetBacklogAlloc)(
     AsyncSocket             sock,
     unsigned                bufferSize
 );
 
-typedef unsigned (* FAsyncSocketStartListening) (
+typedef unsigned(* FAsyncSocketStartListening)(
     const plNetAddress&     listenAddr,
     FAsyncNotifySocketProc  notifyProc
 );
 
-typedef void (* FAsyncSocketStopListening) (
+typedef void (* FAsyncSocketStopListening)(
     const plNetAddress&     listenAddr,
     FAsyncNotifySocketProc  notifyProc
 );
 
-typedef void (* FAsyncSocketEnableNagling) (
+typedef void (* FAsyncSocketEnableNagling)(
     AsyncSocket             conn,
     bool                    enable
 );
@@ -183,7 +183,7 @@ struct AsyncApi {
     FSignalShutdown                 signalShutdown;
     FWaitForShutdown                waitForShutdown;
     FSleep                          sleep;
-    
+
     // Sockets
     FAsyncSocketConnect             socketConnect;
     FAsyncSocketConnectCancel       socketConnectCancel;

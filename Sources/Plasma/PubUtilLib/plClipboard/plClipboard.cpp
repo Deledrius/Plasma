@@ -49,7 +49,7 @@ plClipboard& plClipboard::GetInstance()
     return theInstance;
 }
 
-bool plClipboard::IsTextInClipboard() 
+bool plClipboard::IsTextInClipboard()
 {
 #ifdef HS_BUILD_FOR_WIN32
     return ::IsClipboardFormatAvailable(CF_UNICODETEXT);
@@ -60,12 +60,15 @@ bool plClipboard::IsTextInClipboard()
 
 plString plClipboard::GetClipboardText()
 {
-    if (!IsTextInClipboard()) 
+    if (!IsTextInClipboard()) {
         return plString::Null;
+    }
 
 #ifdef HS_BUILD_FOR_WIN32
-    if (!::OpenClipboard(NULL))
+
+    if (!::OpenClipboard(NULL)) {
         return plString::Null;
+    }
 
     HANDLE clipboardData = ::GetClipboardData(CF_UNICODETEXT);
     size_t size = ::GlobalSize(clipboardData) / sizeof(wchar_t);
@@ -73,39 +76,45 @@ plString plClipboard::GetClipboardText()
 
     plString result = plString::FromWchar(clipboardDataPtr, size);
 
-    ::GlobalUnlock(clipboardData);	
+    ::GlobalUnlock(clipboardData);
     ::CloseClipboard();
 
     return result;
 #else
     return plString::Null;
-#endif	
+#endif
 }
 
 void plClipboard::SetClipboardText(const plString& text)
 {
-    if (text.IsEmpty())
+    if (text.IsEmpty()) {
         return;
+    }
+
 #ifdef HS_BUILD_FOR_WIN32
     plStringBuffer<wchar_t> buf = text.ToWchar();
     size_t len = buf.GetSize();
 
-    if (len == 0) 
+    if (len == 0) {
         return;
+    }
 
     HGLOBAL copy = ::GlobalAlloc(GMEM_MOVEABLE, (len + 1) * sizeof(wchar_t));
-    if (copy == NULL) 
-        return;
 
-    if (!::OpenClipboard(NULL))
+    if (copy == NULL) {
         return;
+    }
+
+    if (!::OpenClipboard(NULL)) {
+        return;
+    }
 
     ::EmptyClipboard();
 
     wchar_t* target = (wchar_t*)::GlobalLock(copy);
     memcpy(target, buf.GetData(), (len + 1) * sizeof(wchar_t));
     target[len] = '\0';
-    ::GlobalUnlock(copy); 
+    ::GlobalUnlock(copy);
 
     ::SetClipboardData(CF_UNICODETEXT, copy);
     ::CloseClipboard();

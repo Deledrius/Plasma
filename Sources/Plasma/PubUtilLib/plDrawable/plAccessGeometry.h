@@ -57,10 +57,11 @@ class plVertexSpan;
 
 class plPipeline;
 
-class plAccessGeometry : public hsRefCnt
-{
+class plAccessGeometry : public hsRefCnt {
 protected:
-    void                    Nilify() { fPipe = nil; }
+    void                    Nilify() {
+        fPipe = nil;
+    }
 
     plPipeline*                     fPipe;
 
@@ -69,9 +70,11 @@ public:
     // You're welcome to make your own,
     // but this is normally just called by the global plAccessGeometry's Init() function.
     // You should normally just use the instance supplied by Instance();
-    plAccessGeometry(plPipeline* pipe=nil);
+    plAccessGeometry(plPipeline* pipe = nil);
 
-    static plAccessGeometry*        Instance() { return fInstance; }
+    static plAccessGeometry*        Instance() {
+        return fInstance;
+    }
 
     // App will initialize, which will create the global instance.
     // DeInit will nil the global instance.
@@ -88,7 +91,7 @@ public:
     static void SetTheIntance(plAccessGeometry* i);
 
     // You have 2 options in opening the data.
-    // RO - Read Only. 
+    // RO - Read Only.
     //      If you specify useSnapShot=true, then for channels which have had a snapshot
     //      taken, you will get pointers to this constant original snapshot form. For
     //      channels which have no snapshot data, or if useSnapShot=false, you will get
@@ -108,8 +111,8 @@ public:
     //      then take the snapshot if you are going to be performing more modifications.
     // In ALL MODIFICATION CASES, if the modified data is paged out, and the original paged back in, you will
     //      need to perform your operation again - your modifications aren't saved anywhere.
-    void    OpenRO(plDrawable* drawable, uint32_t spanIdx, plAccessSpan& acc, bool useSnapShot=true) const;
-    void    OpenRW(plDrawable* drawable, uint32_t spanIdx, plAccessSpan& acc, bool idxToo=false) const;
+    void    OpenRO(plDrawable* drawable, uint32_t spanIdx, plAccessSpan& acc, bool useSnapShot = true) const;
+    void    OpenRW(plDrawable* drawable, uint32_t spanIdx, plAccessSpan& acc, bool idxToo = false) const;
 
     // What do we need to close up here?
     void    Close(plAccessSpan& acc) const;
@@ -120,14 +123,14 @@ public:
     // a list of geometry corresponding to that SceneObject/DrawInterface.
     // NOTE: the list is in no way suggested to be homogenous. In fact, it's guaranteed
     // not to be, because the reason the single object resolved into multiple geometry spans
-    // (possibly across multiple drawables) is that the conceptual single object is composed 
+    // (possibly across multiple drawables) is that the conceptual single object is composed
     // of multiple types of data that can't be batched into a single drawprimitive call.
     // At the least, the different AccessSpans will have different materials. But it's just
     // as likely that they will have different underlying formats (number of UVs, etc.).
     // Again, if you are using the iterators supplied, you probably don't care, but sometimes
     // you will (like if you are messing with the UVs).
-    void    OpenRO(const plDrawInterface* di, hsTArray<plAccessSpan>& accs, bool useSnapShot=true) const;
-    void    OpenRW(const plDrawInterface* di, hsTArray<plAccessSpan>& accs, bool idxToo=false) const;
+    void    OpenRO(const plDrawInterface* di, hsTArray<plAccessSpan>& accs, bool useSnapShot = true) const;
+    void    OpenRW(const plDrawInterface* di, hsTArray<plAccessSpan>& accs, bool idxToo = false) const;
 
     void    Close(hsTArray<plAccessSpan>& accs) const;
 
@@ -146,7 +149,7 @@ public:
     // RestoreSnapShot will copy the stored channels back into the buffer group, resetting those channels to
     //      the state when the snapshot was taken. Note that channels not SnapShotted might have been modified
     //      via OpenRW.
-    // 
+    //
     void    TakeSnapShot(plDrawable* drawable, uint32_t spanIdx, uint32_t channels) const;
     void    RestoreSnapShot(plDrawable* drawable, uint32_t spanIdx, uint32_t channels) const;
     void    ReleaseSnapShot(plDrawable* drawable, uint32_t spanIdx) const;
@@ -158,7 +161,9 @@ public:
     // We often have geometry spans just sitting around devoid of any DI's, drawables or sceneobjects.
     // They aren't too bad to access directly (not like diving through the drawable into buffergroups),
     // but this let's them be accessed in a manner consistent with other geometry manipulations.
-    void    AccessSpanFromGeometrySpan(plAccessSpan& dst, const plGeometrySpan* src) const { IAccessSpanFromSourceSpan(dst, src); }
+    void    AccessSpanFromGeometrySpan(plAccessSpan& dst, const plGeometrySpan* src) const {
+        IAccessSpanFromSourceSpan(dst, src);
+    }
 
 protected:
     void    IAccessSpanFromSourceSpan(plAccessSpan& dst, const plGeometrySpan* src) const;
@@ -169,7 +174,7 @@ protected:
     void    IAccessSpanFromParticle(plAccessSpan& dst, plDrawableSpans* drawable, const plParticleSpan* span, bool readOnly) const;
     void    IAccessSpanFromSnap(plAccessSpan& dst, plDrawableSpans* drawable, const plSpan* src) const;
 
-    void    IOpen(plDrawable* d, uint32_t spanIdx, plAccessSpan& acc, bool useSnap, bool readOnly, bool idxToo=true) const;
+    void    IOpen(plDrawable* d, uint32_t spanIdx, plAccessSpan& acc, bool useSnap, bool readOnly, bool idxToo = true) const;
 };
 
 #endif // plAccessGeometry_inc

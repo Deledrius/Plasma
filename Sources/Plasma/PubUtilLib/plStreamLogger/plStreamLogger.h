@@ -47,14 +47,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsStream.h"
 #include "pnNetCommon/plGenericVar.h"
 
-class plStreamLogger
-{
+class plStreamLogger {
 public:
-    class Event
-    {
+    class Event {
     public:
-        enum Type
-        {
+        enum Type {
             kSubStart,
             kSubEnd,
             kValue,
@@ -66,9 +63,15 @@ public:
         unsigned int fSize;
     public:
         Event(Type type, unsigned int size, plGenericVar& var) : fType(type), fSize(size), fVar(var) { }
-        Type GetType() { return fType; }
-        const plGenericVar& GetVar() { return fVar; }
-        unsigned int  GetSize() { return fSize; }
+        Type GetType() {
+            return fType;
+        }
+        const plGenericVar& GetVar() {
+            return fVar;
+        }
+        unsigned int  GetSize() {
+            return fSize;
+        }
     };
 
     typedef std::list<Event> EventList;
@@ -85,8 +88,12 @@ protected:
 
 public:
     plStreamLogger() : fEntryWaiting(false), fList(nil) { }
-    const EventList* GetList() { return fList; }
-    void LogSetList(EventList* el) { fList = el; }
+    const EventList* GetList() {
+        return fList;
+    }
+    void LogSetList(EventList* el) {
+        fList = el;
+    }
 
     void LogEntry(plGenericType::Types type, unsigned int size, void* value, const char* desc);
     bool IsLogEntryWaiting();
@@ -107,8 +114,7 @@ public:
     void LogReadLEV(int count, type values[], const char* desc) \
             { ILogEntryWaiting(); ReadLE(count,values); int i; for (i=0; i < count; i++) LogEntry(plGenericType::enumtype,sizeof(type),&(values[i]), desc);}
 
-class hsReadOnlyLoggingStream : public hsReadOnlyStream, public plStreamLogger
-{
+class hsReadOnlyLoggingStream : public hsReadOnlyStream, public plStreamLogger {
 private:
 
 public:
@@ -116,10 +122,10 @@ public:
     void    FastFwd();
     void    SetPosition(uint32_t position);
 
-    uint32_t Read(uint32_t byteCount, void * buffer);
+    uint32_t Read(uint32_t byteCount, void* buffer);
     void Skip(uint32_t deltaByteCount);
 
-    uint32_t  LogRead(uint32_t byteCount, void * buffer, const char* desc);
+    uint32_t  LogRead(uint32_t byteCount, void* buffer, const char* desc);
     char*   LogReadSafeString();
     char*   LogReadSafeStringLong();
     void    LogSkip(uint32_t deltaByteCount, const char* desc);

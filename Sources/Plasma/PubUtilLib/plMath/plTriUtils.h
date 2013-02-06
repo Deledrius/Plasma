@@ -43,8 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plTriUtils_inc
 #define plTriUtils_inc
 
-class plTriUtils
-{
+class plTriUtils {
 public:
     enum Bary {
         kInsideTri      = 0x0,
@@ -67,15 +66,15 @@ protected:
     Bary IComputeBarycentric(const hsVector3& v12, float invLenSq12, const hsVector3& v0, const hsVector3& v1, hsPoint3& out);
 
     int ISelectAxis(const hsVector3& norm);
-    bool IFastBarycentric(int iAx, const hsPoint3& p0, const hsPoint3& p1, const hsPoint3& p2, const hsPoint3&p, hsPoint3& out);
+    bool IFastBarycentric(int iAx, const hsPoint3& p0, const hsPoint3& p1, const hsPoint3& p2, const hsPoint3& p, hsPoint3& out);
 public:
 
-    Bary ComputeBarycentricProjection(const hsPoint3& p0, const hsPoint3& p1, const hsPoint3& p2, hsPoint3&p, hsPoint3& out);
-    Bary ComputeBarycentric(const hsPoint3& p0, const hsPoint3& p1, const hsPoint3& p2, const hsPoint3&p, hsPoint3& out);
+    Bary ComputeBarycentricProjection(const hsPoint3& p0, const hsPoint3& p1, const hsPoint3& p2, hsPoint3& p, hsPoint3& out);
+    Bary ComputeBarycentric(const hsPoint3& p0, const hsPoint3& p1, const hsPoint3& p2, const hsPoint3& p, hsPoint3& out);
 
 
-    bool FastBarycentricProjection(const hsPoint3& p0, const hsPoint3& p1, const hsPoint3& p2, hsPoint3&p, hsPoint3& out);
-    bool FastBarycentric(const hsPoint3& p0, const hsPoint3& p1, const hsPoint3& p2, const hsPoint3&p, hsPoint3& out);
+    bool FastBarycentricProjection(const hsPoint3& p0, const hsPoint3& p1, const hsPoint3& p2, hsPoint3& p, hsPoint3& out);
+    bool FastBarycentric(const hsPoint3& p0, const hsPoint3& p1, const hsPoint3& p2, const hsPoint3& p, hsPoint3& out);
 
     bool ProjectOntoPlane(const hsVector3& norm, float dist, hsPoint3& p);
     bool ProjectOntoPlane(const hsPoint3& p0, const hsPoint3& p1, const hsPoint3& p2, hsPoint3& p);

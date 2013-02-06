@@ -59,16 +59,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // plNPCSpawnMod ctor
 plNPCSpawnMod::plNPCSpawnMod()
-: fModelName(nil),
-  fAccountName(nil),
-  fAutoSpawn(false),
-  fNotify(nil)
+    : fModelName(nil),
+      fAccountName(nil),
+      fAutoSpawn(false),
+      fNotify(nil)
 {
 }
 
 // plNPCSpawnMod ctor modelName accountName
-plNPCSpawnMod::plNPCSpawnMod(const char * modelName, const char * accountName, bool autoSpawn)
-: fAutoSpawn(autoSpawn), fNotify(nil)
+plNPCSpawnMod::plNPCSpawnMod(const char* modelName, const char* accountName, bool autoSpawn)
+    : fAutoSpawn(autoSpawn), fNotify(nil)
 {
     fModelName = hsStrcpy(modelName);
     fAccountName = hsStrcpy(accountName);
@@ -77,26 +77,28 @@ plNPCSpawnMod::plNPCSpawnMod(const char * modelName, const char * accountName, b
 // plNPCSpawnMod dtor
 plNPCSpawnMod::~plNPCSpawnMod()
 {
-    if(fModelName)
-    {
+    if (fModelName) {
         delete[] fModelName;
         fModelName = nil;
     }
-    if(fAccountName)
-    {
+
+    if (fAccountName) {
         delete[] fAccountName;
         fAccountName = nil;
     }
-    if (fNotify)
+
+    if (fNotify) {
         fNotify->UnRef();
+    }
 }
 
 void plNPCSpawnMod::AddTarget(plSceneObject* so)
 {
     plSingleModifier::AddTarget(so);
 
-    if(fAutoSpawn)
+    if (fAutoSpawn) {
         Trigger();
+    }
 }
 
 // TRIGGER
@@ -106,10 +108,8 @@ bool plNPCSpawnMod::Trigger()
 
     // you can ONLY spawn if you are local. the spawn message
     // will netpropagate
-    if(this->IsLocallyOwned())
-    {
-        if(fModelName)
-        {
+    if (this->IsLocallyOwned()) {
+        if (fModelName) {
             // spawn the NPC
             plKey spawnPoint = GetTarget(0)->GetKey();
 
@@ -124,39 +124,41 @@ bool plNPCSpawnMod::Trigger()
 }
 
 // SETNOTIFY
-void plNPCSpawnMod::SetNotify(plNotifyMsg *notify)
+void plNPCSpawnMod::SetNotify(plNotifyMsg* notify)
 {
     fNotify = notify;
 }
 
 // GETNOTIFY
-plNotifyMsg * plNPCSpawnMod::GetNotify()
+plNotifyMsg* plNPCSpawnMod::GetNotify()
 {
     return fNotify;
 }
 
 // READ
-void plNPCSpawnMod::Read(hsStream *stream, hsResMgr *mgr)
+void plNPCSpawnMod::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Read(stream, mgr);
 
     fModelName = stream->ReadSafeString();
     fAccountName = stream->ReadSafeString();
     fAutoSpawn = stream->ReadBool();
-    if(stream->ReadBool())
+
+    if (stream->ReadBool()) {
         fNotify = plNotifyMsg::ConvertNoRef(mgr->ReadCreatable(stream));
+    }
 }
 
 // WRITE
-void plNPCSpawnMod::Write(hsStream *stream, hsResMgr *mgr)
+void plNPCSpawnMod::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Write(stream, mgr);
-    
+
     stream->WriteSafeString(fModelName);
     stream->WriteSafeString(fAccountName);
     stream->WriteBool(fAutoSpawn);
-    if(fNotify)
-    {
+
+    if (fNotify) {
         stream->WriteBool(true);
         mgr->WriteCreatable(stream, fNotify);
     } else {
@@ -172,11 +174,10 @@ bool plNPCSpawnMod::IEval(double secs, float del, uint32_t dirty)
 }
 
 // ISENDNOTIFY
-void plNPCSpawnMod::ISendNotify(plKey &avatarKey)
+void plNPCSpawnMod::ISendNotify(plKey& avatarKey)
 {
-    if(fNotify)
-    {
-        proSpawnedEventData * event = new proSpawnedEventData;
+    if (fNotify) {
+        proSpawnedEventData* event = new proSpawnedEventData;
         event->fSpawner = GetKey();
         event->fSpawnee = avatarKey;
         fNotify->ClearEvents();

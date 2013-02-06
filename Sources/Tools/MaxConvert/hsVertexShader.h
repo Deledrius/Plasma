@@ -50,8 +50,7 @@ class plGeometrySpan;
 struct hsColorRGBA;
 class plLightMapGen;
 
-class hsVertexShader 
-{
+class hsVertexShader {
 private:
     hsVertexShader();
 public:
@@ -59,7 +58,7 @@ public:
 
     static hsVertexShader& Instance();
 
-    void ShadeNode(INode* node, hsMatrix44& l2w, hsMatrix44& w2l, hsTArray<plGeometrySpan *> &spans);
+    void ShadeNode(INode* node, hsMatrix44& l2w, hsMatrix44& w2l, hsTArray<plGeometrySpan*>& spans);
 
     void Open();
     void Close();
@@ -67,11 +66,10 @@ public:
 private:
 
     /// Temporary vertex class
-    class plTmpVertex3
-    {
-        public:
-            hsPoint3    fLocalPos;
-            hsVector3   fNormal;
+    class plTmpVertex3 {
+    public:
+        hsPoint3    fLocalPos;
+        hsVector3   fNormal;
     };
 
     bool ILightIncludesNode(LightObject* light, INode* node);
@@ -79,14 +77,14 @@ private:
     void    INativeShadeVtx(hsColorRGBA& shade, plMaxLightContext& ctx, const plTmpVertex3& vtx, bool translucent);
     void    INativeShadowVtx(hsColorRGBA& shade, plMaxLightContext& ctx, const plTmpVertex3& vtx, bool translucent);
 
-    bool IsTranslucent( hsGMaterial *material );
+    bool IsTranslucent(hsGMaterial* material);
 
-    void IShadeSpan( plGeometrySpan *span, INode* node );
-    void IShadeVertices( plGeometrySpan *span, hsBitVector *dirtyVector, INode* node, bool translucent );
+    void IShadeSpan(plGeometrySpan* span, INode* node);
+    void IShadeVertices(plGeometrySpan* span, hsBitVector* dirtyVector, INode* node, bool translucent);
 
 private:
-    Interface           *fInterface;
-    hsConverterUtils    &fConverterUtils;
+    Interface*           fInterface;
+    hsConverterUtils&    fConverterUtils;
 
     plLightMapGen*      fLightMapGen;
 
@@ -94,8 +92,8 @@ private:
 
     int                 fShaded;    // just record-keeping
 
-    hsColorRGBA         *fShadeColorTable;
-    hsColorRGBA         *fIllumColorTable;
+    hsColorRGBA*         fShadeColorTable;
+    hsColorRGBA*         fIllumColorTable;
 };
 
 #endif

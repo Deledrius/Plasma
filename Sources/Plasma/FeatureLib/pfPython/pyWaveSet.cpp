@@ -65,11 +65,10 @@ pyWaveSet::pyWaveSet(pyKey& key)
 
 void pyWaveSet::SetGeoMaxLength(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetGeoMaxLength(s, secs);
         }
     }
@@ -77,11 +76,10 @@ void pyWaveSet::SetGeoMaxLength(float s, float secs)
 
 void pyWaveSet::SetGeoMinLength(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetGeoMinLength(s, secs);
         }
     }
@@ -89,11 +87,10 @@ void pyWaveSet::SetGeoMinLength(float s, float secs)
 
 void pyWaveSet::SetGeoAmpOverLen(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetGeoAmpOverLen(s, secs);
         }
     }
@@ -101,11 +98,10 @@ void pyWaveSet::SetGeoAmpOverLen(float s, float secs)
 
 void pyWaveSet::SetGeoChop(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetGeoChop(s, secs);
         }
     }
@@ -113,11 +109,10 @@ void pyWaveSet::SetGeoChop(float s, float secs)
 
 void pyWaveSet::SetGeoAngleDev(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetGeoAngleDev(s, secs);
         }
     }
@@ -129,11 +124,10 @@ void pyWaveSet::SetGeoAngleDev(float s, float secs)
 
 void pyWaveSet::SetTexMaxLength(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetTexMaxLength(s, secs);
         }
     }
@@ -141,11 +135,10 @@ void pyWaveSet::SetTexMaxLength(float s, float secs)
 
 void pyWaveSet::SetTexMinLength(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetTexMinLength(s, secs);
         }
     }
@@ -153,11 +146,10 @@ void pyWaveSet::SetTexMinLength(float s, float secs)
 
 void pyWaveSet::SetTexAmpOverLen(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetTexAmpOverLen(s, secs);
         }
     }
@@ -165,11 +157,10 @@ void pyWaveSet::SetTexAmpOverLen(float s, float secs)
 
 void pyWaveSet::SetTexChop(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetTexChop(s, secs);
         }
     }
@@ -177,26 +168,24 @@ void pyWaveSet::SetTexChop(float s, float secs)
 
 void pyWaveSet::SetTexAngleDev(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetTexAngleDev(s, secs);
         }
     }
 }
 // --------------------------------------------------------------------------------
-// The size in feet of one tile of the ripple texture. If you change this (I don't 
+// The size in feet of one tile of the ripple texture. If you change this (I don't
 // recommend it), you need to change it very slowly or it will look very stupid.
 
 void pyWaveSet::SetRippleScale(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetRippleScale(s, secs);
         }
     }
@@ -208,11 +197,10 @@ void pyWaveSet::SetRippleScale(float s, float secs)
 
 void pyWaveSet::SetWindDir(const pyVector3& s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetWindDir(s.fVector, secs);
         }
     }
@@ -223,11 +211,10 @@ void pyWaveSet::SetWindDir(const pyVector3& s, float secs)
 
 void pyWaveSet::SetSpecularNoise(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetSpecularNoise(s, secs);
         }
     }
@@ -235,11 +222,10 @@ void pyWaveSet::SetSpecularNoise(float s, float secs)
 
 void pyWaveSet::SetSpecularStart(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetSpecularStart(s, secs);
         }
     }
@@ -247,11 +233,10 @@ void pyWaveSet::SetSpecularStart(float s, float secs)
 
 void pyWaveSet::SetSpecularEnd(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetSpecularEnd(s, secs);
         }
     }
@@ -262,11 +247,10 @@ void pyWaveSet::SetSpecularEnd(float s, float secs)
 
 void pyWaveSet::SetWaterHeight(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetWaterHeight(s, secs);
         }
     }
@@ -277,11 +261,10 @@ void pyWaveSet::SetWaterHeight(float s, float secs)
 
 void pyWaveSet::SetWaterOffset(const pyVector3& s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetWaterOffset(s.fVector, secs);
         }
     }
@@ -289,11 +272,10 @@ void pyWaveSet::SetWaterOffset(const pyVector3& s, float secs)
 
 void pyWaveSet::SetOpacOffset(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetOpacOffset(s, secs);
         }
     }
@@ -301,11 +283,10 @@ void pyWaveSet::SetOpacOffset(float s, float secs)
 
 void pyWaveSet::SetReflOffset(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetReflOffset(s, secs);
         }
     }
@@ -313,11 +294,10 @@ void pyWaveSet::SetReflOffset(float s, float secs)
 
 void pyWaveSet::SetWaveOffset(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetWaveOffset(s, secs);
         }
     }
@@ -325,11 +305,10 @@ void pyWaveSet::SetWaveOffset(float s, float secs)
 
 void pyWaveSet::SetDepthFalloff(const pyVector3& s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetDepthFalloff(s.fVector, secs);
         }
     }
@@ -337,11 +316,10 @@ void pyWaveSet::SetDepthFalloff(const pyVector3& s, float secs)
 
 void pyWaveSet::SetOpacFalloff(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetOpacFalloff(s, secs);
         }
     }
@@ -349,11 +327,10 @@ void pyWaveSet::SetOpacFalloff(float s, float secs)
 
 void pyWaveSet::SetReflFalloff(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetReflFalloff(s, secs);
         }
     }
@@ -361,11 +338,10 @@ void pyWaveSet::SetReflFalloff(float s, float secs)
 
 void pyWaveSet::SetWaveFalloff(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetWaveFalloff(s, secs);
         }
     }
@@ -376,11 +352,10 @@ void pyWaveSet::SetWaveFalloff(float s, float secs)
 
 void pyWaveSet::SetMaxAtten(const pyVector3& s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetMaxAtten(s.fVector, secs);
         }
     }
@@ -388,11 +363,10 @@ void pyWaveSet::SetMaxAtten(const pyVector3& s, float secs)
 
 void pyWaveSet::SetMinAtten(const pyVector3& s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetMinAtten(s.fVector, secs);
         }
     }
@@ -403,11 +377,10 @@ void pyWaveSet::SetMinAtten(const pyVector3& s, float secs)
 
 void pyWaveSet::SetWaterTint(pyColor& s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetWaterTint(s.getColor(), secs);
         }
     }
@@ -415,11 +388,10 @@ void pyWaveSet::SetWaterTint(pyColor& s, float secs)
 
 void pyWaveSet::SetWaterOpacity(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetWaterOpacity(s, secs);
         }
     }
@@ -427,11 +399,10 @@ void pyWaveSet::SetWaterOpacity(float s, float secs)
 
 void pyWaveSet::SetSpecularTint(pyColor& s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetSpecularTint(s.getColor(), secs);
         }
     }
@@ -439,11 +410,10 @@ void pyWaveSet::SetSpecularTint(pyColor& s, float secs)
 
 void pyWaveSet::SetSpecularMute(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetSpecularMute(s, secs);
         }
     }
@@ -456,11 +426,10 @@ void pyWaveSet::SetSpecularMute(float s, float secs)
 
 void pyWaveSet::SetEnvCenter(const pyPoint3& s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetEnvCenter(s.fPoint, secs);
         }
     }
@@ -468,11 +437,10 @@ void pyWaveSet::SetEnvCenter(const pyPoint3& s, float secs)
 
 void pyWaveSet::SetEnvRadius(float s, float secs)
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             waveset->SetEnvRadius(s, secs);
         }
     }
@@ -487,11 +455,10 @@ void pyWaveSet::SetEnvRadius(float s, float secs)
 // --------------------------------------------------------------------------------
 float pyWaveSet::GetGeoMaxLength() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetGeoMaxLength();
         }
     }
@@ -501,11 +468,10 @@ float pyWaveSet::GetGeoMaxLength() const
 
 float pyWaveSet::GetGeoMinLength() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetGeoMinLength();
         }
     }
@@ -515,11 +481,10 @@ float pyWaveSet::GetGeoMinLength() const
 
 float pyWaveSet::GetGeoAmpOverLen() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetGeoAmpOverLen();
         }
     }
@@ -529,11 +494,10 @@ float pyWaveSet::GetGeoAmpOverLen() const
 
 float pyWaveSet::GetGeoChop() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetGeoChop();
         }
     }
@@ -543,11 +507,10 @@ float pyWaveSet::GetGeoChop() const
 
 float pyWaveSet::GetGeoAngleDev() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetGeoAngleDev();
         }
     }
@@ -559,11 +522,10 @@ float pyWaveSet::GetGeoAngleDev() const
 
 float pyWaveSet::GetTexMaxLength() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetTexMaxLength();
         }
     }
@@ -573,11 +535,10 @@ float pyWaveSet::GetTexMaxLength() const
 
 float pyWaveSet::GetTexMinLength() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetTexMinLength();
         }
     }
@@ -587,11 +548,10 @@ float pyWaveSet::GetTexMinLength() const
 
 float pyWaveSet::GetTexAmpOverLen() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetTexAmpOverLen();
         }
     }
@@ -601,11 +561,10 @@ float pyWaveSet::GetTexAmpOverLen() const
 
 float pyWaveSet::GetTexChop() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetTexChop();
         }
     }
@@ -615,11 +574,10 @@ float pyWaveSet::GetTexChop() const
 
 float pyWaveSet::GetTexAngleDev() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetTexAngleDev();
         }
     }
@@ -631,11 +589,10 @@ float pyWaveSet::GetTexAngleDev() const
 
 float pyWaveSet::GetRippleScale() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetRippleScale();
         }
     }
@@ -647,11 +604,10 @@ float pyWaveSet::GetRippleScale() const
 
 PyObject* pyWaveSet::GetWindDir() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return pyVector3::New(waveset->GetWindDir());
         }
     }
@@ -663,11 +619,10 @@ PyObject* pyWaveSet::GetWindDir() const
 
 float pyWaveSet::GetSpecularNoise() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetSpecularNoise();
         }
     }
@@ -677,11 +632,10 @@ float pyWaveSet::GetSpecularNoise() const
 
 float pyWaveSet::GetSpecularStart() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetSpecularStart();
         }
     }
@@ -691,11 +645,10 @@ float pyWaveSet::GetSpecularStart() const
 
 float pyWaveSet::GetSpecularEnd() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetSpecularEnd();
         }
     }
@@ -707,11 +660,10 @@ float pyWaveSet::GetSpecularEnd() const
 
 float pyWaveSet::GetWaterHeight() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetWaterHeight();
         }
     }
@@ -723,11 +675,10 @@ float pyWaveSet::GetWaterHeight() const
 
 PyObject* pyWaveSet::GetWaterOffset() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return pyVector3::New(waveset->GetWaterOffset());
         }
     }
@@ -737,11 +688,10 @@ PyObject* pyWaveSet::GetWaterOffset() const
 
 float pyWaveSet::GetOpacOffset() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetOpacOffset();
         }
     }
@@ -751,11 +701,10 @@ float pyWaveSet::GetOpacOffset() const
 
 float pyWaveSet::GetReflOffset() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetReflOffset();
         }
     }
@@ -765,11 +714,10 @@ float pyWaveSet::GetReflOffset() const
 
 float pyWaveSet::GetWaveOffset() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetWaveOffset();
         }
     }
@@ -779,11 +727,10 @@ float pyWaveSet::GetWaveOffset() const
 
 PyObject* pyWaveSet::GetDepthFalloff() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return pyVector3::New(waveset->GetDepthFalloff());
         }
     }
@@ -793,11 +740,10 @@ PyObject* pyWaveSet::GetDepthFalloff() const
 
 float pyWaveSet::GetOpacFalloff() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetOpacFalloff();
         }
     }
@@ -807,11 +753,10 @@ float pyWaveSet::GetOpacFalloff() const
 
 float pyWaveSet::GetReflFalloff() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetReflFalloff();
         }
     }
@@ -821,11 +766,10 @@ float pyWaveSet::GetReflFalloff() const
 
 float pyWaveSet::GetWaveFalloff() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetWaveFalloff();
         }
     }
@@ -837,11 +781,10 @@ float pyWaveSet::GetWaveFalloff() const
 
 PyObject* pyWaveSet::GetMaxAtten() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return pyVector3::New(waveset->GetMaxAtten());
         }
     }
@@ -851,11 +794,10 @@ PyObject* pyWaveSet::GetMaxAtten() const
 
 PyObject* pyWaveSet::GetMinAtten() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return pyVector3::New(waveset->GetMinAtten());
         }
     }
@@ -867,11 +809,10 @@ PyObject* pyWaveSet::GetMinAtten() const
 
 PyObject* pyWaveSet::GetWaterTint() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return pyColor::New(waveset->GetWaterTint());
         }
     }
@@ -881,11 +822,10 @@ PyObject* pyWaveSet::GetWaterTint() const
 
 float pyWaveSet::GetWaterOpacity() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetWaterOpacity();
         }
     }
@@ -895,11 +835,10 @@ float pyWaveSet::GetWaterOpacity() const
 
 PyObject* pyWaveSet::GetSpecularTint() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return pyColor::New(waveset->GetSpecularTint());
         }
     }
@@ -909,11 +848,10 @@ PyObject* pyWaveSet::GetSpecularTint() const
 
 float pyWaveSet::GetSpecularMute() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetSpecularMute();
         }
     }
@@ -925,11 +863,10 @@ float pyWaveSet::GetSpecularMute() const
 
 PyObject* pyWaveSet::GetEnvCenter() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return pyPoint3::New(waveset->GetEnvCenter());
         }
     }
@@ -939,11 +876,10 @@ PyObject* pyWaveSet::GetEnvCenter() const
 
 float pyWaveSet::GetEnvRadius() const
 {
-    if (fWaterKey)
-    {
+    if (fWaterKey) {
         plWaveSet7* waveset = plWaveSet7::ConvertNoRef(fWaterKey->ObjectIsLoaded());
-        if (waveset)
-        {
+
+        if (waveset) {
             return waveset->GetEnvRadius();
         }
     }

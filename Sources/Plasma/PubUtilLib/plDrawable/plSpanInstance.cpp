@@ -60,8 +60,8 @@ void plSpanEncoding::Write(hsStream* s) const
 
 
 plSpanInstance::plSpanInstance()
-:   fPosDelta(nil),
-    fCol(nil)
+    :   fPosDelta(nil),
+        fCol(nil)
 {
     fL2W[0][1] = fL2W[0][2] = 0.f;
     fL2W[1][0] = fL2W[1][2] = 0.f;
@@ -86,12 +86,16 @@ void plSpanInstance::Alloc(const plSpanEncoding& encoding, uint32_t numVerts)
 {
     DeAlloc();
     uint32_t posStride = PosStrideFromEncoding(encoding);
-    if( posStride )
+
+    if (posStride) {
         fPosDelta = new uint8_t[numVerts * posStride];
+    }
 
     uint32_t colStride = ColStrideFromEncoding(encoding);
-    if( colStride )
+
+    if (colStride) {
         fCol = new uint8_t[numVerts * colStride];
+    }
 }
 
 void plSpanInstance::Read(hsStream* stream, const plSpanEncoding& encoding, uint32_t numVerts)
@@ -99,13 +103,12 @@ void plSpanInstance::Read(hsStream* stream, const plSpanEncoding& encoding, uint
     Alloc(encoding, numVerts);
 
     stream->Read(12 * sizeof(float), fL2W[0]);
-    if( fPosDelta )
-    {
+
+    if (fPosDelta) {
         stream->Read(numVerts * PosStrideFromEncoding(encoding), fPosDelta);
     }
 
-    if( fCol )
-    {
+    if (fCol) {
         stream->Read(numVerts * ColStrideFromEncoding(encoding), fCol);
     }
 }
@@ -113,12 +116,12 @@ void plSpanInstance::Read(hsStream* stream, const plSpanEncoding& encoding, uint
 void plSpanInstance::Write(hsStream* stream, const plSpanEncoding& encoding, uint32_t numVerts) const
 {
     stream->Write(12 * sizeof(float), fL2W[0]);
-    if( fPosDelta )
-    {
+
+    if (fPosDelta) {
         stream->Write(numVerts * PosStrideFromEncoding(encoding), fPosDelta);
     }
-    if( fCol )
-    {
+
+    if (fCol) {
         stream->Write(numVerts * ColStrideFromEncoding(encoding), fCol);
     }
 }
@@ -128,17 +131,18 @@ hsMatrix44 plSpanInstance::LocalToWorld() const
     hsMatrix44 retVal;
     retVal.NotIdentity();
     int i;
-    for( i = 0; i < 3; i++ )
-    {
+
+    for (i = 0; i < 3; i++) {
         int j;
-        for( j = 0; j < 4; j++ )
-        {
+
+        for (j = 0; j < 4; j++) {
             retVal.fMap[i][j] = fL2W[i][j];
         }
     }
+
     retVal.fMap[3][0] =
         retVal.fMap[3][1] =
-        retVal.fMap[3][2] = 0.f;
+            retVal.fMap[3][2] = 0.f;
     retVal.fMap[3][3] = 1.f;
 
     return retVal;
@@ -155,11 +159,11 @@ hsMatrix44 plSpanInstance::WorldToLocal() const
 void plSpanInstance::SetLocalToWorld(const hsMatrix44& l2w)
 {
     int i;
-    for( i = 0; i < 3; i++ )
-    {
+
+    for (i = 0; i < 3; i++) {
         int j;
-        for( j = 0; j < 4; j++ )
-        {
+
+        for (j = 0; j < 4; j++) {
             fL2W[i][j] = l2w.fMap[i][j];
         }
     }
@@ -173,8 +177,9 @@ void plSpanInstance::Encode(const plSpanEncoding& encoding, uint32_t numVerts, c
     hsAssert(!(encoding.fCode & plSpanEncoding::kColMask) == !color, "Color encoding mismatch");
 
     // Check that there's anything to encode.
-    if( !(fPosDelta || fCol) )
+    if (!(fPosDelta || fCol)) {
         return;
+    }
 
     int8_t* pos888 = (int8_t*)fPosDelta;
     int16_t* pos161616 = (int16_t*)fPosDelta;
@@ -184,10 +189,9 @@ void plSpanInstance::Encode(const plSpanEncoding& encoding, uint32_t numVerts, c
     uint16_t* col16 = (uint16_t*)fCol;
     uint32_t* col32 = (uint32_t*)fCol;
     int i;
-    for( i = 0; i < numVerts; i++ )
-    {
-        switch(encoding.fCode & plSpanEncoding::kPosMask)
-        {
+
+    for (i = 0; i < numVerts; i++) {
+        switch (encoding.fCode & plSpanEncoding::kPosMask) {
         case plSpanEncoding::kPos888:
             pos888[0] = int8_t(delPos->fX / encoding.fPosScale);
             pos888[1] = int8_t(delPos->fY / encoding.fPosScale);
@@ -195,6 +199,7 @@ void plSpanInstance::Encode(const plSpanEncoding& encoding, uint32_t numVerts, c
             pos888 += 3;
             delPos++;
             break;
+
         case plSpanEncoding::kPos161616:
             pos161616[0] = int16_t(delPos->fX / encoding.fPosScale);
             pos161616[1] = int16_t(delPos->fY / encoding.fPosScale);
@@ -202,6 +207,7 @@ void plSpanInstance::Encode(const plSpanEncoding& encoding, uint32_t numVerts, c
             pos161616 += 3;
             delPos++;
             break;
+
         case plSpanEncoding::kPos101010:
             *pos101010 =
                 ((uint32_t(delPos->fX / encoding.fPosScale) & 0x3f) << 0)
@@ -210,42 +216,49 @@ void plSpanInstance::Encode(const plSpanEncoding& encoding, uint32_t numVerts, c
             pos101010++;
             delPos++;
             break;
+
         case plSpanEncoding::kPos008:
             *pos888 = int8_t(delPos->fZ / encoding.fPosScale);
             pos888++;
             delPos++;
             break;
+
         case plSpanEncoding::kPosNone:
         default:
             break;
         }
-        switch(encoding.fCode & plSpanEncoding::kColMask)
-        {
+
+        switch (encoding.fCode & plSpanEncoding::kColMask) {
         case plSpanEncoding::kColA8:
             *col8 = (uint8_t)((*color) >> 24);
             col8++;
             color++;
             break;
+
         case plSpanEncoding::kColI8:
             *col8 = (uint8_t)((*color) & 0xff);
             col8++;
             color++;
             break;
+
         case plSpanEncoding::kColAI88:
             *col16 = (uint16_t)(((*color) >> 16) & 0xffff);
             col16++;
             color++;
             break;
+
         case plSpanEncoding::kColRGB888:
             *col8++ = (uint8_t)((*color >> 16) & 0xff);
             *col8++ = (uint8_t)((*color >> 8) & 0xff);
             *col8++ = (uint8_t)((*color >> 0) & 0xff);
             color++;
             break;
+
         case plSpanEncoding::kColARGB8888:
             *col32++ = *color;
             color++;
             break;
+
         case plSpanEncoding::kColNone:
         default:
             break;

@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCoreExe/Private/Nt/pnAceNtThread.cpp
-*   
+*
 ***/
 
 #include "../../Pch.h"
@@ -60,7 +60,8 @@ namespace Nt {
 ***/
 
 //===========================================================================
-void NtSleep (unsigned sleepMs) {
+void NtSleep(unsigned sleepMs)
+{
     Sleep(sleepMs);
 }
 

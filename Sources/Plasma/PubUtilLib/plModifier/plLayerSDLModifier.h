@@ -45,14 +45,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plModifier/plAnimTimeConvertSDLModifier.h"
 
 //
-// This modifier is responsible for sending and recving 
+// This modifier is responsible for sending and recving
 // an layer's animation state (basically an animTimeConvert)
 //
 class plLayerAnimation;
 class plStateDataRecord;
 
-class plLayerSDLModifier : public plAnimTimeConvertSDLModifier
-{
+class plLayerSDLModifier : public plAnimTimeConvertSDLModifier {
 protected:
 
     static char kStrAtc[];      // animTimeConvert var name
@@ -68,15 +67,22 @@ protected:
     void IPutCurrentStateIn(plStateDataRecord* dstState);
     void ISetCurrentStateFrom(const plStateDataRecord* srcState);
 public:
-    CLASSNAME_REGISTER( plLayerSDLModifier);
-    GETINTERFACE_ANY( plLayerSDLModifier, plAnimTimeConvertSDLModifier);
-        
+    CLASSNAME_REGISTER(plLayerSDLModifier);
+    GETINTERFACE_ANY(plLayerSDLModifier, plAnimTimeConvertSDLModifier);
+
     plLayerSDLModifier() : fLayerAnimation(nil) {}
-    
-    const char* GetSDLName() const { return kSDLLayer; }
-    
-    plLayerAnimation* GetLayerAnimation() const { return fLayerAnimation; }
-    void SetLayerAnimation(plLayerAnimation* l) { fLayerAnimation=l; AddTarget(nil); }
+
+    const char* GetSDLName() const {
+        return kSDLLayer;
+    }
+
+    plLayerAnimation* GetLayerAnimation() const {
+        return fLayerAnimation;
+    }
+    void SetLayerAnimation(plLayerAnimation* l) {
+        fLayerAnimation = l;
+        AddTarget(nil);
+    }
     plKey GetStateOwnerKey() const;
 };
 

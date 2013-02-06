@@ -60,8 +60,9 @@ void plClientUnifiedTime::SetSysTime()
 {
     fFrameStartTime.ToCurrentTime();
 
-    if (fSysTimeOffset == 0.0)
+    if (fSysTimeOffset == 0.0) {
         fSysTimeOffset = hsTimer::GetSysSeconds() - fFrameStartTime.GetSecsDouble();
+    }
 }
 
 //
@@ -76,8 +77,8 @@ void plClientUnifiedTime::SetFromGameTime(double gameTime, double curGameSecs)
 
 #if 0
     extern bool gMooseDump;
-    if (gMooseDump)
-    {
+
+    if (gMooseDump) {
         plUnifiedTime ct = plUnifiedTime::GetCurrent();
         plUnifiedTime ft = GetFrameStartTime();
 
@@ -86,6 +87,7 @@ void plClientUnifiedTime::SetFromGameTime(double gameTime, double curGameSecs)
         plNetObjectDebugger::GetInstance()->LogMsg(hsTempStringF("SFGT: gt=%f secs in the past\n", gameTimeOff));
         plNetObjectDebugger::GetInstance()->LogMsg(hsTempStringF("SFGT: this=%s\n\n", PrintWMillis()));
     }
+
 #endif
 }
 
@@ -100,33 +102,34 @@ void plClientUnifiedTime::ConvertToGameTime(double* gameTimeOut, double curGameS
 
 #if 0
     extern bool gMooseDump;
-    if (gMooseDump)
-    {
+
+    if (gMooseDump) {
         plUnifiedTime ct = plUnifiedTime::GetCurrent();
         plUnifiedTime ft = GetFrameStartTime();
 
-        plNetObjectDebugger::GetInstance()->LogMsg( hsTempStringF("CTGT: this=%s\n", PrintWMillis()));
+        plNetObjectDebugger::GetInstance()->LogMsg(hsTempStringF("CTGT: this=%s\n", PrintWMillis()));
         plNetObjectDebugger::GetInstance()->LogMsg(hsTempStringF("CTGT: CT=%s\n", ct.PrintWMillis()));
         plNetObjectDebugger::GetInstance()->LogMsg(hsTempStringF("CTGT: FT=%s\n", ft.PrintWMillis()));
         plNetObjectDebugger::GetInstance()->LogMsg(hsTempStringF("CTGT: OT=%s\n", utOff.PrintWMillis()));
         plNetObjectDebugger::GetInstance()->LogMsg(
             hsTempStringF("CTGT: ct=%f TO=%f\n\n", curGameSecs, *gameTimeOut));
     }
+
 #endif
 }
 #pragma optimize( "", on )  // restore optimizations to their defaults
 
-const plClientUnifiedTime & plClientUnifiedTime::operator=(const plUnifiedTime & src) 
-{ 
-    plUnifiedTime* ut=this;
-    *ut=src;
+const plClientUnifiedTime& plClientUnifiedTime::operator=(const plUnifiedTime& src)
+{
+    plUnifiedTime* ut = this;
+    *ut = src;
     return *this;
 }
 
-const plClientUnifiedTime & plClientUnifiedTime::operator=(const plClientUnifiedTime & src) 
-{ 
-    plUnifiedTime* ut=this;
-    plUnifiedTime* utSrc=this;
-    *ut=*utSrc;
+const plClientUnifiedTime& plClientUnifiedTime::operator=(const plClientUnifiedTime& src)
+{
+    plUnifiedTime* ut = this;
+    plUnifiedTime* utSrc = this;
+    *ut = *utSrc;
     return *this;
 }

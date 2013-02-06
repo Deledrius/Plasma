@@ -43,8 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plRenderLevel_inc
 #define plRenderLevel_inc
 
-class plRenderLevel
-{
+class plRenderLevel {
 public:
     // A renderlevel is [Major bits 32..8]|[Minor bits 7..0]
     // The major render level is further broken into 3 ranges.
@@ -59,7 +58,7 @@ public:
     // decals, but before the first thing with a render dependency on the background (e.g. plants).
 
     // Removed kAvatarBlendRendMinorLevel, not being used anywhere. mf
-    
+
     enum {
         kOpaqueMajorLevel       = 0x0,
         kFBMajorLevel           = 0x1,
@@ -75,31 +74,61 @@ public:
         kDefRendMinorLevel                  = 0x00,
         kOpaqueMinorLevel                   = 0x0,
         kMinorLevelMask                     = ((1 << kMajorShift) - 1),
-        kAvatarRendMinorLevel               = kMinorLevelMask-1
+        kAvatarRendMinorLevel               = kMinorLevelMask - 1
     };
 public:
-    plRenderLevel() { Set(kDefRendMajorLevel, kDefRendMinorLevel); }
+    plRenderLevel() {
+        Set(kDefRendMajorLevel, kDefRendMinorLevel);
+    }
     plRenderLevel(uint32_t l) : fLevel(l) {}
-    plRenderLevel(uint32_t major, uint32_t minor) { Set(major, minor); }
+    plRenderLevel(uint32_t major, uint32_t minor) {
+        Set(major, minor);
+    }
 
-    int operator==(const plRenderLevel& l) const { return fLevel == l.fLevel; }
-    int operator!=(const plRenderLevel& l) const { return fLevel != l.fLevel; }
-    int operator>(const plRenderLevel& l) const { return fLevel > l.fLevel; }
-    int operator<(const plRenderLevel& l) const { return fLevel < l.fLevel; }
-    int operator>=(const plRenderLevel& l) const { return fLevel >= l.fLevel; }
-    int operator<=(const plRenderLevel& l) const { return fLevel <= l.fLevel; }
+    int operator==(const plRenderLevel& l) const {
+        return fLevel == l.fLevel;
+    }
+    int operator!=(const plRenderLevel& l) const {
+        return fLevel != l.fLevel;
+    }
+    int operator>(const plRenderLevel& l) const {
+        return fLevel > l.fLevel;
+    }
+    int operator<(const plRenderLevel& l) const {
+        return fLevel < l.fLevel;
+    }
+    int operator>=(const plRenderLevel& l) const {
+        return fLevel >= l.fLevel;
+    }
+    int operator<=(const plRenderLevel& l) const {
+        return fLevel <= l.fLevel;
+    }
 
-    uint32_t  Level() const { return fLevel; }
+    uint32_t  Level() const {
+        return fLevel;
+    }
 
-    uint32_t  Minor() const { return uint32_t(fLevel & kMinorLevelMask); }
-    uint32_t  Major() const { return uint32_t(fLevel >> kMajorShift); }
+    uint32_t  Minor() const {
+        return uint32_t(fLevel & kMinorLevelMask);
+    }
+    uint32_t  Major() const {
+        return uint32_t(fLevel >> kMajorShift);
+    }
 
-    plRenderLevel& Set(uint32_t l) { fLevel = l; return *this; }
-    plRenderLevel& Set(uint32_t major, uint32_t minor) { fLevel = (uint32_t(major) << kMajorShift) | uint32_t(minor); return *this; }
+    plRenderLevel& Set(uint32_t l) {
+        fLevel = l;
+        return *this;
+    }
+    plRenderLevel& Set(uint32_t major, uint32_t minor) {
+        fLevel = (uint32_t(major) << kMajorShift) | uint32_t(minor);
+        return *this;
+    }
 
     uint32_t  fLevel;
 
-    static plRenderLevel OpaqueRenderLevel() { return plRenderLevel(kOpaqueMajorLevel, kOpaqueMinorLevel); }
+    static plRenderLevel OpaqueRenderLevel() {
+        return plRenderLevel(kOpaqueMajorLevel, kOpaqueMinorLevel);
+    }
 };
 
 #endif // plRenderLevel_inc

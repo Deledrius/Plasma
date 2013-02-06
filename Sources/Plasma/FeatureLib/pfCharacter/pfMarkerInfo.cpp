@@ -76,10 +76,11 @@ void pfMarkerInfo::Init()
     //
     plLocation markerLoc = plKeyFinder::Instance().FindLocation("GlobalMarkers", "Markers");
 
-    if (markerLoc.IsValid())
+    if (markerLoc.IsValid()) {
         fMarkerUoid = plUoid(markerLoc, plSceneObject::Index(), "MarkerRoot");
-    else
+    } else {
         fMarkerUoid.Invalidate();
+    }
 }
 
 pfMarkerInfo::pfMarkerInfo(const hsPoint3& pos, bool isNew) :
@@ -95,15 +96,13 @@ pfMarkerInfo::pfMarkerInfo(const hsPoint3& pos, bool isNew) :
 
 void pfMarkerInfo::Spawn(MarkerType type)
 {
-    if (!fMarkerUoid.IsValid())
-    {
+    if (!fMarkerUoid.IsValid()) {
         plResManager* resMgr = (plResManager*)hsgResMgr::ResMgr();
         plLocation markerLoc = plKeyFinder::Instance().FindLocation("GlobalMarkers", "Markers");
 
-        if (markerLoc.IsValid())
+        if (markerLoc.IsValid()) {
             fMarkerUoid = plUoid(markerLoc, plSceneObject::Index(), "MarkerRoot");
-        else
-        {
+        } else {
             hsAssert(false, "Unable to spawn markers because the marker age was not loaded or found");
             return;
         }
@@ -139,8 +138,10 @@ void pfMarkerInfo::InitSpawned(plKey markerKey)
     // update its state
     Show(fVisible);
     IPlayColor(true);
-    if (fType == kMarkerLocalSelected)
+
+    if (fType == kMarkerLocalSelected) {
         IPlayBounce(true);
+    }
 }
 
 void pfMarkerInfo::Show(bool show)
@@ -166,14 +167,12 @@ void pfMarkerInfo::SetFrozen(double freezeStartTime)
 
 void pfMarkerInfo::Update(double curTime)
 {
-    if (fLastChange != 0 && (curTime - fLastChange) > kFreezeLen)
-    {
+    if (fLastChange != 0 && (curTime - fLastChange) > kFreezeLen) {
         fLastChange = 0;
         IPlayBounce(false);
     }
 
-    if (fIsNew)
-    {
+    if (fIsNew) {
         IPlaySound(true);
         fIsNew = false;
     }
@@ -181,8 +180,7 @@ void pfMarkerInfo::Update(double curTime)
 
 void pfMarkerInfo::Remove()
 {
-    if (fKey)
-    {
+    if (fKey) {
         plLoadCloneMsg* cloneMsg = new plLoadCloneMsg(fKey, pfMarkerMgr::Instance()->GetKey(), 0, false);
         cloneMsg->SetBCastFlag(plMessage::kNetPropagate, false);
         cloneMsg->Send();
@@ -194,21 +192,22 @@ void pfMarkerInfo::Remove()
 
 void pfMarkerInfo::SetType(pfMarkerInfo::MarkerType type)
 {
-    if (fType == kMarkerLocalSelected)
+    if (fType == kMarkerLocalSelected) {
         IPlayBounce(false);
+    }
 
     IPlayColor(false);
     fType = type;
     IPlayColor(true);
 
-    if (fType == kMarkerLocalSelected)
+    if (fType == kMarkerLocalSelected) {
         IPlayBounce(true);
+    }
 }
 
 void pfMarkerInfo::IPlayBounce(bool play)
 {
-    if (fMod && fSpawned)
-    {
+    if (fMod && fSpawned) {
         // Send anim start/stop msg
         plAnimCmdMsg* animMsg = new plAnimCmdMsg;
         animMsg->SetCmd(play ? plAnimCmdMsg::kContinue : plAnimCmdMsg::kStop);
@@ -221,12 +220,11 @@ void pfMarkerInfo::IPlayBounce(bool play)
 
 void pfMarkerInfo::IPlayColor(bool play)
 {
-    if (fMod && fSpawned)
-    {
+    if (fMod && fSpawned) {
         // Play the correct color anim
         plKey key = nil;
-        switch (fType)
-        {
+
+        switch (fType) {
         case kMarkerOpen:
         case kMarkerLocal:
         case kMarkerLocalSelected:
@@ -254,8 +252,7 @@ void pfMarkerInfo::IPlayColor(bool play)
 
 void pfMarkerInfo::IPlaySound(bool place)
 {
-    if (fMod && fSpawned)
-    {
+    if (fMod && fSpawned) {
         const plAudioInterface* ai = fMod->GetTarget()->GetAudioInterface();
 
         plSoundMsg* msg = new plSoundMsg;

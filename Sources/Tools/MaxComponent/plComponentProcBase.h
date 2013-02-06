@@ -53,26 +53,25 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 //  Const Char* [] Version
 //
-class plBaseComponentProc : public ParamMap2UserDlgProc
-{
+class plBaseComponentProc : public ParamMap2UserDlgProc {
 protected:
-    void ILoadComboBox(HWND hComboBox, const char *names[])
-    {
+    void ILoadComboBox(HWND hComboBox, const char* names[]) {
         SendMessage(hComboBox, CB_RESETCONTENT, 0, 0);
-        for (int i = 0; names[i]; i++)
+
+        for (int i = 0; names[i]; i++) {
             SendMessage(hComboBox, CB_ADDSTRING, 0, (LPARAM)names[i]);
+        }
+
         SendMessage(hComboBox, CB_SETCURSEL, 0, 0);
     }
 };
 
-class plLCBoxComponentProc : public plBaseComponentProc
-{
+class plLCBoxComponentProc : public plBaseComponentProc {
 protected:
-    void ILoadListBox(HWND hListBox, IParamBlock2 *pb, int param, const char *names[])
-    {
+    void ILoadListBox(HWND hListBox, IParamBlock2* pb, int param, const char* names[]) {
         SendMessage(hListBox, LB_RESETCONTENT, 0, 0);
-        for (int i = 0; i < pb->Count(param); i++)
-        {
+
+        for (int i = 0; i < pb->Count(param); i++) {
             int idx = pb->GetInt(param, 0, i);
             SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)names[idx]);
         }
@@ -86,44 +85,41 @@ protected:
 
 typedef std::vector<std::string> VStringArray;
 
-class plVSBaseComponentProc : public ParamMap2UserDlgProc
-{
+class plVSBaseComponentProc : public ParamMap2UserDlgProc {
 protected:
-    void ILoadComboBox(HWND hComboBox, VStringArray &names)
-    {
+    void ILoadComboBox(HWND hComboBox, VStringArray& names) {
         SendMessage(hComboBox, CB_RESETCONTENT, 0, 0);
 
         int nNames = 0;
 
-        if(names.empty())
+        if (names.empty()) {
             return;
-        else
+        } else {
             nNames = names.size();
+        }
 
-        if(nNames)
-            for (int i = 0; i < nNames ; i++)
-            {
-                const char * name = names[i].c_str();
+        if (nNames)
+            for (int i = 0; i < nNames ; i++) {
+                const char* name = names[i].c_str();
                 SendMessage(hComboBox, CB_INSERTSTRING, i, (LPARAM)name);
-                
+
             }
-    
+
         SendMessage(hComboBox, CB_SETCURSEL, 0, 0);
-        
+
 
     }
-    
-    void ILoadListBox(HWND hListBox, VStringArray &names, int* GetItemVals, int NumVals)
-    {
+
+    void ILoadListBox(HWND hListBox, VStringArray& names, int* GetItemVals, int NumVals) {
 
         SendMessage(hListBox, LB_RESETCONTENT, 0, 0);
-        for (int i = 0; i < names.size(); i++)
-        {
+
+        for (int i = 0; i < names.size(); i++) {
             const char* c_name = names[i].c_str();
             int idxptr = SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)c_name);
-            
+
             SendMessage(hListBox, LB_SETITEMDATA, (WPARAM) idxptr, (LPARAM) GetItemVals[i]);
-            
+
         }
     }
 

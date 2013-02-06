@@ -43,8 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define PL_DECALMTLADVPB_H
 
 // Param ID's
-enum
-{
+enum {
     // Specular
     kDecalAdvUseSpec,   // Not used anymore, feel free to replace with new fields as necessary
     kDecalAdvSpecType,  // ditto
@@ -73,8 +72,7 @@ enum
 };
 
 // Specular types
-enum
-{
+enum {
     kSpecTypeAlpha,
     kSpecTypeColor,
     kSpecTypeHighlight

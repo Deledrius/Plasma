@@ -65,45 +65,49 @@ void plConvexVolume::IClear()
     delete [] fWorldPlanes;
 }
 
-bool plConvexVolume::AddPlane(const hsPlane3 &plane)
+bool plConvexVolume::AddPlane(const hsPlane3& plane)
 {
     // First check for a redundant plane (since we're convex, a comparison of normals should do)
     int i;
+
     // Start the comparison with the most recently added plane, it's most likely to match
-    for (i = fNumPlanes - 1; i >= 0; i--)
-    {
+    for (i = fNumPlanes - 1; i >= 0; i--) {
         const float MIN_COS_THETA = 0.99999f; // translates to < 0.25 degree angle
-        // If the angle betwen the normals is close enough, count them as equal.        
-        if (fLocalPlanes[i].fN.InnerProduct(plane.fN) >= MIN_COS_THETA)
-            return false; // no need to add it
+
+        // If the angle betwen the normals is close enough, count them as equal.
+        if (fLocalPlanes[i].fN.InnerProduct(plane.fN) >= MIN_COS_THETA) {
+            return false;    // no need to add it
+        }
     }
+
     fNumPlanes++;
     //delete [] fFlags;
     //fFlags = new uint32_t[fNumPlanes];
 
-    hsPlane3 *tempPlanes = new hsPlane3[fNumPlanes];
-    for (i = 0; i < fNumPlanes - 1; i++)
-    {
+    hsPlane3* tempPlanes = new hsPlane3[fNumPlanes];
+
+    for (i = 0; i < fNumPlanes - 1; i++) {
         tempPlanes[i] = fLocalPlanes[i];
     }
+
     tempPlanes[fNumPlanes - 1] = plane;
 
     delete [] fLocalPlanes;
     fLocalPlanes = tempPlanes;
     delete [] fWorldPlanes;
     fWorldPlanes = new hsPlane3[fNumPlanes];
-    
+
     return true;
 }
 
-void plConvexVolume::Update(const hsMatrix44 &l2w)
+void plConvexVolume::Update(const hsMatrix44& l2w)
 {
     int i;
     hsPoint3 planePt;
-    for (i = 0; i < fNumPlanes; i++)
-    {
+
+    for (i = 0; i < fNumPlanes; i++) {
         // Since fN is an hsVector3, it will only apply the rotational aspect of the transform...
-        fWorldPlanes[i].fN = l2w * fLocalPlanes[i].fN; 
+        fWorldPlanes[i].fN = l2w * fLocalPlanes[i].fN;
         hsVector3 tmp = fLocalPlanes[i].fN * fLocalPlanes[i].fD;
         planePt.Set(&tmp);
         fWorldPlanes[i].fD = -(l2w * planePt).InnerProduct(fWorldPlanes[i].fN);
@@ -119,65 +123,70 @@ void plConvexVolume::SetNumPlanesAndClear(const uint32_t num)
     fNumPlanes = num;
 }
 
-void plConvexVolume::SetPlane(const hsPlane3 &plane, const uint32_t index)
+void plConvexVolume::SetPlane(const hsPlane3& plane, const uint32_t index)
 {
     fLocalPlanes[index] = plane;
 }
 
-bool plConvexVolume::IsInside(const hsPoint3 &pos) const
+bool plConvexVolume::IsInside(const hsPoint3& pos) const
 {
     int i;
-    for( i = 0; i < fNumPlanes; i++ )
-    {
-        if (!TestPlane(pos, fWorldPlanes[i]))
+
+    for (i = 0; i < fNumPlanes; i++) {
+        if (!TestPlane(pos, fWorldPlanes[i])) {
             return false;
+        }
     }
 
     return true;
 }
 
-bool plConvexVolume::ResolvePoint(hsPoint3 &pos) const
+bool plConvexVolume::ResolvePoint(hsPoint3& pos) const
 {
     float minDist = 1.e33f;
     int32_t minIndex = -1;
 
     float currDist;
     int i;
-    for (i = 0; i < fNumPlanes; i++)
-    {
-        currDist = -fWorldPlanes[i].fD - fWorldPlanes[i].fN.InnerProduct(pos);
-        if (currDist < 0)
-            return false; // We're not inside this plane, and thus outside the volume
 
-        if (currDist < minDist)
-        {
+    for (i = 0; i < fNumPlanes; i++) {
+        currDist = -fWorldPlanes[i].fD - fWorldPlanes[i].fN.InnerProduct(pos);
+
+        if (currDist < 0) {
+            return false;    // We're not inside this plane, and thus outside the volume
+        }
+
+        if (currDist < minDist) {
             minDist = currDist;
             minIndex = i;
         }
     }
+
     pos += (-fWorldPlanes[minIndex].fD - fWorldPlanes[minIndex].fN.InnerProduct(pos)) * fWorldPlanes[minIndex].fN;
     return true;
 }
 
-bool plConvexVolume::BouncePoint(hsPoint3 &pos, hsVector3 &velocity, float bounce, float friction) const
+bool plConvexVolume::BouncePoint(hsPoint3& pos, hsVector3& velocity, float bounce, float friction) const
 {
     float minDist = 1.e33f;
     int32_t minIndex = -1;
 
     float currDist;
     int i;
-    for (i = 0; i < fNumPlanes; i++)
-    {
-        currDist = -fWorldPlanes[i].fD - fWorldPlanes[i].fN.InnerProduct(pos);
-        if (currDist < 0)
-            return false; // We're not inside this plane, and thus outside the volume
 
-        if (currDist < minDist)
-        {
+    for (i = 0; i < fNumPlanes; i++) {
+        currDist = -fWorldPlanes[i].fD - fWorldPlanes[i].fN.InnerProduct(pos);
+
+        if (currDist < 0) {
+            return false;    // We're not inside this plane, and thus outside the volume
+        }
+
+        if (currDist < minDist) {
             minDist = currDist;
             minIndex = i;
         }
     }
+
     pos += (-fWorldPlanes[minIndex].fD - fWorldPlanes[minIndex].fN.InnerProduct(pos)) * fWorldPlanes[minIndex].fN;
     hsVector3 bnc = -velocity.InnerProduct(fWorldPlanes[minIndex].fN) * fWorldPlanes[minIndex].fN;
     velocity += bnc;
@@ -187,23 +196,23 @@ bool plConvexVolume::BouncePoint(hsPoint3 &pos, hsVector3 &velocity, float bounc
     return true;
 }
 
-void plConvexVolume::Read(hsStream* s, hsResMgr *mgr)
+void plConvexVolume::Read(hsStream* s, hsResMgr* mgr)
 {
     SetNumPlanesAndClear(s->ReadLE32());
     int i;
-    for (i = 0; i < fNumPlanes; i++)
-    {
+
+    for (i = 0; i < fNumPlanes; i++) {
         fLocalPlanes[i].Read(s);
         //fFlags[i] = s->ReadLE32();
     }
 }
 
-void plConvexVolume::Write(hsStream* s, hsResMgr *mgr)
+void plConvexVolume::Write(hsStream* s, hsResMgr* mgr)
 {
     s->WriteLE32(fNumPlanes);
     int i;
-    for (i = 0; i < fNumPlanes; i++)
-    {
+
+    for (i = 0; i < fNumPlanes; i++) {
         fLocalPlanes[i].Write(s);
         //s->WriteLE32(fFlags[i]);
     }

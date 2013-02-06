@@ -58,14 +58,14 @@ void plInstanceDrawInterface::Read(hsStream* stream, hsResMgr* mgr)
     plDrawInterface::Read(stream, mgr);
 
     fTargetID = stream->ReadLE32();
-    plSwapSpansRefMsg *sMsg = new plSwapSpansRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1);
+    plSwapSpansRefMsg* sMsg = new plSwapSpansRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1);
     mgr->ReadKeyNotifyMe(stream, sMsg, plRefFlags::kActiveRef);
 }
 
 void plInstanceDrawInterface::Write(hsStream* stream, hsResMgr* mgr)
 {
     plDrawInterface::Write(stream, mgr);
-    
+
     stream->WriteLE32(fTargetID);
     mgr->WriteKey(stream, fDrawable->GetKey());
 }
@@ -78,35 +78,38 @@ bool plInstanceDrawInterface::MsgReceive(plMessage* msg)
     // contain an LOD field, saying which avatar LOD this is targetted for.
     // Just always specifying 0 won't break anything, it just circumvents some
     // optimizations the pipeline can make, so it'll look right, just slower.
-    plReplaceGeometryMsg *rMsg = plReplaceGeometryMsg::ConvertNoRef(msg);
-    if (rMsg)
-    {
-        if (rMsg->fFlags & rMsg->kAddingGeom)
+    plReplaceGeometryMsg* rMsg = plReplaceGeometryMsg::ConvertNoRef(msg);
+
+    if (rMsg) {
+        if (rMsg->fFlags & rMsg->kAddingGeom) {
             AddSharedMesh(rMsg->fMesh, rMsg->fMaterial, rMsg->fFlags & rMsg->kAddToFront);
-        else
+        } else {
             RemoveSharedMesh(rMsg->fMesh);
-        
+        }
+
         return true;
     }
+
 #endif // UNUSED
 
     plSwapSpansRefMsg* refMsg = plSwapSpansRefMsg::ConvertNoRef(msg);
-    if (refMsg)
-    {
-        if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
+
+    if (refMsg) {
+        if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
             fDrawable = nil;
-        else
+        } else {
             fDrawable = plDrawableSpans::ConvertNoRef(refMsg->GetRef());
+        }
+
         return true;
     }
-    
+
     return plDrawInterface::MsgReceive(msg);
 }
 
-void plInstanceDrawInterface::AddSharedMesh(plSharedMesh *mesh, hsGMaterial *mat, bool addToFront, int lod, bool partialSort)
+void plInstanceDrawInterface::AddSharedMesh(plSharedMesh* mesh, hsGMaterial* mat, bool addToFront, int lod, bool partialSort)
 {
-    if (fDrawable == nil)
-    {
+    if (fDrawable == nil) {
         hsAssert(false, "Missing drawable when instancing a shared mesh. Ignoring instance.");
         return;
     }
@@ -114,82 +117,84 @@ void plInstanceDrawInterface::AddSharedMesh(plSharedMesh *mesh, hsGMaterial *mat
 #ifdef MF_NOSHADOW_ACC
     // TESTHACKERY FOLLOWS - GlassesNoShadow
     uint32_t noShadHack = 0;
-    if( mesh->GetKey() && (mesh->GetKey()->GetName().Find("lasses") >= 0 || mesh->GetKey()->GetName().Find("oggles") >= 0) )
+
+    if (mesh->GetKey() && (mesh->GetKey()->GetName().Find("lasses") >= 0 || mesh->GetKey()->GetName().Find("oggles") >= 0)) {
         noShadHack = plGeometrySpan::kPropNoShadowCast;
+    }
+
 #endif // MF_NOSHADOW_ACC
 
     int i;
-    for (i = 0; i < mesh->fSpans.GetCount(); i++)
-    {
+
+    for (i = 0; i < mesh->fSpans.GetCount(); i++) {
         mesh->fSpans[i]->fMaterial = mat;
 
-        if( partialSort )
-        {
+        if (partialSort) {
             mesh->fSpans[i]->fProps |= plGeometrySpan::kPartialSort;
-        }
-        else
+        } else {
             mesh->fSpans[i]->fProps &= ~plGeometrySpan::kPartialSort;
+        }
 
 #ifdef MF_NOSHADOW_ACC
         mesh->fSpans[i]->fProps |= noShadHack;
 #endif // MF_NOSHADOW_ACC
     }
-            
+
     // Add the spans to the drawable
-    uint32_t index = (uint32_t)-1;
+    uint32_t index = (uint32_t) - 1;
     index = fDrawable->AppendDISpans(mesh->fSpans, index, false, true, addToFront, lod);
-            
+
     // Tell the drawInterface what drawable and index it wants.
     uint8_t iDraw = (uint8_t)GetNumDrawables();
     ISetDrawable(iDraw, fDrawable);
     SetDrawableMeshIndex(iDraw, index);
     SetSharedMesh(iDraw, mesh);
-    if (GetProperty(kDisable))
+
+    if (GetProperty(kDisable)) {
         fDrawables[iDraw]->SetProperty(fDrawableIndices[iDraw], kDisable, true);
+    }
 
 #ifdef HS_DEBUGGING
     plDISpansMsg* diMsg = new plDISpansMsg(fDrawable->GetKey(), plDISpansMsg::kAddingSpan, index, plDISpansMsg::kLeaveEmptyDrawable);
     diMsg->SetSender(GetKey());
     diMsg->Send();
-#endif          
+#endif
 
-    plSharedMeshBCMsg *smMsg = new plSharedMeshBCMsg;
+    plSharedMeshBCMsg* smMsg = new plSharedMeshBCMsg;
     smMsg->SetSender(GetKey());
     smMsg->fDraw = fDrawable;
     smMsg->fMesh = mesh;
     smMsg->fIsAdding = true;
     smMsg->Send();
-            
-    if (mesh->fMorphSet)
-    {
-        plMorphSequence *morph = const_cast<plMorphSequence*>(plMorphSequence::ConvertNoRef(fOwner->GetModifierByType(plMorphSequence::Index())));
-        if (morph)
-        {
+
+    if (mesh->fMorphSet) {
+        plMorphSequence* morph = const_cast<plMorphSequence*>(plMorphSequence::ConvertNoRef(fOwner->GetModifierByType(plMorphSequence::Index())));
+
+        if (morph) {
             //hsgResMgr::ResMgr()->AddViaNotify(mesh->GetKey(), new plGenRefMsg(morph->GetKey(), plRefMsg::kOnCreate, -1, -1), plRefFlags::kPassiveRef);
             morph->AddSharedMesh(mesh);
         }
     }
 }
 
-void plInstanceDrawInterface::RemoveSharedMesh(plSharedMesh *mesh)
+void plInstanceDrawInterface::RemoveSharedMesh(plSharedMesh* mesh)
 {
     uint32_t geoIndex = fMeshes.Find(mesh);
-    if (geoIndex != fMeshes.kMissingIndex)
-    {
+
+    if (geoIndex != fMeshes.kMissingIndex) {
         IClearIndex((uint8_t)geoIndex);
-                
-        plSharedMeshBCMsg *smMsg = new plSharedMeshBCMsg;
+
+        plSharedMeshBCMsg* smMsg = new plSharedMeshBCMsg;
         smMsg->SetSender(GetKey());
         smMsg->fDraw = fDrawable;
         smMsg->fMesh = mesh;
         smMsg->fIsAdding = false;
         smMsg->Send();
-                
-        if (mesh->fMorphSet)
-        {
-            plMorphSequence *morph = const_cast<plMorphSequence*>(plMorphSequence::ConvertNoRef(fOwner->GetModifierByType(plMorphSequence::Index())));
-            if (morph)
-            {
+
+        if (mesh->fMorphSet) {
+            plMorphSequence* morph = const_cast<plMorphSequence*>(plMorphSequence::ConvertNoRef(fOwner->GetModifierByType(plMorphSequence::Index())));
+
+            if (morph) {
                 //morph->GetKey()->Release(mesh->GetKey());
                 morph->RemoveSharedMesh(mesh);
             }
@@ -199,22 +204,21 @@ void plInstanceDrawInterface::RemoveSharedMesh(plSharedMesh *mesh)
 
 void plInstanceDrawInterface::ICheckDrawableIndex(uint8_t which)
 {
-    if( which >= fMeshes.GetCount() )
-    {
-        fMeshes.ExpandAndZero(which+1);
+    if (which >= fMeshes.GetCount()) {
+        fMeshes.ExpandAndZero(which + 1);
     }
-    
+
     plDrawInterface::ICheckDrawableIndex(which);
 }
 
 void plInstanceDrawInterface::ReleaseData()
 {
     fMeshes.Reset();
-    
+
     plDrawInterface::ReleaseData();
 }
 
-void plInstanceDrawInterface::SetSharedMesh(uint8_t which, plSharedMesh *mesh)
+void plInstanceDrawInterface::SetSharedMesh(uint8_t which, plSharedMesh* mesh)
 {
     ICheckDrawableIndex(which);
     fMeshes[which] = mesh;
@@ -222,27 +226,29 @@ void plInstanceDrawInterface::SetSharedMesh(uint8_t which, plSharedMesh *mesh)
 
 void plInstanceDrawInterface::IClearIndex(uint8_t which)
 {
-    plDrawableSpans *drawable = plDrawableSpans::ConvertNoRef(fDrawables[which]);
-    if (drawable != nil)
-    {
+    plDrawableSpans* drawable = plDrawableSpans::ConvertNoRef(fDrawables[which]);
+
+    if (drawable != nil) {
         plDISpansMsg* diMsg = new plDISpansMsg(fDrawable->GetKey(), plDISpansMsg::kRemovingSpan, fDrawableIndices[which], plDISpansMsg::kLeaveEmptyDrawable);
         diMsg->SetSender(GetKey());
         diMsg->Send();
     }
-    
+
     fDrawables.Remove(which);
     fDrawableIndices.Remove(which);
     fMeshes.Remove(which);
 }
 
 // Temp testing - not really ideal. Check with Bob for real soln.
-int32_t plInstanceDrawInterface::GetSharedMeshIndex(const plSharedMesh *mesh) const
+int32_t plInstanceDrawInterface::GetSharedMeshIndex(const plSharedMesh* mesh) const
 {
     int i;
-    for( i = 0; i < fMeshes.GetCount(); i++ )
-    {
-        if( fMeshes[i] == mesh )
+
+    for (i = 0; i < fMeshes.GetCount(); i++) {
+        if (fMeshes[i] == mesh) {
             return i;
+        }
     }
+
     return -1;
 }

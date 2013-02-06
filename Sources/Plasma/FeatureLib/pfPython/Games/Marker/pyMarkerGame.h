@@ -52,8 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCli.h"
 
-class pyMarkerGame : public pyGameCli
-{
+class pyMarkerGame : public pyGameCli {
 protected:
     pyMarkerGame();
     pyMarkerGame(pfGameCli* client);

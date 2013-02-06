@@ -52,8 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCliMsg.h"
 
-class pyTTTMsg : public pyGameCliMsg
-{
+class pyTTTMsg : public pyGameCliMsg {
 protected:
     pyTTTMsg();
     pyTTTMsg(pfGameCliMsg* msg);
@@ -75,8 +74,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyTTTGameStartedMsg : public pyTTTMsg
-{
+class pyTTTGameStartedMsg : public pyTTTMsg {
 protected:
     pyTTTGameStartedMsg();
     pyTTTGameStartedMsg(pfGameCliMsg* msg);
@@ -94,8 +92,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyTTTGameOverMsg : public pyTTTMsg
-{
+class pyTTTGameOverMsg : public pyTTTMsg {
 protected:
     pyTTTGameOverMsg();
     pyTTTGameOverMsg(pfGameCliMsg* msg);
@@ -114,8 +111,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyTTTMoveMadeMsg : public pyTTTMsg
-{
+class pyTTTMoveMadeMsg : public pyTTTMsg {
 protected:
     pyTTTMoveMadeMsg();
     pyTTTMoveMadeMsg(pfGameCliMsg* msg);

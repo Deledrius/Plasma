@@ -68,10 +68,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 plString plFileName::GetFileName() const
 {
     int end = fName.FindLast('/');
-    if (end < 0)
+
+    if (end < 0) {
         end = fName.FindLast('\\');
-    if (end < 0)
+    }
+
+    if (end < 0) {
         return fName;
+    }
 
     return fName.Substr(end + 1);
 }
@@ -82,11 +86,14 @@ plString plFileName::GetFileExt() const
 
     // Be sure not to get a dot in the directory!
     int end = fName.FindLast('/');
-    if (end < 0)
-        end = fName.FindLast('\\');
 
-    if (dot > end)
+    if (end < 0) {
+        end = fName.FindLast('\\');
+    }
+
+    if (dot > end) {
         return fName.Substr(dot + 1);
+    }
 
     return plString::Null;
 }
@@ -96,22 +103,30 @@ plString plFileName::GetFileNameNoExt() const
     int dot = fName.FindLast('.');
 
     int end = fName.FindLast('/');
-    if (end < 0)
+
+    if (end < 0) {
         end = fName.FindLast('\\');
+    }
 
     // Be sure not to get a dot in the directory!
-    if (dot > end)
+    if (dot > end) {
         return fName.Substr(end + 1, dot - end - 1);
+    }
+
     return fName.Substr(end + 1);
 }
 
 plFileName plFileName::StripFileName() const
 {
     int end = fName.FindLast('/');
-    if (end < 0)
+
+    if (end < 0) {
         end = fName.FindLast('\\');
-    if (end < 0)
+    }
+
+    if (end < 0) {
         return "";
+    }
 
     return fName.Left(end);
 }
@@ -122,11 +137,14 @@ plFileName plFileName::StripFileExt() const
 
     // Be sure not to get a dot in the directory!
     int end = fName.FindLast('/');
-    if (end < 0)
-        end = fName.FindLast('\\');
 
-    if (dot > end)
+    if (end < 0) {
+        end = fName.FindLast('\\');
+    }
+
+    if (dot > end) {
         return fName.Left(dot);
+    }
 
     return *this;
 }
@@ -134,21 +152,25 @@ plFileName plFileName::StripFileExt() const
 plFileName plFileName::Normalize(char slash) const
 {
     plStringBuffer<char> norm;
-    char *norm_p = norm.CreateWritableBuffer(fName.GetSize());
-    for (const char *p = fName.c_str(); *p; ++p) {
-        if (*p == '/' || *p == '\\')
+    char* norm_p = norm.CreateWritableBuffer(fName.GetSize());
+
+    for (const char* p = fName.c_str(); *p; ++p) {
+        if (*p == '/' || *p == '\\') {
             *norm_p++ = slash;
-        else
+        } else {
             *norm_p++ = *p;
+        }
     }
+
     *norm_p = 0;
     return plString(norm);
 }
 
 plFileName plFileName::AbsolutePath() const
 {
-    if (!IsValid())
+    if (!IsValid()) {
         return *this;
+    }
 
     plFileName path = Normalize();
 
@@ -156,17 +178,19 @@ plFileName plFileName::AbsolutePath() const
     plStringBuffer<wchar_t> wideName = path.fName.ToWchar();
     wchar_t path_sm[MAX_PATH];
     uint32_t path_length = GetFullPathNameW(wideName, MAX_PATH, path_sm, nullptr);
+
     if (path_length >= MAX_PATH) {
         // Buffer not big enough
-        wchar_t *path_lg = new wchar_t[path_length];
+        wchar_t* path_lg = new wchar_t[path_length];
         GetFullPathNameW(wideName, path_length, path_lg, nullptr);
         path = plString::FromWchar(path_lg);
         delete [] path_lg;
     } else {
         path = plString::FromWchar(path_sm);
     }
+
 #else
-    char *path_a = realpath(path.fName.c_str(), nullptr);
+    char* path_a = realpath(path.fName.c_str(), nullptr);
     hsAssert(path_a, "Failure to get absolute path (unsupported libc?)");
     path = path_a;
     free(path_a);
@@ -175,54 +199,71 @@ plFileName plFileName::AbsolutePath() const
     return path;
 }
 
-plFileName plFileName::Join(const plFileName &base, const plFileName &path)
+plFileName plFileName::Join(const plFileName& base, const plFileName& path)
 {
-    if (!base.IsValid())
+    if (!base.IsValid()) {
         return path;
-    if (!path.IsValid())
+    }
+
+    if (!path.IsValid()) {
         return base;
+    }
 
     char last = base.fName.CharAt(base.GetSize() - 1);
     char first = path.fName.CharAt(0);
+
     if (last != '/' && last != '\\') {
         if (first != '/' && first != '\\') {
             return plString::Format("%s" PATH_SEPARATOR_STR "%s",
                                     base.fName.c_str(), path.fName.c_str());
         }
+
         return base.fName + path.fName;
     } else if (first != '/' && first != '\\') {
         return base.fName + path.fName;
     }
+
     // Both have a slash, but we only need one
     return base.fName + path.fName.Substr(1);
 }
 
 
 /* plFileInfo */
-plFileInfo::plFileInfo(const plFileName &filename)
+plFileInfo::plFileInfo(const plFileName& filename)
     : fFileSize(-1), fCreateTime(), fModifyTime(), fFlags()
 {
-    if (!filename.IsValid())
+    if (!filename.IsValid()) {
         return;
+    }
 
 #if HS_BUILD_FOR_WIN32
     struct __stat64 info;
-    if (!_wstat64(filename.AsString().ToWchar(), &info) == 0)
+
+    if (!_wstat64(filename.AsString().ToWchar(), &info) == 0) {
         return;
+    }
+
 #else
     struct stat info;
-    if (!stat(filename.AsString().c_str(), &info) == 0)
+
+    if (!stat(filename.AsString().c_str(), &info) == 0) {
         return;
+    }
+
 #endif
 
     fFlags |= kEntryExists;
     fFileSize = info.st_size;
     fCreateTime = info.st_ctime;
     fModifyTime = info.st_mtime;
-    if (info.st_mode & S_IFDIR)
+
+    if (info.st_mode & S_IFDIR) {
         fFlags |= kIsDirectory;
-    if (info.st_mode & S_IFREG)
+    }
+
+    if (info.st_mode & S_IFREG) {
         fFlags |= kIsNormalFile;
+    }
 }
 
 
@@ -234,17 +275,19 @@ plFileName plFileSystem::GetCWD()
 #if HS_BUILD_FOR_WIN32
     wchar_t cwd_sm[MAX_PATH];
     uint32_t cwd_length = GetCurrentDirectoryW(MAX_PATH, cwd_sm);
+
     if (cwd_length >= MAX_PATH) {
         // Buffer not big enough
-        wchar_t *cwd_lg = new wchar_t[cwd_length];
+        wchar_t* cwd_lg = new wchar_t[cwd_length];
         GetCurrentDirectoryW(cwd_length, cwd_lg);
         cwd = plString::FromWchar(cwd_lg);
         delete [] cwd_lg;
     } else {
         cwd = plString::FromWchar(cwd_sm);
     }
+
 #else
-    char *cwd_a = getcwd(nullptr, 0);
+    char* cwd_a = getcwd(nullptr, 0);
     hsAssert(cwd_a, "Failure to get working directory (unsupported libc?)");
     cwd = cwd_a;
     free(cwd_a);
@@ -253,7 +296,7 @@ plFileName plFileSystem::GetCWD()
     return cwd;
 }
 
-bool plFileSystem::SetCWD(const plFileName &cwd)
+bool plFileSystem::SetCWD(const plFileName& cwd)
 {
 #if HS_BUILD_FOR_WIN32
     return SetCurrentDirectoryW(cwd.AsString().ToWchar());
@@ -262,7 +305,7 @@ bool plFileSystem::SetCWD(const plFileName &cwd)
 #endif
 }
 
-FILE *plFileSystem::Open(const plFileName &filename, const char *mode)
+FILE* plFileSystem::Open(const plFileName& filename, const char* mode)
 {
 #if HS_BUILD_FOR_WIN32
     wchar_t wmode[8];
@@ -274,6 +317,7 @@ FILE *plFileSystem::Open(const plFileName &filename, const char *mode)
         hsAssert(!(mode[i] & 0x80), "I SAID mode should ONLY ever be ANSI chars!");
         wmode[i] = static_cast<wchar_t>(mode[i]);
     }
+
     wmode[mlen] = 0;
 
     return _wfopen(filename.AsString().ToWchar(), wmode);
@@ -282,7 +326,7 @@ FILE *plFileSystem::Open(const plFileName &filename, const char *mode)
 #endif
 }
 
-bool plFileSystem::Unlink(const plFileName &filename)
+bool plFileSystem::Unlink(const plFileName& filename)
 {
 #if HS_BUILD_FOR_WIN32
     plStringBuffer<wchar_t> wfilename = filename.AsString().ToWchar();
@@ -294,36 +338,45 @@ bool plFileSystem::Unlink(const plFileName &filename)
 #endif
 }
 
-bool plFileSystem::Move(const plFileName &from, const plFileName &to)
+bool plFileSystem::Move(const plFileName& from, const plFileName& to)
 {
 #if HS_BUILD_FOR_WIN32
     return MoveFileExW(from.AsString().ToWchar(), to.AsString().ToWchar(),
                        MOVEFILE_REPLACE_EXISTING);
 #else
-    if (!Copy(from, to))
+
+    if (!Copy(from, to)) {
         return false;
+    }
+
     return Unlink(from);
 #endif
 }
 
-bool plFileSystem::Copy(const plFileName &from, const plFileName &to)
+bool plFileSystem::Copy(const plFileName& from, const plFileName& to)
 {
 #if HS_BUILD_FOR_WIN32
     return CopyFileW(from.AsString().ToWchar(), to.AsString().ToWchar(), FALSE);
 #else
-    typedef std::unique_ptr<FILE, std::function<int (FILE *)>> _FileRef;
+    typedef std::unique_ptr<FILE, std::function<int (FILE*)>> _FileRef;
 
     _FileRef ffrom(Open(from, "rb"), fclose);
     _FileRef fto(Open(to, "wb"), fclose);
-    if (!ffrom.get() || !fto.get())
+
+    if (!ffrom.get() || !fto.get()) {
         return false;
+    }
 
     size_t count;
     uint8_t buffer[4096];
+
     while (!feof(ffrom.get())) {
         count = fread(buffer, sizeof(uint8_t), arrsize(buffer), ffrom.get());
-        if (ferror(ffrom.get()))
+
+        if (ferror(ffrom.get())) {
             return false;
+        }
+
         fwrite(buffer, sizeof(uint8_t), count, fto.get());
     }
 
@@ -331,9 +384,10 @@ bool plFileSystem::Copy(const plFileName &from, const plFileName &to)
 #endif
 }
 
-bool plFileSystem::CreateDir(const plFileName &dir, bool checkParents)
+bool plFileSystem::CreateDir(const plFileName& dir, bool checkParents)
 {
     plFileName fdir = dir;
+
     if (fdir.GetFileName().IsEmpty()) {
         hsDebugMessage("WARNING: CreateDir called with useless trailing slash", 0);
         fdir = fdir.StripFileName();
@@ -341,12 +395,15 @@ bool plFileSystem::CreateDir(const plFileName &dir, bool checkParents)
 
     if (checkParents) {
         plFileName parent = fdir.StripFileName();
-        if (parent.IsValid() && !plFileInfo(parent).Exists() && !CreateDir(parent, true))
+
+        if (parent.IsValid() && !plFileInfo(parent).Exists() && !CreateDir(parent, true)) {
             return false;
+        }
     }
 
-    if (plFileInfo(fdir).Exists())
+    if (plFileInfo(fdir).Exists()) {
         return true;
+    }
 
 #if HS_BUILD_FOR_WIN32
     return CreateDirectoryW(fdir.AsString().ToWchar(), nullptr);
@@ -355,19 +412,24 @@ bool plFileSystem::CreateDir(const plFileName &dir, bool checkParents)
 #endif
 }
 
-std::vector<plFileName> plFileSystem::ListDir(const plFileName &path, const char *pattern)
+std::vector<plFileName> plFileSystem::ListDir(const plFileName& path, const char* pattern)
 {
     std::vector<plFileName> contents;
 
 #if HS_BUILD_FOR_WIN32
-    if (!pattern || !pattern[0])
+
+    if (!pattern || !pattern[0]) {
         pattern = "*";
+    }
+
     plFileName searchPattern = plFileName::Join(path, pattern);
 
     WIN32_FIND_DATAW findData;
     HANDLE hFind = FindFirstFileW(searchPattern.AsString().ToWchar(), &findData);
-    if (hFind == INVALID_HANDLE_VALUE)
+
+    if (hFind == INVALID_HANDLE_VALUE) {
         return contents;
+    }
 
     do {
         if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
@@ -380,22 +442,27 @@ std::vector<plFileName> plFileSystem::ListDir(const plFileName &path, const char
 
     FindClose(hFind);
 #else
-    DIR *dir = opendir(path.AsString().c_str());
-    if (!dir)
-        return contents;
+    DIR* dir = opendir(path.AsString().c_str());
 
-    struct dirent *de;
+    if (!dir) {
+        return contents;
+    }
+
+    struct dirent* de;
+
     while (de = readdir(dir)) {
         plFileName dir_name = plFileName::Join(path, de->d_name);
+
         if (plFileInfo(dir_name).IsDirectory()) {
             // Should also handle . and ..
             continue;
         }
 
-        if (pattern && pattern[0] && fnmatch(pattern, de->d_name, 0))
+        if (pattern && pattern[0] && fnmatch(pattern, de->d_name, 0)) {
             contents.push_back(dir_name);
-        else if (!pattern || !pattern[0])
+        } else if (!pattern || !pattern[0]) {
             contents.push_back(dir_name);
+        }
     }
 
     closedir(dir);
@@ -404,7 +471,7 @@ std::vector<plFileName> plFileSystem::ListDir(const plFileName &path, const char
     return contents;
 }
 
-std::vector<plFileName> plFileSystem::ListSubdirs(const plFileName &path)
+std::vector<plFileName> plFileSystem::ListSubdirs(const plFileName& path)
 {
     std::vector<plFileName> contents;
 
@@ -413,29 +480,38 @@ std::vector<plFileName> plFileSystem::ListSubdirs(const plFileName &path)
 
     WIN32_FIND_DATAW findData;
     HANDLE hFind = FindFirstFileW(searchPattern.AsString().ToWchar(), &findData);
-    if (hFind == INVALID_HANDLE_VALUE)
+
+    if (hFind == INVALID_HANDLE_VALUE) {
         return contents;
+    }
 
     do {
         if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
             plFileName name = plString::FromWchar(findData.cFileName);
-            if (name != "." && name != "..")
+
+            if (name != "." && name != "..") {
                 contents.push_back(plFileName::Join(path, name));
+            }
         }
     } while (FindNextFileW(hFind, &findData));
 
     FindClose(hFind);
 #else
-    DIR *dir = opendir(path.AsString().c_str());
-    if (!dir)
-        return contents;
+    DIR* dir = opendir(path.AsString().c_str());
 
-    struct dirent *de;
+    if (!dir) {
+        return contents;
+    }
+
+    struct dirent* de;
+
     while (de = readdir(dir)) {
         if (plFileInfo(de->d_name).IsDirectory()) {
             plFileName name = de->d_name;
-            if (name != "." && name != "..")
+
+            if (name != "." && name != "..") {
                 contents.push_back(plFileName::Join(path, name));
+            }
         }
     }
 
@@ -452,8 +528,10 @@ plFileName plFileSystem::GetUserDataPath()
     if (!_userData.IsValid()) {
 #if HS_BUILD_FOR_WIN32
         wchar_t path[MAX_PATH];
-        if (!SHGetSpecialFolderPathW(NULL, path, CSIDL_LOCAL_APPDATA, TRUE))
+
+        if (!SHGetSpecialFolderPathW(NULL, path, CSIDL_LOCAL_APPDATA, TRUE)) {
             return "";
+        }
 
         _userData = plFileName::Join(plString::FromWchar(path), plProduct::LongName());
 #else
@@ -480,11 +558,12 @@ plFileName plFileSystem::GetLogPath()
 }
 
 #if !HS_BUILD_FOR_WIN32
-static plFileName _CheckReadlink(const char *link_path)
+static plFileName _CheckReadlink(const char* link_path)
 {
     plFileInfo info(link_path);
+
     if (info.Exists()) {
-        char *path = new char[info.FileSize()];
+        char* path = new char[info.FileSize()];
         readlink(link_path, path, info.FileSize());
         plFileName appPath = plString::FromUtf8(path, info.FileSize());
         delete [] path;
@@ -503,15 +582,20 @@ plFileName plFileSystem::GetCurrentAppPath()
 #if HS_BUILD_FOR_WIN32
     wchar_t path[MAX_PATH];
     size_t size = GetModuleFileNameW(nullptr, path, MAX_PATH);
+
     if (size >= MAX_PATH) {
         // Buffer not big enough
         size_t bigger = MAX_PATH;
+
         do {
             bigger *= 2;
-            wchar_t *path_lg = new wchar_t[bigger];
+            wchar_t* path_lg = new wchar_t[bigger];
             size = GetModuleFileNameW(nullptr, path_lg, bigger);
-            if (size < bigger)
+
+            if (size < bigger) {
                 appPath = plString::FromWchar(path_lg);
+            }
+
             delete [] path_lg;
         } while (!appPath.IsValid());
     } else {
@@ -523,43 +607,56 @@ plFileName plFileSystem::GetCurrentAppPath()
     // Look for /proc/self/exe (Linux), /proc/curproc/file (FreeBSD / Mac),
     // then /proc/self/path/a.out (Solaris).  If none were found, you're SOL
     appPath = _CheckReadlink("/proc/self/exe");
-    if (appPath.IsValid())
+
+    if (appPath.IsValid()) {
         return appPath;
+    }
 
     appPath = _CheckReadlink("/proc/curproc/file");
-    if (appPath.IsValid())
+
+    if (appPath.IsValid()) {
         return appPath;
+    }
 
     appPath = _CheckReadlink("/proc/self/path/a.out");
-    if (appPath.IsValid())
+
+    if (appPath.IsValid()) {
         return appPath;
+    }
 
     hsAssert(0, "Your OS doesn't make life easy, does it?");
 #endif
 }
 
-plFileName plFileSystem::GetTempFilename(const char *prefix, const plFileName &path)
+plFileName plFileSystem::GetTempFilename(const char* prefix, const plFileName& path)
 {
 #if HS_BUILD_FOR_WIN32
     // GetTempFileName() never uses more than 3 chars for the prefix
     wchar_t wprefix[4];
-    for (size_t i=0; i<4; ++i)
+
+    for (size_t i = 0; i < 4; ++i) {
         wprefix[i] = prefix[i];
+    }
+
     wprefix[3] = 0;
 
     wchar_t temp[MAX_PATH];
-    if (GetTempFileNameW(path.AsString().ToWchar(), wprefix, 0, temp))
+
+    if (GetTempFileNameW(path.AsString().ToWchar(), wprefix, 0, temp)) {
         return plString::FromWchar(temp);
+    }
 
     return "";
 #else
     plFileName tmpdir = path;
-    if (!tmpdir.IsValid())
+
+    if (!tmpdir.IsValid()) {
         tmpdir = "/tmp";
+    }
 
     // "/tmp/prefixXXXXXX"
     size_t temp_len = tmpdir.GetSize() + strlen(prefix) + 7;
-    char *temp = new char[temp_len + 1];
+    char* temp = new char[temp_len + 1];
     snprintf(temp, temp_len + 1, "%s/%sXXXXXX", tmpdir.AsString().c_str(), prefix);
     mktemp(temp);
     plFileName result = temp;

@@ -51,21 +51,19 @@ class plKey;
 class plNotifyMsg;
 class plAxisInputInterface;
 
-class plAxisAnimModifier : public plSingleModifier
-{
+class plAxisAnimModifier : public plSingleModifier {
 public:
-    enum
-    {
+    enum {
         kTypeX,
         kTypeY,
         kTypeLogic,
     };
 protected:
-    
+
     plKey fXAnim;
     plKey fYAnim;
     plKey fNotificationKey;
-    
+
     float    fXPos;
     float    fYPos;
 
@@ -73,35 +71,49 @@ protected:
     bool            fAllOrNothing;
     int             fIface;
     plNotifyMsg*    fNotify;
-    
+
     plString        fAnimLabel;
 
-    plAxisInputInterface    *fInputIface;
+    plAxisInputInterface*    fInputIface;
 
     virtual bool IEval(double secs, float del, uint32_t dirty);
 
 public:
-    plAxisAnimModifier(); 
+    plAxisAnimModifier();
     virtual ~plAxisAnimModifier();
 
-    CLASSNAME_REGISTER( plAxisAnimModifier );
-    GETINTERFACE_ANY( plAxisAnimModifier, plSingleModifier );
+    CLASSNAME_REGISTER(plAxisAnimModifier);
+    GETINTERFACE_ANY(plAxisAnimModifier, plSingleModifier);
 
     virtual bool    MsgReceive(plMessage* msg);
     virtual void    SetTarget(plSceneObject* so);
 
-    void SetAllOrNothing(bool b) { fAllOrNothing = b; }
+    void SetAllOrNothing(bool b) {
+        fAllOrNothing = b;
+    }
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    void SetXAnim(plKey c) { fXAnim = c; }
-    void SetYAnim(plKey c) { fYAnim = c; }
-    void SetNotificationKey(plKey k) { fNotificationKey = k; }
-    plNotifyMsg* GetNotify() { return fNotify; }
+    void SetXAnim(plKey c) {
+        fXAnim = c;
+    }
+    void SetYAnim(plKey c) {
+        fYAnim = c;
+    }
+    void SetNotificationKey(plKey k) {
+        fNotificationKey = k;
+    }
+    plNotifyMsg* GetNotify() {
+        return fNotify;
+    }
 
-    plString GetAnimLabel() const { return fAnimLabel; }
-    void SetAnimLabel(const plString& a) { fAnimLabel = a; }
+    plString GetAnimLabel() const {
+        return fAnimLabel;
+    }
+    void SetAnimLabel(const plString& a) {
+        fAnimLabel = a;
+    }
 
 };
 

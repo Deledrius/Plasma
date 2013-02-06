@@ -50,9 +50,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // fairly general. Adding features would most likely
 // be best implemented in a derived type.
 // Notably lacking features are:
-//      ability to read and write, 
+//      ability to read and write,
 //      auto-eval on significant time change
-//      
+//
 //
 // Requires class T to have the following members
 // T& operator+=(const class T& t);
@@ -60,8 +60,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // T& operator*=(float scale);
 // T& operator=(const class T&); // unless builtin = is adequate.
 //
-template <class T> class plTimedInterp
-{
+template <class T> class plTimedInterp {
 protected:
     T           fInit;
     T           fCurr;
@@ -77,63 +76,75 @@ public:
     plTimedInterp();
     plTimedInterp(const T& t);
 
-    const T& Set(const T& val) { return SetTarget(val, 0, 0); }
+    const T& Set(const T& val) {
+        return SetTarget(val, 0, 0);
+    }
     const T& SetTarget(const T& targ, double start, double duration);
 
     const T& Update(double t);
 
-    operator T() const { return fCurr; }
-    const T& Value() const { return fCurr; }
+    operator T() const {
+        return fCurr;
+    }
+    const T& Value() const {
+        return fCurr;
+    }
 };
 
 template <class T>
 plTimedInterp<T>::plTimedInterp()
-:   fDuration(0),
-    fEnd(0)
+    :   fDuration(0),
+        fEnd(0)
 {
 }
 
 template <class T>
 plTimedInterp<T>::plTimedInterp(const T& t)
-:   fInit(t),
-    fCurr(t),
-    fTarg(t),
-    fDuration(0),
-    fEnd(0)
+    :   fInit(t),
+        fCurr(t),
+        fTarg(t),
+        fDuration(0),
+        fEnd(0)
 {
 }
 
 template <class T>
-const T& 
+const T&
 plTimedInterp<T>::Update(double t)
 {
-    if( fDuration <= 0 )
+    if (fDuration <= 0) {
         return IEnd();
+    }
 
     float parm = float((fEnd - t) / fDuration);
-    if( parm <= 0 )
+
+    if (parm <= 0) {
         return IEnd();
-    else if( parm >= 1.f )
+    } else if (parm >= 1.f) {
         return IBegin();
+    }
 
     return IEval(parm);
 }
 
 template <class T>
-const T& 
+const T&
 plTimedInterp<T>::SetTarget(const T& targ, double start, double dur)
 {
     fEnd = start + dur;
     fDuration = dur;
     fTarg = targ;
-    if( dur <= 0 )
+
+    if (dur <= 0) {
         fCurr = targ;
+    }
+
     fInit = fCurr;
     return fCurr;
 }
 
 template <class T>
-const T& 
+const T&
 plTimedInterp<T>::IEnd()
 {
     fDuration = 0;
@@ -142,14 +153,14 @@ plTimedInterp<T>::IEnd()
 }
 
 template <class T>
-const T& 
+const T&
 plTimedInterp<T>::IBegin()
 {
     return fCurr;
 }
 
 template <class T>
-const T& 
+const T&
 plTimedInterp<T>::IEval(float parm)
 {
     fCurr = fInit;

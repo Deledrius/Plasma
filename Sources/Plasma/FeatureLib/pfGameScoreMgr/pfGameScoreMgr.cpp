@@ -44,8 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plNetGameLib/plNetGameLib.h"
 #include "pnNetProtocol/pnNetProtocol.h"
 
-struct ScoreFindParam
-{
+struct ScoreFindParam {
     uint32_t fOwnerId;
     plString fName;
     plKey fReceiver; // because plKey as a void* isn't cool
@@ -55,8 +54,7 @@ struct ScoreFindParam
     { }
 };
 
-struct ScoreTransferParam
-{
+struct ScoreTransferParam {
     pfGameScore* fTo;
     pfGameScore* fFrom;
     int32_t      fPoints;
@@ -67,8 +65,7 @@ struct ScoreTransferParam
     { }
 };
 
-struct ScoreUpdateParam
-{
+struct ScoreUpdateParam {
     pfGameScore* fParent;
     plKey        fReceiver;
     int32_t      fPoints; // reset points to this if update op
@@ -126,22 +123,24 @@ static void OnScoreTransfer(ENetError result, void* param)
 
 void pfGameScore::TransferPoints(pfGameScore* to, int32_t points, plKey recvr)
 {
-    this->Ref(); to->Ref(); // netcode holds us
+    this->Ref();
+    to->Ref(); // netcode holds us
     NetCliAuthScoreTransferPoints(this->fScoreId, to->fScoreId, points,
-        OnScoreTransfer, new ScoreTransferParam(to, this, points, recvr));
+                                  OnScoreTransfer, new ScoreTransferParam(to, this, points, recvr));
 }
 
 //======================================
 static void OnScoreCreate(
     ENetError   result,
-    void *      param,
+    void*       param,
     uint32_t    scoreId,
     uint32_t    createdTime, // ignored
     uint32_t    ownerId,
     const char* gameName,
     uint32_t    gameType,
     int32_t     value
-) {
+)
+{
     ScoreUpdateParam* p = (ScoreUpdateParam*)param;
     pfGameScore* score = new pfGameScore(scoreId, ownerId, gameName, gameType, value);
     pfGameScoreUpdateMsg* msg = new pfGameScoreUpdateMsg(result, score, value);
@@ -157,13 +156,14 @@ void pfGameScore::Create(uint32_t ownerId, const plString& name, uint32_t type, 
 //======================================
 static void OnScoreFound(
     ENetError           result,
-    void *              param,
+    void*               param,
     const NetGameScore  scores[],
     uint32_t            scoreCount
-) {
+)
+{
     std::vector<pfGameScore*> vec(scoreCount);
-    for (uint32_t i = 0; i < scoreCount; ++i)
-    {
+
+    for (uint32_t i = 0; i < scoreCount; ++i) {
         const NetGameScore ngs = scores[i];
         vec[i] = new pfGameScore(ngs.scoreId, ngs.ownerId, plString::FromWchar(ngs.gameName), ngs.gameType, ngs.value);
     }

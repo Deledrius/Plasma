@@ -53,8 +53,10 @@ void plNetVoiceListMsg::Read(hsStream* stream, hsResMgr* mgr)
     fCmd = stream->ReadLE32();
     int n = stream->ReadLE32();
     fClientIDs.SetCountAndZero(0);
-    for (int i = 0; i < n; i++)
+
+    for (int i = 0; i < n; i++) {
         fClientIDs.Append(stream->ReadLE32());
+    }
 
 }
 
@@ -65,6 +67,8 @@ void plNetVoiceListMsg::Write(hsStream* stream, hsResMgr* mgr)
     mgr->WriteKey(stream, fRemoved);
     stream->WriteLE32(fCmd);
     stream->WriteLE32(fClientIDs.Count());
-    for (int i = 0; i<fClientIDs.Count(); i++)
+
+    for (int i = 0; i < fClientIDs.Count(); i++) {
         stream->WriteLE32(fClientIDs[i]);
+    }
 }

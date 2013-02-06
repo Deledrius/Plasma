@@ -70,8 +70,9 @@ plClientResMgr::~plClientResMgr()
         std::map<std::string, plMipmap*>::iterator it;
 
         for (it = this->ClientResources->begin(); it != this->ClientResources->end(); ++it) {
-            if (it->second)
+            if (it->second) {
                 it->second->UnRef();
+            }
         }
 
         delete this->ClientResources;
@@ -92,42 +93,43 @@ void plClientResMgr::ILoadResources(const char* resfile)
         uint32_t num_resources = 0;
 
         switch (version) {
-            case 1:
-                num_resources = in.ReadLE32();
+        case 1:
+            num_resources = in.ReadLE32();
 
-                for (int i = 0; i < num_resources; i++) {
-                    plMipmap* res_data = NULL;
-                    uint32_t res_size = 0;
-                    char* tmp_name = in.ReadSafeStringLong();
-                    std::string res_name = std::string(tmp_name);
-                    std::string res_type = res_name.substr(res_name.length() - 4, 4);
-                    delete tmp_name;
+            for (int i = 0; i < num_resources; i++) {
+                plMipmap* res_data = NULL;
+                uint32_t res_size = 0;
+                char* tmp_name = in.ReadSafeStringLong();
+                std::string res_name = std::string(tmp_name);
+                std::string res_type = res_name.substr(res_name.length() - 4, 4);
+                delete tmp_name;
 
-                    // Version 1 doesn't encode format, so we'll try some simple
-                    // extension sniffing
-                    if (res_type == ".png") {
-                        // Read resource stream size, but the PNG has that info in the header
-                        // so it's not needed
-                        res_size = in.ReadLE32();
-                        res_data = plPNG::Instance().ReadFromStream(&in);
-                    } else if (res_type == ".jpg") {
-                        // Don't read resource stream size, as plJPEG's reader will need it
-                        res_data = plJPEG::Instance().ReadFromStream(&in);
-                    } else {
-                        // Original Myst5 format only is known to support Targa,
-                        // so default fallback is targa
-                        // TODO - Add plTarga::ReadFromStream()
-                        // for now, just skip the unknown resource and put NULL into the map
-                        res_size = in.ReadLE32();
-                        in.Skip(res_size);
-                    }
-
-                    (*this->ClientResources)[res_name] = res_data;
+                // Version 1 doesn't encode format, so we'll try some simple
+                // extension sniffing
+                if (res_type == ".png") {
+                    // Read resource stream size, but the PNG has that info in the header
+                    // so it's not needed
+                    res_size = in.ReadLE32();
+                    res_data = plPNG::Instance().ReadFromStream(&in);
+                } else if (res_type == ".jpg") {
+                    // Don't read resource stream size, as plJPEG's reader will need it
+                    res_data = plJPEG::Instance().ReadFromStream(&in);
+                } else {
+                    // Original Myst5 format only is known to support Targa,
+                    // so default fallback is targa
+                    // TODO - Add plTarga::ReadFromStream()
+                    // for now, just skip the unknown resource and put NULL into the map
+                    res_size = in.ReadLE32();
+                    in.Skip(res_size);
                 }
 
-                break;
-            default:
-                break;
+                (*this->ClientResources)[res_name] = res_data;
+            }
+
+            break;
+
+        default:
+            break;
         }
 
         in.Close();

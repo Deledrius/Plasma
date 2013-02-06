@@ -53,31 +53,49 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plLayerTexBitmapPB.h"
 #include "MaxMain/plPlasmaRefMsgs.h"
 
-class plLayerTexClassDesc : public ClassDesc2
-{
+class plLayerTexClassDesc : public ClassDesc2 {
 public:
-    int             IsPublic()      { return TRUE; }
-    void*           Create(BOOL loading = FALSE) { return new plLayerTex(); }
-    const TCHAR*    ClassName()     { return GetString(IDS_LAYER); }
-    SClass_ID       SuperClassID()  { return TEXMAP_CLASS_ID; }
-    Class_ID        ClassID()       { return LAYER_TEX_CLASS_ID; }
-    const TCHAR*    Category()      { return TEXMAP_CAT_2D; }
-    const TCHAR*    InternalName()  { return _T("PlasmaLayer"); }
-    HINSTANCE       HInstance()     { return hInstance; }
+    int             IsPublic()      {
+        return TRUE;
+    }
+    void*           Create(BOOL loading = FALSE) {
+        return new plLayerTex();
+    }
+    const TCHAR*    ClassName()     {
+        return GetString(IDS_LAYER);
+    }
+    SClass_ID       SuperClassID()  {
+        return TEXMAP_CLASS_ID;
+    }
+    Class_ID        ClassID()       {
+        return LAYER_TEX_CLASS_ID;
+    }
+    const TCHAR*    Category()      {
+        return TEXMAP_CAT_2D;
+    }
+    const TCHAR*    InternalName()  {
+        return _T("PlasmaLayer");
+    }
+    HINSTANCE       HInstance()     {
+        return hInstance;
+    }
 };
 static plLayerTexClassDesc plLayerTexDesc;
-ClassDesc2* GetLayerTexDesc() { return &plLayerTexDesc; }
+ClassDesc2* GetLayerTexDesc()
+{
+    return &plLayerTexDesc;
+}
 
 ParamDlg* plLayerTex::fUVGenDlg = NULL;
 
 // For initializing paramblock descriptor
-ParamBlockDesc2 *GetBitmapBlk();
+ParamBlockDesc2* GetBitmapBlk();
 
 #include "plLayerTexBitmapPB.cpp"
 
-void    plLayerTex::GetClassName( TSTR &s )
+void    plLayerTex::GetClassName(TSTR& s)
 {
-    s = GetString( IDS_LAYER );
+    s = GetString(IDS_LAYER);
 }
 
 plLayerTex::plLayerTex() :
@@ -91,27 +109,29 @@ plLayerTex::plLayerTex() :
 #if 0
     // Initialize the paramblock descriptors only once
     static bool descInit = false;
-    if (!descInit)
-    {
+
+    if (!descInit) {
         descInit = true;
         GetBitmapBlk()->SetClassDesc(GetLayerTexDesc());
     }
+
 #endif
 
     plLayerTexDesc.MakeAutoParamBlocks(this);
-    ReplaceReference(kRefUVGen, GetNewDefaultUVGen());  
+    ReplaceReference(kRefUVGen, GetNewDefaultUVGen());
 }
 
 plLayerTex::~plLayerTex()
 {
-    if (fBM)
+    if (fBM) {
         fBM->DeleteThis();
+    }
 
     IDiscardTexHandle();
 }
 
 //From MtlBase
-void plLayerTex::Reset() 
+void plLayerTex::Reset()
 {
     GetLayerTexDesc()->Reset(this, TRUE);   // reset all pb2's
     SetBitmap(NULL);
@@ -119,13 +139,12 @@ void plLayerTex::Reset()
     fIValid.SetEmpty();
 }
 
-void plLayerTex::Update(TimeValue t, Interval& valid) 
+void plLayerTex::Update(TimeValue t, Interval& valid)
 {
-    if (!fIValid.InInterval(t))
-    {
+    if (!fIValid.InInterval(t)) {
         fIValid.SetInfinite();
 
-        fUVGen->Update(t,fIValid);
+        fUVGen->Update(t, fIValid);
         fBitmapPB->GetValidity(t, fIValid);
 
 //      Interval clipValid;
@@ -139,11 +158,13 @@ void plLayerTex::Update(TimeValue t, Interval& valid)
 
     // Gonna need to do this when we support animated bm's
 #if 0
-    if (fBM)
-    {
-        if (bi.FirstFrame()!=bi.LastFrame())
+
+    if (fBM) {
+        if (bi.FirstFrame() != bi.LastFrame()) {
             ivalid.SetInstant(t);
+        }
     }
+
 #endif
 
     valid &= fIValid;
@@ -161,7 +182,7 @@ Interval plLayerTex::Validity(TimeValue t)
     return v;
 }
 
-ParamDlg* plLayerTex::CreateParamDlg(HWND hwMtlEdit, IMtlParams *imp) 
+ParamDlg* plLayerTex::CreateParamDlg(HWND hwMtlEdit, IMtlParams* imp)
 {
     fMtlParams = imp;
 
@@ -170,13 +191,12 @@ ParamDlg* plLayerTex::CreateParamDlg(HWND hwMtlEdit, IMtlParams *imp)
     fUVGenDlg = fUVGen->CreateParamDlg(hwMtlEdit, imp);
     masterDlg->AddDlg(fUVGenDlg);
 
-    return masterDlg;   
+    return masterDlg;
 }
 
 BOOL plLayerTex::SetDlgThing(ParamDlg* dlg)
-{   
-    if (dlg == fUVGenDlg)
-    {
+{
+    if (dlg == fUVGenDlg) {
         fUVGenDlg->SetThing(fUVGen);
         return TRUE;
     }
@@ -190,34 +210,44 @@ int plLayerTex::NumRefs()
 }
 
 //From ReferenceMaker
-RefTargetHandle plLayerTex::GetReference(int i) 
+RefTargetHandle plLayerTex::GetReference(int i)
 {
-    switch (i)
-    {
-        case kRefUVGen:     return fUVGen;
-        case kRefBitmap:    return fBitmapPB;
-        default: return NULL;
+    switch (i) {
+    case kRefUVGen:
+        return fUVGen;
+
+    case kRefBitmap:
+        return fBitmapPB;
+
+    default:
+        return NULL;
     }
 }
 
-void plLayerTex::SetReference(int i, RefTargetHandle rtarg) 
+void plLayerTex::SetReference(int i, RefTargetHandle rtarg)
 {
     Interval    garbage;
 
-    switch (i)
-    {
-        case kRefUVGen:  
-            fUVGen = (UVGen *)rtarg; 
-            if( fUVGen )
-                fUVGen->Update( TimeValue( 0 ), garbage );
-            break;
-        case kRefBitmap:
-            fBitmapPB = (IParamBlock2 *)rtarg;
-            // KLUDGE: If the paramblock is being set chances are we are being created or
-            // loaded.  In the case of load, we want to refresh our texture.
-            if (fBitmapPB)
-                RefreshBitmaps();
-            break;
+    switch (i) {
+    case kRefUVGen:
+        fUVGen = (UVGen*)rtarg;
+
+        if (fUVGen) {
+            fUVGen->Update(TimeValue(0), garbage);
+        }
+
+        break;
+
+    case kRefBitmap:
+        fBitmapPB = (IParamBlock2*)rtarg;
+
+        // KLUDGE: If the paramblock is being set chances are we are being created or
+        // loaded.  In the case of load, we want to refresh our texture.
+        if (fBitmapPB) {
+            RefreshBitmaps();
+        }
+
+        break;
     }
 }
 
@@ -228,25 +258,28 @@ int plLayerTex::NumParamBlocks()
 
 IParamBlock2* plLayerTex::GetParamBlock(int i)
 {
-    switch (i)
-    {
-    case 0: return fBitmapPB;
-    default: return NULL;
+    switch (i) {
+    case 0:
+        return fBitmapPB;
+
+    default:
+        return NULL;
     }
 }
 
 IParamBlock2* plLayerTex::GetParamBlockByID(BlockID id)
 {
-    if (fBitmapPB->ID() == id)
+    if (fBitmapPB->ID() == id) {
         return fBitmapPB;
-    else
+    } else {
         return NULL;
+    }
 }
 
-//From ReferenceTarget 
-RefTargetHandle plLayerTex::Clone(RemapDir &remap) 
+//From ReferenceTarget
+RefTargetHandle plLayerTex::Clone(RemapDir& remap)
 {
-    plLayerTex *mnew = new plLayerTex();
+    plLayerTex* mnew = new plLayerTex();
     *((MtlBase*)mnew) = *((MtlBase*)this); // copy superclass stuff
     mnew->ReplaceReference(kRefBitmap, remap.CloneRef(fBitmapPB));
     mnew->ReplaceReference(kRefUVGen, remap.CloneRef(fUVGen));
@@ -259,65 +292,71 @@ int plLayerTex::NumSubs()
     return 2;
 }
 
-Animatable* plLayerTex::SubAnim(int i) 
+Animatable* plLayerTex::SubAnim(int i)
 {
     //TODO: Return 'i-th' sub-anim
-    switch (i)
-    {
-        case kRefUVGen:     return fUVGen;
-        case kRefBitmap:    return fBitmapPB;
-        default: return NULL;
+    switch (i) {
+    case kRefUVGen:
+        return fUVGen;
+
+    case kRefBitmap:
+        return fBitmapPB;
+
+    default:
+        return NULL;
     }
 }
 
-TSTR plLayerTex::SubAnimName(int i) 
+TSTR plLayerTex::SubAnimName(int i)
 {
-    switch (i)
-    {
-        case kRefUVGen:     return "UVGen";
-        case kRefBitmap:    return fBitmapPB->GetLocalName();
-        default: return "";
+    switch (i) {
+    case kRefUVGen:
+        return "UVGen";
+
+    case kRefBitmap:
+        return fBitmapPB->GetLocalName();
+
+    default:
+        return "";
     }
 }
 
-RefResult plLayerTex::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, 
-   PartID& partID, RefMessage message) 
+RefResult plLayerTex::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
+                                       PartID& partID, RefMessage message)
 {
-    switch (message)
-    {
-    case REFMSG_CHANGE:
-        {
+    switch (message) {
+    case REFMSG_CHANGE: {
             fIValid.SetEmpty();
 
-            if (hTarget == fBitmapPB)
-            {
+            if (hTarget == fBitmapPB) {
                 // see if this message came from a changing parameter in the pblock,
                 // if so, limit rollout update to the changing item and update any active viewport texture
                 ParamID changingParam = fBitmapPB->LastNotifyParamID();
                 fBitmapPB->GetDesc()->InvalidateUI(changingParam);
 
-                if (changingParam != -1)
+                if (changingParam != -1) {
                     IChanged();
+                }
             }
         }
         break;
 
     case REFMSG_UV_SYM_CHANGE:
-        IDiscardTexHandle();  
+        IDiscardTexHandle();
         break;
     }
 
     return REF_SUCCEED;
 }
 
-BOOL plLayerTex::DiscardColor() 
-{ 
-    return fBitmapPB->GetInt(kBmpDiscardColor); 
+BOOL plLayerTex::DiscardColor()
+{
+    return fBitmapPB->GetInt(kBmpDiscardColor);
 }
 
-BOOL plLayerTex::DiscardAlpha() 
-{ 
-    return fBitmapPB->GetInt(kBmpDiscardAlpha); 
+BOOL plLayerTex::DiscardAlpha()
+{
+    return fBitmapPB->GetInt(kBmpDiscardAlpha);
 }
 
 void plLayerTex::IChanged()
@@ -335,38 +374,43 @@ void plLayerTex::IChanged()
 #define TEX_HDR_CHUNK 0x5000
 #define MAX_ASS_CHUNK 0x5500
 
-IOResult plLayerTex::Save(ISave *isave) 
+IOResult plLayerTex::Save(ISave* isave)
 {
     IOResult res;
     isave->BeginChunk(TEX_HDR_CHUNK);
     res = MtlBase::Save(isave);
-    if (res != IO_OK)
+
+    if (res != IO_OK) {
         return res;
+    }
+
     isave->EndChunk();
 
     return IO_OK;
-}   
+}
 
-IOResult plLayerTex::Load(ILoad *iload) 
+IOResult plLayerTex::Load(ILoad* iload)
 {
     IOResult res;
-    while (IO_OK == (res = iload->OpenChunk()))
-    {
-        if (iload->CurChunkID() == TEX_HDR_CHUNK)
-        {
+
+    while (IO_OK == (res = iload->OpenChunk())) {
+        if (iload->CurChunkID() == TEX_HDR_CHUNK) {
             res = MtlBase::Load(iload);
         }
+
         iload->CloseChunk();
-        if (res != IO_OK) 
+
+        if (res != IO_OK) {
             return res;
+        }
     }
 
-   return IO_OK;
+    return IO_OK;
 }
 
 bool plLayerTex::HasAlpha()
 {
-   return (fBM != NULL && fBM->HasAlpha() != 0);
+    return (fBM != NULL && fBM->HasAlpha() != 0);
 }
 
 Bitmap* plLayerTex::GetBitmap(TimeValue t)
@@ -376,59 +420,68 @@ Bitmap* plLayerTex::GetBitmap(TimeValue t)
 
 AColor plLayerTex::EvalColor(ShadeContext& sc)
 {
-    if (!sc.doMaps) 
+    if (!sc.doMaps) {
         return AColor(0.0f, 0.0f, 0.0f, 1.0f);
+    }
 
     AColor color;
-    if (sc.GetCache(this, color)) 
-        return color;
 
-    if (gbufID) 
+    if (sc.GetCache(this, color)) {
+        return color;
+    }
+
+    if (gbufID) {
         sc.SetGBufferID(gbufID);
+    }
 
     //
     // Evaluate the Bitmap
     //
-    if (fBitmapPB->GetInt(kBmpUseBitmap) && fBM)
-    {
+    if (fBitmapPB->GetInt(kBmpUseBitmap) && fBM) {
         plBMSampler mysamp(this, fBM);
         color = fUVGen->EvalUVMap(sc, &mysamp, FALSE);
         // We'd like to pass TRUE and actually filter the image, but that seems to be
         // tripping an odd crash in Max internals. *shrug*
-    }
-    else
+    } else {
         color.White();
+    }
 
     // Invert color if specified
-    if (fBitmapPB->GetInt(kBmpInvertColor))
-    {
+    if (fBitmapPB->GetInt(kBmpInvertColor)) {
         color.r = 1.0f - color.r;
         color.g = 1.0f - color.g;
         color.b = 1.0f - color.b;
     }
+
     // Discard color if specified
-    if (fBitmapPB->GetInt(kBmpDiscardColor))
+    if (fBitmapPB->GetInt(kBmpDiscardColor)) {
         color.r = color.g = color.b = 1.0f;
+    }
 
     // Invert alpha if specified
-    if (fBitmapPB->GetInt(kBmpInvertAlpha))
+    if (fBitmapPB->GetInt(kBmpInvertAlpha)) {
         color.a = 1.0f - color.a;
+    }
+
     // Discard alpha if specified
-    if (fBitmapPB->GetInt(kBmpDiscardAlpha))
+    if (fBitmapPB->GetInt(kBmpDiscardAlpha)) {
         color.a = 1.0f;
+    }
 
     // If RGB output is set to alpha, show RGB as grayscale of the alpha
-    if (fBitmapPB->GetInt(kBmpRGBOutput) == 1)
+    if (fBitmapPB->GetInt(kBmpRGBOutput) == 1) {
         color = AColor(color.a, color.a, color.a, 1.0f);
+    }
 
-    sc.PutCache(this, color); 
+    sc.PutCache(this, color);
     return color;
 }
 
 float plLayerTex::EvalMono(ShadeContext& sc)
 {
-    if (fBitmapPB->GetInt(kBmpMonoOutput) == 1)
+    if (fBitmapPB->GetInt(kBmpMonoOutput) == 1) {
         return EvalColor(sc).a;
+    }
 
     return Intens(EvalColor(sc));
 }
@@ -441,39 +494,45 @@ Point3 plLayerTex::EvalNormalPerturb(ShadeContext& sc)
 
 ULONG plLayerTex::LocalRequirements(int subMtlNum)
 {
-    return fUVGen->Requirements(subMtlNum); 
+    return fUVGen->Requirements(subMtlNum);
 }
 
 #if 0
-int plLayerTex::ICalcFrame(TimeValue t) 
+int plLayerTex::ICalcFrame(TimeValue t)
 {
-    PBBitmap *pbbm = fBitmapPB->GetBitmap(kBmpBitmap);
-    if (!pbbm || !pbbm->bi)
+    PBBitmap* pbbm = fBitmapPB->GetBitmap(kBmpBitmap);
+
+    if (!pbbm || !pbbm->bi) {
         return 0;
-    BitmapInfo *bi = pbbm->bi;
+    }
+
+    BitmapInfo* bi = pbbm->bi;
 
     TimeValue tm, dur, td;
     int frameStart = bi->FirstFrame();
     int frameEnd = bi->LastFrame();
     int tpf = GetTicksPerFrame();
     tm = TimeValue(float(t - startTime) * pbRate);
-    dur = (fend-fstart+1)*GetTicksPerFrame();
+    dur = (fend - fstart + 1) * GetTicksPerFrame();
 
-    switch (endCond)
-    {
+    switch (endCond) {
     case END_HOLD:
-        if (tm <= 0)
+        if (tm <= 0) {
             return frameStart;
-        if (tm >= dur)
+        }
+
+        if (tm >= dur) {
             return frameEnd;
-        return tm/tpf;
+        }
+
+        return tm / tpf;
 
     case END_PINGPONG:
-        if (((tm >= 0) && ((tm / dur) & 1)) || ((tm < 0) && !(tm / dur)))
-        {
+        if (((tm >= 0) && ((tm / dur) & 1)) || ((tm < 0) && !(tm / dur))) {
             td = modt(tm, dur);
             return frameStart + frameEnd - td / tpf;
         }
+
         // else fall through
     case END_LOOP:
         td = modt(tm, dur);
@@ -484,10 +543,9 @@ int plLayerTex::ICalcFrame(TimeValue t)
 }
 #endif
 
-void plLayerTex::IDiscardTexHandle() 
+void plLayerTex::IDiscardTexHandle()
 {
-    if (fTexHandle)
-    {
+    if (fTexHandle) {
         fTexHandle->DeleteThis();
         fTexHandle = NULL;
     }
@@ -495,20 +553,20 @@ void plLayerTex::IDiscardTexHandle()
 
 void plLayerTex::ActivateTexDisplay(BOOL onoff)
 {
-    if (!onoff)
+    if (!onoff) {
         IDiscardTexHandle();
+    }
 }
 
-BITMAPINFO *plLayerTex::GetVPDisplayDIB(TimeValue t, TexHandleMaker& thmaker, Interval &valid, BOOL mono, BOOL forceW, BOOL forceH)
+BITMAPINFO* plLayerTex::GetVPDisplayDIB(TimeValue t, TexHandleMaker& thmaker, Interval& valid, BOOL mono, BOOL forceW, BOOL forceH)
 {
-                        // FIXME
+    // FIXME
     fTexTime = 0;//CalcFrame(t);
 //  texValid = clipValid;
-    BITMAPINFO *bmi = NULL;
+    BITMAPINFO* bmi = NULL;
     int xflags = 0;
 
-    if (fBitmapPB->GetInt(kBmpApply))
-    {
+    if (fBitmapPB->GetInt(kBmpApply)) {
         float clipu = fBitmapPB->GetFloat(kBmpClipU);
         float clipv = fBitmapPB->GetFloat(kBmpClipV);
         float clipw = fBitmapPB->GetFloat(kBmpClipW);
@@ -519,162 +577,184 @@ BITMAPINFO *plLayerTex::GetVPDisplayDIB(TimeValue t, TexHandleMaker& thmaker, In
         int w = fBM->Width();
         int h = fBM->Height();
 
-        Bitmap *newBM;
+        Bitmap* newBM;
         BitmapInfo bi;
         bi.SetName(_T("y8798734"));
         bi.SetType(BMM_TRUE_32);
         bi.SetFlags(MAP_HAS_ALPHA);
 
-        if (fBitmapPB->GetInt(kBmpCropPlace) == 1)
-        {
+        if (fBitmapPB->GetInt(kBmpCropPlace) == 1) {
             int x0, y0, nw, nh;
             int bmw = thmaker.Size();
-            int bmh = int(float(bmw)*float(h)/float(w));
+            int bmh = int(float(bmw) * float(h) / float(w));
             bi.SetWidth(bmw);
             bi.SetHeight(bmh);
             newBM = TheManager->Create(&bi);
-            newBM->Fill(0,0,0,0);
-            nw = int(float(bmw)*clipw);
-            nh = int(float(bmh)*cliph);
-            x0 = int(float(bmw-1)*clipu);
-            y0 = int(float(bmh-1)*clipv);
-            
-            if (nw<1) nw = 1;
-            if (nh<1) nh = 1;
+            newBM->Fill(0, 0, 0, 0);
+            nw = int(float(bmw) * clipw);
+            nh = int(float(bmh) * cliph);
+            x0 = int(float(bmw - 1) * clipu);
+            y0 = int(float(bmh - 1) * clipv);
+
+            if (nw < 1) {
+                nw = 1;
+            }
+
+            if (nh < 1) {
+                nh = 1;
+            }
+
             PixelBuf row(nw);
-            
-            Bitmap *tmpBM;
+
+            Bitmap* tmpBM;
             BitmapInfo bif2;
             bif2.SetName(_T("xxxx67878"));
             bif2.SetType(BMM_TRUE_32);
             bif2.SetFlags(MAP_HAS_ALPHA);
-            bif2.SetWidth(nw);              
+            bif2.SetWidth(nw);
             bif2.SetHeight(nh);
             tmpBM = TheManager->Create(&bif2);
             tmpBM->CopyImage(fBM, COPY_IMAGE_RESIZE_LO_QUALITY, 0);
             BMM_Color_64*  p1 = row.Ptr();
-            for (int y = 0; y<nh; y++)
-            {
-                tmpBM->GetLinearPixels(0,y, nw, p1);
-                if (alphaAsRGB)
-                {
-                    for (int ix =0; ix<nw; ix++) 
+
+            for (int y = 0; y < nh; y++) {
+                tmpBM->GetLinearPixels(0, y, nw, p1);
+
+                if (alphaAsRGB) {
+                    for (int ix = 0; ix < nw; ix++) {
                         p1[ix].r = p1[ix].g = p1[ix].b = p1[ix].a;
+                    }
                 }
-                if (discardAlpha)
-                {
-                    for (int ix = 0; ix < nw; ix++) 
+
+                if (discardAlpha) {
+                    for (int ix = 0; ix < nw; ix++) {
                         p1[ix].a = 0xffff;
+                    }
                 }
-                newBM->PutPixels(x0, y+y0, nw, p1);
+
+                newBM->PutPixels(x0, y + y0, nw, p1);
             }
+
             tmpBM->DeleteThis();
             bmi = thmaker.BitmapToDIB(newBM, fUVGen->SymFlags(), xflags, forceW, forceH);
             newBM->DeleteThis();
-        }
-        else
-        {
-            int x0,y0,nw,nh;
-            x0 = int(float(w-1)*clipu);
-            y0 = int(float(h-1)*clipv);
-            nw = int(float(w)*clipw);
-            nh = int(float(h)*cliph);
-            if (nw<1) nw = 1;
-            if (nh<1) nh = 1;
+        } else {
+            int x0, y0, nw, nh;
+            x0 = int(float(w - 1) * clipu);
+            y0 = int(float(h - 1) * clipv);
+            nw = int(float(w) * clipw);
+            nh = int(float(h) * cliph);
+
+            if (nw < 1) {
+                nw = 1;
+            }
+
+            if (nh < 1) {
+                nh = 1;
+            }
+
             bi.SetWidth(nw);
             bi.SetHeight(nh);
             PixelBuf row(nw);
             newBM = TheManager->Create(&bi);
             BMM_Color_64*  p1 = row.Ptr();
-            for (int y = 0; y<nh; y++)
-            {
-                fBM->GetLinearPixels(x0,y+y0, nw, p1);
-                if (alphaAsRGB)
-                {
-                    for (int ix = 0; ix < nw; ix++) 
+
+            for (int y = 0; y < nh; y++) {
+                fBM->GetLinearPixels(x0, y + y0, nw, p1);
+
+                if (alphaAsRGB) {
+                    for (int ix = 0; ix < nw; ix++) {
                         p1[ix].r = p1[ix].g = p1[ix].b = p1[ix].a;
+                    }
                 }
-                if (discardAlpha)
-                {
-                    for (int ix = 0; ix < nw; ix++) 
+
+                if (discardAlpha) {
+                    for (int ix = 0; ix < nw; ix++) {
                         p1[ix].a = 0xffff;
+                    }
                 }
+
                 newBM->PutPixels(0, y, nw, p1);
             }
+
             bmi = thmaker.BitmapToDIB(newBM, fUVGen->SymFlags(), xflags, forceW, forceH);
             newBM->DeleteThis();
         }
-    }
-    else
-    {
-        if (fBitmapPB->GetInt(kBmpRGBOutput) == 1)
+    } else {
+        if (fBitmapPB->GetInt(kBmpRGBOutput) == 1) {
             xflags |= EX_RGB_FROM_ALPHA;
+        }
+
         bmi = thmaker.BitmapToDIB(fBM, fUVGen->SymFlags(), xflags, forceW, forceH);
     }
 
     return bmi;
 }
 
-DWORD plLayerTex::GetActiveTexHandle(TimeValue t, TexHandleMaker& thmaker) 
+DWORD plLayerTex::GetActiveTexHandle(TimeValue t, TexHandleMaker& thmaker)
 {
     // FIXME: ignore validity for now
-    if (fTexHandle && fIValid.InInterval(t))// && texTime == CalcFrame(t)) 
+    if (fTexHandle && fIValid.InInterval(t)) { // && texTime == CalcFrame(t))
         return fTexHandle->GetHandle();
-    else
-    {
+    } else {
         IDiscardTexHandle();
-        
+
         fTexTime = 0;//CalcFrame(t);
         fTexHandle = thmaker.MakeHandle(GetVPDisplayDIB(t, thmaker, fIValid));
-        if (fTexHandle)
+
+        if (fTexHandle) {
             return fTexHandle->GetHandle();
-        else
+        } else {
             return 0;
+        }
     }
 }
 
-const char *plLayerTex::GetTextureName()
+const char* plLayerTex::GetTextureName()
 {
 //  if (fBitmapPB->GetInt(kBmpUseBitmap))
     {
-        PBBitmap *pbbm = fBitmapPB->GetBitmap(kBmpBitmap);
-        if (pbbm)
+        PBBitmap* pbbm = fBitmapPB->GetBitmap(kBmpBitmap);
+
+        if (pbbm) {
             return pbbm->bi.Name();
+        }
     }
 
     return NULL;
 }
 
-void plLayerTex::ISetPBBitmap(PBBitmap *pbbm, int index /* = 0 */)
-{ 
-    fBitmapPB->SetValue(ParamID(kBmpBitmap), 0, pbbm, index); 
+void plLayerTex::ISetPBBitmap(PBBitmap* pbbm, int index /* = 0 */)
+{
+    fBitmapPB->SetValue(ParamID(kBmpBitmap), 0, pbbm, index);
 }
 
-PBBitmap *plLayerTex::GetPBBitmap(int index /* = 0 */)
-{ 
-    return fBitmapPB->GetBitmap(ParamID(kBmpBitmap)); 
+PBBitmap* plLayerTex::GetPBBitmap(int index /* = 0 */)
+{
+    return fBitmapPB->GetBitmap(ParamID(kBmpBitmap));
 }
 
 //// GetSamplerInfo ///////////////////////////////////////////////////////////
-//  Virtual function called by plBMSampler to get various things while sampling 
+//  Virtual function called by plBMSampler to get various things while sampling
 //  the layer's image
 
-bool    plLayerTex::GetSamplerInfo( plBMSamplerData *samplerData )
+bool    plLayerTex::GetSamplerInfo(plBMSamplerData* samplerData)
 {
-    samplerData->fClipU = fBitmapPB->GetFloat( (ParamID)kBmpClipU );
-    samplerData->fClipV = fBitmapPB->GetFloat( (ParamID)kBmpClipV );
-    samplerData->fClipW = fBitmapPB->GetFloat( (ParamID)kBmpClipW );
-    samplerData->fClipH = fBitmapPB->GetFloat( (ParamID)kBmpClipH );
+    samplerData->fClipU = fBitmapPB->GetFloat((ParamID)kBmpClipU);
+    samplerData->fClipV = fBitmapPB->GetFloat((ParamID)kBmpClipV);
+    samplerData->fClipW = fBitmapPB->GetFloat((ParamID)kBmpClipW);
+    samplerData->fClipH = fBitmapPB->GetFloat((ParamID)kBmpClipH);
 
-    samplerData->fEnableCrop = fBitmapPB->GetInt( (ParamID)kBmpApply ) ? true : false;
-    samplerData->fCropPlacement = fBitmapPB->GetInt( (ParamID)kBmpCropPlace );
+    samplerData->fEnableCrop = fBitmapPB->GetInt((ParamID)kBmpApply) ? true : false;
+    samplerData->fCropPlacement = fBitmapPB->GetInt((ParamID)kBmpCropPlace);
 
-    if( fBitmapPB->GetInt( (ParamID)kBmpDiscardAlpha ) )
+    if (fBitmapPB->GetInt((ParamID)kBmpDiscardAlpha)) {
         samplerData->fAlphaSource = plBMSamplerData::kDiscard;
-    else if( fBitmapPB->GetInt( (ParamID)kBmpRGBOutput ) == 1 )
+    } else if (fBitmapPB->GetInt((ParamID)kBmpRGBOutput) == 1) {
         samplerData->fAlphaSource = plBMSamplerData::kFromRGB;
-    else
+    } else {
         samplerData->fAlphaSource = plBMSamplerData::kFromTexture;
+    }
 
     return true;
 }

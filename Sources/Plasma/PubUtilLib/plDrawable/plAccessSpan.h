@@ -55,11 +55,9 @@ class plSpan;
 
 class hsGMaterial;
 
-class plAccessSpan
-{
+class plAccessSpan {
 public:
-    enum AccessType
-    {
+    enum AccessType {
         kTri        = 0,
         kParty,
         kVtx,
@@ -67,8 +65,7 @@ public:
     };
 
 private:
-    union
-    {
+    union {
         plAccessTriSpan     fAccessTri;
         plAccessPartySpan   fAccessParty;
         plAccessVtxSpan     fAccessVtx;
@@ -84,9 +81,11 @@ private:
 
     hsGMaterial*        fMaterial;
 
-    void        SetSource(plSpan* s); 
-    void        SetSource(plGeometrySpan* s); 
-    void        SetMaterial(hsGMaterial* m) { fMaterial = m; }
+    void        SetSource(plSpan* s);
+    void        SetSource(plGeometrySpan* s);
+    void        SetMaterial(hsGMaterial* m) {
+        fMaterial = m;
+    }
 
     friend class plAccessGeometry;
 public:
@@ -94,42 +93,79 @@ public:
     plAccessSpan() : fType(kUndefined), fLocalToWorld(nil), fWorldToLocal(nil), fLocalBounds(nil), fWorldBounds(nil), fWaterHeight(nil), fMaterial(nil) {}
     plAccessSpan(AccessType t) : fType(t), fLocalToWorld(nil), fWorldToLocal(nil), fLocalBounds(nil), fWorldBounds(nil), fWaterHeight(nil), fMaterial(nil) {}
 
-    void SetType(AccessType t) { fType = t; }
-    AccessType GetType() const { return fType; }
+    void SetType(AccessType t) {
+        fType = t;
+    }
+    AccessType GetType() const {
+        return fType;
+    }
 
-    bool HasAccessTri() const { return fType == kTri; }
-    bool HasAccessParty() const { return fType == kParty; }
-    bool HasAccessVtx() const { return fType != kUndefined; }
+    bool HasAccessTri() const {
+        return fType == kTri;
+    }
+    bool HasAccessParty() const {
+        return fType == kParty;
+    }
+    bool HasAccessVtx() const {
+        return fType != kUndefined;
+    }
 
-    plAccessTriSpan&    AccessTri() { hsAssert(fType == kTri, "Cross type access"); return fAccess.fAccessTri; }
-    plAccessPartySpan&  AccessParty() { hsAssert(fType == kParty, "Cross type access"); return fAccess.fAccessParty; }
+    plAccessTriSpan&    AccessTri() {
+        hsAssert(fType == kTri, "Cross type access");
+        return fAccess.fAccessTri;
+    }
+    plAccessPartySpan&  AccessParty() {
+        hsAssert(fType == kParty, "Cross type access");
+        return fAccess.fAccessParty;
+    }
 
     inline plAccessVtxSpan& AccessVtx();
 
 
-    const hsMatrix44&   GetLocalToWorld() const { return *fLocalToWorld; }
-    const hsMatrix44&   GetWorldToLocal() const { return *fWorldToLocal; }
+    const hsMatrix44&   GetLocalToWorld() const {
+        return *fLocalToWorld;
+    }
+    const hsMatrix44&   GetWorldToLocal() const {
+        return *fWorldToLocal;
+    }
 
-    hsGMaterial*        GetMaterial() const { return fMaterial; }
+    hsGMaterial*        GetMaterial() const {
+        return fMaterial;
+    }
 
-    const hsBounds3Ext& GetLocalBounds() const { return *fLocalBounds; }
-    const hsBounds3Ext& GetWorldBounds() const { return *fWorldBounds; }
+    const hsBounds3Ext& GetLocalBounds() const {
+        return *fLocalBounds;
+    }
+    const hsBounds3Ext& GetWorldBounds() const {
+        return *fWorldBounds;
+    }
 
-    void SetLocalBounds(const hsBounds3Ext& bnd) { *fWorldBounds = *fLocalBounds = bnd; fWorldBounds->Transform(fLocalToWorld); }
-    void SetWorldBounds(const hsBounds3Ext& wBnd) { *fWorldBounds = wBnd; }
+    void SetLocalBounds(const hsBounds3Ext& bnd) {
+        *fWorldBounds = *fLocalBounds = bnd;
+        fWorldBounds->Transform(fLocalToWorld);
+    }
+    void SetWorldBounds(const hsBounds3Ext& wBnd) {
+        *fWorldBounds = wBnd;
+    }
 
-    bool HasWaterHeight() const { return nil != fWaterHeight; }
-    float GetWaterHeight() const { hsAssert(HasWaterHeight(), "Check before asking"); return *fWaterHeight; }
+    bool HasWaterHeight() const {
+        return nil != fWaterHeight;
+    }
+    float GetWaterHeight() const {
+        hsAssert(HasWaterHeight(), "Check before asking");
+        return *fWaterHeight;
+    }
 };
 
 inline plAccessVtxSpan& plAccessSpan::AccessVtx()
 {
-    switch( fType )
-    {
+    switch (fType) {
     case kTri:
         return fAccess.fAccessTri;
+
     case kParty:
         return fAccess.fAccessParty;
+
     case kVtx:
         return fAccess.fAccessVtx;
 
@@ -137,6 +173,7 @@ inline plAccessVtxSpan& plAccessSpan::AccessVtx()
     default:
         break;
     }
+
     hsAssert(false, "Undefined type");
     return fAccess.fAccessVtx;
 }

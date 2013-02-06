@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnModifier/plLogicModBase.h"
 
-class plLogicModifier : public plLogicModBase
-{
+class plLogicModifier : public plLogicModBase {
 protected:
 
     hsTArray<plConditionalObject*>  fConditionList;
@@ -56,15 +55,15 @@ public:
     plLogicModifier();
     ~plLogicModifier();
 
-    CLASSNAME_REGISTER( plLogicModifier );
-    GETINTERFACE_ANY( plLogicModifier, plLogicModBase );
-    
+    CLASSNAME_REGISTER(plLogicModifier);
+    GETINTERFACE_ANY(plLogicModifier, plLogicModBase);
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     virtual bool MsgReceive(plMessage* msg);
-    
-    virtual void RequestTrigger(bool netRequest=false);
+
+    virtual void RequestTrigger(bool netRequest = false);
     virtual bool VerifyConditions(plMessage* msg);
     void AddCondition(plConditionalObject* c);
     virtual void Reset(bool bCounterReset);

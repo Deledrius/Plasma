@@ -53,56 +53,55 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plMessage;
 class plAGMasterMod;
 
-class pfGUIProgressCtrl : public pfGUIValueCtrl
-{
-    protected:
+class pfGUIProgressCtrl : public pfGUIValueCtrl {
+protected:
 
-        hsTArray<plKey> fAnimationKeys;
-        plString        fAnimName;
+    hsTArray<plKey> fAnimationKeys;
+    plString        fAnimName;
 
-                        // Computed once, once an anim is loaded that we can compute this with
-        float           fAnimBegin, fAnimEnd;
-        bool            fAnimTimesCalced;
-        bool            fPlaySound;
+    // Computed once, once an anim is loaded that we can compute this with
+    float           fAnimBegin, fAnimEnd;
+    bool            fAnimTimesCalced;
+    bool            fPlaySound;
 
-        virtual bool IEval( double secs, float del, uint32_t dirty ); // called only by owner object's Eval()
+    virtual bool IEval(double secs, float del, uint32_t dirty);   // called only by owner object's Eval()
 
-        bool            ICalcAnimTimes( void );
+    bool            ICalcAnimTimes(void);
 
-        const uint32_t  fStopSoundTimer;
+    const uint32_t  fStopSoundTimer;
 
-    public:
+public:
 
-        pfGUIProgressCtrl();
+    pfGUIProgressCtrl();
 
-        CLASSNAME_REGISTER( pfGUIProgressCtrl );
-        GETINTERFACE_ANY( pfGUIProgressCtrl, pfGUIValueCtrl );
+    CLASSNAME_REGISTER(pfGUIProgressCtrl);
+    GETINTERFACE_ANY(pfGUIProgressCtrl, pfGUIValueCtrl);
 
 
-        enum OurFlags
-        {
-            kReverseValues = kDerivedFlagsStart
-        };
+    enum OurFlags {
+        kReverseValues = kDerivedFlagsStart
+    };
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        virtual void    UpdateBounds( hsMatrix44 *invXformMatrix = nil, bool force = false );
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-        virtual void    SetCurrValue( float v );
-        virtual void    AnimateToPercentage( float percent );
+    virtual void    UpdateBounds(hsMatrix44* invXformMatrix = nil, bool force = false);
 
-        enum SoundEvents
-        {
-            kAnimateSound
-        };
-        
-        void DontPlaySounds() { fPlaySound = false; }
+    virtual void    SetCurrValue(float v);
+    virtual void    AnimateToPercentage(float percent);
 
-        // Export only
-        void    SetAnimationKeys( hsTArray<plKey> &keys, const plString &name );
+    enum SoundEvents {
+        kAnimateSound
+    };
+
+    void DontPlaySounds() {
+        fPlaySound = false;
+    }
+
+    // Export only
+    void    SetAnimationKeys(hsTArray<plKey>& keys, const plString& name);
 };
 
 #endif // _pfGUIProgressCtrl_h

@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetProtocol/Private/Protocols/Srv2Vault/pnNpSrv2Vault.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNNETPROTOCOL_PRIVATE_PROTOCOLS_SRV2VAULT_PNNPSRV2VAULT_H
@@ -60,18 +60,18 @@ enum {
     kSrv2Vault_PlayerDeleteRequest      = 1,
     kSrv2Vault_UpgradeVisitorRequest    = 2,
     kSrv2Vault_ChangePlayerNameRequest  = 3,
-    
+
     // Account
     kSrv2Vault_AccountLoginRequest      = 20,
     kSrv2Vault_AccountLogout            = 21,
-    
+
     // NodeRefs
     kSrv2Vault_FetchChildNodeRefs       = 40,
     kSrv2Vault_NodeAdd                  = 41,
     kSrv2Vault_NodeRemove               = 42,
     kSrv2Vault_NodeAdd2                 = 43,
     kSrv2Vault_NodeRemove2              = 44,
-    
+
     // Nodes
     kSrv2Vault_NodeFetch                = 60,
     kSrv2Vault_CreateNodeRequest        = 61,
@@ -80,14 +80,14 @@ enum {
     kSrv2Vault_NodeFindRequest          = 64,
     kSrv2Vault_SendNode                 = 65,
     kSrv2Vault_NodeSave2                = 66,
-    
+
     // Notification targets
     kSrv2Vault_RegisterPlayerVault      = 80,
     kSrv2Vault_UnregisterPlayerVault    = 81,
     kSrv2Vault_RegisterAgeVault         = 82,
     kSrv2Vault_UnregisterAgeVault       = 83,
     kSrv2Vault_AgeInitRequest           = 84,
-    
+
     // Public ages
     kSrv2Vault_GetPublicAgeList         = 100,
     kSrv2Vault_SetAgePublic             = 101,
@@ -109,18 +109,18 @@ enum {
     kVault2Srv_PlayerDeleteReply        = 1,
     kVault2Srv_UpgradeVisitorReply      = 2,
     kVault2Srv_ChangePlayerNameReply    = 3,
-    
+
     // Account
     kVault2Srv_AccountLoginReply        = 20,
-    
+
     // NodeRefs
     kVault2Srv_NodeRefsFetched          = 40,
-    
+
     // Nodes
     kVault2Srv_NodeFetched              = 60,
     kVault2Srv_NodeCreated              = 61,
     kVault2Srv_NodeFindReply            = 62,
-    
+
     // Notification
     kVault2Srv_NodeChanged              = 80,
     kVault2Srv_NodeAdded                = 81,
@@ -129,7 +129,7 @@ enum {
 
     // Notification targets
     kVault2Srv_AgeInitReply             = 102,
-    
+
     // Public ages
     kVault2Srv_PublicAgeList            = 120,
     kVault2Srv_CurrentPopulationRequest = 121,
@@ -246,7 +246,7 @@ struct Srv2Vault_NodeRemove : SrvMsgHeader {
     uint32_t   parentId;
     uint32_t   childId;
     unsigned    playerCheckId;
-    unsigned    isRequestFromAuth;  
+    unsigned    isRequestFromAuth;
 };
 
 struct Srv2Vault_NodeRemove2 : SrvMsgHeader {
@@ -462,7 +462,7 @@ struct Vault2Srv_CurrentPopulationRequest : SrvMsgHeader {
 *
 ***/
 
-bool Srv2VaultValidateConnect (
-    AsyncNotifySocketListen *   listen,
-    Srv2Vault_ConnData *        connectPtr
+bool Srv2VaultValidateConnect(
+    AsyncNotifySocketListen*    listen,
+    Srv2Vault_ConnData*         connectPtr
 );

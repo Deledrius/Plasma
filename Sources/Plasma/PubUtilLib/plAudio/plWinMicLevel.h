@@ -57,24 +57,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Class Definition ////////////////////////////////////////////////////////
 
-class plWinMicLevel
-{
+class plWinMicLevel {
 public:
 
     ~plWinMicLevel();
     // Gets the microphone volume, range 0-1, -1 if error
-    static float GetLevel( void );
+    static float GetLevel(void);
 
     // Sets the microphone volume, range 0-1
-    static void     SetLevel( float level );
+    static void     SetLevel(float level);
 
     // Returns whether we can set the level
-    static bool     CanSetLevel( void );
+    static bool     CanSetLevel(void);
 
 protected:
     plWinMicLevel();    // Protected constructor for IGetInstance. Just to init some stuff
-    static plWinMicLevel    &IGetInstance( void );
-    void    IShutdown( void );
+    static plWinMicLevel&    IGetInstance(void);
+    void    IShutdown(void);
 };
 
 #endif // _plWinMicLevel_h

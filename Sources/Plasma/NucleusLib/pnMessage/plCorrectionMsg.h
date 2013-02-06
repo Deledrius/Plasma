@@ -46,35 +46,32 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMessage.h"
 #include "hsMatrix44.h"
 
-class plCorrectionMsg : public plMessage
-{
+class plCorrectionMsg : public plMessage {
 public:
     plCorrectionMsg() : plMessage(nil, nil, nil) { }
-    plCorrectionMsg(plKey &r, const hsMatrix44& l2w, const hsMatrix44& w2l, bool dirtySynch = false)
+    plCorrectionMsg(plKey& r, const hsMatrix44& l2w, const hsMatrix44& w2l, bool dirtySynch = false)
         : plMessage(nil, r, nil),
           fLocalToWorld(l2w),
           fWorldToLocal(w2l),
           fDirtySynch(dirtySynch)
     { }
 
-    CLASSNAME_REGISTER( plCorrectionMsg );
-    GETINTERFACE_ANY( plCorrectionMsg, plMessage );
+    CLASSNAME_REGISTER(plCorrectionMsg);
+    GETINTERFACE_ANY(plCorrectionMsg, plMessage);
 
     hsMatrix44      fLocalToWorld;
     hsMatrix44      fWorldToLocal;
-    
+
     bool          fDirtySynch;
 
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fLocalToWorld.Read(stream);
         fWorldToLocal.Read(stream);
     }
-    
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         fLocalToWorld.Write(stream);
         fWorldToLocal.Write(stream);

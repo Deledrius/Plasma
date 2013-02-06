@@ -43,17 +43,18 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "HeadSpin.h"
 
 void plClientMsg::IReset()
-{ 
+{
     fMsgFlag = 0;
     fAgeName = "";
 }
 
 void plClientMsg::AddRoomLoc(plLocation loc)
 {
-    if (loc.IsValid())
+    if (loc.IsValid()) {
         fRoomLocs.push_back(loc);
-    else
+    } else {
         hsStatusMessage("Trying to load an invalid room, ignoring");
+    }
 }
 
 void plClientMsg::Read(hsStream* stream, hsResMgr* mgr)

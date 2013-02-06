@@ -61,8 +61,7 @@ class pySpawnPointInfo;
 class pySpawnPointInfoRef;
 
 
-class pyVaultAgeLinkNode : public pyVaultNode
-{
+class pyVaultAgeLinkNode : public pyVaultNode {
 private:
     mutable plAgeLinkStruct     fAgeLinkStruct; // for use with AsAgeLinkStruct()
 
@@ -71,38 +70,38 @@ protected:
     pyVaultAgeLinkNode(RelVaultNode* nfsNode);
 
     //create from the Python side
-    pyVaultAgeLinkNode(int n=0);
+    pyVaultAgeLinkNode(int n = 0);
 
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptVaultAgeLinkNode);
-    static PyObject *New(RelVaultNode* nfsNode);
-    static PyObject *New(int n=0);
+    static PyObject* New(RelVaultNode* nfsNode);
+    static PyObject* New(int n = 0);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyVaultAgeLinkNode object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyVaultAgeLinkNode); // converts a PyObject to a pyVaultAgeLinkNode (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
 //==================================================================
 // class RelVaultNode : public plVaultNode
 //
     PyObject*   GetAgeInfo() const; // returns pyVaultAgeInfoNode
     // locked on psnl age bookshelf
-    void    SetLocked( bool v );
+    void    SetLocked(bool v);
     bool    GetLocked() const;
     // volatile on psnl age bookshelf
-    void    SetVolatile( bool v );
+    void    SetVolatile(bool v);
     bool    GetVolatile() const;
     // spawn points
-    void    AddSpawnPoint( pySpawnPointInfo & point );  // will only add if not there already.
-    void    AddSpawnPointRef( pySpawnPointInfoRef & point );    // will only add if not there already.
-    void    RemoveSpawnPoint( pySpawnPointInfo & point );
-    void    RemoveSpawnPointRef( pySpawnPointInfoRef & point );
-    void    RemoveSpawnPointByName( const plString & spawnPtName );
-    bool    HasSpawnPoint( const plString & spawnPtName ) const;
-    PyObject * GetSpawnPoints() const;  // returns list of pySpawnPointInfo
+    void    AddSpawnPoint(pySpawnPointInfo& point);     // will only add if not there already.
+    void    AddSpawnPointRef(pySpawnPointInfoRef& point);       // will only add if not there already.
+    void    RemoveSpawnPoint(pySpawnPointInfo& point);
+    void    RemoveSpawnPointRef(pySpawnPointInfoRef& point);
+    void    RemoveSpawnPointByName(const plString& spawnPtName);
+    bool    HasSpawnPoint(const plString& spawnPtName) const;
+    PyObject* GetSpawnPoints() const;   // returns list of pySpawnPointInfo
 
-    PyObject * AsAgeLinkStruct() const; // returns pyAgeLinkStruct
+    PyObject* AsAgeLinkStruct() const;  // returns pyAgeLinkStruct
 
 };
 

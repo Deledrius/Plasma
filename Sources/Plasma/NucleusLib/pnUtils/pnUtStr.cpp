@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtStr.cpp
-*   
+*
 ***/
 
 #include "pnUtStr.h"
@@ -71,73 +71,88 @@ static uint32_t s_hashValue[] = {
 ***/
 //===========================================================================
 template<class chartype>
-static unsigned IStrLen (const chartype str[]) {
+static unsigned IStrLen(const chartype str[])
+{
     unsigned chars = 0;
-    for (; *str++; ++chars)
+
+    for (; *str++; ++chars) {
         NULL_STMT;
+    }
+
     return chars;
 }
 
 //===========================================================================
 template<class chartype>
-static void IStrCopy (chartype * dest, const chartype source[], unsigned chars) {
+static void IStrCopy(chartype* dest, const chartype source[], unsigned chars)
+{
     while ((chars > 1) && ((*dest = *source++) != 0)) {
         --chars;
         ++dest;
     }
-    if (chars)
+
+    if (chars) {
         *dest = 0;
+    }
 }
 
 //===========================================================================
 template<class chartype>
-static chartype * IStrDup (const chartype str[]) {
+static chartype* IStrDup(const chartype str[])
+{
     unsigned chars = IStrLen(str) + 1;
-    chartype * buffer = (chartype *)malloc(chars * sizeof(chartype));
+    chartype* buffer = (chartype*)malloc(chars * sizeof(chartype));
     IStrCopy(buffer, str, chars);
     return buffer;
 }
 
 //===========================================================================
 template<class chartype>
-static chartype * IStrDupLen (const chartype str[], unsigned chars) {
+static chartype* IStrDupLen(const chartype str[], unsigned chars)
+{
     unsigned len = IStrLen(str) + 1;
-    if (len > chars)
+
+    if (len > chars) {
         len = chars;
-    chartype * buffer = (chartype *)malloc(len * sizeof(chartype));
+    }
+
+    chartype* buffer = (chartype*)malloc(len * sizeof(chartype));
     IStrCopy(buffer, str, len);
     return buffer;
 }
 
 //===========================================================================
 template<class chartype, class findchartype>
-static chartype * IStrChr (chartype * str, findchartype ch, unsigned chars) {
+static chartype* IStrChr(chartype* str, findchartype ch, unsigned chars)
+{
     for (; chars--; ++str)
-        if (*str == ch)
+        if (*str == ch) {
             return str;
-        else if (!*str)
+        } else if (!*str) {
             break;
+        }
+
     return nil;
 }
 
 //===========================================================================
-static inline bool ICharUnicodeToUtf8 (char ** dest, const wchar_t * source[], unsigned destChars) {
+static inline bool ICharUnicodeToUtf8(char** dest, const wchar_t* source[], unsigned destChars)
+{
     unsigned ch     = *(*source)++;
     bool     result = false;
+
     if (ch < 0x80) {
         if (destChars >= 1) {
             *(*dest)++ = (char)ch;
             result = true;
         }
-    }
-    else if (ch < 0x800) {
+    } else if (ch < 0x800) {
         if (destChars >= 2) {
             *(*dest)++ = (char)(0xc0 | (ch >> 6));
             *(*dest)++ = (char)(0x80 | (ch & 0x3f));
             result = true;
         }
-    }
-    else {
+    } else {
         if (destChars >= 3) {
             *(*dest)++ = (char)(0xe0 | (ch >> 12));
             *(*dest)++ = (char)(0x80 | ((ch >> 6) & 0x3f));
@@ -145,103 +160,131 @@ static inline bool ICharUnicodeToUtf8 (char ** dest, const wchar_t * source[], u
             result = true;
         }
     }
+
     return result;
 }
 
 //===========================================================================
-static inline void ICharUtf8ToUnicode (wchar_t ** dest, const char * source[]) {
+static inline void ICharUtf8ToUnicode(wchar_t** dest, const char* source[])
+{
     unsigned result, remaining;
+
     if ((**source & 0xf0) == 0xe0) {
         result    = *(*source)++ & 0x0f;
         remaining = 2;
-    }
-    else if ((**source & 0xe0) == 0xc0) {
+    } else if ((**source & 0xe0) == 0xc0) {
         result    = *(*source)++ & 0x1f;
         remaining = 1;
-    }
-    else if ((**source & 0x80) == 0x00) {
+    } else if ((**source & 0x80) == 0x00) {
         result    = *(*source)++;
         remaining = 0;
-    }
-    else {
+    } else {
         // unsupported code sequence (>0xffff)
         ++(*source);
         return;
     }
+
     for (; remaining-- && *source; ++*source)
-        if ((**source & 0xc0) == 0x80)
+        if ((**source & 0xc0) == 0x80) {
             result = (result << 6) | (**source & 0x3f);
+        }
+
     *(*dest)++ = (wchar_t)result;
 }
 
 //===========================================================================
 template<typename chartype>
-static unsigned IStrPrintfValidate (chartype * dest, unsigned count, int result) {
-    if (!count)
+static unsigned IStrPrintfValidate(chartype* dest, unsigned count, int result)
+{
+    if (!count) {
         return 0;
+    }
+
     ASSERT(result <= (int)count);
+
     if ((result < 0) || (result == (int)count)) {
         dest[count - 1] = 0;
         return count - 1;
-    }
-    else
+    } else {
         return (unsigned)result;
+    }
 }
 
 //===========================================================================
 template<class chartype>
-static int IStrCmp (const chartype str1[], const chartype str2[], unsigned chars) {
+static int IStrCmp(const chartype str1[], const chartype str2[], unsigned chars)
+{
     for (; chars--; ++str1, ++str2) {
-        if (*str1 != *str2)
+        if (*str1 != *str2) {
             return (*str1 > *str2) ? 1 : -1;
-        if (!*str1)
+        }
+
+        if (!*str1) {
             return 0;
+        }
     }
+
     return 0;
 }
 
 //===========================================================================
 template<class chartype>
-static int IStrCmpI (const chartype str1[], const chartype str2[], unsigned chars) {
+static int IStrCmpI(const chartype str1[], const chartype str2[], unsigned chars)
+{
     while (chars--) {
         chartype ch1 = CharLowerFast(*str1++);
         chartype ch2 = CharLowerFast(*str2++);
-        if (ch1 != ch2)
+
+        if (ch1 != ch2) {
             return (ch1 > ch2) ? 1 : -1;
-        if (!ch1)
+        }
+
+        if (!ch1) {
             return 0;
+        }
     }
+
     return 0;
 }
 
 //===========================================================================
 template<class chartype>
-static void IStrPack (chartype * dest, const chartype source[], unsigned chars) {
+static void IStrPack(chartype* dest, const chartype source[], unsigned chars)
+{
     while ((chars > 1) && *dest) {
         --chars;
         ++dest;
     }
+
     while ((chars > 1) && ((*dest = *source++) != 0)) {
         --chars;
         ++dest;
     }
-    if (chars)
+
+    if (chars) {
         *dest = 0;
+    }
 }
 
 //===========================================================================
 template<class chartype>
-static chartype * IStrStr (chartype source[], const chartype match[]) {
-    if (!*match)
+static chartype* IStrStr(chartype source[], const chartype match[])
+{
+    if (!*match) {
         return source;
+    }
 
-    for (chartype * curr = source; *curr; ++curr) {
-        chartype * s1       = curr;
-        const chartype * s2 = match;
-        while (*s1 && *s2 && *s1 == *s2)
+    for (chartype* curr = source; *curr; ++curr) {
+        chartype* s1       = curr;
+        const chartype* s2 = match;
+
+        while (*s1 && *s2 && *s1 == *s2) {
             s1++, s2++;
-        if (!*s2)
+        }
+
+        if (!*s2) {
             return curr;
+        }
     }
 
     return nil;
@@ -249,61 +292,77 @@ static chartype * IStrStr (chartype source[], const chartype match[]) {
 
 //===========================================================================
 template<class chartype>
-static uint32_t IStrHash (const chartype str[], unsigned chars) {
+static uint32_t IStrHash(const chartype str[], unsigned chars)
+{
     uint32_t temp0  = 0xE2C15C9D;
     uint32_t temp1  = 0x2170A28A;
     uint32_t result = 0x325D1EAE;
-    for (unsigned ch; chars-- && ((ch = (unsigned)*str) != 0); ++str) {
+
+    for (unsigned ch; chars-- && ((ch = (unsigned) * str) != 0); ++str) {
         temp0   = (temp0 << 3) ^ ch;
         temp1  += s_hashValue[temp0 & 0x0F];
         result ^= temp0 + temp1;
     }
+
     return result;
 }
 
 //===========================================================================
 template<class chartype>
-static uint32_t IStrHashI (const chartype str[], unsigned chars) {
+static uint32_t IStrHashI(const chartype str[], unsigned chars)
+{
     uint32_t temp0  = 0xE2C15C9D;
     uint32_t temp1  = 0x2170A28A;
     uint32_t result = 0x325D1EAE;
-    for (unsigned ch; chars-- && ((ch = (unsigned)*str) != 0); ++str) {
-        if ((ch >= 'a') && (ch <= 'z'))
+
+    for (unsigned ch; chars-- && ((ch = (unsigned) * str) != 0); ++str) {
+        if ((ch >= 'a') && (ch <= 'z')) {
             ch = ch + 'A' - 'a';
+        }
+
         temp0   = (temp0 << 3) ^ ch;
         temp1  += s_hashValue[temp0 & 0x0F];
         result ^= temp0 + temp1;
     }
+
     return result;
 }
 
 //===========================================================================
 template<class chartype>
-static bool IStrTokenize (const chartype * source[], chartype * dest, unsigned chars, const chartype whitespace[], unsigned maxWhitespaceSkipCount) {
+static bool IStrTokenize(const chartype* source[], chartype* dest, unsigned chars, const chartype whitespace[], unsigned maxWhitespaceSkipCount)
+{
 
     // Skip past leading whitespace
     bool inQuotes = false;
     unsigned whitespaceSkipped = 0;
-    while (**source && IStrChr(whitespace, **source, (unsigned)-1) && whitespaceSkipped < maxWhitespaceSkipCount) {
+
+    while (**source && IStrChr(whitespace, **source, (unsigned) - 1) && whitespaceSkipped < maxWhitespaceSkipCount) {
         inQuotes = (**source == '\"');
         ++*source;
         ++whitespaceSkipped;
-        if (inQuotes)
+
+        if (inQuotes) {
             break;
+        }
     }
 
     // Copy the token
     unsigned offset = 0;
+
     while (**source &&
-           ((inQuotes && (**source != '\"')) || !IStrChr(whitespace, **source, (unsigned)-1))) {
-        if (offset + 1 < chars)
+            ((inQuotes && (**source != '\"')) || !IStrChr(whitespace, **source, (unsigned) - 1))) {
+        if (offset + 1 < chars) {
             dest[offset++] = **source;
+        }
+
         ++*source;
     }
 
     // Skip past the terminating quote
-    if (inQuotes && (**source == '\"'))
+    if (inQuotes && (**source == '\"')) {
         ++*source;
+    }
 
     // Null terminate the destination buffer
     if (chars) {
@@ -319,7 +378,8 @@ static bool IStrTokenize (const chartype * source[], chartype * dest, unsigned c
 
 //===========================================================================
 template<class chartype>
-static bool IStrTokenize (const chartype * source[], ARRAY(chartype) * destArray, const chartype whitespace[], unsigned maxWhitespaceSkipCount) {
+static bool IStrTokenize(const chartype* source[], ARRAY(chartype) * destArray, const chartype whitespace[], unsigned maxWhitespaceSkipCount)
+{
 
     // Verify that the destination array is empty
     ASSERT(!destArray->Count());
@@ -327,26 +387,31 @@ static bool IStrTokenize (const chartype * source[], ARRAY(chartype) * destArray
     // Skip past leading whitespace
     bool inQuotes = false;
     unsigned whitespaceSkipped = 0;
-    while (**source && IStrChr(whitespace, **source, (unsigned)-1) && whitespaceSkipped < maxWhitespaceSkipCount) {
+
+    while (**source && IStrChr(whitespace, **source, (unsigned) - 1) && whitespaceSkipped < maxWhitespaceSkipCount) {
         inQuotes = (**source == '\"');
         ++*source;
         ++whitespaceSkipped;
-        if (inQuotes)
+
+        if (inQuotes) {
             break;
+        }
     }
 
     // Copy the token
     bool added = false;
+
     while (**source &&
-           ((inQuotes && (**source != '\"')) || !IStrChr(whitespace, **source, (unsigned)-1))) {
+            ((inQuotes && (**source != '\"')) || !IStrChr(whitespace, **source, (unsigned) - 1))) {
         destArray->Add(**source);
         added = true;
         ++*source;
     }
 
     // Skip past the terminating quote
-    if (inQuotes && (**source == '\"'))
+    if (inQuotes && (**source == '\"')) {
         ++*source;
+    }
 
     // Null terminate the destination array
     destArray->Add(0);
@@ -365,82 +430,96 @@ static bool IStrTokenize (const chartype * source[], ARRAY(chartype) * destArray
 ***/
 
 //===========================================================================
-char * StrDup (const char str[]) {
+char* StrDup(const char str[])
+{
     return IStrDup(str);
 }
 
 //===========================================================================
-wchar_t * StrDup (const wchar_t str[]) {
+wchar_t* StrDup(const wchar_t str[])
+{
     return IStrDup(str);
 }
 
 //===========================================================================
-char * StrDupLen (const char str[], unsigned chars) {
+char* StrDupLen(const char str[], unsigned chars)
+{
     return IStrDupLen(str, chars);
 }
 
 //===========================================================================
-wchar_t * StrDupLen (const wchar_t str[], unsigned chars) {
+wchar_t* StrDupLen(const wchar_t str[], unsigned chars)
+{
     return IStrDupLen(str, chars);
 }
 
 //============================================================================
-wchar_t * StrDupToUnicode (const char str[]) {
+wchar_t* StrDupToUnicode(const char str[])
+{
     unsigned bytes = StrBytes(str) * sizeof(wchar_t);
-    wchar_t * dst = (wchar_t*)malloc(bytes);
+    wchar_t* dst = (wchar_t*)malloc(bytes);
     StrToUnicode(dst, str, bytes / sizeof(wchar_t));
     return dst;
 }
 
 //============================================================================
-char * StrDupToAnsi (const wchar_t str[]) {
+char* StrDupToAnsi(const wchar_t str[])
+{
     unsigned bytes = StrBytes(str) / sizeof(wchar_t);
-    char * dst = (char*)malloc(bytes);
+    char* dst = (char*)malloc(bytes);
     StrToAnsi(dst, str, bytes);
     return dst;
 }
 
 //===========================================================================
-unsigned StrBytes (const char str[]) {  // includes space for terminator
+unsigned StrBytes(const char str[])     // includes space for terminator
+{
     return (IStrLen(str) + 1) * sizeof(str[0]);
 }
 
 //===========================================================================
-unsigned StrBytes (const wchar_t str[]) { // includes space for terminator
+unsigned StrBytes(const wchar_t str[])    // includes space for terminator
+{
     return (IStrLen(str) + 1) * sizeof(str[0]);
 }
 
 //===========================================================================
-char * StrChr (char * str, char ch, unsigned chars) {
+char* StrChr(char* str, char ch, unsigned chars)
+{
     return IStrChr(str, ch, chars);
 }
 
 //===========================================================================
-wchar_t * StrChr (wchar_t * str, wchar_t ch, unsigned chars) {
+wchar_t* StrChr(wchar_t* str, wchar_t ch, unsigned chars)
+{
     return IStrChr(str, ch, chars);
 }
 
 //===========================================================================
-const char * StrChr (const char str[], char ch, unsigned chars) {
+const char* StrChr(const char str[], char ch, unsigned chars)
+{
     return IStrChr(str, ch, chars);
 }
 
 //===========================================================================
-const wchar_t * StrChr (const wchar_t str[], wchar_t ch, unsigned chars) {
+const wchar_t* StrChr(const wchar_t str[], wchar_t ch, unsigned chars)
+{
     return IStrChr(str, ch, chars);
 }
 
 //===========================================================================
-unsigned StrPrintf (char * dest, unsigned count, const char format[], ...) {
+unsigned StrPrintf(char* dest, unsigned count, const char format[], ...)
+{
     va_list argList;
     va_start(argList, format);
-    int result = hsVsnprintf((char *)dest, count, (const char *)format, argList);
+    int result = hsVsnprintf((char*)dest, count, (const char*)format, argList);
     va_end(argList);
     return IStrPrintfValidate(dest, count, result);
 }
 
 //===========================================================================
-unsigned StrPrintf (wchar_t * dest, unsigned count, const wchar_t format[], ...) {
+unsigned StrPrintf(wchar_t* dest, unsigned count, const wchar_t format[], ...)
+{
     va_list argList;
     va_start(argList, format);
     int result = hsVsnwprintf(dest, count, format, argList);
@@ -449,163 +528,195 @@ unsigned StrPrintf (wchar_t * dest, unsigned count, const wchar_t format[], ...)
 }
 
 //===========================================================================
-unsigned StrPrintfV (char * dest, unsigned count, const char format[], va_list args) {
+unsigned StrPrintfV(char* dest, unsigned count, const char format[], va_list args)
+{
     int result = hsVsnprintf(dest, count, format, args);
     return IStrPrintfValidate(dest, count, result);
 }
 
 //===========================================================================
-unsigned StrPrintfV (wchar_t * dest, unsigned count, const wchar_t format[], va_list args) {
+unsigned StrPrintfV(wchar_t* dest, unsigned count, const wchar_t format[], va_list args)
+{
     int result = hsVsnwprintf(dest, count, format, args);
     return IStrPrintfValidate(dest, count, result);
 }
 
 //===========================================================================
-int StrCmp (const char str1[], const char str2[], unsigned chars) {
+int StrCmp(const char str1[], const char str2[], unsigned chars)
+{
     return IStrCmp(str1, str2, chars);
 }
 
 //===========================================================================
-int StrCmp (const wchar_t str1[], const wchar_t str2[], unsigned chars) {
+int StrCmp(const wchar_t str1[], const wchar_t str2[], unsigned chars)
+{
     return IStrCmp(str1, str2, chars);
 }
 
 //===========================================================================
-int StrCmpI (const char str1[], const char str2[], unsigned chars) {
+int StrCmpI(const char str1[], const char str2[], unsigned chars)
+{
     return IStrCmpI(str1, str2, chars);
 }
 
 //===========================================================================
-int StrCmpI (const wchar_t str1[], const wchar_t str2[], unsigned chars) {
+int StrCmpI(const wchar_t str1[], const wchar_t str2[], unsigned chars)
+{
     return IStrCmpI(str1, str2, chars);
 }
 
 //===========================================================================
-void StrCopy (char * dest, const char source[], unsigned chars) {
+void StrCopy(char* dest, const char source[], unsigned chars)
+{
     IStrCopy(dest, source, chars);
 }
 
 //===========================================================================
-void StrCopy (wchar_t * dest, const wchar_t source[], unsigned chars) {
+void StrCopy(wchar_t* dest, const wchar_t source[], unsigned chars)
+{
     IStrCopy(dest, source, chars);
 }
 
 //===========================================================================
-void StrPack (char * dest, const char source[], unsigned chars) {
+void StrPack(char* dest, const char source[], unsigned chars)
+{
     IStrPack(dest, source, chars);
 }
 
 //===========================================================================
-void StrPack (wchar_t * dest, const wchar_t source[], unsigned chars) {
+void StrPack(wchar_t* dest, const wchar_t source[], unsigned chars)
+{
     IStrPack(dest, source, chars);
 }
 
 //===========================================================================
-char * StrStr (char * source, const char match[]) {
+char* StrStr(char* source, const char match[])
+{
     return IStrStr(source, match);
 }
 
 //===========================================================================
-const char * StrStr (const char source[], const char match[]) {
+const char* StrStr(const char source[], const char match[])
+{
     return IStrStr<const char>(source, match);
 }
 
 //===========================================================================
-wchar_t * StrStr (wchar_t * source, const wchar_t match[]) {
+wchar_t* StrStr(wchar_t* source, const wchar_t match[])
+{
     return IStrStr(source, match);
 }
 
 //===========================================================================
-const wchar_t * StrStr (const wchar_t source[], const wchar_t match[]) {
+const wchar_t* StrStr(const wchar_t source[], const wchar_t match[])
+{
     return IStrStr<const wchar_t>(source, match);
 }
 
 //===========================================================================
-unsigned StrLen (const char str[]) {
+unsigned StrLen(const char str[])
+{
     return IStrLen(str);
 }
 
 //===========================================================================
-unsigned StrLen (const wchar_t str[]) {
+unsigned StrLen(const wchar_t str[])
+{
     return IStrLen(str);
 }
 
 //===========================================================================
-float StrToFloat (const char source[], const char ** endptr) {
-    return (float) strtod(source, const_cast<char **>(endptr));
+float StrToFloat(const char source[], const char** endptr)
+{
+    return (float) strtod(source, const_cast<char**>(endptr));
 }
 
 //===========================================================================
-float StrToFloat (const wchar_t source[], const wchar_t ** endptr) {
-    return (float) wcstod(source, const_cast<wchar_t **>(endptr));
+float StrToFloat(const wchar_t source[], const wchar_t** endptr)
+{
+    return (float) wcstod(source, const_cast<wchar_t**>(endptr));
 }
 
 //===========================================================================
-int StrToInt (const char source[], const char ** endptr) {
-    return strtol(source, const_cast<char **>(endptr), 0);
+int StrToInt(const char source[], const char** endptr)
+{
+    return strtol(source, const_cast<char**>(endptr), 0);
 }
 
 //===========================================================================
-int StrToInt (const wchar_t source[], const wchar_t ** endptr) {
-    return wcstol(source, const_cast<wchar_t **>(endptr), 0);
+int StrToInt(const wchar_t source[], const wchar_t** endptr)
+{
+    return wcstol(source, const_cast<wchar_t**>(endptr), 0);
 }
 
 //===========================================================================
-unsigned StrToUnsigned (char source[], char ** endptr, int radix) {
-    return strtoul(source, const_cast<char **>(endptr), radix);
+unsigned StrToUnsigned(char source[], char** endptr, int radix)
+{
+    return strtoul(source, const_cast<char**>(endptr), radix);
 }
 
 //===========================================================================
-unsigned StrToUnsigned (wchar_t source[], wchar_t ** endptr, int radix) {
-    return wcstoul(source, const_cast<wchar_t **>(endptr), radix);
+unsigned StrToUnsigned(wchar_t source[], wchar_t** endptr, int radix)
+{
+    return wcstoul(source, const_cast<wchar_t**>(endptr), radix);
 }
 
 //===========================================================================
-unsigned StrToUnsigned (const char source[], const char ** endptr, int radix) {
-    return strtoul(source, const_cast<char **>(endptr), radix);
+unsigned StrToUnsigned(const char source[], const char** endptr, int radix)
+{
+    return strtoul(source, const_cast<char**>(endptr), radix);
 }
 
 //===========================================================================
-unsigned StrToUnsigned (const wchar_t source[], const wchar_t ** endptr, int radix) {
-    return wcstoul(source, const_cast<wchar_t **>(endptr), radix);
+unsigned StrToUnsigned(const wchar_t source[], const wchar_t** endptr, int radix)
+{
+    return wcstoul(source, const_cast<wchar_t**>(endptr), radix);
 }
 
 //===========================================================================
-uint32_t StrHash (const char str[], unsigned chars) {
+uint32_t StrHash(const char str[], unsigned chars)
+{
     return IStrHash(str, chars);
 }
 
 //===========================================================================
-uint32_t StrHash (const wchar_t str[], unsigned chars) {
+uint32_t StrHash(const wchar_t str[], unsigned chars)
+{
     return IStrHash(str, chars);
 }
 
 //===========================================================================
-uint32_t StrHashI (const char str[], unsigned chars) {
+uint32_t StrHashI(const char str[], unsigned chars)
+{
     return IStrHashI(str, chars);
 }
 
 //===========================================================================
-uint32_t StrHashI (const wchar_t str[], unsigned chars) {
+uint32_t StrHashI(const wchar_t str[], unsigned chars)
+{
     return IStrHashI(str, chars);
 }
 
 //===========================================================================
-bool StrTokenize (const char * source[], char * dest, unsigned chars, const char whitespace[], unsigned maxWhitespaceSkipCount) {
+bool StrTokenize(const char* source[], char* dest, unsigned chars, const char whitespace[], unsigned maxWhitespaceSkipCount)
+{
     return IStrTokenize(source, dest, chars, whitespace, maxWhitespaceSkipCount);
 }
 
 //===========================================================================
-bool StrTokenize (const wchar_t * source[], wchar_t * dest, unsigned chars, const wchar_t whitespace[], unsigned maxWhitespaceSkipCount) {
+bool StrTokenize(const wchar_t* source[], wchar_t* dest, unsigned chars, const wchar_t whitespace[], unsigned maxWhitespaceSkipCount)
+{
     return IStrTokenize(source, dest, chars, whitespace, maxWhitespaceSkipCount);
 }
 
 //===========================================================================
-bool StrTokenize (const char * source[], ARRAY(char) * destArray, const char whitespace[], unsigned maxWhitespaceSkipCount) {
+bool StrTokenize(const char* source[], ARRAY(char) * destArray, const char whitespace[], unsigned maxWhitespaceSkipCount)
+{
     return IStrTokenize(source, destArray, whitespace, maxWhitespaceSkipCount);
 }
 
 //===========================================================================
-bool StrTokenize (const wchar_t * source[], ARRAY(wchar_t) * destArray, const wchar_t whitespace[], unsigned maxWhitespaceSkipCount) {
+bool StrTokenize(const wchar_t* source[], ARRAY(wchar_t) * destArray, const wchar_t whitespace[], unsigned maxWhitespaceSkipCount)
+{
     return IStrTokenize(source, destArray, whitespace, maxWhitespaceSkipCount);
 }

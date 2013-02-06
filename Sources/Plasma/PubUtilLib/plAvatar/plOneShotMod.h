@@ -52,11 +52,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // - plays a specific animation
 // - returns control to the user from the final position of the animation
 // This modifier holds the information that the avatar needs to do that.
-class plOneShotMod : public plMultiModifier
-{
+class plOneShotMod : public plMultiModifier {
 protected:
-    virtual bool IEval(double secs, float del, uint32_t dirty) {return true;}
-    char * fAnimName;       // the name of the animation associated with this one-shot
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return true;
+    }
+    char* fAnimName;        // the name of the animation associated with this one-shot
     bool fDrivable;       // whether the user can control the position of the animation
     bool fReversable;     // whether the user can back up the animation (fDrivable must be true as well)
     float fSeekDuration;    // how long to take to get to the seek point (??? should this be speed instead?)
@@ -64,19 +65,19 @@ protected:
     bool fNoSeek;
 public:
     plOneShotMod();
-    plOneShotMod(const char *animName, bool drivable, bool reversable, float seekDuration, bool smartSeek,bool noSeek = false);
+    plOneShotMod(const char* animName, bool drivable, bool reversable, float seekDuration, bool smartSeek, bool noSeek = false);
     virtual ~plOneShotMod();
-    
-    void Init(const char *animName, bool drivable, bool reversable, float seekDuration, bool smartSeek, bool noSeek = false);
 
-    CLASSNAME_REGISTER( plOneShotMod );
-    GETINTERFACE_ANY( plOneShotMod, plMultiModifier );
-    
+    void Init(const char* animName, bool drivable, bool reversable, float seekDuration, bool smartSeek, bool noSeek = false);
+
+    CLASSNAME_REGISTER(plOneShotMod);
+    GETINTERFACE_ANY(plOneShotMod, plMultiModifier);
+
     virtual void AddTarget(plSceneObject* so);
     bool MsgReceive(plMessage* msg);
 
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 };
 
 #endif

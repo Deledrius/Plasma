@@ -47,27 +47,32 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnInputCore/plControlEventCodes.h"
 
 
-class plControlEventConditionalObject : public plConditionalObject
-{
+class plControlEventConditionalObject : public plConditionalObject {
 protected:
 
 
 public:
-    
+
     plControlEventConditionalObject();
-    ~plControlEventConditionalObject(){;}
-    
-    CLASSNAME_REGISTER( plControlEventConditionalObject );
-    GETINTERFACE_ANY( plControlEventConditionalObject, plConditionalObject );
-    
+    ~plControlEventConditionalObject() {
+        ;
+    }
+
+    CLASSNAME_REGISTER(plControlEventConditionalObject);
+    GETINTERFACE_ANY(plControlEventConditionalObject, plConditionalObject);
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
 
     bool MsgReceive(plMessage* msg);
-    
-    void Evaluate(){;}
-    void Reset() { SetSatisfied(false); }
+
+    void Evaluate() {
+        ;
+    }
+    void Reset() {
+        SetSatisfied(false);
+    }
 
     ControlEventCode fControlEvent;
 

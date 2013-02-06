@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plDrawableSpans.h"
 
-class EdgeBin
-{
+class EdgeBin {
 public:
     uint16_t  fVtx;
     uint16_t  fCount;
@@ -56,30 +55,27 @@ public:
 
 void plInterMeshSmooth::FindEdges(uint32_t maxVtxIdx, uint32_t nTris, uint16_t* idxList, hsTArray<uint16_t>& edgeVerts)
 {
-    hsTArray<EdgeBin>*  bins = new hsTArray<EdgeBin>[maxVtxIdx+1];
+    hsTArray<EdgeBin>*  bins = new hsTArray<EdgeBin>[maxVtxIdx + 1];
 
     hsBitVector edgeVertBits;
     // For each vert pair (edge) in idxList
     int i;
-    for( i = 0; i < nTris; i++ )
-    {
+
+    for (i = 0; i < nTris; i++) {
         int j;
-        for( j = 0; j < 3; j++ )
-        {
-            int jPlus = j < 2 ? j+1 : 0;
-            int idx0 = idxList[i*3 + j];
-            int idx1 = idxList[i*3 + jPlus];
+
+        for (j = 0; j < 3; j++) {
+            int jPlus = j < 2 ? j + 1 : 0;
+            int idx0 = idxList[i * 3 + j];
+            int idx1 = idxList[i * 3 + jPlus];
 
             int lo, hi;
-            
+
             // Look in the LUT for the lower index.
-            if( idx0 < idx1 )
-            {
+            if (idx0 < idx1) {
                 lo = idx0;
                 hi = idx1;
-            }
-            else
-            {
+            } else {
                 lo = idx1;
                 hi = idx0;
             }
@@ -87,20 +83,18 @@ void plInterMeshSmooth::FindEdges(uint32_t maxVtxIdx, uint32_t nTris, uint16_t* 
             hsTArray<EdgeBin>& loBin = bins[lo];
             // In that bucket, look for the higher index.
             int k;
-            for( k = 0; k < loBin.GetCount(); k++ )
-            {
-                if( loBin[k].fVtx == hi )
+
+            for (k = 0; k < loBin.GetCount(); k++) {
+                if (loBin[k].fVtx == hi) {
                     break;
+                }
             }
 
             // If we find it, increment it's count,
             // else add it.
-            if( k < loBin.GetCount() )
-            {
+            if (k < loBin.GetCount()) {
                 loBin[k].fCount++;
-            }
-            else
-            {
+            } else {
                 EdgeBin* b = loBin.Push();
                 b->fVtx = hi;
                 b->fCount = 1;
@@ -109,43 +103,44 @@ void plInterMeshSmooth::FindEdges(uint32_t maxVtxIdx, uint32_t nTris, uint16_t* 
     }
 
     // For each bucket in the LUT,
-    for( i = 0; i < maxVtxIdx+1; i++ )
-    {
+    for (i = 0; i < maxVtxIdx + 1; i++) {
         hsTArray<EdgeBin>& loBin = bins[i];
         // For each higher index
         int j;
-        for( j = 0; j < loBin.GetCount(); j++ )
-        {
+
+        for (j = 0; j < loBin.GetCount(); j++) {
             // If the count is one, it's an edge, so set the edge bit for both indices (hi and lo)
-            if( 1 == loBin[j].fCount )
-            {
+            if (1 == loBin[j].fCount) {
                 edgeVertBits.SetBit(i);
                 edgeVertBits.SetBit(loBin[j].fVtx);
             }
         }
     }
-    
+
     // Now translate the bitvector to a list of indices.
-    for( i = 0; i < maxVtxIdx+1; i++ )
-    {
-        if( edgeVertBits.IsBitSet(i) )
+    for (i = 0; i < maxVtxIdx + 1; i++) {
+        if (edgeVertBits.IsBitSet(i)) {
             edgeVerts.Append(i);
+        }
     }
+
     delete [] bins;
 }
 
 void plInterMeshSmooth::FindEdges(hsTArray<plSpanHandle>& sets, hsTArray<uint16_t>* edgeVerts)
 {
     int i;
-    for( i = 0; i < sets.GetCount(); i++ )
-    {
+
+    for (i = 0; i < sets.GetCount(); i++) {
         const plSpan* span = sets[i].fDrawable->GetSpan(sets[i].fSpanIdx);
-        if( !(span->fTypeMask & plSpan::kIcicleSpan) )
+
+        if (!(span->fTypeMask & plSpan::kIcicleSpan)) {
             continue;
+        }
 
         uint32_t nTris = sets[i].fDrawable->CvtGetNumTris(sets[i].fSpanIdx);
         uint16_t* idxList = sets[i].fDrawable->CvtGetIndexList(sets[i].fSpanIdx);
-        uint32_t maxVertIdx = sets[i].fDrawable->CvtGetNumVerts(sets[i].fSpanIdx)-1;
+        uint32_t maxVertIdx = sets[i].fDrawable->CvtGetNumVerts(sets[i].fSpanIdx) - 1;
 
         FindEdges(maxVertIdx, nTris, idxList, edgeVerts[i]);
     }
@@ -158,41 +153,40 @@ void plInterMeshSmooth::SmoothNormals(hsTArray<plSpanHandle>& sets)
     FindEdges(sets, edgeVerts);
 
     int i;
-    for( i = 0; i < sets.GetCount()-1; i++ )
-    {
+
+    for (i = 0; i < sets.GetCount() - 1; i++) {
         int j;
-        for( j = edgeVerts[i].GetCount()-1; j >= 0; --j )
-        {
+
+        for (j = edgeVerts[i].GetCount() - 1; j >= 0; --j) {
             hsPoint3 pos = GetPosition(sets[i], edgeVerts[i][j]);
             hsVector3 normAccum = GetNormal(sets[i], edgeVerts[i][j]);;
 
             shareVtx[i].Append(edgeVerts[i][j]);
 
             int k;
-            for( k = i+1; k < sets.GetCount(); k++ )
-            {
+
+            for (k = i + 1; k < sets.GetCount(); k++) {
                 FindSharedVerts(pos, sets[k], edgeVerts[k], shareVtx[k], normAccum);
             }
 
             normAccum.Normalize();
             GetNormal(sets[i], edgeVerts[i][j]) = normAccum;
 
-            for( k = i+1; k < sets.GetCount(); k++ )
-            {
+            for (k = i + 1; k < sets.GetCount(); k++) {
                 SetNormals(sets[k], shareVtx[k], normAccum);
             }
 
             // Now remove all the shared verts (which we just processed)
             // from edgeVerts so we don't process them again.
-            for( k = i; k < sets.GetCount(); k++ )
-            {
+            for (k = i; k < sets.GetCount(); k++) {
                 int m;
-                for( m = 0; m < shareVtx[k].GetCount(); m++ )
-                {
+
+                for (m = 0; m < shareVtx[k].GetCount(); m++) {
                     int idx = edgeVerts[k].Find(shareVtx[k][m]);
                     hsAssert(idx != edgeVerts[k].kMissingIndex, "Lost vertex between find and remove");
                     edgeVerts[k].Remove(idx);
                 }
+
                 shareVtx[k].SetCount(0);
             }
         }
@@ -205,14 +199,13 @@ void plInterMeshSmooth::SmoothNormals(hsTArray<plSpanHandle>& sets)
 void plInterMeshSmooth::FindSharedVerts(hsPoint3& searchPos, plSpanHandle& set, hsTArray<uint16_t>& edgeVerts, hsTArray<uint16_t>& shareVtx, hsVector3& normAccum)
 {
     int i;
-    for( i = 0; i < edgeVerts.GetCount(); i++ )
-    {
+
+    for (i = 0; i < edgeVerts.GetCount(); i++) {
         hsPoint3 pos = GetPosition(set, edgeVerts[i]);
         hsVector3 norm = GetNormal(set, edgeVerts[i]);
-        if( searchPos == pos )
-        {
-            if( norm.InnerProduct(normAccum) > fMinNormDot )
-            {
+
+        if (searchPos == pos) {
+            if (norm.InnerProduct(normAccum) > fMinNormDot) {
                 shareVtx.Append(edgeVerts[i]);
                 normAccum += norm;
             }
@@ -223,8 +216,10 @@ void plInterMeshSmooth::FindSharedVerts(hsPoint3& searchPos, plSpanHandle& set, 
 void plInterMeshSmooth::SetNormals(plSpanHandle& set, hsTArray<uint16_t>& shareVtx, hsVector3& norm)
 {
     int i;
-    for( i = 0; i < shareVtx.GetCount(); i++ )
+
+    for (i = 0; i < shareVtx.GetCount(); i++) {
         GetNormal(set, shareVtx[i]) = norm;
+    }
 }
 
 hsPoint3& plInterMeshSmooth::GetPosition(plSpanHandle& set, uint16_t idx)

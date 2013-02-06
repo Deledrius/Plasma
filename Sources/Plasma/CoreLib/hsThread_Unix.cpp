@@ -58,14 +58,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 int clock_gettime(int clocktype, struct timespec* ts)
 {
-  struct timezone tz;
-  struct timeval tv;
+    struct timezone tz;
+    struct timeval tv;
 
-  int result = gettimeofday(&tv, &tz);
-  ts->tv_sec = tv.tv_sec;
-  ts->tv_nsec = tv.tv_usec * 1000 + 500;  // sice we're losing accuracy round up by 500 nanos
+    int result = gettimeofday(&tv, &tz);
+    ts->tv_sec = tv.tv_sec;
+    ts->tv_nsec = tv.tv_usec * 1000 + 500;  // sice we're losing accuracy round up by 500 nanos
 
-  return result;
+    return result;
 }
 
 #endif
@@ -86,7 +86,7 @@ extern "C" {
 hsThread::hsThread(uint32_t stackSize) : fStackSize(stackSize), fQuit(false)
 {
     fIsValid = false;
-    pthread_mutex_init(&fMutex,nil);
+    pthread_mutex_init(&fMutex, nil);
 }
 
 hsThread::~hsThread()
@@ -96,8 +96,7 @@ hsThread::~hsThread()
 
 void hsThread::Start()
 {
-    if (fIsValid == false)
-    {
+    if (fIsValid == false) {
         pthread_mutex_lock(GetStartupMutex());
 
         int status = ::pthread_create(&fPThread, nil, gEntryPoint, this);
@@ -106,15 +105,15 @@ void hsThread::Start()
         hsThrowIfOSErr(status);
 
         fIsValid = true;
-    }
-    else
+    } else {
         hsDebugMessage("Calling hsThread::Start() more than once", 0);
+    }
 }
 
 void hsThread::Stop()
 {
-    if (fIsValid)
-    {   this->fQuit = true;
+    if (fIsValid) {
+        this->fQuit = true;
 
         int status = ::pthread_join(fPThread, nil);
         hsThrowIfOSErr(status);
@@ -132,8 +131,9 @@ void* hsThread::Alloc(size_t size)
 
 void hsThread::Free(void* p)
 {
-    if (p)
+    if (p) {
         ::free(p);
+    }
 }
 
 void hsThread::ThreadYield()
@@ -152,14 +152,15 @@ void hsThread::ThreadYield()
 #include "hsWide.h"
 
 
-static FILE * gMutexTimerFile = nil;
+static FILE* gMutexTimerFile = nil;
 static void InitMutexTimerFile()
 {
-    if ( !gMutexTimerFile )
-    {
-        gMutexTimerFile = fopen( "log/MutexTimes.log", "wt" );
-        if ( gMutexTimerFile )
-            fprintf( gMutexTimerFile, "------------------------------------\n" );
+    if (!gMutexTimerFile) {
+        gMutexTimerFile = fopen("log/MutexTimes.log", "wt");
+
+        if (gMutexTimerFile) {
+            fprintf(gMutexTimerFile, "------------------------------------\n");
+        }
     }
 }
 
@@ -174,16 +175,17 @@ static void InitMutexTimerFile()
 #include "NucleusLib/inc/hsTimer.h"
 
 
-static FILE * gEventLoggingFile = nil;
+static FILE* gEventLoggingFile = nil;
 static void InitEventLoggingFile()
 {
-    if ( !gEventLoggingFile )
-    {
+    if (!gEventLoggingFile) {
         char fname[256];
-        sprintf(fname,"log/Events-%u.log",getpid());
-        gEventLoggingFile = fopen( fname, "wt" );
-        if ( gEventLoggingFile )
-            fprintf( gEventLoggingFile, "------------------------------------\n" );
+        sprintf(fname, "log/Events-%u.log", getpid());
+        gEventLoggingFile = fopen(fname, "wt");
+
+        if (gEventLoggingFile) {
+            fprintf(gEventLoggingFile, "------------------------------------\n");
+        }
     }
 }
 
@@ -202,7 +204,7 @@ hsMutex::hsMutex()
     hsThrowIfOSErr(status);
 
     // make the mutex attributes recursive
-    status = ::pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_RECURSIVE);
+    status = ::pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
     hsThrowIfOSErr(status);
 
     //init the mutex
@@ -226,8 +228,8 @@ void hsMutex::Lock()
 # ifndef HS_DEBUGGING
     timeval tv;
     hsWide start;
-    gettimeofday( &tv, nil );
-    start.Mul( tv.tv_sec, 1000000 )->Add( tv.tv_usec );
+    gettimeofday(&tv, nil);
+    start.Mul(tv.tv_sec, 1000000)->Add(tv.tv_usec);
 # endif
 #endif
 
@@ -237,18 +239,19 @@ void hsMutex::Lock()
 #ifdef MUTEX_TIMING
 # ifndef HS_DEBUGGING
     hsWide diff;
-    gettimeofday( &tv, nil );
-    diff.Mul( tv.tv_sec, 1000000 )->Add( tv.tv_usec )->Sub( &start )->Div( 1000000 );
+    gettimeofday(&tv, nil);
+    diff.Mul(tv.tv_sec, 1000000)->Add(tv.tv_usec)->Sub(&start)->Div(1000000);
     double duration = diff.AsDouble();
-    if ( gMutexTimerFile && duration>0.005 )
-    {
+
+    if (gMutexTimerFile && duration > 0.005) {
         time_t t;
-        time( &t );
-        struct tm *now = localtime( &t );
+        time(&t);
+        struct tm* now = localtime(&t);
         char tmp[30];
-        strftime( tmp, 30, "%c", now );
-        fprintf( gMutexTimerFile, "[%s] [%lu:%lu] %f\n", tmp, getpid(), hsThread::GetMyThreadId(), duration );
+        strftime(tmp, 30, "%c", now);
+        fprintf(gMutexTimerFile, "[%s] [%lu:%lu] %f\n", tmp, getpid(), hsThread::GetMyThreadId(), duration);
     }
+
 # endif
 #endif
 }
@@ -257,7 +260,7 @@ bool hsMutex::TryLock()
 {
     int status = ::pthread_mutex_trylock(&fPMutex);
     hsThrowIfOSErr(status);
-    return status==EBUSY?false:true;
+    return status == EBUSY ? false : true;
 }
 
 void hsMutex::Unlock()
@@ -272,11 +275,12 @@ hsSemaphore::hsSemaphore(int initialValue, const char* name)
 {
 #ifdef USE_SEMA
     fPSema = nil;
+
     if ((fNamed = (name != nil))) {
         /* Named semaphore shared between processes */
         fPSema = sem_open(name, O_CREAT, 0666, initialValue);
-        if (fPSema == SEM_FAILED)
-        {
+
+        if (fPSema == SEM_FAILED) {
             hsAssert(0, "hsOSException");
             throw hsOSException(errno);
         }
@@ -286,6 +290,7 @@ hsSemaphore::hsSemaphore(int initialValue, const char* name)
         int status = sem_init(fPSema, shared, initialValue);
         hsThrowIfOSErr(status);
     }
+
 #else
     int status = ::pthread_mutex_init(&fPMutex, nil);
     hsThrowIfOSErr(status);
@@ -301,11 +306,13 @@ hsSemaphore::~hsSemaphore()
 {
 #ifdef USE_SEMA
     int status = 0;
+
     if (fNamed) {
         status = sem_close(fPSema);
     } else {
         status = sem_destroy(fPSema);
     }
+
     hsThrowIfOSErr(status);
 #else
     int status = ::pthread_cond_destroy(&fPCond);
@@ -324,7 +331,7 @@ bool hsSemaphore::TryWait()
 #else
     int status = ::pthread_mutex_trylock(&fPMutex);
     hsThrowIfOSErr(status);
-    return status==EBUSY ? false : true;
+    return status == EBUSY ? false : true;
 #endif
 }
 
@@ -332,7 +339,7 @@ bool hsSemaphore::Wait(hsMilliseconds timeToWait)
 {
 #ifdef USE_SEMA  // SHOULDN'T THIS USE timeToWait??!?!? -rje
     // shouldn't this use sem_timedwait? -dpogue (2012-03-04)
-    hsAssert( timeToWait==kPosInfinity32, "sem_t does not support wait with timeout. #undef USE_SEMA and recompile." );
+    hsAssert(timeToWait == kPosInfinity32, "sem_t does not support wait with timeout. #undef USE_SEMA and recompile.");
     int status = sem_wait(fPSema);
     hsThrowIfOSErr(status);
     return true;
@@ -341,14 +348,13 @@ bool hsSemaphore::Wait(hsMilliseconds timeToWait)
     int status = ::pthread_mutex_lock(&fPMutex);
     hsThrowIfOSErr(status);
 
-    if (timeToWait == kPosInfinity32)
-    {   while (fCounter == 0)
-        {   status = ::pthread_cond_wait(&fPCond, &fPMutex);
+    if (timeToWait == kPosInfinity32) {
+        while (fCounter == 0) {
+            status = ::pthread_cond_wait(&fPCond, &fPMutex);
             hsThrowIfOSErr(status);
         }
-    }
-    else
-    {   timespec spec;
+    } else {
+        timespec spec;
         int  result;
 
         result = ::clock_gettime(CLOCK_REALTIME, &spec);
@@ -356,17 +362,20 @@ bool hsSemaphore::Wait(hsMilliseconds timeToWait)
 
         spec.tv_sec += timeToWait / 1000;
         spec.tv_nsec += (timeToWait % 1000) * 1000 * 1000;
-        while (spec.tv_nsec >= 1000 * 1000 * 1000)
-        {   spec.tv_sec += 1;
+
+        while (spec.tv_nsec >= 1000 * 1000 * 1000) {
+            spec.tv_sec += 1;
             spec.tv_nsec -= 1000 * 1000 * 1000;
         }
 
-        while (fCounter == 0)
-        {   status = ::pthread_cond_timedwait(&fPCond, &fPMutex, &spec);
-            if (status == ETIMEDOUT)
-            {   retVal = false;
+        while (fCounter == 0) {
+            status = ::pthread_cond_timedwait(&fPCond, &fPMutex, &spec);
+
+            if (status == ETIMEDOUT) {
+                retVal = false;
                 goto EXIT;
             }
+
             hsThrowIfOSErr(status);
         }
     }
@@ -438,19 +447,16 @@ bool hsEvent::Wait(hsMilliseconds timeToWait)
     hsThrowIfOSErr(status);
 
 #ifdef EVENT_LOGGING
-    fprintf(gEventLoggingFile,"Event: %p - In Wait (pre trig check), Triggered: %d, t=%f\n",this,fTriggered,hsTimer::GetSeconds());
+    fprintf(gEventLoggingFile, "Event: %p - In Wait (pre trig check), Triggered: %d, t=%f\n", this, fTriggered, hsTimer::GetSeconds());
 #endif
 
-    if ( !fTriggered )
-    {
-        if (timeToWait == kPosInfinity32)
-        {
+    if (!fTriggered) {
+        if (timeToWait == kPosInfinity32) {
             status = ::pthread_cond_wait(&fCond, &fMutex);
             hsAssert(status == 0, "hsEvent Cond Wait");
             hsThrowIfOSErr(status);
-        }
-        else
-        {   timespec spec;
+        } else {
+            timespec spec;
             int  result;
 
             result = ::clock_gettime(CLOCK_REALTIME, &spec);
@@ -458,38 +464,34 @@ bool hsEvent::Wait(hsMilliseconds timeToWait)
 
             spec.tv_sec += timeToWait / 1000;
             spec.tv_nsec += (timeToWait % 1000) * 1000 * 1000;
-            while (spec.tv_nsec >= 1000 * 1000 * 1000)
-            {   spec.tv_sec += 1;
+
+            while (spec.tv_nsec >= 1000 * 1000 * 1000) {
+                spec.tv_sec += 1;
                 spec.tv_nsec -= 1000 * 1000 * 1000;
             }
 
             status = ::pthread_cond_timedwait(&fCond, &fMutex, &spec);
 
-            if (status == ETIMEDOUT)
-            {
+            if (status == ETIMEDOUT) {
                 // It's a conditional paired with a variable!
                 //   Pthread docs all use a variable in conjunction with the conditional
                 retVal = fTriggered;
                 status = 0;
 #ifdef EVENT_LOGGING
-                fprintf(gEventLoggingFile,"Event: %p - In Wait (wait timed out), Triggered: %d, t=%f\n",this,fTriggered,hsTimer::GetSeconds());
+                fprintf(gEventLoggingFile, "Event: %p - In Wait (wait timed out), Triggered: %d, t=%f\n", this, fTriggered, hsTimer::GetSeconds());
 #endif
-            }
-            else
-            {
+            } else {
 #ifdef EVENT_LOGGING
-                fprintf(gEventLoggingFile,"Event: %p - In Wait (wait recvd signal), Triggered: %d, t=%f\n",this,fTriggered,hsTimer::GetSeconds());
+                fprintf(gEventLoggingFile, "Event: %p - In Wait (wait recvd signal), Triggered: %d, t=%f\n", this, fTriggered, hsTimer::GetSeconds());
 #endif
             }
 
             hsAssert(status == 0, "hsEvent Cond Wait");
             hsThrowIfOSErr(status);
         }
-    }
-    else
-    {
+    } else {
 #ifdef EVENT_LOGGING
-        fprintf(gEventLoggingFile,"Event: %p - In Wait (post triggerd), Triggered: %d, t=%f\n",this,fTriggered,hsTimer::GetSeconds());
+        fprintf(gEventLoggingFile, "Event: %p - In Wait (post triggerd), Triggered: %d, t=%f\n", this, fTriggered, hsTimer::GetSeconds());
 #endif
     }
 
@@ -506,7 +508,7 @@ void hsEvent::Signal()
     hsAssert(status == 0, "hsEvent Mutex Lock");
     hsThrowIfOSErr(status);
 #ifdef EVENT_LOGGING
-    fprintf(gEventLoggingFile,"Event: %p - In Signal, Triggered: %d, t=%f\n",this,fTriggered,hsTimer::GetSeconds());
+    fprintf(gEventLoggingFile, "Event: %p - In Signal, Triggered: %d, t=%f\n", this, fTriggered, hsTimer::GetSeconds());
 #endif
     fTriggered = true;
     status = ::pthread_cond_broadcast(&fCond);
@@ -521,44 +523,41 @@ void hsEvent::Signal()
 
 hsEvent::hsEvent()
 {
-    pipe( fFds );
+    pipe(fFds);
 }
 
 hsEvent::~hsEvent()
 {
-    close( fFds[kRead] );
-    close( fFds[kWrite] );
+    close(fFds[kRead]);
+    close(fFds[kWrite]);
 }
 
-bool hsEvent::Wait( hsMilliseconds timeToWait )
+bool hsEvent::Wait(hsMilliseconds timeToWait)
 {
-    hsTempMutexLock lock( fWaitLock );
+    hsTempMutexLock lock(fWaitLock);
 
     fd_set  fdset;
-    FD_ZERO( &fdset );
-    FD_SET( fFds[kRead], &fdset );
+    FD_ZERO(&fdset);
+    FD_SET(fFds[kRead], &fdset);
 
     int ans;
-    if( timeToWait==kPosInfinity32 )                
-    {
-        ans = select( fFds[kRead]+1, &fdset, nil, nil, nil );
-    }
-    else
-    {
+
+    if (timeToWait == kPosInfinity32) {
+        ans = select(fFds[kRead] + 1, &fdset, nil, nil, nil);
+    } else {
         struct timeval tv;
         tv.tv_sec = timeToWait / 1000;
-        tv.tv_usec = ( timeToWait % 1000 ) * 1000;
-        
-        ans = select( fFds[kRead]+1, &fdset, nil, nil, &tv );
+        tv.tv_usec = (timeToWait % 1000) * 1000;
+
+        ans = select(fFds[kRead] + 1, &fdset, nil, nil, &tv);
     }
 
     bool signaled = false;
 
-    if ( ans>0 )
-    {
+    if (ans > 0) {
         char buf[2];
-        int n = read( fFds[kRead], buf, 1 );
-        signaled = ( n==1 );
+        int n = read(fFds[kRead], buf, 1);
+        signaled = (n == 1);
     }
 
     return signaled;
@@ -566,8 +565,8 @@ bool hsEvent::Wait( hsMilliseconds timeToWait )
 
 void hsEvent::Signal()
 {
-    hsTempMutexLock lock( fSignalLock );
-    write( fFds[kWrite], "*", 1 );
+    hsTempMutexLock lock(fSignalLock);
+    write(fFds[kWrite], "*", 1);
 }
 
 
@@ -576,10 +575,11 @@ void hsEvent::Signal()
 void hsSleep::Sleep(uint32_t millis)
 {
     uint32_t secs = millis / 1000;
-    if (secs > 0)
-    {
+
+    if (secs > 0) {
         millis %= 1000;
         ::sleep(secs);
     }
-    usleep(millis*1000);
+
+    usleep(millis * 1000);
 }

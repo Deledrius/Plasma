@@ -65,21 +65,25 @@ pyGUISkin::pyGUISkin()
 
 bool pyGUISkin::IsGUISkin(pyKey& gckey)
 {
-    if ( gckey.getKey() && pfGUISkin::ConvertNoRef(gckey.getKey()->GetObjectPtr()) )
+    if (gckey.getKey() && pfGUISkin::ConvertNoRef(gckey.getKey()->GetObjectPtr())) {
         return true;
+    }
+
     return false;
 }
 
 // override the equals to operator
-bool pyGUISkin::operator==(const pyGUISkin &gcobj) const
+bool pyGUISkin::operator==(const pyGUISkin& gcobj) const
 {
     plKey theirs = ((pyGUISkin&)gcobj).getObjKey();
-    if ( fGCkey == nil && theirs == nil )
+
+    if (fGCkey == nil && theirs == nil) {
         return true;
-    else if ( fGCkey != nil && theirs != nil )
-        return (fGCkey->GetUoid()==theirs->GetUoid());
-    else
+    } else if (fGCkey != nil && theirs != nil) {
+        return (fGCkey->GetUoid() == theirs->GetUoid());
+    } else {
         return false;
+    }
 }
 
 

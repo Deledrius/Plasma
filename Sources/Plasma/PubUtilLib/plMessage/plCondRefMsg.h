@@ -48,29 +48,28 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsResMgr;
 
-class plCondRefMsg : public plRefMsg
-{
+class plCondRefMsg : public plRefMsg {
 
 public:
 
-    plCondRefMsg() { fWhich = -1; }
-    plCondRefMsg(const plKey &s, int which)
+    plCondRefMsg() {
+        fWhich = -1;
+    }
+    plCondRefMsg(const plKey& s, int which)
         : plRefMsg(s, plRefMsg::kOnCreate), fWhich(which) {}
 
-    CLASSNAME_REGISTER( plCondRefMsg );
-    GETINTERFACE_ANY( plCondRefMsg, plRefMsg );
+    CLASSNAME_REGISTER(plCondRefMsg);
+    GETINTERFACE_ANY(plCondRefMsg, plRefMsg);
 
     int8_t                    fWhich;
 
     // IO - not really applicable to ref msgs, but anyway
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plRefMsg::Read(stream, mgr);
         stream->ReadLE(&fWhich);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plRefMsg::Write(stream, mgr);
         stream->WriteLE(fWhich);
     }

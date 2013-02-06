@@ -74,16 +74,16 @@ plAGAnim::plAnimMap plAGAnim::fAllAnims;
 // ctor ------------
 // -----
 plAGAnim::plAGAnim()
-: plSynchedObject()
+    : plSynchedObject()
 {
 }
 
 // ctor ------------------------------------------------------
 // -----
-plAGAnim::plAGAnim(const plString &name, double start, double end)
-: fStart((float)start),
-  fEnd((float)end),
-  fName(name)
+plAGAnim::plAGAnim(const plString& name, double start, double end)
+    : fStart((float)start),
+      fEnd((float)end),
+      fName(name)
 {
 }
 
@@ -91,23 +91,23 @@ plAGAnim::plAGAnim(const plString &name, double start, double end)
 // -----
 plAGAnim::~plAGAnim()
 {
-    if (!fName.IsNull())
-    {
+    if (!fName.IsNull()) {
         RemoveAnim(fName);
     }
 
     //int numChannels = fChannels.size();
     int numApps = fApps.size();
 
-    for (int i = 0; i < numApps; i++)
-    {
-        plAGApplicator *app = fApps[i];
-        if (app)
-        {
-            plAGChannel *channel = app->GetChannel();
-            if(channel)
+    for (int i = 0; i < numApps; i++) {
+        plAGApplicator* app = fApps[i];
+
+        if (app) {
+            plAGChannel* channel = app->GetChannel();
+
+            if (channel) {
                 delete channel;
-            
+            }
+
             delete app;
         }
     }
@@ -122,29 +122,28 @@ int plAGAnim::GetChannelCount() const
 
 // GetChannel -------------------------------------
 // -----------
-plAGChannel * plAGAnim::GetChannel(int index) const
+plAGChannel* plAGAnim::GetChannel(int index) const
 {
-    plAGApplicator *app = fApps[index];
+    plAGApplicator* app = fApps[index];
     return (app ? app->GetChannel() : nil);
 }
 
 // GetChannel --------------------------------------------
 // -----------
-plAGChannel * plAGAnim::GetChannel(const plString &name) const
+plAGChannel* plAGAnim::GetChannel(const plString& name) const
 {
     int appCount = fApps.size();
 
-    for(int i = 0; i < appCount; i++)
-    {
-        plAGApplicator *app = fApps[i];
-        plAGChannel *channel = app->GetChannel();
+    for (int i = 0; i < appCount; i++) {
+        plAGApplicator* app = fApps[i];
+        plAGChannel* channel = app->GetChannel();
         plString channelName = app->GetChannelName();
 
-        if(name.Compare(channelName, plString::kCaseInsensitive) == 0)
-        {
+        if (name.Compare(channelName, plString::kCaseInsensitive) == 0) {
             return channel;
         }
     }
+
     return nil;
 }
 
@@ -157,14 +156,14 @@ int plAGAnim::GetApplicatorCount() const
 
 // GetApplicator -----------------------------------
 // --------------
-plAGApplicator *plAGAnim::GetApplicator(int i) const
+plAGApplicator* plAGAnim::GetApplicator(int i) const
 {
     return fApps[i];
 }
 
 // AddApplicator -------------------------------
 // --------------
-int plAGAnim::AddApplicator(plAGApplicator *app)
+int plAGAnim::AddApplicator(plAGApplicator* app)
 {
     hsAssert(app->GetChannel(), "Adding an applicator with no channel");
     fApps.push_back(app);
@@ -179,8 +178,7 @@ bool plAGAnim::RemoveApplicator(int index)
 {
     hsAssert(index < fApps.size(), "Out of range index for plAGAnim::RemoveApp()");
 
-    if(index < fApps.size())
-    {
+    if (index < fApps.size()) {
         fApps.erase(fApps.begin() + index);
         return true;
     } else {
@@ -192,8 +190,9 @@ bool plAGAnim::RemoveApplicator(int index)
 // ---------------
 void plAGAnim::ExtendToLength(float length)
 {
-    if (length > GetEnd())
+    if (length > GetEnd()) {
         SetEnd(length);
+    }
 }
 
 // GetChannelName ------------------------------
@@ -202,8 +201,7 @@ plString plAGAnim::GetChannelName(int index)
 {
     hsAssert(index < fApps.size(), "Out of range index for plAGAnim::GetChannelName()");
 
-    if(index < fApps.size())
-    {
+    if (index < fApps.size()) {
         return fApps[index]->GetChannel()->GetName();
     } else {
         return plString::Null;
@@ -212,7 +210,7 @@ plString plAGAnim::GetChannelName(int index)
 
 // Read --------------------------------------------
 // -----
-void plAGAnim::Read(hsStream *stream, hsResMgr *mgr)
+void plAGAnim::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSynchedObject::Read(stream, mgr);
 
@@ -226,18 +224,19 @@ void plAGAnim::Read(hsStream *stream, hsResMgr *mgr)
 
     fApps.reserve(numApps);             // pre-allocate for performance
     int i;
-    for (i = 0; i < numApps; i++)
-    {
-        plAGApplicator * app = plAGApplicator::ConvertNoRef(mgr->ReadCreatable(stream));
+
+    for (i = 0; i < numApps; i++) {
+        plAGApplicator* app = plAGApplicator::ConvertNoRef(mgr->ReadCreatable(stream));
         app->SetChannel(plAGChannel::ConvertNoRef(mgr->ReadCreatable(stream)));
         fApps.push_back(app);
     }
+
     plAGAnim::AddAnim(fName, this);
 }
 
 // Write --------------------------------------------
 // ------
-void plAGAnim::Write(hsStream *stream, hsResMgr *mgr)
+void plAGAnim::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSynchedObject::Write(stream, mgr);
 
@@ -251,14 +250,16 @@ void plAGAnim::Write(hsStream *stream, hsResMgr *mgr)
     stream->WriteLE32(numApps);
 
     int i;
-    for (i = 0; i < numApps; i++)
-    {
-        plAGApplicator *app = fApps[i];
+
+    for (i = 0; i < numApps; i++) {
+        plAGApplicator* app = fApps[i];
         hsAssert(app, "Missing applicator during write.");
-        plAGChannel *channel = nil;
-        if (app)
+        plAGChannel* channel = nil;
+
+        if (app) {
             channel = app->GetChannel();
-    
+        }
+
         hsAssert(channel, "Missing channel during write.");
         mgr->WriteCreatable(stream, app);
         mgr->WriteCreatable(stream, channel);
@@ -272,12 +273,11 @@ void plAGAnim::ClearAnimationRegistry()
 
 // AddAnim ----------------------------------------------
 // --------
-void plAGAnim::AddAnim(const plString & name, plAGAnim *anim)
+void plAGAnim::AddAnim(const plString& name, plAGAnim* anim)
 {
     // Only register the animation if it's got a "real" name. Unnamed animations
     // all get the same standard name.
-    if(name.Compare(ENTIRE_ANIMATION_NAME) != 0)
-    {
+    if (name.Compare(ENTIRE_ANIMATION_NAME) != 0) {
         hsAssert(anim, "registering nil anim");
         fAllAnims[name] = anim;
     }
@@ -285,12 +285,11 @@ void plAGAnim::AddAnim(const plString & name, plAGAnim *anim)
 
 // FindAnim -----------------------------------
 // ---------
-plAGAnim * plAGAnim::FindAnim(const plString &name)
+plAGAnim* plAGAnim::FindAnim(const plString& name)
 {
     plAnimMap::iterator i = fAllAnims.find(name);
 
-    if(i != fAllAnims.end())
-    {
+    if (i != fAllAnims.end()) {
         return (*i).second;
     } else {
         return nil;
@@ -299,12 +298,11 @@ plAGAnim * plAGAnim::FindAnim(const plString &name)
 
 // RemoveAnim -------------------------------
 // -----------
-bool plAGAnim::RemoveAnim(const plString &name)
+bool plAGAnim::RemoveAnim(const plString& name)
 {
     plAnimMap::iterator i = fAllAnims.find(name);
 
-    if(i != fAllAnims.end())
-    {
+    if (i != fAllAnims.end()) {
         fAllAnims.erase(i);
         return true;
     } else {
@@ -320,28 +318,27 @@ void plAGAnim::DumpAnimationRegistry()
     int j = 0;
 
     do {
-        plAGAnim *anim = (*i).second;
+        plAGAnim* anim = (*i).second;
         plString name = anim->GetName();
         hsStatusMessageF("GLOBAL ANIMS [%d]: <%s>", j++, name.c_str());
-    } while(++i != fAllAnims.end());
+    } while (++i != fAllAnims.end());
 }
 
 // SharesPinsWith -----------------------------------------
 // ---------------
-bool plAGAnim::SharesPinsWith(const plAGAnim *anim) const
+bool plAGAnim::SharesPinsWith(const plAGAnim* anim) const
 {
     int i, j;
-    for (i = 0; i < fApps.size(); i++)
-    {
-        for (j = 0; j < anim->fApps.size(); j++)
-        {
+
+    for (i = 0; i < fApps.size(); i++) {
+        for (j = 0; j < anim->fApps.size(); j++) {
             if (!fApps[i]->GetChannelName().Compare(anim->fApps[j]->GetChannelName()) &&
-                fApps[i]->CanBlend(anim->fApps[j]))
-            {
+                    fApps[i]->CanBlend(anim->fApps[j])) {
                 return true;
             }
         }
     }
+
     return false;
 }
 
@@ -354,27 +351,27 @@ bool plAGAnim::SharesPinsWith(const plAGAnim *anim) const
 // ctor --------------
 // -----
 plATCAnim::plATCAnim()
-: plAGAnim()
+    : plAGAnim()
 {
 }
 
 // ctor --------------------------------------------------------
 // -----
-plATCAnim::plATCAnim(const plString &name, double start, double end)
-: plAGAnim(name, start, end),
-  fInitial(-1),
-  fAutoStart(true),
-  fLoopStart((float)start),
-  fLoopEnd((float)end),
-  fLoop(false),
-  fEaseInType(plAnimEaseTypes::kNoEase),
-  fEaseOutType(plAnimEaseTypes::kNoEase),
-  fEaseInLength(0),
-  fEaseOutLength(0),
-  fEaseInMin(0.f),
-  fEaseInMax(0.f),
-  fEaseOutMin(0.f),
-  fEaseOutMax(0.f)
+plATCAnim::plATCAnim(const plString& name, double start, double end)
+    : plAGAnim(name, start, end),
+      fInitial(-1),
+      fAutoStart(true),
+      fLoopStart((float)start),
+      fLoopEnd((float)end),
+      fLoop(false),
+      fEaseInType(plAnimEaseTypes::kNoEase),
+      fEaseOutType(plAnimEaseTypes::kNoEase),
+      fEaseInLength(0),
+      fEaseOutLength(0),
+      fEaseInMin(0.f),
+      fEaseInMax(0.f),
+      fEaseOutMin(0.f),
+      fEaseOutMax(0.f)
 {
 }
 
@@ -389,7 +386,7 @@ plATCAnim::~plATCAnim()
 
 // Read ---------------------------------------------
 // -----
-void plATCAnim::Read(hsStream *stream, hsResMgr *mgr)
+void plATCAnim::Read(hsStream* stream, hsResMgr* mgr)
 {
     plAGAnim::Read(stream, mgr);
 
@@ -410,30 +407,32 @@ void plATCAnim::Read(hsStream *stream, hsResMgr *mgr)
 
     int i;
     int numMarkers = stream->ReadLE32();
-    for (i = 0; i < numMarkers; i++)
-    {
+
+    for (i = 0; i < numMarkers; i++) {
         plString name = stream->ReadSafeString_TEMP();
         float time = stream->ReadLEFloat();
         fMarkers[name] = time;
     }
 
     int numLoops = stream->ReadLE32();
-    for (i = 0; i < numLoops; i++)
-    {
+
+    for (i = 0; i < numLoops; i++) {
         plString name = stream->ReadSafeString_TEMP();
         float begin = stream->ReadLEScalar();
         float end = stream->ReadLEScalar();
-        fLoops[name] = std::pair<float,float>(begin,end);
+        fLoops[name] = std::pair<float, float>(begin, end);
     }
 
     int numStops = stream->ReadLE32();
-    for (i = 0; i < numStops; i++)
+
+    for (i = 0; i < numStops; i++) {
         fStopPoints.push_back(stream->ReadLEScalar());
+    }
 }
 
 // Write ---------------------------------------------
 // ------
-void plATCAnim::Write(hsStream *stream, hsResMgr *mgr)
+void plATCAnim::Write(hsStream* stream, hsResMgr* mgr)
 {
     plAGAnim::Write(stream, mgr);
 
@@ -453,33 +452,34 @@ void plATCAnim::Write(hsStream *stream, hsResMgr *mgr)
     stream->WriteLEScalar(fEaseOutLength);
 
     stream->WriteLE32(fMarkers.size());
-    for (MarkerMap::iterator it = fMarkers.begin(); it != fMarkers.end(); it++)
-    {
+
+    for (MarkerMap::iterator it = fMarkers.begin(); it != fMarkers.end(); it++) {
         stream->WriteSafeString(it->first);
         stream->WriteLEFloat(it->second);
     }
 
     stream->WriteLE32(fLoops.size());
-    for (LoopMap::iterator loopIt = fLoops.begin(); loopIt != fLoops.end(); loopIt++)
-    {
+
+    for (LoopMap::iterator loopIt = fLoops.begin(); loopIt != fLoops.end(); loopIt++) {
         stream->WriteSafeString(loopIt->first);
-        std::pair<float,float>& loop = loopIt->second;
+        std::pair<float, float>& loop = loopIt->second;
         stream->WriteLEFloat(loop.first);
         stream->WriteLEFloat(loop.second);
     }
 
     int i;
     stream->WriteLE32(fStopPoints.size());
-    for (i = 0; i < fStopPoints.size(); i++)
+
+    for (i = 0; i < fStopPoints.size(); i++) {
         stream->WriteLEScalar(fStopPoints[i]);
+    }
 }
 
 // CheckLoop --------------
 // ----------
 void plATCAnim::CheckLoop()
 {
-    if (fLoopStart == fLoopEnd)
-    {
+    if (fLoopStart == fLoopEnd) {
         fLoopStart = fStart;
         fLoopEnd = fEnd;
     }
@@ -487,19 +487,19 @@ void plATCAnim::CheckLoop()
 
 // AddLoop ------------------------------------------------------
 // --------
-void plATCAnim::AddLoop(const plString &name, float start, float end)
+void plATCAnim::AddLoop(const plString& name, float start, float end)
 {
-    fLoops[name] = std::pair<float,float>(start, end);
+    fLoops[name] = std::pair<float, float>(start, end);
 }
 
 // GetLoop --------------------------------------------------------------
 // --------
-bool plATCAnim::GetLoop(const plString &name, float &start, float &end) const
+bool plATCAnim::GetLoop(const plString& name, float& start, float& end) const
 {
     LoopMap::const_iterator it = fLoops.find(name);
-    if (it != fLoops.end())
-    {
-        const std::pair<float,float>& loop = (*it).second;
+
+    if (it != fLoops.end()) {
+        const std::pair<float, float>& loop = (*it).second;
         start = loop.first;
         end = loop.second;
         return true;
@@ -510,19 +510,20 @@ bool plATCAnim::GetLoop(const plString &name, float &start, float &end) const
 
 // GetLoop --------------------------------------------------------
 // --------
-bool plATCAnim::GetLoop(uint32_t num, float &start, float &end) const
+bool plATCAnim::GetLoop(uint32_t num, float& start, float& end) const
 {
-    if (num >= fLoops.size())
+    if (num >= fLoops.size()) {
         return false;
+    }
 
     LoopMap::const_iterator it = fLoops.begin();
 
-    while (num > 0)
-    {
+    while (num > 0) {
         it++;
         num--;
     }
-    const std::pair<float,float>& loop = (*it).second;
+
+    const std::pair<float, float>& loop = (*it).second;
     start = loop.first;
     end = loop.second;
     return true;
@@ -537,29 +538,31 @@ uint32_t plATCAnim::GetNumLoops() const
 
 // AddMarker ------------------------------------------
 // ----------
-void plATCAnim::AddMarker(const plString &name, float time)
+void plATCAnim::AddMarker(const plString& name, float time)
 {
     fMarkers[name] = time;
 }
 
 // GetMarker -------------------------------------
 // ----------
-float plATCAnim::GetMarker(const plString &name) const
+float plATCAnim::GetMarker(const plString& name) const
 {
-    if (fMarkers.find(name) != fMarkers.end())
+    if (fMarkers.find(name) != fMarkers.end()) {
         return (*fMarkers.find(name)).second;
+    }
+
     return -1;
 }
 
 // CopyMarkerNames -------------------------------------
 // ----------------
-void plATCAnim::CopyMarkerNames(std::vector<plString> &out)
+void plATCAnim::CopyMarkerNames(std::vector<plString>& out)
 {
     MarkerMap::iterator it = fMarkers.begin();
 
     out.reserve(fMarkers.size());
-    for (; it != fMarkers.end(); it++)
-    {
+
+    for (; it != fMarkers.end(); it++) {
         out.push_back((*it).first);
     }
 }
@@ -595,24 +598,24 @@ float plATCAnim::GetStopPoint(uint32_t i)
 // ctor ------------------
 // -----
 plEmoteAnim::plEmoteAnim()
-: fBodyUsage(kBodyFull)
+    : fBodyUsage(kBodyFull)
 {
 }
 
 // ctor ------------------------------------------------------------------------------
 // -----
-plEmoteAnim::plEmoteAnim(const plString &animName, double begin, double end, float fadeIn,
+plEmoteAnim::plEmoteAnim(const plString& animName, double begin, double end, float fadeIn,
                          float fadeOut, BodyUsage bodyUsage)
-: plATCAnim(animName, begin, end),
-  fFadeIn(fadeIn),
-  fFadeOut(fadeOut),
-  fBodyUsage(bodyUsage)
+    : plATCAnim(animName, begin, end),
+      fFadeIn(fadeIn),
+      fFadeOut(fadeOut),
+      fBodyUsage(bodyUsage)
 {
 }
 
 // Read -----------------------------------------------
 // -----
-void plEmoteAnim::Read(hsStream *stream, hsResMgr *mgr)
+void plEmoteAnim::Read(hsStream* stream, hsResMgr* mgr)
 {
     plATCAnim::Read(stream, mgr);
 
@@ -625,7 +628,7 @@ void plEmoteAnim::Read(hsStream *stream, hsResMgr *mgr)
 
 // Write -----------------------------------------------
 // ------
-void plEmoteAnim::Write(hsStream *stream, hsResMgr *mgr)
+void plEmoteAnim::Write(hsStream* stream, hsResMgr* mgr)
 {
     plATCAnim::Write(stream, mgr);
     stream->WriteLEScalar(fFadeIn);
@@ -663,16 +666,16 @@ float plEmoteAnim::GetFadeOut() const
 // ctor --------------------------
 // -----
 plAgeGlobalAnim::plAgeGlobalAnim()
-: plAGAnim()
+    : plAGAnim()
 {
     fGlobalVarName = nil;
 }
 
 // ctor --------------------------------------------------------------------
 // -----
-plAgeGlobalAnim::plAgeGlobalAnim(const plString &name, double start, double end)
-: plAGAnim(name, start, end),
-  fGlobalVarName(nil)
+plAgeGlobalAnim::plAgeGlobalAnim(const plString& name, double start, double end)
+    : plAGAnim(name, start, end),
+      fGlobalVarName(nil)
 {
 }
 
@@ -683,16 +686,16 @@ plAgeGlobalAnim::~plAgeGlobalAnim()
     delete [] fGlobalVarName;
 }
 
-void plAgeGlobalAnim::SetGlobalVarName(char *name) 
-{ 
-    delete [] fGlobalVarName; 
-    fGlobalVarName = hsStrcpy(name); 
+void plAgeGlobalAnim::SetGlobalVarName(char* name)
+{
+    delete [] fGlobalVarName;
+    fGlobalVarName = hsStrcpy(name);
 }
 
 
 // Read ---------------------------------------------------
 // -----
-void plAgeGlobalAnim::Read(hsStream *stream, hsResMgr *mgr)
+void plAgeGlobalAnim::Read(hsStream* stream, hsResMgr* mgr)
 {
     plAGAnim::Read(stream, mgr);
 
@@ -701,7 +704,7 @@ void plAgeGlobalAnim::Read(hsStream *stream, hsResMgr *mgr)
 
 // Write ---------------------------------------------------
 // ------
-void plAgeGlobalAnim::Write(hsStream *stream, hsResMgr *mgr)
+void plAgeGlobalAnim::Write(hsStream* stream, hsResMgr* mgr)
 {
     plAGAnim::Write(stream, mgr);
 
@@ -716,8 +719,8 @@ void plAgeGlobalAnim::Write(hsStream *stream, hsResMgr *mgr)
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // GetStartToEndTransform -----------------------------------------------
-bool GetStartToEndTransform(const plAGAnim *anim, hsMatrix44 *startToEnd,
-                            hsMatrix44 *endToStart, const plString &channelName)
+bool GetStartToEndTransform(const plAGAnim* anim, hsMatrix44* startToEnd,
+                            hsMatrix44* endToStart, const plString& channelName)
 {
     double start = 0.0f;    // assumed
     double end = anim->GetEnd();
@@ -727,44 +730,42 @@ bool GetStartToEndTransform(const plAGAnim *anim, hsMatrix44 *startToEnd,
 }
 
 // GetRelativeTransform ---------------------------------------------------
-bool GetRelativeTransform(const plAGAnim *anim, double timeA, double timeB,
-                          hsMatrix44 *a2b, hsMatrix44 *b2a, const plString &channelName)
+bool GetRelativeTransform(const plAGAnim* anim, double timeA, double timeB,
+                          hsMatrix44* a2b, hsMatrix44* b2a, const plString& channelName)
 {
     bool result = false;
-    plAGChannel *maybeChannel = anim->GetChannel(channelName);
+    plAGChannel* maybeChannel = anim->GetChannel(channelName);
     hsAssert(maybeChannel, "Couldn't find channel with given name.");
-    if(maybeChannel)
-    {
-        plMatrixChannel *channel = plMatrixChannel::ConvertNoRef(maybeChannel);
+
+    if (maybeChannel) {
+        plMatrixChannel* channel = plMatrixChannel::ConvertNoRef(maybeChannel);
         hsAssert(channel, "Found channel, but it's not a matrix channel.");
-        
-        if(channel)
-        {
+
+        if (channel) {
             hsMatrix44 matA;
             hsMatrix44 matB;
 
             channel->Value(matA, timeA);
             channel->Value(matB, timeB);
 
-            if(a2b)                 // requested a transform from point A to point B
-            {
+            if (a2b) {              // requested a transform from point A to point B
                 hsMatrix44 invA;
                 matA.GetInverse(&invA);
                 *a2b = invA * matB;
             }
-            if(b2a)                 // requested a transform from point B to point A
-            {
+
+            if (b2a) {              // requested a transform from point B to point A
                 hsMatrix44 invB;
                 matB.GetInverse(&invB);
                 *b2a = invB * matA;
-                
-                if(a2b)
-                {
+
+                if (a2b) {
                     hsMatrix44 invB2;
                     a2b->GetInverse(&invB2);
                 }
             }
         }
     }
+
     return result;
 }

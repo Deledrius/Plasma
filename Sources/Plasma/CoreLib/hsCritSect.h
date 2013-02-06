@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/CoreLib/hsCritSect.h
-*   
+*
 *
 *   By Eric Anderson (10/23/2005)
 *   Copyright 2005 Cyan Worlds, Inc.
@@ -61,10 +61,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #ifdef HS_BUILD_FOR_WIN32
 #   include "hsWindows.h"
-    typedef CRITICAL_SECTION CritSectHandle;
+typedef CRITICAL_SECTION CritSectHandle;
 #elif HS_BUILD_FOR_UNIX
 #   include <pthread.h>
-    typedef pthread_mutex_t CritSectHandle;
+typedef pthread_mutex_t CritSectHandle;
 #else
 # error "CCritSect: Not implemented on this platform"
 #endif
@@ -73,10 +73,10 @@ class CCritSect {
 protected:
     CritSectHandle  m_handle;
 public:
-    CCritSect ();
-    ~CCritSect ();
-    void Enter ();
-    void Leave ();
+    CCritSect();
+    ~CCritSect();
+    void Enter();
+    void Leave();
 };
 
 

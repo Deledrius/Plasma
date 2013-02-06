@@ -43,24 +43,29 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plComponentClassDesc;
 
-class plAutoUIBlock : public plAutoUIBase
-{
+class plAutoUIBlock : public plAutoUIBase {
 protected:
     int fVersion;
     bool fIsMultiModifier;
 
 public:
-    plAutoUIBlock(plComponentClassDesc *cd, int blockID, const char *name, int version);
+    plAutoUIBlock(plComponentClassDesc* cd, int blockID, const char* name, int version);
 
-    void SetMultiModifierFlag(bool flag) { fIsMultiModifier=flag; }
+    void SetMultiModifierFlag(bool flag) {
+        fIsMultiModifier = flag;
+    }
     int NumParams();
-    plAutoUIParam *GetParam(int idx);
+    plAutoUIParam* GetParam(int idx);
 
-    IParamBlock2 *CreatePB();
-    
+    IParamBlock2* CreatePB();
+
     int GetBlockID();
 
-    int GetVersion() { return fVersion; }
+    int GetVersion() {
+        return fVersion;
+    }
 
-    bool IsMultiModifier() { return fIsMultiModifier; }
+    bool IsMultiModifier() {
+        return fIsMultiModifier;
+    }
 };

@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plPXPhysical_h_inc
 #define plPXPhysical_h_inc
 
-#include "plPhysical.h" 
+#include "plPhysical.h"
 #include "hsMatrix44.h"
 #include "plPhysical/plSimDefs.h"
 #include "hsBitVector.h"
@@ -69,8 +69,7 @@ class plSceneObject;
 class hsVectorStream;
 class NxCapsule;
 
-class PhysRecipe
-{
+class PhysRecipe {
 public:
     PhysRecipe();
 
@@ -102,13 +101,11 @@ public:
     hsVectorStream* meshStream;
 };
 
-class plPXPhysical : public plPhysical
-{
+class plPXPhysical : public plPhysical {
 public:
     friend class plSimulationMgr;
 
-    enum PhysRefType
-    {
+    enum PhysRefType {
         kPhysRefWorld,
         kPhysRefSndGroup
     };
@@ -131,10 +128,16 @@ public:
     // From plPhysical
     //
     virtual plPhysical& SetProperty(int prop, bool b);
-    virtual bool GetProperty(int prop) const { return fProps.IsBitSet(prop) != 0; }
+    virtual bool GetProperty(int prop) const {
+        return fProps.IsBitSet(prop) != 0;
+    }
 
-    virtual void SetObjectKey(plKey key) { fObjectKey = key; }
-    virtual plKey GetObjectKey() const { return fObjectKey; }
+    virtual void SetObjectKey(plKey key) {
+        fObjectKey = key;
+    }
+    virtual plKey GetObjectKey() const {
+        return fObjectKey;
+    }
 
     virtual void SetSceneNode(plKey node);
     virtual plKey GetSceneNode() const;
@@ -146,27 +149,51 @@ public:
     virtual bool GetAngularVelocitySim(hsVector3& vel) const;
     virtual void SetAngularVelocitySim(const hsVector3& vel);
 
-    virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, bool force=false);
+    virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, bool force = false);
     virtual void GetTransform(hsMatrix44& l2w, hsMatrix44& w2l);
 
-    virtual int GetGroup() const { return fGroup; }
+    virtual int GetGroup() const {
+        return fGroup;
+    }
 
-    virtual void    AddLOSDB(uint16_t flag) { hsSetBits(fLOSDBs, flag); }
-    virtual void    RemoveLOSDB(uint16_t flag) { hsClearBits(fLOSDBs, flag); }
-    virtual uint16_t  GetAllLOSDBs() { return fLOSDBs; }
-    virtual bool    IsInLOSDB(uint16_t flag) { return hsCheckBits(fLOSDBs, flag); }
+    virtual void    AddLOSDB(uint16_t flag) {
+        hsSetBits(fLOSDBs, flag);
+    }
+    virtual void    RemoveLOSDB(uint16_t flag) {
+        hsClearBits(fLOSDBs, flag);
+    }
+    virtual uint16_t  GetAllLOSDBs() {
+        return fLOSDBs;
+    }
+    virtual bool    IsInLOSDB(uint16_t flag) {
+        return hsCheckBits(fLOSDBs, flag);
+    }
 
-    virtual plKey GetWorldKey() const { return fWorldKey; }
+    virtual plKey GetWorldKey() const {
+        return fWorldKey;
+    }
 
-    virtual plPhysicalSndGroup* GetSoundGroup() const { return fSndGroup; }
+    virtual plPhysicalSndGroup* GetSoundGroup() const {
+        return fSndGroup;
+    }
 
-    virtual void GetPositionSim(hsPoint3& pos) const { IGetPositionSim(pos); }
+    virtual void GetPositionSim(hsPoint3& pos) const {
+        IGetPositionSim(pos);
+    }
 
     virtual void SendNewLocation(bool synchTransform = false, bool isSynchUpdate = false);
 
-    virtual void SetHitForce(const hsVector3& force, const hsPoint3& pos) { fWeWereHit=true; fHitForce = force; fHitPos = pos; }
+    virtual void SetHitForce(const hsVector3& force, const hsPoint3& pos) {
+        fWeWereHit = true;
+        fHitForce = force;
+        fHitPos = pos;
+    }
     virtual void ApplyHitForce();
-    virtual void ResetHitForce() { fWeWereHit=false; fHitForce.Set(0,0,0); fHitPos.Set(0,0,0); }
+    virtual void ResetHitForce() {
+        fWeWereHit = false;
+        fHitForce.Set(0, 0, 0);
+        fHitPos.Set(0, 0, 0);
+    }
 
     virtual void GetSyncState(hsPoint3& pos, hsQuat& rot, hsVector3& linV, hsVector3& angV);
     virtual void SetSyncState(hsPoint3* pos, hsQuat* rot, hsVector3* linV, hsVector3* angV);
@@ -175,18 +202,22 @@ public:
 
     virtual plDrawableSpans* CreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo);
 
-    bool DoReportOn(plSimDefs::Group group) const { return hsCheckBits(fReportsOn, 1<<group); }
+    bool DoReportOn(plSimDefs::Group group) const {
+        return hsCheckBits(fReportsOn, 1 << group);
+    }
 
     // Returns true if this object is *really* dynamic.  We can have physicals
     // that are in the dynamic group but are actually animated or something.
     // This weeds those out.
     bool IsDynamic() const;
-    
+
     //Hack to check if there is an overlap with the capsule
     //this partially for exclude regions vs avatar capsule
     virtual bool OverlapWithCapsule(NxCapsule& cap);
 
-    virtual float GetMass() {return fMass;}
+    virtual float GetMass() {
+        return fMass;
+    }
 protected:
     void IGetPositionSim(hsPoint3& pos) const;
     void IGetRotationSim(hsQuat& rot) const;
@@ -194,7 +225,7 @@ protected:
     void ISetRotationSim(const hsQuat& rot);
 
     /** Handle messages about our references. */
-    bool HandleRefMsg(plGenRefMsg * refM);
+    bool HandleRefMsg(plGenRefMsg* refM);
 
     /** See if the object is in a valid, non-overlapping position.
         A valid overlap is one which is approved by the collision
@@ -202,7 +233,7 @@ protected:
         bounceOff and vice-versa
         */
     // Set overlapText to get a string naming all the overlapping physicals (that you must delete)
-    bool CheckValidPosition(char** overlapText=nil);
+    bool CheckValidPosition(char** overlapText = nil);
 
     /////////////////////////////////////////////////////////////
     //
@@ -211,13 +242,15 @@ protected:
     /////////////////////////////////////////////////////////////
 
     /** Remember that we need to do a synch soon. */
-    bool DirtySynchState(const char* SDLStateName, uint32_t synchFlags );
+    bool DirtySynchState(const char* SDLStateName, uint32_t synchFlags);
 
-    double GetLastSyncTime() { return fLastSyncTime; }
+    double GetLastSyncTime() {
+        return fLastSyncTime;
+    }
 
     /** Get the simulation transform of the physical, in world
     coordinates (factoring in the subworld if necessary */
-    void IGetTransformGlobal(hsMatrix44 &l2w) const;
+    void IGetTransformGlobal(hsMatrix44& l2w) const;
     void ISetTransformGlobal(const hsMatrix44& l2w);
 
     // Enable/disable collisions and dynamic movement

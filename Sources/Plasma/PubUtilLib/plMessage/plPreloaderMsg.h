@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plMessage/plPreloaderMsg.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_PUBUTILLIB_PLMESSAGE_PLPRELOADERMSG_H
@@ -54,13 +54,19 @@ class plPreloaderMsg : public plMessage {
 public:
     bool    fSuccess;
 
-    plPreloaderMsg () { SetBCastFlag(kBCastByExactType); }
-    
+    plPreloaderMsg() {
+        SetBCastFlag(kBCastByExactType);
+    }
+
     CLASSNAME_REGISTER(plPreloaderMsg);
     GETINTERFACE_ANY(plPreloaderMsg, plMessage);
 
-    void Read (hsStream* stream, hsResMgr* ) { FATAL("plPreloaderMsg::Read"); }
-    void Write (hsStream* stream, hsResMgr* ) { FATAL("plPreloaderMsg::Write"); }
+    void Read(hsStream* stream, hsResMgr*) {
+        FATAL("plPreloaderMsg::Read");
+    }
+    void Write(hsStream* stream, hsResMgr*) {
+        FATAL("plPreloaderMsg::Write");
+    }
 };
 
 

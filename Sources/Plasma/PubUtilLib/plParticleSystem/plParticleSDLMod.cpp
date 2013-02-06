@@ -47,46 +47,58 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plKey.h"
 
 // static vars
-char plParticleSDLMod::kStrNumParticles[]="numParticles";
+char plParticleSDLMod::kStrNumParticles[] = "numParticles";
 
 void plParticleSDLMod::IPutCurrentStateIn(plStateDataRecord* dstState)
 {
-    plSceneObject* sobj=GetTarget();
-    if (!sobj)
+    plSceneObject* sobj = GetTarget();
+
+    if (!sobj) {
         return;
+    }
 
     uint32_t flags = sobj->GetKey()->GetUoid().GetLocation().GetFlags();
 
-    const plParticleSystem *sys = plParticleSystem::ConvertNoRef(sobj->GetModifierByType(plParticleSystem::Index()));
-    if (!sys)
+    const plParticleSystem* sys = plParticleSystem::ConvertNoRef(sobj->GetModifierByType(plParticleSystem::Index()));
+
+    if (!sys) {
         return;
-    
+    }
+
     int num = sys->GetNumValidParticles(true);
     dstState->FindVar(kStrNumParticles)->Set(num);
 }
 
 void plParticleSDLMod::ISetCurrentStateFrom(const plStateDataRecord* srcState)
 {
-    plSceneObject* sobj=GetTarget();
-    if (!sobj)
-        return;
+    plSceneObject* sobj = GetTarget();
 
-    plParticleSystem *sys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(sobj->GetModifierByType(plParticleSystem::Index())));
-    if (!sys)
+    if (!sobj) {
         return;
+    }
+
+    plParticleSystem* sys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(sobj->GetModifierByType(plParticleSystem::Index())));
+
+    if (!sys) {
+        return;
+    }
 
     int num;
     srcState->FindVar(kStrNumParticles)->Get(&num);
-    if (num > sys->GetMaxTotalParticles())
+
+    if (num > sys->GetMaxTotalParticles()) {
         num = sys->GetMaxTotalParticles();
-    
+    }
+
     sys->WipeExistingParticles();
     sys->GenerateParticles(num);
 }
 
 uint32_t plParticleSDLMod::IApplyModFlags(uint32_t sendFlags)
 {
-    if (fAttachedToAvatar)
+    if (fAttachedToAvatar) {
         return (sendFlags | plSynchedObject::kDontPersistOnServer | plSynchedObject::kIsAvatarState);
+    }
+
     return sendFlags;
 }

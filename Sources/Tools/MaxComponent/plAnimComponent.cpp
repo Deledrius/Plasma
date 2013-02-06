@@ -87,77 +87,82 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // So that the linker won't throw this code away, since it doesn't appear to be used
 void DummyCodeIncludeFunc() {}
 
-plEaseAccessor gAnimCompEaseAccessor(plComponentBase::kBlkComp, 
+plEaseAccessor gAnimCompEaseAccessor(plComponentBase::kBlkComp,
                                      kAnimEaseInMin, kAnimEaseInMax, kAnimEaseInLength,
                                      kAnimEaseOutMin, kAnimEaseOutMax, kAnimEaseOutLength);
 
-bool HasPhysicalComponent(plMaxNodeBase *node, bool searchChildren)
+bool HasPhysicalComponent(plMaxNodeBase* node, bool searchChildren)
 {
     int i;
-    for (i = 0; i < node->NumAttachedComponents(); i++)
-    {
-        if (node->GetAttachedComponent(i)->CanConvertToType(PHYSICS_BASE_CID))
+
+    for (i = 0; i < node->NumAttachedComponents(); i++) {
+        if (node->GetAttachedComponent(i)->CanConvertToType(PHYSICS_BASE_CID)) {
             return true;
+        }
     }
 
-    if (searchChildren)
-    {
+    if (searchChildren) {
         for (i = 0; i < node->NumberOfChildren(); i++)
-            if (HasPhysicalComponent((plMaxNodeBase *)node->GetChildNode(i), searchChildren))
+            if (HasPhysicalComponent((plMaxNodeBase*)node->GetChildNode(i), searchChildren)) {
                 return true;
+            }
     }
+
     return false;
 }
 
-bool HasPhysicalComponent(plComponentBase *comp)
+bool HasPhysicalComponent(plComponentBase* comp)
 {
     int i;
-    for (i = 0; i < comp->NumTargets(); i++)
-    {
-        plMaxNodeBase *node = comp->GetTarget(i);
-        if (node && HasPhysicalComponent(node, true))
+
+    for (i = 0; i < comp->NumTargets(); i++) {
+        plMaxNodeBase* node = comp->GetTarget(i);
+
+        if (node && HasPhysicalComponent(node, true)) {
             return true;
+        }
     }
+
     return false;
 }
 
-bool    plAnimComponentBase::GetAnimKey( plMaxNode *node, hsTArray<plKey> &outKeys )
+bool    plAnimComponentBase::GetAnimKey(plMaxNode* node, hsTArray<plKey>& outKeys)
 {
-    plComponentBase *comp = node->ConvertToComponent();
-    if( comp != nil )
-    {
-        if( IsAnimComponent( comp ) )
-        {
-            plAnimComponentBase *base = (plAnimComponentBase *)comp;
+    plComponentBase* comp = node->ConvertToComponent();
+
+    if (comp != nil) {
+        if (IsAnimComponent(comp)) {
+            plAnimComponentBase* base = (plAnimComponentBase*)comp;
             // Grab this guy's key
         }
     }
+
 //  else if( )
     {
     }
     return true;
 }
 
-plAnimObjInterface  *plAnimComponentBase::GetAnimInterface( INode *inode )
+plAnimObjInterface*  plAnimComponentBase::GetAnimInterface(INode* inode)
 {
-    if( inode == nil )
+    if (inode == nil) {
         return nil;
-
-    plMaxNode *node = (plMaxNode *)inode;
-    plComponentBase *comp = node->ConvertToComponent();
-    if( comp != nil )
-    {
-        if( IsAnimComponent( comp ) )
-        {
-            plAnimComponentBase *base = (plAnimComponentBase *)comp;
-            return (plAnimObjInterface *)base;
-        }
     }
-    else
-    {
-        plAnimStealthNode *stealth = plAnimStealthNode::ConvertToStealth( node );
-        if( stealth != nil )
-            return (plAnimObjInterface *)stealth;
+
+    plMaxNode* node = (plMaxNode*)inode;
+    plComponentBase* comp = node->ConvertToComponent();
+
+    if (comp != nil) {
+        if (IsAnimComponent(comp)) {
+            plAnimComponentBase* base = (plAnimComponentBase*)comp;
+            return (plAnimObjInterface*)base;
+        }
+    } else {
+        plAnimStealthNode* stealth = plAnimStealthNode::ConvertToStealth(node);
+
+        if (stealth != nil) {
+            return (plAnimObjInterface*)stealth;
+        }
     }
 
     return nil;
@@ -170,125 +175,123 @@ void plAnimComponentProc::EnableGlobal(HWND hWnd, bool enable)
     ComboBox_Enable(GetDlgItem(hWnd, IDC_LOOP_NAMES), !enable);
     Button_Enable(GetDlgItem(hWnd, IDC_COMP_ANIM_AUTOSTART_CKBX), !enable);
     Button_Enable(GetDlgItem(hWnd, IDC_COMP_ANIM_LOOP_CKBX), !enable);
-}   
+}
 
-void plAnimComponentProc::FillAgeGlobalComboBox(HWND box, const char *varName)
-{       
-    plStateDescriptor *sd = plSDLMgr::GetInstance()->FindDescriptor(plPageInfoComponent::GetCurrExportAgeName(), plSDL::kLatestVersion);
-    if (sd)
-    {
+void plAnimComponentProc::FillAgeGlobalComboBox(HWND box, const char* varName)
+{
+    plStateDescriptor* sd = plSDLMgr::GetInstance()->FindDescriptor(plPageInfoComponent::GetCurrExportAgeName(), plSDL::kLatestVersion);
+
+    if (sd) {
         int i;
-        for (i = 0; i < sd->GetNumVars(); i++)
-        {
-            plVarDescriptor *var = sd->GetVar(i);
+
+        for (i = 0; i < sd->GetNumVars(); i++) {
+            plVarDescriptor* var = sd->GetVar(i);
+
             if (var->GetType() == plVarDescriptor::kFloat ||
-                var->GetType() == plVarDescriptor::kDouble ||
-                var->GetType() == plVarDescriptor::kTime ||
-                var->GetType() == plVarDescriptor::kAgeTimeOfDay)
-            {
+                    var->GetType() == plVarDescriptor::kDouble ||
+                    var->GetType() == plVarDescriptor::kTime ||
+                    var->GetType() == plVarDescriptor::kAgeTimeOfDay) {
                 ComboBox_AddString(box, var->GetName().c_str());
             }
         }
     }
+
     ComboBox_AddString(box, "(none)");
 }
 
-void plAnimComponentProc::SetBoxToAgeGlobal(HWND box, const char *varName)
+void plAnimComponentProc::SetBoxToAgeGlobal(HWND box, const char* varName)
 {
     char buff[512];
-    if (!varName || !strcmp(varName, ""))
+
+    if (!varName || !strcmp(varName, "")) {
         varName = "(none)";
+    }
 
     ComboBox_SelectString(box, 0, varName);
     ComboBox_GetLBText(box, ComboBox_GetCurSel(box), buff);
-    if (strcmp(varName, buff))
-    {
-        // Didn't find our variable in the age SDL file... 
+
+    if (strcmp(varName, buff)) {
+        // Didn't find our variable in the age SDL file...
         // Probably just missing the sdl file,
         // so we'll force it in there. It'll export fine.
         ComboBox_AddString(box, varName);
         ComboBox_SelectString(box, 0, varName);
     }
-}   
+}
 
-BOOL plAnimComponentProc::DlgProc(TimeValue t, IParamMap2 *pMap, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL plAnimComponentProc::DlgProc(TimeValue t, IParamMap2* pMap, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     HWND gWnd = GetDlgItem(hWnd, IDC_ANIM_GLOBAL_LIST);
     char buff[512];
-    switch (msg)
-    {
-    case WM_INITDIALOG:
-        {
+
+    switch (msg) {
+    case WM_INITDIALOG: {
             fPB = pMap->GetParamBlock();
-            
+
             fNoteTrackDlg.Init(GetDlgItem(hWnd, IDC_ANIM_NAMES),
-                GetDlgItem(hWnd, IDC_LOOP_NAMES),
-                kAnimName,
-                kAnimLoopName,
-                fPB,
-                fPB->GetOwner());
+                               GetDlgItem(hWnd, IDC_LOOP_NAMES),
+                               kAnimName,
+                               kAnimLoopName,
+                               fPB,
+                               fPB->GetOwner());
             fNoteTrackDlg.Load();
-            
+
             EnableWindow(GetDlgItem(hWnd, IDC_LOOP_NAMES), fPB->GetInt(kAnimLoop));
-            
+
             FillAgeGlobalComboBox(gWnd, fPB->GetStr(ParamID(kAnimGlobalName)));
             SetBoxToAgeGlobal(gWnd, fPB->GetStr(ParamID(kAnimGlobalName)));
             EnableGlobal(hWnd, fPB->GetInt(ParamID(kAnimUseGlobal)));
-            Button_Enable(GetDlgItem(hWnd, IDC_COMP_ANIM_PHYSANIM), 
-                HasPhysicalComponent((plComponentBase*)fPB->GetOwner()));
+            Button_Enable(GetDlgItem(hWnd, IDC_COMP_ANIM_PHYSANIM),
+                          HasPhysicalComponent((plComponentBase*)fPB->GetOwner()));
         }
+
         return TRUE;
+
     case WM_COMMAND:
-        if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_ANIM_NAMES)
-        {
+        if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_ANIM_NAMES) {
             fNoteTrackDlg.AnimChanged();
             return TRUE;
-        }
-        else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_LOOP_NAMES)
-        {
+        } else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_LOOP_NAMES) {
             // Get the new loop name
             fNoteTrackDlg.LoopChanged();
             return TRUE;
-        }
-        else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_ANIM_GLOBAL_LIST)
-        {
+        } else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_ANIM_GLOBAL_LIST) {
             ComboBox_GetLBText(gWnd, ComboBox_GetCurSel(gWnd), buff);
             fPB->SetValue(ParamID(kAnimGlobalName), 0, _T(buff));
         }
         // Catch loop button updates
-        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_COMP_ANIM_LOOP_CKBX)
+        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_COMP_ANIM_LOOP_CKBX) {
             EnableWindow(GetDlgItem(hWnd, IDC_LOOP_NAMES), fPB->GetInt(kAnimLoop));
-        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_COMP_ANIM_USE_GLOBAL)
-        {
+        } else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_COMP_ANIM_USE_GLOBAL) {
             EnableGlobal(hWnd, fPB->GetInt(ParamID(kAnimUseGlobal)));
         }
+
         break;
     }
-    return false;   
+
+    return false;
 }
 
-void plAnimComponentProc::Update( TimeValue t, Interval &valid, IParamMap2 *pmap )
+void plAnimComponentProc::Update(TimeValue t, Interval& valid, IParamMap2* pmap)
 {
     HWND hWnd = pmap->GetHWnd();
-    IParamBlock2 *pb = pmap->GetParamBlock();
-    SetBoxToAgeGlobal(GetDlgItem(hWnd, IDC_ANIM_GLOBAL_LIST), pb->GetStr(ParamID(kAnimGlobalName)));    
-}   
+    IParamBlock2* pb = pmap->GetParamBlock();
+    SetBoxToAgeGlobal(GetDlgItem(hWnd, IDC_ANIM_GLOBAL_LIST), pb->GetStr(ParamID(kAnimGlobalName)));
+}
 
 void plAnimComponentProc::DeleteThis()
 {
     fNoteTrackDlg.DeleteCache();
-}   
+}
 
 //  For the paramblock below.
 static plAnimComponentProc gAnimCompProc;
 
 #define WM_ROLLOUT_OPEN WM_USER+1
 
-class plAnimEaseComponentProc : public ParamMap2UserDlgProc
-{
+class plAnimEaseComponentProc : public ParamMap2UserDlgProc {
 protected:
-    void EnableStopPoints(IParamMap2 *pm, bool enable)
-    {
+    void EnableStopPoints(IParamMap2* pm, bool enable) {
         pm->Enable(kAnimEaseInMin, enable);
         pm->Enable(kAnimEaseInMax, enable);
         pm->Enable(kAnimEaseOutMin, enable);
@@ -296,51 +299,51 @@ protected:
     }
 
 public:
-    BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (msg)
-        {
-        case WM_INITDIALOG:
-            {
-                IParamBlock2 *pb = map->GetParamBlock();
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        switch (msg) {
+        case WM_INITDIALOG: {
+                IParamBlock2* pb = map->GetParamBlock();
 
                 // Enable the min and max controls (that are only valid with stop points)
                 // if at least one of the targets has a stop point
-                plAnimComponent *comp = (plAnimComponent*)pb->GetOwner();
+                plAnimComponent* comp = (plAnimComponent*)pb->GetOwner();
                 int num = comp->NumTargets();
                 bool stopPoints = false;
-                for (int i = 0; i < num; i++)
-                {
-                    if (DoesHaveStopPoints(comp->GetTarget(i)))
-                    {
+
+                for (int i = 0; i < num; i++) {
+                    if (DoesHaveStopPoints(comp->GetTarget(i))) {
                         stopPoints = true;
                         break;
                     }
                 }
+
                 EnableStopPoints(map, stopPoints);
 
                 // If we're doing an ease, set the ease rollup to open
                 if (pb->GetInt(kAnimEaseInType) != plAnimEaseTypes::kNoEase ||
-                    pb->GetInt(kAnimEaseOutType) != plAnimEaseTypes::kNoEase)
+                        pb->GetInt(kAnimEaseOutType) != plAnimEaseTypes::kNoEase) {
                     PostMessage(hWnd, WM_ROLLOUT_OPEN, 0, 0);
+                }
             }
+
             return TRUE;
 
-        // Max doesn't know about the rollup until after WM_CREATE, so we get
-        // around it by posting a message
-        case WM_ROLLOUT_OPEN:
-            {
-                IRollupWindow *rollup = GetCOREInterface()->GetCommandPanelRollup();
+            // Max doesn't know about the rollup until after WM_CREATE, so we get
+            // around it by posting a message
+        case WM_ROLLOUT_OPEN: {
+                IRollupWindow* rollup = GetCOREInterface()->GetCommandPanelRollup();
                 int idx = rollup->GetPanelIndex(hWnd);
                 rollup->SetPanelOpen(idx, TRUE);
             }
+
             return TRUE;
         }
+
         return FALSE;
     }
 
     void DeleteThis() {}
-};  
+};
 //  For the paramblock below.
 static plAnimEaseComponentProc gAnimEaseCompProc;
 
@@ -410,12 +413,12 @@ public:
 CLASS_DESC(plAnimComponent, gAnimDesc, "Animation",  "Animation", COMP_TYPE_MISC, ANIM_COMP_CID)
 CLASS_DESC(plAnimGroupedComponent, gAnimGroupedDesc, "Animation Grouped",  "AnimGrouped", COMP_TYPE_MISC, ANIM_GROUP_COMP_CID)
 
-bool plAnimComponentBase::IsAnimComponent(plComponentBase *comp)
+bool plAnimComponentBase::IsAnimComponent(plComponentBase* comp)
 {
     return (comp->ClassID() == ANIM_COMP_CID ||
             comp->ClassID() == ANIM_GROUP_COMP_CID);
 }
-        
+
 enum { kAnimMain, kAnimEase };
 
 ParamBlockDesc2 gAnimBlock
@@ -423,89 +426,89 @@ ParamBlockDesc2 gAnimBlock
     plComponent::kBlkComp, _T("animation"), 0, &gAnimDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP, plComponent::kRefComp,
 
     // map rollups
-    2, 
+    2,
     kAnimMain, IDD_COMP_ANIM, IDS_COMP_ANIM, 0, 0, &gAnimCompProc,
     kAnimEase, IDD_COMP_ANIM_EASE, IDS_COMP_ANIM_EASE, 0, APPENDROLL_CLOSED, &gAnimEaseCompProc,
 
     // Anim Main rollout
     kAnimAutoStart, _T("autoStart"),    TYPE_BOOL,      0, 0,
-        p_ui,       kAnimMain, TYPE_SINGLECHEKBOX, IDC_COMP_ANIM_AUTOSTART_CKBX,
-        p_default,  FALSE,
-        end,
+    p_ui,       kAnimMain, TYPE_SINGLECHEKBOX, IDC_COMP_ANIM_AUTOSTART_CKBX,
+    p_default,  FALSE,
+    end,
     kAnimLoop,      _T("loop"),         TYPE_BOOL,      0, 0,
-        p_ui,       kAnimMain, TYPE_SINGLECHEKBOX, IDC_COMP_ANIM_LOOP_CKBX,
-        p_default,  FALSE,
-        end,
+    p_ui,       kAnimMain, TYPE_SINGLECHEKBOX, IDC_COMP_ANIM_LOOP_CKBX,
+    p_default,  FALSE,
+    end,
     kAnimName,      _T("animName"),     TYPE_STRING,    0, 0,
-        end,
+    end,
     kAnimUseGlobal,     _T("UseGlobal"),    TYPE_BOOL,  0, 0,
-        p_default,  FALSE,
-        p_ui,   kAnimMain, TYPE_SINGLECHEKBOX,  IDC_COMP_ANIM_USE_GLOBAL,
-        end,
+    p_default,  FALSE,
+    p_ui,   kAnimMain, TYPE_SINGLECHEKBOX,  IDC_COMP_ANIM_USE_GLOBAL,
+    end,
     kAnimGlobalName,    _T("GlobalName"),   TYPE_STRING,    0,  0,
-        p_default, _T(""),
-        end,
+    p_default, _T(""),
+    end,
     kAnimLoopName,  _T("loopName"),     TYPE_STRING,    0, 0,
-        end,
+    end,
     kAnimPhysAnim,  _T("PhysAnim"),     TYPE_BOOL,  0, 0,
-        p_default, TRUE,
-        p_ui,   kAnimMain, TYPE_SINGLECHEKBOX, IDC_COMP_ANIM_PHYSANIM,
-        end,
+    p_default, TRUE,
+    p_ui,   kAnimMain, TYPE_SINGLECHEKBOX, IDC_COMP_ANIM_PHYSANIM,
+    end,
 
     // Anim Ease rollout
     kAnimEaseInType,    _T("easeInType"),   TYPE_INT,       0, 0,
-        p_ui,       kAnimEase, TYPE_RADIO, 3, IDC_COMP_ANIM_EASE_IN_NONE, IDC_COMP_ANIM_EASE_IN_CONST_ACCEL, IDC_COMP_ANIM_EASE_IN_SPLINE,
-        p_vals,     plAnimEaseTypes::kNoEase, plAnimEaseTypes::kConstAccel, plAnimEaseTypes::kSpline,
-        p_default,  plAnimEaseTypes::kNoEase,
-        end,
-    kAnimEaseInLength,  _T("easeInLength"), TYPE_FLOAT,     0, 0,   
-        p_default, 1.0,
-        p_range, 0.1, 99.0,
-        p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_ANIM_EASE_IN_TIME, IDC_COMP_ANIM_EASE_IN_TIME_SPIN, 1.0,
-        p_accessor, &gAnimCompEaseAccessor,
-        end,
-    kAnimEaseInMin,     _T("easeInMin"),    TYPE_FLOAT,     0, 0,   
-        p_default, 1.0,
-        p_range, 0.1, 99.0,
-        p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_ANIM_EASE_IN_MIN, IDC_COMP_ANIM_EASE_IN_MIN_SPIN, 1.0,
-        p_accessor, &gAnimCompEaseAccessor,
-        end,
-    kAnimEaseInMax, _T("easeInMax"),    TYPE_FLOAT,     0, 0,   
-        p_default, 1.0,
-        p_range, 0.1, 99.0,
-        p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_ANIM_EASE_IN_MAX, IDC_COMP_ANIM_EASE_IN_MAX_SPIN, 1.0,
-        p_accessor, &gAnimCompEaseAccessor,
-        end,
+    p_ui,       kAnimEase, TYPE_RADIO, 3, IDC_COMP_ANIM_EASE_IN_NONE, IDC_COMP_ANIM_EASE_IN_CONST_ACCEL, IDC_COMP_ANIM_EASE_IN_SPLINE,
+    p_vals,     plAnimEaseTypes::kNoEase, plAnimEaseTypes::kConstAccel, plAnimEaseTypes::kSpline,
+    p_default,  plAnimEaseTypes::kNoEase,
+    end,
+    kAnimEaseInLength,  _T("easeInLength"), TYPE_FLOAT,     0, 0,
+    p_default, 1.0,
+    p_range, 0.1, 99.0,
+    p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_ANIM_EASE_IN_TIME, IDC_COMP_ANIM_EASE_IN_TIME_SPIN, 1.0,
+    p_accessor, &gAnimCompEaseAccessor,
+    end,
+    kAnimEaseInMin,     _T("easeInMin"),    TYPE_FLOAT,     0, 0,
+    p_default, 1.0,
+    p_range, 0.1, 99.0,
+    p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_ANIM_EASE_IN_MIN, IDC_COMP_ANIM_EASE_IN_MIN_SPIN, 1.0,
+    p_accessor, &gAnimCompEaseAccessor,
+    end,
+    kAnimEaseInMax, _T("easeInMax"),    TYPE_FLOAT,     0, 0,
+    p_default, 1.0,
+    p_range, 0.1, 99.0,
+    p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_ANIM_EASE_IN_MAX, IDC_COMP_ANIM_EASE_IN_MAX_SPIN, 1.0,
+    p_accessor, &gAnimCompEaseAccessor,
+    end,
 
     kAnimEaseOutType,   _T("easeOutType"),  TYPE_INT,       0, 0,
-        p_ui,       kAnimEase, TYPE_RADIO, 3, IDC_COMP_ANIM_EASE_OUT_NONE, IDC_COMP_ANIM_EASE_OUT_CONST_ACCEL, IDC_COMP_ANIM_EASE_OUT_SPLINE,
-        p_vals,     plAnimEaseTypes::kNoEase, plAnimEaseTypes::kConstAccel, plAnimEaseTypes::kSpline,
-        p_default,  plAnimEaseTypes::kNoEase,
-        end,
-    kAnimEaseOutLength, _T("easeOutLength"),    TYPE_FLOAT,     0, 0,   
-        p_default, 1.0,
-        p_range, 0.1, 99.0,
-        p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_ANIM_EASE_OUT_TIME, IDC_COMP_ANIM_EASE_OUT_TIME_SPIN, 1.0,
-        p_accessor, &gAnimCompEaseAccessor,
-        end,
-    kAnimEaseOutMin,        _T("easeOutMin"),   TYPE_FLOAT,     0, 0,   
-        p_default, 1.0,
-        p_range, 0.1, 99.0,
-        p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_ANIM_EASE_OUT_MIN, IDC_COMP_ANIM_EASE_OUT_MIN_SPIN, 1.0,
-        p_accessor, &gAnimCompEaseAccessor,
-        end,
-    kAnimEaseOutMax,    _T("easeOutMax"),   TYPE_FLOAT,     0, 0,   
-        p_default, 1.0,
-        p_range, 0.1, 99.0,
-        p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_ANIM_EASE_OUT_MAX, IDC_COMP_ANIM_EASE_OUT_MAX_SPIN, 1.0,
-        p_accessor, &gAnimCompEaseAccessor,
-        end,
+    p_ui,       kAnimEase, TYPE_RADIO, 3, IDC_COMP_ANIM_EASE_OUT_NONE, IDC_COMP_ANIM_EASE_OUT_CONST_ACCEL, IDC_COMP_ANIM_EASE_OUT_SPLINE,
+    p_vals,     plAnimEaseTypes::kNoEase, plAnimEaseTypes::kConstAccel, plAnimEaseTypes::kSpline,
+    p_default,  plAnimEaseTypes::kNoEase,
+    end,
+    kAnimEaseOutLength, _T("easeOutLength"),    TYPE_FLOAT,     0, 0,
+    p_default, 1.0,
+    p_range, 0.1, 99.0,
+    p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_ANIM_EASE_OUT_TIME, IDC_COMP_ANIM_EASE_OUT_TIME_SPIN, 1.0,
+    p_accessor, &gAnimCompEaseAccessor,
+    end,
+    kAnimEaseOutMin,        _T("easeOutMin"),   TYPE_FLOAT,     0, 0,
+    p_default, 1.0,
+    p_range, 0.1, 99.0,
+    p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_ANIM_EASE_OUT_MIN, IDC_COMP_ANIM_EASE_OUT_MIN_SPIN, 1.0,
+    p_accessor, &gAnimCompEaseAccessor,
+    end,
+    kAnimEaseOutMax,    _T("easeOutMax"),   TYPE_FLOAT,     0, 0,
+    p_default, 1.0,
+    p_range, 0.1, 99.0,
+    p_ui,   kAnimEase, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_ANIM_EASE_OUT_MAX, IDC_COMP_ANIM_EASE_OUT_MAX_SPIN, 1.0,
+    p_accessor, &gAnimCompEaseAccessor,
+    end,
 
     end
 );
@@ -515,7 +518,7 @@ ParamBlockDesc2 gAnimGroupedBlock
     plComponent::kBlkComp, _T("animGrouped"), 0, &gAnimGroupedDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP + P_INCLUDE_PARAMS, plComponent::kRefComp,
 
     // map rollups
-    2, 
+    2,
     kAnimMain, IDD_COMP_ANIM, IDS_COMP_ANIM_GROUPED, 0, 0, &gAnimCompProc,
     kAnimEase, IDD_COMP_ANIM_EASE, IDS_COMP_ANIM_EASE, 0, APPENDROLL_CLOSED, &gAnimEaseCompProc,
 
@@ -531,28 +534,26 @@ plAnimComponent::plAnimComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-plKey plAnimComponent::GetModKey(plMaxNode *node)
+plKey plAnimComponent::GetModKey(plMaxNode* node)
 {
-    if (fMods.find(node) != fMods.end())
+    if (fMods.find(node) != fMods.end()) {
         return fMods[node]->GetKey();
+    }
 
     return nil;
 }
 
-bool    plAnimComponent::GetKeyList( INode *restrictedNode, hsTArray<plKey> &outKeys )
+bool    plAnimComponent::GetKeyList(INode* restrictedNode, hsTArray<plKey>& outKeys)
 {
-    if( restrictedNode != nil )
-    {
-        if( fMods.find( (plMaxNode *)restrictedNode ) != fMods.end() )
-        {
-            outKeys.Append( fMods[ (plMaxNode *)restrictedNode ]->GetKey() );
+    if (restrictedNode != nil) {
+        if (fMods.find((plMaxNode*)restrictedNode) != fMods.end()) {
+            outKeys.Append(fMods[(plMaxNode*)restrictedNode ]->GetKey());
             return true;
         }
+
         return false;
-    }
-    else
-    {
-        hsAssert( false, "DO SOMETHING!" );
+    } else {
+        hsAssert(false, "DO SOMETHING!");
         return false;
     }
 }
@@ -563,41 +564,45 @@ plAnimGroupedComponent::plAnimGroupedComponent() : fForward(nil)
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-plKey plAnimGroupedComponent::GetModKey(plMaxNode *node)
+plKey plAnimGroupedComponent::GetModKey(plMaxNode* node)
 {
-    if( fForward )
+    if (fForward) {
         return fForward->GetKey();
+    }
+
     return nil;
 }
 
-bool    plAnimGroupedComponent::GetKeyList( INode *restrictedNode, hsTArray<plKey> &outKeys )
+bool    plAnimGroupedComponent::GetKeyList(INode* restrictedNode, hsTArray<plKey>& outKeys)
 {
-    if( fForward )
-    {
-        outKeys.Append( fForward->GetKey() );
+    if (fForward) {
+        outKeys.Append(fForward->GetKey());
         return true;
     }
+
     return false;
 }
 
-bool plAnimGroupedComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAnimGroupedComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     bool needSetMaster = fNeedReset;
-    if (fNeedReset)
-    {
+
+    if (fNeedReset) {
         fForward = new plMsgForwarder;
         plKey forwardKey = hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), fForward, node->GetLocation());
 
-        plNodeRefMsg *refMsg = new plNodeRefMsg(node->GetRoomKey(), plRefMsg::kOnCreate, -1, plNodeRefMsg::kGeneric);
+        plNodeRefMsg* refMsg = new plNodeRefMsg(node->GetRoomKey(), plRefMsg::kOnCreate, -1, plNodeRefMsg::kGeneric);
         hsgResMgr::ResMgr()->AddViaNotify(forwardKey, refMsg, plRefFlags::kActiveRef);
     }
 
     bool ret = plAnimComponentBase::PreConvert(node, pErrMsg);
 
-    plAGMasterMod *mod = fMods[node];
+    plAGMasterMod* mod = fMods[node];
 
-    if (needSetMaster)
+    if (needSetMaster) {
         mod->SetIsGroupMaster(true, fForward);
+    }
+
     mod->SetIsGrouped(true);
 
     fForward->AddForwardKey(mod->GetKey());
@@ -614,54 +619,62 @@ plAnimComponentBase::plAnimComponentBase() : fNeedReset(true)
 
 plString plAnimComponentBase::GetAnimName()
 {
-    const char *name = fCompPB->GetStr(kAnimName);
-    if (!name || name[0] == '\0')
+    const char* name = fCompPB->GetStr(kAnimName);
+
+    if (!name || name[0] == '\0') {
         return plString::Null;
+    }
+
     return plString::FromUtf8(name);
 }
 
 bool IsSubworld(plMaxNode* node)
 {
     uint32_t numComps = node->NumAttachedComponents();
-    for (int i = 0; i < numComps; i++)
-    {
+
+    for (int i = 0; i < numComps; i++) {
         plComponentBase* comp = node->GetAttachedComponent(i);
-        if (comp && comp->ClassID() == PHYS_SUBWORLD_CID)
+
+        if (comp && comp->ClassID() == PHYS_SUBWORLD_CID) {
             return true;
+        }
     }
 
     return false;
 }
 
-void SetPhysAnimRecurse(plMaxNode *node, plErrorMsg *pErrMsg)
+void SetPhysAnimRecurse(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     // If we hit a subworld, stop.  The subworld may be animated, but the
     // physicals in it aren't.
-    if (IsSubworld(node))
+    if (IsSubworld(node)) {
         return;
+    }
 
-    if (HasPhysicalComponent(node, false))
-    {   char* debugName = node->GetName();
+    if (HasPhysicalComponent(node, false)) {
+        char* debugName = node->GetName();
         node->GetPhysicalProps()->SetPhysAnim(true, node, pErrMsg);
     }
+
     int i;
-    for (i = 0; i < node->NumberOfChildren(); i++)
-        SetPhysAnimRecurse((plMaxNode *)node->GetChildNode(i), pErrMsg);
+
+    for (i = 0; i < node->NumberOfChildren(); i++) {
+        SetPhysAnimRecurse((plMaxNode*)node->GetChildNode(i), pErrMsg);
+    }
 }
 
-bool plAnimComponentBase::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)   
+bool plAnimComponentBase::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if (node->IsTMAnimated())
-    {
+    if (node->IsTMAnimated()) {
         node->SetMovable(true);
         node->SetForceLocal(true);
-    
+
         //
         // forceLocal on our parent (since keys work in local space)
         //
-        plMaxNode *parent = (plMaxNode *)node->GetParentNode();
-        if (!parent->IsRootNode())
-        {
+        plMaxNode* parent = (plMaxNode*)node->GetParentNode();
+
+        if (!parent->IsRootNode()) {
             parent->SetForceLocal(true);
 
             //char str[512];
@@ -670,9 +683,10 @@ bool plAnimComponentBase::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
         }
     }
 
-    if (fCompPB->GetInt(ParamID(kAnimPhysAnim)))
+    if (fCompPB->GetInt(ParamID(kAnimPhysAnim))) {
         SetPhysAnimRecurse(node, pErrMsg);
-    
+    }
+
     /*
     int childCount = node->NumberOfChildren();
     for (int i = 0; i < childCount; i++)
@@ -680,14 +694,13 @@ bool plAnimComponentBase::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
         SetupProperties((plMaxNode *)node->GetChildNode(i), pErrMsg);
     }
     */
-    return true; 
+    return true;
 }
 
-bool plAnimComponentBase::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAnimComponentBase::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     // If this is the first time in the preconvert, reset the map
-    if (fNeedReset)
-    {
+    if (fNeedReset) {
         fNeedReset = false;
     }
 
@@ -695,20 +708,21 @@ bool plAnimComponentBase::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
     // it out to anyone that needs it
 //  if (node->IsTMAnimated() || node->IsAnimatedLight())
 //  {
-        const char *name = node->GetName();
+    const char* name = node->GetName();
 
-        plAGMasterMod *mod = node->GetAGMasterMod();
-        if (mod == nil)
-        {
-            if (!node->HasAGMod()) // Need to add this before the MasterMod, if it doesn't have one already.
-            {
-                node->AddModifier(new plAGModifier(plString::FromUtf8(node->GetName())), IGetUniqueName(node));
-            }
-            mod = new plAGMasterMod();
+    plAGMasterMod* mod = node->GetAGMasterMod();
 
-            plKey modKey = node->AddModifier(mod, IGetUniqueName(node));
+    if (mod == nil) {
+        if (!node->HasAGMod()) { // Need to add this before the MasterMod, if it doesn't have one already.
+            node->AddModifier(new plAGModifier(plString::FromUtf8(node->GetName())), IGetUniqueName(node));
         }
-        fMods[node] = mod;
+
+        mod = new plAGMasterMod();
+
+        plKey modKey = node->AddModifier(mod, IGetUniqueName(node));
+    }
+
+    fMods[node] = mod;
 //  }
 
 
@@ -723,19 +737,18 @@ bool plAnimComponentBase::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
     // be necessary in this case.
 
     plString animName = plString::FromUtf8(fCompPB->GetStr(kAnimName));
-    if (animName.IsEmpty())
-        animName = ENTIRE_ANIMATION_NAME;
 
-    if (fCompPB->GetInt(ParamID(kAnimUseGlobal)))
-    {
-        plAgeGlobalAnim *ageAnim = new plAgeGlobalAnim(animName, 0, 0);
+    if (animName.IsEmpty()) {
+        animName = ENTIRE_ANIMATION_NAME;
+    }
+
+    if (fCompPB->GetInt(ParamID(kAnimUseGlobal))) {
+        plAgeGlobalAnim* ageAnim = new plAgeGlobalAnim(animName, 0, 0);
         ageAnim->SetGlobalVarName((char*)fCompPB->GetStr(ParamID(kAnimGlobalName)));
 
         fAnims[node] = ageAnim;
-    }
-    else
-    {
-        plATCAnim *ATCAnim = new plATCAnim(animName, 0, 0);
+    } else {
+        plATCAnim* ATCAnim = new plATCAnim(animName, 0, 0);
         plNotetrackAnim noteAnim(node, pErrMsg);
         plAnimInfo info = noteAnim.GetAnimInfo(animName);
         ATCAnim->SetAutoStart(fCompPB->GetInt(kAnimAutoStart));
@@ -743,15 +756,20 @@ bool plAnimComponentBase::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
         float start = info.GetAnimStart();
         float end = info.GetAnimEnd();
         float initial = info.GetAnimInitial();
-        if (start != -1)
+
+        if (start != -1) {
             ATCAnim->SetStart(start);
-        if (end != -1)
+        }
+
+        if (end != -1) {
             ATCAnim->SetEnd(end);
-        if (initial != -1)
+        }
+
+        if (initial != -1) {
             ATCAnim->SetInitial(initial);
-    
-        if (fCompPB->GetInt(kAnimLoop))
-        {
+        }
+
+        if (fCompPB->GetInt(kAnimLoop)) {
             ATCAnim->SetLoop(true);
             plString loopName = plString::FromUtf8(fCompPB->GetStr(kAnimLoopName));
             float loopStart = info.GetLoopStart(loopName);
@@ -760,18 +778,24 @@ bool plAnimComponentBase::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
             ATCAnim->SetLoopStart(loopStart == -1 ? ATCAnim->GetStart() : loopStart);
             ATCAnim->SetLoopEnd(loopEnd == -1 ? ATCAnim->GetEnd() : loopEnd);
         }
-    
+
         plString loop;
-        while (!(loop = info.GetNextLoopName()).IsNull())
+
+        while (!(loop = info.GetNextLoopName()).IsNull()) {
             ATCAnim->AddLoop(loop, info.GetLoopStart(loop), info.GetLoopEnd(loop));
+        }
 
         plString marker;
-        while (!(marker = info.GetNextMarkerName()).IsNull())
+
+        while (!(marker = info.GetNextMarkerName()).IsNull()) {
             ATCAnim->AddMarker(marker, info.GetMarkerTime(marker));
+        }
 
         float stopPoint = -1;
-        while ((stopPoint = info.GetNextStopPoint()) != -1)
+
+        while ((stopPoint = info.GetNextStopPoint()) != -1) {
             ATCAnim->AddStopPoint(stopPoint);
+        }
 
         ATCAnim->SetEaseInType(fCompPB->GetInt(kAnimEaseInType));
         ATCAnim->SetEaseOutType(fCompPB->GetInt(kAnimEaseOutType));
@@ -784,33 +808,37 @@ bool plAnimComponentBase::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
 
         fAnims[node] = ATCAnim;
     }
+
     return true;
 }
 
 
-bool plAnimComponentBase::IAddTMToAnim(plMaxNode *node, plAGAnim *anim, plErrorMsg *pErrMsg)
+bool plAnimComponentBase::IAddTMToAnim(plMaxNode* node, plAGAnim* anim, plErrorMsg* pErrMsg)
 {
     bool result = false;
 
     // Get the affine parts and the TM Controller
-    plSceneObject *obj = node->GetSceneObject();
-    hsAffineParts * parts = new hsAffineParts;
+    plSceneObject* obj = node->GetSceneObject();
+    hsAffineParts* parts = new hsAffineParts;
     plController* tmc;
 
-    if (!anim->GetName().Compare(ENTIRE_ANIMATION_NAME))
+    if (!anim->GetName().Compare(ENTIRE_ANIMATION_NAME)) {
         tmc = hsControlConverter::Instance().ConvertTMAnim(obj, node, parts);
-    else 
+    } else {
         tmc = hsControlConverter::Instance().ConvertTMAnim(obj, node, parts, anim->GetStart(), anim->GetEnd());
+    }
 
-    if (tmc)
-    {
-        plMatrixChannelApplicator *app = new plMatrixChannelApplicator();
-            app->SetChannelName(plString::FromUtf8(node->GetName()));
-        plMatrixControllerChannel *channel = new plMatrixControllerChannel(tmc, parts);
+    if (tmc) {
+        plMatrixChannelApplicator* app = new plMatrixChannelApplicator();
+        app->SetChannelName(plString::FromUtf8(node->GetName()));
+        plMatrixControllerChannel* channel = new plMatrixControllerChannel(tmc, parts);
         app->SetChannel(channel);
         anim->AddApplicator(app);
-        if (!anim->GetName().Compare(ENTIRE_ANIMATION_NAME))
+
+        if (!anim->GetName().Compare(ENTIRE_ANIMATION_NAME)) {
             anim->ExtendToLength(tmc->GetLength());
+        }
+
         result = true;
     }
 
@@ -818,76 +846,84 @@ bool plAnimComponentBase::IAddTMToAnim(plMaxNode *node, plAGAnim *anim, plErrorM
     return result;
 }
 
-bool plAnimComponentBase::IAddLightToAnim(plMaxNode *node, plAGAnim *anim, plErrorMsg *pErrMsg)
+bool plAnimComponentBase::IAddLightToAnim(plMaxNode* node, plAGAnim* anim, plErrorMsg* pErrMsg)
 {
-    if (!node->IsAnimatedLight())
+    if (!node->IsAnimatedLight()) {
         return false;
+    }
 
-    Object *obj = node->GetObjectRef();
+    Object* obj = node->GetObjectRef();
     Class_ID cid = obj->ClassID();
 
-    IParamBlock2 *pb = nil;
-    if (cid == RTSPOT_LIGHT_CLASSID)
+    IParamBlock2* pb = nil;
+
+    if (cid == RTSPOT_LIGHT_CLASSID) {
         pb = obj->GetParamBlockByID(plRTLightBase::kBlkSpotLight);
-    else if (cid == RTOMNI_LIGHT_CLASSID)
+    } else if (cid == RTOMNI_LIGHT_CLASSID) {
         pb = obj->GetParamBlockByID(plRTLightBase::kBlkOmniLight);
-    else if (cid == RTDIR_LIGHT_CLASSID)
+    } else if (cid == RTDIR_LIGHT_CLASSID) {
         pb = obj->GetParamBlockByID(plRTLightBase::kBlkTSpotLight);
-    else if (cid == RTPDIR_LIGHT_CLASSID)
+    } else if (cid == RTPDIR_LIGHT_CLASSID) {
         pb = obj->GetParamBlockByID(plRTLightBase::kBlkMain);
+    }
 
     node->GetRTLightColAnim(pb, anim);
 
-    if (cid == RTSPOT_LIGHT_CLASSID || cid == RTOMNI_LIGHT_CLASSID)
+    if (cid == RTSPOT_LIGHT_CLASSID || cid == RTOMNI_LIGHT_CLASSID) {
         node->GetRTLightAttenAnim(pb, anim);
+    }
 
-    if (cid == RTSPOT_LIGHT_CLASSID)
+    if (cid == RTSPOT_LIGHT_CLASSID) {
         node->GetRTConeAnim(pb, anim);
+    }
 
     return true;
 }
 
-bool plAnimComponentBase::IConvertNodeSegmentBranch(plMaxNode *node, plAGAnim *anim, plErrorMsg *pErrMsg)
+bool plAnimComponentBase::IConvertNodeSegmentBranch(plMaxNode* node, plAGAnim* anim, plErrorMsg* pErrMsg)
 {
     bool madeAnim = false;
     int i;
 
-    if (IAddTMToAnim(node, anim, pErrMsg))
+    if (IAddTMToAnim(node, anim, pErrMsg)) {
         madeAnim = true;
-    if (IAddLightToAnim(node, anim, pErrMsg))
-        madeAnim = true;
-
-    for (i = 0; i < node->NumAttachedComponents(); i++)
-    {
-        if (node->GetAttachedComponent(i)->AddToAnim(anim, node))
-            madeAnim = true;
     }
 
-    if (madeAnim)
-    {
+    if (IAddLightToAnim(node, anim, pErrMsg)) {
+        madeAnim = true;
+    }
+
+    for (i = 0; i < node->NumAttachedComponents(); i++) {
+        if (node->GetAttachedComponent(i)->AddToAnim(anim, node)) {
+            madeAnim = true;
+        }
+    }
+
+    if (madeAnim) {
         // It has an animation, we're going to need a plAGMod when loading the anim
-        if (!node->HasAGMod())
-        {
+        if (!node->HasAGMod()) {
             node->AddModifier(new plAGModifier(plString::FromUtf8(node->GetName())), IGetUniqueName(node));
         }
+
         madeAnim = true;
     }
-/*
-    // let's see if the children have any segments specified...
-    int childCount = node->NumberOfChildren();
-    for (int i = 0; i < childCount; i++)
-    {
-        if (IConvertNodeSegmentBranch((plMaxNode *)(node->GetChildNode(i)), anim, pErrMsg))
-            madeAnim = true;
-    }
-*/
+
+    /*
+        // let's see if the children have any segments specified...
+        int childCount = node->NumberOfChildren();
+        for (int i = 0; i < childCount; i++)
+        {
+            if (IConvertNodeSegmentBranch((plMaxNode *)(node->GetChildNode(i)), anim, pErrMsg))
+                madeAnim = true;
+        }
+    */
     return madeAnim;
 }
 
-bool plAnimComponentBase::IMakePersistent(plMaxNode *node, plAGAnim *anim, plErrorMsg *pErrMsg)
+bool plAnimComponentBase::IMakePersistent(plMaxNode* node, plAGAnim* anim, plErrorMsg* pErrMsg)
 {
     // anims made by this component are private to the specific AGMasterMod, so we attach them there.
-    plAGMasterMod *mod = plAGMasterMod::ConvertNoRef(fMods[node]);
+    plAGMasterMod* mod = plAGMasterMod::ConvertNoRef(fMods[node]);
     hsAssert(mod != nil, "No MasterMod to make animation persistent!");
 
     plString buffer = plString::Format("%s_%s_anim_%d", node->GetName(), anim->GetName().c_str(), mod->GetNumPrivateAnimations());
@@ -901,149 +937,150 @@ bool plAnimComponentBase::IMakePersistent(plMaxNode *node, plAGAnim *anim, plErr
 }
 
 
-bool plAnimComponentBase::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAnimComponentBase::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fNeedReset = true;
 
-    if (!IConvertNodeSegmentBranch(node, fAnims[node], pErrMsg))
-    {
+    if (!IConvertNodeSegmentBranch(node, fAnims[node], pErrMsg)) {
         // Either we delete it here, or we make it persistent below and the resMgr handles it
         delete fAnims[node];
         fAnims[node] = nil;
         return false;
     }
 
-    if (fCompPB->GetInt(ParamID(kAnimUseGlobal)))
-    {
-        ((plAgeGlobalAnim *)fAnims[node])->SetGlobalVarName((char*)fCompPB->GetStr(ParamID(kAnimGlobalName)));
-    }
-    else // It's an ATCAnim
-    {
+    if (fCompPB->GetInt(ParamID(kAnimUseGlobal))) {
+        ((plAgeGlobalAnim*)fAnims[node])->SetGlobalVarName((char*)fCompPB->GetStr(ParamID(kAnimGlobalName)));
+    } else { // It's an ATCAnim
         // If we're on an "(Entire Animation)" segment. The loops won't know their lengths until
         // after the nodes have been converted and added. So we adjust them here if necessary.
-        ((plATCAnim *)fAnims[node])->CheckLoop();
+        ((plATCAnim*)fAnims[node])->CheckLoop();
     }
-    
+
     IMakePersistent(node, fAnims[node], pErrMsg);
     return true;
 }
 
-bool plAnimComponentBase::DeInit(plMaxNode *node, plErrorMsg *pErrMsg)        
-{ 
+bool plAnimComponentBase::DeInit(plMaxNode* node, plErrorMsg* pErrMsg)
+{
     fMods.clear();
     fLightMods.clear();
     fAnims.clear();
     return true;
 }
 
-void plAnimComponentBase::SetupCtl( plAGAnim *anim, plController *ctl, plAGApplicator *app, plMaxNode *node )
+void plAnimComponentBase::SetupCtl(plAGAnim* anim, plController* ctl, plAGApplicator* app, plMaxNode* node)
 {
-    plScalarControllerChannel *channel = new plScalarControllerChannel(ctl);
+    plScalarControllerChannel* channel = new plScalarControllerChannel(ctl);
     app->SetChannel(channel);
     anim->AddApplicator(app);
-    if (!anim->GetName().Compare(ENTIRE_ANIMATION_NAME))
+
+    if (!anim->GetName().Compare(ENTIRE_ANIMATION_NAME)) {
         anim->ExtendToLength(ctl->GetLength());
+    }
 }
 
 //// Picker Dialog for Restricted Animation Components //////////////////////////////////////////
 
-class plPickAnimCompNode : public plPickCompNode
-{
+class plPickAnimCompNode : public plPickCompNode {
 protected:
     ParamID fTypeID;
 
-    void IAddUserType(HWND hList)
-    {
+    void IAddUserType(HWND hList) {
         int type = fPB->GetInt(fTypeID);
 
         int idx = ListBox_AddString(hList, kUseParamBlockNodeString);
-        if (type == plAnimObjInterface::kUseParamBlockNode && !fPB->GetINode(fNodeParamID))
+
+        if (type == plAnimObjInterface::kUseParamBlockNode && !fPB->GetINode(fNodeParamID)) {
             ListBox_SetCurSel(hList, idx);
+        }
 
 
         idx = ListBox_AddString(hList, kUseOwnerNodeString);
-        if (type == plAnimObjInterface::kUseOwnerNode)
+
+        if (type == plAnimObjInterface::kUseOwnerNode) {
             ListBox_SetCurSel(hList, idx);
+        }
     }
 
-    void ISetUserType(plMaxNode* node, const char* userType)
-    {
-        if (strcmp(userType, kUseParamBlockNodeString) == 0)
-        {
+    void ISetUserType(plMaxNode* node, const char* userType) {
+        if (strcmp(userType, kUseParamBlockNodeString) == 0) {
             ISetNodeValue(nil);
             fPB->SetValue(fTypeID, 0, plAnimObjInterface::kUseParamBlockNode);
-        }
-        else if (strcmp(userType, kUseOwnerNodeString) == 0)
-        {
+        } else if (strcmp(userType, kUseOwnerNodeString) == 0) {
             ISetNodeValue(nil);
             fPB->SetValue(fTypeID, 0, plAnimObjInterface::kUseOwnerNode);
-        }
-        else
+        } else {
             fPB->SetValue(fTypeID, 0, plAnimObjInterface::kUseParamBlockNode);
+        }
     }
 
 public:
-    plPickAnimCompNode(IParamBlock2* pb, ParamID nodeParamID, ParamID typeID, plComponentBase *comp) :
-      plPickCompNode(pb, nodeParamID, comp), fTypeID(typeID)
-    {
+    plPickAnimCompNode(IParamBlock2* pb, ParamID nodeParamID, ParamID typeID, plComponentBase* comp) :
+        plPickCompNode(pb, nodeParamID, comp), fTypeID(typeID) {
     }
 };
 
-void    plAnimComponentBase::PickTargetNode( IParamBlock2 *destPB, ParamID destParamID, ParamID destTypeID )
+void    plAnimComponentBase::PickTargetNode(IParamBlock2* destPB, ParamID destParamID, ParamID destTypeID)
 {
-    plPickAnimCompNode pick( destPB, destParamID, destTypeID, (plComponentBase *)this );
+    plPickAnimCompNode pick(destPB, destParamID, destTypeID, (plComponentBase*)this);
     pick.DoPick();
 }
 
-plString plAnimComponentBase::GetIfaceSegmentName( bool allowNil )
+plString plAnimComponentBase::GetIfaceSegmentName(bool allowNil)
 {
     plString name = GetAnimName();
-    if( allowNil || !name.IsNull() )
+
+    if (allowNil || !name.IsNull()) {
         return name;
+    }
+
     return ENTIRE_ANIMATION_NAME;
 }
 
 //// Hit Callback for Animations /////////////////////////////////////////////
 
-class plPlasmaAnimHitCallback : public HitByNameDlgCallback
-{
+class plPlasmaAnimHitCallback : public HitByNameDlgCallback {
 protected:
     IParamBlock2*   fPB;
     ParamID         fParamID;
     TCHAR           fTitle[ 128 ];
 
 public:
-    plPlasmaAnimHitCallback( IParamBlock2 *pb, ParamID paramID, TCHAR *title = nil )
-        : fPB( pb ), fParamID( paramID )
+    plPlasmaAnimHitCallback(IParamBlock2* pb, ParamID paramID, TCHAR* title = nil)
+        : fPB(pb), fParamID(paramID)
 
     {
-        strcpy( fTitle, title );
+        strcpy(fTitle, title);
     }
 
-    virtual TCHAR *dialogTitle() { return fTitle; }
-    virtual TCHAR *buttonText() { return "OK"; }
+    virtual TCHAR* dialogTitle() {
+        return fTitle;
+    }
+    virtual TCHAR* buttonText() {
+        return "OK";
+    }
 
-    virtual int filter( INode *node )
-    {
-        plComponentBase *comp = ( (plMaxNodeBase *)node )->ConvertToComponent();
-        if( comp != nil && plAnimComponentBase::IsAnimComponent( comp ) )
-        {
+    virtual int filter(INode* node) {
+        plComponentBase* comp = ((plMaxNodeBase*)node)->ConvertToComponent();
+
+        if (comp != nil && plAnimComponentBase::IsAnimComponent(comp)) {
             // Make sure it won't create a cyclical reference (Max doesn't like those)
-            if( comp->TestForLoop( FOREVER, fPB ) == REF_FAIL )
+            if (comp->TestForLoop(FOREVER, fPB) == REF_FAIL) {
                 return FALSE;
+            }
 
             return TRUE;
-        }
-        else
-        {
-            plAnimStealthNode *stealth = plAnimStealthNode::ConvertToStealth( node );
-            if( stealth != nil )
-            {
-                if( stealth->TestForLoop( FOREVER, fPB ) == REF_FAIL )
-                    return FALSE;
+        } else {
+            plAnimStealthNode* stealth = plAnimStealthNode::ConvertToStealth(node);
 
-                if( !stealth->IsParentUsedInScene() )
+            if (stealth != nil) {
+                if (stealth->TestForLoop(FOREVER, fPB) == REF_FAIL) {
                     return FALSE;
+                }
+
+                if (!stealth->IsParentUsedInScene()) {
+                    return FALSE;
+                }
 
                 return TRUE;
             }
@@ -1052,28 +1089,31 @@ public:
         return FALSE;
     }
 
-    virtual void proc( INodeTab &nodeTab )
-    {
-        fPB->SetValue( fParamID, (TimeValue)0, nodeTab[ 0 ] );
+    virtual void proc(INodeTab& nodeTab) {
+        fPB->SetValue(fParamID, (TimeValue)0, nodeTab[ 0 ]);
     }
 
-    virtual BOOL showHiddenAndFrozen() { return TRUE; }
-    virtual BOOL singleSelect() { return TRUE; }
+    virtual BOOL showHiddenAndFrozen() {
+        return TRUE;
+    }
+    virtual BOOL singleSelect() {
+        return TRUE;
+    }
 };
 
 //// Dialog Proc For Anim Selection /////////////////////////////////////////////////////////////
 
-plPlasmaAnimSelectDlgProc::plPlasmaAnimSelectDlgProc( ParamID paramID, int dlgItem, TCHAR *promptTitle, ParamMap2UserDlgProc *chainedDlgProc )
+plPlasmaAnimSelectDlgProc::plPlasmaAnimSelectDlgProc(ParamID paramID, int dlgItem, TCHAR* promptTitle, ParamMap2UserDlgProc* chainedDlgProc)
 {
     fParamID = paramID;
     fDlgItem = dlgItem;
     fUseNode = false;
-    strcpy( fTitle, promptTitle );
+    strcpy(fTitle, promptTitle);
     fChain = chainedDlgProc;
 }
 
-plPlasmaAnimSelectDlgProc::plPlasmaAnimSelectDlgProc( ParamID paramID, int dlgItem, ParamID nodeParamID, ParamID typeParamID, int nodeDlgItem, 
-                                                      TCHAR *promptTitle, ParamMap2UserDlgProc *chainedDlgProc )
+plPlasmaAnimSelectDlgProc::plPlasmaAnimSelectDlgProc(ParamID paramID, int dlgItem, ParamID nodeParamID, ParamID typeParamID, int nodeDlgItem,
+        TCHAR* promptTitle, ParamMap2UserDlgProc* chainedDlgProc)
 {
     fParamID = paramID;
     fDlgItem = dlgItem;
@@ -1081,102 +1121,99 @@ plPlasmaAnimSelectDlgProc::plPlasmaAnimSelectDlgProc( ParamID paramID, int dlgIt
     fNodeParamID = nodeParamID;
     fTypeParamID = typeParamID;
     fNodeDlgItem = nodeDlgItem;
-    strcpy( fTitle, promptTitle );
+    strcpy(fTitle, promptTitle);
     fChain = chainedDlgProc;
 }
 
-void    plPlasmaAnimSelectDlgProc::SetThing( ReferenceTarget *m )
+void    plPlasmaAnimSelectDlgProc::SetThing(ReferenceTarget* m)
 {
-    if( fChain != nil )
-        fChain->SetThing( m );
+    if (fChain != nil) {
+        fChain->SetThing(m);
+    }
 }
 
-void    plPlasmaAnimSelectDlgProc::Update( TimeValue t, Interval &valid, IParamMap2 *pmap )
+void    plPlasmaAnimSelectDlgProc::Update(TimeValue t, Interval& valid, IParamMap2* pmap)
 {
-    if( fChain != nil )
-        fChain->Update( t, valid, pmap );
+    if (fChain != nil) {
+        fChain->Update(t, valid, pmap);
+    }
 }
 
-void    plPlasmaAnimSelectDlgProc::IUpdateNodeBtn( HWND hWnd, IParamBlock2 *pb )
+void    plPlasmaAnimSelectDlgProc::IUpdateNodeBtn(HWND hWnd, IParamBlock2* pb)
 {
-    if( fUseNode )
-    {
-        int type = pb->GetInt( fTypeParamID );
-        if( type == plAnimObjInterface::kUseOwnerNode )
-            ::SetWindowText( ::GetDlgItem( hWnd, fNodeDlgItem ), kUseOwnerNodeString );
-        else
-        {
-            INode *node = pb->GetINode( fNodeParamID );
-            TSTR newName( node ? node->GetName() : kUseParamBlockNodeString );
-            ::SetWindowText( ::GetDlgItem( hWnd, fNodeDlgItem ), newName );
+    if (fUseNode) {
+        int type = pb->GetInt(fTypeParamID);
+
+        if (type == plAnimObjInterface::kUseOwnerNode) {
+            ::SetWindowText(::GetDlgItem(hWnd, fNodeDlgItem), kUseOwnerNodeString);
+        } else {
+            INode* node = pb->GetINode(fNodeParamID);
+            TSTR newName(node ? node->GetName() : kUseParamBlockNodeString);
+            ::SetWindowText(::GetDlgItem(hWnd, fNodeDlgItem), newName);
         }
 
-        plAnimObjInterface *iface = plAnimComponentBase::GetAnimInterface( pb->GetINode( fParamID ) );
-        if( iface == nil || !iface->IsNodeRestricted() )
-            ::EnableWindow( ::GetDlgItem( hWnd, fNodeDlgItem ), false );
-        else
-        {
-            ::EnableWindow( ::GetDlgItem( hWnd, fNodeDlgItem ), true );
+        plAnimObjInterface* iface = plAnimComponentBase::GetAnimInterface(pb->GetINode(fParamID));
+
+        if (iface == nil || !iface->IsNodeRestricted()) {
+            ::EnableWindow(::GetDlgItem(hWnd, fNodeDlgItem), false);
+        } else {
+            ::EnableWindow(::GetDlgItem(hWnd, fNodeDlgItem), true);
         }
     }
 }
 
-BOOL    plPlasmaAnimSelectDlgProc::DlgProc( TimeValue t, IParamMap2 *pmap, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+BOOL    plPlasmaAnimSelectDlgProc::DlgProc(TimeValue t, IParamMap2* pmap, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch ( msg )
-    {
-        case WM_INITDIALOG:
-            {
-                IParamBlock2 *pb = pmap->GetParamBlock();
+    switch (msg) {
+    case WM_INITDIALOG: {
+            IParamBlock2* pb = pmap->GetParamBlock();
 
-                INode *node = pb->GetINode( fParamID );
-                TSTR newName( node ? node->GetName() : "Pick" );
-                ::SetWindowText( ::GetDlgItem( hWnd, fDlgItem ), newName );
+            INode* node = pb->GetINode(fParamID);
+            TSTR newName(node ? node->GetName() : "Pick");
+            ::SetWindowText(::GetDlgItem(hWnd, fDlgItem), newName);
 
-                IUpdateNodeBtn( hWnd, pb );
+            IUpdateNodeBtn(hWnd, pb);
+        }
+        break;
+
+    case WM_COMMAND:
+        if ((HIWORD(wParam) == BN_CLICKED)) {
+            if (LOWORD(wParam) == fDlgItem) {
+                IParamBlock2* pb = pmap->GetParamBlock();
+                plPlasmaAnimHitCallback hitCB(pb, fParamID, fTitle);
+                GetCOREInterface()->DoHitByNameDialog(&hitCB);
+
+                INode* node = pb->GetINode(fParamID);
+                TSTR newName(node ? node->GetName() : "Pick");
+                ::SetWindowText(::GetDlgItem(hWnd, fDlgItem), newName);
+                pmap->Invalidate(fParamID);
+                ::InvalidateRect(hWnd, NULL, TRUE);
+
+                IUpdateNodeBtn(hWnd, pb);
+                return true;
+            } else if (fUseNode && LOWORD(wParam) == fNodeDlgItem) {
+                IParamBlock2* pb = pmap->GetParamBlock();
+
+                plAnimObjInterface* iface = plAnimComponentBase::GetAnimInterface(pb->GetINode(fParamID));
+                iface->PickTargetNode(pb, fNodeParamID, fTypeParamID);
+
+                IUpdateNodeBtn(hWnd, pb);
+                return true;
             }
-            break;
+        }
 
-        case WM_COMMAND:
-            if( ( HIWORD( wParam ) == BN_CLICKED ) )
-            {
-                if( LOWORD( wParam ) == fDlgItem )
-                {
-                    IParamBlock2 *pb = pmap->GetParamBlock();
-                    plPlasmaAnimHitCallback hitCB( pb, fParamID, fTitle );
-                    GetCOREInterface()->DoHitByNameDialog( &hitCB );
-
-                    INode *node = pb->GetINode( fParamID );
-                    TSTR newName( node ? node->GetName() : "Pick" );
-                    ::SetWindowText( ::GetDlgItem(hWnd, fDlgItem ), newName );
-                    pmap->Invalidate( fParamID );
-                    ::InvalidateRect( hWnd, NULL, TRUE );
-
-                    IUpdateNodeBtn( hWnd, pb );
-                    return true;
-                }
-                else if( fUseNode && LOWORD( wParam ) == fNodeDlgItem )
-                {
-                    IParamBlock2 *pb = pmap->GetParamBlock();
-
-                    plAnimObjInterface *iface = plAnimComponentBase::GetAnimInterface( pb->GetINode( fParamID ) );
-                    iface->PickTargetNode( pb, fNodeParamID, fTypeParamID );
-
-                    IUpdateNodeBtn( hWnd, pb );
-                    return true;
-                }
-            }
-            break;
+        break;
     }
 
-    if( fChain != nil )
-        return fChain->DlgProc( t, pmap, hWnd, msg, wParam, lParam );
+    if (fChain != nil) {
+        return fChain->DlgProc(t, pmap, hWnd, msg, wParam, lParam);
+    }
 
     return false;
 }
 
-void plPlasmaAnimSelectDlgProc::DeleteThis() 
-{ 
+void plPlasmaAnimSelectDlgProc::DeleteThis()
+{
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1185,22 +1222,22 @@ void plPlasmaAnimSelectDlgProc::DeleteThis()
 CLASS_DESC(plAnimCompressComp, gAnimCompressDesc, "Anim Compress",  "AnimCompress", COMP_TYPE_MISC, ANIM_COMPRESS_COMP_CID)
 
 ParamBlockDesc2 gAnimCompressBk
-(   
+(
     plComponent::kBlkComp, _T("AnimCompress"), 0, &gAnimCompressDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
     IDD_COMP_ANIM_COMPRESS, IDS_COMP_ANIM_COMPRESS_ROLL, 0, 0, nil,
 
     plAnimCompressComp::kAnimCompressLevel, _T("compressLevel"),    TYPE_INT,       0, 0,
-        p_ui,       TYPE_RADIO, 3, IDC_COMP_ANIM_COMPRESS_NONE, IDC_COMP_ANIM_COMPRESS_LOW, IDC_COMP_ANIM_COMPRESS_HIGH,
-        p_vals,     plAnimCompressComp::kCompressionNone, plAnimCompressComp::kCompressionLow, plAnimCompressComp::kCompressionHigh,
-        p_default,  plAnimCompressComp::kCompressionLow,
-        end,
+    p_ui,       TYPE_RADIO, 3, IDC_COMP_ANIM_COMPRESS_NONE, IDC_COMP_ANIM_COMPRESS_LOW, IDC_COMP_ANIM_COMPRESS_HIGH,
+    p_vals,     plAnimCompressComp::kCompressionNone, plAnimCompressComp::kCompressionLow, plAnimCompressComp::kCompressionHigh,
+    p_default,  plAnimCompressComp::kCompressionLow,
+    end,
 
-    plAnimCompressComp::kAnimCompressThreshold, _T("Threshold"),    TYPE_FLOAT,     0, 0,   
-        p_default, 0.01,
-        p_range, 0.0, 1.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_ANIM_COMPRESS_THRESHOLD, IDC_COMP_ANIM_COMPRESS_THRESHOLD_SPIN, 0.001,
-        end,
+    plAnimCompressComp::kAnimCompressThreshold, _T("Threshold"),    TYPE_FLOAT,     0, 0,
+    p_default, 0.01,
+    p_range, 0.0, 1.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_ANIM_COMPRESS_THRESHOLD, IDC_COMP_ANIM_COMPRESS_THRESHOLD_SPIN, 0.001,
+    end,
 
     end
 );
@@ -1211,7 +1248,7 @@ plAnimCompressComp::plAnimCompressComp()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plAnimCompressComp::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)    
+bool plAnimCompressComp::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     node->SetAnimCompress(fCompPB->GetInt(ParamID(kAnimCompressLevel)));
 
@@ -1224,7 +1261,7 @@ bool plAnimCompressComp::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
     return true;
 }
 
-bool plAnimCompressComp::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAnimCompressComp::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }

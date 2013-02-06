@@ -50,16 +50,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // For ShellExecute
 #include <shellapi.h>
 
-static const char *kDebugClientExe = "plClient_dbg.exe";
-static const char *kReleaseClientExe = "plClient.exe";
+static const char* kDebugClientExe = "plClient_dbg.exe";
+static const char* kReleaseClientExe = "plClient.exe";
 
-static const char *kSemaphoreName = "PlasmaSceneViewer";
-static const char *kPipeName = "\\\\.\\pipe\\PlasmaSceneViewer";
+static const char* kSemaphoreName = "PlasmaSceneViewer";
+static const char* kPipeName = "\\\\.\\pipe\\PlasmaSceneViewer";
 
 SceneViewer::SceneViewer() : fhDlg(NULL)
 {
     // Get the plugin CFG dir
-    const char *plugFile = plMaxConfig::GetPluginIni();
+    const char* plugFile = plMaxConfig::GetPluginIni();
 
     fUpdate = (GetPrivateProfileInt("SceneViewer", "Update", 1, plugFile) != 0);
     fUpdateFreq = GetPrivateProfileInt("SceneViewer", "UpdateFreq", 500, plugFile);
@@ -73,7 +73,7 @@ SceneViewer::~SceneViewer()
     ISetRunning(false);
 
     // Get the plugin CFG dir
-    const char *plugFile = plMaxConfig::GetPluginIni();
+    const char* plugFile = plMaxConfig::GetPluginIni();
 
     char buf[20];
     WritePrivateProfileString("SceneViewer", "Update", fUpdate ? "1" : "0", plugFile);
@@ -82,7 +82,7 @@ SceneViewer::~SceneViewer()
     WritePrivateProfileString("SceneViewer", "ReleaseExe", fReleaseExe ? "1" : "0", plugFile);
 }
 
-SceneViewer &SceneViewer::Instance()
+SceneViewer& SceneViewer::Instance()
 {
     static SceneViewer theInstance;
     return theInstance;
@@ -91,13 +91,11 @@ SceneViewer &SceneViewer::Instance()
 void SceneViewer::Show()
 {
     // If the dialog is already created, make sure it is visible
-    if (fhDlg)
-    {
-        if (IsIconic(fhDlg))
+    if (fhDlg) {
+        if (IsIconic(fhDlg)) {
             ShowWindow(fhDlg, SW_RESTORE);
-    }
-    else
-    {
+        }
+    } else {
         fhDlg = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_SCENEVIEWER), GetCOREInterface()->GetMAXHWnd(), ForwardDlgProc);
     }
 }
@@ -112,18 +110,18 @@ bool SceneViewer::IToggleRunning()
 // Starts/Stops the client and SceneSync
 bool SceneViewer::ISetRunning(bool running)
 {
-    if (running)
-    {
+    if (running) {
         // The client actually is running, hmmm
-        if (SceneSync::Instance().IsClientRunning())
+        if (SceneSync::Instance().IsClientRunning()) {
             return true;
+        }
 
         // If we're not loading old data, or we are but it's not there, try to create some.
-        if (!fLoadOld || !SceneSync::Instance().CanLoadOldResMgr())
-        {
+        if (!fLoadOld || !SceneSync::Instance().CanLoadOldResMgr()) {
             // If creation fails, fail
-            if (!SceneSync::Instance().CreateClientData())
+            if (!SceneSync::Instance().CreateClientData()) {
                 return false;
+            }
         }
 
         char path[MAX_PATH];
@@ -131,7 +129,7 @@ bool SceneViewer::ISetRunning(bool running)
         strcat(path, "dat\\");
 
         // Start the client
-        char *options = new char[strlen(path)+2+strlen(kSemaphoreName)+strlen(kPipeName)+6];
+        char* options = new char[strlen(path) + 2 + strlen(kSemaphoreName) + strlen(kPipeName) + 6];
         sprintf(options, "-s %s %s \"%s\"", kSemaphoreName, kPipeName, path);
 
         int ret = (int)ShellExecute(NULL,
@@ -143,19 +141,20 @@ bool SceneViewer::ISetRunning(bool running)
         delete [] options;
 
         // Client start failed
-        if (ret < 32)
+        if (ret < 32) {
             return false;
+        }
 
         // Start client sync
         SceneSync::Instance().SetUpdateFreq(fUpdateFreq);
         SceneSync::Instance().BeginClientSync(kSemaphoreName, kPipeName);
 
         return true;
-    }
-    else
-    {
-        if (SceneSync::Instance().IsClientRunning())
+    } else {
+        if (SceneSync::Instance().IsClientRunning()) {
             SceneSync::Instance().EndClientSync(false);
+        }
+
         return true;
     }
 }
@@ -167,10 +166,8 @@ BOOL SceneViewer::ForwardDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 
 BOOL SceneViewer::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
-    case WM_INITDIALOG:
-        {
+    switch (msg) {
+    case WM_INITDIALOG: {
             fhDlg = hDlg;
 
             // Set the exe to use
@@ -180,8 +177,8 @@ BOOL SceneViewer::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
             ComboBox_SetCurSel(hExeCombo, fReleaseExe ? 0 : 1);
 
             // Set the client path
-            const char *path = plMaxConfig::GetClientPath(false, true);
-            ICustEdit *edit = GetICustEdit(GetDlgItem(hDlg, IDC_CLIENT_PATH));
+            const char* path = plMaxConfig::GetClientPath(false, true);
+            ICustEdit* edit = GetICustEdit(GetDlgItem(hDlg, IDC_CLIENT_PATH));
             edit->SetText((char*)path);
 
             // Set the "Load old data" checkbox
@@ -191,92 +188,89 @@ BOOL SceneViewer::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 
             // Set the update controls
             float val = float(fUpdateFreq) / 1000.f;
-            ISpinnerControl *spin = SetupFloatSpinner(hDlg, IDC_SPINNER, IDC_EDIT, 0.1, 1.f, val);
+            ISpinnerControl* spin = SetupFloatSpinner(hDlg, IDC_SPINNER, IDC_EDIT, 0.1, 1.f, val);
             spin->Enable(fUpdate);
             CheckDlgButton(hDlg, IDC_UPDATE, fUpdate ? BST_CHECKED : BST_UNCHECKED);
 
             IEnableSetupControls(!SceneSync::Instance().IsClientRunning());
         }
+
         return TRUE;
 
     case WM_COMMAND:
+
         // Start/Stop SceneViewer
-        if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_START)
-        {
+        if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_START) {
             IToggleRunning();
             IEnableSetupControls(!SceneSync::Instance().IsClientRunning());
             return TRUE;
         }
         // Close dialog
-        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDCANCEL)
-        {
+        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDCANCEL) {
             DestroyWindow(hDlg);
             fhDlg = NULL;
             return TRUE;
         }
         // Browse for directory
-        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_DIR)
-        {
-            const char *path = plMaxConfig::GetClientPath(true);
-            if (path)
-            {
-                ICustEdit *edit = GetICustEdit(GetDlgItem(hDlg, IDC_CLIENT_PATH));
+        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_DIR) {
+            const char* path = plMaxConfig::GetClientPath(true);
+
+            if (path) {
+                ICustEdit* edit = GetICustEdit(GetDlgItem(hDlg, IDC_CLIENT_PATH));
                 edit->SetText((char*)path);
             }
 
             return TRUE;
         }
         // "Load old data" selection changed
-        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_REUSE_DATA)
-        {
+        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_REUSE_DATA) {
             fLoadOld = (Button_GetCheck((HWND)lParam) == BST_CHECKED);
             return TRUE;
         }
         // Release/Debug exe selection changed
-        else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_EXE)
-        {
+        else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_EXE) {
             int sel = ComboBox_GetCurSel((HWND)lParam);
             fReleaseExe = (sel == 0);
             return TRUE;
-        }
-        else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_UPDATE)
-        {
+        } else if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_UPDATE) {
             fUpdate = (SendMessage((HWND)lParam, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
-            ISpinnerControl *spin = GetISpinner(GetDlgItem(hDlg, IDC_SPINNER));
+            ISpinnerControl* spin = GetISpinner(GetDlgItem(hDlg, IDC_SPINNER));
             spin->Enable(fUpdate);
             ReleaseISpinner(spin);
 
             // If update was turned on, send out an update message so any dirty objects
             // will be reconverted right away
-            if (fUpdate)
+            if (fUpdate) {
                 SceneSync::Instance().SetUpdateFreq(fUpdateFreq);
+            }
 
             return TRUE;
         }
+
         break;
-        
-    // Update frequency changed
+
+        // Update frequency changed
     case CC_SPINNER_CHANGE:
-        if (LOWORD(wParam) == IDC_SPINNER)
-        {
-            ISpinnerControl *spin = (ISpinnerControl*)lParam;
+        if (LOWORD(wParam) == IDC_SPINNER) {
+            ISpinnerControl* spin = (ISpinnerControl*)lParam;
             float val = spin->GetFVal();
-            fUpdateFreq = int(val*1000.f);
+            fUpdateFreq = int(val * 1000.f);
             SceneSync::Instance().SetUpdateFreq(fUpdateFreq);
         }
+
         return TRUE;
 
-    // Type in directory
+        // Type in directory
     case WM_CUSTEDIT_ENTER:
-        if (wParam == IDC_CLIENT_PATH)
-        {
-            ICustEdit *edit = GetICustEdit((HWND)lParam);
+        if (wParam == IDC_CLIENT_PATH) {
+            ICustEdit* edit = GetICustEdit((HWND)lParam);
 
             char path[MAX_PATH];
             edit->GetText(path, sizeof(path));
             plMaxConfig::SetClientPath(path);
         }
+
         return TRUE;
     }
 
@@ -285,7 +279,7 @@ BOOL SceneViewer::DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void SceneViewer::IEnableSetupControls(bool enable)
 {
-    ICustEdit *edit = GetICustEdit(GetDlgItem(fhDlg, IDC_CLIENT_PATH));
+    ICustEdit* edit = GetICustEdit(GetDlgItem(fhDlg, IDC_CLIENT_PATH));
     edit->Enable(enable);
 
     EnableWindow(GetDlgItem(fhDlg, IDC_DIR), enable);

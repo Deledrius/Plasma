@@ -59,7 +59,7 @@ plMemBuffer::plMemBuffer(int len)
 }
 
 
-plMemBuffer::plMemBuffer(char * data, int len)
+plMemBuffer::plMemBuffer(char* data, int len)
 {
     fBufferLocal = false;
     fBufferLen = len;
@@ -73,22 +73,22 @@ plMemBuffer::~plMemBuffer()
 }
 
 
-void plMemBuffer::SetBuffer(char * data, int len)
+void plMemBuffer::SetBuffer(char* data, int len)
 {
     ClearBuffer();
     fBufferLocal = false;
     fBufferLen = len;
-    fBuffer = data;        
+    fBuffer = data;
 }
 
 
-void plMemBuffer::CopyBuffer(char * data, int len)
+void plMemBuffer::CopyBuffer(char* data, int len)
 {
-    char * tmp =  new char[len];
-    memcpy(tmp,data,len);
+    char* tmp =  new char[len];
+    memcpy(tmp, data, len);
     ClearBuffer();
     AllocBuffer(len);
-    memcpy(fBuffer,tmp,len);
+    memcpy(fBuffer, tmp, len);
     delete [] tmp;
 }
 
@@ -96,18 +96,19 @@ void plMemBuffer::CopyBuffer(char * data, int len)
 void plMemBuffer::GrowBuffer(int newLen)
 {
     const int kThrashSize   = 25;
-    if(newLen >= fBufferLen)
-    {
+
+    if (newLen >= fBufferLen) {
         int len = newLen + kThrashSize;
-        len = len+len;
-        
-        char * tmp =  new char[len];
-        
-        if(fBuffer != nil)
-            memcpy(tmp,fBuffer,fBufferLen);
-        
+        len = len + len;
+
+        char* tmp =  new char[len];
+
+        if (fBuffer != nil) {
+            memcpy(tmp, fBuffer, fBufferLen);
+        }
+
         ClearBuffer();
-        
+
         fBuffer = tmp;
         fBufferLocal = true;
         fBufferLen = len;
@@ -115,35 +116,36 @@ void plMemBuffer::GrowBuffer(int newLen)
 }
 
 
-int plMemBuffer::GetBufferSize()  
+int plMemBuffer::GetBufferSize()
 {
-    return  fBufferLen; 
+    return  fBufferLen;
 };
 
 
-char * plMemBuffer::GetBuffer() 
+char* plMemBuffer::GetBuffer()
 {
-    return  fBuffer; 
+    return  fBuffer;
 };
 
 
-bool plMemBuffer::InBufferRange(char * inpos)
+bool plMemBuffer::InBufferRange(char* inpos)
 {
     return (inpos >= fBuffer && inpos <= (fBuffer + fBufferLen));
 }
 
 void plMemBuffer::ClearBuffer()
 {
-    if(fBufferLocal == true)
-    {
-        if(fBuffer != nil)
+    if (fBufferLocal == true) {
+        if (fBuffer != nil) {
             delete [] fBuffer;
+        }
+
         fBuffer = nil;
-    }        
+    }
 }
 
 void plMemBuffer::AllocBuffer(int len)
-{        
+{
     fBuffer = new char[len];
     fBufferLocal = true;
     fBufferLen = len;

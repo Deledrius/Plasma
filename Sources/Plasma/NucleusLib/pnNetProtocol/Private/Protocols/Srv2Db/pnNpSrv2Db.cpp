@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetProtocol/Private/Protocols/Srv2Db/pnNpSrv2Db.cpp
-*   
+*
 ***/
 
 #ifdef SERVER
@@ -59,27 +59,32 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 //===========================================================================
-bool Srv2DbValidateConnect (
-    AsyncNotifySocketListen *   listen,
-    Srv2Db_ConnData *           connectPtr
-) {
+bool Srv2DbValidateConnect(
+    AsyncNotifySocketListen*    listen,
+    Srv2Db_ConnData*            connectPtr
+)
+{
     // Ensure that there are enough bytes for the header
-    const Srv2Db_ConnData & connect = * (const Srv2Db_ConnData *) listen->buffer;
+    const Srv2Db_ConnData& connect = * (const Srv2Db_ConnData*) listen->buffer;
 
     // Validate message size
     const unsigned kMinStructSize = sizeof(uint32_t) * 1;
-    if (listen->bytes < kMinStructSize)
+
+    if (listen->bytes < kMinStructSize) {
         return false;
-    if (listen->bytes < connect.dataBytes)
+    }
+
+    if (listen->bytes < connect.dataBytes) {
         return false;
+    }
 
     // Validate connect server type
-    if (! (connect.srvType == kSrvTypeAuth
-        || connect.srvType == kSrvTypeVault
-        || connect.srvType == kSrvTypeState
-        || connect.srvType == kSrvTypeScore
-        || connect.srvType == kSrvTypeCsr)
-    ) {
+    if (!(connect.srvType == kSrvTypeAuth
+            || connect.srvType == kSrvTypeVault
+            || connect.srvType == kSrvTypeState
+            || connect.srvType == kSrvTypeScore
+            || connect.srvType == kSrvTypeCsr)
+       ) {
         return false;
     }
 

@@ -51,8 +51,9 @@ extern "C" {
 
 hsThread::hsThread(uint32_t stackSize) : fTaskId(0), fStackSize(stackSize), fQuit(false)
 {
-    if (MPLibraryIsLoaded() == false)
+    if (MPLibraryIsLoaded() == false) {
         throw "MPLibraryIsLoaded() returned false";
+    }
 }
 
 hsThread::~hsThread()
@@ -62,35 +63,36 @@ hsThread::~hsThread()
 
 void hsThread::Start()
 {
-    if (fTaskId == 0)
-    {   OSStatus    status = ::MPCreateQueue(&fNotifyQ);
+    if (fTaskId == 0) {
+        OSStatus    status = ::MPCreateQueue(&fNotifyQ);
         hsThrowIfOSErr(status);
 
         status = ::MPCreateTask(gEntryPoint, this, fStackSize, fNotifyQ, nil, nil, 0, &fTaskId);
-        if (status)
-        {   ::MPDeleteQueue(fNotifyQ);
+
+        if (status) {
+            ::MPDeleteQueue(fNotifyQ);
             throw hsOSException(status);
         }
-    }
-    else
+    } else {
         hsDebugMessage("Calling hsThread::Start() more than once", 0);
+    }
 }
 
 void hsThread::Stop()
 {
-    if (fTaskId)
-    {   this->fQuit = true;
+    if (fTaskId) {
+        this->fQuit = true;
 
         OSStatus    status = ::MPTerminateTask(fTaskId, 0);
         hsThrowIfOSErr(status);
-        
+
         //  Wait for the task to tell us that its actually quit
         status = ::MPWaitOnQueue(fNotifyQ, nil, nil, nil, kDurationForever);
         hsThrowIfOSErr(status);
 
         status = ::MPDeleteQueue(fNotifyQ);
         hsThrowIfOSErr(status);
-        
+
         fTaskId = 0;
     }
 }
@@ -104,8 +106,9 @@ void* hsThread::Alloc(size_t size)
 
 void hsThread::Free(void* p)
 {
-    if (p)
+    if (p) {
         ::MPFree(p);
+    }
 }
 
 void hsThread::ThreadYield()
@@ -157,16 +160,17 @@ bool hsSemaphore::Wait(hsMilliseconds timeToWait)
 {
     Duration    duration;
 
-    if (timeToWait == kPosInfinity32)
+    if (timeToWait == kPosInfinity32) {
         duration = kDurationForever;
-    else
-        duration = 0;   // THEY DON'T IMPLEMENT delay times yet !!!
+    } else {
+        duration = 0;    // THEY DON'T IMPLEMENT delay times yet !!!
+    }
 
     OSStatus    status = MPWaitOnSemaphore(fSemaId, duration);
-/*
-    if (status == kMPTimeoutErr)
-        return false;
-*/
+    /*
+        if (status == kMPTimeoutErr)
+            return false;
+    */
     hsThrowIfOSErr(status);
     return true;
 }

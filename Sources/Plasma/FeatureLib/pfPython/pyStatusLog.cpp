@@ -53,9 +53,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pyStatusLog.h"
 #include "plStatusLog/plStatusLog.h"
 
-pyStatusLog::pyStatusLog( plStatusLog* log/*=nil */)
-: fLog( log )
-, fICreatedLog( false )
+pyStatusLog::pyStatusLog(plStatusLog* log/*=nil */)
+    : fLog(log)
+    , fICreatedLog(false)
 {
 }
 
@@ -72,19 +72,19 @@ bool pyStatusLog::Open(plString logName, uint32_t numLines, uint32_t flags)
 
     // create a status log guy for this
     fICreatedLog = true;
-    fLog = plStatusLogMgr::GetInstance().CreateStatusLog( (uint8_t)numLines, logName.c_str(), flags );
-    if (fLog)
-    {
+    fLog = plStatusLogMgr::GetInstance().CreateStatusLog((uint8_t)numLines, logName.c_str(), flags);
+
+    if (fLog) {
         fLog->SetForceLog(true);
         return true;
     }
+
     return false;
 }
 
 bool pyStatusLog::Write(plString text)
 {
-    if (fLog)
-    {
+    if (fLog) {
         fLog->AddLine(text.c_str());
         return true;
     }
@@ -94,13 +94,12 @@ bool pyStatusLog::Write(plString text)
 
 bool pyStatusLog::WriteColor(plString text, pyColor& color)
 {
-    if (fLog)
-    {
-        uint32_t st_color = ((uint32_t)(color.getAlpha()*255)<<24) +
-                                ((uint32_t)(color.getRed()*255)<<16) +
-                                ((uint32_t)(color.getGreen()*255)<<8) + 
-                                ((uint32_t)(color.getBlue()*255));
-        fLog->AddLine( text.c_str(), st_color );
+    if (fLog) {
+        uint32_t st_color = ((uint32_t)(color.getAlpha() * 255) << 24) +
+                            ((uint32_t)(color.getRed() * 255) << 16) +
+                            ((uint32_t)(color.getGreen() * 255) << 8) +
+                            ((uint32_t)(color.getBlue() * 255));
+        fLog->AddLine(text.c_str(), st_color);
         return true;
     }
 
@@ -109,9 +108,9 @@ bool pyStatusLog::WriteColor(plString text, pyColor& color)
 
 void pyStatusLog::Close()
 {
-    if (fLog && fICreatedLog)
-    {
+    if (fLog && fICreatedLog) {
         delete fLog;
     }
+
     fLog = nil;
 }

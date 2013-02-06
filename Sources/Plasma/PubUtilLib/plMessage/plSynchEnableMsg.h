@@ -48,17 +48,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // Push or pop a cmd to enable/disable dirty state tracking.
 // Sends a local msg to the NetClientMgr which does the work.
 //
-class plSynchEnableMsg : public plMessage
-{
+class plSynchEnableMsg : public plMessage {
 public:
     bool fPush;     // true to push or false to pop
     bool fEnable;   // or disable
 
-    plSynchEnableMsg(bool push=true, bool enable=true);
+    plSynchEnableMsg(bool push = true, bool enable = true);
     ~plSynchEnableMsg() {}
 
-    CLASSNAME_REGISTER( plSynchEnableMsg);
-    GETINTERFACE_ANY( plSynchEnableMsg, plMessage );    
+    CLASSNAME_REGISTER(plSynchEnableMsg);
+    GETINTERFACE_ANY(plSynchEnableMsg, plMessage);
 
     void Read(hsStream* stream, hsResMgr* mgr);
     void Write(hsStream* stream, hsResMgr* mgr);

@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetProtocol/Private/Protocols/Srv2Db/pnNpSrv2Db.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNNETPROTOCOL_PRIVATE_PROTOCOLS_SRV2DB_PNNPSRV2DB_H
@@ -80,7 +80,7 @@ enum {
     kSrv2Db_SetAgeSequenceNumRequest    = 26,
     kSrv2Db_VaultNodeChanged            = 27,
     kSrv2Db_FetchInviterInfo            = 28,
-    
+
     // VaultNodeRefs
     kSrv2Db_VaultNodeAddRefs        = 40,
     kSrv2Db_VaultNodeDelRefs        = 41,
@@ -91,11 +91,11 @@ enum {
     kSrv2Db_StateSaveObject         = 60,
     kSrv2Db_StateDeleteObject       = 61,
     kSrv2Db_StateFetchObject        = 62,
-    
+
     // Public ages
     kSrv2Db_GetPublicAgeInfoIds     = 80,
     kSrv2Db_SetAgePublic            = 81,
-    
+
     // Score
     kSrv2Db_ScoreCreate             = 100,
     kSrv2Db_ScoreFindScoreIds       = 101,
@@ -129,10 +129,10 @@ enum {
     kDb2Srv_VaultNodeFindReply      = 24,
     kDb2Srv_SetAgeSequenceNumReply  = 25,
     kDb2Srv_FetchInviterInfoReply   = 26,
-    
+
     // VaultNodeRefs
     kDb2Srv_VaultNodeRefs           = 40,
-    
+
     // State Objects
     kDb2Srv_StateObjectFetched      = 60,
 
@@ -151,7 +151,7 @@ enum {
     kDb2Srv_ScoreFetchScoresReply   = 122,
     kDb2Srv_ScoreDeleteReply        = 123,
     kDb2Srv_ScoreGetRanksReply      = 124,
-    
+
     // CSR
     kDb2Srv_CsrAcctInfoReply        = 140,
 };
@@ -238,7 +238,7 @@ struct Srv2Db_AccountActivateRequest : SrvMsgHeader {
     plUUID      activationKey;
 };
 
-struct Srv2Db_AccountLockPlayerNameRequest :SrvMsgHeader {
+struct Srv2Db_AccountLockPlayerNameRequest : SrvMsgHeader {
     wchar_t       playerName[kMaxPlayerNameLength];
     plUUID      accountUuid;
 };
@@ -563,7 +563,7 @@ struct Db2Srv_CsrAcctInfoReply : SrvMsgHeader {
 *
 ***/
 
-bool Srv2DbValidateConnect (
-    AsyncNotifySocketListen *   listen,
-    Srv2Db_ConnData *           connectPtr
+bool Srv2DbValidateConnect(
+    AsyncNotifySocketListen*    listen,
+    Srv2Db_ConnData*            connectPtr
 );

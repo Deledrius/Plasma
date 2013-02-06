@@ -54,19 +54,19 @@ PYTHON_DEFAULT_DEALLOC_DEFINITION(ptGUIControlDraggable)
 
 PYTHON_INIT_DEFINITION(ptGUIControlDraggable, args, keywords)
 {
-    PyObject *keyObject = NULL;
-    if (!PyArg_ParseTuple(args, "O", &keyObject))
-    {
-        PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
-        PYTHON_RETURN_INIT_ERROR;
-    }
-    if (!pyKey::Check(keyObject))
-    {
+    PyObject* keyObject = NULL;
+
+    if (!PyArg_ParseTuple(args, "O", &keyObject)) {
         PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
         PYTHON_RETURN_INIT_ERROR;
     }
 
-    pyKey *key = pyKey::ConvertFrom(keyObject);
+    if (!pyKey::Check(keyObject)) {
+        PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
+        PYTHON_RETURN_INIT_ERROR;
+    }
+
+    pyKey* key = pyKey::ConvertFrom(keyObject);
     self->fThis->setKey(key->getKey());
 
     PYTHON_RETURN_INIT_OK;
@@ -75,11 +75,12 @@ PYTHON_INIT_DEFINITION(ptGUIControlDraggable, args, keywords)
 PYTHON_METHOD_DEFINITION(ptGUIControlDraggable, stopDragging, args)
 {
     char cancelFlag;
-    if (!PyArg_ParseTuple(args, "b", &cancelFlag))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &cancelFlag)) {
         PyErr_SetString(PyExc_TypeError, "stopDragging expects a boolean");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->StopDragging(cancelFlag != 0);
     PYTHON_RETURN_NONE;
 }
@@ -90,24 +91,24 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGUIControlDraggable, getLastMousePoint)
 }
 
 PYTHON_START_METHODS_TABLE(ptGUIControlDraggable)
-    PYTHON_METHOD(ptGUIControlDraggable, stopDragging, "Params: cancelFlag\nUNKNOWN"),
-    PYTHON_METHOD_NOARGS(ptGUIControlDraggable, getLastMousePoint, "Returns the last point we were dragged to"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptGUIControlDraggable, stopDragging, "Params: cancelFlag\nUNKNOWN"),
+              PYTHON_METHOD_NOARGS(ptGUIControlDraggable, getLastMousePoint, "Returns the last point we were dragged to"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGUIControlDraggable, pyGUIControl, "Params: ctrlKey\nPlasma GUI control for something draggable");
 
 // required functions for PyObject interoperability
-PyObject *pyGUIControlDraggable::New(pyKey& gckey)
+PyObject* pyGUIControlDraggable::New(pyKey& gckey)
 {
-    ptGUIControlDraggable *newObj = (ptGUIControlDraggable*)ptGUIControlDraggable_type.tp_new(&ptGUIControlDraggable_type, NULL, NULL);
+    ptGUIControlDraggable* newObj = (ptGUIControlDraggable*)ptGUIControlDraggable_type.tp_new(&ptGUIControlDraggable_type, NULL, NULL);
     newObj->fThis->fGCkey = gckey.getKey();
     return (PyObject*)newObj;
 }
 
-PyObject *pyGUIControlDraggable::New(plKey objkey)
+PyObject* pyGUIControlDraggable::New(plKey objkey)
 {
-    ptGUIControlDraggable *newObj = (ptGUIControlDraggable*)ptGUIControlDraggable_type.tp_new(&ptGUIControlDraggable_type, NULL, NULL);
+    ptGUIControlDraggable* newObj = (ptGUIControlDraggable*)ptGUIControlDraggable_type.tp_new(&ptGUIControlDraggable_type, NULL, NULL);
     newObj->fThis->fGCkey = objkey;
     return (PyObject*)newObj;
 }
@@ -119,7 +120,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptGUIControlDraggable, pyGUIControlDraggable)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyGUIControlDraggable::AddPlasmaClasses(PyObject *m)
+void pyGUIControlDraggable::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptGUIControlDraggable);

@@ -58,33 +58,35 @@ PYTHON_NO_INIT_DEFINITION(ptKey)
 
 PYTHON_RICH_COMPARE_DEFINITION(ptKey, obj1, obj2, compareType)
 {
-    if ((obj1 == Py_None) || (obj2 == Py_None) || !pyKey::Check(obj1) || !pyKey::Check(obj2))
-    {
+    if ((obj1 == Py_None) || (obj2 == Py_None) || !pyKey::Check(obj1) || !pyKey::Check(obj2)) {
         // if they aren't the same type, they don't match, obviously (we also never equal none)
-        if (compareType == Py_EQ)
+        if (compareType == Py_EQ) {
             PYTHON_RCOMPARE_FALSE;
-        else if (compareType == Py_NE)
+        } else if (compareType == Py_NE) {
             PYTHON_RCOMPARE_TRUE;
-        else
-        {
+        } else {
             PyErr_SetString(PyExc_NotImplementedError, "invalid comparison for a ptKey object");
             PYTHON_RCOMPARE_ERROR;
         }
     }
-    pyKey *key1 = pyKey::ConvertFrom(obj1);
-    pyKey *key2 = pyKey::ConvertFrom(obj2);
-    if (compareType == Py_EQ)
-    {
-        if ((*key1) == (*key2))
+
+    pyKey* key1 = pyKey::ConvertFrom(obj1);
+    pyKey* key2 = pyKey::ConvertFrom(obj2);
+
+    if (compareType == Py_EQ) {
+        if ((*key1) == (*key2)) {
             PYTHON_RCOMPARE_TRUE;
+        }
+
+        PYTHON_RCOMPARE_FALSE;
+    } else if (compareType == Py_NE) {
+        if ((*key1) != (*key2)) {
+            PYTHON_RCOMPARE_TRUE;
+        }
+
         PYTHON_RCOMPARE_FALSE;
     }
-    else if (compareType == Py_NE)
-    {
-        if ((*key1) != (*key2))
-            PYTHON_RCOMPARE_TRUE;
-        PYTHON_RCOMPARE_FALSE;
-    }
+
     PyErr_SetString(PyExc_NotImplementedError, "invalid comparison for a ptKey object");
     PYTHON_RCOMPARE_ERROR;
 }
@@ -93,11 +95,12 @@ PYTHON_RICH_COMPARE_DEFINITION(ptKey, obj1, obj2, compareType)
 PYTHON_METHOD_DEFINITION(ptKey, netForce, args)
 {
     char forceFlag;
-    if (!PyArg_ParseTuple(args, "b", &forceFlag))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &forceFlag)) {
         PyErr_SetString(PyExc_TypeError, "netForce requires a boolean argument");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetNetForce(forceFlag != 0);
     PYTHON_RETURN_NONE;
 }
@@ -118,8 +121,11 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptKey, getSceneObject)
 PYTHON_METHOD_DEFINITION_NOARGS(ptKey, getParentKey)
 {
     PyObject* retVal = self->fThis->GetParentObject();
-    if (!retVal)
+
+    if (!retVal) {
         PYTHON_RETURN_NONE;
+    }
+
     return retVal;
 }
 
@@ -132,19 +138,19 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptKey, isAttachedToClone)
 
 PYTHON_START_METHODS_TABLE(ptKey)
 #ifndef BUILDING_PYPLASMA
-    PYTHON_METHOD(ptKey, netForce, "Params: forceFlag\nSpecify whether this object needs to use messages that are forced to the network\n"
-                "- This is to be used if your Python program is running on only one client\n"
-                "Such as a game master, only running on the client that owns a particular object"),
-    PYTHON_METHOD_NOARGS(ptKey, getName, "Get the name of the object that this ptKey is pointing to"),
-    PYTHON_BASIC_METHOD(ptKey, enable, "Sends an enable message to whatever this ptKey is pointing to"),
-    PYTHON_BASIC_METHOD(ptKey, disable, "Sends a disable message to whatever this ptKey is pointing to"),
-    PYTHON_METHOD_NOARGS(ptKey, getSceneObject, "This will return a ptSceneobject object that is associated with this ptKey\n"
-                "However, if this ptKey is _not_ a sceneobject, then unpredicatable results will ensue"),
-    PYTHON_METHOD_NOARGS(ptKey, getParentKey, "This will return a ptKey object that is the parent of this modifer\n"
-                "However, if the parent is not a modifier or not loaded, then None is returned."),
-    PYTHON_METHOD_NOARGS(ptKey, isAttachedToClone, "Returns whether the python file mod is attached to a clone"),
+PYTHON_METHOD(ptKey, netForce, "Params: forceFlag\nSpecify whether this object needs to use messages that are forced to the network\n"
+              "- This is to be used if your Python program is running on only one client\n"
+              "Such as a game master, only running on the client that owns a particular object"),
+              PYTHON_METHOD_NOARGS(ptKey, getName, "Get the name of the object that this ptKey is pointing to"),
+              PYTHON_BASIC_METHOD(ptKey, enable, "Sends an enable message to whatever this ptKey is pointing to"),
+              PYTHON_BASIC_METHOD(ptKey, disable, "Sends a disable message to whatever this ptKey is pointing to"),
+              PYTHON_METHOD_NOARGS(ptKey, getSceneObject, "This will return a ptSceneobject object that is associated with this ptKey\n"
+                                   "However, if this ptKey is _not_ a sceneobject, then unpredicatable results will ensue"),
+              PYTHON_METHOD_NOARGS(ptKey, getParentKey, "This will return a ptKey object that is the parent of this modifer\n"
+                                   "However, if the parent is not a modifier or not loaded, then None is returned."),
+              PYTHON_METHOD_NOARGS(ptKey, isAttachedToClone, "Returns whether the python file mod is attached to a clone"),
 #endif // BUILDING_PYPLASMA
-PYTHON_END_METHODS_TABLE;
+              PYTHON_END_METHODS_TABLE;
 
 // type structure definition
 #define ptKey_COMPARE       PYTHON_NO_COMPARE
@@ -160,9 +166,9 @@ PLASMA_CUSTOM_TYPE(ptKey, "Plasma Key class");
 // required functions for PyObject interoperability
 PYTHON_CLASS_NEW_IMPL(ptKey, pyKey)
 
-PyObject *pyKey::New(plKey key)
+PyObject* pyKey::New(plKey key)
 {
-    ptKey *newObj = (ptKey*)ptKey_type.tp_new(&ptKey_type, NULL, NULL);
+    ptKey* newObj = (ptKey*)ptKey_type.tp_new(&ptKey_type, NULL, NULL);
     newObj->fThis->fKey = key;
 #ifndef BUILDING_PYPLASMA
     newObj->fThis->fPyFileMod = nil;
@@ -171,9 +177,9 @@ PyObject *pyKey::New(plKey key)
     return (PyObject*)newObj;
 }
 
-PyObject *pyKey::New(pyKey *key)
+PyObject* pyKey::New(pyKey* key)
 {
-    ptKey *newObj = (ptKey*)ptKey_type.tp_new(&ptKey_type, NULL, NULL);
+    ptKey* newObj = (ptKey*)ptKey_type.tp_new(&ptKey_type, NULL, NULL);
     newObj->fThis->fKey = key->getKey();
 #ifndef BUILDING_PYPLASMA
     newObj->fThis->fPyFileMod = nil;
@@ -182,18 +188,18 @@ PyObject *pyKey::New(pyKey *key)
     return (PyObject*)newObj;
 }
 #ifndef BUILDING_PYPLASMA
-PyObject *pyKey::New(plKey key, plPythonFileMod* pymod)
+PyObject* pyKey::New(plKey key, plPythonFileMod* pymod)
 {
-    ptKey *newObj = (ptKey*)ptKey_type.tp_new(&ptKey_type, NULL, NULL);
+    ptKey* newObj = (ptKey*)ptKey_type.tp_new(&ptKey_type, NULL, NULL);
     newObj->fThis->fKey = key;
     newObj->fThis->fPyFileMod = pymod;
     newObj->fThis->fNetForce = false;
     return (PyObject*)newObj;
 }
 
-PyObject *pyKey::New(pyKey *key, plPythonFileMod* pymod)
+PyObject* pyKey::New(pyKey* key, plPythonFileMod* pymod)
 {
-    ptKey *newObj = (ptKey*)ptKey_type.tp_new(&ptKey_type, NULL, NULL);
+    ptKey* newObj = (ptKey*)ptKey_type.tp_new(&ptKey_type, NULL, NULL);
     newObj->fThis->fKey = key->getKey();
     newObj->fThis->fPyFileMod = pymod;
     newObj->fThis->fNetForce = false;
@@ -208,7 +214,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptKey, pyKey)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyKey::AddPlasmaClasses(PyObject *m)
+void pyKey::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptKey);

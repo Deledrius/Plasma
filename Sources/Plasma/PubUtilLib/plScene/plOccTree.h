@@ -48,16 +48,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plBoundsHierarchy;
 
-class plOccPlane
-{
+class plOccPlane {
 public:
     hsVector3           fNormal;
     hsScalar            fDist;
 
 };
 
-class plOccPoly
-{
+class plOccPoly {
 public:
     enum {
         kEdgeClipped        = 0x1
@@ -69,8 +67,7 @@ public:
     hsTArray<uint8_t>             fEdgeFlags; // flag[i] => edge(fVerts[i], fVerts[(i+1)%n])
 };
 
-class plOccNode
-{
+class plOccNode {
 protected:
     enum {
         kNone           = 0x0,
@@ -85,7 +82,7 @@ protected:
     uint32_t              fFlags;
 
     plOccPlane          fPolyPlane; // Plane of the poly we came from
-    plOccPlane          fViewPlane; // Plane perp to view dir. 
+    plOccPlane          fViewPlane; // Plane perp to view dir.
     // For an interior node, ViewPlane is for the nearest (to view) point
     // on the poly. A bound closer than that will not be occluded by this
     // node or any nodes deeper in the tree.
@@ -93,12 +90,11 @@ protected:
     // plane OR the PolyPlane is occluded.
 
     plOccNode*      fInChild;
-    
+
     plOccNode*      fOutChild;
 };
 
-class plOccTree
-{
+class plOccTree {
 protected:
 
     enum {
@@ -147,7 +143,7 @@ public:
     //      recur bnd on outside child
     //  else
     //      recur bnd's children on this node
-    // 
+    //
     // There's two ways to output the visibility info
     //      1) Set a visible/invisible bit for each of the bnd leaves
     //      2) output a list of visible bnds.
@@ -166,7 +162,7 @@ public:
     //  Recursion stops when:
     //      1) A bnd is totally in or totally out of a leaf of the occluder tree
     //      2) A bnd is a leaf of the bnd hierarchy.
-    // 
+    //
     void TestHeirarchy(plBoundsHierarchy* bnd);
 
     virtual void Read(hsStream* s, hsResMgr* mgr);

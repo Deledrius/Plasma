@@ -60,9 +60,9 @@ PYTHON_BASIC_METHOD_DEFINITION(ptInputInterface, pushTelescope, PushTelescopeInt
 PYTHON_BASIC_METHOD_DEFINITION(ptInputInterface, popTelescope, PopTelescope)
 
 PYTHON_START_METHODS_TABLE(ptInputInterface)
-    PYTHON_BASIC_METHOD(ptInputInterface, pushTelescope, "pushes on the telescope interface"),
-    PYTHON_BASIC_METHOD(ptInputInterface, popTelescope, "pops off the telescope interface and gos back to previous interface"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_BASIC_METHOD(ptInputInterface, pushTelescope, "pushes on the telescope interface"),
+                    PYTHON_BASIC_METHOD(ptInputInterface, popTelescope, "pops off the telescope interface and gos back to previous interface"),
+                    PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptInputInterface, "Plasma input interface class");
@@ -76,7 +76,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptInputInterface, cyInputInterface)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void cyInputInterface::AddPlasmaClasses(PyObject *m)
+void cyInputInterface::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptInputInterface);

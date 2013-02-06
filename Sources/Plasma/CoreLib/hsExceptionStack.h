@@ -51,8 +51,7 @@ class hsExceptionStackDestroyer;
 // hsExceptionStack - logs function/scope IDs added by hsStackToken
 //
 
-class hsExceptionStack
-{
+class hsExceptionStack {
     friend class hsExceptionStackDestroyer;
 private:
     hsExceptionStack()                      { }
@@ -61,14 +60,20 @@ public:
 
     static hsExceptionStack& Instance();
 
-    int32_t GetNumEntries() const             { return fEntries.Count(); }
-    const char* GetEntry(int32_t i) const     { return fEntries[i]; }
+    int32_t GetNumEntries() const             {
+        return fEntries.Count();
+    }
+    const char* GetEntry(int32_t i) const     {
+        return fEntries[i];
+    }
 
     void Push(const char* str);
 
     // After an exception is caught and stack has been displayed,
     // call continue to flush stack
-    void Continue()                         { fEntries.Reset(); }
+    void Continue()                         {
+        fEntries.Reset();
+    }
 
 private:
     static void FreeInstance();
@@ -81,8 +86,7 @@ private:
 
 inline hsExceptionStack& hsExceptionStack::Instance()
 {
-    if (!fExceptionStack)
-    {
+    if (!fExceptionStack) {
         fExceptionStack = new hsExceptionStack;
     }
 
@@ -97,11 +101,9 @@ inline void hsExceptionStack::Push(const char* str)
 //
 // hsExceptionStackDestroyer - removes the hsExceptionStack instance
 //
-class hsExceptionStackDestroyer 
-{
+class hsExceptionStackDestroyer {
 public:
-    ~hsExceptionStackDestroyer()
-    {
+    ~hsExceptionStackDestroyer() {
         hsExceptionStack::FreeInstance();
     }
 };

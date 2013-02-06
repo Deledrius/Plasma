@@ -47,38 +47,41 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsGeometry3.h"
 
 
-class plPickedMsg : public plMessage
-{
+class plPickedMsg : public plMessage {
 protected:
 
 public:
-    
+
     bool    fPicked;
     hsPoint3    fHitPoint;      // where in the world the object was picked on
-        
-    plPickedMsg() : fPicked(true),fHitPoint(0,0,0){SetBCastFlag(plMessage::kPropagateToModifiers);}
-    plPickedMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t) : fPicked(true),fHitPoint(0,0,0) {SetBCastFlag(plMessage::kPropagateToModifiers);}
-    ~plPickedMsg(){;}
 
-    CLASSNAME_REGISTER( plPickedMsg );
-    GETINTERFACE_ANY( plPickedMsg, plMessage );
+    plPickedMsg() : fPicked(true), fHitPoint(0, 0, 0) {
+        SetBCastFlag(plMessage::kPropagateToModifiers);
+    }
+    plPickedMsg(const plKey& s,
+                const plKey& r,
+                const double* t) : fPicked(true), fHitPoint(0, 0, 0) {
+        SetBCastFlag(plMessage::kPropagateToModifiers);
+    }
+    ~plPickedMsg() {
+        ;
+    }
 
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    CLASSNAME_REGISTER(plPickedMsg);
+    GETINTERFACE_ANY(plPickedMsg, plMessage);
+
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fPicked = stream->ReadBool();
         fHitPoint.Read(stream);
     }
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         stream->WriteBool(fPicked);
         fHitPoint.Write(stream);
     }
-    
+
 
 };
 

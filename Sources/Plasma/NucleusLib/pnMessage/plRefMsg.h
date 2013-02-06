@@ -47,11 +47,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class hsKeyedObject;
 
-class plRefMsg : public plMessage
-{
+class plRefMsg : public plMessage {
 public:
-    enum Context
-    {
+    enum Context {
         kOnCreate           = 0x1,  // fRef just created.
         kOnDestroy          = 0x2,  // fRef about to be destroyed
         kOnRequest          = 0x4,  // fRef wants to be added
@@ -66,32 +64,40 @@ protected:
     uint8_t                   fContext;
 public:
     plRefMsg();
-    plRefMsg(const plKey &r, uint8_t c);
+    plRefMsg(const plKey& r, uint8_t c);
 
     virtual ~plRefMsg();
 
-    CLASSNAME_REGISTER( plRefMsg );
-    GETINTERFACE_ANY( plRefMsg, plMessage );
+    CLASSNAME_REGISTER(plRefMsg);
+    GETINTERFACE_ANY(plRefMsg, plMessage);
 
     plRefMsg&       SetRef(hsKeyedObject* ref);
-    hsKeyedObject*  GetRef() { return fRef; }
+    hsKeyedObject*  GetRef() {
+        return fRef;
+    }
 
     plRefMsg&       SetOldRef(hsKeyedObject* oldRef);
-    hsKeyedObject*  GetOldRef() { return fOldRef; }
+    hsKeyedObject*  GetOldRef() {
+        return fOldRef;
+    }
 
-    plRefMsg&   SetContext(uint8_t c) { fContext = c; return *this; }
-    uint8_t       GetContext() { return fContext; }
+    plRefMsg&   SetContext(uint8_t c) {
+        fContext = c;
+        return *this;
+    }
+    uint8_t       GetContext() {
+        return fContext;
+    }
 
     void Read(hsStream* stream, hsResMgr* mgr);
     void Write(hsStream* stream, hsResMgr* mgr);
 };
 
 
-class plGenRefMsg : public plRefMsg
-{
+class plGenRefMsg : public plRefMsg {
 public:
     plGenRefMsg() : fType(-1), fWhich(-1) {}
-    plGenRefMsg(const plKey &r, uint8_t c, int32_t which, int8_t type) : plRefMsg(r, c), fWhich(which), fType(type) {}
+    plGenRefMsg(const plKey& r, uint8_t c, int32_t which, int8_t type) : plRefMsg(r, c), fWhich(which), fType(type) {}
 
     CLASSNAME_REGISTER(plGenRefMsg);
     GETINTERFACE_ANY(plGenRefMsg, plRefMsg);

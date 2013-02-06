@@ -54,55 +54,58 @@ class plMessage;
 class hsGMaterial;
 class plTextGenerator;
 
-class pfGUITextBoxMod : public pfGUIControlMod
-{
-    protected:
+class pfGUITextBoxMod : public pfGUIControlMod {
+protected:
 
-        wchar_t         *fText;
-        plString        fLocalizationPath;
-        bool            fUseLocalizationPath;
+    wchar_t*         fText;
+    plString        fLocalizationPath;
+    bool            fUseLocalizationPath;
 
 
-        virtual bool IEval( double secs, float del, uint32_t dirty ); // called only by owner object's Eval()
+    virtual bool IEval(double secs, float del, uint32_t dirty);   // called only by owner object's Eval()
 
-        virtual void    IUpdate( void );
-        virtual void    IPostSetUpDynTextMap( void );
+    virtual void    IUpdate(void);
+    virtual void    IPostSetUpDynTextMap(void);
 
-    public:
+public:
 
-        pfGUITextBoxMod();
-        virtual ~pfGUITextBoxMod();
+    pfGUITextBoxMod();
+    virtual ~pfGUITextBoxMod();
 
-        CLASSNAME_REGISTER( pfGUITextBoxMod );
-        GETINTERFACE_ANY( pfGUITextBoxMod, pfGUIControlMod );
+    CLASSNAME_REGISTER(pfGUITextBoxMod);
+    GETINTERFACE_ANY(pfGUITextBoxMod, pfGUIControlMod);
 
-        enum OurFlags
-        {
-            kCenterJustify = kDerivedFlagsStart,
-            kRightJustify
-        };
+    enum OurFlags {
+        kCenterJustify = kDerivedFlagsStart,
+        kRightJustify
+    };
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        virtual void    HandleMouseDown( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseUp( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseDrag( hsPoint3 &mousePt, uint8_t modifiers );
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-        virtual void    PurgeDynaTextMapImage();
+    virtual void    HandleMouseDown(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseUp(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseDrag(hsPoint3& mousePt, uint8_t modifiers);
 
-        virtual const wchar_t*  GetText() { return fText; }
+    virtual void    PurgeDynaTextMapImage();
 
-        // Export only
-        void    SetText( const char *text );
-        void    SetText( const wchar_t *text );
+    virtual const wchar_t*  GetText() {
+        return fText;
+    }
 
-        void    SetLocalizationPath(const plString& path);
-        void    SetUseLocalizationPath(bool use);
+    // Export only
+    void    SetText(const char* text);
+    void    SetText(const wchar_t* text);
 
-        virtual void    UpdateColorScheme() { IPostSetUpDynTextMap(); IUpdate(); }
+    void    SetLocalizationPath(const plString& path);
+    void    SetUseLocalizationPath(bool use);
+
+    virtual void    UpdateColorScheme() {
+        IPostSetUpDynTextMap();
+        IUpdate();
+    }
 };
 
 #endif // _pfGUITextBoxMod_h

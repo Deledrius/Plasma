@@ -76,35 +76,35 @@ class pyVaultMarkerListNode;
 class pyVaultSystemNode;
 #endif
 
-class pyVaultNode
-{
+class pyVaultNode {
 public:
-    struct pyVaultNodeOperationCallback
-    {
-        PyObject *          fCbObject;
-        RelVaultNode *      fNode;
-        PyObject *          fPyNodeRef;
+    struct pyVaultNodeOperationCallback {
+        PyObject*           fCbObject;
+        RelVaultNode*       fNode;
+        PyObject*           fPyNodeRef;
         uint32_t            fContext;
 
-        pyVaultNodeOperationCallback(PyObject * cbObject);
+        pyVaultNodeOperationCallback(PyObject* cbObject);
         ~pyVaultNodeOperationCallback();
 
         void VaultOperationStarted(uint32_t context);
         void VaultOperationComplete(uint32_t context, int resultCode);
-        void VaultOperationComplete(int resultCode) { VaultOperationComplete(fContext, resultCode); }
-        
-        void SetNode (RelVaultNode * rvn);
-        RelVaultNode * GetNode ();
+        void VaultOperationComplete(int resultCode) {
+            VaultOperationComplete(fContext, resultCode);
+        }
+
+        void SetNode(RelVaultNode* rvn);
+        RelVaultNode* GetNode();
     };
 
-    RelVaultNode *      fNode;
-    mutable char *      fCreateAgeName;
+    RelVaultNode*       fNode;
+    mutable char*       fCreateAgeName;
 
 protected:
     // only for python glue, do NOT call
     pyVaultNode();
     // should only be created from C++ side
-    pyVaultNode( RelVaultNode* node );
+    pyVaultNode(RelVaultNode* node);
 
 public:
     virtual ~pyVaultNode();
@@ -112,81 +112,83 @@ public:
     // required functions for PyObject interoperability
     PYTHON_EXPOSE_TYPE; // so we can subclass
     PYTHON_CLASS_NEW_FRIEND(ptVaultNode);
-    static PyObject *New(RelVaultNode* node);
+    static PyObject* New(RelVaultNode* node);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyVaultNode object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyVaultNode); // converts a PyObject to a pyVaultNode (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
-    RelVaultNode * GetNode() const;
+    RelVaultNode* GetNode() const;
 
     // override the equals to operator
-    bool operator==(const pyVaultNode &vaultNode) const;
-    bool operator!=(const pyVaultNode &vaultNode) const { return !(vaultNode == *this); }
+    bool operator==(const pyVaultNode& vaultNode) const;
+    bool operator!=(const pyVaultNode& vaultNode) const {
+        return !(vaultNode == *this);
+    }
 
     // public getters
-    uint32_t  GetID( void );
-    virtual uint32_t  GetType( void );
-    uint32_t  GetPermissions( void );
-    uint32_t  GetOwnerNodeID( void );
-    PyObject* GetOwnerNode( void ); // returns pyVaultPlayerInfoNode
-    uint32_t  GetGroupNodeID( void );
-    PyObject* GetGroupNode( void ); // returns pyVaultNode
-    uint32_t GetModifyTime( void );
-    uint32_t GetCreatorNodeID( void );
-    PyObject* GetCreatorNode( void ); // returns pyVaultPlayerInfoNode
-    uint32_t GetCreateTime( void );
-    uint32_t GetCreateAgeTime( void );
-    const char * GetCreateAgeName( void );
+    uint32_t  GetID(void);
+    virtual uint32_t  GetType(void);
+    uint32_t  GetPermissions(void);
+    uint32_t  GetOwnerNodeID(void);
+    PyObject* GetOwnerNode(void);   // returns pyVaultPlayerInfoNode
+    uint32_t  GetGroupNodeID(void);
+    PyObject* GetGroupNode(void);   // returns pyVaultNode
+    uint32_t GetModifyTime(void);
+    uint32_t GetCreatorNodeID(void);
+    PyObject* GetCreatorNode(void);   // returns pyVaultPlayerInfoNode
+    uint32_t GetCreateTime(void);
+    uint32_t GetCreateAgeTime(void);
+    const char* GetCreateAgeName(void);
     plUUID    GetCreateAgeGuid(void) const;
-    PyObject* GetCreateAgeCoords ();
+    PyObject* GetCreateAgeCoords();
 
     // public setters
-    void SetID( uint32_t v );
-    void SetType( int v );
-    void SetOwnerNodeID( uint32_t v );
-    void SetCreatorNodeID( uint32_t v );
-    void SetCreateAgeName( const char * v );
-    void SetCreateAgeGuid( const char * v );
+    void SetID(uint32_t v);
+    void SetType(int v);
+    void SetOwnerNodeID(uint32_t v);
+    void SetCreatorNodeID(uint32_t v);
+    void SetCreateAgeName(const char* v);
+    void SetCreateAgeGuid(const char* v);
 
 
     /////////////////////////////////////////////////
     // Vault Node API
 
     // Add child node
-    PyObject* AddNode(pyVaultNode* pynode, PyObject* cbObject=nil, uint32_t cbContext=0 );
+    PyObject* AddNode(pyVaultNode* pynode, PyObject* cbObject = nil, uint32_t cbContext = 0);
     // Link node to this one
-    void LinkToNode(int nodeID, PyObject* cbObject=nil, uint32_t cbContext=0 );
+    void LinkToNode(int nodeID, PyObject* cbObject = nil, uint32_t cbContext = 0);
     // Remove child node
-    bool RemoveNode( pyVaultNode& pynode, PyObject* cbObject=nil, uint32_t cbContext=0 );
+    bool RemoveNode(pyVaultNode& pynode, PyObject* cbObject = nil, uint32_t cbContext = 0);
     // Remove all child nodes
-    void RemoveAllNodes( void );
+    void RemoveAllNodes(void);
     // Add/Save this node to vault
-    void Save( PyObject* cbObject=nil, uint32_t cbContext=0 );
+    void Save(PyObject* cbObject = nil, uint32_t cbContext = 0);
     // Save this node and all child nodes that need saving.
     // NOTE: Currently, the cb object is called back for
     // each node saved.
-    void SaveAll( PyObject* cbObject=nil, uint32_t cbContext=0 );
+    void SaveAll(PyObject* cbObject = nil, uint32_t cbContext = 0);
     // Force a save on this node because currently Save doesn't do anything because dirty
     // nodes are periodically saved automatically - call this to force a save immediately
     void ForceSave();
     // Send this node to the destination client node. will be received in it's inbox folder.
-    void SendTo(uint32_t destClientNodeID, PyObject* cbObject=nil, uint32_t cbContext=0 );
+    void SendTo(uint32_t destClientNodeID, PyObject* cbObject = nil, uint32_t cbContext = 0);
     // Returns true if is a child node of ours.
-    bool HasNode( uint32_t nodeID );
+    bool HasNode(uint32_t nodeID);
     //  Returns a ptVaultNodeRef or nil
-    PyObject* GetNode2( uint32_t nodeID ) const;          // returns pyVaultNodeRef, for legacy compatibility
+    PyObject* GetNode2(uint32_t nodeID) const;            // returns pyVaultNodeRef, for legacy compatibility
     // Get child node matching template node
-    PyObject* FindNode( pyVaultNode * templateNode );   // returns pyVaultNode
-    
-    PyObject * GetChildNode (unsigned nodeId);  // returns pyVaultNode, or None
+    PyObject* FindNode(pyVaultNode* templateNode);      // returns pyVaultNode
+
+    PyObject* GetChildNode(unsigned nodeId);    // returns pyVaultNode, or None
 
     // Get all child nodes.
     virtual PyObject* GetChildNodeRefList(); // for legacy compatibility
     virtual int GetChildNodeCount();
 
     // Get the client ID from my Vault client.
-    uint32_t  GetClientID( void );
+    uint32_t  GetClientID(void);
 
     // all the upcasting stuff...
     PyObject* UpcastToFolderNode(); // returns pyVaultFolderNode

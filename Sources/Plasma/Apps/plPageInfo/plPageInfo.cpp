@@ -70,14 +70,14 @@ void PrintVersion()
 
 //// PrintHelp ///////////////////////////////////////////////////////////////
 
-int PrintHelp( void )
+int PrintHelp(void)
 {
     puts("");
     PrintVersion();
     puts("");
     puts("Usage: plPageInfo [-s -i] pageFile");
     puts("       plPageInfo -v");
-    puts("Where:" );
+    puts("Where:");
     puts("       -v print version and exit.");
     puts("       -s dump sounds in page to the console");
     puts("       -i dump object size info to .csv files");
@@ -91,35 +91,38 @@ int PrintHelp( void )
 
 int main(int argc, char* argv[])
 {
-    if (argc >= 2 && strcmp(argv[1], "-v") == 0)
-    {
+    if (argc >= 2 && strcmp(argv[1], "-v") == 0) {
         PrintVersion();
         return 0;
     }
 
-    if (argc < 3)
+    if (argc < 3) {
         return PrintHelp();
+    }
 
     bool sounds = false;
     bool stats = false;
 
     int arg = 1;
-    for (arg = 1; arg < argc; arg++)
-    {
-        if (strcmp(argv[arg], "-s") == 0)
+
+    for (arg = 1; arg < argc; arg++) {
+        if (strcmp(argv[arg], "-s") == 0) {
             sounds = true;
-        else if (strcmp(argv[arg], "-i") == 0)
+        } else if (strcmp(argv[arg], "-i") == 0) {
             stats = true;
-        else
+        } else {
             break;
+        }
     }
 
     // Make sure we have 1 arg left after getting the options
     plFileName pageFile;
-    if (arg < argc)
+
+    if (arg < argc) {
         pageFile = argv[arg];
-    else
+    } else {
         return PrintHelp();
+    }
 
     // Init our special resMgr
     plResMgrSettings::Get().SetFilterNewerPageVersions(false);
@@ -129,10 +132,13 @@ int main(int argc, char* argv[])
     hsgResMgr::Init(gResMgr);
     gResMgr->AddSinglePage(pageFile);
 
-    if (sounds)
+    if (sounds) {
         DumpSounds();
-    if (stats)
+    }
+
+    if (stats) {
         DumpStats(pageFile.StripFileName());
+    }
 
     hsgResMgr::Shutdown();
 
@@ -142,14 +148,12 @@ int main(int argc, char* argv[])
 //// plSoundBufferCollector //////////////////////////////////////////////////
 //  Page iterator that collects all the plSoundBuffers in all of our pages
 
-class plSoundBufferCollector : public plRegistryPageIterator, public plKeyCollector
-{
+class plSoundBufferCollector : public plRegistryPageIterator, public plKeyCollector {
 public:
-    plSoundBufferCollector(hsTArray<plKey>& keyArray) 
-                : plKeyCollector(keyArray) {}
+    plSoundBufferCollector(hsTArray<plKey>& keyArray)
+        : plKeyCollector(keyArray) {}
 
-    bool EatPage(plRegistryPageNode* page)
-    {
+    bool EatPage(plRegistryPageNode* page) {
         page->LoadKeys();
         return page->IterateKeys(this, plSoundBuffer::Index());
         return true;
@@ -164,29 +168,28 @@ bool DumpSounds()
     plSoundBufferCollector soundCollector(soundKeys);
     gResMgr->IterateAllPages(&soundCollector);
 
-    for (int i = 0; i < soundKeys.GetCount(); i++)
-    {
+    for (int i = 0; i < soundKeys.GetCount(); i++) {
         plSoundBuffer* buffer = plSoundBuffer::ConvertNoRef(soundKeys[i]->VerifyLoaded());
-        if (buffer)
-        {
+
+        if (buffer) {
             // Ref it...
             buffer->GetKey()->RefObject();
 
             // Get the filename from it and add that file if necessary
             plFileName filename = buffer->GetFileName();
-            if (filename.IsValid())
-            {
+
+            if (filename.IsValid()) {
                 uint32_t flags = 0;
 
-                if (filename.GetFileExt().CompareI("wav") != 0)
-                {
+                if (filename.GetFileExt().CompareI("wav") != 0) {
                     if (buffer->HasFlag(plSoundBuffer::kOnlyLeftChannel) ||
-                        buffer->HasFlag(plSoundBuffer::kOnlyRightChannel))
+                            buffer->HasFlag(plSoundBuffer::kOnlyRightChannel)) {
                         hsSetBits(flags, plManifestFile::kSndFlagCacheSplit);
-                    else if (buffer->HasFlag(plSoundBuffer::kStreamCompressed))
+                    } else if (buffer->HasFlag(plSoundBuffer::kStreamCompressed)) {
                         hsSetBits(flags, plManifestFile::kSndFlagStreamCompressed);
-                    else
+                    } else {
                         hsSetBits(flags, plManifestFile::kSndFlagCacheStereo);
+                    }
                 }
 
                 printf("%s,%u\n", filename.AsString().c_str(), flags);
@@ -208,8 +211,7 @@ bool DumpSounds()
 
 #include "../pnKeyedObject/plKeyImp.h"
 
-class plStatDumpIterator : public plRegistryPageIterator, public plRegistryKeyIterator
-{
+class plStatDumpIterator : public plRegistryPageIterator, public plRegistryKeyIterator {
 protected:
     plFileName fOutputDir;
     hsUNIXStream fStream;
@@ -217,8 +219,7 @@ protected:
 public:
     plStatDumpIterator(const plFileName& outputDir) : fOutputDir(outputDir) {}
 
-    bool EatKey(const plKey& key)
-    {
+    bool EatKey(const plKey& key) {
         plKeyImp* imp = (plKey)key;
 
         fStream.WriteString(imp->GetName());
@@ -235,12 +236,11 @@ public:
         return true;
     }
 
-    bool EatPage(plRegistryPageNode* page)
-    {
+    bool EatPage(plRegistryPageNode* page) {
         const plPageInfo& info = page->GetPageInfo();
 
         plFileName fileName = plFileName::Join(fOutputDir,
-                plString::Format("%s_%s.csv", info.GetAge().c_str(), info.GetPage().c_str()));
+                                               plString::Format("%s_%s.csv", info.GetAge().c_str(), info.GetPage().c_str()));
         fStream.Open(fileName, "wt");
 
         page->LoadKeys();

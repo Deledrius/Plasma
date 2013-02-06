@@ -48,20 +48,26 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plMaxNodeBase;
 
-class plComponentExt : public plComponentBase
-{
+class plComponentExt : public plComponentBase {
 public:
-    int CanConvertToType(Class_ID obtype)
-        { return (obtype == EXT_COMPONENT_CLASSID) ? 1 : plComponentBase::CanConvertToType(obtype); }
+    int CanConvertToType(Class_ID obtype) {
+        return (obtype == EXT_COMPONENT_CLASSID) ? 1 : plComponentBase::CanConvertToType(obtype);
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNodeBase *node, plComponentTools *tools, plErrorMsg *pErrMsg) { return true; }
-    virtual bool PreConvert(plMaxNodeBase *node, plComponentTools *tools, plErrorMsg *pErrMsg) { return true; }
-    virtual bool Convert(plMaxNodeBase *node, plComponentTools *tools, plErrorMsg *pErrMsg) = 0;
+    virtual bool SetupProperties(plMaxNodeBase* node, plComponentTools* tools, plErrorMsg* pErrMsg) {
+        return true;
+    }
+    virtual bool PreConvert(plMaxNodeBase* node, plComponentTools* tools, plErrorMsg* pErrMsg) {
+        return true;
+    }
+    virtual bool Convert(plMaxNodeBase* node, plComponentTools* tools, plErrorMsg* pErrMsg) = 0;
 
     // DeInit pass--free up any temp memory you might have allocated here
-    virtual bool DeInit(plMaxNodeBase *node, plComponentTools *tools, plErrorMsg *pErrMsg) { return true; }
+    virtual bool DeInit(plMaxNodeBase* node, plComponentTools* tools, plErrorMsg* pErrMsg) {
+        return true;
+    }
 };
 
 #endif

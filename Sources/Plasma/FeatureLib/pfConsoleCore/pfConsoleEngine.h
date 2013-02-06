@@ -64,50 +64,55 @@ class plFileName;
 
 class pfConsoleCmdParam;
 class pfConsoleCmdGroup;
-class pfConsoleEngine
-{
-    private:
+class pfConsoleEngine {
+private:
 
-        static const int32_t      fMaxNumParams;
+    static const int32_t      fMaxNumParams;
 
-        bool    IConvertToParam( uint8_t type, char *string, pfConsoleCmdParam *param );
+    bool    IConvertToParam(uint8_t type, char* string, pfConsoleCmdParam* param);
 
-        char    fErrorMsg[ 128 ];
-        char    fLastErrorLine[ 512 ];
+    char    fErrorMsg[ 128 ];
+    char    fLastErrorLine[ 512 ];
 
-        void    ISetErrorMsg(const char *msg ) { hsStrncpy( fErrorMsg, msg, sizeof( fErrorMsg ) ); }
+    void    ISetErrorMsg(const char* msg) {
+        hsStrncpy(fErrorMsg, msg, sizeof(fErrorMsg));
+    }
 
-        // Recursive function to build a string of the groups a command is in
-        void        IBuildCmdNameRecurse( pfConsoleCmdGroup *group, char *string );
+    // Recursive function to build a string of the groups a command is in
+    void        IBuildCmdNameRecurse(pfConsoleCmdGroup* group, char* string);
 
-    public:
+public:
 
-        pfConsoleEngine();
-        ~pfConsoleEngine();
+    pfConsoleEngine();
+    ~pfConsoleEngine();
 
-        // Gets the signature for the command given (NO groups!)
-        const char  *GetCmdSignature( char *name );
+    // Gets the signature for the command given (NO groups!)
+    const char*  GetCmdSignature(char* name);
 
-        // Prints out the help for a given command (or group)
-        bool    PrintCmdHelp( char *name, void (*PrintFn)( const char * ) );
+    // Prints out the help for a given command (or group)
+    bool    PrintCmdHelp(char* name, void (*PrintFn)(const char*));
 
-        // Breaks the given line into a command and parameters and runs the command
-        bool    RunCommand( char *line, void (*PrintFn)( const char * ) );
+    // Breaks the given line into a command and parameters and runs the command
+    bool    RunCommand(char* line, void (*PrintFn)(const char*));
 
-        // Executes the given file as a sequence of console commands
-        bool    ExecuteFile( const plFileName &fileName );
+    // Executes the given file as a sequence of console commands
+    bool    ExecuteFile(const plFileName& fileName);
 
-        // Get the last reported error
-        const char  *GetErrorMsg( void ) { return fErrorMsg; }
+    // Get the last reported error
+    const char*  GetErrorMsg(void) {
+        return fErrorMsg;
+    }
 
-        // Get the line for which the last reported error was for
-        const char  *GetLastErrorLine( void ) { return fLastErrorLine; }
+    // Get the line for which the last reported error was for
+    const char*  GetLastErrorLine(void) {
+        return fLastErrorLine;
+    }
 
-        // Does command completion on a partially-complete console line
-        bool        FindPartialCmd( char *line, bool findAgain = false, bool perserveParams = false );
+    // Does command completion on a partially-complete console line
+    bool        FindPartialCmd(char* line, bool findAgain = false, bool perserveParams = false);
 
-        // Does command completion without restrictions to any group, skipping the number of matches given
-        bool        FindNestedPartialCmd( char *line, uint32_t numToSkip, bool perserveParams = false );
+    // Does command completion without restrictions to any group, skipping the number of matches given
+    bool        FindNestedPartialCmd(char* line, uint32_t numToSkip, bool perserveParams = false);
 };
 
 

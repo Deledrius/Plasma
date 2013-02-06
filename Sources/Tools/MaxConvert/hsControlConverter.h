@@ -59,8 +59,7 @@ class IParamBlock2;
 class plSceneObject;
 class StdUVGen;
 
-enum ControllerType
-{
+enum ControllerType {
     ctrlTypeUnknown,
     ctrlTypeFloat,
     ctrlTypePoint3,
@@ -79,26 +78,25 @@ enum ControllerType
     ctrlTypeRollAngle,
 };
 
-class hsControlConverter
-{
+class hsControlConverter {
 private:
     hsControlConverter();
 
 public:
     ~hsControlConverter() { };
     static hsControlConverter& Instance();
-    
+
     void Init(plErrorMsg* msg);
     void DeInit();
 
     // Used to pick correct controller by lights/materials
-    bool GetControllerByName(Animatable* anim, TSTR &name, Control* &ctl);
-    Control *GetControllerByID(IParamBlock2 *pblock, int paramID);
+    bool GetControllerByName(Animatable* anim, TSTR& name, Control*& ctl);
+    Control* GetControllerByID(IParamBlock2* pblock, int paramID);
 
     /////////////////////////////////////////////////////////////////////////
-    // 
+    //
     // Controller convert functions:
-    // 
+    //
     // All convert functions must call ISetSegRange(start, end) at the beginning.
     // (ISetSegRange(-1, -1) will give you the entire anim.)
     plLeafController* MakeMatrix44Controller(StdUVGen* uvGen, const char* nodeName);
@@ -113,18 +111,18 @@ public:
     // This last one was in tempAnim.cpp on its own for some time, apparently created
     // as an initial attempt to get anims working in Max. It's still used, so I don't want
     // to nuke it, but it made sense to move it here.
-    plController* ConvertTMAnim(plSceneObject *obj, plMaxNode *node, hsAffineParts *parts, float start = -1, float end = -1);
+    plController* ConvertTMAnim(plSceneObject* obj, plMaxNode* node, hsAffineParts* parts, float start = -1, float end = -1);
     //
     //
     //////////////////////////////////////////////////////////////////////////
 
     void    Matrix3ToHsMatrix44(Matrix3* m3, hsMatrix44* hsM);
     Matrix3 StdUVGenToMatrix3(StdUVGen* uvGen);
-    bool    StdUVGenToHsMatrix44(hsMatrix44* hsMat, StdUVGen* uvGen, bool preserveOffset=false);
+    bool    StdUVGenToHsMatrix44(hsMatrix44* hsMat, StdUVGen* uvGen, bool preserveOffset = false);
     void    MaxSampleAngles(const char* nodeName, Control* ctl, Tab<TimeValue>& kTimes, float maxRads);
     void    ScalePositionController(plController* ctl, float scale);
 
-    void    ReduceKeys(Control *control, float threshold);
+    void    ReduceKeys(Control* control, float threshold);
     bool    HasKeyTimes(Control* ctl);
     uint8_t       GetKeyType(Control* ctl, bool rotQuat = false);
 
@@ -134,21 +132,35 @@ public:
     bool ForceLocal(plMaxNode* node);
     bool IsAnimated(plMaxNode* node);
     bool OwnsMaterialCopy(plMaxNode* node);
-    bool HasFrameEvents(plMaxNode *node);
+    bool HasFrameEvents(plMaxNode* node);
 
-    void CompositeKeyTimes(Control* ctl, Tab<TimeValue> &time);
+    void CompositeKeyTimes(Control* ctl, Tab<TimeValue>& time);
 
-    int GetTicksPerFrame()      { return fTicksPerFrame; }
-    int GetFrameRate()          { return fFrameRate; }
-    int GetTicksPerSec()        { return fTicksPerSec; }
-    int GetStartFrame()         { return fStartFrame; }
-    int GetEndFrame()           { return fEndFrame; }
-    int GetNumFrames()          { return fNumFrames; }
-    float GetAnimLength()       { return fAnimLength; }
+    int GetTicksPerFrame()      {
+        return fTicksPerFrame;
+    }
+    int GetFrameRate()          {
+        return fFrameRate;
+    }
+    int GetTicksPerSec()        {
+        return fTicksPerSec;
+    }
+    int GetStartFrame()         {
+        return fStartFrame;
+    }
+    int GetEndFrame()           {
+        return fEndFrame;
+    }
+    int GetNumFrames()          {
+        return fNumFrames;
+    }
+    float GetAnimLength()       {
+        return fAnimLength;
+    }
 
 private:
     void ISetSegRange(float start, float end);
-    void IConvertSubTransform(Control *control, char *ctlName, plMaxNode *node, plCompoundController *tmc, float start, float end);
+    void IConvertSubTransform(Control* control, char* ctlName, plMaxNode* node, plCompoundController* tmc, float start, float end);
 
     plLeafController* ICreateSimpleRotController(plMaxNode* node, Control* control, bool camRot = false);
     plLeafController* ICreateSimpleScaleController(plMaxNode* node, Control* control);
@@ -160,25 +172,27 @@ private:
     void    IEnableEaseCurves(Animatable* control, bool enable);
     void    IGetControlSampleTimes(Control* control, int iLo, int iHi, Tab<TimeValue>& kTimes, float maxRads);
     int     IAddPartsKeys(Control* control, hsTArray <hsG3DSMaxKeyFrame>* kfArray, plMaxNode* node);
-    int32_t   ICreateHSInterpKey(Control* control, IKey* mKey, TimeValue keyTime, hsKeyFrame* baseKey, plMaxNode* node=nil, bool rotQuat = false);
-    int32_t   IGetRangeCoverKeyIndices(char* nodeName, Control* cont, int32_t &start, int32_t &end);
+    int32_t   ICreateHSInterpKey(Control* control, IKey* mKey, TimeValue keyTime, hsKeyFrame* baseKey, plMaxNode* node = nil, bool rotQuat = false);
+    int32_t   IGetRangeCoverKeyIndices(char* nodeName, Control* cont, int32_t& start, int32_t& end);
     ControllerType IGetControlType(TSTR ctrlName);
     bool    IIsKeyTimeInRange(TimeValue time);
     bool    IIsKeyInRange(IKey* key);
     void    IGetUnEasedLocalTM(plMaxNode* node, Control* control, hsMatrix44* out, TimeValue time);
     Matrix3 IFlipY();
     bool    ISkinNode(plMaxNode* node);
-    void    ISetForceLocal(bool f) { fForceLocal=f; }
+    void    ISetForceLocal(bool f) {
+        fForceLocal = f;
+    }
 
-    bool    IGetEditableMeshKeyTimes( plMaxNode *node, Tab<TimeValue> &times );
-    bool    IGetGeomKeyTimes( plMaxNode *node, Tab<TimeValue> &times );
-    void    IGetGeomKeyTimesRecur( Animatable *anim, Tab<TimeValue> &times );
-    bool    IGetSubAnimByName( Animatable *anim, TSTR &name, Animatable *&subAnim );
+    bool    IGetEditableMeshKeyTimes(plMaxNode* node, Tab<TimeValue>& times);
+    bool    IGetGeomKeyTimes(plMaxNode* node, Tab<TimeValue>& times);
+    void    IGetGeomKeyTimesRecur(Animatable* anim, Tab<TimeValue>& times);
+    bool    IGetSubAnimByName(Animatable* anim, TSTR& name, Animatable*& subAnim);
     void    IExportAnimatedCameraFOV(plMaxNode* node, hsTArray <hsG3DSMaxKeyFrame>* kfArray);
     Interface* fInterface;
 
     hsConverterUtils& fConverterUtils;
-    plErrorMsg * fErrorMsg;
+    plErrorMsg* fErrorMsg;
 
     int32_t       fTicksPerFrame;
     int32_t       fFrameRate;

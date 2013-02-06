@@ -45,18 +45,18 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsTimer.h"
 
 plTimeMsg::plTimeMsg()
-: plMessage(nil, nil, nil), fSeconds(0), fDelSecs(0)
+    : plMessage(nil, nil, nil), fSeconds(0), fDelSecs(0)
 {
 }
 
-plTimeMsg::plTimeMsg(const plKey &s, 
-                const plKey &r, 
-                const double* t, const float* d)
-: plMessage(s, r, t)
+plTimeMsg::plTimeMsg(const plKey& s,
+                     const plKey& r,
+                     const double* t, const float* d)
+    : plMessage(s, r, t)
 {
     fSeconds = t ? *t : hsTimer::GetSysSeconds();
     fDelSecs = d ? *d : hsTimer::GetDelSysSeconds();
-    
+
     SetBCastFlag(plMessage::kBCastByExactType);
 }
 
@@ -68,10 +68,10 @@ plEvalMsg::plEvalMsg()
 {
 }
 
-plEvalMsg::plEvalMsg(const plKey &s, 
-                const plKey &r, 
-                const double* t, const float* d)
-: plTimeMsg(s, r, t, d)
+plEvalMsg::plEvalMsg(const plKey& s,
+                     const plKey& r,
+                     const double* t, const float* d)
+    : plTimeMsg(s, r, t, d)
 {
 }
 
@@ -83,10 +83,10 @@ plTransformMsg::plTransformMsg()
 {
 }
 
-plTransformMsg::plTransformMsg(const plKey &s, 
-                const plKey &r, 
-                const double* t, const float* d)
-: plTimeMsg(s, r, t, d)
+plTransformMsg::plTransformMsg(const plKey& s,
+                               const plKey& r,
+                               const double* t, const float* d)
+    : plTimeMsg(s, r, t, d)
 {
     SetBCastFlag(plMessage::kClearAfterBCast);
 }

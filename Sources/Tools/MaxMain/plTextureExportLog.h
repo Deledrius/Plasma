@@ -57,34 +57,32 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plBitmap;
 class hsStream;
 
-class plTextureExportLog
-{
-    protected:
+class plTextureExportLog {
+protected:
 
-        char    *fFileName;
+    char*    fFileName;
 
-        // Tiny linked list helper
-        class plBMapNode
-        {
-            public:
-                uint32_t      fRank;  // Sort with biggest first
-                plBitmap    *fBitmap;
-                plBMapNode  *fNextNode;
-        };
+    // Tiny linked list helper
+    class plBMapNode {
+    public:
+        uint32_t      fRank;  // Sort with biggest first
+        plBitmap*    fBitmap;
+        plBMapNode*  fNextNode;
+    };
 
-        plBMapNode  *fNodeList;
+    plBMapNode*  fNodeList;
 
 
-        void    IAddBMapNode( uint32_t rank, plBitmap *bMap );
-        void    IWriteTabbedString( hsStream *stream, const char *string, int8_t numTabs );
+    void    IAddBMapNode(uint32_t rank, plBitmap* bMap);
+    void    IWriteTabbedString(hsStream* stream, const char* string, int8_t numTabs);
 
-    public: 
+public:
 
-        plTextureExportLog( const char *fileName );
-        ~plTextureExportLog();
+    plTextureExportLog(const char* fileName);
+    ~plTextureExportLog();
 
-        void    AddTexture( plBitmap *texture );
-        void    Write( void );
+    void    AddTexture(plBitmap* texture);
+    void    Write(void);
 };
 
 

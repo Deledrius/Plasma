@@ -73,8 +73,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 void plCaptureRenderRequest::Render(plPipeline* pipe, plPageTreeMgr* pageMgr)
 {
     // If we don't have a render target, something has gone horribly wrong.
-    if( !GetRenderTarget() )
-    {
+    if (!GetRenderTarget()) {
         hsAssert(false, "CaptureRenderRequest with no render target");
         return;
     }
@@ -104,11 +103,11 @@ void plCaptureRenderRequest::Render(plPipeline* pipe, plPageTreeMgr* pageMgr)
 
     // render all GUI items
     std::vector<plPostEffectMod*> guiRenderMods = pfGameGUIMgr::GetInstance()->GetDlgRenderMods();
-    for (int i = (int)guiRenderMods.size() - 1; i >= 0; i--) // render in reverse, so dialogs on the bottom get rendered first
-    {
+
+    for (int i = (int)guiRenderMods.size() - 1; i >= 0; i--) { // render in reverse, so dialogs on the bottom get rendered first
         plPageTreeMgr* dlgPageMgr = guiRenderMods[i]->GetPageMgr();
-        if (dlgPageMgr)
-        {
+
+        if (dlgPageMgr) {
             SetViewTransform(guiRenderMods[i]->GetViewTransform());
             pipe->PushRenderRequest(this);
             pipe->ClearRenderTarget();
@@ -137,7 +136,7 @@ bool plCaptureRender::Capture(const plKey& ack, uint16_t width, uint16_t height)
     const uint8_t stencilDepth(-1);
     plRenderTarget* rt = new plRenderTarget(flags, width, height, bitDepth, zDepth, stencilDepth);
 
-    static int idx=0;
+    static int idx = 0;
     plString buff = plString::Format("tRT%d", idx++);
     hsgResMgr::ResMgr()->NewKey(buff, rt, ack->GetUoid().GetLocation());
 
@@ -150,10 +149,10 @@ bool plCaptureRender::Capture(const plKey& ack, uint16_t width, uint16_t height)
 
     req->SetRenderTarget(rt);
 
-    const uint32_t renderState 
+    const uint32_t renderState
         = plPipeline::kRenderNormal
-        | plPipeline::kRenderClearColor
-        | plPipeline::kRenderClearDepth;
+          | plPipeline::kRenderClearColor
+          | plPipeline::kRenderClearDepth;
     req->SetRenderState(renderState);
 
     // Set the Ack to be our requestor
@@ -171,11 +170,13 @@ bool plCaptureRender::Capture(const plKey& ack, uint16_t width, uint16_t height)
 bool plCaptureRender::IProcess(plPipeline* pipe, const plKey& ack, plRenderTarget* targ)
 {
     // We've just had a successful render into our render target
-    
+
     // Copy that into a plMipmap
     plMipmap* mipMap = pipe->ExtractMipMap(targ);
-    if( !mipMap )
+
+    if (!mipMap) {
         return false;
+    }
 
     static int currentCapIndex = 0;
 
@@ -195,10 +196,11 @@ bool plCaptureRender::IProcess(plPipeline* pipe, const plKey& ack, plRenderTarge
 void plCaptureRender::Update()
 {
     int i;
-    for( i = 0; i < fProcessed.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fProcessed.GetCount(); i++) {
         fProcessed[i]->Send();
     }
+
     fProcessed.SetCount(0);
 }
 
@@ -211,8 +213,7 @@ void plCaptureRender::Update(plPipeline* pipe)
 {
     int i;
 
-    for( i = 0; i < fCapReqs.GetCount(); i++ )
-    {
+    for (i = 0; i < fCapReqs.GetCount(); i++) {
         plMipmap* mipmap = new plMipmap(fCapReqs[i].fWidth, fCapReqs[i].fHeight, plMipmap::kARGB32Config, 1);
 
         pipe->CaptureScreen(mipmap, false, fCapReqs[i].fWidth, fCapReqs[i].fHeight);

@@ -51,8 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plSceneObject;
 class plMultiModMsg;
 
-class plMultiModifier : public plModifier
-{
+class plMultiModifier : public plModifier {
 protected:
     hsTArray<plSceneObject*>    fTargets;
     hsBitVector     fFlags;
@@ -61,20 +60,32 @@ public:
     plMultiModifier();
     virtual ~plMultiModifier();
 
-    CLASSNAME_REGISTER( plMultiModifier );
-    GETINTERFACE_ANY( plMultiModifier, plModifier );
-    
+    CLASSNAME_REGISTER(plMultiModifier);
+    GETINTERFACE_ANY(plMultiModifier, plModifier);
+
     virtual bool IEval(double secs, float del, uint32_t dirty) = 0;
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    virtual int GetNumTargets() const { return fTargets.Count(); }
-    virtual plSceneObject* GetTarget(int w) const { hsAssert(w < GetNumTargets(), "Bad target"); return fTargets[w]; }
-    virtual void AddTarget(plSceneObject* so) {fTargets.Append(so);}
-    virtual void RemoveTarget(plSceneObject* so); 
+    virtual int GetNumTargets() const {
+        return fTargets.Count();
+    }
+    virtual plSceneObject* GetTarget(int w) const {
+        hsAssert(w < GetNumTargets(), "Bad target");
+        return fTargets[w];
+    }
+    virtual void AddTarget(plSceneObject* so) {
+        fTargets.Append(so);
+    }
+    virtual void RemoveTarget(plSceneObject* so);
 
-    bool HasFlag(int f) const { return fFlags.IsBitSet(f); }
-    plMultiModifier& SetFlag(int f) { fFlags.SetBit(f); return *this; }
+    bool HasFlag(int f) const {
+        return fFlags.IsBitSet(f);
+    }
+    plMultiModifier& SetFlag(int f) {
+        fFlags.SetBit(f);
+        return *this;
+    }
 
 };
 

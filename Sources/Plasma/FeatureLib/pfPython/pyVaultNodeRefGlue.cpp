@@ -99,15 +99,15 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultNodeRef, setSeen)
 }
 
 PYTHON_START_METHODS_TABLE(ptVaultNodeRef)
-    PYTHON_METHOD_NOARGS(ptVaultNodeRef, getParent, "Returns a ptVaultNode that is the parent of the reference"),
-    PYTHON_METHOD_NOARGS(ptVaultNodeRef, getChild, "Returns a ptVaultNode that is the child of this reference"),
-    PYTHON_METHOD_NOARGS(ptVaultNodeRef, getParentID, "Returns id of the parent node"),
-    PYTHON_METHOD_NOARGS(ptVaultNodeRef, getChildID, "Returns id of the child node"),
-    PYTHON_METHOD_NOARGS(ptVaultNodeRef, getSaver, "Returns a ptVaultPlayerInfoNode of player that created this relationship"),
-    PYTHON_METHOD_NOARGS(ptVaultNodeRef, getSaverID, "Returns id of player that created this relationship"),
-    PYTHON_METHOD_NOARGS(ptVaultNodeRef, beenSeen, "Returns true until we reimplement this"),
-    PYTHON_METHOD_NOARGS(ptVaultNodeRef, setSeen, "Does nothing until we reimplement this"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptVaultNodeRef, getParent, "Returns a ptVaultNode that is the parent of the reference"),
+                     PYTHON_METHOD_NOARGS(ptVaultNodeRef, getChild, "Returns a ptVaultNode that is the child of this reference"),
+                     PYTHON_METHOD_NOARGS(ptVaultNodeRef, getParentID, "Returns id of the parent node"),
+                     PYTHON_METHOD_NOARGS(ptVaultNodeRef, getChildID, "Returns id of the child node"),
+                     PYTHON_METHOD_NOARGS(ptVaultNodeRef, getSaver, "Returns a ptVaultPlayerInfoNode of player that created this relationship"),
+                     PYTHON_METHOD_NOARGS(ptVaultNodeRef, getSaverID, "Returns id of player that created this relationship"),
+                     PYTHON_METHOD_NOARGS(ptVaultNodeRef, beenSeen, "Returns true until we reimplement this"),
+                     PYTHON_METHOD_NOARGS(ptVaultNodeRef, setSeen, "Does nothing until we reimplement this"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 #define ptVaultNodeRef_COMPARE          PYTHON_NO_COMPARE
@@ -122,19 +122,29 @@ PLASMA_CUSTOM_TYPE(ptVaultNodeRef, "Vault node relationship pseudo class");
 PYTHON_EXPOSE_TYPE_DEFINITION(ptVaultNodeRef, pyVaultNodeRef);
 
 // required functions for PyObject interoperability
-PyObject *pyVaultNodeRef::New(RelVaultNode * parent, RelVaultNode * child)
+PyObject* pyVaultNodeRef::New(RelVaultNode* parent, RelVaultNode* child)
 {
-    ptVaultNodeRef *newObj = (ptVaultNodeRef*)ptVaultNodeRef_type.tp_new(&ptVaultNodeRef_type, NULL, NULL);
-    if (newObj->fThis->fParent)
+    ptVaultNodeRef* newObj = (ptVaultNodeRef*)ptVaultNodeRef_type.tp_new(&ptVaultNodeRef_type, NULL, NULL);
+
+    if (newObj->fThis->fParent) {
         newObj->fThis->fParent->DecRef();
-    if (newObj->fThis->fChild)
+    }
+
+    if (newObj->fThis->fChild) {
         newObj->fThis->fChild->DecRef();
+    }
+
     newObj->fThis->fParent = parent;
     newObj->fThis->fChild = child;
-    if (newObj->fThis->fParent)
+
+    if (newObj->fThis->fParent) {
         newObj->fThis->fParent->IncRef();
-    if (newObj->fThis->fChild)
+    }
+
+    if (newObj->fThis->fChild) {
         newObj->fThis->fChild->IncRef();
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -145,7 +155,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptVaultNodeRef, pyVaultNodeRef)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyVaultNodeRef::AddPlasmaClasses(PyObject *m)
+void pyVaultNodeRef::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptVaultNodeRef);

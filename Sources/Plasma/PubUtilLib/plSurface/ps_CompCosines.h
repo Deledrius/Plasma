@@ -81,7 +81,7 @@ static const uint8_t ps_CompCosinesCodes[] = {
     0x0,    0x0,    0xe4,   0x80,
     0x4,    0x0,    0xe4,   0xa0,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl ps_CompCosinesDecl("sha/ps_CompCosines.inl", ps_CompCosines, ps_CompCosinesbyteLen, ps_CompCosinesCodes);
 

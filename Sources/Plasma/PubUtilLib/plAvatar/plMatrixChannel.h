@@ -65,8 +65,7 @@ class plControllerCacheInfo;
 // PLMATRIXCHANNEL
 //////////////////
 // an animation channel that outputs matrices
-class plMatrixChannel : public plAGChannel
-{
+class plMatrixChannel : public plAGChannel {
 protected:
     hsMatrix44 fResult;
     hsAffineParts fAP;
@@ -76,49 +75,50 @@ public:
     virtual ~plMatrixChannel();
 
     // AG PROTOCOL
-    virtual const hsMatrix44 & Value(double time, bool peek = false);
-    virtual void Value(hsMatrix44 &matrix, double time, bool peek = false);
-    virtual const hsAffineParts & AffineValue(double time, bool peek = false);
+    virtual const hsMatrix44& Value(double time, bool peek = false);
+    virtual void Value(hsMatrix44& matrix, double time, bool peek = false);
+    virtual const hsAffineParts& AffineValue(double time, bool peek = false);
 
     // combine it (allocates combine object)
-    virtual plAGChannel * MakeCombine(plAGChannel * channelB);
+    virtual plAGChannel* MakeCombine(plAGChannel* channelB);
 
     // blend it (allocates blend object)
-    virtual plAGChannel * MakeBlend(plAGChannel * channelB, plScalarChannel * channelBias, int blendPriority);
-    
-    // const eval at time zero
-    virtual plAGChannel * MakeZeroState();
-    // make a timeScale instance
-    virtual plAGChannel * MakeTimeScale(plScalarChannel *timeSource);
+    virtual plAGChannel* MakeBlend(plAGChannel* channelB, plScalarChannel* channelBias, int blendPriority);
 
-    virtual plAGPinType GetPinType() { return kAGPinTransform; };
+    // const eval at time zero
+    virtual plAGChannel* MakeZeroState();
+    // make a timeScale instance
+    virtual plAGChannel* MakeTimeScale(plScalarChannel* timeSource);
+
+    virtual plAGPinType GetPinType() {
+        return kAGPinTransform;
+    };
 
     virtual void Dump(int indent, bool optimized, double time);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plMatrixChannel );
-    GETINTERFACE_ANY( plMatrixChannel, plAGChannel );
+    CLASSNAME_REGISTER(plMatrixChannel);
+    GETINTERFACE_ANY(plMatrixChannel, plAGChannel);
 };
 
 ///////////////////
 // PLMATRIXCONSTANT
 ///////////////////
 // A matrix source that just keeps handing out the same value
-class plMatrixConstant : public plMatrixChannel
-{
+class plMatrixConstant : public plMatrixChannel {
 public:
     plMatrixConstant();
-    plMatrixConstant(const hsMatrix44 &value);
+    plMatrixConstant(const hsMatrix44& value);
     virtual ~plMatrixConstant();
 
-    void Set(const hsMatrix44 &value);
-    
-    // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plMatrixConstant );
-    GETINTERFACE_ANY( plMatrixConstant, plMatrixChannel );
+    void Set(const hsMatrix44& value);
 
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
-    virtual void Read(hsStream *s, hsResMgr *mgr);
+    // PLASMA PROTOCOL
+    CLASSNAME_REGISTER(plMatrixConstant);
+    GETINTERFACE_ANY(plMatrixConstant, plMatrixChannel);
+
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
 };
 
 ////////////////////
@@ -126,64 +126,74 @@ public:
 ////////////////////
 // Adapts the time scale before passing it to the next channel in line.
 // Use to instance animations while allowing each instance to run at different speeds.
-class plMatrixTimeScale : public plMatrixChannel
-{
+class plMatrixTimeScale : public plMatrixChannel {
 protected:
-    plScalarChannel *fTimeSource;
-    plMatrixChannel *fChannelIn;
+    plScalarChannel* fTimeSource;
+    plMatrixChannel* fChannelIn;
 
 public:
     plMatrixTimeScale();
-    plMatrixTimeScale(plMatrixChannel *channel, plScalarChannel *timeSource);
+    plMatrixTimeScale(plMatrixChannel* channel, plScalarChannel* timeSource);
     virtual ~plMatrixTimeScale();
 
     virtual bool IsStoppedAt(double time);
-    virtual const hsMatrix44 & Value(double time, bool peek = false);
-    virtual const hsAffineParts & AffineValue(double time, bool peek = false);
+    virtual const hsMatrix44& Value(double time, bool peek = false);
+    virtual const hsAffineParts& AffineValue(double time, bool peek = false);
 
-    virtual plAGChannel * Detach(plAGChannel * channel);
+    virtual plAGChannel* Detach(plAGChannel* channel);
 
     virtual void Dump(int indent, bool optimized, double time);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plMatrixTimeScale );
-    GETINTERFACE_ANY( plMatrixTimeScale, plMatrixChannel );
+    CLASSNAME_REGISTER(plMatrixTimeScale);
+    GETINTERFACE_ANY(plMatrixTimeScale, plMatrixChannel);
 };
 
 ////////////////
 // PLMATRIXBLEND
 ////////////////
 // blends two matrices into one with weighting
-class plMatrixBlend : public plMatrixChannel
-{
+class plMatrixBlend : public plMatrixChannel {
 protected:
-    plMatrixChannel * fChannelA;
-    plMatrixChannel * fOptimizedA;
-    plMatrixChannel * fChannelB;
-    plMatrixChannel * fOptimizedB;
-    plScalarChannel * fChannelBias;
+    plMatrixChannel* fChannelA;
+    plMatrixChannel* fOptimizedA;
+    plMatrixChannel* fChannelB;
+    plMatrixChannel* fOptimizedB;
+    plScalarChannel* fChannelBias;
     int fPriority;
 
 public:
     // xTORs
     plMatrixBlend();
-    plMatrixBlend(plMatrixChannel * channelA, plMatrixChannel * channelB, plScalarChannel * channelBias, int priority);
+    plMatrixBlend(plMatrixChannel* channelA, plMatrixChannel* channelB, plScalarChannel* channelBias, int priority);
     virtual ~plMatrixBlend();
 
-    virtual plAGChannel * MakeBlend(plAGChannel *newChannel, plScalarChannel *channelBias, int blendPriority);
+    virtual plAGChannel* MakeBlend(plAGChannel* newChannel, plScalarChannel* channelBias, int blendPriority);
 
     // you cannot blend on top of a channel that has higher priority than you do.
     virtual uint16_t GetPriority();
 
     // SPECIFICS
-    const plMatrixChannel * GetChannelA() const { return fChannelA; }
-    void SetChannelA(plMatrixChannel * channel) { fChannelA = channel; }
+    const plMatrixChannel* GetChannelA() const {
+        return fChannelA;
+    }
+    void SetChannelA(plMatrixChannel* channel) {
+        fChannelA = channel;
+    }
 
-    const plMatrixChannel * GetChannelB() const { return fChannelB; }
-    void SetChannelB(plMatrixChannel * channel) { fChannelB = channel; }
+    const plMatrixChannel* GetChannelB() const {
+        return fChannelB;
+    }
+    void SetChannelB(plMatrixChannel* channel) {
+        fChannelB = channel;
+    }
 
-    const plScalarChannel * GetChannelBias() const { return fChannelBias; }
-    void SetChannelBias(plScalarChannel * channel) { fChannelBias = channel; }
+    const plScalarChannel* GetChannelBias() const {
+        return fChannelBias;
+    }
+    void SetChannelBias(plScalarChannel* channel) {
+        fChannelBias = channel;
+    }
 
     //virtual void SetBlend(float blend) { fBlend = blend; };
     //virtual float GetBlend() { return fBlend; };
@@ -191,78 +201,76 @@ public:
     virtual bool IsStoppedAt(double time);
 
     // AG PROTOCOL
-    virtual const hsMatrix44 & Value(double time, bool peek = false);
-    virtual const hsAffineParts & AffineValue(double time, bool peek = false);
+    virtual const hsMatrix44& Value(double time, bool peek = false);
+    virtual const hsAffineParts& AffineValue(double time, bool peek = false);
 
     // remove the specified channel from our graph
-    virtual plAGChannel * Detach(plAGChannel * channel);
+    virtual plAGChannel* Detach(plAGChannel* channel);
     virtual void Dump(int indent, bool optimized, double time);
 
     plAGChannel* Optimize(double time);
-    
+
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plMatrixBlend );
-    GETINTERFACE_ANY( plMatrixBlend, plMatrixChannel );
+    CLASSNAME_REGISTER(plMatrixBlend);
+    GETINTERFACE_ANY(plMatrixBlend, plMatrixChannel);
 };
 
 /////////////////////
 // PLMATRIXCONTROLLER
 /////////////////////
 // converts a plController-style animation into a plMatrixChannel
-class plMatrixControllerChannel : public plMatrixChannel
-{
+class plMatrixControllerChannel : public plMatrixChannel {
 protected:
-    plController    *fController;
+    plController*    fController;
 
 public:
     // xTORs
     plMatrixControllerChannel();
-    plMatrixControllerChannel(plController *controller, hsAffineParts *parts);
+    plMatrixControllerChannel(plController* controller, hsAffineParts* parts);
     virtual ~plMatrixControllerChannel();
 
     // AG PROTOCOL
-    virtual const hsAffineParts & AffineValue(double time, bool peek = false);
-    virtual const hsAffineParts & AffineValue(double time, bool peek, plControllerCacheInfo *cache);    
-    virtual const hsMatrix44 & Value(double time, bool peek = false);
-    virtual const hsMatrix44 & Value(double time, bool peek, plControllerCacheInfo *cache);
-    
-    virtual plAGChannel * MakeCacheChannel(plAnimTimeConvert *atc);
+    virtual const hsAffineParts& AffineValue(double time, bool peek = false);
+    virtual const hsAffineParts& AffineValue(double time, bool peek, plControllerCacheInfo* cache);
+    virtual const hsMatrix44& Value(double time, bool peek = false);
+    virtual const hsMatrix44& Value(double time, bool peek, plControllerCacheInfo* cache);
+
+    virtual plAGChannel* MakeCacheChannel(plAnimTimeConvert* atc);
 
     virtual void Dump(int indent, bool optimized, double time);
 
     // PLASMA PROTOCOL
     // rtti
-    CLASSNAME_REGISTER( plMatrixControllerChannel );
-    GETINTERFACE_ANY( plMatrixControllerChannel, plMatrixChannel );
+    CLASSNAME_REGISTER(plMatrixControllerChannel);
+    GETINTERFACE_ANY(plMatrixControllerChannel, plMatrixChannel);
 
     // persistence
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
-    virtual void Read(hsStream *s, hsResMgr *mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
 };
 
 /////////////////////////////////
 // PLMATRIXCONTROLLERCACHECHANNEL
 /////////////////////////////////
 // Same as plMatrixController, but with caching info
-class plMatrixControllerCacheChannel : public plMatrixChannel
-{
+class plMatrixControllerCacheChannel : public plMatrixChannel {
 protected:
-    plControllerCacheInfo *fCache;
-    plMatrixControllerChannel *fControllerChannel;
-    
+    plControllerCacheInfo* fCache;
+    plMatrixControllerChannel* fControllerChannel;
+
 public:
     plMatrixControllerCacheChannel();
-    plMatrixControllerCacheChannel(plMatrixControllerChannel *channel, plControllerCacheInfo *cache);
+    plMatrixControllerCacheChannel(plMatrixControllerChannel* channel, plControllerCacheInfo* cache);
     virtual ~plMatrixControllerCacheChannel();
-    
-    virtual const hsMatrix44 & Value(double time, bool peek = false);
-    virtual const hsAffineParts & AffineValue(double time, bool peek = false);
-    
-    virtual plAGChannel * Detach(plAGChannel * channel);
-    
+
+    virtual const hsMatrix44& Value(double time, bool peek = false);
+    virtual const hsAffineParts& AffineValue(double time, bool peek = false);
+
+    virtual plAGChannel* Detach(plAGChannel* channel);
+
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plMatrixControllerCacheChannel );
-    GETINTERFACE_ANY( plMatrixControllerCacheChannel, plMatrixChannel );
+    CLASSNAME_REGISTER(plMatrixControllerCacheChannel);
+    GETINTERFACE_ANY(plMatrixControllerCacheChannel, plMatrixChannel);
 
     // Created at runtime only, so no Read/Write
 };
@@ -271,35 +279,42 @@ public:
 // PLQUATPOINTCOMBINE
 /////////////////////
 // combines a quaternion and a point into a matrix
-class plQuatPointCombine : public plMatrixChannel
-{
+class plQuatPointCombine : public plMatrixChannel {
 protected:
-    plQuatChannel *fQuatChannel;
-    plPointChannel *fPointChannel;
+    plQuatChannel* fQuatChannel;
+    plPointChannel* fPointChannel;
 
 public:
     // xTORs
     plQuatPointCombine();
-    plQuatPointCombine(plQuatChannel *quatChannel, plPointChannel *pointChannel);
+    plQuatPointCombine(plQuatChannel* quatChannel, plPointChannel* pointChannel);
     virtual ~plQuatPointCombine();
 
     // SPECIFICS
-    const plQuatChannel * GetQuatChannel() const { return fQuatChannel; }
-    void SetQuatChannel(plQuatChannel * channel) { fQuatChannel = channel; }
+    const plQuatChannel* GetQuatChannel() const {
+        return fQuatChannel;
+    }
+    void SetQuatChannel(plQuatChannel* channel) {
+        fQuatChannel = channel;
+    }
 
-    plPointChannel * GetPointChannel() const { return fPointChannel; }
-    void SetPointChannel(plPointChannel * channel) { fPointChannel = channel; }
+    plPointChannel* GetPointChannel() const {
+        return fPointChannel;
+    }
+    void SetPointChannel(plPointChannel* channel) {
+        fPointChannel = channel;
+    }
 
     // AG PROTOCOL
-    virtual const hsMatrix44 & Value(double time);
-    virtual const hsAffineParts & AffineValue(double time);
+    virtual const hsMatrix44& Value(double time);
+    virtual const hsAffineParts& AffineValue(double time);
 
     // remove the specified channel from our graph
-    virtual plAGChannel * Detach(plAGChannel * channel);
+    virtual plAGChannel* Detach(plAGChannel* channel);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plQuatPointCombine );
-    GETINTERFACE_ANY( plQuatPointCombine, plMatrixChannel );
+    CLASSNAME_REGISTER(plQuatPointCombine);
+    GETINTERFACE_ANY(plQuatPointCombine, plMatrixChannel);
 };
 
 
@@ -307,17 +322,20 @@ public:
 //
 // Applicator classes
 
-class plMatrixChannelApplicator : public plAGApplicator
-{
+class plMatrixChannelApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plMatrixChannelApplicator );
-    GETINTERFACE_ANY( plMatrixChannelApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plMatrixChannelApplicator);
+    GETINTERFACE_ANY(plMatrixChannelApplicator, plAGApplicator);
 
-    virtual bool CanCombine(plAGApplicator *app) { return false; }
-    virtual plAGPinType GetPinType() { return kAGPinTransform; }
+    virtual bool CanCombine(plAGApplicator* app) {
+        return false;
+    }
+    virtual plAGPinType GetPinType() {
+        return kAGPinTransform;
+    }
 };
 
 // PLMATRIXDELAYEDCORRECTIONAPPLICATOR
@@ -325,30 +343,35 @@ public:
 // This app tacks on a correction to the l2p transform
 // (so l2p is set as animL2P*correction)
 // interpolating this to the identity matrix over time.
-class plMatrixDelayedCorrectionApplicator : public plMatrixChannelApplicator
-{
+class plMatrixDelayedCorrectionApplicator : public plMatrixChannelApplicator {
 protected:
     hsAffineParts fCorAP;   // AP of the correction.
     double fDelayStart;     // Start time of the delayed correction
-    
+
     // apply our animation * our correction to the node
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    plMatrixDelayedCorrectionApplicator() : fDelayStart(-1000.f), fIgnoreNextCorrection(true) { fCorAP.Reset(); }
-    
-    CLASSNAME_REGISTER( plMatrixDelayedCorrectionApplicator );
-    GETINTERFACE_ANY( plMatrixDelayedCorrectionApplicator, plMatrixChannelApplicator );
+    plMatrixDelayedCorrectionApplicator() : fDelayStart(-1000.f), fIgnoreNextCorrection(true) {
+        fCorAP.Reset();
+    }
 
-    void SetCorrection(hsMatrix44 &correction);
-    virtual bool AutoDelete() { return false; } // should we remove it when its input channel is gone?
+    CLASSNAME_REGISTER(plMatrixDelayedCorrectionApplicator);
+    GETINTERFACE_ANY(plMatrixDelayedCorrectionApplicator, plMatrixChannelApplicator);
+
+    void SetCorrection(hsMatrix44& correction);
+    virtual bool AutoDelete() {
+        return false;    // should we remove it when its input channel is gone?
+    }
 
     // applicator arbitration...
-    virtual plAGPinType GetPinType() { return kAGPinTransform; }
-    virtual bool CanBlend(plAGApplicator *app);
+    virtual plAGPinType GetPinType() {
+        return kAGPinTransform;
+    }
+    virtual bool CanBlend(plAGApplicator* app);
 
     bool fIgnoreNextCorrection;
-    static const float fDelayLength; // static var for now.  
+    static const float fDelayLength; // static var for now.
 };
 
 // PLMATRIXDIFFERENCEAPP
@@ -357,24 +380,27 @@ public:
 // transform of the target.
 // You could also call it the Temporal Matrix Difference Applicator,
 // but that sucks to type.
-class plMatrixDifferenceApp : public plMatrixChannelApplicator
-{
+class plMatrixDifferenceApp : public plMatrixChannelApplicator {
 public:
     /** Forget the previous cached transform and start again */
     void Reset(double time);
 
     /** Should this applicator be automatically removed when its channel goes away? */
-    virtual bool AutoDelete() { return false; }
+    virtual bool AutoDelete() {
+        return false;
+    }
 
     // applicator arbitration
-    virtual plAGPinType GetPinType() { return kAGPinTransform; }
-    virtual bool CanBlend(plAGApplicator *app);
+    virtual plAGPinType GetPinType() {
+        return kAGPinTransform;
+    }
+    virtual bool CanBlend(plAGApplicator* app);
 
     CLASSNAME_REGISTER(plMatrixDifferenceApp);
     GETINTERFACE_ANY(plMatrixDifferenceApp, plMatrixChannelApplicator);
 
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
     hsMatrix44 fLastL2A;        // local to animation space
     hsMatrix44 fLastA2L;        // animation space to local
     bool fNew;                  // true if we haven't cached anything yet

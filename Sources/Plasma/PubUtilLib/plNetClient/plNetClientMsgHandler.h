@@ -55,23 +55,21 @@ class plNetTransportMember;
 
 ///////////////////////////////////////////////////////////////////
 
-class plNetClientMsgHandler : public plNetMsgHandler
-{
+class plNetClientMsgHandler : public plNetMsgHandler {
 //protected:
-    enum // SendOrTimeOut return values and meanings
-    {
+    enum { // SendOrTimeOut return values and meanings
         kTimedOutNoRetry    = -1,
         kDoNothing  =  0,
         kSend       =  1,
     };
-    plNetClientMgr * IGetNetClientMgr();
+    plNetClientMgr* IGetNetClientMgr();
     void IFillInTransportMember(const plNetMsgMemberInfoHelper* mbi, plNetTransportMember* mbr);
 public:
-    plNetClientMsgHandler(plNetClientMgr * mgr);
+    plNetClientMsgHandler(plNetClientMgr* mgr);
     ~plNetClientMsgHandler();
 
-    int     ReceiveMsg(plNetMessage *& netMsg); 
-    int     PeekMsg(plNetMessage * netMsg); // return msgsize on success. -1 on error.
+    int     ReceiveMsg(plNetMessage*& netMsg);
+    int     PeekMsg(plNetMessage* netMsg);  // return msgsize on success. -1 on error.
 
     MSG_HANDLER_DECL(plNetMsgTerminated)
     MSG_HANDLER_DECL(plNetMsgGroupOwner)

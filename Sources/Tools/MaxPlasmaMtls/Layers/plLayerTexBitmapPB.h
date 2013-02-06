@@ -43,8 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define PL_LAYERTEXBITMAPPB_H
 
 // Param ID's
-enum
-{
+enum {
     kBmpUseBitmap,
     kBmpBitmap,
 
@@ -93,8 +92,7 @@ enum
     kBmpNoDiscard
 };
 
-enum
-{
+enum {
     kScalingAny,
     kScalingHalf,
     kScalingNone

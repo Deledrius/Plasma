@@ -70,10 +70,10 @@ plKey plPluginResManager::NameToLoc(const plString& age, const plString& page, i
     plUoid nodeUoid(pageNode->GetPageInfo().GetLocation(), plSceneNode::Index(), keyName);
 
     plKey snKey = FindKey(nodeUoid);
-    if (snKey == nil)
-    {
+
+    if (snKey == nil) {
         // Not found, create a new one
-        plSceneNode *newSceneNode = new plSceneNode;
+        plSceneNode* newSceneNode = new plSceneNode;
         snKey = NewKey(keyName, newSceneNode, pageNode->GetPageInfo().GetLocation());
 
         // Call init after it gets a key
@@ -82,17 +82,14 @@ plKey plPluginResManager::NameToLoc(const plString& age, const plString& page, i
         // Add to our list of exported nodes
         fExportedNodes.Append(newSceneNode);
         newSceneNode->GetKey()->RefObject();
-    }
-    else
-    {
+    } else {
         hsAssert(snKey->ObjectIsLoaded() != nil, "Somehow we still have the key for a sceneNode that hasn't been loaded.");
 
         // Force load, or attempt to at least
         plSceneNode* node = plSceneNode::ConvertNoRef(snKey->VerifyLoaded());
 
         // Add to our list if necessary
-        if (fExportedNodes.Find(node) == fExportedNodes.kMissingIndex)
-        {
+        if (fExportedNodes.Find(node) == fExportedNodes.kMissingIndex) {
             fExportedNodes.Append(node);
             node->GetKey()->RefObject();
         }
@@ -111,25 +108,21 @@ plRegistryPageNode* plPluginResManager::INameToPage(const plString& age, const p
 {
     // Find the location first, to see if it already exists
     plRegistryPageNode* pageNode = FindPage(age, page);
-    if (pageNode == nil)
-    {
+
+    if (pageNode == nil) {
         // This page does not yet exist, so create a new page
-        if (sequenceNumber != uint32_t(-1))
-        {
+        if (sequenceNumber != uint32_t(-1)) {
             const plLocation& newLoc = ICreateLocation(age, page, sequenceNumber, itinerant);
             pageNode = CreatePage(newLoc, age.c_str(), page.c_str());
-        }
-        else
-        {
+        } else {
             const plLocation& newLoc = ICreateLocation(age, page, itinerant);
             pageNode = CreatePage(newLoc, age.c_str(), page.c_str());
         }
+
         // Still preload textures on this guy. This should be a no-op for this page since it's new, but won't be
         // for the shared textures page
         IPreLoadTextures(pageNode, sequenceNumber);
-    }
-    else if (!pageNode->IsNewPage())
-    {
+    } else if (!pageNode->IsNewPage()) {
         // Node's already in our registry (i.e. already stored somewhere), so make sure it loads so
         // we can update from that
         LoadPageKeys(pageNode);
@@ -145,22 +138,19 @@ plRegistryPageNode* plPluginResManager::INameToPage(const plString& age, const p
 //  Iterator that takes the keys in a common page and distributes them to
 //  whichever commonObjectLibs are interested in them.
 
-class plCommonKeyDistributor : public plRegistryKeyIterator
-{
+class plCommonKeyDistributor : public plRegistryKeyIterator {
     plPluginResManager* fMgr;
 
 public:
     plCommonKeyDistributor(plPluginResManager* mgr) : fMgr(mgr) {}
 
-    virtual bool EatKey(const plKey& key)
-    {
+    virtual bool EatKey(const plKey& key) {
         uint32_t count = plCommonObjLib::GetNumLibs();
 
-        for (uint32_t i = 0; i < count; i++)
-        {
+        for (uint32_t i = 0; i < count; i++) {
             plCommonObjLib* lib = plCommonObjLib::GetLib(i);
-            if (lib->IsInteresting(key))
-            {
+
+            if (lib->IsInteresting(key)) {
                 // Lib wants this guy, so load the object and add it
                 // Note: we want to switch to passive mode here, so any keys read in
                 // will NOT force a load on whichever page those keys belong to. Otherwise,
@@ -191,17 +181,15 @@ void plPluginResManager::IPreLoadTextures(plRegistryPageNode* pageNode, int32_t 
     // re-export them. However, we don't have a good way of telling whether a page is a common page,
     // which is where this hack comes in
     bool common = false;
-    for (int i = 0; i < plAgeDescription::kNumCommonPages; i++)
-    {
-        if (pageNode->GetPageInfo().GetPage().CompareI(plAgeDescription::GetCommonPage(i)) == 0)
-        {
+
+    for (int i = 0; i < plAgeDescription::kNumCommonPages; i++) {
+        if (pageNode->GetPageInfo().GetPage().CompareI(plAgeDescription::GetCommonPage(i)) == 0) {
             common = true;
             break;
         }
     }
 
-    if (common)
-    {
+    if (common) {
         // Iterate through all the keys in our page, scattering them to various objectLibs if they're
         // interested. If nobody likes them, they get unreffed and disappear.
         plCommonKeyDistributor distributor(this);
@@ -211,10 +199,11 @@ void plPluginResManager::IPreLoadTextures(plRegistryPageNode* pageNode, int32_t 
     // Clear out all the unwanted keys in the page we just loaded (by implication; they won't clear if we already
     // stored the keys via our objectLibs above)
     {
-        class plEmptyIterator : public plRegistryKeyIterator
-        {
+        class plEmptyIterator : public plRegistryKeyIterator {
         public:
-            virtual bool EatKey(const plKey& key) { return true; }
+            virtual bool EatKey(const plKey& key) {
+                return true;
+            }
         } empty;
 
         pageNode->IterateKeys(&empty);
@@ -225,29 +214,31 @@ void plPluginResManager::IPreLoadTextures(plRegistryPageNode* pageNode, int32_t 
     pageNode->SetNewPage();
 
     // Get our texture page now, if we're not a texture page
-    if (!common)
-    {
+    if (!common) {
         // Make sure it's not a global page we're handling either
-        if (!pageNode->GetPageInfo().GetLocation().IsReserved())
-        {
+        if (!pageNode->GetPageInfo().GetLocation().IsReserved()) {
             int32_t texSeqNum = -1;
-            if (origSeqNumber != -1)
+
+            if (origSeqNumber != -1) {
                 texSeqNum = plPageInfoUtils::GetCommonSeqNumFromNormal(origSeqNumber, plAgeDescription::kTextures);
+            }
 
             // Note: INameToPage will turn around and call us again, so no need to do the call twice
-            plRegistryPageNode* texturePage = INameToPage(pageNode->GetPageInfo().GetAge(), 
-                                                            plAgeDescription::GetCommonPage(plAgeDescription::kTextures), texSeqNum);
+            plRegistryPageNode* texturePage = INameToPage(pageNode->GetPageInfo().GetAge(),
+                                              plAgeDescription::GetCommonPage(plAgeDescription::kTextures), texSeqNum);
             hsAssert(texturePage != nil, "Unable to get or create the shared textures page? Shouldn't be possible.");
 
             // Do the other one
             int32_t commonSeqNum = -1;
-            if (origSeqNumber != -1)
+
+            if (origSeqNumber != -1) {
                 commonSeqNum = plPageInfoUtils::GetCommonSeqNumFromNormal(origSeqNumber, plAgeDescription::kGlobal);
+            }
 
             // Note: INameToPage will turn around and call us again, so no need to do the call twice
-            plRegistryPageNode* commonPage = INameToPage(pageNode->GetPageInfo().GetAge(), 
-                                                            plAgeDescription::GetCommonPage(plAgeDescription::kGlobal),
-                                                            commonSeqNum);
+            plRegistryPageNode* commonPage = INameToPage(pageNode->GetPageInfo().GetAge(),
+                                             plAgeDescription::GetCommonPage(plAgeDescription::kGlobal),
+                                             commonSeqNum);
             hsAssert(commonPage != nil, "Unable to get or create the shared built-in page? Shouldn't be possible.");
         }
     }
@@ -257,23 +248,24 @@ void plPluginResManager::IPreLoadTextures(plRegistryPageNode* pageNode, int32_t 
 //  Given a plLocation, finds the texture page that's in the same age and
 //  returns its location.
 
-const plLocation& plPluginResManager::GetCommonPage(const plLocation &sisterPage, int whichPage)
+const plLocation& plPluginResManager::GetCommonPage(const plLocation& sisterPage, int whichPage)
 {
-    if (sisterPage.IsReserved())
-        return sisterPage;          // Reserved pages have no common pages
+    if (sisterPage.IsReserved()) {
+        return sisterPage;    // Reserved pages have no common pages
+    }
 
     plRegistryPageNode* page = FindPage(sisterPage);
-    if (page == nil)
-    {
+
+    if (page == nil) {
         hsAssert(false, "Trying to find the sister common page to a page that doesn't exist!");
         return sisterPage;
     }
 
     // Find the common page in the same age as this one
-    plRegistryPageNode* commonPage = FindPage(page->GetPageInfo().GetAge(), 
-                                                plAgeDescription::GetCommonPage(whichPage));
-    if (commonPage == nil)
-    {
+    plRegistryPageNode* commonPage = FindPage(page->GetPageInfo().GetAge(),
+                                     plAgeDescription::GetCommonPage(whichPage));
+
+    if (commonPage == nil) {
         hsAssert(false, "Unable to find sister common page to this page");
         return sisterPage;
     }
@@ -285,21 +277,22 @@ const plLocation& plPluginResManager::GetCommonPage(const plLocation &sisterPage
 
 void plPluginResManager::IShutdown()
 {
-    if (!fInited)
+    if (!fInited) {
         return;
+    }
 
     // Loop through all the commonObjLibs and clear their object lists, just
     // as a safety measure (the creators of the various libs should really
     // be doing it)
-    for (uint32_t i = 0; i < plCommonObjLib::GetNumLibs(); i++)
+    for (uint32_t i = 0; i < plCommonObjLib::GetNumLibs(); i++) {
         plCommonObjLib::GetLib(i)->ClearObjectList();
+    }
 
     plResManager::IShutdown();
 }
 
 // Little finder class to, erm, find unused location sequence numbers
-class plSeqNumberFinder : public plRegistryPageIterator
-{
+class plSeqNumberFinder : public plRegistryPageIterator {
 protected:
     int32_t&  fSeqNum;
     bool    fWillBeReserved;
@@ -307,11 +300,12 @@ protected:
 public:
     plSeqNumberFinder(int32_t& seqNum, bool willBeReserved) : fSeqNum(seqNum), fWillBeReserved(willBeReserved) {}
 
-    virtual bool EatPage(plRegistryPageNode* page)
-    {
+    virtual bool EatPage(plRegistryPageNode* page) {
         if (fSeqNum <= page->GetPageInfo().GetLocation().GetSequenceNumber() &&
-            fWillBeReserved == page->GetPageInfo().GetLocation().IsReserved())
+                fWillBeReserved == page->GetPageInfo().GetLocation().IsReserved()) {
             fSeqNum = page->GetPageInfo().GetLocation().GetSequenceNumber() + 1;
+        }
+
         return true;
     }
 };
@@ -329,28 +323,27 @@ plLocation plPluginResManager::ICreateLocation(const plString& age, const plStri
 
     int32_t oldNum = seqNum;
     seqNum = VerifySeqNumber(seqNum, age, page);
-    if (seqNum != oldNum)
-    {
-        hsAssert(false, "Conflicting page sequence number. Somebody called NameToLoc without verifying their seq# first!"); 
+
+    if (seqNum != oldNum) {
+        hsAssert(false, "Conflicting page sequence number. Somebody called NameToLoc without verifying their seq# first!");
     }
 
-    if (seqNum < 0)
-    {
+    if (seqNum < 0) {
         willBeReserved = true;
         seqNum = -seqNum;
     }
 
     plLocation newLoc;
-    if (willBeReserved)
+
+    if (willBeReserved) {
         newLoc = plLocation::MakeReserved(seqNum);
-    else
+    } else {
         newLoc = plLocation::MakeNormal(seqNum);
+    }
 
     // Flag common pages
-    for (int i = 0; i < plAgeDescription::kNumCommonPages; i++)
-    {
-        if (page.Compare(plAgeDescription::GetCommonPage(i)) == 0)
-        {
+    for (int i = 0; i < plAgeDescription::kNumCommonPages; i++) {
+        if (page.Compare(plAgeDescription::GetCommonPage(i)) == 0) {
             newLoc.SetFlags(plLocation::kBuiltIn);
             break;
         }
@@ -360,29 +353,33 @@ plLocation plPluginResManager::ICreateLocation(const plString& age, const plStri
     // for, grab some extra flags from it
     plAgeDescription* ageDesc = plPageInfoUtils::GetAgeDesc(age.c_str());
     plAgePage* agePage = ageDesc ? ageDesc->FindPage(page.c_str()) : nil;
-    if (agePage)
-    {
-        if (agePage->GetFlags() & plAgePage::kIsLocalOnly)
-            newLoc.SetFlags(plLocation::kLocalOnly);
 
-        if (agePage->GetFlags() & plAgePage::kIsVolatile)
+    if (agePage) {
+        if (agePage->GetFlags() & plAgePage::kIsLocalOnly) {
+            newLoc.SetFlags(plLocation::kLocalOnly);
+        }
+
+        if (agePage->GetFlags() & plAgePage::kIsVolatile) {
             newLoc.SetFlags(plLocation::kVolatile);
+        }
     }
-    if (itinerant)
+
+    if (itinerant) {
         newLoc.SetFlags(plLocation::kItinerant);
+    }
 
     delete ageDesc;
     return newLoc;
 }
 
-class plWritePageIterator : public plRegistryPageIterator
-{
+class plWritePageIterator : public plRegistryPageIterator {
 public:
     plWritePageIterator() {}
-    virtual bool EatPage(plRegistryPageNode *page) 
-    {
-        if (page->GetPageInfo().GetLocation() != plLocation::kGlobalFixedLoc)
+    virtual bool EatPage(plRegistryPageNode* page) {
+        if (page->GetPageInfo().GetLocation() != plLocation::kGlobalFixedLoc) {
             page->Write();
+        }
+
         return true;
     }
 };
@@ -398,18 +395,20 @@ void plPluginResManager::WriteAllPages()
 //  by paging out all the sceneNodes we just created.
 void plPluginResManager::EndExport()
 {
-    for (int i = 0; i < fExportedNodes.GetCount(); i++)
-    {
-        if (fExportedNodes[i] != nil)
+    for (int i = 0; i < fExportedNodes.GetCount(); i++) {
+        if (fExportedNodes[i] != nil) {
             fExportedNodes[i]->GetKey()->UnRefObject();
+        }
     }
+
     fExportedNodes.Reset();
 
-    for(int i = 0; i < fLooseEnds.GetCount(); i++ )
-    {
-        if( fLooseEnds[i] )
+    for (int i = 0; i < fLooseEnds.GetCount(); i++) {
+        if (fLooseEnds[i]) {
             fLooseEnds[i]->UnRefObject();
+        }
     }
+
     fLooseEnds.Reset();
     // Flush the message queue, so all the messages for paging out stuff actually get delivered
     plgDispatch::Dispatch()->MsgQueueProcess();
@@ -417,8 +416,7 @@ void plPluginResManager::EndExport()
 
 void plPluginResManager::AddLooseEnd(plKey key)
 {
-    if( key )
-    {
+    if (key) {
         key->RefObject();
         fLooseEnds.Append(key);
     }
@@ -427,8 +425,8 @@ void plPluginResManager::AddLooseEnd(plKey key)
 int32_t plPluginResManager::VerifySeqNumber(int32_t sequenceNumber, const plString& age, const plString& page)
 {
     bool negated = false, willBeReserved = age.CompareI("global") == 0;
-    if (sequenceNumber < 0)
-    {
+
+    if (sequenceNumber < 0) {
         sequenceNumber = -sequenceNumber;
         willBeReserved = negated = true;
     }
@@ -437,35 +435,40 @@ int32_t plPluginResManager::VerifySeqNumber(int32_t sequenceNumber, const plStri
     fLastVerifyPage = nil;
 
     plLocation toCompareTo;
-    if (willBeReserved)
+
+    if (willBeReserved) {
         plLocation::MakeReserved(sequenceNumber);
-    else
+    } else {
         plLocation::MakeNormal(sequenceNumber);
+    }
 
     // Does the page already exist?
     plRegistryPageNode* pageNode = FindPage(age, page);
-    if (pageNode != nil)
-    {
+
+    if (pageNode != nil) {
         if (pageNode->GetPageInfo().GetLocation() == toCompareTo)
             // Right page, right sequence #. Assume we're smart enough to already have it right
+        {
             return negated ? -sequenceNumber : sequenceNumber;
+        }
 
         // Right page, wrong seq #...tag our last error field so we can know this later on
         fLastVerifyError = kErrRightPageWrongSeq;
     }
 
     // Page doesn't yet exist, check to make sure the seq # isn't used yet
-    if (sequenceNumber > 0)
-    {
+    if (sequenceNumber > 0) {
         pageNode = FindPage(toCompareTo);
+
         if (pageNode == nil)
             // Safe to use
-            return negated ? -sequenceNumber : sequenceNumber;
-        else
         {
+            return negated ? -sequenceNumber : sequenceNumber;
+        } else {
             // If there is no error yet, set the error to "already taken"
-            if (fLastVerifyError == kNoVerifyError)
+            if (fLastVerifyError == kNoVerifyError) {
                 fLastVerifyError = kErrSeqAlreadyTaken;
+            }
 
             fLastVerifyPage = &pageNode->GetPageInfo();
         }
@@ -477,16 +480,19 @@ int32_t plPluginResManager::VerifySeqNumber(int32_t sequenceNumber, const plStri
     sequenceNumber = plPageInfoUtils::CombineSeqNum(kTemporarySequenceStartPrefix, 0);
 
     int32_t upperLimit = 0xFEFFFF; // largest legal sequence number is a prefix of FE and a suffix of FFFF
-    for(; sequenceNumber < upperLimit; sequenceNumber++)
-    {
-        if (willBeReserved)
+
+    for (; sequenceNumber < upperLimit; sequenceNumber++) {
+        if (willBeReserved) {
             toCompareTo = plLocation::MakeReserved(sequenceNumber);
-        else
+        } else {
             toCompareTo = plLocation::MakeNormal(sequenceNumber);
+        }
 
         pageNode = FindPage(toCompareTo);
-        if (pageNode == nil)
+
+        if (pageNode == nil) {
             return negated ? -sequenceNumber : sequenceNumber;
+        }
     }
 
     hsAssert(false, "Unable to find a valid sequence number to use");
@@ -495,17 +501,18 @@ int32_t plPluginResManager::VerifySeqNumber(int32_t sequenceNumber, const plStri
 }
 
 //// NukeKeyAndObject ////////////////////////////////////////////////////////
-//  Given a key, will ref and unref the associated object so it goes away, 
-//  then nukes the key and sets it to nil. The key's UOID should be safe to 
+//  Given a key, will ref and unref the associated object so it goes away,
+//  then nukes the key and sets it to nil. The key's UOID should be safe to
 //  reuse at that point, unless someone else still has a ref, in which case
 //  this function returns false (returns true if successful).
 
 bool plPluginResManager::NukeKeyAndObject(plKey& objectKey)
 {
-    class plPublicRefKey : public plKeyImp
-    {
+    class plPublicRefKey : public plKeyImp {
     public:
-        uint16_t GetRefCount() const { return fRefCount; }
+        uint16_t GetRefCount() const {
+            return fRefCount;
+        }
     };
 
     plKeyImp* keyData = (plKeyImp*)objectKey;
@@ -513,11 +520,13 @@ bool plPluginResManager::NukeKeyAndObject(plKey& objectKey)
     // Check the ref count on the object. Nobody should have a ref to it
     // except the key
     hsKeyedObject* object = objectKey->ObjectIsLoaded();
-    if (object != nil)
-    {
+
+    if (object != nil) {
         if (keyData->GetActiveRefs())
             // Somebody still has a ref to this object, so we can't nuke it
+        {
             return false;
+        }
     }
 
     // Nobody has a ref to the object, so we're clear to nuke
@@ -526,8 +535,9 @@ bool plPluginResManager::NukeKeyAndObject(plKey& objectKey)
     // Check the key. The refcount should be 1 at this point, for the copy
     // we're holding in this function. Nobody else should be holding the key
     // now that the object is gone.
-    if (((plPublicRefKey*)keyData)->GetRefCount() > 1)
+    if (((plPublicRefKey*)keyData)->GetRefCount() > 1) {
         return false;
+    }
 
     // Nuke out the key as well
     objectKey = nil;

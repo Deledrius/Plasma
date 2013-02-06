@@ -54,7 +54,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 bool cyAccountManagement::IsSubscriptionActive()
 {
-    const NetCommAccount* account = NetCommGetAccount();    
+    const NetCommAccount* account = NetCommGetAccount();
     return (account->billingType & kBillingTypePaidSubscriber);
 }
 
@@ -66,8 +66,7 @@ PyObject* cyAccountManagement::GetPlayerList()
 
     PyObject* visitor = nil;
 
-    for (int i = 0; i < numPlayers; ++i)
-    {
+    for (int i = 0; i < numPlayers; ++i) {
         PyObject* playerTuple   = PyTuple_New(3);
         PyObject* playerName    = PyUnicode_FromUnicode((const Py_UNICODE*)playerList[i].playerName, wcslen(playerList[i].playerName));
         PyObject* playerId      = PyInt_FromLong(playerList[i].playerInt);
@@ -77,18 +76,16 @@ PyObject* cyAccountManagement::GetPlayerList()
         PyTuple_SetItem(playerTuple, 1, playerId);
         PyTuple_SetItem(playerTuple, 2, avatarShape);
 
-        if (visitor || playerList[i].explorer)
+        if (visitor || playerList[i].explorer) {
             PyList_Append(pList, playerTuple);
-        else
+        } else {
             visitor = playerTuple;
+        }
     }
 
-    if (visitor)
-    {
+    if (visitor) {
         PyList_Insert(pList, 0, visitor);
-    }
-    else
-    {
+    } else {
         Py_INCREF(Py_None);
         PyList_Insert(pList, 0, Py_None);
     }
@@ -99,10 +96,12 @@ PyObject* cyAccountManagement::GetPlayerList()
 std::wstring cyAccountManagement::GetAccountName()
 {
     const NetCommAccount* acct = NetCommGetAccount();
-    if (acct)
+
+    if (acct) {
         return acct->accountName;
-    else
+    } else {
         return L"";
+    }
 }
 
 void cyAccountManagement::CreatePlayer(const char* playerName, const char* avatar, const char* invitationCode)

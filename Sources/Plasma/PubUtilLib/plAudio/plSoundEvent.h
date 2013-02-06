@@ -56,42 +56,40 @@ class plSound;
 //// plSoundEvent ////////////////////////////////////////////////////////////
 //  Storage class for an event node.
 
-class plSoundEvent
-{
+class plSoundEvent {
 public:
 
-    enum Types
-    {
+    enum Types {
         kStart,
         kStop,
         kTime,
         kLoop
     };
 
-    plSoundEvent( Types type, plSound *owner );
-    plSoundEvent( Types type, uint32_t bytePos, plSound *owner );
+    plSoundEvent(Types type, plSound* owner);
+    plSoundEvent(Types type, uint32_t bytePos, plSound* owner);
     plSoundEvent();
     ~plSoundEvent();
 
-    void    AddCallback( plEventCallbackMsg *msg );
-    bool    RemoveCallback( plEventCallbackMsg *msg );
+    void    AddCallback(plEventCallbackMsg* msg);
+    bool    RemoveCallback(plEventCallbackMsg* msg);
 
-    uint32_t  GetNumCallbacks( void ) const;
-    int     GetType( void ) const;
-    void    SetType( Types type );
-    uint32_t  GetTime( void ) const;
+    uint32_t  GetNumCallbacks(void) const;
+    int     GetType(void) const;
+    void    SetType(Types type);
+    uint32_t  GetTime(void) const;
 
-    void    SendCallbacks( void );
+    void    SendCallbacks(void);
 
-    static Types    GetTypeFromCallbackMsg( plEventCallbackMsg *msg );
+    static Types    GetTypeFromCallbackMsg(plEventCallbackMsg* msg);
 
 protected:
 
     Types       fType;
     uint32_t      fBytePosTime;
-    plSound     *fOwner;
+    plSound*     fOwner;
 
-    hsTArray<plEventCallbackMsg *>  fCallbacks;
+    hsTArray<plEventCallbackMsg*>  fCallbacks;
     hsTArray<uint8_t>                 fCallbackEndingFlags;
 };
 

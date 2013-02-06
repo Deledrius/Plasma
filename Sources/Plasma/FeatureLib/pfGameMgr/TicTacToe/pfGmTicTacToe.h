@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/FeatureLib/pfGameMgr/TicTacToe/pfGmTicTacToe.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_FEATURELIB_PFGAMEMGR_TICTACTOE_PFGMTICTACTOE_H
@@ -61,33 +61,33 @@ class pfGmTicTacToe : public pfGameCli {
     // Encapsulate all implementation details such as member fields
     // in an opaque friend class, in this case that's ITicTacToe.
     friend struct ITicTacToe;
-    struct ITicTacToe * internal;
+    struct ITicTacToe* internal;
 
     //========================================================================
     // Required subclass methods
     //--------------------------
-    void Recv           (GameMsgHeader * msg, void * param);
-    void OnPlayerJoined (const Srv2Cli_Game_PlayerJoined & msg);
-    void OnPlayerLeft   (const Srv2Cli_Game_PlayerLeft & msg);
-    void OnInviteFailed (const Srv2Cli_Game_InviteFailed & msg);
-    void OnOwnerChange  (const Srv2Cli_Game_OwnerChange & msg);
+    void Recv(GameMsgHeader* msg, void* param);
+    void OnPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg);
+    void OnPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg);
+    void OnInviteFailed(const Srv2Cli_Game_InviteFailed& msg);
+    void OnOwnerChange(const Srv2Cli_Game_OwnerChange& msg);
     //========================================================================
 
 public:
-    #pragma warning(push, 0)
+#pragma warning(push, 0)
     // These macros produce warnings on W4
     CLASSNAME_REGISTER(pfGmTicTacToe);
     GETINTERFACE_ANY(pfGmTicTacToe, pfGameCli);
-    #pragma warning(pop)
-    
-    pfGmTicTacToe (unsigned gameId, plKey receiver);
-    ~pfGmTicTacToe ();
-    
+#pragma warning(pop)
+
+    pfGmTicTacToe(unsigned gameId, plKey receiver);
+    ~pfGmTicTacToe();
+
     //========================================================================
     // Game methods
     //-------------
-    void MakeMove   (unsigned row, unsigned col);
-    void ShowBoard  ();
+    void MakeMove(unsigned row, unsigned col);
+    void ShowBoard();
     //========================================================================
 };
 

@@ -55,8 +55,7 @@ class plLayer;
 
 // inlines for Texture and Material after class declarations
 
-class hsGMaterial : public plSynchedObject
-{
+class hsGMaterial : public plSynchedObject {
 public:
     // Things we have to know that some layer has
     enum hsGCompFlags {
@@ -75,8 +74,7 @@ public:
         kCompIsLightMapped                  = 0x1000,
         kCompNeedsBlendChannel              = 0x2000    // For materials that have extra layers to simulate vtx alpha
     };
-    enum UpdateFlags
-    {
+    enum UpdateFlags {
         kUpdateAgain        = 0x01
     };
 
@@ -94,7 +92,7 @@ protected:
     uint32_t              IMakeExtraLayer();
 
     void                    InsertLayer(plLayerInterface* lay, int32_t which = 0, bool piggyBack = false);
-    void                    SetLayer(plLayerInterface* lay, int32_t which = 0, bool insert=false, bool piggyBack=false);
+    void                    SetLayer(plLayerInterface* lay, int32_t which = 0, bool insert = false, bool piggyBack = false);
     void                    ReplaceLayer(plLayerInterface* oldLay, plLayerInterface* newLay, bool piggyBack = false);
     void                    RemoveLayer(plLayerInterface* oldLay, bool piggyBack = false);
 public:
@@ -103,43 +101,69 @@ public:
 
     virtual hsGMaterial*    Clone();
     virtual hsGMaterial*    CloneNoLayers(); // For things like blending copies, that manipulate layers directly.
-                                             // copies no keyed objects.
+    // copies no keyed objects.
     plLayer*                MakeBaseLayer();
     plLayerInterface*       GetLayer(uint32_t which);
     plLayerInterface*       GetPiggyBack(uint32_t which);
     uint32_t                  AddLayerViaNotify(plLayerInterface* lay);
-    uint32_t                  GetNumLayers() const        { return fLayers.GetCount(); }
+    uint32_t                  GetNumLayers() const        {
+        return fLayers.GetCount();
+    }
     void                    SetNumLayers(int cnt);
-    uint32_t                  GetNumPiggyBacks() const    { return fPiggyBacks.GetCount(); }
+    uint32_t                  GetNumPiggyBacks() const    {
+        return fPiggyBacks.GetCount();
+    }
     void                    SetNumPiggyBacks();
 
-    void                    SetLOD(uint32_t l)            { fLOD = l; }
-    uint32_t                  GetLOD() const              { return fLOD; }
+    void                    SetLOD(uint32_t l)            {
+        fLOD = l;
+    }
+    uint32_t                  GetLOD() const              {
+        return fLOD;
+    }
 
-    void                    SetCompositeFlags(uint32_t f) { fCompFlags = f; } // normally composite flags are calculated internally, not set.
-    uint32_t                  GetCompositeFlags() const   { return fCompFlags; }
-    uint32_t                  GetLoadFlags() const        { return fLoadFlags; }
+    void                    SetCompositeFlags(uint32_t f) {
+        fCompFlags = f;    // normally composite flags are calculated internally, not set.
+    }
+    uint32_t                  GetCompositeFlags() const   {
+        return fCompFlags;
+    }
+    uint32_t                  GetLoadFlags() const        {
+        return fLoadFlags;
+    }
 
-    float                GetLastUpdateTime() const   { return fLastUpdateTime; }
-    void                    SetLastUpdateTime(float f) { fLastUpdateTime = f; }
-    bool                    IShouldUpdate(float secs, uint32_t flags) { return GetLastUpdateTime() != secs || (flags & kUpdateAgain); }
+    float                GetLastUpdateTime() const   {
+        return fLastUpdateTime;
+    }
+    void                    SetLastUpdateTime(float f) {
+        fLastUpdateTime = f;
+    }
+    bool                    IShouldUpdate(float secs, uint32_t flags) {
+        return GetLastUpdateTime() != secs || (flags & kUpdateAgain);
+    }
 
-    bool                    IsDynamic() const           { return (fCompFlags & kCompDynamic); }
-    bool                    IsDecal() const             { return (fCompFlags & kCompDecal); }
-    bool                    NeedsBlendChannel()         { return (fCompFlags & kCompNeedsBlendChannel); }
+    bool                    IsDynamic() const           {
+        return (fCompFlags & kCompDynamic);
+    }
+    bool                    IsDecal() const             {
+        return (fCompFlags & kCompDecal);
+    }
+    bool                    NeedsBlendChannel()         {
+        return (fCompFlags & kCompNeedsBlendChannel);
+    }
 
     virtual void        Read(hsStream* s);
     virtual void        Write(hsStream* s);
-    virtual void        Read(hsStream* s, hsResMgr *group);
-    virtual void        Write(hsStream* s, hsResMgr *group);
+    virtual void        Read(hsStream* s, hsResMgr* group);
+    virtual void        Write(hsStream* s, hsResMgr* group);
 
     virtual void Eval(double secs, uint32_t frame);
     virtual void Reset();
     virtual void Init();
 
-    CLASSNAME_REGISTER( hsGMaterial );
-    GETINTERFACE_ANY( hsGMaterial, hsKeyedObject );
-    
+    CLASSNAME_REGISTER(hsGMaterial);
+    GETINTERFACE_ANY(hsGMaterial, hsKeyedObject);
+
     virtual bool MsgReceive(plMessage* msg);
 };
 

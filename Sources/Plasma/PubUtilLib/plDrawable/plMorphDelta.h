@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plAccessSpan.h"
 
-class plVertDelta
-{
+class plVertDelta {
 public:
     uint16_t      fIdx;
     uint16_t      fPadding;
@@ -58,8 +57,7 @@ public:
     hsVector3   fNorm;
 };
 
-class plMorphSpan
-{
+class plMorphSpan {
 public:
     plMorphSpan();
     virtual ~plMorphSpan();
@@ -70,8 +68,7 @@ public:
     hsPoint3*               fUVWs; // Length is fUVWChans*fDeltas.GetCount() (*sizeof(hsPoint3) in bytes).
 };
 
-class plMorphDelta : public plCreatable
-{
+class plMorphDelta : public plCreatable {
 protected:
     hsTArray<plMorphSpan>   fSpans;
 
@@ -83,25 +80,31 @@ public:
     plMorphDelta(const plMorphDelta& src);
     plMorphDelta& operator=(const plMorphDelta& src);
 
-    CLASSNAME_REGISTER( plMorphDelta );
-    GETINTERFACE_ANY( plMorphDelta, plCreatable );
+    CLASSNAME_REGISTER(plMorphDelta);
+    GETINTERFACE_ANY(plMorphDelta, plCreatable);
 
-    void        SetWeight(float w) { fWeight = w; }
-    float    GetWeight() const { return fWeight; }
+    void        SetWeight(float w) {
+        fWeight = w;
+    }
+    float    GetWeight() const {
+        return fWeight;
+    }
 
     void        Apply(hsTArray<plAccessSpan>& dst, float weight = -1.f) const;
 
     void        ComputeDeltas(const hsTArray<plAccessSpan>& base, const hsTArray<plAccessSpan>& moved);
     void        ComputeDeltas(const hsTArray<plGeometrySpan*>& base, const hsTArray<plGeometrySpan*>& moved, const hsMatrix44& d2b, const hsMatrix44& d2bTInv);
 
-    uint32_t      GetNumSpans() const { return fSpans.GetCount(); }
+    uint32_t      GetNumSpans() const {
+        return fSpans.GetCount();
+    }
     void        SetNumSpans(int n);
     void        SetDeltas(int iSpan, const hsTArray<plVertDelta>& deltas, int numUVWChans, const hsPoint3* uvws); // len uvws is deltas.GetCount() * numUVWChans
 
     void        AllocDeltas(int iSpan, int nDel, int nUVW);
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
-    virtual void Write(hsStream* s, hsResMgr* mgr); 
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
 };
 

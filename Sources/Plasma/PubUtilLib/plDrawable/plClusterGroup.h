@@ -59,8 +59,7 @@ class plMessage;
 class plGenRefMsg;
 class plDrawableSpans;
 
-class plLODDist
-{
+class plLODDist {
 public:
     float fMinDist;
     float fMaxDist;
@@ -68,19 +67,28 @@ public:
     plLODDist(float minDist, float maxDist) : fMinDist(minDist), fMaxDist(maxDist) {}
     plLODDist() : fMinDist(0), fMaxDist(0) {}
 
-    plLODDist& Set(float minDist, float maxDist) { fMinDist = minDist; fMaxDist = maxDist; return *this; }
+    plLODDist& Set(float minDist, float maxDist) {
+        fMinDist = minDist;
+        fMaxDist = maxDist;
+        return *this;
+    }
 
-    plLODDist& operator=(int d) { fMinDist = float(d); fMaxDist = float(d); return *this; }
+    plLODDist& operator=(int d) {
+        fMinDist = float(d);
+        fMaxDist = float(d);
+        return *this;
+    }
 
-    int operator==(const plLODDist& d) const { return (fMinDist == d.fMinDist)&&(fMaxDist == d.fMaxDist); }
+    int operator==(const plLODDist& d) const {
+        return (fMinDist == d.fMinDist) && (fMaxDist == d.fMaxDist);
+    }
 
     void Read(hsStream* s);
     void Write(hsStream* s) const;
 
 };
 
-class plClusterGroup : public hsKeyedObject
-{
+class plClusterGroup : public hsKeyedObject {
 public:
     enum RefType {
         kRefMaterial,
@@ -126,38 +134,60 @@ public:
     plClusterGroup();
     ~plClusterGroup();
 
-    CLASSNAME_REGISTER( plClusterGroup );
-    GETINTERFACE_ANY( plClusterGroup, hsKeyedObject );
+    CLASSNAME_REGISTER(plClusterGroup);
+    GETINTERFACE_ANY(plClusterGroup, hsKeyedObject);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     virtual bool MsgReceive(plMessage* msg);
 
-    hsGMaterial* GetMaterial() const { return fMaterial; }
-    const hsBitVector& GetVisSet() const { return fVisSet; }
-    const hsBitVector& GetVisNot() const { return fVisNot; }
-    const hsTArray<plLightInfo*>& GetLights() const { return fLights; }
-    const plLODDist& GetLOD() const { return fLOD; }
+    hsGMaterial* GetMaterial() const {
+        return fMaterial;
+    }
+    const hsBitVector& GetVisSet() const {
+        return fVisSet;
+    }
+    const hsBitVector& GetVisNot() const {
+        return fVisNot;
+    }
+    const hsTArray<plLightInfo*>& GetLights() const {
+        return fLights;
+    }
+    const plLODDist& GetLOD() const {
+        return fLOD;
+    }
 
-    const plSpanTemplate* GetTemplate() const { return fTemplate; }
+    const plSpanTemplate* GetTemplate() const {
+        return fTemplate;
+    }
 
     const plCluster* GetCluster(int i) const;
-    int         GetNumClusters() const { return fClusters.GetCount(); }
+    int         GetNumClusters() const {
+        return fClusters.GetCount();
+    }
     uint32_t      NumInst() const;
 
     // The drawable needs us to be able to convert our data
     // into, well, drawable stuff.
     void UnPack();
 
-    void SetVisible(bool visible=true);
+    void SetVisible(bool visible = true);
 
-    void SetSceneNode(const plKey& key) { fSceneNode = key; }
-    plKey GetSceneNode() const { return fSceneNode; }
-    
-    plKey GetDrawable() const { return fDrawable; }
+    void SetSceneNode(const plKey& key) {
+        fSceneNode = key;
+    }
+    plKey GetSceneNode() const {
+        return fSceneNode;
+    }
 
-    plRenderLevel GetRenderLevel() const { return fRenderLevel; }
+    plKey GetDrawable() const {
+        return fDrawable;
+    }
+
+    plRenderLevel GetRenderLevel() const {
+        return fRenderLevel;
+    }
 };
 
 #endif // plClusterGroup_inc

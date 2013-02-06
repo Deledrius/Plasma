@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plGeometrySpan;
 
-class plGeoSpanDice
-{
+class plGeoSpanDice {
 protected:
     uint32_t      fMinFaces;
     uint32_t      fMaxFaces;
@@ -59,7 +58,7 @@ protected:
     plGeometrySpan*     IAllocSpace(plGeometrySpan* src, int numVerts, int numTris) const;
     plGeometrySpan*     IExtractTris(plGeometrySpan* src, hsTArray<uint32_t>& tris) const;
     int                 ISelectAxis(int exclAxis, plGeometrySpan* src) const;
-    bool                IHalf(plGeometrySpan* src, hsTArray<plGeometrySpan*>& out, int exclAxis=0) const;
+    bool                IHalf(plGeometrySpan* src, hsTArray<plGeometrySpan*>& out, int exclAxis = 0) const;
 
 public:
     plGeoSpanDice();
@@ -67,14 +66,26 @@ public:
 
     bool                Dice(hsTArray<plGeometrySpan*>& spans) const;
 
-    void SetMaxSize(const hsPoint3& size) { fMaxSize = size; }
-    hsPoint3 GetMaxSize() const { return fMaxSize; }
+    void SetMaxSize(const hsPoint3& size) {
+        fMaxSize = size;
+    }
+    hsPoint3 GetMaxSize() const {
+        return fMaxSize;
+    }
 
-    void SetMinFaces(int n) { fMinFaces = n; }
-    int GetMinFaces() const { return fMinFaces; }
+    void SetMinFaces(int n) {
+        fMinFaces = n;
+    }
+    int GetMinFaces() const {
+        return fMinFaces;
+    }
 
-    void SetMaxFaces(int n) { fMaxFaces = n; }
-    int GetMaxFaces() const { return fMaxFaces; }
+    void SetMaxFaces(int n) {
+        fMaxFaces = n;
+    }
+    int GetMaxFaces() const {
+        return fMaxFaces;
+    }
 };
 
 #endif // plGeoSpanDice_inc

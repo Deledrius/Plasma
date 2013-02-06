@@ -256,9 +256,9 @@ struct NetMsgField {
 };
 
 struct NetMsg {
-    const char *        name;
+    const char*         name;
     unsigned            messageId;
-    const NetMsgField * fields;
+    const NetMsgField* fields;
     unsigned            count;
 };
 
@@ -315,10 +315,10 @@ struct NetMsgInitSend {
 };
 struct NetMsgInitRecv {
     NetMsg  msg;
-    bool (* recv)(const uint8_t msg[], unsigned bytes, void * param);
+    bool (* recv)(const uint8_t msg[], unsigned bytes, void* param);
 };
 
-void NetMsgProtocolRegister (
+void NetMsgProtocolRegister(
     uint32_t                protocol,       // from pnNetBase/pnNbProtocol.h
     bool                    server,
     const NetMsgInitSend    sendMsgs[],     // messages this program can send
@@ -331,7 +331,7 @@ void NetMsgProtocolRegister (
     const plBigNum&         dh_n
 );
 
-void NetMsgProtocolDestroy (
+void NetMsgProtocolDestroy(
     uint32_t                protocol,
     bool                    server
 );
@@ -343,20 +343,20 @@ void NetMsgProtocolDestroy (
 *
 ***/
 
-NetCliQueue * NetCliQueueCreate (
+NetCliQueue* NetCliQueueCreate(
     unsigned        flushTimeMs
 );
 
-void NetCliQueueDestroy (
-    NetCliQueue *   queue
+void NetCliQueueDestroy(
+    NetCliQueue*    queue
 );
 
-void NetCliQueueFlush (
-    NetCliQueue *   queue
+void NetCliQueueFlush(
+    NetCliQueue*    queue
 );
 
-float NetCliQueueQueryFlush (
-    NetCliQueue *   queue
+float NetCliQueueQueryFlush(
+    NetCliQueue*    queue
 );
 
 
@@ -366,74 +366,74 @@ float NetCliQueueQueryFlush (
 *
 ***/
 
-typedef bool (* FNetCliEncrypt) (
+typedef bool (* FNetCliEncrypt)(
     ENetError       error,
-    void *          encryptParam
+    void*           encryptParam
 );
 
-NetCli * NetCliConnectAccept (
+NetCli* NetCliConnectAccept(
     AsyncSocket         sock,
     unsigned            protocol,
     bool                unbuffered,
     FNetCliEncrypt      encryptFcn,
     unsigned            seedBytes,      // optional
     const uint8_t          seedData[],     // optional
-    void *              encryptParam    // optional
+    void*               encryptParam    // optional
 );
 
 #ifdef SERVER
-NetCli * NetCliListenAccept (
+NetCli* NetCliListenAccept(
     AsyncSocket         sock,
     unsigned            protocol,
     bool                unbuffered,
     FNetCliEncrypt      encryptFcn,
     unsigned            seedBytes,      // optional
     const uint8_t          seedData[],     // optional
-    void *              encryptParam    // optional
+    void*               encryptParam    // optional
 );
 #endif
 
 #ifdef SERVER
-void NetCliListenReject (
+void NetCliListenReject(
     AsyncSocket     sock,
     ENetError       error
 );
 #endif
 
-void NetCliClearSocket (
-    NetCli *        cli
+void NetCliClearSocket(
+    NetCli*         cli
 );
 
-void NetCliSetQueue (
-    NetCli *        cli,
-    NetCliQueue *   queue
+void NetCliSetQueue(
+    NetCli*         cli,
+    NetCliQueue*    queue
 );
 
-void NetCliDisconnect (
-    NetCli *        cli,
+void NetCliDisconnect(
+    NetCli*         cli,
     bool            hardClose
 );
 
-void NetCliDelete (
-    NetCli *        cli, 
+void NetCliDelete(
+    NetCli*         cli,
     bool            deleteSocket
 );
 
-void NetCliFlush (
-    NetCli *        cli
+void NetCliFlush(
+    NetCli*         cli
 );
 
-void NetCliSend (
-    NetCli *            cli,
-    const uintptr_t  msg[], 
+void NetCliSend(
+    NetCli*             cli,
+    const uintptr_t  msg[],
     unsigned            count
 );
 
-bool NetCliDispatch (
-    NetCli *        cli,
+bool NetCliDispatch(
+    NetCli*         cli,
     const uint8_t      buffer[],
     unsigned        bytes,
-    void *          param
+    void*           param
 );
 
 

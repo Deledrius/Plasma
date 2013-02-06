@@ -63,31 +63,33 @@ typedef struct ALCdevice_struct ALCdevice;
 
 
 // Sound used for playing back dynamic voice chat data. this allows us to hook voice chat into the audio system
-class plVoiceSound : public plWin32Sound
-{
+class plVoiceSound : public plWin32Sound {
 public:
     plVoiceSound();
     ~plVoiceSound();
-    bool LoadSound( bool is3D );
-    void AddVoiceData(void *data, unsigned bytes);
+    bool LoadSound(bool is3D);
+    void AddVoiceData(void* data, unsigned bytes);
     void Update();
     void Play();
-    virtual void SetStartPos(unsigned bytes){}
-    
-private:
-    virtual bool    ILoadDataBuffer( void ){ return true; }
-    virtual void    IUnloadDataBuffer( void ){}
+    virtual void SetStartPos(unsigned bytes) {}
 
-    virtual void    IDerivedActuallyPlay( void );
-    virtual void    ISetActualTime( double t ){}
-    virtual float   GetActualTimeSec() { return 0.0f; }
-    virtual void    IRefreshParams( void );
+private:
+    virtual bool    ILoadDataBuffer(void) {
+        return true;
+    }
+    virtual void    IUnloadDataBuffer(void) {}
+
+    virtual void    IDerivedActuallyPlay(void);
+    virtual void    ISetActualTime(double t) {}
+    virtual float   GetActualTimeSec() {
+        return 0.0f;
+    }
+    virtual void    IRefreshParams(void);
     static unsigned fCount;
     double   fLastUpdate;
 };
 
-class plVoicePlayer
-{
+class plVoicePlayer {
 public:
     plVoicePlayer();
     ~plVoicePlayer();
@@ -96,19 +98,22 @@ public:
     void SetVelocity(const hsVector3 vel);
     void SetPosition(const hsPoint3 pos);
     void SetOrientation(const hsPoint3 pos);
-    
-    void SetTalkIcon(int index, uint32_t str){}
-    void ClearTalkIcon(){}
-    plVoiceSound *GetSoundPtr() { return &fSound; }
-    static void Enable(bool enable) { fEnabled = enable; }
+
+    void SetTalkIcon(int index, uint32_t str) {}
+    void ClearTalkIcon() {}
+    plVoiceSound* GetSoundPtr() {
+        return &fSound;
+    }
+    static void Enable(bool enable) {
+        fEnabled = enable;
+    }
 
 private:
     plVoiceSound fSound;
     static bool fEnabled;
 };
 
-class plVoiceRecorder
-{
+class plVoiceRecorder {
 public:
     plVoiceRecorder();
     ~plVoiceRecorder();
@@ -117,20 +122,40 @@ public:
     void SetMikeOpen(bool b);
     void DrawTalkIcon(bool b);
     void DrawDisabledIcon(bool b);
-    
+
     void    SetTalkIcon(int index, uint32_t str);
     void    ClearTalkIcon();
 
-    static bool     RecordingEnabled() { return fRecording; }
-    static bool     NetVoiceEnabled() { return fNetVoice; }
-    static bool     CompressionEnabled() { return fCompress; }
-    static void     EnablePushToTalk(bool b) { fMicAlwaysOpen = !b; }
-    static void     EnableIcons(bool b) { fShowIcons = b; }
-    static void     EnableRecording(bool b) { fRecording = b; }
-    static void     EnableNetVoice(bool b) { fNetVoice = b; }
-    static void     EnableCompression(bool b) { fCompress = b; }
-    static void     SetSampleRate(short s) { fSampleRate = s; }
-    static void     SetSquelch(float f) { fRecordThreshhold = f; }
+    static bool     RecordingEnabled() {
+        return fRecording;
+    }
+    static bool     NetVoiceEnabled() {
+        return fNetVoice;
+    }
+    static bool     CompressionEnabled() {
+        return fCompress;
+    }
+    static void     EnablePushToTalk(bool b) {
+        fMicAlwaysOpen = !b;
+    }
+    static void     EnableIcons(bool b) {
+        fShowIcons = b;
+    }
+    static void     EnableRecording(bool b) {
+        fRecording = b;
+    }
+    static void     EnableNetVoice(bool b) {
+        fNetVoice = b;
+    }
+    static void     EnableCompression(bool b) {
+        fCompress = b;
+    }
+    static void     SetSampleRate(short s) {
+        fSampleRate = s;
+    }
+    static void     SetSquelch(float f) {
+        fRecordThreshhold = f;
+    }
 
     static void IncreaseRecordingThreshhold();
     static void DecreaseRecordingThreshhold();
@@ -140,10 +165,12 @@ public:
     static void SetVBR(bool vbr);
     static void SetComplexity(int c);
     static void SetENH(bool b);
-    static short GetSampleRate() { return fSampleRate; }
-    
+    static short GetSampleRate() {
+        return fSampleRate;
+    }
+
 private:
-    
+
     bool                    fMikeOpen;
     bool                    fMikeJustClosed;
     static bool             fMicAlwaysOpen;
@@ -159,40 +186,45 @@ private:
 
 
 // Speex voice encoder/decoder class
-class plSpeex 
-{
+class plSpeex {
 public:
     ~plSpeex();
-    
-    enum Mode
-    {
+
+    enum Mode {
         kNarrowband,
         kWideband,
         kUltraWideband
     };
-    static plSpeex *GetInstance()   
-    {
+    static plSpeex* GetInstance() {
         static plSpeex instance;
         return &instance;
     }
 
     bool Init(Mode mode);
     bool Shutdown();
-    bool Encode(short *data, int numFrames, int *packedLength, hsRAMStream *out);
-    bool Decode(uint8_t *data, int size, int numFrames, int *numOutputBytes, short *out);
-    int    GetFrameSize() { return fFrameSize; }
+    bool Encode(short* data, int numFrames, int* packedLength, hsRAMStream* out);
+    bool Decode(uint8_t* data, int size, int numFrames, int* numOutputBytes, short* out);
+    int    GetFrameSize() {
+        return fFrameSize;
+    }
     void   VBR(bool b);                                   // turn variable bit rate on/off
     void   SetVBR(uint32_t vbr);                              // Set variable bit rate quality
     void   ABR(bool b);                                   // turn average bit rate on/off
     void   SetABR(uint32_t abr);                              // Set average bit rate quality
     void   SetQuality(uint32_t quality);                      // Set encoder quality
-    bool IsUsingVBR()         { return fVBR; }
-    int    GetQuality()         { return fQuality; }
+    bool IsUsingVBR()         {
+        return fVBR;
+    }
+    int    GetQuality()         {
+        return fQuality;
+    }
     void   SetENH(bool b);
     void   SetComplexity(uint8_t c);
 
-    bool Initialized() { return fInitialized; }
-    
+    bool Initialized() {
+        return fInitialized;
+    }
+
 private:
     plSpeex();
     SpeexBits*                  fBits;                  // main speex structure
@@ -206,7 +238,7 @@ private:
     int                         fAverageBitrate;        // n-bits per second
     uint8_t                       fComplexity;            // 1-10 sets cpu resources allowed for encoder
     bool                        fENH;                   // perceptual enhancement
-    bool                        fInitialized;           
+    bool                        fInitialized;
 };
 
 #endif //plVoiceChat_h

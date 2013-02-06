@@ -44,7 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // PythonInterface   - The Python interface to the Python dll
 //
 // NOTE: Eventually, this will be made into a separate dll, because there should
-//       only be one instance of this interface. 
+//       only be one instance of this interface.
 //
 #include "HeadSpin.h"
 #include "plString.h"
@@ -59,11 +59,10 @@ class pyKey;
 typedef struct _object PyObject;
 typedef struct PyMethodDef PyMethodDef;
 
-class  PythonInterface
-{
+class  PythonInterface {
 private:
     static int32_t initialized;   // count how many times we initialize
-                                // and make sure that many finalize on the way out
+    // and make sure that many finalize on the way out
     static bool FirstTimeInit;
     static bool IsInShutdown; // whether we are _really_ in shutdown mode
 
@@ -93,13 +92,15 @@ private:
 public:
 
     // set that we are truly shutting down
-    static void WeAreInShutdown() { IsInShutdown = true; }
+    static void WeAreInShutdown() {
+        IsInShutdown = true;
+    }
 
     // Initialize the Python dll
     static void initPython();
 
     // Initialize the Plasma module
-    static void AddPlasmaMethods(std::vector<PyMethodDef> &methods);
+    static void AddPlasmaMethods(std::vector<PyMethodDef>& methods);
     static void AddPlasmaClasses();
 
     // Initialize the PlasmaConstants module
@@ -112,13 +113,13 @@ public:
     static void AddPlasmaVaultConstantsClasses();
 
     // Initialize the PlasmaGame module
-    static void AddPlasmaGameMethods(std::vector<PyMethodDef> &methods);
+    static void AddPlasmaGameMethods(std::vector<PyMethodDef>& methods);
     static void AddPlasmaGameClasses();
 
     // Initialize the PlasmaGameConstants module
     static void AddPlasmaGameConstantsClasses();
 
-    // Initialize the Python to Plasma 
+    // Initialize the Python to Plasma
     static void initDebugInterface();
 
     // Finalize the Python dll, ie. get ready to shut down
@@ -168,7 +169,7 @@ public:
     //  run a python string in a specific module name
     //  PARAMETERS : command       - string of commands to execute in the...
     //             : filename      - filename to say where to code came from
-    static PyObject* CompileString(char *command, char* filename);
+    static PyObject* CompileString(char* command, char* filename);
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -199,7 +200,7 @@ public:
     //  PURPOSE    : run a python string in a specific module name
     //             : Interactive mode (displays results)
     //
-    static bool RunStringInteractive(char *command, PyObject* module);
+    static bool RunStringInteractive(char* command, PyObject* module);
 
 
     /////////////////////////////////////////////////////////////////////////////
@@ -210,7 +211,7 @@ public:
     //
     //  PURPOSE    : run a python string in a specific module name
     //
-    static bool RunString(char *command, PyObject* module);
+    static bool RunString(char* command, PyObject* module);
 
 
     /////////////////////////////////////////////////////////////////////////////
@@ -238,11 +239,21 @@ public:
     static pyKey* GetpyKeyFromPython(PyObject* pkey);
 
 #if defined(HAVE_CYPYTHONIDE) && !defined(PLASMA_EXTERNAL_RELEASE)
-    static bool UsePythonDebugger() { return usePythonDebugger; }
-    static void UsePythonDebugger(bool use) { usePythonDebugger = use; }
+    static bool UsePythonDebugger() {
+        return usePythonDebugger;
+    }
+    static void UsePythonDebugger(bool use) {
+        usePythonDebugger = use;
+    }
 
-    static plCyDebServer* PythonDebugger() {return &debugServer;}
-    static bool DebuggerRequestedExit() {return requestedExit;}
-    static void DebuggerRequestedExit(bool reqExit) {requestedExit = reqExit;}
+    static plCyDebServer* PythonDebugger() {
+        return &debugServer;
+    }
+    static bool DebuggerRequestedExit() {
+        return requestedExit;
+    }
+    static void DebuggerRequestedExit(bool reqExit) {
+        requestedExit = reqExit;
+    }
 #endif
 };

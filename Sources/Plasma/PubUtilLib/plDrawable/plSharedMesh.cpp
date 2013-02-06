@@ -54,51 +54,50 @@ plSharedMesh::plSharedMesh() : fMorphSet(nil), fFlags(0)
 plSharedMesh::~plSharedMesh()
 {
     hsAssert(fActiveInstances.GetCount() == 0, "Tried to delete a shared mesh that has active instances.");
-    
-    while (fSpans.GetCount() > 0)
+
+    while (fSpans.GetCount() > 0) {
         delete fSpans.Pop();
+    }
 }
 /*
 void plSharedMesh::CreateInstance(plSceneObject *so, uint8_t boneIndex)
-{   
+{
 plDrawInterface *di = so->GetVolatileDrawInterface();
 
-  //    hsAssert((fActiveInstances.GetCount == 0) || 
+  //    hsAssert((fActiveInstances.GetCount == 0) ||
   //             (di->GetDrawable() == fActiveInstances[0]->GetDrawInterface()->GetDrawable()),
   //             "Trying to share a mesh between two seperate drawables. No can do.");
-  
-    
+
+
       fActiveInstances.Append(so);
       }
-      
+
         void plSharedMesh::RemoveInstance(plSceneObject *so)
         {
         so->GetVolatileDrawInterface()->ReleaseData();
-        
+
           fActiveInstances.RemoveItem(so);
           }
 */
 
 bool plSharedMesh::MsgReceive(plMessage* msg)
 {
-    plGenRefMsg *refMsg = plGenRefMsg::ConvertNoRef(msg);
-    if (refMsg)
-    {
-        plMorphDataSet *set = plMorphDataSet::ConvertNoRef(refMsg->GetRef());
-        if (set)
-        {
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-            {
+    plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
+
+    if (refMsg) {
+        plMorphDataSet* set = plMorphDataSet::ConvertNoRef(refMsg->GetRef());
+
+        if (set) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fMorphSet = plMorphDataSet::ConvertNoRef(refMsg->GetRef());
-            }
-            else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-            {
+            } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                 fMorphSet = nil;
             }
+
             return true;
         }
     }
-    
+
     return hsKeyedObject::MsgReceive(msg);
 }
 
@@ -106,11 +105,11 @@ bool plSharedMesh::MsgReceive(plMessage* msg)
 void plSharedMesh::Read(hsStream* s, hsResMgr* mgr)
 {
     hsKeyedObject::Read(s, mgr);
-    
+
     int i;
     fSpans.SetCount(s->ReadLE32());
-    for (i = 0; i < fSpans.GetCount(); i++)
-    {
+
+    for (i = 0; i < fSpans.GetCount(); i++) {
         fSpans[i] = new plGeometrySpan;
         fSpans[i]->Read(s);
     }
@@ -125,8 +124,10 @@ void plSharedMesh::Write(hsStream* s, hsResMgr* mgr)
 
     int i;
     s->WriteLE32(fSpans.GetCount());
-    for (i = 0; i < fSpans.GetCount(); i++)
+
+    for (i = 0; i < fSpans.GetCount(); i++) {
         fSpans[i]->Write(s);
+    }
 
     mgr->WriteKey(s, (fMorphSet ? fMorphSet->GetKey() : nil));
     s->WriteByte(fFlags);
@@ -134,4 +135,7 @@ void plSharedMesh::Write(hsStream* s, hsResMgr* mgr)
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-plSharedMeshBCMsg::plSharedMeshBCMsg() : plMessage(), fMesh(nil), fIsAdding(true) { SetBCastFlag(plMessage::kBCastByExactType); }
+plSharedMeshBCMsg::plSharedMeshBCMsg() : plMessage(), fMesh(nil), fIsAdding(true)
+{
+    SetBCastFlag(plMessage::kBCastByExactType);
+}

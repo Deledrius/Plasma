@@ -62,20 +62,20 @@ plCloneSpawnModifier::~plCloneSpawnModifier()
     delete [] fTemplateName;
 }
 
-void plCloneSpawnModifier::Read(hsStream *s, hsResMgr *mgr)
+void plCloneSpawnModifier::Read(hsStream* s, hsResMgr* mgr)
 {
     delete [] fTemplateName;
     fTemplateName = s->ReadSafeString();
     plSingleModifier::Read(s, mgr);
 }
 
-void plCloneSpawnModifier::Write(hsStream *s, hsResMgr *mgr)
+void plCloneSpawnModifier::Write(hsStream* s, hsResMgr* mgr)
 {
     s->WriteSafeString(fTemplateName);
     plSingleModifier::Write(s, mgr);
 }
 
-void plCloneSpawnModifier::SetTemplateName(const char *templateName)
+void plCloneSpawnModifier::SetTemplateName(const char* templateName)
 {
     delete [] fTemplateName;
     fTemplateName = hsStrcpy(templateName);
@@ -84,9 +84,9 @@ void plCloneSpawnModifier::SetTemplateName(const char *templateName)
 void plCloneSpawnModifier::SetTarget(plSceneObject* so)
 {
     fTarget = so;
+
     // Spawning the clone here since at Read time fTarget isn't set.  Kind of a hack though.
-    if (fTarget && !fExportTime)
-    {
+    if (fTarget && !fExportTime) {
         // Assume the clone template is in the same age we are
         const plLocation& loc = GetKey()->GetUoid().GetLocation();
         plString ageName;
@@ -109,8 +109,7 @@ plKey plCloneSpawnModifier::SpawnClone(const plString& cloneName, const plString
     plUoid objUoid(loc, plSceneObject::Index(), cloneName);
     plKey key = resMgr->FindKey(objUoid);
 
-    if (key)
-    {
+    if (key) {
         plLoadCloneMsg* cloneMsg = new plLoadCloneMsg(objUoid, requestor, 0);
         cloneMsg->SetBCastFlag(plMessage::kMsgWatch);
         plKey cloneKey = cloneMsg->GetCloneKey();//resMgr->CloneKey(key);
@@ -122,7 +121,7 @@ plKey plCloneSpawnModifier::SpawnClone(const plString& cloneName, const plString
         resMgr->AddViaNotify(cloneKey, nodeRefCloneMsg, plRefFlags::kActiveRef);
 
         // Warp it into position
-        plWarpMsg *warpMsg = new plWarpMsg;
+        plWarpMsg* warpMsg = new plWarpMsg;
         warpMsg->AddReceiver(cloneKey);
         warpMsg->SetTransform(pos);
         plgDispatch::MsgSend(warpMsg);

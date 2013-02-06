@@ -44,7 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 // list of all controls that could potentially
-// be mapped to a key, a mouse button, etc 
+// be mapped to a key, a mouse button, etc
 
 // NOTE:
 // NOTE:
@@ -56,8 +56,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //     and cause much less stress on game play programmers who's telescopes stop working
 //        Thanks!
 
-enum ControlEventCode
-{
+enum ControlEventCode {
     // button controls
     B_CONTROL_ACTION            = 0,
     B_CONTROL_ACTION_MOUSE,

@@ -48,8 +48,11 @@ void plClothingMsg::Read(hsStream* stream, hsResMgr* mgr)
     plMessage::IMsgRead(stream, mgr);
 
     fCommands = stream->ReadLE32();
-    if (stream->ReadBool())
+
+    if (stream->ReadBool()) {
         fItemKey = mgr->ReadKey(stream);
+    }
+
     fColor.Read(stream);
     fLayer = stream->ReadByte();
     fDelta = stream->ReadByte();
@@ -62,16 +65,18 @@ void plClothingMsg::Write(hsStream* stream, hsResMgr* mgr)
 
     stream->WriteLE32(fCommands);
     stream->WriteBool(fItemKey != nil);
-    if (fItemKey)
+
+    if (fItemKey) {
         mgr->WriteKey(stream, fItemKey);
+    }
+
     fColor.Write(stream);
     stream->WriteByte(fLayer);
     stream->WriteByte(fDelta);
     stream->WriteLEScalar(fWeight);
 }
 
-enum ClothingFlags
-{
+enum ClothingFlags {
     kClothingCommands,
     kClothingItemKey,
     kClothingColor,
@@ -84,15 +89,19 @@ void plClothingMsg::ReadVersion(hsStream* s, hsResMgr* mgr)
     hsBitVector contentFlags;
     contentFlags.Read(s);
 
-    if (contentFlags.IsBitSet(kClothingCommands))
+    if (contentFlags.IsBitSet(kClothingCommands)) {
         fCommands = s->ReadLE32();
-    if (contentFlags.IsBitSet(kClothingItemKey))
-    {
-        if (s->ReadBool())
-            fItemKey = mgr->ReadKey(s);
     }
-    if (contentFlags.IsBitSet(kClothingColor))
+
+    if (contentFlags.IsBitSet(kClothingItemKey)) {
+        if (s->ReadBool()) {
+            fItemKey = mgr->ReadKey(s);
+        }
+    }
+
+    if (contentFlags.IsBitSet(kClothingColor)) {
         fColor.Read(s);
+    }
 }
 
 void plClothingMsg::WriteVersion(hsStream* s, hsResMgr* mgr)
@@ -109,15 +118,21 @@ void plClothingMsg::WriteVersion(hsStream* s, hsResMgr* mgr)
     s->WriteLE32(fCommands);
     // kClothingItemKey
     s->WriteBool(fItemKey != nil);
-    if (fItemKey)
+
+    if (fItemKey) {
         mgr->WriteKey(s, fItemKey);
+    }
+
     // kClothingColor
     fColor.Write(s);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 
-plClothingUpdateBCMsg::plClothingUpdateBCMsg() { SetBCastFlag(plMessage::kBCastByExactType); }
+plClothingUpdateBCMsg::plClothingUpdateBCMsg()
+{
+    SetBCastFlag(plMessage::kBCastByExactType);
+}
 
 void plClothingUpdateBCMsg::Read(hsStream* stream, hsResMgr* mgr)
 {

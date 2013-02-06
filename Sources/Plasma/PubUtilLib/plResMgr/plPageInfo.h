@@ -55,10 +55,12 @@ class hsStream;
 class plLocation;
 class plString;
 
-class plPageInfo
-{
+class plPageInfo {
 public:
-    struct ClassVersion { uint16_t Class; uint16_t Version; };
+    struct ClassVersion {
+        uint16_t Class;
+        uint16_t Version;
+    };
     typedef std::vector<ClassVersion> ClassVerVec;
 
 protected:
@@ -70,45 +72,71 @@ protected:
     uint32_t    fChecksum;
     uint32_t    fDataStart, fIndexStart;
 
-    void        IInit( void );
-    void        ISetFrom( const plPageInfo &src );
+    void        IInit(void);
+    void        ISetFrom(const plPageInfo& src);
 
 public:
 
     plPageInfo();
-    plPageInfo( const plLocation &loc );
-    plPageInfo( const plPageInfo &src );
+    plPageInfo(const plLocation& loc);
+    plPageInfo(const plPageInfo& src);
     virtual ~plPageInfo();
 
-    const plString& GetAge() const  { return fAge; }
-    const plString& GetPage() const { return fPage; }
+    const plString& GetAge() const  {
+        return fAge;
+    }
+    const plString& GetPage() const {
+        return fPage;
+    }
 
-    plPageInfo &operator=( const plPageInfo &src );
+    plPageInfo& operator=(const plPageInfo& src);
 
-    void                ClearClassVersions() { fClassVersions.clear(); }
+    void                ClearClassVersions() {
+        fClassVersions.clear();
+    }
     void                AddClassVersion(uint16_t classIdx, uint16_t version);
-    const ClassVerVec&  GetClassVersions() const { return fClassVersions; }
+    const ClassVerVec&  GetClassVersions() const {
+        return fClassVersions;
+    }
 
     void SetStrings(const plString& age, const plString& page);
 
     void                SetLocation(const plLocation& loc);
-    const plLocation&   GetLocation() const { return fLocation; }
+    const plLocation&   GetLocation() const {
+        return fLocation;
+    }
 
-    uint16_t  GetMajorVersion() const { return fMajorVersion; }
-    void    SetMajorVersion(uint16_t major) { fMajorVersion = major; }
+    uint16_t  GetMajorVersion() const {
+        return fMajorVersion;
+    }
+    void    SetMajorVersion(uint16_t major) {
+        fMajorVersion = major;
+    }
 
-    void    SetChecksum( uint32_t c ) { fChecksum = c; }
-    uint32_t  GetChecksum( void ) const { return fChecksum; }
+    void    SetChecksum(uint32_t c) {
+        fChecksum = c;
+    }
+    uint32_t  GetChecksum(void) const {
+        return fChecksum;
+    }
 
-    void    Read( hsStream *s );
-    void    Write( hsStream *s );
+    void    Read(hsStream* s);
+    void    Write(hsStream* s);
 
-    bool    IsValid( void ) const;
+    bool    IsValid(void) const;
 
-    uint32_t  GetDataStart( void ) const { return fDataStart; }
-    void    SetDataStart( uint32_t s ) { fDataStart = s; }
+    uint32_t  GetDataStart(void) const {
+        return fDataStart;
+    }
+    void    SetDataStart(uint32_t s) {
+        fDataStart = s;
+    }
 
-    uint32_t  GetIndexStart( void ) const { return fIndexStart; }
-    void    SetIndexStart( uint32_t s ) { fIndexStart = s; }
+    uint32_t  GetIndexStart(void) const {
+        return fIndexStart;
+    }
+    void    SetIndexStart(uint32_t s) {
+        fIndexStart = s;
+    }
 };
 #endif // _plPageInfo_h

@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define FAST_Q
 
 
-class plRandom
-{
+class plRandom {
 protected:
     mutable uint32_t      fSeed;
 public:
@@ -65,27 +64,31 @@ public:
     inline float        RandMinusOneToOne() const;
     inline float        RandZeroToOne() const;
 
-    uint32_t              GetSeed() const { return fSeed; }
-    void                SetSeed(int seed) { fSeed = seed; }
+    uint32_t              GetSeed() const {
+        return fSeed;
+    }
+    void                SetSeed(int seed) {
+        fSeed = seed;
+    }
 
     plRandom(int seed = 1) : fSeed(seed) {}
 };
 
 inline float plRandom::RandNorm() const
-{ 
+{
 #ifndef FAST_Q
-    return 1.f / 32767.f; 
+    return 1.f / 32767.f;
 #else // FAST_Q
     return (1.f / float(~0UL));
 #endif // FAST_Q
-} 
+}
 
 inline int plRandom::Rand() const
 {
 #ifndef FAST_Q
     register int temp;
     fSeed = fSeed * 1103515245 + 12345;
-    temp = (int)((fSeed/65536)&32767);
+    temp = (int)((fSeed / 65536) & 32767);
     return (temp);
 #else // FAST_Q
     return fSeed = 1664525L * fSeed + 1013904223L;
@@ -109,7 +112,7 @@ inline float plRandom::RandZeroToOne() const
 }
 
 // RandMinusOneToOne - same as RandZeroToOne, but we
-// mask in an exponent putting it in range [2..4), 
+// mask in an exponent putting it in range [2..4),
 // then subtract 3 to give [-1..1).
 inline float plRandom::RandMinusOneToOne() const
 {

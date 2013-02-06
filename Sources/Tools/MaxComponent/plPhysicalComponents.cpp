@@ -85,14 +85,14 @@ void DummyCodeIncludeFuncPhys()
 
 // SetupProperties -----------------------------------------------------------------
 // ----------------
-bool plPhysicCoreComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plPhysicCoreComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
 // PreConvert ----------------------------------------------------------------
 // -----------
-bool plPhysicCoreComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plPhysicCoreComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
@@ -101,8 +101,7 @@ bool plPhysicCoreComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
 // -----------
 void plPhysicCoreComponent::IFixBounds()
 {
-    if (fCompPB->GetInt(kBoundCondRadio) == 0)
-    {
+    if (fCompPB->GetInt(kBoundCondRadio) == 0) {
         // zero is a bad value left over from an old version of the GUI: upgrade in place
         fCompPB->Reset(kBoundCondRadio);                                    // reset to default
     }
@@ -110,13 +109,14 @@ void plPhysicCoreComponent::IFixBounds()
 
 // IGetProxy ----------------------------------------------------------------
 // ----------
-bool plPhysicCoreComponent::IGetProxy(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plPhysicCoreComponent::IGetProxy(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if (fCompPB->GetInt(kCustomBoundField))
-    {
-        plMaxNode *boundNode = (plMaxNode*)fCompPB->GetINode(kCustomBoundListStuff);
-        if (boundNode && boundNode->CanConvert())
+    if (fCompPB->GetInt(kCustomBoundField)) {
+        plMaxNode* boundNode = (plMaxNode*)fCompPB->GetINode(kCustomBoundListStuff);
+
+        if (boundNode && boundNode->CanConvert()) {
             return node->GetPhysicalProps()->SetProxyNode(boundNode, node, pErrMsg);
+        }
     }
 
     return true;
@@ -124,7 +124,7 @@ bool plPhysicCoreComponent::IGetProxy(plMaxNode *node, plErrorMsg *pErrMsg)
 
 // Convert ----------------------------------------------------------------
 // --------
-bool plPhysicCoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plPhysicCoreComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
@@ -139,14 +139,11 @@ bool plPhysicCoreComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
  converts.
 */
 
-class plPhysCoreAccessor : public PBAccessor
-{
+class plPhysCoreAccessor : public PBAccessor {
 public:
-    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t)
-    {
-        if (id == plPhysicCoreComponent::kCustomBoundListStuff)
-        {
-            plComponentBase *comp = (plComponentBase*)owner;
+    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t) {
+        if (id == plPhysicCoreComponent::kCustomBoundListStuff) {
+            plComponentBase* comp = (plComponentBase*)owner;
             comp->NotifyDependents(FOREVER, PART_ALL, REFMSG_USER_COMP_REF_CHANGED);
         }
     }
@@ -158,15 +155,14 @@ class plPhysDebugComponent : public plPhysicCoreComponent
 {
 public:
     plPhysDebugComponent();
-    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg); 
+    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
 
     virtual void CollectNonDrawables(INodeTab& nonDrawables);
 };
 */
 OBSOLETE_CLASS(plPhysDebugComponent, gPhysDebugDesc, "Physics Debug", "PhysDebug", COMP_TYPE_PHYSICAL, PHYSICS_DEBUG_CID)
 
-enum
-{
+enum {
     kPhysMain,
     kPhysMember,
     kPhysBounce,
@@ -174,69 +170,69 @@ enum
 };
 /*
 ParamBlockDesc2 gPhysicalBk
-(   
+(
     plComponent::kBlkComp, _T("physicsDebug"), 0, &gPhysDebugDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP, plComponent::kRefComp,
 
     //Roll out
-    4, 
+    4,
     kPhysMain, IDD_COMP_PHYSICAL, IDS_COMP_PHYS_DEBUG, 0, 0, NULL,
     kPhysMember, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_MEMBER, 0, APPENDROLL_CLOSED, &gMemberGroupProc,
     kPhysBounce, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_BOUNCE, 0, APPENDROLL_CLOSED, &gBounceGroupProc,
     kPhysReport, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_REPORT, 0, APPENDROLL_CLOSED, &gReportGroupProc,
 
     // params
-    plPhysicCoreComponent::kMass,       _T("Mass"),     TYPE_FLOAT,     P_ANIMATABLE, 0,    
+    plPhysicCoreComponent::kMass,       _T("Mass"),     TYPE_FLOAT,     P_ANIMATABLE, 0,
         p_default, 0.0,
         p_range, 0.0, 500.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
+        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
         IDC_COMP_PHYSICAL_EDIT1, IDC_COMP_PHYSICAL_SPIN1, 1.0,
         end,
 
-    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,    
+    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,
         p_default, 0.0,
         p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
+        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
         IDC_COMP_PHYSICAL_EDIT2, IDC_COMP_PHYSICAL_SPIN2, 0.1,
         end,
 
-    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
+    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,
         p_default, 0.5,
         p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
+        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
         IDC_COMP_PHYSICAL_EDIT3, IDC_COMP_PHYSICAL_SPIN3, 0.1,
         end,
-    
+
     plPhysicCoreComponent::kStartForceX, _T("StartForceX"),     TYPE_FLOAT,     P_ANIMATABLE, 0,
         p_default, 0.0f,
-        p_ui,   kPhysMain, TYPE_SPINNER, EDITTYPE_FLOAT, 
+        p_ui,   kPhysMain, TYPE_SPINNER, EDITTYPE_FLOAT,
         IDC_COMP_PHYSICAL_P3SF_EDIT1,IDC_COMP_PHYSICAL_P3SF_SPIN1, 0.1f,
         end,
 
     plPhysicCoreComponent::kStartForceY, _T("StartForceY"),     TYPE_FLOAT,     P_ANIMATABLE, 0,
         p_default, 0.0f,
-        p_ui,   kPhysMain, TYPE_SPINNER, EDITTYPE_FLOAT, 
+        p_ui,   kPhysMain, TYPE_SPINNER, EDITTYPE_FLOAT,
         IDC_COMP_PHYSICAL_P3SF_EDIT2,IDC_COMP_PHYSICAL_P3SF_SPIN2, 0.1f,
         end,
-    
+
     plPhysicCoreComponent::kStartForceZ, _T("StartForceZ"),     TYPE_FLOAT,     P_ANIMATABLE, 0,
         p_default, 0.0f,
-        p_ui,   kPhysMain, TYPE_SPINNER, EDITTYPE_FLOAT, 
+        p_ui,   kPhysMain, TYPE_SPINNER, EDITTYPE_FLOAT,
         IDC_COMP_PHYSICAL_P3SF_EDIT3,IDC_COMP_PHYSICAL_P3SF_SPIN3, 0.1f,
         end,
 
-    plPhysicCoreComponent::kStartTorqueX, _T("StartTorqueX"),       TYPE_FLOAT,     P_ANIMATABLE, 0,    
+    plPhysicCoreComponent::kStartTorqueX, _T("StartTorqueX"),       TYPE_FLOAT,     P_ANIMATABLE, 0,
         p_default, 0.0f,
         p_ui,   kPhysMain, TYPE_SPINNER, EDITTYPE_FLOAT,
         IDC_COMP_PHYSICAL_P3ST_EDIT1,IDC_COMP_PHYSICAL_P3ST_SPIN1, 0.1f,
         end,
 
-    plPhysicCoreComponent::kStartTorqueY, _T("StartTorqueY"),       TYPE_FLOAT,     P_ANIMATABLE, 0,    
+    plPhysicCoreComponent::kStartTorqueY, _T("StartTorqueY"),       TYPE_FLOAT,     P_ANIMATABLE, 0,
         p_default, 0.0f,
         p_ui,   kPhysMain, TYPE_SPINNER, EDITTYPE_FLOAT,
         IDC_COMP_PHYSICAL_P3ST_EDIT2,IDC_COMP_PHYSICAL_P3ST_SPIN2, 0.1f,
         end,
 
-    plPhysicCoreComponent::kStartTorqueZ, _T("StartTorqueZ"),       TYPE_FLOAT,     P_ANIMATABLE, 0,    
+    plPhysicCoreComponent::kStartTorqueZ, _T("StartTorqueZ"),       TYPE_FLOAT,     P_ANIMATABLE, 0,
         p_default, 0.0f,
         p_ui,   kPhysMain, TYPE_SPINNER, EDITTYPE_FLOAT,
         IDC_COMP_PHYSICAL_P3ST_EDIT3,IDC_COMP_PHYSICAL_P3ST_SPIN3, 0.1f,
@@ -261,12 +257,12 @@ ParamBlockDesc2 gPhysicalBk
         p_enable_ctrls, 1, plPhysicCoreComponent::kCustomBoundListStuff,
         end,
 
-    plPhysicCoreComponent::kLOSChkBx, _T("LOSChkBx"),       TYPE_BOOL,  P_ANIMATABLE, 0,    
+    plPhysicCoreComponent::kLOSChkBx, _T("LOSChkBx"),       TYPE_BOOL,  P_ANIMATABLE, 0,
         p_default, FALSE,
         p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_CHECK_LOS,
         end,
 
-    plPhysicCoreComponent::kAlignProxyShape, _T("AlignShapeChkBx"),     TYPE_BOOL,  P_ANIMATABLE, 0,    
+    plPhysicCoreComponent::kAlignProxyShape, _T("AlignShapeChkBx"),     TYPE_BOOL,  P_ANIMATABLE, 0,
         p_default, FALSE,
         p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_PHYS_ALIGN_SHAPE_BOOL,
         end,
@@ -335,11 +331,10 @@ bool plPhysDebugComponent::SetupProperties(plMaxNode *node, plErrorMsg *errMsg)
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-class plPhysTerrainComponent : public plPhysicCoreComponent
-{
+class plPhysTerrainComponent : public plPhysicCoreComponent {
 public:
     plPhysTerrainComponent();
-    bool SetupProperties(plMaxNode* node,plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
 
     virtual void CollectNonDrawables(INodeTab& nonDrawables);
 };
@@ -349,62 +344,62 @@ CLASS_DESC(plPhysTerrainComponent, gPhysTerrainDesc, "Terrain", "Terrain", COMP_
 
 
 ParamBlockDesc2 gPhysTerrainBk
-(   
+(
     plComponent::kBlkComp, _T("Terrain"), 0, &gPhysTerrainDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP, plComponent::kRefComp,
 
     //Roll out
-    1, 
+    1,
     kPhysMain, IDD_COMP_PHYS_TERRAIN, IDS_COMP_PHYS_TERRAIN, 0, 0, NULL,
 //  kPhysMember, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_MEMBER, 0, APPENDROLL_CLOSED, &gMemberGroupProc,
 //  kPhysBounce, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_BOUNCE, 0, APPENDROLL_CLOSED, &gBounceGroupProc,
 
     // params
 
-    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.5,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
-        end,
-    
-    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.0,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_TERRAIN_EDIT2, IDC_COMP_PHYS_TERRAIN_SPIN2, 0.0001f,
-        end,
-    
+    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.5,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
+    end,
+
+    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.0,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_TERRAIN_EDIT2, IDC_COMP_PHYS_TERRAIN_SPIN2, 0.0001f,
+    end,
+
     plPhysicCoreComponent::kBoundCondRadio, _T("BoundingConditions"),       TYPE_INT,       0, 0,
-        p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
-        p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
-        p_default, plSimDefs::kHullBounds,
-        end,
+    p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
+    p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
+    p_default, plSimDefs::kHullBounds,
+    end,
 
     plPhysicCoreComponent::kCustomBoundListStuff, _T("UserBoundChoice"),    TYPE_INODE,     0, 0,
-        p_ui,   kPhysMain, TYPE_PICKNODEBUTTON, IDC_COMP_PHYS_PICKSTATE_TERRAIN,
-        p_sclassID, GEOMOBJECT_CLASS_ID,
-        p_prompt, IDS_COMP_PHYS_CHOSEN_TERRAIN,
-        p_accessor, &gPhysCoreAccessor,
-        end,
+    p_ui,   kPhysMain, TYPE_PICKNODEBUTTON, IDC_COMP_PHYS_PICKSTATE_TERRAIN,
+    p_sclassID, GEOMOBJECT_CLASS_ID,
+    p_prompt, IDS_COMP_PHYS_CHOSEN_TERRAIN,
+    p_accessor, &gPhysCoreAccessor,
+    end,
 
     plPhysicCoreComponent::kCustomBoundField, _T("UserBoundCheckBx"),       TYPE_BOOL,      0,      0,
-        p_default, false,
-        p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_PHYS_CUSTOMCHK,
-        p_enable_ctrls, 1, plPhysicCoreComponent::kCustomBoundListStuff,
-        end,
+    p_default, false,
+    p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_PHYS_CUSTOMCHK,
+    p_enable_ctrls, 1, plPhysicCoreComponent::kCustomBoundListStuff,
+    end,
 
-    plPhysicCoreComponent::kAlignProxyShape, _T("AlignShapeChkBx"),     TYPE_BOOL,  P_ANIMATABLE, 0,    
-        p_default, FALSE,
-        p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_PHYS_ALIGN_SHAPE_BOOL,
-        end,
+    plPhysicCoreComponent::kAlignProxyShape, _T("AlignShapeChkBx"),     TYPE_BOOL,  P_ANIMATABLE, 0,
+    p_default, FALSE,
+    p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_PHYS_ALIGN_SHAPE_BOOL,
+    end,
 
     // Event Groups
-    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0,0,
-        p_default, plPhysicsGroups_DEAD::kStaticSimulated,
-        end,
+    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0, 0,
+    p_default, plPhysicsGroups_DEAD::kStaticSimulated,
+    end,
 
-    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0,0,
-        end,
+    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0, 0,
+    end,
 
     end
 );
@@ -417,11 +412,12 @@ plPhysTerrainComponent::plPhysTerrainComponent()
 
 void plPhysTerrainComponent::CollectNonDrawables(INodeTab& nonDrawables)
 {
-    if (fCompPB->GetInt(kCustomBoundField))
-    {
+    if (fCompPB->GetInt(kCustomBoundField)) {
         INode* boundsNode = fCompPB->GetINode(kCustomBoundListStuff);
-        if( boundsNode )
+
+        if (boundsNode) {
             nonDrawables.Append(1, &boundsNode);
+        }
     }
 }
 
@@ -433,21 +429,20 @@ void ValidateGroups(IParamBlock2* pb, int memberID, int bounceID, plComponent* c
     uint32_t defCollide = pb->GetParamDef(bounceID).def.i;
     uint32_t collide = pb->GetInt(bounceID);
 
-    if (defMember != member || defCollide != collide)
-    {
+    if (defMember != member || defCollide != collide) {
         pErrMsg->Set(true,
-            "Physics Conflict",
-            "The legacy physical component \"%s\" has non-default member or collide groups.\nPlease recreate it.",
-            comp->GetINode()->GetName()).Show();
+                     "Physics Conflict",
+                     "The legacy physical component \"%s\" has non-default member or collide groups.\nPlease recreate it.",
+                     comp->GetINode()->GetName()).Show();
         pErrMsg->Set(false);
     }
 }
 
-bool plPhysTerrainComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plPhysTerrainComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     IFixBounds();
 
-    plPhysicalProps *physProps = pNode->GetPhysicalProps();
+    plPhysicalProps* physProps = pNode->GetPhysicalProps();
 
     physProps->SetMass(0, pNode, pErrMsg);
 
@@ -474,69 +469,70 @@ bool plPhysTerrainComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrM
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-class plProxyTerrainComponent : public plPhysicCoreComponent
-{
+class plProxyTerrainComponent : public plPhysicCoreComponent {
 public:
     plProxyTerrainComponent();
-    bool SetupProperties(plMaxNode* node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual void CollectNonDrawables(INodeTab& nonDrawables) { AddTargetsToList(nonDrawables); }
+    virtual void CollectNonDrawables(INodeTab& nonDrawables) {
+        AddTargetsToList(nonDrawables);
+    }
 };
 
 CLASS_DESC(plProxyTerrainComponent, gProxyTerrainDesc, "Proxy Terrain", "ProxyTerrain", COMP_TYPE_PHYSICAL, PHYSICS_INVISIBLE_CID)
 
 ParamBlockDesc2 gPhysInvisibleBk
-(   
+(
     plComponent::kBlkComp, _T("ProxyTerrain"), 0, &gProxyTerrainDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP, plComponent::kRefComp,
 
     //Roll out
-    1, 
+    1,
     kPhysMain, IDD_COMP_PHYS_PROXY_TERRAIN, IDS_COMP_PHYS_PROXY_TERRAIN, 0, 0, NULL,
 //  kPhysMember, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_MEMBER, 0, APPENDROLL_CLOSED, &gMemberGroupProc,
 //  kPhysBounce, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_BOUNCE, 0, APPENDROLL_CLOSED, &gBounceGroupProc,
 
     // params
     plPhysicCoreComponent::kBoundCondRadio, _T("BoundingConditions"),       TYPE_INT,       0, 0,
-        p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
-        p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
-        p_default, plSimDefs::kHullBounds,
-        end,
+    p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
+    p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
+    p_default, plSimDefs::kHullBounds,
+    end,
 
-    plPhysicCoreComponent::kUILOSChkBx, _T("UILOSChkBx"),       TYPE_BOOL,  P_ANIMATABLE, 0,    
-        p_default, FALSE,
-        p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_CHECK_LOS,
-        end,
+    plPhysicCoreComponent::kUILOSChkBx, _T("UILOSChkBx"),       TYPE_BOOL,  P_ANIMATABLE, 0,
+    p_default, FALSE,
+    p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_CHECK_LOS,
+    end,
 
-    plPhysicCoreComponent::kCamLOSChkBx, _T("CamLOSChkBx"),     TYPE_BOOL,  P_ANIMATABLE, 0,    
-        p_default, FALSE,
-        p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_CHECK_LOS2,
-        end,
+    plPhysicCoreComponent::kCamLOSChkBx, _T("CamLOSChkBx"),     TYPE_BOOL,  P_ANIMATABLE, 0,
+    p_default, FALSE,
+    p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_CHECK_LOS2,
+    end,
 
-    plPhysicCoreComponent::kCamAvoidChkBx, _T("CamLOSChkBx"),       TYPE_BOOL,  P_ANIMATABLE, 0,    
-        p_default, FALSE,
-        p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_CHECK_LOS3,
-        end,
-        
-    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.5,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
-        end,
+    plPhysicCoreComponent::kCamAvoidChkBx, _T("CamLOSChkBx"),       TYPE_BOOL,  P_ANIMATABLE, 0,
+    p_default, FALSE,
+    p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_CHECK_LOS3,
+    end,
 
-    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.0,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_INVIS_BOUNCE_EDIT, IDC_COMP_PHYS_INVIS_BOUNCE_SPIN, 0.0001f,
-        end,
+    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.5,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
+    end,
+
+    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.0,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_INVIS_BOUNCE_EDIT, IDC_COMP_PHYS_INVIS_BOUNCE_SPIN, 0.0001f,
+    end,
 
     // Event Groups
-    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0,0,
-        p_default, plPhysicsGroups_DEAD::kStaticSimulated,
-        end,
-    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0,0,
-        end,
+    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0, 0,
+    p_default, plPhysicsGroups_DEAD::kStaticSimulated,
+    end,
+    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0, 0,
+    end,
 
     end
 );
@@ -547,33 +543,37 @@ plProxyTerrainComponent::plProxyTerrainComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plProxyTerrainComponent::SetupProperties(plMaxNode *node, plErrorMsg *errMsg)
+bool plProxyTerrainComponent::SetupProperties(plMaxNode* node, plErrorMsg* errMsg)
 {
     IFixBounds();
     node->SetDrawable(false);
 
-    plPhysicalProps *physProps = node->GetPhysicalProps();
+    plPhysicalProps* physProps = node->GetPhysicalProps();
 
     physProps->SetMass(0, node, errMsg);
-    
-    if (fCompPB->GetInt(kUILOSChkBx) || fCompPB->GetInt(kCamLOSChkBx))
-    {
+
+    if (fCompPB->GetInt(kUILOSChkBx) || fCompPB->GetInt(kCamLOSChkBx)) {
 // XXX      physProps->SetAllowLOS(false, pNode, pErrMsg);
 
-    
-        if (fCompPB->GetInt(kUILOSChkBx))
+
+        if (fCompPB->GetInt(kUILOSChkBx)) {
             physProps->SetLOSBlockUI(true, node, errMsg);
-        if (fCompPB->GetInt(kCamLOSChkBx))
+        }
+
+        if (fCompPB->GetInt(kCamLOSChkBx)) {
             physProps->SetLOSBlockCamera(true, node, errMsg);
-        if (fCompPB->GetInt(kCamAvoidChkBx))
+        }
+
+        if (fCompPB->GetInt(kCamAvoidChkBx)) {
             physProps->SetCameraAvoidFlag(true, node, errMsg);
+        }
     }
-    
+
     physProps->SetLOSAvatarWalkable(true, node, errMsg);
-    
+
     physProps->SetFriction(fCompPB->GetFloat(kFriction), node, errMsg);
     physProps->SetBoundsType(fCompPB->GetInt(kBoundCondRadio), node, errMsg);
-    
+
     physProps->SetGroup(plSimDefs::kGroupStatic, node, errMsg);
     ValidateGroups(fCompPB, plPhysicCoreComponent::kMemberGroups_DEAD, plPhysicCoreComponent::kBounceGroups_DEAD, this, errMsg);
 //  physProps->SetMemberGroup(plEventGroupProc::GetGroups(fCompPB, plPhysicCoreComponent::kMemberGroups), node, errMsg);
@@ -588,14 +588,15 @@ bool plProxyTerrainComponent::SetupProperties(plMaxNode *node, plErrorMsg *errMs
 // plCameraBlockerComponent
 //
 /////////////////////////////////////////////////////////////////////////////////////////
-class plCameraBlockerComponent : public plPhysicCoreComponent
-{
+class plCameraBlockerComponent : public plPhysicCoreComponent {
 public:
     plCameraBlockerComponent();
 
-    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg); 
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual void CollectNonDrawables(INodeTab& nonDrawables) { AddTargetsToList(nonDrawables); }
+    virtual void CollectNonDrawables(INodeTab& nonDrawables) {
+        AddTargetsToList(nonDrawables);
+    }
 };
 
 CLASS_DESC(plCameraBlockerComponent, gCameraBlockerDesc, "(ex) Camera Blocker", "CameraBlocker", COMP_TYPE_PHYSICAL, PHYS_CAMERA_BLOCK_CID)
@@ -605,23 +606,23 @@ ParamBlockDesc2 gCameraOccludeBlock
     plComponent::kBlkComp, _T("cameraBlocker"), 0, &gCameraBlockerDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP, plComponent::kRefComp,
 
     //Roll out
-    1, 
+    1,
     kPhysMain, IDD_COMP_CAMERA_OCCLUDER, IDS_CAMERA_OCCLUDERS, 0, 0, NULL,
 //  kPhysMember, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_MEMBER, 0, APPENDROLL_CLOSED, &gMemberGroupProc,
 //  kPhysBounce, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_BOUNCE, 0, APPENDROLL_CLOSED, &gBounceGroupProc,
 
     plPhysicCoreComponent::kBoundCondRadio, _T("BlockerBounds"),    TYPE_INT,       0, 0,
-        p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
-        p_vals,     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
-        p_default, plSimDefs::kHullBounds,
-        end,
+    p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
+    p_vals,     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
+    p_default, plSimDefs::kHullBounds,
+    end,
 
     // Event Groups
-    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0,0,
-        end,
+    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0, 0,
+    end,
 
-    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0,0,
-        end,
+    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0, 0,
+    end,
 
     end
 );
@@ -632,13 +633,13 @@ plCameraBlockerComponent::plCameraBlockerComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plCameraBlockerComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plCameraBlockerComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     IFixBounds();
 
     pNode->SetDrawable(false);
 
-    plPhysicalProps *physProps = pNode->GetPhysicalProps();
+    plPhysicalProps* physProps = pNode->GetPhysicalProps();
 
     physProps->SetMass(0, pNode, pErrMsg);
     physProps->SetFriction(0, pNode, pErrMsg);
@@ -661,11 +662,10 @@ bool plCameraBlockerComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pEr
 // plPhysSimpleComponent
 //
 /////////////////////////////////////////////////////////////////////////////////////////
-class plPhysSimpleComponent : public plPhysicCoreComponent
-{
+class plPhysSimpleComponent : public plPhysicCoreComponent {
 public:
     plPhysSimpleComponent();
-    bool SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
 
     virtual void CollectNonDrawables(INodeTab& nonDrawables);
 };
@@ -673,88 +673,88 @@ public:
 CLASS_DESC(plPhysSimpleComponent, gPhysSimpleDesc, "Simple", "Simple", COMP_TYPE_PHYSICAL, PHYSICS_SIMPLE_CID)
 
 ParamBlockDesc2 gPhysSimpleBk
-(   
+(
     plComponent::kBlkComp, _T("Simple"), 0, &gPhysSimpleDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP, plComponent::kRefComp,
 
     //Roll out
-    1, 
+    1,
     kPhysMain, IDD_COMP_PHYS_SIMPLE, IDS_COMP_PHYS_SIMPLE, 0, 0, NULL,
 //  kPhysMember, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_MEMBER, 0, APPENDROLL_CLOSED, &gMemberGroupProc,
 //  kPhysBounce, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_BOUNCE, 0, APPENDROLL_CLOSED, &gBounceGroupProc,
 
     // params
-    plPhysicCoreComponent::kMass,       _T("Mass"),     TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 1.0,
-        p_range, 0.001, 500.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_SIMP_EDIT1, IDC_COMP_PHYS_SIMP_SPIN1, 1.0,
-        end,
+    plPhysicCoreComponent::kMass,       _T("Mass"),     TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 1.0,
+    p_range, 0.001, 500.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_SIMP_EDIT1, IDC_COMP_PHYS_SIMP_SPIN1, 1.0,
+    end,
 
-    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.0,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_SIMP_EDIT2, IDC_COMP_PHYS_SIMP_SPIN2, 0.1,
-        end,
+    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.0,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_SIMP_EDIT2, IDC_COMP_PHYS_SIMP_SPIN2, 0.1,
+    end,
 
-    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.5,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_SIMP_EDIT3, IDC_COMP_PHYS_SIMP_SPIN3, 0.1,
-        end,
+    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.5,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_SIMP_EDIT3, IDC_COMP_PHYS_SIMP_SPIN3, 0.1,
+    end,
 
     plPhysicCoreComponent::kBoundCondRadio, _T("BoundingConditions"),       TYPE_INT,       0, 0,
-        p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
-        p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
-        p_default, plSimDefs::kHullBounds,
-        end,
+    p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
+    p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
+    p_default, plSimDefs::kHullBounds,
+    end,
 
     plPhysicCoreComponent::kCustomBoundListStuff, _T("UserBoundChoice"),    TYPE_INODE,     0, 0,
-        p_ui,   kPhysMain, TYPE_PICKNODEBUTTON, IDC_COMP_PHYS_PICKSTATE_SIMP,
-        p_sclassID, GEOMOBJECT_CLASS_ID,
-        p_prompt, IDS_COMP_PHYS_CHOSEN_SIMP,
-        p_accessor, &gPhysCoreAccessor,
-        end,
+    p_ui,   kPhysMain, TYPE_PICKNODEBUTTON, IDC_COMP_PHYS_PICKSTATE_SIMP,
+    p_sclassID, GEOMOBJECT_CLASS_ID,
+    p_prompt, IDS_COMP_PHYS_CHOSEN_SIMP,
+    p_accessor, &gPhysCoreAccessor,
+    end,
 
     plPhysicCoreComponent::kCustomBoundField, _T("UserBoundCheckBx"),       TYPE_BOOL,      0,      0,
-        p_default, false,
-        p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_PHYS_CUSTOMCHK,
-        p_enable_ctrls, 1, plPhysicCoreComponent::kCustomBoundListStuff,
-        end,
+    p_default, false,
+    p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_PHYS_CUSTOMCHK,
+    p_enable_ctrls, 1, plPhysicCoreComponent::kCustomBoundListStuff,
+    end,
 
-    plPhysicCoreComponent::kAlignProxyShape, _T("AlignShapeChkBx"),     TYPE_BOOL,  P_ANIMATABLE, 0,    
-        p_default, FALSE,
-        p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_PHYS_ALIGN_SHAPE_BOOL,
-        end,
-        
+    plPhysicCoreComponent::kAlignProxyShape, _T("AlignShapeChkBx"),     TYPE_BOOL,  P_ANIMATABLE, 0,
+    p_default, FALSE,
+    p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_PHYS_ALIGN_SHAPE_BOOL,
+    end,
+
     plPhysicCoreComponent::kNoSynchronize, _T("DontSynchronizeChkBx"),  TYPE_BOOL,  0,  0,
-        p_default, false,
-        p_ui,   kPhysMain,  TYPE_SINGLECHEKBOX, IDC_PH_NO_SYNC_CHK,
-        end,
+    p_default, false,
+    p_ui,   kPhysMain,  TYPE_SINGLECHEKBOX, IDC_PH_NO_SYNC_CHK,
+    end,
 
     plPhysicCoreComponent::kStartInactive, _T("StartInactiveChkBx"),    TYPE_BOOL, 0, 0,
-        p_default, true,
-        p_ui,   kPhysMain,  TYPE_SINGLECHEKBOX, IDC_PH_INACTIVE_CHK,
-        end,
-        
+    p_default, true,
+    p_ui,   kPhysMain,  TYPE_SINGLECHEKBOX, IDC_PH_INACTIVE_CHK,
+    end,
+
     // Event Groups
-    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0,0,
-        p_default, plPhysicsGroups_DEAD::kDynamicSimulated,
-        end,
-    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0,0,
-        p_default,  plPhysicsGroups_DEAD::kStaticSimulated |
-                    plPhysicsGroups_DEAD::kDynamicSimulated |
-                    plPhysicsGroups_DEAD::kAnimated,
-        end,
+    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0, 0,
+    p_default, plPhysicsGroups_DEAD::kDynamicSimulated,
+    end,
+    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0, 0,
+    p_default,  plPhysicsGroups_DEAD::kStaticSimulated |
+    plPhysicsGroups_DEAD::kDynamicSimulated |
+    plPhysicsGroups_DEAD::kAnimated,
+    end,
 
     plPhysicCoreComponent::kAvAnimPushable, _T("AvAnimPushable"),   TYPE_BOOL,  0,  0,
-        p_default, false,
-        p_ui,   kPhysMain,  TYPE_SINGLECHEKBOX, IDC_PH_AVANIMPUSHABLE,
-        end,
-        
+    p_default, false,
+    p_ui,   kPhysMain,  TYPE_SINGLECHEKBOX, IDC_PH_AVANIMPUSHABLE,
+    end,
+
     end
-);  
+);
 
 plPhysSimpleComponent::plPhysSimpleComponent()
 {
@@ -764,19 +764,20 @@ plPhysSimpleComponent::plPhysSimpleComponent()
 
 void plPhysSimpleComponent::CollectNonDrawables(INodeTab& nonDrawables)
 {
-    if (fCompPB->GetInt(kCustomBoundField))
-    {
+    if (fCompPB->GetInt(kCustomBoundField)) {
         INode* boundsNode = fCompPB->GetINode(kCustomBoundListStuff);
-        if( boundsNode )
+
+        if (boundsNode) {
             nonDrawables.Append(1, &boundsNode);
+        }
     }
 }
 
-bool plPhysSimpleComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plPhysSimpleComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     IFixBounds();
 
-    plPhysicalProps *physProps = pNode->GetPhysicalProps();
+    plPhysicalProps* physProps = pNode->GetPhysicalProps();
 
     physProps->SetMass(fCompPB->GetFloat(kMass), pNode, pErrMsg);
     physProps->SetRestitution(fCompPB->GetFloat(kBounce), pNode, pErrMsg);
@@ -793,8 +794,9 @@ bool plPhysSimpleComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMs
     physProps->SetStartInactive(fCompPB->GetInt(kStartInactive));
     physProps->SetAvAnimPushable(fCompPB->GetInt(kAvAnimPushable));
 
-    if( !pNode->IsAnimated() )
+    if (!pNode->IsAnimated()) {
         pNode->SetItinerant(true);
+    }
 
     return IGetProxy(pNode, pErrMsg);
 }
@@ -803,65 +805,66 @@ bool plPhysSimpleComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMs
 ////////////////////////////////////////////////////////////////////////////////
 //!  Invisible Blocker Component Class
 
-class plPhysBlockerComponent : public plPhysicCoreComponent
-{
+class plPhysBlockerComponent : public plPhysicCoreComponent {
 public:
     plPhysBlockerComponent();
-    bool SetupProperties(plMaxNode* node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual void CollectNonDrawables(INodeTab& nonDrawables) { AddTargetsToList(nonDrawables); }
+    virtual void CollectNonDrawables(INodeTab& nonDrawables) {
+        AddTargetsToList(nonDrawables);
+    }
 };
 
 CLASS_DESC(plPhysBlockerComponent, gPhysBlockerDesc, "(ex) Invisible Blocker",  "InvisBlocker", COMP_TYPE_PHYSICAL, PHYSICS_BLOCKER_CID)
 
 ParamBlockDesc2 gPhysBlockerBk
-(   
+(
     plComponent::kBlkComp, _T("invisibleBlocker"), 0, &gPhysBlockerDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP, plComponent::kRefComp,
 
     //Roll out
-    1, 
+    1,
     kPhysMain, IDD_COMP_PHYS_INVISIBLE, IDS_COMP_PHYS_INVISIBLE, 0, 0, NULL,
 //  kPhysMember, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_MEMBER, 0, APPENDROLL_CLOSED, &gMemberGroupProc,
 //  kPhysBounce, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_BOUNCE, 0, APPENDROLL_CLOSED, &gBounceGroupProc,
 
     // params
     plPhysicCoreComponent::kBoundCondRadio, _T("BoundingConditions"),       TYPE_INT,       0, 0,
-        p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
-        p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
-        p_default, plSimDefs::kHullBounds,
-        end,
+    p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
+    p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
+    p_default, plSimDefs::kHullBounds,
+    end,
 
-    plPhysicCoreComponent::kLOSChkBx, _T("LOSChkBx"),       TYPE_BOOL,  P_ANIMATABLE, 0,    
-        p_default, FALSE,
-        p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_CHECK_LOS,
-        end,
+    plPhysicCoreComponent::kLOSChkBx, _T("LOSChkBx"),       TYPE_BOOL,  P_ANIMATABLE, 0,
+    p_default, FALSE,
+    p_ui,   kPhysMain, TYPE_SINGLECHEKBOX, IDC_COMP_CHECK_LOS,
+    end,
 
-    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.5,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
-        end,
+    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.5,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
+    end,
 
-    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.0,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_INVIS_BOUNCE_EDIT, IDC_COMP_PHYS_INVIS_BOUNCE_SPIN, 0.0001f,
-        end,
+    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.0,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_INVIS_BOUNCE_EDIT, IDC_COMP_PHYS_INVIS_BOUNCE_SPIN, 0.0001f,
+    end,
 
     // Event Groups
-    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0,0,
-        p_default, plPhysicsGroups_DEAD::kStaticSimulated,
-        end,
-    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0,0,
-        end,
+    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0, 0,
+    p_default, plPhysicsGroups_DEAD::kStaticSimulated,
+    end,
+    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0, 0,
+    end,
 
     plPhysicCoreComponent::kGroup, _T("group"),     TYPE_INT,       0, 0,
-        p_ui,       kPhysMain, TYPE_RADIO, 2, IDC_RADIO_BLOCK_AVATAR, IDC_RADIO_BLOCK_DYNAMIC,
-        p_vals,     plSimDefs::kGroupAvatarBlocker,     plSimDefs::kGroupDynamicBlocker,
-        p_default, plSimDefs::kGroupAvatarBlocker,
-        end,
+    p_ui,       kPhysMain, TYPE_RADIO, 2, IDC_RADIO_BLOCK_AVATAR, IDC_RADIO_BLOCK_DYNAMIC,
+    p_vals,     plSimDefs::kGroupAvatarBlocker,     plSimDefs::kGroupDynamicBlocker,
+    p_default, plSimDefs::kGroupAvatarBlocker,
+    end,
 
     end
 );
@@ -872,18 +875,17 @@ plPhysBlockerComponent::plPhysBlockerComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plPhysBlockerComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plPhysBlockerComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     IFixBounds();
 
     pNode->SetDrawable(false);
 
-    plPhysicalProps *physProps = pNode->GetPhysicalProps();
+    plPhysicalProps* physProps = pNode->GetPhysicalProps();
 
     physProps->SetMass(0, pNode, pErrMsg);
 
-    if(fCompPB->GetInt(kLOSChkBx))
-    {
+    if (fCompPB->GetInt(kLOSChkBx)) {
         physProps->SetLOSBlockUI(true, pNode, pErrMsg);
         physProps->SetLOSBlockCamera(true, pNode, pErrMsg);
     }
@@ -902,55 +904,56 @@ bool plPhysBlockerComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrM
 ////////////////////////////////////////////////////////////////////////////////
 // Walkable
 
-class plPhysWalkableComponent : public plPhysicCoreComponent
-{
+class plPhysWalkableComponent : public plPhysicCoreComponent {
 public:
     plPhysWalkableComponent();
-    bool SetupProperties(plMaxNode* node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual void CollectNonDrawables(INodeTab& nonDrawables) { AddTargetsToList(nonDrawables); }
+    virtual void CollectNonDrawables(INodeTab& nonDrawables) {
+        AddTargetsToList(nonDrawables);
+    }
 };
 
 CLASS_DESC(plPhysWalkableComponent, gPhysWalkableDesc, "Walkable", "Walkable", COMP_TYPE_PHYS_TERRAINS, PHYS_WALKABLE_CID)
 
 ParamBlockDesc2 gPhysWalkableBk
-(   
+(
     plComponent::kBlkComp, _T("Walkable"), 0, &gPhysWalkableDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP, plComponent::kRefComp,
 
     //Roll out
-    1, 
+    1,
     kPhysMain, IDD_COMP_PHYS_INVISIBLE, IDS_COMP_PHYS_WALKABLE, 0, 0, NULL,
 //  kPhysMember, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_MEMBER, 0, APPENDROLL_CLOSED, &gMemberGroupProc,
 //  kPhysBounce, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_BOUNCE, 0, APPENDROLL_CLOSED, &gBounceGroupProc,
-    
+
     // params
     plPhysicCoreComponent::kBoundCondRadio, _T("BoundingConditions"),       TYPE_INT,       0, 0,
-        p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
-        p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
-        p_default, plSimDefs::kHullBounds,
-        end,
+    p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
+    p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
+    p_default, plSimDefs::kHullBounds,
+    end,
 
 
-    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.5,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
-        end,
+    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.5,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
+    end,
 
-    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.0,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_INVIS_BOUNCE_EDIT, IDC_COMP_PHYS_INVIS_BOUNCE_SPIN, 0.0001f,
-        end,
-    
+    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.0,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_INVIS_BOUNCE_EDIT, IDC_COMP_PHYS_INVIS_BOUNCE_SPIN, 0.0001f,
+    end,
+
     // Event Groups
-    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0,0,
-        p_default, plPhysicsGroups_DEAD::kStaticSimulated,
-        end,
-    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0,0,
-        end,
+    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0, 0,
+    p_default, plPhysicsGroups_DEAD::kStaticSimulated,
+    end,
+    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0, 0,
+    end,
 
     end
 );
@@ -961,13 +964,13 @@ plPhysWalkableComponent::plPhysWalkableComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plPhysWalkableComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plPhysWalkableComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     IFixBounds();
 
     pNode->SetDrawable(false);
 
-    plPhysicalProps *physProps = pNode->GetPhysicalProps();
+    plPhysicalProps* physProps = pNode->GetPhysicalProps();
 
     physProps->SetMass(0, pNode, pErrMsg);
     physProps->SetFriction(fCompPB->GetFloat(kFriction), pNode, pErrMsg);
@@ -984,54 +987,55 @@ bool plPhysWalkableComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErr
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Climable
-class plPhysClimbableComponent : public plPhysicCoreComponent
-{
+class plPhysClimbableComponent : public plPhysicCoreComponent {
 public:
     plPhysClimbableComponent();
-    bool SetupProperties(plMaxNode* node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual void CollectNonDrawables(INodeTab& nonDrawables) { AddTargetsToList(nonDrawables); }
+    virtual void CollectNonDrawables(INodeTab& nonDrawables) {
+        AddTargetsToList(nonDrawables);
+    }
 };
 
 CLASS_DESC(plPhysClimbableComponent, gPhysClimbableDesc, "Climbable", "Climbable", COMP_TYPE_PHYS_TERRAINS, PHYS_CLIMBABLE_CID)
 
 ParamBlockDesc2 gPhysClimbableBk
-(   
+(
     plComponent::kBlkComp, _T("Climbable"), 0, &gPhysClimbableDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP, plComponent::kRefComp,
 
     //Roll out
-    1, 
+    1,
     kPhysMain, IDD_COMP_PHYS_CLIMBABLE, IDS_COMP_PHYS_CLIMBABLE, 0, 0, NULL,
 //  kPhysMember, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_MEMBER, 0, APPENDROLL_CLOSED, &gMemberGroupProc,
 //  kPhysBounce, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_BOUNCE, 0, APPENDROLL_CLOSED, &gBounceGroupProc,
-    
+
     // params
     plPhysicCoreComponent::kBoundCondRadio, _T("BoundingConditions"),       TYPE_INT,       0, 0,
-        p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
-        p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
-        p_default, plSimDefs::kHullBounds,
-        end,
+    p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
+    p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
+    p_default, plSimDefs::kHullBounds,
+    end,
 
-    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.5,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
-        end,
+    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.5,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
+    end,
 
-    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.0,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_INVIS_BOUNCE_EDIT, IDC_COMP_PHYS_INVIS_BOUNCE_SPIN, 0.0001f,
-        end,
-    
+    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.0,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_INVIS_BOUNCE_EDIT, IDC_COMP_PHYS_INVIS_BOUNCE_SPIN, 0.0001f,
+    end,
+
     // Event Groups
-    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0,0,
-        p_default, plPhysicsGroups_DEAD::kStaticSimulated,
-        end,
-    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0,0,
-        end,
+    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0, 0,
+    p_default, plPhysicsGroups_DEAD::kStaticSimulated,
+    end,
+    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0, 0,
+    end,
 
     end
 );
@@ -1042,13 +1046,13 @@ plPhysClimbableComponent::plPhysClimbableComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plPhysClimbableComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plPhysClimbableComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     IFixBounds();
 
     pNode->SetDrawable(false);
 
-    plPhysicalProps *physProps = pNode->GetPhysicalProps();
+    plPhysicalProps* physProps = pNode->GetPhysicalProps();
 
     physProps->SetMass(0, pNode, pErrMsg);
     physProps->SetFriction(fCompPB->GetFloat(kFriction), pNode, pErrMsg);
@@ -1070,71 +1074,76 @@ bool plPhysClimbableComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pEr
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-class Swim2DDlgProc : public ParamMap2UserDlgProc
-{
+class Swim2DDlgProc : public ParamMap2UserDlgProc {
 public:
     Swim2DDlgProc() {}
     ~Swim2DDlgProc() {}
-    
-    void IValidateSpinners(TimeValue t, IParamBlock2 *pb, IParamMap2 *map, uint32_t id)
-    {
+
+    void IValidateSpinners(TimeValue t, IParamBlock2* pb, IParamMap2* map, uint32_t id) {
         uint32_t minIndex, maxIndex;
         bool adjustMin;
-        switch(id)
-        {
+
+        switch (id) {
         case IDC_SWIM_CURRENT_PULL_NEAR_DIST:
         case IDC_SWIM_CURRENT_PULL_NEAR_DIST_SPIN:
-            minIndex = plPhysicCoreComponent::kSwimCurrentPullNearDist; maxIndex = plPhysicCoreComponent::kSwimCurrentPullFarDist; adjustMin = false;
+            minIndex = plPhysicCoreComponent::kSwimCurrentPullNearDist;
+            maxIndex = plPhysicCoreComponent::kSwimCurrentPullFarDist;
+            adjustMin = false;
             break;
 
         case IDC_SWIM_CURRENT_PULL_FAR_DIST:
         case IDC_SWIM_CURRENT_PULL_FAR_DIST_SPIN:
-            minIndex = plPhysicCoreComponent::kSwimCurrentPullNearDist; maxIndex = plPhysicCoreComponent::kSwimCurrentPullFarDist; adjustMin = true;
+            minIndex = plPhysicCoreComponent::kSwimCurrentPullNearDist;
+            maxIndex = plPhysicCoreComponent::kSwimCurrentPullFarDist;
+            adjustMin = true;
             break;
 
         case IDC_SWIM_CURRENT_STRAIGHT_NEAR_DIST:
         case IDC_SWIM_CURRENT_STRAIGHT_NEAR_DIST_SPIN:
-            minIndex = plPhysicCoreComponent::kSwimCurrentStraightNearDist; maxIndex = plPhysicCoreComponent::kSwimCurrentStraightFarDist; adjustMin = false;
+            minIndex = plPhysicCoreComponent::kSwimCurrentStraightNearDist;
+            maxIndex = plPhysicCoreComponent::kSwimCurrentStraightFarDist;
+            adjustMin = false;
             break;
 
         case IDC_SWIM_CURRENT_STRAIGHT_FAR_DIST:
         case IDC_SWIM_CURRENT_STRAIGHT_FAR_DIST_SPIN:
-            minIndex = plPhysicCoreComponent::kSwimCurrentStraightNearDist; maxIndex = plPhysicCoreComponent::kSwimCurrentStraightFarDist; adjustMin = true;
+            minIndex = plPhysicCoreComponent::kSwimCurrentStraightNearDist;
+            maxIndex = plPhysicCoreComponent::kSwimCurrentStraightFarDist;
+            adjustMin = true;
             break;
-            
+
         default:
             return;
         }
-        
+
         float min, max;
         min = pb->GetFloat(minIndex, t);
         max = pb->GetFloat(maxIndex, t);
-        
-        if (min > max)
-        {
-            if (adjustMin)
+
+        if (min > max) {
+            if (adjustMin) {
                 pb->SetValue(minIndex, t, max);
-            else
+            } else {
                 pb->SetValue(maxIndex, t, min);
-            
+            }
+
             map->Invalidate(minIndex);
             map->Invalidate(maxIndex);
         }
     }
-    
-    BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
+
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         int id = LOWORD(wParam);
-        
-        IParamBlock2 *pb = map->GetParamBlock();
-        
-        switch (msg)
-        {
-        case WM_COMMAND:  
+
+        IParamBlock2* pb = map->GetParamBlock();
+
+        switch (msg) {
+        case WM_COMMAND:
         case CC_SPINNER_CHANGE:
             IValidateSpinners(t, pb, map, id);
             return TRUE;
         }
+
         return FALSE;
     }
     void DeleteThis() {}
@@ -1144,132 +1153,132 @@ static Swim2DDlgProc gSwim2DDlgProc;
 CLASS_DESC(plSwim2DComponent, gPhysSwimSurfaceDesc, "Swim 2D", "Swim 2D", COMP_TYPE_PHYS_TERRAINS, PHYS_SWIMSURFACE_CID)
 
 ParamBlockDesc2 gPhysSwimSurfaceBk
-(   
+(
     plComponent::kBlkComp, _T("Swim 2D"), 0, &gPhysSwimSurfaceDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP, plComponent::kRefComp,
 
     //Roll out
-    1, 
+    1,
     kPhysMain, IDD_COMP_PHYS_SWIMSURF, IDS_COMP_PHYS_SWIMSURF, 0, 0, &gSwim2DDlgProc,
 //  kPhysMember, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_MEMBER, 0, APPENDROLL_CLOSED, &gMemberGroupProc,
 //  kPhysBounce, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_BOUNCE, 0, APPENDROLL_CLOSED, &gBounceGroupProc,
-    
+
     // params
     plPhysicCoreComponent::kBoundCondRadio, _T("BoundingConditions"),       TYPE_INT,       0, 0,
-        p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
-        p_vals,     plSimDefs::kSphereBounds,   plSimDefs::kBoxBounds,  plSimDefs::kHullBounds, plSimDefs::kProxyBounds,
-        p_default, plSimDefs::kHullBounds,
-        end,
-        
+    p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
+    p_vals,     plSimDefs::kSphereBounds,   plSimDefs::kBoxBounds,  plSimDefs::kHullBounds, plSimDefs::kProxyBounds,
+    p_default, plSimDefs::kHullBounds,
+    end,
+
     // Event Groups
-    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0,0,
-        end,
-    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0,0,
-        end,
+    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0, 0,
+    end,
+    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0, 0,
+    end,
 
     plPhysicCoreComponent::kSwimCurrentType, _T("CurrentType"),     TYPE_INT,       0, 0,
-        p_ui,       kPhysMain, TYPE_RADIO, 3, IDC_SWIM_CURRENT_NONE, IDC_SWIM_CURRENT_SPIRAL, IDC_SWIM_CURRENT_STRAIGHT,
-        p_vals,     plSwim2DComponent::kCurrentNone,    plSwim2DComponent::kCurrentSpiral, plSwim2DComponent::kCurrentStraight,
-        p_default,  plSwim2DComponent::kCurrentNone,
-        end,
+    p_ui,       kPhysMain, TYPE_RADIO, 3, IDC_SWIM_CURRENT_NONE, IDC_SWIM_CURRENT_SPIRAL, IDC_SWIM_CURRENT_STRAIGHT,
+    p_vals,     plSwim2DComponent::kCurrentNone,    plSwim2DComponent::kCurrentSpiral, plSwim2DComponent::kCurrentStraight,
+    p_default,  plSwim2DComponent::kCurrentNone,
+    end,
 
-    plPhysicCoreComponent::kSwimCurrentRotation, _T("SwimRotation"), TYPE_FLOAT, 0, 0,  
-        p_default, 1.0,
-        p_range, -100.0, 100.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT, 
-        IDC_SWIM_CURRENT_ROTATION, IDC_SWIM_CURRENT_ROTATION_SPIN, 1.0,
-        end,
-        
+    plPhysicCoreComponent::kSwimCurrentRotation, _T("SwimRotation"), TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, -100.0, 100.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT,
+    IDC_SWIM_CURRENT_ROTATION, IDC_SWIM_CURRENT_ROTATION_SPIN, 1.0,
+    end,
+
     plPhysicCoreComponent::kSwimDetectorNode, _T("swimDetector"),   TYPE_INODE,     0, 0,
-        p_ui,       kPhysMain, TYPE_PICKNODEBUTTON, IDC_SWIM_DETECTOR_NODE,
-        p_sclassID,  GEOMOBJECT_CLASS_ID,
-        p_prompt, IDS_SWIM_DETECTOR_NODE,
-        end,
-        
+    p_ui,       kPhysMain, TYPE_PICKNODEBUTTON, IDC_SWIM_DETECTOR_NODE,
+    p_sclassID,  GEOMOBJECT_CLASS_ID,
+    p_prompt, IDS_SWIM_DETECTOR_NODE,
+    end,
+
     plPhysicCoreComponent::kSwimCurrentNode, _T("swimCurrentNode"), TYPE_INODE,     0, 0,
-        p_ui,       kPhysMain, TYPE_PICKNODEBUTTON, IDC_SWIM_CURRENT_NODE,
-        //p_sclassID,    DUMMY_CLASS_ID,
-        p_prompt, IDS_SWIM_CURRENT_NODE,
-        end,
-        
-    plPhysicCoreComponent::kSwimBuoyancyDown, _T("BuoyancyDown"), TYPE_FLOAT, 0, 0, 
-        p_default, 3.0,
-        p_range, 0.0, 100.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_SWIM_BUOYANCY_DOWN, IDC_SWIM_BUOYANCY_DOWN_SPIN, 0.1,
-        end,
+    p_ui,       kPhysMain, TYPE_PICKNODEBUTTON, IDC_SWIM_CURRENT_NODE,
+    //p_sclassID,    DUMMY_CLASS_ID,
+    p_prompt, IDS_SWIM_CURRENT_NODE,
+    end,
 
-    plPhysicCoreComponent::kSwimBuoyancyUp, _T("BuoyancyUp"), TYPE_FLOAT, 0, 0, 
-        p_default, 0.05,
-        p_range, 0.0, 100.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_SWIM_BUOYANCY_UP, IDC_SWIM_BUOYANCY_UP_SPIN, 0.1,
-        end,
-    
-    plPhysicCoreComponent::kSwimMaxUpVel, _T("MaxUpVel"), TYPE_FLOAT, 0, 0, 
-        p_default, 3.0,
-        p_range, 0.0, 100.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_SWIM_MAX_UP_VEL, IDC_SWIM_MAX_UP_VEL_SPIN, 0.1,
-        end,        
+    plPhysicCoreComponent::kSwimBuoyancyDown, _T("BuoyancyDown"), TYPE_FLOAT, 0, 0,
+    p_default, 3.0,
+    p_range, 0.0, 100.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_SWIM_BUOYANCY_DOWN, IDC_SWIM_BUOYANCY_DOWN_SPIN, 0.1,
+    end,
 
-    plPhysicCoreComponent::kSwimCurrentPullNearDist, _T("PullNearDist"), TYPE_FLOAT, 0, 0,  
-        p_default, 1.0,
-        p_range, 0.0, 10000.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_SWIM_CURRENT_PULL_NEAR_DIST, IDC_SWIM_CURRENT_PULL_NEAR_DIST_SPIN, 1.0,
-        end,
+    plPhysicCoreComponent::kSwimBuoyancyUp, _T("BuoyancyUp"), TYPE_FLOAT, 0, 0,
+    p_default, 0.05,
+    p_range, 0.0, 100.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_SWIM_BUOYANCY_UP, IDC_SWIM_BUOYANCY_UP_SPIN, 0.1,
+    end,
 
-    plPhysicCoreComponent::kSwimCurrentPullNearVel, _T("PullNearVel"), TYPE_FLOAT, 0, 0,    
-        p_default, 0.0,
-        p_range, -100.0, 100.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT, 
-        IDC_SWIM_CURRENT_PULL_NEAR_VEL, IDC_SWIM_CURRENT_PULL_NEAR_VEL_SPIN, 1.0,
-        end,
+    plPhysicCoreComponent::kSwimMaxUpVel, _T("MaxUpVel"), TYPE_FLOAT, 0, 0,
+    p_default, 3.0,
+    p_range, 0.0, 100.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_SWIM_MAX_UP_VEL, IDC_SWIM_MAX_UP_VEL_SPIN, 0.1,
+    end,
 
-    plPhysicCoreComponent::kSwimCurrentPullFarDist, _T("PullFarDist"), TYPE_FLOAT, 0, 0,    
-        p_default, 1.0,
-        p_range, 0.0, 10000.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_SWIM_CURRENT_PULL_FAR_DIST, IDC_SWIM_CURRENT_PULL_FAR_DIST_SPIN, 1.0,
-        end,
+    plPhysicCoreComponent::kSwimCurrentPullNearDist, _T("PullNearDist"), TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, 0.0, 10000.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_SWIM_CURRENT_PULL_NEAR_DIST, IDC_SWIM_CURRENT_PULL_NEAR_DIST_SPIN, 1.0,
+    end,
 
-    plPhysicCoreComponent::kSwimCurrentPullFarVel, _T("PullFarVel"), TYPE_FLOAT, 0, 0,  
-        p_default, 0.0,
-        p_range, -100.0, 100.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT, 
-        IDC_SWIM_CURRENT_PULL_FAR_VEL, IDC_SWIM_CURRENT_PULL_FAR_VEL_SPIN, 1.0,
-        end,
+    plPhysicCoreComponent::kSwimCurrentPullNearVel, _T("PullNearVel"), TYPE_FLOAT, 0, 0,
+    p_default, 0.0,
+    p_range, -100.0, 100.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT,
+    IDC_SWIM_CURRENT_PULL_NEAR_VEL, IDC_SWIM_CURRENT_PULL_NEAR_VEL_SPIN, 1.0,
+    end,
 
-    plPhysicCoreComponent::kSwimCurrentStraightNearDist, _T("StraightNearDist"), TYPE_FLOAT, 0, 0,  
-        p_default, 1.0,
-        p_range, -10000.0, 10000.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT, 
-        IDC_SWIM_CURRENT_STRAIGHT_NEAR_DIST, IDC_SWIM_CURRENT_STRAIGHT_NEAR_DIST_SPIN, 1.0,
-        end,
+    plPhysicCoreComponent::kSwimCurrentPullFarDist, _T("PullFarDist"), TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, 0.0, 10000.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_SWIM_CURRENT_PULL_FAR_DIST, IDC_SWIM_CURRENT_PULL_FAR_DIST_SPIN, 1.0,
+    end,
 
-    plPhysicCoreComponent::kSwimCurrentStraightNearVel, _T("StraightNearVel"), TYPE_FLOAT, 0, 0,    
-        p_default, 0.0,
-        p_range, -100.0, 100.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT, 
-        IDC_SWIM_CURRENT_STRAIGHT_NEAR_VEL, IDC_SWIM_CURRENT_STRAIGHT_NEAR_VEL_SPIN, 1.0,
-        end,
+    plPhysicCoreComponent::kSwimCurrentPullFarVel, _T("PullFarVel"), TYPE_FLOAT, 0, 0,
+    p_default, 0.0,
+    p_range, -100.0, 100.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT,
+    IDC_SWIM_CURRENT_PULL_FAR_VEL, IDC_SWIM_CURRENT_PULL_FAR_VEL_SPIN, 1.0,
+    end,
 
-    plPhysicCoreComponent::kSwimCurrentStraightFarDist, _T("StraightFarDist"), TYPE_FLOAT, 0, 0,    
-        p_default, 1.0,
-        p_range, -10000.0, 10000.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT, 
-        IDC_SWIM_CURRENT_STRAIGHT_FAR_DIST, IDC_SWIM_CURRENT_STRAIGHT_FAR_DIST_SPIN, 1.0,
-        end,
+    plPhysicCoreComponent::kSwimCurrentStraightNearDist, _T("StraightNearDist"), TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, -10000.0, 10000.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT,
+    IDC_SWIM_CURRENT_STRAIGHT_NEAR_DIST, IDC_SWIM_CURRENT_STRAIGHT_NEAR_DIST_SPIN, 1.0,
+    end,
 
-    plPhysicCoreComponent::kSwimCurrentStraightFarVel, _T("StraightFarVel"), TYPE_FLOAT, 0, 0,  
-        p_default, 0.0,
-        p_range, -100.0, 100.0,
-        p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT, 
-        IDC_SWIM_CURRENT_STRAIGHT_FAR_VEL, IDC_SWIM_CURRENT_STRAIGHT_FAR_VEL_SPIN, 1.0,
-        end,
-        
+    plPhysicCoreComponent::kSwimCurrentStraightNearVel, _T("StraightNearVel"), TYPE_FLOAT, 0, 0,
+    p_default, 0.0,
+    p_range, -100.0, 100.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT,
+    IDC_SWIM_CURRENT_STRAIGHT_NEAR_VEL, IDC_SWIM_CURRENT_STRAIGHT_NEAR_VEL_SPIN, 1.0,
+    end,
+
+    plPhysicCoreComponent::kSwimCurrentStraightFarDist, _T("StraightFarDist"), TYPE_FLOAT, 0, 0,
+    p_default, 1.0,
+    p_range, -10000.0, 10000.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT,
+    IDC_SWIM_CURRENT_STRAIGHT_FAR_DIST, IDC_SWIM_CURRENT_STRAIGHT_FAR_DIST_SPIN, 1.0,
+    end,
+
+    plPhysicCoreComponent::kSwimCurrentStraightFarVel, _T("StraightFarVel"), TYPE_FLOAT, 0, 0,
+    p_default, 0.0,
+    p_range, -100.0, 100.0,
+    p_ui,       kPhysMain, TYPE_SPINNER,    EDITTYPE_FLOAT,
+    IDC_SWIM_CURRENT_STRAIGHT_FAR_VEL, IDC_SWIM_CURRENT_STRAIGHT_FAR_VEL_SPIN, 1.0,
+    end,
+
     end
-    );
+);
 
 // plSwim2DComponent -----------------
 // ------------------
@@ -1281,13 +1290,13 @@ plSwim2DComponent::plSwim2DComponent()
 
 // SetUpProperties -----------------------------------------------------------
 // ----------------
-bool plSwim2DComponent::SetupProperties(plMaxNode *node, plErrorMsg *errMsg)
+bool plSwim2DComponent::SetupProperties(plMaxNode* node, plErrorMsg* errMsg)
 {
     IFixBounds();
-    plPhysicalProps *physProps = nil;
-    plMaxNode *detectorNode = (plMaxNode *)fCompPB->GetINode(kSwimDetectorNode);
-    if (detectorNode)
-    {
+    plPhysicalProps* physProps = nil;
+    plMaxNode* detectorNode = (plMaxNode*)fCompPB->GetINode(kSwimDetectorNode);
+
+    if (detectorNode) {
         detectorNode->SetDrawable(false);
         physProps = detectorNode->GetPhysicalProps();
         physProps->SetMass(0, detectorNode, errMsg);
@@ -1295,85 +1304,84 @@ bool plSwim2DComponent::SetupProperties(plMaxNode *node, plErrorMsg *errMsg)
         physProps->SetGroup(plSimDefs::kGroupDetector, node, errMsg);
 //      physProps->SetMemberGroup(plEventGroupProc::GetGroups(fCompPB, plPhysicCoreComponent::kMemberGroups), detectorNode, errMsg);
 //      physProps->SetBounceGroup(plEventGroupProc::GetGroups(fCompPB, plPhysicCoreComponent::kBounceGroups), detectorNode, errMsg);
-        physProps->SetReportGroup(1<<plSimDefs::kGroupAvatar, detectorNode, errMsg);
+        physProps->SetReportGroup(1 << plSimDefs::kGroupAvatar, detectorNode, errMsg);
         physProps->SetBoundsType(plSimDefs::kBoxBounds, detectorNode, errMsg);
     }
-    
+
     physProps = node->GetPhysicalProps();
     physProps->SetMass(0, node, errMsg);
     physProps->SetBoundsType(fCompPB->GetInt(kBoundCondRadio), node, errMsg);
     physProps->SetLOSSwimRegion(true, node, errMsg);
-    
-    plMaxNode *currentNode = (plMaxNode *)fCompPB->GetINode(kSwimCurrentNode);
-    if (currentNode)
+
+    plMaxNode* currentNode = (plMaxNode*)fCompPB->GetINode(kSwimCurrentNode);
+
+    if (currentNode) {
         currentNode->SetForceLocal(true);
-    
+    }
+
     return true;
 }
 
-bool plSwim2DComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plSwim2DComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    plSwimRegionInterface *swimInt = nil;
+    plSwimRegionInterface* swimInt = nil;
     int type = fCompPB->GetInt(ParamID(kSwimCurrentType));
-    if (type != kCurrentNone && fCompPB->GetINode(ParamID(kSwimCurrentNode)) == nil)
-    {
+
+    if (type != kCurrentNone && fCompPB->GetINode(ParamID(kSwimCurrentNode)) == nil) {
         pErrMsg->Set(true, node->GetName(), "No dummy box set to define current. Forcing current to \"none\"").Show();
         type = kCurrentNone;
     }
-    
-    switch (type)
-    {
-    case kCurrentSpiral:
-        {
+
+    switch (type) {
+    case kCurrentSpiral: {
             fSwimRegions[node] = new plSwimCircularCurrentRegion();
             hsgResMgr::ResMgr()->NewKey(plString::FromUtf8(node->GetName()), fSwimRegions[node], node->GetLocation(), node->GetLoadMask());
             break;
         }
-    case kCurrentStraight:
-        {
+
+    case kCurrentStraight: {
             fSwimRegions[node] = new plSwimStraightCurrentRegion();
             hsgResMgr::ResMgr()->NewKey(plString::FromUtf8(node->GetName()), fSwimRegions[node], node->GetLocation(), node->GetLoadMask());
             break;
         }
-    default:
-        {
+
+    default: {
             fSwimRegions[node] = new plSwimRegionInterface();
             hsgResMgr::ResMgr()->NewKey(plString::FromUtf8(node->GetName()), fSwimRegions[node], node->GetLocation(), node->GetLoadMask());
             break;
         }
     }
+
     return true;
 }
-    
+
 // Convert ------------------------------------------------------------
 // --------
-bool plSwim2DComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plSwim2DComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    plMaxNode *detectorNode = (plMaxNode *)fCompPB->GetINode(kSwimDetectorNode);
-    if (detectorNode && detectorNode->GetSceneObject())
-    {
-        if (!detectorNode->GetSceneObject()->GetModifierByType(plSwimDetector::Index()))
-        {
+    plMaxNode* detectorNode = (plMaxNode*)fCompPB->GetINode(kSwimDetectorNode);
+
+    if (detectorNode && detectorNode->GetSceneObject()) {
+        if (!detectorNode->GetSceneObject()->GetModifierByType(plSwimDetector::Index())) {
             plKey nilKey;
-            plSwimMsg *enterMsg = new plSwimMsg(detectorNode->GetKey(), nilKey, true, nil);
-            plSwimMsg *exitMsg = new plSwimMsg(detectorNode->GetKey(), nilKey, false, nil);
+            plSwimMsg* enterMsg = new plSwimMsg(detectorNode->GetKey(), nilKey, true, nil);
+            plSwimMsg* exitMsg = new plSwimMsg(detectorNode->GetKey(), nilKey, false, nil);
             enterMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
             exitMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
-            plSwimDetector *swimMod = new plSwimDetector(enterMsg, exitMsg);
+            plSwimDetector* swimMod = new plSwimDetector(enterMsg, exitMsg);
             detectorNode->AddModifier(swimMod, IGetUniqueName(node));
-            
+
             // the mod doesn't have a valid key until AddModifier is called, so this comes last.
             enterMsg->fSwimRegionKey = swimMod->GetKey();
             exitMsg->fSwimRegionKey = swimMod->GetKey();
         }
     }
-    
+
     int type = fCompPB->GetInt(ParamID(kSwimCurrentType));
-    switch (type)
-    {
-    case kCurrentSpiral:
-        {
-            plSwimCircularCurrentRegion *circInt = plSwimCircularCurrentRegion::ConvertNoRef(fSwimRegions[node]);
+
+    switch (type) {
+    case kCurrentSpiral: {
+            plSwimCircularCurrentRegion* circInt = plSwimCircularCurrentRegion::ConvertNoRef(fSwimRegions[node]);
             circInt->fRotation = fCompPB->GetFloat(ParamID(kSwimCurrentRotation));
             circInt->fPullNearDistSq = fCompPB->GetFloat(ParamID(kSwimCurrentPullNearDist));
             circInt->fPullNearDistSq *= circInt->fPullNearDistSq;
@@ -1381,33 +1389,35 @@ bool plSwim2DComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
             circInt->fPullFarDistSq = fCompPB->GetFloat(ParamID(kSwimCurrentPullFarDist));
             circInt->fPullFarDistSq *= circInt->fPullFarDistSq;
             circInt->fPullFarVel = fCompPB->GetFloat(ParamID(kSwimCurrentPullFarVel));
-        
-            plMaxNode *currentNode = (plMaxNode *)fCompPB->GetINode(ParamID(kSwimCurrentNode));
-            if (currentNode)
-            {
-                plGenRefMsg *msg= new plGenRefMsg(circInt->GetKey(), plRefMsg::kOnCreate, -1, -1);
-                hsgResMgr::ResMgr()->AddViaNotify(currentNode->GetSceneObject()->GetKey(), msg, plRefFlags::kActiveRef); 
+
+            plMaxNode* currentNode = (plMaxNode*)fCompPB->GetINode(ParamID(kSwimCurrentNode));
+
+            if (currentNode) {
+                plGenRefMsg* msg = new plGenRefMsg(circInt->GetKey(), plRefMsg::kOnCreate, -1, -1);
+                hsgResMgr::ResMgr()->AddViaNotify(currentNode->GetSceneObject()->GetKey(), msg, plRefFlags::kActiveRef);
             }
+
             break;
         }
-    case kCurrentStraight:
-        {
-            plSwimStraightCurrentRegion *strInt = plSwimStraightCurrentRegion::ConvertNoRef(fSwimRegions[node]);
+
+    case kCurrentStraight: {
+            plSwimStraightCurrentRegion* strInt = plSwimStraightCurrentRegion::ConvertNoRef(fSwimRegions[node]);
             strInt->fNearDist = fCompPB->GetFloat(ParamID(kSwimCurrentStraightNearDist));
             strInt->fNearVel = fCompPB->GetFloat(ParamID(kSwimCurrentStraightNearVel));
             strInt->fFarDist = fCompPB->GetFloat(ParamID(kSwimCurrentStraightFarDist));
             strInt->fFarVel = fCompPB->GetFloat(ParamID(kSwimCurrentStraightFarVel));
-            
-            plMaxNode *currentNode = (plMaxNode *)fCompPB->GetINode(ParamID(kSwimCurrentNode));
-            if (currentNode)
-            {
-                plGenRefMsg *msg= new plGenRefMsg(strInt->GetKey(), plRefMsg::kOnCreate, -1, -1);
-                hsgResMgr::ResMgr()->AddViaNotify(currentNode->GetSceneObject()->GetKey(), msg, plRefFlags::kActiveRef); 
+
+            plMaxNode* currentNode = (plMaxNode*)fCompPB->GetINode(ParamID(kSwimCurrentNode));
+
+            if (currentNode) {
+                plGenRefMsg* msg = new plGenRefMsg(strInt->GetKey(), plRefMsg::kOnCreate, -1, -1);
+                hsgResMgr::ResMgr()->AddViaNotify(currentNode->GetSceneObject()->GetKey(), msg, plRefFlags::kActiveRef);
             }
+
             break;
         }
-    default:
-        {
+
+    default: {
             // Already done all the work in PreConvert
             break;
         }
@@ -1416,9 +1426,9 @@ bool plSwim2DComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     fSwimRegions[node]->fDownBuoyancy = fCompPB->GetFloat(ParamID(kSwimBuoyancyDown)) + 1;
     fSwimRegions[node]->fUpBuoyancy = fCompPB->GetFloat(ParamID(kSwimBuoyancyUp)) + 1;
     fSwimRegions[node]->fMaxUpwardVel = fCompPB->GetFloat(ParamID(kSwimMaxUpVel));
-    
+
     hsgResMgr::ResMgr()->AddViaNotify(fSwimRegions[node]->GetKey(), new plObjRefMsg(node->GetKey(), plRefMsg::kOnCreate, -1, plObjRefMsg::kInterface), plRefFlags::kActiveRef);
-    
+
     return true;
 }
 
@@ -1426,54 +1436,55 @@ bool plSwim2DComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 ////////////////////////////////////////////////////////////////////////////////
 // Swim 3D
 
-class plPhysSwim3DComponent : public plPhysicCoreComponent
-{
+class plPhysSwim3DComponent : public plPhysicCoreComponent {
 public:
     plPhysSwim3DComponent();
-    bool SetupProperties(plMaxNode* node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual void CollectNonDrawables(INodeTab& nonDrawables) { AddTargetsToList(nonDrawables); }
+    virtual void CollectNonDrawables(INodeTab& nonDrawables) {
+        AddTargetsToList(nonDrawables);
+    }
 };
 
 CLASS_DESC(plPhysSwim3DComponent, gPhysSwim3DDesc, "Swim 3D", "Swim 3D", COMP_TYPE_PHYS_TERRAINS, PHYS_SWIM3D_CID)
 
 ParamBlockDesc2 gPhysSwim3DBk
-(   
+(
     plComponent::kBlkComp, _T("Swim 3D"), 0, &gPhysSwim3DDesc, P_AUTO_CONSTRUCT + P_AUTO_UI + P_MULTIMAP, plComponent::kRefComp,
 
     //Roll out
-    1, 
+    1,
     kPhysMain, IDD_COMP_PHYS_SWIM3D, IDS_COMP_PHYS_SWIM3D, 0, 0, NULL,
 //  kPhysMember, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_MEMBER, 0, APPENDROLL_CLOSED, &gMemberGroupProc,
 //  kPhysBounce, IDD_COMP_PHYS_CORE_GROUP, IDS_COMP_PHYS_BOUNCE, 0, APPENDROLL_CLOSED, &gBounceGroupProc,
-    
+
     // params
     plPhysicCoreComponent::kBoundCondRadio, _T("BoundingConditions"),       TYPE_INT,       0, 0,
-        p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
-        p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
-        p_default, plSimDefs::kHullBounds,
-        end,
+    p_ui,       kPhysMain, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
+    p_vals,                     plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kProxyBounds,
+    p_default, plSimDefs::kHullBounds,
+    end,
 
-    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.5,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
-        end,
+    plPhysicCoreComponent::kFriction,   _T("Friction"), TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.5,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_TERRAIN_EDIT1, IDC_COMP_PHYS_TERRAIN_SPIN1, 0.0001f,
+    end,
 
-    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,    
-        p_default, 0.0,
-        p_range, 0.0, 1.0,
-        p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT, 
-        IDC_COMP_PHYS_INVIS_BOUNCE_EDIT, IDC_COMP_PHYS_INVIS_BOUNCE_SPIN, 0.0001f,
-        end,
-    
+    plPhysicCoreComponent::kBounce, _T("Bounce"),   TYPE_FLOAT,     P_ANIMATABLE, 0,
+    p_default, 0.0,
+    p_range, 0.0, 1.0,
+    p_ui,   kPhysMain, TYPE_SPINNER,    EDITTYPE_POS_FLOAT,
+    IDC_COMP_PHYS_INVIS_BOUNCE_EDIT, IDC_COMP_PHYS_INVIS_BOUNCE_SPIN, 0.0001f,
+    end,
+
     // Event Groups
-    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0,0,
-        p_default, plPhysicsGroups_DEAD::kStaticSimulated,
-        end,
-    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0,0,
-        end,
+    plPhysicCoreComponent::kMemberGroups_DEAD, _T("memberGroups"), TYPE_INT,    0, 0,
+    p_default, plPhysicsGroups_DEAD::kStaticSimulated,
+    end,
+    plPhysicCoreComponent::kBounceGroups_DEAD, _T("bounceGroups"), TYPE_INT,    0, 0,
+    end,
 
     end
 );
@@ -1484,13 +1495,13 @@ plPhysSwim3DComponent::plPhysSwim3DComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plPhysSwim3DComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plPhysSwim3DComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     IFixBounds();
 
     pNode->SetDrawable(false);
 
-    plPhysicalProps *physProps = pNode->GetPhysicalProps();
+    plPhysicalProps* physProps = pNode->GetPhysicalProps();
 
     physProps->SetMass(0, pNode, pErrMsg);
     physProps->SetFriction(fCompPB->GetFloat(kFriction), pNode, pErrMsg);
@@ -1512,8 +1523,7 @@ bool plPhysSwim3DComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMs
 // DEAD
 //
 /////////////////////////////////////////////////////////////////////////////////////////
-class plPhysPlayerComponent : public plPhysicCoreComponent
-{
+class plPhysPlayerComponent : public plPhysicCoreComponent {
 public:
     plPhysPlayerComponent();
 };
@@ -1521,7 +1531,7 @@ public:
 OBSOLETE_CLASS_DESC(plPhysPlayerComponent, gPhysPlayerDesc, "Player", "Player", COMP_TYPE_PHYSICAL, PHYSICS_PLAYER_CID)
 
 ParamBlockDesc2 gPhysPlayerBk
-(   
+(
     plComponent::kBlkComp, _T("Player"), 0, &gPhysPlayerDesc, P_AUTO_CONSTRUCT, plComponent::kRefComp,
 
     end
@@ -1535,8 +1545,7 @@ plPhysPlayerComponent::plPhysPlayerComponent()
 
 /////
 
-class plPhysBoundBlockerComponent : public plPhysicCoreComponent
-{
+class plPhysBoundBlockerComponent : public plPhysicCoreComponent {
 public:
     plPhysBoundBlockerComponent();
 };
@@ -1544,7 +1553,7 @@ public:
 OBSOLETE_CLASS_DESC(plPhysBoundBlockerComponent, gPhysBoundBlockerDesc, "(ex) Boundary Blocker",  "BoundaryBlocker", COMP_TYPE_PHYSICAL, PHYSICS_BOUND_BLOCKER_CID)
 
 ParamBlockDesc2 gPhysBoundBlockerBk
-(   
+(
     plComponent::kBlkComp, _T("(ex)Boundary Blocker"), 0, &gPhysBoundBlockerDesc, P_AUTO_CONSTRUCT, plComponent::kRefComp,
 
     end
@@ -1558,8 +1567,7 @@ plPhysBoundBlockerComponent::plPhysBoundBlockerComponent()
 
 /////
 
-class plPhysDetectorComponent : public plPhysicCoreComponent
-{
+class plPhysDetectorComponent : public plPhysicCoreComponent {
 public:
     plPhysDetectorComponent();
 };
@@ -1567,7 +1575,7 @@ public:
 OBSOLETE_CLASS_DESC(plPhysDetectorComponent, gPhysDetectorDesc, "Detector", "Detector", COMP_TYPE_PHYSICAL, PHYSICS_DETECTOR_CID)
 
 ParamBlockDesc2 gPhysDetectorBk
-(   
+(
     plComponent::kBlkComp, _T("Detector"), 0, &gPhysDetectorDesc, P_AUTO_CONSTRUCT, plComponent::kRefComp,
 
     end
@@ -1580,28 +1588,27 @@ plPhysDetectorComponent::plPhysDetectorComponent()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//!  Physical Simple Component Class 
+//!  Physical Simple Component Class
 
-class plPhysSubWorldComponent : public plPhysicCoreComponent
-{
+class plPhysSubWorldComponent : public plPhysicCoreComponent {
 public:
     plPhysSubWorldComponent();
-    bool SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
-    void IAddChildren(plMaxNode *node, plMaxNode* worldKey);
+    bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    void IAddChildren(plMaxNode* node, plMaxNode* worldKey);
 };
 
 CLASS_DESC(plPhysSubWorldComponent, gPhysSubWorldDesc, "Subworld", "Subworld", COMP_TYPE_PHYSICAL, PHYS_SUBWORLD_CID)
 
 ParamBlockDesc2 gPhysSubWorldBk
-(   
+(
     plComponent::kBlkComp, _T("Subworld\t"), 0, &gPhysSubWorldDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     //Roll out
     IDD_COMP_PHYS_SUBWORLD, IDS_COMP_PHYS_SUBWORLD, 0, 0, NULL,
 
     end
-);  
+);
 
 plPhysSubWorldComponent::plPhysSubWorldComponent()
 {
@@ -1609,7 +1616,7 @@ plPhysSubWorldComponent::plPhysSubWorldComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plPhysSubWorldComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plPhysSubWorldComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     IAddChildren(node, node);
 
@@ -1619,7 +1626,7 @@ bool plPhysSubWorldComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrM
     return true;
 }
 
-bool plPhysSubWorldComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plPhysSubWorldComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
@@ -1627,19 +1634,19 @@ bool plPhysSubWorldComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 void plPhysSubWorldComponent::IAddChildren(plMaxNode* node, plMaxNode* subworld)
 {
     int numChildren = node->NumberOfChildren();
-    for (int i = 0; i < numChildren; i++)
-    {
+
+    for (int i = 0; i < numChildren; i++) {
         plMaxNode* child = (plMaxNode*)node->GetChildNode(i);
         const char* childName = child->GetName();
 
         bool hasSubworld = false;
 
         uint32_t numComps = child->NumAttachedComponents();
-        for (int j = 0; j < numComps; j++)
-        {
+
+        for (int j = 0; j < numComps; j++) {
             plComponentBase* comp = child->GetAttachedComponent(j);
-            if (comp && comp->ClassID() == PHYS_SUBWORLD_CID)
-            {
+
+            if (comp && comp->ClassID() == PHYS_SUBWORLD_CID) {
                 hasSubworld = true;
                 break;
             }
@@ -1649,11 +1656,13 @@ void plPhysSubWorldComponent::IAddChildren(plMaxNode* node, plMaxNode* subworld)
         // children in our subworld instead.
         // This has to happen *after* we've converted this node, because it may be a physical
         // in the parent subworld.
-        if (!hasSubworld)
-        {
+        if (!hasSubworld) {
             plPhysicalProps* props = child->GetPhysicalProps();
-            if (props)
+
+            if (props) {
                 props->SetSubworld(subworld);
+            }
+
             IAddChildren(child, subworld);
         }
     }
@@ -1682,31 +1691,30 @@ void plPhysSubWorldComponent::IAddChildren(plMaxNode* node, plMaxNode* subworld)
 // the detector for triggering subworld changes
 ///////////////////////////////////////////////////////
 
-class plSubworldDetectorComponent : public plPhysicCoreComponent
-{
+class plSubworldDetectorComponent : public plPhysicCoreComponent {
 public:
     plSubworldDetectorComponent();
 
-    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg); 
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg); 
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    virtual void CollectNonDrawables(INodeTab& nonDrawables) { AddTargetsToList(nonDrawables); }
+    virtual void CollectNonDrawables(INodeTab& nonDrawables) {
+        AddTargetsToList(nonDrawables);
+    }
 };
 
 
 
 CLASS_DESC(plSubworldDetectorComponent, gSubworldDetectorDesc, "Subworld Region",  "SubworldRegion", COMP_TYPE_PHYSICAL, SUBWORLD_REGION_CID)
 
-enum
-{
+enum {
     kSubworldTarget,
     kInclusive_DEAD,
     kSubworldTriggerOn,
 };
 
-enum
-{
+enum {
     kSubTriggerOnEnter,
     kSubTriggerOnExit,
 };
@@ -1718,16 +1726,16 @@ ParamBlockDesc2 gSubworldRegionBlock
     IDD_COMP_SUBWORLD_REGION, IDS_COMP_SUBWORLD_REGION, 0, 0, NULL,
 
     kSubworldTarget, _T("SubworldTarget"),  TYPE_INODE,     0, 0,
-        p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_CAMERARGN_PICKSTATE_BASE,
-        p_sclassID,  HELPER_CLASS_ID,
-        p_prompt, IDS_COMP_PHYS_CHOSEN_BASE,
-        end,
+    p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_CAMERARGN_PICKSTATE_BASE,
+    p_sclassID,  HELPER_CLASS_ID,
+    p_prompt, IDS_COMP_PHYS_CHOSEN_BASE,
+    end,
 
     kSubworldTriggerOn, _T("triggerOn"),    TYPE_INT,       0, 0,
-        p_ui,       TYPE_RADIO, 2, IDC_RADIO_ENTER, IDC_RADIO_EXIT,
-        p_vals,     kSubTriggerOnEnter, kSubTriggerOnExit,
-        p_default,  kSubTriggerOnEnter,
-        end,
+    p_ui,       TYPE_RADIO, 2, IDC_RADIO_ENTER, IDC_RADIO_EXIT,
+    p_vals,     kSubTriggerOnEnter, kSubTriggerOnExit,
+    p_default,  kSubTriggerOnEnter,
+    end,
 
     end
 );
@@ -1738,12 +1746,12 @@ plSubworldDetectorComponent::plSubworldDetectorComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plSubworldDetectorComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plSubworldDetectorComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     pNode->SetForceLocal(true);
     pNode->SetDrawable(false);
 
-    plPhysicalProps *physProps = pNode->GetPhysicalProps();
+    plPhysicalProps* physProps = pNode->GetPhysicalProps();
 
     physProps->SetMass(1.0, pNode, pErrMsg);
     physProps->SetFriction(0.0, pNode, pErrMsg);
@@ -1751,38 +1759,35 @@ bool plSubworldDetectorComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *
     //physProps->SetBoundsType(plSimDefs::kExplicitBounds, pNode, pErrMsg);
     physProps->SetBoundsType(plSimDefs::kHullBounds, pNode, pErrMsg);
     physProps->SetGroup(plSimDefs::kGroupDetector, pNode, pErrMsg);
-    physProps->SetReportGroup(1<<plSimDefs::kGroupAvatar, pNode, pErrMsg);
+    physProps->SetReportGroup(1 << plSimDefs::kGroupAvatar, pNode, pErrMsg);
 
     return true;
 }
 
-bool plSubworldDetectorComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plSubworldDetectorComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
-bool plSubworldDetectorComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plSubworldDetectorComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    plSceneObject *obj = node->GetSceneObject();
+    plSceneObject* obj = node->GetSceneObject();
     plLocation loc = node->GetLocation();
-    
-    plSubworldRegionDetector *detector = new plSubworldRegionDetector;
-    
+
+    plSubworldRegionDetector* detector = new plSubworldRegionDetector;
+
     // Register the detector
     plKey detectorKey = hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), detector, loc);
     hsgResMgr::ResMgr()->AddViaNotify(detectorKey, new plObjRefMsg(obj->GetKey(), plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier), plRefFlags::kActiveRef);
 
     // need to get the key for the camera here...
     plMaxNode* pSubNode = (plMaxNode*)fCompPB->GetINode(kSubworldTarget);
-    if (pSubNode)
-    {   
-        if(pSubNode->CanConvert())
-        {
+
+    if (pSubNode) {
+        if (pSubNode->CanConvert()) {
             detector->SetSubworldKey(pSubNode->GetKey());
         }
-    }
-    else
-    {
+    } else {
         detector->SetSubworldKey(nil);
     }
 
@@ -1814,21 +1819,23 @@ bool plSubworldDetectorComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 // the detector for triggering panic links
 ///////////////////////////////////////////////////////
 
-class plPanicLinkDetectorComponent : public plPhysicCoreComponent
-{
+class plPanicLinkDetectorComponent : public plPhysicCoreComponent {
 public:
-    enum
-    {
+    enum {
         kPlayAnim,
     };
 
     plPanicLinkDetectorComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
-    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg); 
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg); 
-    virtual void CollectNonDrawables(INodeTab& nonDrawables) { AddTargetsToList(nonDrawables); }
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual void CollectNonDrawables(INodeTab& nonDrawables) {
+        AddTargetsToList(nonDrawables);
+    }
 };
 
 
@@ -1839,12 +1846,12 @@ ParamBlockDesc2 gPanicLinkRegionBlock
     plComponent::kBlkComp, _T("panicLinkRegion"), 0, &gPanicLinkDetectorDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_PANIC, IDS_COMP_PANIC, 0, 0, NULL,
-    
+
     plPanicLinkDetectorComponent::kPlayAnim, _T("PlayAnim"),        TYPE_BOOL,      0,      0,
     p_default, true,
     p_ui, TYPE_SINGLECHEKBOX, IDC_COMP_PANIC_ANIM,
     end,
-    
+
     end
 );
 
@@ -1855,36 +1862,36 @@ plPanicLinkDetectorComponent::plPanicLinkDetectorComponent()
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-bool plPanicLinkDetectorComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plPanicLinkDetectorComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     pNode->SetForceLocal(true);
     pNode->SetDrawable(false);
 
-    plPhysicalProps *physProps = pNode->GetPhysicalProps();
+    plPhysicalProps* physProps = pNode->GetPhysicalProps();
 
     physProps->SetMass(1.0, pNode, pErrMsg);
     physProps->SetFriction(0.0, pNode, pErrMsg);
     physProps->SetRestitution(0.0, pNode, pErrMsg);
     physProps->SetBoundsType(plSimDefs::kHullBounds, pNode, pErrMsg);
     physProps->SetGroup(plSimDefs::kGroupDetector, pNode, pErrMsg);
-    physProps->SetReportGroup(1<<plSimDefs::kGroupAvatar, pNode, pErrMsg);
+    physProps->SetReportGroup(1 << plSimDefs::kGroupAvatar, pNode, pErrMsg);
 
     return true;
 }
 
-bool plPanicLinkDetectorComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plPanicLinkDetectorComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
-bool plPanicLinkDetectorComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plPanicLinkDetectorComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    plSceneObject *obj = node->GetSceneObject();
+    plSceneObject* obj = node->GetSceneObject();
     plLocation loc = node->GetLocation();
-    
-    plPanicLinkRegion *detector = new plPanicLinkRegion;
+
+    plPanicLinkRegion* detector = new plPanicLinkRegion;
     detector->fPlayLinkOutAnim = fCompPB->GetInt(ParamID(kPlayAnim));
-    
+
     // Register the detector
     plKey detectorKey = hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), detector, loc);
     hsgResMgr::ResMgr()->AddViaNotify(detectorKey, new plObjRefMsg(obj->GetKey(), plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier), plRefFlags::kActiveRef);
@@ -1898,15 +1905,14 @@ bool plPanicLinkDetectorComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //Class that accesses the paramblock below.
-class plShootableComponent : public plComponent
-{
+class plShootableComponent : public plComponent {
 public:
     plShootableComponent();
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    bool SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 //Max desc stuff necessary below.
@@ -1930,9 +1936,9 @@ plShootableComponent::plShootableComponent()
 
 // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plShootableComponent::SetupProperties(plMaxNode *node,  plErrorMsg *errMsg)
+bool plShootableComponent::SetupProperties(plMaxNode* node,  plErrorMsg* errMsg)
 {
-    plPhysicalProps *props = node->GetPhysicalProps();
+    plPhysicalProps* props = node->GetPhysicalProps();
 
     props->SetMass(0.0, node, errMsg);
     props->SetFriction(0.0, node, errMsg);
@@ -1945,32 +1951,35 @@ bool plShootableComponent::SetupProperties(plMaxNode *node,  plErrorMsg *errMsg)
     return true;
 }
 
-bool plShootableComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plShootableComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
-class plRideAnimatedPhysicalComponent : public plPhysicCoreComponent
-{
+class plRideAnimatedPhysicalComponent : public plPhysicCoreComponent {
 public:
     plRideAnimatedPhysicalComponent();
-    void DeleteThis(){delete this;}     
-    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg); 
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg); 
-    virtual void CollectNonDrawables(INodeTab& nonDrawables) { AddTargetsToList(nonDrawables); }
+    void DeleteThis() {
+        delete this;
+    }
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual void CollectNonDrawables(INodeTab& nonDrawables) {
+        AddTargetsToList(nonDrawables);
+    }
 };
 CLASS_DESC(plRideAnimatedPhysicalComponent , gRideAnimatedPhysicalComponent, "RideAnimPhysReg",  "RideAnimatedPhysicalRegion", COMP_TYPE_PHYSICAL, Class_ID(0xaf305963, 0x63a246df));
 ParamBlockDesc2 gSRideAnimatedPhysBk
 (
-plComponent::kBlkComp, _T("rideAnimated"), 0, &gRideAnimatedPhysicalComponent, P_AUTO_CONSTRUCT + P_AUTO_UI , plComponent::kRefComp,
+    plComponent::kBlkComp, _T("rideAnimated"), 0, &gRideAnimatedPhysicalComponent, P_AUTO_CONSTRUCT + P_AUTO_UI , plComponent::kRefComp,
 //Roll out
 
-IDD_COMP_RIDE_ANIMATED_PHYS, IDS_COMP_RIDE_ANIMATED_PHYS, 0, 0, NULL,
+    IDD_COMP_RIDE_ANIMATED_PHYS, IDS_COMP_RIDE_ANIMATED_PHYS, 0, 0, NULL,
 
-plPhysicCoreComponent::kBoundCondRadio, _T("BoundingConditions"), TYPE_INT, 0, 0,
+    plPhysicCoreComponent::kBoundCondRadio, _T("BoundingConditions"), TYPE_INT, 0, 0,
     p_ui, TYPE_RADIO, 4, IDC_RADIO_BSPHERE, IDC_RADIO_BBOX, IDC_RADIO_BHULL, IDC_RADIO_PICKSTATE,
     p_vals, plSimDefs::kSphereBounds,       plSimDefs::kBoxBounds,      plSimDefs::kHullBounds,     plSimDefs::kExplicitBounds,
-    p_default, plSimDefs::kHullBounds,  
+    p_default, plSimDefs::kHullBounds,
     end,
     end
 );
@@ -1979,35 +1988,35 @@ plRideAnimatedPhysicalComponent::plRideAnimatedPhysicalComponent()
     fClassDesc = &gRideAnimatedPhysicalComponent;
     fClassDesc->MakeAutoParamBlocks(this);
 }
-bool plRideAnimatedPhysicalComponent::SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg)
+bool plRideAnimatedPhysicalComponent::SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     pNode->SetForceLocal(true);
     pNode->SetDrawable(false);
 
-    plPhysicalProps *physProps = pNode->GetPhysicalProps();
+    plPhysicalProps* physProps = pNode->GetPhysicalProps();
 
     physProps->SetMass(1.0, pNode, pErrMsg);
     physProps->SetFriction(0.0, pNode, pErrMsg);
     physProps->SetRestitution(0.0, pNode, pErrMsg);
     physProps->SetGroup(plSimDefs::kGroupDetector, pNode, pErrMsg);
-    physProps->SetReportGroup(1<<plSimDefs::kGroupAvatar, pNode, pErrMsg);
+    physProps->SetReportGroup(1 << plSimDefs::kGroupAvatar, pNode, pErrMsg);
     physProps->SetBoundsType(fCompPB->GetInt(kBoundCondRadio), pNode, pErrMsg);
     return true;
 }
-bool plRideAnimatedPhysicalComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plRideAnimatedPhysicalComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
-bool plRideAnimatedPhysicalComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plRideAnimatedPhysicalComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    plSceneObject *obj = node->GetSceneObject();
+    plSceneObject* obj = node->GetSceneObject();
     plLocation loc = node->GetLocation();
     plRideAnimatedPhysMsg* enter = new plRideAnimatedPhysMsg(obj->GetKey(), nil, true, nil);
     enter->SetBCastFlag(plMessage::kPropagateToModifiers);
     plRideAnimatedPhysMsg* exit = new plRideAnimatedPhysMsg(obj->GetKey(), nil, false, nil);
     exit->SetBCastFlag(plMessage::kPropagateToModifiers);
-    plRidingAnimatedPhysicalDetector *detector = new plRidingAnimatedPhysicalDetector(enter, exit);
+    plRidingAnimatedPhysicalDetector* detector = new plRidingAnimatedPhysicalDetector(enter, exit);
     // Register the detector
     //node->AddModifier(detector, IGetUniqueName(node));
     plKey detectorKey = hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), detector, loc);

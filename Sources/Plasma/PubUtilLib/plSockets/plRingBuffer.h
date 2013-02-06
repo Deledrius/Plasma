@@ -45,14 +45,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMemBuffer.h"
 
 
-class plRingBuffer : protected plMemBuffer
-{
+class plRingBuffer : protected plMemBuffer {
 public:
-    plRingBuffer(int size=4096);
+    plRingBuffer(int size = 4096);
     void FullCompress();
     void Compress();
-    bool Put(const char * data, int len);
-    bool Get(char * data, int len);
+    bool Put(const char* data, int len);
+    bool Get(char* data, int len);
     int AmountBuffered();
     int BufferAvailable();
     void Reset();
@@ -60,13 +59,13 @@ public:
 protected:
     int fStartPos;
     int fEndPos;
-    char * GetBufferStart();
-    char * GetBufferOpen();
+    char* GetBufferStart();
+    char* GetBufferOpen();
     void ForceWindowSlide();
 #define FastGetBufferStart() (fBuffer+fStartPos)
 #define FastAmountBuffered() (fEndPos-fStartPos)
-    bool PutFast(const char * data, int len);
-    
+    bool PutFast(const char* data, int len);
+
 };
 
 

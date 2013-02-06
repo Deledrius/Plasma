@@ -47,29 +47,35 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsResMgr;
 
-class plTimerCallbackMsg : public plMessage
-{
+class plTimerCallbackMsg : public plMessage {
 public:
-    plTimerCallbackMsg(){;}
-    plTimerCallbackMsg(const plKey &s, const plKey &r, const double* t){;}
-    plTimerCallbackMsg(const plKey &r, uint32_t id = 0) { AddReceiver(r); fID = id;}
-    ~plTimerCallbackMsg(){;}
+    plTimerCallbackMsg() {
+        ;
+    }
+    plTimerCallbackMsg(const plKey& s, const plKey& r, const double* t) {
+        ;
+    }
+    plTimerCallbackMsg(const plKey& r, uint32_t id = 0) {
+        AddReceiver(r);
+        fID = id;
+    }
+    ~plTimerCallbackMsg() {
+        ;
+    }
 
-    CLASSNAME_REGISTER( plTimerCallbackMsg );
-    GETINTERFACE_ANY( plTimerCallbackMsg, plMessage );
-    
+    CLASSNAME_REGISTER(plTimerCallbackMsg);
+    GETINTERFACE_ANY(plTimerCallbackMsg, plMessage);
+
     uint32_t fID;
     float fTime;
 
-    virtual void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    virtual void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fID = stream->ReadLE32();
         fTime = stream->ReadLEScalar();
     }
 
-    virtual void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    virtual void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         stream->WriteLE32(fID);
         stream->WriteLEScalar(fTime);

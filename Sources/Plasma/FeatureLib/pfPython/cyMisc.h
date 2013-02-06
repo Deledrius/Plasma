@@ -71,8 +71,7 @@ struct PipelineParams;
 typedef struct _object PyObject;
 typedef struct PyMethodDef PyMethodDef;
 
-class cyMisc
-{
+class cyMisc {
 
     // game playing to get the pipeline from the client when we can't really
     // this is only for the C++ side
@@ -83,19 +82,23 @@ class cyMisc
 
 public:
     // periodically do things
-    static void Update( double secs );
+    static void Update(double secs);
 
     // the python definitions
-    static void AddPlasmaMethods(std::vector<PyMethodDef> &methods);
-    static void AddPlasmaMethods2(std::vector<PyMethodDef> &methods);
-    static void AddPlasmaMethods3(std::vector<PyMethodDef> &methods);
-    static void AddPlasmaMethods4(std::vector<PyMethodDef> &methods);
+    static void AddPlasmaMethods(std::vector<PyMethodDef>& methods);
+    static void AddPlasmaMethods2(std::vector<PyMethodDef>& methods);
+    static void AddPlasmaMethods3(std::vector<PyMethodDef>& methods);
+    static void AddPlasmaMethods4(std::vector<PyMethodDef>& methods);
 
-    static void AddPlasmaConstantsClasses(PyObject *m);
+    static void AddPlasmaConstantsClasses(PyObject* m);
 
 
-    static void         SetPipeline( plPipeline *pipe ) { fPipeline = pipe; }
-    static plPipeline   *GetPipeline( void ) { return fPipeline; }
+    static void         SetPipeline(plPipeline* pipe) {
+        fPipeline = pipe;
+    }
+    static plPipeline*   GetPipeline(void) {
+        return fPipeline;
+    }
 
 
 #if 1
@@ -106,8 +109,7 @@ public:
     static void PrintToScreen(const char* msg);
 #endif
 
-    enum PythonDebugPrintLevels
-    {
+    enum PythonDebugPrintLevels {
         kNoLevel = 0,
         kDebugDump = 1,
         kWarningLevel = 2,
@@ -115,8 +117,7 @@ public:
         kAssertLevel = 4
     };
 
-    enum LOSObjectType
-    {
+    enum LOSObjectType {
         kClickables,
         kCameraBlockers,
         kCustom,
@@ -125,7 +126,7 @@ public:
 
     static uint32_t GetPythonLoggingLevel();
     static void SetPythonLoggingLevel(uint32_t new_level);
-    
+
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : Console
@@ -135,7 +136,7 @@ public:
     //                  optionally propagate over the net
     //
     static void Console(const char* command);
-    static void ConsoleNet(const char* command, bool netForce); 
+    static void ConsoleNet(const char* command, bool netForce);
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -201,7 +202,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : LinkToAge
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : LinkToAge
     //
@@ -212,21 +213,21 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : SetDirtySyncStateServer
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : set the Python modifier to be dirty and asked to be saved out
     //
-    static void SetDirtySyncState(pyKey &selfkey, const char* SDLStateName, uint32_t sendFlags);
+    static void SetDirtySyncState(pyKey& selfkey, const char* SDLStateName, uint32_t sendFlags);
 
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : SetDirtySyncStateClients
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : set the Python modifier to be dirty and asked to be saved out
     //                  specifies that state should be sent to other clients as well as server
     //
-    static void SetDirtySyncStateWithClients(pyKey &selfkey, const char* SDLStateName, uint32_t sendFlags);
+    static void SetDirtySyncStateWithClients(pyKey& selfkey, const char* SDLStateName, uint32_t sendFlags);
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -235,8 +236,8 @@ public:
     //
     //  PURPOSE    : register and unregister for control key events
     //
-    static void EnableControlKeyEvents(pyKey &selfkey);
-    static void DisableControlKeyEvents(pyKey &selfkey);
+    static void EnableControlKeyEvents(pyKey& selfkey);
+    static void DisableControlKeyEvents(pyKey& selfkey);
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -246,12 +247,12 @@ public:
     //  PURPOSE    : Return the net client (account) name of the player whose avatar
     //              key is provided.
     //
-    static bool WasLocallyNotified(pyKey &selfkey);
+    static bool WasLocallyNotified(pyKey& selfkey);
 
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : FlashWindow
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Flashes the client window if it is not focused
     //
@@ -265,7 +266,7 @@ public:
     //  PURPOSE    : Return the net client (account) name of the player whose avatar
     //              key is provided.
     //
-    static plString GetClientName(pyKey &avKey);
+    static plString GetClientName(pyKey& avKey);
 
     static PyObject* GetAvatarKeyFromClientID(int clientID); // returns pyKey
     static int GetLocalClientID();
@@ -277,7 +278,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetClientName
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return the local net client (account) name
     //
@@ -291,7 +292,7 @@ public:
     //
     //  Function   : GetAgeName
     //  Function   : GetAgeTime
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return the age name of the current age the local player is in
     //             : Return the current coordinates of the player within this age
@@ -302,10 +303,10 @@ public:
     static const char* GetPrevAgeName();
     static PyObject* GetPrevAgeInfo();
     // current time in current age
-    static uint32_t GetAgeTime( void );
+    static uint32_t GetAgeTime(void);
     static time_t GetDniTime(void);
     static time_t ConvertGMTtoDni(time_t time);
-    static time_t GetServerTime( void ); // returns the current server time in GMT
+    static time_t GetServerTime(void);   // returns the current server time in GMT
     static float GetAgeTimeOfDayPercent(void);
 
     /////////////////////////////////////////////////////////////////////////////
@@ -316,8 +317,7 @@ public:
     //
     //  PURPOSE    : Sets the state of an exclude region
     //
-    enum
-    {
+    enum {
         kExRegRelease = 0,
         kExRegClear = 1,
     };
@@ -328,7 +328,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetSeconds
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return the nunber of seconds elapsed
     //
@@ -336,7 +336,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetSysSeconds
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return the number of system seconds elapsed
     //
@@ -344,7 +344,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetDelSysSeconds
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return the frame delta seconds
     //
@@ -354,7 +354,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : LoadDialog
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Loads the dialog by name
     //             : optionally sets the receiver key for the GUINotifyMsg
@@ -366,7 +366,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : UnLoadDialog
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : UnLoads the dialog by name
     //             : optionally sets the receiver key for the GUINotifyMsg
@@ -376,7 +376,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : IsDialogLoaded
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Test to see if a dialog is loaded (according to the dialog manager)
     //
@@ -386,7 +386,7 @@ public:
     //
     //  Function   : ShowDialog
     //  Function   : HideDialog
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Show or Hide a dialog by name
     //
@@ -396,7 +396,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetDialogFromTagID
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return the frame delta seconds
     //
@@ -406,7 +406,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : IsGUIModal
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Returns true if the GUI is currently modal (and therefore blocking input)
     //
@@ -415,7 +415,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetLocalAvatar
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Return a pySceneobject of the local Avatar
     //
@@ -426,7 +426,7 @@ public:
     //
     //  Function   : GetPlayerList
     //  Function   : GetPlayerListDistanceSorted
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : Get a list of players (other than self) that are playing the game
     //             : optionally get it sorted by distance
@@ -452,8 +452,8 @@ public:
     //
     //  RETURNS    : the flags that were sent with the message (may be modified)
     //
-    static uint32_t SendRTChat(pyPlayer& from, const std::vector<pyPlayer*> & tolist, const char* message, uint32_t flags);
-    static uint32_t SendRTChat(pyPlayer& from, const std::vector<pyPlayer*> & tolist, const wchar_t* message, uint32_t flags);
+    static uint32_t SendRTChat(pyPlayer& from, const std::vector<pyPlayer*>& tolist, const char* message, uint32_t flags);
+    static uint32_t SendRTChat(pyPlayer& from, const std::vector<pyPlayer*>& tolist, const wchar_t* message, uint32_t flags);
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -528,8 +528,8 @@ public:
     //
     //  RETURNS    : nothing
     //
-    static void SetPrivateChatList(const std::vector<pyPlayer*> & tolist);
-    
+    static void SetPrivateChatList(const std::vector<pyPlayer*>& tolist);
+
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : RemovePrivateChatMember
@@ -540,11 +540,11 @@ public:
     //  RETURNS    : nothing
     //
     static void ClearPrivateChatList(pyKey& member);
-    
+
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : ClearCameraStack
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
     //  PURPOSE    : knocks all the cameras off the current stack
     //
@@ -558,7 +558,7 @@ public:
     //  PURPOSE    : Send a petition to the CCR for help or questions
     //
     static void SendPetitionToCCR(const char* message);
-    static void SendPetitionToCCRI(const char* message, uint8_t reason,const char* title);
+    static void SendPetitionToCCRI(const char* message, uint8_t reason, const char* title);
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -567,12 +567,12 @@ public:
     //
     //  PURPOSE    : Send a petition to the CCR for help or questions
     //
-    static void SendChatToCCR(const char* message,int32_t CCRPlayerID);
+    static void SendChatToCCR(const char* message, int32_t CCRPlayerID);
 
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : GetNumRemotePlayers
-    //  
+    //
     //  PURPOSE    : return the number of remote players connected
     //
     static int GetNumRemotePlayers();
@@ -581,17 +581,17 @@ public:
     //
     //  Function   : Paging functions
     //  PARAMETERS : nodeName  - name of the page to load
-    //  
+    //
     //  PURPOSE    : page in, or out a paritcular node
     //
-    static void PageInNodes(const std::vector<std::string> & nodeNames, const char* age);
+    static void PageInNodes(const std::vector<std::string>& nodeNames, const char* age);
     static void PageOutNode(const char* nodeName);
 
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : LimitAvatarLOD
     //  PARAMETERS : LODlimit - number of to limit the LOD to
-    //  
+    //
     //  PURPOSE    : sets the avatar LOD limit
     //
     static void LimitAvatarLOD(int LODlimit);
@@ -600,7 +600,7 @@ public:
     //
     //  Function   : Set fog default functions
     //  PARAMETERS : floats  - the parameters
-    //  
+    //
     //  PURPOSE    : sets the fog defaults
     //
     static void FogSetDefColor(pyColor& color);
@@ -612,21 +612,21 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : Enable / disable cursor fade for avatar
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
-    //  PURPOSE    : turns avatar fade out on / off 
+    //  PURPOSE    : turns avatar fade out on / off
     //
     static void EnableAvatarCursorFade();
     static void DisableAvatarCursorFade();
     static void FadeLocalPlayer(bool fade);
 
-    
+
     /////////////////////////////////////////////////////////////////////////////
     //
     //  Function   : Put the interface into 'offer book mode'
-    //  PARAMETERS : 
+    //  PARAMETERS :
     //
-    //  PURPOSE    :  
+    //  PURPOSE    :
     //
     static void EnableOfferBookMode(pyKey& selfkey, const char* ageFileName, const char* ageInstanceName);
     static void DisableOfferBookMode();
@@ -636,7 +636,7 @@ public:
     static void ToggleAvatarClickability(bool on);
     static void SetShareSpawnPoint(const char* spawnPoint);
     static void SetShareAgeInstanceGuid(const plUUID& guid);
-    
+
     //////////////////////////////////////////////////////////////////////////////
     //
     // Function   : IsCCRAwayStatus
@@ -663,7 +663,7 @@ public:
     // PURPOSE    : Send's a VaultTask to the server to perform the invite
     //
     static void AcceptInviteInGame(const char* friendName, const char* inviteKey);
-    
+
     //////////////////////////////////////////////////////////////////////////////
     //
     // Function   : GetLanguage
@@ -672,7 +672,7 @@ public:
     // PURPOSE    : Returns the current language the game is in
     //
     static int GetLanguage();
-    
+
     //////////////////////////////////////////////////////////////////////////////
     //
     // Function   : UsingUnicode
@@ -689,7 +689,7 @@ public:
     //
     // PURPOSE    : To request an LOS from a point on the screen
     //
-    static bool RequestLOSScreen(pyKey &selfkey, int32_t ID, float xPos, float yPos, float distance, int what, int reportType);
+    static bool RequestLOSScreen(pyKey& selfkey, int32_t ID, float xPos, float yPos, float distance, int what, int reportType);
 
     //////////////////////////////////////////////////////////////////////////////
     //
@@ -732,7 +732,7 @@ public:
     //
     static bool IsSinglePlayerMode();
     static bool IsDemoMode();
-    
+
     //////////////////////////////////////////////////////////////////////////////
     //
     // Function   : IsInternalRelease
@@ -758,7 +758,7 @@ public:
     //
     // PURPOSE    : Shoots from screen coordinates, a bullet and makes a mark on objects that know about bullet holes
     //
-    static void ShootBulletFromScreen(pyKey &selfkey, float xPos, float yPos, float radius, float range);
+    static void ShootBulletFromScreen(pyKey& selfkey, float xPos, float yPos, float radius, float range);
 
     //////////////////////////////////////////////////////////////////////////////
     //
@@ -767,7 +767,7 @@ public:
     //
     // PURPOSE    : Shoots from an object, a bullet and makes a mark on objects that know about bullet holes
     //
-    static void ShootBulletFromObject(pyKey &selfkey, pySceneObject* sobj, float radius, float range);
+    static void ShootBulletFromObject(pyKey& selfkey, pySceneObject* sobj, float radius, float range);
 
     //////////////////////////////////////////////////////////////////////////////
     //
@@ -776,7 +776,7 @@ public:
     //
     // PURPOSE    : Get the list of public ages for the given age name.
     //
-    static void GetPublicAgeList( const char * ageName, PyObject * cbObject=nil );
+    static void GetPublicAgeList(const char* ageName, PyObject* cbObject = nil);
 
     //////////////////////////////////////////////////////////////////////////////
     //
@@ -785,7 +785,7 @@ public:
     //
     // PURPOSE    : Add a public age to the list of available ones.
     //
-    static void CreatePublicAge( pyAgeInfoStruct * ageInfo, PyObject * cbObject=nil );
+    static void CreatePublicAge(pyAgeInfoStruct* ageInfo, PyObject* cbObject = nil);
 
     //////////////////////////////////////////////////////////////////////////////
     //
@@ -794,7 +794,7 @@ public:
     //
     // PURPOSE    : Remove a public age from the list of available ones.
     //
-    static void RemovePublicAge( const char * ageInstanceGuid, PyObject * cbObject=nil );
+    static void RemovePublicAge(const char* ageInstanceGuid, PyObject* cbObject = nil);
 
     //////////////////////////////////////////////////////////////////////////////
     //
@@ -806,7 +806,7 @@ public:
 
     //////////////////////////////////////////////////////////////////////////////
     //
-    // 
+    //
     // PURPOSE    : these functions are for saving / restoring the camera stack
     //
 
@@ -835,14 +835,14 @@ public:
     //
     static void SetClickability(bool b);
 
-    
+
     //////////////////////////////////////////////////////////////////////////////
     //
     // Function   : Debug build only: Assert if condition is false.
     //
     // PURPOSE    : debugging
     //
-    static void DebugAssert( bool cond, const char * msg );
+    static void DebugAssert(bool cond, const char* msg);
 
 
     //////////////////////////////////////////////////////////////////////////////
@@ -852,8 +852,8 @@ public:
     //
     // PURPOSE    : script can trigger itself over time w/o having to specify it in the dataset.
     //
-    static void SetAlarm( float secs, PyObject * cb, uint32_t cbContext );
-    
+    static void SetAlarm(float secs, PyObject* cb, uint32_t cbContext);
+
     //////////////////////////////////////////////////////////////////////////////
     //
     // Function   : Save Screen Shot
@@ -879,7 +879,7 @@ public:
     // PURPOSE    : puts the maintainer suit on or off the avatar
     //
     static void WearMaintainerSuit(pyKey& key, bool wear);
-    
+
     static void WearDefaultClothing(pyKey& key);
     static void WearDefaultClothingType(pyKey& key, uint32_t type);
 
@@ -892,7 +892,7 @@ public:
     //
     static void FakeLinkToObject(pyKey& avatar, pyKey& object);
     static void FakeLinkToObjectNamed(const plString& name);
-    
+
     //////////////////////////////////////////////////////////////////////////////
     //
     // Function   : Spawn an avatar
@@ -902,7 +902,7 @@ public:
     //
     static PyObject* LoadAvatarModel(const char* modelName, pyKey& object, const char* userStr); // returns pyKey
     static void UnLoadAvatarModel(pyKey& avatar);
-    
+
     ///////////////////////////////////////////////////////////////////////////////
     //
     // Function   : Hide/show the mouse cursor
@@ -921,25 +921,25 @@ public:
     //              properly replaced (the list is a list of unicode strings) Name
     //              is in "Age.Set.Name" format
     //
-    static plString GetLocalizedString(plString name, const std::vector<plString> & arguments);
+    static plString GetLocalizedString(plString name, const std::vector<plString>& arguments);
 
     static void EnablePlanarReflections(bool enable = true);
     static void SetGraphicsOptions(int Width, int Height, int ColorDepth, bool Windowed, int NumAASamples, int MaxAnisotropicSamples, bool VSync);
-    static void GetSupportedDisplayModes(std::vector<plDisplayMode> *res);
+    static void GetSupportedDisplayModes(std::vector<plDisplayMode>* res);
     static int GetDesktopWidth();
     static int GetDesktopHeight();
     static int GetDesktopColorDepth();
-    static PipelineParams *GetDefaultDisplayParams();
+    static PipelineParams* GetDefaultDisplayParams();
 
-    static bool DumpLogs(const std::wstring & folder);
+    static bool DumpLogs(const std::wstring& folder);
 
-    static bool FileExists(const plFileName & filename);
-    static bool CreateDir(const plFileName & directory);
+    static bool FileExists(const plFileName& filename);
+    static bool CreateDir(const plFileName& directory);
 
     static plFileName GetUserPath();
     static plFileName GetInitPath();
 
-    static void SetBehaviorNetFlags(pyKey & behKey, bool netForce, bool netProp);
+    static void SetBehaviorNetFlags(pyKey& behKey, bool netForce, bool netProp);
     static void SendFriendInvite(const wchar_t email[], const wchar_t toName[]);
     static PyObject* PyGuidGenerate();
     static PyObject* GetAIAvatarsByModelName(const char* name);

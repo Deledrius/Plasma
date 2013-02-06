@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/FeatureLib/pfGameMgr/Intern.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_FEATURELIB_PFGAMEMGR_INTERN_H
@@ -58,7 +58,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *
 ***/
 
-typedef pfGameCli * (*FGameCliFactory)(
+typedef pfGameCli* (*FGameCliFactory)(
     unsigned    gameSrvId,
     plKey       receiver
 );
@@ -69,5 +69,5 @@ struct GameTypeReg {
     const wchar_t*   name;
 };
 
-void GameMgrRegisterGameType (const GameTypeReg & reg);
-void GameMgrSend (GameMsgHeader * msg, void * param = nil);
+void GameMgrRegisterGameType(const GameTypeReg& reg);
+void GameMgrSend(GameMsgHeader* msg, void* param = nil);

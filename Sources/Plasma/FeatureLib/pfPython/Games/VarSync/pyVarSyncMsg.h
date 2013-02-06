@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCliMsg.h"
 
-class pyVarSyncMsg : public pyGameCliMsg
-{
+class pyVarSyncMsg : public pyGameCliMsg {
 protected:
     pyVarSyncMsg();
     pyVarSyncMsg(pfGameCliMsg* msg);
@@ -76,8 +75,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyVarSyncStringVarChangedMsg : public pyVarSyncMsg
-{
+class pyVarSyncStringVarChangedMsg : public pyVarSyncMsg {
 protected:
     pyVarSyncStringVarChangedMsg();
     pyVarSyncStringVarChangedMsg(pfGameCliMsg* msg);
@@ -96,8 +94,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyVarSyncNumericVarChangedMsg : public pyVarSyncMsg
-{
+class pyVarSyncNumericVarChangedMsg : public pyVarSyncMsg {
 protected:
     pyVarSyncNumericVarChangedMsg();
     pyVarSyncNumericVarChangedMsg(pfGameCliMsg* msg);
@@ -116,8 +113,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyVarSyncAllVarsSentMsg : public pyVarSyncMsg
-{
+class pyVarSyncAllVarsSentMsg : public pyVarSyncMsg {
 protected:
     pyVarSyncAllVarsSentMsg();
     pyVarSyncAllVarsSentMsg(pfGameCliMsg* msg);
@@ -133,8 +129,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyVarSyncStringVarCreatedMsg : public pyVarSyncMsg
-{
+class pyVarSyncStringVarCreatedMsg : public pyVarSyncMsg {
 protected:
     pyVarSyncStringVarCreatedMsg();
     pyVarSyncStringVarCreatedMsg(pfGameCliMsg* msg);
@@ -154,8 +149,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyVarSyncNumericVarCreatedMsg : public pyVarSyncMsg
-{
+class pyVarSyncNumericVarCreatedMsg : public pyVarSyncMsg {
 protected:
     pyVarSyncNumericVarCreatedMsg();
     pyVarSyncNumericVarCreatedMsg(pfGameCliMsg* msg);

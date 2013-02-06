@@ -60,11 +60,13 @@ plHardRegionPlanes::~plHardRegionPlanes()
 bool plHardRegionPlanes::IIsInside(const hsPoint3& pos) const
 {
     int i;
-    for( i = 0; i < fPlanes.GetCount(); i++ )
-    {
-        if( fPlanes[i].fWorldNorm.InnerProduct(pos) > fPlanes[i].fWorldDist )
+
+    for (i = 0; i < fPlanes.GetCount(); i++) {
+        if (fPlanes[i].fWorldNorm.InnerProduct(pos) > fPlanes[i].fWorldDist) {
             return false;
+        }
     }
+
     return true;
 }
 
@@ -76,22 +78,22 @@ bool plHardRegionPlanes::ICameraInside() const
 void plHardRegionPlanes::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l)
 {
     int i;
-    for( i = 0; i < fPlanes.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fPlanes.GetCount(); i++) {
         fPlanes[i].fWorldPos = l2w * fPlanes[i].fPos;
 
         // Normal gets transpose of inverse.
         fPlanes[i].fWorldNorm.fX = w2l.fMap[0][0] * fPlanes[i].fNorm.fX
-                                    + w2l.fMap[1][0] * fPlanes[i].fNorm.fY
-                                    + w2l.fMap[2][0] * fPlanes[i].fNorm.fZ;
+                                   + w2l.fMap[1][0] * fPlanes[i].fNorm.fY
+                                   + w2l.fMap[2][0] * fPlanes[i].fNorm.fZ;
 
         fPlanes[i].fWorldNorm.fY = w2l.fMap[0][1] * fPlanes[i].fNorm.fX
-                                    + w2l.fMap[1][1] * fPlanes[i].fNorm.fY
-                                    + w2l.fMap[2][1] * fPlanes[i].fNorm.fZ;
+                                   + w2l.fMap[1][1] * fPlanes[i].fNorm.fY
+                                   + w2l.fMap[2][1] * fPlanes[i].fNorm.fZ;
 
         fPlanes[i].fWorldNorm.fZ = w2l.fMap[0][2] * fPlanes[i].fNorm.fX
-                                    + w2l.fMap[1][2] * fPlanes[i].fNorm.fY
-                                    + w2l.fMap[2][2] * fPlanes[i].fNorm.fZ;
+                                   + w2l.fMap[1][2] * fPlanes[i].fNorm.fY
+                                   + w2l.fMap[2][2] * fPlanes[i].fNorm.fZ;
 
         hsFastMath::NormalizeAppr(fPlanes[i].fWorldNorm);
 
@@ -107,8 +109,8 @@ void plHardRegionPlanes::Read(hsStream* s, hsResMgr* mgr)
     fPlanes.SetCount(n);
 
     int i;
-    for( i = 0; i < n; i++ )
-    {
+
+    for (i = 0; i < n; i++) {
         fPlanes[i].fNorm.Read(s);
         fPlanes[i].fPos.Read(s);
 
@@ -126,8 +128,8 @@ void plHardRegionPlanes::Write(hsStream* s, hsResMgr* mgr)
     s->WriteLE32(fPlanes.GetCount());
 
     int i;
-    for( i = 0; i < fPlanes.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fPlanes.GetCount(); i++) {
         fPlanes[i].fNorm.Write(s);
         fPlanes[i].fPos.Write(s);
 
@@ -145,20 +147,22 @@ void plHardRegionPlanes::AddPlane(const hsVector3& n, const hsPoint3& p)
     // Also, look for the degenerate case of two parallel planes. In that
     // case, take the outer.
     int i;
-    for( i = 0; i < fPlanes.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fPlanes.GetCount(); i++) {
         const float kCloseToOne = 1.f - 1.e-4f;
-        if( fPlanes[i].fNorm.InnerProduct(nNorm) >= kCloseToOne )
-        {
+
+        if (fPlanes[i].fNorm.InnerProduct(nNorm) >= kCloseToOne) {
             float newDist = nNorm.InnerProduct(p);
             float oldDist = fPlanes[i].fNorm.InnerProduct(fPlanes[i].fPos);
-            if( newDist > oldDist )
-            {
+
+            if (newDist > oldDist) {
                 fPlanes[i].fPos = p;
             }
+
             return;
         }
     }
+
     HardPlane plane;
     plane.fWorldNorm = plane.fNorm = nNorm;
     plane.fWorldPos = plane.fPos = p;

@@ -46,12 +46,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plMipmap;
 
-class hsCodec
-{
+class hsCodec {
 public:
-    virtual plMipmap    *CreateCompressedMipmap( plMipmap *uncompressed ) = 0;
-    virtual plMipmap    *CreateUncompressedMipmap( plMipmap *compressed, uint8_t bitDepth = 0 ) = 0;
-    virtual bool        ColorizeCompMipmap( plMipmap *bMap, const uint8_t *colorMask ) = 0;
+    virtual plMipmap*    CreateCompressedMipmap(plMipmap* uncompressed) = 0;
+    virtual plMipmap*    CreateUncompressedMipmap(plMipmap* compressed, uint8_t bitDepth = 0) = 0;
+    virtual bool        ColorizeCompMipmap(plMipmap* bMap, const uint8_t* colorMask) = 0;
 };
 
 #endif // hsCodec_inc

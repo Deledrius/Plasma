@@ -48,10 +48,10 @@ plLOSHitMsg::plLOSHitMsg()
     SetBCastFlag(plMessage::kPropagateToModifiers);
     fHitFlags = 0;
 }
-plLOSHitMsg::plLOSHitMsg(const plKey &s, 
-                const plKey &r, 
-                const double* t)
-: plMessage(s, r, t)
+plLOSHitMsg::plLOSHitMsg(const plKey& s,
+                         const plKey& r,
+                         const double* t)
+    : plMessage(s, r, t)
 {
     SetBCastFlag(plMessage::kPropagateToModifiers);
     fHitFlags = 0;

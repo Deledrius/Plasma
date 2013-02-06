@@ -49,37 +49,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMessage/plAnimCmdMsg.h"
 
 plAnimationEventConditionalObject::plAnimationEventConditionalObject(plKey pTargetModifier) :
-fTarget(pTargetModifier),
-fAction(kEventEnd)
+    fTarget(pTargetModifier),
+    fAction(kEventEnd)
 {
 }
 
 bool plAnimationEventConditionalObject::MsgReceive(plMessage* msg)
 {
     plEventCallbackMsg* pMsg = plEventCallbackMsg::ConvertNoRef(msg);
-    if (pMsg)
-    {
+
+    if (pMsg) {
         SetSatisfied(true);
 //      fLogicMod->RequestTrigger();
         return true;
     }
+
     return plConditionalObject::MsgReceive(msg);
 }
-    
+
 
 void plAnimationEventConditionalObject::SetEvent(const CallbackEvent b, float time)
 {
     plAnimCmdMsg* pMsg = new plAnimCmdMsg;
     pMsg->AddReceiver(fTarget);
-    pMsg->SetSender( GetKey() );
+    pMsg->SetSender(GetKey());
 
     plEventCallbackMsg* cb = new plEventCallbackMsg(GetKey(), b, 0, time);
 
-    pMsg->AddCallback( cb );
+    pMsg->AddCallback(cb);
     hsRefCnt_SafeUnRef(cb);
-    pMsg->SetCmd( plAnimCmdMsg::kAddCallbacks );
-    
-    plgDispatch::MsgSend( pMsg );
+    pMsg->SetCmd(plAnimCmdMsg::kAddCallbacks);
+
+    plgDispatch::MsgSend(pMsg);
 }
 
 void plAnimationEventConditionalObject::Read(hsStream* stream, hsResMgr* mgr)
@@ -93,6 +94,6 @@ void plAnimationEventConditionalObject::Write(hsStream* stream, hsResMgr* mgr)
 {
     plConditionalObject::Write(stream, mgr);
     mgr->WriteKey(stream, fTarget);
-    stream->WriteLE32(fAction); 
+    stream->WriteLE32(fAction);
 }
-    
+

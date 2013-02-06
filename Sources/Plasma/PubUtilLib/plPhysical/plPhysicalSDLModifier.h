@@ -49,19 +49,22 @@ class plStatusLog;
 class plPhysical;
 
 //
-// This modifier is responsible for sending and recving 
+// This modifier is responsible for sending and recving
 // an object's physical state.
 //
-class plPhysicalSDLModifier : public plSDLModifier
-{
+class plPhysicalSDLModifier : public plSDLModifier {
 public:
-    CLASSNAME_REGISTER( plPhysicalSDLModifier );
-    GETINTERFACE_ANY( plPhysicalSDLModifier, plSDLModifier);
+    CLASSNAME_REGISTER(plPhysicalSDLModifier);
+    GETINTERFACE_ANY(plPhysicalSDLModifier, plSDLModifier);
 
-    const char* GetSDLName() const { return kSDLPhysical; }
+    const char* GetSDLName() const {
+        return kSDLPhysical;
+    }
 
     // For the console
-    static void SetLogLevel(int level) { fLogLevel = level; }
+    static void SetLogLevel(int level) {
+        fLogLevel = level;
+    }
 
 protected:
     static int fLogLevel;

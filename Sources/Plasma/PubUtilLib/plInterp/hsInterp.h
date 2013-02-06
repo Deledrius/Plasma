@@ -54,11 +54,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 struct hsColorRGBA;
 class hsAffineParts;
-class hsInterp
-{
+class hsInterp {
 public:
-    enum IgnoreFlags
-    {
+    enum IgnoreFlags {
         kIgnoreAlpha        = 0x1,
         kIgnoreLastMatRow   = 0x2,
         kIgnorePartsPos     = 0x4,
@@ -70,24 +68,24 @@ public:
 
     static void BezScalarEval(const float value1, const float outTan,
                               const float value2, const float inTan,
-                              const float t, const float scale, float *result);
-    static void BezInterp(const hsBezPoint3Key *k1, const hsBezPoint3Key *k2, const float t, hsScalarTriple *result);
-    static void BezInterp(const hsBezScalarKey *k1, const hsBezScalarKey *k2, const float t, float *result);
-    static void BezInterp(const hsBezScaleKey *k1, const hsBezScaleKey *k2, const float t, hsScaleValue *result);
+                              const float t, const float scale, float* result);
+    static void BezInterp(const hsBezPoint3Key* k1, const hsBezPoint3Key* k2, const float t, hsScalarTriple* result);
+    static void BezInterp(const hsBezScalarKey* k1, const hsBezScalarKey* k2, const float t, float* result);
+    static void BezInterp(const hsBezScaleKey* k1, const hsBezScaleKey* k2, const float t, hsScaleValue* result);
 
     // simple linear interpolation
-    static void LinInterp(const float k1, const float k2, const float t, float *result);
-    static void LinInterp(const hsScalarTriple *k1, const hsScalarTriple *k2, const float t, hsScalarTriple *result);
-    static void LinInterp(const hsColorRGBA *k1, const hsColorRGBA *k2, const float t, hsColorRGBA *result, uint32_t ignoreFlags=0);
-    static void LinInterp(const hsMatrix33 *k1, const hsMatrix33 *k2, const float t, hsMatrix33 *result, uint32_t ignoreFlags=0);
-    static void LinInterp(const hsMatrix44 *mat1, const hsMatrix44 *mat2, const float t, hsMatrix44 *out, uint32_t ignoreFlags=0);
-    static void LinInterp(const hsQuat *k1, const hsQuat *k2, const float t, hsQuat *result);
-    static void LinInterp(const hsScaleValue *k1, const hsScaleValue *k2, const float t, hsScaleValue *result);
-    static void LinInterp(const hsAffineParts *k1, const hsAffineParts *k2, const float t, hsAffineParts *result, uint32_t ignoreFlags=0);
+    static void LinInterp(const float k1, const float k2, const float t, float* result);
+    static void LinInterp(const hsScalarTriple* k1, const hsScalarTriple* k2, const float t, hsScalarTriple* result);
+    static void LinInterp(const hsColorRGBA* k1, const hsColorRGBA* k2, const float t, hsColorRGBA* result, uint32_t ignoreFlags = 0);
+    static void LinInterp(const hsMatrix33* k1, const hsMatrix33* k2, const float t, hsMatrix33* result, uint32_t ignoreFlags = 0);
+    static void LinInterp(const hsMatrix44* mat1, const hsMatrix44* mat2, const float t, hsMatrix44* out, uint32_t ignoreFlags = 0);
+    static void LinInterp(const hsQuat* k1, const hsQuat* k2, const float t, hsQuat* result);
+    static void LinInterp(const hsScaleValue* k1, const hsScaleValue* k2, const float t, hsScaleValue* result);
+    static void LinInterp(const hsAffineParts* k1, const hsAffineParts* k2, const float t, hsAffineParts* result, uint32_t ignoreFlags = 0);
 
     // Given a time value, find the enclosing keyframes and normalize time (0-1)
-    static void GetBoundaryKeyFrames(float time, uint32_t numKeys, void *keys, 
-        uint32_t keySize, hsKeyFrame **kF1, hsKeyFrame **kF2, uint32_t *lastKeyIdx, float *p, bool forwards);
+    static void GetBoundaryKeyFrames(float time, uint32_t numKeys, void* keys,
+                                     uint32_t keySize, hsKeyFrame** kF1, hsKeyFrame** kF2, uint32_t* lastKeyIdx, float* p, bool forwards);
 
 };
 

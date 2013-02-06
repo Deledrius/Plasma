@@ -52,8 +52,7 @@ class plSceneObject;
 class plStereizer;
 class plListenerMsg;
 
-class plLineFollowMod : public plMultiModifier
-{
+class plLineFollowMod : public plMultiModifier {
 public:
     enum FollowMode {
         kFollowObject,
@@ -67,7 +66,7 @@ public:
         kRefStereizer
     };
 
-    
+
     enum {
         kNone           = 0x0,
         kFullMatrix     = 0x1,
@@ -98,7 +97,7 @@ protected:
     float            fSpeedClamp;
 
     virtual bool        IEval(double secs, float del, uint32_t dirty);
-    
+
     virtual bool        IGetSearchPos();
     virtual void        ISetTargetTransform(int iTarg, const hsMatrix44& tgtXfm);
     virtual void        ISetPathTransform();
@@ -119,69 +118,96 @@ public:
     plLineFollowMod();
     ~plLineFollowMod();
 
-    CLASSNAME_REGISTER( plLineFollowMod );
-    GETINTERFACE_ANY( plLineFollowMod, plMultiModifier );
-    
+    CLASSNAME_REGISTER(plLineFollowMod);
+    GETINTERFACE_ANY(plLineFollowMod, plMultiModifier);
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     // Export time stuff
     void                SetPath(plAnimPath* path);
-    const plAnimPath*   GetPath() const { return fPath; }
+    const plAnimPath*   GetPath() const {
+        return fPath;
+    }
 
     void                SetFollowMode(FollowMode f);
-    FollowMode          GetFollowMode() const { return fFollowMode; }
+    FollowMode          GetFollowMode() const {
+        return fFollowMode;
+    }
 
-    bool                HasOffsetFeet() const { return 0 != (fFollowFlags & kOffsetFeet); }
-    bool                HasOffsetDegrees() const { return 0 != (fFollowFlags & kOffsetAng); }
-    bool                HasOffset() const { return 0 != (fFollowFlags & kOffset); }
-    bool                HasOffsetClamp() const { return 0 != (fFollowFlags & kOffsetClamp); }
-    bool                HasSpeedClamp() const { return 0 != (fFollowFlags & kSpeedClamp); }
+    bool                HasOffsetFeet() const {
+        return 0 != (fFollowFlags & kOffsetFeet);
+    }
+    bool                HasOffsetDegrees() const {
+        return 0 != (fFollowFlags & kOffsetAng);
+    }
+    bool                HasOffset() const {
+        return 0 != (fFollowFlags & kOffset);
+    }
+    bool                HasOffsetClamp() const {
+        return 0 != (fFollowFlags & kOffsetClamp);
+    }
+    bool                HasSpeedClamp() const {
+        return 0 != (fFollowFlags & kSpeedClamp);
+    }
 
     void                SetOffsetFeet(float f);
-    float               GetOffsetFeet() const { return fOffset; }
+    float               GetOffsetFeet() const {
+        return fOffset;
+    }
 
     void                SetOffsetDegrees(float f);
-    float               GetOffsetDegrees() const { return hsRadiansToDegrees(fOffset); }
+    float               GetOffsetDegrees() const {
+        return hsRadiansToDegrees(fOffset);
+    }
 
     void                SetOffsetClamp(float f);
-    float               GetOffsetClamp() const { return fOffsetClamp; }
+    float               GetOffsetClamp() const {
+        return fOffsetClamp;
+    }
 
     void                SetForceToLine(bool on);
-    bool                GetForceToLine() const { return 0 != (fFollowFlags & kForceToLine); }
+    bool                GetForceToLine() const {
+        return 0 != (fFollowFlags & kForceToLine);
+    }
 
     void                SetSpeedClamp(float feetPerSec);
-    float               GetSpeedClamp() const { return fSpeedClamp; }
+    float               GetSpeedClamp() const {
+        return fSpeedClamp;
+    }
 
     bool                MsgReceive(plMessage* msg);
 
     virtual void AddTarget(plSceneObject* so);
-    virtual void RemoveTarget(plSceneObject* so); 
+    virtual void RemoveTarget(plSceneObject* so);
 
     void        AddStereizer(const plKey& sterKey);
     void        RemoveStereizer(const plKey& sterKey);
 };
 
 
-class plRailCameraMod : public plLineFollowMod
-{
+class plRailCameraMod : public plLineFollowMod {
 
 public:
 
     plRailCameraMod();
     ~plRailCameraMod();
 
-    CLASSNAME_REGISTER( plRailCameraMod );
-    GETINTERFACE_ANY( plRailCameraMod, plLineFollowMod );
-    
-    void Init() { fCurrentTime = -1; } // twiddle ourselves so we get ready to go...
+    CLASSNAME_REGISTER(plRailCameraMod);
+    GETINTERFACE_ANY(plRailCameraMod, plLineFollowMod);
+
+    void Init() {
+        fCurrentTime = -1;    // twiddle ourselves so we get ready to go...
+    }
     hsPoint3 GetGoal(double secs, float speed);
 
 protected:
-    
-    virtual void        ISetTargetTransform(int iTarg, const hsMatrix44& tgtXfm) {fDesiredMatrix = tgtXfm;}
+
+    virtual void        ISetTargetTransform(int iTarg, const hsMatrix44& tgtXfm) {
+        fDesiredMatrix = tgtXfm;
+    }
     virtual bool        IGetTargetTransform(hsPoint3& searchPos, hsMatrix44& tgtXfm);
-    
+
     hsMatrix44  fDesiredMatrix;
     float       fCurrentTime;
     float       fTargetTime;

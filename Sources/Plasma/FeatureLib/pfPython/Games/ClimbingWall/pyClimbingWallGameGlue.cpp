@@ -63,21 +63,18 @@ PYTHON_NO_INIT_DEFINITION(ptClimbingWallGame)
 PYTHON_GLOBAL_METHOD_DEFINITION(PtIsClimbingWallGame, args, "Params: typeID\nReturns true if the specifed typeID (guid as a string) is a ClimbingWall game")
 {
     PyObject* textObj;
-    if (!PyArg_ParseTuple(args, "O", &textObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &textObj)) {
         PyErr_SetString(PyExc_TypeError, "PtIsClimbingWallGame expects a string");
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyString_CheckEx(textObj))
-    {
+    if (PyString_CheckEx(textObj)) {
         plString text = PyString_AsStringEx(textObj);
 
         bool retVal = pyClimbingWallGame::IsClimbingWallGame(text);
         PYTHON_RETURN_BOOL(retVal);
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtIsClimbingWallGame expects a string");
         PYTHON_RETURN_ERROR;
     }
@@ -87,16 +84,17 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtJoinCommonClimbingWallGame, args, "Params: cal
 {
     PyObject* callbackObj = NULL;
     int gameID = 0;
-    if (!PyArg_ParseTuple(args, "Oii", &callbackObj, &gameID))
-    {
+
+    if (!PyArg_ParseTuple(args, "Oii", &callbackObj, &gameID)) {
         PyErr_SetString(PyExc_TypeError, "PtJoinCommonClimbingWallGame expects a ptKey and an integer");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(callbackObj))
-    {
+
+    if (!pyKey::Check(callbackObj)) {
         PyErr_SetString(PyExc_TypeError, "PtJoinCommonClimbingWallGame expects a ptKey and an integer");
         PYTHON_RETURN_ERROR;
     }
+
     pyKey* key = pyKey::ConvertFrom(callbackObj);
     pyClimbingWallGame::JoinCommonClimbingWallGame(*key, gameID);
     PYTHON_RETURN_NONE;
@@ -105,11 +103,12 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtJoinCommonClimbingWallGame, args, "Params: cal
 PYTHON_METHOD_DEFINITION(ptClimbingWallGame, changeNumBlockers, args)
 {
     int amountToAdjust;
-    if (!PyArg_ParseTuple(args, "i", &amountToAdjust))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &amountToAdjust)) {
         PyErr_SetString(PyExc_TypeError, "changeNumBlockers expects an integer");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->ChangeNumBlockers(amountToAdjust);
     PYTHON_RETURN_NONE;
 }
@@ -117,11 +116,12 @@ PYTHON_METHOD_DEFINITION(ptClimbingWallGame, changeNumBlockers, args)
 PYTHON_METHOD_DEFINITION(ptClimbingWallGame, ready, args)
 {
     int readyType, teamNumber;
-    if (!PyArg_ParseTuple(args, "ii", &readyType, &teamNumber))
-    {
+
+    if (!PyArg_ParseTuple(args, "ii", &readyType, &teamNumber)) {
         PyErr_SetString(PyExc_TypeError, "ready expects two integers");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->Ready((unsigned)readyType, (unsigned)teamNumber);
     PYTHON_RETURN_NONE;
 }
@@ -130,11 +130,12 @@ PYTHON_METHOD_DEFINITION(ptClimbingWallGame, changeBlocker, args)
 {
     int teamNumber, blockerNumber;
     char added;
-    if (!PyArg_ParseTuple(args, "iib", &teamNumber, &blockerNumber, &added))
-    {
+
+    if (!PyArg_ParseTuple(args, "iib", &teamNumber, &blockerNumber, &added)) {
         PyErr_SetString(PyExc_TypeError, "changeBlocker expects two integers and a boolean");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->ChangeBlocker(teamNumber, blockerNumber, added != 0);
     PYTHON_RETURN_NONE;
 }
@@ -144,11 +145,12 @@ PYTHON_BASIC_METHOD_DEFINITION(ptClimbingWallGame, reset, Reset)
 PYTHON_METHOD_DEFINITION(ptClimbingWallGame, playerEntered, args)
 {
     int teamNumber;
-    if (!PyArg_ParseTuple(args, "i", &teamNumber))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &teamNumber)) {
         PyErr_SetString(PyExc_TypeError, "playerEntered expects an integer");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->PlayerEntered(teamNumber);
     PYTHON_RETURN_NONE;
 }
@@ -158,14 +160,14 @@ PYTHON_BASIC_METHOD_DEFINITION(ptClimbingWallGame, finishedGame, FinishedGame)
 PYTHON_BASIC_METHOD_DEFINITION(ptClimbingWallGame, panic, Panic)
 
 PYTHON_START_METHODS_TABLE(ptClimbingWallGame)
-    PYTHON_METHOD(ptClimbingWallGame, changeNumBlockers, "Params: amountToAdjust\nAdjusts the number of blockers we are playing with"),
-    PYTHON_METHOD(ptClimbingWallGame, ready, "Params: readyType, teamNumber\nMarks the specified team as ready for the specified type (See PtClimbingWallReadyTypes)"),
-    PYTHON_METHOD(ptClimbingWallGame, changeBlocker, "Params: teamNumber, blockerNumber, added\nChanges the specified marker's state for the specified team"),
-    PYTHON_BASIC_METHOD(ptClimbingWallGame, reset, "Attempts to reset the game's control panel"),
-    PYTHON_METHOD(ptClimbingWallGame, playerEntered, "Params: teamNumber\nTells the server that you are trying to play the game for the specified team"),
-    PYTHON_BASIC_METHOD(ptClimbingWallGame, finishedGame, "Tells the server you reached the top of the wall"),
-    PYTHON_BASIC_METHOD(ptClimbingWallGame, panic, "Tells the server you are panicking and want your blockers reset"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptClimbingWallGame, changeNumBlockers, "Params: amountToAdjust\nAdjusts the number of blockers we are playing with"),
+              PYTHON_METHOD(ptClimbingWallGame, ready, "Params: readyType, teamNumber\nMarks the specified team as ready for the specified type (See PtClimbingWallReadyTypes)"),
+              PYTHON_METHOD(ptClimbingWallGame, changeBlocker, "Params: teamNumber, blockerNumber, added\nChanges the specified marker's state for the specified team"),
+              PYTHON_BASIC_METHOD(ptClimbingWallGame, reset, "Attempts to reset the game's control panel"),
+              PYTHON_METHOD(ptClimbingWallGame, playerEntered, "Params: teamNumber\nTells the server that you are trying to play the game for the specified team"),
+              PYTHON_BASIC_METHOD(ptClimbingWallGame, finishedGame, "Tells the server you reached the top of the wall"),
+              PYTHON_BASIC_METHOD(ptClimbingWallGame, panic, "Tells the server you are panicking and want your blockers reset"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallGame, pyGameCli, "Game client for the ClimbingWall game");
@@ -173,9 +175,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptClimbingWallGame, pyGameCli, "Game client for the Cl
 // required functions for PyObject interoperability
 PyObject* pyClimbingWallGame::New(pfGameCli* client)
 {
-    ptClimbingWallGame *newObj = (ptClimbingWallGame*)ptClimbingWallGame_type.tp_new(&ptClimbingWallGame_type, NULL, NULL);
-    if (client && (client->GetGameTypeId() == kGameTypeId_ClimbingWall))
+    ptClimbingWallGame* newObj = (ptClimbingWallGame*)ptClimbingWallGame_type.tp_new(&ptClimbingWallGame_type, NULL, NULL);
+
+    if (client && (client->GetGameTypeId() == kGameTypeId_ClimbingWall)) {
         newObj->fThis->gameClient = client;
+    }
+
     return (PyObject*)newObj;
 }
 

@@ -53,7 +53,7 @@ plPageInfo::plPageInfo()
     IInit();
 }
 
-plPageInfo::plPageInfo( const plLocation &loc )
+plPageInfo::plPageInfo(const plLocation& loc)
 {
     IInit();
     fLocation = loc;
@@ -74,23 +74,23 @@ plPageInfo::~plPageInfo()
     SetStrings("", "");
 }
 
-plPageInfo::plPageInfo( const plPageInfo &src )
+plPageInfo::plPageInfo(const plPageInfo& src)
 {
     IInit();
-    ISetFrom( src );
+    ISetFrom(src);
 }
 
-plPageInfo &plPageInfo::operator=( const plPageInfo &src )
+plPageInfo& plPageInfo::operator=(const plPageInfo& src)
 {
-    ISetFrom( src );
+    ISetFrom(src);
     return *this;
 }
 
-void    plPageInfo::ISetFrom( const plPageInfo &src )
+void    plPageInfo::ISetFrom(const plPageInfo& src)
 {
     fLocation = src.fLocation;
 
-    SetStrings( src.fAge, src.fPage );
+    SetStrings(src.fAge, src.fPage);
     fMajorVersion = src.fMajorVersion;
     fClassVersions = src.fClassVersions;
     fChecksum = src.fChecksum;
@@ -104,7 +104,7 @@ void    plPageInfo::SetStrings(const plString& age, const plString& page)
     fPage = page;
 }
 
-void    plPageInfo::SetLocation( const plLocation &loc )
+void    plPageInfo::SetLocation(const plLocation& loc)
 {
     fLocation = loc;
 }
@@ -117,7 +117,7 @@ void plPageInfo::AddClassVersion(uint16_t classIdx, uint16_t version)
     fClassVersions.push_back(cv);
 }
 
-void plPageInfo::Read( hsStream *s )
+void plPageInfo::Read(hsStream* s)
 {
     IInit();
 
@@ -125,23 +125,25 @@ void plPageInfo::Read( hsStream *s )
     // after Uru's online component was cancelled in Feb 2004, so I've removed support for
     // anything prior to that to clean things up a bit.
     uint32_t version = s->ReadLE32();
-    if (version > sCurrPageInfoVersion || version < 5)
-    {
-        hsAssert( false, "Invalid header version in plPageInfo::Read()" );
+
+    if (version > sCurrPageInfoVersion || version < 5) {
+        hsAssert(false, "Invalid header version in plPageInfo::Read()");
         return;
     }
-    if (version >= 5)
-    {
-        fLocation.Read( s );
+
+    if (version >= 5) {
+        fLocation.Read(s);
         fAge = s->ReadSafeString_TEMP();
-        if (version < 6)
-            s->ReadSafeString_TEMP(); // fChapter was never used, and always "District".
+
+        if (version < 6) {
+            s->ReadSafeString_TEMP();    // fChapter was never used, and always "District".
+        }
+
         fPage = s->ReadSafeString_TEMP();
 
-        s->ReadLE( &fMajorVersion );
+        s->ReadLE(&fMajorVersion);
 
-        if (version < 6)
-        {
+        if (version < 6) {
             uint16_t unusedMinorVersion;
             s->ReadLE(&unusedMinorVersion);
             int32_t unusedReleaseVersion;
@@ -150,17 +152,16 @@ void plPageInfo::Read( hsStream *s )
             s->ReadLE(&unusedFlags);
         }
 
-        s->ReadLE( &fChecksum );
-        s->ReadLE( &fDataStart );
-        s->ReadLE( &fIndexStart );
+        s->ReadLE(&fChecksum);
+        s->ReadLE(&fDataStart);
+        s->ReadLE(&fIndexStart);
     }
 
-    if (version >= 6)
-    {
+    if (version >= 6) {
         uint16_t numClassVersions = s->ReadLE16();
         fClassVersions.reserve(numClassVersions);
-        for (uint16_t i = 0; i < numClassVersions; i++)
-        {
+
+        for (uint16_t i = 0; i < numClassVersions; i++) {
             ClassVersion cv;
             cv.Class = s->ReadLE16();
             cv.Version = s->ReadLE16();
@@ -169,20 +170,20 @@ void plPageInfo::Read( hsStream *s )
     }
 }
 
-void    plPageInfo::Write( hsStream *s )
+void    plPageInfo::Write(hsStream* s)
 {
-    s->WriteLE32( sCurrPageInfoVersion );
-    fLocation.Write( s );
-    s->WriteSafeString( fAge );
-    s->WriteSafeString( fPage );
-    s->WriteLE( fMajorVersion );
-    s->WriteLE( fChecksum );
-    s->WriteLE( fDataStart );
-    s->WriteLE( fIndexStart );
+    s->WriteLE32(sCurrPageInfoVersion);
+    fLocation.Write(s);
+    s->WriteSafeString(fAge);
+    s->WriteSafeString(fPage);
+    s->WriteLE(fMajorVersion);
+    s->WriteLE(fChecksum);
+    s->WriteLE(fDataStart);
+    s->WriteLE(fIndexStart);
     uint16_t numClassVersions = uint16_t(fClassVersions.size());
     s->WriteLE16(numClassVersions);
-    for (uint16_t i = 0; i < numClassVersions; i++)
-    {
+
+    for (uint16_t i = 0; i < numClassVersions; i++) {
         ClassVersion& cv = fClassVersions[i];
         s->WriteLE16(cv.Class);
         s->WriteLE16(cv.Version);
@@ -192,7 +193,7 @@ void    plPageInfo::Write( hsStream *s )
 //// IsValid /////////////////////////////////////////////////////////////////
 //  Just a simple test for now.
 
-bool    plPageInfo::IsValid( void ) const
+bool    plPageInfo::IsValid(void) const
 {
     return fLocation.IsValid();
 }

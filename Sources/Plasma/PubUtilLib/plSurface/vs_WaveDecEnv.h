@@ -448,7 +448,7 @@ static const uint8_t vs_WaveDecEnvCodes[] = {
     0x5,    0x0,    0x15,   0x90,
     0x1a,   0x0,    0xe4,   0xa0,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl vs_WaveDecEnvDecl("sha/vs_WaveDecEnv.inl", vs_WaveDecEnv, vs_WaveDecEnvbyteLen, vs_WaveDecEnvCodes);
 

@@ -62,21 +62,19 @@ void plPhysicsSoundMgr::Update()
     // Get all the physicals that only in the new list (started colliding)
     CollideSet startedColliding;
     std::set_difference(fCurCollisions.begin(), fCurCollisions.end(),
-        fPrevCollisions.begin(), fPrevCollisions.end(),
-        std::inserter(startedColliding, startedColliding.begin()));
+                        fPrevCollisions.begin(), fPrevCollisions.end(),
+                        std::inserter(startedColliding, startedColliding.begin()));
 
-    for (CollideSet::iterator it = startedColliding.begin(); it != startedColliding.end(); it++)
+    for (CollideSet::iterator it = startedColliding.begin(); it != startedColliding.end(); it++) {
         IStartCollision(*it);
+    }
 
-    for (CollideSet::iterator it = fPrevCollisions.begin(); it != fPrevCollisions.end(); it++)
-    {
+    for (CollideSet::iterator it = fPrevCollisions.begin(); it != fPrevCollisions.end(); it++) {
         CollideSet::iterator old = fCurCollisions.find(*it);
-        if (old != fCurCollisions.end())
-        {
+
+        if (old != fCurCollisions.end()) {
             IUpdateCollision(*it);
-        }
-        else
-        {
+        } else {
             IStopCollision(*it);
         }
     }
@@ -92,30 +90,29 @@ void plPhysicsSoundMgr::IStartCollision(const CollidePair& cp)
 
     plPhysical* physicalA = cp.FirstPhysical();
     plPhysical* physicalB = cp.SecondPhysical();
-    if (!physicalA || !physicalB)
+
+    if (!physicalA || !physicalB) {
         return;
+    }
 
     plPhysicalSndGroup* sndA = physicalA->GetSoundGroup();
     plPhysicalSndGroup* sndB = physicalB->GetSoundGroup();
 
     // If no impact sounds were specified in max don't do anything here.
     if (!sndA->HasImpactSound(sndB->GetGroup()) &&
-        !sndB->HasImpactSound(sndA->GetGroup()))
+            !sndB->HasImpactSound(sndA->GetGroup())) {
         return;
+    }
 
     physicalA->GetLinearVelocitySim(v1);
     physicalB->GetLinearVelocitySim(v2);
     hsVector3 vel = v1 - v2;
     float strength = vel.MagnitudeSquared();
-    
-    if (strength >= strengthThreshold)
-    {
-        if (sndA->HasImpactSound(sndB->GetGroup()))
-        {
+
+    if (strength >= strengthThreshold) {
+        if (sndA->HasImpactSound(sndB->GetGroup())) {
             sndA->PlayImpactSound(sndB->GetGroup());
-        }
-        else
-        {
+        } else {
             sndB->PlayImpactSound(sndA->GetGroup());
         }
     }
@@ -125,23 +122,20 @@ void plPhysicsSoundMgr::IStopCollision(const CollidePair& cp)
 {
     plPhysical* physicalA = cp.FirstPhysical();
     plPhysical* physicalB = cp.SecondPhysical();
-    if (physicalA && physicalB)
-    {
+
+    if (physicalA && physicalB) {
         plPhysicalSndGroup* sndA = physicalA->GetSoundGroup();
         plPhysicalSndGroup* sndB = physicalB->GetSoundGroup();
 
-        if (sndA->HasSlideSound(sndB->GetGroup()))
-        {
-            if(sndA->IsSliding())
-            {
-                sndA->StopSlideSound(sndB->GetGroup()); 
+        if (sndA->HasSlideSound(sndB->GetGroup())) {
+            if (sndA->IsSliding()) {
+                sndA->StopSlideSound(sndB->GetGroup());
             }
         }
-        if (sndB->HasSlideSound(sndA->GetGroup()))
-        {
-            if(sndB->IsSliding())
-            {
-                sndB->StopSlideSound(sndA->GetGroup());     
+
+        if (sndB->HasSlideSound(sndA->GetGroup())) {
+            if (sndB->IsSliding()) {
+                sndB->StopSlideSound(sndA->GetGroup());
             }
         }
     }
@@ -149,12 +143,14 @@ void plPhysicsSoundMgr::IStopCollision(const CollidePair& cp)
 
 void plPhysicsSoundMgr::IUpdateCollision(const CollidePair& cp)
 {
-    const float slideThreshhold = 0.f;   
+    const float slideThreshhold = 0.f;
     hsVector3 v1, v2;
     plPhysical* physicalA = cp.FirstPhysical();
     plPhysical* physicalB = cp.SecondPhysical();
-    if (!physicalA || !physicalB)
+
+    if (!physicalA || !physicalB) {
         return;
+    }
 
     plPhysicalSndGroup* sndA = physicalA->GetSoundGroup();
     plPhysicalSndGroup* sndB = physicalB->GetSoundGroup();
@@ -163,26 +159,27 @@ void plPhysicsSoundMgr::IUpdateCollision(const CollidePair& cp)
     physicalB->GetLinearVelocitySim(v2);
     hsVector3 vel = v1 - v2;
     float strength = vel.MagnitudeSquared();
-    
+
     // scale strength to use as volume
-    strength /= 16*8;
-    if(strength < MIN_VOLUME)
+    strength /= 16 * 8;
+
+    if (strength < MIN_VOLUME) {
         strength = 0;
-    
-    if (sndA->HasSlideSound(sndB->GetGroup()))
+    }
+
+    if (sndA->HasSlideSound(sndB->GetGroup())) {
         IProcessSlide(sndA, sndB, strength);
-    else
+    } else {
         IProcessSlide(sndB, sndA, strength);
+    }
 }
 
 void plPhysicsSoundMgr::IProcessSlide(plPhysicalSndGroup* sndA, plPhysicalSndGroup* sndB, float strength)
 {
     sndA->SetSlideSoundVolume(sndB->GetGroup(), strength);
 
-    if(strength > MIN_VOLUME)
-    {
-        if(!sndA->IsSliding())
-        {
+    if (strength > MIN_VOLUME) {
+        if (!sndA->IsSliding()) {
             sndA->PlaySlideSound(sndB->GetGroup());
         }
     }
@@ -194,13 +191,10 @@ plPhysicsSoundMgr::CollidePair::CollidePair(const plKey& firstPhys, const plKey&
 {
     // To simplify searching and sorting, all pairs are set up with the pointer value of the
     // first element greater than the pointer value of the second.
-    if (firstPhys->GetObjectPtr() < secondPhys->GetObjectPtr())
-    {
+    if (firstPhys->GetObjectPtr() < secondPhys->GetObjectPtr()) {
         this->firstPhysKey = secondPhys;
         this->secondPhysKey = firstPhys;
-    }
-    else
-    {
+    } else {
         this->firstPhysKey = firstPhys;
         this->secondPhysKey = secondPhys;
     }
@@ -211,14 +205,16 @@ plPhysicsSoundMgr::CollidePair::CollidePair(const plKey& firstPhys, const plKey&
 
 bool plPhysicsSoundMgr::CollidePair::operator<(const CollidePair& rhs) const
 {
-    return (firstPhysKey->GetObjectPtr() < rhs.firstPhysKey->GetObjectPtr() 
-        || (rhs.firstPhysKey->GetObjectPtr() == firstPhysKey->GetObjectPtr() && secondPhysKey->GetObjectPtr() < rhs.secondPhysKey->GetObjectPtr()));
+    return (firstPhysKey->GetObjectPtr() < rhs.firstPhysKey->GetObjectPtr()
+            || (rhs.firstPhysKey->GetObjectPtr() == firstPhysKey->GetObjectPtr() && secondPhysKey->GetObjectPtr() < rhs.secondPhysKey->GetObjectPtr()));
 }
 
 bool plPhysicsSoundMgr::CollidePair::operator==(const CollidePair& rhs) const
 {
-    if (firstPhysKey == rhs.firstPhysKey && secondPhysKey == rhs.secondPhysKey)
+    if (firstPhysKey == rhs.firstPhysKey && secondPhysKey == rhs.secondPhysKey) {
         return true;
+    }
+
     return false;
 }
 

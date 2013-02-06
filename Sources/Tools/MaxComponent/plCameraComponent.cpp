@@ -69,8 +69,7 @@ void DummyCodeIncludeFuncCamera() {}
 
 OBSOLETE_CLASS_DESC(plCameraCmdComponent, gCameraCmdDesc, "(ex)Camera Command Region",  "CameraCmdRegion", COMP_TYPE_MISC, CAMERACMD_CID)
 
-enum
-{
+enum {
     kCommand,
     kOffsetX,
     kOffsetY,
@@ -79,32 +78,26 @@ enum
     kSmooth,
 };
 
-class plCameraCmdComponentProc : public ParamMap2UserDlgProc
-{
+class plCameraCmdComponentProc : public ParamMap2UserDlgProc {
 public:
-    BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
+    BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         return false;
     }
 
     void DeleteThis() {}
 
 protected:
-    void IEnableControls(IParamMap2 *map, int type)
-    {
+    void IEnableControls(IParamMap2* map, int type) {
     }
 
-    void IAddComboItem(HWND hCombo, const char *name, int id)
-    {
+    void IAddComboItem(HWND hCombo, const char* name, int id) {
     }
-    void ISetComboSel(HWND hCombo, int type)
-    {
+    void ISetComboSel(HWND hCombo, int type) {
     }
 };
 static plCameraCmdComponentProc gCameraCmdComponentProc;
 
-enum
-{
+enum {
     kCommandSetOffset,
     kCommandSetFP,
     kCommandSetFixedCam,
@@ -117,39 +110,39 @@ ParamBlockDesc2 gCameraCmdBlock
     IDD_COMP_CAMERACMD, IDS_COMP_CAMERACMD, 0, 0, &gCameraCmdComponentProc,
 
     kCommand,       _T("Command"),      TYPE_INT,               0, 0,
-        p_default, kCommandSetFixedCam,
-        end,
-        
+    p_default, kCommandSetFixedCam,
+    end,
+
     kOffsetX,   _T("X Offset"), TYPE_FLOAT, P_ANIMATABLE,   0,
-        p_range, 0.0f, 50.0f,
-        p_default, 0.0f,
-        p_ui,   TYPE_SPINNER, EDITTYPE_FLOAT,
-        IDC_CAMERACMD_OFFSETX, IDC_CAMERACMD_SPIN_OFFSETX, SPIN_AUTOSCALE,
-        end,
+    p_range, 0.0f, 50.0f,
+    p_default, 0.0f,
+    p_ui,   TYPE_SPINNER, EDITTYPE_FLOAT,
+    IDC_CAMERACMD_OFFSETX, IDC_CAMERACMD_SPIN_OFFSETX, SPIN_AUTOSCALE,
+    end,
 
     kOffsetY,   _T("Y Offset"), TYPE_FLOAT, P_ANIMATABLE,   0,
-        p_range, 0.0f, 50.0f,
-        p_default, 10.0f,
-        p_ui,   TYPE_SPINNER, EDITTYPE_FLOAT,
-        IDC_CAMERACMD_OFFSETY, IDC_CAMERACMD_SPIN_OFFSETY, SPIN_AUTOSCALE,
-        end,
+    p_range, 0.0f, 50.0f,
+    p_default, 10.0f,
+    p_ui,   TYPE_SPINNER, EDITTYPE_FLOAT,
+    IDC_CAMERACMD_OFFSETY, IDC_CAMERACMD_SPIN_OFFSETY, SPIN_AUTOSCALE,
+    end,
 
     kOffsetZ,   _T("Z Offset"), TYPE_FLOAT, P_ANIMATABLE,   0,
-        p_range, 0.0f, 50.0f,
-        p_default, 3.0f,
-        p_ui,   TYPE_SPINNER, EDITTYPE_FLOAT,
-        IDC_CAMERACMD_OFFSETZ, IDC_CAMERACMD_SPIN_OFFSETZ, SPIN_AUTOSCALE,
-        end,
+    p_range, 0.0f, 50.0f,
+    p_default, 3.0f,
+    p_ui,   TYPE_SPINNER, EDITTYPE_FLOAT,
+    IDC_CAMERACMD_OFFSETZ, IDC_CAMERACMD_SPIN_OFFSETZ, SPIN_AUTOSCALE,
+    end,
 
     kCustomBoundListStuff, _T("FixedCamera"),   TYPE_INODE,     0, 0,
-        p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_CAMERACMD_PICKSTATE_BASE,
-        p_sclassID,  CAMERA_CLASS_ID,
-        p_prompt, IDS_COMP_PHYS_CHOSEN_BASE,
-        end,
+    p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_CAMERACMD_PICKSTATE_BASE,
+    p_sclassID,  CAMERA_CLASS_ID,
+    p_prompt, IDS_COMP_PHYS_CHOSEN_BASE,
+    end,
 
     kSmooth,    _T("useCut"),       TYPE_BOOL,              0, 0,
-        p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CAMERACMD_CUT,
-        end,
+    p_ui,               TYPE_SINGLECHEKBOX, IDC_COMP_CAMERACMD_CUT,
+    end,
 
 
 
@@ -164,17 +157,17 @@ plCameraCmdComponent::plCameraCmdComponent()
 
 // Internal setup and write-only set properties on the MaxNode. No reading
 // of properties on the MaxNode, as it's still indeterminant.
-bool plCameraCmdComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plCameraCmdComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
-bool plCameraCmdComponent::PreConvert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plCameraCmdComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
-bool plCameraCmdComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plCameraCmdComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }

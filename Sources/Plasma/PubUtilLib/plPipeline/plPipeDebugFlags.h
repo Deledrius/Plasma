@@ -43,46 +43,44 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plPipeDebugFlags_inc
 #define plPipeDebugFlags_inc
 
-namespace plPipeDbg
-{
-    // Debug flags
-    enum DebugFlags
-    {
-        kFlagReload,
-        kFlagShowAllBounds,
-        kFlagNoMultitexture,
-        kFlagNoLightmaps,
-        kFlagNoRuntimeLights,
-        kFlagOcclusionSnap,
-        kFlagNoAlphaBlending,
-        kFlagNoDecals,
-        kFlagDontSortFaces,
-        kFlagDisableSpecular,
-        kFlagOverlayWire,
-        kFlagShowNormals,
-        kFlagColorizeMipmaps,
-        kFlagSingleMat,
-        kFlagSkipVisDist,
-        kFlagNoPlates,
-        kFlagNoShadows,
-        kFlagNoUpperLayers,
-        kFlagNoProjLights,
-        kFlagNoSkinning,
-        kFlagBumpUV,
-        kFlagBumpW,
-        kFlagNoBump,
-        kFlagNoRender,
-        kFlagNoAnisotropy,
-        kFlagAllBright,
-        kFlagNoApplyProjLights,
-        kFlagOnlyApplyProjLights,
-        kFlagShowShadowBounds,
-        kFlagNoAuxSpans,
-        kFlagNoShadowApply,
-        kFlagNoPreShade,
-        kFlagNVPerfHUD,
-        kFlagNoFog,
-    };
+namespace plPipeDbg {
+// Debug flags
+enum DebugFlags {
+    kFlagReload,
+    kFlagShowAllBounds,
+    kFlagNoMultitexture,
+    kFlagNoLightmaps,
+    kFlagNoRuntimeLights,
+    kFlagOcclusionSnap,
+    kFlagNoAlphaBlending,
+    kFlagNoDecals,
+    kFlagDontSortFaces,
+    kFlagDisableSpecular,
+    kFlagOverlayWire,
+    kFlagShowNormals,
+    kFlagColorizeMipmaps,
+    kFlagSingleMat,
+    kFlagSkipVisDist,
+    kFlagNoPlates,
+    kFlagNoShadows,
+    kFlagNoUpperLayers,
+    kFlagNoProjLights,
+    kFlagNoSkinning,
+    kFlagBumpUV,
+    kFlagBumpW,
+    kFlagNoBump,
+    kFlagNoRender,
+    kFlagNoAnisotropy,
+    kFlagAllBright,
+    kFlagNoApplyProjLights,
+    kFlagOnlyApplyProjLights,
+    kFlagShowShadowBounds,
+    kFlagNoAuxSpans,
+    kFlagNoShadowApply,
+    kFlagNoPreShade,
+    kFlagNVPerfHUD,
+    kFlagNoFog,
+};
 
 }
 

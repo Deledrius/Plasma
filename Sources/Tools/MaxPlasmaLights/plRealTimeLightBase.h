@@ -52,7 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "MaxMain/MaxCompat.h"
 
 
-extern TCHAR *GetString(int id);
+extern TCHAR* GetString(int id);
 extern HINSTANCE hInstance;
 
 #define RTOMNI_LIGHT_CLASSID    Class_ID(0x57cf7089, 0x282e5b71)
@@ -80,8 +80,14 @@ extern HINSTANCE hInstance;
 #define WM_SET_TYPE     WM_USER + 0x04002
 
 
-inline float MaxF(float a, float b) { return a>b?a:b; }
-inline float MinF(float a, float b) { return a<b?a:b; }
+inline float MaxF(float a, float b)
+{
+    return a > b ? a : b;
+}
+inline float MinF(float a, float b)
+{
+    return a < b ? a : b;
+}
 
 class plLayerTex;
 class plMaxNode;
@@ -92,57 +98,58 @@ class plRTLightBase;
 //// Base LightDlgProc ////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-class plBaseLightProc : public ParamMap2UserDlgProc
-{
-    protected:
-        void            ILoadComboBox( HWND hComboBox, const char *names[] );
-        void            IBuildLightMesh( plRTLightBase *base, float coneSize );
+class plBaseLightProc : public ParamMap2UserDlgProc {
+protected:
+    void            ILoadComboBox(HWND hComboBox, const char* names[]);
+    void            IBuildLightMesh(plRTLightBase* base, float coneSize);
 
-    public:
-        virtual BOOL    DlgProc( TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
+public:
+    virtual BOOL    DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 //// plLightTexPBAccessor /////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-class plLightTexPBAccessor : public PBAccessor
-{
-    public:
-        void Set( PB2Value& val, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t );
-        void Get( PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t, Interval &valid );
+class plLightTexPBAccessor : public PBAccessor {
+public:
+    void Set(PB2Value& val, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t);
+    void Get(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t, Interval& valid);
 
-        static plLightTexPBAccessor *Instance( void ) { return &fAccessor; }
+    static plLightTexPBAccessor* Instance(void) {
+        return &fAccessor;
+    }
 
-    protected:
+protected:
 
-        static plLightTexPBAccessor fAccessor;
+    static plLightTexPBAccessor fAccessor;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 //// plRTLightBase Class //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-class plRTLightBase : public GenLight
-{
+class plRTLightBase : public GenLight {
 
 protected:
-    ClassDesc2   *fClassDesc;   // Must set in derived classes constructor
+    ClassDesc2*   fClassDesc;   // Must set in derived classes constructor
     Color        fColor;        // Color of mesh
     Mesh         fMesh;         // Mesh to draw
-    IParamBlock2 *fLightPB;     // The derived component's paramblock (optional)
+    IParamBlock2* fLightPB;     // The derived component's paramblock (optional)
     plLayerTex*  fTex;
 
 
-    virtual bool    IHasAttenuation( void ) { return false; }
-    virtual void    IBuildMeshes( BOOL isNew ) {}
+    virtual bool    IHasAttenuation(void) {
+        return false;
+    }
+    virtual void    IBuildMeshes(BOOL isNew) {}
 
     void    BuildStaticMeshes();
     void    BuildSpotMesh(float coneSize);
     int     meshBuilt;
     int     extDispFlags;
 
-    
+
     Mesh    staticMesh[2];
     Mesh    spotMesh;
 
@@ -153,12 +160,11 @@ public:
     friend class SetTypeRest;
 
     ExclList exclList;
-    IObjParam    *fIP;
+    IObjParam*    fIP;
 
 
 
-    enum LightType
-    {
+    enum LightType {
         RT_OMNI,
         RT_TARGET_SPOT,
         RT_FREE_SPOT,
@@ -173,19 +179,18 @@ public:
     //  they would crash and burn, or at best just not read in). As a result,
     //  as much as it annoys me to death, we can't do a damn thing about it.
     //  Hopefully, in the future we will be able to clean all of this out somehow
-    //  (a conversion utility might come in handy, dunno). 
+    //  (a conversion utility might come in handy, dunno).
     //
     //  For reference, the setup SHOULD have separate paramBlocks for each rollout,
     //  using the P_USE_PARAMS to duplicate the shared ones, and all the rollouts
     //  should have *IDENTICAL* block and ref #s, so the shared code actually looks
-    //  sane. The final block/ref #s needed would be kBlkMain, kBlkAnim, kBlkProj 
-    //  (for spots and proj dir) and kBlkAttenuation (projMaps don't need ref #s, 
+    //  sane. The final block/ref #s needed would be kBlkMain, kBlkAnim, kBlkProj
+    //  (for spots and proj dir) and kBlkAttenuation (projMaps don't need ref #s,
     //  since they're part of the paramBlocks).
     ///////////////////////////////////////////////////////////////////////////////
 
     // Blk Numbers
-    enum BlkNumber
-    {
+    enum BlkNumber {
         // Old numbers. Phase out when possible
         kBlkGeneralLightProp,
         kBlkAttenLightProp,
@@ -205,8 +210,7 @@ public:
     };
 
     // Ref numbers
-    enum    RefNumber
-    {
+    enum    RefNumber {
         kRefGeneralLightProp,
         kRefProjMap,
         kRefShadowProjMap,
@@ -225,8 +229,7 @@ public:
     };
 
     //Multimap Support?
-    enum    MapChoice
-    {
+    enum    MapChoice {
         kLightMap1,
         kLightMap2,
         kLightMap3,
@@ -235,8 +238,7 @@ public:
         kLightMap6
     };
 
-    enum    ParamVals
-    {
+    enum    ParamVals {
         kLightType,         //Inserted in v1, Removed in v4
         kAffectDiffuse,     //Inserted in v1
         kLightColor,        //Inserted in v1
@@ -270,7 +272,7 @@ public:
         kUseProjectorBool,  //Inserted in v1
         kProjMapTexButton2, //Inserted in v1
         kTargetDist,        //Inserted in v1
-        
+
         kShadowOn,          //Inserted in v2
         kShadowChoice,      //Inserted in v2
         kUseShadGlobal,     //Inserted in v2
@@ -302,209 +304,330 @@ public:
     };
 
     // Projection types.
-    enum
-    {
-        kIlluminate, 
-        kAdd, 
-        kMult, 
+    enum {
+        kIlluminate,
+        kAdd,
+        kMult,
         kMADD
     };
-    
+
     // Animation rollout parameters
-    enum
-    {
+    enum {
         kAnimName,
         kAnimAutoStart,
         kAnimLoop,
         kAnimLoopName
     };
-    
+
     plRTLightBase() { }//meshBuilt = 0; fClassDesc = NULL;  fLightPB = NULL; fIP = NULL; BuildMeshes(true); }
     virtual ~plRTLightBase();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
-    static ParamBlockDesc2  *GetAnimPBDesc( void );
+    static ParamBlockDesc2*  GetAnimPBDesc(void);
 
-    TCHAR* GetObjectName()      { return (TCHAR*)fClassDesc->ClassName(); }
-    void GetClassName(TSTR& s)  { s = fClassDesc->ClassName(); }
+    TCHAR* GetObjectName()      {
+        return (TCHAR*)fClassDesc->ClassName();
+    }
+    void GetClassName(TSTR& s)  {
+        s = fClassDesc->ClassName();
+    }
 
-    virtual IParamBlock2 *GetParamBlock( int i );
+    virtual IParamBlock2* GetParamBlock(int i);
     virtual IParamBlock2* GetParamBlock2();
     virtual IParamBlock2* GetParamBlockByID(short id);
-    plLayerTex*   GetTex() { return fTex; }
+    plLayerTex*   GetTex() {
+        return fTex;
+    }
     // So our animatables will show up in the trackview
-    virtual int NumParamBlocks() { return 1; }
+    virtual int NumParamBlocks() {
+        return 1;
+    }
     virtual int NumSubs();
     virtual Animatable* SubAnim(int i);
     virtual TSTR SubAnimName(int i);
 
     // plug-in mouse creation callback
     CreateMouseCallBack* GetCreateMouseCallBack();
-    RefTargetHandle Clone(RemapDir &remap = DEFAULTREMAP){ plRTLightBase* thisObj = new plRTLightBase(); BaseClone(this, thisObj, remap); return thisObj;}
-    
-    virtual void BeginEditParams(IObjParam *ip, ULONG flags, Animatable *prev);
-    virtual void EndEditParams(IObjParam *ip, ULONG flags, Animatable *next);
-    
+    RefTargetHandle Clone(RemapDir& remap = DEFAULTREMAP) {
+        plRTLightBase* thisObj = new plRTLightBase();
+        BaseClone(this, thisObj, remap);
+        return thisObj;
+    }
+
+    virtual void BeginEditParams(IObjParam* ip, ULONG flags, Animatable* prev);
+    virtual void EndEditParams(IObjParam* ip, ULONG flags, Animatable* next);
+
     // main function that will build our mesh
     void FreeCaches();
-    
-    // retreives bounding box in object space/world space
-    void GetLocalBoundBox(TimeValue t, INode *node, ViewExp *vpt, Box3 &box);
-    void GetWorldBoundBox(TimeValue t, INode *node, ViewExp *vpt, Box3 &box);
-    
-    // main display function for this object
-    int Display(TimeValue t, INode *node, ViewExp *vpt, int flags);
-    virtual int DrawConeAndLine(TimeValue t, INode* inode, GraphicsWindow *gw, int drawing );
-    void GetConePoints(TimeValue t, float aspect, float angle, float dist, Point3 *q);
-    virtual void DrawCone(TimeValue t, GraphicsWindow *gw, float dist);
-    int GetSpotShape(void){ return 0; }
-    void SetExtendedDisplay(int flags){ extDispFlags = flags; }
-    void BoxCircle(TimeValue t, float r, float d, Box3& box, int extraPt, Matrix3 *tm);
-    void BoxDirPoints(TimeValue t, float angle, float dist, Box3 &box, Matrix3 *tm);
-    void BoxPoints(TimeValue t, float angle, float dist, Box3 &box, Matrix3 *tm);
 
-    void    DrawArrow( TimeValue t, GraphicsWindow *gw, Point3 &direction, float dist );
-    
-    void GetAttenPoints(TimeValue t, float rad, Point3 *q);
-    int GetRectXPoints(TimeValue t, float angle, float dist, Point3 *q);
-    int GetCirXPoints(TimeValue t, float angle, float dist, Point3 *q);
-    void DrawSphereArcs(TimeValue t, GraphicsWindow *gw, float r, Point3 *q);
-    
+    // retreives bounding box in object space/world space
+    void GetLocalBoundBox(TimeValue t, INode* node, ViewExp* vpt, Box3& box);
+    void GetWorldBoundBox(TimeValue t, INode* node, ViewExp* vpt, Box3& box);
+
+    // main display function for this object
+    int Display(TimeValue t, INode* node, ViewExp* vpt, int flags);
+    virtual int DrawConeAndLine(TimeValue t, INode* inode, GraphicsWindow* gw, int drawing);
+    void GetConePoints(TimeValue t, float aspect, float angle, float dist, Point3* q);
+    virtual void DrawCone(TimeValue t, GraphicsWindow* gw, float dist);
+    int GetSpotShape(void) {
+        return 0;
+    }
+    void SetExtendedDisplay(int flags) {
+        extDispFlags = flags;
+    }
+    void BoxCircle(TimeValue t, float r, float d, Box3& box, int extraPt, Matrix3* tm);
+    void BoxDirPoints(TimeValue t, float angle, float dist, Box3& box, Matrix3* tm);
+    void BoxPoints(TimeValue t, float angle, float dist, Box3& box, Matrix3* tm);
+
+    void    DrawArrow(TimeValue t, GraphicsWindow* gw, Point3& direction, float dist);
+
+    void GetAttenPoints(TimeValue t, float rad, Point3* q);
+    int GetRectXPoints(TimeValue t, float angle, float dist, Point3* q);
+    int GetCirXPoints(TimeValue t, float angle, float dist, Point3* q);
+    void DrawSphereArcs(TimeValue t, GraphicsWindow* gw, float r, Point3* q);
+
 //
-    void DrawX(TimeValue t, float asp, int npts, float dist, GraphicsWindow *gw, int indx); 
-    void DrawCircleX(TimeValue t, GraphicsWindow *gw, float angle, float dist, Point3 *q);
-    void DrawWarpRect(TimeValue t, GraphicsWindow *gw, float angle, float dist, Point3 *q);
-    void DrawAttenCirOrRect(TimeValue t, GraphicsWindow *gw, float dist, BOOL froze, int uicol);
-    int DrawAtten(TimeValue t, INode *inode, GraphicsWindow *gw);
-    
-    
-    
-    
+    void DrawX(TimeValue t, float asp, int npts, float dist, GraphicsWindow* gw, int indx);
+    void DrawCircleX(TimeValue t, GraphicsWindow* gw, float angle, float dist, Point3* q);
+    void DrawWarpRect(TimeValue t, GraphicsWindow* gw, float angle, float dist, Point3* q);
+    void DrawAttenCirOrRect(TimeValue t, GraphicsWindow* gw, float dist, BOOL froze, int uicol);
+    int DrawAtten(TimeValue t, INode* inode, GraphicsWindow* gw);
+
+
+
+
     //void SetType(int tp);
 
-    
+
 
     // hit testing of this object
-    int HitTest(TimeValue t, INode *node, int type, int crossing, int flags, IPoint2 *p, ViewExp *vpt);
-    
-    void Snap(TimeValue t, INode* inode, SnapInfo *snap, IPoint2 *p, ViewExp *vpt);
-    void GetDeformBBox(TimeValue t, Box3& box, Matrix3 *tm, BOOL useSel );
+    int HitTest(TimeValue t, INode* node, int type, int crossing, int flags, IPoint2* p, ViewExp* vpt);
+
+    void Snap(TimeValue t, INode* inode, SnapInfo* snap, IPoint2* p, ViewExp* vpt);
+    void GetDeformBBox(TimeValue t, Box3& box, Matrix3* tm, BOOL useSel);
 
 
     //Internal routines
-    void BoxLight(TimeValue t, INode *inode, Box3& box, Matrix3 *tm);
-    void GetMat(TimeValue t, INode* inode, ViewExp *vpt, Matrix3& tm);
+    void BoxLight(TimeValue t, INode* inode, Box3& box, Matrix3* tm);
+    void GetMat(TimeValue t, INode* inode, ViewExp* vpt, Matrix3& tm);
 
     virtual RefTargetHandle GetReference(int i);
     virtual void SetReference(int ref, RefTargetHandle rtarg);
-    virtual int NumRefs() { return kNumRefs;}
-    
+    virtual int NumRefs() {
+        return kNumRefs;
+    }
+
     RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, PartID& partID, RefMessage message);
 
     // Called to retreive the state of this object at the specified time.
-    ObjectState Eval(TimeValue t) { return ObjectState(this); }
+    ObjectState Eval(TimeValue t) {
+        return ObjectState(this);
+    }
 
-    const char *GetCategory(){ return fClassDesc->Category(); }
+    const char* GetCategory() {
+        return fClassDesc->Category();
+    }
 
     //
     //  LightObject Specific Stuff below
     //
     //
 
-    virtual BOOL IsSpot( void ) { return FALSE; }
-    virtual BOOL IsDir( void )  { return FALSE; }
+    virtual BOOL IsSpot(void) {
+        return FALSE;
+    }
+    virtual BOOL IsDir(void)  {
+        return FALSE;
+    }
 
-    RefResult EvalLightState(TimeValue time, Interval& valid, LightState *ls);
-    ObjLightDesc *CreateLightDesc(INode *n, BOOL forceShadowBuffer=FALSE);
-    void SetUseLight(int onOff) { fLightPB->SetValue(kLightOn, 0, onOff); NotifyDependents(FOREVER, PART_OBJ, REFMSG_CHANGE); }
-    BOOL GetUseLight(void) { BOOL v; fLightPB->GetValue(kLightOn, 0, v, FOREVER); return v; }
-    void SetHotspot(TimeValue time, float f); 
-    float GetHotspot(TimeValue t, Interval& valid = Interval(0,0));
-    void SetFallsize(TimeValue time, float f); 
-    float GetFallsize(TimeValue t, Interval& valid = Interval(0,0));
+    RefResult EvalLightState(TimeValue time, Interval& valid, LightState* ls);
+    ObjLightDesc* CreateLightDesc(INode* n, BOOL forceShadowBuffer = FALSE);
+    void SetUseLight(int onOff) {
+        fLightPB->SetValue(kLightOn, 0, onOff);
+        NotifyDependents(FOREVER, PART_OBJ, REFMSG_CHANGE);
+    }
+    BOOL GetUseLight(void) {
+        BOOL v;
+        fLightPB->GetValue(kLightOn, 0, v, FOREVER);
+        return v;
+    }
+    void SetHotspot(TimeValue time, float f);
+    float GetHotspot(TimeValue t, Interval& valid = Interval(0, 0));
+    void SetFallsize(TimeValue time, float f);
+    float GetFallsize(TimeValue t, Interval& valid = Interval(0, 0));
     void SetAtten(TimeValue time, int which, float f);
-    float GetAtten(TimeValue t, int which, Interval& valid = Interval(0,0));
-    
-    // TDist funcs needs implementation  as of 31/5/01
-    void SetTDist(TimeValue time, float f); 
-    float GetTDist(TimeValue t, Interval& valid = Interval(0,0));
+    float GetAtten(TimeValue t, int which, Interval& valid = Interval(0, 0));
 
-    void SetConeDisplay(int s, int notify=TRUE);
+    // TDist funcs needs implementation  as of 31/5/01
+    void SetTDist(TimeValue time, float f);
+    float GetTDist(TimeValue t, Interval& valid = Interval(0, 0));
+
+    void SetConeDisplay(int s, int notify = TRUE);
     BOOL GetConeDisplay(void);
 
     void SetRGBColor(TimeValue t, Point3& rgb); //fLightPB->SetValue(kRGB, t, rgb); NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE);}
-    Point3 GetRGBColor(TimeValue t, Interval &valid = Interval(0,0)); //return fLightPB->GetPoint3(kRGB, t); }        
-    void SetIntensity(TimeValue t, float f) { fLightPB->SetValue(kIntensity, t, f); NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE);}
-    float GetIntensity(TimeValue t, Interval& valid = Interval(0,0)) {return fLightPB->GetFloat(kIntensity, t); }
+    Point3 GetRGBColor(TimeValue t, Interval& valid = Interval(0, 0)); //return fLightPB->GetPoint3(kRGB, t); }
+    void SetIntensity(TimeValue t, float f) {
+        fLightPB->SetValue(kIntensity, t, f);
+        NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE);
+    }
+    float GetIntensity(TimeValue t, Interval& valid = Interval(0, 0)) {
+        return fLightPB->GetFloat(kIntensity, t);
+    }
     void SetAspect(TimeValue t, float f) {}
-    float GetAspect(TimeValue t, Interval& valid = Interval(0,0)) { return 0.0; }    
-    void SetUseAtten(int s){ fLightPB->SetValue(kUseAttenuationBool, 0, s); NotifyDependents(FOREVER, PART_OBJ, REFMSG_CHANGE); }
-    BOOL GetUseAtten(void) {return fLightPB->GetInt(kUseAttenuationBool, 0);}
+    float GetAspect(TimeValue t, Interval& valid = Interval(0, 0)) {
+        return 0.0;
+    }
+    void SetUseAtten(int s) {
+        fLightPB->SetValue(kUseAttenuationBool, 0, s);
+        NotifyDependents(FOREVER, PART_OBJ, REFMSG_CHANGE);
+    }
+    BOOL GetUseAtten(void) {
+        return fLightPB->GetInt(kUseAttenuationBool, 0);
+    }
     void SetUseAttenNear(int s) {  }
-    BOOL GetUseAttenNear(void) {return false;}
-    void SetAttenDisplay(int s){  }
-    BOOL GetAttenDisplay(void) {return fLightPB->GetInt(kUseAttenuationBool, 0);}      
-    void SetAttenDisplayNear(int s){ }
-    BOOL GetAttenDisplayNear(void){return false;}      
-    void Enable(int enab) { fLightPB->SetValue(kLightOn, 0, enab); }
+    BOOL GetUseAttenNear(void) {
+        return false;
+    }
+    void SetAttenDisplay(int s) {  }
+    BOOL GetAttenDisplay(void) {
+        return fLightPB->GetInt(kUseAttenuationBool, 0);
+    }
+    void SetAttenDisplayNear(int s) { }
+    BOOL GetAttenDisplayNear(void) {
+        return false;
+    }
+    void Enable(int enab) {
+        fLightPB->SetValue(kLightOn, 0, enab);
+    }
     void SetMapBias(TimeValue t, float f) {}
-    float GetMapBias(TimeValue t, Interval& valid = Interval(0,0)){return 0.0f;}
+    float GetMapBias(TimeValue t, Interval& valid = Interval(0, 0)) {
+        return 0.0f;
+    }
     void SetMapRange(TimeValue t, float f) {}
-    float GetMapRange(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0f;}
+    float GetMapRange(TimeValue t, Interval& valid = Interval(0, 0)) {
+        return 0.0f;
+    }
     void SetMapSize(TimeValue t, int f) {}
-    int GetMapSize(TimeValue t, Interval& valid = Interval(0,0)){return 0;}
+    int GetMapSize(TimeValue t, Interval& valid = Interval(0, 0)) {
+        return 0;
+    }
     void SetRayBias(TimeValue t, float f) {}
-    float GetRayBias(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0;} //{return 0.0f;}
-    int GetAbsMapBias() {return 0;}
+    float GetRayBias(TimeValue t, Interval& valid = Interval(0, 0)) {
+        return 0.0;
+    } //{return 0.0f;}
+    int GetAbsMapBias() {
+        return 0;
+    }
     void SetAbsMapBias(int a) {}
-    int GetOvershoot(){return 0;}
-    void SetOvershoot(int a){}
-    virtual int GetProjector() { return 0; }
-    void SetProjector(int a){fLightPB->SetValue(kUseProjectorBool, 0, a); }
-    ExclList* GetExclList(){return NULL;}
-    BOOL Include() {return false;}
+    int GetOvershoot() {
+        return 0;
+    }
+    void SetOvershoot(int a) {}
+    virtual int GetProjector() {
+        return 0;
+    }
+    void SetProjector(int a) {
+        fLightPB->SetValue(kUseProjectorBool, 0, a);
+    }
+    ExclList* GetExclList() {
+        return NULL;
+    }
+    BOOL Include() {
+        return false;
+    }
     virtual Texmap* GetProjMap(); //{ Interval valid = Interval(0,0); Texmap* MyMap; fLightPB->GetValue(kProjMapTexButton, 0, MyMap, valid); return MyMap; }
     void SetProjMap(BitmapInfo* pmap);
     void UpdateTargDistance(TimeValue t, INode* inode);
 
     // GenLight Specific Stuff below
 
-    BOOL GetUseGlobal() { return false; }   //Global Shadow param
+    BOOL GetUseGlobal() {
+        return false;    //Global Shadow param
+    }
     void SetUseGlobal(int a) {}
     BOOL GetShadow();
     void SetShadow(int a);
-    BOOL GetShadowType() { return -1; } //No Shadows generated ....
+    BOOL GetShadowType() {
+        return -1;    //No Shadows generated ....
+    }
     void SetShadowType(int a) {}        //Until implemented....
-    GenLight* NewLight(int type) { return NULL;} 
-    int Type()  {return -1;}
+    GenLight* NewLight(int type) {
+        return NULL;
+    }
+    int Type()  {
+        return -1;
+    }
     void SetSpotShape(int a) {}
-    void SetHSVColor(TimeValue t, class Point3 &b);
+    void SetHSVColor(TimeValue t, class Point3& b);
     Point3 GetHSVColor(TimeValue t, Interval& b);
     void SetContrast(int a, float other) {} // fLightPB->SetValue(kContrast, a, other); NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE);}
-    float GetContrast(int a, Interval &valid) {return 0.0;} //float f; f = fLightPB->GetFloat(kContrast, a); return f;}
+    float GetContrast(int a, Interval& valid) {
+        return 0.0;
+    } //float f; f = fLightPB->GetFloat(kContrast, a); return f;}
     void SetAttenNearDisplay(int a) {}
-    BOOL GetAttenNearDisplay() {return false;}
-    ExclList& GetExclusionList() {return exclList;}
-    void SetExclusionList(ExclList & a) {}
-    BOOL SetHotSpotControl(Control* a) {SetParamBlock2Controller(fLightPB, ParamID(kHotSpot),0, a); return true;}
-    BOOL SetFalloffControl(Control* a) {SetParamBlock2Controller(fLightPB, ParamID(kFallOff),0, a); return true;}
-    Control* GetHotSpotControl() {return GetParamBlock2Controller(fLightPB, ParamID(kHotSpot));}
-    Control* GetFalloffControl() {return GetParamBlock2Controller(fLightPB, ParamID(kFallOff));}
-    BOOL SetColorControl(Control * a) {SetParamBlock2Controller(fLightPB, ParamID(kLightColor),0, a); return true;}
-    Control* GetColorControl() {return GetParamBlock2Controller(fLightPB, ParamID(kLightColor)); }
+    BOOL GetAttenNearDisplay() {
+        return false;
+    }
+    ExclList& GetExclusionList() {
+        return exclList;
+    }
+    void SetExclusionList(ExclList& a) {}
+    BOOL SetHotSpotControl(Control* a) {
+        SetParamBlock2Controller(fLightPB, ParamID(kHotSpot), 0, a);
+        return true;
+    }
+    BOOL SetFalloffControl(Control* a) {
+        SetParamBlock2Controller(fLightPB, ParamID(kFallOff), 0, a);
+        return true;
+    }
+    Control* GetHotSpotControl() {
+        return GetParamBlock2Controller(fLightPB, ParamID(kHotSpot));
+    }
+    Control* GetFalloffControl() {
+        return GetParamBlock2Controller(fLightPB, ParamID(kFallOff));
+    }
+    BOOL SetColorControl(Control* a) {
+        SetParamBlock2Controller(fLightPB, ParamID(kLightColor), 0, a);
+        return true;
+    }
+    Control* GetColorControl() {
+        return GetParamBlock2Controller(fLightPB, ParamID(kLightColor));
+    }
 
-    BOOL GetDecayType() { return fLightPB->GetInt(kAttenTypeRadio, 0) + 1;} //Offset for the radio.
-    void SetDecayType(BOOL onOff) {if (!onOff) return; else {fLightPB->SetValue(kAttenTypeRadio, 0, ((int) onOff - 1)); return;} } 
-    void SetDecayRadius(TimeValue time, float f) { fLightPB->SetValue(kAttenMaxFalloffEdit, time, f); }
-    float GetDecayRadius(TimeValue t, Interval& valid = Interval(0,0)) {return fLightPB->GetFloat(kAttenMaxFalloffEdit, t); }
+    BOOL GetDecayType() {
+        return fLightPB->GetInt(kAttenTypeRadio, 0) + 1;   //Offset for the radio.
+    }
+    void SetDecayType(BOOL onOff) {
+        if (!onOff) {
+            return;
+        } else {
+            fLightPB->SetValue(kAttenTypeRadio, 0, ((int) onOff - 1));
+            return;
+        }
+    }
+    void SetDecayRadius(TimeValue time, float f) {
+        fLightPB->SetValue(kAttenMaxFalloffEdit, time, f);
+    }
+    float GetDecayRadius(TimeValue t, Interval& valid = Interval(0, 0)) {
+        return fLightPB->GetFloat(kAttenMaxFalloffEdit, t);
+    }
 
     void SetDiffuseSoft(TimeValue time, float f) {}//fLightPB->SetValue(kDiffSoft, time, f);}
-    float GetDiffuseSoft(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0;} //return fLightPB->GetFloat(kDiffSoft, t);}
+    float GetDiffuseSoft(TimeValue t, Interval& valid = Interval(0, 0)) {
+        return 0.0;
+    } //return fLightPB->GetFloat(kDiffSoft, t);}
     void SetAffectDiffuse(BOOL onOff) {}//fLightPB->SetValue(kDiffOn, 0, onOff); }
-    BOOL GetAffectDiffuse() {return false; } //fLightPB->GetInt(kDiffOn, 0); }
+    BOOL GetAffectDiffuse() {
+        return false;
+    } //fLightPB->GetInt(kDiffOn, 0); }
 
-    LRESULT CALLBACK TrackViewWinProc( HWND hwnd,  UINT message, 
-            WPARAM wParam,   LPARAM lParam ){return(0);}
+    LRESULT CALLBACK TrackViewWinProc(HWND hwnd,  UINT message,
+                                      WPARAM wParam,   LPARAM lParam) {
+        return(0);
+    }
 };
 
 #endif

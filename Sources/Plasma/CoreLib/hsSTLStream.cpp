@@ -46,7 +46,7 @@ hsVectorStream::hsVectorStream() : fEnd(0)
 }
 
 hsVectorStream::hsVectorStream(uint32_t chunkSize)
-{   
+{
     fVector.reserve(chunkSize);
 }
 
@@ -59,14 +59,13 @@ bool hsVectorStream::AtEnd()
     return (fBytesRead >= fEnd);
 }
 
-uint32_t hsVectorStream::Read(uint32_t byteCount, void *buffer)
+uint32_t hsVectorStream::Read(uint32_t byteCount, void* buffer)
 {
-    if (fBytesRead + byteCount > fEnd)
-    {
+    if (fBytesRead + byteCount > fEnd) {
 //      hsStatusMessageF("Reading past end of hsVectorStream (read %u of %u requested bytes)", fEnd-fBytesRead, byteCount);
         byteCount = fEnd - fBytesRead;
     }
-    
+
     memcpy(buffer, &fVector[fBytesRead], byteCount);
 
     fBytesRead += byteCount;
@@ -78,21 +77,24 @@ uint32_t hsVectorStream::Read(uint32_t byteCount, void *buffer)
 uint32_t hsVectorStream::Write(uint32_t byteCount, const void* buffer)
 {
     // If we are at the end of the vector, we can just do a block insert of the data
-    if (fPosition == fVector.size())
-        fVector.insert(fVector.end(), (uint8_t*)buffer, (uint8_t*)buffer+byteCount);
+    if (fPosition == fVector.size()) {
+        fVector.insert(fVector.end(), (uint8_t*)buffer, (uint8_t*)buffer + byteCount);
+    }
     // If we are in the middle, I don't know how to just overwrite a block of the vector.
     // So, we make sure there is enough space and copy the elements one by one
-    else
-    {
-        fVector.reserve(fPosition+byteCount);
-        for (uint32_t i = 0; i < byteCount; i++)
-            fVector[fPosition+i] = ((uint8_t*)buffer)[i];
+    else {
+        fVector.reserve(fPosition + byteCount);
+
+        for (uint32_t i = 0; i < byteCount; i++) {
+            fVector[fPosition + i] = ((uint8_t*)buffer)[i];
+        }
     }
 
     fPosition += byteCount;
 
-    if (fPosition > fEnd)
+    if (fPosition > fEnd) {
         fEnd = fPosition;
+    }
 
     return byteCount;
 }
@@ -116,8 +118,8 @@ void hsVectorStream::FastFwd()
 
 void hsVectorStream::Truncate()
 {
-    fVector.erase(fVector.begin()+fPosition, fVector.end());
-    fEnd = fPosition-1;
+    fVector.erase(fVector.begin() + fPosition, fVector.end());
+    fEnd = fPosition - 1;
 }
 
 uint32_t hsVectorStream::GetEOF()
@@ -132,9 +134,9 @@ void hsVectorStream::CopyToMem(void* mem)
 
 void hsVectorStream::Erase(uint32_t bytes)
 {
-    hsAssert(fPosition+bytes <= fEnd, "Erasing past end of stream");
+    hsAssert(fPosition + bytes <= fEnd, "Erasing past end of stream");
 
-    fVector.erase(fVector.begin()+fPosition, fVector.begin()+fPosition+bytes);
+    fVector.erase(fVector.begin() + fPosition, fVector.begin() + fPosition + bytes);
     fEnd -= bytes;
 }
 
@@ -146,10 +148,11 @@ void hsVectorStream::Reset()
     fVector.clear();
 }
 
-const void *hsVectorStream::GetData()
+const void* hsVectorStream::GetData()
 {
-    if (fVector.size() > 0)
+    if (fVector.size() > 0) {
         return &fVector[0];
-    else
+    } else {
         return nil;
+    }
 }

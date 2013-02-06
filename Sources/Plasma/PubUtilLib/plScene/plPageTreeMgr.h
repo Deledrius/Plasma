@@ -55,8 +55,7 @@ class plDrawVisList;
 class plVolumeIsect;
 class plVisMgr;
 
-class plDrawSpanPair
-{
+class plDrawSpanPair {
 public:
     plDrawSpanPair() {}
     plDrawSpanPair(uint16_t d, uint16_t s) : fDrawable(d), fSpan(s) {}
@@ -64,8 +63,7 @@ public:
     uint16_t      fSpan;
 };
 
-class plDrawVisList
-{
+class plDrawVisList {
 public:
     plDrawVisList() : fDrawable(nil) {}
     virtual ~plDrawVisList() {}
@@ -73,11 +71,14 @@ public:
     plDrawable*         fDrawable;
     hsTArray<int16_t>     fVisList;
 
-    plDrawVisList& operator=(const plDrawVisList& v) { fDrawable = v.fDrawable; fVisList = v.fVisList; return *this; }
+    plDrawVisList& operator=(const plDrawVisList& v) {
+        fDrawable = v.fDrawable;
+        fVisList = v.fVisList;
+        return *this;
+    }
 };
 
-class plPageTreeMgr
-{
+class plPageTreeMgr {
 protected:
     hsTArray<plSceneNode*>      fNodes;
 
@@ -108,12 +109,16 @@ public:
     plPageTreeMgr();
     virtual ~plPageTreeMgr();
 
-    const hsTArray<plSceneNode*>& GetNodes() const { return fNodes; }
+    const hsTArray<plSceneNode*>& GetNodes() const {
+        return fNodes;
+    }
 
     void            AddNode(plSceneNode* node);
     void            RemoveNode(plSceneNode* node);
     virtual void    Reset(); // remove all nodes, nuke the space tree
-    virtual bool    Empty() const { return !fNodes.GetCount(); }
+    virtual bool    Empty() const {
+        return !fNodes.GetCount();
+    }
 
     virtual int     Render(plPipeline* pipe);
 
@@ -121,13 +126,27 @@ public:
 
     void            AddOccluderList(const hsTArray<plOccluder*> occList);
 
-    plSpaceTree*    GetSpaceTree() { if( !fSpaceTree ) IBuildSpaceTree(); return fSpaceTree; }
+    plSpaceTree*    GetSpaceTree() {
+        if (!fSpaceTree) {
+            IBuildSpaceTree();
+        }
 
-    void            SetVisMgr(plVisMgr* visMgr) { fVisMgr = visMgr; }
-    plVisMgr*       GetVisMgr() const { return fVisMgr; }
+        return fSpaceTree;
+    }
 
-    static void     EnableVisMgr(bool on) { fDisableVisMgr = !on; }
-    static bool     VisMgrEnabled() { return !fDisableVisMgr; }
+    void            SetVisMgr(plVisMgr* visMgr) {
+        fVisMgr = visMgr;
+    }
+    plVisMgr*       GetVisMgr() const {
+        return fVisMgr;
+    }
+
+    static void     EnableVisMgr(bool on) {
+        fDisableVisMgr = !on;
+    }
+    static bool     VisMgrEnabled() {
+        return !fDisableVisMgr;
+    }
 };
 
 #endif // plPageTreeMgr_inc

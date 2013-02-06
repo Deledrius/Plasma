@@ -69,68 +69,75 @@ plArmatureBrain::plArmatureBrain() :
 
 plArmatureBrain::~plArmatureBrain()
 {
-    while (fTaskQueue.size() > 0)
-    {
-        plAvTask *task = fTaskQueue.front();
+    while (fTaskQueue.size() > 0) {
+        plAvTask* task = fTaskQueue.front();
         delete task;
         fTaskQueue.pop_front();
     }
-    if (fCurTask)
-        delete fCurTask;    
+
+    if (fCurTask) {
+        delete fCurTask;
+    }
 }
 
 bool plArmatureBrain::Apply(double timeNow, float elapsed)
 {
     IProcessTasks(timeNow, elapsed);
     fArmature->ApplyAnimations(timeNow, elapsed);
-    
+
     return true;
 }
 
-void plArmatureBrain::Activate(plArmatureModBase *armature)
-{ 
+void plArmatureBrain::Activate(plArmatureModBase* armature)
+{
     fArmature = armature;
     fAvMod = plArmatureMod::ConvertNoRef(armature);
 }
 
-void plArmatureBrain::QueueTask(plAvTask *task)
+void plArmatureBrain::QueueTask(plAvTask* task)
 {
-    if (task)
+    if (task) {
         fTaskQueue.push_back(task);
+    }
 }
 
 bool plArmatureBrain::LeaveAge()
 {
-    if (fCurTask)
+    if (fCurTask) {
         fCurTask->LeaveAge(plArmatureMod::ConvertNoRef(fArmature));
-    
+    }
+
     plAvTaskQueue::iterator i = fTaskQueue.begin();
-    for (; i != fTaskQueue.end(); i++)
-    {
-        plAvTask *task = *i;
+
+    for (; i != fTaskQueue.end(); i++) {
+        plAvTask* task = *i;
         task->LeaveAge(plArmatureMod::ConvertNoRef(fArmature)); // Give it a chance to do something before we nuke it.
         delete task;
     }
+
     fTaskQueue.clear();
     return true;
 }
-    
+
 bool plArmatureBrain::IsRunningTask() const
 {
-    if (fCurTask)
+    if (fCurTask) {
         return true;
-    if(fTaskQueue.size() > 0)
+    }
+
+    if (fTaskQueue.size() > 0) {
         return true;
+    }
 
     return false;
 }
 
 // Nothing for this class to read/write. These methods exist
 // for backwards compatability with plAvBrain and plAvBrainUser
-void plArmatureBrain::Write(hsStream *stream, hsResMgr *mgr)
+void plArmatureBrain::Write(hsStream* stream, hsResMgr* mgr)
 {
     plCreatable::Write(stream, mgr);
-    
+
     // plAvBrain
     stream->WriteLE32(0);
     stream->WriteBool(false);
@@ -138,17 +145,19 @@ void plArmatureBrain::Write(hsStream *stream, hsResMgr *mgr)
     // plAvBrainUser
     stream->WriteLE32(0);
     stream->WriteLEScalar(0.f);
-    stream->WriteLEDouble(0.f);   
+    stream->WriteLEDouble(0.f);
 }
 
-void plArmatureBrain::Read(hsStream *stream, hsResMgr *mgr)
+void plArmatureBrain::Read(hsStream* stream, hsResMgr* mgr)
 {
     plCreatable::Read(stream, mgr);
 
     // plAvBrain
     stream->ReadLE32();
-    if (stream->ReadBool()) 
+
+    if (stream->ReadBool()) {
         mgr->ReadKey(stream);
+    }
 
     // plAvBrainUser
     stream->ReadLE32();
@@ -157,44 +166,43 @@ void plArmatureBrain::Read(hsStream *stream, hsResMgr *mgr)
 }
 
 // MSGRECEIVE
-bool plArmatureBrain::MsgReceive(plMessage * msg)
+bool plArmatureBrain::MsgReceive(plMessage* msg)
 {
-    plAvTaskMsg *taskMsg = plAvTaskMsg::ConvertNoRef(msg);
-    if (taskMsg)
-    {
+    plAvTaskMsg* taskMsg = plAvTaskMsg::ConvertNoRef(msg);
+
+    if (taskMsg) {
         return IHandleTaskMsg(taskMsg);
     }
+
     return false;
 }
 
 void plArmatureBrain::IProcessTasks(double time, float elapsed)
 {
-    if (!fCurTask || !fCurTask->Process(plArmatureMod::ConvertNoRef(fArmature), this, time, elapsed))
-    {
-        if (fCurTask)
-        {
+    if (!fCurTask || !fCurTask->Process(plArmatureMod::ConvertNoRef(fArmature), this, time, elapsed)) {
+        if (fCurTask) {
             fCurTask->Finish(plArmatureMod::ConvertNoRef(fArmature), this, time, elapsed);
             delete fCurTask;
             fCurTask = nil;
         }
-        
+
         // need a new task
-        if (fTaskQueue.size() > 0)
-        {
-            plAvTask *newTask = fTaskQueue.front();
-            if (newTask && newTask->Start(plArmatureMod::ConvertNoRef(fArmature), this, time, elapsed))
-            {
+        if (fTaskQueue.size() > 0) {
+            plAvTask* newTask = fTaskQueue.front();
+
+            if (newTask && newTask->Start(plArmatureMod::ConvertNoRef(fArmature), this, time, elapsed)) {
                 fCurTask = newTask;
                 fTaskQueue.pop_front();
             }
+
             // if we couldn't start the task, we'll keep trying until we can.
         }
     }
 }
 
-bool plArmatureBrain::IHandleTaskMsg(plAvTaskMsg *msg)
+bool plArmatureBrain::IHandleTaskMsg(plAvTaskMsg* msg)
 {
-    plAvTask *task = msg->GetTask();
+    plAvTask* task = msg->GetTask();
     QueueTask(task);
     return true;
 }

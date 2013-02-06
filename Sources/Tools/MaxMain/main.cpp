@@ -75,28 +75,32 @@ static HSClassDesc2 HSDesc;
 static int controlsInit = FALSE;
 HINSTANCE hInstance = NULL;
 
-/*inline*/ TCHAR *GetString(int id)
+/*inline*/
+TCHAR* GetString(int id)
 {
     static TCHAR buf[256];
-    if (hInstance)
+
+    if (hInstance) {
         return LoadString(hInstance, id, buf, sizeof(buf)) ? buf : NULL;
+    }
+
     return NULL;
 }
 
 //
 // return a string to be displayed if the DLL is not found
 //
-__declspec(dllexport) const TCHAR *LibDescription() 
-{ 
-    return "Plasma 2.0"; 
+__declspec(dllexport) const TCHAR* LibDescription()
+{
+    return "Plasma 2.0";
 }
 
 //
 // the number of plugin classes in the dll
 //
-__declspec(dllexport) int LibNumberClasses() 
-{ 
-    return 7 + plComponentMgr::Inst().Count() + plPlasmaMtlImport::GetNumMtlDescs(); 
+__declspec(dllexport) int LibNumberClasses()
+{
+    return 7 + plComponentMgr::Inst().Count() + plPlasmaMtlImport::GetNumMtlDescs();
 }
 
 //
@@ -108,57 +112,64 @@ class plGeneralAttribClassDesc;
 extern plGeneralAttribClassDesc theGeneralAttribClassDesc;
 // TEMP //
 
-__declspec(dllexport) ClassDesc *LibClassDesc(int i) 
+__declspec(dllexport) ClassDesc* LibClassDesc(int i)
 {
-    switch(i) 
-    { 
-        case 0: 
-            return &HSDesc; 
-        case 1:
-            return GetGUPDesc();
-        case 2:
-            return (ClassDesc*)&theGeneralAttribClassDesc;
-        case 3:
-            return GetComponentUtilDesc();
-        case 4:
-            return GetComponentMgrDesc();
-        case 5:
+    switch (i) {
+    case 0:
+        return &HSDesc;
+
+    case 1:
+        return GetGUPDesc();
+
+    case 2:
+        return (ClassDesc*)&theGeneralAttribClassDesc;
+
+    case 3:
+        return GetComponentUtilDesc();
+
+    case 4:
+        return GetComponentMgrDesc();
+
+    case 5:
 #ifdef MAXSCENEVIEWER_ENABLED
-            return GetMaxFileDataDesc();
+        return GetMaxFileDataDesc();
 #else
-            return 0;
+        return 0;
 #endif
-        case 6:
-            return GetMaxUtilsDesc();
-        default: 
-            {
-                int numMtls = plPlasmaMtlImport::GetNumMtlDescs();
-                if( i - 7 < numMtls )
-                    return plPlasmaMtlImport::GetMtlDesc( i - 7 );
-                return plComponentMgr::Inst().Get( i - 7 - numMtls );
+
+    case 6:
+        return GetMaxUtilsDesc();
+
+    default: {
+            int numMtls = plPlasmaMtlImport::GetNumMtlDescs();
+
+            if (i - 7 < numMtls) {
+                return plPlasmaMtlImport::GetMtlDesc(i - 7);
             }
+
+            return plComponentMgr::Inst().Get(i - 7 - numMtls);
+        }
     }
 }
 
 //
 // Return version so can detect obsolete DLLs
 //
-__declspec(dllexport) ULONG LibVersion() 
-{ 
-    return VERSION_3DSMAX; 
+__declspec(dllexport) ULONG LibVersion()
+{
+    return VERSION_3DSMAX;
 }
 
 //
 // DLLMAIN
 //
-BOOL WINAPI DllMain(HINSTANCE hinstDLL,ULONG fdwReason,LPVOID lpvReserved) 
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
 {
     hInstance = hinstDLL;
 
-    if (!controlsInit) 
-    {
+    if (!controlsInit) {
         controlsInit = TRUE;
-        
+
         // jaguar controls
         INIT_CUSTOM_CONTROLS(hInstance);
 
@@ -168,8 +179,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,ULONG fdwReason,LPVOID lpvReserved)
         plPythonMgr::Instance().LoadPythonFiles();
 
         plFileName clientPath = plMaxConfig::GetClientPath(false, true);
-        if (clientPath.IsValid())
-        {
+
+        if (clientPath.IsValid()) {
             plFileName oldCwd = plFileSystem::GetCWD();
             plFileSystem::SetCWD(clientPath);
             plSDLMgr::GetInstance()->Init();
@@ -181,17 +192,20 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,ULONG fdwReason,LPVOID lpvReserved)
         hsgResMgr::Init(pRmgr);
     }
 
-    switch (fdwReason) 
-    {
-        case DLL_PROCESS_ATTACH:
-            break;
-        case DLL_THREAD_ATTACH:
-            break;
-        case DLL_THREAD_DETACH:
-            break;
-        case DLL_PROCESS_DETACH:
-            break;
+    switch (fdwReason) {
+    case DLL_PROCESS_ATTACH:
+        break;
+
+    case DLL_THREAD_ATTACH:
+        break;
+
+    case DLL_THREAD_DETACH:
+        break;
+
+    case DLL_PROCESS_DETACH:
+        break;
     }
+
     return(TRUE);
 }
 
@@ -201,62 +215,111 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,ULONG fdwReason,LPVOID lpvReserved)
 
 #define PL_GEN_ATTRIB_CLASS_ID Class_ID(0x24c36e6e, 0x53ec2ce4)
 
-class plGeneralAttrib : public CustAttrib
-{
+class plGeneralAttrib : public CustAttrib {
 public:
-    ClassDesc2  *fClassDesc;
-    IParamBlock2 *fPBlock;
+    ClassDesc2*  fClassDesc;
+    IParamBlock2* fPBlock;
 
     plGeneralAttrib();
 
-    virtual RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, 
-                               PartID& partID,  RefMessage message){return REF_SUCCEED;}
+    virtual RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
+                                       PartID& partID,  RefMessage message) {
+        return REF_SUCCEED;
+    }
 
-    int NumParamBlocks() { return 1; }                  // return number of ParamBlocks in this instance
-    IParamBlock2* GetParamBlock(int i) { return fPBlock; } // return i'th ParamBlock
-    IParamBlock2* GetParamBlockByID(BlockID id) { return (fPBlock->ID() == id) ? fPBlock : NULL; } // return id'd ParamBlock
+    int NumParamBlocks() {
+        return 1;    // return number of ParamBlocks in this instance
+    }
+    IParamBlock2* GetParamBlock(int i) {
+        return fPBlock;    // return i'th ParamBlock
+    }
+    IParamBlock2* GetParamBlockByID(BlockID id) {
+        return (fPBlock->ID() == id) ? fPBlock : NULL;    // return id'd ParamBlock
+    }
 
-    int NumRefs() { return 1;}
-    virtual RefTargetHandle GetReference(int i) { if(i == 0) return fPBlock; else return NULL; }
-    virtual void SetReference(int i, RefTargetHandle rtarg) { if(i == 0) fPBlock = (IParamBlock2 *)rtarg; }
+    int NumRefs() {
+        return 1;
+    }
+    virtual RefTargetHandle GetReference(int i) {
+        if (i == 0) {
+            return fPBlock;
+        } else {
+            return NULL;
+        }
+    }
+    virtual void SetReference(int i, RefTargetHandle rtarg) {
+        if (i == 0) {
+            fPBlock = (IParamBlock2*)rtarg;
+        }
+    }
 
-    virtual int NumSubs()  { return 1; }
-    virtual Animatable* SubAnim(int i) { return fPBlock; }
-    virtual TSTR SubAnimName(int i){ return fClassDesc->ClassName();} 
+    virtual int NumSubs()  {
+        return 1;
+    }
+    virtual Animatable* SubAnim(int i) {
+        return fPBlock;
+    }
+    virtual TSTR SubAnimName(int i) {
+        return fClassDesc->ClassName();
+    }
 
 
-    void BeginEditParams(IObjParam *ip,ULONG flags,Animatable *prev);
-    void EndEditParams(IObjParam *ip, ULONG flags, Animatable *next);
-    SClass_ID       SuperClassID() {return CUST_ATTRIB_CLASS_ID;}
-    Class_ID        ClassID() {return fClassDesc->ClassID();}
+    void BeginEditParams(IObjParam* ip, ULONG flags, Animatable* prev);
+    void EndEditParams(IObjParam* ip, ULONG flags, Animatable* next);
+    SClass_ID       SuperClassID() {
+        return CUST_ATTRIB_CLASS_ID;
+    }
+    Class_ID        ClassID() {
+        return fClassDesc->ClassID();
+    }
 
-    ReferenceTarget *Clone(RemapDir &remap = DEFAULTREMAP);
-    virtual bool CheckCopyAttribTo(ICustAttribContainer *to) { return true; }
-    
-    GETNAME_RETURN_TYPE GetName() { return (GETNAME_RETURN_TYPE)_T(fClassDesc->ClassName()); }
-    void DeleteThis() { delete this; }
+    ReferenceTarget* Clone(RemapDir& remap = DEFAULTREMAP);
+    virtual bool CheckCopyAttribTo(ICustAttribContainer* to) {
+        return true;
+    }
+
+    GETNAME_RETURN_TYPE GetName() {
+        return (GETNAME_RETURN_TYPE)_T(fClassDesc->ClassName());
+    }
+    void DeleteThis() {
+        delete this;
+    }
 };
 
 
-class plGeneralAttribClassDesc : public ClassDesc2
-{
+class plGeneralAttribClassDesc : public ClassDesc2 {
 public:
-    int             IsPublic()      { return 1; }
-    void*           Create(BOOL loading) { return new plGeneralAttrib; }
-    const TCHAR*    ClassName()     { return _T("Plasma Attrib"); }
-    SClass_ID       SuperClassID()  { return CUST_ATTRIB_CLASS_ID; }
-    Class_ID        ClassID()       { return PL_GEN_ATTRIB_CLASS_ID; }
-    const TCHAR*    Category()      { return _T(""); }
-    const TCHAR*    InternalName()  { return _T("PlasmaAttrib"); }
-    HINSTANCE       HInstance()     { return hInstance; }
+    int             IsPublic()      {
+        return 1;
+    }
+    void*           Create(BOOL loading) {
+        return new plGeneralAttrib;
+    }
+    const TCHAR*    ClassName()     {
+        return _T("Plasma Attrib");
+    }
+    SClass_ID       SuperClassID()  {
+        return CUST_ATTRIB_CLASS_ID;
+    }
+    Class_ID        ClassID()       {
+        return PL_GEN_ATTRIB_CLASS_ID;
+    }
+    const TCHAR*    Category()      {
+        return _T("");
+    }
+    const TCHAR*    InternalName()  {
+        return _T("PlasmaAttrib");
+    }
+    HINSTANCE       HInstance()     {
+        return hInstance;
+    }
 };
 static plGeneralAttribClassDesc theGeneralAttribClassDesc;
 
 //
 // Parameter Block Description
 //
-enum
-{
+enum {
     kRoomName = 0
 };
 
@@ -266,7 +329,7 @@ ParamBlockDesc2 generalAttribBlock
 
     // params
     kRoomName,      _T("roomName"),         TYPE_STRING,        0,  0,
-    p_default,      "", 
+    p_default,      "",
     end,
 
     end
@@ -277,19 +340,19 @@ plGeneralAttrib::plGeneralAttrib() : fClassDesc(&theGeneralAttribClassDesc), fPB
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-void plGeneralAttrib::BeginEditParams(IObjParam *ip,ULONG flags,Animatable *prev)
+void plGeneralAttrib::BeginEditParams(IObjParam* ip, ULONG flags, Animatable* prev)
 {
-    fClassDesc->BeginEditParams(ip,this,flags,prev);
+    fClassDesc->BeginEditParams(ip, this, flags, prev);
 }
 
-void plGeneralAttrib::EndEditParams(IObjParam *ip, ULONG flags, Animatable *next)
+void plGeneralAttrib::EndEditParams(IObjParam* ip, ULONG flags, Animatable* next)
 {
-    fClassDesc->EndEditParams(ip,this,flags,next);
+    fClassDesc->EndEditParams(ip, this, flags, next);
 }
 
-ReferenceTarget *plGeneralAttrib::Clone(RemapDir &remap)
+ReferenceTarget* plGeneralAttrib::Clone(RemapDir& remap)
 {
-    plGeneralAttrib *pnew = (plGeneralAttrib*) fClassDesc->Create(false);
+    plGeneralAttrib* pnew = (plGeneralAttrib*) fClassDesc->Create(false);
     pnew->SetReference(0, remap.CloneRef(fPBlock));
     BaseClone(this, pnew, remap);
     return pnew;

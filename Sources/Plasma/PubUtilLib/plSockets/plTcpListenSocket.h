@@ -47,12 +47,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plNetAddress;
 
 
-class plTcpListenSocket : public plSocket
-{
+class plTcpListenSocket : public plSocket {
 public:
-    bool OpenForListen(plNetAddress & inAddress, int backlogSize=1024);
-    bool OpenForListenNonBlocking(plNetAddress & inAddress, int backlogSize=1024);
-    bool GetIncomingConnection(SOCKET & outNewSession, plNetAddress & outRemoteAddress);
+    bool OpenForListen(plNetAddress& inAddress, int backlogSize = 1024);
+    bool OpenForListenNonBlocking(plNetAddress& inAddress, int backlogSize = 1024);
+    bool GetIncomingConnection(SOCKET& outNewSession, plNetAddress& outRemoteAddress);
 };
 
 

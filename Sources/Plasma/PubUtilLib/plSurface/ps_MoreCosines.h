@@ -84,7 +84,7 @@ static const uint8_t ps_MoreCosinesCodes[] = {
     0x0,    0x0,    0xe4,   0x80,
     0x5,    0x0,    0xe4,   0xa0,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl ps_MoreCosinesDecl("sha/ps_MoreCosines.inl", ps_MoreCosines, ps_MoreCosinesbyteLen, ps_MoreCosinesCodes);
 

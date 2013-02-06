@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plMessage/plNetClientMgrMsg.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_PUBUTILLIB_PLMESSAGE_PLNETCLIENTMGRMSG_H
@@ -65,19 +65,22 @@ public:
     CLASSNAME_REGISTER(plNetClientMgrMsg);
     GETINTERFACE_ANY(plNetClientMgrMsg, plMessage);
 
-    plNetClientMgrMsg(unsigned _type = 0, bool _yes = false, const char * _str = nil)
-        : type(_type), yes(_yes)
-    {
+    plNetClientMgrMsg(unsigned _type = 0, bool _yes = false, const char* _str = nil)
+        : type(_type), yes(_yes) {
         if (_str) {
             strncpy(str, _str, arrsize(str));
-            str[arrsize(str)-1] = 0;
+            str[arrsize(str) - 1] = 0;
         } else {
             memset(str, 0, sizeof(str));
         }
     }
 
-    void Read (hsStream *, hsResMgr *) { FATAL("plNetClientMgrMsg::Read"); }
-    void Write (hsStream *, hsResMgr *) { FATAL("plNetClientMgrMsg::Write"); }
+    void Read(hsStream*, hsResMgr*) {
+        FATAL("plNetClientMgrMsg::Read");
+    }
+    void Write(hsStream*, hsResMgr*) {
+        FATAL("plNetClientMgrMsg::Write");
+    }
 };
 
 

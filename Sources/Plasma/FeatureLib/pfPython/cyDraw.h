@@ -54,32 +54,37 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pyGlueHelpers.h"
 
-class cyDraw
-{
+class cyDraw {
 protected:
     plKey           fSender;
     hsTArray<plKey> fRecvr;
     bool            fNetForce;
 
-    cyDraw(plKey sender=nil,const plKey recvr=nil);
+    cyDraw(plKey sender = nil, const plKey recvr = nil);
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptDraw);
-    static PyObject *New(PyObject *sender = NULL, PyObject* recvr = NULL);
+    static PyObject* New(PyObject* sender = NULL, PyObject* recvr = NULL);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a cyDraw object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(cyDraw); // converts a PyObject to a cyDraw (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     // setters
-    void SetSender(plKey &sender);
-    void AddRecvr(plKey &recvr);
-    void SetNetForce(bool state) { fNetForce = state; }
+    void SetSender(plKey& sender);
+    void AddRecvr(plKey& recvr);
+    void SetNetForce(bool state) {
+        fNetForce = state;
+    }
 
     // Enable draw
     virtual void EnableT(bool state);
-    virtual void Enable() { EnableT(true); }
-    virtual void Disable() { EnableT(false); }
+    virtual void Enable() {
+        EnableT(true);
+    }
+    virtual void Disable() {
+        EnableT(false);
+    }
 };
 
 #endif  // cyDraw_h

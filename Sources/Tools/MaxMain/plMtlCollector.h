@@ -57,11 +57,9 @@ typedef std::set<plPlasmaMAXLayer*> LayerSet;
 typedef std::set<PBBitmap*> PBSet;
 typedef std::set<plString, plString::less_i> TexNameSet;
 
-class plMtlCollector
-{
+class plMtlCollector {
 public:
-    enum
-    {
+    enum {
         kUsedOnly = 0x1,
         kPlasmaOnly = 0x2,
         kNoMultiMtl = 0x4,
@@ -69,9 +67,9 @@ public:
         kNoSubMtls = 0x10,
     };
 
-    static void GetMtls(MtlSet* mtls, TexSet* texmaps, uint32_t flags=0);
+    static void GetMtls(MtlSet* mtls, TexSet* texmaps, uint32_t flags = 0);
 
-    static void GetMtlLayers(Mtl *mtl, LayerSet& layers);
+    static void GetMtlLayers(Mtl* mtl, LayerSet& layers);
 
     // Warning: These pointers are only valid until you return control to Max
     // (where a bitmap could be modified).  Don't hang on to them!

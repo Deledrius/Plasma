@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plVolumeIsect;
 
-class plSoftVolumeSimple : public plSoftVolume
-{
+class plSoftVolumeSimple : public plSoftVolume {
 protected:
     plVolumeIsect*              fVolume;
     float                    fSoftDist;
@@ -61,8 +60,8 @@ public:
     plSoftVolumeSimple();
     virtual ~plSoftVolumeSimple();
 
-    CLASSNAME_REGISTER( plSoftVolumeSimple );
-    GETINTERFACE_ANY( plSoftVolumeSimple, plSoftVolume );
+    CLASSNAME_REGISTER(plSoftVolumeSimple);
+    GETINTERFACE_ANY(plSoftVolumeSimple, plSoftVolume);
 
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);
 
@@ -70,16 +69,21 @@ public:
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     // Now Simple specifics
-    plVolumeIsect* GetVolume() const { return fVolume; }
+    plVolumeIsect* GetVolume() const {
+        return fVolume;
+    }
     void SetVolume(plVolumeIsect* v); // Takes ownership, don't delete after giving to SoftVolume
 
-    float GetDistance() const { return fSoftDist; }
-    void SetDistance(float d) { fSoftDist = d; }
+    float GetDistance() const {
+        return fSoftDist;
+    }
+    void SetDistance(float d) {
+        fSoftDist = d;
+    }
 
 };
 
-class plSoftVolumeComplex : public plSoftVolume
-{
+class plSoftVolumeComplex : public plSoftVolume {
 protected:
     hsTArray<plSoftVolume*>         fSubVolumes;
 
@@ -87,8 +91,8 @@ public:
     plSoftVolumeComplex();
     virtual ~plSoftVolumeComplex();
 
-    CLASSNAME_REGISTER( plSoftVolumeComplex );
-    GETINTERFACE_ANY( plSoftVolumeComplex, plSoftVolume );
+    CLASSNAME_REGISTER(plSoftVolumeComplex);
+    GETINTERFACE_ANY(plSoftVolumeComplex, plSoftVolume);
 
     // Don't propagate the settransform to our children, they move independently
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l) {}
@@ -101,12 +105,15 @@ public:
     // Now Complex specifics
     virtual bool MsgReceive(plMessage* msg);
 
-    uint16_t          GetNumSubs() const { return fSubVolumes.GetCount(); }
-    const plSoftVolume* GetSub(int i) const { return fSubVolumes[i]; }
+    uint16_t          GetNumSubs() const {
+        return fSubVolumes.GetCount();
+    }
+    const plSoftVolume* GetSub(int i) const {
+        return fSubVolumes[i];
+    }
 };
 
-class plSoftVolumeUnion : public plSoftVolumeComplex
-{
+class plSoftVolumeUnion : public plSoftVolumeComplex {
 protected:
     virtual float            IUpdateListenerStrength() const;
 
@@ -117,13 +124,12 @@ public:
     plSoftVolumeUnion();
     virtual ~plSoftVolumeUnion();
 
-    CLASSNAME_REGISTER( plSoftVolumeUnion );
-    GETINTERFACE_ANY( plSoftVolumeUnion, plSoftVolumeComplex );
+    CLASSNAME_REGISTER(plSoftVolumeUnion);
+    GETINTERFACE_ANY(plSoftVolumeUnion, plSoftVolumeComplex);
 
 };
 
-class plSoftVolumeIntersect : public plSoftVolumeComplex
-{
+class plSoftVolumeIntersect : public plSoftVolumeComplex {
 protected:
     virtual float            IUpdateListenerStrength() const;
 
@@ -134,13 +140,12 @@ public:
     plSoftVolumeIntersect();
     virtual ~plSoftVolumeIntersect();
 
-    CLASSNAME_REGISTER( plSoftVolumeIntersect );
-    GETINTERFACE_ANY( plSoftVolumeIntersect, plSoftVolumeComplex );
+    CLASSNAME_REGISTER(plSoftVolumeIntersect);
+    GETINTERFACE_ANY(plSoftVolumeIntersect, plSoftVolumeComplex);
 
 };
 
-class plSoftVolumeInvert : public plSoftVolumeComplex
-{
+class plSoftVolumeInvert : public plSoftVolumeComplex {
 protected:
     virtual float            IUpdateListenerStrength() const;
 
@@ -151,8 +156,8 @@ public:
     plSoftVolumeInvert();
     virtual ~plSoftVolumeInvert();
 
-    CLASSNAME_REGISTER( plSoftVolumeInvert );
-    GETINTERFACE_ANY( plSoftVolumeInvert, plSoftVolumeComplex );
+    CLASSNAME_REGISTER(plSoftVolumeInvert);
+    GETINTERFACE_ANY(plSoftVolumeInvert, plSoftVolumeComplex);
 
 
 };

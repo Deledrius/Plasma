@@ -46,12 +46,11 @@ class plMaxNode;
 class IUtil;
 class UtilityObj;
 
-class plComponentUtil : public UtilityObj
-{
+class plComponentUtil : public UtilityObj {
 protected:
     friend class plComponentDlg;
-    
-    Interface *fInterface;
+
+    Interface* fInterface;
     HWND fhPanel;
     plComponentBase* fCurComponent;
     // Used to try and load the last displayed component on reload, just for pointer compares
@@ -62,15 +61,17 @@ protected:
 public:
     static plComponentUtil& Instance();
 
-    void BeginEditParams(Interface *ip, IUtil *iu);
-    void EndEditParams(Interface *ip, IUtil *iu);
-    void SelectionSetChanged(Interface *ip, IUtil *iu);
+    void BeginEditParams(Interface* ip, IUtil* iu);
+    void EndEditParams(Interface* ip, IUtil* iu);
+    void SelectionSetChanged(Interface* ip, IUtil* iu);
     void DeleteThis() {};
 
     static BOOL CALLBACK ForwardDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
     BOOL DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
-    bool IsOpen() { return (fhPanel != NULL); }
+    bool IsOpen() {
+        return (fhPanel != NULL);
+    }
 
 protected:
     void IUpdateRollups();
@@ -79,7 +80,7 @@ protected:
 
     void INextTarget(bool forward);
 
-    plComponentBase *IGetListSelection();
+    plComponentBase* IGetListSelection();
     void IDeleteListSelection();
     int IFindListItem(plComponentBase* comp);
 
@@ -88,5 +89,5 @@ protected:
     // plComponentDlg is about to delete this comp, get rid of it's interface
     void IComponentPreDelete(plComponentBase* comp);
     // To syncronize with plComponentDlg when a name is changed
-    void IUpdateNodeName(plMaxNode *node);
+    void IUpdateNodeName(plMaxNode* node);
 };

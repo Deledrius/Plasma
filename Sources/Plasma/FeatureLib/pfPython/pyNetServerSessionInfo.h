@@ -54,48 +54,80 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 //////////////////////////////////////////////////////////////////////
 
-class pyNetServerSessionInfo
-{
+class pyNetServerSessionInfo {
 private:
     plNetServerSessionInfo  fInfo;
     mutable plUUID fServerGuid; // for GetServerGuid()
 
 protected:
     pyNetServerSessionInfo() {}
-    pyNetServerSessionInfo( const plNetServerSessionInfo & info ): fInfo( info ) {}
+    pyNetServerSessionInfo(const plNetServerSessionInfo& info): fInfo(info) {}
 
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptNetServerSessionInfo);
     PYTHON_CLASS_NEW_DEFINITION;
-    static PyObject *New(const plNetServerSessionInfo &info);
+    static PyObject* New(const plNetServerSessionInfo& info);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyNetServerSessionInfo object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyNetServerSessionInfo); // converts a PyObject to a pyNetServerSessionInfo (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
-    plNetServerSessionInfo & ServerInfo() { return fInfo; }
+    plNetServerSessionInfo& ServerInfo() {
+        return fInfo;
+    }
 
-    void SetServerName(const char * val) { fInfo.SetServerName( val ); }
-    void SetServerType(uint8_t val) { fInfo.SetServerType( val ); }
-    void SetServerAddr(const char * val) { fInfo.SetServerAddr( val ); }
-    void SetServerPort(uint16_t val) { fInfo.SetServerPort( val ); }
-    void SetServerGuid(const char * val) { fServerGuid.FromString( val ); fInfo.SetServerGuid( &fServerGuid ); }
-    bool HasServerName() const { return fInfo.HasServerName(); }
-    bool HasServerType() const { return fInfo.HasServerType(); }
-    bool HasServerAddr() const { return fInfo.HasServerAddr(); }
-    bool HasServerPort() const { return fInfo.HasServerPort(); }
-    bool HasServerGuid() const { return fInfo.HasServerGuid(); }
-    const char *    GetServerName() const { return fInfo.GetServerName(); }
-    uint8_t         GetServerType() const { return fInfo.GetServerType(); }
-    const char *    GetServerAddr() const { return fInfo.GetServerAddr(); }
-    uint16_t        GetServerPort() const { return fInfo.GetServerPort(); }
-    const char *    GetServerGuid() const { fServerGuid.CopyFrom( fInfo.GetServerGuid() ); return fServerGuid.AsString().c_str(); }
+    void SetServerName(const char* val) {
+        fInfo.SetServerName(val);
+    }
+    void SetServerType(uint8_t val) {
+        fInfo.SetServerType(val);
+    }
+    void SetServerAddr(const char* val) {
+        fInfo.SetServerAddr(val);
+    }
+    void SetServerPort(uint16_t val) {
+        fInfo.SetServerPort(val);
+    }
+    void SetServerGuid(const char* val) {
+        fServerGuid.FromString(val);
+        fInfo.SetServerGuid(&fServerGuid);
+    }
+    bool HasServerName() const {
+        return fInfo.HasServerName();
+    }
+    bool HasServerType() const {
+        return fInfo.HasServerType();
+    }
+    bool HasServerAddr() const {
+        return fInfo.HasServerAddr();
+    }
+    bool HasServerPort() const {
+        return fInfo.HasServerPort();
+    }
+    bool HasServerGuid() const {
+        return fInfo.HasServerGuid();
+    }
+    const char*     GetServerName() const {
+        return fInfo.GetServerName();
+    }
+    uint8_t         GetServerType() const {
+        return fInfo.GetServerType();
+    }
+    const char*     GetServerAddr() const {
+        return fInfo.GetServerAddr();
+    }
+    uint16_t        GetServerPort() const {
+        return fInfo.GetServerPort();
+    }
+    const char*     GetServerGuid() const {
+        fServerGuid.CopyFrom(fInfo.GetServerGuid());
+        return fServerGuid.AsString().c_str();
+    }
 };
 
 
-class pyNetServerSessionInfoRef
-{
+class pyNetServerSessionInfoRef {
 private:
     static plNetServerSessionInfo fDefaultServerSessionInfo; // created so a default constructor could be made for python. Do NOT use
 
@@ -104,33 +136,67 @@ private:
 
 protected:
     pyNetServerSessionInfoRef(): fInfo(fDefaultServerSessionInfo) {} // only here for the python glue... do NOT call directly
-    pyNetServerSessionInfoRef( plNetServerSessionInfo& info ): fInfo( info ) {}
-    plNetServerSessionInfo & ServerInfo() { return fInfo; }
+    pyNetServerSessionInfoRef(plNetServerSessionInfo& info): fInfo(info) {}
+    plNetServerSessionInfo& ServerInfo() {
+        return fInfo;
+    }
 
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptNetServerSessionInfoRef);
-    static PyObject *New(plNetServerSessionInfo &info);
+    static PyObject* New(plNetServerSessionInfo& info);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyNetServerSessionInfoRef object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyNetServerSessionInfoRef); // converts a PyObject to a pyNetServerSessionInfoRef (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
-    void SetServerName(const char * val) { fInfo.SetServerName( val ); }
-    void SetServerType(uint8_t val) { fInfo.SetServerType( val ); }
-    void SetServerAddr(const char * val) { fInfo.SetServerAddr( val ); }
-    void SetServerPort(uint16_t val) { fInfo.SetServerPort( val ); }
-    void SetServerGuid(const char * val) { fServerGuid.FromString( val ); fInfo.SetServerGuid( &fServerGuid ); }
-    bool HasServerName() const { return fInfo.HasServerName(); }
-    bool HasServerType() const { return fInfo.HasServerType(); }
-    bool HasServerAddr() const { return fInfo.HasServerAddr(); }
-    bool HasServerPort() const { return fInfo.HasServerPort(); }
-    bool HasServerGuid() const { return fInfo.HasServerGuid(); }
-    const char *    GetServerName() const { return fInfo.GetServerName(); }
-    uint8_t         GetServerType() const { return fInfo.GetServerType(); }
-    const char *    GetServerAddr() const { return fInfo.GetServerAddr(); }
-    uint16_t        GetServerPort() const { return fInfo.GetServerPort(); }
-    const char *    GetServerGuid() const { fServerGuid.CopyFrom( fInfo.GetServerGuid() ); return fServerGuid.AsString().c_str(); }
+    void SetServerName(const char* val) {
+        fInfo.SetServerName(val);
+    }
+    void SetServerType(uint8_t val) {
+        fInfo.SetServerType(val);
+    }
+    void SetServerAddr(const char* val) {
+        fInfo.SetServerAddr(val);
+    }
+    void SetServerPort(uint16_t val) {
+        fInfo.SetServerPort(val);
+    }
+    void SetServerGuid(const char* val) {
+        fServerGuid.FromString(val);
+        fInfo.SetServerGuid(&fServerGuid);
+    }
+    bool HasServerName() const {
+        return fInfo.HasServerName();
+    }
+    bool HasServerType() const {
+        return fInfo.HasServerType();
+    }
+    bool HasServerAddr() const {
+        return fInfo.HasServerAddr();
+    }
+    bool HasServerPort() const {
+        return fInfo.HasServerPort();
+    }
+    bool HasServerGuid() const {
+        return fInfo.HasServerGuid();
+    }
+    const char*     GetServerName() const {
+        return fInfo.GetServerName();
+    }
+    uint8_t         GetServerType() const {
+        return fInfo.GetServerType();
+    }
+    const char*     GetServerAddr() const {
+        return fInfo.GetServerAddr();
+    }
+    uint16_t        GetServerPort() const {
+        return fInfo.GetServerPort();
+    }
+    const char*     GetServerGuid() const {
+        fServerGuid.CopyFrom(fInfo.GetServerGuid());
+        return fServerGuid.AsString().c_str();
+    }
 };
 
 

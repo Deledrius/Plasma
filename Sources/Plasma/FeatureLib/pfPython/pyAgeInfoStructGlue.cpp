@@ -58,33 +58,35 @@ PYTHON_INIT_DEFINITION(ptAgeInfoStruct, args, keywords)
 
 PYTHON_RICH_COMPARE_DEFINITION(ptAgeInfoStruct, obj1, obj2, compareType)
 {
-    if ((obj1 == Py_None) || (obj2 == Py_None) || !pyAgeInfoStruct::Check(obj1) || !pyAgeInfoStruct::Check(obj2))
-    {
+    if ((obj1 == Py_None) || (obj2 == Py_None) || !pyAgeInfoStruct::Check(obj1) || !pyAgeInfoStruct::Check(obj2)) {
         // if they aren't the same type, they don't match, obviously (we also never equal none)
-        if (compareType == Py_EQ)
+        if (compareType == Py_EQ) {
             PYTHON_RCOMPARE_FALSE;
-        else if (compareType == Py_NE)
+        } else if (compareType == Py_NE) {
             PYTHON_RCOMPARE_TRUE;
-        else
-        {
+        } else {
             PyErr_SetString(PyExc_NotImplementedError, "invalid comparison for a ptAgeInfoStruct object");
             PYTHON_RCOMPARE_ERROR;
         }
     }
-    pyAgeInfoStruct *struct1 = pyAgeInfoStruct::ConvertFrom(obj1);
-    pyAgeInfoStruct *struct2 = pyAgeInfoStruct::ConvertFrom(obj2);
-    if (compareType == Py_EQ)
-    {
-        if ((*struct1) == (*struct2))
+
+    pyAgeInfoStruct* struct1 = pyAgeInfoStruct::ConvertFrom(obj1);
+    pyAgeInfoStruct* struct2 = pyAgeInfoStruct::ConvertFrom(obj2);
+
+    if (compareType == Py_EQ) {
+        if ((*struct1) == (*struct2)) {
             PYTHON_RCOMPARE_TRUE;
+        }
+
+        PYTHON_RCOMPARE_FALSE;
+    } else if (compareType == Py_NE) {
+        if ((*struct1) != (*struct2)) {
+            PYTHON_RCOMPARE_TRUE;
+        }
+
         PYTHON_RCOMPARE_FALSE;
     }
-    else if (compareType == Py_NE)
-    {
-        if ((*struct1) != (*struct2))
-            PYTHON_RCOMPARE_TRUE;
-        PYTHON_RCOMPARE_FALSE;
-    }
+
     PyErr_SetString(PyExc_NotImplementedError, "invalid comparison for a ptAgeInfoStruct object");
     PYTHON_RCOMPARE_ERROR;
 }
@@ -92,23 +94,22 @@ PYTHON_RICH_COMPARE_DEFINITION(ptAgeInfoStruct, obj1, obj2, compareType)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStruct, copyFrom, args)
 {
     PyObject* infoStructObj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &infoStructObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &infoStructObj)) {
         PyErr_SetString(PyExc_TypeError, "copyFrom expects a ptAgeInfoStruct or ptAgeInfoStructRef");
         PYTHON_RETURN_ERROR;
     }
-    if (pyAgeInfoStruct::Check(infoStructObj))
-    {
+
+    if (pyAgeInfoStruct::Check(infoStructObj)) {
         pyAgeInfoStruct* infoStruct = pyAgeInfoStruct::ConvertFrom(infoStructObj);
         self->fThis->CopyFrom(*infoStruct);
         PYTHON_RETURN_NONE;
-    }
-    else if (pyAgeInfoStructRef::Check(infoStructObj))
-    {
+    } else if (pyAgeInfoStructRef::Check(infoStructObj)) {
         pyAgeInfoStructRef* infoStruct = pyAgeInfoStructRef::ConvertFrom(infoStructObj);
         self->fThis->CopyFromRef(*infoStruct);
         PYTHON_RETURN_NONE;
     }
+
     PyErr_SetString(PyExc_TypeError, "copyFrom expects a ptAgeInfoStruct or ptAgeInfoStructRef");
     PYTHON_RETURN_ERROR;
 }
@@ -121,11 +122,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStruct, getAgeFilename)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStruct, setAgeFilename, args)
 {
     char* filename;
-    if (!PyArg_ParseTuple(args, "s", &filename))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         PyErr_SetString(PyExc_TypeError, "setAgeFilename expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeFilename(filename);
     PYTHON_RETURN_NONE;
 }
@@ -138,11 +140,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStruct, getAgeInstanceName)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStruct, setAgeInstanceName, args)
 {
     char* instanceName;
-    if (!PyArg_ParseTuple(args, "s", &instanceName))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &instanceName)) {
         PyErr_SetString(PyExc_TypeError, "setAgeInstanceName expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeInstanceName(instanceName);
     PYTHON_RETURN_NONE;
 }
@@ -155,11 +158,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStruct, getAgeUserDefinedName)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStruct, setAgeUserDefinedName, args)
 {
     char* userName;
-    if (!PyArg_ParseTuple(args, "s", &userName))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &userName)) {
         PyErr_SetString(PyExc_TypeError, "setAgeUserDefinedName expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeUserDefinedName(userName);
     PYTHON_RETURN_NONE;
 }
@@ -172,11 +176,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStruct, getAgeDescription)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStruct, setAgeDescription, args)
 {
     char* desc;
-    if (!PyArg_ParseTuple(args, "s", &desc))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &desc)) {
         PyErr_SetString(PyExc_TypeError, "setAgeDescription expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeDescription(desc);
     PYTHON_RETURN_NONE;
 }
@@ -189,11 +194,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStruct, getAgeInstanceGuid)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStruct, setAgeInstanceGuid, args)
 {
     char* guid;
-    if (!PyArg_ParseTuple(args, "s", &guid))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &guid)) {
         PyErr_SetString(PyExc_TypeError, "setAgeInstanceGuid expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeInstanceGuid(guid);
     PYTHON_RETURN_NONE;
 }
@@ -206,11 +212,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStruct, getAgeSequenceNumber)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStruct, setAgeSequenceNumber, args)
 {
     long sequenceNum;
-    if (!PyArg_ParseTuple(args, "l", &sequenceNum))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &sequenceNum)) {
         PyErr_SetString(PyExc_TypeError, "setAgeSequenceNumber expects a long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeSequenceNumber(sequenceNum);
     PYTHON_RETURN_NONE;
 }
@@ -223,11 +230,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStruct, getAgeLanguage)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStruct, setAgeLanguage, args)
 {
     long lang;
-    if (!PyArg_ParseTuple(args, "l", &lang))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &lang)) {
         PyErr_SetString(PyExc_TypeError, "setAgeLanguage expects a long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeLanguage(lang);
     PYTHON_RETURN_NONE;
 }
@@ -238,23 +246,23 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStruct, getDisplayName)
 }
 
 PYTHON_START_METHODS_TABLE(ptAgeInfoStruct)
-    PYTHON_METHOD(ptAgeInfoStruct, copyFrom, "Params: other\nCopies data from one ptAgeInfoStruct or ptAgeInfoStructRef to this one"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeFilename, "Gets the Age's filename"),
-    PYTHON_METHOD(ptAgeInfoStruct, setAgeFilename, "Params: filename\nSets the filename of the Age"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeInstanceName, "Get the instance name of the Age"),
-    PYTHON_METHOD(ptAgeInfoStruct, setAgeInstanceName, "Params: instanceName\nSets the instance name of the Age"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeUserDefinedName, "Gets the user defined part of the Age name"),
-    PYTHON_METHOD(ptAgeInfoStruct, setAgeUserDefinedName, "Params: udName\nSets the user defined part of the Age"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeDescription, "Gets the description part of the Age name"),
-    PYTHON_METHOD(ptAgeInfoStruct, setAgeDescription, "Params: udName\nSets the description part of the Age"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeInstanceGuid, "Get the Age's instance GUID"),
-    PYTHON_METHOD(ptAgeInfoStruct, setAgeInstanceGuid, "Params: guid\nSets the Age instance's GUID"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeSequenceNumber, "Gets the unique sequence number"),
-    PYTHON_METHOD(ptAgeInfoStruct, setAgeSequenceNumber, "Params: seqNumber\nSets the unique sequence number"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeLanguage, "Gets the age's language (integer)"),
-    PYTHON_METHOD(ptAgeInfoStruct, setAgeLanguage, "Params: lang\nSets the age's language (integer)"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getDisplayName, "Returns a string that is the displayable name of the age instance"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptAgeInfoStruct, copyFrom, "Params: other\nCopies data from one ptAgeInfoStruct or ptAgeInfoStructRef to this one"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeFilename, "Gets the Age's filename"),
+              PYTHON_METHOD(ptAgeInfoStruct, setAgeFilename, "Params: filename\nSets the filename of the Age"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeInstanceName, "Get the instance name of the Age"),
+              PYTHON_METHOD(ptAgeInfoStruct, setAgeInstanceName, "Params: instanceName\nSets the instance name of the Age"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeUserDefinedName, "Gets the user defined part of the Age name"),
+              PYTHON_METHOD(ptAgeInfoStruct, setAgeUserDefinedName, "Params: udName\nSets the user defined part of the Age"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeDescription, "Gets the description part of the Age name"),
+              PYTHON_METHOD(ptAgeInfoStruct, setAgeDescription, "Params: udName\nSets the description part of the Age"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeInstanceGuid, "Get the Age's instance GUID"),
+              PYTHON_METHOD(ptAgeInfoStruct, setAgeInstanceGuid, "Params: guid\nSets the Age instance's GUID"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeSequenceNumber, "Gets the unique sequence number"),
+              PYTHON_METHOD(ptAgeInfoStruct, setAgeSequenceNumber, "Params: seqNumber\nSets the unique sequence number"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getAgeLanguage, "Gets the age's language (integer)"),
+              PYTHON_METHOD(ptAgeInfoStruct, setAgeLanguage, "Params: lang\nSets the age's language (integer)"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStruct, getDisplayName, "Returns a string that is the displayable name of the age instance"),
+              PYTHON_END_METHODS_TABLE;
 
 // type structure definition
 #define ptAgeInfoStruct_COMPARE         PYTHON_NO_COMPARE
@@ -270,9 +278,9 @@ PLASMA_CUSTOM_TYPE(ptAgeInfoStruct, "Class to hold AgeInfo struct data");
 // required functions for PyObject interoperability
 PYTHON_CLASS_NEW_IMPL(ptAgeInfoStruct, pyAgeInfoStruct)
 
-PyObject *pyAgeInfoStruct::New(plAgeInfoStruct *info)
+PyObject* pyAgeInfoStruct::New(plAgeInfoStruct* info)
 {
-    ptAgeInfoStruct *newObj = (ptAgeInfoStruct*)ptAgeInfoStruct_type.tp_new(&ptAgeInfoStruct_type, NULL, NULL);
+    ptAgeInfoStruct* newObj = (ptAgeInfoStruct*)ptAgeInfoStruct_type.tp_new(&ptAgeInfoStruct_type, NULL, NULL);
     newObj->fThis->fAgeInfo.CopyFrom(info);
     return (PyObject*)newObj;
 }
@@ -284,7 +292,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptAgeInfoStruct, pyAgeInfoStruct)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyAgeInfoStruct::AddPlasmaClasses(PyObject *m)
+void pyAgeInfoStruct::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptAgeInfoStruct);
@@ -302,23 +310,22 @@ PYTHON_NO_INIT_DEFINITION(ptAgeInfoStructRef)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStructRef, copyFrom, args)
 {
     PyObject* infoStructObj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &infoStructObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &infoStructObj)) {
         PyErr_SetString(PyExc_TypeError, "copyFrom expects a ptAgeInfoStruct or ptAgeInfoStructRef");
         PYTHON_RETURN_ERROR;
     }
-    if (pyAgeInfoStruct::Check(infoStructObj))
-    {
+
+    if (pyAgeInfoStruct::Check(infoStructObj)) {
         pyAgeInfoStruct* infoStruct = pyAgeInfoStruct::ConvertFrom(infoStructObj);
         self->fThis->CopyFrom(*infoStruct);
         PYTHON_RETURN_NONE;
-    }
-    else if (pyAgeInfoStructRef::Check(infoStructObj))
-    {
+    } else if (pyAgeInfoStructRef::Check(infoStructObj)) {
         pyAgeInfoStructRef* infoStruct = pyAgeInfoStructRef::ConvertFrom(infoStructObj);
         self->fThis->CopyFromRef(*infoStruct);
         PYTHON_RETURN_NONE;
     }
+
     PyErr_SetString(PyExc_TypeError, "copyFrom expects a ptAgeInfoStruct or ptAgeInfoStructRef");
     PYTHON_RETURN_ERROR;
 }
@@ -331,11 +338,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStructRef, getAgeFilename)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStructRef, setAgeFilename, args)
 {
     char* filename;
-    if (!PyArg_ParseTuple(args, "s", &filename))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         PyErr_SetString(PyExc_TypeError, "setAgeFilename expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeFilename(filename);
     PYTHON_RETURN_NONE;
 }
@@ -348,11 +356,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStructRef, getAgeInstanceName)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStructRef, setAgeInstanceName, args)
 {
     char* instanceName;
-    if (!PyArg_ParseTuple(args, "s", &instanceName))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &instanceName)) {
         PyErr_SetString(PyExc_TypeError, "setAgeInstanceName expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeInstanceName(instanceName);
     PYTHON_RETURN_NONE;
 }
@@ -365,11 +374,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStructRef, getAgeUserDefinedName)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStructRef, setAgeUserDefinedName, args)
 {
     char* userName;
-    if (!PyArg_ParseTuple(args, "s", &userName))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &userName)) {
         PyErr_SetString(PyExc_TypeError, "setAgeUserDefinedName expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeUserDefinedName(userName);
     PYTHON_RETURN_NONE;
 }
@@ -382,11 +392,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStructRef, getAgeInstanceGuid)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStructRef, setAgeInstanceGuid, args)
 {
     char* guid;
-    if (!PyArg_ParseTuple(args, "s", &guid))
-    {
+
+    if (!PyArg_ParseTuple(args, "s", &guid)) {
         PyErr_SetString(PyExc_TypeError, "setAgeInstanceGuid expects a string");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeInstanceGuid(guid);
     PYTHON_RETURN_NONE;
 }
@@ -399,11 +410,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStructRef, getAgeSequenceNumber)
 PYTHON_METHOD_DEFINITION(ptAgeInfoStructRef, setAgeSequenceNumber, args)
 {
     long sequenceNum;
-    if (!PyArg_ParseTuple(args, "l", &sequenceNum))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &sequenceNum)) {
         PyErr_SetString(PyExc_TypeError, "setAgeSequenceNumber expects a long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetAgeSequenceNumber(sequenceNum);
     PYTHON_RETURN_NONE;
 }
@@ -414,27 +426,27 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptAgeInfoStructRef, getDisplayName)
 }
 
 PYTHON_START_METHODS_TABLE(ptAgeInfoStructRef)
-    PYTHON_METHOD(ptAgeInfoStructRef, copyFrom, "Params: other\nCopies data from one ptAgeInfoStruct or ptAgeInfoStructRef to this one"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getAgeFilename, "Gets the Age's filename"),
-    PYTHON_METHOD(ptAgeInfoStructRef, setAgeFilename, "Params: filename\nSets the filename of the Age"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getAgeInstanceName, "Get the instance name of the Age"),
-    PYTHON_METHOD(ptAgeInfoStructRef, setAgeInstanceName, "Params: instanceName\nSets the instance name of the Age"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getAgeUserDefinedName, "Gets the user defined part of the Age name"),
-    PYTHON_METHOD(ptAgeInfoStructRef, setAgeUserDefinedName, "Params: udName\nSets the user defined part of the Age"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getAgeInstanceGuid, "Get the Age's instance GUID"),
-    PYTHON_METHOD(ptAgeInfoStructRef, setAgeInstanceGuid, "Params: guid\nSets the Age instance's GUID"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getAgeSequenceNumber, "Gets the unique sequence number"),
-    PYTHON_METHOD(ptAgeInfoStructRef, setAgeSequenceNumber, "Params: seqNumber\nSets the unique sequence number"),
-    PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getDisplayName, "Returns a string that is the displayable name of the age instance"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptAgeInfoStructRef, copyFrom, "Params: other\nCopies data from one ptAgeInfoStruct or ptAgeInfoStructRef to this one"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getAgeFilename, "Gets the Age's filename"),
+              PYTHON_METHOD(ptAgeInfoStructRef, setAgeFilename, "Params: filename\nSets the filename of the Age"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getAgeInstanceName, "Get the instance name of the Age"),
+              PYTHON_METHOD(ptAgeInfoStructRef, setAgeInstanceName, "Params: instanceName\nSets the instance name of the Age"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getAgeUserDefinedName, "Gets the user defined part of the Age name"),
+              PYTHON_METHOD(ptAgeInfoStructRef, setAgeUserDefinedName, "Params: udName\nSets the user defined part of the Age"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getAgeInstanceGuid, "Get the Age's instance GUID"),
+              PYTHON_METHOD(ptAgeInfoStructRef, setAgeInstanceGuid, "Params: guid\nSets the Age instance's GUID"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getAgeSequenceNumber, "Gets the unique sequence number"),
+              PYTHON_METHOD(ptAgeInfoStructRef, setAgeSequenceNumber, "Params: seqNumber\nSets the unique sequence number"),
+              PYTHON_METHOD_NOARGS(ptAgeInfoStructRef, getDisplayName, "Returns a string that is the displayable name of the age instance"),
+              PYTHON_END_METHODS_TABLE;
 
 // type structure definition
 PLASMA_DEFAULT_TYPE(ptAgeInfoStructRef, "Class to hold AgeInfo struct data");
 
 // required functions for PyObject interoperability
-PyObject *pyAgeInfoStructRef::New(plAgeInfoStruct &info)
+PyObject* pyAgeInfoStructRef::New(plAgeInfoStruct& info)
 {
-    ptAgeInfoStructRef *newObj = (ptAgeInfoStructRef*)ptAgeInfoStructRef_type.tp_new(&ptAgeInfoStructRef_type, NULL, NULL);
+    ptAgeInfoStructRef* newObj = (ptAgeInfoStructRef*)ptAgeInfoStructRef_type.tp_new(&ptAgeInfoStructRef_type, NULL, NULL);
     newObj->fThis->fAgeInfo = info;
     return (PyObject*)newObj;
 }
@@ -446,7 +458,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptAgeInfoStructRef, pyAgeInfoStructRef)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyAgeInfoStructRef::AddPlasmaClasses(PyObject *m)
+void pyAgeInfoStructRef::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptAgeInfoStructRef);

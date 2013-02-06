@@ -50,15 +50,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plRenderTarget;
 class plCaptureRenderMsg;
 
-class plCaptureRenderRequest : public plRenderRequest
-{
+class plCaptureRenderRequest : public plRenderRequest {
 public:
 
     virtual void    Render(plPipeline* pipe, plPageTreeMgr* pageMgr);
 };
 
-class plCaptureRender
-{
+class plCaptureRender {
 protected:
     static hsTArray<plCaptureRenderMsg*>        fProcessed;
 
@@ -71,7 +69,7 @@ protected:
     friend class plClient;
 public:
 
-    static bool         Capture(const plKey& ack, uint16_t width=800, uint16_t height=600);
+    static bool         Capture(const plKey& ack, uint16_t width = 800, uint16_t height = 600);
 
 };
 
@@ -82,11 +80,9 @@ public:
 
 class plPipeline;
 
-class plCaptureRender
-{
+class plCaptureRender {
 protected:
-    class CapInfo
-    {
+    class CapInfo {
     public:
         plKey       fAck;
         uint16_t      fWidth;
@@ -100,7 +96,7 @@ protected:
     friend class plClient;
 public:
 
-    static bool         Capture(const plKey& ack, uint16_t width=800, uint16_t height=600);
+    static bool         Capture(const plKey& ack, uint16_t width = 800, uint16_t height = 600);
 
 };
 

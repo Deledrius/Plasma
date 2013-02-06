@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pyGlueHelpers.h"
 #include "pnKeyedObject/plKey.h"
 
-class pySwimCurrentInterface
-{
+class pySwimCurrentInterface {
 private:
     plKey fSwimCurrentKey;
 
@@ -58,14 +57,16 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptSwimCurrentInterface);
-    static PyObject *New(plKey key);
-    static PyObject *New(pyKey& key);
+    static PyObject* New(plKey key);
+    static PyObject* New(pyKey& key);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pySwimCurrentInterface object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pySwimCurrentInterface); // converts a PyObject to a pySwimCurrentInterface (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
-    void setKey(pyKey& key) {fSwimCurrentKey = key.getKey();} // for python glue only, do NOT call
+    void setKey(pyKey& key) {
+        fSwimCurrentKey = key.getKey();   // for python glue only, do NOT call
+    }
 
     float getNearDist();
     void setNearDist(float val);

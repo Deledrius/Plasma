@@ -44,8 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnModifier/plSingleModifier.h"
 
-class plGameMarkerModifier : public plSingleModifier
-{
+class plGameMarkerModifier : public plSingleModifier {
 protected:
     plKey fGreenAnimKey;
     plKey fRedAnimKey;
@@ -54,10 +53,12 @@ protected:
     uint16_t fPlaceSndIdx;
     uint16_t fHitSndIdx;
 
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return true; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return true;
+    }
 
     plKey IFindCloneKey(plKey baseKey);
-    
+
     friend class pfMarkerInfo;
     friend class pfMarkerInfoOwned;
 
@@ -68,8 +69,7 @@ public:
     GETINTERFACE_ANY(plGameMarkerModifier, plSingleModifier);
 
     void ExportInit(plKey greenKey, plKey redKey, plKey openKey, plKey bounceAnimKey,
-                    uint16_t placeSndIdx, uint16_t hitSndIdx)
-    {
+                    uint16_t placeSndIdx, uint16_t hitSndIdx) {
         fGreenAnimKey = greenKey;
         fRedAnimKey = redKey;
         fOpenAnimKey = openKey;

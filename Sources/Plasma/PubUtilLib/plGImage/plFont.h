@@ -71,11 +71,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include <wchar.h>
 
-class plBDFConvertCallback
-{
-    public:
-        virtual void    NumChars( uint16_t chars ) {}
-        virtual void    CharDone( void ) {}
+class plBDFConvertCallback {
+public:
+    virtual void    NumChars(uint16_t chars) {}
+    virtual void    CharDone(void) {}
 };
 
 //// Class Definition /////////////////////////////////////////////////////////
@@ -84,215 +83,261 @@ class plMipmap;
 class plBDFHeaderParser;
 class plBDFPropertiesParser;
 class plBDFCharsParser;
-class plFont : public hsKeyedObject
-{
+class plFont : public hsKeyedObject {
+public:
+
+    enum RenderFlags {
+        kRenderItalic       = 0x00000001,
+        kRenderBold         = 0x00000002,
+        kRenderScaleAA      = 0x00000004,
+        kRenderClip         = 0x00000008,
+        kRenderWrap         = 0x00000010,
+
+        kRenderJustXLeft    = 0,
+        kRenderJustXRight   = 0x00000020,   // X right justify
+        kRenderJustXCenter  = 0x00000040,   // X center justify (left default)
+        kRenderJustXForceLeft = 0x00000080, // Force left (no kerning)
+        kRenderJustXMask    = 0x000000e0,
+
+        kRenderJustYBaseline = 0,
+        kRenderJustYTop     = 0x00000100,   // Y top justify
+        kRenderJustYCenter  = 0x00000200,   // Y center justify
+        kRenderJustYBottom  = 0x00000400,   // Y bottom justify (baseline is default)
+        kRenderJustYMask    = 0x00000700,
+
+        kRenderIntoAlpha    = 0x00000800,   // This option causes grayscale (AA) fonts to
+        // render into the alpha channel instead of the color
+        // channel, so that the resulting pixels touched always
+        // have the renderColor and the alpha = to the font pixel.
+        // By default, we use the font pixel as an alpha blending
+        // value between the renderColor and the destColor and
+        // leave the alpha as-is
+        // This flag has no effect on monochrome fonts
+    };
+
+    enum Flags {
+        kFlagBold       = 0x00000001,
+        kFlagItalic     = 0x00000002
+    };
+
+protected:
+
+    friend class plBDFHeaderParser;
+    friend class plBDFPropertiesParser;
+    friend class plBDFCharsParser;
+
+    // Font face and size. This is just used for IDing purposes, not for rendering
+    char    fFace[ 256 ];
+    uint8_t   fSize;
+    uint32_t  fFlags;
+
+    // Size of the whole font bitmap. Fonts are stored vertically, one
+    // character at a time, so fWidth is really the max width of any one
+    // character bitmap, with of course the proper padding
+    uint32_t  fWidth, fHeight;
+
+    // Bpp of our font bitmap. We're grayscale, remember...
+    uint8_t   fBPP;
+
+    // Bitmap data!
+    uint8_t*   fBMapData;
+
+    // Our character class, for per-char info
+    class plCharacter {
     public:
+        uint32_t  fBitmapOff;     // Offset in the font bitmap in bytes
+        // to the first uint8_t of the character
+        uint32_t  fHeight;        // Height in pixels of this character
+        int32_t   fBaseline;      // Number of pixels down from the top of
+        // the char bitmap to the baseline.
 
-        enum RenderFlags
-        {
-            kRenderItalic       = 0x00000001,
-            kRenderBold         = 0x00000002,
-            kRenderScaleAA      = 0x00000004,
-            kRenderClip         = 0x00000008,
-            kRenderWrap         = 0x00000010,
+        float    fLeftKern;  // Kerning values for this char, in pixels
+        float    fRightKern; // Note that the right kern is relative to
+        // the right side of the bitmap area, which
+        // is the width of the font bitmap, so
+        // basically each character is the same width,
+        // just kerned back!
+        // (left kerning currently unsupported, just
+        // in here in case we need to eventually)
 
-            kRenderJustXLeft    = 0,
-            kRenderJustXRight   = 0x00000020,   // X right justify
-            kRenderJustXCenter  = 0x00000040,   // X center justify (left default)
-            kRenderJustXForceLeft=0x00000080,   // Force left (no kerning)
-            kRenderJustXMask    = 0x000000e0,
+        plCharacter& operator=(const int zero) {
+            fBitmapOff = 0;
+            fHeight = 0;
+            fBaseline = 0;
+            fLeftKern = 0;
+            fRightKern = 0;
 
-            kRenderJustYBaseline = 0,
-            kRenderJustYTop     = 0x00000100,   // Y top justify
-            kRenderJustYCenter  = 0x00000200,   // Y center justify
-            kRenderJustYBottom  = 0x00000400,   // Y bottom justify (baseline is default)
-            kRenderJustYMask    = 0x00000700,
+            return *this;
+        }
 
-            kRenderIntoAlpha    = 0x00000800,   // This option causes grayscale (AA) fonts to 
-                                                // render into the alpha channel instead of the color
-                                                // channel, so that the resulting pixels touched always
-                                                // have the renderColor and the alpha = to the font pixel.
-                                                // By default, we use the font pixel as an alpha blending
-                                                // value between the renderColor and the destColor and
-                                                // leave the alpha as-is
-                                                // This flag has no effect on monochrome fonts
-        };
+        plCharacter();
+        void    Read(hsStream* s);
+        void    Write(hsStream* s);
+    };
 
-        enum Flags
-        {
-            kFlagBold       = 0x00000001,
-            kFlagItalic     = 0x00000002
-        };
+    // First character we encode--everything below this we don't render
+    uint16_t  fFirstChar;
 
-    protected:
+    // Our characters, stored in an hsTArray for easy construction
+    hsTArray<plCharacter>   fCharacters;
 
-        friend class plBDFHeaderParser;
-        friend class plBDFPropertiesParser;
-        friend class plBDFCharsParser;
+    // Max character bitmap height and max ascent for any character
+    uint32_t  fMaxCharHeight;
+    int32_t   fFontAscent, fFontDescent;
 
-        // Font face and size. This is just used for IDing purposes, not for rendering
-        char    fFace[ 256 ];
-        uint8_t   fSize;
-        uint32_t  fFlags;
+    typedef void (plFont::*CharRenderFunc)(const plCharacter& c);
 
-        // Size of the whole font bitmap. Fonts are stored vertically, one
-        // character at a time, so fWidth is really the max width of any one
-        // character bitmap, with of course the proper padding
-        uint32_t  fWidth, fHeight;
-
-        // Bpp of our font bitmap. We're grayscale, remember...
-        uint8_t   fBPP;
-
-        // Bitmap data!
-        uint8_t   *fBMapData;
-
-        // Our character class, for per-char info
-        class plCharacter
-        {
-            public:
-                uint32_t  fBitmapOff;     // Offset in the font bitmap in bytes 
-                                        // to the first uint8_t of the character
-                uint32_t  fHeight;        // Height in pixels of this character
-                int32_t   fBaseline;      // Number of pixels down from the top of 
-                                        // the char bitmap to the baseline.
-                
-                float    fLeftKern;  // Kerning values for this char, in pixels
-                float    fRightKern; // Note that the right kern is relative to 
-                                        // the right side of the bitmap area, which
-                                        // is the width of the font bitmap, so
-                                        // basically each character is the same width,
-                                        // just kerned back!
-                                        // (left kerning currently unsupported, just 
-                                        // in here in case we need to eventually)
-
-                plCharacter& operator=(const int zero) 
-                { 
-                    fBitmapOff=0;
-                    fHeight = 0;
-                    fBaseline = 0;
-                    fLeftKern = 0;
-                    fRightKern = 0;
-
-                    return *this;
-                }
-
-                plCharacter();
-                void    Read( hsStream *s );
-                void    Write( hsStream *s );
-        };
-
-        // First character we encode--everything below this we don't render
-        uint16_t  fFirstChar;
-
-        // Our characters, stored in an hsTArray for easy construction
-        hsTArray<plCharacter>   fCharacters;
-
-        // Max character bitmap height and max ascent for any character
-        uint32_t  fMaxCharHeight;
-        int32_t   fFontAscent, fFontDescent;
-
-        typedef void (plFont::*CharRenderFunc)( const plCharacter &c );
-
-        // Render info
-        class plRenderInfo
-        {
-            public:
-                int16_t       fFirstLineIndent;
-                int16_t       fX, fY, fNumCols, fFarthestX, fLastX, fLastY;
-                int16_t       fMaxWidth, fMaxHeight, fMaxAscent, fMaxDescent;
-                int16_t       fLineSpacing;
-                uint8_t       *fDestPtr;
-                uint32_t      fDestStride;
-                uint8_t       fDestBPP;
-                uint32_t      fColor;
-                plMipmap    *fMipmap;
-                uint32_t      fFlags;
-                pcSmallRect fClipRect;
-                float    fFloatWidth;
-
-                const wchar_t   *fVolatileStringPtr;    // Just so we know where we clipped
-
-                CharRenderFunc  fRenderFunc;
-        };
-
-        plRenderInfo    fRenderInfo;
-
-        void    IClear( bool onConstruct = false );
-        void    ICalcFontAscent( void );
-
-        uint8_t   *IGetFreeCharData( uint32_t &newOffset );
-
-        void    IRenderLoop( const wchar_t *string, int32_t maxCount );
-        void    IRenderString( plMipmap *mip, uint16_t x, uint16_t y, const wchar_t *string, bool justCalc );
-
-        // Various render functions
-        void    IRenderChar1To32( const plCharacter &c );
-        void    IRenderChar1To32AA( const plCharacter &c );
-        void    IRenderChar8To32( const plCharacter &c );
-        void    IRenderChar8To32Alpha( const plCharacter &c );
-        void    IRenderChar8To32FullAlpha( const plCharacter &c );
-        void    IRenderCharNull( const plCharacter &c );
-
+    // Render info
+    class plRenderInfo {
     public:
+        int16_t       fFirstLineIndent;
+        int16_t       fX, fY, fNumCols, fFarthestX, fLastX, fLastY;
+        int16_t       fMaxWidth, fMaxHeight, fMaxAscent, fMaxDescent;
+        int16_t       fLineSpacing;
+        uint8_t*       fDestPtr;
+        uint32_t      fDestStride;
+        uint8_t       fDestBPP;
+        uint32_t      fColor;
+        plMipmap*    fMipmap;
+        uint32_t      fFlags;
+        pcSmallRect fClipRect;
+        float    fFloatWidth;
 
-        plFont();
-        virtual ~plFont();
+        const wchar_t*   fVolatileStringPtr;    // Just so we know where we clipped
 
-        CLASSNAME_REGISTER( plFont );
-        GETINTERFACE_ANY( plFont, hsKeyedObject );
+        CharRenderFunc  fRenderFunc;
+    };
 
-        virtual void    Read( hsStream *s, hsResMgr *mgr );
-        virtual void    Write( hsStream *s, hsResMgr *mgr );
+    plRenderInfo    fRenderInfo;
 
-        const char  *GetFace( void ) const { return fFace; }
-        uint8_t       GetSize( void ) const { return fSize; }
-        uint16_t      GetFirstChar( void ) const { return fFirstChar; }
-        uint16_t      GetNumChars( void ) const { return fCharacters.GetCount(); }
-        uint32_t      GetFlags( void ) const { return fFlags; }
-        float    GetDescent( void ) const { return (float)fFontDescent; }
-        float    GetAscent( void ) const { return (float)fFontAscent; }
+    void    IClear(bool onConstruct = false);
+    void    ICalcFontAscent(void);
 
-        uint32_t      GetBitmapWidth( void ) const { return fWidth; }
-        uint32_t      GetBitmapHeight( void ) const { return fHeight; }
-        uint8_t       GetBitmapBPP( void ) const { return fBPP; }
+    uint8_t*   IGetFreeCharData(uint32_t& newOffset);
 
-        void    SetFace( const char *face );
-        void    SetSize( uint8_t size );
-        void    SetFlags( uint32_t flags ) { fFlags = flags; }
-        void    SetFlag( uint32_t flag, bool on ) { if( on ) fFlags |= flag; else fFlags &= ~flag; }
-        bool    IsFlagSet( uint32_t flag ) { if( fFlags & flag ) return true; return false; }
+    void    IRenderLoop(const wchar_t* string, int32_t maxCount);
+    void    IRenderString(plMipmap* mip, uint16_t x, uint16_t y, const wchar_t* string, bool justCalc);
 
-        void    SetRenderColor( uint32_t color );
-        void    SetRenderFlag( uint32_t flag, bool on ) { if( on ) fRenderInfo.fFlags |= flag; else fRenderInfo.fFlags &= ~flag; }
-        bool    IsRenderFlagSet( uint32_t flag ) { return ( fRenderInfo.fFlags & flag ) ? true : false; }
-        void    SetRenderClipRect( int16_t x, int16_t y, int16_t width, int16_t height );
-        void    SetRenderXJustify( uint32_t j ) { fRenderInfo.fFlags &= ~kRenderJustXMask; fRenderInfo.fFlags |= j; }
-        void    SetRenderYJustify( uint32_t j ) { fRenderInfo.fFlags &= ~kRenderJustYMask; fRenderInfo.fFlags |= j; }
-        void    SetRenderFirstLineIndent( int16_t indent ) { fRenderInfo.fFirstLineIndent = indent; }
-        void    SetRenderLineSpacing( int16_t spacing ) { fRenderInfo.fLineSpacing = spacing; }
+    // Various render functions
+    void    IRenderChar1To32(const plCharacter& c);
+    void    IRenderChar1To32AA(const plCharacter& c);
+    void    IRenderChar8To32(const plCharacter& c);
+    void    IRenderChar8To32Alpha(const plCharacter& c);
+    void    IRenderChar8To32FullAlpha(const plCharacter& c);
+    void    IRenderCharNull(const plCharacter& c);
 
-        // Sets flags too
-        void    SetRenderClipping( int16_t x, int16_t y, int16_t width, int16_t height );
-        void    SetRenderWrapping( int16_t x, int16_t y, int16_t width, int16_t height );
+public:
 
-        void    RenderString( plMipmap *mip, uint16_t x, uint16_t y, const char *string, uint16_t *lastX = nil, uint16_t *lastY = nil );
-        void    RenderString( plMipmap *mip, uint16_t x, uint16_t y, const wchar_t *string, uint16_t *lastX = nil, uint16_t *lastY = nil );
+    plFont();
+    virtual ~plFont();
 
-        uint16_t  CalcStringWidth( const char *string );
-        uint16_t  CalcStringWidth( const wchar_t *string );
-        void    CalcStringExtents( const char *string, uint16_t &width, uint16_t &height, uint16_t &ascent, uint32_t &firstClippedChar, uint16_t &lastX, uint16_t &lastY );
-        void    CalcStringExtents( const wchar_t *string, uint16_t &width, uint16_t &height, uint16_t &ascent, uint32_t &firstClippedChar, uint16_t &lastX, uint16_t &lastY );
+    CLASSNAME_REGISTER(plFont);
+    GETINTERFACE_ANY(plFont, hsKeyedObject);
 
-        bool    LoadFromFNT( const char *path );
-        bool    LoadFromFNTStream( hsStream *stream );
+    virtual void    Read(hsStream* s, hsResMgr* mgr);
+    virtual void    Write(hsStream* s, hsResMgr* mgr);
 
-        bool    LoadFromBDF( const char *path, plBDFConvertCallback *callback );
-        bool    LoadFromBDFStream( hsStream *stream, plBDFConvertCallback *callback );
+    const char*  GetFace(void) const {
+        return fFace;
+    }
+    uint8_t       GetSize(void) const {
+        return fSize;
+    }
+    uint16_t      GetFirstChar(void) const {
+        return fFirstChar;
+    }
+    uint16_t      GetNumChars(void) const {
+        return fCharacters.GetCount();
+    }
+    uint32_t      GetFlags(void) const {
+        return fFlags;
+    }
+    float    GetDescent(void) const {
+        return (float)fFontDescent;
+    }
+    float    GetAscent(void) const {
+        return (float)fFontAscent;
+    }
 
-        bool    LoadFromP2FFile( const plFileName &path );
+    uint32_t      GetBitmapWidth(void) const {
+        return fWidth;
+    }
+    uint32_t      GetBitmapHeight(void) const {
+        return fHeight;
+    }
+    uint8_t       GetBitmapBPP(void) const {
+        return fBPP;
+    }
 
-        bool    ReadRaw( hsStream *stream );
-        bool    WriteRaw( hsStream *stream );
+    void    SetFace(const char* face);
+    void    SetSize(uint8_t size);
+    void    SetFlags(uint32_t flags) {
+        fFlags = flags;
+    }
+    void    SetFlag(uint32_t flag, bool on) {
+        if (on) {
+            fFlags |= flag;
+        } else {
+            fFlags &= ~flag;
+        }
+    }
+    bool    IsFlagSet(uint32_t flag) {
+        if (fFlags & flag) {
+            return true;
+        }
+
+        return false;
+    }
+
+    void    SetRenderColor(uint32_t color);
+    void    SetRenderFlag(uint32_t flag, bool on) {
+        if (on) {
+            fRenderInfo.fFlags |= flag;
+        } else {
+            fRenderInfo.fFlags &= ~flag;
+        }
+    }
+    bool    IsRenderFlagSet(uint32_t flag) {
+        return (fRenderInfo.fFlags & flag) ? true : false;
+    }
+    void    SetRenderClipRect(int16_t x, int16_t y, int16_t width, int16_t height);
+    void    SetRenderXJustify(uint32_t j) {
+        fRenderInfo.fFlags &= ~kRenderJustXMask;
+        fRenderInfo.fFlags |= j;
+    }
+    void    SetRenderYJustify(uint32_t j) {
+        fRenderInfo.fFlags &= ~kRenderJustYMask;
+        fRenderInfo.fFlags |= j;
+    }
+    void    SetRenderFirstLineIndent(int16_t indent) {
+        fRenderInfo.fFirstLineIndent = indent;
+    }
+    void    SetRenderLineSpacing(int16_t spacing) {
+        fRenderInfo.fLineSpacing = spacing;
+    }
+
+    // Sets flags too
+    void    SetRenderClipping(int16_t x, int16_t y, int16_t width, int16_t height);
+    void    SetRenderWrapping(int16_t x, int16_t y, int16_t width, int16_t height);
+
+    void    RenderString(plMipmap* mip, uint16_t x, uint16_t y, const char* string, uint16_t* lastX = nil, uint16_t* lastY = nil);
+    void    RenderString(plMipmap* mip, uint16_t x, uint16_t y, const wchar_t* string, uint16_t* lastX = nil, uint16_t* lastY = nil);
+
+    uint16_t  CalcStringWidth(const char* string);
+    uint16_t  CalcStringWidth(const wchar_t* string);
+    void    CalcStringExtents(const char* string, uint16_t& width, uint16_t& height, uint16_t& ascent, uint32_t& firstClippedChar, uint16_t& lastX, uint16_t& lastY);
+    void    CalcStringExtents(const wchar_t* string, uint16_t& width, uint16_t& height, uint16_t& ascent, uint32_t& firstClippedChar, uint16_t& lastX, uint16_t& lastY);
+
+    bool    LoadFromFNT(const char* path);
+    bool    LoadFromFNTStream(hsStream* stream);
+
+    bool    LoadFromBDF(const char* path, plBDFConvertCallback* callback);
+    bool    LoadFromBDFStream(hsStream* stream, plBDFConvertCallback* callback);
+
+    bool    LoadFromP2FFile(const plFileName& path);
+
+    bool    ReadRaw(hsStream* stream);
+    bool    WriteRaw(hsStream* stream);
 };
 
 #endif // _plFont_h

@@ -52,20 +52,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMultipassMtlPB.h"
 #include "plMultipassMtlDlg.h"
 
-class plMultipassClassDesc : public ClassDesc2
-{
+class plMultipassClassDesc : public ClassDesc2 {
 public:
-    int             IsPublic()      { return TRUE; }
-    void*           Create(BOOL loading) { return new plMultipassMtl(loading); }
-    const TCHAR*    ClassName()     { return GetString(IDS_MULTI_MTL); }
-    SClass_ID       SuperClassID()  { return MATERIAL_CLASS_ID; }
-    Class_ID        ClassID()       { return MULTIMTL_CLASS_ID; }
-    const TCHAR*    Category()      { return NULL; }
-    const TCHAR*    InternalName()  { return _T("PlasmaMultipass"); }
-    HINSTANCE       HInstance()     { return hInstance; }
+    int             IsPublic()      {
+        return TRUE;
+    }
+    void*           Create(BOOL loading) {
+        return new plMultipassMtl(loading);
+    }
+    const TCHAR*    ClassName()     {
+        return GetString(IDS_MULTI_MTL);
+    }
+    SClass_ID       SuperClassID()  {
+        return MATERIAL_CLASS_ID;
+    }
+    Class_ID        ClassID()       {
+        return MULTIMTL_CLASS_ID;
+    }
+    const TCHAR*    Category()      {
+        return NULL;
+    }
+    const TCHAR*    InternalName()  {
+        return _T("PlasmaMultipass");
+    }
+    HINSTANCE       HInstance()     {
+        return hInstance;
+    }
 };
 static plMultipassClassDesc plMultipassMtlDesc;
-ClassDesc2* GetMultiMtlDesc() { return &plMultipassMtlDesc; }
+ClassDesc2* GetMultiMtlDesc()
+{
+    return &plMultipassMtlDesc;
+}
 
 #include "plMultipassMtlPB.cpp"
 
@@ -73,8 +91,9 @@ plMultipassMtl::plMultipassMtl(BOOL loading) : fPassesPB(NULL)
 {
     plMultipassMtlDesc.MakeAutoParamBlocks(this);
 
-    if (!loading) 
+    if (!loading) {
         Reset();
+    }
 
     SetNumSubMtls(1);
 }
@@ -84,27 +103,26 @@ void plMultipassMtl::GetClassName(TSTR& s)
     s = GetString(IDS_MULTI_MTL);
 }
 
-void plMultipassMtl::Reset() 
+void plMultipassMtl::Reset()
 {
     fIValid.SetEmpty();
 }
 
-ParamDlg* plMultipassMtl::CreateParamDlg(HWND hwMtlEdit, IMtlParams *imp) 
+ParamDlg* plMultipassMtl::CreateParamDlg(HWND hwMtlEdit, IMtlParams* imp)
 {
     fMtlDlg = new plMultipassMtlDlg(hwMtlEdit, imp, this);
 
-    return fMtlDlg; 
+    return fMtlDlg;
 }
 
-void plMultipassMtl::SetParamDlg(ParamDlg *dlg)
+void plMultipassMtl::SetParamDlg(ParamDlg* dlg)
 {
     fMtlDlg = (plMultipassMtlDlg*)dlg;
 }
 
 BOOL plMultipassMtl::SetDlgThing(ParamDlg* dlg)
 {
-    if (dlg == fMtlDlg)
-    {
+    if (dlg == fMtlDlg) {
         fMtlDlg->SetThing(this);
         return TRUE;
     }
@@ -114,14 +132,14 @@ BOOL plMultipassMtl::SetDlgThing(ParamDlg* dlg)
 
 Interval plMultipassMtl::Validity(TimeValue t)
 {
-    Interval valid = FOREVER;       
+    Interval valid = FOREVER;
 
-/*  for (int i = 0; i < fSubTexmap.Count(); i++) 
-    {
-        if (fSubTexmap[i]) 
-            valid &= fSubTexmap[i]->Validity(t);
-    }
-*/  
+    /*  for (int i = 0; i < fSubTexmap.Count(); i++)
+        {
+            if (fSubTexmap[i])
+                valid &= fSubTexmap[i]->Validity(t);
+        }
+    */
 //  float u;
 //  fPBlock->GetValue(pb_spin,t,u,valid);
     return valid;
@@ -136,7 +154,7 @@ int plMultipassMtl::NumSubs()
     return NumSubMtls();
 }
 
-TSTR plMultipassMtl::SubAnimName(int i) 
+TSTR plMultipassMtl::SubAnimName(int i)
 {
     return GetSubMtlSlotName(i);
 }
@@ -153,16 +171,18 @@ int plMultipassMtl::NumRefs()
 
 RefTargetHandle plMultipassMtl::GetReference(int i)
 {
-    if (i == kRefPasses)
+    if (i == kRefPasses) {
         return fPassesPB;
+    }
 
     return NULL;
 }
 
 void plMultipassMtl::SetReference(int i, RefTargetHandle rtarg)
 {
-    if (i == kRefPasses)
-        fPassesPB = (IParamBlock2 *)rtarg;
+    if (i == kRefPasses) {
+        fPassesPB = (IParamBlock2*)rtarg;
+    }
 }
 
 int plMultipassMtl::NumParamBlocks()
@@ -170,34 +190,36 @@ int plMultipassMtl::NumParamBlocks()
     return 1;
 }
 
-IParamBlock2 *plMultipassMtl::GetParamBlock(int i)
+IParamBlock2* plMultipassMtl::GetParamBlock(int i)
 {
-    if (i == kRefPasses)
+    if (i == kRefPasses) {
         return fPassesPB;
+    }
 
     return NULL;
 }
 
-IParamBlock2 *plMultipassMtl::GetParamBlockByID(BlockID id)
+IParamBlock2* plMultipassMtl::GetParamBlockByID(BlockID id)
 {
-    if (fPassesPB->ID() == id)
+    if (fPassesPB->ID() == id) {
         return fPassesPB;
+    }
 
     return NULL;
 }
 
-RefResult plMultipassMtl::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, 
-   PartID& partID, RefMessage message ) 
+RefResult plMultipassMtl::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
+        PartID& partID, RefMessage message)
 {
-    switch (message)
-    {
+    switch (message) {
     case REFMSG_CHANGE:
         fIValid.SetEmpty();
-        if (hTarget == fPassesPB)
-        {
+
+        if (hTarget == fPassesPB) {
             ParamID changingParam = fPassesPB->LastNotifyParamID();
             fPassesPB->GetDesc()->InvalidateUI(changingParam);
         }
+
         break;
     }
 
@@ -212,24 +234,26 @@ int plMultipassMtl::NumSubMtls()
     return fPassesPB->GetInt(kMultCount);
 }
 
-Mtl *plMultipassMtl::GetSubMtl(int i)
+Mtl* plMultipassMtl::GetSubMtl(int i)
 {
-    if (i < NumSubMtls())
+    if (i < NumSubMtls()) {
         return fPassesPB->GetMtl(kMultPasses, 0, i);
+    }
 
     return NULL;
 }
 
-void plMultipassMtl::SetSubMtl(int i, Mtl *m)
+void plMultipassMtl::SetSubMtl(int i, Mtl* m)
 {
-    if (i < NumSubMtls())
+    if (i < NumSubMtls()) {
         fPassesPB->SetValue(kMultPasses, 0, m, i);
+    }
 }
 
 TSTR plMultipassMtl::GetSubMtlSlotName(int i)
 {
     TSTR str;
-    str.printf("Pass %d", i+1);
+    str.printf("Pass %d", i + 1);
     return str;
 }
 
@@ -245,32 +269,38 @@ TSTR plMultipassMtl::GetSubMtlTVName(int i)
 
 #define MTL_HDR_CHUNK 0x4000
 
-IOResult plMultipassMtl::Save(ISave *isave)
-{ 
+IOResult plMultipassMtl::Save(ISave* isave)
+{
     IOResult res;
     isave->BeginChunk(MTL_HDR_CHUNK);
     res = MtlBase::Save(isave);
-    if (res!=IO_OK) return res;
+
+    if (res != IO_OK) {
+        return res;
+    }
+
     isave->EndChunk();
 
     return IO_OK;
-}   
+}
 
-IOResult plMultipassMtl::Load(ILoad *iload)
+IOResult plMultipassMtl::Load(ILoad* iload)
 {
     IOResult res;
     int id;
-    while (IO_OK==(res=iload->OpenChunk()))
-    {
-        switch(id = iload->CurChunkID())
-        {
-            case MTL_HDR_CHUNK:
-                res = MtlBase::Load(iload);
-                break;
+
+    while (IO_OK == (res = iload->OpenChunk())) {
+        switch (id = iload->CurChunkID()) {
+        case MTL_HDR_CHUNK:
+            res = MtlBase::Load(iload);
+            break;
         }
+
         iload->CloseChunk();
-        if (res!=IO_OK) 
+
+        if (res != IO_OK) {
             return res;
+        }
     }
 
     return IO_OK;
@@ -281,34 +311,33 @@ IOResult plMultipassMtl::Load(ILoad *iload)
  |  Updating and cloning
 \*===========================================================================*/
 
-RefTargetHandle plMultipassMtl::Clone(RemapDir &remap)
+RefTargetHandle plMultipassMtl::Clone(RemapDir& remap)
 {
-    plMultipassMtl *mnew = new plMultipassMtl(FALSE);
-    *((MtlBase*)mnew) = *((MtlBase*)this); 
+    plMultipassMtl* mnew = new plMultipassMtl(FALSE);
+    *((MtlBase*)mnew) = *((MtlBase*)this);
     mnew->ReplaceReference(kRefPasses, remap.CloneRef(fPassesPB));
 
-    mnew->fIValid.SetEmpty();   
+    mnew->fIValid.SetEmpty();
     BaseClone(this, mnew, remap);
 
     return (RefTargetHandle)mnew;
 }
 
-void plMultipassMtl::NotifyChanged() 
+void plMultipassMtl::NotifyChanged()
 {
     NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE);
 }
 
-void plMultipassMtl::Update(TimeValue t, Interval& valid) 
-{   
-    if (!fIValid.InInterval(t))
-    {
+void plMultipassMtl::Update(TimeValue t, Interval& valid)
+{
+    if (!fIValid.InInterval(t)) {
         fIValid.SetInfinite();
 //      fPassesPB->GetValue(kMtlLayLayer1On, t, fMapOn[0], fIValid);
 
-        for (int i = 0; i < NumSubMtls(); i++)
-        {
-            if (GetSubMtl(i))
+        for (int i = 0; i < NumSubMtls(); i++) {
+            if (GetSubMtl(i)) {
                 GetSubMtl(i)->Update(t, fIValid);
+            }
         }
     }
 
@@ -318,24 +347,45 @@ void plMultipassMtl::Update(TimeValue t, Interval& valid)
 /*===========================================================================*\
  |  Determine the characteristics of the material
 \*===========================================================================*/
-void plMultipassMtl::SetAmbient(Color c, TimeValue t) {}        
-void plMultipassMtl::SetDiffuse(Color c, TimeValue t) {}        
+void plMultipassMtl::SetAmbient(Color c, TimeValue t) {}
+void plMultipassMtl::SetDiffuse(Color c, TimeValue t) {}
 void plMultipassMtl::SetSpecular(Color c, TimeValue t) {}
 void plMultipassMtl::SetShininess(float v, TimeValue t) {}
-                
-Color plMultipassMtl::GetAmbient(int mtlNum, BOOL backFace) { return Color(0,0,0); }
-Color plMultipassMtl::GetDiffuse(int mtlNum, BOOL backFace) { return Color(0,0,0); }
-Color plMultipassMtl::GetSpecular(int mtlNum, BOOL backFace)    { return Color(0,0,0); }
-float plMultipassMtl::GetXParency(int mtlNum, BOOL backFace)    { return 0.0f; }
-float plMultipassMtl::GetShininess(int mtlNum, BOOL backFace)   { return 0.0f; }
-float plMultipassMtl::GetShinStr(int mtlNum, BOOL backFace) { return 0.0f; }
-float plMultipassMtl::WireSize(int mtlNum, BOOL backFace)       { return 0.0f; }
+
+Color plMultipassMtl::GetAmbient(int mtlNum, BOOL backFace)
+{
+    return Color(0, 0, 0);
+}
+Color plMultipassMtl::GetDiffuse(int mtlNum, BOOL backFace)
+{
+    return Color(0, 0, 0);
+}
+Color plMultipassMtl::GetSpecular(int mtlNum, BOOL backFace)
+{
+    return Color(0, 0, 0);
+}
+float plMultipassMtl::GetXParency(int mtlNum, BOOL backFace)
+{
+    return 0.0f;
+}
+float plMultipassMtl::GetShininess(int mtlNum, BOOL backFace)
+{
+    return 0.0f;
+}
+float plMultipassMtl::GetShinStr(int mtlNum, BOOL backFace)
+{
+    return 0.0f;
+}
+float plMultipassMtl::WireSize(int mtlNum, BOOL backFace)
+{
+    return 0.0f;
+}
 
 /*===========================================================================*\
  |  Actual shading takes place
 \*===========================================================================*/
 
-void plMultipassMtl::Shade(ShadeContext& sc) 
+void plMultipassMtl::Shade(ShadeContext& sc)
 {
     // Get the background color
     Color backColor, backTrans;
@@ -343,17 +393,18 @@ void plMultipassMtl::Shade(ShadeContext& sc)
     backTrans.White();
 
     int count = NumSubMtls();
-    for (int i = 0; i < count; i++)
-    {
-        if (fPassesPB->GetInt(kMultOn, 0, i) == 0)
+
+    for (int i = 0; i < count; i++) {
+        if (fPassesPB->GetInt(kMultOn, 0, i) == 0) {
             continue;
-        
+        }
+
         // Call each pass' shade function with the previous color
-        Mtl *mtl = GetSubMtl(i);
+        Mtl* mtl = GetSubMtl(i);
+
         //backTrans = Color(0,0,0);
-        if (mtl->ClassID() == PASS_MTL_CLASS_ID)
-        {
-            plPassMtl *passMtl = (plPassMtl*)mtl;
+        if (mtl->ClassID() == PASS_MTL_CLASS_ID) {
+            plPassMtl* passMtl = (plPassMtl*)mtl;
             passMtl->ShadeWithBackground(sc, backColor);
             backTrans *= sc.out.t;
             backColor = backColor * sc.out.t + sc.out.c;
@@ -374,7 +425,7 @@ Interval plMultipassMtl::DisplacementValidity(TimeValue t)
     Interval iv;
     iv.SetInfinite();
 
-    return iv;  
+    return iv;
 }
 
 void plMultipassMtl::SetNumSubMtls(int num)
@@ -388,9 +439,8 @@ void plMultipassMtl::SetNumSubMtls(int num)
     fPassesPB->SetCount(kMultOn, num);
     fPassesPB->SetCount(kMultLayerCounts, num);
 
-    for (int i = curNum; i < num; i++)
-    {
-        plPassMtl *newMtl = new plPassMtl(false);
+    for (int i = curNum; i < num; i++) {
+        plPassMtl* newMtl = new plPassMtl(false);
         fPassesPB->SetValue(kMultPasses, t, newMtl, i);
         fPassesPB->SetValue(kMultOn, t, TRUE, i);
         GetCOREInterface()->AssignNewName(fPassesPB->GetMtl(kMultPasses, t, i));

@@ -55,8 +55,7 @@ void plServerReplyMsg::Write(hsStream* stream, hsResMgr* mgr)
     stream->WriteLE(fType);
 }
 
-enum ServerReplyFlags
-{
+enum ServerReplyFlags {
     kServerReplyType,
 };
 
@@ -67,8 +66,9 @@ void plServerReplyMsg::ReadVersion(hsStream* s, hsResMgr* mgr)
     hsBitVector contentFlags;
     contentFlags.Read(s);
 
-    if (contentFlags.IsBitSet(kServerReplyType))
+    if (contentFlags.IsBitSet(kServerReplyType)) {
         s->ReadLE(&fType);
+    }
 }
 
 void plServerReplyMsg::WriteVersion(hsStream* s, hsResMgr* mgr)

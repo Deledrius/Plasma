@@ -52,8 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsTemplates.h"
 #include "pyGlueHelpers.h"
 
-class cyAnimation
-{
+class cyAnimation {
 
     plKey           fSender;
     hsTArray<plKey> fRecvr;
@@ -76,12 +75,12 @@ public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptAnimation);
     PYTHON_CLASS_NEW_DEFINITION;
-    static PyObject *New(PyObject *sender);
-    static PyObject *New(cyAnimation &obj);
+    static PyObject* New(PyObject* sender);
+    static PyObject* New(cyAnimation& obj);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a cyAnimation object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(cyAnimation); // converts a PyObject to a cyAnimation (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     // setters
     virtual void SetSender(pyKey& sender);
@@ -90,7 +89,9 @@ public:
 
     virtual PyObject* GetFirstRecvr();
 
-    virtual void SetNetForce(bool state) { fNetForce = state; }
+    virtual void SetNetForce(bool state) {
+        fNetForce = state;
+    }
 
     //  Play animation from start to end (whatever is already set)
     //
@@ -114,7 +115,7 @@ public:
 
     //  Play (continue) an animation until the specified point is reached
     //
-    virtual void PlayToPercentage(float zeroToOne);  
+    virtual void PlayToPercentage(float zeroToOne);
 
     //  Jump the animation to the specified time
     //  Doesn't start or stop playing of animation
@@ -134,7 +135,7 @@ public:
     //
     virtual void SetLoopStart(float start);
     virtual void SetLoopEnd(float end);
-    
+
     //  Sets the speed of the animation
     //  Doesn't start or stop playing animation
     //

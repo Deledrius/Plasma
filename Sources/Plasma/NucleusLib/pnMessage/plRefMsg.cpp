@@ -49,15 +49,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/hsKeyedObject.h"
 
 plRefMsg::plRefMsg()
-: fRef(nil), fOldRef(nil), fContext(0)
+    : fRef(nil), fOldRef(nil), fContext(0)
 {
 }
 
-plRefMsg::plRefMsg(const plKey &r, uint8_t c)
-: plMessage(nil, r, nil), fRef(nil), fOldRef(nil), fContext(c)
+plRefMsg::plRefMsg(const plKey& r, uint8_t c)
+    : plMessage(nil, r, nil), fRef(nil), fOldRef(nil), fContext(c)
 {
-    if( !fContext )
+    if (!fContext) {
         fContext = kOnCreate;
+    }
 }
 
 plRefMsg::~plRefMsg()
@@ -74,7 +75,7 @@ plRefMsg& plRefMsg::SetRef(hsKeyedObject* ref)
 plRefMsg& plRefMsg::SetOldRef(hsKeyedObject* oldRef)
 {
     fOldRef = oldRef;
-    // Ref here! 
+    // Ref here!
     return *this;
 }
 

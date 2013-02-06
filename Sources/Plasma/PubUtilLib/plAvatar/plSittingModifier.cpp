@@ -65,23 +65,28 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // CTOR ------------------------------
 // -----
 plSittingModifier::plSittingModifier()
-: fTriggeredAvatarKey(nil),
-  fMiscFlags(0)
+    : fTriggeredAvatarKey(nil),
+      fMiscFlags(0)
 {
 }
 
 // CTOR ------------------------------------------------------------------------
 // -----
 plSittingModifier::plSittingModifier(bool hasFront, bool hasLeft, bool hasRight)
-: fTriggeredAvatarKey(nil),
-  fMiscFlags(0)
+    : fTriggeredAvatarKey(nil),
+      fMiscFlags(0)
 {
-    if (hasFront)
+    if (hasFront) {
         fMiscFlags |= kApproachFront;
-    if (hasLeft)
+    }
+
+    if (hasLeft) {
         fMiscFlags |= kApproachLeft;
-    if (hasRight)
+    }
+
+    if (hasRight) {
         fMiscFlags |= kApproachRight;
+    }
 }
 
 // DTOR -------------------------------
@@ -92,81 +97,87 @@ plSittingModifier::~plSittingModifier()
 
 // Read -----------------------------------------------------
 // -----
-void plSittingModifier::Read(hsStream *stream, hsResMgr *mgr)
+void plSittingModifier::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Read(stream, mgr);
 
     fMiscFlags = stream->ReadByte();
 
     int keyCount = stream->ReadLE32();
-    for (int i = 0; i < keyCount; i++ )
+
+    for (int i = 0; i < keyCount; i++) {
         fNotifyKeys.Append(mgr->ReadKey(stream));
+    }
 }
 
 // Write -----------------------------------------------------
 // ------
-void plSittingModifier::Write(hsStream *stream, hsResMgr *mgr)
+void plSittingModifier::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Write(stream, mgr);
 
     stream->WriteByte(fMiscFlags);
-    
+
     stream->WriteLE32(fNotifyKeys.GetCount());
-    for (int i = 0; i < fNotifyKeys.GetCount(); i++)
+
+    for (int i = 0; i < fNotifyKeys.GetCount(); i++) {
         mgr->WriteKey(stream, fNotifyKeys[i]);
+    }
 }
 
 // ISetupNotify -------------------------------------------------------------------------
 // -------------
-void plSittingModifier::ISetupNotify(plNotifyMsg *notifyMsg, plNotifyMsg *originalNotify)
+void plSittingModifier::ISetupNotify(plNotifyMsg* notifyMsg, plNotifyMsg* originalNotify)
 {
     // Copy the original events to the new notify (some notify receivers need to have events)
     int i;
-    for (i = 0; i < originalNotify->GetEventCount(); i++)
+
+    for (i = 0; i < originalNotify->GetEventCount(); i++) {
         notifyMsg->AddEvent(originalNotify->GetEventRecord(i));
-    for (i = 0; i < fNotifyKeys.Count(); i++)
-    {
+    }
+
+    for (i = 0; i < fNotifyKeys.Count(); i++) {
         plKey receiver = fNotifyKeys[i];
         notifyMsg->AddReceiver(receiver);
     }
+
     notifyMsg->SetSender(GetKey());
     plNetClientApp::InheritNetMsgFlags(originalNotify, notifyMsg, true);
 }
 
 // MsgReceive --------------------------------------
 // -----------
-bool plSittingModifier::MsgReceive(plMessage *msg)
+bool plSittingModifier::MsgReceive(plMessage* msg)
 {
     bool result = false;
-    
+
     plNotifyMsg* notifyMsg = plNotifyMsg::ConvertNoRef(msg);
-    if(notifyMsg)
-    {
-        if (notifyMsg->fState == 1.0)
-        {
+
+    if (notifyMsg) {
+        if (notifyMsg->fState == 1.0) {
             // In case the previous occupant quit, lost-connection, etc.
-            if (fTriggeredAvatarKey && !fTriggeredAvatarKey->ObjectIsLoaded())
+            if (fTriggeredAvatarKey && !fTriggeredAvatarKey->ObjectIsLoaded()) {
                 UnTrigger();
-            
+            }
+
             // only fire if we're not already triggered
-            if (!fTriggeredAvatarKey)
-            {
+            if (!fTriggeredAvatarKey) {
                 // a notify message with a state of 1 tells us to fire.
                 // we'll copy any events from this notify and use them when we send our
-                // own notify messages -- 
+                // own notify messages --
                 plKey avatarKey = notifyMsg->GetAvatarKey();
-                plSceneObject * obj = plSceneObject::ConvertNoRef(avatarKey->ObjectIsLoaded());
-                const plArmatureMod * avMod = (plArmatureMod*)obj->GetModifierByType(plArmatureMod::Index());
-                plAvBrainHuman *brain = (avMod ? plAvBrainHuman::ConvertNoRef(avMod->GetCurrentBrain()) : nil);
-                if (brain && !brain->IsRunningTask())
-                {
-                    plNotifyMsg *notifyEnter = new plNotifyMsg();   // a message to send back when the brain starts
+                plSceneObject* obj = plSceneObject::ConvertNoRef(avatarKey->ObjectIsLoaded());
+                const plArmatureMod* avMod = (plArmatureMod*)obj->GetModifierByType(plArmatureMod::Index());
+                plAvBrainHuman* brain = (avMod ? plAvBrainHuman::ConvertNoRef(avMod->GetCurrentBrain()) : nil);
+
+                if (brain && !brain->IsRunningTask()) {
+                    plNotifyMsg* notifyEnter = new plNotifyMsg();   // a message to send back when the brain starts
                     notifyEnter->fState = 1.0f;                     // it's an "on" event
                     ISetupNotify(notifyEnter, notifyMsg);           // copy events and address to sender
-            
-                    plNotifyMsg *notifyExit = nil;
-                    if (avatarKey == plNetClientApp::GetInstance()->GetLocalPlayerKey())
-                    {
+
+                    plNotifyMsg* notifyExit = nil;
+
+                    if (avatarKey == plNetClientApp::GetInstance()->GetLocalPlayerKey()) {
                         notifyExit = new plNotifyMsg();         // a new message to send back when the brain's done
                         notifyExit->fState = 0.0f;              // it's an "off" event
                         ISetupNotify(notifyExit, notifyMsg);    // copy events and address to sender
@@ -179,24 +190,24 @@ bool plSittingModifier::MsgReceive(plMessage *msg)
                         notifyExit->SetBCastFlag(plMessage::kNetPropagate, true);
                         notifyExit->SetBCastFlag(plMessage::kNetForce, true);
                     }
+
                     Trigger(avMod, notifyEnter, notifyExit);
                 }
             }
+
             // eat the message either way
             result = true;
         } else if (notifyMsg->fState == 0.0f && msg->GetSender() == GetKey()) {
             // it's a notify, but off; untrigger
             UnTrigger();
             result = true;
-        }
-        else if (notifyMsg->GetEventCount() > 0 && notifyMsg->GetEventRecord(0)->fEventType == proEventData::kMultiStage && notifyMsg->GetAvatarKey() == plNetClientApp::GetInstance()->GetLocalPlayerKey())
-        {
+        } else if (notifyMsg->GetEventCount() > 0 && notifyMsg->GetEventRecord(0)->fEventType == proEventData::kMultiStage && notifyMsg->GetAvatarKey() == plNetClientApp::GetInstance()->GetLocalPlayerKey()) {
             proMultiStageEventData* mStage = (proMultiStageEventData*)notifyMsg->GetEventRecord(0);
-            if (mStage->fEvent == proMultiStageEventData::kEnterStage && mStage->fStage == 1)
-            {
+
+            if (mStage->fEvent == proMultiStageEventData::kEnterStage && mStage->fStage == 1) {
                 plKey avatarKey = notifyMsg->GetAvatarKey();
-                plSceneObject * obj = plSceneObject::ConvertNoRef(avatarKey->ObjectIsLoaded());
-                plArmatureMod * avMod = (plArmatureMod*)obj->GetModifierByType(plArmatureMod::Index());
+                plSceneObject* obj = plSceneObject::ConvertNoRef(avatarKey->ObjectIsLoaded());
+                plArmatureMod* avMod = (plArmatureMod*)obj->GetModifierByType(plArmatureMod::Index());
 
                 uint32_t flags = kBCastToClients | kUseRelevanceRegions | kForceFullSend;
                 avMod->DirtyPhysicalSynchState(flags);
@@ -209,10 +220,9 @@ bool plSittingModifier::MsgReceive(plMessage *msg)
 
 // Trigger ----------------------------------------------------------------------------------------
 // --------
-void plSittingModifier::Trigger(const plArmatureMod *avMod, plNotifyMsg *enterNotify, plNotifyMsg *exitNotify)
+void plSittingModifier::Trigger(const plArmatureMod* avMod, plNotifyMsg* enterNotify, plNotifyMsg* exitNotify)
 {
-    if (avMod)
-    {
+    if (avMod) {
         plKey avModKey = avMod->GetKey();           // key to the avatar MODIFIER
         plKey ourKey = GetKey();                    // key to this modifier
         plKey seekKey = GetTarget()->GetKey();      // key to the scene object this modifier's on
@@ -220,43 +230,43 @@ void plSittingModifier::Trigger(const plArmatureMod *avMod, plNotifyMsg *enterNo
         // send the SEEK message
 
 
-        const char *animName = nil;   // this will be the name of our sit animation, which we
-                                      // need to know so we can seek properly.
-        
-        plAvBrainGeneric *brain = IBuildSitBrain(avModKey, seekKey, &animName, enterNotify, exitNotify);
-        if(brain)
-        {
-            plAvSeekMsg *seekMsg = new plAvSeekMsg(ourKey, avModKey, seekKey, 0.0f, true, kAlignHandleAnimEnd, animName);
+        const char* animName = nil;   // this will be the name of our sit animation, which we
+        // need to know so we can seek properly.
+
+        plAvBrainGeneric* brain = IBuildSitBrain(avModKey, seekKey, &animName, enterNotify, exitNotify);
+
+        if (brain) {
+            plAvSeekMsg* seekMsg = new plAvSeekMsg(ourKey, avModKey, seekKey, 0.0f, true, kAlignHandleAnimEnd, animName);
             seekMsg->Send();
-            plAvTaskBrain *brainTask = new plAvTaskBrain(brain);
-            plAvTaskMsg *brainMsg = new plAvTaskMsg(ourKey, avModKey, brainTask);
+            plAvTaskBrain* brainTask = new plAvTaskBrain(brain);
+            plAvTaskMsg* brainMsg = new plAvTaskMsg(ourKey, avModKey, brainTask);
 
             brainMsg->Send();
-            
-            if (avModKey == plAvatarMgr::GetInstance()->GetLocalAvatarKey())
-            {
+
+            if (avModKey == plAvatarMgr::GetInstance()->GetLocalAvatarKey()) {
                 plCameraMsg* pCam = new plCameraMsg;
                 pCam->SetBCastFlag(plMessage::kBCastByExactType);
                 pCam->SetCmd(plCameraMsg::kResetPanning);
                 pCam->Send();
-            
+
                 plCameraMsg* pCam2 = new plCameraMsg;
                 pCam2->SetBCastFlag(plMessage::kBCastByExactType);
                 pCam2->SetCmd(plCameraMsg::kPythonSetFirstPersonOverrideEnable);
                 pCam2->SetActivated(false);
-                pCam2->Send();  
-    
+                pCam2->Send();
+
                 plCameraMsg* pCam3 = new plCameraMsg;
                 pCam3->SetBCastFlag(plMessage::kBCastByExactType);
-                    pCam3->SetCmd(plCameraMsg::kPythonUndoFirstPerson);
+                pCam3->SetCmd(plCameraMsg::kPythonUndoFirstPerson);
                 pCam3->Send();
             }
+
             fTriggeredAvatarKey = avModKey;
 
-            if (fMiscFlags & kDisableForward)
-            {
-                if (fTriggeredAvatarKey == plAvatarMgr::GetInstance()->GetLocalAvatarKey())
+            if (fMiscFlags & kDisableForward) {
+                if (fTriggeredAvatarKey == plAvatarMgr::GetInstance()->GetLocalAvatarKey()) {
                     plAvatarInputInterface::GetInstance()->EnableControl(false, B_CONTROL_MOVE_FORWARD);
+                }
             }
         }
     }
@@ -264,12 +274,12 @@ void plSittingModifier::Trigger(const plArmatureMod *avMod, plNotifyMsg *enterNo
 
 // IIsClosestAnim -------------------------------------------------------------------
 // ---------------
-bool IIsClosestAnim(const char *animName, hsMatrix44 &sitGoal, float &closestDist,
-                    hsPoint3 curPosition, const plArmatureMod *avatar)
+bool IIsClosestAnim(const char* animName, hsMatrix44& sitGoal, float& closestDist,
+                    hsPoint3 curPosition, const plArmatureMod* avatar)
 {
-    plAGAnim *anim = avatar->FindCustomAnim(animName);
-    if(anim)
-    {
+    plAGAnim* anim = avatar->FindCustomAnim(animName);
+
+    if (anim) {
         hsMatrix44 animEndToStart;
         // The sit target is the position we want to be at the END of the sit animation.
         // We have several animations to choose from, each starting from a different
@@ -284,24 +294,25 @@ bool IIsClosestAnim(const char *animName, hsMatrix44 &sitGoal, float &closestDis
         hsPoint3 distP = candidateGoal.GetTranslate() - curPosition;
         hsVector3 distV(distP.fX, distP.fY, distP.fZ);
         float dist = distP.Magnitude();
-        if(closestDist == 0.0 || dist < closestDist)
-        {
+
+        if (closestDist == 0.0 || dist < closestDist) {
             closestDist = dist;
             return true;
         }
     } else {
         hsAssert(false, plString::Format("Missing sit animation: %s", animName).c_str());
     }
+
     return false;
 }
 
 // IBuildSitBrain ---------------------------------------------------------------------
 // ----------------
-plAvBrainGeneric *plSittingModifier::IBuildSitBrain(plKey avModKey, plKey seekKey,
-                    const char **pAnimName, plNotifyMsg *enterNotify, plNotifyMsg *exitNotify)
+plAvBrainGeneric* plSittingModifier::IBuildSitBrain(plKey avModKey, plKey seekKey,
+        const char** pAnimName, plNotifyMsg* enterNotify, plNotifyMsg* exitNotify)
 {
-    plArmatureMod *avatar = plArmatureMod::ConvertNoRef(avModKey->ObjectIsLoaded());
-    plSceneObject *seekObj = plSceneObject::ConvertNoRef(seekKey->ObjectIsLoaded());
+    plArmatureMod* avatar = plArmatureMod::ConvertNoRef(avModKey->ObjectIsLoaded());
+    plSceneObject* seekObj = plSceneObject::ConvertNoRef(seekKey->ObjectIsLoaded());
     hsMatrix44 animEndToStart;
     hsMatrix44 sitGoal = seekObj->GetLocalToWorld();
     hsMatrix44 candidateGoal;
@@ -312,43 +323,44 @@ plAvBrainGeneric *plSittingModifier::IBuildSitBrain(plKey avModKey, plKey seekKe
     const char* standAnimName = "StandUpFront";      // always prefer to stand facing front
 
     bool frontClear = fMiscFlags & kApproachFront;
-    plAvBrainGeneric *brain = nil;
+    plAvBrainGeneric* brain = nil;
 
-    if(avatar)
-    {
-        if(fMiscFlags & kApproachLeft && IIsClosestAnim("SitLeft", sitGoal, closestDist, curPosition, avatar))
-        {
+    if (avatar) {
+        if (fMiscFlags & kApproachLeft && IIsClosestAnim("SitLeft", sitGoal, closestDist, curPosition, avatar)) {
             closestApproach = kApproachLeft;
             sitAnimName = "SitLeft";
-            if(!frontClear)
+
+            if (!frontClear) {
                 standAnimName = "StandUpLeft";
+            }
         }
-        if(fMiscFlags & kApproachRight && IIsClosestAnim("SitRight", sitGoal, closestDist, curPosition, avatar))
-        {
+
+        if (fMiscFlags & kApproachRight && IIsClosestAnim("SitRight", sitGoal, closestDist, curPosition, avatar)) {
             closestApproach = kApproachRight;
             sitAnimName = "SitRight";
-            if(!frontClear)
+
+            if (!frontClear) {
                 standAnimName = "StandUpRight";
+            }
         }
-        if(frontClear && IIsClosestAnim("SitFront", sitGoal, closestDist, curPosition, avatar))
-        {
+
+        if (frontClear && IIsClosestAnim("SitFront", sitGoal, closestDist, curPosition, avatar)) {
             sitAnimName = "SitFront";
             standAnimName = "StandUpFront";
             closestApproach = kApproachFront;
         }
 
-        if(sitAnimName)
-        {
+        if (sitAnimName) {
             uint32_t exitFlags = plAvBrainGeneric::kExitNormal;   // SOME stages can be interrupted, but not the brain itself
-            brain = new plAvBrainGeneric(nil, enterNotify, exitNotify, nil, exitFlags, plAvBrainGeneric::kDefaultFadeIn, 
+            brain = new plAvBrainGeneric(nil, enterNotify, exitNotify, nil, exitFlags, plAvBrainGeneric::kDefaultFadeIn,
                                          plAvBrainGeneric::kDefaultFadeOut, plAvBrainGeneric::kMoveRelative);
 
-            plAnimStage *sitStage = new plAnimStage(sitAnimName, 0, plAnimStage::kForwardAuto, plAnimStage::kBackNone,
+            plAnimStage* sitStage = new plAnimStage(sitAnimName, 0, plAnimStage::kForwardAuto, plAnimStage::kBackNone,
                                                     plAnimStage::kAdvanceAuto, plAnimStage::kRegressNone, 0);
-            plAnimStage *idleStage = new plAnimStage("SitIdle", plAnimStage::kNotifyEnter, plAnimStage::kForwardAuto, plAnimStage::kBackNone,
-                                                    plAnimStage::kAdvanceOnMove, plAnimStage::kRegressNone, -1);
-            plAnimStage *standStage = new plAnimStage(standAnimName, 0, plAnimStage::kForwardAuto, plAnimStage::kBackNone,
-                                                    plAnimStage::kAdvanceAuto, plAnimStage::kRegressNone, 0);
+            plAnimStage* idleStage = new plAnimStage("SitIdle", plAnimStage::kNotifyEnter, plAnimStage::kForwardAuto, plAnimStage::kBackNone,
+                    plAnimStage::kAdvanceOnMove, plAnimStage::kRegressNone, -1);
+            plAnimStage* standStage = new plAnimStage(standAnimName, 0, plAnimStage::kForwardAuto, plAnimStage::kBackNone,
+                    plAnimStage::kAdvanceAuto, plAnimStage::kRegressNone, 0);
 
             brain->AddStage(sitStage);
             brain->AddStage(idleStage);
@@ -359,6 +371,7 @@ plAvBrainGeneric *plSittingModifier::IBuildSitBrain(plKey avModKey, plKey seekKe
             brain->SetRecipient(GetKey());
         }
     }
+
     return brain;
 }
 
@@ -366,8 +379,7 @@ plAvBrainGeneric *plSittingModifier::IBuildSitBrain(plKey avModKey, plKey seekKe
 // ----------
 void plSittingModifier::UnTrigger()
 {
-    if (fTriggeredAvatarKey == plAvatarMgr::GetInstance()->GetLocalAvatarKey())
-    {
+    if (fTriggeredAvatarKey == plAvatarMgr::GetInstance()->GetLocalAvatarKey()) {
         plCameraMsg* pCam = new plCameraMsg;
         pCam->SetBCastFlag(plMessage::kBCastByExactType);
         pCam->SetCmd(plCameraMsg::kResetPanning);
@@ -377,12 +389,13 @@ void plSittingModifier::UnTrigger()
         pCam2->SetBCastFlag(plMessage::kBCastByExactType);
         pCam2->SetCmd(plCameraMsg::kPythonSetFirstPersonOverrideEnable);
         pCam2->SetActivated(true);
-        pCam2->Send();  
+        pCam2->Send();
 
         // The flag means we disabled it, so re-enable on UnTrigger.
-        if (fMiscFlags & kDisableForward)
+        if (fMiscFlags & kDisableForward) {
             plAvatarInputInterface::GetInstance()->EnableControl(true, B_CONTROL_MOVE_FORWARD);
+        }
     }
-    
+
     fTriggeredAvatarKey = nil;
 }

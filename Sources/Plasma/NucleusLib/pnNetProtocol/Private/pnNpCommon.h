@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetProtocol/Private/pnNpCommon.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNNETPROTOCOL_PRIVATE_PNNPCOMMON_H
@@ -123,10 +123,10 @@ struct NetGameScore {
     unsigned    gameType;
     int         value;
 
-    unsigned Read (const uint8_t inbuffer[], unsigned bufsz, uint8_t** end = nil);    // returns number of bytes read
-    unsigned Write (ARRAY(uint8_t) * buffer) const;                                // returns number of bytes written
+    unsigned Read(const uint8_t inbuffer[], unsigned bufsz, uint8_t** end = nil);     // returns number of bytes read
+    unsigned Write(ARRAY(uint8_t) * buffer) const;                                 // returns number of bytes written
 
-    void CopyFrom (const NetGameScore & score);
+    void CopyFrom(const NetGameScore& score);
 };
 
 /*****************************************************************************
@@ -140,10 +140,10 @@ struct NetGameRank {
     int         score;
     wchar_t       name[kMaxPlayerNameLength];
 
-    unsigned Read (const uint8_t inbuffer[], unsigned bufsz, uint8_t** end = nil);    // returns number of bytes read
-    unsigned Write (ARRAY(uint8_t) * buffer) const;                                // returns number of bytes written
+    unsigned Read(const uint8_t inbuffer[], unsigned bufsz, uint8_t** end = nil);     // returns number of bytes read
+    unsigned Write(ARRAY(uint8_t) * buffer) const;                                 // returns number of bytes written
 
-    void CopyFrom (const NetGameRank & fromRank);
+    void CopyFrom(const NetGameRank& fromRank);
 };
 
 /*****************************************************************************
@@ -158,53 +158,53 @@ struct NetGameRank {
 // Threaded apps: App is responsible for locking node->critsect before accessing *any* field in this struct
 struct NetVaultNode : AtomicRef {
     enum RwOptions {
-        kRwDirtyOnly    = 1<<0, // READ : No meaning
-                                // WRITE: Only write fields marked dirty
-        kRwUpdateDirty  = 1<<1, // READ : Set dirty flag on fields read from stream
-                                // WRITE: Clear dirty flag on fields written to stream
+        kRwDirtyOnly    = 1 << 0, // READ : No meaning
+        // WRITE: Only write fields marked dirty
+        kRwUpdateDirty  = 1 << 1, // READ : Set dirty flag on fields read from stream
+        // WRITE: Clear dirty flag on fields written to stream
     };
-    
+
     enum CopyOptions {
-        kCopySetDirty   = 1<<0,     // set dirty flag on changed dst fields
-        kCopyOverwrite  = 1<<1,     // overwrite fields for which dst node already has values
-        kCopyClear      = 1<<2,     // clear dst fields for which src node does not have values
+        kCopySetDirty   = 1 << 0,   // set dirty flag on changed dst fields
+        kCopyOverwrite  = 1 << 1,   // overwrite fields for which dst node already has values
+        kCopyClear      = 1 << 2,   // clear dst fields for which src node does not have values
     };
-    
+
     // These flag values must not change unless all servers are
     // simultaneously replaced, so basically forget it.
-    static const uint64_t kNodeId          = (uint64_t)1<< 0;
-    static const uint64_t kCreateTime      = (uint64_t)1<< 1;
-    static const uint64_t kModifyTime      = (uint64_t)1<< 2;
-    static const uint64_t kCreateAgeName   = (uint64_t)1<< 3;
-    static const uint64_t kCreateAgeUuid   = (uint64_t)1<< 4;
-    static const uint64_t kCreatorAcct     = (uint64_t)1<< 5;
-    static const uint64_t kCreatorId       = (uint64_t)1<< 6;
-    static const uint64_t kNodeType        = (uint64_t)1<< 7;
-    static const uint64_t kInt32_1         = (uint64_t)1<< 8;
-    static const uint64_t kInt32_2         = (uint64_t)1<< 9;
-    static const uint64_t kInt32_3         = (uint64_t)1<<10;
-    static const uint64_t kInt32_4         = (uint64_t)1<<11;
-    static const uint64_t kUInt32_1        = (uint64_t)1<<12;
-    static const uint64_t kUInt32_2        = (uint64_t)1<<13;
-    static const uint64_t kUInt32_3        = (uint64_t)1<<14;
-    static const uint64_t kUInt32_4        = (uint64_t)1<<15;
-    static const uint64_t kUuid_1          = (uint64_t)1<<16;
-    static const uint64_t kUuid_2          = (uint64_t)1<<17;
-    static const uint64_t kUuid_3          = (uint64_t)1<<18;
-    static const uint64_t kUuid_4          = (uint64_t)1<<19;
-    static const uint64_t kString64_1      = (uint64_t)1<<20;
-    static const uint64_t kString64_2      = (uint64_t)1<<21;
-    static const uint64_t kString64_3      = (uint64_t)1<<22;
-    static const uint64_t kString64_4      = (uint64_t)1<<23;
-    static const uint64_t kString64_5      = (uint64_t)1<<24;
-    static const uint64_t kString64_6      = (uint64_t)1<<25;
-    static const uint64_t kIString64_1     = (uint64_t)1<<26;
-    static const uint64_t kIString64_2     = (uint64_t)1<<27;
+    static const uint64_t kNodeId          = (uint64_t)1 << 0;
+    static const uint64_t kCreateTime      = (uint64_t)1 << 1;
+    static const uint64_t kModifyTime      = (uint64_t)1 << 2;
+    static const uint64_t kCreateAgeName   = (uint64_t)1 << 3;
+    static const uint64_t kCreateAgeUuid   = (uint64_t)1 << 4;
+    static const uint64_t kCreatorAcct     = (uint64_t)1 << 5;
+    static const uint64_t kCreatorId       = (uint64_t)1 << 6;
+    static const uint64_t kNodeType        = (uint64_t)1 << 7;
+    static const uint64_t kInt32_1         = (uint64_t)1 << 8;
+    static const uint64_t kInt32_2         = (uint64_t)1 << 9;
+    static const uint64_t kInt32_3         = (uint64_t)1 << 10;
+    static const uint64_t kInt32_4         = (uint64_t)1 << 11;
+    static const uint64_t kUInt32_1        = (uint64_t)1 << 12;
+    static const uint64_t kUInt32_2        = (uint64_t)1 << 13;
+    static const uint64_t kUInt32_3        = (uint64_t)1 << 14;
+    static const uint64_t kUInt32_4        = (uint64_t)1 << 15;
+    static const uint64_t kUuid_1          = (uint64_t)1 << 16;
+    static const uint64_t kUuid_2          = (uint64_t)1 << 17;
+    static const uint64_t kUuid_3          = (uint64_t)1 << 18;
+    static const uint64_t kUuid_4          = (uint64_t)1 << 19;
+    static const uint64_t kString64_1      = (uint64_t)1 << 20;
+    static const uint64_t kString64_2      = (uint64_t)1 << 21;
+    static const uint64_t kString64_3      = (uint64_t)1 << 22;
+    static const uint64_t kString64_4      = (uint64_t)1 << 23;
+    static const uint64_t kString64_5      = (uint64_t)1 << 24;
+    static const uint64_t kString64_6      = (uint64_t)1 << 25;
+    static const uint64_t kIString64_1     = (uint64_t)1 << 26;
+    static const uint64_t kIString64_2     = (uint64_t)1 << 27;
     // blobs always come last
-    static const uint64_t kText_1          = (uint64_t)1<<28;
-    static const uint64_t kText_2          = (uint64_t)1<<29;
-    static const uint64_t kBlob_1          = (uint64_t)1<<30;
-    static const uint64_t kBlob_2          = (uint64_t)1<<31;
+    static const uint64_t kText_1          = (uint64_t)1 << 28;
+    static const uint64_t kText_2          = (uint64_t)1 << 29;
+    static const uint64_t kBlob_1          = (uint64_t)1 << 30;
+    static const uint64_t kBlob_2          = (uint64_t)1 << 31;
 
     static const uint64_t kAllValidFields  = 0x00000000FFFFFFFFULL;
 
@@ -216,12 +216,12 @@ private:
     uint64_t    fieldFlags;
     uint64_t    dirtyFlags;
 
-    // Treat these as read-only or node flag fields will become invalid 
-    // Threaded apps: Must be accessed with node->critsect locked   
+    // Treat these as read-only or node flag fields will become invalid
+    // Threaded apps: Must be accessed with node->critsect locked
     uint32_t    nodeId;
     uint32_t    createTime;
     uint32_t    modifyTime;
-    wchar_t *   createAgeName;
+    wchar_t*    createAgeName;
     plUUID      createAgeUuid;
     plUUID      creatorAcct;    // accountId of node creator
     uint32_t    creatorId;      // playerId of node creator
@@ -238,77 +238,86 @@ private:
     plUUID      uuid_2;
     plUUID      uuid_3;
     plUUID      uuid_4;
-    wchar_t *   string64_1;
-    wchar_t *   string64_2;
-    wchar_t *   string64_3;
-    wchar_t *   string64_4;
-    wchar_t *   string64_5;
-    wchar_t *   string64_6;
-    wchar_t *   istring64_1;
-    wchar_t *   istring64_2;
-    wchar_t *   text_1;
-    wchar_t *   text_2;
-    uint8_t *   blob_1; size_t blob_1Length;
-    uint8_t *   blob_2; size_t blob_2Length;
+    wchar_t*    string64_1;
+    wchar_t*    string64_2;
+    wchar_t*    string64_3;
+    wchar_t*    string64_4;
+    wchar_t*    string64_5;
+    wchar_t*    string64_6;
+    wchar_t*    istring64_1;
+    wchar_t*    istring64_2;
+    wchar_t*    text_1;
+    wchar_t*    text_2;
+    uint8_t*    blob_1;
+    size_t blob_1Length;
+    uint8_t*    blob_2;
+    size_t blob_2Length;
 
-    void IVaultNodeSetString (
+    void IVaultNodeSetString(
         uint64_t        bit,
-        char **         pdst,
+        char**          pdst,
         const char      src[],
         unsigned        chars
     ) {
         free(*pdst);
-        if (src && src[0])
+
+        if (src && src[0]) {
             *pdst = StrDupLen(src, chars);
-        else
+        } else {
             *pdst = StrDupLen("", chars);
+        }
+
         fieldFlags |= bit;
         dirtyFlags |= bit;
     }
 
-    void IVaultNodeSetString (
+    void IVaultNodeSetString(
         uint64_t        bit,
-        wchar_t **      pdst,
+        wchar_t**       pdst,
         const wchar_t   src[],
         unsigned        chars
     ) {
         free(*pdst);
-        if (src && src[0])
+
+        if (src && src[0]) {
             *pdst = StrDupLen(src, chars);
-        else
+        } else {
             *pdst = StrDupLen(L"", chars);
+        }
+
         fieldFlags |= bit;
         dirtyFlags |= bit;
     }
 
     template <typename T>
-    inline void IVaultNodeSetValue (
+    inline void IVaultNodeSetValue(
         uint64_t        bit,
-        T *             pdst,
-        const T &       src
+        T*              pdst,
+        const T&        src
     ) {
         *pdst = src;
         fieldFlags |= bit;
         dirtyFlags |= bit;
     }
 
-    void IVaultNodeSetBlob (
+    void IVaultNodeSetBlob(
         uint64_t        bit,
-        uint8_t **      pdst,
-        unsigned *      pdstLen,
+        uint8_t**       pdst,
+        unsigned*       pdstLen,
         const uint8_t   src[],
         unsigned        srcLen
     ) {
         free(*pdst);
+
         if (src) {
             *pdst = (uint8_t*)malloc(srcLen);
             memcpy(*pdst, src, srcLen);
             *pdstLen = srcLen;
-        }
-        else {
+        } else {
             *pdst = nil;
             *pdstLen = 0;
         }
+
         fieldFlags |= bit;
         dirtyFlags |= bit;
     }
@@ -316,92 +325,172 @@ private:
     void DeallocNodeFields();
 
 public:
-    NetVaultNode ();
-    ~NetVaultNode ();
+    NetVaultNode();
+    ~NetVaultNode();
 
     // Threaded apps: Must be called with node->critsect locked
-    uint32_t Read_LCS (const uint8_t buffer[], size_t bufsz, uint32_t rwOpts);   // returns number of bytes read
-    uint32_t Write_LCS (ARRAY(uint8_t) * buffer, uint32_t rwOpts);               // returns number of bytes written
+    uint32_t Read_LCS(const uint8_t buffer[], size_t bufsz, uint32_t rwOpts);    // returns number of bytes read
+    uint32_t Write_LCS(ARRAY(uint8_t) * buffer, uint32_t rwOpts);                // returns number of bytes written
 
-    bool Matches (const NetVaultNode * other);
-    void CopyFrom (const NetVaultNode * other, uint32_t copyOpts);
+    bool Matches(const NetVaultNode* other);
+    void CopyFrom(const NetVaultNode* other, uint32_t copyOpts);
 
-    uint64_t GetFieldFlags () const { return fieldFlags; }
-    void ClearFieldFlags () { fieldFlags = 0; }
+    uint64_t GetFieldFlags() const {
+        return fieldFlags;
+    }
+    void ClearFieldFlags() {
+        fieldFlags = 0;
+    }
 
-    uint64_t GetDirtyFlags () const { return dirtyFlags; }
-    void SetDirtyFlags (uint64_t flags) { dirtyFlags |= flags; }
-    void ClearDirtyFlags (uint64_t flags) { dirtyFlags &= ~flags; }
+    uint64_t GetDirtyFlags() const {
+        return dirtyFlags;
+    }
+    void SetDirtyFlags(uint64_t flags) {
+        dirtyFlags |= flags;
+    }
+    void ClearDirtyFlags(uint64_t flags) {
+        dirtyFlags &= ~flags;
+    }
 
     // Threaded apps: Must be called with node->critsect locked
-    void SetNodeId (uint32_t v);
-    void SetNodeId_NoDirty (uint32_t v) { nodeId = v; }
-    void SetCreateTime (uint32_t v);
-    void SetModifyTime (uint32_t v);
-    void SetCreateAgeName (const wchar_t v[]);
-    void SetCreateAgeUuid (const plUUID & v);
-    void SetCreatorAcct (const plUUID & v);
-    void SetCreatorId (uint32_t v);
-    void SetNodeType (uint32_t v);
-    void SetInt32_1 (int32_t v);
-    void SetInt32_2 (int32_t v);
-    void SetInt32_3 (int32_t v);
-    void SetInt32_4 (int32_t v);
-    void SetUInt32_1 (uint32_t v);
-    void SetUInt32_2 (uint32_t v);
-    void SetUInt32_3 (uint32_t v);
-    void SetUInt32_4 (uint32_t v);
-    void SetUuid_1 (const plUUID & v);
-    void SetUuid_2 (const plUUID & v);
-    void SetUuid_3 (const plUUID & v);
-    void SetUuid_4 (const plUUID & v);
-    void SetString64_1 (const wchar_t v[]);
-    void SetString64_2 (const wchar_t v[]);
-    void SetString64_3 (const wchar_t v[]);
-    void SetString64_4 (const wchar_t v[]);
-    void SetString64_5 (const wchar_t v[]);
-    void SetString64_6 (const wchar_t v[]);
-    void SetIString64_1 (const wchar_t v[]);
-    void SetIString64_2 (const wchar_t v[]);
-    void SetText_1 (const wchar_t v[]);
-    void SetText_2 (const wchar_t v[]);
-    void SetBlob_1 (const uint8_t v[], size_t len);
-    void SetBlob_2 (const uint8_t v[], size_t len);
+    void SetNodeId(uint32_t v);
+    void SetNodeId_NoDirty(uint32_t v) {
+        nodeId = v;
+    }
+    void SetCreateTime(uint32_t v);
+    void SetModifyTime(uint32_t v);
+    void SetCreateAgeName(const wchar_t v[]);
+    void SetCreateAgeUuid(const plUUID& v);
+    void SetCreatorAcct(const plUUID& v);
+    void SetCreatorId(uint32_t v);
+    void SetNodeType(uint32_t v);
+    void SetInt32_1(int32_t v);
+    void SetInt32_2(int32_t v);
+    void SetInt32_3(int32_t v);
+    void SetInt32_4(int32_t v);
+    void SetUInt32_1(uint32_t v);
+    void SetUInt32_2(uint32_t v);
+    void SetUInt32_3(uint32_t v);
+    void SetUInt32_4(uint32_t v);
+    void SetUuid_1(const plUUID& v);
+    void SetUuid_2(const plUUID& v);
+    void SetUuid_3(const plUUID& v);
+    void SetUuid_4(const plUUID& v);
+    void SetString64_1(const wchar_t v[]);
+    void SetString64_2(const wchar_t v[]);
+    void SetString64_3(const wchar_t v[]);
+    void SetString64_4(const wchar_t v[]);
+    void SetString64_5(const wchar_t v[]);
+    void SetString64_6(const wchar_t v[]);
+    void SetIString64_1(const wchar_t v[]);
+    void SetIString64_2(const wchar_t v[]);
+    void SetText_1(const wchar_t v[]);
+    void SetText_2(const wchar_t v[]);
+    void SetBlob_1(const uint8_t v[], size_t len);
+    void SetBlob_2(const uint8_t v[], size_t len);
 
-    uint32_t GetNodeId () const { return nodeId; }
-    uint32_t GetCreateTime () const { return createTime; }
-    uint32_t GetModifyTime () const { return modifyTime; }
-    const wchar_t * GetCreateAgeName () const { return createAgeName; }
-    plUUID GetCreateAgeUuid () const { return createAgeUuid; }
-    plUUID GetCreatorAcct () const { return creatorAcct; }
-    uint32_t GetCreatorId () const { return creatorId; }
-    uint32_t GetNodeType () const { return nodeType; }
-    int32_t GetInt32_1 () const { return int32_1; }
-    int32_t GetInt32_2 () const { return int32_2; }
-    int32_t GetInt32_3 () const { return int32_3; }
-    int32_t GetInt32_4 () const { return int32_4; }
-    uint32_t GetUInt32_1 () const { return uint32_1; }
-    uint32_t GetUInt32_2 () const { return uint32_2; }
-    uint32_t GetUInt32_3 () const { return uint32_3; }
-    uint32_t GetUInt32_4 () const { return uint32_4; }
-    plUUID GetUuid_1 () const { return uuid_1; }
-    plUUID GetUuid_2 () const { return uuid_2; }
-    plUUID GetUuid_3 () const { return uuid_3; }
-    plUUID GetUuid_4 () const { return uuid_4; }
-    const wchar_t * GetString64_1 () const { return string64_1; }
-    const wchar_t * GetString64_2 () const { return string64_2; }
-    const wchar_t * GetString64_3 () const { return string64_3; }
-    const wchar_t * GetString64_4 () const { return string64_4; }
-    const wchar_t * GetString64_5 () const { return string64_5; }
-    const wchar_t * GetString64_6 () const { return string64_6; }
-    const wchar_t * GetIString64_1 () const { return istring64_1; }
-    const wchar_t * GetIString64_2 () const { return istring64_2; }
-    const wchar_t * GetText_1 () const { return text_1; }
-    const wchar_t * GetText_2 () const { return text_2; }
-    const uint8_t * GetBlob_1 () const { return blob_1; }
-    size_t GetBlob_1Length () const { return blob_1Length; }
-    const uint8_t * GetBlob_2 () const { return blob_2; }
-    size_t GetBlob_2Length () const { return blob_2Length; }
+    uint32_t GetNodeId() const {
+        return nodeId;
+    }
+    uint32_t GetCreateTime() const {
+        return createTime;
+    }
+    uint32_t GetModifyTime() const {
+        return modifyTime;
+    }
+    const wchar_t* GetCreateAgeName() const {
+        return createAgeName;
+    }
+    plUUID GetCreateAgeUuid() const {
+        return createAgeUuid;
+    }
+    plUUID GetCreatorAcct() const {
+        return creatorAcct;
+    }
+    uint32_t GetCreatorId() const {
+        return creatorId;
+    }
+    uint32_t GetNodeType() const {
+        return nodeType;
+    }
+    int32_t GetInt32_1() const {
+        return int32_1;
+    }
+    int32_t GetInt32_2() const {
+        return int32_2;
+    }
+    int32_t GetInt32_3() const {
+        return int32_3;
+    }
+    int32_t GetInt32_4() const {
+        return int32_4;
+    }
+    uint32_t GetUInt32_1() const {
+        return uint32_1;
+    }
+    uint32_t GetUInt32_2() const {
+        return uint32_2;
+    }
+    uint32_t GetUInt32_3() const {
+        return uint32_3;
+    }
+    uint32_t GetUInt32_4() const {
+        return uint32_4;
+    }
+    plUUID GetUuid_1() const {
+        return uuid_1;
+    }
+    plUUID GetUuid_2() const {
+        return uuid_2;
+    }
+    plUUID GetUuid_3() const {
+        return uuid_3;
+    }
+    plUUID GetUuid_4() const {
+        return uuid_4;
+    }
+    const wchar_t* GetString64_1() const {
+        return string64_1;
+    }
+    const wchar_t* GetString64_2() const {
+        return string64_2;
+    }
+    const wchar_t* GetString64_3() const {
+        return string64_3;
+    }
+    const wchar_t* GetString64_4() const {
+        return string64_4;
+    }
+    const wchar_t* GetString64_5() const {
+        return string64_5;
+    }
+    const wchar_t* GetString64_6() const {
+        return string64_6;
+    }
+    const wchar_t* GetIString64_1() const {
+        return istring64_1;
+    }
+    const wchar_t* GetIString64_2() const {
+        return istring64_2;
+    }
+    const wchar_t* GetText_1() const {
+        return text_1;
+    }
+    const wchar_t* GetText_2() const {
+        return text_2;
+    }
+    const uint8_t* GetBlob_1() const {
+        return blob_1;
+    }
+    size_t GetBlob_1Length() const {
+        return blob_1Length;
+    }
+    const uint8_t* GetBlob_2() const {
+        return blob_2;
+    }
+    size_t GetBlob_2Length() const {
+        return blob_2Length;
+    }
 };
 
 
@@ -433,34 +522,34 @@ struct NetVaultNodeRef {
 
 class CSrvPackBuffer {
 public:
-    CSrvPackBuffer (unsigned bytes);
+    CSrvPackBuffer(unsigned bytes);
 
-    void * Alloc (unsigned bytes);
-    void AddData (const void * ptr, unsigned bytes);
-    void AddString (const wchar_t str[]);
-    void AddDWordArray (const uint32_t * arr, unsigned count);
+    void* Alloc(unsigned bytes);
+    void AddData(const void* ptr, unsigned bytes);
+    void AddString(const wchar_t str[]);
+    void AddDWordArray(const uint32_t* arr, unsigned count);
     // add new "Add..." methods here as needed
 
-    unsigned Size ();
-    
+    unsigned Size();
+
 private:
-    uint8_t * m_pos;
-    uint8_t * m_end;
-    uint8_t * m_data;
+    uint8_t* m_pos;
+    uint8_t* m_end;
+    uint8_t* m_data;
 };
 
 class CSrvUnpackBuffer {
 public:
-    CSrvUnpackBuffer (const void * buffer, unsigned count);
+    CSrvUnpackBuffer(const void* buffer, unsigned count);
 
-    const void *  GetData (unsigned bytes);
-    const wchar_t * GetString ();
-    const uint32_t * GetDWordArray (unsigned count);
-    
-    unsigned BytesLeft ();
-    bool ParseError ();
+    const void*   GetData(unsigned bytes);
+    const wchar_t* GetString();
+    const uint32_t* GetDWordArray(unsigned count);
+
+    unsigned BytesLeft();
+    bool ParseError();
 
 private:
-    const uint8_t * m_pos;
-    const uint8_t * m_end;
+    const uint8_t* m_pos;
+    const uint8_t* m_end;
 };

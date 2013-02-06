@@ -45,21 +45,21 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class StringTokenizer {
 private:
-    char *seps;
-    char *tok;
+    char* seps;
+    char* tok;
     bool isSep(char c);
     int numSeps;
     bool qAsTok;
     bool inQuote;
 public:
     StringTokenizer();
-    StringTokenizer(const char *string, const char *seps);
+    StringTokenizer(const char* string, const char* seps);
     ~StringTokenizer();
-    char *next();
+    char* next();
     bool hasMoreTokens();
-    void reset(const char *string, const char *seps);
+    void reset(const char* string, const char* seps);
     void ParseQuotes(bool qAsTok);
-    char *string;
+    char* string;
 };
 
 #endif

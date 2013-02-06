@@ -63,21 +63,18 @@ PYTHON_NO_INIT_DEFINITION(ptBlueSpiralGame)
 PYTHON_GLOBAL_METHOD_DEFINITION(PtIsBlueSpiralGame, args, "Params: typeID\nReturns true if the specifed typeID (guid as a string) is a BlueSpiral game")
 {
     PyObject* textObj;
-    if (!PyArg_ParseTuple(args, "O", &textObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &textObj)) {
         PyErr_SetString(PyExc_TypeError, "PtIsBlueSpiralGame expects a string");
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyString_CheckEx(textObj))
-    {
+    if (PyString_CheckEx(textObj)) {
         plString text = PyString_AsStringEx(textObj);
 
         bool retVal = pyBlueSpiralGame::IsBlueSpiralGame(text);
         PYTHON_RETURN_BOOL(retVal);
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtIsBlueSpiralGame expects a string");
         PYTHON_RETURN_ERROR;
     }
@@ -87,16 +84,17 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtJoinCommonBlueSpiralGame, args, "Params: callb
 {
     PyObject* callbackObj = NULL;
     int gameID = 0;
-    if (!PyArg_ParseTuple(args, "Oi", &callbackObj, &gameID))
-    {
+
+    if (!PyArg_ParseTuple(args, "Oi", &callbackObj, &gameID)) {
         PyErr_SetString(PyExc_TypeError, "PtJoinCommonBlueSpiralGame expects a ptKey and an integer");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(callbackObj))
-    {
+
+    if (!pyKey::Check(callbackObj)) {
         PyErr_SetString(PyExc_TypeError, "PtJoinCommonBlueSpiralGame expects a ptKey and an integer");
         PYTHON_RETURN_ERROR;
     }
+
     pyKey* key = pyKey::ConvertFrom(callbackObj);
     pyBlueSpiralGame::JoinCommonBlueSpiralGame(*key, gameID);
     PYTHON_RETURN_NONE;
@@ -107,19 +105,20 @@ PYTHON_BASIC_METHOD_DEFINITION(ptBlueSpiralGame, startGame, StartGame)
 PYTHON_METHOD_DEFINITION(ptBlueSpiralGame, hitCloth, args)
 {
     int clothNum = 0;
-    if (!PyArg_ParseTuple(args, "i", &clothNum))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &clothNum)) {
         PyErr_SetString(PyExc_TypeError, "hitCloth expects one integer");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->HitCloth(clothNum);
     PYTHON_RETURN_NONE;
 }
 
 PYTHON_START_METHODS_TABLE(ptBlueSpiralGame)
-    PYTHON_BASIC_METHOD(ptBlueSpiralGame, startGame, "Starts a new game"),
-    PYTHON_METHOD(ptBlueSpiralGame, hitCloth, "Params: clothNum\nTells the server you hit the specified cloth"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_BASIC_METHOD(ptBlueSpiralGame, startGame, "Starts a new game"),
+                    PYTHON_METHOD(ptBlueSpiralGame, hitCloth, "Params: clothNum\nTells the server you hit the specified cloth"),
+                    PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptBlueSpiralGame, pyGameCli, "Game client for the BlueSpiral game");
@@ -127,9 +126,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptBlueSpiralGame, pyGameCli, "Game client for the Blue
 // required functions for PyObject interoperability
 PyObject* pyBlueSpiralGame::New(pfGameCli* client)
 {
-    ptBlueSpiralGame *newObj = (ptBlueSpiralGame*)ptBlueSpiralGame_type.tp_new(&ptBlueSpiralGame_type, NULL, NULL);
-    if (client && (client->GetGameTypeId() == kGameTypeId_BlueSpiral))
+    ptBlueSpiralGame* newObj = (ptBlueSpiralGame*)ptBlueSpiralGame_type.tp_new(&ptBlueSpiralGame_type, NULL, NULL);
+
+    if (client && (client->GetGameTypeId() == kGameTypeId_BlueSpiral)) {
         newObj->fThis->gameClient = client;
+    }
+
     return (PyObject*)newObj;
 }
 

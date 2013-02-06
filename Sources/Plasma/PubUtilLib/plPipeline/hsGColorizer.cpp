@@ -44,19 +44,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plPipeline.h"
 #include "hsGColorizer.h"
 
-bool hsGColorizer::Colorizing() 
-{ 
-    return fPipeline ? 0 != (fPipeline->GetColorOverride().fFlags & hsColorOverride::kModColor) : false; 
+bool hsGColorizer::Colorizing()
+{
+    return fPipeline ? 0 != (fPipeline->GetColorOverride().fFlags & hsColorOverride::kModColor) : false;
 }
 
-bool hsGColorizer::Alpharizing() 
-{ 
-    return fPipeline ? 0 != (fPipeline->GetColorOverride().fFlags & hsColorOverride::kModAlpha) : false; 
+bool hsGColorizer::Alpharizing()
+{
+    return fPipeline ? 0 != (fPipeline->GetColorOverride().fFlags & hsColorOverride::kModAlpha) : false;
 }
 
-hsColorRGBA hsGColorizer::GetCurrentColor() 
-{ 
-    return fPipeline ? fPipeline->GetColorOverride().fColor : hsColorRGBA().Set(1.f,1.f,1.f,1.f); 
+hsColorRGBA hsGColorizer::GetCurrentColor()
+{
+    return fPipeline ? fPipeline->GetColorOverride().fColor : hsColorRGBA().Set(1.f, 1.f, 1.f, 1.f);
 }
 
 void hsGColorizer::Init(plPipeline* pipe)
@@ -66,8 +66,7 @@ void hsGColorizer::Init(plPipeline* pipe)
 
 void hsGColorizer::PushColorize(hsColorRGBA& col, bool alphaOnly)
 {
-    if( fPipeline )
-    {
+    if (fPipeline) {
         hsColorOverride colorOver;
         colorOver.fFlags = alphaOnly ? hsColorOverride::kModAlpha : hsColorOverride::kModColor | hsColorOverride::kModAlpha;
         colorOver.fColor = col;
@@ -77,8 +76,7 @@ void hsGColorizer::PushColorize(hsColorRGBA& col, bool alphaOnly)
 
 void hsGColorizer::PopColorize()
 {
-    if( fPipeline )
-    {
+    if (fPipeline) {
         fPipeline->PopColorOverride(fResetColor);
     }
 }

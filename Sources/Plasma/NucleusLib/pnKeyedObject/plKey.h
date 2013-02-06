@@ -57,8 +57,7 @@ class hsBitVector;
 class plKeyData;
 class plKeyImp;
 
-class plKey 
-{
+class plKey {
 public:
     // Constructors and destructors and copy stuff
     plKey() : fKeyData(nullptr) { }
@@ -69,15 +68,23 @@ public:
 
     bool operator==(const plKey& rhs) const;
     bool operator==(const plKeyData* rhs) const;
-    bool operator!=(const plKey& rhs) const { return !(*this == rhs); }
-    bool operator!=(const plKeyData* rhs) const { return !(*this == rhs); }
+    bool operator!=(const plKey& rhs) const {
+        return !(*this == rhs);
+    }
+    bool operator!=(const plKeyData* rhs) const {
+        return !(*this == rhs);
+    }
 
     plKeyData* operator->() const;
     plKeyData& operator*() const;
 
-    operator plKeyImp*() const { return (plKeyImp*)fKeyData; }
+    operator plKeyImp* () const {
+        return (plKeyImp*)fKeyData;
+    }
 
-    static plKey Make(plKeyData* data) { return plKey(data); }
+    static plKey Make(plKeyData* data) {
+        return plKey(data);
+    }
 
 protected:
     // Pointer to our real key
@@ -93,14 +100,13 @@ protected:
 //  Base virtual class that provides the essential functionality you would
 //  want from a plKey-ish thing.
 
-class plKeyData
-{
+class plKeyData {
 public:
-    virtual const plUoid&   GetUoid() const=0;
-    virtual const plString& GetName() const=0;
+    virtual const plUoid&   GetUoid() const = 0;
+    virtual const plString& GetName() const = 0;
 
-    virtual hsKeyedObject*  GetObjectPtr()=0;
-    virtual hsKeyedObject*  ObjectIsLoaded() const=0;
+    virtual hsKeyedObject*  GetObjectPtr() = 0;
+    virtual hsKeyedObject*  ObjectIsLoaded() const = 0;
     virtual hsKeyedObject*  VerifyLoaded() = 0;
 
     //----------------------
@@ -108,15 +114,15 @@ public:
     // should only be active ref'ed by a non-keyed parent.  Essentially just bumps/decs
     // the active ref count to facilitate normal object creation/destruction
     //----------------------
-    virtual hsKeyedObject*  RefObject(plRefFlags::Type flags = plRefFlags::kActiveRef)=0;
-    virtual void            UnRefObject(plRefFlags::Type flags = plRefFlags::kActiveRef)=0;
+    virtual hsKeyedObject*  RefObject(plRefFlags::Type flags = plRefFlags::kActiveRef) = 0;
+    virtual void            UnRefObject(plRefFlags::Type flags = plRefFlags::kActiveRef) = 0;
 
     //----------------------
     // Release has two behaviors, depending on whether the ref is active or passive:
     // Active - Release decs the ActiveRefCnt. When it gets to zero, the object will be deleted.
     // Passive - Unregisters my interest in when the object is created or destroyed.
     //----------------------
-    virtual void Release(plKey targetKey)=0;
+    virtual void Release(plKey targetKey) = 0;
 
     virtual uint16_t      GetActiveRefs() const = 0;
 

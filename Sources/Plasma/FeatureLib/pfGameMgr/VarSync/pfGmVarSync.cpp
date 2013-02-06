@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/FeatureLib/pfGameMgr/VarSync/pfGmVarSync.cpp
-*   
+*
 ***/
 
 #define USES_GAME_VARSYNC
@@ -57,23 +57,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 struct IVarSync {
-    pfGmVarSync * gameCli;
+    pfGmVarSync* gameCli;
 
-    IVarSync (pfGmVarSync * gameCli) : gameCli(gameCli) { }
+    IVarSync(pfGmVarSync* gameCli) : gameCli(gameCli) { }
 
     // pfGameCli event notification handlers
-    void Recv           (GameMsgHeader * msg, void * param);
-    void OnPlayerJoined (const Srv2Cli_Game_PlayerJoined & msg);
-    void OnPlayerLeft   (const Srv2Cli_Game_PlayerLeft & msg);
-    void OnInviteFailed (const Srv2Cli_Game_InviteFailed & msg);
-    void OnOwnerChange  (const Srv2Cli_Game_OwnerChange & msg);
+    void Recv(GameMsgHeader* msg, void* param);
+    void OnPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg);
+    void OnPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg);
+    void OnInviteFailed(const Srv2Cli_Game_InviteFailed& msg);
+    void OnOwnerChange(const Srv2Cli_Game_OwnerChange& msg);
 
-    // VarSync network message handlers 
-    void RecvStringVarChanged   (const Srv2Cli_VarSync_StringVarChanged & msg, void * param);
-    void RecvNumericVarChanged  (const Srv2Cli_VarSync_NumericVarChanged & msg, void * param);
-    void RecvAllVarsSent        (const Srv2Cli_VarSync_AllVarsSent & msg, void * param);
-    void RecvStringVarCreated   (const Srv2Cli_VarSync_StringVarCreated & msg, void * param);
-    void RecvNumericVarCreated  (const Srv2Cli_VarSync_NumericVarCreated & msg, void * param);
+    // VarSync network message handlers
+    void RecvStringVarChanged(const Srv2Cli_VarSync_StringVarChanged& msg, void* param);
+    void RecvNumericVarChanged(const Srv2Cli_VarSync_NumericVarChanged& msg, void* param);
+    void RecvAllVarsSent(const Srv2Cli_VarSync_AllVarsSent& msg, void* param);
+    void RecvStringVarCreated(const Srv2Cli_VarSync_StringVarCreated& msg, void* param);
+    void RecvNumericVarCreated(const Srv2Cli_VarSync_NumericVarCreated& msg, void* param);
 };
 
 
@@ -84,15 +84,17 @@ struct IVarSync {
 ***/
 
 //============================================================================
-static pfGameCli * VarSyncFactory (
+static pfGameCli* VarSyncFactory(
     unsigned    gameId,
     plKey       receiver
-) {
+)
+{
     return new pfGmVarSync(gameId, receiver);
 }
 
 //============================================================================
-AUTO_INIT_FUNC(RegisterVarSyncFactory) {
+AUTO_INIT_FUNC(RegisterVarSyncFactory)
+{
 
     static GameTypeReg reg = {
         VarSyncFactory,
@@ -111,71 +113,80 @@ AUTO_INIT_FUNC(RegisterVarSyncFactory) {
 ***/
 
 //============================================================================
-void IVarSync::OnPlayerJoined (const Srv2Cli_Game_PlayerJoined & msg) {
+void IVarSync::OnPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg)
+{
 
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IVarSync::OnPlayerLeft (const Srv2Cli_Game_PlayerLeft & msg) {
+void IVarSync::OnPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg)
+{
 
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IVarSync::OnInviteFailed (const Srv2Cli_Game_InviteFailed & msg) {
-    
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IVarSync::OnInviteFailed(const Srv2Cli_Game_InviteFailed& msg)
+{
+
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IVarSync::OnOwnerChange (const Srv2Cli_Game_OwnerChange & msg) {
+void IVarSync::OnOwnerChange(const Srv2Cli_Game_OwnerChange& msg)
+{
 
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IVarSync::RecvStringVarChanged (const Srv2Cli_VarSync_StringVarChanged & msg, void * param) {
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IVarSync::RecvStringVarChanged(const Srv2Cli_VarSync_StringVarChanged& msg, void* param)
+{
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IVarSync::RecvNumericVarChanged (const Srv2Cli_VarSync_NumericVarChanged & msg, void * param) {
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IVarSync::RecvNumericVarChanged(const Srv2Cli_VarSync_NumericVarChanged& msg, void* param)
+{
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IVarSync::RecvAllVarsSent (const Srv2Cli_VarSync_AllVarsSent & msg, void * param) {
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IVarSync::RecvAllVarsSent(const Srv2Cli_VarSync_AllVarsSent& msg, void* param)
+{
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IVarSync::RecvStringVarCreated (const Srv2Cli_VarSync_StringVarCreated & msg, void * param) {
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IVarSync::RecvStringVarCreated(const Srv2Cli_VarSync_StringVarCreated& msg, void* param)
+{
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IVarSync::RecvNumericVarCreated (const Srv2Cli_VarSync_NumericVarCreated & msg, void * param) {
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IVarSync::RecvNumericVarCreated(const Srv2Cli_VarSync_NumericVarCreated& msg, void* param)
+{
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
-}                   
+}
 
 /*****************************************************************************
 *
@@ -184,29 +195,32 @@ void IVarSync::RecvNumericVarCreated (const Srv2Cli_VarSync_NumericVarCreated & 
 ***/
 
 //============================================================================
-pfGmVarSync::pfGmVarSync (
+pfGmVarSync::pfGmVarSync(
     unsigned    gameId,
     plKey       receiver
 )
-:   pfGameCli(gameId, receiver)
+    :   pfGameCli(gameId, receiver)
 {
     internal = new IVarSync(this);
 }
 
 //============================================================================
-pfGmVarSync::~pfGmVarSync () {
+pfGmVarSync::~pfGmVarSync()
+{
 
     delete internal;
 }
 
 //============================================================================
-void pfGmVarSync::Recv (GameMsgHeader * msg, void * param) {
+void pfGmVarSync::Recv(GameMsgHeader* msg, void* param)
+{
 
-    #define DISPATCH(a) case kSrv2Cli_VarSync_##a: {                        \
+#define DISPATCH(a) case kSrv2Cli_VarSync_##a: {                        \
         const Srv2Cli_VarSync_##a & m = *(const Srv2Cli_VarSync_##a *)msg;  \
         internal->Recv##a(m, param);                                        \
     }                                                                       \
     break;                                                                  //
+
     switch (msg->messageId) {
         DISPATCH(StringVarChanged);
         DISPATCH(NumericVarChanged);
@@ -215,35 +229,41 @@ void pfGmVarSync::Recv (GameMsgHeader * msg, void * param) {
         DISPATCH(NumericVarCreated);
         DEFAULT_FATAL(msg->messageId);
     }
-    #undef DISPATCH
+
+#undef DISPATCH
 }
 
 //============================================================================
-void pfGmVarSync::OnPlayerJoined (const Srv2Cli_Game_PlayerJoined & msg) {
+void pfGmVarSync::OnPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg)
+{
 
     internal->OnPlayerJoined(msg);
 }
 
 //============================================================================
-void pfGmVarSync::OnPlayerLeft (const Srv2Cli_Game_PlayerLeft & msg) {
+void pfGmVarSync::OnPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg)
+{
 
     internal->OnPlayerLeft(msg);
 }
 
 //============================================================================
-void pfGmVarSync::OnInviteFailed (const Srv2Cli_Game_InviteFailed & msg) {
+void pfGmVarSync::OnInviteFailed(const Srv2Cli_Game_InviteFailed& msg)
+{
 
     internal->OnInviteFailed(msg);
 }
 
 //============================================================================
-void pfGmVarSync::OnOwnerChange (const Srv2Cli_Game_OwnerChange & msg) {
+void pfGmVarSync::OnOwnerChange(const Srv2Cli_Game_OwnerChange& msg)
+{
 
     internal->OnOwnerChange(msg);
 }
 
 //============================================================================
-void pfGmVarSync::SetStringVar (unsigned long id, const wchar_t* val) {
+void pfGmVarSync::SetStringVar(unsigned long id, const wchar_t* val)
+{
 
     Cli2Srv_VarSync_SetStringVar msg;
     msg.messageId       = kCli2Srv_VarSync_SetStringVar;
@@ -252,12 +272,13 @@ void pfGmVarSync::SetStringVar (unsigned long id, const wchar_t* val) {
     msg.transId         = 0;
     msg.varID           = id;
     StrCopy(msg.varValue, val, arrsize(msg.varValue));
-    
+
     GameMgrSend(&msg);
 }
 
 //============================================================================
-void pfGmVarSync::SetNumericVar (unsigned long id, double val) {
+void pfGmVarSync::SetNumericVar(unsigned long id, double val)
+{
 
     Cli2Srv_VarSync_SetNumericVar msg;
     msg.messageId       = kCli2Srv_VarSync_SetNumericVar;
@@ -271,19 +292,21 @@ void pfGmVarSync::SetNumericVar (unsigned long id, double val) {
 }
 
 //============================================================================
-void pfGmVarSync::RequestAllVars () {
+void pfGmVarSync::RequestAllVars()
+{
 
     Cli2Srv_VarSync_RequestAllVars msg;
     msg.messageId       = kCli2Srv_VarSync_RequestAllVars;
     msg.messageBytes    = sizeof(msg);
     msg.recvGameId      = GetGameId();  // send to GameSrv on server
     msg.transId         = 0;
-    
+
     GameMgrSend(&msg);
 }
 
 //============================================================================
-void pfGmVarSync::CreateStringVar (const wchar_t* name, const wchar_t* val) {
+void pfGmVarSync::CreateStringVar(const wchar_t* name, const wchar_t* val)
+{
 
     Cli2Srv_VarSync_CreateStringVar msg;
     msg.messageId       = kCli2Srv_VarSync_CreateStringVar;
@@ -297,7 +320,8 @@ void pfGmVarSync::CreateStringVar (const wchar_t* name, const wchar_t* val) {
 }
 
 //============================================================================
-void pfGmVarSync::CreateNumericVar (const wchar_t* name, double val) {
+void pfGmVarSync::CreateNumericVar(const wchar_t* name, double val)
+{
 
     Cli2Srv_VarSync_CreateNumericVar msg;
     msg.messageId       = kCli2Srv_VarSync_CreateNumericVar;

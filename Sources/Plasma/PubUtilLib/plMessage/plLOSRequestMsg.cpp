@@ -45,11 +45,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 plLOSRequestMsg::plLOSRequestMsg()
     : fRequestID(0),
-    fRequestType(plSimDefs::kLOSDBNone),
-    fTestType(kTestAny),
-    fReportType(kReportHit),
-    fCullDB(plSimDefs::kLOSDBNone),
-    fWorldKey(nil)
+      fRequestType(plSimDefs::kLOSDBNone),
+      fTestType(kTestAny),
+      fReportType(kReportHit),
+      fCullDB(plSimDefs::kLOSDBNone),
+      fWorldKey(nil)
 {
     AddReceiver(hsgResMgr::ResMgr()->FindKey(kLOSObject_KEY));
     SetBCastFlag(plMessage::kPropagateToModifiers);
@@ -57,14 +57,14 @@ plLOSRequestMsg::plLOSRequestMsg()
 
 plLOSRequestMsg::plLOSRequestMsg(const plKey& sender, hsPoint3& fromPoint, hsPoint3& toPoint, plSimDefs::plLOSDB db, TestType test, ReportType report)
     : plMessage(sender, hsgResMgr::ResMgr()->FindKey(kLOSObject_KEY), nil),
-    fFrom(fromPoint),
-    fTo(toPoint),
-    fRequestID(0),
-    fRequestType(db),
-    fTestType(test),
-    fReportType(report),
-    fCullDB(plSimDefs::kLOSDBNone),
-    fWorldKey(nil)
+      fFrom(fromPoint),
+      fTo(toPoint),
+      fRequestID(0),
+      fRequestType(db),
+      fTestType(test),
+      fReportType(report),
+      fCullDB(plSimDefs::kLOSDBNone),
+      fWorldKey(nil)
 {
     SetBCastFlag(plMessage::kPropagateToModifiers);
 }

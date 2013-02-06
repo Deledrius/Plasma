@@ -62,12 +62,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMessage/plAvatarMsg.h"
 
 plLayerAnimationBase::plLayerAnimationBase()
-: 
-    fPreshadeColorCtl(nil), 
+    :
+    fPreshadeColorCtl(nil),
     fRuntimeColorCtl(nil),
-    fAmbientColorCtl(nil), 
+    fAmbientColorCtl(nil),
     fSpecularColorCtl(nil),
-    fOpacityCtl(nil), 
+    fOpacityCtl(nil),
     fTransformCtl(nil),
     fEvalTime(-1.0),
     fCurrentTime(-1.f)
@@ -89,42 +89,42 @@ void plLayerAnimationBase::Read(hsStream* s, hsResMgr* mgr)
     plLayerInterface::Read(s, mgr);
 
     fPreshadeColorCtl = plController::ConvertNoRef(mgr->ReadCreatable(s));
-    fRuntimeColorCtl = plController::ConvertNoRef( mgr->ReadCreatable( s ) );
+    fRuntimeColorCtl = plController::ConvertNoRef(mgr->ReadCreatable(s));
     fAmbientColorCtl = plController::ConvertNoRef(mgr->ReadCreatable(s));
     fSpecularColorCtl = plController::ConvertNoRef(mgr->ReadCreatable(s));
     fOpacityCtl = plController::ConvertNoRef(mgr->ReadCreatable(s));
     fTransformCtl = plController::ConvertNoRef(mgr->ReadCreatable(s));
 
-    if( fOpacityCtl )
-    {
+    if (fOpacityCtl) {
         fOwnedChannels |= kOpacity;
         fOpacity = new float;
     }
-    if( fPreshadeColorCtl )
-    {
+
+    if (fPreshadeColorCtl) {
         fOwnedChannels |= kPreshadeColor;
         fPreshadeColor = new hsColorRGBA;
     }
-    if( fRuntimeColorCtl )
-    {
+
+    if (fRuntimeColorCtl) {
         fOwnedChannels |= kRuntimeColor;
         fRuntimeColor = new hsColorRGBA;
     }
-    if( fAmbientColorCtl )
-    {
+
+    if (fAmbientColorCtl) {
         fOwnedChannels |= kAmbientColor;
         fAmbientColor = new hsColorRGBA;
     }
-    if( fSpecularColorCtl )
-    {
+
+    if (fSpecularColorCtl) {
         fOwnedChannels |= kSpecularColor;
         fSpecularColor = new hsColorRGBA;
     }
-    if( fTransformCtl )
-    {
+
+    if (fTransformCtl) {
         fOwnedChannels |= kTransform;
         fTransform = new hsMatrix44;
     }
+
     fLength = IMakeUniformLength();
 }
 
@@ -145,68 +145,51 @@ plLayerInterface* plLayerAnimationBase::Attach(plLayerInterface* prev)
     return plLayerInterface::Attach(prev);
 }
 
-void plLayerAnimationBase::IEvalConvertedTime(float secs, uint32_t passChans, uint32_t evalChans, uint32_t &dirty)
+void plLayerAnimationBase::IEvalConvertedTime(float secs, uint32_t passChans, uint32_t evalChans, uint32_t& dirty)
 {
-    if( evalChans & kPreshadeColor )
-    {
+    if (evalChans & kPreshadeColor) {
         fPreshadeColorCtl->Interp(fCurrentTime, fPreshadeColor);
         dirty |= kPreshadeColor;
-    }
-    else if( passChans & kPreshadeColor )
-    {
+    } else if (passChans & kPreshadeColor) {
         *fPreshadeColor = fUnderLay->GetPreshadeColor();
     }
 
-    if( evalChans & kRuntimeColor )
-    {
-        fRuntimeColorCtl->Interp( fCurrentTime, fRuntimeColor );
+    if (evalChans & kRuntimeColor) {
+        fRuntimeColorCtl->Interp(fCurrentTime, fRuntimeColor);
         dirty |= kRuntimeColor;
-    }
-    else if( passChans & kRuntimeColor )
-    {
+    } else if (passChans & kRuntimeColor) {
         *fRuntimeColor = fUnderLay->GetRuntimeColor();
     }
 
-    if( evalChans & kAmbientColor )
-    {
+    if (evalChans & kAmbientColor) {
         fAmbientColorCtl->Interp(fCurrentTime, fAmbientColor);
         dirty |= kAmbientColor;
-    }
-    else if( passChans & kAmbientColor )
-    {
+    } else if (passChans & kAmbientColor) {
         *fAmbientColor = fUnderLay->GetAmbientColor();
     }
 
-    if( evalChans & kSpecularColor )
-    {
-        fSpecularColorCtl->Interp( fCurrentTime, fSpecularColor );
+    if (evalChans & kSpecularColor) {
+        fSpecularColorCtl->Interp(fCurrentTime, fSpecularColor);
         dirty |= kSpecularColor;
-    }
-    else if( passChans & kSpecularColor )
-    {
+    } else if (passChans & kSpecularColor) {
         *fSpecularColor = fUnderLay->GetSpecularColor();
     }
 
-    if( evalChans & kOpacity )
-    {
+    if (evalChans & kOpacity) {
         fOpacityCtl->Interp(fCurrentTime, fOpacity);
         *fOpacity *= 1.e-2f;
         dirty |= kOpacity;
-    }
-    else if( passChans & kOpacity )
-    {
+    } else if (passChans & kOpacity) {
         *fOpacity = fUnderLay->GetOpacity();
     }
 
-    if( evalChans & kTransform )
-    {
+    if (evalChans & kTransform) {
         fTransformCtl->Interp(fCurrentTime, fTransform);
         dirty |= kTransform;
-    }
-    else if( passChans & kTransform )
-    {
+    } else if (passChans & kTransform) {
         *fTransform = fUnderLay->GetTransform();
     }
+
     fPassThruChannels = 0; // already handled, don't need to keep passing them through.
 }
 
@@ -217,10 +200,11 @@ bool plLayerAnimationBase::MsgReceive(plMessage* msg)
 
 void plLayerAnimationBase::SetPreshadeColorCtl(plController* colCtl)
 {
-    if( fPreshadeColorCtl )
+    if (fPreshadeColorCtl) {
         delete fPreshadeColorCtl;
-    else
+    } else {
         fPreshadeColor = new hsColorRGBA;
+    }
 
     fOwnedChannels |= kPreshadeColor;
     fPreshadeColorCtl = colCtl;
@@ -228,10 +212,11 @@ void plLayerAnimationBase::SetPreshadeColorCtl(plController* colCtl)
 
 void plLayerAnimationBase::SetRuntimeColorCtl(plController* colCtl)
 {
-    if( fRuntimeColorCtl )
+    if (fRuntimeColorCtl) {
         delete fRuntimeColorCtl;
-    else
+    } else {
         fRuntimeColor = new hsColorRGBA;
+    }
 
     fOwnedChannels |= kRuntimeColor;
     fRuntimeColorCtl = colCtl;
@@ -239,10 +224,11 @@ void plLayerAnimationBase::SetRuntimeColorCtl(plController* colCtl)
 
 void plLayerAnimationBase::SetAmbientColorCtl(plController* ambCtl)
 {
-    if( fAmbientColorCtl )
+    if (fAmbientColorCtl) {
         delete fAmbientColorCtl;
-    else
+    } else {
         fAmbientColor = new hsColorRGBA;
+    }
 
     fOwnedChannels |= kAmbientColor;
     fAmbientColorCtl = ambCtl;
@@ -250,10 +236,11 @@ void plLayerAnimationBase::SetAmbientColorCtl(plController* ambCtl)
 
 void plLayerAnimationBase::SetSpecularColorCtl(plController* ambCtl)
 {
-    if( fSpecularColorCtl )
+    if (fSpecularColorCtl) {
         delete fSpecularColorCtl;
-    else
+    } else {
         fSpecularColor = new hsColorRGBA;
+    }
 
     fOwnedChannels |= kSpecularColor;
     fSpecularColorCtl = ambCtl;
@@ -261,10 +248,11 @@ void plLayerAnimationBase::SetSpecularColorCtl(plController* ambCtl)
 
 void plLayerAnimationBase::SetOpacityCtl(plController* opaCtl)
 {
-    if( fOpacityCtl )
+    if (fOpacityCtl) {
         delete fOpacityCtl;
-    else
+    } else {
         fOpacity = new float;
+    }
 
     fOwnedChannels |= kOpacity;
     fOpacityCtl = opaCtl;
@@ -272,10 +260,11 @@ void plLayerAnimationBase::SetOpacityCtl(plController* opaCtl)
 
 void plLayerAnimationBase::SetTransformCtl(plController* xfmCtl)
 {
-    if( fTransformCtl )
+    if (fTransformCtl) {
         delete fTransformCtl;
-    else
+    } else {
         fTransform = new hsMatrix44;
+    }
 
     fOwnedChannels |= kTransform;
     fTransformCtl = xfmCtl;
@@ -284,18 +273,30 @@ void plLayerAnimationBase::SetTransformCtl(plController* xfmCtl)
 float plLayerAnimationBase::IMakeUniformLength()
 {
     fLength = 0;
-    if( fPreshadeColorCtl && (fPreshadeColorCtl->GetLength() > fLength) )
+
+    if (fPreshadeColorCtl && (fPreshadeColorCtl->GetLength() > fLength)) {
         fLength = fPreshadeColorCtl->GetLength();
-    if( fRuntimeColorCtl && (fRuntimeColorCtl->GetLength() > fLength) )
+    }
+
+    if (fRuntimeColorCtl && (fRuntimeColorCtl->GetLength() > fLength)) {
         fLength = fRuntimeColorCtl->GetLength();
-    if( fAmbientColorCtl && (fAmbientColorCtl->GetLength() > fLength) )
+    }
+
+    if (fAmbientColorCtl && (fAmbientColorCtl->GetLength() > fLength)) {
         fLength = fAmbientColorCtl->GetLength();
-    if( fSpecularColorCtl && (fSpecularColorCtl->GetLength() > fLength) )
+    }
+
+    if (fSpecularColorCtl && (fSpecularColorCtl->GetLength() > fLength)) {
         fLength = fSpecularColorCtl->GetLength();
-    if( fOpacityCtl && (fOpacityCtl->GetLength() > fLength) )
+    }
+
+    if (fOpacityCtl && (fOpacityCtl->GetLength() > fLength)) {
         fLength = fOpacityCtl->GetLength();
-    if( fTransformCtl && (fTransformCtl->GetLength() > fLength) )
+    }
+
+    if (fTransformCtl && (fTransformCtl->GetLength() > fLength)) {
         fLength = fTransformCtl->GetLength();
+    }
 
     return fLength;
 }
@@ -303,7 +304,7 @@ float plLayerAnimationBase::IMakeUniformLength()
 /////////////////////////////////////////////////////////////////////////////////
 
 plLayerAnimation::plLayerAnimation()
-:
+    :
     plLayerAnimationBase(),
     fLayerSDLMod(nil)
 {
@@ -319,14 +320,15 @@ void plLayerAnimation::Read(hsStream* s, hsResMgr* mgr)
 {
     plLayerAnimationBase::Read(s, mgr);
 
-    fTimeConvert.Read(s, mgr);  
-    if (!(fTimeConvert.IsStopped()))
-    {   
+    fTimeConvert.Read(s, mgr);
+
+    if (!(fTimeConvert.IsStopped())) {
         plSynchEnabler ps(true);    // enable dirty tracking so that we send state about
-                                    // the anim resetting to start now.
+        // the anim resetting to start now.
         fTimeConvert.SetCurrentAnimTime(0, true);
     }
-    Eval(hsTimer::GetSysSeconds(),0,0);
+
+    Eval(hsTimer::GetSysSeconds(), 0, 0);
 
     // add sdl modifier
     delete fLayerSDLMod;
@@ -344,7 +346,7 @@ void plLayerAnimation::Write(hsStream* s, hsResMgr* mgr)
 
 plLayerInterface* plLayerAnimation::Attach(plLayerInterface* prev)
 {
-    fCurrentTime = fTimeConvert.CurrentAnimTime()-1.f;
+    fCurrentTime = fTimeConvert.CurrentAnimTime() - 1.f;
 
     return plLayerAnimationBase::Attach(prev);
 }
@@ -352,19 +354,20 @@ plLayerInterface* plLayerAnimation::Attach(plLayerInterface* prev)
 uint32_t plLayerAnimation::Eval(double wSecs, uint32_t frame, uint32_t ignore)
 {
     uint32_t dirty = plLayerInterface::Eval(wSecs, frame, ignore);
-    if( wSecs != fEvalTime )
-    {
+
+    if (wSecs != fEvalTime) {
         uint32_t evalChans = 0;
         uint32_t passChans = dirty | fPassThruChannels;
         float secs = fTimeConvert.WorldToAnimTime(wSecs);
-        if( secs != fCurrentTime )
-        {
+
+        if (secs != fCurrentTime) {
             evalChans = fOwnedChannels & ~ignore & ~fPassThruChannels;
             fCurrentTime = secs;
         }
 
         IEvalConvertedTime(secs, passChans, evalChans, dirty);
     }
+
     fEvalTime = wSecs;
     return dirty;
 }
@@ -373,16 +376,17 @@ bool plLayerAnimation::MsgReceive(plMessage* msg)
 {
     // pass sdl msg to sdlMod
     plSDLModifierMsg* sdlMsg = plSDLModifierMsg::ConvertNoRef(msg);
-    if (sdlMsg && fLayerSDLMod)
-    {
-        if (fLayerSDLMod->MsgReceive(sdlMsg))
+
+    if (sdlMsg && fLayerSDLMod) {
+        if (fLayerSDLMod->MsgReceive(sdlMsg)) {
             return true;    // msg handled
+        }
     }
 
     bool retVal = false;
     plAnimCmdMsg* cmdMsg = plAnimCmdMsg::ConvertNoRef(msg);
-    if( cmdMsg )
-    {
+
+    if (cmdMsg) {
         // Evaluate first, so we'll be transitioning from our
         // real current state, whether we've been evaluated (in view)
         // lately or not.
@@ -391,19 +395,15 @@ bool plLayerAnimation::MsgReceive(plMessage* msg)
         DirtySynchState(kSDLLayer, 0);
     }
 
-    if( retVal )
-    {
-        if( !fTimeConvert.IsStopped() || fTimeConvert.GetFlag(plAnimTimeConvert::kForcedMove) )
-        {
+    if (retVal) {
+        if (!fTimeConvert.IsStopped() || fTimeConvert.GetFlag(plAnimTimeConvert::kForcedMove)) {
             ClaimChannels(fOwnedChannels);
             fCurrentTime = -1.f; // force an eval
         }
-    }
-    else
-    {
+    } else {
         retVal = plLayerAnimationBase::MsgReceive(msg);
     }
-    
+
     return retVal;
 }
 
@@ -412,28 +412,28 @@ void plLayerAnimation::DefaultAnimation()
     IMakeUniformLength();
     fTimeConvert.SetBegin(0);
     fTimeConvert.SetEnd(fLength);
-    fTimeConvert.SetLoopPoints(0,fLength);
+    fTimeConvert.SetLoopPoints(0, fLength);
     fTimeConvert.Loop();
     fTimeConvert.Start();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
-plLayerLinkAnimation::plLayerLinkAnimation() : 
-    fLinkKey(nil), 
+plLayerLinkAnimation::plLayerLinkAnimation() :
+    fLinkKey(nil),
     fLeavingAge(true),
-    fEnabled(true), 
-    fFadeFlags(0), 
+    fEnabled(true),
+    fFadeFlags(0),
     fLastFadeFlag(0),
-    fFadeFlagsDirty(false) 
-{ 
+    fFadeFlagsDirty(false)
+{
     fIFaceCallback = new plEventCallbackMsg();
     fIFaceCallback->fEvent = kTime;
-    fIFaceCallback->fRepeats = 0;           
+    fIFaceCallback->fRepeats = 0;
 }
 
-plLayerLinkAnimation::~plLayerLinkAnimation() 
-{ 
+plLayerLinkAnimation::~plLayerLinkAnimation()
+{
     hsRefCnt_SafeUnRef(fIFaceCallback);
 }
 
@@ -441,7 +441,7 @@ plLayerLinkAnimation::~plLayerLinkAnimation()
 void plLayerLinkAnimation::Read(hsStream* s, hsResMgr* mgr)
 {
     plLayerAnimation::Read(s, mgr);
-    
+
     fLinkKey = mgr->ReadKey(s);
     fLeavingAge = s->ReadBool();
     plgDispatch::Dispatch()->RegisterForExactType(plLinkEffectBCMsg::Index(), GetKey());
@@ -450,15 +450,15 @@ void plLayerLinkAnimation::Read(hsStream* s, hsResMgr* mgr)
     plgDispatch::Dispatch()->RegisterForExactType(plAvatarStealthModeMsg::Index(), GetKey());
     plgDispatch::Dispatch()->RegisterForExactType(plIfaceFadeAvatarMsg::Index(), GetKey());
     plgDispatch::Dispatch()->RegisterForExactType(plPseudoLinkAnimTriggerMsg::Index(), GetKey());
-    
-    fIFaceCallback->AddReceiver(GetKey());  
+
+    fIFaceCallback->AddReceiver(GetKey());
 }
 
 
 void plLayerLinkAnimation::Write(hsStream* s, hsResMgr* mgr)
 {
     plLayerAnimation::Write(s, mgr);
-    
+
     mgr->WriteKey(s, fLinkKey);
     s->WriteBool(fLeavingAge);
 }
@@ -466,210 +466,216 @@ void plLayerLinkAnimation::Write(hsStream* s, hsResMgr* mgr)
 uint32_t plLayerLinkAnimation::Eval(double wSecs, uint32_t frame, uint32_t ignore)
 {
     uint32_t dirty = plLayerInterface::Eval(wSecs, frame, ignore);
-    if (wSecs != fEvalTime)
-    {
+
+    if (wSecs != fEvalTime) {
         uint32_t evalChans = 0;
         uint32_t passChans = dirty | fPassThruChannels;
         float oldAnimTime = fTimeConvert.CurrentAnimTime();
         float secs = oldAnimTime;
-        
-        if (fFadeFlagsDirty)
-        {
+
+        if (fFadeFlagsDirty) {
             float goal = 0.f;
 
-            if (fFadeFlags & kFadeLinkPrep)
+            if (fFadeFlags & kFadeLinkPrep) {
                 secs = goal = fLength;
-            else
-            {
+            } else {
                 float rate = 0.f;
                 float delta = (float)(wSecs - fEvalTime);
-                
-                if (fFadeFlags & kFadeLinking)
-                {
+
+                if (fFadeFlags & kFadeLinking) {
                     goal = fLength;
                     rate = 1.f;
-                }
-                else if (fFadeFlags & kFadeCamera)
-                {
+                } else if (fFadeFlags & kFadeCamera) {
                     goal = fLength;
                     rate = 10.f;
-                }
-                else if (fFadeFlags & (kFadeIFace | kFadeCCR))
-                {
+                } else if (fFadeFlags & (kFadeIFace | kFadeCCR)) {
                     goal = fLength * 0.4f;
                     rate = 10.f;
-                }
-                else if (fFadeFlags == 0)
-                {
+                } else if (fFadeFlags == 0) {
                     goal = 0.f;
-                    if (fLastFadeFlag == kFadeLinking)
+
+                    if (fLastFadeFlag == kFadeLinking) {
                         rate = 1.f;
-                    else
+                    } else {
                         rate = 10.f;
+                    }
                 }
 
-                if (fabs(oldAnimTime - goal) < delta * rate || rate == 0)
+                if (fabs(oldAnimTime - goal) < delta * rate || rate == 0) {
                     secs = goal;
-                else if (goal > oldAnimTime)
+                } else if (goal > oldAnimTime) {
                     secs = oldAnimTime + delta * rate;
-                else
+                } else {
                     secs = oldAnimTime - delta * rate;
+                }
             }
 
-            if (secs == goal)
+            if (secs == goal) {
                 fFadeFlagsDirty = false;
+            }
         }
-        
-        if( secs != fCurrentTime )
-        {
+
+        if (secs != fCurrentTime) {
             fTimeConvert.SetCurrentAnimTime(secs);
-            if (secs == 0.f || oldAnimTime == 0.f)
-            {
+
+            if (secs == 0.f || oldAnimTime == 0.f) {
                 // Either we're going opaque, or we were opaque and now we're fading.
                 // Tell the armature to re-eval its opacity settings.
-                plAvatarOpacityCallbackMsg *opacityMsg = new plAvatarOpacityCallbackMsg(fLinkKey, kStop);
+                plAvatarOpacityCallbackMsg* opacityMsg = new plAvatarOpacityCallbackMsg(fLinkKey, kStop);
                 opacityMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
                 opacityMsg->Send();
-            }               
+            }
+
             evalChans = fOwnedChannels & ~ignore & ~fPassThruChannels;
             fCurrentTime = secs;
         }
+
         IEvalConvertedTime(secs, passChans, evalChans, dirty);
     }
+
     fEvalTime = wSecs;
     return dirty;
 }
 
 void plLayerLinkAnimation::SetFadeFlag(uint8_t flag, bool val)
 {
-    if (val)
+    if (val) {
         fFadeFlags |= flag;
-    else
+    } else {
         fFadeFlags &= ~flag;
+    }
 
-    if (fFadeFlags == 0)
+    if (fFadeFlags == 0) {
         fLastFadeFlag = flag;
-    
+    }
+
     TopOfStack()->Eval(hsTimer::GetSysSeconds(), 0, 0);
     ClaimChannels(fOwnedChannels);
     fCurrentTime = -1; // force eval
     fFadeFlagsDirty = true;
 }
 
-bool plLayerLinkAnimation::MsgReceive( plMessage* pMsg )
+bool plLayerLinkAnimation::MsgReceive(plMessage* pMsg)
 {
-    plLinkEffectPrepBCMsg *bcpMsg = plLinkEffectPrepBCMsg::ConvertNoRef(pMsg);
-    if (bcpMsg != nil)
-    {
-        if (bcpMsg->fLinkKey != fLinkKey || bcpMsg->fLeavingAge)
+    plLinkEffectPrepBCMsg* bcpMsg = plLinkEffectPrepBCMsg::ConvertNoRef(pMsg);
+
+    if (bcpMsg != nil) {
+        if (bcpMsg->fLinkKey != fLinkKey || bcpMsg->fLeavingAge) {
             return true;
-    
+        }
+
         SetFadeFlag(kFadeLinkPrep, true);
         return true;
     }
-        
-        
-    plLinkEffectBCMsg *msg = plLinkEffectBCMsg::ConvertNoRef(pMsg);
-    if (msg != nil)
-    {
-        if (msg->fLinkKey == fLinkKey)
-        {
-            SetFadeFlag(kFadeLinkPrep, false);
-            if (msg->HasLinkFlag(plLinkEffectBCMsg::kLeavingAge))
-                SetFadeFlag(kFadeLinking, true);
-            else
-                SetFadeFlag(kFadeLinking, false);
 
-            if (msg->HasLinkFlag(plLinkEffectBCMsg::kSendCallback))
-            {
-                plLinkEffectsMgr *mgr;
-                if ((mgr = plLinkEffectsMgr::ConvertNoRef(msg->GetSender()->ObjectIsLoaded())))
+
+    plLinkEffectBCMsg* msg = plLinkEffectBCMsg::ConvertNoRef(pMsg);
+
+    if (msg != nil) {
+        if (msg->fLinkKey == fLinkKey) {
+            SetFadeFlag(kFadeLinkPrep, false);
+
+            if (msg->HasLinkFlag(plLinkEffectBCMsg::kLeavingAge)) {
+                SetFadeFlag(kFadeLinking, true);
+            } else {
+                SetFadeFlag(kFadeLinking, false);
+            }
+
+            if (msg->HasLinkFlag(plLinkEffectBCMsg::kSendCallback)) {
+                plLinkEffectsMgr* mgr;
+
+                if ((mgr = plLinkEffectsMgr::ConvertNoRef(msg->GetSender()->ObjectIsLoaded()))) {
                     mgr->WaitForEffect(msg->fLinkKey, fTimeConvert.GetEnd() - fTimeConvert.GetBegin());
-            }           
+                }
+            }
         }
+
         return true;
     }
 
     plPseudoLinkAnimTriggerMsg* pSeudoMsg = plPseudoLinkAnimTriggerMsg::ConvertNoRef(pMsg);
-    if (pSeudoMsg)
-    {
-        if (fLinkKey != pSeudoMsg->fAvatarKey)
-            return true;
 
-        if (pSeudoMsg->fForward)
+    if (pSeudoMsg) {
+        if (fLinkKey != pSeudoMsg->fAvatarKey) {
+            return true;
+        }
+
+        if (pSeudoMsg->fForward) {
             SetFadeFlag(kFadeLinking, true);
-        else
+        } else {
             SetFadeFlag(kFadeLinking, false);
-        
+        }
+
         // add a callback for when it's done if it's in forward
-        plLinkEffectsMgr *mgr;
+        plLinkEffectsMgr* mgr;
+
         if ((mgr = plLinkEffectsMgr::ConvertNoRef(pMsg->GetSender()->ObjectIsLoaded())))
-            if (pSeudoMsg->fForward)
+            if (pSeudoMsg->fForward) {
                 mgr->WaitForPseudoEffect(fLinkKey, fTimeConvert.GetEnd() - fTimeConvert.GetBegin());
+            }
 
         return true;
     }
+
     // used to fade the player in or out when entering / exiting first person mode
     // or when distance between camera and player is too small...
     plCameraTargetFadeMsg* fMsg = plCameraTargetFadeMsg::ConvertNoRef(pMsg);
-    if (fMsg)
-    {
-        if (fLinkKey != fMsg->GetSubjectKey())
-            return true;
 
-        if (fMsg->FadeOut())
+    if (fMsg) {
+        if (fLinkKey != fMsg->GetSubjectKey()) {
+            return true;
+        }
+
+        if (fMsg->FadeOut()) {
             SetFadeFlag(kFadeCamera, true);
-        else
-            SetFadeFlag(kFadeCamera, false);    
+        } else {
+            SetFadeFlag(kFadeCamera, false);
+        }
 
         return true;
     }
-    plIfaceFadeAvatarMsg* iMsg = plIfaceFadeAvatarMsg::ConvertNoRef(pMsg);
-    if (iMsg)
-    {
-        if (fLinkKey != iMsg->GetSubjectKey())
-            return true;
 
-        if (iMsg->GetEnable())
-        {
-            Enable(true);
+    plIfaceFadeAvatarMsg* iMsg = plIfaceFadeAvatarMsg::ConvertNoRef(pMsg);
+
+    if (iMsg) {
+        if (fLinkKey != iMsg->GetSubjectKey()) {
+            return true;
         }
-        else if (iMsg->GetDisable())
-        {
+
+        if (iMsg->GetEnable()) {
+            Enable(true);
+        } else if (iMsg->GetDisable()) {
             Enable(false); // disable and un-fade
             SetFadeFlag(kFadeIFace, false);
-        }
-        else
-        if (fEnabled)
-        {
-            if (iMsg->FadeOut())
+        } else if (fEnabled) {
+            if (iMsg->FadeOut()) {
                 SetFadeFlag(kFadeIFace, true);
-            else
+            } else {
                 SetFadeFlag(kFadeIFace, false);
+            }
         }
+
         return true;
     }
 
-    plAvatarStealthModeMsg *sMsg = plAvatarStealthModeMsg::ConvertNoRef(pMsg);
-    if (sMsg)
-    {
-        if (sMsg->GetSender() == fLinkKey)
-        {
-            if (sMsg->fMode == plAvatarStealthModeMsg::kStealthCloakedButSeen)
-            {
+    plAvatarStealthModeMsg* sMsg = plAvatarStealthModeMsg::ConvertNoRef(pMsg);
+
+    if (sMsg) {
+        if (sMsg->GetSender() == fLinkKey) {
+            if (sMsg->fMode == plAvatarStealthModeMsg::kStealthCloakedButSeen) {
                 SetFadeFlag(kFadeCCR, true);
-            }
-            else if (sMsg->fMode == plAvatarStealthModeMsg::kStealthVisible)
-            {
+            } else if (sMsg->fMode == plAvatarStealthModeMsg::kStealthVisible) {
                 SetFadeFlag(kFadeCCR, false);
             }
+
             // Don't need to set opacity if we're fully cloaked, since we won't
             // even be drawing the spans (due to plEnableMsg() on the sceneObject)
         }
+
         return true;
     }
 
-    return plLayerAnimation::MsgReceive( pMsg );
+    return plLayerAnimation::MsgReceive(pMsg);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -684,42 +690,45 @@ plLayerSDLAnimation::~plLayerSDLAnimation()
 uint32_t plLayerSDLAnimation::Eval(double wSecs, uint32_t frame, uint32_t ignore)
 {
     uint32_t dirty = plLayerInterface::Eval(wSecs, frame, ignore);
-    if( wSecs != fEvalTime )
-    {
+
+    if (wSecs != fEvalTime) {
         uint32_t evalChans = 0;
         uint32_t passChans = dirty | fPassThruChannels;
 
-        if (fEvalTime < 0)
-        {
-            if (fVarName != nil)
-            {
-                extern const plSDLModifier *ExternFindAgeSDL();
-                const plSDLModifier *sdlMod = ExternFindAgeSDL();
-                if (sdlMod)
-                {
+        if (fEvalTime < 0) {
+            if (fVarName != nil) {
+                extern const plSDLModifier* ExternFindAgeSDL();
+                const plSDLModifier* sdlMod = ExternFindAgeSDL();
+
+                if (sdlMod) {
                     fVar = sdlMod->GetStateCache()->FindVar(fVarName);
-                    if (fVar)
+
+                    if (fVar) {
                         sdlMod->AddNotifyForVar(GetKey(), fVarName, 0);
+                    }
                 }
             }
         }
+
         float secs;
-        if (fVar)
+
+        if (fVar) {
             fVar->Get(&secs);
-        else
+        } else {
             secs = 0.f;
+        }
 
         // We're guaranteed a 0-1 time. Scale that to our animation length.
         secs *= GetLength();
 
-        if( secs != fCurrentTime )
-        {
+        if (secs != fCurrentTime) {
             evalChans = fOwnedChannels & ~ignore & ~fPassThruChannels;
             fCurrentTime = secs;
         }
 
         IEvalConvertedTime(secs, passChans, evalChans, dirty);
     }
+
     fEvalTime = wSecs;
     return dirty;
 }
@@ -727,8 +736,8 @@ uint32_t plLayerSDLAnimation::Eval(double wSecs, uint32_t frame, uint32_t ignore
 bool plLayerSDLAnimation::MsgReceive(plMessage* msg)
 {
     plSDLNotificationMsg* nMsg = plSDLNotificationMsg::ConvertNoRef(msg);
-    if (nMsg)
-    {
+
+    if (nMsg) {
         TopOfStack()->Eval(hsTimer::GetSysSeconds(), 0, 0);
         ClaimChannels(fOwnedChannels);
         return true;
@@ -751,8 +760,8 @@ void plLayerSDLAnimation::Write(hsStream* s, hsResMgr* mgr)
     s->WriteSafeString(fVarName);
 }
 
-void plLayerSDLAnimation::SetVarName(char *name) 
-{ 
-    delete [] fVarName; 
-    fVarName = hsStrcpy(name); 
+void plLayerSDLAnimation::SetVarName(char* name)
+{
+    delete [] fVarName;
+    fVarName = hsStrcpy(name);
 }

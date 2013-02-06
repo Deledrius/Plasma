@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plNetGameLib/Private/plNglCore.cpp
-*   
+*
 ***/
 
 #include "../Pch.h"
@@ -61,12 +61,12 @@ struct ReportNetErrorTrans : NetNotifyTrans {
     ENetProtocol        m_errProtocol;
     ENetError           m_errError;
 
-    ReportNetErrorTrans (
+    ReportNetErrorTrans(
         ENetProtocol    errProtocol,
         ENetError       errError
     );
 
-    void Post ();
+    void Post();
 };
 
 
@@ -96,26 +96,28 @@ static long                 s_initCount;
 //============================================================================
 // NetNotifyTrans
 //============================================================================
-NetNotifyTrans::NetNotifyTrans (ETransType transType)
-:   NetTrans(kNetProtocolNil, transType)
+NetNotifyTrans::NetNotifyTrans(ETransType transType)
+    :   NetTrans(kNetProtocolNil, transType)
 {
 }
 
 //============================================================================
 // ReportNetErrorTrans
 //============================================================================
-ReportNetErrorTrans::ReportNetErrorTrans (
+ReportNetErrorTrans::ReportNetErrorTrans(
     ENetProtocol    errProtocol,
     ENetError       errError
 ) : NetNotifyTrans(kReportNetErrorTrans)
-,   m_errProtocol(errProtocol)
-,   m_errError(errError)
+    ,   m_errProtocol(errProtocol)
+    ,   m_errError(errError)
 { }
 
 //============================================================================
-void ReportNetErrorTrans::Post () {
-    if (s_errorProc)
+void ReportNetErrorTrans::Post()
+{
+    if (s_errorProc) {
         s_errorProc(m_errProtocol, m_errError);
+    }
 }
 
 
@@ -126,8 +128,9 @@ void ReportNetErrorTrans::Post () {
 ***/
 
 //============================================================================
-void ReportNetError (ENetProtocol protocol, ENetError error) {
-    ReportNetErrorTrans * trans = new ReportNetErrorTrans(protocol, error);
+void ReportNetError(ENetProtocol protocol, ENetError error)
+{
+    ReportNetErrorTrans* trans = new ReportNetErrorTrans(protocol, error);
     NetTransSend(trans);
 }
 
@@ -141,8 +144,9 @@ void ReportNetError (ENetProtocol protocol, ENetError error) {
 ***/
 
 //============================================================================
-void NetClientInitialize () {
-    
+void NetClientInitialize()
+{
+
     if (0 == AtomicAdd(&s_initCount, 1)) {
         NetTransInitialize();
         AuthInitialize();
@@ -153,12 +157,14 @@ void NetClientInitialize () {
 }
 
 //============================================================================
-void NetClientCancelAllTrans () {
+void NetClientCancelAllTrans()
+{
     NetTransCancelAll(kNetErrTimeout);
 }
 
 //============================================================================
-void NetClientDestroy (bool wait) {
+void NetClientDestroy(bool wait)
+{
 
     if (1 == AtomicAdd(&s_initCount, -1)) {
         s_errorProc = nil;
@@ -168,6 +174,7 @@ void NetClientDestroy (bool wait) {
         GameDestroy(false);
         AuthDestroy(false);
         NetTransDestroy(false);
+
         if (wait) {
             GateKeeperDestroy(true);
             FileDestroy(true);
@@ -179,22 +186,26 @@ void NetClientDestroy (bool wait) {
 }
 
 //============================================================================
-void NetClientUpdate () {
+void NetClientUpdate()
+{
     NetTransUpdate();
 }
 
 //============================================================================
-void NetClientSetTransTimeoutMs (unsigned ms) {
+void NetClientSetTransTimeoutMs(unsigned ms)
+{
     NetTransSetTimeoutMs(ms);
 }
 
 //============================================================================
-void NetClientPingEnable (bool enable) {
+void NetClientPingEnable(bool enable)
+{
     AuthPingEnable(enable);
     GamePingEnable(enable);
 }
 
 //============================================================================
-void NetClientSetErrorHandler (FNetClientErrorProc errorProc) {
+void NetClientSetErrorHandler(FNetClientErrorProc errorProc)
+{
     s_errorProc = errorProc;
 }

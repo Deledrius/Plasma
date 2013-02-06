@@ -58,19 +58,21 @@ typedef bool(*ActionCallbackFunc)(int);
  Helper classes for plActionTableMgr
 ******************************************************************************/
 
-class ActionTableMgrCB : public ActionCallback
-{
+class ActionTableMgrCB : public ActionCallback {
     ActionCallbackFunc fCallbackFunc;
 
 public:
-    ActionTableMgrCB(ActionCallbackFunc cbFunc) {fCallbackFunc = cbFunc;}
+    ActionTableMgrCB(ActionCallbackFunc cbFunc) {
+        fCallbackFunc = cbFunc;
+    }
 
-    BOOL ExecuteAction(int id) { return fCallbackFunc(id) ? TRUE : FALSE; }
+    BOOL ExecuteAction(int id) {
+        return fCallbackFunc(id) ? TRUE : FALSE;
+    }
 };
 
 
-class ActionTableInfo
-{
+class ActionTableInfo {
     friend class plActionTableMgr;
 
 private:
@@ -84,30 +86,26 @@ public:
 
     std::vector<ActionDescription> Actions;
 
-    ActionTableInfo(ActionTableId actionId, TCHAR* name, ActionDescription actions[], int numActions)
-    {
+    ActionTableInfo(ActionTableId actionId, TCHAR* name, ActionDescription actions[], int numActions) {
         TableId = actionId;
         ContextId = actionId;
         Name = name;
         Created = false;
         ActionCB = NULL;
 
-        for(int i = 0; i < numActions; i++)
-        {
+        for (int i = 0; i < numActions; i++) {
             Actions.push_back(actions[i]);
         }
     }
 
-    ActionTableInfo()
-    {
+    ActionTableInfo() {
         TableId = 0;
         ContextId = 0;
         Created = false;
         ActionCB = NULL;
     }
 
-    virtual ~ActionTableInfo()
-    {
+    virtual ~ActionTableInfo() {
         delete ActionCB;
     }
 };
@@ -118,8 +116,7 @@ public:
  plActionTableMgr class defintion
 ******************************************************************************/
 
-class plActionTableMgr
-{
+class plActionTableMgr {
     std::vector<ActionTableInfo*> fActionTables;
 
 public:
@@ -128,12 +125,14 @@ public:
 
     void AddActionTable(ActionTableInfo& actionTable, ActionCallbackFunc cbFunc);
 
-    int NumActionTables() { return fActionTables.size(); }
+    int NumActionTables() {
+        return fActionTables.size();
+    }
     ActionTable* GetActionTable(int i);
 
 private:
-    static void SysStartup(void *param, NotifyInfo *info);
-    static void SysShutdown(void *param, NotifyInfo *info);
+    static void SysStartup(void* param, NotifyInfo* info);
+    static void SysShutdown(void* param, NotifyInfo* info);
 };
 
 

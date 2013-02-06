@@ -49,16 +49,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plLogicModBase;
 
-class plConditionalObject : public hsKeyedObject
-{
+class plConditionalObject : public hsKeyedObject {
 private:
     // since 'this' is not derived from synchedObject, its synched values must be associated
     // with it's logicModifier (which is a synchedObject).  Thus it's a synched value 'friend'.
-    bool                            bSatisfied;     
+    bool                            bSatisfied;
     bool                            fToggle;
 public:
-    enum
-    {
+    enum {
         kLocalElement   = 0,
         kNOT,
     };
@@ -70,33 +68,65 @@ public:
     plConditionalObject();
     virtual ~plConditionalObject();
 
-    CLASSNAME_REGISTER( plConditionalObject );
-    GETINTERFACE_ANY( plConditionalObject, hsKeyedObject );
+    CLASSNAME_REGISTER(plConditionalObject);
+    GETINTERFACE_ANY(plConditionalObject, hsKeyedObject);
 
-    virtual void Read(hsStream* stream, hsResMgr* mgr) { hsKeyedObject::Read(stream, mgr); bSatisfied = stream->ReadBool(); fToggle = stream->ReadBool();}
-    virtual void Write(hsStream* stream, hsResMgr* mgr){ hsKeyedObject::Write(stream, mgr); stream->WriteBool( bSatisfied ); stream->WriteBool(fToggle);}
+    virtual void Read(hsStream* stream, hsResMgr* mgr) {
+        hsKeyedObject::Read(stream, mgr);
+        bSatisfied = stream->ReadBool();
+        fToggle = stream->ReadBool();
+    }
+    virtual void Write(hsStream* stream, hsResMgr* mgr) {
+        hsKeyedObject::Write(stream, mgr);
+        stream->WriteBool(bSatisfied);
+        stream->WriteBool(fToggle);
+    }
 
-    virtual void SetLogicMod(plLogicModBase* pMod) { fLogicMod = pMod; }
+    virtual void SetLogicMod(plLogicModBase* pMod) {
+        fLogicMod = pMod;
+    }
 
 //  virtual bool MsgReceive(plMessage* msg) = 0;
 
-    virtual bool Satisfied() { if(HasFlag(kNOT)) return !bSatisfied; else return bSatisfied; }
-    void SetSatisfied(bool b) { bSatisfied=b; }
-    bool IsToggle() { return fToggle; }
-    void SetToggle(bool b) { fToggle = b; }
+    virtual bool Satisfied() {
+        if (HasFlag(kNOT)) {
+            return !bSatisfied;
+        } else {
+            return bSatisfied;
+        }
+    }
+    void SetSatisfied(bool b) {
+        bSatisfied = b;
+    }
+    bool IsToggle() {
+        return fToggle;
+    }
+    void SetToggle(bool b) {
+        fToggle = b;
+    }
 
     // this is used if condtiton 1 is dependent on another condition's state at the
     // time of a message coming into condition 1;
-    virtual bool Verify(plMessage* msg) { return true; }
+    virtual bool Verify(plMessage* msg) {
+        return true;
+    }
 
     virtual void Evaluate() = 0;
-    
-    virtual void Reset() = 0;
-    virtual bool ResetOnTrigger() { return fReset; }
 
-    bool    HasFlag(int f) const { return fFlags.IsBitSet(f); }
-    void    SetFlag(int f) { fFlags.SetBit(f); }
-    void    ClearFlag(int which) { fFlags.ClearBit( which ); }
+    virtual void Reset() = 0;
+    virtual bool ResetOnTrigger() {
+        return fReset;
+    }
+
+    bool    HasFlag(int f) const {
+        return fFlags.IsBitSet(f);
+    }
+    void    SetFlag(int f) {
+        fFlags.SetBit(f);
+    }
+    void    ClearFlag(int which) {
+        fFlags.ClearBit(which);
+    }
 
 
 };

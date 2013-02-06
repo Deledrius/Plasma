@@ -66,11 +66,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMessage/plAgeLoadedMsg.h"
 
 plClusterGroup::plClusterGroup()
-:   fSceneNode(nil),
-    fDrawable(nil),
-    fTemplate(nil),
-    fMaterial(nil),
-    fUnPacked(0)
+    :   fSceneNode(nil),
+        fDrawable(nil),
+        fTemplate(nil),
+        fMaterial(nil),
+        fUnPacked(0)
 {
     fVisSet.SetBit(plVisMgr::kNormal);
 }
@@ -78,8 +78,10 @@ plClusterGroup::plClusterGroup()
 plClusterGroup::~plClusterGroup()
 {
     int i;
-    for( i = 0; i < fClusters.GetCount(); i++ )
+
+    for (i = 0; i < fClusters.GetCount(); i++) {
         delete fClusters[i];
+    }
 
     delete fTemplate;
 }
@@ -94,13 +96,13 @@ plCluster* plClusterGroup::IAddCluster()
 }
 
 plCluster* plClusterGroup::IGetCluster(int i) const
-{ 
-    return fClusters[i]; 
+{
+    return fClusters[i];
 }
 
 const plCluster* plClusterGroup::GetCluster(int i) const
-{ 
-    return fClusters[i]; 
+{
+    return fClusters[i];
 }
 
 void plClusterGroup::Read(hsStream* stream, hsResMgr* mgr)
@@ -116,19 +118,23 @@ void plClusterGroup::Read(hsStream* stream, hsResMgr* mgr)
 
     const int numClust = stream->ReadLE32();
     fClusters.SetCount(numClust);
-    for( i = 0; i < numClust; i++ )
-    {
+
+    for (i = 0; i < numClust; i++) {
         fClusters[i] = new plCluster;
         fClusters[i]->Read(stream, this);
     }
 
     const int numRegions = stream->ReadLE32();
-    for( i = 0; i < numRegions; i++ )
+
+    for (i = 0; i < numRegions; i++) {
         mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, kRefRegion), plRefFlags::kActiveRef);
+    }
 
     const int numLights = stream->ReadLE32();
-    for( i = 0; i < numLights; i++ )
+
+    for (i = 0; i < numLights; i++) {
         mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, kRefLight), plRefFlags::kActiveRef);
+    }
 
     fLOD.Read(stream);
 
@@ -151,16 +157,22 @@ void plClusterGroup::Write(hsStream* stream, hsResMgr* mgr)
     mgr->WriteKey(stream, fMaterial);
 
     stream->WriteLE32(fClusters.GetCount());
-    for( i = 0; i < fClusters.GetCount(); i++ )
+
+    for (i = 0; i < fClusters.GetCount(); i++) {
         fClusters[i]->Write(stream);
+    }
 
     stream->WriteLE32(fRegions.GetCount());
-    for( i = 0; i < fRegions.GetCount(); i++ )
+
+    for (i = 0; i < fRegions.GetCount(); i++) {
         mgr->WriteKey(stream, fRegions[i]);
+    }
 
     stream->WriteLE32(fLights.GetCount());
-    for( i = 0; i < fLights.GetCount(); i++ )
+
+    for (i = 0; i < fLights.GetCount(); i++) {
         mgr->WriteKey(stream, fLights[i]);
+    }
 
     fLOD.Write(stream);
 
@@ -178,97 +190,107 @@ void plClusterGroup::ISendToSelf(RefType t, hsKeyedObject* ref)
 
 bool plClusterGroup::IAddVisRegion(plVisRegion* reg)
 {
-    if( reg )
-    {
+    if (reg) {
         int idx = fRegions.Find(reg);
-        if( idx == fRegions.kMissingIndex )
-        {
+
+        if (idx == fRegions.kMissingIndex) {
             fRegions.Append(reg);
-            if( reg->GetProperty(plVisRegion::kIsNot) )
+
+            if (reg->GetProperty(plVisRegion::kIsNot)) {
                 fVisNot.SetBit(reg->GetIndex());
-            else
-            {
+            } else {
                 fVisSet.SetBit(reg->GetIndex());
-                if( reg->ReplaceNormal() )
+
+                if (reg->ReplaceNormal()) {
                     fVisSet.ClearBit(plVisMgr::kNormal);
+                }
             }
         }
     }
+
     return true;
 }
 
 bool plClusterGroup::IRemoveVisRegion(plVisRegion* reg)
 {
-    if( reg )
-    {
+    if (reg) {
         int idx = fRegions.Find(reg);
-        if( fRegions.kMissingIndex != idx )
-        {
+
+        if (fRegions.kMissingIndex != idx) {
             fRegions.Remove(idx);
-            if( reg->GetProperty(plVisRegion::kIsNot) )
+
+            if (reg->GetProperty(plVisRegion::kIsNot)) {
                 fVisNot.ClearBit(reg->GetIndex());
-            else
+            } else {
                 fVisSet.ClearBit(reg->GetIndex());
+            }
         }
     }
+
     return true;
 }
 
 bool plClusterGroup::IAddLight(plLightInfo* li)
 {
     int idx = fLights.Find(li);
-    if( fLights.kMissingIndex == idx )
-    {
+
+    if (fLights.kMissingIndex == idx) {
         fLights.Append(li);
     }
+
     return true;
 }
 
 bool plClusterGroup::IRemoveLight(plLightInfo* li)
 {
     int idx = fLights.Find(li);
-    if( fLights.kMissingIndex != idx )
-    {
+
+    if (fLights.kMissingIndex != idx) {
         fLights.Remove(idx);
     }
+
     return true;
 }
 
 bool plClusterGroup::IOnReceive(plGenRefMsg* ref)
 {
-    switch( ref->fType )
-    {
+    switch (ref->fType) {
     case kRefMaterial:
         fMaterial = hsGMaterial::ConvertNoRef(ref->GetRef());
         return true;
+
     case kRefRegion:
         return IAddVisRegion(plVisRegion::ConvertNoRef(ref->GetRef()));
+
     case kRefLight:
         return IAddLight(plLightInfo::ConvertNoRef(ref->GetRef()));
     }
+
     return false;
 }
 
 bool plClusterGroup::IOnRemove(plGenRefMsg* ref)
 {
     int idx = -1;
-    switch( ref->fType )
-    {
+
+    switch (ref->fType) {
     case kRefMaterial:
         fMaterial = nil;
         return true;
+
     case kRefRegion:
         return IRemoveVisRegion(plVisRegion::ConvertNoRef(ref->GetRef()));
+
     case kRefLight:
         return IRemoveLight(plLightInfo::ConvertNoRef(ref->GetRef()));
     }
+
     return false;
 }
 
 bool plClusterGroup::IOnRef(plGenRefMsg* ref)
 {
-    if( ref->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-    {
+    if (ref->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
         return IOnReceive(ref);
     }
 
@@ -278,16 +300,17 @@ bool plClusterGroup::IOnRef(plGenRefMsg* ref)
 bool plClusterGroup::MsgReceive(plMessage* msg)
 {
     plGenRefMsg* ref = plGenRefMsg::ConvertNoRef(msg);
-    if( ref )
-    {
-        if( IOnRef(ref) )
+
+    if (ref) {
+        if (IOnRef(ref)) {
             return true;
+        }
     }
 
     // STUB
     plEvalMsg* evalMsg = plEvalMsg::ConvertNoRef(msg);
-    if (evalMsg)
-    {
+
+    if (evalMsg) {
         UnPack();
         fUnPacked = true;
         plgDispatch::Dispatch()->UnRegisterForExactType(plEvalMsg::Index(), GetKey());
@@ -308,11 +331,12 @@ void plClusterGroup::UnPack()
 
 void plClusterGroup::SetVisible(bool visible)
 {
-    if (fDrawable)
-    {
-        plDrawableSpans *drawable = plDrawableSpans::ConvertNoRef(fDrawable->ObjectIsLoaded());
-        if (drawable)
-            drawable->SetProperty(0,!visible); // property 0 is the disable drawing property
+    if (fDrawable) {
+        plDrawableSpans* drawable = plDrawableSpans::ConvertNoRef(fDrawable->ObjectIsLoaded());
+
+        if (drawable) {
+            drawable->SetProperty(0, !visible);    // property 0 is the disable drawing property
+        }
     }
 }
 
@@ -320,8 +344,10 @@ uint32_t plClusterGroup::NumInst() const
 {
     uint32_t numInst = 0;
     int i;
-    for( i = 0; i < fClusters.GetCount(); i++ )
+
+    for (i = 0; i < fClusters.GetCount(); i++) {
         numInst += fClusters[i]->NumInsts();
+    }
 
     return numInst;
 }

@@ -46,24 +46,33 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plMessage.h"
 
 
-class plTriggerMsg : public plMessage
-{
+class plTriggerMsg : public plMessage {
 protected:
 
 public:
-    
-    plTriggerMsg(){SetBCastFlag(plMessage::kBCastByExactType | plMessage::kPropagateToModifiers);}
-    plTriggerMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t){SetBCastFlag(plMessage::kBCastByExactType | plMessage::kPropagateToModifiers);}
-    ~plTriggerMsg(){;}
 
-    CLASSNAME_REGISTER( plTriggerMsg );
-    GETINTERFACE_ANY( plTriggerMsg, plMessage );
+    plTriggerMsg() {
+        SetBCastFlag(plMessage::kBCastByExactType | plMessage::kPropagateToModifiers);
+    }
+    plTriggerMsg(const plKey& s,
+                 const plKey& r,
+                 const double* t) {
+        SetBCastFlag(plMessage::kBCastByExactType | plMessage::kPropagateToModifiers);
+    }
+    ~plTriggerMsg() {
+        ;
+    }
 
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr) {    plMessage::IMsgRead(stream, mgr);   }
-    void Write(hsStream* stream, hsResMgr* mgr) {   plMessage::IMsgWrite(stream, mgr);  }
+    CLASSNAME_REGISTER(plTriggerMsg);
+    GETINTERFACE_ANY(plTriggerMsg, plMessage);
+
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
+        plMessage::IMsgRead(stream, mgr);
+    }
+    void Write(hsStream* stream, hsResMgr* mgr) {
+        plMessage::IMsgWrite(stream, mgr);
+    }
 };
 
 

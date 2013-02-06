@@ -47,13 +47,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class hsResMgr;
 
-class plAccountUpdateMsg : public plMessage
-{
+class plAccountUpdateMsg : public plMessage {
 public:
     // If you update this enum, please update the python enum
     // located at the bottom of cyAccountManagementGlue.cpp
-    enum
-    {
+    enum {
         kCreatePlayer = 1,
         kDeletePlayer,
         kUpgradePlayer,
@@ -64,9 +62,9 @@ public:
     plAccountUpdateMsg();
     plAccountUpdateMsg(unsigned updateType);
 
-    CLASSNAME_REGISTER( plAccountUpdateMsg );
-    GETINTERFACE_ANY( plAccountUpdateMsg, plMessage );
-    
+    CLASSNAME_REGISTER(plAccountUpdateMsg);
+    GETINTERFACE_ANY(plAccountUpdateMsg, plMessage);
+
     void Read(hsStream* stream, hsResMgr* mgr);
     void Write(hsStream* stream, hsResMgr* mgr);
 

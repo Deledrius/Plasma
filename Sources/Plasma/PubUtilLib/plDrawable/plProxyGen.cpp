@@ -59,9 +59,9 @@ static hsTArray<hsGMaterial*>   fProxyMaterials;
 static uint32_t                   fProxyKeyCounter = 0;
 
 plProxyGen::plProxyGen(const hsColorRGBA& amb, const hsColorRGBA& dif, float opac)
-:   fProxyMsgType(0),
-    fProxyDraw(nil),
-    fProxyMat(nil)
+    :   fProxyMsgType(0),
+        fProxyDraw(nil),
+        fProxyMat(nil)
 {
     fAmbient = amb;
     fColor = dif;
@@ -70,30 +70,30 @@ plProxyGen::plProxyGen(const hsColorRGBA& amb, const hsColorRGBA& dif, float opa
 
 plProxyGen::~plProxyGen()
 {
-    if( fProxyDraw )
+    if (fProxyDraw) {
         GetKey()->Release(fProxyDraw->GetKey());
-    if( fProxyMat )
+    }
+
+    if (fProxyMat) {
         GetKey()->Release(fProxyMat->GetKey());
+    }
 }
 
 void plProxyGen::Init(const hsKeyedObject* owner)
 {
-    if( !GetKey() )
-    {
+    if (!GetKey()) {
         plString buff;
         plLocation loc;
-        if( owner->GetKey() )
-        {
+
+        if (owner->GetKey()) {
             buff = plString::Format("%s_ProxyGen_%d_%d", owner->GetKey()->GetName().c_str(), owner->GetKey()->GetUoid().GetClonePlayerID(), fProxyKeyCounter++);
             loc = owner->GetKey()->GetUoid().GetLocation();
-        }
-        else
-        {
-            buff = plString::Format( "ProxyGen%d", fProxyKeyCounter++ );
+        } else {
+            buff = plString::Format("ProxyGen%d", fProxyKeyCounter++);
             loc = plLocation::kGlobalFixedLoc;
         }
 
-        hsgResMgr::ResMgr()->NewKey( buff, this, loc );
+        hsgResMgr::ResMgr()->NewKey(buff, this, loc);
 
         plgDispatch::Dispatch()->RegisterForExactType(plProxyDrawMsg::Index(), GetKey());
     }
@@ -102,21 +102,26 @@ void plProxyGen::Init(const hsKeyedObject* owner)
 
 uint32_t plProxyGen::IGetDrawableType() const
 {
-    switch( fProxyMsgType & plProxyDrawMsg::kAllTypes )
-    {
+    switch (fProxyMsgType & plProxyDrawMsg::kAllTypes) {
     case plProxyDrawMsg::kLight:
         return plDrawable::kLightProxy;
+
     case plProxyDrawMsg::kPhysical:
         return plDrawable::kPhysicalProxy;
+
     case plProxyDrawMsg::kOccluder:
         return plDrawable::kOccluderProxy;
+
     case plProxyDrawMsg::kAudible:
         return plDrawable::kAudibleProxy;
+
     case plProxyDrawMsg::kCoordinate:
         return plDrawable::kCoordinateProxy;
+
     case plProxyDrawMsg::kCamera:
         return plDrawable::kCameraProxy;
     }
+
     hsAssert(false, "Unknown proxy type");
     return plDrawable::kGenericProxy;
 }
@@ -129,22 +134,23 @@ uint32_t plProxyGen::IGetProxyIndex() const
     int firstNil = -1;
     int firstMatch = -1;
     int i;
-    for( i = 0; i < fProxyDrawables.GetCount(); i++ )
-    {
-        if( fProxyDrawables[i] )
-        {
-            if( (fProxyDrawables[i]->GetType() & drawType)
-                &&(fProxyDrawables[i]->GetSceneNode() == sceneNode) )
-            {
+
+    for (i = 0; i < fProxyDrawables.GetCount(); i++) {
+        if (fProxyDrawables[i]) {
+            if ((fProxyDrawables[i]->GetType() & drawType)
+                    && (fProxyDrawables[i]->GetSceneNode() == sceneNode)) {
                 return i;
             }
-        }
-        else if( firstNil < 0 )
+        } else if (firstNil < 0) {
             firstNil = i;
+        }
     }
-    if( firstNil < 0 )
+
+    if (firstNil < 0) {
         firstNil = fProxyDrawables.GetCount();
-    fProxyDrawables.ExpandAndZero(firstNil+1);
+    }
+
+    fProxyDrawables.ExpandAndZero(firstNil + 1);
 
     return firstNil;
 }
@@ -158,19 +164,22 @@ hsGMaterial* plProxyGen::IMakeProxyMaterial() const
     hsGMaterial* retVal = new hsGMaterial();
 
     plString buff;
-    if( !GetKeyName().IsNull() )
-        buff = plString::Format("%s_Material", GetKeyName().c_str());
-    else
-        buff = "ProxyMaterial";
-    hsgResMgr::ResMgr()->NewKey( buff, retVal, GetKey() ? GetKey()->GetUoid().GetLocation() : plLocation::kGlobalFixedLoc );
 
-    plLayer *lay = retVal->MakeBaseLayer();
+    if (!GetKeyName().IsNull()) {
+        buff = plString::Format("%s_Material", GetKeyName().c_str());
+    } else {
+        buff = "ProxyMaterial";
+    }
+
+    hsgResMgr::ResMgr()->NewKey(buff, retVal, GetKey() ? GetKey()->GetUoid().GetLocation() : plLocation::kGlobalFixedLoc);
+
+    plLayer* lay = retVal->MakeBaseLayer();
     lay->SetRuntimeColor(dif);
     lay->SetPreshadeColor(dif);
     lay->SetAmbientColor(amb);
     lay->SetOpacity(opac);
-    if( opac < 1.f )
-    {
+
+    if (opac < 1.f) {
         lay->SetBlendFlags(lay->GetBlendFlags() | hsGMatState::kBlendAlpha);
         lay->SetMiscFlags(hsGMatState::kMiscTwoSided);
         lay->SetZFlags(hsGMatState::kZNoZWrite);
@@ -181,18 +190,21 @@ hsGMaterial* plProxyGen::IMakeProxyMaterial() const
 
 hsGMaterial* plProxyGen::IFindProxyMaterial() const
 {
-    for (int i = 0; i < fProxyMaterials.GetCount(); i++)
-    {
+    for (int i = 0; i < fProxyMaterials.GetCount(); i++) {
         hsGMaterial* mat = fProxyMaterials[i];
-        if (!mat)
+
+        if (!mat) {
             continue;
+        }
 
         plLayer* lay = plLayer::ConvertNoRef(mat->GetLayer(0));
+
         if (lay &&
-            lay->GetAmbientColor() == fAmbient &&
-            lay->GetRuntimeColor() == fColor &&
-            lay->GetOpacity() == fAmbient.a)
+                lay->GetAmbientColor() == fAmbient &&
+                lay->GetRuntimeColor() == fColor &&
+                lay->GetOpacity() == fAmbient.a) {
             return mat;
+        }
     }
 
     return nil;
@@ -201,13 +213,16 @@ hsGMaterial* plProxyGen::IFindProxyMaterial() const
 hsGMaterial* plProxyGen::IGetProxyMaterial() const
 {
     // If we already have a material, return that
-    if (fProxyMat)
+    if (fProxyMat) {
         return fProxyMat;
+    }
 
     // If there's one existing (for another proxy) that is setup the same as ours, use that
     hsGMaterial* mat = IFindProxyMaterial();
-    if (mat)
+
+    if (mat) {
         return mat;
+    }
 
     // Have to make a new one
     mat = IMakeProxyMaterial();
@@ -217,8 +232,9 @@ hsGMaterial* plProxyGen::IGetProxyMaterial() const
 
 void plProxyGen::IGenerateProxy()
 {
-    if( !IGetNode() )
+    if (!IGetNode()) {
         return;
+    }
 
     uint32_t idx = IGetProxyIndex();
 
@@ -230,19 +246,19 @@ void plProxyGen::IGenerateProxy()
     fProxyIndex.SetCount(0);
     fProxyDrawables[idx] = ICreateProxy(mat, fProxyIndex, fProxyDrawables[idx]);
 
-    if( fProxyDrawables[idx] && !fProxyDrawables[idx]->GetKey() )
-    {
+    if (fProxyDrawables[idx] && !fProxyDrawables[idx]->GetKey()) {
         plString buff;
-        if( !GetKeyName().IsNull() )
-            buff = plString::Format("%s_ProxyDrawable", GetKeyName().c_str());
-        else
-            buff = "ProxyDrawable";
 
-        hsgResMgr::ResMgr()->NewKey( buff, fProxyDrawables[ idx ], GetKey() ? GetKey()->GetUoid().GetLocation() : plLocation::kGlobalFixedLoc );
+        if (!GetKeyName().IsNull()) {
+            buff = plString::Format("%s_ProxyDrawable", GetKeyName().c_str());
+        } else {
+            buff = "ProxyDrawable";
+        }
+
+        hsgResMgr::ResMgr()->NewKey(buff, fProxyDrawables[ idx ], GetKey() ? GetKey()->GetUoid().GetLocation() : plLocation::kGlobalFixedLoc);
     }
 
-    if( fProxyDrawables[idx] )
-    {
+    if (fProxyDrawables[idx]) {
         fProxyDrawables[idx]->SetType(IGetDrawableType());
 
         IApplyProxy(idx);
@@ -251,7 +267,7 @@ void plProxyGen::IGenerateProxy()
         hsgResMgr::ResMgr()->AddViaNotify(mat->GetKey(), msg, plRefFlags::kActiveRef);
         fProxyMat = mat;
 
-        plNodeRefMsg* refMsg = new plNodeRefMsg( GetKey(), plNodeRefMsg::kOnRequest, (int8_t)idx, plNodeRefMsg::kDrawable );
+        plNodeRefMsg* refMsg = new plNodeRefMsg(GetKey(), plNodeRefMsg::kOnRequest, (int8_t)idx, plNodeRefMsg::kDrawable);
         hsgResMgr::ResMgr()->AddViaNotify(fProxyDrawables[idx]->GetKey(), refMsg, plRefFlags::kActiveRef);
         fProxyDraw = fProxyDrawables[idx];
     }
@@ -261,8 +277,7 @@ void plProxyGen::IGenerateProxy()
 // Add our proxy to our scenenode for rendering.
 void plProxyGen::IApplyProxy(uint32_t idx) const
 {
-    if( fProxyDrawables[idx] && IGetNode() && (fProxyDrawables[idx]->GetSceneNode() != IGetNode()) )
-    {
+    if (fProxyDrawables[idx] && IGetNode() && (fProxyDrawables[idx]->GetSceneNode() != IGetNode())) {
         fProxyDrawables[idx]->SetSceneNode(IGetNode());
     }
 }
@@ -271,8 +286,7 @@ void plProxyGen::IApplyProxy(uint32_t idx) const
 // Remove our proxy from our scenenode.
 void plProxyGen::IRemoveProxy(uint32_t idx) const
 {
-    if( fProxyDrawables[idx] )
-    {
+    if (fProxyDrawables[idx]) {
         fProxyDrawables[idx]->SetSceneNode(nil);
     }
 }
@@ -280,18 +294,20 @@ void plProxyGen::IRemoveProxy(uint32_t idx) const
 /// Destroy the proxy. Duh.
 void plProxyGen::IDestroyProxy()
 {
-    if( fProxyDraw )
-    {
-        if( fProxyDraw->GetSceneNode() )
+    if (fProxyDraw) {
+        if (fProxyDraw->GetSceneNode()) {
             fProxyDraw->SetSceneNode(nil);
+        }
+
         GetKey()->Release(fProxyDraw->GetKey());
         fProxyDraw = nil;
     }
-    if( fProxyMat )
-    {
+
+    if (fProxyMat) {
         GetKey()->Release(fProxyMat->GetKey());
         fProxyMat = nil;
     }
+
     fProxyDrawables.Reset();
     fProxyMaterials.Reset();
 }
@@ -299,45 +315,48 @@ void plProxyGen::IDestroyProxy()
 bool plProxyGen::MsgReceive(plMessage* msg)
 {
     plProxyDrawMsg* pDraw = plProxyDrawMsg::ConvertNoRef(msg);
-    if( pDraw && (pDraw->GetProxyFlags() & IGetProxyMsgType()) )
-    {
-        if( pDraw->GetProxyFlags() & plProxyDrawMsg::kCreate )
-        {
-            if( fProxyDraw == nil )
+
+    if (pDraw && (pDraw->GetProxyFlags() & IGetProxyMsgType())) {
+        if (pDraw->GetProxyFlags() & plProxyDrawMsg::kCreate) {
+            if (fProxyDraw == nil) {
                 IGenerateProxy();
-        }
-        else if( pDraw->GetProxyFlags() & plProxyDrawMsg::kDestroy )
-        {
-            if( fProxyDraw != nil )
+            }
+        } else if (pDraw->GetProxyFlags() & plProxyDrawMsg::kDestroy) {
+            if (fProxyDraw != nil) {
                 IDestroyProxy();
-        }
-        else if( pDraw->GetProxyFlags() & plProxyDrawMsg::kToggle )
-        {
-            if( fProxyDraw == nil )
+            }
+        } else if (pDraw->GetProxyFlags() & plProxyDrawMsg::kToggle) {
+            if (fProxyDraw == nil) {
                 IGenerateProxy();
-            else
+            } else {
                 IDestroyProxy();
+            }
         }
+
         return true;
     }
+
     plNodeRefMsg* nodeRef = plNodeRefMsg::ConvertNoRef(msg);
-    if( nodeRef )
-    {
-        if( nodeRef->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove) )
-        {
-            if( nodeRef->fWhich < fProxyDrawables.GetCount() )
+
+    if (nodeRef) {
+        if (nodeRef->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
+            if (nodeRef->fWhich < fProxyDrawables.GetCount()) {
                 fProxyDrawables[nodeRef->fWhich] = nil;
+            }
         }
+
         return true;
     }
+
     plGenRefMsg* genMsg = plGenRefMsg::ConvertNoRef(msg);
-    if( genMsg )
-    {
-        if( genMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove) )
-        {
-            if( genMsg->fWhich < fProxyMaterials.GetCount() )
+
+    if (genMsg) {
+        if (genMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
+            if (genMsg->fWhich < fProxyMaterials.GetCount()) {
                 fProxyMaterials[genMsg->fWhich] = nil;
+            }
         }
+
         return true;
     }
 
@@ -348,21 +367,25 @@ bool plProxyGen::MsgReceive(plMessage* msg)
 void plProxyGen::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l)
 {
     uint32_t idx = IGetProxyIndex();
-    if( fProxyDrawables[idx] )
-    {
+
+    if (fProxyDrawables[idx]) {
         int i;
-        for( i = 0; i < fProxyIndex.GetCount(); i++ )
+
+        for (i = 0; i < fProxyIndex.GetCount(); i++) {
             fProxyDrawables[idx]->SetTransform(fProxyIndex[i], l2w, w2l);
+        }
     }
 }
 
 void plProxyGen::SetDisable(bool on)
 {
     uint32_t idx = IGetProxyIndex();
-    if( fProxyDrawables[idx] )
-    {
+
+    if (fProxyDrawables[idx]) {
         int i;
-        for( i = 0; i < fProxyIndex.GetCount(); i++ )
+
+        for (i = 0; i < fProxyIndex.GetCount(); i++) {
             fProxyDrawables[idx]->SetNativeProperty(fProxyIndex[i], plDrawable::kPropNoDraw, on);
+        }
     }
 }

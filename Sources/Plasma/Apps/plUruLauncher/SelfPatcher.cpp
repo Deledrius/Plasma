@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/Apps/plUruLauncher/SelfPatcher.cpp
-*   
+*
 ***/
 
 #include "Pch.h"
@@ -57,17 +57,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 #ifndef PLASMA_EXTERNAL_RELEASE
-    static const wchar_t s_manifest[] = L"InternalPatcher";
+static const wchar_t s_manifest[] = L"InternalPatcher";
 #else
-    static const wchar_t s_manifest[] = L"ExternalPatcher";
+static const wchar_t s_manifest[] = L"ExternalPatcher";
 #endif
 
 class SelfPatcherStream : public plZlibStream {
-    public:
-        virtual uint32_t  Write(uint32_t byteCount, const void* buffer);
-        static plLauncherInfo *info;
-        static unsigned totalBytes;
-        static unsigned progress;
+public:
+    virtual uint32_t  Write(uint32_t byteCount, const void* buffer);
+    static plLauncherInfo* info;
+    static unsigned totalBytes;
+    static unsigned progress;
 };
 
 unsigned SelfPatcherStream::totalBytes = 0;
@@ -87,45 +87,52 @@ static plFileName   s_newPatcherFile;
 ***/
 
 //============================================================================
-static void NetErrorHandler (ENetProtocol protocol, ENetError error) {
+static void NetErrorHandler(ENetProtocol protocol, ENetError error)
+{
     plString msg = plString::Format("NetErr: %S", NetErrorToString(error));
     plStatusLog::AddLineS("patcher.log", msg.c_str());
 
-    if (IS_NET_SUCCESS(s_patchResult))
+    if (IS_NET_SUCCESS(s_patchResult)) {
         s_patchResult = error;
+    }
+
     s_downloadComplete = true;
 
-    switch(error) {
-        case kNetErrServerBusy:
-            MessageBox(0, "Due to the high demand, the server is currently busy. Please try again later, or for alternative download options visit: http://www.mystonline.com/play/", "UruLauncher", MB_OK);
-            s_patchResult = kNetErrServerBusy;
-            s_downloadComplete = true;
+    switch (error) {
+    case kNetErrServerBusy:
+        MessageBox(0, "Due to the high demand, the server is currently busy. Please try again later, or for alternative download options visit: http://www.mystonline.com/play/", "UruLauncher", MB_OK);
+        s_patchResult = kNetErrServerBusy;
+        s_downloadComplete = true;
         break;
     }
 }
 
 //============================================================================
-static void DownloadCallback (
+static void DownloadCallback(
     ENetError           result,
-    void *              param,
-    const plFileName &  filename,
-    hsStream *          writer
-) {
-    if(IS_NET_ERROR(result)) {
+    void*               param,
+    const plFileName&   filename,
+    hsStream*           writer
+)
+{
+    if (IS_NET_ERROR(result)) {
         switch (result) {
-            case kNetErrTimeout:
-                writer->Rewind();
-                NetCliFileDownloadRequest(filename, writer, DownloadCallback, param);
+        case kNetErrTimeout:
+            writer->Rewind();
+            NetCliFileDownloadRequest(filename, writer, DownloadCallback, param);
             break;
-            
-            default:
-                plString msg = plString::Format("Error getting patcher file: %S", NetErrorToString(result));
-                plStatusLog::AddLineS("patcher.log", msg.c_str());
 
-                if (IS_NET_SUCCESS(s_patchResult))
-                    s_patchResult = result;
+        default:
+            plString msg = plString::Format("Error getting patcher file: %S", NetErrorToString(result));
+            plStatusLog::AddLineS("patcher.log", msg.c_str());
+
+            if (IS_NET_SUCCESS(s_patchResult)) {
+                s_patchResult = result;
+            }
+
             break;
         }
+
         return;
     }
 
@@ -133,14 +140,15 @@ static void DownloadCallback (
     delete writer;
     AtomicAdd(&s_numFiles, -1);
 
-    if(!s_numFiles) {
+    if (!s_numFiles) {
         s_downloadComplete = true;
         s_updated = true;
     }
 }
 
 //============================================================================
-static bool MD5Check (const plFileName &filename, const char *md5) {
+static bool MD5Check(const plFileName& filename, const char* md5)
+{
     // Do md5 check
     plMD5Checksum existingMD5(filename);
     plMD5Checksum latestMD5;
@@ -150,40 +158,47 @@ static bool MD5Check (const plFileName &filename, const char *md5) {
 }
 
 //============================================================================
-static void ManifestCallback (
+static void ManifestCallback(
     ENetError                       result,
-    void *                          param,
+    void*                           param,
     const wchar_t                   group[],
     const NetCliFileManifestEntry   manifest[],
     unsigned                        entryCount
-) {
-    if(IS_NET_ERROR(result)) {
+)
+{
+    if (IS_NET_ERROR(result)) {
         switch (result) {
-            case kNetErrTimeout:
-                NetCliFileManifestRequest(ManifestCallback, nil, s_manifest);
+        case kNetErrTimeout:
+            NetCliFileManifestRequest(ManifestCallback, nil, s_manifest);
             break;
-            
-            default:
-                plString msg = plString::Format("Error getting patcher manifest: %S", NetErrorToString(result));
-                plStatusLog::AddLineS("patcher.log", msg.c_str());
 
-                if (IS_NET_SUCCESS(s_patchResult))
-                    s_patchResult = result;
+        default:
+            plString msg = plString::Format("Error getting patcher manifest: %S", NetErrorToString(result));
+            plStatusLog::AddLineS("patcher.log", msg.c_str());
+
+            if (IS_NET_SUCCESS(s_patchResult)) {
+                s_patchResult = result;
+            }
+
             break;
         }
+
         return;
     }
 
 #ifndef PLASMA_EXTERNAL_RELEASE
+
     if (entryCount == 0)  { // dataserver does not contain a patcher
         s_downloadComplete = true;
         return;
     }
+
 #endif
 
     // MD5 check current patcher against value in manifest
     ASSERT(entryCount == 1);
     plFileName curPatcherFile = plFileSystem::GetCurrentAppPath();
+
     if (!MD5Check(curPatcherFile, plString::FromWchar(manifest[0].md5, 32).c_str())) {
 //      MessageBox(GetTopWindow(nil), "MD5 failed", "Msg", MB_OK);
         SelfPatcherStream::totalBytes += manifest[0].zipSize;
@@ -191,23 +206,25 @@ static void ManifestCallback (
         AtomicAdd(&s_numFiles, 1);
         SetText("Downloading new patcher...");
 
-        SelfPatcherStream * stream = new SelfPatcherStream;
-        if (!stream->Open(s_newPatcherFile, "wb"))
+        SelfPatcherStream* stream = new SelfPatcherStream;
+
+        if (!stream->Open(s_newPatcherFile, "wb")) {
             ErrorAssert(__LINE__, __FILE__, "Failed to create file: %s, errno: %u", s_newPatcherFile.AsString().c_str(), errno);
+        }
 
         NetCliFileDownloadRequest(plString::FromWchar(manifest[0].downloadName), stream, DownloadCallback, nil);
-    }
-    else {
+    } else {
         s_downloadComplete = true;
     }
 }
 
 //============================================================================
-static void FileSrvIpAddressCallback (
+static void FileSrvIpAddressCallback(
     ENetError       result,
-    void *          param,
+    void*           param,
     const wchar_t   addr[]
-) {
+)
+{
     NetCliGateKeeperDisconnect();
 
     if (IS_NET_ERROR(result)) {
@@ -217,7 +234,7 @@ static void FileSrvIpAddressCallback (
         s_patchResult = result;
         s_downloadComplete = true;
     }
-    
+
     // Start connecting to the server
     const char* caddr = hsWStringToString(addr);
     NetCliFileStartConnect(&caddr, 1, true);
@@ -231,7 +248,8 @@ static void FileSrvIpAddressCallback (
 }
 
 //============================================================================
-static bool SelfPatcherProc (bool * abort, plLauncherInfo *info) {
+static bool SelfPatcherProc(bool* abort, plLauncherInfo* info)
+{
 
     bool patched = false;
     s_downloadComplete = false;
@@ -251,10 +269,10 @@ static bool SelfPatcherProc (bool * abort, plLauncherInfo *info) {
     // request a file server ip address
     NetCliGateKeeperFileSrvIpAddressRequest(FileSrvIpAddressCallback, nil, true);
 
-    while(!s_downloadComplete && !*abort) {
+    while (!s_downloadComplete && !*abort) {
         NetClientUpdate();
         AsyncSleep(10);
-    }   
+    }
 
     NetCliFileDisconnect();
     NetClientUpdate();
@@ -277,20 +295,20 @@ static bool SelfPatcherProc (bool * abort, plLauncherInfo *info) {
 
         // we have only successfully patched if we actually launch the new version of the patcher
         patched = CreateProcessW(
-            NULL,
-            cmdline,
-            NULL,
-            NULL,
-            FALSE, 
-            DETACHED_PROCESS,
-            NULL,
-            NULL,
-            &si,
-            &pi
-        );
+                      NULL,
+                      cmdline,
+                      NULL,
+                      NULL,
+                      FALSE,
+                      DETACHED_PROCESS,
+                      NULL,
+                      NULL,
+                      &si,
+                      &pi
+                  );
         SetReturnCode(pi.dwProcessId);
-        CloseHandle( pi.hThread );
-        CloseHandle( pi.hProcess );
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
         ASSERT(patched);
     }
 
@@ -305,10 +323,11 @@ static bool SelfPatcherProc (bool * abort, plLauncherInfo *info) {
 ***/
 
 //============================================================================
-uint32_t SelfPatcherStream::Write(uint32_t byteCount, const void* buffer) {
+uint32_t SelfPatcherStream::Write(uint32_t byteCount, const void* buffer)
+{
     progress += byteCount;
     float p = (float)progress / (float)totalBytes * 100;        // progress
-    SetProgress( (int)p );
+    SetProgress((int)p);
     return plZlibStream::Write(byteCount, buffer);
 }
 
@@ -321,12 +340,15 @@ uint32_t SelfPatcherStream::Write(uint32_t byteCount, const void* buffer) {
 
 //============================================================================
 // if return value is true, there was an update and the patcher should be shutdown, so the new patcher can take over
-bool SelfPatch (bool noSelfPatch, bool * abort, ENetError * result, plLauncherInfo *info) {
+bool SelfPatch(bool noSelfPatch, bool* abort, ENetError* result, plLauncherInfo* info)
+{
     bool patched = false;
+
     if (!noSelfPatch) {
         SetText("Checking for patcher update...");
         patched = SelfPatcherProc(abort, info);
     }
+
     *result = s_patchResult;
     return patched;
 }

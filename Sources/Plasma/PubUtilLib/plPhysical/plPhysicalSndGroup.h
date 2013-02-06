@@ -59,31 +59,29 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plUoid.h"
 
 class plSound;
-class plPhysicalSndGroup : public hsKeyedObject
-{
+class plPhysicalSndGroup : public hsKeyedObject {
 public:
 
     // The group enums
-    enum SoundGroup
-    {
+    enum SoundGroup {
         kNone = 0,
         kMetal,
         kGrass,
         kWood
     };
-    
+
     plPhysicalSndGroup();
-    plPhysicalSndGroup( uint32_t grp );
+    plPhysicalSndGroup(uint32_t grp);
     virtual ~plPhysicalSndGroup();
 
-    CLASSNAME_REGISTER( plPhysicalSndGroup );
-    GETINTERFACE_ANY( plPhysicalSndGroup, hsKeyedObject );
+    CLASSNAME_REGISTER(plPhysicalSndGroup);
+    GETINTERFACE_ANY(plPhysicalSndGroup, hsKeyedObject);
 
     // Our required virtual
-    virtual bool    MsgReceive( plMessage *pMsg );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-    virtual void Read( hsStream *s, hsResMgr *mgr );
-    virtual void Write( hsStream *s, hsResMgr *mgr );
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
     void PlaySlideSound(uint32_t against);
     void StopSlideSound(uint32_t against);
@@ -92,17 +90,20 @@ public:
     bool HasSlideSound(uint32_t against);
     bool HasImpactSound(uint32_t against);
 
-    uint32_t GetGroup( void ) const { return fGroup; }
+    uint32_t GetGroup(void) const {
+        return fGroup;
+    }
 
     // Export only
-    void    AddImpactSound( uint32_t against, plKey receiver );
-    void    AddSlideSound( uint32_t against, plKey receiver );
-    bool    IsSliding() { return fPlayingSlideSound; }
+    void    AddImpactSound(uint32_t against, plKey receiver);
+    void    AddSlideSound(uint32_t against, plKey receiver);
+    bool    IsSliding() {
+        return fPlayingSlideSound;
+    }
 
 protected:
 
-    enum Refs
-    {
+    enum Refs {
         kRefImpactSound,
         kRefSlideSound
     };

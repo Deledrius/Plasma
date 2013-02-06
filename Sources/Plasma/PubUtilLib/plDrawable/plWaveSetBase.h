@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsGMaterial;
 class plRipVSConsts;
 
-class plWaveSetBase : public plMultiModifier
-{
+class plWaveSetBase : public plMultiModifier {
     virtual int IShoreRef() const = 0;
     virtual int IDecalRef() const = 0;
 
@@ -58,12 +57,16 @@ public:
     plWaveSetBase();
     virtual ~plWaveSetBase();
 
-    CLASSNAME_REGISTER( plWaveSetBase );
-    GETINTERFACE_ANY( plWaveSetBase, plMultiModifier );
+    CLASSNAME_REGISTER(plWaveSetBase);
+    GETINTERFACE_ANY(plWaveSetBase, plMultiModifier);
 
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return false; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return false;
+    }
 
-    int32_t       GetNumProperties() const { return 0; }
+    int32_t       GetNumProperties() const {
+        return 0;
+    }
 
     virtual bool        SetupRippleMat(hsGMaterial* mat, const plRipVSConsts& ripConsts) = 0;
     virtual float    GetHeight() const = 0;

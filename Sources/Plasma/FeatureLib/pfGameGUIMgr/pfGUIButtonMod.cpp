@@ -63,87 +63,87 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Control Proc For Managing the Draggable /////////////////////////////////
 
-class pfGUIButtonDragProc : public pfGUICtrlProcObject
-{
-    protected:
+class pfGUIButtonDragProc : public pfGUICtrlProcObject {
+protected:
 
-        pfGUICtrlProcObject *fOrigProc;
+    pfGUICtrlProcObject* fOrigProc;
 
-        pfGUIButtonMod      *fParent;
-        pfGUIDraggableMod   *fDraggable;
-        bool                fReportDrag;
+    pfGUIButtonMod*      fParent;
+    pfGUIDraggableMod*   fDraggable;
+    bool                fReportDrag;
 
-    public:
+public:
 
-        pfGUIButtonDragProc( pfGUIButtonMod *parent, pfGUIDraggableMod *draggable, pfGUICtrlProcObject *origProc, bool reportDrag )
-        {
-            fParent = parent;
-            fDraggable = draggable;
-            fOrigProc = origProc;
-            fReportDrag = reportDrag;
+    pfGUIButtonDragProc(pfGUIButtonMod* parent, pfGUIDraggableMod* draggable, pfGUICtrlProcObject* origProc, bool reportDrag) {
+        fParent = parent;
+        fDraggable = draggable;
+        fOrigProc = origProc;
+        fReportDrag = reportDrag;
+    }
+
+    virtual void    DoSomething(pfGUIControlMod* ctrl) {
+        // The draggable was let up, so now we stop dragging, disable the draggable again, and pass
+        // on the event to our original proc
+        if (fOrigProc != nil && fParent->IsTriggering()) {
+            fOrigProc->DoSomething(ctrl);
         }
 
-        virtual void    DoSomething( pfGUIControlMod *ctrl )
-        {
-            // The draggable was let up, so now we stop dragging, disable the draggable again, and pass
-            // on the event to our original proc
-            if( fOrigProc != nil && fParent->IsTriggering() )
-                fOrigProc->DoSomething( ctrl );
-            if (!fParent->IsButtonDown())
-                fParent->StopDragging( false );
+        if (!fParent->IsButtonDown()) {
+            fParent->StopDragging(false);
         }
+    }
 
-        virtual void    HandleExtendedEvent( pfGUIControlMod *ctrl, uint32_t event )
-        {
-            if( event == pfGUIDraggableMod::kDragging )
-            {
-                // First test if we're inside our button (if so, we stop dragging)
-                if( fParent->PointInBounds( fDraggable->GetLastMousePt() ) )
-                {
-                    // Cancel the drag
-                    fParent->StopDragging( true );
-                    return;
-                }
-
-                if( !fReportDrag )
-                    return;
+    virtual void    HandleExtendedEvent(pfGUIControlMod* ctrl, uint32_t event) {
+        if (event == pfGUIDraggableMod::kDragging) {
+            // First test if we're inside our button (if so, we stop dragging)
+            if (fParent->PointInBounds(fDraggable->GetLastMousePt())) {
+                // Cancel the drag
+                fParent->StopDragging(true);
+                return;
             }
-            
-            if( fOrigProc != nil )
-                fOrigProc->HandleExtendedEvent( ctrl, event );
+
+            if (!fReportDrag) {
+                return;
+            }
         }
 
-        virtual void    UserCallback( uint32_t userValue )
-        {
-            if( fOrigProc != nil )
-                fOrigProc->UserCallback( userValue );
+        if (fOrigProc != nil) {
+            fOrigProc->HandleExtendedEvent(ctrl, event);
         }
+    }
+
+    virtual void    UserCallback(uint32_t userValue) {
+        if (fOrigProc != nil) {
+            fOrigProc->UserCallback(userValue);
+        }
+    }
 };
 
 
-void    pfGUIButtonMod::StopDragging( bool cancel )
+void    pfGUIButtonMod::StopDragging(bool cancel)
 {
-    fDraggable->StopDragging( cancel );
-    fDraggable->SetVisible( false );
-    fDraggable->SetHandler( fOrigHandler );
+    fDraggable->StopDragging(cancel);
+    fDraggable->SetVisible(false);
+    fDraggable->SetHandler(fOrigHandler);
     fOrigHandler = nil;
 
-    if( !fOrigReportedDrag )
-        fDraggable->ClearFlag( pfGUIDraggableMod::kReportDragging );
+    if (!fOrigReportedDrag) {
+        fDraggable->ClearFlag(pfGUIDraggableMod::kReportDragging);
+    }
 
     // Steal interest back
-    fDialog->SetControlOfInterest( this );
+    fDialog->SetControlOfInterest(this);
 }
 
-void    pfGUIButtonMod::StartDragging( void )
+void    pfGUIButtonMod::StartDragging(void)
 {
-    fOrigReportedDrag = fDraggable->HasFlag( pfGUIDraggableMod::kReportDragging );
-    fDraggable->SetFlag( pfGUIDraggableMod::kReportDragging );
+    fOrigReportedDrag = fDraggable->HasFlag(pfGUIDraggableMod::kReportDragging);
+    fDraggable->SetFlag(pfGUIDraggableMod::kReportDragging);
 
     fOrigHandler = fDraggable->GetHandler();
-    fDraggable->SetVisible( true );
-    fDraggable->SetHandler( new pfGUIButtonDragProc( this, fDraggable, fOrigHandler, fOrigReportedDrag ) );
-    fDraggable->HandleMouseDown( fOrigMouseDownPt, 0 );
+    fDraggable->SetVisible(true);
+    fDraggable->SetHandler(new pfGUIButtonDragProc(this, fDraggable, fOrigHandler, fOrigReportedDrag));
+    fDraggable->HandleMouseDown(fOrigMouseDownPt, 0);
 }
 
 //// Constructor/Destructor //////////////////////////////////////////////////
@@ -156,165 +156,183 @@ pfGUIButtonMod::pfGUIButtonMod()
     fClicking = false;
     fTriggering = false;
     fNotifyType = kNotifyOnUp;
-    SetFlag( kWantsInterest );
+    SetFlag(kWantsInterest);
 }
 
 //// IEval ///////////////////////////////////////////////////////////////////
 
-bool    pfGUIButtonMod::IEval( double secs, float del, uint32_t dirty )
+bool    pfGUIButtonMod::IEval(double secs, float del, uint32_t dirty)
 {
-    return pfGUIControlMod::IEval( secs, del, dirty );
+    return pfGUIControlMod::IEval(secs, del, dirty);
 }
 
 //// MsgReceive //////////////////////////////////////////////////////////////
 
-bool    pfGUIButtonMod::MsgReceive( plMessage *msg )
+bool    pfGUIButtonMod::MsgReceive(plMessage* msg)
 {
-    plGenRefMsg *refMsg = plGenRefMsg::ConvertNoRef( msg );
-    if( refMsg != nil && refMsg->fType == kRefDraggable )
-    {
-        if( refMsg->GetContext() & ( plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace ) )
-        {
-            fDraggable = pfGUIDraggableMod::ConvertNoRef( refMsg->GetRef() );
-            fDraggable->SetVisible( false );        // Disable until we're dragging
-        }
-        else
+    plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
+
+    if (refMsg != nil && refMsg->fType == kRefDraggable) {
+        if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+            fDraggable = pfGUIDraggableMod::ConvertNoRef(refMsg->GetRef());
+            fDraggable->SetVisible(false);          // Disable until we're dragging
+        } else {
             fDraggable = nil;
+        }
+
         return true;
     }
 
-    return pfGUIControlMod::MsgReceive( msg );
+    return pfGUIControlMod::MsgReceive(msg);
 }
 
 //// Read/Write //////////////////////////////////////////////////////////////
 
-void    pfGUIButtonMod::Read( hsStream *s, hsResMgr *mgr )
+void    pfGUIButtonMod::Read(hsStream* s, hsResMgr* mgr)
 {
     pfGUIControlMod::Read(s, mgr);
 
     fAnimationKeys.Reset();
     uint32_t i, count = s->ReadLE32();
-    for( i = 0; i < count; i++ )
-        fAnimationKeys.Append( mgr->ReadKey( s ) );
+
+    for (i = 0; i < count; i++) {
+        fAnimationKeys.Append(mgr->ReadKey(s));
+    }
+
     fAnimName = s->ReadSafeString_TEMP();
 
     fMouseOverAnimKeys.Reset();
     count = s->ReadLE32();
-    for( i = 0; i < count; i++ )
-        fMouseOverAnimKeys.Append( mgr->ReadKey( s ) );
+
+    for (i = 0; i < count; i++) {
+        fMouseOverAnimKeys.Append(mgr->ReadKey(s));
+    }
+
     fMouseOverAnimName = s->ReadSafeString_TEMP();
 
     fNotifyType = s->ReadLE32();
-    mgr->ReadKeyNotifyMe( s, new plGenRefMsg( GetKey(), plRefMsg::kOnCreate, -1, kRefDraggable ), plRefFlags::kActiveRef );
+    mgr->ReadKeyNotifyMe(s, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, kRefDraggable), plRefFlags::kActiveRef);
 }
 
-void    pfGUIButtonMod::Write( hsStream *s, hsResMgr *mgr )
+void    pfGUIButtonMod::Write(hsStream* s, hsResMgr* mgr)
 {
-    pfGUIControlMod::Write( s, mgr );
+    pfGUIControlMod::Write(s, mgr);
 
     uint32_t i, count = fAnimationKeys.GetCount();
-    s->WriteLE32( count );
-    for( i = 0; i < count; i++ )
-        mgr->WriteKey( s, fAnimationKeys[ i ] );
-    s->WriteSafeString( fAnimName );
+    s->WriteLE32(count);
+
+    for (i = 0; i < count; i++) {
+        mgr->WriteKey(s, fAnimationKeys[ i ]);
+    }
+
+    s->WriteSafeString(fAnimName);
 
     count = fMouseOverAnimKeys.GetCount();
-    s->WriteLE32( count );
-    for( i = 0; i < count; i++ )
-        mgr->WriteKey( s, fMouseOverAnimKeys[ i ] );
-    s->WriteSafeString( fMouseOverAnimName );
+    s->WriteLE32(count);
 
-    s->WriteLE32( fNotifyType );
+    for (i = 0; i < count; i++) {
+        mgr->WriteKey(s, fMouseOverAnimKeys[ i ]);
+    }
 
-    mgr->WriteKey( s, fDraggable != nil ? fDraggable->GetKey() : nil );
+    s->WriteSafeString(fMouseOverAnimName);
+
+    s->WriteLE32(fNotifyType);
+
+    mgr->WriteKey(s, fDraggable != nil ? fDraggable->GetKey() : nil);
 
 }
 
 //// UpdateBounds ////////////////////////////////////////////////////////////
 
-void    pfGUIButtonMod::UpdateBounds( hsMatrix44 *invXformMatrix, bool force )
+void    pfGUIButtonMod::UpdateBounds(hsMatrix44* invXformMatrix, bool force)
 {
-    pfGUIControlMod::UpdateBounds( invXformMatrix, force );
-    if( fAnimationKeys.GetCount() > 0 || fMouseOverAnimKeys.GetCount() > 0 )
+    pfGUIControlMod::UpdateBounds(invXformMatrix, force);
+
+    if (fAnimationKeys.GetCount() > 0 || fMouseOverAnimKeys.GetCount() > 0) {
         fBoundsValid = false;
+    }
 }
 
 //// HandleMouseDown/Up //////////////////////////////////////////////////////
 
-void    pfGUIButtonMod::HandleMouseDown( hsPoint3 &mousePt, uint8_t modifiers )
+void    pfGUIButtonMod::HandleMouseDown(hsPoint3& mousePt, uint8_t modifiers)
 {
     fClicking = true;
-    if( fAnimationKeys.GetCount() > 0 )
-    {
-        plAnimCmdMsg *msg = new plAnimCmdMsg();
-        msg->SetCmd( plAnimCmdMsg::kContinue );
-        msg->SetCmd( plAnimCmdMsg::kSetForewards );
-        msg->SetCmd( plAnimCmdMsg::kGoToBegin );    
-        msg->SetAnimName( fAnimName );
-        msg->AddReceivers( fAnimationKeys );
-        plgDispatch::MsgSend( msg );
+
+    if (fAnimationKeys.GetCount() > 0) {
+        plAnimCmdMsg* msg = new plAnimCmdMsg();
+        msg->SetCmd(plAnimCmdMsg::kContinue);
+        msg->SetCmd(plAnimCmdMsg::kSetForewards);
+        msg->SetCmd(plAnimCmdMsg::kGoToBegin);
+        msg->SetAnimName(fAnimName);
+        msg->AddReceivers(fAnimationKeys);
+        plgDispatch::MsgSend(msg);
     }
 
-    IPlaySound( kMouseDown );
+    IPlaySound(kMouseDown);
 
     fOrigMouseDownPt = mousePt;
-    if ( fNotifyType == kNotifyOnDown || fNotifyType == kNotifyOnUpAndDown)
-    {
+
+    if (fNotifyType == kNotifyOnDown || fNotifyType == kNotifyOnUpAndDown) {
         fTriggering = true;
         DoSomething();
         fTriggering = false;
     }
 }
 
-void    pfGUIButtonMod::HandleMouseUp( hsPoint3 &mousePt, uint8_t modifiers )
+void    pfGUIButtonMod::HandleMouseUp(hsPoint3& mousePt, uint8_t modifiers)
 {
 
     // make sure that we got the down click first
-    if ( !fClicking )
+    if (!fClicking) {
         return;
-
-    fClicking = false;
-    if( fAnimationKeys.GetCount() > 0 )
-    {
-        plAnimCmdMsg *msg = new plAnimCmdMsg();
-        msg->SetCmd( plAnimCmdMsg::kContinue );
-        msg->SetCmd( plAnimCmdMsg::kSetBackwards );
-        msg->SetCmd( plAnimCmdMsg::kGoToEnd );  
-        msg->SetAnimName( fAnimName );
-        msg->AddReceivers( fAnimationKeys );
-        plgDispatch::MsgSend( msg );
     }
 
-    IPlaySound( kMouseUp );
+    fClicking = false;
+
+    if (fAnimationKeys.GetCount() > 0) {
+        plAnimCmdMsg* msg = new plAnimCmdMsg();
+        msg->SetCmd(plAnimCmdMsg::kContinue);
+        msg->SetCmd(plAnimCmdMsg::kSetBackwards);
+        msg->SetCmd(plAnimCmdMsg::kGoToEnd);
+        msg->SetAnimName(fAnimName);
+        msg->AddReceivers(fAnimationKeys);
+        plgDispatch::MsgSend(msg);
+    }
+
+    IPlaySound(kMouseUp);
 
     // Don't run the command if the mouse is outside our bounds
-    if( !fBounds.IsInside( &mousePt ) && fNotifyType != kNotifyOnUpAndDown )
-        return;     
+    if (!fBounds.IsInside(&mousePt) && fNotifyType != kNotifyOnUpAndDown) {
+        return;
+    }
 
-    if ( fNotifyType == kNotifyOnUp || fNotifyType == kNotifyOnUpAndDown)
+    if (fNotifyType == kNotifyOnUp || fNotifyType == kNotifyOnUpAndDown) {
         fTriggering = true;
+    }
+
     DoSomething();
     fTriggering = false;
 }
 
-void    pfGUIButtonMod::HandleMouseDrag( hsPoint3 &mousePt, uint8_t modifiers )
+void    pfGUIButtonMod::HandleMouseDrag(hsPoint3& mousePt, uint8_t modifiers)
 {
-    if( !fClicking )
+    if (!fClicking) {
         return;
+    }
 
-    if( fDraggable == nil )
+    if (fDraggable == nil) {
         return;
+    }
 
-    if( !fDraggable->IsVisible() )
-    {
+    if (!fDraggable->IsVisible()) {
         // Are we outside ourselves?
-        if( !PointInBounds( mousePt ) )
-        {
+        if (!PointInBounds(mousePt)) {
             // Yes, start dragging
             StartDragging();
 
             // Hand off our interest to the draggable
-            fDialog->SetControlOfInterest( fDraggable );
+            fDialog->SetControlOfInterest(fDraggable);
         }
     }
 }
@@ -337,34 +355,34 @@ bool    pfGUIButtonMod::IsButtonDown()
 //// SetInteresting //////////////////////////////////////////////////////////
 //  Overridden to play mouse over animation when we're interesting
 
-void    pfGUIButtonMod::SetInteresting( bool i )
+void    pfGUIButtonMod::SetInteresting(bool i)
 {
-    pfGUIControlMod::SetInteresting( i );
+    pfGUIControlMod::SetInteresting(i);
 
-    if( fMouseOverAnimKeys.GetCount() )
-    {
-        plAnimCmdMsg *msg = new plAnimCmdMsg();
-        msg->SetCmd( plAnimCmdMsg::kContinue );
-        msg->SetCmd( fInteresting ? plAnimCmdMsg::kSetForewards : plAnimCmdMsg::kSetBackwards );
-        msg->SetAnimName( fMouseOverAnimName );
-        msg->AddReceivers( fMouseOverAnimKeys );
-        plgDispatch::MsgSend( msg );
+    if (fMouseOverAnimKeys.GetCount()) {
+        plAnimCmdMsg* msg = new plAnimCmdMsg();
+        msg->SetCmd(plAnimCmdMsg::kContinue);
+        msg->SetCmd(fInteresting ? plAnimCmdMsg::kSetForewards : plAnimCmdMsg::kSetBackwards);
+        msg->SetAnimName(fMouseOverAnimName);
+        msg->AddReceivers(fMouseOverAnimKeys);
+        plgDispatch::MsgSend(msg);
     }
 
-    if( i )
-        IPlaySound( kMouseOver );
-    else
-        IPlaySound( kMouseOff );
+    if (i) {
+        IPlaySound(kMouseOver);
+    } else {
+        IPlaySound(kMouseOff);
+    }
 }
 
 
-void    pfGUIButtonMod::SetAnimationKeys( hsTArray<plKey> &keys, const plString &name )
+void    pfGUIButtonMod::SetAnimationKeys(hsTArray<plKey>& keys, const plString& name)
 {
     fAnimationKeys = keys;
     fAnimName = name;
 }
 
-void    pfGUIButtonMod::SetMouseOverAnimKeys( hsTArray<plKey> &keys, const plString &name )
+void    pfGUIButtonMod::SetMouseOverAnimKeys(hsTArray<plKey>& keys, const plString& name)
 {
     fMouseOverAnimKeys = keys;
     fMouseOverAnimName = name;
@@ -373,13 +391,15 @@ void    pfGUIButtonMod::SetMouseOverAnimKeys( hsTArray<plKey> &keys, const plStr
 
 //// IGetDesiredCursor ///////////////////////////////////////////////////////
 
-uint32_t      pfGUIButtonMod::IGetDesiredCursor( void ) const
+uint32_t      pfGUIButtonMod::IGetDesiredCursor(void) const
 {
-    if( fHandler == nil )
+    if (fHandler == nil) {
         return 0;
+    }
 
-    if( fClicking )
+    if (fClicking) {
         return plInputInterface::kCursorClicked;
+    }
 
     return plInputInterface::kCursorPoised;
 }

@@ -58,42 +58,44 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plRIFFChunk;
 
-class plFastWAV : public plAudioFileReader
-{
+class plFastWAV : public plAudioFileReader {
 public:
-    plFastWAV( const plFileName &path, plAudioCore::ChannelSelect whichChan = plAudioCore::kAll );
+    plFastWAV(const plFileName& path, plAudioCore::ChannelSelect whichChan = plAudioCore::kAll);
     virtual ~plFastWAV();
 
-    virtual plWAVHeader &GetHeader( void );
+    virtual plWAVHeader& GetHeader(void);
 
     virtual void    Open();
-    virtual void    Close( void );
+    virtual void    Close(void);
 
-    virtual uint32_t  GetDataSize( void ) { return fDataSize / fChannelAdjust; }
-    virtual float   GetLengthInSecs( void );
+    virtual uint32_t  GetDataSize(void) {
+        return fDataSize / fChannelAdjust;
+    }
+    virtual float   GetLengthInSecs(void);
 
-    virtual bool    SetPosition( uint32_t numBytes );
-    virtual bool    Read( uint32_t numBytes, void *buffer );
-    virtual uint32_t  NumBytesLeft( void );
+    virtual bool    SetPosition(uint32_t numBytes);
+    virtual bool    Read(uint32_t numBytes, void* buffer);
+    virtual uint32_t  NumBytesLeft(void);
 
-    virtual bool    IsValid( void ) { return ( fFileHandle != nil ) ? true : false; }
+    virtual bool    IsValid(void) {
+        return (fFileHandle != nil) ? true : false;
+    }
 
 protected:
-    enum
-    {
+    enum {
         kPCMFormatTag = 1
     };
 
     plFileName      fFilename;
-    FILE *          fFileHandle;
+    FILE*           fFileHandle;
     plWAVHeader     fHeader, fFakeHeader;
     uint32_t        fDataStartPos, fCurrDataPos, fDataSize;
     uint32_t        fChunkStart;
     plAudioCore::ChannelSelect  fWhichChannel;
     uint32_t        fChannelAdjust, fChannelOffset;
 
-    void    IError( const char *msg );
-    bool    ISeekToChunk( const char *type, plRIFFChunk *c );
+    void    IError(const char* msg);
+    bool    ISeekToChunk(const char* type, plRIFFChunk* c);
 };
 
 #endif //_plFastWavReader_h

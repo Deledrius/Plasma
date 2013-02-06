@@ -71,27 +71,26 @@ void pyGrassShader::SetKey(plKey key)
 // Setter functions
 //////////////////////////////////////////////////////////////////////
 
-void pyGrassShader::SetWaveDistortion(int waveNum, const std::vector<float> & distortion)
+void pyGrassShader::SetWaveDistortion(int waveNum, const std::vector<float>& distortion)
 {
-    if ((waveNum < 0)||(waveNum >= plGrassShaderMod::kNumWaves))
-    {
+    if ((waveNum < 0) || (waveNum >= plGrassShaderMod::kNumWaves)) {
         char errmsg[256];
-        sprintf(errmsg,"setWaveDistortion expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
+        sprintf(errmsg, "setWaveDistortion expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
         PyErr_SetString(PyExc_ValueError, errmsg);
         return;
     }
-    if (distortion.size() != 3)
-    {
+
+    if (distortion.size() != 3) {
         char errmsg[256];
-        sprintf(errmsg,"setWaveDistortion expects the direction to be a three-element tuple only");
+        sprintf(errmsg, "setWaveDistortion expects the direction to be a three-element tuple only");
         PyErr_SetString(PyExc_TypeError, errmsg);
         return;
     }
-    if (fShaderKey)
-    {
+
+    if (fShaderKey) {
         plGrassShaderMod* shader = plGrassShaderMod::ConvertNoRef(fShaderKey->ObjectIsLoaded());
-        if (shader)
-        {
+
+        if (shader) {
             shader->fWaves[waveNum].fDistX = distortion[0];
             shader->fWaves[waveNum].fDistY = distortion[1];
             shader->fWaves[waveNum].fDistZ = distortion[2];
@@ -100,27 +99,26 @@ void pyGrassShader::SetWaveDistortion(int waveNum, const std::vector<float> & di
     }
 }
 
-void pyGrassShader::SetWaveDirection(int waveNum, const std::vector<float> & direction)
+void pyGrassShader::SetWaveDirection(int waveNum, const std::vector<float>& direction)
 {
-    if ((waveNum < 0)||(waveNum >= plGrassShaderMod::kNumWaves))
-    {
+    if ((waveNum < 0) || (waveNum >= plGrassShaderMod::kNumWaves)) {
         char errmsg[256];
-        sprintf(errmsg,"setWaveDirection expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
+        sprintf(errmsg, "setWaveDirection expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
         PyErr_SetString(PyExc_ValueError, errmsg);
         return;
     }
-    if (direction.size() != 2)
-    {
+
+    if (direction.size() != 2) {
         char errmsg[256];
-        sprintf(errmsg,"setWaveDirection expects the direction to be a two-element tuple only");
+        sprintf(errmsg, "setWaveDirection expects the direction to be a two-element tuple only");
         PyErr_SetString(PyExc_TypeError, errmsg);
         return;
     }
-    if (fShaderKey)
-    {
+
+    if (fShaderKey) {
         plGrassShaderMod* shader = plGrassShaderMod::ConvertNoRef(fShaderKey->ObjectIsLoaded());
-        if (shader)
-        {
+
+        if (shader) {
             shader->fWaves[waveNum].fDirX = direction[0];
             shader->fWaves[waveNum].fDirY = direction[1];
             shader->RefreshWaves();
@@ -130,18 +128,17 @@ void pyGrassShader::SetWaveDirection(int waveNum, const std::vector<float> & dir
 
 void pyGrassShader::SetWaveSpeed(int waveNum, float speed)
 {
-    if ((waveNum < 0)||(waveNum >= plGrassShaderMod::kNumWaves))
-    {
+    if ((waveNum < 0) || (waveNum >= plGrassShaderMod::kNumWaves)) {
         char errmsg[256];
-        sprintf(errmsg,"setWaveSpeed expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
+        sprintf(errmsg, "setWaveSpeed expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
         PyErr_SetString(PyExc_ValueError, errmsg);
         return;
     }
-    if (fShaderKey)
-    {
+
+    if (fShaderKey) {
         plGrassShaderMod* shader = plGrassShaderMod::ConvertNoRef(fShaderKey->ObjectIsLoaded());
-        if (shader)
-        {
+
+        if (shader) {
             shader->fWaves[waveNum].fSpeed = speed;
             shader->RefreshWaves();
         }
@@ -158,24 +155,25 @@ std::vector<float> pyGrassShader::GetWaveDistortion(int waveNum) const
     retVal.push_back(-1);
     retVal.push_back(-1);
     retVal.push_back(-1);
-    if ((waveNum < 0)||(waveNum >= plGrassShaderMod::kNumWaves))
-    {
+
+    if ((waveNum < 0) || (waveNum >= plGrassShaderMod::kNumWaves)) {
         char errmsg[256];
-        sprintf(errmsg,"getWaveDistortion expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
+        sprintf(errmsg, "getWaveDistortion expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
         PyErr_SetString(PyExc_ValueError, errmsg);
         return retVal;
     }
-    if (fShaderKey)
-    {
+
+    if (fShaderKey) {
         plGrassShaderMod* shader = plGrassShaderMod::ConvertNoRef(fShaderKey->ObjectIsLoaded());
-        if (shader)
-        {
+
+        if (shader) {
             retVal[0] = shader->fWaves[waveNum].fDistX;
             retVal[1] = shader->fWaves[waveNum].fDistY;
             retVal[2] = shader->fWaves[waveNum].fDistZ;
             return retVal;
         }
     }
+
     return retVal;
 }
 
@@ -184,41 +182,44 @@ std::vector<float> pyGrassShader::GetWaveDirection(int waveNum) const
     std::vector<float> retVal;
     retVal.push_back(-1);
     retVal.push_back(-1);
-    if ((waveNum < 0)||(waveNum >= plGrassShaderMod::kNumWaves))
-    {
+
+    if ((waveNum < 0) || (waveNum >= plGrassShaderMod::kNumWaves)) {
         char errmsg[256];
-        sprintf(errmsg,"getWaveDirection expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
+        sprintf(errmsg, "getWaveDirection expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
         PyErr_SetString(PyExc_ValueError, errmsg);
         return retVal;
     }
-    if (fShaderKey)
-    {
+
+    if (fShaderKey) {
         plGrassShaderMod* shader = plGrassShaderMod::ConvertNoRef(fShaderKey->ObjectIsLoaded());
-        if (shader)
-        {
+
+        if (shader) {
             retVal[0] = shader->fWaves[waveNum].fDirX;
             retVal[1] = shader->fWaves[waveNum].fDirY;
             return retVal;
         }
     }
+
     return retVal;
 }
 
 float pyGrassShader::GetWaveSpeed(int waveNum) const
 {
-    if ((waveNum < 0)||(waveNum >= plGrassShaderMod::kNumWaves))
-    {
+    if ((waveNum < 0) || (waveNum >= plGrassShaderMod::kNumWaves)) {
         char errmsg[256];
-        sprintf(errmsg,"getWaveSpeed expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
+        sprintf(errmsg, "getWaveSpeed expects the waveNum to be between 0 and %d (inclusive)", plGrassShaderMod::kNumWaves - 1);
         PyErr_SetString(PyExc_ValueError, errmsg);
         return -1;
     }
-    if (fShaderKey)
-    {
+
+    if (fShaderKey) {
         plGrassShaderMod* shader = plGrassShaderMod::ConvertNoRef(fShaderKey->ObjectIsLoaded());
-        if (shader)
+
+        if (shader) {
             return shader->fWaves[waveNum].fSpeed;
+        }
     }
+
     return -1;
 }
 
@@ -228,10 +229,11 @@ float pyGrassShader::GetWaveSpeed(int waveNum) const
 
 void pyGrassShader::ResetWaves()
 {
-    if (fShaderKey)
-    {
+    if (fShaderKey) {
         plGrassShaderMod* shader = plGrassShaderMod::ConvertNoRef(fShaderKey->ObjectIsLoaded());
-        if (shader)
+
+        if (shader) {
             shader->ResetWaves();
+        }
     }
 }

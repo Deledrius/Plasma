@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plHardRegion.h"
 #include "hsTemplates.h"
 
-class plHardRegionComplex : public plHardRegion
-{
+class plHardRegionComplex : public plHardRegion {
 protected:
     hsTArray<plHardRegion*>         fSubRegions;
 
@@ -55,8 +54,8 @@ public:
     plHardRegionComplex();
     virtual ~plHardRegionComplex();
 
-    CLASSNAME_REGISTER( plHardRegionComplex );
-    GETINTERFACE_ANY( plHardRegionComplex, plHardRegion );
+    CLASSNAME_REGISTER(plHardRegionComplex);
+    GETINTERFACE_ANY(plHardRegionComplex, plHardRegion);
 
     // Don't propagate the settransform to our children, they move independently
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l) {}
@@ -67,49 +66,50 @@ public:
     // Now Complex specifics
     virtual bool MsgReceive(plMessage* msg);
 
-    uint16_t          GetNumSubs() const { return fSubRegions.GetCount(); }
-    const plHardRegion* GetSub(int i) const { return fSubRegions[i]; }
+    uint16_t          GetNumSubs() const {
+        return fSubRegions.GetCount();
+    }
+    const plHardRegion* GetSub(int i) const {
+        return fSubRegions[i];
+    }
 };
 
-class plHardRegionUnion : public plHardRegionComplex
-{
+class plHardRegionUnion : public plHardRegionComplex {
 protected:
 public:
     plHardRegionUnion();
     virtual ~plHardRegionUnion();
 
-    CLASSNAME_REGISTER( plHardRegionUnion );
-    GETINTERFACE_ANY( plHardRegionUnion, plHardRegionComplex );
+    CLASSNAME_REGISTER(plHardRegionUnion);
+    GETINTERFACE_ANY(plHardRegionUnion, plHardRegionComplex);
 
     virtual bool    IIsInside(const hsPoint3& pos) const;
     virtual bool    ICameraInside() const;
 
 };
 
-class plHardRegionIntersect : public plHardRegionComplex
-{
+class plHardRegionIntersect : public plHardRegionComplex {
 protected:
 public:
     plHardRegionIntersect();
     virtual ~plHardRegionIntersect();
 
-    CLASSNAME_REGISTER( plHardRegionIntersect );
-    GETINTERFACE_ANY( plHardRegionIntersect, plHardRegionComplex );
+    CLASSNAME_REGISTER(plHardRegionIntersect);
+    GETINTERFACE_ANY(plHardRegionIntersect, plHardRegionComplex);
 
     virtual bool    IIsInside(const hsPoint3& pos) const;
     virtual bool    ICameraInside() const;
 
 };
 
-class plHardRegionInvert : public plHardRegionComplex
-{
+class plHardRegionInvert : public plHardRegionComplex {
 protected:
 public:
     plHardRegionInvert();
     virtual ~plHardRegionInvert();
 
-    CLASSNAME_REGISTER( plHardRegionInvert );
-    GETINTERFACE_ANY( plHardRegionInvert, plHardRegionComplex );
+    CLASSNAME_REGISTER(plHardRegionInvert);
+    GETINTERFACE_ANY(plHardRegionInvert, plHardRegionComplex);
 
     virtual bool    IIsInside(const hsPoint3& pos) const;
     virtual bool    ICameraInside() const;

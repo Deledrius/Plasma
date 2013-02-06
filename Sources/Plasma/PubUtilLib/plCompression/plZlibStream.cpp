@@ -44,7 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 voidpf ZlibAlloc(voidpf opaque, uInt items, uInt size)
 {
-    return malloc(items*size);
+    return malloc(items * size);
 }
 
 void ZlibFree(voidpf opaque, voidpf address)
@@ -72,14 +72,13 @@ bool plZlibStream::Open(const plFileName& filename, const char* mode)
 
 bool plZlibStream::Close()
 {
-    if (fOutput)
-    {
+    if (fOutput) {
         fOutput->Close();
         delete fOutput;
         fOutput = nil;
     }
-    if (fZStream)
-    {
+
+    if (fZStream) {
         z_streamp zstream = (z_streamp)fZStream;
         inflateEnd(zstream);
         delete zstream;
@@ -94,24 +93,22 @@ uint32_t plZlibStream::Write(uint32_t byteCount, const void* buffer)
     uint8_t* byteBuf = (uint8_t*)buffer;
 
     // Check if we've read in the full gzip header yet
-    if (fHeader == kNeedMoreData)
-    {
+    if (fHeader == kNeedMoreData) {
         int cutAmt = IValidateGzHeader(byteCount, buffer);
 
         // Once we've read in the whole header, cut out whatever part of it is
         // in this buffer, leaving raw compressed data
-        if (cutAmt != 0)
-        {
+        if (cutAmt != 0) {
             byteCount -= cutAmt;
             byteBuf += cutAmt;
         }
     }
 
-    if (fHeader == kInvalidHeader)
+    if (fHeader == kInvalidHeader) {
         return 0;
+    }
 
-    if (fHeader == kValidHeader)
-    {
+    if (fHeader == kValidHeader) {
         ASSERT(fOutput);
         ASSERT(fZStream);
         z_streamp zstream = (z_streamp)fZStream;
@@ -119,8 +116,8 @@ uint32_t plZlibStream::Write(uint32_t byteCount, const void* buffer)
         zstream->next_in = byteBuf;
 
         char outBuf[2048];
-        while (zstream->avail_in != 0)
-        {
+
+        while (zstream->avail_in != 0) {
             zstream->avail_out = sizeof(outBuf);
             zstream->next_out = (uint8_t*)outBuf;
 
@@ -129,10 +126,10 @@ uint32_t plZlibStream::Write(uint32_t byteCount, const void* buffer)
             int ret = inflate(zstream, Z_NO_FLUSH);
 
             bool inflateErr = (ret == Z_NEED_DICT || ret == Z_DATA_ERROR ||
-                                ret == Z_STREAM_ERROR || ret == Z_MEM_ERROR || ret == Z_BUF_ERROR);
+                               ret == Z_STREAM_ERROR || ret == Z_MEM_ERROR || ret == Z_BUF_ERROR);
+
             // If we have a decompression error, just fail
-            if (inflateErr)
-            {
+            if (inflateErr) {
                 hsAssert(!inflateErr, "Error in inflate");
                 fHeader = kInvalidHeader;
                 break;
@@ -142,8 +139,7 @@ uint32_t plZlibStream::Write(uint32_t byteCount, const void* buffer)
             fOutput->Write(amtWritten, outBuf);
 
             // If zlib says we hit the end of the stream, ignore avail_in
-            if (ret == Z_STREAM_END)
-            {
+            if (ret == Z_STREAM_END) {
                 fDecompressedOk = true;
                 break;
             }
@@ -156,90 +152,88 @@ uint32_t plZlibStream::Write(uint32_t byteCount, const void* buffer)
 int plZlibStream::IValidateGzHeader(uint32_t byteCount, const void* buffer)
 {
     // Ripped from gzio.cpp
-    #define HEAD_CRC     0x02
-    #define EXTRA_FIELD  0x04
-    #define ORIG_NAME    0x08
-    #define COMMENT      0x10
-    #define RESERVED     0xE0
+#define HEAD_CRC     0x02
+#define EXTRA_FIELD  0x04
+#define ORIG_NAME    0x08
+#define COMMENT      0x10
+#define RESERVED     0xE0
     static int gz_magic[2] = {0x1f, 0x8b}; // gzip magic header
-    
-    #define CheckForEnd() if (s.AtEnd()) { fHeader = kNeedMoreData; return 0; }
+
+#define CheckForEnd() if (s.AtEnd()) { fHeader = kNeedMoreData; return 0; }
 
     int i;
 
     int initCacheSize = fHeaderCache.size();
-    for (i = 0; i < byteCount; i++)
+
+    for (i = 0; i < byteCount; i++) {
         fHeaderCache.push_back(((uint8_t*)buffer)[i]);
+    }
+
     hsReadOnlyStream s(fHeaderCache.size(), &fHeaderCache[0]);
-    
+
     // Check the gzip magic header
-    for (i = 0; i < 2; i++)
-    {
+    for (i = 0; i < 2; i++) {
         uint8_t c = s.ReadByte();
-        if (c != gz_magic[i])
-        {
+
+        if (c != gz_magic[i]) {
             CheckForEnd();
             fHeader = kInvalidHeader;
             return 0;
         }
     }
-    
+
     int method = s.ReadByte();
     int flags = s.ReadByte();
-    if (method != Z_DEFLATED || (flags & RESERVED) != 0)
-    {
+
+    if (method != Z_DEFLATED || (flags & RESERVED) != 0) {
         CheckForEnd();
         fHeader = kInvalidHeader;
         return 0;
     }
-    
+
     // Discard time, xflags and OS code:
-    for (i = 0; i < 6; i++)
+    for (i = 0; i < 6; i++) {
         s.ReadByte();
+    }
+
     CheckForEnd();
-    
-    if ((flags & EXTRA_FIELD) != 0)
-    {
+
+    if ((flags & EXTRA_FIELD) != 0) {
         // skip the extra field
         uint16_t len = s.ReadLE16();
-        while (len-- != 0 && s.ReadByte())
-        {
+
+        while (len-- != 0 && s.ReadByte()) {
             CheckForEnd();
         }
     }
-    
+
     int c;
 
     // skip the original file name
-    if ((flags & ORIG_NAME) != 0)
-    {
-        while ((c = s.ReadByte()) != 0)
-        {
+    if ((flags & ORIG_NAME) != 0) {
+        while ((c = s.ReadByte()) != 0) {
             CheckForEnd();
         }
     }
-    
+
     // skip the .gz file comment
-    if ((flags & COMMENT) != 0)
-    {
-        while ((c = s.ReadByte()) != 0)
-        {
+    if ((flags & COMMENT) != 0) {
+        while ((c = s.ReadByte()) != 0) {
             CheckForEnd();
         }
     }
 
     // skip the header crc
-    if ((flags & HEAD_CRC) != 0)
-    {
+    if ((flags & HEAD_CRC) != 0) {
         s.ReadLE16();
         CheckForEnd();
     }
-    
+
     CheckForEnd();
-    
+
     uint32_t headerSize = s.GetPosition();
     uint32_t clipBuffer = headerSize - initCacheSize;
-    
+
     // Initialize the zlib stream
     z_streamp zstream = new z_stream_s;
     memset(zstream, 0, sizeof(z_stream_s));
@@ -255,12 +249,12 @@ int plZlibStream::IValidateGzHeader(uint32_t byteCount, const void* buffer)
 
     fHeaderCache.clear();
 
-    if (!initOk)
-    {
+    if (!initOk) {
         hsAssert(0, "Zip init failed");
         fHeader = kInvalidHeader;
         return 0;
     }
+
     ASSERT(fZStream);
 
     fHeader = kValidHeader;

@@ -87,13 +87,13 @@ PYTHON_METHOD_DEFINITION(ptGameScore, addPoints, args)
 {
     int32_t numPoints = 0;
     PyObject* keyObj = nil;
-    if (!PyArg_ParseTuple(args, "i|O", &numPoints, &keyObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "i|O", &numPoints, &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "addPoints expects an int and an optional key");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(keyObj))
-    {
+
+    if (!pyKey::Check(keyObj)) {
         PyErr_SetString(PyExc_TypeError, "addPoints expects an int and an optional key");
         PYTHON_RETURN_ERROR;
     }
@@ -109,23 +109,26 @@ PYTHON_METHOD_DEFINITION_WKEY(ptGameScore, transferPoints, args, kwargs)
     PyObject* destObj = nil;
     int32_t   points  = 0; // Hmmm... Evil?
     PyObject* keyObj  = nil;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|iO", kwlist, &destObj, &points, &keyObj))
-    {
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|iO", kwlist, &destObj, &points, &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "transferPoints expects a ptGameScore, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(pyGameScore::Check(destObj) && pyKey::Check(keyObj)))
-    {
+
+    if (!(pyGameScore::Check(destObj) && pyKey::Check(keyObj))) {
         PyErr_SetString(PyExc_TypeError, "transferPoints expects a ptGameScore, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
 
     pyGameScore* dest = pyGameScore::ConvertFrom(destObj);
     pyKey*       rcvr = pyKey::ConvertFrom(keyObj);
-    if (points)
+
+    if (points) {
         self->fThis->TransferPoints(dest, points, *rcvr);
-    else
+    } else {
         self->fThis->TransferPoints(dest, *rcvr);
+    }
+
     PYTHON_RETURN_NONE; // get result in callback
 }
 
@@ -133,13 +136,13 @@ PYTHON_METHOD_DEFINITION(ptGameScore, setPoints, args)
 {
     int32_t numPoints = 0;
     PyObject* keyObj  = nil;
-    if (!PyArg_ParseTuple(args, "i|O", &numPoints))
-    {
+
+    if (!PyArg_ParseTuple(args, "i|O", &numPoints)) {
         PyErr_SetString(PyExc_TypeError, "setPoints expects an int and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(keyObj))
-    {
+
+    if (!pyKey::Check(keyObj)) {
         PyErr_SetString(PyExc_TypeError, "setPoints expects an int and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
@@ -156,13 +159,13 @@ PYTHON_METHOD_DEFINITION_STATIC_WKEY(ptGameScore, createAgeScore, args, kwargs)
     uint32_t type     = 0;
     int32_t points    = 0;
     PyObject* keyObj  = nil;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OI|iO", kwlist, &nameObj, &type, &points, &keyObj))
-    {
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OI|iO", kwlist, &nameObj, &type, &points, &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "createAgeScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
-    {
+
+    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj))) {
         PyErr_SetString(PyExc_TypeError, "createAgeScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
@@ -180,13 +183,13 @@ PYTHON_METHOD_DEFINITION_STATIC_WKEY(ptGameScore, createGlobalScore, args, kwarg
     uint32_t type     = 0;
     int32_t points    = 0;
     PyObject* keyObj  = nil;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OI|iO", kwlist, &nameObj, &type, &points, &keyObj))
-    {
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OI|iO", kwlist, &nameObj, &type, &points, &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "createGlobalScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
-    {
+
+    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj))) {
         PyErr_SetString(PyExc_TypeError, "createGlobalScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
@@ -204,13 +207,13 @@ PYTHON_METHOD_DEFINITION_STATIC_WKEY(ptGameScore, createPlayerScore, args, kwarg
     uint32_t type     = 0;
     int32_t points    = 0;
     PyObject* keyObj  = nil;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OI|iO", kwlist, &nameObj, &type, &points, &keyObj))
-    {
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OI|iO", kwlist, &nameObj, &type, &points, &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "createPlayerScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
-    {
+
+    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj))) {
         PyErr_SetString(PyExc_TypeError, "createPlayerScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
@@ -229,13 +232,13 @@ PYTHON_METHOD_DEFINITION_STATIC_WKEY(ptGameScore, createScore, args, kwargs)
     uint32_t type     = 0;
     int32_t points    = 0;
     PyObject* keyObj  = nil;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "IOI|iO", kwlist, &ownerID, &nameObj, &type, &points, &keyObj))
-    {
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "IOI|iO", kwlist, &ownerID, &nameObj, &type, &points, &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "createScore expects an int, a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
-    {
+
+    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj))) {
         PyErr_SetString(PyExc_TypeError, "createScore expects an int, a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
@@ -250,13 +253,13 @@ PYTHON_METHOD_DEFINITION_STATIC(ptGameScore, findAgeScores, args)
 {
     PyObject* nameObj = nil;
     PyObject* keyObj  = nil;
-    if (!PyArg_ParseTuple(args, "OO", &nameObj, &keyObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "OO", &nameObj, &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "findAgeScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
-    {
+
+    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj))) {
         PyErr_SetString(PyExc_TypeError, "findAgeScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
     }
@@ -271,13 +274,13 @@ PYTHON_METHOD_DEFINITION_STATIC(ptGameScore, findGlobalScores, args)
 {
     PyObject* nameObj = nil;
     PyObject* keyObj  = nil;
-    if (!PyArg_ParseTuple(args, "OO", &nameObj, &keyObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "OO", &nameObj, &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "findGlobalScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
-    {
+
+    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj))) {
         PyErr_SetString(PyExc_TypeError, "findGlobalScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
     }
@@ -292,13 +295,13 @@ PYTHON_METHOD_DEFINITION_STATIC(ptGameScore, findPlayerScores, args)
 {
     PyObject* nameObj = nil;
     PyObject* keyObj  = nil;
-    if (!PyArg_ParseTuple(args, "OO", &nameObj, &keyObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "OO", &nameObj, &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "findPlayerScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
-    {
+
+    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj))) {
         PyErr_SetString(PyExc_TypeError, "findPlayerScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
     }
@@ -314,13 +317,13 @@ PYTHON_METHOD_DEFINITION_STATIC(ptGameScore, findScores, args)
     uint32_t ownerId  = 0;
     PyObject* nameObj = nil;
     PyObject* keyObj  = nil;
-    if (!PyArg_ParseTuple(args, "IOO", &ownerId, &nameObj, &keyObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "IOO", &ownerId, &nameObj, &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "findScore expects an int, a string, and a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
-    {
+
+    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj))) {
         PyErr_SetString(PyExc_TypeError, "findScore expects an int, a string, and a ptKey");
         PYTHON_RETURN_ERROR;
     }
@@ -332,23 +335,23 @@ PYTHON_METHOD_DEFINITION_STATIC(ptGameScore, findScores, args)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameScore)
-    PYTHON_METHOD_NOARGS(ptGameScore, getGameType, "Returns the score game type."),
-    PYTHON_METHOD_NOARGS(ptGameScore, getName, "Returns the score game name."),
-    PYTHON_METHOD_NOARGS(ptGameScore, getOwnerID, "Returns the score owner."),
-    PYTHON_METHOD_NOARGS(ptGameScore, getPoints, "Returns the number of points in this score"),
-    PYTHON_METHOD_NOARGS(ptGameScore, remove, "Removes this score from the server"),
-    PYTHON_METHOD(ptGameScore, addPoints, "Params: points, key\nAdds points to the score"),
-    PYTHON_METHOD_WKEY(ptGameScore, transferPoints, "Params: dest, points, key\nTransfers points from this score to another"),
-    PYTHON_METHOD(ptGameScore, setPoints, "Params: numPoints, key\nSets the number of points in the score\nDon't use to add/remove points, use only to reset values!"),
-    PYTHON_METHOD_STATIC_WKEY(ptGameScore, createAgeScore, "Params: scoreName, type, points, key\nCreates a new score associated with this age"),
-    PYTHON_METHOD_STATIC_WKEY(ptGameScore, createGlobalScore, "Params: scoreName, type, points, key\nCreates a new global score"),
-    PYTHON_METHOD_STATIC_WKEY(ptGameScore, createPlayerScore, "Params: scoreName, type, points, key\nCreates a new score associated with this player"),
-    PYTHON_METHOD_STATIC_WKEY(ptGameScore, createScore, "Params: ownerID, scoreName, type, points, key\nCreates a new score for an arbitrary owner"),
-    PYTHON_METHOD_STATIC(ptGameScore, findAgeScores, "Params: scoreName, key\nFinds matching scores for this age"),
-    PYTHON_METHOD_STATIC(ptGameScore, findGlobalScores, "Params: scoreName, key\nFinds matching global scores"),
-    PYTHON_METHOD_STATIC(ptGameScore, findPlayerScores, "Params: scoreName, key\nFinds matching player scores"),
-    PYTHON_METHOD_STATIC(ptGameScore, findScores, "Params: ownerID, scoreName, key\nFinds matching scores for an arbitrary owner"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameScore, getGameType, "Returns the score game type."),
+                     PYTHON_METHOD_NOARGS(ptGameScore, getName, "Returns the score game name."),
+                     PYTHON_METHOD_NOARGS(ptGameScore, getOwnerID, "Returns the score owner."),
+                     PYTHON_METHOD_NOARGS(ptGameScore, getPoints, "Returns the number of points in this score"),
+                     PYTHON_METHOD_NOARGS(ptGameScore, remove, "Removes this score from the server"),
+                     PYTHON_METHOD(ptGameScore, addPoints, "Params: points, key\nAdds points to the score"),
+                     PYTHON_METHOD_WKEY(ptGameScore, transferPoints, "Params: dest, points, key\nTransfers points from this score to another"),
+                     PYTHON_METHOD(ptGameScore, setPoints, "Params: numPoints, key\nSets the number of points in the score\nDon't use to add/remove points, use only to reset values!"),
+                     PYTHON_METHOD_STATIC_WKEY(ptGameScore, createAgeScore, "Params: scoreName, type, points, key\nCreates a new score associated with this age"),
+                     PYTHON_METHOD_STATIC_WKEY(ptGameScore, createGlobalScore, "Params: scoreName, type, points, key\nCreates a new global score"),
+                     PYTHON_METHOD_STATIC_WKEY(ptGameScore, createPlayerScore, "Params: scoreName, type, points, key\nCreates a new score associated with this player"),
+                     PYTHON_METHOD_STATIC_WKEY(ptGameScore, createScore, "Params: ownerID, scoreName, type, points, key\nCreates a new score for an arbitrary owner"),
+                     PYTHON_METHOD_STATIC(ptGameScore, findAgeScores, "Params: scoreName, key\nFinds matching scores for this age"),
+                     PYTHON_METHOD_STATIC(ptGameScore, findGlobalScores, "Params: scoreName, key\nFinds matching global scores"),
+                     PYTHON_METHOD_STATIC(ptGameScore, findPlayerScores, "Params: scoreName, key\nFinds matching player scores"),
+                     PYTHON_METHOD_STATIC(ptGameScore, findScores, "Params: ownerID, scoreName, key\nFinds matching scores for an arbitrary owner"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptGameScore, "Plasma Game Score");
@@ -370,14 +373,14 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptGameScore, pyGameScore)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyGameScore::AddPlasmaClasses(PyObject *m)
+void pyGameScore::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptGameScore);
     PYTHON_CLASS_IMPORT_END(m);
 }
 
-void pyGameScore::AddPlasmaConstantsClasses(PyObject *m)
+void pyGameScore::AddPlasmaConstantsClasses(PyObject* m)
 {
     PYTHON_ENUM_START(PtGameScoreTypes);
     PYTHON_ENUM_ELEMENT(PtGameScoreTypes, kFixed, kScoreTypeFixed);

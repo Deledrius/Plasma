@@ -57,19 +57,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // CTOR default
 plAvBrainDrive::plAvBrainDrive()
-: fMaxVelocity(20), fTurnRate(1)
+    : fMaxVelocity(20), fTurnRate(1)
 {
 
 }
 
 // CTOR max velocity, turn rate
 plAvBrainDrive::plAvBrainDrive(float maxVelocity, float turnRate)
-: fMaxVelocity(maxVelocity), fTurnRate(turnRate)
+    : fMaxVelocity(maxVelocity), fTurnRate(turnRate)
 {
 }
 
 // ACTIVATE
-void plAvBrainDrive::Activate(plArmatureModBase *avMod)
+void plAvBrainDrive::Activate(plArmatureModBase* avMod)
 {
     plArmatureBrain::Activate(avMod);
 
@@ -77,19 +77,18 @@ void plAvBrainDrive::Activate(plArmatureModBase *avMod)
     plCameraMsg* pMsg = new plCameraMsg;
     pMsg->SetCmd(plCameraMsg::kNonPhysOn);
     pMsg->SetBCastFlag(plMessage::kBCastByExactType);
-    pMsg->Send();               
+    pMsg->Send();
 }
 
 // DEACTIVATE
 void plAvBrainDrive::Deactivate()
 {
-    if (fAvMod)
-    {   
+    if (fAvMod) {
         IEnablePhysics(true, fAvMod->GetTarget(0)->GetKey());
         plCameraMsg* pMsg = new plCameraMsg;
         pMsg->SetCmd(plCameraMsg::kNonPhysOff);
         pMsg->SetBCastFlag(plMessage::kBCastByExactType);
-        pMsg->Send();               
+        pMsg->Send();
     }
 }
 
@@ -101,7 +100,7 @@ void plAvBrainDrive::IEnablePhysics(bool enable, plKey avKey)
 // APPLY
 bool plAvBrainDrive::Apply(double timeNow, float elapsed)
 {
-    plSceneObject * avSO = fAvMod->GetTarget(0);
+    plSceneObject* avSO = fAvMod->GetTarget(0);
     float eTime = hsTimer::GetDelSysSeconds();
     hsMatrix44 targetMatrix = avSO->GetLocalToWorld();
 
@@ -111,57 +110,55 @@ bool plAvBrainDrive::Apply(double timeNow, float elapsed)
     float speed = fMaxVelocity;
     float turn = fTurnRate;
 
-    if (fAvMod->FastKeyDown())
-    {
+    if (fAvMod->FastKeyDown()) {
         turn *= 0.25;
         speed *= 3.5;
     }
-    if (fAvMod->GetInputFlag(B_CONTROL_MOVE_FORWARD))
-    {
+
+    if (fAvMod->GetInputFlag(B_CONTROL_MOVE_FORWARD)) {
         playerPos += view * speed * eTime;
     }
-    if (fAvMod->GetInputFlag(B_CONTROL_MOVE_BACKWARD))
-    {
+
+    if (fAvMod->GetInputFlag(B_CONTROL_MOVE_BACKWARD)) {
         playerPos += view * speed * eTime * -1;
     }
-    if (fAvMod->StrafeLeftKeyDown() || (fAvMod->StrafeKeyDown() && fAvMod->TurnLeftKeyDown()))
-    {
+
+    if (fAvMod->StrafeLeftKeyDown() || (fAvMod->StrafeKeyDown() && fAvMod->TurnLeftKeyDown())) {
         playerPos += right * speed * eTime * -1;
     }
-    if (fAvMod->StrafeRightKeyDown() || (fAvMod->StrafeKeyDown() && fAvMod->TurnRightKeyDown()))
-    {
+
+    if (fAvMod->StrafeRightKeyDown() || (fAvMod->StrafeKeyDown() && fAvMod->TurnRightKeyDown())) {
         playerPos += right * speed * eTime;
     }
-    if (fAvMod->GetInputFlag(B_CONTROL_MOVE_DOWN))
-    {
+
+    if (fAvMod->GetInputFlag(B_CONTROL_MOVE_DOWN)) {
         playerPos += up * speed * eTime * -1;
     }
-    if (fAvMod->GetInputFlag(B_CONTROL_MOVE_UP))
-    {
+
+    if (fAvMod->GetInputFlag(B_CONTROL_MOVE_UP)) {
         playerPos += up * speed * eTime;
     }
 
     hsPoint3 desiredPosition = playerPos;
     // calculate rotation matrix
 
-    hsVector3 rotUp(0,0,1);
-    hsVector3 rotRight(1,0,0);
+    hsVector3 rotUp(0, 0, 1);
+    hsVector3 rotRight(1, 0, 0);
     hsMatrix44 rot;
     float angle = 0;
 
-    if ( fAvMod->GetInputFlag( B_CONTROL_ROTATE_RIGHT ) || fAvMod->GetInputFlag( B_CONTROL_ROTATE_LEFT ) || fAvMod->GetInputFlag( A_CONTROL_TURN ) )
-    {
+    if (fAvMod->GetInputFlag(B_CONTROL_ROTATE_RIGHT) || fAvMod->GetInputFlag(B_CONTROL_ROTATE_LEFT) || fAvMod->GetInputFlag(A_CONTROL_TURN)) {
         angle = fTurnRate * eTime * fAvMod->GetTurnStrength();
     }
 
     hsMatrix44 justRot(targetMatrix);
-    hsPoint3 zero(0,0,0);
+    hsPoint3 zero(0, 0, 0);
     justRot.SetTranslate(&zero);
 
-    if( angle ) {
-        hsQuat q( angle, &rotUp );  
+    if (angle) {
+        hsQuat q(angle, &rotUp);
         q.NormalizeIfNeeded();
-        q.MakeMatrix( &rot );
+        q.MakeMatrix(&rot);
 
         justRot = rot * justRot;
 
@@ -170,9 +167,9 @@ bool plAvBrainDrive::Apply(double timeNow, float elapsed)
 
     // use the desired rotation matrix to set position and rotation:
     hsMatrix44 inv;
-    targetMatrix.SetTranslate( &desiredPosition );
-    targetMatrix.GetInverse( &inv );
-    avSO->SetTransform( targetMatrix, inv );
+    targetMatrix.SetTranslate(&desiredPosition);
+    targetMatrix.GetInverse(&inv);
+    avSO->SetTransform(targetMatrix, inv);
     avSO->FlushTransform();
 
     return true;
@@ -181,18 +178,17 @@ bool plAvBrainDrive::Apply(double timeNow, float elapsed)
 // IHANDLECONTROLMSG
 bool plAvBrainDrive::MsgReceive(plMessage* msg)
 {
-    plControlEventMsg *ctrlMsg = plControlEventMsg::ConvertNoRef(msg);
-    if(ctrlMsg)
-    {
-        if( ctrlMsg->ControlActivated() )
-        {
-            if(ctrlMsg->GetControlCode() == B_CONTROL_TOGGLE_PHYSICAL)
-            {
+    plControlEventMsg* ctrlMsg = plControlEventMsg::ConvertNoRef(msg);
+
+    if (ctrlMsg) {
+        if (ctrlMsg->ControlActivated()) {
+            if (ctrlMsg->GetControlCode() == B_CONTROL_TOGGLE_PHYSICAL) {
                 fAvMod->PopBrain();
                 return true;
             }
         }
     }
+
     return false;
 }
 

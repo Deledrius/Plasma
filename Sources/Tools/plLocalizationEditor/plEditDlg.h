@@ -49,22 +49,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plString;
 
 // Little trick to show a wait cursor while something is working
-class plWaitCursor
-{
+class plWaitCursor {
     HCURSOR    fOrig;
 public:
-    plWaitCursor()
-    {
+    plWaitCursor() {
         fOrig = SetCursor(LoadCursor(NULL, IDC_WAIT));
     }
 
-    ~plWaitCursor()
-    {
+    ~plWaitCursor() {
         SetCursor(fOrig);
     }
 };
 
-void SplitLocalizationPath(plString path, plString &ageName, plString &setName, plString &locName, plString &locLanguage);
+void SplitLocalizationPath(plString path, plString& ageName, plString& setName, plString& locName, plString& locLanguage);
 void SaveLocalizationText();
 void UpdateEditDlg(plString subtitlePath);
 BOOL CALLBACK EditDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

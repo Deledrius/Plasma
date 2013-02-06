@@ -43,8 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plDistTree_inc
 #define plDistTree_inc
 
-class plDistNode
-{
+class plDistNode {
 public:
     enum {
         kIsLeaf = 0x1
@@ -55,22 +54,30 @@ public:
     Box3        fBox;
     Box3        fFade;
 
-    union
-    {
+    union {
         void*       fPData;
         uint32_t      fIData;
     };
 
-    const Box3& GetBox() const { return fBox; }
+    const Box3& GetBox() const {
+        return fBox;
+    }
 
-    BOOL        IsLeaf() const { return 0 != (fFlags & kIsLeaf); }
-    void        SetIsLeaf(BOOL on) { if(on)fFlags |= kIsLeaf; else fFlags &= ~kIsLeaf; }
+    BOOL        IsLeaf() const {
+        return 0 != (fFlags & kIsLeaf);
+    }
+    void        SetIsLeaf(BOOL on) {
+        if (on) {
+            fFlags |= kIsLeaf;
+        } else {
+            fFlags &= ~kIsLeaf;
+        }
+    }
 };
 
-class plDistTree
-{
+class plDistTree {
 protected:
-    
+
     int32_t                           fRoot;
 
     hsLargeArray<plDistNode>        fNodes;
@@ -98,20 +105,30 @@ public:
 
     void Reset();
 
-    void AddBoxPData(const Box3& box, const Box3& fade, void* pData=nil) { AddBoxIData(box, fade, uint32_t(pData)); }
-    void AddBoxIData(const Box3& box, const Box3& fade, uint32_t iData=0);
-    void AddBox(const Box3& box, const Box3& fade=NonFade()) { AddBoxIData(box, fade, 0); }
+    void AddBoxPData(const Box3& box, const Box3& fade, void* pData = nil) {
+        AddBoxIData(box, fade, uint32_t(pData));
+    }
+    void AddBoxIData(const Box3& box, const Box3& fade, uint32_t iData = 0);
+    void AddBox(const Box3& box, const Box3& fade = NonFade()) {
+        AddBoxIData(box, fade, 0);
+    }
 
     BOOL BoxClear(const Box3& box, const Box3& fade) const;
     BOOL PointClear(const Point3& pt, const Box3& fade) const;
 
-    BOOL IsEmpty() const { return fRoot < 0; }
+    BOOL IsEmpty() const {
+        return fRoot < 0;
+    }
 
-    static Box3 NonFade() { return Box3(Point3(0,0,0), Point3(0,0,0)); }
+    static Box3 NonFade() {
+        return Box3(Point3(0, 0, 0), Point3(0, 0, 0));
+    }
 
     void HarvestBox(const Box3& box, Tab<int32_t>& out) const;
 
-    const plDistNode& GetBox(int32_t i) const { return fNodes[i]; }
+    const plDistNode& GetBox(int32_t i) const {
+        return fNodes[i];
+    }
 };
 
 #endif // plDistTree_inc

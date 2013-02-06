@@ -63,8 +63,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // Step 1: Add your konstant to the end of this list
 
-enum
-{
+enum {
     kKIMainDialog = 1,
     kKITestEditBox,
     kKIEntryDlg,
@@ -101,4 +100,4 @@ enum
 
 // Step 2: Add the string to the .cpp file
 
-#endif 
+#endif

@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnGameMgr/Heek/pnGmHeek.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNGAMEMGR_HEEK_PNGMHEEK_H
@@ -127,75 +127,75 @@ enum {
 #pragma pack(push,1)
 //============================================================================
 
-    //========================================================================
-    // Message parameters
-    //========================================================================
-    // No creation parameters
+//========================================================================
+// Message parameters
+//========================================================================
+// No creation parameters
 
-    //========================================================================
-    // Heek message structures
-    //========================================================================
+//========================================================================
+// Heek message structures
+//========================================================================
 
-    // Cli2Srv
-    struct Cli2Srv_Heek_PlayGame : GameMsgHeader {
-        uint8_t        position;       // 0...4
-        uint32_t       points;
-        wchar_t       name[256];
-    };
-    struct Cli2Srv_Heek_LeaveGame : GameMsgHeader {
-        // no extra data
-    };
-    struct Cli2Srv_Heek_Choose : GameMsgHeader {
-        uint8_t        choice;         // kHeekRock...kHeekScissors
-    };
-    struct Cli2Srv_Heek_SeqFinished : GameMsgHeader {
-        uint8_t        seqFinished;    // kHeekCountdownSeq...kHeekGameWinSeq
-    };
+// Cli2Srv
+struct Cli2Srv_Heek_PlayGame : GameMsgHeader {
+    uint8_t        position;       // 0...4
+    uint32_t       points;
+    wchar_t       name[256];
+};
+struct Cli2Srv_Heek_LeaveGame : GameMsgHeader {
+    // no extra data
+};
+struct Cli2Srv_Heek_Choose : GameMsgHeader {
+    uint8_t        choice;         // kHeekRock...kHeekScissors
+};
+struct Cli2Srv_Heek_SeqFinished : GameMsgHeader {
+    uint8_t        seqFinished;    // kHeekCountdownSeq...kHeekGameWinSeq
+};
 
-    // Srv2Cli
-    struct Srv2Cli_Heek_PlayGame : GameMsgHeader {
-        bool        isPlaying;
-        bool        isSinglePlayer;
-        bool        enableButtons;
-    };
-    struct Srv2Cli_Heek_Goodbye : GameMsgHeader {
-        // no extra data
-    };
-    struct Srv2Cli_Heek_Welcome : GameMsgHeader {
-        uint32_t       points;
-        uint32_t       rank;
-        wchar_t       name[256];
-    };
-    struct Srv2Cli_Heek_Drop : GameMsgHeader {
-        uint8_t        position;       // 0...4
-    };
-    struct Srv2Cli_Heek_Setup : GameMsgHeader {
-        uint8_t        position;       // 0...4
-        bool        buttonState;
-        bool        lightOn[6];
-    };
-    struct Srv2Cli_Heek_LightState : GameMsgHeader {
-        uint8_t        lightNum;
-        uint8_t        state;          // kHeekLightOn...kHeekLightFlash
-    };
-    struct Srv2Cli_Heek_InterfaceState : GameMsgHeader {
-        bool        buttonsEnabled;
-    };
-    struct Srv2Cli_Heek_CountdownState : GameMsgHeader {
-        uint8_t        state;          // kHeekCountdownStart...kHeekCountdownIdle
-    };
-    struct Srv2Cli_Heek_WinLose : GameMsgHeader {
-        bool        win;
-        uint8_t        choice;         // kHeekRock...kHeekScissors
-    };
-    struct Srv2Cli_Heek_GameWin : GameMsgHeader {
-        uint8_t        choice;         // kHeekRock...kHeekScissors
-    };
-    struct Srv2Cli_Heek_PointUpdate : GameMsgHeader {
-        bool        displayUpdate;
-        uint32_t       points;
-        uint32_t       rank;
-    };
+// Srv2Cli
+struct Srv2Cli_Heek_PlayGame : GameMsgHeader {
+    bool        isPlaying;
+    bool        isSinglePlayer;
+    bool        enableButtons;
+};
+struct Srv2Cli_Heek_Goodbye : GameMsgHeader {
+    // no extra data
+};
+struct Srv2Cli_Heek_Welcome : GameMsgHeader {
+    uint32_t       points;
+    uint32_t       rank;
+    wchar_t       name[256];
+};
+struct Srv2Cli_Heek_Drop : GameMsgHeader {
+    uint8_t        position;       // 0...4
+};
+struct Srv2Cli_Heek_Setup : GameMsgHeader {
+    uint8_t        position;       // 0...4
+    bool        buttonState;
+    bool        lightOn[6];
+};
+struct Srv2Cli_Heek_LightState : GameMsgHeader {
+    uint8_t        lightNum;
+    uint8_t        state;          // kHeekLightOn...kHeekLightFlash
+};
+struct Srv2Cli_Heek_InterfaceState : GameMsgHeader {
+    bool        buttonsEnabled;
+};
+struct Srv2Cli_Heek_CountdownState : GameMsgHeader {
+    uint8_t        state;          // kHeekCountdownStart...kHeekCountdownIdle
+};
+struct Srv2Cli_Heek_WinLose : GameMsgHeader {
+    bool        win;
+    uint8_t        choice;         // kHeekRock...kHeekScissors
+};
+struct Srv2Cli_Heek_GameWin : GameMsgHeader {
+    uint8_t        choice;         // kHeekRock...kHeekScissors
+};
+struct Srv2Cli_Heek_PointUpdate : GameMsgHeader {
+    bool        displayUpdate;
+    uint32_t       points;
+    uint32_t       rank;
+};
 
 //============================================================================
 // End networked data structures

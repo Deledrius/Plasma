@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plRenderInstance;
 
-class plRenderGlobalContext : public RenderGlobalContext
-{
+class plRenderGlobalContext : public RenderGlobalContext {
 protected:
     Interface*                          fInterface;
 
@@ -62,11 +61,13 @@ public:
 
     void MakeRenderInstances(plMaxNode* root, TimeValue t);
 
-    virtual int NumRenderInstances() const { return fInstList.GetCount(); }
-    virtual RenderInstance* GetRenderInstance( int i ) const;
+    virtual int NumRenderInstances() const {
+        return fInstList.GetCount();
+    }
+    virtual RenderInstance* GetRenderInstance(int i) const;
 
-    virtual void IntersectRay(RenderInstance *inst, Ray& ray, ISect &isct, ISectList &xpList, BOOL findExit);
-    virtual BOOL IntersectWorld(Ray &ray, int skipID, ISect &hit, ISectList &xplist, int blurFrame = NO_MOTBLUR);
+    virtual void IntersectRay(RenderInstance* inst, Ray& ray, ISect& isct, ISectList& xpList, BOOL findExit);
+    virtual BOOL IntersectWorld(Ray& ray, int skipID, ISect& hit, ISectList& xplist, int blurFrame = NO_MOTBLUR);
 };
 
 #endif // plRenderGlobalContext_inc

@@ -102,13 +102,13 @@ void plResponderEnableMsg::Write(hsStream* stream, hsResMgr* mgr)
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
-plResponderModifier::plResponderModifier() : 
-    fCurState(0), 
-    fCurCommand(-1), 
-    fEnabled(true), 
-    fFlags(0), 
+plResponderModifier::plResponderModifier() :
+    fCurState(0),
+    fCurCommand(-1),
+    fEnabled(true),
+    fFlags(0),
     fEnter(false),
-    fResponderSDLMod(nil), 
+    fResponderSDLMod(nil),
     fGotFirstLoad(false),
     fNotifyMsgFlags(0)
 {
@@ -117,36 +117,30 @@ plResponderModifier::plResponderModifier() :
 plResponderModifier::~plResponderModifier()
 {
     delete fResponderSDLMod;
-    fResponderSDLMod=nil;
+    fResponderSDLMod = nil;
 
-    for (int i = 0; i < fStates.Count(); i++)
-    {
-        for (int j = 0; j < fStates[i].fCmds.Count(); j++ )
+    for (int i = 0; i < fStates.Count(); i++) {
+        for (int j = 0; j < fStates[i].fCmds.Count(); j++) {
             hsRefCnt_SafeUnRef(fStates[i].fCmds[j].fMsg);
+        }
     }
 }
 
 bool plResponderModifier::MsgReceive(plMessage* msg)
 {
     plNotifyMsg* pNMsg = plNotifyMsg::ConvertNoRef(msg);
-    if (pNMsg)
-    {
-        if (pNMsg->fType == plNotifyMsg::kResponderFF)
-        {
+
+    if (pNMsg) {
+        if (pNMsg->fType == plNotifyMsg::kResponderFF) {
             ISetResponderStateFromNotify(pNMsg);
             IFastForward(true);
-        }
-        else if (pNMsg->fType == plNotifyMsg::kResponderChangeState)
-        {
+        } else if (pNMsg->fType == plNotifyMsg::kResponderChangeState) {
             ISetResponderStateFromNotify(pNMsg);
             DirtySynchState(kSDLResponder, 0);
-        }
-        else
-        {
+        } else {
             // assumes state of 0 means untriggered and state of 1 is triggered
             if ((pNMsg->fState != 0 && (fFlags & kDetectTrigger)) ||
-                (pNMsg->fState == 0 && (fFlags & kDetectUnTrigger)))
-            {
+                    (pNMsg->fState == 0 && (fFlags & kDetectUnTrigger))) {
                 Trigger(pNMsg);
                 DirtySynchState(kSDLResponder, 0);
             }
@@ -155,43 +149,44 @@ bool plResponderModifier::MsgReceive(plMessage* msg)
         return true;
     }
 
-    plResponderEnableMsg *pEnableMsg = plResponderEnableMsg::ConvertNoRef(msg);
-    if (pEnableMsg)
-    {
+    plResponderEnableMsg* pEnableMsg = plResponderEnableMsg::ConvertNoRef(msg);
+
+    if (pEnableMsg) {
         fEnabled = pEnableMsg->fEnable;
         DirtySynchState(kSDLResponder, 0);
         return true;
     }
 
-    plEventCallbackMsg *pEventMsg = plEventCallbackMsg::ConvertNoRef(msg);
-    plTimerCallbackMsg *timerMsg = plTimerCallbackMsg::ConvertNoRef(msg);
-    if (pEventMsg || timerMsg)
-    {
+    plEventCallbackMsg* pEventMsg = plEventCallbackMsg::ConvertNoRef(msg);
+    plTimerCallbackMsg* timerMsg = plTimerCallbackMsg::ConvertNoRef(msg);
+
+    if (pEventMsg || timerMsg) {
         uint32_t waitID = pEventMsg ? pEventMsg->fUser : timerMsg->fID;
 
-        if (waitID != -1)
-        {
+        if (waitID != -1) {
             // Flag that this callback completed and try sending in case any commands were waiting on this
             fCompletedEvents.SetBit(waitID);
 
-            ResponderLog(ILog(plStatusLog::kWhite, "Got callback from command %d(id:%d)", ICmdFromWait((int8_t)waitID)+1, waitID));
+            ResponderLog(ILog(plStatusLog::kWhite, "Got callback from command %d(id:%d)", ICmdFromWait((int8_t)waitID) + 1, waitID));
 
             IContinueSending();
             DirtySynchState(kSDLResponder, 0);
         }
         // The is one of the stop callbacks we generated for debug mode
-        else if (fDebugAnimBox)
+        else if (fDebugAnimBox) {
             IDebugAnimBox(false);
+        }
 
         return true;
     }
 
     // pass sdl msg to sdlMod
     plSDLModifierMsg* sdlMsg = plSDLModifierMsg::ConvertNoRef(msg);
-    if (sdlMsg && fResponderSDLMod)
-    {
-        if (fResponderSDLMod->MsgReceive(sdlMsg))
+
+    if (sdlMsg && fResponderSDLMod) {
+        if (fResponderSDLMod->MsgReceive(sdlMsg)) {
             return true;    // msg handled
+        }
     }
 
     return plSingleModifier::MsgReceive(msg);
@@ -214,14 +209,19 @@ void plResponderModifier::AddCallback(int8_t state, int8_t cmd, int8_t callback)
 //
 bool plResponderModifier::IIsLocalOnlyCmd(plMessage* cmd)
 {
-    if (plLinkToAgeMsg::ConvertNoRef(cmd))  // don't want to page out any rooms
+    if (plLinkToAgeMsg::ConvertNoRef(cmd)) { // don't want to page out any rooms
         return true;
-    if (plCameraMsg::ConvertNoRef(cmd))     // don't want to change our camera
-        return true;
+    }
 
-    plSoundMsg *snd = plSoundMsg::ConvertNoRef( cmd );
-    if( snd != nil && snd->Cmd( plSoundMsg::kIsLocalOnly ) )
+    if (plCameraMsg::ConvertNoRef(cmd)) {   // don't want to change our camera
         return true;
+    }
+
+    plSoundMsg* snd = plSoundMsg::ConvertNoRef(cmd);
+
+    if (snd != nil && snd->Cmd(plSoundMsg::kIsLocalOnly)) {
+        return true;
+    }
 
     return false;
 }
@@ -229,12 +229,9 @@ bool plResponderModifier::IIsLocalOnlyCmd(plMessage* cmd)
 void plResponderModifier::ISetResponderState(int8_t state)
 {
     // make sure that it is a valid state to switch to
-    if (state >= 0 && state < fStates.Count())
-    {
+    if (state >= 0 && state < fStates.Count()) {
         fCurState = state;
-    }
-    else
-    {
+    } else {
         ResponderLog(ILog(plStatusLog::kRed, "Invalid state %d specified, will default to current state", state));
     }
 }
@@ -243,23 +240,24 @@ void plResponderModifier::ISetResponderStateFromNotify(plNotifyMsg* msg)
 {
     // set the state of the responder IF they want it to be
     proResponderStateEventData* event = (proResponderStateEventData*)msg->FindEventRecord(proEventData::kResponderState);
-    if (event != nil)
+
+    if (event != nil) {
         ISetResponderState((int8_t)(event->fState));
+    }
 }
 
-void plResponderModifier::Trigger(plNotifyMsg *msg)
+void plResponderModifier::Trigger(plNotifyMsg* msg)
 {
 #if 0
     char str[256];
-    sprintf(str, "RM: Responder %s is triggering, num cmds=%d, enabled=%d, curCmd=%d, t=%f\n", 
-        GetKeyName(), fStates[fCurState].fCmds.GetCount(), 
-        ((int)fEnabled), ((int)fCurCommand), hsTimer::GetSysSeconds());
+    sprintf(str, "RM: Responder %s is triggering, num cmds=%d, enabled=%d, curCmd=%d, t=%f\n",
+            GetKeyName(), fStates[fCurState].fCmds.GetCount(),
+            ((int)fEnabled), ((int)fCurCommand), hsTimer::GetSysSeconds());
     plNetClientApp::GetInstance()->DebugMsg(str);
 #endif
 
     // If we're not in the middle of sending, reset and start sending commands
-    if (fCurCommand == int8_t(-1) && fEnabled)
-    {
+    if (fCurCommand == int8_t(-1) && fEnabled) {
         ResponderLog(ILog(plStatusLog::kGreen, "Trigger"));
 
         fNotifyMsgFlags = msg->GetAllBCastFlags();
@@ -268,7 +266,7 @@ void plResponderModifier::Trigger(plNotifyMsg *msg)
 
         ISetResponderStateFromNotify(msg);
 
-        proCollisionEventData *cEvent = (proCollisionEventData *)msg->FindEventRecord(proEventData::kCollision);
+        proCollisionEventData* cEvent = (proCollisionEventData*)msg->FindEventRecord(proEventData::kCollision);
         fEnter = (cEvent ? cEvent->fEnter : false);
 
         fCompletedEvents.Reset();
@@ -277,9 +275,7 @@ void plResponderModifier::Trigger(plNotifyMsg *msg)
         DirtySynchState(kSDLResponder, 0);
 
         IContinueSending();
-    }
-    else
-    {
+    } else {
         ResponderLog(ILog(plStatusLog::kRed, "Rejected Trigger, %s", !fEnabled ? "responder disabled" : "responder is running"));
     }
 }
@@ -287,46 +283,41 @@ void plResponderModifier::Trigger(plNotifyMsg *msg)
 bool plResponderModifier::IContinueSending()
 {
     // If we haven't been started, exit
-    if (fCurCommand == int8_t(-1))
+    if (fCurCommand == int8_t(-1)) {
         return false;
+    }
 
     plResponderState& state = fStates[fCurState];
 
-    while (fCurCommand < state.fCmds.Count())
-    {
-        plMessage *msg = state.fCmds[fCurCommand].fMsg;
-        if (msg)
-        {
+    while (fCurCommand < state.fCmds.Count()) {
+        plMessage* msg = state.fCmds[fCurCommand].fMsg;
+
+        if (msg) {
             // If this command needs to wait, and it's condition hasn't been met yet, exit
             int8_t wait = state.fCmds[fCurCommand].fWaitOn;
-            if (wait != -1 && !fCompletedEvents.IsBitSet(wait))
-            {
-                ResponderLog(ILog(plStatusLog::kWhite, "Command %d is waiting for command %d(id:%d)", int8_t(fCurCommand)+1, ICmdFromWait(wait)+1, wait));
+
+            if (wait != -1 && !fCompletedEvents.IsBitSet(wait)) {
+                ResponderLog(ILog(plStatusLog::kWhite, "Command %d is waiting for command %d(id:%d)", int8_t(fCurCommand) + 1, ICmdFromWait(wait) + 1, wait));
                 return false;
             }
 
-            if (!(fNotifyMsgFlags & plMessage::kNetNonLocal)|| !IIsLocalOnlyCmd(msg))
-            {
+            if (!(fNotifyMsgFlags & plMessage::kNetNonLocal) || !IIsLocalOnlyCmd(msg)) {
                 // make sure outgoing msgs inherit net flags as part of cascade
                 uint32_t msgFlags = msg->GetAllBCastFlags();
                 plNetClientApp::InheritNetMsgFlags(fNotifyMsgFlags, &msgFlags, true);
                 msg->SetAllBCastFlags(msgFlags);
 
                 // If this is a responder message, let it know which player triggered this
-                if (plResponderMsg* responderMsg = plResponderMsg::ConvertNoRef(msg))
-                {
+                if (plResponderMsg* responderMsg = plResponderMsg::ConvertNoRef(msg)) {
                     responderMsg->fPlayerKey = fPlayerKey;
-                }
-                else if (plNotifyMsg* notifyMsg = plNotifyMsg::ConvertNoRef(msg))
-                {
+                } else if (plNotifyMsg* notifyMsg = plNotifyMsg::ConvertNoRef(msg)) {
                     bool foundCollision = false;
 
                     // If we find a collision event, this message is meant to trigger a multistage
-                    for (int i = 0; i < notifyMsg->GetEventCount(); i++)
-                    {
+                    for (int i = 0; i < notifyMsg->GetEventCount(); i++) {
                         proEventData* event = notifyMsg->GetEventRecord(i);
-                        if (event->fEventType == proEventData::kCollision)
-                        {
+
+                        if (event->fEventType == proEventData::kCollision) {
                             proCollisionEventData* collisionEvent = (proCollisionEventData*)event;
                             collisionEvent->fHitter = fPlayerKey;
                             foundCollision = true;
@@ -334,56 +325,46 @@ bool plResponderModifier::IContinueSending()
                     }
 
                     // No collision event, this message is for notifying the triggerer
-                    if (!foundCollision)
-                    {
+                    if (!foundCollision) {
                         notifyMsg->ClearReceivers();
                         notifyMsg->AddReceiver(fTriggerer);
                     }
 
                     notifyMsg->SetSender(GetKey());
-                }
-                else if (plLinkToAgeMsg* linkMsg = plLinkToAgeMsg::ConvertNoRef(msg))
-                {
-                    if (linkMsg->GetNumReceivers() == 0)
-                    {
+                } else if (plLinkToAgeMsg* linkMsg = plLinkToAgeMsg::ConvertNoRef(msg)) {
+                    if (linkMsg->GetNumReceivers() == 0) {
                         plUoid netUoid(kNetClientMgr_KEY);
                         plKey netKey = hsgResMgr::ResMgr()->FindKey(netUoid);
-                        hsAssert(netKey,"NetClientMgr not found");
+                        hsAssert(netKey, "NetClientMgr not found");
                         linkMsg->AddReceiver(netKey);
                     }
-                }
-                else if (plArmatureEffectStateMsg* stateMsg = plArmatureEffectStateMsg::ConvertNoRef(msg))
-                {
+                } else if (plArmatureEffectStateMsg* stateMsg = plArmatureEffectStateMsg::ConvertNoRef(msg)) {
                     stateMsg->ClearReceivers();
                     stateMsg->AddReceiver(fPlayerKey);
                     stateMsg->fAddSurface = fEnter;
-                }
-                else if (plSubWorldMsg* swMsg = plSubWorldMsg::ConvertNoRef(msg))
-                {
-                    plArmatureMod *avatar = plAvatarMgr::GetInstance()->GetLocalAvatar();
-                    if(avatar)
-                    {
+                } else if (plSubWorldMsg* swMsg = plSubWorldMsg::ConvertNoRef(msg)) {
+                    plArmatureMod* avatar = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+                    if (avatar) {
                         swMsg->AddReceiver(avatar->GetKey());
                     }
                 }
 
                 // If we're in anim debug mode, check if this is an anim play
                 // message so we can put up the cue
-                if (fDebugAnimBox)
-                {
+                if (fDebugAnimBox) {
                     plAnimCmdMsg* animMsg = plAnimCmdMsg::ConvertNoRef(msg);
-                    if (animMsg && animMsg->Cmd(plAnimCmdMsg::kContinue))
+
+                    if (animMsg && animMsg->Cmd(plAnimCmdMsg::kContinue)) {
                         IDebugPlayMsg(animMsg);
+                    }
                 }
 
 
-                if (plTimerCallbackMsg *timerMsg = plTimerCallbackMsg::ConvertNoRef(msg))
-                {
+                if (plTimerCallbackMsg* timerMsg = plTimerCallbackMsg::ConvertNoRef(msg)) {
                     hsRefCnt_SafeRef(timerMsg);
                     plgTimerCallbackMgr::NewTimer(timerMsg->fTime, timerMsg);
-                }
-                else
-                {
+                } else {
                     hsRefCnt_SafeRef(msg);
                     plgDispatch::MsgSend(msg);
                 }
@@ -395,11 +376,9 @@ bool plResponderModifier::IContinueSending()
     }
 
     // Make sure all callbacks we need to wait on are done before allowing a state switch or restart
-    for (int i = 0; i < state.fNumCallbacks; i++)
-    {
-        if (!fCompletedEvents.IsBitSet(i))
-        {
-            ResponderLog(ILog(plStatusLog::kWhite, "Can't reset, waiting for command %d(id:%d)", ICmdFromWait(i)+1, i));
+    for (int i = 0; i < state.fNumCallbacks; i++) {
+        if (!fCompletedEvents.IsBitSet(i)) {
+            ResponderLog(ILog(plStatusLog::kWhite, "Can't reset, waiting for command %d(id:%d)", ICmdFromWait(i) + 1, i));
             return false;
         }
     }
@@ -409,15 +388,18 @@ bool plResponderModifier::IContinueSending()
     fCurCommand = -1;
     ISetResponderState(state.fSwitchToState);
     DirtySynchState(kSDLResponder, 0);
-    
+
     return true;
 }
 
 int8_t plResponderModifier::ICmdFromWait(int8_t waitIdx)
 {
     WaitToCmd& waitToCmd = fStates[fCurState].fWaitToCmd;
-    if (waitToCmd.find(waitIdx) != waitToCmd.end())
+
+    if (waitToCmd.find(waitIdx) != waitToCmd.end()) {
         return waitToCmd[waitIdx];
+    }
+
     return -1;
 }
 
@@ -425,22 +407,20 @@ void plResponderModifier::Restore()
 {
     // If we're the first player in and we're loading old state where this responder
     // was running, fast forward it
-    if (plNetClientApp::GetInstance()->GetJoinOrder() == 0 && fCurCommand != -1 && !fGotFirstLoad)
-    {
+    if (plNetClientApp::GetInstance()->GetJoinOrder() == 0 && fCurCommand != -1 && !fGotFirstLoad) {
         fGotFirstLoad = true;
         IFastForward(false);
         return;
     }
 
     ResponderLog(ILog(plStatusLog::kGreen, "Load SDL State"));
-    
+
     fGotFirstLoad = true;
 
     plResponderState& state = fStates[fCurState];
-    for (int i = 0; i < state.fNumCallbacks; i++)
-    {
-        if (!fCompletedEvents[i])
-        {
+
+    for (int i = 0; i < state.fNumCallbacks; i++) {
+        if (!fCompletedEvents[i]) {
             int cmdIdx = state.fWaitToCmd[i];
 
             plResponderCmd& cmd = state.fCmds[cmdIdx];
@@ -449,20 +429,17 @@ void plResponderModifier::Restore()
             // If it's a callback message (anim or sound), just send the callbacks again
             //
             plMessageWithCallbacks* callbackMsg = plMessageWithCallbacks::ConvertNoRef(cmd.fMsg);
-            if (callbackMsg)
-            {
+
+            if (callbackMsg) {
                 // Create a new message for just the callbacks
                 plMessageWithCallbacks* newCallbackMsg = nil;
 
-                if (plAnimCmdMsg* animMsg = plAnimCmdMsg::ConvertNoRef(callbackMsg))
-                {
+                if (plAnimCmdMsg* animMsg = plAnimCmdMsg::ConvertNoRef(callbackMsg)) {
                     plAnimCmdMsg* newAnimMsg = new plAnimCmdMsg;
                     newAnimMsg->SetCmd(plAnimCmdMsg::kAddCallbacks);
                     newCallbackMsg = newAnimMsg;
                     ResponderLog(ILog(plStatusLog::kGreen, "Restoring anim callback"));
-                }
-                else if (plSoundMsg* soundMsg = plSoundMsg::ConvertNoRef(callbackMsg))
-                {
+                } else if (plSoundMsg* soundMsg = plSoundMsg::ConvertNoRef(callbackMsg)) {
                     plSoundMsg* newSoundMsg = new plSoundMsg;
                     newSoundMsg->SetCmd(plSoundMsg::kAddCallbacks);
                     newCallbackMsg = newSoundMsg;
@@ -471,13 +448,15 @@ void plResponderModifier::Restore()
 
                 // Setup the sender and receiver
                 newCallbackMsg->SetSender(callbackMsg->GetSender());
-                for (int iReceiver = 0; i < callbackMsg->GetNumReceivers(); i++)
+
+                for (int iReceiver = 0; i < callbackMsg->GetNumReceivers(); i++) {
                     newCallbackMsg->AddReceiver(callbackMsg->GetReceiver(iReceiver));
+                }
 
                 // Add the callbacks
                 int numCallbacks = callbackMsg->GetNumCallbacks();
-                for (int iCallback = 0; iCallback < numCallbacks; iCallback++)
-                {
+
+                for (int iCallback = 0; iCallback < numCallbacks; iCallback++) {
                     plMessage* callback = callbackMsg->GetCallback(iCallback);
 //                  hsRefCnt_SafeRef(callback); AddCallback will ref this for us.
                     newCallbackMsg->AddCallback(callback);
@@ -493,14 +472,13 @@ void plResponderModifier::Restore()
 
 plMessage* plResponderModifier::IGetFastForwardMsg(plMessage* msg, bool python)
 {
-    if (!msg)
+    if (!msg) {
         return nil;
+    }
 
-    if (plAnimCmdMsg* animMsg = plAnimCmdMsg::ConvertNoRef(msg))
-    {
+    if (plAnimCmdMsg* animMsg = plAnimCmdMsg::ConvertNoRef(msg)) {
         if (animMsg->Cmd(plAnimCmdMsg::kContinue) ||
-            animMsg->Cmd(plAnimCmdMsg::kAddCallbacks))
-        {
+                animMsg->Cmd(plAnimCmdMsg::kAddCallbacks)) {
             plAnimCmdMsg* newAnimMsg = new plAnimCmdMsg;
             newAnimMsg->fCmd                = animMsg->fCmd;
             newAnimMsg->fBegin              = animMsg->fBegin;
@@ -516,14 +494,14 @@ plMessage* plResponderModifier::IGetFastForwardMsg(plMessage* msg, bool python)
             // Remove the callbacks
             newAnimMsg->fCmd.SetBit(plAnimCmdMsg::kAddCallbacks, false);
 
-            if (newAnimMsg->Cmd(plAnimCmdMsg::kContinue))
-            {
+            if (newAnimMsg->Cmd(plAnimCmdMsg::kContinue)) {
                 newAnimMsg->fCmd.SetBit(plAnimCmdMsg::kContinue, false);
                 newAnimMsg->fCmd.SetBit(plAnimCmdMsg::kFastForward, true);
             }
 
-            for (int i = 0; i < animMsg->GetNumReceivers(); i++)
+            for (int i = 0; i < animMsg->GetNumReceivers(); i++) {
                 newAnimMsg->AddReceiver(animMsg->GetReceiver(i));
+            }
 
             ResponderLog(ILog(plStatusLog::kWhite, "FF Animation Play Msg"));
             return newAnimMsg;
@@ -532,18 +510,15 @@ plMessage* plResponderModifier::IGetFastForwardMsg(plMessage* msg, bool python)
         ResponderLog(ILog(plStatusLog::kWhite, "FF Animation Non-Play Msg"));
         hsRefCnt_SafeRef(msg);
         return msg;
-    }
-    else if(plSoundMsg *soundMsg = plSoundMsg::ConvertNoRef(msg))
-    {
-        if( fFlags & kSkipFFSound )
-        {
+    } else if (plSoundMsg* soundMsg = plSoundMsg::ConvertNoRef(msg)) {
+        if (fFlags & kSkipFFSound) {
             return nil;
         }
-        if(soundMsg->Cmd(plSoundMsg::kPlay) ||
-            soundMsg->Cmd(plSoundMsg::kToggleState)  ||
-            soundMsg->Cmd(plAnimCmdMsg::kAddCallbacks))
-        {
-            plSoundMsg *newSoundMsg = new plSoundMsg;
+
+        if (soundMsg->Cmd(plSoundMsg::kPlay) ||
+                soundMsg->Cmd(plSoundMsg::kToggleState)  ||
+                soundMsg->Cmd(plAnimCmdMsg::kAddCallbacks)) {
+            plSoundMsg* newSoundMsg = new plSoundMsg;
             newSoundMsg->fCmd = soundMsg->fCmd;
             newSoundMsg->fBegin = soundMsg->fBegin;
             newSoundMsg->fEnd = soundMsg->fEnd;
@@ -559,47 +534,39 @@ plMessage* plResponderModifier::IGetFastForwardMsg(plMessage* msg, bool python)
             // Remove the callbacks
             newSoundMsg->fCmd.SetBit(plSoundMsg::kAddCallbacks, false);
 
-            if(newSoundMsg->Cmd(plSoundMsg::kPlay))
-            {
+            if (newSoundMsg->Cmd(plSoundMsg::kPlay)) {
                 newSoundMsg->fCmd.SetBit(plSoundMsg::kPlay, false);
                 newSoundMsg->fCmd.SetBit(plSoundMsg::kFastForwardPlay);
                 ResponderLog(ILog(plStatusLog::kWhite, "FF Sound Play Msg"));
-            }
-            else if(newSoundMsg->Cmd(plSoundMsg::kToggleState))
-            {
+            } else if (newSoundMsg->Cmd(plSoundMsg::kToggleState)) {
                 newSoundMsg->fCmd.SetBit(plSoundMsg::kToggleState, false);
                 newSoundMsg->fCmd.SetBit(plSoundMsg::kFastForwardToggle);
                 ResponderLog(ILog(plStatusLog::kWhite, "FF Sound Toggle State Msg"));
             }
-            for (int i = 0; i < soundMsg->GetNumReceivers(); i++)
+
+            for (int i = 0; i < soundMsg->GetNumReceivers(); i++) {
                 newSoundMsg->AddReceiver(soundMsg->GetReceiver(i));
+            }
 
             return newSoundMsg;
         }
+
         ResponderLog(ILog(plStatusLog::kWhite, "FF Sound Non-Play/Toggle Msg"));
         hsRefCnt_SafeRef(msg);
         return msg;
-    }
-    else if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plExcludeRegionMsg))
-    {
+    } else if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plExcludeRegionMsg)) {
         ResponderLog(ILog(plStatusLog::kWhite, "FF Exclude Region Msg"));
         hsRefCnt_SafeRef(msg);
         return msg;
-    }
-    else if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plEnableMsg))
-    {
+    } else if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plEnableMsg)) {
         ResponderLog(ILog(plStatusLog::kWhite, "FF Visibility/Detector Enable Msg"));
         hsRefCnt_SafeRef(msg);
         return msg;
-    }
-    else if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plResponderEnableMsg))
-    {
+    } else if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plResponderEnableMsg)) {
         ResponderLog(ILog(plStatusLog::kWhite, "FF Responder Enable Msg"));
         hsRefCnt_SafeRef(msg);
         return msg;
-    }
-    else if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plSimSuppressMsg))
-    {
+    } else if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plSimSuppressMsg)) {
         ResponderLog(ILog(plStatusLog::kWhite, "FF Physical Enable Msg"));
         hsRefCnt_SafeRef(msg);
         return msg;
@@ -616,12 +583,13 @@ void plResponderModifier::IFastForward(bool python)
 
     plResponderState& state = fStates[fCurState];
 
-    while (fCurCommand < state.fCmds.Count())
-    {
-        plMessage *msg = state.fCmds[fCurCommand].fMsg;
+    while (fCurCommand < state.fCmds.Count()) {
+        plMessage* msg = state.fCmds[fCurCommand].fMsg;
         msg = IGetFastForwardMsg(msg, python);
-        if (msg)
+
+        if (msg) {
             plgDispatch::MsgSend(msg);
+        }
 
         fCurCommand++;
     }
@@ -641,8 +609,8 @@ void plResponderModifier::Read(hsStream* stream, hsResMgr* mgr)
 
     int8_t numStates = stream->ReadByte();
     fStates.SetCount(numStates);
-    for (int8_t i = 0; i < numStates; i++)
-    {
+
+    for (int8_t i = 0; i < numStates; i++) {
         plResponderState& state = fStates[i];
         state.fNumCallbacks = stream->ReadByte();
         state.fSwitchToState = stream->ReadByte();
@@ -651,8 +619,8 @@ void plResponderModifier::Read(hsStream* stream, hsResMgr* mgr)
 
         int8_t numCmds = stream->ReadByte();
         state.fCmds.SetCount(numCmds);
-        for (j = 0; j < numCmds; j++)
-        {
+
+        for (j = 0; j < numCmds; j++) {
             plResponderCmd& cmd = state.fCmds[j];
 
             plMessage* pMsg = plMessage::ConvertNoRef(mgr->ReadCreatable(stream));
@@ -662,8 +630,8 @@ void plResponderModifier::Read(hsStream* stream, hsResMgr* mgr)
 
         state.fWaitToCmd.clear();
         int8_t mapSize = stream->ReadByte();
-        for (j = 0; j < mapSize; j++)
-        {
+
+        for (j = 0; j < mapSize; j++) {
             int8_t wait = stream->ReadByte();
             int8_t cmd = stream->ReadByte();
             state.fWaitToCmd[wait] = cmd;
@@ -686,16 +654,16 @@ void plResponderModifier::Write(hsStream* stream, hsResMgr* mgr)
 
     int8_t numStates = fStates.GetCount();
     stream->WriteByte(numStates);
-    for (int i = 0; i < numStates; i++)
-    {
+
+    for (int i = 0; i < numStates; i++) {
         plResponderState& state = fStates[i];
         stream->WriteByte(state.fNumCallbacks);
         stream->WriteByte(state.fSwitchToState);
 
         int8_t numCmds = state.fCmds.GetCount();
         stream->WriteByte(numCmds);
-        for (int j = 0; j < numCmds; j++)
-        {
+
+        for (int j = 0; j < numCmds; j++) {
             plResponderCmd& cmd = state.fCmds[j];
 
             mgr->WriteCreatable(stream, cmd.fMsg);
@@ -704,8 +672,8 @@ void plResponderModifier::Write(hsStream* stream, hsResMgr* mgr)
 
         int8_t mapSize = state.fWaitToCmd.size();
         stream->WriteByte(mapSize);
-        for (WaitToCmd::iterator it = state.fWaitToCmd.begin(); it != state.fWaitToCmd.end(); it++)
-        {
+
+        for (WaitToCmd::iterator it = state.fWaitToCmd.begin(); it != state.fWaitToCmd.end(); it++) {
             stream->WriteByte(it->first);
             stream->WriteByte(it->second);
         }
@@ -721,7 +689,7 @@ bool plResponderModifier::fDebugAnimBox = false;
 
 void plResponderModifier::IDebugAnimBox(bool start)
 {
-    plDebugText &debugTxt = plDebugText::Instance();
+    plDebugText& debugTxt = plDebugText::Instance();
 
     uint32_t scrnWidth, scrnHeight;
     debugTxt.GetScreenSize(&scrnWidth, &scrnHeight);
@@ -730,16 +698,17 @@ void plResponderModifier::IDebugAnimBox(bool start)
     uint32_t boxSize = scrnHeight / 8;
 
     // Draw box in lower left corner
-    if (start)
-        debugTxt.DrawRect(0, (uint16_t)(scrnHeight-boxSize), (uint16_t)boxSize, (uint16_t)scrnHeight, 0, 255, 0);
-    else
-        debugTxt.DrawRect((uint16_t)boxSize, (uint16_t)(scrnHeight-boxSize), (uint16_t)(boxSize*2), (uint16_t)scrnHeight, 255, 0, 0);
+    if (start) {
+        debugTxt.DrawRect(0, (uint16_t)(scrnHeight - boxSize), (uint16_t)boxSize, (uint16_t)scrnHeight, 0, 255, 0);
+    } else {
+        debugTxt.DrawRect((uint16_t)boxSize, (uint16_t)(scrnHeight - boxSize), (uint16_t)(boxSize * 2), (uint16_t)scrnHeight, 255, 0, 0);
+    }
 }
 
 void plResponderModifier::IDebugPlayMsg(plAnimCmdMsg* msg)
 {
     // Create a stop callback so we can do a cue for that too
-    plEventCallbackMsg *eventMsg = new plEventCallbackMsg;
+    plEventCallbackMsg* eventMsg = new plEventCallbackMsg;
     eventMsg->AddReceiver(GetKey());
     eventMsg->fRepeats = 0;
     eventMsg->fUser = -1;
@@ -754,7 +723,7 @@ void plResponderModifier::IDebugPlayMsg(plAnimCmdMsg* msg)
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef STATUS_LOG
-static plStatusLog *gLog = nil;
+static plStatusLog* gLog = nil;
 static std::vector<std::string> gNoLogStrings;
 #endif // STATUS_LOG
 
@@ -768,19 +737,22 @@ void plResponderModifier::NoLogString(const char* str)
 void plResponderModifier::ILog(uint32_t color, const char* format, ...)
 {
 #ifdef STATUS_LOG
-    if (!gLog)
-        gLog = plStatusLogMgr::GetInstance().CreateStatusLog(15, "Responder", plStatusLog::kFilledBackground | plStatusLog::kDeleteForMe | plStatusLog::kDontWriteFile | plStatusLog::kAlignToTop);
 
-    if (!format || *format == '\0')
+    if (!gLog) {
+        gLog = plStatusLogMgr::GetInstance().CreateStatusLog(15, "Responder", plStatusLog::kFilledBackground | plStatusLog::kDeleteForMe | plStatusLog::kDontWriteFile | plStatusLog::kAlignToTop);
+    }
+
+    if (!format || *format == '\0') {
         return;
+    }
 
     const char* keyName = GetKeyName().c_str();
 
     // Make sure this key isn't in our list of keys to deny
-    for (int i = 0; i < gNoLogStrings.size(); i++)
-    {
-        if (strncmp(gNoLogStrings[i].c_str(), keyName, gNoLogStrings[i].length()) == 0)
+    for (int i = 0; i < gNoLogStrings.size(); i++) {
+        if (strncmp(gNoLogStrings[i].c_str(), keyName, gNoLogStrings[i].length()) == 0) {
             return;
+        }
     }
 
     // Format the log text
@@ -794,10 +766,12 @@ void plResponderModifier::ILog(uint32_t color, const char* format, ...)
     // Strip the redundant part off the key name
     char logLine[512];
     const char* modPos = strstr("_ResponderModifier", keyName);
-    if (modPos)
+
+    if (modPos) {
         strncpy(logLine, keyName, modPos - keyName);
-    else
+    } else {
         strcpy(logLine, keyName);
+    }
 
     strcat(logLine, ": ");
     strcat(logLine, buf);

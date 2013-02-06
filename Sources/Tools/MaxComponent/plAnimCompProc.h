@@ -46,19 +46,18 @@ class plComponentBase;
 class plMaxNode;
 class IParamBlock2;
 
-class plAnimCompProc : public ParamMap2UserDlgProc
-{
+class plAnimCompProc : public ParamMap2UserDlgProc {
 protected:
     int fCompButtonID;
     int fCompParamID;
     int fNodeButtonID;
     int fNodeParamID;
 
-    virtual void IPickComponent(IParamBlock2* pb)=0;
+    virtual void IPickComponent(IParamBlock2* pb) = 0;
     virtual void IPickNode(IParamBlock2* pb, plComponentBase* comp);
-    
-    virtual void ILoadUser(HWND hWnd, IParamBlock2* pb)=0;
-    virtual bool IUserCommand(HWND hWnd, IParamBlock2* pb, int cmd, int resID)=0;
+
+    virtual void ILoadUser(HWND hWnd, IParamBlock2* pb) = 0;
+    virtual bool IUserCommand(HWND hWnd, IParamBlock2* pb, int cmd, int resID) = 0;
 
     plMaxNode* IGetNode(IParamBlock2* pb);
     void IClearNode(IParamBlock2* pb);
@@ -69,7 +68,7 @@ protected:
 
     void IUpdateCompButton(HWND hWnd, IParamBlock2* pb);
     virtual void IUpdateNodeButton(HWND hWnd, IParamBlock2* pb);
-    
+
 public:
     plAnimCompProc();
     virtual void DeleteThis() {}
@@ -83,8 +82,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 
-class plMtlAnimProc : public ParamMap2UserDlgProc
-{
+class plMtlAnimProc : public ParamMap2UserDlgProc {
 protected:
     int fMtlButtonID;
     int fMtlParamID;
@@ -96,8 +94,8 @@ protected:
     Mtl* IGetMtl(IParamBlock2* pb);
 
     virtual void IOnInitDlg(HWND hWnd, IParamBlock2* pb) {}
-    virtual void ILoadUser(HWND hWnd, IParamBlock2* pb)=0;
-    virtual bool IUserCommand(HWND hWnd, IParamBlock2* pb, int cmd, int resID)=0;
+    virtual void ILoadUser(HWND hWnd, IParamBlock2* pb) = 0;
+    virtual bool IUserCommand(HWND hWnd, IParamBlock2* pb, int cmd, int resID) = 0;
 
     virtual void IPickNode(IParamBlock2* pb);
 

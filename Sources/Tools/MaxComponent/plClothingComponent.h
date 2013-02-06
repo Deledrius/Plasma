@@ -42,18 +42,18 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef PL_CLOTHING_COMPONENT_H
 #define PL_CLOTHING_COMPONENT_H
 
-class plClothingComponent : public plComponent
-{
+class plClothingComponent : public plComponent {
 public:
     plClothingComponent();
 
-    virtual void DeleteThis() { delete this; }
+    virtual void DeleteThis() {
+        delete this;
+    }
     virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg); 
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    enum // ParamBlock indices
-    {
+    enum { // ParamBlock indices
         kMaterials,
         kGroup,
         kType,
@@ -65,12 +65,11 @@ public:
 
 #define CLOTHING_COMPONENT_CLASS_ID Class_ID(0x2df85c56, 0x27bc2a7a)
 
-class plClothingComponentProc : public ParamMap2UserDlgProc
-{
+class plClothingComponentProc : public ParamMap2UserDlgProc {
 public:
     plClothingComponentProc() {}
 
-    BOOL DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    BOOL DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     void DeleteThis() {}
 };

@@ -68,8 +68,9 @@ int SceneWatcher::NumRefs()
 
 RefTargetHandle SceneWatcher::GetReference(int i)
 {
-    if (i < fNodes.size())
+    if (i < fNodes.size()) {
         return fNodes[i];
+    }
 
     hsAssert(0, "Index out of range");
     return nil;
@@ -77,56 +78,57 @@ RefTargetHandle SceneWatcher::GetReference(int i)
 
 void SceneWatcher::SetReference(int i, RefTargetHandle rtarg)
 {
-    if (i < fNodes.size())
+    if (i < fNodes.size()) {
         fNodes[i] = (plMaxNode*)rtarg;
-    else
+    } else {
         hsAssert(0, "Index out of range");
+    }
 }
 
 //
 // Something in the scene has changed.
 //
-RefResult SceneWatcher::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, 
-                           PartID& partID, RefMessage message)
+RefResult SceneWatcher::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
+        PartID& partID, RefMessage message)
 {
-    plMaxNode *node = (plMaxNode *)hTarget;
+    plMaxNode* node = (plMaxNode*)hTarget;
 
 #ifdef HS_DEBUGGING
-    char *tmp = node->GetName();
+    char* tmp = node->GetName();
 #endif
 
-    if (message == REFMSG_CHANGE)
-    {
+    if (message == REFMSG_CHANGE) {
         // If the message is from a component, and was not generated locally (ie.
         // it came from a ref parameter), ignore it.  There is no way to tell if
         // one of these messages is an actual change to the component or just a
         // change to the referenced object.  We'll catch the real changes with
         // REFMSG_USER_COMP_REF_CHANGED below.
-        if (node->IsComponent())
-        {
-            plComponentBase *comp = node->ConvertToComponent();
-            if (!comp->IsCurMsgLocal())
+        if (node->IsComponent()) {
+            plComponentBase* comp = node->ConvertToComponent();
+
+            if (!comp->IsCurMsgLocal()) {
                 return REF_SUCCEED;
+            }
         }
 
         // If this is a static light, ignore it
-        Object *obj = node->GetObjectRef();
-        if (obj && obj->SuperClassID() == LIGHT_CLASS_ID && !node->GetRunTimeLight())
+        Object* obj = node->GetObjectRef();
+
+        if (obj && obj->SuperClassID() == LIGHT_CLASS_ID && !node->GetRunTimeLight()) {
             return REF_SUCCEED;
+        }
 
         node->SetDirty(plMaxNode::kGeomDirty, true);
         ISetDirty();
-    }
-    else if (message == REFMSG_TARGET_DELETED)
-    {
+    } else if (message == REFMSG_TARGET_DELETED) {
         // If the deleted node was a component, dirty everyone it was attached to
-        if (node->IsComponent())
-        {
-            plComponentBase *comp = node->ConvertToComponent();
-            for (uint32_t i = 0; i < comp->NumTargets(); i++)
-            {
-                if (comp->GetTarget(i))
+        if (node->IsComponent()) {
+            plComponentBase* comp = node->ConvertToComponent();
+
+            for (uint32_t i = 0; i < comp->NumTargets(); i++) {
+                if (comp->GetTarget(i)) {
                     comp->GetTarget(i)->SetDirty(plMaxNode::kGeomDirty, true);
+                }
             }
         }
 
@@ -134,34 +136,28 @@ RefResult SceneWatcher::NotifyRefChanged(Interval changeInt, RefTargetHandle hTa
 
         IRemoveRef(node);
         ISetDirty();
-    }
-    else if (message == REFMSG_NODE_MATERIAL_CHANGED ||
-            message == REFMSG_USER_MAT)
-    {
-        if (!node->IsComponent())
-        {
+    } else if (message == REFMSG_NODE_MATERIAL_CHANGED ||
+               message == REFMSG_USER_MAT) {
+        if (!node->IsComponent()) {
             node->SetDirty(plMaxNode::kMatDirty, true);
             ISetDirty();
         }
     }
     // A node was added to the components target list
-    else if (message == REFMSG_USER_TARGET_ADD)
-    {
-        plMaxNode *target = (plMaxNode*)partID;
+    else if (message == REFMSG_USER_TARGET_ADD) {
+        plMaxNode* target = (plMaxNode*)partID;
         target->SetDirty(plMaxNode::kGeomDirty, true);
         ISetDirty();
     }
     // A node was deleted from the components target list
-    else if (message == REFMSG_USER_TARGET_DELETE)
-    {
-        plMaxNode *target = (plMaxNode*)partID;
+    else if (message == REFMSG_USER_TARGET_DELETE) {
+        plMaxNode* target = (plMaxNode*)partID;
         target->SetDirty(plMaxNode::kGeomDirty, true);
         ISetDirty();
     }
     // A ref maintained by a component PB changed (not just a propagated message
     // from the ref)
-    else if (message == REFMSG_USER_COMP_REF_CHANGED)
-    {
+    else if (message == REFMSG_USER_COMP_REF_CHANGED) {
         node->SetDirty(plMaxNode::kGeomDirty, true);
         ISetDirty();
     }
@@ -192,40 +188,42 @@ bool SceneWatcher::AnyDirty()
 void SceneWatcher::GetDirty(NodeSet& dirtyNodes)
 {
     int size = fNodes.size();
-    for (int i = 0; i < size; i++)
-    {
-        plMaxNode *node = fNodes[i];
+
+    for (int i = 0; i < size; i++) {
+        plMaxNode* node = fNodes[i];
 
 #ifdef HS_DEBUGGING
-        const char *tmp = node ? node->GetName() : nil;
+        const char* tmp = node ? node->GetName() : nil;
 #endif
+
         // If any dirty flags are set, add to dirty list
-        if (node && node->GetDirty(plMaxNode::kAllDirty))
+        if (node && node->GetDirty(plMaxNode::kAllDirty)) {
             IGetDependents(node, dirtyNodes);
+        }
     }
 
     fDirty = false;
 }
 
-void SceneWatcher::IAddRef(plMaxNode *node)
+void SceneWatcher::IAddRef(plMaxNode* node)
 {
     // Ensure that we don't already ref this node
-    if (FindRef(node) != -1)
+    if (FindRef(node) != -1) {
         return;
+    }
 
     // Make a ref
     int size = fNodes.size();
-    fNodes.resize(size+1);
+    fNodes.resize(size + 1);
     MakeRefByID(FOREVER, size, node);
 }
 
-void SceneWatcher::IRemoveRef(plMaxNode *node)
+void SceneWatcher::IRemoveRef(plMaxNode* node)
 {
     // Delete the reference if it's in our list
     int i = FindRef(node);
 
-    if (i != -1)
-    {
+    if (i != -1) {
         // Clear the node data, in case it is undeleted later
         // (when it will be invalid)
         node->ClearData(nil, nil);
@@ -237,32 +235,31 @@ void SceneWatcher::IRemoveRef(plMaxNode *node)
     }
 }
 
-void SceneWatcher::IAddNodeRecur(plMaxNode *node)
+void SceneWatcher::IAddNodeRecur(plMaxNode* node)
 {
     IAddRef(node);
 
     // If a node is dirty, make sure to set the dirty flag (since nodes may have
     // been dirtied in a previous run but not reconverted yet).
-    if (node->GetDirty(plMaxNode::kAllDirty))
+    if (node->GetDirty(plMaxNode::kAllDirty)) {
         fDirty = true;
+    }
 
-    for (int i = 0; i < node->NumberOfChildren(); ++i)
-    {
-        plMaxNode *childNode = (plMaxNode*)node->GetChildNode(i);
+    for (int i = 0; i < node->NumberOfChildren(); ++i) {
+        plMaxNode* childNode = (plMaxNode*)node->GetChildNode(i);
         IAddNodeRecur(childNode);
     }
 }
 
-void SceneWatcher::INotify(void *param, NotifyInfo *info)
+void SceneWatcher::INotify(void* param, NotifyInfo* info)
 {
-    SceneWatcher *inst = (SceneWatcher*)param;
+    SceneWatcher* inst = (SceneWatcher*)param;
 
     int code = info->intcode;
 
     // New node was added to the scene, add it to our refs
-    if (code == NOTIFY_NODE_CREATED)
-    {
-        plMaxNode *node = (plMaxNode*)info->callParam;
+    if (code == NOTIFY_NODE_CREATED) {
+        plMaxNode* node = (plMaxNode*)info->callParam;
 
         // Add a ref to the node and set it to dirty
         inst->IAddRef(node);
@@ -282,48 +279,47 @@ void SceneWatcher::ISetDirty()
 #include "../MaxExport/plExportProgressBar.h"
 #include "../MaxComponent/plResponderComponent.h"   // Just need the CID
 
-void SceneWatcher::IGetLogicDependents(plMaxNode *node, NodeSet& nodes)
+void SceneWatcher::IGetLogicDependents(plMaxNode* node, NodeSet& nodes)
 {
     int attached = node->NumAttachedComponents();
-    for (int i = 0; i < attached; i++)
-    {
-        plComponentBase *comp = node->GetAttachedComponent(i);
-/*
-        if (comp->ClassID() == ACTIVATOR_CID)
-        {
-            plMaxNodeBase *activatorNode = comp->GetINode();
-            int numResponders = activatorNode->NumAttachedComponents(true);
-            for (int i = 0; i < numResponders; i++)
-            {
-                plComponentBase *responderComp = activatorNode->GetAttachedComponent(i, true);
-                if (responderComp->ClassID() == RESPONDER_CID)
+
+    for (int i = 0; i < attached; i++) {
+        plComponentBase* comp = node->GetAttachedComponent(i);
+
+        /*
+                if (comp->ClassID() == ACTIVATOR_CID)
                 {
-                    for (int j = 0; j < responderComp->NumTargets(); j++)
+                    plMaxNodeBase *activatorNode = comp->GetINode();
+                    int numResponders = activatorNode->NumAttachedComponents(true);
+                    for (int i = 0; i < numResponders; i++)
                     {
-                        plMaxNode *targ = (plMaxNode*)responderComp->GetTarget(j);
-                        if (targ && nodes.find(targ) == nodes.end())
+                        plComponentBase *responderComp = activatorNode->GetAttachedComponent(i, true);
+                        if (responderComp->ClassID() == RESPONDER_CID)
                         {
-                            nodes.insert(targ);
-                            IGetLogicDependents(targ, nodes);
+                            for (int j = 0; j < responderComp->NumTargets(); j++)
+                            {
+                                plMaxNode *targ = (plMaxNode*)responderComp->GetTarget(j);
+                                if (targ && nodes.find(targ) == nodes.end())
+                                {
+                                    nodes.insert(targ);
+                                    IGetLogicDependents(targ, nodes);
+                                }
+                            }
                         }
                     }
                 }
-            }
-        }
-        else
-*/
-        if (comp->ClassID() == RESPONDER_CID)
-        {
+                else
+        */
+        if (comp->ClassID() == RESPONDER_CID) {
             int activatorCnt = ResponderGetActivatorCount(comp);
-            for (int i = 0; i < activatorCnt; i++)
-            {
-                plComponentBase *activator = ResponderGetActivator(comp, i);
 
-                for (int j = 0; j < activator->NumTargets(); j++)
-                {
-                    plMaxNode *targ = (plMaxNode*)activator->GetTarget(j);
-                    if (targ && nodes.find(targ) == nodes.end())
-                    {
+            for (int i = 0; i < activatorCnt; i++) {
+                plComponentBase* activator = ResponderGetActivator(comp, i);
+
+                for (int j = 0; j < activator->NumTargets(); j++) {
+                    plMaxNode* targ = (plMaxNode*)activator->GetTarget(j);
+
+                    if (targ && nodes.find(targ) == nodes.end()) {
                         nodes.insert(targ);
                         IGetLogicDependents(targ, nodes);
                     }
@@ -333,29 +329,26 @@ void SceneWatcher::IGetLogicDependents(plMaxNode *node, NodeSet& nodes)
     }
 }
 
-void SceneWatcher::IGetDependents(plMaxNode *node, NodeSet& nodes)
+void SceneWatcher::IGetDependents(plMaxNode* node, NodeSet& nodes)
 {
     NodeSet dependents;
 
-    if (node->IsComponent())
-    {
-        plComponentBase *comp = node->ConvertToComponent();
+    if (node->IsComponent()) {
+        plComponentBase* comp = node->ConvertToComponent();
 
-        if (comp->ClassID() == ROOM_CID || comp->ClassID() == PAGEINFO_CID)
+        if (comp->ClassID() == ROOM_CID || comp->ClassID() == PAGEINFO_CID) {
             return;
+        }
 
-        for (int i = 0; i < comp->NumTargets(); i++)
-        {
-            plMaxNode *targ = (plMaxNode*)comp->GetTarget(i);
-            if (targ)
-            {
+        for (int i = 0; i < comp->NumTargets(); i++) {
+            plMaxNode* targ = (plMaxNode*)comp->GetTarget(i);
+
+            if (targ) {
                 dependents.insert(targ);
                 IGetLogicDependents(targ, dependents);
             }
         }
-    }
-    else
-    {
+    } else {
         dependents.insert(node);
 
         IGetLogicDependents(node, dependents);
@@ -363,6 +356,7 @@ void SceneWatcher::IGetDependents(plMaxNode *node, NodeSet& nodes)
 
 //  Bug in VC++?
 //  nodes.insert(dependents.begin(), dependents.end());
-    for (NodeSet::iterator i = dependents.begin(); i != dependents.end(); i++)
+    for (NodeSet::iterator i = dependents.begin(); i != dependents.end(); i++) {
         nodes.insert(*i);
+    }
 }

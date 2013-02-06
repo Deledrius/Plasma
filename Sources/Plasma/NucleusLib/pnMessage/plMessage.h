@@ -54,8 +54,7 @@ class plString;
 
 // Base class for messages only has enough info to route it
 // and send it over the wire (Read/Write).
-class plMessage : public plCreatable
-{
+class plMessage : public plCreatable {
 public:
     typedef uint16_t  plStrLen;
 
@@ -68,20 +67,20 @@ public:
         kPropagateToModifiers   = 0x10, // Send the msg to an object and all its modifier
         kClearAfterBCast        = 0x20, // Clear registration for this type after sending this msg
         kNetPropagate           = 0x40, // Propagate this message over the network (remotely)
-        kNetSent                = 0x80, // Internal use-This msg has been sent over the network 
+        kNetSent                = 0x80, // Internal use-This msg has been sent over the network
         kNetUseRelevanceRegions = 0x100, // Used along with NetPropagate to filter the msg bcast using relevance regions
         kNetForce               = 0x200, // Used along with NetPropagate to force the msg to go out (ie. ignore cascading rules)
         kNetNonLocal            = 0x400, // Internal use-This msg came in over the network (remote msg)
         kLocalPropagate         = 0x800, // Propagate this message locally (ON BY DEFAULT)
-        kNetNonDeterministic    = kNetForce, // This msg is a non-deterministic response to another msg 
+        kNetNonDeterministic    = kNetForce, // This msg is a non-deterministic response to another msg
         kMsgWatch               = 0x1000, // Debug only - will break in dispatch before sending this msg
         kNetStartCascade        = 0x2000, // Internal use-msg is non-local and initiates a cascade of net msgs. This bit is not inherited or computed, it's a property.
         kNetAllowInterAge       = 0x4000, // If rcvr is online but not in current age, they will receive msg courtesy of pls routing.
         kNetSendUnreliable      = 0x8000,  // Don't use reliable send when net propagating
         kCCRSendToAllPlayers    = 0x10000,  // CCRs can send a plMessage to all online players.
         kNetCreatedRemotely     = 0x20000,  // kNetSent and kNetNonLocal are inherited by child messages sent off while processing a net-propped
-                                            // parent. This flag ONLY gets sent on the actual message that went across the wire.
-                
+        // parent. This flag ONLY gets sent on the actual message that went across the wire.
+
     };
 private:
     bool dispatchBreak;
@@ -105,23 +104,28 @@ protected:
 
 public:
     plMessage();
-    plMessage(const plKey &s,
-                const plKey &r,
-                const double* t);
+    plMessage(const plKey& s,
+              const plKey& r,
+              const double* t);
 
     virtual ~plMessage();
-    
-    CLASSNAME_REGISTER( plMessage );
-    GETINTERFACE_ANY( plMessage, plCreatable );
+
+    CLASSNAME_REGISTER(plMessage);
+    GETINTERFACE_ANY(plMessage, plCreatable);
 
     // These must be implemented by all derived message classes (hence pure).
-    // Derived classes should call the base-class default read/write implementation, 
+    // Derived classes should call the base-class default read/write implementation,
     // so the derived Read() should call plMessage::IMsgRead().
     virtual void Read(hsStream* stream, hsResMgr* mgr) = 0;
     virtual void Write(hsStream* stream, hsResMgr* mgr) = 0;
 
-    const plKey             GetSender() const { return fSender; }
-    plMessage&              SetSender(const plKey &s) { fSender = s; return *this; }
+    const plKey             GetSender() const {
+        return fSender;
+    }
+    plMessage&              SetSender(const plKey& s) {
+        fSender = s;
+        return *this;
+    }
 
     plMessage&              SetNumReceivers(int n);
     uint32_t                  GetNumReceivers() const ;
@@ -129,28 +133,53 @@ public:
     plMessage&              RemoveReceiver(int i);
 
     plMessage&              ClearReceivers();
-    plMessage&              AddReceiver(const plKey &r);
+    plMessage&              AddReceiver(const plKey& r);
     plMessage&              AddReceivers(const hsTArray<plKey>& rList);
 
-    bool                    Send(const plKey r=nil, bool async=false); // Message will self-destruct after send.
-    bool                    SendAndKeep(const plKey r=nil, bool async=false); // Message won't self-destruct after send.
+    bool                    Send(const plKey r = nil, bool async = false); // Message will self-destruct after send.
+    bool                    SendAndKeep(const plKey r = nil, bool async = false); // Message won't self-destruct after send.
 
-    double GetTimeStamp() const { return fTimeStamp; }
-    plMessage& SetTimeStamp(double t) { fTimeStamp = t; return *this; }
+    double GetTimeStamp() const {
+        return fTimeStamp;
+    }
+    plMessage& SetTimeStamp(double t) {
+        fTimeStamp = t;
+        return *this;
+    }
 
-    bool HasBCastFlag(uint32_t f) const { return 0 != (fBCastFlags & f); }
-    plMessage& SetBCastFlag(uint32_t f, bool on=true) { if( on )fBCastFlags |= f; else fBCastFlags &= ~f; return *this; }
+    bool HasBCastFlag(uint32_t f) const {
+        return 0 != (fBCastFlags & f);
+    }
+    plMessage& SetBCastFlag(uint32_t f, bool on = true) {
+        if (on) {
+            fBCastFlags |= f;
+        } else {
+            fBCastFlags &= ~f;
+        }
 
-    void SetAllBCastFlags(uint32_t f) { fBCastFlags=f; }
-    uint32_t GetAllBCastFlags() const { return fBCastFlags; }
+        return *this;
+    }
 
-    void AddNetReceiver( uint32_t plrID );
-    void AddNetReceivers( const std::vector<uint32_t> & plrIDs );
-    std::vector<uint32_t>* GetNetReceivers() const { return fNetRcvrPlayerIDs; }
+    void SetAllBCastFlags(uint32_t f) {
+        fBCastFlags = f;
+    }
+    uint32_t GetAllBCastFlags() const {
+        return fBCastFlags;
+    }
 
-    // just before dispatching this message, drop into debugger 
-    void SetBreakBeforeDispatch (bool on) { dispatchBreak = on; }
-    bool GetBreakBeforeDispatch () const { return dispatchBreak; }
+    void AddNetReceiver(uint32_t plrID);
+    void AddNetReceivers(const std::vector<uint32_t>& plrIDs);
+    std::vector<uint32_t>* GetNetReceivers() const {
+        return fNetRcvrPlayerIDs;
+    }
+
+    // just before dispatching this message, drop into debugger
+    void SetBreakBeforeDispatch(bool on) {
+        dispatchBreak = on;
+    }
+    bool GetBreakBeforeDispatch() const {
+        return dispatchBreak;
+    }
 };
 
 
@@ -166,31 +195,29 @@ public:
 /////////////////////////////////////////////////////////////////
 // reads/writes your std::string field
 
-struct plMsgStdStringHelper
-{
-    static int Poke(const std::string & stringref, hsStream* stream, const uint32_t peekOptions=0);
-    static int PokeBig(const std::string & stringref, hsStream* stream, const uint32_t peekOptions=0);
-    static int Poke(const char * buf, uint32_t bufsz, hsStream* stream, const uint32_t peekOptions=0);
-    static int PokeBig(const char * buf, uint32_t bufsz, hsStream* stream, const uint32_t peekOptions=0);
-    static int Poke(const plString & stringref, hsStream* stream, const uint32_t peekOptions=0);
-    static int PokeBig(const plString & stringref, hsStream* stream, const uint32_t peekOptions=0);
-    static int Peek(std::string & stringref, hsStream* stream, const uint32_t peekOptions=0);
-    static int PeekBig(std::string & stringref, hsStream* stream, const uint32_t peekOptions=0);
-    static int Peek(plString & stringref, hsStream* stream, const uint32_t peekOptions=0);
-    static int PeekBig(plString & stringref, hsStream* stream, const uint32_t peekOptions=0);
+struct plMsgStdStringHelper {
+    static int Poke(const std::string& stringref, hsStream* stream, const uint32_t peekOptions = 0);
+    static int PokeBig(const std::string& stringref, hsStream* stream, const uint32_t peekOptions = 0);
+    static int Poke(const char* buf, uint32_t bufsz, hsStream* stream, const uint32_t peekOptions = 0);
+    static int PokeBig(const char* buf, uint32_t bufsz, hsStream* stream, const uint32_t peekOptions = 0);
+    static int Poke(const plString& stringref, hsStream* stream, const uint32_t peekOptions = 0);
+    static int PokeBig(const plString& stringref, hsStream* stream, const uint32_t peekOptions = 0);
+    static int Peek(std::string& stringref, hsStream* stream, const uint32_t peekOptions = 0);
+    static int PeekBig(std::string& stringref, hsStream* stream, const uint32_t peekOptions = 0);
+    static int Peek(plString& stringref, hsStream* stream, const uint32_t peekOptions = 0);
+    static int PeekBig(plString& stringref, hsStream* stream, const uint32_t peekOptions = 0);
 };
 
 /////////////////////////////////////////////////////////////////
 // reads/writes your char * field  (deprecated)
 
-struct plMsgCStringHelper
-{
-    static int Poke(const char * str, hsStream* stream, const uint32_t peekOptions=0);
+struct plMsgCStringHelper {
+    static int Poke(const char* str, hsStream* stream, const uint32_t peekOptions = 0);
     // deletes str and reallocates. you must delete [] str;
-    static int Peek(char *& str, hsStream* stream, const uint32_t peekOptions=0);
+    static int Peek(char*& str, hsStream* stream, const uint32_t peekOptions = 0);
 
-    static int Poke(const plString & str, hsStream* stream, const uint32_t peekOptions=0);
-    static int Peek(plString & str, hsStream* stream, const uint32_t peekOptions=0);
+    static int Poke(const plString& str, hsStream* stream, const uint32_t peekOptions = 0);
+    static int Peek(plString& str, hsStream* stream, const uint32_t peekOptions = 0);
 };
 
 /////////////////////////////////////////////////////////////////
@@ -198,10 +225,9 @@ struct plMsgCStringHelper
 // don't use with uint8_t ordered types like int16_t,32.
 // fine for int8_t, char, and IEEE formatted types like float, double.
 
-struct plMsgCArrayHelper
-{
-    static int Poke(const void * buf, uint32_t bufsz, hsStream* stream, const uint32_t peekOptions=0);
-    static int Peek(void * buf, uint32_t bufsz, hsStream* stream, const uint32_t peekOptions=0);
+struct plMsgCArrayHelper {
+    static int Poke(const void* buf, uint32_t bufsz, hsStream* stream, const uint32_t peekOptions = 0);
+    static int Peek(void* buf, uint32_t bufsz, hsStream* stream, const uint32_t peekOptions = 0);
 };
 
 

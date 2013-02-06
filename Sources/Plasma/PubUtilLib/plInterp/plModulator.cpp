@@ -52,8 +52,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plIntersect/plVolumeIsect.h"
 
 plModulator::plModulator()
-:   fVolume(nil),
-    fSoftDist(0)
+    :   fVolume(nil),
+        fSoftDist(0)
 {
 }
 
@@ -88,20 +88,15 @@ float plModulator::Modulation(const hsPoint3& pos) const
     float dist = fVolume->Test(pos);
 
     float retVal;
-    if( dist > 0 )
-    {
-        if( dist < fSoftDist )
-        {
+
+    if (dist > 0) {
+        if (dist < fSoftDist) {
             dist /= fSoftDist;
             retVal = 1.f - dist;
-        }
-        else
-        {
+        } else {
             retVal = 0;
         }
-    }
-    else
-    {
+    } else {
         retVal = 1.f;
     }
 

@@ -48,39 +48,37 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 bool plNetTransportMember::AddSubscription(int chan)
 {
-    if (FindSubscription(chan)==-1)
-    {
+    if (FindSubscription(chan) == -1) {
         fSubscriptions.push_back(chan);
         return true;
     }
+
     return false;
 }
 
 bool plNetTransportMember::RemoveSubscription(int chan)
 {
-    int idx=FindSubscription(chan);
-    if (idx>=0)
-    {
-        fSubscriptions.erase(fSubscriptions.begin()+idx);
+    int idx = FindSubscription(chan);
+
+    if (idx >= 0) {
+        fSubscriptions.erase(fSubscriptions.begin() + idx);
         return true;
     }
+
     return false;
 }
 
 int plNetTransportMember::FindSubscription(int chan)
 {
-    std::vector<int>::iterator it=std::find(fSubscriptions.begin(), fSubscriptions.end(), chan);
-    return (it==fSubscriptions.end()) ? -1 : (it-fSubscriptions.begin());
+    std::vector<int>::iterator it = std::find(fSubscriptions.begin(), fSubscriptions.end(), chan);
+    return (it == fSubscriptions.end()) ? -1 : (it - fSubscriptions.begin());
 }
 
 plString plNetTransportMember::AsString() const
 {
-    if (IsServer())
-    {
+    if (IsServer()) {
         return "(server)";
-    }
-    else
-    {
+    } else {
         return GetPlayerName();
     }
 }

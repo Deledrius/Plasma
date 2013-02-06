@@ -54,19 +54,19 @@ PYTHON_DEFAULT_DEALLOC_DEFINITION(ptGUIControlDynamicText)
 
 PYTHON_INIT_DEFINITION(ptGUIControlDynamicText, args, keywords)
 {
-    PyObject *keyObject = NULL;
-    if (!PyArg_ParseTuple(args, "O", &keyObject))
-    {
-        PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
-        PYTHON_RETURN_INIT_ERROR;
-    }
-    if (!pyKey::Check(keyObject))
-    {
+    PyObject* keyObject = NULL;
+
+    if (!PyArg_ParseTuple(args, "O", &keyObject)) {
         PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
         PYTHON_RETURN_INIT_ERROR;
     }
 
-    pyKey *key = pyKey::ConvertFrom(keyObject);
+    if (!pyKey::Check(keyObject)) {
+        PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
+        PYTHON_RETURN_INIT_ERROR;
+    }
+
+    pyKey* key = pyKey::ConvertFrom(keyObject);
     self->fThis->setKey(key->getKey());
 
     PYTHON_RETURN_INIT_OK;
@@ -80,34 +80,35 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGUIControlDynamicText, getNumMaps)
 PYTHON_METHOD_DEFINITION(ptGUIControlDynamicText, getMap, args)
 {
     unsigned long i;
-    if (!PyArg_ParseTuple(args, "l", &i))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &i)) {
         PyErr_SetString(PyExc_KeyError, "getMap expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     return self->fThis->GetMap(i);
 }
 
 PYTHON_START_METHODS_TABLE(ptGUIControlDynamicText)
-    PYTHON_METHOD_NOARGS(ptGUIControlDynamicText, getNumMaps, "Returns the number of ptDynamicText maps attached"),
-    PYTHON_METHOD(ptGUIControlDynamicText, getMap, "Params: index\nReturns a specific ptDynamicText attached to this contol\n"
-                "If there is no map at 'index' then a KeyError exception will be raised"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGUIControlDynamicText, getNumMaps, "Returns the number of ptDynamicText maps attached"),
+                     PYTHON_METHOD(ptGUIControlDynamicText, getMap, "Params: index\nReturns a specific ptDynamicText attached to this contol\n"
+                                   "If there is no map at 'index' then a KeyError exception will be raised"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGUIControlDynamicText, pyGUIControl, "Params: ctrlKey\nPlasma GUI Control DynamicText class");
 
 // required functions for PyObject interoperability
-PyObject *pyGUIControlDynamicText::New(pyKey& gckey)
+PyObject* pyGUIControlDynamicText::New(pyKey& gckey)
 {
-    ptGUIControlDynamicText *newObj = (ptGUIControlDynamicText*)ptGUIControlDynamicText_type.tp_new(&ptGUIControlDynamicText_type, NULL, NULL);
+    ptGUIControlDynamicText* newObj = (ptGUIControlDynamicText*)ptGUIControlDynamicText_type.tp_new(&ptGUIControlDynamicText_type, NULL, NULL);
     newObj->fThis->fGCkey = gckey.getKey();
     return (PyObject*)newObj;
 }
 
-PyObject *pyGUIControlDynamicText::New(plKey objkey)
+PyObject* pyGUIControlDynamicText::New(plKey objkey)
 {
-    ptGUIControlDynamicText *newObj = (ptGUIControlDynamicText*)ptGUIControlDynamicText_type.tp_new(&ptGUIControlDynamicText_type, NULL, NULL);
+    ptGUIControlDynamicText* newObj = (ptGUIControlDynamicText*)ptGUIControlDynamicText_type.tp_new(&ptGUIControlDynamicText_type, NULL, NULL);
     newObj->fThis->fGCkey = objkey;
     return (PyObject*)newObj;
 }
@@ -119,7 +120,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptGUIControlDynamicText, pyGUIControlDynamicText)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyGUIControlDynamicText::AddPlasmaClasses(PyObject *m)
+void pyGUIControlDynamicText::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptGUIControlDynamicText);

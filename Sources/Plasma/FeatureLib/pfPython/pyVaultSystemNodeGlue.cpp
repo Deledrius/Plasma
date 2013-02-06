@@ -58,7 +58,7 @@ PYTHON_INIT_DEFINITION(ptVaultSystemNode, args, keywords)
 }
 
 PYTHON_START_METHODS_TABLE(ptVaultSystemNode)
-    // no methods...
+// no methods...
 PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
@@ -67,14 +67,20 @@ PLASMA_DEFAULT_TYPE_WBASE(ptVaultSystemNode, pyVaultNode, "Plasma vault system n
 // required functions for PyObject interoperability
 PYTHON_CLASS_NEW_IMPL(ptVaultSystemNode, pyVaultSystemNode)
 
-PyObject *pyVaultSystemNode::New(RelVaultNode* nfsNode)
+PyObject* pyVaultSystemNode::New(RelVaultNode* nfsNode)
 {
-    ptVaultSystemNode *newObj = (ptVaultSystemNode*)ptVaultSystemNode_type.tp_new(&ptVaultSystemNode_type, NULL, NULL);
-    if (newObj->fThis->fNode)
+    ptVaultSystemNode* newObj = (ptVaultSystemNode*)ptVaultSystemNode_type.tp_new(&ptVaultSystemNode_type, NULL, NULL);
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->DecRef();
+    }
+
     newObj->fThis->fNode = nfsNode;
-    if (newObj->fThis->fNode)
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->IncRef();
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -85,7 +91,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptVaultSystemNode, pyVaultSystemNode)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyVaultSystemNode::AddPlasmaClasses(PyObject *m)
+void pyVaultSystemNode::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptVaultSystemNode);

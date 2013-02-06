@@ -65,7 +65,7 @@ plSDLMgr::~plSDLMgr()
     DeInit();
 }
 
-bool plSDLMgr::Init( uint32_t behaviorFlags )
+bool plSDLMgr::Init(uint32_t behaviorFlags)
 {
     fBehaviorFlags = behaviorFlags;
     plSDLParser parser;
@@ -82,9 +82,11 @@ void plSDLMgr::DeInit()
 //
 void plSDLMgr::IDeleteDescriptors(plSDL::DescriptorList* dl)
 {
-    std::for_each( dl->begin(), dl->end(),
-        [](plStateDescriptor* sd) { delete sd; }
-    );
+    std::for_each(dl->begin(), dl->end(),
+    [](plStateDescriptor * sd) {
+        delete sd;
+    }
+                 );
     dl->clear();
 }
 
@@ -102,30 +104,28 @@ plSDLMgr* plSDLMgr::GetInstance()
 // search latest and legacy descriptors for one that matches.
 // if version is -1, search for latest descriptor with matching name
 //
-plStateDescriptor* plSDLMgr::FindDescriptor(const plString& name, int version, const plSDL::DescriptorList * dl) const
+plStateDescriptor* plSDLMgr::FindDescriptor(const plString& name, int version, const plSDL::DescriptorList* dl) const
 {
-    if (name.IsNull())
+    if (name.IsNull()) {
         return nil;
+    }
 
-    if ( !dl )
+    if (!dl) {
         dl = &fDescriptors;
+    }
 
     plStateDescriptor* sd = nil;
 
     plSDL::DescriptorList::const_iterator it;
 
     int highestFound = -1;
-    for(it=(*dl).begin(); it!= (*dl).end(); it++)
-    {
-        if (!(*it)->GetName().CompareI(name) )
-        {
-            if ( (*it)->GetVersion()==version )
-            {
+
+    for (it = (*dl).begin(); it != (*dl).end(); it++) {
+        if (!(*it)->GetName().CompareI(name)) {
+            if ((*it)->GetVersion() == version) {
                 sd = *it;
                 break;
-            }
-            else if ( version==plSDL::kLatestVersion && (*it)->GetVersion()>highestFound )
-            {
+            } else if (version == plSDL::kLatestVersion && (*it)->GetVersion() > highestFound) {
                 sd = *it;
                 highestFound = (*it)->GetVersion();
             }
@@ -141,68 +141,74 @@ plStateDescriptor* plSDLMgr::FindDescriptor(const plString& name, int version, c
 //
 int plSDLMgr::Write(hsStream* s, const plSDL::DescriptorList* dl)
 {
-    int pos=s->GetPosition();
+    int pos = s->GetPosition();
 
-    if (dl==nil)
-        dl=&fDescriptors;
+    if (dl == nil) {
+        dl = &fDescriptors;
+    }
 
-    uint16_t num=dl->size();
+    uint16_t num = dl->size();
     s->WriteLE(num);
 
     plSDL::DescriptorList::const_iterator it;
-    for(it=dl->begin(); it!= dl->end(); it++)
-        (*it)->Write(s);    
 
-    int bytes=s->GetPosition()-pos;
-    if (fNetApp)
-    {
+    for (it = dl->begin(); it != dl->end(); it++) {
+        (*it)->Write(s);
+    }
+
+    int bytes = s->GetPosition() - pos;
+
+    if (fNetApp) {
         hsLogEntry(fNetApp->DebugMsg("Writing %d SDL descriptors, %d bytes", num, bytes));
     }
+
     return bytes;
 }
 
 //
-// read descriptors into provided list 
+// read descriptors into provided list
 // return number of bytes
 //
 int plSDLMgr::Read(hsStream* s, plSDL::DescriptorList* dl)
 {
-    int pos=s->GetPosition();
+    int pos = s->GetPosition();
 
-    if (dl==nil)
-        dl=&fDescriptors;
+    if (dl == nil) {
+        dl = &fDescriptors;
+    }
 
     // clear dl
     IDeleteDescriptors(dl);
 
     uint16_t num;
-    try
-    {       
+
+    try {
         // read dtor list
         s->ReadLE(&num);
 
         int i;
-        for(i=0;i<num;i++)
-        {
-            plStateDescriptor* sd=new plStateDescriptor;
-            if (sd->Read(s))
+
+        for (i = 0; i < num; i++) {
+            plStateDescriptor* sd = new plStateDescriptor;
+
+            if (sd->Read(s)) {
                 dl->push_back(sd);
-        }       
-    }
-    catch(...)
-    {
-        if (fNetApp)
-        {
+            }
+        }
+    } catch (...) {
+        if (fNetApp) {
             hsLogEntry(fNetApp->DebugMsg("Something bad happened while reading SDLMgr data"));
         }
+
         return 0;
     }
 
-    int bytes=s->GetPosition()-pos;
-    if (fNetApp)
-    {
+    int bytes = s->GetPosition() - pos;
+
+    if (fNetApp) {
         hsLogEntry(fNetApp->DebugMsg("Reading %d SDL descriptors, %d bytes", num, bytes));
     }
+
     return bytes;
 }
 

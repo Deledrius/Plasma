@@ -54,35 +54,35 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define isnan _isnan
 #endif
 
-void plPerspDirSlave::Init() 
-{ 
+void plPerspDirSlave::Init()
+{
     plShadowSlave::Init();
-    fFlags |= kCastInCameraSpace; 
+    fFlags |= kCastInCameraSpace;
 }
 
 hsPoint3 plPerspDirSlave::IProject(const hsMatrix44& world2NDC, const hsPoint3& pos, float w) const
 {
     hsPoint3 retVal;
     retVal.fX = world2NDC.fMap[0][0] * pos.fX
-        + world2NDC.fMap[0][1] * pos.fY
-        + world2NDC.fMap[0][2] * pos.fZ
-        + world2NDC.fMap[0][3] * w;
+                + world2NDC.fMap[0][1] * pos.fY
+                + world2NDC.fMap[0][2] * pos.fZ
+                + world2NDC.fMap[0][3] * w;
 
     retVal.fY = world2NDC.fMap[1][0] * pos.fX
-        + world2NDC.fMap[1][1] * pos.fY
-        + world2NDC.fMap[1][2] * pos.fZ
-        + world2NDC.fMap[1][3] * w;
+                + world2NDC.fMap[1][1] * pos.fY
+                + world2NDC.fMap[1][2] * pos.fZ
+                + world2NDC.fMap[1][3] * w;
 
     retVal.fZ = world2NDC.fMap[2][0] * pos.fX
-        + world2NDC.fMap[2][1] * pos.fY
-        + world2NDC.fMap[2][2] * pos.fZ
-        + world2NDC.fMap[2][3] * w;
+                + world2NDC.fMap[2][1] * pos.fY
+                + world2NDC.fMap[2][2] * pos.fZ
+                + world2NDC.fMap[2][3] * w;
 
     float invW = 1.f / (
-        world2NDC.fMap[3][0] * pos.fX
-        + world2NDC.fMap[3][1] * pos.fY
-        + world2NDC.fMap[3][2] * pos.fZ
-        + world2NDC.fMap[3][3] * w);
+                     world2NDC.fMap[3][0] * pos.fX
+                     + world2NDC.fMap[3][1] * pos.fY
+                     + world2NDC.fMap[3][2] * pos.fZ
+                     + world2NDC.fMap[3][3] * w);
 
     retVal *= invW;
 
@@ -96,27 +96,33 @@ hsBounds3Ext plPerspDirSlave::IGetPerspCasterBound(const hsMatrix44& world2NDC) 
     hsPoint3 perspCorners[8];
 
     int i;
-    for( i = 0; i < 8; i++ )
-    {
+
+    for (i = 0; i < 8; i++) {
         perspCorners[i] = IProject(world2NDC, corners[i]);
 
-        if( perspCorners[i].fX < -1.f )
+        if (perspCorners[i].fX < -1.f) {
             perspCorners[i].fX = -1.f;
-        else if( perspCorners[i].fX > 1.f )
+        } else if (perspCorners[i].fX > 1.f) {
             perspCorners[i].fX = 1.f;
+        }
 
-        if( perspCorners[i].fY < -1.f )
+        if (perspCorners[i].fY < -1.f) {
             perspCorners[i].fY = -1.f;
-        else if( perspCorners[i].fY > 1.f )
+        } else if (perspCorners[i].fY > 1.f) {
             perspCorners[i].fY = 1.f;
+        }
 
-        if( perspCorners[i].fZ < 0 )
+        if (perspCorners[i].fZ < 0) {
             perspCorners[i].Set(0.f, 0.f, 0.f);
+        }
     }
+
     hsBounds3Ext bnd;
     bnd.MakeEmpty();
-    for( i = 0; i < 8; i++ )
+
+    for (i = 0; i < 8; i++) {
         bnd.Union(&perspCorners[i]);
+    }
 
     return bnd;
 }
@@ -132,7 +138,7 @@ bool plPerspDirSlave::SetupViewTransform(plPipeline* pipe)
 
     hsMatrix44 cam2NDC = pipeView.GetCameraToNDC();
     hsMatrix44 world2NDC = cam2NDC * pipeView.GetWorldToCamera();
-    
+
     fLightDir = fLightToWorld.GetAxis(hsMatrix44::kUp);
     hsVector3 worldLiDir = fLightDir;
     hsPoint3 pWorldLiDir(worldLiDir.fX, worldLiDir.fY, worldLiDir.fZ);
@@ -145,20 +151,16 @@ bool plPerspDirSlave::SetupViewTransform(plPipeline* pipe)
     hsPoint3 lookAt;
     plConst(bool) kUsePerspCenter(true);
     plConst(bool) kUseFrustCenter(true);
-    if( kUsePerspCenter )
-    {
+
+    if (kUsePerspCenter) {
         hsPoint3 lookAtCam = pipeView.GetWorldToCamera() * fCasterWorldBounds.GetCenter();
         hsPoint3 lookAtNDC = IProject(pipeView.GetCameraToNDC(), lookAtCam);
         lookAt = IProject(world2NDC, fCasterWorldBounds.GetCenter());
-    }
-    else if( kUseFrustCenter )
-    {
+    } else if (kUseFrustCenter) {
         plConst(float) kDist(50.f);
         hsPoint3 camFrustCenter(0.f, 0.f, kDist);
         lookAt = IProject(cam2NDC, camFrustCenter);
-    }
-    else
-    {
+    } else {
         hsBounds3Ext ndcBnd(IGetPerspCasterBound(world2NDC));
         lookAt = ndcBnd.GetCenter();
     }
@@ -171,14 +173,16 @@ bool plPerspDirSlave::SetupViewTransform(plPipeline* pipe)
     float cotX, cotY;
 
     plConst(bool) kFixedPersp(true);
-    if( !kFixedPersp )
-    {
+
+    if (!kFixedPersp) {
         hsBounds3Ext bnd(IGetPerspCasterBound(camNDC2Li * world2NDC));
         hsBounds3Ext bnd2(IGetPerspCasterBound(world2NDC));
         bnd2.Transform(&camNDC2Li);
         plConst(bool) kUseBnd2(false);
-        if( kUseBnd2 )
+
+        if (kUseBnd2) {
             bnd = bnd2;
+        }
 
         minZ = bnd.GetMins().fZ;
         maxZ = bnd.GetMaxs().fZ; // THIS IS WRONG
@@ -187,16 +191,19 @@ bool plPerspDirSlave::SetupViewTransform(plPipeline* pipe)
         // This is my hack to get the Nexus age working.  The real problem
         // is probably data-side.  I take full responsibility for this
         // hack-around breaking the entire system, loosing data, causing
-        // unauthorized credit card transactions, etc.      
-        if (isnan(bnd.GetMins().fX) || isnan(bnd.GetMins().fY))
+        // unauthorized credit card transactions, etc.
+        if (isnan(bnd.GetMins().fX) || isnan(bnd.GetMins().fY)) {
             return false;
-        if (isnan(bnd.GetMaxs().fX) || isnan(bnd.GetMaxs().fY))
+        }
+
+        if (isnan(bnd.GetMaxs().fX) || isnan(bnd.GetMaxs().fY)) {
             return false;
+        }
 
         // THIS IS EVEN MORE WRONG
         plConst(bool) kFakeDepth(false);
-        if( kFakeDepth )
-        {
+
+        if (kFakeDepth) {
             plConst(float) kMin(1.f);
             plConst(float) kMax(30.f);
             minZ = kMin;
@@ -204,33 +211,27 @@ bool plPerspDirSlave::SetupViewTransform(plPipeline* pipe)
         }
 
         plConst(float) kMinMinZ(1.f);
-        if( minZ < kMinMinZ )
-            minZ = kMinMinZ;
 
-        if( -bnd.GetMins().fX > bnd.GetMaxs().fX )
-        {
+        if (minZ < kMinMinZ) {
+            minZ = kMinMinZ;
+        }
+
+        if (-bnd.GetMins().fX > bnd.GetMaxs().fX) {
             hsAssert(bnd.GetMins().fX < 0, "Empty shadow caster bounds?");
             cotX = -minZ / bnd.GetMins().fX;
-        }
-        else
-        {
+        } else {
             hsAssert(bnd.GetMaxs().fX > 0, "Empty shadow caster bounds?");
             cotX = minZ / bnd.GetMaxs().fX;
         }
 
-        if( -bnd.GetMins().fY > bnd.GetMaxs().fY )
-        {
+        if (-bnd.GetMins().fY > bnd.GetMaxs().fY) {
             hsAssert(bnd.GetMins().fY < 0, "Empty shadow caster bounds?");
             cotY = -minZ / bnd.GetMins().fY;
-        }
-        else
-        {
+        } else {
             hsAssert(bnd.GetMaxs().fY > 0, "Empty shadow caster bounds?");
             cotY = minZ / bnd.GetMaxs().fY;
         }
-    }
-    else
-    {
+    } else {
         plConst(float) kHi(1.f);
         hsBounds3Ext bnd;
         const hsPoint3 lo(-1.f, -1.f, 0.f);
@@ -248,34 +249,33 @@ bool plPerspDirSlave::SetupViewTransform(plPipeline* pipe)
         // This is my hack to get the Nexus age working.  The real problem
         // is probably data-side.  I take full responsibility for this
         // hack-around breaking the entire system, loosing data, causing
-        // unauthorized credit card transactions, etc.      
-        if (isnan(bnd.GetMins().fX) || isnan(bnd.GetMins().fY))
+        // unauthorized credit card transactions, etc.
+        if (isnan(bnd.GetMins().fX) || isnan(bnd.GetMins().fY)) {
             return false;
-        if (isnan(bnd.GetMaxs().fX) || isnan(bnd.GetMaxs().fY))
+        }
+
+        if (isnan(bnd.GetMaxs().fX) || isnan(bnd.GetMaxs().fY)) {
             return false;
+        }
 
         plConst(float) kMinMinZ(1.f);
-        if( minZ < kMinMinZ )
-            minZ = kMinMinZ;
 
-        if( -bnd.GetMins().fX > bnd.GetMaxs().fX )
-        {
+        if (minZ < kMinMinZ) {
+            minZ = kMinMinZ;
+        }
+
+        if (-bnd.GetMins().fX > bnd.GetMaxs().fX) {
             hsAssert(bnd.GetMins().fX < 0, "Empty shadow caster bounds?");
             cotX = -minZ / bnd.GetMins().fX;
-        }
-        else
-        {
+        } else {
             hsAssert(bnd.GetMaxs().fX > 0, "Empty shadow caster bounds?");
             cotX = minZ / bnd.GetMaxs().fX;
         }
 
-        if( -bnd.GetMins().fY > bnd.GetMaxs().fY )
-        {
+        if (-bnd.GetMins().fY > bnd.GetMaxs().fY) {
             hsAssert(bnd.GetMins().fY < 0, "Empty shadow caster bounds?");
             cotY = -minZ / bnd.GetMins().fY;
-        }
-        else
-        {
+        } else {
             hsAssert(bnd.GetMaxs().fY > 0, "Empty shadow caster bounds?");
             cotY = minZ / bnd.GetMaxs().fY;
         }
@@ -294,9 +294,9 @@ bool plPerspDirSlave::SetupViewTransform(plPipeline* pipe)
     // output be W (instead of Z).
     // This also means that our translate goes into [i][2] instead of [i][3].
     proj.fMap[0][0] = cotX * 0.5f;
-    proj.fMap[0][2] = 0.5f * (1.f + 0.5f/fWidth);
+    proj.fMap[0][2] = 0.5f * (1.f + 0.5f / fWidth);
     proj.fMap[1][1] = -cotY * 0.5f;
-    proj.fMap[1][2] = 0.5f * (1.f + 0.5f/fHeight);
+    proj.fMap[1][2] = 0.5f * (1.f + 0.5f / fHeight);
 #if 1 // This computes correct Z, but we really just want W in 3rd component. HACKFISH
     proj.fMap[2][2] = maxZ / (maxZ - minZ);
     proj.fMap[2][3] = -minZ * maxZ / (maxZ - minZ);
@@ -315,7 +315,7 @@ bool plPerspDirSlave::SetupViewTransform(plPipeline* pipe)
     fWorldToTexture.fMap[2][3] = fWorldToTexture.fMap[3][3];
 
     // Now the LightToNDC. This one's a little trickier, because we want to compensate for
-    // having brought in the viewport to keep our border constant, so we can clamp the 
+    // having brought in the viewport to keep our border constant, so we can clamp the
     // projected texture and not have the edges smear off to infinity.
     cotX -= cotX / (fWidth * 0.5f);
     cotY -= cotY / (fHeight * 0.5f);
@@ -333,13 +333,13 @@ bool plPerspDirSlave::SetupViewTransform(plPipeline* pipe)
 
     fLightPos = fLightToWorld.GetTranslate();
     SetFlag(kPositional, false);
-    
+
     return true;
 }
 
 static inline hsVector3 CrossProd(const hsVector3& a, const hsPoint3& b)
 {
-    return hsVector3(a.fY*b.fZ - a.fZ*b.fY, a.fZ*b.fX - a.fX*b.fZ, a.fX*b.fY - a.fY*b.fX);
+    return hsVector3(a.fY * b.fZ - a.fZ * b.fY, a.fZ * b.fX - a.fX * b.fZ, a.fX * b.fY - a.fY * b.fX);
 }
 
 static inline void InverseOfPureRotTran(const hsMatrix44& src, hsMatrix44& inv)
@@ -372,11 +372,12 @@ void plPerspDirSlave::IComputeCamNDCToLight(const hsPoint3& from, const hsPoint3
     atToFrom *= hsFastMath::InvSqrtAppr(distSq);
 
     const float kMinMag = 0.5f;
-    hsVector3 up(0,0,1.f);
-    if( CrossProd(up, (at - from)).MagnitudeSquared() < kMinMag )
-    {
+    hsVector3 up(0, 0, 1.f);
+
+    if (CrossProd(up, (at - from)).MagnitudeSquared() < kMinMag) {
         up.Set(0, 1.f, 0);
     }
+
     hsMatrix44 w2light;
     w2light.MakeCamera(&from, &at, &up);
 

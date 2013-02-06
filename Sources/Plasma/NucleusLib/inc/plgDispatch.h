@@ -48,11 +48,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plMessage;
 class plKey;
 
-class plDispatchBase : public plCreatable
-{
+class plDispatchBase : public plCreatable {
 public:
-    CLASSNAME_REGISTER( plDispatchBase );
-    GETINTERFACE_ANY( plDispatchBase, plCreatable );
+    CLASSNAME_REGISTER(plDispatchBase);
+    GETINTERFACE_ANY(plDispatchBase, plCreatable);
 
     virtual void RegisterForType(uint16_t hClass, const plKey& receiver) = 0;
     virtual void RegisterForExactType(uint16_t hClass, const plKey& receiver) = 0;
@@ -62,8 +61,8 @@ public:
 
     virtual void UnRegisterAll(const plKey& receiver) = 0;
 
-    virtual bool    MsgSend(plMessage* msg, bool async=false) = 0;
-    virtual void    MsgQueue(plMessage* msg)=0; // Used by other thread to Send Messages, they are handled as soon as Practicable
+    virtual bool    MsgSend(plMessage* msg, bool async = false) = 0;
+    virtual void    MsgQueue(plMessage* msg) = 0; // Used by other thread to Send Messages, they are handled as soon as Practicable
     virtual void    MsgQueueProcess() = 0;
     virtual void    MsgQueueOnOff(bool) = 0;      // Turn on or off Queued Messages, if off, uses MsgSend Immediately (for plugins)
 
@@ -72,11 +71,12 @@ public:
     virtual void    BeginShutdown() = 0;
 };
 
-class plgDispatch
-{
+class plgDispatch {
 public:
     static plDispatchBase* Dispatch();
-    static bool MsgSend(plMessage* msg, bool async = false) { return Dispatch()->MsgSend(msg, async); }
+    static bool MsgSend(plMessage* msg, bool async = false) {
+        return Dispatch()->MsgSend(msg, async);
+    }
 };
 
 

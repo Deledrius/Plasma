@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCoreExe/Private/Win32/pnAceW32Dns.cpp
-*   
+*
 ***/
 
 #include "../../Pch.h"
@@ -68,7 +68,7 @@ struct Lookup {
     HANDLE              cancelHandle;
     FAsyncLookupProc    lookupProc;
     unsigned            port;
-    void *              param;
+    void*               param;
     char                name[kMaxLookupName];
     char                buffer[MAXGETHOSTSTRUCT];
 };
@@ -87,19 +87,27 @@ static unsigned                 s_nextLookupCancelId = 1;
 ***/
 
 //===========================================================================
-static void LookupProcess (Lookup * lookup, unsigned error) {
-    if (error)
+static void LookupProcess(Lookup* lookup, unsigned error)
+{
+    if (error) {
         return;
+    }
 
-    const HOSTENT & host = * (HOSTENT *) lookup->buffer;
-    if (host.h_addrtype != AF_INET)
-        return;
-    if (host.h_length != sizeof(in_addr))
-        return;
-    if (!host.h_addr_list)
-        return;
+    const HOSTENT& host = * (HOSTENT*) lookup->buffer;
 
-    in_addr const * const * const inAddr = (in_addr **) host.h_addr_list;
+    if (host.h_addrtype != AF_INET) {
+        return;
+    }
+
+    if (host.h_length != sizeof(in_addr)) {
+        return;
+    }
+
+    if (!host.h_addr_list) {
+        return;
+    }
+
+    in_addr const* const* const inAddr = (in_addr**) host.h_addr_list;
 
     // allocate a buffer large enough to hold all the addresses
     size_t count = arrsize(inAddr);
@@ -111,11 +119,13 @@ static void LookupProcess (Lookup * lookup, unsigned error) {
         addrs[i].SetPort(lookup->port);
     }
 
-    if (host.h_name && host.h_name[0])
+    if (host.h_name && host.h_name[0]) {
         strncpy(lookup->name, host.h_name, arrsize(lookup->name));
+    }
 
-    if (lookup->lookupProc)
+    if (lookup->lookupProc) {
         lookup->lookupProc(lookup->param, lookup->name, count, addrs);
+    }
 
     // we can delete the operation outside an IoConn critical
     // section because it isn't linked into an ioConn opList
@@ -128,10 +138,12 @@ static void LookupProcess (Lookup * lookup, unsigned error) {
 }
 
 //===========================================================================
-static void LookupFindAndProcess (HANDLE cancelHandle, unsigned error) {
+static void LookupFindAndProcess(HANDLE cancelHandle, unsigned error)
+{
     // find the operation for this cancel handle
-    Lookup * lookup;
+    Lookup* lookup;
     s_critsect.Enter();
+
     for (lookup = s_lookupList.Head(); lookup; lookup = s_lookupList.Next(lookup)) {
         if (lookup->cancelHandle == cancelHandle) {
             lookup->cancelHandle = nil;
@@ -139,13 +151,17 @@ static void LookupFindAndProcess (HANDLE cancelHandle, unsigned error) {
             break;
         }
     }
+
     s_critsect.Leave();
-    if (lookup)
+
+    if (lookup) {
         LookupProcess(lookup, error);
+    }
 }
 
 //===========================================================================
-static unsigned THREADCALL LookupThreadProc (AsyncThread * thread) {
+static unsigned THREADCALL LookupThreadProc(AsyncThread* thread)
+{
     static const char WINDOW_CLASS[] = "AsyncLookupWnd";
     WNDCLASS wc;
     memset(&wc, 0, sizeof(wc));
@@ -155,28 +171,31 @@ static unsigned THREADCALL LookupThreadProc (AsyncThread * thread) {
     RegisterClass(&wc);
 
     s_lookupWindow = CreateWindow(
-        WINDOW_CLASS,
-        WINDOW_CLASS,
-        WS_OVERLAPPED,
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
-        (HWND)0,
-        (HMENU) 0,
-        wc.hInstance,
-        0
-    );
-    if (!s_lookupWindow)
+                         WINDOW_CLASS,
+                         WINDOW_CLASS,
+                         WS_OVERLAPPED,
+                         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                         (HWND)0,
+                         (HMENU) 0,
+                         wc.hInstance,
+                         0
+                     );
+
+    if (!s_lookupWindow) {
         ErrorAssert(__LINE__, __FILE__, "CreateWindow %#x", GetLastError());
+    }
 
     HANDLE lookupStartEvent = (HANDLE) thread->argument;
     SetEvent(lookupStartEvent);
 
     MSG msg;
+
     while (GetMessage(&msg, s_lookupWindow, 0, 0)) {
-        if (msg.message == WM_LOOKUP_FOUND_HOST)
+        if (msg.message == WM_LOOKUP_FOUND_HOST) {
             LookupFindAndProcess((HANDLE) msg.wParam, HIWORD(msg.lParam));
-        else if (msg.message == WM_LOOKUP_EXIT)
+        } else if (msg.message == WM_LOOKUP_EXIT) {
             break;
-        else {
+        } else {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
@@ -185,17 +204,21 @@ static unsigned THREADCALL LookupThreadProc (AsyncThread * thread) {
     // fail all pending name lookups
     for (;;) {
         s_critsect.Enter();
-        Lookup * lookup = s_lookupList.Head();
+        Lookup* lookup = s_lookupList.Head();
+
         if (lookup) {
             WSACancelAsyncRequest(lookup->cancelHandle);
             lookup->cancelHandle = nil;
             s_lookupList.Unlink(lookup);
         }
-        s_critsect.Leave();
-        if (!lookup)
-            break;
 
-        LookupProcess(lookup, (unsigned) -1);
+        s_critsect.Leave();
+
+        if (!lookup) {
+            break;
+        }
+
+        LookupProcess(lookup, (unsigned) - 1);
     }
 
     // cleanup
@@ -206,26 +229,30 @@ static unsigned THREADCALL LookupThreadProc (AsyncThread * thread) {
 }
 
 //===========================================================================
-static void StartLookupThread () {
-    if (s_lookupThread)
+static void StartLookupThread()
+{
+    if (s_lookupThread) {
         return;
+    }
 
     // create a shutdown event
     HANDLE lookupStartEvent = CreateEvent(
-        (LPSECURITY_ATTRIBUTES) 0,
-        true,           // manual reset
-        false,          // initial state off
-        (LPCTSTR) 0     // name
-    );
-    if (!lookupStartEvent)
+                                  (LPSECURITY_ATTRIBUTES) 0,
+                                  true,           // manual reset
+                                  false,          // initial state off
+                                  (LPCTSTR) 0     // name
+                              );
+
+    if (!lookupStartEvent) {
         ErrorAssert(__LINE__, __FILE__, "CreateEvent %#x", GetLastError());
+    }
 
     // create a thread to perform lookups
     s_lookupThread = (HANDLE) AsyncThreadCreate(
-        LookupThreadProc,
-        lookupStartEvent,
-        L"AsyncLookupThread"
-    );
+                         LookupThreadProc,
+                         lookupStartEvent,
+                         L"AsyncLookupThread"
+                     );
 
     WaitForSingleObject(lookupStartEvent, INFINITE);
     CloseHandle(lookupStartEvent);
@@ -240,7 +267,8 @@ static void StartLookupThread () {
 ***/
 
 //===========================================================================
-void DnsDestroy (unsigned exitThreadWaitMs) {
+void DnsDestroy(unsigned exitThreadWaitMs)
+{
     if (s_lookupThread) {
         PostMessage(s_lookupWindow, WM_LOOKUP_EXIT, 0, 0);
         WaitForSingleObject(s_lookupThread, exitThreadWaitMs);
@@ -258,13 +286,14 @@ void DnsDestroy (unsigned exitThreadWaitMs) {
 ***/
 
 //===========================================================================
-void AsyncAddressLookupName (
-    AsyncCancelId *     cancelId,   // out
+void AsyncAddressLookupName(
+    AsyncCancelId*      cancelId,   // out
     FAsyncLookupProc    lookupProc,
-    const char*         name, 
-    unsigned            port, 
-    void *              param
-) {
+    const char*         name,
+    unsigned            port,
+    void*               param
+)
+{
     ASSERT(lookupProc);
     ASSERT(name);
 
@@ -273,14 +302,17 @@ void AsyncAddressLookupName (
 
     // Get name/port
     char* ansiName = strdup(name);
+
     if (char* portStr = StrChr(ansiName, ':')) {
-        if (unsigned newPort = StrToUnsigned(portStr + 1, nil, 10))
+        if (unsigned newPort = StrToUnsigned(portStr + 1, nil, 10)) {
             port = newPort;
+        }
+
         *portStr = 0;
     }
 
     // Initialize lookup
-    Lookup * lookup         = new Lookup;
+    Lookup* lookup         = new Lookup;
     lookup->lookupProc      = lookupProc;
     lookup->port            = port;
     lookup->param           = param;
@@ -299,33 +331,35 @@ void AsyncAddressLookupName (
 
         // Perform async lookup
         lookup->cancelHandle = WSAAsyncGetHostByName(
-            s_lookupWindow, 
-            WM_LOOKUP_FOUND_HOST,
-            name,
-            &lookup->buffer[0],
-            sizeof(lookup->buffer)
-        );
+                                   s_lookupWindow,
+                                   WM_LOOKUP_FOUND_HOST,
+                                   name,
+                                   &lookup->buffer[0],
+                                   sizeof(lookup->buffer)
+                               );
+
         if (!lookup->cancelHandle) {
-            PostMessage(s_lookupWindow, WM_LOOKUP_FOUND_HOST, 0, (unsigned) -1);
+            PostMessage(s_lookupWindow, WM_LOOKUP_FOUND_HOST, 0, (unsigned) - 1);
         }
     }
     s_critsect.Leave();
 }
 
 //===========================================================================
-void AsyncAddressLookupAddr (
-    AsyncCancelId *     cancelId,   // out
+void AsyncAddressLookupAddr(
+    AsyncCancelId*      cancelId,   // out
     FAsyncLookupProc    lookupProc,
     const plNetAddress& address,
-    void *              param
-) {
+    void*               param
+)
+{
     ASSERT(lookupProc);
 
     PerfAddCounter(kAsyncPerfNameLookupAttemptsCurr, 1);
     PerfAddCounter(kAsyncPerfNameLookupAttemptsTotal, 1);
 
     // Initialize lookup
-    Lookup * lookup         = new Lookup;
+    Lookup* lookup         = new Lookup;
     lookup->lookupProc      = lookupProc;
     lookup->port            = 1;
     lookup->param           = param;
@@ -345,43 +379,52 @@ void AsyncAddressLookupAddr (
         *cancelId = lookup->cancelId = (AsyncCancelId) s_nextLookupCancelId;
 
         // Perform async lookup
-        u_long addr = ((const sockaddr_in *) &address)->sin_addr.S_un.S_addr;
+        u_long addr = ((const sockaddr_in*) &address)->sin_addr.S_un.S_addr;
         lookup->cancelHandle = WSAAsyncGetHostByAddr(
-            s_lookupWindow, 
-            WM_LOOKUP_FOUND_HOST,
-            (const char *) &addr,
-            sizeof(addr),
-            AF_INET,
-            &lookup->buffer[0],
-            sizeof(lookup->buffer)
-        );
+                                   s_lookupWindow,
+                                   WM_LOOKUP_FOUND_HOST,
+                                   (const char*) &addr,
+                                   sizeof(addr),
+                                   AF_INET,
+                                   &lookup->buffer[0],
+                                   sizeof(lookup->buffer)
+                               );
+
         if (!lookup->cancelHandle) {
-            PostMessage(s_lookupWindow, WM_LOOKUP_FOUND_HOST, 0, (unsigned) -1);
+            PostMessage(s_lookupWindow, WM_LOOKUP_FOUND_HOST, 0, (unsigned) - 1);
         }
     }
     s_critsect.Leave();
 }
 
 //===========================================================================
-void AsyncAddressLookupCancel (
+void AsyncAddressLookupCancel(
     FAsyncLookupProc    lookupProc,
     AsyncCancelId       cancelId        // nil = cancel all with specified lookupProc
-) {
+)
+{
     s_critsect.Enter();
-    for (Lookup * lookup = s_lookupList.Head(); lookup; lookup = s_lookupList.Next(lookup)) {
-        if (lookup->lookupProc && (lookup->lookupProc != lookupProc))
+
+    for (Lookup* lookup = s_lookupList.Head(); lookup; lookup = s_lookupList.Next(lookup)) {
+        if (lookup->lookupProc && (lookup->lookupProc != lookupProc)) {
             continue;
-        if (cancelId && (lookup->cancelId != cancelId))
+        }
+
+        if (cancelId && (lookup->cancelId != cancelId)) {
             continue;
-        if (!lookup->cancelHandle)
+        }
+
+        if (!lookup->cancelHandle) {
             continue;
+        }
 
         // cancel this request
         WSACancelAsyncRequest(lookup->cancelHandle);
         lookup->cancelHandle = nil;
 
         // initiate user callback
-        PostMessage(s_lookupWindow, WM_LOOKUP_FOUND_HOST, 0, (unsigned) -1);
+        PostMessage(s_lookupWindow, WM_LOOKUP_FOUND_HOST, 0, (unsigned) - 1);
     }
+
     s_critsect.Leave();
 }

@@ -62,27 +62,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  Sets the given registry key to the given string value. If valueName = nil,
 //  sets the (default) value
 
-static bool     ISetRegKey( const char *keyName, const char *value, const char *valueName = nil )
+static bool     ISetRegKey(const char* keyName, const char* value, const char* valueName = nil)
 {
     HKEY    regKey;
     DWORD   result;
 
 
     // Create the key (just opens if it already exists)
-    if( ::RegCreateKeyEx( HKEY_CLASSES_ROOT, keyName, 0, nil, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS,
-                            nil, &regKey, &result ) != ERROR_SUCCESS )
-    {
-        hsStatusMessageF( "Warning: Registry database open failed for key '%s'.\n", keyName );
+    if (::RegCreateKeyEx(HKEY_CLASSES_ROOT, keyName, 0, nil, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS,
+                         nil, &regKey, &result) != ERROR_SUCCESS) {
+        hsStatusMessageF("Warning: Registry database open failed for key '%s'.\n", keyName);
         return false;
     }
 
     // Assign the "default" subkey value
-    LONG lResult = ::RegSetValueEx( regKey, valueName, 0, REG_SZ, (const BYTE *)value, ( lstrlen( value ) + 1 ) * sizeof( TCHAR ) );
-    
-    if( ::RegCloseKey( regKey ) == ERROR_SUCCESS && lResult == ERROR_SUCCESS )
-        return true;
+    LONG lResult = ::RegSetValueEx(regKey, valueName, 0, REG_SZ, (const BYTE*)value, (lstrlen(value) + 1) * sizeof(TCHAR));
 
-    hsStatusMessageF( "Warning: Registry database update failed for key '%s'.\n", keyName );
+    if (::RegCloseKey(regKey) == ERROR_SUCCESS && lResult == ERROR_SUCCESS) {
+        return true;
+    }
+
+    hsStatusMessageF("Warning: Registry database update failed for key '%s'.\n", keyName);
     return false;
 }
 
@@ -91,14 +91,14 @@ static bool     ISetRegKey( const char *keyName, const char *value, const char *
 //////////////////////////////////////////////////////////////////////////////
 
 //// AssociateFileType ///////////////////////////////////////////////////////
-//  Associates a given file type in the Win32 registry with the given 
+//  Associates a given file type in the Win32 registry with the given
 //  application. Also assigns a default icon if iconIndex != -1
 //
 //  To do this, we create a set of keys in the registry under CLASSES_ROOT that
 //  looks like this:
 //      fileTypeID  (value = fileTypeName)
 //          |
-//          |--- DefaultIcon (value = path,index) [omit this one if you don't 
+//          |--- DefaultIcon (value = path,index) [omit this one if you don't
 //          |                                      want a default icon]
 //          |
 //          |--- shell
@@ -108,39 +108,43 @@ static bool     ISetRegKey( const char *keyName, const char *value, const char *
 //                        |--- command (value = command line)
 //
 
-bool    plWinRegistryTools::AssociateFileType( const char *fileTypeID, const char *fileTypeName, const char *appPath, int iconIndex )
+bool    plWinRegistryTools::AssociateFileType(const char* fileTypeID, const char* fileTypeName, const char* appPath, int iconIndex)
 {
     char        keyName[ 512 ], keyValue[ 512 ];
 
 
     // Root key
-    if( !ISetRegKey( fileTypeID, fileTypeName ) )
+    if (!ISetRegKey(fileTypeID, fileTypeName)) {
         return false;
+    }
 
     // DefaultIcon key, if we want one
-    if( iconIndex != -1 )
-    {
-        sprintf( keyName, "%s\\DefaultIcon", fileTypeID );
-        sprintf( keyValue, "%s,%d", appPath, iconIndex );
-        if( !ISetRegKey( keyName, keyValue ) )
+    if (iconIndex != -1) {
+        sprintf(keyName, "%s\\DefaultIcon", fileTypeID);
+        sprintf(keyValue, "%s,%d", appPath, iconIndex);
+
+        if (!ISetRegKey(keyName, keyValue)) {
             return false;
+        }
     }
 
     // shell/open/command key
-    sprintf( keyName, "%s\\shell\\open\\command", fileTypeID );
-    sprintf( keyValue, "\"%s\" \"%%1\"", appPath );
-    if( !ISetRegKey( keyName, keyValue ) )
+    sprintf(keyName, "%s\\shell\\open\\command", fileTypeID);
+    sprintf(keyValue, "\"%s\" \"%%1\"", appPath);
+
+    if (!ISetRegKey(keyName, keyValue)) {
         return false;
+    }
 
     // Success!
     return true;
 }
 
 //// AssociateFileExtension //////////////////////////////////////////////////
-//  Assigns a given file extension to a previously registered Win32 file type 
+//  Assigns a given file extension to a previously registered Win32 file type
 //  (using the above function)
 //
-//  We do this by creating a key entry under CLASSES_ROOT of the following 
+//  We do this by creating a key entry under CLASSES_ROOT of the following
 //  structure:
 //
 //          fileExtension (value = fileTypeID)
@@ -148,16 +152,16 @@ bool    plWinRegistryTools::AssociateFileType( const char *fileTypeID, const cha
 //  where fileExtension includes the leading . and fileTypeID is the same
 //  typeID registered with the above function
 
-bool    plWinRegistryTools::AssociateFileExtension( const char *fileExtension, const char *fileTypeID )
+bool    plWinRegistryTools::AssociateFileExtension(const char* fileExtension, const char* fileTypeID)
 {
-    return ISetRegKey( fileExtension, fileTypeID ); 
+    return ISetRegKey(fileExtension, fileTypeID);
 }
 
 //// GetCurrentFileExtensionAssociation //////////////////////////////////////
 //  Obtains the current fileTypeID associated with the given file extension,
 //  or a null string if it isn't yet associated.
 
-bool    plWinRegistryTools::GetCurrentFileExtensionAssociation( const char *extension, char *buffer, int bufferLen )
+bool    plWinRegistryTools::GetCurrentFileExtensionAssociation(const char* extension, char* buffer, int bufferLen)
 {
     long    dataLen;
 
@@ -165,12 +169,12 @@ bool    plWinRegistryTools::GetCurrentFileExtensionAssociation( const char *exte
     buffer[ 0 ] = 0;
     dataLen = bufferLen;
 
-    LONG retVal = ::RegQueryValue( HKEY_CLASSES_ROOT, extension, buffer, &dataLen );
-    if( retVal != ERROR_SUCCESS )
-    {
+    LONG retVal = ::RegQueryValue(HKEY_CLASSES_ROOT, extension, buffer, &dataLen);
+
+    if (retVal != ERROR_SUCCESS) {
         char msg[ 512 ];
-        FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, 0, retVal, 0, msg, sizeof( msg ), nil );
-        hsStatusMessageF( "Error querying registry key '%s' : %s\n", extension, msg );
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, retVal, 0, msg, sizeof(msg), nil);
+        hsStatusMessageF("Error querying registry key '%s' : %s\n", extension, msg);
         return false;
     }
 

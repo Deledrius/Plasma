@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plStatusLog;
 
-class plDispatchLog : public plDispatchLogBase
-{
+class plDispatchLog : public plDispatchLogBase {
 private:
     hsBitVector fIncludeTypes;  // include/exclude list
     uint64_t fStartTicks;

@@ -56,13 +56,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //      plFdSet
 //
 
-class plSocket
-{
+class plSocket {
 public:
     plSocket();
     plSocket(SOCKET sck);
     virtual ~plSocket();
-    bool operator==(const plSocket & rhs);
+    bool operator==(const plSocket& rhs);
     static int GetLastError();
     void Close();
     void SetBlocking(bool value);
@@ -71,17 +70,22 @@ public:
     bool Active();
     int SetRecvBufferSize(int size);
     void SetSocket(SOCKET sck);
-    SOCKET GetSocket() const { return fSocket; }
-    void CloseOnDestroy(bool value) { fCloseOnDestroy=value; }
-    void CloseBeforeSet(bool value) { fCloseBeforeSet=value; }
-    int SetSendTimeOut(unsigned int milliSecs=0);
-    int SetRecvTimeOut(unsigned int milliSecs=0);
+    SOCKET GetSocket() const {
+        return fSocket;
+    }
+    void CloseOnDestroy(bool value) {
+        fCloseOnDestroy = value;
+    }
+    void CloseBeforeSet(bool value) {
+        fCloseBeforeSet = value;
+    }
+    int SetSendTimeOut(unsigned int milliSecs = 0);
+    int SetRecvTimeOut(unsigned int milliSecs = 0);
 
 protected:
-    enum TimeoutsSet
-    {
-        kRecvTimeoutSet = 1<<0,
-        kSendTimeoutSet = 1<<1,
+    enum TimeoutsSet {
+        kRecvTimeoutSet = 1 << 0,
+        kSendTimeoutSet = 1 << 1,
     };
     bool ErrorClose();
     SOCKET  fSocket;

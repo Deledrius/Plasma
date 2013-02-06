@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // Use this when owner is a component and you want the shared notetracks from all
 // the objects it is applied to.  (This is in a seperate file because it uses
 // plComponentBase and external stuff might want to use plNoteTrackDlg.)
-class plComponentNoteTrackDlg : public plNoteTrackDlg
-{
+class plComponentNoteTrackDlg : public plNoteTrackDlg {
     void ICacheNoteTrack();
 };
 

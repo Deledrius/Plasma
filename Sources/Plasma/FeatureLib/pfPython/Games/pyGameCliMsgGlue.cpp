@@ -80,11 +80,11 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameCliMsg, upcastToGameMsg)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameCliMsg)
-    PYTHON_METHOD_NOARGS(ptGameCliMsg, getType, "Returns the type of the message (see PtGameCliMsgTypes)"),
-    PYTHON_METHOD_NOARGS(ptGameCliMsg, getGameCli, "Returns the game client associated with this message"),
-    PYTHON_METHOD_NOARGS(ptGameCliMsg, upcastToFinalGameCliMsg, "Returns this message as the game client message it is (player joined, player left, invite failed, or owner change)"),
-    PYTHON_METHOD_NOARGS(ptGameCliMsg, upcastToGameMsg, "Returns this message as the base class of message for the game it is associated with (ttt, heek, marker, etc)"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameCliMsg, getType, "Returns the type of the message (see PtGameCliMsgTypes)"),
+                     PYTHON_METHOD_NOARGS(ptGameCliMsg, getGameCli, "Returns the game client associated with this message"),
+                     PYTHON_METHOD_NOARGS(ptGameCliMsg, upcastToFinalGameCliMsg, "Returns this message as the game client message it is (player joined, player left, invite failed, or owner change)"),
+                     PYTHON_METHOD_NOARGS(ptGameCliMsg, upcastToGameMsg, "Returns this message as the base class of message for the game it is associated with (ttt, heek, marker, etc)"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptGameCliMsg, "Message from the game server from a game");
@@ -93,7 +93,7 @@ PYTHON_EXPOSE_TYPE_DEFINITION(ptGameCliMsg, pyGameCliMsg);
 // required functions for PyObject interoperability
 PyObject* pyGameCliMsg::New(pfGameCliMsg* msg)
 {
-    ptGameCliMsg *newObj = (ptGameCliMsg*)ptGameCliMsg_type.tp_new(&ptGameCliMsg_type, NULL, NULL);
+    ptGameCliMsg* newObj = (ptGameCliMsg*)ptGameCliMsg_type.tp_new(&ptGameCliMsg_type, NULL, NULL);
     newObj->fThis->message = msg;
     return (PyObject*)newObj;
 }
@@ -143,8 +143,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameCliPlayerJoinedMsg, playerID)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameCliPlayerJoinedMsg)
-    PYTHON_METHOD_NOARGS(ptGameCliPlayerJoinedMsg, playerID, "Returns the player's ID number"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameCliPlayerJoinedMsg, playerID, "Returns the player's ID number"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGameCliPlayerJoinedMsg, pyGameCliMsg, "Game client message when a player joined message is received");
@@ -152,9 +152,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptGameCliPlayerJoinedMsg, pyGameCliMsg, "Game client m
 // required functions for PyObject interoperability
 PyObject* pyGameCliPlayerJoinedMsg::New(pfGameCliMsg* msg)
 {
-    ptGameCliPlayerJoinedMsg *newObj = (ptGameCliPlayerJoinedMsg*)ptGameCliPlayerJoinedMsg_type.tp_new(&ptGameCliPlayerJoinedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Game_PlayerJoined))
+    ptGameCliPlayerJoinedMsg* newObj = (ptGameCliPlayerJoinedMsg*)ptGameCliPlayerJoinedMsg_type.tp_new(&ptGameCliPlayerJoinedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Game_PlayerJoined)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -183,8 +186,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameCliPlayerLeftMsg, playerID)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameCliPlayerLeftMsg)
-    PYTHON_METHOD_NOARGS(ptGameCliPlayerLeftMsg, playerID, "Returns the player's ID number"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameCliPlayerLeftMsg, playerID, "Returns the player's ID number"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGameCliPlayerLeftMsg, pyGameCliMsg, "Game client message when a player left message is received");
@@ -192,9 +195,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptGameCliPlayerLeftMsg, pyGameCliMsg, "Game client mes
 // required functions for PyObject interoperability
 PyObject* pyGameCliPlayerLeftMsg::New(pfGameCliMsg* msg)
 {
-    ptGameCliPlayerLeftMsg *newObj = (ptGameCliPlayerLeftMsg*)ptGameCliPlayerLeftMsg_type.tp_new(&ptGameCliPlayerLeftMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Game_PlayerLeft))
+    ptGameCliPlayerLeftMsg* newObj = (ptGameCliPlayerLeftMsg*)ptGameCliPlayerLeftMsg_type.tp_new(&ptGameCliPlayerLeftMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Game_PlayerLeft)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -233,10 +239,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameCliInviteFailedMsg, error)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameCliInviteFailedMsg)
-    PYTHON_METHOD_NOARGS(ptGameCliInviteFailedMsg, inviteeID, "Returns the invitee's ID number"),
-    PYTHON_METHOD_NOARGS(ptGameCliInviteFailedMsg, operationID, "Returns the operation's ID number"),
-    PYTHON_METHOD_NOARGS(ptGameCliInviteFailedMsg, error, "Returns the error value (See PtGameCliInviteErrors)"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameCliInviteFailedMsg, inviteeID, "Returns the invitee's ID number"),
+                     PYTHON_METHOD_NOARGS(ptGameCliInviteFailedMsg, operationID, "Returns the operation's ID number"),
+                     PYTHON_METHOD_NOARGS(ptGameCliInviteFailedMsg, error, "Returns the error value (See PtGameCliInviteErrors)"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGameCliInviteFailedMsg, pyGameCliMsg, "Game client message when an invite failed message is received");
@@ -244,9 +250,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptGameCliInviteFailedMsg, pyGameCliMsg, "Game client m
 // required functions for PyObject interoperability
 PyObject* pyGameCliInviteFailedMsg::New(pfGameCliMsg* msg)
 {
-    ptGameCliInviteFailedMsg *newObj = (ptGameCliInviteFailedMsg*)ptGameCliInviteFailedMsg_type.tp_new(&ptGameCliInviteFailedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Game_InviteFailed))
+    ptGameCliInviteFailedMsg* newObj = (ptGameCliInviteFailedMsg*)ptGameCliInviteFailedMsg_type.tp_new(&ptGameCliInviteFailedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Game_InviteFailed)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -289,8 +298,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameCliOwnerChangeMsg, ownerID)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameCliOwnerChangeMsg)
-    PYTHON_METHOD_NOARGS(ptGameCliOwnerChangeMsg, ownerID, "Returns the owner's ID number"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameCliOwnerChangeMsg, ownerID, "Returns the owner's ID number"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGameCliOwnerChangeMsg, pyGameCliMsg, "Game client message when a owner change message is received");
@@ -298,9 +307,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptGameCliOwnerChangeMsg, pyGameCliMsg, "Game client me
 // required functions for PyObject interoperability
 PyObject* pyGameCliOwnerChangeMsg::New(pfGameCliMsg* msg)
 {
-    ptGameCliOwnerChangeMsg *newObj = (ptGameCliOwnerChangeMsg*)ptGameCliOwnerChangeMsg_type.tp_new(&ptGameCliOwnerChangeMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Game_OwnerChange))
+    ptGameCliOwnerChangeMsg* newObj = (ptGameCliOwnerChangeMsg*)ptGameCliOwnerChangeMsg_type.tp_new(&ptGameCliOwnerChangeMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Game_OwnerChange)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 

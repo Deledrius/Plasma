@@ -46,29 +46,33 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 hsRadixSort::hsRadixSort()
 {
-    HSMemory::Clear(fHeads, 256*sizeof(Elem*));
-    HSMemory::Clear(fTails, 256*sizeof(Elem*));
+    HSMemory::Clear(fHeads, 256 * sizeof(Elem*));
+    HSMemory::Clear(fTails, 256 * sizeof(Elem*));
 }
 
 void hsRadixSort::ILink(Elem*& head, Elem*& tail, int i)
 {
-    if( fHeads[i] )
-    {
-        if( !head )
+    if (fHeads[i]) {
+        if (!head) {
             head = fHeads[i];
-        else
+        } else {
             tail->fNext = fHeads[i];
+        }
+
         tail = fTails[i];
     }
+
     fHeads[i] = fTails[i] = nil;
 }
 
 void hsRadixSort::ISlot(Elem* in, int i)
 {
-    if( !fTails[i] )
+    if (!fTails[i]) {
         fHeads[i] = in;
-    else
+    } else {
         fTails[i]->fNext = in;
+    }
+
     in->fNext = nil;
     fTails[i] = in;
 }
@@ -79,8 +83,10 @@ void hsRadixSort::ICollapse()
     Elem* tail = nil;
 
     int i;
-    for( i = 0; i < 256; i++ )
+
+    for (i = 0; i < 256; i++) {
         ILink(head, tail, i);
+    }
 
     fList = head;
 }
@@ -91,11 +97,14 @@ void hsRadixSort::IUnPackSignedInt()
     Elem* tail = nil;
 
     int i;
-    for( i = 128; i < 256; i++ )
-        ILink(head, tail, i);
 
-    for( i = 0; i < 128; i++ )
+    for (i = 128; i < 256; i++) {
         ILink(head, tail, i);
+    }
+
+    for (i = 0; i < 128; i++) {
+        ILink(head, tail, i);
+    }
 
     fList = head;
 }
@@ -106,28 +115,33 @@ void hsRadixSort::IUnPackFloat()
     Elem* tail = nil;
 
     int i;
-    for( i = 128; i < 256; i++ )
+
+    for (i = 128; i < 256; i++) {
         ILink(head, tail, i);
+    }
+
     fList = head;
     head = tail;
     tail = fList;
     IReverse();
 
-    for( i = 0; i < 128; i++ )
+    for (i = 0; i < 128; i++) {
         ILink(head, tail, i);
+    }
 
     fList = head;
 }
 
 void hsRadixSort::IReverse()
 {
-    if( !(fList && fList->fNext) )
+    if (!(fList && fList->fNext)) {
         return;
+    }
 
     Elem* p = fList->fNext;
     fList->fNext = nil;
-    while( p )
-    {
+
+    while (p) {
         Elem* n = p->fNext;
         p->fNext = fList;
         fList = p;
@@ -137,45 +151,56 @@ void hsRadixSort::IReverse()
 
 hsRadixSort::Elem* hsRadixSort::Sort(Elem* inList, uint32_t flags)
 {
-    if( !(inList && inList->fNext) )
+    if (!(inList && inList->fNext)) {
         return inList;
+    }
 
     fList = inList;
 
     Elem* p;
     Elem* n;
 
-    for( p = fList, n = p->fNext; n; p = n, n = p->fNext )
+    for (p = fList, n = p->fNext; n; p = n, n = p->fNext) {
         ISlot(p, p->fKey.fLong & 0xff);
+    }
+
     ISlot(p, p->fKey.fLong & 0xff);
 
     ICollapse();
 
-    for( p = fList, n = p->fNext; n; p = n, n = p->fNext )
+    for (p = fList, n = p->fNext; n; p = n, n = p->fNext) {
         ISlot(p, (p->fKey.fLong >> 8) & 0xff);
+    }
+
     ISlot(p, (p->fKey.fLong >> 8) & 0xff);
 
     ICollapse();
 
-    for( p = fList, n = p->fNext; n; p = n, n = p->fNext )
+    for (p = fList, n = p->fNext; n; p = n, n = p->fNext) {
         ISlot(p, (p->fKey.fLong >> 16) & 0xff);
+    }
+
     ISlot(p, (p->fKey.fLong >> 16) & 0xff);
 
     ICollapse();
 
-    for( p = fList, n = p->fNext; n; p = n, n = p->fNext )
+    for (p = fList, n = p->fNext; n; p = n, n = p->fNext) {
         ISlot(p, (p->fKey.fLong >> 24) & 0xff);
+    }
+
     ISlot(p, (p->fKey.fLong >> 24) & 0xff);
 
-    if( flags & kSignedInt )
+    if (flags & kSignedInt) {
         IUnPackSignedInt();
-    else if( flags & kUnsigned )
+    } else if (flags & kUnsigned) {
         ICollapse();
-    else
+    } else {
         IUnPackFloat();
+    }
 
-    if( flags & kReverse )
+    if (flags & kReverse) {
         IReverse();
+    }
 
     return fList;
 }

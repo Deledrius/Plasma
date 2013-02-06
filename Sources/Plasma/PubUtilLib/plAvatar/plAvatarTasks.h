@@ -68,8 +68,7 @@ class plAvPushBrainMsg;
     Optionally begin playing.
     It's perfectly reasonable to attach an animation with a blend of zero and start of false.
     This will have no effect visually until you start blending the animation in. */
-class plAvAnimTask : public plAvTask
-{
+class plAvAnimTask : public plAvTask {
 public:
     /** Default constructor for the class factory and subclases */
     plAvAnimTask();
@@ -84,25 +83,25 @@ public:
         \param loop Make the animation loop?
         \param attach Are we attaching or detaching the animation?
     */
-    plAvAnimTask(const plString &animName, float initialBlend, float targetBlend, float fadeSpeed,
+    plAvAnimTask(const plString& animName, float initialBlend, float targetBlend, float fadeSpeed,
                  float setTime, bool start, bool loop, bool attach);
 
     /** Canonical constructor form form for detaching
         \param animName The name of the animation we're detaching
         \param fadeSpeed How fast to fade it out. */
-    plAvAnimTask(const plString &animName, float fadeSpeed, bool attach = false);
+    plAvAnimTask(const plString& animName, float fadeSpeed, bool attach = false);
 
     // task protocol
-    virtual bool Start(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed);
-    virtual bool Process(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed);
-    virtual void LeaveAge(plArmatureMod *avatar);
+    virtual bool Start(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed);
+    virtual bool Process(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed);
+    virtual void LeaveAge(plArmatureMod* avatar);
 
     // plasma protocol
-    CLASSNAME_REGISTER( plAvAnimTask );
-    GETINTERFACE_ANY( plAvAnimTask, plAvTask );
+    CLASSNAME_REGISTER(plAvAnimTask);
+    GETINTERFACE_ANY(plAvAnimTask, plAvTask);
 
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
 
 protected:
     // public members
@@ -114,7 +113,7 @@ protected:
     bool fStart;                      // start the animation playing? (attaching only)
     bool fLoop;                       // turn on looping? (attaching only)
     bool fAttach;                     // attach? (otherwise detach)
-    plAGAnimInstance *fAnimInstance;    // the animation we're monitoring (detaching only)
+    plAGAnimInstance* fAnimInstance;    // the animation we're monitoring (detaching only)
 };
 
 
@@ -123,8 +122,7 @@ protected:
     to fly through incomplete areas of a level.
     !!! Generally deprecated in favor of avBlendedSeekTask, a slightly less-gross-looking hack.
     \deprecated */
-class plAvSeekTask : public plAvTask
-{
+class plAvSeekTask : public plAvTask {
 public:
     /** Default constructor used by class factory and descendants. */
     plAvSeekTask();
@@ -135,13 +133,13 @@ public:
     plAvSeekTask(plKey target, plAvAlignment alignType, const plString& animName);
 
     // task protocol
-    virtual bool Start(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed);
-    virtual bool Process(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed);
-    virtual void LeaveAge(plArmatureMod *avatar);
-    
+    virtual bool Start(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed);
+    virtual bool Process(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed);
+    virtual void LeaveAge(plArmatureMod* avatar);
+
     // plasma protocol
-    CLASSNAME_REGISTER( plAvSeekTask );
-    GETINTERFACE_ANY( plAvSeekTask, plAvTask );
+    CLASSNAME_REGISTER(plAvSeekTask);
+    GETINTERFACE_ANY(plAvSeekTask, plAvTask);
 
     // *** implement reader and writer if needed for network propagation
 protected:
@@ -152,7 +150,7 @@ protected:
     plKey                       fTarget;            // the thing we're seeking towards
 
     // -- implementation members --
-    plAGAnimInstance *          fAnimInstance;      // the animation we're using
+    plAGAnimInstance*           fAnimInstance;      // the animation we're using
     hsPoint3                    fTargetPosition;    // the position we're seeking
     hsQuat                      fTargetRotation;    // the orientation we're seeking
     double                      fTargetTime;        // the time we want to be done with the task (start + duration)
@@ -172,7 +170,7 @@ class plAvOneShotTask : public plAvTask {
 public:
     /** Put default values for all member variables. */
     void InitDefaults();
-    
+
     /** Default constructor for the class factor and descendants. */
     plAvOneShotTask();
 
@@ -182,81 +180,80 @@ public:
         \param reversable Unused. Allows the oneshot to be backed up by keyboard input
         \param callbacks A vector of callback messages to be sent at specific times during the animation
         */
-    plAvOneShotTask(const plString &animName, bool drivable, bool reversible, plOneShotCallbacks *callbacks);
+    plAvOneShotTask(const plString& animName, bool drivable, bool reversible, plOneShotCallbacks* callbacks);
     /** Construct from a oneshot message.
         \param msg The message to copy our parameters from
         \param brain The brain to attach the task to.
         */
-    plAvOneShotTask (plAvOneShotMsg *msg, plArmatureMod *avatar, plArmatureBrain *brain);
+    plAvOneShotTask(plAvOneShotMsg* msg, plArmatureMod* avatar, plArmatureBrain* brain);
     virtual ~plAvOneShotTask();
 
     // task protocol
-    virtual bool Start(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed);
-    virtual bool Process(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed);
-    virtual void LeaveAge(plArmatureMod *avatar);
-    
-    void SetAnimName(const plString &name);
-    
+    virtual bool Start(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed);
+    virtual bool Process(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed);
+    virtual void LeaveAge(plArmatureMod* avatar);
+
+    void SetAnimName(const plString& name);
+
     static bool fForce3rdPerson;
 
     // plasma protocol
-    CLASSNAME_REGISTER( plAvOneShotTask );
-    GETINTERFACE_ANY( plAvOneShotTask, plAvTask );
+    CLASSNAME_REGISTER(plAvOneShotTask);
+    GETINTERFACE_ANY(plAvOneShotTask, plAvTask);
 
     bool fBackwards;                  // play the anim backwards
-    bool fDisableLooping;             // explicitly kill looping on this anim;    
+    bool fDisableLooping;             // explicitly kill looping on this anim;
     bool fDisablePhysics;             // disable physics when we play this oneshot
-    
+
     // *** implement reader and writer if needed for network propagation
 protected:
     plString fAnimName;                 // the name of the one-shot animation we want to use
     bool fMoveHandle;                 // move the handle after the oneshot's done playing?
-    plAGAnimInstance *fAnimInstance;    // the animation instance (available only after it starts playing)
+    plAGAnimInstance* fAnimInstance;    // the animation instance (available only after it starts playing)
     bool fDrivable;                   // the user can control the animation with the mouse
     bool fReversible;                 // the user can back up the animation with the mouse
     bool fEnablePhysicsAtEnd;         // was the avatar physical before we started (and did we disable physics?)
     bool fDetachAnimation;            // should we detach the animation when we're done?
     bool fIgnore;                     // if this gets set before we start, we just finish without doing anything.
-    
-    plOneShotCallbacks *fCallbacks;     // a set of callbacks to set up on our animation
-    
+
+    plOneShotCallbacks* fCallbacks;     // a set of callbacks to set up on our animation
+
     hsMatrix44 fPlayer2Anim;            // matrix from player root space to animation root space
     hsMatrix44 fAnim2Player;            // matrix from animation root space to player root space
-    
+
     hsMatrix44 fWorld2Anim;
     hsMatrix44 fAnim2World;
-    
+
     int fWaitFrames;                    // wait a couple frames before finalizing position to allow changes
     // from any animation callbacks to propagate. based on weird interaction
     // with Attach() command. sheeeit.
 };
 
-void GetPositionAndRotation(hsMatrix44 transform, hsScalarTriple *position, hsQuat *rotation);
+void GetPositionAndRotation(hsMatrix44 transform, hsScalarTriple* position, hsQuat* rotation);
 
 
 // A quick task to play a oneshot, wait on a marker, and link to your personal age.
 // Could be done with a responder, but this gives me a quick way to trigger it from code
 // without the responder and callback messages flying around.
-class plAvOneShotLinkTask : public plAvOneShotTask
-{
+class plAvOneShotLinkTask : public plAvOneShotTask {
 public:
     plAvOneShotLinkTask();
     virtual ~plAvOneShotLinkTask();
 
     // task protocol
-    virtual bool Start(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed);
-    virtual bool Process(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed);   
+    virtual bool Start(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed);
+    virtual bool Process(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed);
 
-    CLASSNAME_REGISTER( plAvOneShotLinkTask );
-    GETINTERFACE_ANY( plAvOneShotLinkTask, plAvOneShotTask );   
+    CLASSNAME_REGISTER(plAvOneShotLinkTask);
+    GETINTERFACE_ANY(plAvOneShotLinkTask, plAvOneShotTask);
 
     // only read/writes enough to send an unstarted task across the net. Not intended for
     // use with a running task.
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
-    virtual void Read(hsStream *stream, hsResMgr *mgr); 
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
 
-    void SetMarkerName(const plString &name);
-        
+    void SetMarkerName(const plString& name);
+
 protected:
     plString fMarkerName;
     double fStartTime;

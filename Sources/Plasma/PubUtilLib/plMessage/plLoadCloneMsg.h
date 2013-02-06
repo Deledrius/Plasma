@@ -47,7 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 #include "pnMessage/plMessage.h"
-// 
+//
 #include "pnKeyedObject/plUoid.h"
 
 /** \class plLoadCloneMsg
@@ -57,8 +57,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
     On the remote machines, it will use the (enclosed) new key and load the object.
     On both machines, the requestor will be notified after the object is loaded.
     */
-class plLoadCloneMsg : public plMessage
-{
+class plLoadCloneMsg : public plMessage {
 public:
     /** Default constructor. only useful for sending over the network, prior
         to reading and writing. The clone message needs to synthesize its key
@@ -78,9 +77,9 @@ public:
             strongly recommended that this be a local object, so that we don't get the same
             requestor creating multiple clones by starting the process on several machines.
         \param userData - Whatever you want. Will be propagated to the requestor after cloning.
-                        
+
     */
-    plLoadCloneMsg(const plUoid &uoidToClone, const plKey &requestorKey, uint32_t userData);
+    plLoadCloneMsg(const plUoid& uoidToClone, const plKey& requestorKey, uint32_t userData);
 
     /** This constructor form is for when you want to send a clone message based on
         an existing cloned object. The two primary uses of this are:
@@ -92,20 +91,20 @@ public:
         \param userData - Whatever you want. Will be propagated to the requestor.
         \param isLoading - Are we loading or unloading?
         */
-    plLoadCloneMsg(const plKey &existing, const plKey &requestor, uint32_t userData, bool isLoading);
+    plLoadCloneMsg(const plKey& existing, const plKey& requestor, uint32_t userData, bool isLoading);
 
     virtual ~plLoadCloneMsg();
 
     CLASSNAME_REGISTER(plLoadCloneMsg);
     GETINTERFACE_ANY(plLoadCloneMsg, plMessage);
 
-    // IO 
+    // IO
     void Read(hsStream* stream, hsResMgr* mgr);
     void Write(hsStream* stream, hsResMgr* mgr);
 
     void ReadVersion(hsStream* stream, hsResMgr* mgr);
     void WriteVersion(hsStream* stream, hsResMgr* mgr);
-    
+
     plKey   GetCloneKey();
     plKey   GetRequestorKey();
     bool    IsValidMessage();
@@ -113,8 +112,8 @@ public:
     uint32_t  GetOriginatingPlayerID();
     void    SetOriginatingPlayerID(uint32_t playerId);
     bool    GetIsLoading();
-    void    SetTriggerMsg(plMessage *msg);
-    plMessage *GetTriggerMsg();
+    void    SetTriggerMsg(plMessage* msg);
+    plMessage* GetTriggerMsg();
 
 
 protected:
@@ -124,8 +123,8 @@ protected:
     uint32_t  fUserData;              // let requestors send some data to their remote versions
     uint32_t  fOriginatingPlayerID;   // network / player id of the client initiating the request
     bool    fIsLoading;             // true if we're loading; false if we're unloading
-    plMessage *fTriggerMsg;         // Handy place to store a message that caused you to request a clone,
-                                    // so you can see it and continue processing once your clone is loaded.
+    plMessage* fTriggerMsg;         // Handy place to store a message that caused you to request a clone,
+    // so you can see it and continue processing once your clone is loaded.
 };
 
 #endif

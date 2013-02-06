@@ -62,7 +62,7 @@ void DummyCodeIncludeFuncLightMap()
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //      LightMap Component
-//      
+//
 //
 //
 //
@@ -71,8 +71,7 @@ void DummyCodeIncludeFuncLightMap()
 //Max desc stuff necessary below.
 CLASS_DESC(plLightMapComponent, gLightMapDesc, "Light Map",  "LightMap", COMP_TYPE_GRAPHICS, LIGHTMAP_COMP_CID)
 
-enum
-{
+enum {
     kMapChannel,                    //Inserted in v1
     kResolutionLevelRadio,          //Inserted in v1, removed in v2
     kResSpinControl,                    //Inserted in v2
@@ -87,11 +86,11 @@ ParamBlockDesc2 gLightMapBk
 
     IDD_COMP_LIGHTMAP, IDS_COMP_LIGHTMAPS, 0, 0, NULL,
 
-        kMapChannel, _T("UVW Channel Light Map"), TYPE_INT, 0, 0,
-        p_ui,   TYPE_SPINNER, EDITTYPE_INT, IDC_COMP_LIGHTMAP_EDIT1, IDC_COMP_LIGHTMAP_SPIN1,   0.4,
-        p_default, 1,
-        p_range, 1, plGeometrySpan::kMaxNumUVChannels,
-        end,
+    kMapChannel, _T("UVW Channel Light Map"), TYPE_INT, 0, 0,
+    p_ui,   TYPE_SPINNER, EDITTYPE_INT, IDC_COMP_LIGHTMAP_EDIT1, IDC_COMP_LIGHTMAP_SPIN1,   0.4,
+    p_default, 1,
+    p_range, 1, plGeometrySpan::kMaxNumUVChannels,
+    end,
 //
 //      kResolutionLevelRadio,  _T("Resolution Level"),     TYPE_INT,       0, 0,
 //      p_ui,       TYPE_RADIO, 5,  IDC_RADIO_LM1,  IDC_RADIO_LM2,  IDC_RADIO_LM3,  IDC_RADIO_LM4, IDC_RADIO_LM5,
@@ -99,26 +98,26 @@ ParamBlockDesc2 gLightMapBk
 //      p_default,      2,
 //
 //
-        kResSpinControl, _T("Resolution Spinner"),  TYPE_INT,       0,  0,
-        p_ui,   TYPE_SLIDER,    EDITTYPE_INT, IDC_COMP_LM_DUMMY, IDC_COMP_LIGHT_SLIDER, 4,
-        p_range, 0, 4,
-        p_default, 2,
-        end,
-    
-        kMapInitColor, _T("Initial map color"), TYPE_RGBA, 0, 0,
-        p_ui, TYPE_COLORSWATCH,         IDC_COMP_LIGHTMAP_COLOR,
-        p_default, Color(0,0,0),
-        end,
+    kResSpinControl, _T("Resolution Spinner"),  TYPE_INT,       0,  0,
+    p_ui,   TYPE_SLIDER,    EDITTYPE_INT, IDC_COMP_LM_DUMMY, IDC_COMP_LIGHT_SLIDER, 4,
+    p_range, 0, 4,
+    p_default, 2,
+    end,
 
-        kCompress,  _T("Compress"), TYPE_BOOL,      0, 0,
-            p_default,  TRUE,
-            p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LIGHTMAP_COMPRESS,
-            end,
+    kMapInitColor, _T("Initial map color"), TYPE_RGBA, 0, 0,
+    p_ui, TYPE_COLORSWATCH,         IDC_COMP_LIGHTMAP_COLOR,
+    p_default, Color(0, 0, 0),
+    end,
 
-        kShared,  _T("Shared"), TYPE_BOOL,      0, 0,
-            p_default,  FALSE,
-            p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LIGHTMAP_SHARED,
-            end,
+    kCompress,  _T("Compress"), TYPE_BOOL,      0, 0,
+    p_default,  TRUE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LIGHTMAP_COMPRESS,
+    end,
+
+    kShared,  _T("Shared"), TYPE_BOOL,      0, 0,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LIGHTMAP_SHARED,
+    end,
 
     end
 );
@@ -127,7 +126,7 @@ ParamBlockDesc2 gLightMapBk
 
 
 plLightMapComponent::plLightMapComponent()
-:   fLightMapKey(nil)
+    :   fLightMapKey(nil)
 {
     fClassDesc = &gLightMapDesc;
     fClassDesc->MakeAutoParamBlocks(this);
@@ -136,19 +135,19 @@ plLightMapComponent::plLightMapComponent()
 
 
 
-bool plLightMapComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plLightMapComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     return true;
 }
 
-bool plLightMapComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plLightMapComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fLightMapKey = nil;
     return true;
 }
 
 
-bool plLightMapComponent::PreConvert(plMaxNode *pNode,  plErrorMsg *pErrMsg)
+bool plLightMapComponent::PreConvert(plMaxNode* pNode,  plErrorMsg* pErrMsg)
 {
     return true;
 }
@@ -158,21 +157,25 @@ float plLightMapComponent::GetScale() const
 {
     int resBut = fCompPB->GetInt(kResSpinControl);
     float res = 1.f;
-    switch( resBut )
-    {
+
+    switch (resBut) {
     case 4:
         res = 9.f;
         break;
+
     case 3:
         res = 3.f;
         break;
+
     default:
     case 2:
         res = 1.f;
         break;
+
     case 1:
         res = 0.5f;
         break;
+
     case 0:
         res = 0.25f;
         break;
@@ -183,7 +186,7 @@ float plLightMapComponent::GetScale() const
 
 uint32_t plLightMapComponent::GetUVWSrc() const
 {
-    return fCompPB->GetInt(kMapChannel)-1;
+    return fCompPB->GetInt(kMapChannel) - 1;
 }
 
 bool plLightMapComponent::GetCompress() const

@@ -46,10 +46,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plAudio/plSound.h"
 
 // static vars
-char plSoundSDLModifier::kStrVolume[]="desiredVolume";
-char plSoundSDLModifier::kStrTime[]="time";
-char plSoundSDLModifier::kStrPlaying[]="playing";
-char plSoundSDLModifier::kStrSounds[]="sounds";
+char plSoundSDLModifier::kStrVolume[] = "desiredVolume";
+char plSoundSDLModifier::kStrTime[] = "time";
+char plSoundSDLModifier::kStrPlaying[] = "playing";
+char plSoundSDLModifier::kStrSounds[] = "sounds";
 
 //
 // get current state from audio interface
@@ -59,14 +59,14 @@ void plSoundSDLModifier::IPutCurrentStateIn(plStateDataRecord* dstState)
 {
     /*plSceneObject* sobj=GetTarget();
     hsAssert(sobj, "plSoundSDLModifier, nil target");
-    
+
     const plAudioInterface* ai=sobj->GetAudioInterface();
     hsAssert(ai, "nil audio interface");
 
     plSDStateVariable* soundListVar=dstState->FindSDVar(kStrSounds);
     int numSounds=ai->GetNumSounds();
     soundListVar->Resize(numSounds);
-        
+
     int i;
     for(i=0;i<numSounds; i++)
     {
@@ -84,36 +84,34 @@ void plSoundSDLModifier::IPutCurrentStateIn(plStateDataRecord* dstState)
 //
 void plSoundSDLModifier::ISetCurrentStateFrom(const plStateDataRecord* srcState)
 {
-    plSceneObject* sobj=GetTarget();
+    plSceneObject* sobj = GetTarget();
     hsAssert(sobj, "plSoundSDLModifier, nil target");
 
-    const plAudioInterface* ai=sobj->GetAudioInterface();
+    const plAudioInterface* ai = sobj->GetAudioInterface();
     hsAssert(ai, "nil audio interface");
-    int numSounds=ai->GetNumSounds();
+    int numSounds = ai->GetNumSounds();
 
-    plSDStateVariable* soundListVar=srcState->FindSDVar(kStrSounds);
+    plSDStateVariable* soundListVar = srcState->FindSDVar(kStrSounds);
 
-    if( soundListVar->GetCount() != numSounds )
-    {
-        hsAssert( false, "number sounds sounds should not be changing");
+    if (soundListVar->GetCount() != numSounds) {
+        hsAssert(false, "number sounds sounds should not be changing");
         return;
     }
 
     int i;
-    for(i=0;i<numSounds;i++)
-    {
-        plStateDataRecord* soundState=soundListVar->GetStateDataRecord(i);
-        plSound* sound=ai->GetSound(i);
+
+    for (i = 0; i < numSounds; i++) {
+        plStateDataRecord* soundState = soundListVar->GetStateDataRecord(i);
+        plSound* sound = ai->GetSound(i);
 
         float desiredVol;
-        soundState->FindVar(kStrVolume)->Get(&desiredVol);      
+        soundState->FindVar(kStrVolume)->Get(&desiredVol);
         //sound->ISetUnsynchedVolume(desiredVol);       // MCN CHECK
 
         bool playing;
-        if (soundState->FindVar(kStrPlaying)->Get(&playing))
-        {
-            if (playing)
-            {
+
+        if (soundState->FindVar(kStrPlaying)->Get(&playing)) {
+            if (playing) {
                 //double timeStarted;
                 /*if (soundState->FindVar(kStrTime)->Get(&timeStarted))
                     sound->SynchedPlay((float)timeStarted);
@@ -124,19 +122,17 @@ void plSoundSDLModifier::ISetCurrentStateFrom(const plStateDataRecord* srcState)
                     hsAssert( false, "No timeStarted state in sound SDL. Bad state from server? Contact MCN *immediately*" );
                     sound->Play();
                 }*/
-            }
-            else
-            {
-                if( sound->IsPropertySet( plSound::kPropAutoStart ) )
-                {
+            } else {
+                if (sound->IsPropertySet(plSound::kPropAutoStart)) {
 #if 0
                     // There is a sound in teledahn (swampAmb) which leggaly has this behavior
-                    hsAssert( false, "Auto-start sound just got a state update telling it to stop. "
-                                "This is technically legal, but so far there isn't any case where this should "
-                                "happen. Further, it's very likely to be the cause of the very-intermittent "
-                                "auto-start-sounds-not-playing bug. Leave this up and contact MCN *immediately*" );
+                    hsAssert(false, "Auto-start sound just got a state update telling it to stop. "
+                             "This is technically legal, but so far there isn't any case where this should "
+                             "happen. Further, it's very likely to be the cause of the very-intermittent "
+                             "auto-start-sounds-not-playing bug. Leave this up and contact MCN *immediately*");
 #endif
                 }
+
                 //sound->IStop();
             }
         }

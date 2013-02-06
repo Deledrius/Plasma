@@ -55,10 +55,13 @@ void CryptCreateRandomSeed(size_t length, uint8_t* data)
     for (; cur < end; cur++) {
         fSeed[seedIdx] ^= data[dataIdx];
 
-        if (++seedIdx >= sizeof(ShaDigest))
+        if (++seedIdx >= sizeof(ShaDigest)) {
             seedIdx = 0;
-        if (++dataIdx >= length)
+        }
+
+        if (++dataIdx >= length) {
             dataIdx = 0;
+        }
     }
 
     ((uint32_t*)fSeed)[2] ^= (uint32_t)((uintptr_t)&length);
@@ -78,10 +81,13 @@ void CryptCreateRandomSeed(size_t length, uint8_t* data)
     for (; cur < end; cur++) {
         data[dataIdx] ^= digest[seedIdx];
 
-        if (++seedIdx >= sizeof(ShaDigest))
+        if (++seedIdx >= sizeof(ShaDigest)) {
             seedIdx = 0;
-        if (++dataIdx >= length)
+        }
+
+        if (++dataIdx >= length) {
             dataIdx = 0;
+        }
     }
 
     // Combine seed with digest

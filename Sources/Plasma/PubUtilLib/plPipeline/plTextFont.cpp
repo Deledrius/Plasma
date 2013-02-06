@@ -60,7 +60,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Constructor & Destructor /////////////////////////////////////////////////
 
-plTextFont::plTextFont( plPipeline *pipe )
+plTextFont::plTextFont(plPipeline* pipe)
 {
     fMaxNumIndices = 1024;
     fInitialized = false;
@@ -74,13 +74,13 @@ plTextFont::~plTextFont()
 
 //// IInitFontTexture /////////////////////////////////////////////////////////
 
-uint16_t  *plTextFont::IInitFontTexture( void )
+uint16_t*  plTextFont::IInitFontTexture(void)
 {
     int     nHeight, x, y, c;
     char    myChar[ 2 ] = "x";
-    uint16_t  *tBits;
+    uint16_t*  tBits;
 
-    DWORD       *bitmapBits;
+    DWORD*       bitmapBits;
     BITMAPINFO  bmi;
     HDC         hDC;
     HBITMAP     hBitmap;
@@ -88,75 +88,76 @@ uint16_t  *plTextFont::IInitFontTexture( void )
     SIZE        size;
     BYTE        bAlpha;
 
-    
+
     // Figure out our texture size
-    if( fSize > 40 )
+    if (fSize > 40) {
         fTextureWidth = fTextureHeight = 1024;
-    else if( fSize > 20 )
+    } else if (fSize > 20) {
         fTextureWidth = fTextureHeight = 512;
-    else
+    } else {
         fTextureWidth = fTextureHeight = 256;
+    }
 
 
     // Create a new DC and bitmap that we can draw characters to
-    memset( &bmi.bmiHeader, 0, sizeof( BITMAPINFOHEADER ) );
-    bmi.bmiHeader.biSize = sizeof( BITMAPINFOHEADER );
+    memset(&bmi.bmiHeader, 0, sizeof(BITMAPINFOHEADER));
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bmi.bmiHeader.biWidth = fTextureWidth;
     bmi.bmiHeader.biHeight = -(int)fTextureHeight;
     bmi.bmiHeader.biPlanes = 1;
     bmi.bmiHeader.biCompression = BI_RGB;
     bmi.bmiHeader.biBitCount = 32;
-    
-    hDC = CreateCompatibleDC( nil );
-    hBitmap = CreateDIBSection( hDC, &bmi, DIB_RGB_COLORS, (void **)&bitmapBits, nil, 0 );
-    SetMapMode( hDC, MM_TEXT );
 
-    nHeight = -MulDiv( fSize, GetDeviceCaps( hDC, LOGPIXELSY ), 72 );
+    hDC = CreateCompatibleDC(nil);
+    hBitmap = CreateDIBSection(hDC, &bmi, DIB_RGB_COLORS, (void**)&bitmapBits, nil, 0);
+    SetMapMode(hDC, MM_TEXT);
+
+    nHeight = -MulDiv(fSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
     fFontHeight = -nHeight;
 
-    hFont = CreateFont( nHeight, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-                        CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH, fFace );
-    hsAssert( hFont != nil, "Cannot create Windows font" );
+    hFont = CreateFont(nHeight, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+                       CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH, fFace);
+    hsAssert(hFont != nil, "Cannot create Windows font");
 
-    SelectObject( hDC, hBitmap );
-    SelectObject( hDC, hFont );
+    SelectObject(hDC, hBitmap);
+    SelectObject(hDC, hFont);
 
     // Set text colors
-    SetTextColor( hDC, RGB( 255, 255, 255 ) );
-    SetBkColor( hDC, 0 );
-    SetTextAlign( hDC, TA_TOP );
+    SetTextColor(hDC, RGB(255, 255, 255));
+    SetBkColor(hDC, 0);
+    SetTextAlign(hDC, TA_TOP);
 
     // Loop through characters, drawing them one at a time
     RECT    r;
     r.left = r.top = 0;
     r.right = r.bottom = 10;
-    FillRect( hDC, &r, (HBRUSH)GetStockObject( GRAY_BRUSH ) );
+    FillRect(hDC, &r, (HBRUSH)GetStockObject(GRAY_BRUSH));
 
     // (Make first character a black dot, for filling rectangles)
-    SetPixel( hDC, 0, 0, RGB( 255, 255, 255 ) );
-    for( c = 32, x = 1, y = 0; c < 127; c++ )
-    {
-        myChar[ 0 ] = c;
-        GetTextExtentPoint32( hDC, myChar, 1, &size );
+    SetPixel(hDC, 0, 0, RGB(255, 255, 255));
 
-        if( (uint32_t)( x + size.cx + 1 ) > fTextureWidth )
-        {
+    for (c = 32, x = 1, y = 0; c < 127; c++) {
+        myChar[ 0 ] = c;
+        GetTextExtentPoint32(hDC, myChar, 1, &size);
+
+        if ((uint32_t)(x + size.cx + 1) > fTextureWidth) {
             x = 0;
             y += size.cy + 1;
         }
 
-        ExtTextOut( hDC, x, y, ETO_OPAQUE, nil, myChar, 1, nil );
+        ExtTextOut(hDC, x, y, ETO_OPAQUE, nil, myChar, 1, nil);
 
         fCharInfo[ c ].fW = (uint16_t)size.cx;
         fCharInfo[ c ].fH = (uint16_t)size.cy;
         fCharInfo[ c ].fUVs[ 0 ].fX = (float)x / (float)fTextureWidth;
         fCharInfo[ c ].fUVs[ 0 ].fY = (float)y / (float)fTextureHeight;
-        fCharInfo[ c ].fUVs[ 1 ].fX = (float)( x + size.cx ) / (float)fTextureWidth;
-        fCharInfo[ c ].fUVs[ 1 ].fY = (float)( y + size.cy ) / (float)fTextureHeight;
+        fCharInfo[ c ].fUVs[ 1 ].fX = (float)(x + size.cx) / (float)fTextureWidth;
+        fCharInfo[ c ].fUVs[ 1 ].fY = (float)(y + size.cy) / (float)fTextureHeight;
         fCharInfo[ c ].fUVs[ 0 ].fZ = fCharInfo[ c ].fUVs[ 1 ].fZ = 0;
 
         x += size.cx + 1;
     }
+
     fCharInfo[ 32 ].fUVs[ 1 ].fX = fCharInfo[ 32 ].fUVs[ 0 ].fX;
 
     // Special case the tab key
@@ -167,52 +168,52 @@ uint16_t  *plTextFont::IInitFontTexture( void )
     fCharInfo[ '\t' ].fH = fCharInfo[ 32 ].fH;
 
     /// Now create the data block
-    uint16_t  *data = new uint16_t[ fTextureWidth * fTextureHeight ];
+    uint16_t*  data = new uint16_t[ fTextureWidth * fTextureHeight ];
     tBits = data;
-    for( y = 0; y < fTextureHeight; y++ )
-    {
-        for( x = 0; x < fTextureWidth; x++ )
-        {
-            bAlpha = (BYTE)( ( bitmapBits[ fTextureWidth * y + x ] & 0xff ) >> 4 );
 
-            if( bitmapBits[ fTextureWidth * y + x ] )
+    for (y = 0; y < fTextureHeight; y++) {
+        for (x = 0; x < fTextureWidth; x++) {
+            bAlpha = (BYTE)((bitmapBits[ fTextureWidth * y + x ] & 0xff) >> 4);
+
+            if (bitmapBits[ fTextureWidth * y + x ]) {
                 *tBits = 0xffff;
-            else
+            } else {
                 *tBits = 0;
+            }
 
             tBits++;
         }
     }
 
     // Cleanup and return
-    DeleteObject( hBitmap );
-    DeleteDC( hDC );
-    DeleteObject( hFont );
+    DeleteObject(hBitmap);
+    DeleteDC(hDC);
+    DeleteObject(hFont);
 
     return data;
 }
 
 //// Create ///////////////////////////////////////////////////////////////////
 
-void    plTextFont::Create( char *face, uint16_t size )
+void    plTextFont::Create(char* face, uint16_t size)
 {
     // Init normal stuff
-    strncpy( fFace, face, sizeof( fFace ) );
+    strncpy(fFace, face, sizeof(fFace));
     fSize = size;
 }
 
 //// IInitObjects /////////////////////////////////////////////////////////////
 
-void    plTextFont::IInitObjects( void )
+void    plTextFont::IInitObjects(void)
 {
-    uint16_t  *data;
+    uint16_t*  data;
 
 
     // Create texture
     data = IInitFontTexture();
-    hsAssert( data != nil, "Cannot create font texture" );
+    hsAssert(data != nil, "Cannot create font texture");
 
-    ICreateTexture( data );
+    ICreateTexture(data);
     delete [] data;
 
     // Create state blocks
@@ -223,49 +224,47 @@ void    plTextFont::IInitObjects( void )
 
 //// DrawString ///////////////////////////////////////////////////////////////
 
-void    plTextFont::DrawString( const char *string, int sX, int sY, uint32_t hexColor, 
-                                uint8_t style, uint32_t rightEdge )
+void    plTextFont::DrawString(const char* string, int sX, int sY, uint32_t hexColor,
+                               uint8_t style, uint32_t rightEdge)
 {
     static hsTArray<plFontVertex>   verts;
-    
+
     int     i, j, width, height, count, thisCount, italOffset;
     float   x = (float)sX;
     char    c, *strPtr;
 
 
-    if( !fInitialized )
+    if (!fInitialized) {
         IInitObjects();
+    }
 
     /// Set up to draw
-    italOffset = ( style & plDebugText::kStyleItalic ) ? fSize / 2: 0;
-    count = strlen( string );
-    strPtr = (char *)string;
-    while( count > 0 )
-    {
-        thisCount = ( count > 64 ) ? 64 : count;
+    italOffset = (style & plDebugText::kStyleItalic) ? fSize / 2 : 0;
+    count = strlen(string);
+    strPtr = (char*)string;
+
+    while (count > 0) {
+        thisCount = (count > 64) ? 64 : count;
         count -= thisCount;
 
         // Create an array for our vertices
-        verts.SetCountAndZero( thisCount * ( ( style & plDebugText::kStyleBold ) ? 12 : 6 ) );
-    
+        verts.SetCountAndZero(thisCount * ((style & plDebugText::kStyleBold) ? 12 : 6));
+
         // Fill them all up now
-        for( i = 0; i < thisCount * ( ( style & plDebugText::kStyleBold ) ? 12 : 6 ); i++ )
-        {
+        for (i = 0; i < thisCount * ((style & plDebugText::kStyleBold) ? 12 : 6); i++) {
             verts[ i ].fColor = hexColor;
             verts[ i ].fPoint.fZ = 0;
         }
 
-        for( i = 0, j = 0; i < thisCount; i++, j += 6 )
-        {
+        for (i = 0, j = 0; i < thisCount; i++, j += 6) {
             c = strPtr[ i ];
+
             // make sure its a character we will display
-            if ( DisplayableChar(c) )
-            {
+            if (DisplayableChar(c)) {
                 width = fCharInfo[ c ].fW + 1;
                 height = fCharInfo[ c ].fH + 1;
 
-                if( rightEdge > 0 && x + width + italOffset >= rightEdge )
-                {
+                if (rightEdge > 0 && x + width + italOffset >= rightEdge) {
                     count = 0;
                     thisCount = i;
                     break;
@@ -303,13 +302,12 @@ void    plTextFont::DrawString( const char *string, int sX, int sY, uint32_t hex
             }
         }
 
-        if( thisCount == 0 )
+        if (thisCount == 0) {
             break;
+        }
 
-        if( style & plDebugText::kStyleBold )
-        {
-            for( i = 0; i < thisCount * 6; i++, j++ )
-            {
+        if (style & plDebugText::kStyleBold) {
+            for (i = 0; i < thisCount * 6; i++, j++) {
                 verts[ j ] = verts[ i ];
                 verts[ j ].fPoint.fX = verts[ j ].fPoint.fX + 1.0f;
             }
@@ -317,36 +315,37 @@ void    plTextFont::DrawString( const char *string, int sX, int sY, uint32_t hex
 
         /// TEMPORARY DEBUG ONLY: see if we can catch this stupid random draw bug
 #if 0
-        for( i = 0; i < thisCount * ( ( style & plDebugText::kStyleBold ) ? 12 : 6 ); i += 3 )
-        {
-            for( j = 0; j < 3; j++ )
-            {
-                hsAssert( verts[ i + j ].fPoint.fX >= 0, "Text point out of range" );
-                hsAssert( verts[ i + j ].fPoint.fY >= 0, "Text point out of range" );
-                hsAssert( verts[ i + j ].fPoint.fX < 1024, "Text point out of range" );
-                hsAssert( verts[ i + j ].fPoint.fY < 768, "Text point out of range" );
+
+        for (i = 0; i < thisCount * ((style & plDebugText::kStyleBold) ? 12 : 6); i += 3) {
+            for (j = 0; j < 3; j++) {
+                hsAssert(verts[ i + j ].fPoint.fX >= 0, "Text point out of range");
+                hsAssert(verts[ i + j ].fPoint.fY >= 0, "Text point out of range");
+                hsAssert(verts[ i + j ].fPoint.fX < 1024, "Text point out of range");
+                hsAssert(verts[ i + j ].fPoint.fY < 768, "Text point out of range");
             }
-            int lt = ( verts[ i ].fPoint.fX < verts[ i + 1 ].fPoint.fX ? verts[ i ].fPoint.fX : verts[ i + 1 ].fPoint.fX );
-            lt = ( verts[ i + 2 ].fPoint.fX < lt ? verts[ i + 2 ].fPoint.fX : lt );
 
-            int tp = ( verts[ i ].fPoint.fY < verts[ i + 1 ].fPoint.fY ? verts[ i ].fPoint.fY : verts[ i + 1 ].fPoint.fY );
-            tp = ( verts[ i + 2 ].fPoint.fY < tp ? verts[ i + 2 ].fPoint.fY : tp );
+            int lt = (verts[ i ].fPoint.fX < verts[ i + 1 ].fPoint.fX ? verts[ i ].fPoint.fX : verts[ i + 1 ].fPoint.fX);
+            lt = (verts[ i + 2 ].fPoint.fX < lt ? verts[ i + 2 ].fPoint.fX : lt);
 
-            int rt = ( verts[ i ].fPoint.fX > verts[ i + 1 ].fPoint.fX ? verts[ i ].fPoint.fX : verts[ i + 1 ].fPoint.fX );
-            rt = ( verts[ i + 2 ].fPoint.fX > rt ? verts[ i + 2 ].fPoint.fX : rt );
+            int tp = (verts[ i ].fPoint.fY < verts[ i + 1 ].fPoint.fY ? verts[ i ].fPoint.fY : verts[ i + 1 ].fPoint.fY);
+            tp = (verts[ i + 2 ].fPoint.fY < tp ? verts[ i + 2 ].fPoint.fY : tp);
 
-            int bt = ( verts[ i ].fPoint.fY > verts[ i + 1 ].fPoint.fY ? verts[ i ].fPoint.fY : verts[ i + 1 ].fPoint.fY );
-            bt = ( verts[ i + 2 ].fPoint.fY > bt ? verts[ i + 2 ].fPoint.fY : bt );
+            int rt = (verts[ i ].fPoint.fX > verts[ i + 1 ].fPoint.fX ? verts[ i ].fPoint.fX : verts[ i + 1 ].fPoint.fX);
+            rt = (verts[ i + 2 ].fPoint.fX > rt ? verts[ i + 2 ].fPoint.fX : rt);
 
-            hsAssert( rt - lt < 32, "Text character too big" );
-            hsAssert( bt - tp < 32, "Text character too big" );
+            int bt = (verts[ i ].fPoint.fY > verts[ i + 1 ].fPoint.fY ? verts[ i ].fPoint.fY : verts[ i + 1 ].fPoint.fY);
+            bt = (verts[ i + 2 ].fPoint.fY > bt ? verts[ i + 2 ].fPoint.fY : bt);
+
+            hsAssert(rt - lt < 32, "Text character too big");
+            hsAssert(bt - tp < 32, "Text character too big");
         }
+
 #endif
         /// TEMPORARY DEBUG ONLY: see if we can catch this stupid random draw bug
 
-        
+
         /// Draw a set of tris now
-        IDrawPrimitive( thisCount * ( ( style & plDebugText::kStyleBold ) ? 4 : 2 ), verts.AcquireArray() );
+        IDrawPrimitive(thisCount * ((style & plDebugText::kStyleBold) ? 4 : 2), verts.AcquireArray());
 
         strPtr += thisCount;
     }
@@ -356,19 +355,20 @@ void    plTextFont::DrawString( const char *string, int sX, int sY, uint32_t hex
 
 //// CalcStringWidth //////////////////////////////////////////////////////////
 
-uint32_t  plTextFont::CalcStringWidth( const char *string )
+uint32_t  plTextFont::CalcStringWidth(const char* string)
 {
     int     i, width = 0;
 
 
-    if( !fInitialized )
+    if (!fInitialized) {
         IInitObjects();
-    
-    for( i = 0; i < strlen( string ); i++ )
-    {
+    }
+
+    for (i = 0; i < strlen(string); i++) {
         // make sure its a character we will display
-        if ( DisplayableChar(string[i]) )
+        if (DisplayableChar(string[i])) {
             width += fCharInfo[ string[ i ] ].fW + 2;
+        }
     }
 
     return width;
@@ -379,19 +379,20 @@ uint32_t  plTextFont::CalcStringWidth( const char *string )
 //  to create a background for our console; will be obliterated once we figure
 //  a better way to do so.
 
-void    plTextFont::DrawRect( int left, int top, int right, int bottom, uint32_t hexColor )
+void    plTextFont::DrawRect(int left, int top, int right, int bottom, uint32_t hexColor)
 {
     static hsTArray<plFontVertex>   verts;
     int                             i;
 
 
-    if( !fInitialized )
+    if (!fInitialized) {
         IInitObjects();
+    }
 
     /// Draw!
-    verts.SetCountAndZero( 6 );
-    for( i = 0; i < 6; i++ )
-    {
+    verts.SetCountAndZero(6);
+
+    for (i = 0; i < 6; i++) {
         verts[ i ].fColor = hexColor;
         verts[ i ].fPoint.fZ = 0;
         verts[ i ].fUV.fX = verts[ i ].fUV.fY = 0;
@@ -403,7 +404,7 @@ void    plTextFont::DrawRect( int left, int top, int right, int bottom, uint32_t
     verts[ 2 ].fPoint.fY = verts[ 3 ].fPoint.fY = verts[ 5 ].fPoint.fY = (float)bottom;
 
     // omg I had this at 6...just slap the dunce cap on me...-mcn
-    IDrawPrimitive( 2, verts.AcquireArray() );
+    IDrawPrimitive(2, verts.AcquireArray());
 
     /// All done!
 }
@@ -413,19 +414,20 @@ void    plTextFont::DrawRect( int left, int top, int right, int bottom, uint32_t
 //  second. I just LOOOOVE temporary functions :)
 //  Note: this way sucks. Live with it.
 
-void    plTextFont::Draw3DBorder( int left, int top, int right, int bottom, uint32_t hexColor1, uint32_t hexColor2 )
+void    plTextFont::Draw3DBorder(int left, int top, int right, int bottom, uint32_t hexColor1, uint32_t hexColor2)
 {
     static hsTArray<plFontVertex>   verts;
     int                             i;
 
 
-    if( !fInitialized )
+    if (!fInitialized) {
         IInitObjects();
+    }
 
     /// Draw!
-    verts.SetCountAndZero( 8 );
-    for( i = 0; i < 8; i++ )
-    {
+    verts.SetCountAndZero(8);
+
+    for (i = 0; i < 8; i++) {
         verts[ i ].fColor = hexColor1;
         verts[ i ].fPoint.fZ = 0;
         verts[ i ].fUV.fX = verts[ i ].fUV.fY = 0;
@@ -437,10 +439,11 @@ void    plTextFont::Draw3DBorder( int left, int top, int right, int bottom, uint
     verts[ 0 ].fPoint.fY = verts[ 1 ].fPoint.fY = verts[ 2 ].fPoint.fY = verts[ 7 ].fPoint.fY = (float)top;
     verts[ 3 ].fPoint.fY = verts[ 4 ].fPoint.fY = verts[ 5 ].fPoint.fY = verts[ 6 ].fPoint.fY = (float)bottom;
 
-    for( i = 4; i < 8; i++ )
+    for (i = 4; i < 8; i++) {
         verts[ i ].fColor = hexColor2;
+    }
 
-    IDrawLines( 4, verts.AcquireArray() );
+    IDrawLines(4, verts.AcquireArray());
 
     /// All done!
 }

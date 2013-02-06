@@ -70,25 +70,26 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //// Creation Constructor ////////////////////////////////////////////////////
 //  Use this constructor when creating a new diff buffer. Pass in the length
 //  of the final new buffer. You don't need to pass in the length of the old
-//  buffer, but if you do, it'll help this class do some internal space 
+//  buffer, but if you do, it'll help this class do some internal space
 //  optimization.
 
-plDiffBuffer::plDiffBuffer( uint32_t newLength, uint32_t oldLength )
-: fBSDiffBuffer( nil )
-, fIsBSDiff( false )
+plDiffBuffer::plDiffBuffer(uint32_t newLength, uint32_t oldLength)
+    : fBSDiffBuffer(nil)
+    , fIsBSDiff(false)
 {
-    // Basically, if the new and old lengths can both fit into 16 bits 
+    // Basically, if the new and old lengths can both fit into 16 bits
     // (not including a potential negation), then we can store all the
     // segment info as 16-bit values instead of 32.
-    if( oldLength > 0 && oldLength < 32767 && newLength < 32767 )
+    if (oldLength > 0 && oldLength < 32767 && newLength < 32767) {
         f16BitMode = true;
-    else
+    } else {
         f16BitMode = false;
+    }
 
     fNewLength = newLength;
     fStream = new hsRAMStream();
-    fStream->WriteLE32( fNewLength );
-    fStream->WriteBool( f16BitMode );
+    fStream->WriteLE32(fNewLength);
+    fStream->WriteBool(f16BitMode);
     fWriting = true;
 }
 
@@ -98,24 +99,21 @@ plDiffBuffer::plDiffBuffer( uint32_t newLength, uint32_t oldLength )
 //  will be copied, so you don't need to keep it around after you construct
 //  this object.
 
-plDiffBuffer::plDiffBuffer( void *buffer, uint32_t length )
-: fBSDiffBuffer( nil )
-, fStream( nil )
-, fIsBSDiff( false )
-, fWriting( false )
+plDiffBuffer::plDiffBuffer(void* buffer, uint32_t length)
+    : fBSDiffBuffer(nil)
+    , fStream(nil)
+    , fIsBSDiff(false)
+    , fWriting(false)
 {
     // Check to see if this uses the newer BSDiff format
-    if ( buffer && length > 32 &&
-         memcmp(buffer,"BSDIFF40",8)==0 )
-    {
+    if (buffer && length > 32 &&
+            memcmp(buffer, "BSDIFF40", 8) == 0) {
         // This is a bsdiff buffer. Use plBSDiffBuffer to handle it.
         fBSDiffBuffer = new plBSDiffBuffer(buffer, length);
         fIsBSDiff = true;
-    }
-    else
-    {
+    } else {
         fStream = new hsRAMStream();
-        fStream->Write( length, buffer );
+        fStream->Write(length, buffer);
         fStream->Rewind();
 
         fNewLength = fStream->ReadLE32();
@@ -125,10 +123,13 @@ plDiffBuffer::plDiffBuffer( void *buffer, uint32_t length )
 
 plDiffBuffer::~plDiffBuffer()
 {
-    if (fStream)
+    if (fStream) {
         delete fStream;
-    if (fBSDiffBuffer)
+    }
+
+    if (fBSDiffBuffer) {
         delete fBSDiffBuffer;
+    }
 }
 
 
@@ -137,60 +138,59 @@ plDiffBuffer::~plDiffBuffer()
 //////////////////////////////////////////////////////////////////////////////
 
 //// Add /////////////////////////////////////////////////////////////////////
-//  Add() appends an Add-New-Data operation to the diff buffer. The data 
+//  Add() appends an Add-New-Data operation to the diff buffer. The data
 //  supplied will be copied internally, so you can discard it after you call
-//  this function. 
+//  this function.
 
-void    plDiffBuffer::Add( int32_t length, void *newData )
+void    plDiffBuffer::Add(int32_t length, void* newData)
 {
-    hsAssert( fWriting, "Trying to Add() to a difference buffer that's reading" );
+    hsAssert(fWriting, "Trying to Add() to a difference buffer that's reading");
 
     // We flag our two different op types by the sign of the length. Negative
     // lengths are an add operation, positive ones are copy ops.
-    if( f16BitMode )
-        fStream->WriteLE16( -( (int16_t)length ) );
-    else
-        fStream->WriteLE32( -length );
-    fStream->Write( length, newData );
+    if (f16BitMode) {
+        fStream->WriteLE16(-((int16_t)length));
+    } else {
+        fStream->WriteLE32(-length);
+    }
+
+    fStream->Write(length, newData);
 }
 
 //// Copy ////////////////////////////////////////////////////////////////////
-//  Copy() appends a Copy-Data-From-Old operation to the diff buffer. 
+//  Copy() appends a Copy-Data-From-Old operation to the diff buffer.
 
-void    plDiffBuffer::Copy( int32_t length, uint32_t oldOffset )
+void    plDiffBuffer::Copy(int32_t length, uint32_t oldOffset)
 {
-    hsAssert( fWriting, "Trying to Copy() to a difference buffer that's reading" );
+    hsAssert(fWriting, "Trying to Copy() to a difference buffer that's reading");
 
     // We flag our two different op types by the sign of the length. Negative
     // lengths are an add operation, positive ones are copy ops.
-    if( f16BitMode )
-    {
-        fStream->WriteLE16( (int16_t)length );
-        fStream->WriteLE16( (uint16_t)oldOffset );
-    }
-    else
-    {
-        fStream->WriteLE32( length );
-        fStream->WriteLE32( oldOffset );
+    if (f16BitMode) {
+        fStream->WriteLE16((int16_t)length);
+        fStream->WriteLE16((uint16_t)oldOffset);
+    } else {
+        fStream->WriteLE32(length);
+        fStream->WriteLE32(oldOffset);
     }
 }
 
 //// GetBuffer ///////////////////////////////////////////////////////////////
 //  GetBuffer() will copy the diff stream into a new buffer and return it.
-//  You are responsible for freeing the buffer. Call this once you're done 
+//  You are responsible for freeing the buffer. Call this once you're done
 //  adding ops and want the raw data to write out somewhere. Note: this
 //  function will rewind the diff stream, so once you call it, you can't do
 //  anything else on the object.
 
-void    plDiffBuffer::GetBuffer( uint32_t &length, void *&bufferPtr )
+void    plDiffBuffer::GetBuffer(uint32_t& length, void*& bufferPtr)
 {
-    hsAssert( fWriting, "Trying to GetBuffer() on a difference buffer that's reading" );
+    hsAssert(fWriting, "Trying to GetBuffer() on a difference buffer that's reading");
 
     length = fStream->GetPosition();
-    bufferPtr = (void *)new uint8_t[ length ];
+    bufferPtr = (void*)new uint8_t[ length ];
 
     fStream->Rewind();
-    fStream->Read( length, bufferPtr );
+    fStream->Read(length, bufferPtr);
 }
 
 
@@ -199,68 +199,65 @@ void    plDiffBuffer::GetBuffer( uint32_t &length, void *&bufferPtr )
 //////////////////////////////////////////////////////////////////////////////
 
 //// Apply ///////////////////////////////////////////////////////////////////
-//  Apply() will take this diff buffer and apply it to the given old buffer, 
-//  allocating and producing a new buffer. You are responsible for freeing 
+//  Apply() will take this diff buffer and apply it to the given old buffer,
+//  allocating and producing a new buffer. You are responsible for freeing
 //  the new buffer.
 
 #define hsAssertAndBreak( cond, msg ) { if( cond ) { hsAssert( false, msg ); break; } }
 
-void    plDiffBuffer::Apply( uint32_t oldLength, void *oldBuffer, uint32_t &newLength, void *&newBuffer )
+void    plDiffBuffer::Apply(uint32_t oldLength, void* oldBuffer, uint32_t& newLength, void*& newBuffer)
 {
-    hsAssert( !fWriting, "Trying to Apply() a difference buffer that's writing" );
+    hsAssert(!fWriting, "Trying to Apply() a difference buffer that's writing");
 
     // Is this is a BSDiff patch, use plBSDiffBuffer and return.
-    if (fIsBSDiff)
-    {
+    if (fIsBSDiff) {
         fBSDiffBuffer->Apply(oldLength, oldBuffer, newLength, newBuffer);
         return;
     }
 
     /// Step 1: Allocate the new buffer
     newLength = fNewLength;
-    uint8_t *new8Buffer = new uint8_t[ newLength ];
-    uint8_t *old8Buffer = (uint8_t *)oldBuffer;
-    newBuffer = (void *)new8Buffer;
+    uint8_t* new8Buffer = new uint8_t[ newLength ];
+    uint8_t* old8Buffer = (uint8_t*)oldBuffer;
+    newBuffer = (void*)new8Buffer;
 
 
     /// Step 2: Loop through the difference stream
     int32_t   opLength;
     uint32_t  newBufferPos = 0;
-    while( newBufferPos < newLength )
-    {
+
+    while (newBufferPos < newLength) {
         // Read in the op length
-        if( f16BitMode )
-        {
+        if (f16BitMode) {
             int16_t opLen16 = fStream->ReadLE16();
-            if( opLen16 < 0 )
-                opLength = -( (int32_t)( -opLen16 ) );
-            else
+
+            if (opLen16 < 0) {
+                opLength = -((int32_t)(-opLen16));
+            } else {
                 opLength = (uint32_t)opLen16;
-        }
-        else
+            }
+        } else {
             opLength = fStream->ReadLE32();
+        }
 
         // As defined, negative ops are add ops, positive ones are copys
-        if( opLength < 0 )
-        {
-            hsAssertAndBreak( newBufferPos - opLength > newLength, "Destination buffer offset in plDiffBuffer() is out of range!" );
+        if (opLength < 0) {
+            hsAssertAndBreak(newBufferPos - opLength > newLength, "Destination buffer offset in plDiffBuffer() is out of range!");
 
             // Add op, read in the added data
-            fStream->Read( -opLength, &new8Buffer[ newBufferPos ] );
+            fStream->Read(-opLength, &new8Buffer[ newBufferPos ]);
             newBufferPos += -opLength;
-        }
-        else
-        {
+        } else {
             // Copy op, so get the old offset and copy from there
             uint32_t oldOffset = f16BitMode ? fStream->ReadLE16() : fStream->ReadLE32();
 
-            hsAssertAndBreak( newBufferPos + opLength > newLength, "Destination buffer offset in plDiffBuffer() is out of range!" );
-            hsAssertAndBreak( oldOffset + opLength > oldLength, "Difference buffer offset in plDiffBuffer() is out of range of the old buffer!" );
+            hsAssertAndBreak(newBufferPos + opLength > newLength, "Destination buffer offset in plDiffBuffer() is out of range!");
+            hsAssertAndBreak(oldOffset + opLength > oldLength, "Difference buffer offset in plDiffBuffer() is out of range of the old buffer!");
 
-            memcpy( &new8Buffer[ newBufferPos ], old8Buffer + oldOffset, opLength );
+            memcpy(&new8Buffer[ newBufferPos ], old8Buffer + oldOffset, opLength);
             newBufferPos += opLength;
         }
     }
 
-    hsAssert( newBufferPos == newLength, "Invalid sequence of difference ops in plDiffBuffer::Apply()" );
+    hsAssert(newBufferPos == newLength, "Invalid sequence of difference ops in plDiffBuffer::Apply()");
 }

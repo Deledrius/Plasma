@@ -72,8 +72,7 @@ class plCoopCoordinator;
     the other avatar.
     A possible future optimization would be to send them only to the involved players.
 */
-class plAvCoopMsg : public plMessage
-{
+class plAvCoopMsg : public plMessage {
 public:
 
     /////////////////////////////////////////////////////////////////////////////////////
@@ -100,16 +99,16 @@ public:
     // constructors
     plAvCoopMsg();
     plAvCoopMsg(Command cmd, uint32_t id, uint16_t serial);
-    plAvCoopMsg(plKey sender, plCoopCoordinator *coordinateur);
+    plAvCoopMsg(plKey sender, plCoopCoordinator* coordinateur);
     ~plAvCoopMsg();
 
     // rtti
-    CLASSNAME_REGISTER( plAvCoopMsg );
-    GETINTERFACE_ANY( plAvCoopMsg, plMessage);
+    CLASSNAME_REGISTER(plAvCoopMsg);
+    GETINTERFACE_ANY(plAvCoopMsg, plMessage);
 
     // i/o
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     /////////////////////////////////////////////////////////////////////////////////////
     //
@@ -122,7 +121,7 @@ public:
 
     Command fCommand;
 
-    plCoopCoordinator *fCoordinator;        // optional
+    plCoopCoordinator* fCoordinator;        // optional
 };
 
 #endif

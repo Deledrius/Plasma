@@ -71,8 +71,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "MaxMain/plPlasmaRefMsgs.h"
 
-enum
-{
+enum {
     kRespAnimComp,
     kRespAnimLoop,
     kRespAnimType,
@@ -81,8 +80,7 @@ enum
     kRespAnimObjectType,
 };
 
-enum AnimObjectType
-{
+enum AnimObjectType {
     kNodePB,        // Use the node in the PB
     kNodeResponder  // Use the node the responder is attached to
 };
@@ -94,14 +92,13 @@ plResponderCmdAnim& plResponderCmdAnim::Instance()
 }
 
 // Use the old types, for backwards compatibility
-enum 
-{
-    kRespondPlayAnim, 
-    kRespondStopAnim, 
-    kRespondToggleAnim, 
+enum {
+    kRespondPlayAnim,
+    kRespondStopAnim,
+    kRespondToggleAnim,
     kRespondLoopAnimOn,
-    kRespondLoopAnimOff, 
-    kRespondSetForeAnim=7,
+    kRespondLoopAnimOff,
+    kRespondSetForeAnim = 7,
     kRespondSetBackAnim,
 
     kRespondPlaySound,
@@ -109,14 +106,14 @@ enum
     kRespondToggleSound,
     kRespondSyncedPlaySound,
 
-    kRespondPlayRndSound=19,
+    kRespondPlayRndSound = 19,
     kRespondStopRndSound,
     kRespondToggleRndSound,
 
     kRespondRewindAnim,
     kRespondRewindSound,
     kRespondFastForwardAnim,
-    
+
     kNumTypes = 16
 };
 
@@ -127,13 +124,12 @@ int plResponderCmdAnim::NumTypes()
 
 static int IndexToOldType(int idx)
 {
-    static int oldTypes[] =
-    {
+    static int oldTypes[] = {
         kRespondPlayAnim,
-        kRespondStopAnim, 
-        kRespondToggleAnim, 
+        kRespondStopAnim,
+        kRespondToggleAnim,
         kRespondLoopAnimOn,
-        kRespondLoopAnimOff, 
+        kRespondLoopAnimOff,
         kRespondSetForeAnim,
         kRespondSetBackAnim,
 
@@ -155,12 +151,11 @@ static int IndexToOldType(int idx)
     return oldTypes[idx];
 }
 
-const char *plResponderCmdAnim::GetCategory(int idx)
+const char* plResponderCmdAnim::GetCategory(int idx)
 {
     int type = IndexToOldType(idx);
 
-    switch (type)
-    {
+    switch (type) {
     case kRespondPlayAnim:
     case kRespondStopAnim:
     case kRespondToggleAnim:
@@ -188,12 +183,11 @@ const char *plResponderCmdAnim::GetCategory(int idx)
     return nil;
 }
 
-const char *plResponderCmdAnim::GetName(int idx)
+const char* plResponderCmdAnim::GetName(int idx)
 {
     int type = IndexToOldType(idx);
 
-    switch (type)
-    {
+    switch (type) {
     case kRespondPlayAnim:
     case kRespondPlaySound:
     case kRespondPlayRndSound:
@@ -211,18 +205,23 @@ const char *plResponderCmdAnim::GetName(int idx)
 
     case kRespondLoopAnimOn:
         return "Set Looping On";
+
     case kRespondLoopAnimOff:
         return "Set Looping Off";
+
     case kRespondSetForeAnim:
         return "Set Forwards";
+
     case kRespondSetBackAnim:
         return "Set Backwards";
 
     case kRespondRewindAnim:
     case kRespondRewindSound:
         return "Rewind";
+
     case kRespondFastForwardAnim:
         return "Fast Forward";
+
     case kRespondSyncedPlaySound:
         return "Synched Play";
     }
@@ -230,37 +229,69 @@ const char *plResponderCmdAnim::GetName(int idx)
     return nil;
 }
 
-static const char *GetShortName(int type)
+static const char* GetShortName(int type)
 {
-    switch (type)
-    {
-    case kRespondPlayAnim:          return "Anim Play";
-    case kRespondStopAnim:          return "Anim Stop";
-    case kRespondToggleAnim:        return "Anim Toggle";
-    case kRespondLoopAnimOn:        return "Anim Loop On";
-    case kRespondLoopAnimOff:       return "Anim Loop Off";
-    case kRespondSetForeAnim:       return "Anim Set Fore";
-    case kRespondSetBackAnim:       return "Anim Set Back";
-    case kRespondPlaySound:         return "Snd Play";
-    case kRespondSyncedPlaySound:   return "Snd Synched Play";
-    case kRespondStopSound:         return "Snd Stop";
-    case kRespondToggleSound:       return "Snd Toggle";
-    case kRespondPlayRndSound:      return "Rnd Snd Play";
-    case kRespondStopRndSound:      return "Rnd Snd Stop";
-    case kRespondToggleRndSound:    return "Rnd Snd Toggle";
-    case kRespondRewindAnim:        return "Anim Rewind";
-    case kRespondRewindSound:       return "Snd Rewind";
-    case kRespondFastForwardAnim:   return "Anim FFwd";
+    switch (type) {
+    case kRespondPlayAnim:
+        return "Anim Play";
+
+    case kRespondStopAnim:
+        return "Anim Stop";
+
+    case kRespondToggleAnim:
+        return "Anim Toggle";
+
+    case kRespondLoopAnimOn:
+        return "Anim Loop On";
+
+    case kRespondLoopAnimOff:
+        return "Anim Loop Off";
+
+    case kRespondSetForeAnim:
+        return "Anim Set Fore";
+
+    case kRespondSetBackAnim:
+        return "Anim Set Back";
+
+    case kRespondPlaySound:
+        return "Snd Play";
+
+    case kRespondSyncedPlaySound:
+        return "Snd Synched Play";
+
+    case kRespondStopSound:
+        return "Snd Stop";
+
+    case kRespondToggleSound:
+        return "Snd Toggle";
+
+    case kRespondPlayRndSound:
+        return "Rnd Snd Play";
+
+    case kRespondStopRndSound:
+        return "Rnd Snd Stop";
+
+    case kRespondToggleRndSound:
+        return "Rnd Snd Toggle";
+
+    case kRespondRewindAnim:
+        return "Anim Rewind";
+
+    case kRespondRewindSound:
+        return "Snd Rewind";
+
+    case kRespondFastForwardAnim:
+        return "Anim FFwd";
     }
 
     return nil;
 }
-const char *plResponderCmdAnim::GetInstanceName(IParamBlock2 *pb)
+const char* plResponderCmdAnim::GetInstanceName(IParamBlock2* pb)
 {
     static char name[256];
 
-    const char *shortName = GetShortName(pb->GetInt(kRespAnimType));
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(kRespAnimComp);
+    const char* shortName = GetShortName(pb->GetInt(kRespAnimType));
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(kRespAnimComp);
     sprintf(name, "%s (%s)", shortName, node ? node->GetName() : "none");
 
     return name;
@@ -269,98 +300,116 @@ const char *plResponderCmdAnim::GetInstanceName(IParamBlock2 *pb)
 static bool IsSoundMsg(int type)
 {
     if (type == kRespondPlaySound ||
-        type == kRespondSyncedPlaySound ||
-        type == kRespondStopSound ||
-        type == kRespondToggleSound ||
-        type == kRespondPlayRndSound ||
-        type == kRespondStopRndSound ||
-        type == kRespondToggleRndSound ||
-        type == kRespondRewindSound)
+            type == kRespondSyncedPlaySound ||
+            type == kRespondStopSound ||
+            type == kRespondToggleSound ||
+            type == kRespondPlayRndSound ||
+            type == kRespondStopRndSound ||
+            type == kRespondToggleRndSound ||
+            type == kRespondRewindSound) {
         return true;
+    }
+
     return false;
 }
 
-plComponentBase *plResponderCmdAnim::GetComponent(IParamBlock2 *pb)
+plComponentBase* plResponderCmdAnim::GetComponent(IParamBlock2* pb)
 {
-    plMaxNode *node = (plMaxNode*)pb->GetReferenceTarget(kRespAnimComp);
-    if (node)
+    plMaxNode* node = (plMaxNode*)pb->GetReferenceTarget(kRespAnimComp);
+
+    if (node) {
         return node->ConvertToComponent();
-    else
+    } else {
         return nil;
+    }
 }
 
-plMessage *plResponderCmdAnim::CreateMsg(plMaxNode* node, plErrorMsg *pErrMsg, IParamBlock2 *pb)
+plMessage* plResponderCmdAnim::CreateMsg(plMaxNode* node, plErrorMsg* pErrMsg, IParamBlock2* pb)
 {
-    if (IsSoundMsg(pb->GetInt(kRespAnimType)))
+    if (IsSoundMsg(pb->GetInt(kRespAnimType))) {
         return ICreateSndMsg(node, pErrMsg, pb);
-    else
+    } else {
         return ICreateAnimMsg(node, pErrMsg, pb);
+    }
 }
 
 bool GetCompAndNode(IParamBlock2* pb, plMaxNode* node, plComponentBase*& comp, plMaxNode*& targNode)
 {
-    plMaxNode *compNode = (plMaxNode*)pb->GetReferenceTarget(kRespAnimComp);
-    if (!compNode)
+    plMaxNode* compNode = (plMaxNode*)pb->GetReferenceTarget(kRespAnimComp);
+
+    if (!compNode) {
         return false;
+    }
 
     comp = compNode->ConvertToComponent();
 
     // KLUDGE: Anim group components don't need target nodes
-    if (comp->ClassID() == ANIM_GROUP_COMP_CID)
+    if (comp->ClassID() == ANIM_GROUP_COMP_CID) {
         return true;
+    }
 
-    if (pb->GetInt(kRespAnimObjectType) == kNodeResponder)
+    if (pb->GetInt(kRespAnimObjectType) == kNodeResponder) {
         targNode = node;
-    else
+    } else {
         targNode = (plMaxNode*)pb->GetReferenceTarget(kRespAnimObject);
+    }
 
-    if (!targNode)
+    if (!targNode) {
         return false;
+    }
 
-    if (!comp->IsTarget(targNode))
+    if (!comp->IsTarget(targNode)) {
         return false;
+    }
 
     return true;
 }
 
-plMessage *plResponderCmdAnim::ICreateAnimMsg(plMaxNode* node, plErrorMsg *pErrMsg, IParamBlock2 *pb)
+plMessage* plResponderCmdAnim::ICreateAnimMsg(plMaxNode* node, plErrorMsg* pErrMsg, IParamBlock2* pb)
 {
-    plAnimComponentBase *comp = nil;
-    plMaxNode *targNode = nil;
-    if (!GetCompAndNode(pb, node, (plComponentBase*&)comp, targNode))
+    plAnimComponentBase* comp = nil;
+    plMaxNode* targNode = nil;
+
+    if (!GetCompAndNode(pb, node, (plComponentBase*&)comp, targNode)) {
         throw "A valid animation component and node were not found";
+    }
 
     // Get the anim modifier keys for all nodes this comp is attached to
     plKey animKey = comp->GetModKey(targNode);
-    if (!animKey)
-        throw "Animation component didn't convert";
 
-    plAnimCmdMsg *msg = new plAnimCmdMsg;
+    if (!animKey) {
+        throw "Animation component didn't convert";
+    }
+
+    plAnimCmdMsg* msg = new plAnimCmdMsg;
     msg->AddReceiver(animKey);
 
     plString tempAnimName = comp->GetAnimName();
     msg->SetAnimName(tempAnimName);
 
     // Create and initialize a message for the command
-    switch (pb->GetInt(kRespAnimType))
-    {
+    switch (pb->GetInt(kRespAnimType)) {
     case kRespondPlayAnim:
         msg->SetCmd(plAnimCmdMsg::kContinue);
         break;
+
     case kRespondStopAnim:
         msg->SetCmd(plAnimCmdMsg::kStop);
         break;
+
     case kRespondToggleAnim:
         msg->SetCmd(plAnimCmdMsg::kToggleState);
         break;
+
     case kRespondSetForeAnim:
         msg->SetCmd(plAnimCmdMsg::kSetForewards);
         break;
+
     case kRespondSetBackAnim:
         msg->SetCmd(plAnimCmdMsg::kSetBackwards);
         break;
-    case kRespondLoopAnimOn:
-        {
+
+    case kRespondLoopAnimOn: {
             msg->SetCmd(plAnimCmdMsg::kSetLooping);
             // KLUDGE - We send the loop to play by name here, so anim grouped components
             // could have loops with different begin and end points.  However, apparently
@@ -373,6 +422,7 @@ plMessage *plResponderCmdAnim::ICreateAnimMsg(plMaxNode* node, plErrorMsg *pErrM
             msg->SetLoopName(loopName);
         }
         break;
+
     case kRespondLoopAnimOff:
         msg->SetCmd(plAnimCmdMsg::kUnSetLooping);
         break;
@@ -380,6 +430,7 @@ plMessage *plResponderCmdAnim::ICreateAnimMsg(plMaxNode* node, plErrorMsg *pErrM
     case kRespondRewindAnim:
         msg->SetCmd(plAnimCmdMsg::kGoToBegin);
         break;
+
     case kRespondFastForwardAnim:
         msg->SetCmd(plAnimCmdMsg::kGoToEnd);
         break;
@@ -388,72 +439,74 @@ plMessage *plResponderCmdAnim::ICreateAnimMsg(plMaxNode* node, plErrorMsg *pErrM
     return msg;
 }
 
-plMessage* plResponderCmdAnim::ICreateSndMsg(plMaxNode* node, plErrorMsg *pErrMsg, IParamBlock2 *pb)
+plMessage* plResponderCmdAnim::ICreateSndMsg(plMaxNode* node, plErrorMsg* pErrMsg, IParamBlock2* pb)
 {
-    plComponentBase *comp;
-    plMaxNode *targNode;
-    if (!GetCompAndNode(pb, node, comp, targNode))
+    plComponentBase* comp;
+    plMaxNode* targNode;
+
+    if (!GetCompAndNode(pb, node, comp, targNode)) {
         throw "A valid sound component and node were not found";
+    }
 
     int type = pb->GetInt(kRespAnimType);
-    switch (type)
-    {
-        case kRespondPlaySound:
-        case kRespondStopSound:
-        case kRespondToggleSound:
-        case kRespondRewindSound:
-        case kRespondSyncedPlaySound:
-        {
-            if (!targNode->GetSceneObject())
+
+    switch (type) {
+    case kRespondPlaySound:
+    case kRespondStopSound:
+    case kRespondToggleSound:
+    case kRespondRewindSound:
+    case kRespondSyncedPlaySound: {
+            if (!targNode->GetSceneObject()) {
                 throw "Sound emitter didn't export";
+            }
 
             int soundIdx = plAudioComp::GetSoundModIdx(comp, targNode);
 
             // Changed 8.26.2001 mcn - The audioInterface should be the message receiver,
             // not the audible itself.
-            const plAudioInterface *ai = targNode->GetSceneObject()->GetAudioInterface();
+            const plAudioInterface* ai = targNode->GetSceneObject()->GetAudioInterface();
             plKey key = ai->GetKey();
 
             plSoundMsg* msg = new plSoundMsg;
             msg->AddReceiver(key);
             msg->fIndex = soundIdx;
 
-            if (type == kRespondPlaySound)
+            if (type == kRespondPlaySound) {
                 msg->SetCmd(plSoundMsg::kPlay);
-            else if (type == kRespondStopSound)
+            } else if (type == kRespondStopSound) {
                 msg->SetCmd(plSoundMsg::kStop);
-            else if (type == kRespondToggleSound)
+            } else if (type == kRespondToggleSound) {
                 msg->SetCmd(plSoundMsg::kToggleState);
-            else if (type == kRespondRewindSound)
-            {
+            } else if (type == kRespondRewindSound) {
                 msg->fTime = 0;
                 msg->SetCmd(plSoundMsg::kGoToTime);
-            }
-            else if(type == kRespondSyncedPlaySound)
+            } else if (type == kRespondSyncedPlaySound) {
                 msg->SetCmd(plSoundMsg::kSynchedPlay);
+            }
 
-            if( plAudioComp::IsLocalOnly( comp ) )
-                msg->SetCmd( plSoundMsg::kIsLocalOnly );
+            if (plAudioComp::IsLocalOnly(comp)) {
+                msg->SetCmd(plSoundMsg::kIsLocalOnly);
+            }
 
             return msg;
         }
 
-        case kRespondPlayRndSound:
-        case kRespondStopRndSound:
-        case kRespondToggleRndSound:
-        {
+    case kRespondPlayRndSound:
+    case kRespondStopRndSound:
+    case kRespondToggleRndSound: {
             plKey key = plAudioComp::GetRandomSoundKey(comp, targNode);
-            if (key)
-            {
-                plAnimCmdMsg *msg = new plAnimCmdMsg;
+
+            if (key) {
+                plAnimCmdMsg* msg = new plAnimCmdMsg;
                 msg->AddReceiver(key);
 
-                if (type == kRespondPlayRndSound)
+                if (type == kRespondPlayRndSound) {
                     msg->SetCmd(plAnimCmdMsg::kContinue);
-                else if (type == kRespondStopRndSound)
+                } else if (type == kRespondStopRndSound) {
                     msg->SetCmd(plAnimCmdMsg::kStop);
-                else if (type == kRespondToggleRndSound)
+                } else if (type == kRespondToggleRndSound) {
                     msg->SetCmd(plAnimCmdMsg::kToggleState);
+                }
 
                 return msg;
             }
@@ -463,60 +516,67 @@ plMessage* plResponderCmdAnim::ICreateSndMsg(plMaxNode* node, plErrorMsg *pErrMs
     throw "Unknown sound command";
 }
 
-bool plResponderCmdAnim::IsWaitable(IParamBlock2 *pb)
+bool plResponderCmdAnim::IsWaitable(IParamBlock2* pb)
 {
     int type = pb->GetInt(kRespAnimType);
+
     if (type == kRespondPlayAnim ||
-        type == kRespondToggleAnim ||
-        type == kRespondStopAnim ||
-        type == kRespondPlaySound ||
-        type == kRespondSyncedPlaySound ||
-        type == kRespondToggleSound)
+            type == kRespondToggleAnim ||
+            type == kRespondStopAnim ||
+            type == kRespondPlaySound ||
+            type == kRespondSyncedPlaySound ||
+            type == kRespondToggleSound) {
         return true;
+    }
 
     return false;
 }
 
-void plResponderCmdAnim::GetWaitPoints(IParamBlock2 *pb, WaitPoints& waitPoints)
+void plResponderCmdAnim::GetWaitPoints(IParamBlock2* pb, WaitPoints& waitPoints)
 {
     int type = pb->GetInt(kRespAnimType);
-    
-    // Don't try and get points for the stop anim, it can only stop at a stop point
-    if (type == kRespondStopAnim || IsSoundMsg(type))
-        return;
 
-    plAnimComponent *animComp = (plAnimComponent*)GetComponent(pb);
+    // Don't try and get points for the stop anim, it can only stop at a stop point
+    if (type == kRespondStopAnim || IsSoundMsg(type)) {
+        return;
+    }
+
+    plAnimComponent* animComp = (plAnimComponent*)GetComponent(pb);
     plString animName = animComp->GetAnimName();
 
-    if (animComp)
-    {
+    if (animComp) {
         plNotetrackAnim notetrackAnim(animComp, nil);
         plAnimInfo info = notetrackAnim.GetAnimInfo(animName);
         plString marker;
-        while (!(marker = info.GetNextMarkerName()).IsNull())
+
+        while (!(marker = info.GetNextMarkerName()).IsNull()) {
             waitPoints.push_back(marker);
+        }
     }
 }
 
-void plResponderCmdAnim::CreateWait(plMaxNode* node, plErrorMsg* pErrMsg, IParamBlock2 *pb, ResponderWaitInfo& waitInfo)
+void plResponderCmdAnim::CreateWait(plMaxNode* node, plErrorMsg* pErrMsg, IParamBlock2* pb, ResponderWaitInfo& waitInfo)
 {
-    plAnimCmdMsg *animMsg = plAnimCmdMsg::ConvertNoRef(waitInfo.msg);
-    if (animMsg)
+    plAnimCmdMsg* animMsg = plAnimCmdMsg::ConvertNoRef(waitInfo.msg);
+
+    if (animMsg) {
         animMsg->SetCmd(plAnimCmdMsg::kAddCallbacks);
+    }
 
-    plSoundMsg *soundMsg = plSoundMsg::ConvertNoRef(waitInfo.msg);
-    if (soundMsg)
+    plSoundMsg* soundMsg = plSoundMsg::ConvertNoRef(waitInfo.msg);
+
+    if (soundMsg) {
         soundMsg->SetCmd(plSoundMsg::kAddCallbacks);
+    }
 
-    plEventCallbackMsg *eventMsg = new plEventCallbackMsg;
+    plEventCallbackMsg* eventMsg = new plEventCallbackMsg;
     eventMsg->AddReceiver(waitInfo.receiver);
     eventMsg->fRepeats = 0;
     eventMsg->fUser = waitInfo.callbackUser;
 
-    if (!waitInfo.point.IsNull())
-    {
+    if (!waitInfo.point.IsNull()) {
         // FIXME COLIN - Error checking here?
-        plAnimComponent *animComp = (plAnimComponent*)GetComponent(pb);
+        plAnimComponent* animComp = (plAnimComponent*)GetComponent(pb);
         plString animName = animComp->GetAnimName();
 
         plNotetrackAnim notetrackAnim(animComp, nil);
@@ -524,21 +584,20 @@ void plResponderCmdAnim::CreateWait(plMaxNode* node, plErrorMsg* pErrMsg, IParam
 
         eventMsg->fEvent = kTime;
         eventMsg->fEventTime = info.GetMarkerTime(waitInfo.point);
-    }
-    else
+    } else {
         eventMsg->fEvent = kStop;
+    }
 
-    plMessageWithCallbacks *callbackMsg = plMessageWithCallbacks::ConvertNoRef(waitInfo.msg);
+    plMessageWithCallbacks* callbackMsg = plMessageWithCallbacks::ConvertNoRef(waitInfo.msg);
     callbackMsg->AddCallback(eventMsg);
     // AddCallback adds it's own ref, so remove ours (the default of 1)
     hsRefCnt_SafeUnRef(eventMsg);
 }
 
-class plResponderAnimProc : public plAnimCompProc
-{
+class plResponderAnimProc : public plAnimCompProc {
 public:
     plResponderAnimProc();
-    virtual BOOL DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    virtual BOOL DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 protected:
     virtual void IPickComponent(IParamBlock2* pb);
@@ -559,13 +618,11 @@ plResponderAnimProc::plResponderAnimProc()
     fNodeParamID    = kRespAnimObject;
 }
 
-BOOL plResponderAnimProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL plResponderAnimProc::DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
-    case WM_INITDIALOG:
-        {
-            IParamBlock2 *pb = pm->GetParamBlock();
+    switch (msg) {
+    case WM_INITDIALOG: {
+            IParamBlock2* pb = pm->GetParamBlock();
 
             int type = pb->GetInt(kRespAnimType);
 
@@ -573,18 +630,19 @@ BOOL plResponderAnimProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT m
             int show = (type == kRespondLoopAnimOn) ? SW_SHOW : SW_HIDE;
             ShowWindow(GetDlgItem(hWnd, IDC_LOOP_COMBO), show);
             ShowWindow(GetDlgItem(hWnd, IDC_LOOP_TEXT), show);
+
             // Resize the dialog if we're not using the loop control
-            if (type != kRespondLoopAnimOn)
-            {
+            if (type != kRespondLoopAnimOn) {
                 RECT itemRect, clientRect;
                 GetWindowRect(GetDlgItem(hWnd, IDC_LOOP_TEXT), &itemRect);
                 GetWindowRect(hWnd, &clientRect);
-                SetWindowPos(hWnd, NULL, 0, 0, clientRect.right-clientRect.left,
-                    itemRect.top-clientRect.top, SWP_NOMOVE | SWP_NOZORDER);
+                SetWindowPos(hWnd, NULL, 0, 0, clientRect.right - clientRect.left,
+                             itemRect.top - clientRect.top, SWP_NOMOVE | SWP_NOZORDER);
             }
 
-            if (IsSoundMsg(type))
+            if (IsSoundMsg(type)) {
                 SetDlgItemText(hWnd, IDC_COMP_TEXT, "Sound Component");
+            }
         }
         break;
     }
@@ -594,22 +652,19 @@ BOOL plResponderAnimProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT m
 
 bool plResponderAnimProc::IUserCommand(HWND hWnd, IParamBlock2* pb, int cmd, int resID)
 {
-    if (cmd == CBN_SELCHANGE && resID == IDC_LOOP_COMBO)
-    {
+    if (cmd == CBN_SELCHANGE && resID == IDC_LOOP_COMBO) {
         HWND hCombo = GetDlgItem(hWnd, IDC_LOOP_COMBO);
         int sel = ComboBox_GetCurSel(hCombo);
 
         // If this is an actual loop (not the entire animation) get its name and save it
-        if (sel != CB_ERR)
-        {
-            if (ComboBox_GetItemData(hCombo, sel) == 1)
-            {
+        if (sel != CB_ERR) {
+            if (ComboBox_GetItemData(hCombo, sel) == 1) {
                 char buf[256];
                 ComboBox_GetText(hCombo, buf, sizeof(buf));
                 pb->SetValue(kAnimLoop, 0, buf);
-            }
-            else
+            } else {
                 pb->SetValue(kAnimLoop, 0, "");
+            }
         }
 
         return true;
@@ -623,24 +678,20 @@ void plResponderAnimProc::IPickComponent(IParamBlock2* pb)
     std::vector<Class_ID> cids;
 
     int type = pb->GetInt(kRespAnimType);
+
     if (type == kRespondPlaySound ||
-        type == kRespondStopSound ||
-        type == kRespondToggleSound ||
-        type == kRespondRewindSound || 
-        type == kRespondSyncedPlaySound)
-    {
+            type == kRespondStopSound ||
+            type == kRespondToggleSound ||
+            type == kRespondRewindSound ||
+            type == kRespondSyncedPlaySound) {
         cids.push_back(SOUND_3D_COMPONENT_ID);
         cids.push_back(BGND_MUSIC_COMPONENT_ID);
         cids.push_back(GUI_SOUND_COMPONENT_ID);
-    }
-    else if (type == kRespondPlayRndSound ||
-            type == kRespondStopRndSound ||
-            type == kRespondToggleRndSound)
-    {
+    } else if (type == kRespondPlayRndSound ||
+               type == kRespondStopRndSound ||
+               type == kRespondToggleRndSound) {
         cids.push_back(RANDOM_SOUND_COMPONENT_ID);
-    }
-    else
-    {
+    } else {
         cids.push_back(ANIM_COMP_CID);
         cids.push_back(ANIM_GROUP_COMP_CID);
     }
@@ -655,34 +706,34 @@ ParamBlockDesc2 gResponderAnimBlock
     IDD_COMP_RESPOND_ANIM, IDS_COMP_CMD_PARAMS, 0, 0, &gResponderAnimProc,
 
     kRespAnimComp,  _T("comp"),     TYPE_REFTARG,       0, 0,
-        end,
+    end,
 
     kRespAnimObject, _T("object"),  TYPE_REFTARG,       0, 0,
-        end,
+    end,
 
     kRespAnimLoop,  _T("loop"),     TYPE_STRING,        0, 0,
-        end,
+    end,
 
     kRespAnimType,  _T("type"),     TYPE_INT,           0, 0,
-        end,
+    end,
 
     kRespAnimObjectType,    _T("objType"),  TYPE_INT,   0, 0,
-        end,
+    end,
 
     end
 );
 
-ParamBlockDesc2 *plResponderCmdAnim::GetDesc()
+ParamBlockDesc2* plResponderCmdAnim::GetDesc()
 {
     return &gResponderAnimBlock;
 }
 
-IParamBlock2 *plResponderCmdAnim::CreatePB(int idx)
+IParamBlock2* plResponderCmdAnim::CreatePB(int idx)
 {
     int type = IndexToOldType(idx);
 
     // Create the paramblock and save it's type
-    IParamBlock2 *pb = CreateParameterBlock2(&gResponderAnimBlock, nil);
+    IParamBlock2* pb = CreateParameterBlock2(&gResponderAnimBlock, nil);
     pb->SetValue(kRespAnimType, 0, type);
 
     return pb;
@@ -692,35 +743,32 @@ IParamBlock2 *plResponderCmdAnim::CreatePB(int idx)
 
 static const char* kResponderNodeName = "(Responder Node)";
 
-class plPickRespNode : public plPickCompNode
-{
+class plPickRespNode : public plPickCompNode {
 protected:
     int fTypeID;
 
-    void IAddUserType(HWND hList)
-    {
+    void IAddUserType(HWND hList) {
         int idx = ListBox_AddString(hList, kResponderNodeName);
 
         int type = fPB->GetInt(fTypeID);
-        if (type == kNodeResponder)
+
+        if (type == kNodeResponder) {
             ListBox_SetCurSel(hList, idx);
+        }
     }
 
-    void ISetUserType(plMaxNode* node, const char* userType)
-    {
-        if (userType && !strcmp(userType, kResponderNodeName))
-        {
+    void ISetUserType(plMaxNode* node, const char* userType) {
+        if (userType && !strcmp(userType, kResponderNodeName)) {
             ISetNodeValue(nil);
             fPB->SetValue(fTypeID, 0, kNodeResponder);
-        }
-        else
+        } else {
             fPB->SetValue(fTypeID, 0, kNodePB);
+        }
     }
 
 public:
     plPickRespNode(IParamBlock2* pb, int nodeParamID, int typeID, plComponentBase* comp) :
-      plPickCompNode(pb, nodeParamID, comp), fTypeID(typeID)
-    {
+        plPickCompNode(pb, nodeParamID, comp), fTypeID(typeID) {
     }
 };
 
@@ -732,18 +780,22 @@ void plResponderAnimProc::IPickNode(IParamBlock2* pb, plComponentBase* comp)
 
 #include "plNotetrackAnim.h"
 
-void plResponderAnimProc::ILoadUser(HWND hWnd, IParamBlock2 *pb)
+void plResponderAnimProc::ILoadUser(HWND hWnd, IParamBlock2* pb)
 {
     // Premptive strike.  If this isn't a loop, don't bother!
     int type = pb->GetInt(kRespAnimType);
-    if (type != kRespondLoopAnimOn)
+
+    if (type != kRespondLoopAnimOn) {
         return;
+    }
 
     HWND hLoop = GetDlgItem(hWnd, IDC_LOOP_COMBO);
 
-    const char *savedName = pb->GetStr(kAnimLoop);
-    if (!savedName)
+    const char* savedName = pb->GetStr(kAnimLoop);
+
+    if (!savedName) {
         savedName = "";
+    }
 
     // Reset the combo and add the default selection
     ComboBox_ResetContent(hLoop);
@@ -751,9 +803,9 @@ void plResponderAnimProc::ILoadUser(HWND hWnd, IParamBlock2 *pb)
     ComboBox_SetCurSel(hLoop, sel);
 
     // FIXME
-    plComponentBase *comp = plResponderCmdAnim::Instance().GetComponent(pb);
-    if (comp && comp->ClassID() == ANIM_COMP_CID)
-    {
+    plComponentBase* comp = plResponderCmdAnim::Instance().GetComponent(pb);
+
+    if (comp && comp->ClassID() == ANIM_COMP_CID) {
         plString animName = ((plAnimComponent*)comp)->GetAnimName();
 
         // Get the shared animations for all the nodes this component is applied to
@@ -761,30 +813,28 @@ void plResponderAnimProc::ILoadUser(HWND hWnd, IParamBlock2 *pb)
         plAnimInfo info = anim.GetAnimInfo(animName);
         // Get all the loops in this animation
         plString loopName;
-        while (!(loopName = info.GetNextLoopName()).IsNull())
-        {
+
+        while (!(loopName = info.GetNextLoopName()).IsNull()) {
             int idx = ComboBox_AddString(hLoop, loopName.c_str());
             ComboBox_SetItemData(hLoop, idx, 1);
 
-            if (!loopName.Compare(savedName))
+            if (!loopName.Compare(savedName)) {
                 ComboBox_SetCurSel(hLoop, idx);
+            }
         }
 
         EnableWindow(hLoop, TRUE);
-    }
-    else
-    {
+    } else {
         EnableWindow(hLoop, FALSE);
     }
 }
 
 void plResponderAnimProc::IUpdateNodeButton(HWND hWnd, IParamBlock2* pb)
 {
-    if (pb->GetInt(kRespAnimObjectType) == kNodeResponder)
-    {
+    if (pb->GetInt(kRespAnimObjectType) == kNodeResponder) {
         HWND hButton = GetDlgItem(hWnd, IDC_OBJ_BUTTON);
         SetWindowText(hButton, kResponderNodeName);
-    }
-    else
+    } else {
         plAnimCompProc::IUpdateNodeButton(hWnd, pb);
+    }
 }

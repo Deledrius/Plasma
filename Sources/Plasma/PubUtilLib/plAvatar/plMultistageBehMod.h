@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plAnimStageVec;
 
-class plMultistageBehMod : public plSingleModifier
-{
+class plMultistageBehMod : public plSingleModifier {
 protected:
     plAnimStageVec* fStages;
     bool fFreezePhys;
@@ -60,28 +59,38 @@ protected:
     std::vector<plKey> fReceivers;
 
     void IDeleteStageVec();
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return true; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return true;
+    }
 
 public:
     plMultistageBehMod();
     plMultistageBehMod(plAnimStageVec* stages, bool freezePhys, bool smartSeek, bool reverseFBControlsOnRelease, std::vector<plKey>* receivers);
     virtual ~plMultistageBehMod();
-    
-    CLASSNAME_REGISTER( plMultistageBehMod );
-    GETINTERFACE_ANY( plMultistageBehMod, plSingleModifier );
 
-    bool NetProp() { return fNetProp; }
-    bool NetForce() { return fNetForce; }
+    CLASSNAME_REGISTER(plMultistageBehMod);
+    GETINTERFACE_ANY(plMultistageBehMod, plSingleModifier);
 
-    void SetNetProp(bool netProp) { fNetProp = netProp; }
-    void SetNetForce(bool netForce) { fNetForce = netForce; }
-    
+    bool NetProp() {
+        return fNetProp;
+    }
+    bool NetForce() {
+        return fNetForce;
+    }
+
+    void SetNetProp(bool netProp) {
+        fNetProp = netProp;
+    }
+    void SetNetForce(bool netForce) {
+        fNetForce = netForce;
+    }
+
     bool MsgReceive(plMessage* msg);
 
-    virtual void Init(plAnimStageVec *stages, bool freezePhys, bool smartSeek, bool reverseFBControlsOnRelease, std::vector<plKey>* receivers);
+    virtual void Init(plAnimStageVec* stages, bool freezePhys, bool smartSeek, bool reverseFBControlsOnRelease, std::vector<plKey>* receivers);
 
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 };
 
 #endif // plMultistageBehMod_h_inc

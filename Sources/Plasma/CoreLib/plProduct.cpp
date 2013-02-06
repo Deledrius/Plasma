@@ -47,9 +47,18 @@ static_assert(PRODUCT_BUILD_ID > 0, "Build ID cannot be zero");
 static_assert(PRODUCT_BUILD_TYPE > 0, "Build Type cannot be zero");
 static_assert(PRODUCT_BRANCH_ID > 0, "Branch ID cannot be zero");
 
-uint32_t plProduct::BuildId() { return PRODUCT_BUILD_ID; }
-uint32_t plProduct::BuildType() { return PRODUCT_BUILD_TYPE; }
-uint32_t plProduct::BranchId() { return PRODUCT_BRANCH_ID; }
+uint32_t plProduct::BuildId()
+{
+    return PRODUCT_BUILD_ID;
+}
+uint32_t plProduct::BuildType()
+{
+    return PRODUCT_BUILD_TYPE;
+}
+uint32_t plProduct::BranchId()
+{
+    return PRODUCT_BRANCH_ID;
+}
 
 plString plProduct::CoreName()
 {
@@ -69,7 +78,10 @@ plString plProduct::LongName()
     return _longName;
 }
 
-const char *plProduct::UUID() { return PRODUCT_UUID; }
+const char* plProduct::UUID()
+{
+    return PRODUCT_UUID;
+}
 
 
 #ifdef PLASMA_EXTERNAL_RELEASE
@@ -87,7 +99,7 @@ const char *plProduct::UUID() { return PRODUCT_UUID; }
 plString plProduct::ProductString()
 {
     static plString _cache = plString::Format(
-            "%s.%u.%u - " RELEASE_ACCESS "." RELEASE_TYPE,
-            CoreName().c_str(), BranchId(), BuildId());
+                                 "%s.%u.%u - " RELEASE_ACCESS "." RELEASE_TYPE,
+                                 CoreName().c_str(), BranchId(), BuildId());
     return _cache;
 }

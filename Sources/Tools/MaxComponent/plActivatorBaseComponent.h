@@ -52,8 +52,7 @@ class plMaxNode;
 
 #define ACTIVATOR_BASE_CID Class_ID(0x23915577, 0x2d0f4cdd)
 
-class plActivatorBaseComponent : public plPhysicCoreComponent
-{
+class plActivatorBaseComponent : public plPhysicCoreComponent {
 public:
     typedef std::map<plMaxNode*, plKey> LogicKeys;
 protected:
@@ -68,17 +67,22 @@ protected:
 public:
     // Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg* pErrMsg);
-    virtual bool DeInit(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool DeInit(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    const LogicKeys& GetLogicKeys() { return fLogicModKeys; }
+    const LogicKeys& GetLogicKeys() {
+        return fLogicModKeys;
+    }
     virtual plKey GetLogicKey(plMaxNode* node);
-    virtual void AddReceiverKey(plKey pKey, plMaxNode* node=nil);
-    virtual bool HasLogicOut() { return false; }
+    virtual void AddReceiverKey(plKey pKey, plMaxNode* node = nil);
+    virtual bool HasLogicOut() {
+        return false;
+    }
 
-    int CanConvertToType(Class_ID obtype)
-    { return (obtype == ACTIVATOR_BASE_CID) ? 1 : plComponent::CanConvertToType(obtype); }
+    int CanConvertToType(Class_ID obtype) {
+        return (obtype == ACTIVATOR_BASE_CID) ? 1 : plComponent::CanConvertToType(obtype);
+    }
 };
 
 #endif // plActivatorBaseComponent_inc

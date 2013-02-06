@@ -43,21 +43,22 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plTweak_inc
 #define plTweak_inc
 
-template <typename T> class plTweak
-{
-    public:
-        plTweak() {}
-        plTweak(const T& init) : fVal(init) {};
+template <typename T> class plTweak {
+public:
+    plTweak() {}
+    plTweak(const T& init) : fVal(init) {};
 
-        
-        T       fVal;
-        
-        plTweak& operator=(const T& v) { fVal = v; return *this; }
 
-        operator T () const 
-        { 
-            return fVal; 
-        }
+    T       fVal;
+
+    plTweak& operator=(const T& v) {
+        fVal = v;
+        return *this;
+    }
+
+    operator T() const {
+        return fVal;
+    }
 
 };
 

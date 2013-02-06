@@ -44,6 +44,6 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plMaxAnimUtils.h"
 
-SegmentMap *GetWaveSegmentMap(const char *file, plErrorMsg *pErrMsg);
+SegmentMap* GetWaveSegmentMap(const char* file, plErrorMsg* pErrMsg);
 
 #endif

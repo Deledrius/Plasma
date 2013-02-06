@@ -81,21 +81,20 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "MaxMain/plMaxAccelerators.h"
 
-IParamBlock2 *CreateWaitBlk();
+IParamBlock2* CreateWaitBlk();
 
-class plResponderProc : public ParamMap2UserDlgProc
-{
+class plResponderProc : public ParamMap2UserDlgProc {
 protected:
     HWND fhDlg;
-    IParamBlock2 *fPB;
-    IParamBlock2 *fStatePB;
+    IParamBlock2* fPB;
+    IParamBlock2* fStatePB;
     int fCurState;
-    
-    plResponderComponent *fComp;
 
-    IParamMap2 *fCmdMap;
-    IParamMap2 *fWaitMap;
-    
+    plResponderComponent* fComp;
+
+    IParamMap2* fCmdMap;
+    IParamMap2* fWaitMap;
+
     int fCmdIdx;
 
     typedef std::map<int, const char*> NameID;
@@ -113,8 +112,10 @@ protected:
 public:
     plResponderProc();
 
-    BOOL DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    void DeleteThis() { IRemoveCmdRollups(); }
+    BOOL DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    void DeleteThis() {
+        IRemoveCmdRollups();
+    }
 
 protected:
     void ICreateMenu();
@@ -125,56 +126,59 @@ protected:
     // Add and remove command rollups
     void ICreateCmdRollups();
     void IRemoveCmdRollups();
-    IParamMap2 *ICreateMap(IParamBlock2 *pb);   // Helper
+    IParamMap2* ICreateMap(IParamBlock2* pb);   // Helper
 
     const char* GetCommandName(int cmdIdx);
     void LoadList();
 
-    BOOL DragListProc(HWND hWnd, DRAGLISTINFO *info);
+    BOOL DragListProc(HWND hWnd, DRAGLISTINFO* info);
 
-    void IDrawComboItem(DRAWITEMSTRUCT *dis);
+    void IDrawComboItem(DRAWITEMSTRUCT* dis);
 
     void LoadState();
-    
+
     void AddCommand();
     void RemoveCurCommand();
     void MoveCommand(int oldIdx, int newIdx);
 
     // Takes a freshly created state PB and adds it as a new state, then returns its index
-    int AddState(IParamBlock2 *pb);
+    int AddState(IParamBlock2* pb);
 };
 static plResponderProc gResponderComponentProc;
 
-int ResponderGetActivatorCount(plComponentBase *comp)
+int ResponderGetActivatorCount(plComponentBase* comp)
 {
-    if (comp->ClassID() == RESPONDER_CID)
+    if (comp->ClassID() == RESPONDER_CID) {
         return comp->GetParamBlockByID(plComponentBase::kBlkComp)->Count(kResponderActivators);
+    }
 
     return -1;
 }
 
-plComponentBase *ResponderGetActivator(plComponentBase *comp, int idx)
+plComponentBase* ResponderGetActivator(plComponentBase* comp, int idx)
 {
-    if (comp->ClassID() == RESPONDER_CID)
-    {
-        IParamBlock2 *pb = comp->GetParamBlockByID(plComponentBase::kBlkComp);
-        plMaxNode *activatorNode = (plMaxNode*)pb->GetINode(kResponderActivators, 0, idx);
+    if (comp->ClassID() == RESPONDER_CID) {
+        IParamBlock2* pb = comp->GetParamBlockByID(plComponentBase::kBlkComp);
+        plMaxNode* activatorNode = (plMaxNode*)pb->GetINode(kResponderActivators, 0, idx);
         return activatorNode->ConvertToComponent();
     }
 
     return nil;
 }
 
-plKey Responder::GetKey(plComponentBase *comp, plMaxNodeBase *node)
+plKey Responder::GetKey(plComponentBase* comp, plMaxNodeBase* node)
 {
-    if (comp->ClassID() != RESPONDER_CID)
+    if (comp->ClassID() != RESPONDER_CID) {
         return nil;
+    }
 
-    plResponderComponent *responder = (plResponderComponent*)comp;
-    if (responder->fModKeys.find((plMaxNode*)node) != responder->fModKeys.end())
+    plResponderComponent* responder = (plResponderComponent*)comp;
+
+    if (responder->fModKeys.find((plMaxNode*)node) != responder->fModKeys.end()) {
         return responder->fModKeys[(plMaxNode*)node];
+    }
 
-    return nil; 
+    return nil;
 }
 
 CLASS_DESC(plResponderComponent, gResponderDesc, "Responder", "Responder", COMP_TYPE_LOGIC, RESPONDER_CID)
@@ -184,14 +188,11 @@ CLASS_DESC(plResponderComponent, gResponderDesc, "Responder", "Responder", COMP_
 // changed message.  Normally, messages from component refs are ignored since
 // they pass along all the messages of the ref, which generates a lot of false
 // converts.
-class plResponderAccessor : public PBAccessor
-{
+class plResponderAccessor : public PBAccessor {
 public:
-    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t)
-    {
-        if (id == kResponderActivators || id == kResponderState)
-        {
-            plResponderComponent *comp = (plResponderComponent*)owner;
+    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t) {
+        if (id == kResponderActivators || id == kResponderState) {
+            plResponderComponent* comp = (plResponderComponent*)owner;
             comp->NotifyDependents(FOREVER, PART_ALL, REFMSG_USER_COMP_REF_CHANGED);
         }
     }
@@ -205,43 +206,43 @@ ParamBlockDesc2 gResponderBlock
     IDD_COMP_RESPOND, IDS_COMP_RESPOND, 0, 0, &gResponderComponentProc,
 
     kResponderState,    _T("state"),        TYPE_REFTARG_TAB, 0,        0, 0,
-        p_accessor,     &gResponderAccessor,
-        end,
+    p_accessor,     &gResponderAccessor,
+    end,
     kResponderStateName, _T("stateName"),   TYPE_STRING_TAB, 0,         0, 0,
-        end,
+    end,
 
     kResponderActivators,   _T("activators"),   TYPE_INODE_TAB, 0,      0, 0,
-        p_ui,           TYPE_NODELISTBOX, IDC_LIST_TARGS, 0, 0, IDC_DEL_TARGS,
-        p_accessor,     &gResponderAccessor,
-        end,
+    p_ui,           TYPE_NODELISTBOX, IDC_LIST_TARGS, 0, 0, IDC_DEL_TARGS,
+    p_accessor,     &gResponderAccessor,
+    end,
 
     kResponderStateDef, _T("defState"),     TYPE_INT,                   0, 0,
-        end,
+    end,
 
     kResponderEnabled, _T("enabled"),   TYPE_BOOL,                  0, 0,
-        p_default,  TRUE,
-        p_ui,       TYPE_SINGLECHEKBOX, IDC_ENABLED,
-        end,
+    p_default,  TRUE,
+    p_ui,       TYPE_SINGLECHEKBOX, IDC_ENABLED,
+    end,
 
     kResponderTrigger, _T("trigger"),   TYPE_BOOL,                  0, 0,
-        p_default,  TRUE,
-        p_ui,       TYPE_SINGLECHEKBOX, IDC_CHECK_TRIGGER,
-        end,
+    p_default,  TRUE,
+    p_ui,       TYPE_SINGLECHEKBOX, IDC_CHECK_TRIGGER,
+    end,
 
     kResponderUnTrigger, _T("unTrigger"),   TYPE_BOOL,              0, 0,
-        p_default,  FALSE,
-        p_ui,       TYPE_SINGLECHEKBOX, IDC_CHECK_UNTRIGGER,
-        end,
+    p_default,  FALSE,
+    p_ui,       TYPE_SINGLECHEKBOX, IDC_CHECK_UNTRIGGER,
+    end,
 
     kResponderLocalDetect, _T("localDetect"),   TYPE_BOOL,          0, 0,
-        p_default,  FALSE,
-        p_ui,       TYPE_SINGLECHEKBOX, IDC_DETECT_LOCAL_CHECK,
-        end,
+    p_default,  FALSE,
+    p_ui,       TYPE_SINGLECHEKBOX, IDC_DETECT_LOCAL_CHECK,
+    end,
 
     kResponderSkipFFSound, _T("skipFFSound"),   TYPE_BOOL,                  0, 0,
-        p_default,  FALSE,
-        p_ui,       TYPE_SINGLECHEKBOX, IDC_CHECK_SKIPFFSOUND,
-        end,
+    p_default,  FALSE,
+    p_ui,       TYPE_SINGLECHEKBOX, IDC_CHECK_SKIPFFSOUND,
+    end,
 
     end
 );
@@ -251,34 +252,35 @@ ParamBlockDesc2 gStateBlock
     kResponderStateBlk, _T("responderState"), 0, &gResponderDesc, 0,
 
     kStateCmdParams, _T("cmdParam"),    TYPE_REFTARG_TAB, 0,        0, 0,
-        end,
+    end,
 
     kStateCmdWait,  _T("cmdWait"),      TYPE_REFTARG_TAB, 0,        0, 0,
-        end,
+    end,
 
     kStateCmdSwitch, _T("cmdSwitch"),   TYPE_INT,                   0, 0,
-        end,
+    end,
 
     kStateCmdEnabled, _T("enabled"),    TYPE_BOOL_TAB, 0,           0, 0,
-        p_default,  TRUE,
-        end,
+    p_default,  TRUE,
+    end,
 
     end
 );
 
 std::vector<plResponderCmd*> gResponderCmds;
 
-plResponderCmd *plResponderCmd::Find(IParamBlock2 *pb)
+plResponderCmd* plResponderCmd::Find(IParamBlock2* pb)
 {
-    if (!pb)
+    if (!pb) {
         return nil;
+    }
 
-    ParamBlockDesc2 *pbDesc = pb->GetDesc();
+    ParamBlockDesc2* pbDesc = pb->GetDesc();
 
-    for (int i = 0; i < gResponderCmds.size(); i++)
-    {
-        if (gResponderCmds[i]->GetDesc() == pbDesc)
+    for (int i = 0; i < gResponderCmds.size(); i++) {
+        if (gResponderCmds[i]->GetDesc() == pbDesc) {
             return gResponderCmds[i];
+        }
     }
 
     return nil;
@@ -287,7 +289,7 @@ plResponderCmd *plResponderCmd::Find(IParamBlock2 *pb)
 IParamBlock2* plResponderCmd::CreatePB(int idx)
 {
     hsAssert(NumTypes() == 1, "Can't auto-create the pb for a cmd with multiple types");
-    IParamBlock2 *pb = CreateParameterBlock2(GetDesc(), nil);
+    IParamBlock2* pb = CreateParameterBlock2(GetDesc(), nil);
     return pb;
 }
 
@@ -310,8 +312,9 @@ void DummyCodeIncludeFuncResponder()
     gResponderCmds.push_back(&(plResponderCmdPhysEnable::Instance()));
     gResponderCmds.push_back(&(plResponderCmdSubWorld::Instance()));
 
-    for (int i = 0; i < gResponderCmds.size(); i++)
+    for (int i = 0; i < gResponderCmds.size(); i++) {
         gResponderCmds[i]->GetDesc()->SetClassDesc(&gResponderDesc);
+    }
 
     ResponderWait::SetDesc(&gResponderDesc);
 }
@@ -325,14 +328,13 @@ plResponderComponent::plResponderComponent()
 bool plResponderComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     int numStates = fCompPB->Count(kResponderState);
-    for (int i = 0; i < numStates; i++)
-    {
-        IParamBlock2 *statePB = (IParamBlock2*)fCompPB->GetReferenceTarget(kResponderState, 0, i);
 
-        for (int j = 0; j < statePB->Count(kStateCmdParams); j++)
-        {
-            IParamBlock2 *cmdPB = (IParamBlock2*)statePB->GetReferenceTarget(kStateCmdParams, 0, j);
-            plResponderCmd *cmd = plResponderCmd::Find(cmdPB);
+    for (int i = 0; i < numStates; i++) {
+        IParamBlock2* statePB = (IParamBlock2*)fCompPB->GetReferenceTarget(kResponderState, 0, i);
+
+        for (int j = 0; j < statePB->Count(kStateCmdParams); j++) {
+            IParamBlock2* cmdPB = (IParamBlock2*)statePB->GetReferenceTarget(kStateCmdParams, 0, j);
+            plResponderCmd* cmd = plResponderCmd::Find(cmdPB);
             cmd->SetupProperties(node, pErrMsg, cmdPB);
         }
     }
@@ -340,27 +342,27 @@ bool plResponderComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
     return true;
 }
 
-bool plResponderComponent::PreConvert(plMaxNode *node,plErrorMsg *pErrMsg)
+bool plResponderComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plSceneObject* rObj = node->GetSceneObject();
     plLocation loc = node->GetLocation();
 
     // Create and register the RESPONDER's logic component
-    plResponderModifier *responder = new plResponderModifier;
+    plResponderModifier* responder = new plResponderModifier;
     plKey responderKey = hsgResMgr::ResMgr()->NewKey(IGetUniqueName(node), responder, loc);
     hsgResMgr::ResMgr()->AddViaNotify(responderKey, new plObjRefMsg(rObj->GetKey(), plRefMsg::kOnCreate, -1, plObjRefMsg::kModifier), plRefFlags::kActiveRef);
 
     // Tell all the activators to notify us
-    for (int i = 0; i < fCompPB->Count(kResponderActivators); i++)
-    {
-        plMaxNode *activatorNode = (plMaxNode*)fCompPB->GetINode(kResponderActivators, 0, i);
-        plComponentBase *comp = activatorNode ? activatorNode->ConvertToComponent() : nil;
-        if (comp)
-        {
-            if (fCompPB->GetInt(kResponderLocalDetect))
+    for (int i = 0; i < fCompPB->Count(kResponderActivators); i++) {
+        plMaxNode* activatorNode = (plMaxNode*)fCompPB->GetINode(kResponderActivators, 0, i);
+        plComponentBase* comp = activatorNode ? activatorNode->ConvertToComponent() : nil;
+
+        if (comp) {
+            if (fCompPB->GetInt(kResponderLocalDetect)) {
                 comp->AddReceiverKey(responderKey, node);
-            else
+            } else {
                 comp->AddReceiverKey(responderKey);
+            }
         }
     }
 
@@ -382,11 +384,10 @@ bool plResponderComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
     // Create the commands for each state
     int numStates = fCompPB->Count(kResponderState);
 
-    plResponderModifier *responder = IGetResponderMod(node);
+    plResponderModifier* responder = IGetResponderMod(node);
     responder->fStates.SetCount(numStates);
 
-    for (int i = 0; i < numStates; i++)
-    {
+    for (int i = 0; i < numStates; i++) {
         CmdIdxs cmdIdxs;
 
         IConvertCmds(node, pErrMsg, i, cmdIdxs);
@@ -395,7 +396,7 @@ bool plResponderComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
         ISetupDefaultWait(node, pErrMsg, i, cmdIdxs, numCallbacks);
         IConvertCmdWaits(node, pErrMsg, i, cmdIdxs, numCallbacks);
 
-        IParamBlock2 *statePB = (IParamBlock2*)fCompPB->GetReferenceTarget(kResponderState, 0, i);
+        IParamBlock2* statePB = (IParamBlock2*)fCompPB->GetReferenceTarget(kResponderState, 0, i);
         responder->fStates[i].fNumCallbacks = numCallbacks;
         responder->fStates[i].fSwitchToState = statePB->GetInt(kStateCmdSwitch);
     }
@@ -404,21 +405,27 @@ bool plResponderComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
     responder->fCurState = fCompPB->GetInt(kResponderStateDef);
     responder->fEnabled = fCompPB->GetInt(kResponderEnabled) != 0;
 
-    if (fCompPB->GetInt(kResponderTrigger))
+    if (fCompPB->GetInt(kResponderTrigger)) {
         responder->fFlags |= plResponderModifier::kDetectTrigger;
-    if (fCompPB->GetInt(kResponderUnTrigger))
+    }
+
+    if (fCompPB->GetInt(kResponderUnTrigger)) {
         responder->fFlags |= plResponderModifier::kDetectUnTrigger;
-    if (fCompPB->GetInt(kResponderSkipFFSound))
+    }
+
+    if (fCompPB->GetInt(kResponderSkipFFSound)) {
         responder->fFlags |= plResponderModifier::kSkipFFSound;
+    }
 
     // Unless it's been overridden somewhere else, don't save our state on the server
-    if (!node->GetOverrideHighLevelSDL())
+    if (!node->GetOverrideHighLevelSDL()) {
         responder->AddToSDLExcludeList(kSDLResponder);
+    }
 
     return true;
 }
 
-bool plResponderComponent::DeInit(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plResponderComponent::DeInit(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     fModKeys.clear();
     return true;
@@ -426,76 +433,76 @@ bool plResponderComponent::DeInit(plMaxNode *node, plErrorMsg *pErrMsg)
 
 void plResponderComponent::IConvertCmds(plMaxNode* node, plErrorMsg* pErrMsg, int state, CmdIdxs& cmdIdxs)
 {
-    IParamBlock2 *statePB = (IParamBlock2*)fCompPB->GetReferenceTarget(kResponderState, 0, state);
-    plResponderModifier *responder = IGetResponderMod(node);
+    IParamBlock2* statePB = (IParamBlock2*)fCompPB->GetReferenceTarget(kResponderState, 0, state);
+    plResponderModifier* responder = IGetResponderMod(node);
 
     // Add the messages to the logic modifier
-    for (int i = 0; i < statePB->Count(kStateCmdParams); i++)
-    {
-        plMessage *msg = nil;
+    for (int i = 0; i < statePB->Count(kStateCmdParams); i++) {
+        plMessage* msg = nil;
 
         BOOL enabled = statePB->GetInt(kStateCmdEnabled, 0, i);
-        if (!enabled)
+
+        if (!enabled) {
             continue;
-
-        IParamBlock2 *cmdPB = (IParamBlock2*)statePB->GetReferenceTarget(kStateCmdParams, 0, i);
-
-        try
-        {
-            plResponderCmd *cmd = plResponderCmd::Find(cmdPB);
-            if (cmd)
-                msg = cmd->CreateMsg(node, pErrMsg, cmdPB);
         }
-        catch (char *reason)
-        {
+
+        IParamBlock2* cmdPB = (IParamBlock2*)statePB->GetReferenceTarget(kStateCmdParams, 0, i);
+
+        try {
+            plResponderCmd* cmd = plResponderCmd::Find(cmdPB);
+
+            if (cmd) {
+                msg = cmd->CreateMsg(node, pErrMsg, cmdPB);
+            }
+        } catch (char* reason) {
             char buf[512];
 
             char stateName[128];
-            const char *curStateName = fCompPB->GetStr(kResponderStateName, 0, state);
-            if (curStateName && *curStateName != '\0')
+            const char* curStateName = fCompPB->GetStr(kResponderStateName, 0, state);
+
+            if (curStateName && *curStateName != '\0') {
                 strcpy(stateName, fCompPB->GetStr(kResponderStateName, 0, state));
-            else
-                sprintf(stateName, "State %d", state+1);
+            } else {
+                sprintf(stateName, "State %d", state + 1);
+            }
 
             sprintf(buf,
-                "A responder command failed to export.\n\nResponder:\t%s\nState:\t\t%s\nCommand:\t%d\n\nReason: %s",
-                GetINode()->GetName(), stateName, i+1, reason);
+                    "A responder command failed to export.\n\nResponder:\t%s\nState:\t\t%s\nCommand:\t%d\n\nReason: %s",
+                    GetINode()->GetName(), stateName, i + 1, reason);
 
             pErrMsg->Set(true, "Responder Warning", buf).Show();
             pErrMsg->Set(false);
         }
 
-        if (msg)
-        {
+        if (msg) {
             msg->SetSender(responder->GetKey());
             responder->AddCommand(msg, state);
-            int idx = responder->fStates[state].fCmds.Count()-1;
+            int idx = responder->fStates[state].fCmds.Count() - 1;
             cmdIdxs[i] = idx;
         }
     }
 }
 
-static IParamBlock2 *GetWaitBlk(IParamBlock2 *state, int idx)
+static IParamBlock2* GetWaitBlk(IParamBlock2* state, int idx)
 {
     return (IParamBlock2*)state->GetReferenceTarget(kStateCmdWait, 0, idx);
 }
 
 void plResponderComponent::ISetupDefaultWait(plMaxNode* node, plErrorMsg* pErrMsg,
-                                             int state, CmdIdxs& cmdIdxs, int &numCallbacks)
+        int state, CmdIdxs& cmdIdxs, int& numCallbacks)
 {
-    IParamBlock2 *statePB = (IParamBlock2*)fCompPB->GetReferenceTarget(kResponderState, 0, state);
-    plResponderModifier *responder = IGetResponderMod(node);
+    IParamBlock2* statePB = (IParamBlock2*)fCompPB->GetReferenceTarget(kResponderState, 0, state);
+    plResponderModifier* responder = IGetResponderMod(node);
     hsTArray<plResponderModifier::plResponderCmd>& cmds = responder->fStates[state].fCmds;
 
     int numCmds = cmds.Count();
-    for (int i = 0; i < numCmds; i++)
-    {
-        IParamBlock2 *waitPB = GetWaitBlk(statePB, i);
+
+    for (int i = 0; i < numCmds; i++) {
+        IParamBlock2* waitPB = GetWaitBlk(statePB, i);
         ResponderWait::FixupWaitBlock(waitPB);
 
         // If we're supposed to wait for this command, and it converted, create a callback
-        if (ResponderWait::GetWaitOnMe(waitPB) && cmdIdxs.find(i) != cmdIdxs.end())
-        {
+        if (ResponderWait::GetWaitOnMe(waitPB) && cmdIdxs.find(i) != cmdIdxs.end()) {
             int convertedIdx = cmdIdxs[i];
 
             ResponderWaitInfo waitInfo;
@@ -505,8 +512,8 @@ void plResponderComponent::ISetupDefaultWait(plMaxNode* node, plErrorMsg* pErrMs
             waitInfo.msg = cmds[convertedIdx].fMsg;
             waitInfo.point = plString::Null;
 
-            IParamBlock2 *pb = (IParamBlock2*)statePB->GetReferenceTarget(kStateCmdParams, 0, i);
-            plResponderCmd *cmd = plResponderCmd::Find(pb);
+            IParamBlock2* pb = (IParamBlock2*)statePB->GetReferenceTarget(kStateCmdParams, 0, i);
+            plResponderCmd* cmd = plResponderCmd::Find(pb);
 
             cmd->CreateWait(node, pErrMsg, pb, waitInfo);
         }
@@ -514,22 +521,21 @@ void plResponderComponent::ISetupDefaultWait(plMaxNode* node, plErrorMsg* pErrMs
 }
 
 void plResponderComponent::IConvertCmdWaits(plMaxNode* node, plErrorMsg* pErrMsg,
-                                            int state, CmdIdxs& cmdIdxs, int &numCallbacks)
+        int state, CmdIdxs& cmdIdxs, int& numCallbacks)
 {
-    IParamBlock2 *statePB = (IParamBlock2*)fCompPB->GetReferenceTarget(kResponderState, 0, state);
-    plResponderModifier *responder = IGetResponderMod(node);
+    IParamBlock2* statePB = (IParamBlock2*)fCompPB->GetReferenceTarget(kResponderState, 0, state);
+    plResponderModifier* responder = IGetResponderMod(node);
     hsTArray<plResponderModifier::plResponderCmd>& cmds = responder->fStates[state].fCmds;
 
     int numWaits = statePB->Count(kStateCmdWait);
-    for (int i = 0; i < numWaits; i++)
-    {
-        IParamBlock2 *waitPB = GetWaitBlk(statePB, i);
+
+    for (int i = 0; i < numWaits; i++) {
+        IParamBlock2* waitPB = GetWaitBlk(statePB, i);
 
         int wait = ResponderWait::GetWaitingOn(waitPB);
 
         // If the waiter and waitee both converted, create the callback
-        if (cmdIdxs.find(wait) != cmdIdxs.end() && cmdIdxs.find(i) != cmdIdxs.end())
-        {
+        if (cmdIdxs.find(wait) != cmdIdxs.end() && cmdIdxs.find(i) != cmdIdxs.end()) {
             int convertedIdx = cmdIdxs[wait];
 
             ResponderWaitInfo waitInfo;
@@ -542,8 +548,8 @@ void plResponderComponent::IConvertCmdWaits(plMaxNode* node, plErrorMsg* pErrMsg
             responder->AddCallback(state, convertedIdx, waitInfo.callbackUser);
             cmds[cmdIdxs[i]].fWaitOn = waitInfo.callbackUser;
 
-            IParamBlock2 *pb = (IParamBlock2*)statePB->GetReferenceTarget(kStateCmdParams, 0, wait);
-            plResponderCmd *cmd = plResponderCmd::Find(pb);
+            IParamBlock2* pb = (IParamBlock2*)statePB->GetReferenceTarget(kStateCmdParams, 0, wait);
+            plResponderCmd* cmd = plResponderCmd::Find(pb);
 
             cmd->CreateWait(node, pErrMsg, pb, waitInfo);
         }
@@ -552,34 +558,32 @@ void plResponderComponent::IConvertCmdWaits(plMaxNode* node, plErrorMsg* pErrMsg
 
 void plResponderComponent::IFixOldPB()
 {
-    if (fCompPB)
-    {
-        if (fCompPB->Count(kResponderState) == 0)
-        {
-            IParamBlock2 *pb = CreateParameterBlock2(&gStateBlock, nil);
+    if (fCompPB) {
+        if (fCompPB->Count(kResponderState) == 0) {
+            IParamBlock2* pb = CreateParameterBlock2(&gStateBlock, nil);
             int idx = fCompPB->Append(kResponderState, 1, (ReferenceTarget**)&pb);
             pb->SetValue(kStateCmdSwitch, 0, idx);
         }
-        if (fCompPB->Count(kResponderStateName) == 0)
-        {
-            char *name = "";
+
+        if (fCompPB->Count(kResponderStateName) == 0) {
+            char* name = "";
             fCompPB->Append(kResponderStateName, 1, &name);
         }
 
         // Make sure there is an enabled value for each command in the state
-        for (int i = 0; i < fCompPB->Count(kResponderState); i++)
-        {
+        for (int i = 0; i < fCompPB->Count(kResponderState); i++) {
             IParamBlock2* pb = (IParamBlock2*)fCompPB->GetReferenceTarget(kResponderState, 0, i);
-            if (pb->Count(kStateCmdEnabled) != pb->Count(kStateCmdParams))
+
+            if (pb->Count(kStateCmdEnabled) != pb->Count(kStateCmdParams)) {
                 pb->SetCount(kStateCmdEnabled, pb->Count(kStateCmdParams));
+            }
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-enum
-{
+enum {
     kStateName,
     kStateAdd,
     kStateRemove,
@@ -589,7 +593,7 @@ enum
 
 void plResponderProc::IAddMenuItem(HMENU hMenu, int id)
 {
-    AppendMenu(hMenu, MF_STRING, id+1, fNames[id]);
+    AppendMenu(hMenu, MF_STRING, id + 1, fNames[id]);
 }
 
 void plResponderProc::ICreateMenu()
@@ -599,29 +603,27 @@ void plResponderProc::ICreateMenu()
     std::map<plString, HMENU> menus;
     int cmdID = 0;
 
-    for (int i = 0; i < gResponderCmds.size(); i++)
-    {
-        plResponderCmd *cmd = gResponderCmds[i];
-        for (int j = 0; j < cmd->NumTypes(); j++)
-        {
+    for (int i = 0; i < gResponderCmds.size(); i++) {
+        plResponderCmd* cmd = gResponderCmds[i];
+
+        for (int j = 0; j < cmd->NumTypes(); j++) {
             HMENU hParent = fhMenu;
 
-            const char *category = cmd->GetCategory(j);
-            if (category)
-            {
+            const char* category = cmd->GetCategory(j);
+
+            if (category) {
                 // Menu for this category hasn't been created yet, make one
-                if (menus.find(category) == menus.end())
-                {
+                if (menus.find(category) == menus.end()) {
                     hParent = CreatePopupMenu();
                     menus[category] = hParent;
                     InsertMenu(fhMenu, 0, MF_BYPOSITION | MF_POPUP, (UINT)hParent, category);
-                }
-                else
+                } else {
                     hParent = menus[category];
+                }
             }
 
-            const char *name = cmd->GetName(j);
-            
+            const char* name = cmd->GetName(j);
+
             cmdID++;
             fMenuCmds[cmdID] = CmdID(cmd, j);
             AppendMenu(hParent, MF_STRING, cmdID, name);
@@ -637,23 +639,24 @@ const char* plResponderProc::GetCommandName(int cmdIdx)
 {
     static char buf[256];
 
-    if (fStatePB->Count(kStateCmdParams) > cmdIdx)
-    {
+    if (fStatePB->Count(kStateCmdParams) > cmdIdx) {
         buf[0] = '\0';
 
         BOOL enabled = fStatePB->GetInt(kStateCmdEnabled, 0, cmdIdx);
-        if (!enabled)
+
+        if (!enabled) {
             strcat(buf, "[D]");
+        }
 
-        IParamBlock2 *cmdPB = (IParamBlock2*)fStatePB->GetReferenceTarget(kStateCmdParams, 0, cmdIdx);
-        plResponderCmd *cmd = plResponderCmd::Find(cmdPB);
+        IParamBlock2* cmdPB = (IParamBlock2*)fStatePB->GetReferenceTarget(kStateCmdParams, 0, cmdIdx);
+        plResponderCmd* cmd = plResponderCmd::Find(cmdPB);
 
-        IParamBlock2 *waitPB = (IParamBlock2*)fStatePB->GetReferenceTarget(kStateCmdWait, 0, cmdIdx);
+        IParamBlock2* waitPB = (IParamBlock2*)fStatePB->GetReferenceTarget(kStateCmdWait, 0, cmdIdx);
         int waitingOn = ResponderWait::GetWaitingOn(waitPB);
-        if (waitingOn != -1)
-        {
+
+        if (waitingOn != -1) {
             char num[10];
-            sprintf(num, "(%d)", waitingOn+1);
+            sprintf(num, "(%d)", waitingOn + 1);
             strcat(buf, num);
         }
 
@@ -670,8 +673,7 @@ void plResponderProc::LoadList()
 {
     ListBox_ResetContent(fhList);
 
-    for (int i = 0; i < fStatePB->Count(kStateCmdParams); i++)
-    {
+    for (int i = 0; i < fStatePB->Count(kStateCmdParams); i++) {
         const char* name = GetCommandName(i);
         ListBox_AddString(fhList, name);
     }
@@ -689,23 +691,24 @@ void plResponderProc::AddCommand()
     int type = TrackPopupMenu(fhMenu, TPM_RIGHTALIGN | TPM_NONOTIFY | TPM_RETURNCMD, rect.left, rect.top, 0, fhDlg, NULL);
     PostMessage(fhDlg, WM_USER, 0, 0);
 
-    if (type == 0)
+    if (type == 0) {
         return;
+    }
 
     CmdID& cmdID = fMenuCmds[type];
-    plResponderCmd *cmd = cmdID.first;
+    plResponderCmd* cmd = cmdID.first;
     int cmdIdx = cmdID.second;
 
-    IParamBlock2 *cmdPB = cmd->CreatePB(cmdIdx);
+    IParamBlock2* cmdPB = cmd->CreatePB(cmdIdx);
     fStatePB->Append(kStateCmdParams, 1, (ReferenceTarget**)&cmdPB);
 
-    IParamBlock2 *waitPB = ResponderWait::CreatePB();
+    IParamBlock2* waitPB = ResponderWait::CreatePB();
     fStatePB->Append(kStateCmdWait, 1, (ReferenceTarget**)&waitPB);
 
     BOOL enabled = TRUE;
     fStatePB->Append(kStateCmdEnabled, 1, &enabled);
 
-    const char* name = GetCommandName(fStatePB->Count(kStateCmdParams)-1);
+    const char* name = GetCommandName(fStatePB->Count(kStateCmdParams) - 1);
     int idx = ListBox_AddString(fhList, name);
     ListBox_SetCurSel(fhList, idx);
 
@@ -715,8 +718,10 @@ void plResponderProc::AddCommand()
 void plResponderProc::RemoveCurCommand()
 {
     int idx = ListBox_GetCurSel(fhList);
-    if (idx == LB_ERR)
+
+    if (idx == LB_ERR) {
         return;
+    }
 
     // Destroy the current rollup, since it's this guy
     IRemoveCmdRollups();
@@ -729,37 +734,35 @@ void plResponderProc::RemoveCurCommand()
 
     // Patch the wait commands
     ResponderWait::CmdRemoved(fStatePB, idx);
-    
+
     fCmdIdx = -1;
 }
 
 void plResponderProc::IRemoveCmdRollups()
 {
-    if (fCmdMap)
-    {
+    if (fCmdMap) {
         DestroyCPParamMap2(fCmdMap);
         fCmdMap = nil;
     }
-    if (fWaitMap)
-    {
+
+    if (fWaitMap) {
         DestroyCPParamMap2(fWaitMap);
         fWaitMap = nil;
     }
 }
 
-IParamMap2 *plResponderProc::ICreateMap(IParamBlock2 *pb)
+IParamMap2* plResponderProc::ICreateMap(IParamBlock2* pb)
 {
-    ParamBlockDesc2 *pd = pb->GetDesc();
+    ParamBlockDesc2* pd = pb->GetDesc();
 
     // Don't show anything if there isn't a UI
-    if (pd->Count() < 1)
-    {
+    if (pd->Count() < 1) {
         pb->ReleaseDesc();
         return nil;
     }
 
     // Create the rollout
-    IParamMap2 *map = CreateCPParamMap2(0,
+    IParamMap2* map = CreateCPParamMap2(0,
                                         pb,
                                         GetCOREInterface(),
                                         hInstance,
@@ -783,21 +786,20 @@ void plResponderProc::ICreateCmdRollups()
     HWND hCmds = GetDlgItem(fhDlg, IDC_CMD_LIST);
     int cmdIdx = ListBox_GetCurSel(hCmds);
 
-    if (cmdIdx != LB_ERR && cmdIdx != fCmdIdx)
-    {
+    if (cmdIdx != LB_ERR && cmdIdx != fCmdIdx) {
         fCmdIdx = cmdIdx;
         fIgnoreNextDrop = true;
 
         // Save the current scroll position and reset it at the end, so the panels
         // won't always jerk back up to the top
-        IRollupWindow *rollup = GetCOREInterface()->GetCommandPanelRollup();
+        IRollupWindow* rollup = GetCOREInterface()->GetCommandPanelRollup();
         int scrollPos = rollup->GetScrollPos();
 
         // Destroy the last command's rollups
         IRemoveCmdRollups();
 
         // Create the rollup for the current command
-        IParamBlock2 *pb = (IParamBlock2*)fStatePB->GetReferenceTarget(kStateCmdParams, 0, fCmdIdx);
+        IParamBlock2* pb = (IParamBlock2*)fStatePB->GetReferenceTarget(kStateCmdParams, 0, fCmdIdx);
         fCmdMap = ICreateMap(pb);
 
         ResponderWait::InitDlg(fStatePB, fCmdIdx, GetDlgItem(fhDlg, IDC_CMD_LIST));
@@ -808,51 +810,48 @@ void plResponderProc::ICreateCmdRollups()
     }
 }
 
-BOOL plResponderProc::DragListProc(HWND hWnd, DRAGLISTINFO *info)
+BOOL plResponderProc::DragListProc(HWND hWnd, DRAGLISTINFO* info)
 {
     static int oldIdx = -1;
 
     int curIdx = LBItemFromPt(info->hWnd, info->ptCursor, TRUE);
 
-    switch (info->uNotification)
-    {
+    switch (info->uNotification) {
         // Allow the drag
-        case DL_BEGINDRAG:
-            // When you click on an item in the listbox, the rollups are changed and Max can
-            // shift the position of dialog you were just clicking in.  Since this happens
-            // before you let go of the mouse button, the listbox thinks you are dragging.
-            // To get around it, we don't allow a selection change and a drag in the same click.
-            if (fIgnoreNextDrop)
-            {
-                SetWindowLong(hWnd, DWL_MSGRESULT, FALSE);
-            }
-            else
-            {
-                oldIdx = curIdx;
-                SetWindowLong(hWnd, DWL_MSGRESULT, TRUE);
-            }
-            return TRUE;
+    case DL_BEGINDRAG:
 
-        case DL_DRAGGING:
-            {
-                if (curIdx < oldIdx)
-                    DrawInsert(hWnd, info->hWnd, curIdx);
-                else if (curIdx > oldIdx && ListBox_GetCount(info->hWnd) > curIdx+1)
-                    DrawInsert(hWnd, info->hWnd, curIdx+1);
-                else
-                    DrawInsert(hWnd, info->hWnd, -1);
+        // When you click on an item in the listbox, the rollups are changed and Max can
+        // shift the position of dialog you were just clicking in.  Since this happens
+        // before you let go of the mouse button, the listbox thinks you are dragging.
+        // To get around it, we don't allow a selection change and a drag in the same click.
+        if (fIgnoreNextDrop) {
+            SetWindowLong(hWnd, DWL_MSGRESULT, FALSE);
+        } else {
+            oldIdx = curIdx;
+            SetWindowLong(hWnd, DWL_MSGRESULT, TRUE);
+        }
+
+        return TRUE;
+
+    case DL_DRAGGING: {
+            if (curIdx < oldIdx) {
+                DrawInsert(hWnd, info->hWnd, curIdx);
+            } else if (curIdx > oldIdx && ListBox_GetCount(info->hWnd) > curIdx + 1) {
+                DrawInsert(hWnd, info->hWnd, curIdx + 1);
+            } else {
+                DrawInsert(hWnd, info->hWnd, -1);
             }
-            return TRUE;
+        }
 
-        case DL_CANCELDRAG:
-            // Clear drag arrow
-            DrawInsert(hWnd, info->hWnd, -1);
-            return TRUE;
+        return TRUE;
 
-        case DL_DROPPED:
-        {
-            if (fIgnoreNextDrop)
-            {
+    case DL_CANCELDRAG:
+        // Clear drag arrow
+        DrawInsert(hWnd, info->hWnd, -1);
+        return TRUE;
+
+    case DL_DROPPED: {
+            if (fIgnoreNextDrop) {
                 fIgnoreNextDrop = false;
                 return TRUE;
             }
@@ -860,12 +859,12 @@ BOOL plResponderProc::DragListProc(HWND hWnd, DRAGLISTINFO *info)
             // Clear drag arrow
             DrawInsert(hWnd, info->hWnd, -1);
 
-            if (curIdx != -1 && oldIdx != -1 && curIdx != oldIdx)
-            {
+            if (curIdx != -1 && oldIdx != -1 && curIdx != oldIdx) {
                 // Make sure this won't mess up any wait commands, or at least
                 // that the user approves if it does.
-                if (!ResponderWait::ValidateCmdMove(fStatePB, oldIdx, curIdx))
+                if (!ResponderWait::ValidateCmdMove(fStatePB, oldIdx, curIdx)) {
                     return TRUE;
+                }
 
                 MoveCommand(oldIdx, curIdx);
             }
@@ -877,17 +876,18 @@ BOOL plResponderProc::DragListProc(HWND hWnd, DRAGLISTINFO *info)
     return FALSE;
 }
 
-void plResponderProc::IDrawComboItem(DRAWITEMSTRUCT *dis)
+void plResponderProc::IDrawComboItem(DRAWITEMSTRUCT* dis)
 {
-    if (dis->itemID == -1)          // empty item
-        return; 
+    if (dis->itemID == -1) {        // empty item
+        return;
+    }
 
-    // The colors depend on whether the item is selected. 
-    COLORREF clrForeground = SetTextColor(dis->hDC, 
-        GetSysColor(dis->itemState & ODS_SELECTED ? COLOR_HIGHLIGHTTEXT : COLOR_WINDOWTEXT)); 
+    // The colors depend on whether the item is selected.
+    COLORREF clrForeground = SetTextColor(dis->hDC,
+                                          GetSysColor(dis->itemState & ODS_SELECTED ? COLOR_HIGHLIGHTTEXT : COLOR_WINDOWTEXT));
 
-    COLORREF clrBackground = SetBkColor(dis->hDC, 
-        GetSysColor(dis->itemState & ODS_SELECTED ? COLOR_HIGHLIGHT : COLOR_WINDOW)); 
+    COLORREF clrBackground = SetBkColor(dis->hDC,
+                                        GetSysColor(dis->itemState & ODS_SELECTED ? COLOR_HIGHLIGHT : COLOR_WINDOW));
 
     // Calculate the vertical and horizontal position.
     TEXTMETRIC tm;
@@ -897,8 +897,8 @@ void plResponderProc::IDrawComboItem(DRAWITEMSTRUCT *dis)
 
     // If this is a command, not a state, make it bold
     HFONT oldFont = nil;
-    if (dis->itemData != kStateName)
-    {
+
+    if (dis->itemData != kStateName) {
         LOGFONT lf;
         memset(&lf, 0, sizeof(lf));
         lf.lfHeight = tm.tmHeight;
@@ -911,25 +911,27 @@ void plResponderProc::IDrawComboItem(DRAWITEMSTRUCT *dis)
     // Get and display the text for the list item.
     char buf[256];
     ComboBox_GetLBText(dis->hwndItem, dis->itemID, buf);
-    if (fPB->GetInt(kResponderStateDef) == dis->itemID)
-    {
+
+    if (fPB->GetInt(kResponderStateDef) == dis->itemID) {
         char buf2[256];
         sprintf(buf2, "* %s", buf);
         strcpy(buf, buf2);
     }
 
-    ExtTextOut(dis->hDC, x, y, ETO_CLIPPED | ETO_OPAQUE, &dis->rcItem, buf, strlen(buf), NULL); 
+    ExtTextOut(dis->hDC, x, y, ETO_CLIPPED | ETO_OPAQUE, &dis->rcItem, buf, strlen(buf), NULL);
 
-    // Restore the previous colors. 
-    SetTextColor(dis->hDC, clrForeground); 
-    SetBkColor(dis->hDC, clrBackground); 
+    // Restore the previous colors.
+    SetTextColor(dis->hDC, clrForeground);
+    SetBkColor(dis->hDC, clrBackground);
 
-    if (oldFont)
+    if (oldFont) {
         DeleteFont(SelectFont(dis->hDC, oldFont));
+    }
 
-    // If the item has the focus, draw focus rectangle. 
-    if (dis->itemState & ODS_FOCUS) 
-        DrawFocusRect(dis->hDC, &dis->rcItem); 
+    // If the item has the focus, draw focus rectangle.
+    if (dis->itemState & ODS_FOCUS) {
+        DrawFocusRect(dis->hDC, &dis->rcItem);
+    }
 }
 
 void plResponderProc::LoadState()
@@ -950,37 +952,59 @@ void plResponderProc::LoadState()
 //
 // UPDATE: Looks like it's only with ResponderComponents.  Probably the parentless PB's (which
 // exist due to another bug).  Who cares, this works.
-class MyRemapDir : public RemapDir
-{
+class MyRemapDir : public RemapDir {
 public:
-    RefTargetHandle CloneRef(RefTargetHandle oldTarg)
-    {
-        if (oldTarg == NULL)
+    RefTargetHandle CloneRef(RefTargetHandle oldTarg) {
+        if (oldTarg == NULL) {
             return NULL;
-        else if (oldTarg->SuperClassID() == PARAMETER_BLOCK2_CLASS_ID)
+        } else if (oldTarg->SuperClassID() == PARAMETER_BLOCK2_CLASS_ID) {
             return oldTarg->Clone(*this);
-        else
+        } else {
             return oldTarg;
+        }
     }
 
-    RefTargetHandle FindMapping(RefTargetHandle from) { hsAssert(0, "shit"); return NULL; }
-    void PatchPointer(RefTargetHandle* patchThis, RefTargetHandle oldTarg) { hsAssert(0, "shit"); }
-    void AddPostPatchProc(PostPatchProc* proc, bool toDelete) { hsAssert(0, "shit"); }
-    void AddEntry(RefTargetHandle hfrom, RefTargetHandle hto) { hsAssert(0, "shit"); }
-    void Backpatch() { hsAssert(0, "shit"); }
-    bool BackpatchPending() { hsAssert(0, "shit"); return false; }
-    void Clear() { hsAssert(0, "shit"); }
-    void ClearBackpatch() { hsAssert(0, "shit"); }
-    void DeleteThis() { hsAssert(0, "shit"); }
-    
+    RefTargetHandle FindMapping(RefTargetHandle from) {
+        hsAssert(0, "shit");
+        return NULL;
+    }
+    void PatchPointer(RefTargetHandle* patchThis, RefTargetHandle oldTarg) {
+        hsAssert(0, "shit");
+    }
+    void AddPostPatchProc(PostPatchProc* proc, bool toDelete) {
+        hsAssert(0, "shit");
+    }
+    void AddEntry(RefTargetHandle hfrom, RefTargetHandle hto) {
+        hsAssert(0, "shit");
+    }
+    void Backpatch() {
+        hsAssert(0, "shit");
+    }
+    bool BackpatchPending() {
+        hsAssert(0, "shit");
+        return false;
+    }
+    void Clear() {
+        hsAssert(0, "shit");
+    }
+    void ClearBackpatch() {
+        hsAssert(0, "shit");
+    }
+    void DeleteThis() {
+        hsAssert(0, "shit");
+    }
+
 };
 // Even turdier - I had to define this to compile
-RefTargetHandle RemapDir::CloneRef(RefTargetHandle oldTarg) { return NULL; }
+RefTargetHandle RemapDir::CloneRef(RefTargetHandle oldTarg)
+{
+    return NULL;
+}
 static MyRemapDir gMyRemapDir;
 
-RefTargetHandle plResponderComponent::Clone(RemapDir &remap)
+RefTargetHandle plResponderComponent::Clone(RemapDir& remap)
 {
-    plComponentBase *obj = (plComponentBase*)fClassDesc->Create(false);
+    plComponentBase* obj = (plComponentBase*)fClassDesc->Create(false);
     // Do the base clone
     BaseClone(this, obj, remap);
     // Copy our references
@@ -990,33 +1014,33 @@ RefTargetHandle plResponderComponent::Clone(RemapDir &remap)
     return obj;
 }
 
-BOOL plResponderProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL plResponderProc::DlgProc(TimeValue t, IParamMap2* pm, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     static UINT dragListMsg = 0;
 
     if (dragListMsg != 0 && msg == dragListMsg)
-        if (DragListProc(hWnd, (DRAGLISTINFO*)lParam))
+        if (DragListProc(hWnd, (DRAGLISTINFO*)lParam)) {
             return TRUE;
+        }
 
-    switch (msg)
-    {
-    case WM_INITDIALOG:
-        {
-            if (!fhMenu)
+    switch (msg) {
+    case WM_INITDIALOG: {
+            if (!fhMenu) {
                 ICreateMenu();
+            }
 
             fhDlg = hWnd;
             fhList = GetDlgItem(fhDlg, IDC_CMD_LIST);
             fCurState = 0;
             fCmdIdx = -1;
-            
+
             fPB = pm->GetParamBlock();
             fComp = (plResponderComponent*)fPB->GetOwner();
 
             fComp->IFixOldPB();
 
             LoadState();
-            
+
             // Make it so the user can drag commands to different positions
             dragListMsg = RegisterWindowMessage(DRAGLISTMSGSTRING);
             MakeDragList(GetDlgItem(hWnd, IDC_CMD_LIST));
@@ -1034,7 +1058,7 @@ BOOL plResponderProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, 
 
             TEXTMETRIC tm;
             GetTextMetrics(hDC, &tm);
-            ComboBox_SetItemHeight(hStateName, 0, tm.tmHeight+2);
+            ComboBox_SetItemHeight(hStateName, 0, tm.tmHeight + 2);
 
             DeleteFont(SelectFont(hDC, oldFont));
             ReleaseDC(hStateName, hDC);
@@ -1053,15 +1077,16 @@ BOOL plResponderProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, 
             HWND hSwitchCombo = GetDlgItem(hWnd, IDC_SWITCH_COMBO);
 
             int numStates = fPB->Count(kResponderStateName);
-            for (int i = 0; i < numStates; i++)
-            {
-                const char *stateName = fPB->GetStr(kResponderStateName, 0, i);
+
+            for (int i = 0; i < numStates; i++) {
+                const char* stateName = fPB->GetStr(kResponderStateName, 0, i);
                 char buf[128];
-                if (!stateName || *stateName == '\0')
-                {
-                    sprintf(buf, "State %d", i+1);
+
+                if (!stateName || *stateName == '\0') {
+                    sprintf(buf, "State %d", i + 1);
                     stateName = buf;
                 }
+
                 ComboBox_InsertString(hStateName, i, stateName);
                 ComboBox_AddString(hSwitchCombo, stateName);
             }
@@ -1070,91 +1095,78 @@ BOOL plResponderProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, 
 
             ComboBox_SetCurSel(hSwitchCombo, fStatePB->GetInt(kStateCmdSwitch));
         }
+
         return TRUE;
 
 #ifdef CUSTOM_DRAW
+
     case WM_DRAWITEM:
-        if (wParam == IDC_STATE_COMBO)
-        {
+        if (wParam == IDC_STATE_COMBO) {
             IDrawComboItem((DRAWITEMSTRUCT*)lParam);
             return TRUE;
         }
+
         break;
 #endif
 
-    case WM_SETCURSOR:
-        {
-            if (HIWORD(lParam) == WM_RBUTTONDOWN && HWND(wParam) == GetDlgItem(hWnd, IDC_CMD_LIST))
-            {
+    case WM_SETCURSOR: {
+            if (HIWORD(lParam) == WM_RBUTTONDOWN && HWND(wParam) == GetDlgItem(hWnd, IDC_CMD_LIST)) {
                 ICmdRightClick(HWND(wParam));
                 return TRUE;
             }
         }
         break;
-    
+
     case WM_COMMAND:
-        if (HIWORD(wParam) == BN_CLICKED)
-        {
-            if (LOWORD(wParam) == IDC_ADD_ACTIVATOR)
-            {
+        if (HIWORD(wParam) == BN_CLICKED) {
+            if (LOWORD(wParam) == IDC_ADD_ACTIVATOR) {
                 // Adding an activator.  Set it and refresh the UI to show it in our list.
                 plPick::Activator(fPB, kResponderActivators, false);
                 pm->Invalidate(kResponderActivators);
                 return TRUE;
-            }
-            else if (LOWORD(wParam) == IDC_ADD_CMD)
-            {
+            } else if (LOWORD(wParam) == IDC_ADD_CMD) {
                 AddCommand();
                 return TRUE;
             }
             // Remove the currently selected condition
-            else if (LOWORD(wParam) == IDC_REMOVE_CMD)
-            {
+            else if (LOWORD(wParam) == IDC_REMOVE_CMD) {
                 RemoveCurCommand();
                 return TRUE;
             }
-        }
-        else if (HIWORD(wParam) == LBN_SELCHANGE && LOWORD(wParam) == IDC_CMD_LIST)
-        {
+        } else if (HIWORD(wParam) == LBN_SELCHANGE && LOWORD(wParam) == IDC_CMD_LIST) {
             ICreateCmdRollups();
             return TRUE;
-        }
-        else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_SWITCH_COMBO)
-        {
+        } else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_SWITCH_COMBO) {
             int sel = ComboBox_GetCurSel((HWND)lParam);
-            if (sel != CB_ERR)
+
+            if (sel != CB_ERR) {
                 fStatePB->SetValue(kStateCmdSwitch, 0, sel);
-        }
-        else if (LOWORD(wParam) == IDC_STATE_COMBO)
-        {
+            }
+        } else if (LOWORD(wParam) == IDC_STATE_COMBO) {
             HWND hCombo = (HWND)lParam;
             int code = HIWORD(wParam);
 
             // Disable accelerators when the combo has focus, so that new names can be typed in
-            if (code == CBN_SETFOCUS)
-            {
+            if (code == CBN_SETFOCUS) {
                 plMaxAccelerators::Disable();
                 return TRUE;
-            }
-            else if (code == CBN_KILLFOCUS)
-            {
+            } else if (code == CBN_KILLFOCUS) {
                 plMaxAccelerators::Enable();
                 return TRUE;
             }
             // State name changed, save it in the PB
-            else if (code == CBN_EDITCHANGE)
-            {
+            else if (code == CBN_EDITCHANGE) {
                 char buf[256];
                 ComboBox_GetText(hCombo, buf, sizeof(buf));
-                const char *curName = fPB->GetStr(kResponderStateName, 0, fCurState);
-                if (!curName || strcmp(buf, curName))
-                {
+                const char* curName = fPB->GetStr(kResponderStateName, 0, fCurState);
+
+                if (!curName || strcmp(buf, curName)) {
                     HWND hSwitch = GetDlgItem(hWnd, IDC_SWITCH_COMBO);
                     int sel = ComboBox_GetCurSel(hSwitch);
                     ComboBox_DeleteString(hSwitch, fCurState);
                     ComboBox_InsertString(hSwitch, fCurState, buf);
                     ComboBox_SetCurSel(hSwitch, sel);
-                    
+
                     fPB->SetValue(kResponderStateName, 0, buf, fCurState);
                     ComboBox_DeleteString(hCombo, fCurState);
                     ComboBox_InsertString(hCombo, fCurState, buf);
@@ -1162,34 +1174,28 @@ BOOL plResponderProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, 
                 }
 
                 return TRUE;
-            }
-            else if (code == CBN_SELCHANGE)
-            {
+            } else if (code == CBN_SELCHANGE) {
                 int sel = ComboBox_GetCurSel(hCombo);
                 int type = ComboBox_GetItemData(hCombo, sel);
 
-                if (type == kStateAdd)
-                {
-                    IParamBlock2 *pb = CreateParameterBlock2(&gStateBlock, nil);
+                if (type == kStateAdd) {
+                    IParamBlock2* pb = CreateParameterBlock2(&gStateBlock, nil);
                     fCurState = AddState(pb);
                     fCmdIdx = -1;
-                }
-                else if (type == kStateRemove)
-                {
+                } else if (type == kStateRemove) {
                     int count = fPB->Count(kResponderState);
+
                     // Don't let the user remove the last state
-                    if (count == 1)
-                    {
+                    if (count == 1) {
                         hsMessageBox("You must have at least one state.", "Error", hsMessageBoxNormal);
                         ComboBox_SetCurSel(hCombo, fCurState);
                         return TRUE;
                     }
                     // Verify that the user really wants to delete the state
-                    else
-                    {
+                    else {
                         int ret = hsMessageBox("Are you sure you want to remove this state?", "Verify Remove", hsMessageBoxYesNo);
-                        if (ret == hsMBoxNo)
-                        {
+
+                        if (ret == hsMBoxNo) {
                             ComboBox_SetCurSel(hCombo, fCurState);
                             return TRUE;
                         }
@@ -1206,43 +1212,40 @@ BOOL plResponderProc::DlgProc(TimeValue t, IParamMap2 *pm, HWND hWnd, UINT msg, 
 
                     // If the deleted state was the default, set the default to the first
                     int defState = fPB->GetInt(kResponderStateDef);
-                    if (fCurState == defState)
+
+                    if (fCurState == defState) {
                         fPB->SetValue(kResponderStateDef, 0, 0);
-                    else if (fCurState < defState)
-                        fPB->SetValue(kResponderStateDef, 0, defState-1);
+                    } else if (fCurState < defState) {
+                        fPB->SetValue(kResponderStateDef, 0, defState - 1);
+                    }
 
                     // Patch up the switch commands
-                    for (int i = fCurState; i < fPB->Count(kResponderState); i++)
-                    {
-                        IParamBlock2 *pb = (IParamBlock2*)fPB->GetReferenceTarget(kResponderState, 0, i);
+                    for (int i = fCurState; i < fPB->Count(kResponderState); i++) {
+                        IParamBlock2* pb = (IParamBlock2*)fPB->GetReferenceTarget(kResponderState, 0, i);
 
                         int switchState = pb->GetInt(kStateCmdSwitch);
+
                         // TODO: might want to warn about this
-                        if (switchState == fCurState)
+                        if (switchState == fCurState) {
                             pb->SetValue(kStateCmdSwitch, 0, 0);
-                        else if (switchState > fCurState)
-                            pb->SetValue(kStateCmdSwitch, 0, switchState-1);
+                        } else if (switchState > fCurState) {
+                            pb->SetValue(kStateCmdSwitch, 0, switchState - 1);
+                        }
                     }
 
                     fCurState = 0;
                     fCmdIdx = -1;
-                }
-                else if (type == kStateDefault)
-                {
+                } else if (type == kStateDefault) {
                     // Set the current state as the default
                     fPB->SetValue(kResponderStateDef, 0, fCurState);
                     ComboBox_SetCurSel(hCombo, fCurState);
-                }
-                else if (type == kStateCopy)
-                {
+                } else if (type == kStateCopy) {
                     // Clone the state PB
-                    IParamBlock2 *origPB = (IParamBlock2*)fPB->GetReferenceTarget(kResponderState, 0, fCurState);
-                    IParamBlock2 *copyPB = (IParamBlock2*)origPB->Clone(gMyRemapDir);
+                    IParamBlock2* origPB = (IParamBlock2*)fPB->GetReferenceTarget(kResponderState, 0, fCurState);
+                    IParamBlock2* copyPB = (IParamBlock2*)origPB->Clone(gMyRemapDir);
                     fCurState = AddState(copyPB);
                     fCmdIdx = -1;
-                }
-                else
-                {
+                } else {
                     fCurState = sel;
                     fCmdIdx = -1;
                 }
@@ -1267,15 +1270,16 @@ void plResponderProc::ICmdRightClick(HWND hCmdList)
 
     LRESULT res = SendMessage(hCmdList, LB_ITEMFROMPOINT, 0, MAKELPARAM(localPoint.x, localPoint.y));
     WORD index = LOWORD(res);
-    if (index == WORD(LB_ERR))
+
+    if (index == WORD(LB_ERR)) {
         return;
+    }
 
     RECT rect;
     SendMessage(hCmdList, LB_GETITEMRECT, index, (LPARAM)&rect);
 
     // Make sure we're actually ON an item, LB_ITEMFROMPOINT get the closest instead of exact
-    if (localPoint.y >= rect.top && localPoint.y <= rect.bottom)
-    {
+    if (localPoint.y >= rect.top && localPoint.y <= rect.bottom) {
         BOOL enabled = fStatePB->GetInt(kStateCmdEnabled, 0, index);
 
         HMENU hMenu = CreatePopupMenu();
@@ -1283,8 +1287,8 @@ void plResponderProc::ICmdRightClick(HWND hCmdList)
 
         SetForegroundWindow(fhDlg);
         int sel = TrackPopupMenu(hMenu, TPM_NONOTIFY | TPM_RETURNCMD, point.x, point.y, 0, fhDlg, NULL);
-        if (sel == 1)
-        {
+
+        if (sel == 1) {
             fStatePB->SetValue(kStateCmdEnabled, 0, !enabled, index);
 
             ListBox_DeleteString(hCmdList, index);
@@ -1295,17 +1299,17 @@ void plResponderProc::ICmdRightClick(HWND hCmdList)
     }
 }
 
-int plResponderProc::AddState(IParamBlock2 *pb)
+int plResponderProc::AddState(IParamBlock2* pb)
 {
     int idx = fPB->Append(kResponderState, 1, (ReferenceTarget**)&pb);
     pb->SetValue(kStateCmdSwitch, 0, idx);
 
-    char *name = "";
+    char* name = "";
     fPB->Append(kResponderStateName, 1, &name);
 
     HWND hCombo = GetDlgItem(fhDlg, IDC_STATE_COMBO);
     char buf[128];
-    sprintf(buf, "State %d", idx+1);
+    sprintf(buf, "State %d", idx + 1);
     ComboBox_InsertString(hCombo, idx, buf);
     ComboBox_SetCurSel(hCombo, idx);
 
@@ -1318,14 +1322,14 @@ int plResponderProc::AddState(IParamBlock2 *pb)
 void plResponderProc::MoveCommand(int oldIdx, int newIdx)
 {
     // Move data
-    int insertIdx = (newIdx > oldIdx) ? newIdx+1 : newIdx;
-    int deleteIdx = (newIdx < oldIdx) ? oldIdx+1 : oldIdx;
+    int insertIdx = (newIdx > oldIdx) ? newIdx + 1 : newIdx;
+    int deleteIdx = (newIdx < oldIdx) ? oldIdx + 1 : oldIdx;
 
-    ReferenceTarget *targ = fStatePB->GetReferenceTarget(kStateCmdParams, 0, oldIdx);
+    ReferenceTarget* targ = fStatePB->GetReferenceTarget(kStateCmdParams, 0, oldIdx);
     fStatePB->Insert(kStateCmdParams, insertIdx, 1, &targ);
     fStatePB->Delete(kStateCmdParams, deleteIdx, 1);
 
-    ReferenceTarget *wait = fStatePB->GetReferenceTarget(kStateCmdWait, 0, oldIdx);
+    ReferenceTarget* wait = fStatePB->GetReferenceTarget(kStateCmdWait, 0, oldIdx);
     fStatePB->Insert(kStateCmdWait, insertIdx, 1, &wait);
     fStatePB->Delete(kStateCmdWait, deleteIdx, 1);
 

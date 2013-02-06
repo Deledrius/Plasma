@@ -51,33 +51,42 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pfGUIControlMod.h"
 
 
-class pfGUIValueCtrl : public pfGUIControlMod
-{
-    protected:
+class pfGUIValueCtrl : public pfGUIControlMod {
+protected:
 
-        float        fValue, fMin, fMax, fStep;
+    float        fValue, fMin, fMax, fStep;
 
 
-    public:
+public:
 
-        pfGUIValueCtrl();
-        virtual ~pfGUIValueCtrl();
+    pfGUIValueCtrl();
+    virtual ~pfGUIValueCtrl();
 
-        CLASSNAME_REGISTER( pfGUIValueCtrl );
-        GETINTERFACE_ANY( pfGUIValueCtrl, pfGUIControlMod );
+    CLASSNAME_REGISTER(pfGUIValueCtrl);
+    GETINTERFACE_ANY(pfGUIValueCtrl, pfGUIControlMod);
 
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-        virtual float    GetCurrValue( void ) { return fValue; }
-        virtual void        SetCurrValue( float v );
+    virtual float    GetCurrValue(void) {
+        return fValue;
+    }
+    virtual void        SetCurrValue(float v);
 
-        virtual float    GetMin( void ) { return fMin; }
-        virtual float    GetMax( void ) { return fMax; }
-        virtual float    GetStep( void ) { return fStep; }
+    virtual float    GetMin(void) {
+        return fMin;
+    }
+    virtual float    GetMax(void) {
+        return fMax;
+    }
+    virtual float    GetStep(void) {
+        return fStep;
+    }
 
-        virtual void    SetRange( float min, float max );
-        virtual void    SetStep( float step ) { fStep = step; }
+    virtual void    SetRange(float min, float max);
+    virtual void    SetStep(float step) {
+        fStep = step;
+    }
 
 };
 

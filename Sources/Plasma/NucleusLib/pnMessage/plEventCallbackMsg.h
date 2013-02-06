@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsStream.h"
 #include "plMessage.h"
 
-enum CallbackEvent
-{
+enum CallbackEvent {
     kStart = 0,
     kStop,
     kReverse,
@@ -60,45 +59,48 @@ enum CallbackEvent
     kSingleFrameEval
 };
 
-class plEventCallbackMsg : public plMessage
-{
+class plEventCallbackMsg : public plMessage {
 protected:
 
 public:
     float           fEventTime; // the time for time events
-    CallbackEvent   fEvent;     // the event    
+    CallbackEvent   fEvent;     // the event
     int16_t         fIndex;     // the index of the object we want the event to come from
-                                // (where applicable, required for sounds)
+    // (where applicable, required for sounds)
     int16_t         fRepeats;   // -1 for infinite repeats, 0 for one call, no repeats
     int16_t         fUser;      // User defined data, useful for keeping track of multiple callbacks
 
-    plEventCallbackMsg() : fEventTime(0.0f), fEvent((CallbackEvent)0), fRepeats(-1), fUser(0), fIndex(0) {;}
-    plEventCallbackMsg (const plKey &s, 
-                    const plKey &r, 
-                    const double* t) : 
-                        plMessage(s, r, t),
-                        fEventTime(0.0f), fEvent((CallbackEvent)0), fRepeats(-1), fUser(0), fIndex(0) {;}
+    plEventCallbackMsg() : fEventTime(0.0f), fEvent((CallbackEvent)0), fRepeats(-1), fUser(0), fIndex(0) {
+        ;
+    }
+    plEventCallbackMsg(const plKey& s,
+                       const plKey& r,
+                       const double* t) :
+        plMessage(s, r, t),
+        fEventTime(0.0f), fEvent((CallbackEvent)0), fRepeats(-1), fUser(0), fIndex(0) {
+        ;
+    }
 
-    plEventCallbackMsg(const plKey &receiver, CallbackEvent e, int idx=0, float t=0, int16_t repeats=-1, uint16_t user=0) :
-                        plMessage(nil, receiver, nil), fEvent(e), fIndex(idx), fEventTime(t), fRepeats(repeats), fUser(user) {}
+    plEventCallbackMsg(const plKey& receiver, CallbackEvent e, int idx = 0, float t = 0, int16_t repeats = -1, uint16_t user = 0) :
+        plMessage(nil, receiver, nil), fEvent(e), fIndex(idx), fEventTime(t), fRepeats(repeats), fUser(user) {}
 
-    ~plEventCallbackMsg(){;}
+    ~plEventCallbackMsg() {
+        ;
+    }
 
-    CLASSNAME_REGISTER( plEventCallbackMsg );
-    GETINTERFACE_ANY( plEventCallbackMsg, plMessage );
+    CLASSNAME_REGISTER(plEventCallbackMsg);
+    GETINTERFACE_ANY(plEventCallbackMsg, plMessage);
 
-    // IO 
-    virtual void Read(hsStream* stream, hsResMgr* mgr) 
-    {
-        plMessage::IMsgRead(stream, mgr);   
+    // IO
+    virtual void Read(hsStream* stream, hsResMgr* mgr) {
+        plMessage::IMsgRead(stream, mgr);
         fEventTime = stream->ReadLEFloat();
         fEvent = (CallbackEvent)stream->ReadLE16();
         fIndex = stream->ReadLE16();
         fRepeats = stream->ReadLE16();
         fUser = stream->ReadLE16();
     }
-    virtual void Write(hsStream* stream, hsResMgr* mgr) 
-    {
+    virtual void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         stream->WriteLEFloat(fEventTime);
         stream->WriteLE16((int16_t)fEvent);
@@ -110,34 +112,41 @@ public:
 
 // For when you want to send callbacks, but someone other than the sender/receiver
 // needs to modify them along the way.
-class plEventCallbackInterceptMsg : public plEventCallbackMsg
-{
+class plEventCallbackInterceptMsg : public plEventCallbackMsg {
 protected:
-    plMessage *fMsg;
+    plMessage* fMsg;
 
 public:
-    plMessage* GetMessageNoRef() const { return fMsg; }
-    void SetMessageRef(plMessage *msg)
-    {
+    plMessage* GetMessageNoRef() const {
+        return fMsg;
+    }
+    void SetMessageRef(plMessage* msg) {
         hsRefCnt_SafeUnRef(fMsg);
         hsRefCnt_SafeRef(msg);
         fMsg = msg;
     }
 
-    void SendMessageAndKeep()
-    {
-        if (fMsg)
+    void SendMessageAndKeep() {
+        if (fMsg) {
             fMsg->SendAndKeep();
+        }
     }
 
     plEventCallbackInterceptMsg() : plEventCallbackMsg(), fMsg(nil) {}
-    ~plEventCallbackInterceptMsg() { hsRefCnt_SafeUnRef(fMsg); fMsg = nil; }
+    ~plEventCallbackInterceptMsg() {
+        hsRefCnt_SafeUnRef(fMsg);
+        fMsg = nil;
+    }
 
-    CLASSNAME_REGISTER( plEventCallbackInterceptMsg );
-    GETINTERFACE_ANY( plEventCallbackInterceptMsg, plEventCallbackMsg );
+    CLASSNAME_REGISTER(plEventCallbackInterceptMsg);
+    GETINTERFACE_ANY(plEventCallbackInterceptMsg, plEventCallbackMsg);
 
-    virtual void Read(hsStream *stream, hsResMgr *mgr) { plEventCallbackMsg::Read(stream, mgr); }
-    virtual void Write(hsStream *stream, hsResMgr *mgr) { plEventCallbackMsg::Write(stream, mgr); }
+    virtual void Read(hsStream* stream, hsResMgr* mgr) {
+        plEventCallbackMsg::Read(stream, mgr);
+    }
+    virtual void Write(hsStream* stream, hsResMgr* mgr) {
+        plEventCallbackMsg::Write(stream, mgr);
+    }
 };
 
 

@@ -63,8 +63,7 @@ pfPlayerBookMod::pfPlayerBookMod()
     int     i;
 
 
-    for( i = 0; i < 6; i++ )
-    {
+    for (i = 0; i < 6; i++) {
         fCheckBoxes[ i ] = nil;
         fDynLayerKeys[ i ] = nil;
     }
@@ -81,78 +80,81 @@ pfPlayerBookMod::~pfPlayerBookMod()
 
 //// IEval ///////////////////////////////////////////////////////////////////
 
-bool    pfPlayerBookMod::IEval( double secs, hsScalar del, uint32_t dirty )
+bool    pfPlayerBookMod::IEval(double secs, hsScalar del, uint32_t dirty)
 {
     return false;
 }
 
 //// MsgReceive //////////////////////////////////////////////////////////////
 
-bool    pfPlayerBookMod::MsgReceive( plMessage *msg )
+bool    pfPlayerBookMod::MsgReceive(plMessage* msg)
 {
-    plGenRefMsg *refMsg = plGenRefMsg::ConvertNoRef( msg );
-    if( refMsg != nil )
-    {
-        if( refMsg->fType == kRefCheckBox )
-        {
-            if( refMsg->GetContext() & ( plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace ) )
-                fCheckBoxes[ refMsg->fWhich ] = pfGUICheckBoxCtrl::ConvertNoRef( refMsg->GetRef() );
-            else
+    plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
+
+    if (refMsg != nil) {
+        if (refMsg->fType == kRefCheckBox) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+                fCheckBoxes[ refMsg->fWhich ] = pfGUICheckBoxCtrl::ConvertNoRef(refMsg->GetRef());
+            } else {
                 fCheckBoxes[ refMsg->fWhich ] = nil;
-        }
-        else if( refMsg->fType == kRefLoadButton )
-        {
-            if( refMsg->GetContext() & ( plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace ) )
-                fLoadButton = pfGUIButtonMod::ConvertNoRef( refMsg->GetRef() );
-            else
+            }
+        } else if (refMsg->fType == kRefLoadButton) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+                fLoadButton = pfGUIButtonMod::ConvertNoRef(refMsg->GetRef());
+            } else {
                 fLoadButton = nil;
-        }
-        else if( refMsg->fType == kRefSaveButton )
-        {
-            if( refMsg->GetContext() & ( plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace ) )
-                fSaveButton = pfGUIButtonMod::ConvertNoRef( refMsg->GetRef() );
-            else
+            }
+        } else if (refMsg->fType == kRefSaveButton) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+                fSaveButton = pfGUIButtonMod::ConvertNoRef(refMsg->GetRef());
+            } else {
                 fSaveButton = nil;
+            }
         }
+
         return true;
     }
 
-    return plSingleModifier::MsgReceive( msg );
+    return plSingleModifier::MsgReceive(msg);
 }
 
 //// Read/Write //////////////////////////////////////////////////////////////
 
-void    pfPlayerBookMod::Read( hsStream *s, hsResMgr *mgr )
+void    pfPlayerBookMod::Read(hsStream* s, hsResMgr* mgr)
 {
     int     i;
 
 
     plSingleModifier::Read(s, mgr);
 
-    for( i = 0; i < 6; i++ )
-        mgr->ReadKeyNotifyMe( s, new plGenRefMsg( GetKey(), plRefMsg::kOnCreate, i, kRefCheckBox ), plRefFlags::kActiveRef );
+    for (i = 0; i < 6; i++) {
+        mgr->ReadKeyNotifyMe(s, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, i, kRefCheckBox), plRefFlags::kActiveRef);
+    }
 
-    for( i = 0; i < 6; i++ )
-        fDynLayerKeys[ i ] = mgr->ReadKey( s );
+    for (i = 0; i < 6; i++) {
+        fDynLayerKeys[ i ] = mgr->ReadKey(s);
+    }
 
-    mgr->ReadKeyNotifyMe( s, new plGenRefMsg( GetKey(), plRefMsg::kOnCreate, -1, kRefLoadButton ), plRefFlags::kActiveRef );
-    mgr->ReadKeyNotifyMe( s, new plGenRefMsg( GetKey(), plRefMsg::kOnCreate, -1, kRefSaveButton ), plRefFlags::kActiveRef );
+    mgr->ReadKeyNotifyMe(s, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, kRefLoadButton), plRefFlags::kActiveRef);
+    mgr->ReadKeyNotifyMe(s, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, kRefSaveButton), plRefFlags::kActiveRef);
 }
 
-void    pfPlayerBookMod::Write( hsStream *s, hsResMgr *mgr )
+void    pfPlayerBookMod::Write(hsStream* s, hsResMgr* mgr)
 {
     int     i;
 
 
-    plSingleModifier::Write( s, mgr );
+    plSingleModifier::Write(s, mgr);
 
-    for( i = 0; i < 6; i++ )
-        mgr->WriteKey( s, fCheckBoxes[ i ]->GetKey() );
+    for (i = 0; i < 6; i++) {
+        mgr->WriteKey(s, fCheckBoxes[ i ]->GetKey());
+    }
 
-    for( i = 0; i < 6; i++ )
-        mgr->WriteKey( s, fDynLayerKeys[ i ] );
+    for (i = 0; i < 6; i++) {
+        mgr->WriteKey(s, fDynLayerKeys[ i ]);
+    }
 
-    mgr->WriteKey( s, fLoadButton->GetKey() );
-    mgr->WriteKey( s, fSaveButton->GetKey() );
+    mgr->WriteKey(s, fLoadButton->GetKey());
+    mgr->WriteKey(s, fSaveButton->GetKey());
 }
 

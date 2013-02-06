@@ -123,8 +123,7 @@ class plScalarChannel;
 /** \class plAGChannel
     An object that emits data of a specific type. Fundamental building
     block of the animation graph. */
-class plAGChannel : public plCreatable
-{
+class plAGChannel : public plCreatable {
 public:
 
     // -- methods --
@@ -136,60 +135,68 @@ public:
 
     // AG PROTOCOL
     /** Combine the given channel with this channel, allocating and returning
-        a new node which does the combination. It's up to the caller to 
+        a new node which does the combination. It's up to the caller to
         manage the lifetime of the new node. */
-    virtual plAGChannel * MakeCombine(plAGChannel * channelB);
+    virtual plAGChannel* MakeCombine(plAGChannel* channelB);
 
-    /** Blend the given channel with this channel, using a third channel (which 
+    /** Blend the given channel with this channel, using a third channel (which
         must output a float/scalar value) to crossfade between the two.
         As the blendChannel varies, the blend will vary. */
-    virtual plAGChannel * MakeBlend(plAGChannel * channelB, plScalarChannel * blendChannel, int blendPriority);
+    virtual plAGChannel* MakeBlend(plAGChannel* channelB, plScalarChannel* blendChannel, int blendPriority);
 
     /** Create a "static clone" of this channel which always returns this channel's
         value at time zero. */
-    virtual plAGChannel * MakeZeroState() = 0;
-    
+    virtual plAGChannel* MakeZeroState() = 0;
+
     /** If we're potentially sharing this channel with other plAGMasterMods, we'll
         want to insert a channel in the graph for cache info. This function returns
         either the cache channel (replacing us) or ourself. */
-    virtual plAGChannel * MakeCacheChannel(plAnimTimeConvert *atc) { return this; }
+    virtual plAGChannel* MakeCacheChannel(plAnimTimeConvert* atc) {
+        return this;
+    }
 
     /** Create a new channel which converts global time to local time
         and attach it downstream from this channel. This allows you to
         convert an animation from one timespace to another - critical for
         blending.
         local-time-animation <-- timescale <-- world-time-animation */
-    virtual plAGChannel * MakeTimeScale(plScalarChannel *timeSource) = 0;
+    virtual plAGChannel* MakeTimeScale(plScalarChannel* timeSource) = 0;
 
     /** Is the animation moving at the given world time? Takes into account
         start/stop messages that haven't been applied yet, ease curves, etc. */
-    virtual bool IsStoppedAt(double wSecs) { return true; }
+    virtual bool IsStoppedAt(double wSecs) {
+        return true;
+    }
 
     /** Detach the given channel from our graph. If this is the channel in
         question, returns any upstream channels so they can be reattached.
         If this is not the channel in question, passes the request upstream
         and does any reattachment necessary. */
-    virtual plAGChannel * Detach(plAGChannel * channel);
-    
+    virtual plAGChannel* Detach(plAGChannel* channel);
+
     /** Return the optimized version of this channel. May be a completely
         different channel; will collapse out inactive subgraphs. */
-    virtual plAGChannel * Optimize(double time);
+    virtual plAGChannel* Optimize(double time);
 
     // \{
     /** The name of the channel is used to dynamically attach to sub-parts of an
         object. */
-    virtual plString GetName() { return fName; };
-    virtual void SetName(const plString & name) { fName = name; };
+    virtual plString GetName() {
+        return fName;
+    };
+    virtual void SetName(const plString& name) {
+        fName = name;
+    };
     // \}
 
     // PLASMA PROTOCOL
     // rtti
-    CLASSNAME_REGISTER( plAGChannel );
-    GETINTERFACE_ANY( plAGChannel, plCreatable );
+    CLASSNAME_REGISTER(plAGChannel);
+    GETINTERFACE_ANY(plAGChannel, plCreatable);
 
     // persistence
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
-    virtual void Read(hsStream *s, hsResMgr *mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
 
 protected:
     plString fName;

@@ -56,11 +56,10 @@ uint32_t  plVertCoder::fCodedBytes = 0;
 uint32_t  plVertCoder::fRawBytes = 0;
 uint32_t  plVertCoder::fSkippedBytes = 0;
 
-static const float kQuanta[plVertCoder::kNumFloatFields] =
-{
+static const float kQuanta[plVertCoder::kNumFloatFields] = {
     kPosQuantum,
     kWeightQuantum,
-    
+
     kUVWQuantum,
     kUVWQuantum,
     kUVWQuantum,
@@ -73,14 +72,14 @@ static const float kQuanta[plVertCoder::kNumFloatFields] =
 };
 
 
-inline void plVertCoder::ICountFloats(const uint8_t* src, uint16_t maxCnt, const float quant, const uint32_t stride, 
-                                      float& lo, bool &allSame, uint16_t& count)
+inline void plVertCoder::ICountFloats(const uint8_t* src, uint16_t maxCnt, const float quant, const uint32_t stride,
+                                      float& lo, bool& allSame, uint16_t& count)
 {
     lo = *(float*)src;
     lo = floor(lo / quant + 0.5f) * quant;
     allSame = false;
     float hi = lo;
-    
+
     count = 1;
 
     const float maxRange = float(uint16_t(0xffff)) * quant;
@@ -88,25 +87,28 @@ inline void plVertCoder::ICountFloats(const uint8_t* src, uint16_t maxCnt, const
     src += stride;
     maxCnt--;
 
-    while( maxCnt-- )
-    {
+    while (maxCnt--) {
         float val = *(float*)src;
         val = floor(val / quant + 0.5f) * quant;
-        if( val < lo )
-        {
-            if( hi - val > maxRange )
+
+        if (val < lo) {
+            if (hi - val > maxRange) {
                 return;
+            }
+
             lo = val;
-        }
-        else if( val > hi )
-        {
-            if( val - lo > maxRange )
+        } else if (val > hi) {
+            if (val - lo > maxRange) {
                 return;
+            }
+
             hi = val;
         }
+
         count++;
         src += stride;
     }
+
     allSame = (lo == hi);
 }
 
@@ -137,8 +139,7 @@ static inline void IReadFloat(hsStream* s, uint8_t*& dst, const float offset, co
 
 inline void plVertCoder::IEncodeFloat(hsStream* s, const uint32_t vertsLeft, const int field, const int chan, const uint8_t*& src, const uint32_t stride)
 {
-    if( !fFloats[field][chan].fCount )
-    {
+    if (!fFloats[field][chan].fCount) {
         ICountFloats(src, (uint16_t)vertsLeft, kQuanta[field], stride, fFloats[field][chan].fOffset, fFloats[field][chan].fAllSame, fFloats[field][chan].fCount);
 
         s->WriteLEScalar(fFloats[field][chan].fOffset);
@@ -146,27 +147,27 @@ inline void plVertCoder::IEncodeFloat(hsStream* s, const uint32_t vertsLeft, con
         s->WriteLE16(fFloats[field][chan].fCount);
 
     }
-    if (!fFloats[field][chan].fAllSame)
+
+    if (!fFloats[field][chan].fAllSame) {
         IWriteFloat(s, src, fFloats[field][chan].fOffset, kQuanta[field]);
-    else
+    } else {
         src += 4;
+    }
 
     fFloats[field][chan].fCount--;
 }
 
 inline void plVertCoder::IDecodeFloat(hsStream* s, const int field, const int chan, uint8_t*& dst, const uint32_t stride)
 {
-    if( !fFloats[field][chan].fCount )
-    {
+    if (!fFloats[field][chan].fCount) {
         fFloats[field][chan].fOffset = s->ReadLEScalar();
         fFloats[field][chan].fAllSame = s->ReadBool();
         fFloats[field][chan].fCount = s->ReadLE16();
     }
 
-    if (!fFloats[field][chan].fAllSame)
+    if (!fFloats[field][chan].fAllSame) {
         IReadFloat(s, dst, fFloats[field][chan].fOffset, kQuanta[field]);
-    else
-    {
+    } else {
         *((float*)dst) = fFloats[field][chan].fOffset;
         dst += 4;
     }
@@ -222,28 +223,27 @@ inline void plVertCoder::ICountBytes(const uint32_t vertsLeft, const uint8_t* sr
     // We want to run length encode this. So we're looking here for either
     // the number of consecutive bytes of the same value,
     // or the number of consective bytes of different values.
-    // The latter is so we don't wind up getting larger when there aren't any 
+    // The latter is so we don't wind up getting larger when there aren't any
     // runs of the same value (count=1 and val=c1, count=1 and val=c2, etc.).
     // The break-even point is a run of 3, so we'll look for a minimum run of 4.
 
-    if( vertsLeft < 4 )
-    {
+    if (vertsLeft < 4) {
         len = (uint16_t)vertsLeft;
         same = false;
-        
+
         return;
     }
 
     // First, count how many values are the same as the first one
     int i;
-    for( i = 0; i < vertsLeft; i++ )
-    {
-        if( src[i * stride] != src[0] )
+
+    for (i = 0; i < vertsLeft; i++) {
+        if (src[i * stride] != src[0]) {
             break;
+        }
     }
 
-    if( i >= 4 )
-    {
+    if (i >= 4) {
         // Found a good run.
         len = i;
         same = true;
@@ -251,19 +251,19 @@ inline void plVertCoder::ICountBytes(const uint32_t vertsLeft, const uint8_t* sr
         return;
     }
 
-    // Okay, we're in a section of varying values. How far to the next 
+    // Okay, we're in a section of varying values. How far to the next
     // section of sameness?
     same = false;
-    for( ; i < vertsLeft-4; i++ )
-    {
-        if( (src[i*stride] == src[(i+1)*stride])
-            &&(src[i*stride] == src[(i+2)*stride])
-            &&(src[i*stride] == src[(i+3)*stride]) )
+
+    for (; i < vertsLeft - 4; i++) {
+        if ((src[i * stride] == src[(i + 1)*stride])
+                && (src[i * stride] == src[(i + 2)*stride])
+                && (src[i * stride] == src[(i + 3)*stride])) {
             break;
+        }
     }
 
-    if( i < vertsLeft-4 )
-    {
+    if (i < vertsLeft - 4) {
         len = i;
         return;
     }
@@ -276,48 +276,52 @@ static const uint16_t kSameMask(0x8000);
 
 inline void plVertCoder::IEncodeByte(hsStream* s, const int chan, const uint32_t vertsLeft, const uint8_t*& src, const uint32_t stride)
 {
-    if( !fColors[chan].fCount )
-    {
+    if (!fColors[chan].fCount) {
         ICountBytes(vertsLeft, src, stride, fColors[chan].fCount, fColors[chan].fSame);
 
         uint16_t cnt = fColors[chan].fCount;
-        if( fColors[chan].fSame )
+
+        if (fColors[chan].fSame) {
             cnt |= kSameMask;
+        }
+
         s->WriteLE16(cnt);
 
-        if( fColors[chan].fSame )
+        if (fColors[chan].fSame) {
             s->WriteByte(*src);
+        }
     }
 
-    if( !fColors[chan].fSame )
+    if (!fColors[chan].fSame) {
         s->WriteByte(*src);
-    
+    }
+
     src++;
     fColors[chan].fCount--;
 }
 
 inline void plVertCoder::IDecodeByte(hsStream* s, const int chan, uint8_t*& dst, const uint32_t stride)
 {
-    if( !fColors[chan].fCount )
-    {
+    if (!fColors[chan].fCount) {
         uint16_t cnt = s->ReadLE16();
-        if( cnt & kSameMask )
-        {
+
+        if (cnt & kSameMask) {
             fColors[chan].fSame = true;
             fColors[chan].fVal = s->ReadByte();
 
             cnt &= ~kSameMask;
-        }
-        else
-        {
+        } else {
             fColors[chan].fSame = false;
         }
+
         fColors[chan].fCount = cnt;
     }
-    if( !fColors[chan].fSame )
+
+    if (!fColors[chan].fSame) {
         *dst = s->ReadByte();
-    else
+    } else {
         *dst = fColors[chan].fVal;
+    }
 
     dst++;
     fColors[chan].fCount--;
@@ -347,14 +351,15 @@ inline void plVertCoder::IEncode(hsStream* s, const uint32_t vertsLeft, const ui
 
     // Weights and indices?
     const int numWeights = INumWeights(format);
-    if( numWeights )
-    {
-        int j;
-        for( j = 0; j < numWeights; j++ )
-            IEncodeFloat(s, vertsLeft, kWeight, j, src, stride);
 
-        if( format & plGBufferGroup::kSkinIndices )
-        {
+    if (numWeights) {
+        int j;
+
+        for (j = 0; j < numWeights; j++) {
+            IEncodeFloat(s, vertsLeft, kWeight, j, src, stride);
+        }
+
+        if (format & plGBufferGroup::kSkinIndices) {
             const uint32_t idx = *(uint32_t*)src;
             s->WriteLE32(idx);
             src += 4;
@@ -370,8 +375,8 @@ inline void plVertCoder::IEncode(hsStream* s, const uint32_t vertsLeft, const ui
 
     const int numUVWs = format & plGBufferGroup::kUVCountMask;
     int i;
-    for( i = 0; i < numUVWs; i++ )
-    {
+
+    for (i = 0; i < numUVWs; i++) {
         IEncodeFloat(s, vertsLeft, kUVW + i, 0, src, stride);
         IEncodeFloat(s, vertsLeft, kUVW + i, 1, src, stride);
         IEncodeFloat(s, vertsLeft, kUVW + i, 2, src, stride);
@@ -386,14 +391,15 @@ inline void plVertCoder::IDecode(hsStream* s, uint8_t*& dst, const uint32_t stri
 
     // Weights and indices?
     const int numWeights = INumWeights(format);
-    if( numWeights )
-    {
-        int j;
-        for( j = 0; j < numWeights; j++ )
-            IDecodeFloat(s, kWeight, j, dst, stride);
 
-        if( format & plGBufferGroup::kSkinIndices )
-        {
+    if (numWeights) {
+        int j;
+
+        for (j = 0; j < numWeights; j++) {
+            IDecodeFloat(s, kWeight, j, dst, stride);
+        }
+
+        if (format & plGBufferGroup::kSkinIndices) {
             uint32_t* idx = (uint32_t*)dst;
             *idx = s->ReadLE32();
             dst += 4;
@@ -411,8 +417,8 @@ inline void plVertCoder::IDecode(hsStream* s, uint8_t*& dst, const uint32_t stri
 
     const int numUVWs = format & plGBufferGroup::kUVCountMask;
     int i;
-    for( i = 0; i < numUVWs; i++ )
-    {
+
+    for (i = 0; i < numUVWs; i++) {
         IDecodeFloat(s, kUVW + i, 0, dst, stride);
         IDecodeFloat(s, kUVW + i, 1, dst, stride);
         IDecodeFloat(s, kUVW + i, 2, dst, stride);
@@ -424,8 +430,10 @@ void plVertCoder::Read(hsStream* s, uint8_t* dst, const uint8_t format, const ui
     Clear();
 
     int i = numVerts;
-    for( i = 0; i < numVerts; i++ )
+
+    for (i = 0; i < numVerts; i++) {
         IDecode(s, dst, stride, format);
+    }
 }
 
 
@@ -436,8 +444,8 @@ void plVertCoder::Write(hsStream* s, const uint8_t* src, const uint8_t format, c
     uint32_t streamStart = s->GetPosition();
 
     int numLeft = numVerts;
-    while( numLeft )
-    {
+
+    while (numLeft) {
         IEncode(s, numLeft, src, stride, format);
         numLeft--;
     }

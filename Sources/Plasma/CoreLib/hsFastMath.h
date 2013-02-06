@@ -59,8 +59,12 @@ public:
 
     static inline float InvSqrtAppr(float x);
     static inline float InvSqrt(float x);
-    static inline hsVector3& Normalize(hsVector3& v) { return (v *= InvSqrt(v.MagnitudeSquared())); }
-    static inline hsVector3& NormalizeAppr(hsVector3& v) { return (v *= InvSqrtAppr(v.MagnitudeSquared())); }
+    static inline hsVector3& Normalize(hsVector3& v) {
+        return (v *= InvSqrt(v.MagnitudeSquared()));
+    }
+    static inline hsVector3& NormalizeAppr(hsVector3& v) {
+        return (v *= InvSqrtAppr(v.MagnitudeSquared()));
+    }
 
     static inline void SinCosAppr(float rads, float& sinRads, float& cosRads);
     static inline void SinCosInRangeAppr(float rads, float& sinRads, float& cosRads);
@@ -116,7 +120,7 @@ inline float hsFastMath::InvSqrtAppr(float x)
 
     extern unsigned char statSeedTable[];
 
-    seed.i = SET_EXP(((3*EXP_BIAS - 1) - GET_EXP(a)) >> 1) | SET_MANTSEED(statSeedTable[GET_EMANT(a)]);
+    seed.i = SET_EXP(((3 * EXP_BIAS - 1) - GET_EXP(a)) >> 1) | SET_MANTSEED(statSeedTable[GET_EMANT(a)]);
 
     r = seed.f;
 
@@ -143,7 +147,7 @@ inline float hsFastMath::InvSqrt(float x)
 
     extern unsigned char statSeedTable[];
 
-    seed.i = SET_EXP(((3*EXP_BIAS - 1) - GET_EXP(a)) >> 1) | SET_MANTSEED(statSeedTable[GET_EMANT(a)]);
+    seed.i = SET_EXP(((3 * EXP_BIAS - 1) - GET_EXP(a)) >> 1) | SET_MANTSEED(statSeedTable[GET_EMANT(a)]);
 
     r = seed.f;
 
@@ -158,8 +162,11 @@ inline float hsFastMath::InvSqrt(float x)
 inline void hsFastMath::SinCosAppr(float rads, float& sinRads, float& cosRads)
 {
     rads = fmodf(rads, kTwoPI);
-    if( rads < 0 )
+
+    if (rads < 0) {
         rads += kTwoPI;
+    }
+
     SinCosInRangeAppr(rads, sinRads, cosRads);
 }
 
@@ -187,8 +194,10 @@ inline void hsFastMath::SinCosInRangeAppr(float rads, float& sinRads, float& cos
 inline float hsFastMath::Sin(float rads)
 {
     rads = fmodf(rads, kTwoPI);
-    if( rads < 0 )
+
+    if (rads < 0) {
         rads += kTwoPI;
+    }
 
     return SinInRange(rads);
 }
@@ -196,8 +205,10 @@ inline float hsFastMath::Sin(float rads)
 inline float hsFastMath::Cos(float rads)
 {
     rads = fmodf(rads, kTwoPI);
-    if( rads < 0 )
+
+    if (rads < 0) {
         rads += kTwoPI;
+    }
 
     return CosInRange(rads);
 }
@@ -206,54 +217,54 @@ inline float hsFastMath::SinInRange(float ang)
 {
     float sgn = 1.f;
 
-    if(ang >= (0.75f * kTwoPI))
+    if (ang >= (0.75f * kTwoPI)) {
         ang -= kTwoPI;
-    else if(ang >= (0.25f * kTwoPI))
-    {
+    } else if (ang >= (0.25f * kTwoPI)) {
         ang -= 3.141592654f;
         sgn = -1.0f;
     }
-    
-    return (ang - (ang*ang*ang) * (1.0f/6.0f) + (ang*ang*ang*ang*ang) / 120.0f) * sgn;
+
+    return (ang - (ang * ang * ang) * (1.0f / 6.0f) + (ang * ang * ang * ang * ang) / 120.0f) * sgn;
 }
 
 inline float hsFastMath::CosInRange(float ang)
 {
     float sgn = 1.f;
-    
-    if(ang >= (0.75f * kTwoPI))
+
+    if (ang >= (0.75f * kTwoPI)) {
         ang -= kTwoPI;
-    else if(ang >= (0.25f * kTwoPI))
-    {
+    } else if (ang >= (0.25f * kTwoPI)) {
         ang -= 3.141592654f;
         sgn = -1.0f;
     }
-    
-    return (1.0f - (ang*ang / 2.0f) + (ang*ang*ang*ang) / 24.0f) *sgn;
+
+    return (1.0f - (ang * ang / 2.0f) + (ang * ang * ang * ang) / 24.0f) * sgn;
 }
 
 inline void hsFastMath::SinCos(float rads, float& sinRads, float& cosRads)
 {
     rads = fmodf(rads, kTwoPI);
-    if( rads < 0 )
+
+    if (rads < 0) {
         rads += kTwoPI;
+    }
+
     SinCosInRange(rads, sinRads, cosRads);
 }
 
 inline void hsFastMath::SinCosInRange(float ang, float& sinRads, float& cosRads)
 {
     float sgn = 1.f;
-    
-    if(ang >= (0.75f * kTwoPI))
+
+    if (ang >= (0.75f * kTwoPI)) {
         ang -= kTwoPI;
-    else if(ang >= (0.25f * kTwoPI))
-    {
+    } else if (ang >= (0.25f * kTwoPI)) {
         ang -= 3.141592654f;
         sgn = -1.0f;
     }
-    
-    sinRads = (ang - (ang*ang*ang) * (1.0f/6.0f) + (ang*ang*ang*ang*ang) / 120.0f) * sgn;
-    cosRads = (1.0f - (ang*ang / 2.0f) + (ang*ang*ang*ang) / 24.0f) *sgn;
+
+    sinRads = (ang - (ang * ang * ang) * (1.0f / 6.0f) + (ang * ang * ang * ang * ang) / 120.0f) * sgn;
+    cosRads = (1.0f - (ang * ang / 2.0f) + (ang * ang * ang * ang) / 24.0f) * sgn;
 }
 //
 // Here's an interesting one from GDalgorithms, which doesn't need a LUT
@@ -284,23 +295,23 @@ as shorts, and converted to normalized floats where necessary using SIMD
 instructions.
 */
 
-void FastSinCos(long Angle, float *pSin, float *pCos)
+void FastSinCos(long Angle, float* pSin, float* pCos)
 {
-float ang, sgn;
+    float ang, sgn;
 
-        ang = (Angle & 65535) * ((1.0f/65536.0f) * TwoPI);
+    ang = (Angle & 65535) * ((1.0f / 65536.0f) * TwoPI);
 
-        sgn = 1.0f;
-        if(ang >= (0.75f * TwoPI))
-                ang -= TwoPI;
-        else if(ang >= (0.25f * TwoPI))
-        {
-                ang -= 3.141592654f;
-                sgn = -1.0f;
-        }
+    sgn = 1.0f;
 
-        *pSin = (ang - (ang*ang*ang) * (1.0f/6.0f) + (ang*ang*ang*ang*ang) / 120.0f) * sgn;
-        *pCos = (1.0f - (ang*ang / 2.0f) + (ang*ang*ang*ang) / 24.0f) *sgn;
+    if (ang >= (0.75f * TwoPI)) {
+        ang -= TwoPI;
+    } else if (ang >= (0.25f * TwoPI)) {
+        ang -= 3.141592654f;
+        sgn = -1.0f;
+    }
+
+    *pSin = (ang - (ang * ang * ang) * (1.0f / 6.0f) + (ang * ang * ang * ang * ang) / 120.0f) * sgn;
+    *pCos = (1.0f - (ang * ang / 2.0f) + (ang * ang * ang * ang) / 24.0f) * sgn;
 }
 #endif // For future reference
 #endif // hsFastMath_inc

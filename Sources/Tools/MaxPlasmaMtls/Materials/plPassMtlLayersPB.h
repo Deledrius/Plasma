@@ -42,8 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef PL_PASSMTLLAYERSPB_H
 #define PL_PASSMTLLAYERSPB_H
 
-enum
-{
+enum {
     // Layers
     kPassLayBase,
     kPassLayTopOn,

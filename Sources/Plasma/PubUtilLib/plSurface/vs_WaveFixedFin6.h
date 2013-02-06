@@ -526,7 +526,7 @@ static const uint8_t vs_WaveFixedFin6Codes[] = {
     0x1,    0x0,    0xe4,   0x80,
     0x14,   0x0,    0xe4,   0xa0,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl vs_WaveFixedFin6Decl("sha/vs_WaveFixedFin6.inl", vs_WaveFixedFin6, vs_WaveFixedFin6byteLen, vs_WaveFixedFin6Codes);
 

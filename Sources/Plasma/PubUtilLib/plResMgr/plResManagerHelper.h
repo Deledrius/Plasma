@@ -72,75 +72,80 @@ class plResMgrDebugInterface;
 
 class plResManager;
 class plRegistryPageNode;
-class plResManagerHelper : public hsKeyedObject
-{
-    protected:
+class plResManagerHelper : public hsKeyedObject {
+protected:
 
-        plResManager                *fResManager;
-        static plResManagerHelper   *fInstance;
+    plResManager*                fResManager;
+    static plResManagerHelper*   fInstance;
 
-        bool                        fInShutdown;
+    bool                        fInShutdown;
 
 #ifdef MCN_RESMGR_DEBUGGING
-        friend class plDebugPrintIterator;
-        friend class plResMgrDebugInterface;
+    friend class plDebugPrintIterator;
+    friend class plResMgrDebugInterface;
 
-        plStatusLog     *fDebugScreen;
-        bool            fRefreshing, fCurrAgeExpanded;
-        int             fCurrAge;
-        int             fDebugDisplayType;
+    plStatusLog*     fDebugScreen;
+    bool            fRefreshing, fCurrAgeExpanded;
+    int             fCurrAge;
+    int             fDebugDisplayType;
 
-        enum DebugDisplayTypes
-        {
-            kSizes = 0,
-            kPercents,
-            kBars,
-            kMaxDisplayType
-        };
-        plResMgrDebugInterface  *fDebugInput;
+    enum DebugDisplayTypes {
+        kSizes = 0,
+        kPercents,
+        kBars,
+        kMaxDisplayType
+    };
+    plResMgrDebugInterface*  fDebugInput;
 #endif
 
-        void    IUpdateDebugScreen( bool force = false );
+    void    IUpdateDebugScreen(bool force = false);
 
-    public:
+public:
 
-        plResManagerHelper( plResManager *resMgr );
-        virtual ~plResManagerHelper();
+    plResManagerHelper(plResManager* resMgr);
+    virtual ~plResManagerHelper();
 
-        CLASSNAME_REGISTER( plResManagerHelper );
-        GETINTERFACE_ANY( plResManagerHelper, hsKeyedObject );
+    CLASSNAME_REGISTER(plResManagerHelper);
+    GETINTERFACE_ANY(plResManagerHelper, hsKeyedObject);
 
-        virtual bool    MsgReceive( plMessage *msg );
-    
-        virtual void    Read( hsStream *s, hsResMgr *mgr );
-        virtual void    Write( hsStream *s, hsResMgr *mgr );
+    virtual bool    MsgReceive(plMessage* msg);
 
-        void    Init( void );
-        void    Shutdown( void );
+    virtual void    Read(hsStream* s, hsResMgr* mgr);
+    virtual void    Write(hsStream* s, hsResMgr* mgr);
 
-        void    LoadAndHoldPageKeys( plRegistryPageNode *page );
+    void    Init(void);
+    void    Shutdown(void);
 
-        void    EnableDebugScreen( bool enable );
+    void    LoadAndHoldPageKeys(plRegistryPageNode* page);
 
-        // Please let the res manager handle telling this.
-        void    SetInShutdown(bool b) { fInShutdown = b; }
-        bool    GetInShutdown() const { return fInShutdown; }
+    void    EnableDebugScreen(bool enable);
 
-        static plResManagerHelper   *GetInstance( void ) { return fInstance; }
+    // Please let the res manager handle telling this.
+    void    SetInShutdown(bool b) {
+        fInShutdown = b;
+    }
+    bool    GetInShutdown() const {
+        return fInShutdown;
+    }
+
+    static plResManagerHelper*   GetInstance(void) {
+        return fInstance;
+    }
 };
 
 //// Reffer Class ////////////////////////////////////////////////////////////
 
-class plResPageKeyRefList : public plKeyCollector 
-{
-    protected:
+class plResPageKeyRefList : public plKeyCollector {
+protected:
 
-        hsTArray<plKey>     fKeyList;
+    hsTArray<plKey>     fKeyList;
 
-    public:
+public:
 
-        plResPageKeyRefList() : plKeyCollector( fKeyList ) {}
-        virtual ~plResPageKeyRefList() { fKeyList.Reset(); }
+    plResPageKeyRefList() : plKeyCollector(fKeyList) {}
+    virtual ~plResPageKeyRefList() {
+        fKeyList.Reset();
+    }
 };
 
 #endif // _plResManagerHelper_h

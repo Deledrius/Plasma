@@ -52,26 +52,26 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plVisMgr.h"
 
 plRenderRequest::plRenderRequest()
-:   fRenderTarget(nil),
-    fPageMgr(nil),
-    fAck(nil),
-    fOverrideMat(nil),
-    fEraseMat(nil),
-    fDrawableMask(uint32_t(-1)),
-    fSubDrawableMask(uint32_t(-1)),
-    fRenderState(0),
-    fClearDepth(1.f),
-    fFogStart(-1.f),
-    fClearDrawable(nil),
-    fPriority(-1.e6f),
-    fUserData(0),
-    fIgnoreOccluders(false)
+    :   fRenderTarget(nil),
+        fPageMgr(nil),
+        fAck(nil),
+        fOverrideMat(nil),
+        fEraseMat(nil),
+        fDrawableMask(uint32_t(-1)),
+        fSubDrawableMask(uint32_t(-1)),
+        fRenderState(0),
+        fClearDepth(1.f),
+        fFogStart(-1.f),
+        fClearDrawable(nil),
+        fPriority(-1.e6f),
+        fUserData(0),
+        fIgnoreOccluders(false)
 {
-    fClearColor.Set(0,0,0,1.f);
+    fClearColor.Set(0, 0, 0, 1.f);
 
     fLocalToWorld.Reset();
     fWorldToLocal.Reset();
-    
+
 }
 
 plRenderRequest::~plRenderRequest()
@@ -116,8 +116,7 @@ void plRenderRequest::Write(hsStream* s, hsResMgr* mgr)
 
 void plRenderRequest::Render(plPipeline* pipe, plPageTreeMgr* pageMgr)
 {
-    if( !fVisForce.Empty() )
-    {
+    if (!fVisForce.Empty()) {
         plGlobalVisMgr::Instance()->DisableNormal();
         plGlobalVisMgr::Instance()->ForceVisSets(fVisForce, false);
     }
@@ -127,29 +126,28 @@ void plRenderRequest::Render(plPipeline* pipe, plPageTreeMgr* pageMgr)
     pipe->ClearRenderTarget(GetClearDrawable());
 
     int numDrawn = 0;
-    if( GetPageTreeMgr() )
+
+    if (GetPageTreeMgr()) {
         numDrawn = GetPageTreeMgr()->Render(pipe);
-    else
+    } else {
         numDrawn = pageMgr->Render(pipe);
+    }
 
     pipe->PopRenderRequest(this);
-    
-    if( GetAck() )
-    {
-        plRenderRequestAck* ack = new plRenderRequestAck( GetAck(), GetUserData() );
+
+    if (GetAck()) {
+        plRenderRequestAck* ack = new plRenderRequestAck(GetAck(), GetUserData());
         ack->SetNumDrawn(numDrawn);
-        plgDispatch::MsgSend( ack );
+        plgDispatch::MsgSend(ack);
     }
 }
 
-void plRenderRequest::SetRenderTarget(plRenderTarget* t) 
-{ 
-    if( t != fRenderTarget )
-    {
-        fRenderTarget = t; 
+void plRenderRequest::SetRenderTarget(plRenderTarget* t)
+{
+    if (t != fRenderTarget) {
+        fRenderTarget = t;
 
-        if( fRenderTarget )
-        {
+        if (fRenderTarget) {
             fViewTransform.SetWidth(t->GetWidth());
             fViewTransform.SetHeight(t->GetHeight());
         }
@@ -158,13 +156,14 @@ void plRenderRequest::SetRenderTarget(plRenderTarget* t)
 
 void plRenderRequest::SetVisForce(const hsBitVector& b)
 {
-    if( b.Empty() )
+    if (b.Empty()) {
         fVisForce.Reset();
-    else
+    } else {
         fVisForce = b;
+    }
 }
 
-bool plRenderRequest::GetRenderCharacters() const 
-{ 
-    return fVisForce.IsBitSet(plVisMgr::kCharacter); 
+bool plRenderRequest::GetRenderCharacters() const
+{
+    return fVisForce.IsBitSet(plVisMgr::kCharacter);
 }

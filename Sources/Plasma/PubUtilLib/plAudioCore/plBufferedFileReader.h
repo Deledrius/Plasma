@@ -56,27 +56,30 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Class Definition ////////////////////////////////////////////////////////
 
-class plBufferedFileReader : public plAudioFileReader
-{
+class plBufferedFileReader : public plAudioFileReader {
 public:
-    plBufferedFileReader( const plFileName &path, plAudioCore::ChannelSelect whichChan = plAudioCore::kAll );
+    plBufferedFileReader(const plFileName& path, plAudioCore::ChannelSelect whichChan = plAudioCore::kAll);
     virtual ~plBufferedFileReader();
 
-    virtual plWAVHeader &GetHeader( void );
-    virtual void    Close( void );
-    virtual uint32_t  GetDataSize( void ) { return fBufferSize; }
-    virtual float   GetLengthInSecs( void );
-    virtual bool    SetPosition( uint32_t numBytes );
-    virtual bool    Read( uint32_t numBytes, void *buffer );
-    virtual uint32_t  NumBytesLeft( void );
-    virtual bool    IsValid( void ) { return ( fBuffer != nil ) ? true : false; }
+    virtual plWAVHeader& GetHeader(void);
+    virtual void    Close(void);
+    virtual uint32_t  GetDataSize(void) {
+        return fBufferSize;
+    }
+    virtual float   GetLengthInSecs(void);
+    virtual bool    SetPosition(uint32_t numBytes);
+    virtual bool    Read(uint32_t numBytes, void* buffer);
+    virtual uint32_t  NumBytesLeft(void);
+    virtual bool    IsValid(void) {
+        return (fBuffer != nil) ? true : false;
+    }
 
 protected:
     uint32_t        fBufferSize;
-    uint8_t        *fBuffer;
+    uint8_t*        fBuffer;
     plWAVHeader     fHeader;
     uint32_t        fCursor;
-    void            IError( const char *msg );
+    void            IError(const char* msg);
 };
 
 #endif //_plBufferedFileReader_h

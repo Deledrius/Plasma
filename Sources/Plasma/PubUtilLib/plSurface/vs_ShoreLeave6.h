@@ -349,7 +349,7 @@ static const uint8_t vs_ShoreLeave6Codes[] = {
     0x2,    0x0,    0xf,    0xe0,
     0x0,    0x0,    0xf4,   0x80,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl vs_ShoreLeave6Decl("sha/vs_ShoreLeave6.inl", vs_ShoreLeave6, vs_ShoreLeave6byteLen, vs_ShoreLeave6Codes);
 

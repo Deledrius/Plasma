@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/Apps/plClientPatcher/UruPlayer.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_APPS_PLCLIENTPATCHER_URUPLAYER_H
@@ -57,11 +57,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *
 ***/
 
-void InitAsyncCore ();
-void ShutdownAsyncCore () ;
-void UruPrepProc (void * param);
-void UruStartProc (void * param);
-void PlayerTerminateProc (void * param);
-void PlayerStopProc (void * param);
+void InitAsyncCore();
+void ShutdownAsyncCore() ;
+void UruPrepProc(void* param);
+void UruStartProc(void* param);
+void PlayerTerminateProc(void* param);
+void PlayerStopProc(void* param);
 
 extern plFileName kPatcherExeFilename;

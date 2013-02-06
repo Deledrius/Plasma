@@ -48,49 +48,43 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 ////////////////////////////////////////////////////////////////////
 
-struct pyAlarm
-{
+struct pyAlarm {
     double  fStart;
     float   fSecs;
-    PyObject *  fCb;
+    PyObject*   fCb;
     uint32_t  fCbContext;
-    pyAlarm( double start, float secs, PyObject * cb, uint32_t cbContext )
-    : fStart( start )
-    , fSecs( secs )
-    , fCb( cb )
-    , fCbContext( cbContext )
-    {
-        Py_XINCREF( fCb );
+    pyAlarm(double start, float secs, PyObject* cb, uint32_t cbContext)
+        : fStart(start)
+        , fSecs(secs)
+        , fCb(cb)
+        , fCbContext(cbContext) {
+        Py_XINCREF(fCb);
     }
-    ~pyAlarm()
-    {
-        Py_XDECREF( fCb );
+    ~pyAlarm() {
+        Py_XDECREF(fCb);
     }
-    bool MaybeFire( double secs )
-    {
-        if ( secs-fStart>fSecs )
-        {
+    bool MaybeFire(double secs) {
+        if (secs - fStart > fSecs) {
             Fire();
             return true;
         }
+
         return false;
     }
-    void Fire()
-    {
-        if ( fCb )
-        {
+    void Fire() {
+        if (fCb) {
             PyObject* func = nil;
 
             // Call the callback.
-            func = PyObject_GetAttrString( fCb, "onAlarm" );
-            if ( func )
-            {
-                if ( PyCallable_Check(func)>0 )
-                {
-                    PyObject *retVal = PyObject_CallMethod(fCb, "onAlarm", "l", fCbContext);
+            func = PyObject_GetAttrString(fCb, "onAlarm");
+
+            if (func) {
+                if (PyCallable_Check(func) > 0) {
+                    PyObject* retVal = PyObject_CallMethod(fCb, "onAlarm", "l", fCbContext);
                     Py_XDECREF(retVal);
                 }
             }
+
             Py_XDECREF(func);
         }
     }
@@ -100,7 +94,7 @@ struct pyAlarm
 ////////////////////////////////////////////////////////////////////
 
 //static
-pyAlarmMgr * pyAlarmMgr::GetInstance()
+pyAlarmMgr* pyAlarmMgr::GetInstance()
 {
     static pyAlarmMgr inst;
     return &inst;
@@ -111,35 +105,35 @@ pyAlarmMgr::~pyAlarmMgr()
 //  Clear();
 }
 
-void pyAlarmMgr::Update( double secs )
+void pyAlarmMgr::Update(double secs)
 {
     Alarms::iterator it = fAlarms.begin();
-    while ( it!=fAlarms.end() )
-    {
-        pyAlarm * alarm = (*it);
-        if ( alarm->MaybeFire( secs ) )
-        {
+
+    while (it != fAlarms.end()) {
+        pyAlarm* alarm = (*it);
+
+        if (alarm->MaybeFire(secs)) {
             Alarms::iterator jt = it++;
-            fAlarms.erase( jt );
+            fAlarms.erase(jt);
             delete alarm;
-        }
-        else
-        {
+        } else {
             it++;
         }
     }
 }
 
-void pyAlarmMgr::SetAlarm( float secs, PyObject * cb, uint32_t cbContext )
+void pyAlarmMgr::SetAlarm(float secs, PyObject* cb, uint32_t cbContext)
 {
     double start = hsTimer::GetSysSeconds();
-    fAlarms.push_back( new pyAlarm( start, secs, cb, cbContext ) );
+    fAlarms.push_back(new pyAlarm(start, secs, cb, cbContext));
 }
 
 void pyAlarmMgr::Clear()
 {
-    for (Alarms::iterator i = fAlarms.begin(); i != fAlarms.end(); i++)
+    for (Alarms::iterator i = fAlarms.begin(); i != fAlarms.end(); i++) {
         delete *i;
+    }
+
     fAlarms.clear();
 }
 

@@ -48,12 +48,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMessage/plRideAnimatedPhysMsg.h"
 
 
-void plAvBrainRideAnimatedPhysical::Activate(plArmatureModBase *avMod)
+void plAvBrainRideAnimatedPhysical::Activate(plArmatureModBase* avMod)
 {
     plArmatureBrain::Activate(avMod);
     IInitAnimations();
-    if (!fWalkingStrategy)
-    {
+
+    if (!fWalkingStrategy) {
         plSceneObject* avObj = fArmature->GetTarget(0);
         plAGModifier* agMod = const_cast<plAGModifier*>(plAGModifier::ConvertNoRef(FindModifierByClass(avObj, plAGModifier::Index())));
         plPhysicalControllerCore* controller = avMod->GetController();
@@ -71,59 +71,58 @@ void plAvBrainRideAnimatedPhysical::Deactivate()
 {
     plArmatureBrain::Deactivate();
 }
-bool plAvBrainRideAnimatedPhysical::MsgReceive(plMessage *msg)
+bool plAvBrainRideAnimatedPhysical::MsgReceive(plMessage* msg)
 {
-    plRideAnimatedPhysMsg *ride = plRideAnimatedPhysMsg::ConvertNoRef(msg);
-    if(ride)
-    {
-        if(!ride->Entering())
-        {
+    plRideAnimatedPhysMsg* ride = plRideAnimatedPhysMsg::ConvertNoRef(msg);
+
+    if (ride) {
+        if (!ride->Entering()) {
             /*this->fArmature->PopBrain();
             delete this;
             return true;
             */
-            fMode=kAbort;
+            fMode = kAbort;
         }
     }
+
     return plArmatureBrain::MsgReceive(msg);
 }
 bool plAvBrainRideAnimatedPhysical::IInitAnimations()
 {
     bool result = false;
 
-    plAGAnim *idle = fAvMod->FindCustomAnim("Idle");
-    plAGAnim *walk = fAvMod->FindCustomAnim("Walk");
-    plAGAnim *run = fAvMod->FindCustomAnim("Run");
-    plAGAnim *walkBack = fAvMod->FindCustomAnim("WalkBack");
-    plAGAnim *stepLeft = fAvMod->FindCustomAnim("StepLeft");
-    plAGAnim *stepRight = fAvMod->FindCustomAnim("StepRight");
-    plAGAnim *standingLeft = fAvMod->FindCustomAnim("TurnLeft");
-    plAGAnim *standingRight = fAvMod->FindCustomAnim("TurnRight");
-    plAGAnim *fall = fAvMod->FindCustomAnim("Fall");
-    plAGAnim *standJump = fAvMod->FindCustomAnim("StandingJump");
-    plAGAnim *walkJump = fAvMod->FindCustomAnim("WalkingJump");
-    plAGAnim *runJump = fAvMod->FindCustomAnim("RunningJump");
-    plAGAnim *groundImpact = fAvMod->FindCustomAnim("GroundImpact");
-    plAGAnim *runningImpact = fAvMod->FindCustomAnim("RunningImpact");
-    plAGAnim *movingLeft = nil; // fAvMod->FindCustomAnim("LeanLeft");
-    plAGAnim *movingRight = nil; // fAvMod->FindCustomAnim("LeanRight");
-    plAGAnim *pushWalk = fAvMod->FindCustomAnim("BallPushWalk");
+    plAGAnim* idle = fAvMod->FindCustomAnim("Idle");
+    plAGAnim* walk = fAvMod->FindCustomAnim("Walk");
+    plAGAnim* run = fAvMod->FindCustomAnim("Run");
+    plAGAnim* walkBack = fAvMod->FindCustomAnim("WalkBack");
+    plAGAnim* stepLeft = fAvMod->FindCustomAnim("StepLeft");
+    plAGAnim* stepRight = fAvMod->FindCustomAnim("StepRight");
+    plAGAnim* standingLeft = fAvMod->FindCustomAnim("TurnLeft");
+    plAGAnim* standingRight = fAvMod->FindCustomAnim("TurnRight");
+    plAGAnim* fall = fAvMod->FindCustomAnim("Fall");
+    plAGAnim* standJump = fAvMod->FindCustomAnim("StandingJump");
+    plAGAnim* walkJump = fAvMod->FindCustomAnim("WalkingJump");
+    plAGAnim* runJump = fAvMod->FindCustomAnim("RunningJump");
+    plAGAnim* groundImpact = fAvMod->FindCustomAnim("GroundImpact");
+    plAGAnim* runningImpact = fAvMod->FindCustomAnim("RunningImpact");
+    plAGAnim* movingLeft = nil; // fAvMod->FindCustomAnim("LeanLeft");
+    plAGAnim* movingRight = nil; // fAvMod->FindCustomAnim("LeanRight");
+    plAGAnim* pushWalk = fAvMod->FindCustomAnim("BallPushWalk");
 
     //plAGAnim *pushIdle = fAvMod->FindCustomAnim("BallPushIdle");
-    
+
     const float kDefaultFade = 3.0;     // most animations fade in and out in 1/4 of a second.
 
-    if (idle && walk && run && walkBack && standingLeft && standingRight && stepLeft && stepRight)
-    {
-        plHBehavior *behavior;
+    if (idle && walk && run && walkBack && standingLeft && standingRight && stepLeft && stepRight) {
+        plHBehavior* behavior;
         fBehaviors.SetCountAndZero(kHuBehaviorMax);
         fBehaviors[kIdle] = behavior = new Idle;
         behavior->Init(idle, true, this, fAvMod, kDefaultFade, kDefaultFade, kIdle, plHBehavior::kBehaviorTypeIdle);
         behavior->SetStrength(1.f, 0.f);
-        
+
         fBehaviors[kWalk] = behavior = new Walk;
         behavior->Init(walk, true, this, fAvMod, kDefaultFade, 5.f, kWalk, plHBehavior::kBehaviorTypeWalk);
-        
+
         fBehaviors[kRun] = behavior = new Run;
         behavior->Init(run, true, this, fAvMod, kDefaultFade, 2.0, kRun, plHBehavior::kBehaviorTypeRun);
 
@@ -156,13 +155,13 @@ bool plAvBrainRideAnimatedPhysical::IInitAnimations()
 
         fBehaviors[kRunningJump] = behavior = new RunningJump;
         behavior->Init(runJump, false, this, fAvMod, 10, 2.0, kRunningJump, plHBehavior::kBehaviorTypeRunningJump);
-        
+
         fBehaviors[kGroundImpact] = behavior = new GroundImpact;
         behavior->Init(groundImpact, false, this, fAvMod, 6.0f, kDefaultFade, kGroundImpact, plHBehavior::kBehaviorTypeGroundImpact);
-        
+
         fBehaviors[kRunningImpact] = behavior = new RunningImpact;
         behavior->Init(runningImpact, false, this, fAvMod, 6.0f, kDefaultFade, kRunningImpact, plHBehavior::kBehaviorTypeRunningImpact);
-        
+
         fBehaviors[kMovingTurnLeft] = behavior = new MovingTurnLeft;
         behavior->Init(movingLeft, true, this, fAvMod, kDefaultFade, kDefaultFade, kMovingTurnLeft, plHBehavior::kBehaviorTypeMovingTurnLeft);
 
@@ -171,12 +170,13 @@ bool plAvBrainRideAnimatedPhysical::IInitAnimations()
 
         fBehaviors[kPushWalk] = behavior = new PushWalk;
         behavior->Init(pushWalk, true, this, fAvMod, kDefaultFade, kDefaultFade, kPushWalk, plHBehavior::kBehaviorTypePushWalk);
-        
+
         //fBehaviors[kPushIdle] = behavior = new PushIdle;
         //behavior->Init(pushIdle, true, this, fAvMod, kDefaultFade, kDefaultFade, kPushIdle, plHBehavior::kBehaviorTypePushIdle);
 
         result = true;
     }
+
     return result;
 }
 bool plAvBrainRideAnimatedPhysical::LeaveAge()
@@ -185,7 +185,10 @@ bool plAvBrainRideAnimatedPhysical::LeaveAge()
 }
 bool plAvBrainRideAnimatedPhysical::Apply(double timeNow, float elapsed)
 {
-    if(this->fMode==kAbort) return false;
-    else return plAvBrainHuman::Apply(timeNow, elapsed);
+    if (this->fMode == kAbort) {
+        return false;
+    } else {
+        return plAvBrainHuman::Apply(timeNow, elapsed);
+    }
 
 }

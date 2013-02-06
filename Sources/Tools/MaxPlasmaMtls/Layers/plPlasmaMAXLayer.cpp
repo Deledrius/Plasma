@@ -76,11 +76,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 //// Derived Types List ///////////////////////////////////////////////////////
-//  If you create a new Plasma layer type, add a define for the class ID in 
+//  If you create a new Plasma layer type, add a define for the class ID in
 //  the header and add it to the list here.
 
-const Class_ID  plPlasmaMAXLayer::fDerivedTypes[] =
-{
+const Class_ID  plPlasmaMAXLayer::fDerivedTypes[] = {
     LAYER_TEX_CLASS_ID,
     STATIC_ENV_LAYER_CLASS_ID,
     DYNAMIC_ENV_LAYER_CLASS_ID,
@@ -101,21 +100,22 @@ plPlasmaMAXLayer::~plPlasmaMAXLayer()
 }
 
 //// GetPlasmaMAXLayer ////////////////////////////////////////////////////////
-//  Static function that checks the classID of the given texMap and, if it's a 
+//  Static function that checks the classID of the given texMap and, if it's a
 //  valid Plasma MAX Layer, returns a pointer to such.
 
-plPlasmaMAXLayer    *plPlasmaMAXLayer::GetPlasmaMAXLayer( Texmap *map )
+plPlasmaMAXLayer*    plPlasmaMAXLayer::GetPlasmaMAXLayer(Texmap* map)
 {
-    if (!map)
+    if (!map) {
         return NULL;
+    }
 
     int     i;
 
 
-    for( i = 0; i < sizeof( fDerivedTypes ) / sizeof( Class_ID ); i++ )
-    {
-        if( map->ClassID() == fDerivedTypes[ i ] )
-            return (plPlasmaMAXLayer *)map;
+    for (i = 0; i < sizeof(fDerivedTypes) / sizeof(Class_ID); i++) {
+        if (map->ClassID() == fDerivedTypes[ i ]) {
+            return (plPlasmaMAXLayer*)map;
+        }
     }
 
     return NULL;
@@ -134,89 +134,90 @@ plPlasmaMAXLayer    *plPlasmaMAXLayer::GetPlasmaMAXLayer( Texmap *map )
 //  actually used), we have a small helper class that just keep passive refs,
 //  so when one of them goes away, we get a notify about it.
 
-class plLayerTargetContainer : public hsKeyedObject
-{
+class plLayerTargetContainer : public hsKeyedObject {
     static uint32_t       fKeyCount;
 
-    public:
-        hsTArray<plLayerInterface *>    fLayers;
+public:
+    hsTArray<plLayerInterface*>    fLayers;
 
-        virtual bool MsgReceive( plMessage *msg )
-        {
-            plGenRefMsg *ref = plGenRefMsg::ConvertNoRef( msg );
-            if( ref != nil )
-            {
-                if( ref->GetContext() & ( plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace ) )
-                    fLayers[ ref->fWhich ] = plLayerInterface::ConvertNoRef( ref->GetRef() );
-                else
-                    fLayers[ ref->fWhich ] = nil;
+    virtual bool MsgReceive(plMessage* msg) {
+        plGenRefMsg* ref = plGenRefMsg::ConvertNoRef(msg);
+
+        if (ref != nil) {
+            if (ref->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+                fLayers[ ref->fWhich ] = plLayerInterface::ConvertNoRef(ref->GetRef());
+            } else {
+                fLayers[ ref->fWhich ] = nil;
             }
-
-            return hsKeyedObject::MsgReceive( msg );
         }
 
-        plLayerTargetContainer()
-        {
-            plString str = plString::Format( "plLayerTargetContainer-%d", fKeyCount++ );
-            hsgResMgr::ResMgr()->NewKey( str, this, plLocation::kGlobalFixedLoc );
-        }
+        return hsKeyedObject::MsgReceive(msg);
+    }
+
+    plLayerTargetContainer() {
+        plString str = plString::Format("plLayerTargetContainer-%d", fKeyCount++);
+        hsgResMgr::ResMgr()->NewKey(str, this, plLocation::kGlobalFixedLoc);
+    }
 };
 
 uint32_t  plLayerTargetContainer::fKeyCount = 0;
 
 
-void    plPlasmaMAXLayer::IAddConversionTarget( plLayerInterface *target )
+void    plPlasmaMAXLayer::IAddConversionTarget(plLayerInterface* target)
 {
-    if( fConversionTargets == nil )
-    {
+    if (fConversionTargets == nil) {
         // Create us a new container
         fConversionTargets = new plLayerTargetContainer;
         fConversionTargets->GetKey()->RefObject();
     }
 
-    fConversionTargets->fLayers.Append( target );
-    hsgResMgr::ResMgr()->AddViaNotify( target->GetKey(), 
-                                        new plGenRefMsg( fConversionTargets->GetKey(), plRefMsg::kOnCreate, 
-                                                        fConversionTargets->fLayers.GetCount() - 1, 0 ),
-                                        plRefFlags::kPassiveRef );
+    fConversionTargets->fLayers.Append(target);
+    hsgResMgr::ResMgr()->AddViaNotify(target->GetKey(),
+                                      new plGenRefMsg(fConversionTargets->GetKey(), plRefMsg::kOnCreate,
+                                              fConversionTargets->fLayers.GetCount() - 1, 0),
+                                      plRefFlags::kPassiveRef);
 }
 
-void    plPlasmaMAXLayer::IClearConversionTargets( void )
+void    plPlasmaMAXLayer::IClearConversionTargets(void)
 {
-    if( fConversionTargets != nil )
-    {
+    if (fConversionTargets != nil) {
         fConversionTargets->GetKey()->UnRefObject();
         fConversionTargets = nil;
     }
 }
 
-int     plPlasmaMAXLayer::GetNumConversionTargets( void )
+int     plPlasmaMAXLayer::GetNumConversionTargets(void)
 {
-    if( fConversionTargets == nil )
+    if (fConversionTargets == nil) {
         return 0;
+    }
 
 
     int i, count = 0;
-    for( i = 0; i < fConversionTargets->fLayers.GetCount(); i++ )
-    {
-        if( fConversionTargets->fLayers[ i ] != nil )
+
+    for (i = 0; i < fConversionTargets->fLayers.GetCount(); i++) {
+        if (fConversionTargets->fLayers[ i ] != nil) {
             count++;
+        }
     }
+
     return count;
 }
 
-plLayerInterface    *plPlasmaMAXLayer::GetConversionTarget( int index )
+plLayerInterface*    plPlasmaMAXLayer::GetConversionTarget(int index)
 {
-    if( fConversionTargets == nil )
+    if (fConversionTargets == nil) {
         return nil;
+    }
 
     int i;
-    for( i = 0; i < fConversionTargets->fLayers.GetCount(); i++ )
-    {
-        if( fConversionTargets->fLayers[ i ] != nil )
-        {
-            if( index == 0 )
+
+    for (i = 0; i < fConversionTargets->fLayers.GetCount(); i++) {
+        if (fConversionTargets->fLayers[ i ] != nil) {
+            if (index == 0) {
                 return fConversionTargets->fLayers[ i ];
+            }
+
             index--;
         }
     }
@@ -231,9 +232,9 @@ plLayerInterface    *plPlasmaMAXLayer::GetConversionTarget( int index )
 #ifdef MAXASS_AVAILABLE
 void plPlasmaMAXLayer::SetBitmapAssetId(jvUniqueId& assetId, int index /* = 0 */)
 {
-    PBBitmap *pbbm = GetPBBitmap(index);
-    if (pbbm && GetMaxAssInterface())
-    {
+    PBBitmap* pbbm = GetPBBitmap(index);
+
+    if (pbbm && GetMaxAssInterface()) {
         char buf[20];
         GetMaxAssInterface()->UniqueIdToString(assetId, buf);
         pbbm->bi.SetDevice(buf);
@@ -242,124 +243,127 @@ void plPlasmaMAXLayer::SetBitmapAssetId(jvUniqueId& assetId, int index /* = 0 */
 
 void plPlasmaMAXLayer::GetBitmapAssetId(jvUniqueId& assetId, int index /* = 0 */)
 {
-    PBBitmap *pbbm = GetPBBitmap(index);
-    if (pbbm && GetMaxAssInterface())
+    PBBitmap* pbbm = GetPBBitmap(index);
+
+    if (pbbm && GetMaxAssInterface()) {
         assetId = GetMaxAssInterface()->StringToUniqueId(pbbm->bi.Device());
-    else
+    } else {
         assetId.SetEmpty();
+    }
 }
 #endif
 
-void plPlasmaMAXLayer::SetBitmap(BitmapInfo *bi, int index)
+void plPlasmaMAXLayer::SetBitmap(BitmapInfo* bi, int index)
 {
 #ifdef MAXASS_AVAILABLE
     jvUniqueId targetAssetId;
     GetBitmapAssetId(targetAssetId, index);
 #endif
 
-    Bitmap *BM = GetMaxBitmap(index);
-    if (BM)
-    {
+    Bitmap* BM = GetMaxBitmap(index);
+
+    if (BM) {
         BM->DeleteThis();
         BM = NULL;
     }
-    
-    if (bi)
-    {
+
+    if (bi) {
 #ifdef MAXASS_AVAILABLE
-        if (!targetAssetId.IsEmpty())
-        {
+
+        if (!targetAssetId.IsEmpty()) {
             // If this texture has an assetId, we will check the
             // asset database and make sure we have the latest version
             // of the texture file before loading it
             MaxAssInterface* assInterface = GetMaxAssInterface();
-            if (assInterface) 
-            {
+
+            if (assInterface) {
                 char buf[20];
                 assInterface->UniqueIdToString(targetAssetId, buf);
                 bi->SetDevice(buf);
-            
+
                 const char* filename = bi->Name();
                 // Download the latest version and retrieve the filename
                 char newfilename[MAX_PATH];
-                if (assInterface->GetLatestVersionFile(targetAssetId, newfilename, sizeof(newfilename)))
-                {
+
+                if (assInterface->GetLatestVersionFile(targetAssetId, newfilename, sizeof(newfilename))) {
                     // If the filename has changed, we have to reset the bitmap in the ParamBlock
-                    if(stricmp(filename, newfilename) != 0)
+                    if (stricmp(filename, newfilename) != 0) {
                         bi->SetName(newfilename);
-                }
-            }
-        }
-#endif
-
-        BMMRES result;
-        BM = TheManager->Load(bi, &result);
-        if (result == BMMRES_SUCCESS)
-            ISetMaxBitmap(BM, index);
-        else
-            ISetMaxBitmap(NULL, index);
-
-        // The load may have failed, but we still want to set the paramblock. We
-        // don't want to modify the layer if we're just missing the file.
-        PBBitmap pbBitmap(*bi);
-        ISetPBBitmap(&pbBitmap, index);
-    }
-    else
-    {
-        ISetMaxBitmap(NULL, index);
-        ISetPBBitmap(NULL, index);
-    }
-
-/*
-    Bitmap *BM = GetMaxBitmap(index);
-
-    if (BM)
-    {
-        BM->DeleteThis();
-        BM = NULL;
-    }
-    
-    if (filename)
-    {
-        BitmapInfo bi;
-        bi.SetName(filename);
-
-        // If this texture has an assetId, get the latest version from AssetMan before loading it
-        if (assetId && !assetId->IsEmpty())
-        {
-            MaxAssInterface* maxAssInterface = GetMaxAssInterface();
-            if (maxAssInterface) 
-            {
-                // Download the latest version and retrieve the filename
-                char newfilename[MAX_PATH];
-                if (maxAssInterface->GetLatestVersionFile(*assetId, newfilename, sizeof(newfilename)))
-                {
-                    // If the filename has changed, we have to reset the bitmap in the ParamBlock
-                    if (stricmp(filename, newfilename) != 0)
-                    {
-                        bi.SetName(newfilename);
                     }
                 }
             }
         }
 
-        ISetMaxBitmap(TheManager->Load(&bi));
+#endif
 
-        PBBitmap pbBitmap(bi);
-//      TheManager->LoadInto(&pbBitmap.bi, &pbBitmap.bm, TRUE);
+        BMMRES result;
+        BM = TheManager->Load(bi, &result);
+
+        if (result == BMMRES_SUCCESS) {
+            ISetMaxBitmap(BM, index);
+        } else {
+            ISetMaxBitmap(NULL, index);
+        }
+
+        // The load may have failed, but we still want to set the paramblock. We
+        // don't want to modify the layer if we're just missing the file.
+        PBBitmap pbBitmap(*bi);
         ISetPBBitmap(&pbBitmap, index);
-
-        if (assetId)
-            SetBitmapAssetId(*assetId, index);
-    }
-    else
-    {
+    } else {
         ISetMaxBitmap(NULL, index);
         ISetPBBitmap(NULL, index);
     }
 
-    NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE);
-*/
+    /*
+        Bitmap *BM = GetMaxBitmap(index);
+
+        if (BM)
+        {
+            BM->DeleteThis();
+            BM = NULL;
+        }
+
+        if (filename)
+        {
+            BitmapInfo bi;
+            bi.SetName(filename);
+
+            // If this texture has an assetId, get the latest version from AssetMan before loading it
+            if (assetId && !assetId->IsEmpty())
+            {
+                MaxAssInterface* maxAssInterface = GetMaxAssInterface();
+                if (maxAssInterface)
+                {
+                    // Download the latest version and retrieve the filename
+                    char newfilename[MAX_PATH];
+                    if (maxAssInterface->GetLatestVersionFile(*assetId, newfilename, sizeof(newfilename)))
+                    {
+                        // If the filename has changed, we have to reset the bitmap in the ParamBlock
+                        if (stricmp(filename, newfilename) != 0)
+                        {
+                            bi.SetName(newfilename);
+                        }
+                    }
+                }
+            }
+
+            ISetMaxBitmap(TheManager->Load(&bi));
+
+            PBBitmap pbBitmap(bi);
+    //      TheManager->LoadInto(&pbBitmap.bi, &pbBitmap.bm, TRUE);
+            ISetPBBitmap(&pbBitmap, index);
+
+            if (assetId)
+                SetBitmapAssetId(*assetId, index);
+        }
+        else
+        {
+            ISetMaxBitmap(NULL, index);
+            ISetPBBitmap(NULL, index);
+        }
+
+        NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE);
+    */
 }
 
 //// RefreshBitmaps ///////////////////////////////////////////////////////////
@@ -367,13 +371,12 @@ void plPlasmaMAXLayer::SetBitmap(BitmapInfo *bi, int index)
 
 void plPlasmaMAXLayer::RefreshBitmaps()
 {
-    int i, count = GetNumBitmaps(); 
+    int i, count = GetNumBitmaps();
 
-    for( i = 0; i < count; i++ )
-    {
-        PBBitmap *pbbm = GetPBBitmap(i);
-        if (pbbm)
-        {
+    for (i = 0; i < count; i++) {
+        PBBitmap* pbbm = GetPBBitmap(i);
+
+        if (pbbm) {
             SetBitmap(&pbbm->bi, i);
         }
     }
@@ -383,26 +386,29 @@ void plPlasmaMAXLayer::RefreshBitmaps()
 //  Returns the filename of the ith bitmap. Makes sure we have the latest
 //  version from assetMan as well, if applicable.
 
-bool    plPlasmaMAXLayer::GetBitmapFileName( char *destFilename, int maxLength, int index /* = 0 */ )
+bool    plPlasmaMAXLayer::GetBitmapFileName(char* destFilename, int maxLength, int index /* = 0 */)
 {
 #ifdef MAXASS_AVAILABLE
     jvUniqueId targetAssetId;
     GetBitmapAssetId(targetAssetId, index);
 
     MaxAssInterface* maxAssInterface = GetMaxAssInterface();
-    if (maxAssInterface != nil && !targetAssetId.IsEmpty()) 
-    {
+
+    if (maxAssInterface != nil && !targetAssetId.IsEmpty()) {
         // Download the latest version and retrieve the filename
-        if (maxAssInterface->GetLatestVersionFile(targetAssetId, destFilename, maxLength))
+        if (maxAssInterface->GetLatestVersionFile(targetAssetId, destFilename, maxLength)) {
             return true;
+        }
     }
+
 #endif
 
     // Normal return
-    if( GetPBBitmap( index ) == nil )
+    if (GetPBBitmap(index) == nil) {
         return false;
+    }
 
-    strncpy( destFilename, GetPBBitmap( index )->bi.Name(), maxLength );
+    strncpy(destFilename, GetPBBitmap(index)->bi.Name(), maxLength);
     return true;
 }
 
@@ -410,34 +416,34 @@ BOOL plPlasmaMAXLayer::HandleBitmapSelection(int index /* = 0 */)
 {
     static ICustButton* bmSelectBtn;
 
-    PBBitmap *pbbm = GetPBBitmap( index );
+    PBBitmap* pbbm = GetPBBitmap(index);
 
 #ifdef MAXASS_AVAILABLE
     MaxAssInterface* maxAssInterface = GetMaxAssInterface();
 #endif
-    
+
     // If the control key is held, we want to get rid of this texture
-    if ((GetKeyState(VK_CONTROL) & 0x8000) && pbbm != nil)
-    {
+    if ((GetKeyState(VK_CONTROL) & 0x8000) && pbbm != nil) {
         char msg[512];
         sprintf(msg, "Are you sure you want to change this bitmap from %s to (none)?", pbbm->bi.Name());
-        if (hsMessageBox(msg, "Remove texture?", hsMessageBoxYesNo) == hsMBoxYes)
-        {
+
+        if (hsMessageBox(msg, "Remove texture?", hsMessageBoxYesNo) == hsMBoxYes) {
             SetBitmap(nil, index);
             return TRUE;
         }
+
         return FALSE;
     }
+
     // if we have the assetman plug-in, then try to use it, unless shift is held down
 #ifdef MAXASS_AVAILABLE
-    else if(maxAssInterface && !(GetKeyState(VK_SHIFT) & 0x8000))
-    {
+    else if (maxAssInterface && !(GetKeyState(VK_SHIFT) & 0x8000)) {
         jvUniqueId assetId;
         GetBitmapAssetId(assetId, index);
 
         char filename[MAX_PATH];
-        if (maxAssInterface->OpenBitmapDlg(assetId, filename, sizeof(filename)))
-        {
+
+        if (maxAssInterface->OpenBitmapDlg(assetId, filename, sizeof(filename))) {
             SetBitmapAssetId(assetId, index);
 
             BitmapInfo bi;
@@ -446,18 +452,20 @@ BOOL plPlasmaMAXLayer::HandleBitmapSelection(int index /* = 0 */)
             return TRUE;
         }
     }
+
 #endif
-    else
-    {
+    else {
         BitmapInfo bi;
-        if( pbbm != NULL )
-            bi.SetName( pbbm->bi.Name() );
+
+        if (pbbm != NULL) {
+            bi.SetName(pbbm->bi.Name());
+        }
 
         BOOL selectedNewBitmap = TheManager->SelectFileInput(&bi,
-                                                            GetCOREInterface()->GetMAXHWnd(),
-                                                            _T("Select Bitmap Image File"));
-        if (selectedNewBitmap)
-        {
+                                 GetCOREInterface()->GetMAXHWnd(),
+                                 _T("Select Bitmap Image File"));
+
+        if (selectedNewBitmap) {
 #ifdef MAXASS_AVAILABLE
             // Set the assetId to empty so our new, unmanaged texture will take
             jvUniqueId emptyId;

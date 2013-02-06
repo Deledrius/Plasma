@@ -44,24 +44,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plGrassShaderMod;
 
-class plGrassComponent : public plComponent
-{
+class plGrassComponent : public plComponent {
 protected:
-    plGrassShaderMod *fShader;
+    plGrassShaderMod* fShader;
 public:
 
     plGrassComponent();
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
     virtual bool DeInit(plMaxNode* node, plErrorMsg* pErrMsg);
-    virtual void DeleteThis() { delete this; }
+    virtual void DeleteThis() {
+        delete this;
+    }
 
     // These only work after PreConvert pass
     static plGrassShaderMod* GetShader(INode* node); // Node is the component node
     static plGrassShaderMod* GetShaderNode(plMaxNode* node); // node is the component's target
 
-    enum
-    {
+    enum {
         kWave,
         kDistX,
         kDistY,

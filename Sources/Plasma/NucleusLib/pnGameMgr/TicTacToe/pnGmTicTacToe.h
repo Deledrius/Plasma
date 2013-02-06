@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnGameMgr/TicTacToe/pnGmTicTacToe.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNGAMEMGR_TICTACTOE_PNGMTICTACTOE_H
@@ -99,36 +99,36 @@ enum {
 #pragma pack(push,1)
 //============================================================================
 
-    //========================================================================
-    // Message parameters
-    //========================================================================
-    struct TTT_CreateParam {
-        uint8_t        playerCount;    // 1 or 2
-    };
+//========================================================================
+// Message parameters
+//========================================================================
+struct TTT_CreateParam {
+    uint8_t        playerCount;    // 1 or 2
+};
 
-    //========================================================================
-    // Tic-Tac-Toe message structures
-    //========================================================================
+//========================================================================
+// Tic-Tac-Toe message structures
+//========================================================================
 
-    // Cli2Srv
-    struct Cli2Srv_TTT_MakeMove : GameMsgHeader {
-        uint8_t        row;            // 1..3
-        uint8_t        col;            // 1..3
-    };
+// Cli2Srv
+struct Cli2Srv_TTT_MakeMove : GameMsgHeader {
+    uint8_t        row;            // 1..3
+    uint8_t        col;            // 1..3
+};
 
-    // Srv2Cli
-    struct Srv2Cli_TTT_GameStarted : GameMsgHeader {
-        bool        yourTurn;       // randomly selected first player
-    };
-    struct Srv2Cli_TTT_GameOver : GameMsgHeader {
-        ETTTGameResult  result;
-        uint32_t           winnerId;
-    };
-    struct Srv2Cli_TTT_MoveMade : GameMsgHeader {
-        uint32_t           playerId;
-        uint8_t            row;            // 1..3
-        uint8_t            col;            // 1..3
-    };
+// Srv2Cli
+struct Srv2Cli_TTT_GameStarted : GameMsgHeader {
+    bool        yourTurn;       // randomly selected first player
+};
+struct Srv2Cli_TTT_GameOver : GameMsgHeader {
+    ETTTGameResult  result;
+    uint32_t           winnerId;
+};
+struct Srv2Cli_TTT_MoveMade : GameMsgHeader {
+    uint32_t           playerId;
+    uint8_t            row;            // 1..3
+    uint8_t            col;            // 1..3
+};
 
 //============================================================================
 // End networked data structures

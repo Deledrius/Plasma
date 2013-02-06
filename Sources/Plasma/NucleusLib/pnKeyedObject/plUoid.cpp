@@ -105,8 +105,9 @@ bool plLocation::IsItinerant() const
 bool plLocation::IsVirtual() const
 {
     // This returns whether the location is "virtual", i.e. isn't a true room per se. Like fixed keys
-    if (fSequenceNumber == kGlobalFixedLocIdx)
+    if (fSequenceNumber == kGlobalFixedLocIdx) {
         return true;
+    }
 
     return false;
 }
@@ -161,10 +162,11 @@ void plUoid::Read(hsStream* s)
     fLocation.Read(s);
 
     // conditional loadmask read
-    if (contents & kHasLoadMask)
+    if (contents & kHasLoadMask) {
         fLoadMask.Read(s);
-    else
+    } else {
         fLoadMask.SetAlways();
+    }
 
     s->LogReadLE(&fClassType, "ClassType");
     s->LogReadLE(&fObjectID, "ObjectID");
@@ -172,15 +174,12 @@ void plUoid::Read(hsStream* s)
     fObjectName = s->LogReadSafeString_TEMP();
 
     // conditional cloneIDs read
-    if (contents & kHasCloneIDs)
-    {       
-        s->LogReadLE( &fCloneID ,"CloneID");
+    if (contents & kHasCloneIDs) {
+        s->LogReadLE(&fCloneID , "CloneID");
         uint16_t dummy;
         s->LogReadLE(&dummy, "dummy"); // To avoid breaking format
-        s->LogReadLE( &fClonePlayerID ,"ClonePlayerID");
-    }
-    else
-    {
+        s->LogReadLE(&fClonePlayerID , "ClonePlayerID");
+    } else {
         fCloneID = 0;
         fClonePlayerID = 0;
     }
@@ -190,23 +189,26 @@ void plUoid::Write(hsStream* s) const
 {
     // first write contents byte
     uint8_t contents = IsClone() ? kHasCloneIDs : 0;
-    if (fLoadMask.IsUsed())
+
+    if (fLoadMask.IsUsed()) {
         contents |= kHasLoadMask;
+    }
+
     s->WriteByte(contents);
 
     fLocation.Write(s);
 
     // conditional loadmask write
-    if (contents & kHasLoadMask)
+    if (contents & kHasLoadMask) {
         fLoadMask.Write(s);
+    }
 
-    s->WriteLE( fClassType );
-    s->WriteLE( fObjectID );
-    s->WriteSafeString( fObjectName );
+    s->WriteLE(fClassType);
+    s->WriteLE(fObjectID);
+    s->WriteSafeString(fObjectName);
 
     // conditional cloneIDs write
-    if (contents & kHasCloneIDs)
-    {
+    if (contents & kHasCloneIDs) {
         s->WriteLE(fCloneID);
         uint16_t dummy = 0;
         s->WriteLE(dummy); // to avoid breaking format
@@ -228,8 +230,9 @@ void plUoid::Invalidate()
 
 bool plUoid::IsValid() const
 {
-    if (!fLocation.IsValid() || fObjectName.IsNull())
+    if (!fLocation.IsValid() || fObjectName.IsNull()) {
         return false;
+    }
 
     return true;
 }
@@ -262,9 +265,9 @@ plUoid& plUoid::operator=(const plUoid& rhs)
 plString plUoid::StringIze() const // Format to displayable string
 {
     return plString::Format("(0x%x:0x%x:%s:C:[%u,%u])",
-        fLocation.GetSequenceNumber(), 
-        int(fLocation.GetFlags()), 
-        fObjectName.c_str(),
-        GetClonePlayerID(), 
-        GetCloneID());
+                            fLocation.GetSequenceNumber(),
+                            int(fLocation.GetFlags()),
+                            fObjectName.c_str(),
+                            GetClonePlayerID(),
+                            GetCloneID());
 }

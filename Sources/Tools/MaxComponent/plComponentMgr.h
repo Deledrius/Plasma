@@ -60,29 +60,28 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // 8/28/01: Added globals -Colin
 //
 
-class plComponentMgr : public UtilityObj
-{
+class plComponentMgr : public UtilityObj {
 private:
     std::vector<ClassDesc*> fDescs;
 
     plComponentMgr() {};
 
 public:
-    static plComponentMgr &Inst();
+    static plComponentMgr& Inst();
 
     // Required Max functions
-    virtual void BeginEditParams(Interface *ip,IUtil *iu) {}
-    virtual void EndEditParams(Interface *ip,IUtil *iu) {}
-    virtual void SelectionSetChanged(Interface *ip,IUtil *iu) {}
+    virtual void BeginEditParams(Interface* ip, IUtil* iu) {}
+    virtual void EndEditParams(Interface* ip, IUtil* iu) {}
+    virtual void SelectionSetChanged(Interface* ip, IUtil* iu) {}
     virtual void DeleteThis() {}
 
     virtual uint32_t Count();
-    virtual ClassDesc *Get(uint32_t i);
+    virtual ClassDesc* Get(uint32_t i);
 
     virtual uint32_t FindClassID(Class_ID id);
 
     // Registers a component.  Only used by the classdesc macro.
-    virtual void Register(ClassDesc *desc);
+    virtual void Register(ClassDesc* desc);
 };
 
 #endif //PL_COMPONENTMGR_H

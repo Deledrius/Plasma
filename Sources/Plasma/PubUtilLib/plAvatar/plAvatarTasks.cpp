@@ -88,64 +88,62 @@ plAvTask::plAvTask()
 }
 
 // START
-bool plAvTask::Start(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvTask::Start(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
     return true;    // true indicates the task has started succesfully
 }
 
 // PROCESS
-bool plAvTask::Process(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvTask::Process(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
     return false;
 }
 
 // Finish -----------------------------------------------------------------------------------
 // -------
-void plAvTask::Finish(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+void plAvTask::Finish(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
 }
 
 
 // DUMPDEBUG
-void plAvTask::DumpDebug(const char *name, int &x, int&y, int lineHeight, char *strBuf, plDebugText &debugTxt)
+void plAvTask::DumpDebug(const char* name, int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt)
 {
     debugTxt.DrawString(x, y, "<anonymous task>");
     y += lineHeight;
 }
 
 // READ
-void plAvTask::Read(hsStream *stream, hsResMgr *mgr)
+void plAvTask::Read(hsStream* stream, hsResMgr* mgr)
 {
     plCreatable::Read(stream, mgr);
 }
 
 // WRITE
-void plAvTask::Write(hsStream *stream, hsResMgr *mgr)
+void plAvTask::Write(hsStream* stream, hsResMgr* mgr)
 {
     plCreatable::Write(stream, mgr);
 }
 
-void plAvTask::ILimitPlayersInput(plArmatureMod *avatar)
+void plAvTask::ILimitPlayersInput(plArmatureMod* avatar)
 {
-    // make sure this is the local avatar we are talking about  
-    if (avatar == plAvatarMgr::GetInstance()->GetLocalAvatar())
-    {
+    // make sure this is the local avatar we are talking about
+    if (avatar == plAvatarMgr::GetInstance()->GetLocalAvatar()) {
         plInputInterfaceMgr::GetInstance()->ForceCursorHidden(true);
         // tell the KI to be disabled while we are busy
         pfKIMsg* msg = new pfKIMsg(pfKIMsg::kTempDisableKIandBB);
-        plgDispatch::MsgSend( msg );
+        plgDispatch::MsgSend(msg);
     }
 }
 
-void plAvTask::IUndoLimitPlayersInput(plArmatureMod *avatar)
+void plAvTask::IUndoLimitPlayersInput(plArmatureMod* avatar)
 {
-    // make sure this is the local avatar we are talking about  
-    if (avatar == plAvatarMgr::GetInstance()->GetLocalAvatar())
-    {
+    // make sure this is the local avatar we are talking about
+    if (avatar == plAvatarMgr::GetInstance()->GetLocalAvatar()) {
         plInputInterfaceMgr::GetInstance()->ForceCursorHidden(false);
         // tell the KI to be re-enabled
         pfKIMsg* msg = new pfKIMsg(pfKIMsg::kTempEnableKIandBB);
-        plgDispatch::MsgSend( msg );
+        plgDispatch::MsgSend(msg);
     }
 }
 
@@ -157,128 +155,137 @@ void plAvTask::IUndoLimitPlayersInput(plArmatureMod *avatar)
 
 // CTOR default
 plAvSeekTask::plAvSeekTask()
-: fAlign(kAlignHandle),
-  fDuration(0.25),
-  fTarget(nil),
-  fAnimInstance(nil),
-  fTargetTime(0),
-  fPhysicalAtStart(false),
-  fCleanup(false)
+    : fAlign(kAlignHandle),
+      fDuration(0.25),
+      fTarget(nil),
+      fAnimInstance(nil),
+      fTargetTime(0),
+      fPhysicalAtStart(false),
+      fCleanup(false)
 {
 }
 
 // CTOR target, align, animName
 plAvSeekTask::plAvSeekTask(plKey target, plAvAlignment align, const plString& animName)
-: fAnimName(animName),
-  fAlign(align),
-  fDuration(0.25),
-  fTarget(target),
-  fAnimInstance(nil),
-  fTargetTime(0),
-  fPhysicalAtStart(false),
-  fCleanup(false)
+    : fAnimName(animName),
+      fAlign(align),
+      fDuration(0.25),
+      fTarget(target),
+      fAnimInstance(nil),
+      fTargetTime(0),
+      fPhysicalAtStart(false),
+      fCleanup(false)
 {
 }
 
 // CTOR target
 plAvSeekTask::plAvSeekTask(plKey target)
-: fAlign(kAlignHandle),
-  fDuration(0.25),
-  fTarget(target),
-  fAnimInstance(nil),
-  fTargetTime(0),
-  fPhysicalAtStart(false),
-  fCleanup(false)
+    : fAlign(kAlignHandle),
+      fDuration(0.25),
+      fTarget(target),
+      fAnimInstance(nil),
+      fTargetTime(0),
+      fPhysicalAtStart(false),
+      fCleanup(false)
 {
 }
 
-void GetPositionAndRotation(hsMatrix44 transform, hsScalarTriple *position, hsQuat *rotation)
+void GetPositionAndRotation(hsMatrix44 transform, hsScalarTriple* position, hsQuat* rotation)
 {
     hsPoint3 p = (hsPoint3)transform.GetTranslate();
-    position->fX = p.fX; position->fY = p.fY; position->fZ = p.fZ;
-    
-    
+    position->fX = p.fX;
+    position->fY = p.fY;
+    position->fZ = p.fZ;
+
+
     transform.RemoveScale();
-    
+
     rotation->SetFromMatrix(&transform);
     rotation->Normalize();
-    
+
     float angle;
     hsVector3 axis;
-    
+
     rotation->GetAngleAxis(&angle, &axis);
 }
 
 // START
 // Adjust our goal time based on our duration and the current time
-bool plAvSeekTask::Start(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvSeekTask::Start(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
     fTargetTime = time + fDuration;     // clock starts now....
     fPhysicalAtStart = avatar->IsPhysicsEnabled();
     avatar->EnablePhysics(false);       // always turn physics off for seek
-    plAvBrainHuman *huBrain = plAvBrainHuman::ConvertNoRef(brain);
-    if(huBrain)
+    plAvBrainHuman* huBrain = plAvBrainHuman::ConvertNoRef(brain);
+
+    if (huBrain) {
         huBrain->IdleOnly();
-    
+    }
+
     ILimitPlayersInput(avatar);
-    
-    if (!fTarget || !fTarget->ObjectIsLoaded())
-    {
+
+    if (!fTarget || !fTarget->ObjectIsLoaded()) {
         fCleanup = true;
         return true;
     }
-    
+
     plSceneObject* seekTarget = plSceneObject::ConvertNoRef(fTarget->ObjectIsLoaded());
     hsMatrix44 targetL2W = seekTarget->GetLocalToWorld();
     const plCoordinateInterface* subworldCI = nil;
-    if (avatar->GetController())
-        subworldCI = avatar->GetController()->GetSubworldCI();
-    if (subworldCI)
-        targetL2W = subworldCI->GetWorldToLocal() * targetL2W;
 
-    switch(fAlign)
-    {
+    if (avatar->GetController()) {
+        subworldCI = avatar->GetController()->GetSubworldCI();
+    }
+
+    if (subworldCI) {
+        targetL2W = subworldCI->GetWorldToLocal() * targetL2W;
+    }
+
+    switch (fAlign) {
         // just match our handle to the target matrix
-        case kAlignHandle:
-            // targetL2Sim is already correct
-            break;
+    case kAlignHandle:
+        // targetL2Sim is already correct
+        break;
+
         // match our handle to the target matrix at the end of the given animation
-        case kAlignHandleAnimEnd:
-            {
-                hsMatrix44 adjustment;
-                plAGAnim *anim = avatar->FindCustomAnim(fAnimName);
-                GetStartToEndTransform(anim, nil, &adjustment, "Handle");   // actually getting end-to-start
-                targetL2W = targetL2W * adjustment;
-            }
-            break;
-        default:
-            break;
+    case kAlignHandleAnimEnd: {
+            hsMatrix44 adjustment;
+            plAGAnim* anim = avatar->FindCustomAnim(fAnimName);
+            GetStartToEndTransform(anim, nil, &adjustment, "Handle");   // actually getting end-to-start
+            targetL2W = targetL2W * adjustment;
+        }
+        break;
+
+    default:
+        break;
     };
 
     GetPositionAndRotation(targetL2W, &fTargetPosition, &fTargetRotation);
+
     Process(avatar, brain, time, elapsed);
+
     return true;
 }
 
 // CALCHANDLETARGETPOSITION
-void CalcHandleTargetPosition(hsMatrix44 &result, plSceneObject *handle, plSceneObject *target, hsMatrix44 &bodyToHandle)
+void CalcHandleTargetPosition(hsMatrix44& result, plSceneObject* handle, plSceneObject* target, hsMatrix44& bodyToHandle)
 {
     hsMatrix44 targetToWorld = target->GetLocalToWorld();
-    
+
     result = bodyToHandle * targetToWorld;
 }
 
 // CALCHANDLETARGETPOSITION
 // where should I move my insertion point so that my bodyRoot lines up with the target?
-void CalcHandleTargetPosition(hsMatrix44 &result, plSceneObject *insert, plSceneObject *target, plSceneObject *bodyRoot)
+void CalcHandleTargetPosition(hsMatrix44& result, plSceneObject* insert, plSceneObject* target, plSceneObject* bodyRoot)
 {
     hsMatrix44 bodyToHandle = bodyRoot->GetLocalToParent();
-    CalcHandleTargetPosition(result, insert, target, bodyToHandle); 
+    CalcHandleTargetPosition(result, insert, target, bodyToHandle);
 }
 
 // PROCESS
 // Move closer to the goal position and orientation
-bool plAvSeekTask::Process(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvSeekTask::Process(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
     hsQuat rotation;
     hsPoint3 position;
@@ -289,24 +296,20 @@ bool plAvSeekTask::Process(plArmatureMod *avatar, plArmatureBrain *brain, double
     rotation.Normalize();
 
     double timeToGo = fTargetTime - time - elapsed; // time from *beginning* of this interval to the goal
-    if (fCleanup)
-    {
-        avatar->EnablePhysics( fPhysicalAtStart );
+
+    if (fCleanup) {
+        avatar->EnablePhysics(fPhysicalAtStart);
         IUndoLimitPlayersInput(avatar);
-        
+
         return false;       // we're done processing
-    }
-    else if(timeToGo < .01)
-    {
+    } else if (timeToGo < .01) {
         fTargetRotation.Normalize();
         avatar->SetPositionAndRotationSim(&fTargetPosition, &fTargetRotation);
         fCleanup = true;    // we're going to wait one frame for the transform to propagate
         return true;        // still running until next frame/cleanup
-    }
-    else
-    {
+    } else {
         hsPoint3 posToGo = fTargetPosition - position;          // vec from here to the goal
-        float thisPercentage = (float)(elapsed / timeToGo);         
+        float thisPercentage = (float)(elapsed / timeToGo);
 
         hsPoint3 newPosition = position + posToGo * thisPercentage;
         hsQuat newRotation;
@@ -318,7 +321,7 @@ bool plAvSeekTask::Process(plArmatureMod *avatar, plArmatureBrain *brain, double
     }
 }
 
-void plAvSeekTask::LeaveAge(plArmatureMod *avatar)
+void plAvSeekTask::LeaveAge(plArmatureMod* avatar)
 {
     fTarget = nil;
     fCleanup = true;
@@ -332,19 +335,19 @@ void plAvSeekTask::LeaveAge(plArmatureMod *avatar)
 
 // CTOR default
 plAvAnimTask::plAvAnimTask()
-: fInitialBlend(0.0f),
-  fTargetBlend(0.0f),
-  fFadeSpeed(0.0f),
-  fSetTime(0.0f),
-  fStart(false),
-  fLoop(false),
-  fAttach(false),
-  fAnimInstance(nil)
+    : fInitialBlend(0.0f),
+      fTargetBlend(0.0f),
+      fFadeSpeed(0.0f),
+      fSetTime(0.0f),
+      fStart(false),
+      fLoop(false),
+      fAttach(false),
+      fAnimInstance(nil)
 {
 }
 
 // CTOR animName, initialBlend, targetBlend, fadeSpeed, start, loop, attach
-plAvAnimTask::plAvAnimTask(const plString &animName,
+plAvAnimTask::plAvAnimTask(const plString& animName,
                            float initialBlend,
                            float targetBlend,
                            float fadeSpeed,
@@ -352,29 +355,29 @@ plAvAnimTask::plAvAnimTask(const plString &animName,
                            bool start,
                            bool loop,
                            bool attach)
-: fAnimName(animName),
-  fInitialBlend(initialBlend),
-  fTargetBlend(targetBlend),
-  fFadeSpeed(fadeSpeed),
-  fSetTime(setTime),
-  fStart(start),
-  fLoop(loop),
-  fAttach(attach),
-  fAnimInstance(nil)
+    : fAnimName(animName),
+      fInitialBlend(initialBlend),
+      fTargetBlend(targetBlend),
+      fFadeSpeed(fadeSpeed),
+      fSetTime(setTime),
+      fStart(start),
+      fLoop(loop),
+      fAttach(attach),
+      fAnimInstance(nil)
 {
 }
 
 // CTOR animName, fadeSpeed, attach
-plAvAnimTask::plAvAnimTask(const plString &animName, float fadeSpeed, bool attach)
-: fAnimName(animName),
-  fInitialBlend(0.0f),
-  fTargetBlend(0.0f),
-  fFadeSpeed(fadeSpeed),
-  fSetTime(0.0f),
-  fStart(false),
-  fLoop(false),
-  fAttach(attach),
-  fAnimInstance(nil)
+plAvAnimTask::plAvAnimTask(const plString& animName, float fadeSpeed, bool attach)
+    : fAnimName(animName),
+      fInitialBlend(0.0f),
+      fTargetBlend(0.0f),
+      fFadeSpeed(fadeSpeed),
+      fSetTime(0.0f),
+      fStart(false),
+      fLoop(false),
+      fAttach(attach),
+      fAnimInstance(nil)
 {
 }
 
@@ -382,88 +385,85 @@ plAvAnimTask::plAvAnimTask(const plString &animName, float fadeSpeed, bool attac
 
 
 // START
-bool plAvAnimTask::Start(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvAnimTask::Start(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
     bool result = false;
-    if(fAttach)
-    {
-        plAGAnimInstance * aInstance = avatar->FindOrAttachInstance(fAnimName, fInitialBlend);
 
-        if(aInstance)
-        {
-            if(fStart)
+    if (fAttach) {
+        plAGAnimInstance* aInstance = avatar->FindOrAttachInstance(fAnimName, fInitialBlend);
+
+        if (aInstance) {
+            if (fStart) {
                 aInstance->Start(fStart);
-            if(fSetTime > 0)
+            }
+
+            if (fSetTime > 0) {
                 aInstance->SetCurrentTime(fSetTime, true);
-            if(fTargetBlend > fInitialBlend)
-            {
+            }
+
+            if (fTargetBlend > fInitialBlend) {
                 aInstance->Fade(fTargetBlend, fFadeSpeed);
             }
+
             aInstance->SetLoop(fLoop);
 
             result = true;
-        }
-        else
-        {
+        } else {
             hsStatusMessageF("Couldn't find animation <%s> for plAvAnimTask: will try again", fAnimName.c_str());
         }
-    }
-    else
-    {
+    } else {
         fAnimInstance = avatar->FindAnimInstance(fAnimName);
-        if(fAnimInstance)
-        {
+
+        if (fAnimInstance) {
             // start fading towards zero
             fAnimInstance->Fade(0.0, fFadeSpeed);
         }
+
         // if we started the fade, we're done and ready to process
         // if we couldn't find the animation, we're still done.
         result = true;
     }
+
     return result;
 }
 
 // PROCESS
-bool plAvAnimTask::Process(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvAnimTask::Process(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
     // the only reason we need this function is to watch the animation until it fades out
     bool result = false;
-    if(fAttach)
-    {
+
+    if (fAttach) {
         // we finished in the Start() function
-    }
-    else
-    {
-        if(fAnimInstance)
-        {
-            if(fAnimInstance->GetBlend() < 0.1)
-            {
+    } else {
+        if (fAnimInstance) {
+            if (fAnimInstance->GetBlend() < 0.1) {
                 avatar->DetachAnimation(fAnimInstance);
-            }
-            else
-            {
+            } else {
                 // still waiting for the fadeout; keep the task alive
                 result = true;
             }
         }
     }
+
     return result;
 }
 
 // LEAVEAGE
-void plAvAnimTask::LeaveAge(plArmatureMod *avatar)
+void plAvAnimTask::LeaveAge(plArmatureMod* avatar)
 {
     // if we are supposed to be removing the animation anyway, kill it completely on link out
-    if (!fAttach)
-    {
+    if (!fAttach) {
         fAnimInstance = avatar->FindAnimInstance(fAnimName);
-        if(fAnimInstance)
+
+        if (fAnimInstance) {
             avatar->DetachAnimation(fAnimInstance);
+        }
     }
 }
 
 // READ
-void plAvAnimTask::Read(hsStream *stream, hsResMgr *mgr)
+void plAvAnimTask::Read(hsStream* stream, hsResMgr* mgr)
 {
     fAnimName = stream->ReadSafeString_TEMP();
     fInitialBlend = stream->ReadLEScalar();
@@ -476,7 +476,7 @@ void plAvAnimTask::Read(hsStream *stream, hsResMgr *mgr)
 }
 
 // WRITE
-void plAvAnimTask::Write(hsStream *stream, hsResMgr *mgr)
+void plAvAnimTask::Write(hsStream* stream, hsResMgr* mgr)
 {
     stream->WriteSafeString(fAnimName);
     stream->WriteLEScalar(fInitialBlend);
@@ -521,14 +521,14 @@ plAvOneShotTask::plAvOneShotTask()
 // this construct is typically used when you want to create a one-shot task as part of a sequence
 // of tasks
 // it's different than the message-based constructor in that fDetachAnimation and fMoveHandle default to false
-plAvOneShotTask::plAvOneShotTask(const plString &animName, bool drivable, bool reversible, plOneShotCallbacks *callbacks)
+plAvOneShotTask::plAvOneShotTask(const plString& animName, bool drivable, bool reversible, plOneShotCallbacks* callbacks)
 {
     InitDefaults();
 
     fDrivable = drivable;
     fReversible = reversible;
     fCallbacks = callbacks;
-    
+
     // we're going to use this sometime in the future, better ref it so someone else doesn't release it
     hsRefCnt_SafeRef(fCallbacks);
     fAnimName = animName;
@@ -537,7 +537,7 @@ plAvOneShotTask::plAvOneShotTask(const plString &animName, bool drivable, bool r
 // CTOR (plAvOneShotMsg, plArmatureMod)
 // this constructor is typically used when we're doing a classic, isolated one-shot
 // fDetachAnimation and fMoveHandle both default to *true*
-plAvOneShotTask::plAvOneShotTask (plAvOneShotMsg *msg, plArmatureMod *avatar, plArmatureBrain *brain)
+plAvOneShotTask::plAvOneShotTask(plAvOneShotMsg* msg, plArmatureMod* avatar, plArmatureBrain* brain)
 {
     InitDefaults();
 
@@ -560,32 +560,31 @@ plAvOneShotTask::~plAvOneShotTask()
 
 
 // START
-bool plAvOneShotTask::Start(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvOneShotTask::Start(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
     bool result = false;
 
-    if (fIgnore)
+    if (fIgnore) {
         return true;
+    }
 
-    plAGMasterMod * master = avatar;
+    plAGMasterMod* master = avatar;
 
     fAnimInstance = master->AttachAnimationBlended(fAnimName, 0);
     fDetachAnimation = true;
 
-    if(fAnimInstance)
-    {
+    if (fAnimInstance) {
         fEnablePhysicsAtEnd = (avatar->IsPhysicsEnabled() && fDisablePhysics);
-        if (fEnablePhysicsAtEnd)
-        {
+
+        if (fEnablePhysicsAtEnd) {
             // Must do the physics re-enable through a callback so that it happens before the "done" callback and we don't
             // step over some script's attempt to disable physics again.
-            plAvatarPhysicsEnableCallbackMsg *epMsg = new plAvatarPhysicsEnableCallbackMsg(avatar->GetKey(), kStop, 0, 0, 0, 0);
+            plAvatarPhysicsEnableCallbackMsg* epMsg = new plAvatarPhysicsEnableCallbackMsg(avatar->GetKey(), kStop, 0, 0, 0, 0);
             fAnimInstance->GetTimeConvert()->AddCallback(epMsg);
             hsRefCnt_SafeUnRef(epMsg);
-        }   
+        }
 
-        if (fCallbacks)
-        {
+        if (fCallbacks) {
             fAnimInstance->AttachCallbacks(fCallbacks);
             // ok, we're done with it, release it back to the river
             hsRefCnt_SafeUnRef(fCallbacks);
@@ -594,144 +593,152 @@ bool plAvOneShotTask::Start(plArmatureMod *avatar, plArmatureBrain *brain, doubl
 
         fAnimInstance->SetBlend(1.0f);
         fAnimInstance->SetSpeed(1.0f);
-        plAnimTimeConvert *atc = fAnimInstance->GetTimeConvert();
-        if (fBackwards)
+        plAnimTimeConvert* atc = fAnimInstance->GetTimeConvert();
+
+        if (fBackwards) {
             atc->Backwards();
-        if (fDisableLooping)
+        }
+
+        if (fDisableLooping) {
             atc->Loop(false);
-        
+        }
+
         fAnimInstance->SetCurrentTime(fBackwards ? atc->GetEnd() : atc->GetBegin(), true);
         fAnimInstance->Start(time);
-            
+
         fWaitFrames = 2;        // wait two frames after animation finishes before finalizing
 
 
-        if (fDisablePhysics)
+        if (fDisablePhysics) {
             avatar->EnablePhysics(false);
+        }
 
         ILimitPlayersInput(avatar);
-        
+
         // this is for a console command hack
-        if (plAvOneShotTask::fForce3rdPerson && avatar->IsLocalAvatar())
-        {
+        if (plAvOneShotTask::fForce3rdPerson && avatar->IsLocalAvatar()) {
             // create message
             plCameraMsg* pMsg = new plCameraMsg;
             pMsg->SetBCastFlag(plMessage::kBCastByExactType);
             pMsg->SetBCastFlag(plMessage::kNetPropagate, false);
             pMsg->SetCmd(plCameraMsg::kResponderSetThirdPerson);
-            plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+            plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
         }
 
         fMoveHandle = (fAnimInstance->GetAnimation()->GetChannel("Handle") != nil);
-        if(fMoveHandle)
-        {
-            plMatrixDifferenceApp *differ = avatar->GetRootAnimator();
+
+        if (fMoveHandle) {
+            plMatrixDifferenceApp* differ = avatar->GetRootAnimator();
             differ->Reset(time);        // throw away any old state
             differ->Enable(true);
         }
 
-        avatar->ApplyAnimations(time, elapsed);                         
+        avatar->ApplyAnimations(time, elapsed);
 
         result = true;
-    }
-    else
-    {
+    } else {
         plString buf = plString::Format("Oneshot: Can't find animation <%s>; all bets are off.", fAnimName.c_str());
         hsAssert(false, buf.c_str());
         result = true;
     }
+
     return result;
 }
 
 // PROCESS
-bool plAvOneShotTask::Process(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvOneShotTask::Process(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
     // *** if we are under mouse control, adjust it here
 
     avatar->ApplyAnimations(time, elapsed);
-    if(fAnimInstance)
-    {
-        if(fAnimInstance->IsFinished())
-        {
-            const plAGAnim * animation = fAnimInstance->GetAnimation();
+
+    if (fAnimInstance) {
+        if (fAnimInstance->IsFinished()) {
+            const plAGAnim* animation = fAnimInstance->GetAnimation();
             double endTime = (fBackwards ? animation->GetStart() : animation->GetEnd());
             fAnimInstance->SetCurrentTime((float)endTime);
             avatar->ApplyAnimations(time, elapsed);
 
-            if(--fWaitFrames == 0)
-            {
+            if (--fWaitFrames == 0) {
 
-                plSceneObject *handle = avatar->GetTarget(0);
+                plSceneObject* handle = avatar->GetTarget(0);
 
                 avatar->DetachAnimation(fAnimInstance);
                 avatar->GetRootAnimator()->Enable(false);
-                plAvBrainHuman *humanBrain = plAvBrainHuman::ConvertNoRef(brain);
-                if(fEnablePhysicsAtEnd)
-                {
+                plAvBrainHuman* humanBrain = plAvBrainHuman::ConvertNoRef(brain);
+
+                if (fEnablePhysicsAtEnd) {
 #if 0//ndef PLASMA_EXTERNAL_RELEASE
-                    if (!humanBrain || humanBrain->fWalkingStrategy->HitGroundInThisAge())
-                    {
+
+                    if (!humanBrain || humanBrain->fWalkingStrategy->HitGroundInThisAge()) {
                         // For some reason, calling CheckValidPosition at the beginning of
                         // an age can cause detectors to incorrectly report collisions. So
                         // we only call this if we're in the age.
-                        // 
+                        //
                         // It's only debugging code anyway to help the artist check that
                         // their oneshot doesn't end while penetrating geometry.
-                        char *overlaps = nil;
-                        if (avatar->GetPhysical())
+                        char* overlaps = nil;
+
+                        if (avatar->GetPhysical()) {
                             avatar->GetPhysical()->CheckValidPosition(&overlaps);
-                        if (overlaps)
-                        {
-                            char *buffy = new char[64 + strlen(overlaps)];
+                        }
+
+                        if (overlaps) {
+                            char* buffy = new char[64 + strlen(overlaps)];
                             sprintf(buffy, "Oneshot ends overlapping %s", overlaps);
-                            plConsoleMsg *showLine = new plConsoleMsg( plConsoleMsg::kAddLine, buffy );
+                            plConsoleMsg* showLine = new plConsoleMsg(plConsoleMsg::kAddLine, buffy);
                             showLine->Send();
                             delete[] overlaps;
                             delete[] buffy;
                         }
                     }
+
 #endif
-                }                   
-                if (humanBrain)
+                }
+
+                if (humanBrain) {
                     humanBrain->ResetIdle();
+                }
 
                 IUndoLimitPlayersInput(avatar);
+
                 // this is for a console command hack
-                if (plAvOneShotTask::fForce3rdPerson && avatar->IsLocalAvatar())
-                {
+                if (plAvOneShotTask::fForce3rdPerson && avatar->IsLocalAvatar()) {
                     // create message
                     plCameraMsg* pMsg = new plCameraMsg;
                     pMsg->SetBCastFlag(plMessage::kBCastByExactType);
                     pMsg->SetBCastFlag(plMessage::kNetPropagate, false);
                     pMsg->SetCmd(plCameraMsg::kResponderUndoThirdPerson);
-                    plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+                    plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
                 }
-                
+
                 return false;
-            }
-            else
+            } else {
                 return true;    // still running; waiting for fWaitFrames == 0
-        }
-        else
+            }
+        } else {
             return true;
-    }
-    else
+        }
+    } else {
         return false;
+    }
 }
 
-void plAvOneShotTask::LeaveAge(plArmatureMod *avatar)
+void plAvOneShotTask::LeaveAge(plArmatureMod* avatar)
 {
-    if (fAnimInstance)
+    if (fAnimInstance) {
         fAnimInstance->Stop();
+    }
 
-    if (fEnablePhysicsAtEnd)
+    if (fEnablePhysicsAtEnd) {
         avatar->EnablePhysics(true);
+    }
 
     IUndoLimitPlayersInput(avatar);
     fIgnore = true;
 }
 
-void plAvOneShotTask::SetAnimName(const plString &name)
+void plAvOneShotTask::SetAnimName(const plString& name)
 {
     fAnimName = name;
 }
@@ -742,12 +749,12 @@ void plAvOneShotTask::SetAnimName(const plString &name)
 //
 //////////////////////
 
-plAvOneShotLinkTask::plAvOneShotLinkTask() : plAvOneShotTask(), 
-fMarkerTime(-1),
-fStartTime(0),
-fLinkFired(false)
+plAvOneShotLinkTask::plAvOneShotLinkTask() : plAvOneShotTask(),
+    fMarkerTime(-1),
+    fStartTime(0),
+    fLinkFired(false)
 {
-    fDisablePhysics = false;        
+    fDisablePhysics = false;
 }
 
 plAvOneShotLinkTask::~plAvOneShotLinkTask()
@@ -755,35 +762,35 @@ plAvOneShotLinkTask::~plAvOneShotLinkTask()
 }
 
 // task protocol
-bool plAvOneShotLinkTask::Start(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvOneShotLinkTask::Start(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
     bool result = plAvOneShotTask::Start(avatar, brain, time, elapsed);
     fStartTime = time;
 
-    if (fAnimInstance && !fMarkerName.IsNull())
-    {
-        const plATCAnim *anim = plATCAnim::ConvertNoRef(fAnimInstance->GetAnimation());
-        if (anim)
-        {
+    if (fAnimInstance && !fMarkerName.IsNull()) {
+        const plATCAnim* anim = plATCAnim::ConvertNoRef(fAnimInstance->GetAnimation());
+
+        if (anim) {
             // GetMarker returns -1 if the marker isn't found
             fMarkerTime = anim->GetMarker(fMarkerName);
         }
     }
+
     return result;
 }
 
-bool plAvOneShotLinkTask::Process(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed)
+bool plAvOneShotLinkTask::Process(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed)
 {
     bool result = plAvOneShotTask::Process(avatar, brain, time, elapsed);
-    if (fIgnore)
-        return result;
 
-    if (avatar->GetTarget(0) == plNetClientApp::GetInstance()->GetLocalPlayer())
-    {
-        if (!fLinkFired && (fStartTime + fMarkerTime < time))
-        {
+    if (fIgnore) {
+        return result;
+    }
+
+    if (avatar->GetTarget(0) == plNetClientApp::GetInstance()->GetLocalPlayer()) {
+        if (!fLinkFired && (fStartTime + fMarkerTime < time)) {
             avatar->ILinkToPersonalAge();
-            
+
             avatar->EnablePhysics(false, plArmatureMod::kDisableReasonLinking);
             fLinkFired = true;
         }
@@ -792,21 +799,21 @@ bool plAvOneShotLinkTask::Process(plArmatureMod *avatar, plArmatureBrain *brain,
     return result;
 }
 
-void plAvOneShotLinkTask::Write(hsStream *stream, hsResMgr *mgr)
+void plAvOneShotLinkTask::Write(hsStream* stream, hsResMgr* mgr)
 {
     plAvOneShotTask::Write(stream, mgr);
     stream->WriteSafeString(fAnimName);
     stream->WriteSafeString(fMarkerName);
 }
 
-void plAvOneShotLinkTask::Read(hsStream *stream, hsResMgr *mgr)
+void plAvOneShotLinkTask::Read(hsStream* stream, hsResMgr* mgr)
 {
     plAvOneShotTask::Read(stream, mgr);
     fAnimName = stream->ReadSafeString_TEMP();
     fMarkerName = stream->ReadSafeString_TEMP();
 }
 
-void plAvOneShotLinkTask::SetMarkerName(const plString &name)
+void plAvOneShotLinkTask::SetMarkerName(const plString& name)
 {
     fMarkerName = name;
 }

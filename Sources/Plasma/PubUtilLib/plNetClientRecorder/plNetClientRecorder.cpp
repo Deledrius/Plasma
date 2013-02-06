@@ -59,7 +59,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plStatusLog/plStatusLog.h"
 
 plNetClientRecorder::plNetClientRecorder(TimeWrapper* timeWrapper) :
-fTimeWrapper(timeWrapper)
+    fTimeWrapper(timeWrapper)
 {
 }
 
@@ -69,10 +69,11 @@ plNetClientRecorder::~plNetClientRecorder()
 
 double plNetClientRecorder::GetTime()
 {
-    if (fTimeWrapper)
+    if (fTimeWrapper) {
         return fTimeWrapper->GetWrappedTime();
-    else
+    } else {
         return hsTimer::GetSysSeconds();
+    }
 }
 
 void plNetClientRecorder::IMakeFilename(const char* recName, char* path)
@@ -83,10 +84,12 @@ void plNetClientRecorder::IMakeFilename(const char* recName, char* path)
 #endif
 
     const char* lastDot = strrchr(recName, '.');
-    if (lastDot)
-        strncat(path, recName, lastDot-recName);
-    else
+
+    if (lastDot) {
+        strncat(path, recName, lastDot - recName);
+    } else {
         strcat(path, recName);
+    }
 
     strcat(path, ".rec");
 }
@@ -96,11 +99,11 @@ bool plNetClientRecorder::IsRecordableMsg(plNetMessage* msg) const
     uint16_t idx = msg->ClassIndex();
 
     return (
-        idx == CLASS_INDEX_SCOPED(plNetMsgLoadClone) ||
-        idx == CLASS_INDEX_SCOPED(plNetMsgSDLStateBCast) ||
-        idx == CLASS_INDEX_SCOPED(plNetMsgSDLState) ||
-        idx == CLASS_INDEX_SCOPED(plNetMsgGameMessage)
-        );
+               idx == CLASS_INDEX_SCOPED(plNetMsgLoadClone) ||
+               idx == CLASS_INDEX_SCOPED(plNetMsgSDLStateBCast) ||
+               idx == CLASS_INDEX_SCOPED(plNetMsgSDLState) ||
+               idx == CLASS_INDEX_SCOPED(plNetMsgGameMessage)
+           );
 }
 
 plNetClientLoggingRecorder::plNetClientLoggingRecorder(TimeWrapper* timeWrapper) :
@@ -120,47 +123,49 @@ plNetClientLoggingRecorder::~plNetClientLoggingRecorder()
 
 bool plNetClientLoggingRecorder::IProcessRecordMsg(plNetMessage* msg, double secs)
 {
-    if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plNetMsgGameMessage))
-    {
+    if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plNetMsgGameMessage)) {
         plNetMsgGameMessage* gameMsg = plNetMsgGameMessage::ConvertNoRef(msg);
         uint16_t gameMsgIdx = gameMsg->StreamInfo()->GetStreamType();
 
-        if (gameMsgIdx == CLASS_INDEX_SCOPED(plServerReplyMsg))
+        if (gameMsgIdx == CLASS_INDEX_SCOPED(plServerReplyMsg)) {
             return false;
+        }
 
         // Throw out any notify messages that don't involve picking (running into
         // detectors and that sort of thing should be recreated automatically
         // during playback)
-        if (gameMsgIdx == CLASS_INDEX_SCOPED(plNotifyMsg))
-        {
+        if (gameMsgIdx == CLASS_INDEX_SCOPED(plNotifyMsg)) {
             bool hasPick = false;
 
             plNotifyMsg* notifyMsg = plNotifyMsg::ConvertNoRef(gameMsg->GetContainedMsg());
             int numEvents = notifyMsg->GetEventCount();
-            for (int i = 0; i < numEvents; i++)
-            {
+
+            for (int i = 0; i < numEvents; i++) {
                 proEventData* event = notifyMsg->GetEventRecord(i);
-                if (event->fEventType == proEventData::kPicked)
+
+                if (event->fEventType == proEventData::kPicked) {
                     hasPick = true;
+                }
             }
 
             hsRefCnt_SafeUnRef(notifyMsg);
 
-            if (!hasPick)
+            if (!hasPick) {
                 return false;
+            }
         }
     }
-    
-    if (fPlaybackTimeOffset == 0)
+
+    if (fPlaybackTimeOffset == 0) {
         fPlaybackTimeOffset = secs;
+    }
 
     return true;
 }
 
 void plNetClientLoggingRecorder::RecordLinkMsg(plLinkToAgeMsg* linkMsg, double secs)
 {
-    if (!linkMsg->HasBCastFlag(plMessage::kNetSent))
-    {
+    if (!linkMsg->HasBCastFlag(plMessage::kNetSent)) {
         plNetMsgGameMessage netMsgWrap;
 
         // write message (and label) to ram stream

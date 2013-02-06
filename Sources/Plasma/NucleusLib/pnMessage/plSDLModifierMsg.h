@@ -51,11 +51,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class hsResMgr;
 class plStateDataRecord;
-class plSDLModifierMsg : public plMessage
-{
+class plSDLModifierMsg : public plMessage {
 public:
-    enum Action
-    {
+    enum Action {
         kActionNone = 0,
         kRecv,
         kSendToServer,
@@ -71,30 +69,59 @@ protected:
     uint32_t fFlags;
 
 public:
-    plSDLModifierMsg(const plString& sdlName="", Action a=kActionNone);
+    plSDLModifierMsg(const plString& sdlName = "", Action a = kActionNone);
     ~plSDLModifierMsg();
 
-    CLASSNAME_REGISTER( plSDLModifierMsg );
-    GETINTERFACE_ANY( plSDLModifierMsg, plMessage );
+    CLASSNAME_REGISTER(plSDLModifierMsg);
+    GETINTERFACE_ANY(plSDLModifierMsg, plMessage);
 
-    uint32_t GetFlags() const { return fFlags; }
-    void SetFlags(uint32_t f) { fFlags = f; }
+    uint32_t GetFlags() const {
+        return fFlags;
+    }
+    void SetFlags(uint32_t f) {
+        fFlags = f;
+    }
 
-    Action GetAction() const { return fAction; }
-    void SetAction(Action t) { fAction=t; }
+    Action GetAction() const {
+        return fAction;
+    }
+    void SetAction(Action t) {
+        fAction = t;
+    }
 
-    plStateDataRecord* GetState(bool unManageState=false) { if ( unManageState ) fManageStateMem=false; return fState; }
-    void SetState(plStateDataRecord* s, bool manageState) { fState=s; fManageStateMem=manageState; }
+    plStateDataRecord* GetState(bool unManageState = false) {
+        if (unManageState) {
+            fManageStateMem = false;
+        }
 
-    plString GetSDLName() const { return fSDLName; }
-    void SetSDLName(const plString& s) { fSDLName=s; }
-        
-    uint32_t GetPlayerID() const { return fPlayerID;  }
-    void SetPlayerID(uint32_t p) { fPlayerID=p;   }
-    
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr) { hsAssert(false, "local only msg"); }
-    void Write(hsStream* stream, hsResMgr* mgr) { hsAssert(false, "local only msg"); }
+        return fState;
+    }
+    void SetState(plStateDataRecord* s, bool manageState) {
+        fState = s;
+        fManageStateMem = manageState;
+    }
+
+    plString GetSDLName() const {
+        return fSDLName;
+    }
+    void SetSDLName(const plString& s) {
+        fSDLName = s;
+    }
+
+    uint32_t GetPlayerID() const {
+        return fPlayerID;
+    }
+    void SetPlayerID(uint32_t p) {
+        fPlayerID = p;
+    }
+
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
+        hsAssert(false, "local only msg");
+    }
+    void Write(hsStream* stream, hsResMgr* mgr) {
+        hsAssert(false, "local only msg");
+    }
 };
 
 #endif  // plSDLModifierMsg_INC

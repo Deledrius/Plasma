@@ -52,8 +52,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
  */
 
 #ifdef HS_BUILD_FOR_WIN32
-    // Terrible hacks for MinGW because they don't have a reasonable
-    // default for the Windows version. We cheat and say it's XP.
+// Terrible hacks for MinGW because they don't have a reasonable
+// default for the Windows version. We cheat and say it's XP.
 #   ifdef __MINGW32__
 #       undef _WIN32_WINNT
 #       define _WIN32_WINNT 0x501
@@ -66,7 +66,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #   include <windows.h>
 #   include <ws2tcpip.h> // Pulls in WinSock 2 for us
 
-    // This needs to be after #include <windows.h>, since it also includes windows.h
+// This needs to be after #include <windows.h>, since it also includes windows.h
 #   ifdef USE_VLD
 #       include <vld.h>
 #   endif // USE_VLD

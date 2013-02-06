@@ -56,27 +56,40 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "HeadSpin.h"
 
 class hsStream;
-class pcSmallRect
-{
-    public:
-        int16_t   fX, fY, fWidth, fHeight;
+class pcSmallRect {
+public:
+    int16_t   fX, fY, fWidth, fHeight;
 
-        pcSmallRect() { Empty(); }
-        pcSmallRect( int16_t x, int16_t y, int16_t w, int16_t h ) { Set( x, y, w, h ); }
-        
-        void    Set( int16_t x, int16_t y, int16_t w, int16_t h ) { fX = x; fY = y; fWidth = w; fHeight = h; }
-        void    Empty( void ) { fX = fY = fWidth = fHeight = 0; }
+    pcSmallRect() {
+        Empty();
+    }
+    pcSmallRect(int16_t x, int16_t y, int16_t w, int16_t h) {
+        Set(x, y, w, h);
+    }
 
-        int16_t   GetRight( void ) const { return fX + fWidth; }
-        int16_t   GetBottom( void ) const { return fY + fHeight; }
+    void    Set(int16_t x, int16_t y, int16_t w, int16_t h) {
+        fX = x;
+        fY = y;
+        fWidth = w;
+        fHeight = h;
+    }
+    void    Empty(void) {
+        fX = fY = fWidth = fHeight = 0;
+    }
 
-        void    Read( hsStream *s );
-        void    Write( hsStream *s );
+    int16_t   GetRight(void) const {
+        return fX + fWidth;
+    }
+    int16_t   GetBottom(void) const {
+        return fY + fHeight;
+    }
 
-        bool  Contains( int16_t x, int16_t y ) const
-        {
-            return (x >= fX) && (x <= fX + fWidth) && (y >= fY) && (y <= fY + fHeight);
-        }
+    void    Read(hsStream* s);
+    void    Write(hsStream* s);
+
+    bool  Contains(int16_t x, int16_t y) const {
+        return (x >= fX) && (x <= fX + fWidth) && (y >= fY) && (y <= fY + fHeight);
+    }
 };
 
 

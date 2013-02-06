@@ -80,14 +80,16 @@ static const char* s_gateKeeperAddrs[] = {
 //============================================================================
 // Auth
 //============================================================================
-unsigned GetAuthSrvHostnames (const char*** addrs) {
+unsigned GetAuthSrvHostnames(const char** * addrs)
+{
 
-    *addrs = s_authAddrs; 
+    *addrs = s_authAddrs;
     return arrsize(s_authAddrs);
 }
 
 //============================================================================
-void SetAuthSrvHostname (const char addr[]) {
+void SetAuthSrvHostname(const char addr[])
+{
 
     strncpy(s_authAddrConsole, addr, arrsize(s_authAddrConsole));
 }
@@ -95,14 +97,16 @@ void SetAuthSrvHostname (const char addr[]) {
 //============================================================================
 // File
 //============================================================================
-unsigned GetFileSrvHostnames (const char*** addrs) {
+unsigned GetFileSrvHostnames(const char** * addrs)
+{
 
-    *addrs = s_fileAddrs; 
+    *addrs = s_fileAddrs;
     return arrsize(s_fileAddrs);
 }
 
 //============================================================================
-void SetFileSrvHostname (const char addr[]) {
+void SetFileSrvHostname(const char addr[])
+{
 
     strncpy(s_fileAddrConsole, addr, arrsize(s_fileAddrConsole));
 }
@@ -110,14 +114,16 @@ void SetFileSrvHostname (const char addr[]) {
 //============================================================================
 // GateKeeper
 //============================================================================
-unsigned GetGateKeeperSrvHostnames (const char*** addrs) {
+unsigned GetGateKeeperSrvHostnames(const char** * addrs)
+{
 
-    *addrs = s_gateKeeperAddrs; 
+    *addrs = s_gateKeeperAddrs;
     return arrsize(s_gateKeeperAddrs);
 }
 
 //============================================================================
-void SetGateKeeperSrvHostname (const char addr[]) {
+void SetGateKeeperSrvHostname(const char addr[])
+{
     strncpy(s_gateKeeperAddrConsole, addr, arrsize(s_gateKeeperAddrConsole));
 }
 
@@ -130,31 +136,37 @@ static char s_serverSignupUrl[256] = {0};
 static char s_serverName[256] = {0};
 
 //============================================================================
-const char* GetServerStatusUrl () {
+const char* GetServerStatusUrl()
+{
     return s_serverStatusUrl;
 }
 
 //============================================================================
-void SetServerStatusUrl (const char url[]) {
+void SetServerStatusUrl(const char url[])
+{
     strncpy(s_serverStatusUrl, url, arrsize(s_serverStatusUrl));
 }
 
 //============================================================================
-const char* GetServerSignupUrl () {
+const char* GetServerSignupUrl()
+{
     return s_serverSignupUrl;
 }
 
 //============================================================================
-void SetServerSignupUrl (const char url[]) {
+void SetServerSignupUrl(const char url[])
+{
     strncpy(s_serverSignupUrl, url, arrsize(s_serverSignupUrl));
 }
 
 //============================================================================
-const char* GetServerDisplayName () {
+const char* GetServerDisplayName()
+{
     return s_serverName;
 }
 
 //============================================================================
-void SetServerDisplayName (const char name[]) {
+void SetServerDisplayName(const char name[])
+{
     strncpy(s_serverName, name, arrsize(s_serverName));
 }

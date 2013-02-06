@@ -64,40 +64,41 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetGameIDs, "Returns a list of game IDs
 {
     std::vector<unsigned> ids = pyGameCli::GetGameIDs();
     PyObject* retVal = PyList_New(ids.size());
-    for (unsigned i = 0; i < ids.size(); ++i)
+
+    for (unsigned i = 0; i < ids.size(); ++i) {
         PyList_SetItem(retVal, i, PyInt_FromLong(ids[i]));
+    }
+
     return retVal;
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtGetGameCli, args, "Params: gameID\nReturns a ptGameCli associated with the specified id")
 {
     int gameID = 0;
-    if (!PyArg_ParseTuple(args, "i", &gameID))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &gameID)) {
         PyErr_SetString(PyExc_TypeError, "PtGetGameCli expects an integer");
         PYTHON_RETURN_ERROR;
     }
+
     return pyGameCli::GetGameCli(gameID);
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtGetGameNameByTypeID, args, "Params: guid\nReturns the name of the game represented by guid passed in as a string")
 {
     PyObject* textObj;
-    if (!PyArg_ParseTuple(args, "O", &textObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &textObj)) {
         PyErr_SetString(PyExc_TypeError, "PtGetGameNameByTypeID expects a string");
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyString_CheckEx(textObj))
-    {
+    if (PyString_CheckEx(textObj)) {
         plString guid = PyString_AsStringEx(textObj);
 
         std::wstring retVal = pyGameCli::GetGameNameByTypeID(guid);
         return PyUnicode_FromWideChar(retVal.c_str(), retVal.length());
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtGetGameNameByTypeID expects a string");
         PYTHON_RETURN_ERROR;
     }
@@ -107,16 +108,17 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtJoinGame, args, "Params: callbackKey, gameID\n
 {
     PyObject* callbackObj = NULL;
     int gameID = 0;
-    if (!PyArg_ParseTuple(args, "Oi", &callbackObj, &gameID))
-    {
+
+    if (!PyArg_ParseTuple(args, "Oi", &callbackObj, &gameID)) {
         PyErr_SetString(PyExc_TypeError, "PtJoinGame expects a ptKey and an integer");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(callbackObj))
-    {
+
+    if (!pyKey::Check(callbackObj)) {
         PyErr_SetString(PyExc_TypeError, "PtJoinGame expects a ptKey and an integer");
         PYTHON_RETURN_ERROR;
     }
+
     pyKey* key = pyKey::ConvertFrom(callbackObj);
     pyGameCli::JoinGame(*key, gameID);
     PYTHON_RETURN_NONE;
@@ -147,11 +149,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameCli, playerCount)
 PYTHON_METHOD_DEFINITION(ptGameCli, invitePlayer, args)
 {
     int playerID = 0;
-    if (!PyArg_ParseTuple(args, "i", &playerID))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &playerID)) {
         PyErr_SetString(PyExc_TypeError, "invitePlayer expects an unsigned int");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->InvitePlayer(playerID);
     PYTHON_RETURN_NONE;
 }
@@ -159,11 +162,12 @@ PYTHON_METHOD_DEFINITION(ptGameCli, invitePlayer, args)
 PYTHON_METHOD_DEFINITION(ptGameCli, uninvitePlayer, args)
 {
     int playerID = 0;
-    if (!PyArg_ParseTuple(args, "i", &playerID))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &playerID)) {
         PyErr_SetString(PyExc_TypeError, "uninvitePlayer expects an unsigned int");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->UninvitePlayer(playerID);
     PYTHON_RETURN_NONE;
 }
@@ -201,20 +205,20 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameCli, upcastToVarSyncGame)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameCli)
-    PYTHON_METHOD_NOARGS(ptGameCli, gameID, "Returns the ID number for this game"),
-    PYTHON_METHOD_NOARGS(ptGameCli, gameTypeID, "Returns the game type ID for this game (as a guid string)"),
-    PYTHON_METHOD_NOARGS(ptGameCli, name, "Returns the name of the game"),
-    PYTHON_METHOD_NOARGS(ptGameCli, playerCount, "Returns the current number of players"),
-    PYTHON_METHOD(ptGameCli, invitePlayer, "Params: playerID\nInvites the specified player to join the game"),
-    PYTHON_METHOD(ptGameCli, uninvitePlayer, "Params: playerID\nRevokes the invitation for the specified player"),
-    PYTHON_BASIC_METHOD(ptGameCli, leaveGame, "Leaves this game"),
-    PYTHON_METHOD_NOARGS(ptGameCli, upcastToTTTGame, "Returns this game client as a ptTTTGame"),
-    PYTHON_METHOD_NOARGS(ptGameCli, upcastToHeekGame, "Returns this game client as a ptHeekGame"),
-    PYTHON_METHOD_NOARGS(ptGameCli, upcastToMarkerGame, "Returns this game client as a ptMarkerGame"),
-    PYTHON_METHOD_NOARGS(ptGameCli, upcastToBlueSpiralGame, "Returns this game client as a ptBlueSpiralGame"),
-    PYTHON_METHOD_NOARGS(ptGameCli, upcastToClimbingWallGame, "Returns this game client as a ptClimbingWallGame"),
-    PYTHON_METHOD_NOARGS(ptGameCli, upcastToVarSyncGame, "Returns this game client as a ptVarSyncGame"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameCli, gameID, "Returns the ID number for this game"),
+                     PYTHON_METHOD_NOARGS(ptGameCli, gameTypeID, "Returns the game type ID for this game (as a guid string)"),
+                     PYTHON_METHOD_NOARGS(ptGameCli, name, "Returns the name of the game"),
+                     PYTHON_METHOD_NOARGS(ptGameCli, playerCount, "Returns the current number of players"),
+                     PYTHON_METHOD(ptGameCli, invitePlayer, "Params: playerID\nInvites the specified player to join the game"),
+                     PYTHON_METHOD(ptGameCli, uninvitePlayer, "Params: playerID\nRevokes the invitation for the specified player"),
+                     PYTHON_BASIC_METHOD(ptGameCli, leaveGame, "Leaves this game"),
+                     PYTHON_METHOD_NOARGS(ptGameCli, upcastToTTTGame, "Returns this game client as a ptTTTGame"),
+                     PYTHON_METHOD_NOARGS(ptGameCli, upcastToHeekGame, "Returns this game client as a ptHeekGame"),
+                     PYTHON_METHOD_NOARGS(ptGameCli, upcastToMarkerGame, "Returns this game client as a ptMarkerGame"),
+                     PYTHON_METHOD_NOARGS(ptGameCli, upcastToBlueSpiralGame, "Returns this game client as a ptBlueSpiralGame"),
+                     PYTHON_METHOD_NOARGS(ptGameCli, upcastToClimbingWallGame, "Returns this game client as a ptClimbingWallGame"),
+                     PYTHON_METHOD_NOARGS(ptGameCli, upcastToVarSyncGame, "Returns this game client as a ptVarSyncGame"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptGameCli, "Base class for all game client interfaces");
@@ -223,7 +227,7 @@ PYTHON_EXPOSE_TYPE_DEFINITION(ptGameCli, pyGameCli);
 // required functions for PyObject interoperability
 PyObject* pyGameCli::New(pfGameCli* client)
 {
-    ptGameCli *newObj = (ptGameCli*)ptGameCli_type.tp_new(&ptGameCli_type, NULL, NULL);
+    ptGameCli* newObj = (ptGameCli*)ptGameCli_type.tp_new(&ptGameCli_type, NULL, NULL);
     newObj->fThis->gameClient = client;
     return (PyObject*)newObj;
 }

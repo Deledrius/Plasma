@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCoreExe/pnAceThread.cpp
-*   
+*
 ***/
 
 #include "Pch.h"
@@ -64,7 +64,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 //===========================================================================
-static unsigned CALLBACK CreateThreadProc (LPVOID param) {
+static unsigned CALLBACK CreateThreadProc(LPVOID param)
+{
 
 #ifdef USE_VLD
     VLDEnable();
@@ -74,7 +75,7 @@ static unsigned CALLBACK CreateThreadProc (LPVOID param) {
     PerfAddCounter(kAsyncPerfThreadsCurr, 1);
 
     // Initialize thread
-    AsyncThread * thread = (AsyncThread *) param;
+    AsyncThread* thread = (AsyncThread*) param;
 
     // Call thread procedure
     unsigned result = thread->proc(thread);
@@ -94,11 +95,14 @@ static unsigned CALLBACK CreateThreadProc (LPVOID param) {
 ***/
 
 //============================================================================
-void ThreadDestroy (unsigned exitThreadWaitMs) {
+void ThreadDestroy(unsigned exitThreadWaitMs)
+{
 
     unsigned bailAt = TimeGetMs() + exitThreadWaitMs;
-    while (AsyncPerfGetCounter(kAsyncPerfThreadsCurr) && signed(bailAt - TimeGetMs()) > 0)
+
+    while (AsyncPerfGetCounter(kAsyncPerfThreadsCurr) && signed(bailAt - TimeGetMs()) > 0) {
         AsyncSleep(10);
+    }
 }
 
 
@@ -109,28 +113,30 @@ void ThreadDestroy (unsigned exitThreadWaitMs) {
 ***/
 
 //===========================================================================
-void * AsyncThreadCreate (
+void* AsyncThreadCreate(
     FAsyncThreadProc    threadProc,
-    void *              argument,
+    void*               argument,
     const wchar_t         name[]
-) {
-    AsyncThread * thread    = new AsyncThread;
+)
+{
+    AsyncThread* thread    = new AsyncThread;
     thread->proc            = threadProc;
     thread->handle          = nil;
     thread->argument        = argument;
     thread->workTimeMs      = kAsyncTimeInfinite;
     StrCopy(thread->name, name, arrsize(thread->name));
-    
+
     // Create thread suspended
     unsigned threadId;
     HANDLE handle = (HANDLE) _beginthreadex(
-        (LPSECURITY_ATTRIBUTES) 0,
-        0,          // stack size
-        CreateThreadProc,
-        thread,     // argument
-        0,          // initFlag
-        &threadId
-    );
+                        (LPSECURITY_ATTRIBUTES) 0,
+                        0,          // stack size
+                        CreateThreadProc,
+                        thread,     // argument
+                        0,          // initFlag
+                        &threadId
+                    );
+
     if (!handle) {
         LogMsg(kLogFatal, "%s (%u)", __FILE__, GetLastError());
         ErrorAssert(__LINE__, __FILE__, "_beginthreadex failed");

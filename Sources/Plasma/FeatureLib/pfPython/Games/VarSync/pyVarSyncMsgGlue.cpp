@@ -70,9 +70,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVarSyncMsg, upcastToFinalVarSyncMsg)
 }
 
 PYTHON_START_METHODS_TABLE(ptVarSyncMsg)
-    PYTHON_METHOD_NOARGS(ptVarSyncMsg, getVarSyncMsgType, "Returns the type of the VarSync message (see PtVarSyncMsgTypes)"),
-    PYTHON_METHOD_NOARGS(ptVarSyncMsg, upcastToFinalVarSyncMsg, "Returns this message as the VarSync msg it is"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptVarSyncMsg, getVarSyncMsgType, "Returns the type of the VarSync message (see PtVarSyncMsgTypes)"),
+                     PYTHON_METHOD_NOARGS(ptVarSyncMsg, upcastToFinalVarSyncMsg, "Returns this message as the VarSync msg it is"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVarSyncMsg, pyGameCliMsg, "Base class for VarSync game messages");
@@ -81,9 +81,12 @@ PYTHON_EXPOSE_TYPE_DEFINITION(ptVarSyncMsg, pyVarSyncMsg);
 // required functions for PyObject interoperability
 PyObject* pyVarSyncMsg::New(pfGameCliMsg* msg)
 {
-    ptVarSyncMsg *newObj = (ptVarSyncMsg*)ptVarSyncMsg_type.tp_new(&ptVarSyncMsg_type, NULL, NULL);
-    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_VarSync))
+    ptVarSyncMsg* newObj = (ptVarSyncMsg*)ptVarSyncMsg_type.tp_new(&ptVarSyncMsg_type, NULL, NULL);
+
+    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_VarSync)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -133,9 +136,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVarSyncStringVarChangedMsg, value)
 }
 
 PYTHON_START_METHODS_TABLE(ptVarSyncStringVarChangedMsg)
-    PYTHON_METHOD_NOARGS(ptVarSyncStringVarChangedMsg, id, "Returns the id of the var that changed"),
-    PYTHON_METHOD_NOARGS(ptVarSyncStringVarChangedMsg, value, "Returns the variable's new value"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptVarSyncStringVarChangedMsg, id, "Returns the id of the var that changed"),
+                     PYTHON_METHOD_NOARGS(ptVarSyncStringVarChangedMsg, value, "Returns the variable's new value"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVarSyncStringVarChangedMsg, pyVarSyncMsg, "VarSync message received when a string variable's value changes");
@@ -143,9 +146,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptVarSyncStringVarChangedMsg, pyVarSyncMsg, "VarSync m
 // required functions for PyObject interoperability
 PyObject* pyVarSyncStringVarChangedMsg::New(pfGameCliMsg* msg)
 {
-    ptVarSyncStringVarChangedMsg *newObj = (ptVarSyncStringVarChangedMsg*)ptVarSyncStringVarChangedMsg_type.tp_new(&ptVarSyncStringVarChangedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_VarSync_StringVarChanged))
+    ptVarSyncStringVarChangedMsg* newObj = (ptVarSyncStringVarChangedMsg*)ptVarSyncStringVarChangedMsg_type.tp_new(&ptVarSyncStringVarChangedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_VarSync_StringVarChanged)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -179,9 +185,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVarSyncNumericVarChangedMsg, value)
 }
 
 PYTHON_START_METHODS_TABLE(ptVarSyncNumericVarChangedMsg)
-    PYTHON_METHOD_NOARGS(ptVarSyncNumericVarChangedMsg, id, "Returns the id of the var that changed"),
-    PYTHON_METHOD_NOARGS(ptVarSyncNumericVarChangedMsg, value, "Returns the variable's new value"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptVarSyncNumericVarChangedMsg, id, "Returns the id of the var that changed"),
+                     PYTHON_METHOD_NOARGS(ptVarSyncNumericVarChangedMsg, value, "Returns the variable's new value"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVarSyncNumericVarChangedMsg, pyVarSyncMsg, "VarSync message received when a numeric variable's value changes");
@@ -189,9 +195,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptVarSyncNumericVarChangedMsg, pyVarSyncMsg, "VarSync 
 // required functions for PyObject interoperability
 PyObject* pyVarSyncNumericVarChangedMsg::New(pfGameCliMsg* msg)
 {
-    ptVarSyncNumericVarChangedMsg *newObj = (ptVarSyncNumericVarChangedMsg*)ptVarSyncNumericVarChangedMsg_type.tp_new(&ptVarSyncNumericVarChangedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_VarSync_NumericVarChanged))
+    ptVarSyncNumericVarChangedMsg* newObj = (ptVarSyncNumericVarChangedMsg*)ptVarSyncNumericVarChangedMsg_type.tp_new(&ptVarSyncNumericVarChangedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_VarSync_NumericVarChanged)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -223,9 +232,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptVarSyncAllVarsSentMsg, pyVarSyncMsg, "VarSync messag
 // required functions for PyObject interoperability
 PyObject* pyVarSyncAllVarsSentMsg::New(pfGameCliMsg* msg)
 {
-    ptVarSyncAllVarsSentMsg *newObj = (ptVarSyncAllVarsSentMsg*)ptVarSyncAllVarsSentMsg_type.tp_new(&ptVarSyncAllVarsSentMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_VarSync_AllVarsSent))
+    ptVarSyncAllVarsSentMsg* newObj = (ptVarSyncAllVarsSentMsg*)ptVarSyncAllVarsSentMsg_type.tp_new(&ptVarSyncAllVarsSentMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_VarSync_AllVarsSent)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -266,10 +278,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVarSyncStringVarCreatedMsg, value)
 }
 
 PYTHON_START_METHODS_TABLE(ptVarSyncStringVarCreatedMsg)
-    PYTHON_METHOD_NOARGS(ptVarSyncStringVarCreatedMsg, name, "Returns the name of the var that was created"),
-    PYTHON_METHOD_NOARGS(ptVarSyncStringVarCreatedMsg, id, "Returns the id that was assigned to this variable"),
-    PYTHON_METHOD_NOARGS(ptVarSyncStringVarCreatedMsg, value, "Returns the variable's new value"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptVarSyncStringVarCreatedMsg, name, "Returns the name of the var that was created"),
+                     PYTHON_METHOD_NOARGS(ptVarSyncStringVarCreatedMsg, id, "Returns the id that was assigned to this variable"),
+                     PYTHON_METHOD_NOARGS(ptVarSyncStringVarCreatedMsg, value, "Returns the variable's new value"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVarSyncStringVarCreatedMsg, pyVarSyncMsg, "VarSync message received when a string variable is created and assigned an id");
@@ -277,9 +289,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptVarSyncStringVarCreatedMsg, pyVarSyncMsg, "VarSync m
 // required functions for PyObject interoperability
 PyObject* pyVarSyncStringVarCreatedMsg::New(pfGameCliMsg* msg)
 {
-    ptVarSyncStringVarCreatedMsg *newObj = (ptVarSyncStringVarCreatedMsg*)ptVarSyncStringVarCreatedMsg_type.tp_new(&ptVarSyncStringVarCreatedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_VarSync_StringVarCreated))
+    ptVarSyncStringVarCreatedMsg* newObj = (ptVarSyncStringVarCreatedMsg*)ptVarSyncStringVarCreatedMsg_type.tp_new(&ptVarSyncStringVarCreatedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_VarSync_StringVarCreated)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -319,10 +334,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVarSyncNumericVarCreatedMsg, value)
 }
 
 PYTHON_START_METHODS_TABLE(ptVarSyncNumericVarCreatedMsg)
-    PYTHON_METHOD_NOARGS(ptVarSyncNumericVarCreatedMsg, name, "Returns the name of the var that was created"),
-    PYTHON_METHOD_NOARGS(ptVarSyncNumericVarCreatedMsg, id, "Returns the id assigned to this variable"),
-    PYTHON_METHOD_NOARGS(ptVarSyncNumericVarCreatedMsg, value, "Returns the variable's new value"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptVarSyncNumericVarCreatedMsg, name, "Returns the name of the var that was created"),
+                     PYTHON_METHOD_NOARGS(ptVarSyncNumericVarCreatedMsg, id, "Returns the id assigned to this variable"),
+                     PYTHON_METHOD_NOARGS(ptVarSyncNumericVarCreatedMsg, value, "Returns the variable's new value"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVarSyncNumericVarCreatedMsg, pyVarSyncMsg, "VarSync message received when a numeric variable is created and assigned an id");
@@ -330,9 +345,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptVarSyncNumericVarCreatedMsg, pyVarSyncMsg, "VarSync 
 // required functions for PyObject interoperability
 PyObject* pyVarSyncNumericVarCreatedMsg::New(pfGameCliMsg* msg)
 {
-    ptVarSyncNumericVarCreatedMsg *newObj = (ptVarSyncNumericVarCreatedMsg*)ptVarSyncNumericVarCreatedMsg_type.tp_new(&ptVarSyncNumericVarCreatedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_VarSync_NumericVarCreated))
+    ptVarSyncNumericVarCreatedMsg* newObj = (ptVarSyncNumericVarCreatedMsg*)ptVarSyncNumericVarCreatedMsg_type.tp_new(&ptVarSyncNumericVarCreatedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_VarSync_NumericVarCreated)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 

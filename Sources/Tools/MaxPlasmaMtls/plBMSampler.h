@@ -44,53 +44,49 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plPlasmaMAXLayer;
 
-class plBMSamplerData
-{
-    public:
-        bool    fEnableCrop;
-        int     fCropPlacement;
-        float   fClipU, fClipV;
-        float   fClipW, fClipH;
+class plBMSamplerData {
+public:
+    bool    fEnableCrop;
+    int     fCropPlacement;
+    float   fClipU, fClipV;
+    float   fClipW, fClipH;
 
-        enum ASource
-        {
-            kFromTexture,
-            kFromRGB,
-            kDiscard
-        };
+    enum ASource {
+        kFromTexture,
+        kFromRGB,
+        kDiscard
+    };
 
-        ASource fAlphaSource;
+    ASource fAlphaSource;
 
-        plBMSamplerData()
-        {
-            fEnableCrop = false;
-            fCropPlacement = 0;
-            fClipU = fClipV = 0.f;
-            fClipW = fClipH = 1.f;
-            fAlphaSource = kFromTexture;
-        }
+    plBMSamplerData() {
+        fEnableCrop = false;
+        fCropPlacement = 0;
+        fClipU = fClipV = 0.f;
+        fClipW = fClipH = 1.f;
+        fAlphaSource = kFromTexture;
+    }
 };
 
-class plBMSampler : public MapSampler
-{
+class plBMSampler : public MapSampler {
 protected:
-    Bitmap  *fBM;
+    Bitmap*  fBM;
 
     plBMSamplerData fData;
 
-    float u1,v1;
-    int bmw,bmh,clipx, clipy, cliph;
-    float fclipw,fcliph, fbmh, fbmw;
+    float u1, v1;
+    int bmw, bmh, clipx, clipy, cliph;
+    float fclipw, fcliph, fbmh, fbmw;
     bool fInitialized;
 
     plBMSampler() {}
 
 public:
-    plBMSampler(plPlasmaMAXLayer *layer, Bitmap *bm);
-    int PlaceUV(ShadeContext& sc, float &u, float &v, int iu, int iv);
-    void PlaceUVFilter(ShadeContext& sc, float &u, float &v, int iu, int iv);
-    AColor Sample(ShadeContext& sc, float u,float v);
-    AColor SampleFilter(ShadeContext& sc, float u,float v, float du, float dv);
+    plBMSampler(plPlasmaMAXLayer* layer, Bitmap* bm);
+    int PlaceUV(ShadeContext& sc, float& u, float& v, int iu, int iv);
+    void PlaceUVFilter(ShadeContext& sc, float& u, float& v, int iu, int iv);
+    AColor Sample(ShadeContext& sc, float u, float v);
+    AColor SampleFilter(ShadeContext& sc, float u, float v, float du, float dv);
     //      float SampleMono(ShadeContext& sc, float u,float v);
     //      float SampleMonoFilter(ShadeContext& sc, float u,float v, float du, float dv);
 };

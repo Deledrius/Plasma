@@ -47,15 +47,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plUnifiedTime;
 class plUUID;
 
-class plAgeInfoSource
-{
+class plAgeInfoSource {
 public:
     // current time in current age
-    virtual const plUnifiedTime *       GetAgeTime( void ) const = 0;
+    virtual const plUnifiedTime*        GetAgeTime(void) const = 0;
     // name of current age
-    virtual const char *                GetAgeName( void ) const = 0;
+    virtual const char*                 GetAgeName(void) const = 0;
     // unique identifier for this age instance
-    virtual const plUUID *      GetAgeGuid( void ) const = 0;
+    virtual const plUUID*       GetAgeGuid(void) const = 0;
 };
 
 

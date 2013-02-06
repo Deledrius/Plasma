@@ -56,54 +56,66 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 struct OggVorbis_File;
 
-class plOGGCodec : public plAudioFileReader
-{
+class plOGGCodec : public plAudioFileReader {
 public:
 
-    plOGGCodec( const plFileName &path, plAudioCore::ChannelSelect whichChan = plAudioCore::kAll );
+    plOGGCodec(const plFileName& path, plAudioCore::ChannelSelect whichChan = plAudioCore::kAll);
     virtual ~plOGGCodec();
 
-    enum DecodeFormat
-    {
+    enum DecodeFormat {
         k8bitUnsigned,
         k16bitSigned
     };
 
-    enum DecodeFlags
-    {
+    enum DecodeFlags {
         kFastSeeking = 0x01
     };
-    
-    virtual plWAVHeader &GetHeader( void );
 
-    virtual void    Close( void );
+    virtual plWAVHeader& GetHeader(void);
 
-    virtual uint32_t  GetDataSize( void ) { return fDataSize / fChannelAdjust; }
-    virtual float   GetLengthInSecs( void );
+    virtual void    Close(void);
 
-    virtual bool    SetPosition( uint32_t numBytes );
-    virtual bool    Read( uint32_t numBytes, void *buffer );
-    virtual uint32_t  NumBytesLeft( void );
+    virtual uint32_t  GetDataSize(void) {
+        return fDataSize / fChannelAdjust;
+    }
+    virtual float   GetLengthInSecs(void);
 
-    virtual bool    IsValid( void ) { return ( fOggFile != nil ) ? true : false; }
+    virtual bool    SetPosition(uint32_t numBytes);
+    virtual bool    Read(uint32_t numBytes, void* buffer);
+    virtual uint32_t  NumBytesLeft(void);
 
-    static void     SetDecodeFormat( DecodeFormat f ) { fDecodeFormat = f; }
-    static void     SetDecodeFlag( uint8_t flag, bool on ) { if( on ) fDecodeFlags |= flag; else fDecodeFlags &= ~flag; }
-    static uint8_t  GetDecodeFlags( void ) { return fDecodeFlags; }
-    void            ResetWaveHeaderRef() { fCurHeaderPos = 0; }
+    virtual bool    IsValid(void) {
+        return (fOggFile != nil) ? true : false;
+    }
+
+    static void     SetDecodeFormat(DecodeFormat f) {
+        fDecodeFormat = f;
+    }
+    static void     SetDecodeFlag(uint8_t flag, bool on) {
+        if (on) {
+            fDecodeFlags |= flag;
+        } else {
+            fDecodeFlags &= ~flag;
+        }
+    }
+    static uint8_t  GetDecodeFlags(void) {
+        return fDecodeFlags;
+    }
+    void            ResetWaveHeaderRef() {
+        fCurHeaderPos = 0;
+    }
     void            BuildActualWaveHeader();
-    bool            ReadFromHeader(int numBytes, void *data); // read from Actual wave header
+    bool            ReadFromHeader(int numBytes, void* data); // read from Actual wave header
 
 protected:
 
-    enum
-    {
+    enum {
         kPCMFormatTag = 1
     };
 
     plFileName      fFilename;
-    FILE           *fFileHandle;
-    OggVorbis_File *fOggFile;
+    FILE*           fFileHandle;
+    OggVorbis_File* fOggFile;
 
     plWAVHeader     fHeader, fFakeHeader;
     uint32_t        fDataStartPos, fCurrDataPos, fDataSize;
@@ -113,11 +125,11 @@ protected:
 
     static DecodeFormat fDecodeFormat;
     static uint8_t      fDecodeFlags;
-    uint8_t *           fHeadBuf;
+    uint8_t*            fHeadBuf;
     int                 fCurHeaderPos;
 
-    void    IError( const char *msg );
-    void    IOpen( const plFileName &path, plAudioCore::ChannelSelect whichChan = plAudioCore::kAll );
+    void    IError(const char* msg);
+    void    IOpen(const plFileName& path, plAudioCore::ChannelSelect whichChan = plAudioCore::kAll);
 };
 
 #endif //_plOGGCodec_h

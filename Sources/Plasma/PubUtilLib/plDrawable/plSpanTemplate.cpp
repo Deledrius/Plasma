@@ -50,31 +50,45 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 plSpanTemplate::plSpanTemplate()
-:   fNumVerts(0),
-    fFormat(0),
-    fData(nil),
-    fNumTris(0),
-    fIndices(nil)
+    :   fNumVerts(0),
+        fFormat(0),
+        fData(nil),
+        fNumTris(0),
+        fIndices(nil)
 {
 }
 
-uint32_t plSpanTemplate::CalcStride() 
+uint32_t plSpanTemplate::CalcStride()
 {
     fStride = 0;
-    if( NumPos() )
+
+    if (NumPos()) {
         fStride += sizeof(hsPoint3);
-    if( NumNorm() )
+    }
+
+    if (NumNorm()) {
         fStride += sizeof(hsVector3);
-    if( NumColor() )
+    }
+
+    if (NumColor()) {
         fStride += sizeof(uint32_t);
-    if( NumColor2() )
+    }
+
+    if (NumColor2()) {
         fStride += sizeof(uint32_t);
-    if( NumWgtIdx() )
+    }
+
+    if (NumWgtIdx()) {
         fStride += sizeof(uint32_t);
-    if( NumUVWs() )
+    }
+
+    if (NumUVWs()) {
         fStride += (uint8_t)(sizeof(hsPoint3) * NumUVWs());
-    if( NumWeights() )
+    }
+
+    if (NumWeights()) {
         fStride += (uint8_t)(sizeof(float) * NumWeights());
+    }
 
     return uint32_t(fStride);
 }
@@ -133,8 +147,10 @@ void plSpanTemplateB::ComputeBounds()
 {
     fLocalBounds.MakeEmpty();
     int i;
-    for( i = 0; i < NumVerts(); i++ )
+
+    for (i = 0; i < NumVerts(); i++) {
         fLocalBounds.Union(Position(i));
+    }
 }
 
 void plSpanTemplateB::AllocColors()

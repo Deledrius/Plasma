@@ -46,15 +46,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // The dialog for setting up and starting the SceneViewer.  Controls starting the client
 // and SceneSync; SceneSync controls the updates though.
-class SceneViewer
-{
+class SceneViewer {
 protected:
     bool fUpdate;
     int fUpdateFreq;    // Update rate (ms), -1 for no update
     bool fLoadOld;      // Load old data if possible
     bool fReleaseExe;   // True for release exe, false for debug
     bool fRunning;      // Do we think the client is currently running (not sure since the
-                        // client can terminate without us knowing).
+    // client can terminate without us knowing).
     HWND fhDlg;         // Handle to the setup dialog
 
     SceneViewer();
@@ -69,7 +68,7 @@ protected:
 
 public:
     ~SceneViewer();
-    static SceneViewer &Instance();
+    static SceneViewer& Instance();
 
     void Show();
 };

@@ -50,23 +50,22 @@ class plMaxNodeBase;
 
 #define RESPONDER_CID Class_ID(0x46b83f3e, 0x7d5e5d17)
 
-class plResponderComponentExt : public plComponentExt
-{
+class plResponderComponentExt : public plComponentExt {
 public:
     // All classes derived from plResponderComponent can be picked from the activator component,
     // because they can convert to the responder type.
-    int CanConvertToType(Class_ID obtype)
-    { return (obtype == RESPONDER_CID) ? 1 : plComponentExt::CanConvertToType(obtype); }
+    int CanConvertToType(Class_ID obtype) {
+        return (obtype == RESPONDER_CID) ? 1 : plComponentExt::CanConvertToType(obtype);
+    }
 };
 
-int ResponderGetActivatorCount(plComponentBase *comp);
-plComponentBase *ResponderGetActivator(plComponentBase *comp, int idx);
+int ResponderGetActivatorCount(plComponentBase* comp);
+plComponentBase* ResponderGetActivator(plComponentBase* comp, int idx);
 
-namespace Responder
-{
-    // Pass in a responder component and a node it is attached to, and you will
-    // get the key to the responder modifier
-    plKey GetKey(plComponentBase *comp, plMaxNodeBase *node);
+namespace Responder {
+// Pass in a responder component and a node it is attached to, and you will
+// get the key to the responder modifier
+plKey GetKey(plComponentBase* comp, plMaxNodeBase* node);
 }
 
 #endif // _plResponderComponent_h_inc_

@@ -55,37 +55,41 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 /////////////////////////////////////////////////////////////////////////////
 
-class plResDownloadStream : public plZlibStream
-{
+class plResDownloadStream : public plZlibStream {
     plOperationProgress* fProgress;
     plFileName fFilename;
     bool fIsZipped;
 
 public:
     plResDownloadStream(plOperationProgress* prog, const plFileName& reqFile)
-        : fProgress(prog)
-    { 
+        : fProgress(prog) {
         fIsZipped = reqFile.GetFileExt().CompareI("gz") == 0;
     }
 
-    virtual bool Open(const plFileName& filename, const char* mode)
-    {
+    virtual bool Open(const plFileName& filename, const char* mode) {
         fFilename = filename;
         return plZlibStream::Open(filename, mode);
     }
 
-    virtual uint32_t Write(uint32_t count, const void* buf)
-    {
+    virtual uint32_t Write(uint32_t count, const void* buf) {
         fProgress->Increment((float)count);
-        if (fIsZipped)
+
+        if (fIsZipped) {
             return plZlibStream::Write(count, buf);
-        else
+        } else {
             return fOutput->Write(count, buf);
+        }
     }
 
-    plFileName GetFileName() const { return fFilename; }
-    bool IsZipped() const { return fIsZipped; }
-    void Unlink() const { plFileSystem::Unlink(fFilename); }
+    plFileName GetFileName() const {
+        return fFilename;
+    }
+    bool IsZipped() const {
+        return fIsZipped;
+    }
+    void Unlink() const {
+        plFileSystem::Unlink(fFilename);
+    }
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -93,25 +97,26 @@ public:
 static void FileDownloaded(
     ENetError           result,
     void*               param,
-    const plFileName &  filename,
+    const plFileName&   filename,
     hsStream*           writer)
 {
     plResPatcher* patcher = (plResPatcher*)param;
     plFileName file = filename;
-    if (((plResDownloadStream*)writer)->IsZipped())
-        file = file.StripFileExt(); // Kill off .gz
+
+    if (((plResDownloadStream*)writer)->IsZipped()) {
+        file = file.StripFileExt();    // Kill off .gz
+    }
+
     writer->Close();
 
-    switch (result)
-    {
-        case kNetSuccess:
-        {
+    switch (result) {
+    case kNetSuccess: {
             PatcherLog(kStatus, "    Download Complete: %s", file.AsString().c_str());
-            
+
             // If this is a PRP, then we need to add it to the ResManager
             plFileName clientPath = static_cast<plResDownloadStream*>(writer)->GetFileName();
-            if (clientPath.GetFileExt().CompareI("prp") == 0)
-            {
+
+            if (clientPath.GetFileExt().CompareI("prp") == 0) {
                 plResManager* clientResMgr = static_cast<plResManager*>(hsgResMgr::ResMgr());
                 clientResMgr->AddSinglePage(clientPath);
             }
@@ -121,14 +126,16 @@ static void FileDownloaded(
             delete writer;
             return;
         }
-        case kNetErrFileNotFound:
-            PatcherLog(kError, "    Download Failed: %s not found", file.AsString().c_str());
-            break;
-        default:
-            char* error = hsWStringToString(NetErrorToString(result));
-            PatcherLog(kError, "    Download Failed: %s", error);
-            delete[] error;
-            break;
+
+    case kNetErrFileNotFound:
+        PatcherLog(kError, "    Download Failed: %s not found", file.AsString().c_str());
+        break;
+
+    default:
+        char* error = hsWStringToString(NetErrorToString(result));
+        PatcherLog(kError, "    Download Failed: %s", error);
+        delete[] error;
+        break;
     }
 
     // Failure case
@@ -146,16 +153,16 @@ static void ManifestDownloaded(
 {
     plResPatcher* patcher = (plResPatcher*)param;
     plString name = plString::FromWchar(group);
-    if (IS_NET_SUCCESS(result))
+
+    if (IS_NET_SUCCESS(result)) {
         PatcherLog(kInfo, "    Downloaded manifest %s", name.c_str());
-    else {
+    } else {
         PatcherLog(kError, "    Failed to download manifest %s", name.c_str());
         patcher->Finish(false);
         return;
     }
 
-    for (uint32_t i = 0; i < entryCount; ++i)
-    {
+    for (uint32_t i = 0; i < entryCount; ++i) {
         const NetCliFileManifestEntry mfs = manifest[i];
         plFileName fileName = plString::FromWchar(mfs.clientName);
         plFileName downloadName = plString::FromWchar(mfs.downloadName);
@@ -163,18 +170,19 @@ static void ManifestDownloaded(
         // See if the files are the same
         // 1. Check file size before we do time consuming md5 operations
         // 2. Do wasteful md5. We should consider implementing a CRC instead.
-        if (plFileInfo(fileName).FileSize() == mfs.fileSize)
-        {
+        if (plFileInfo(fileName).FileSize() == mfs.fileSize) {
             plMD5Checksum cliMD5(fileName);
             plMD5Checksum srvMD5;
             srvMD5.SetFromHexString(plString::FromWchar(mfs.md5, 32).c_str());
 
-            if (cliMD5 == srvMD5)
+            if (cliMD5 == srvMD5) {
                 continue;
-            else
+            } else {
                 PatcherLog(kInfo, "    Enqueueing %s: MD5 Checksums Differ", fileName.AsString().c_str());
-        } else
+            }
+        } else {
             PatcherLog(kInfo, "    Enqueueing %s: File Sizes Differ", fileName.AsString().c_str());
+        }
 
         // If we're still here, then we need to update the file.
         float size = mfs.zipSize ? (float)mfs.zipSize : (float)mfs.fileSize;
@@ -192,8 +200,10 @@ plResPatcher* plResPatcher::fInstance = nil;
 
 plResPatcher* plResPatcher::GetInstance()
 {
-    if (!fInstance)
+    if (!fInstance) {
         fInstance = new plResPatcher;
+    }
+
     return fInstance;
 }
 
@@ -210,23 +220,28 @@ plResPatcher::plResPatcher()
 
 plResPatcher::~plResPatcher()
 {
-    if (fProgress)
+    if (fProgress) {
         delete fProgress;
+    }
 }
 
 void plResPatcher::IssueRequest()
 {
-    if (!fPatching) return;
+    if (!fPatching) {
+        return;
+    }
+
     if (fRequests.empty())
         // Wheee!
+    {
         Finish();
-    else {
+    } else {
         Request req = fRequests.front();
         fRequests.pop();
 
         plString title;
-        if (req.fType == kManifest)
-        {
+
+        if (req.fType == kManifest) {
             PatcherLog(kMajorStatus, "    Downloading manifest... %s", req.fFile.AsString().c_str());
             title = plString::Format("Checking %s for updates...", req.fFile.AsString().c_str());
             NetCliFileManifestRequest(ManifestDownloaded, this, req.fFile.AsString().ToWchar());
@@ -236,14 +251,16 @@ void plResPatcher::IssueRequest()
 
             // If this is a PRP, we need to unload it from the ResManager
 
-            if (req.fFriendlyName.GetFileExt().CompareI("prp") == 0)
+            if (req.fFriendlyName.GetFileExt().CompareI("prp") == 0) {
                 ((plResManager*)hsgResMgr::ResMgr())->RemoveSinglePage(req.fFriendlyName);
+            }
 
             plFileSystem::CreateDir(req.fFriendlyName.StripFileName(), true);
             plResDownloadStream* stream = new plResDownloadStream(fProgress, req.fFile);
-            if (stream->Open(req.fFriendlyName, "wb"))
+
+            if (stream->Open(req.fFriendlyName, "wb")) {
                 NetCliFileDownloadRequest(req.fFile, stream, FileDownloaded, this);
-            else {
+            } else {
                 PatcherLog(kError, "    Unable to create file %s", req.fFriendlyName.AsString().c_str());
                 Finish(false);
             }
@@ -255,22 +272,28 @@ void plResPatcher::IssueRequest()
 
 void plResPatcher::Finish(bool success)
 {
-    while (fRequests.size())
+    while (fRequests.size()) {
         fRequests.pop();
+    }
 
     fPatching = false;
-    if (success)
+
+    if (success) {
         PatcherLog(kHeader, "--- Patch Completed Successfully ---");
-    else
-    {
+    } else {
         PatcherLog(kHeader, "--- Patch Killed by Error ---");
-        if (fProgress)
+
+        if (fProgress) {
             fProgress->SetAborting();
+        }
     }
-    delete fProgress; fProgress = nil;
+
+    delete fProgress;
+    fProgress = nil;
 
     plResPatcherMsg* pMsg = new plResPatcherMsg(success, sLastError);
-    delete[] sLastError; sLastError = nil;
+    delete[] sLastError;
+    sLastError = nil;
     pMsg->Send(); // whoosh... off it goes
 }
 
@@ -290,7 +313,7 @@ void plResPatcher::Start()
     fPatching = true;
     PatcherLog(kHeader, "--- Patch Started (%i requests) ---", fRequests.size());
     fProgress = plProgressMgr::GetInstance()->RegisterOperation(0.0, "Checking for updates...",
-        plProgressMgr::kUpdateText, false, true);
+                plProgressMgr::kUpdateText, false, true);
     IssueRequest();
 }
 
@@ -299,34 +322,48 @@ void plResPatcher::Start()
 void PatcherLog(PatcherLogType type, const char* format, ...)
 {
     uint32_t color = 0;
-    switch (type)
-    {
-    case kHeader:       color = plStatusLog::kWhite;    break;
-    case kInfo:         color = plStatusLog::kBlue;     break;
-    case kMajorStatus:  color = plStatusLog::kYellow;   break;
-    case kStatus:       color = plStatusLog::kGreen;    break;
-    case kError:        color = plStatusLog::kRed;      break;
+
+    switch (type) {
+    case kHeader:
+        color = plStatusLog::kWhite;
+        break;
+
+    case kInfo:
+        color = plStatusLog::kBlue;
+        break;
+
+    case kMajorStatus:
+        color = plStatusLog::kYellow;
+        break;
+
+    case kStatus:
+        color = plStatusLog::kGreen;
+        break;
+
+    case kError:
+        color = plStatusLog::kRed;
+        break;
     }
 
     static plStatusLog* gStatusLog = nil;
-    if (!gStatusLog)
-    {
+
+    if (!gStatusLog) {
         gStatusLog = plStatusLogMgr::GetInstance().CreateStatusLog(
-            20,
-            "patcher.log",
-            plStatusLog::kFilledBackground | plStatusLog::kAlignToTop | plStatusLog::kDeleteForMe);
+                         20,
+                         "patcher.log",
+                         plStatusLog::kFilledBackground | plStatusLog::kAlignToTop | plStatusLog::kDeleteForMe);
     }
 
     va_list args;
     va_start(args, format);
 
-    if (type == kError)
-    {
+    if (type == kError) {
         sLastError = new char[1024]; // Deleted by Finish(false)
         vsprintf(sLastError, format, args);
         gStatusLog->AddLine(sLastError, color);
-    } else
+    } else {
         gStatusLog->AddLineV(color, format, args);
+    }
 
     va_end(args);
 }

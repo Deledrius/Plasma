@@ -54,24 +54,25 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plErrorMsg;
 class plMaxNode;
 
-class plResponderComponent : public plComponent
-{
+class plResponderComponent : public plComponent {
 public:
     std::map<plMaxNode*, plKey> fModKeys;
 
     plResponderComponent();
 
     bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
-    bool PreConvert(plMaxNode *node,plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node,plErrorMsg *pErrMsg);
-    bool DeInit(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool DeInit(plMaxNode* node, plErrorMsg* pErrMsg);
 
     // All classes derived from plResponderComponent can be picked from the activator component,
     // because they can convert to the responder type.
-    int CanConvertToType(Class_ID obtype) { return (obtype == RESPONDER_CID) ? 1 : plComponent::CanConvertToType(obtype); }
+    int CanConvertToType(Class_ID obtype) {
+        return (obtype == RESPONDER_CID) ? 1 : plComponent::CanConvertToType(obtype);
+    }
 
-    RefTargetHandle Clone(RemapDir &remap);
-    
+    RefTargetHandle Clone(RemapDir& remap);
+
 protected:
     // Old responders won't have their tables set up correctly.  Call this to fix them
     // before export or opening a dialog.
@@ -84,17 +85,16 @@ protected:
     void IConvertCmds(plMaxNode* node, plErrorMsg* pErrMsg, int state, CmdIdxs& cmdIdxs);
 //  void IConvertWait(int state, plResponderModifier *responder);
 
-    void ISetupDefaultWait(plMaxNode* node, plErrorMsg* pErrMsg, int state, CmdIdxs& cmdIdxs, int &numCallbacks);
-    void IConvertCmdWaits (plMaxNode* node, plErrorMsg* pErrMsg, int state, CmdIdxs& cmdIdxs, int &numCallbacks);
+    void ISetupDefaultWait(plMaxNode* node, plErrorMsg* pErrMsg, int state, CmdIdxs& cmdIdxs, int& numCallbacks);
+    void IConvertCmdWaits(plMaxNode* node, plErrorMsg* pErrMsg, int state, CmdIdxs& cmdIdxs, int& numCallbacks);
 
     friend class plResponderProc;
 };
 
 // Param ID's for the responder comp PB
-enum
-{
-    kResponderActivators=1,
-    kResponderState=7,
+enum {
+    kResponderActivators = 1,
+    kResponderState = 7,
     kResponderStateName,
     kResponderStateDef,
     kResponderEnabled,
@@ -105,8 +105,7 @@ enum
 };
 
 // Param ID's for the responder state PB
-enum
-{
+enum {
     kStateCmdType_DEAD,
     kStateCmdParams,
     kStateCmdWait,
@@ -116,8 +115,7 @@ enum
 };
 
 // Block ID's for responder command PB's
-enum
-{
+enum {
     kResponderAnimBlk = 100,
     kResponderMtlBlk,
     kResponderSndBlk,

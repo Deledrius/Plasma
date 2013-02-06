@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plNetGameLib/Private/plNglGame.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_PUBUTILLIB_PLNETGAMELIB_PRIVATE_PLNGLGAME_H
@@ -60,28 +60,28 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //============================================================================
 // Connect
 //============================================================================
-void NetCliGameStartConnect (
+void NetCliGameStartConnect(
     const uint32_t node
 );
 
 //============================================================================
 // Disconnect
 //============================================================================
-void NetCliGameDisconnect ();
+void NetCliGameDisconnect();
 
 //============================================================================
 // Join Age
 //============================================================================
 typedef void (*FNetCliGameJoinAgeRequestCallback)(
     ENetError       result,
-    void *          param
+    void*           param
 );
-void NetCliGameJoinAgeRequest (
+void NetCliGameJoinAgeRequest(
     unsigned                            ageMcpId,
     const plUUID&                       accountUuid,
     unsigned                            playerInt,
     FNetCliGameJoinAgeRequestCallback   callback,
-    void *                              param
+    void*                               param
 );
 
 //============================================================================
@@ -92,10 +92,10 @@ typedef void (*FNetCliGameRecvBufferHandler)(
     unsigned                        bytes,
     const uint8_t                      buffer[]
 );
-void NetCliGameSetRecvBufferHandler (
+void NetCliGameSetRecvBufferHandler(
     FNetCliGameRecvBufferHandler    handler
 );
-void NetCliGamePropagateBuffer (
+void NetCliGamePropagateBuffer(
     unsigned                        type,
     unsigned                        bytes,
     const uint8_t                      buffer[]
@@ -105,6 +105,6 @@ void NetCliGamePropagateBuffer (
 // GameMgrMsg
 //============================================================================
 struct GameMsgHeader;
-typedef void (*FNetCliGameRecvGameMgrMsgHandler)(GameMsgHeader * msg);
-void NetCliGameSetRecvGameMgrMsgHandler (FNetCliGameRecvGameMgrMsgHandler handler);
-void NetCliGameSendGameMgrMsg (GameMsgHeader * msg);
+typedef void (*FNetCliGameRecvGameMgrMsgHandler)(GameMsgHeader* msg);
+void NetCliGameSetRecvGameMgrMsgHandler(FNetCliGameRecvGameMgrMsgHandler handler);
+void NetCliGameSendGameMgrMsg(GameMsgHeader* msg);

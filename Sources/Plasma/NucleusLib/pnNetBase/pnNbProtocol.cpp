@@ -50,9 +50,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 //============================================================================
-const wchar_t * NetProtocolToString (ENetProtocol protocol) {
+const wchar_t* NetProtocolToString(ENetProtocol protocol)
+{
 
-    static struct { ENetProtocol protocol; const wchar_t *name; } s_protocols[] = {
+    static struct {
+        ENetProtocol protocol;
+        const wchar_t* name;
+    } s_protocols[] = {
         { kNetProtocolNil,          L"kNetProtocolNil" },
 
         // For test applications
@@ -77,8 +81,9 @@ const wchar_t * NetProtocolToString (ENetProtocol protocol) {
     };
 
     for (unsigned i = 0; i < arrsize(s_protocols); ++i)
-        if (s_protocols[i].protocol == protocol)
+        if (s_protocols[i].protocol == protocol) {
             return s_protocols[i].name;
+        }
 
-    return L"Unknown protocol id";  
+    return L"Unknown protocol id";
 }

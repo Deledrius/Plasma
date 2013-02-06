@@ -46,15 +46,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 plObjectIntersectPlaneConditionalObject::plObjectIntersectPlaneConditionalObject()
 {
-    
+
 }
 
 bool plObjectIntersectPlaneConditionalObject::MsgReceive(plMessage* msg)
 {
     /*
-    
+
      if our target is within the bounds of the object our logic modifier is attached to...
-    
+
     {
         bSatisfied = true;
         fLogicMod->RequestTrigger();

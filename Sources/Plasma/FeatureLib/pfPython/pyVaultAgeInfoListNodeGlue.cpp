@@ -55,11 +55,12 @@ PYTHON_DEFAULT_DEALLOC_DEFINITION(ptVaultAgeInfoListNode)
 PYTHON_INIT_DEFINITION(ptVaultAgeInfoListNode, args, keywords)
 {
     int n = 0;
-    if (!PyArg_ParseTuple(args, "|i", &n))
-    {
+
+    if (!PyArg_ParseTuple(args, "|i", &n)) {
         PyErr_SetString(PyExc_TypeError, "__init__ expects an optional int");
         PYTHON_RETURN_INIT_ERROR;
     }
+
     // we don't really do anything? Not according to the associated constructor. Odd...
     PYTHON_RETURN_INIT_OK;
 }
@@ -67,61 +68,70 @@ PYTHON_INIT_DEFINITION(ptVaultAgeInfoListNode, args, keywords)
 PYTHON_METHOD_DEFINITION(ptVaultAgeInfoListNode, hasAge, args)
 {
     unsigned long ageID;
-    if (!PyArg_ParseTuple(args, "l", &ageID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &ageID)) {
         PyErr_SetString(PyExc_TypeError, "hasAge expects a unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_BOOL(self->fThis->HasAge(ageID));
 }
 
 PYTHON_METHOD_DEFINITION(ptVaultAgeInfoListNode, addAge, args)
 {
     unsigned long ageID;
-    if (!PyArg_ParseTuple(args, "l", &ageID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &ageID)) {
         PyErr_SetString(PyExc_TypeError, "addAge expects a unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_BOOL(self->fThis->AddAge(ageID));
 }
 
 PYTHON_METHOD_DEFINITION(ptVaultAgeInfoListNode, removeAge, args)
 {
     unsigned long ageID;
-    if (!PyArg_ParseTuple(args, "l", &ageID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &ageID)) {
         PyErr_SetString(PyExc_TypeError, "removeAge expects a unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->RemoveAge(ageID);
     PYTHON_RETURN_NONE;
 }
 
 PYTHON_START_METHODS_TABLE(ptVaultAgeInfoListNode)
-    PYTHON_METHOD(ptVaultAgeInfoListNode, hasAge, "Params: ageID\nReturns whether ageID is in the list of ages"),
-    PYTHON_METHOD(ptVaultAgeInfoListNode, addAge, "Params: ageID\nAdds ageID to list of ages"),
-    PYTHON_METHOD(ptVaultAgeInfoListNode, removeAge, "Params: ageID\nRemoves ageID from list of ages"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptVaultAgeInfoListNode, hasAge, "Params: ageID\nReturns whether ageID is in the list of ages"),
+              PYTHON_METHOD(ptVaultAgeInfoListNode, addAge, "Params: ageID\nAdds ageID to list of ages"),
+              PYTHON_METHOD(ptVaultAgeInfoListNode, removeAge, "Params: ageID\nRemoves ageID from list of ages"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVaultAgeInfoListNode, pyVaultFolderNode, "Params: n=0\nPlasma vault age info list node");
 
 // required functions for PyObject interoperability
-PyObject *pyVaultAgeInfoListNode::New(RelVaultNode* nfsNode)
+PyObject* pyVaultAgeInfoListNode::New(RelVaultNode* nfsNode)
 {
-    ptVaultAgeInfoListNode *newObj = (ptVaultAgeInfoListNode*)ptVaultAgeInfoListNode_type.tp_new(&ptVaultAgeInfoListNode_type, NULL, NULL);
-    if (newObj->fThis->fNode)
+    ptVaultAgeInfoListNode* newObj = (ptVaultAgeInfoListNode*)ptVaultAgeInfoListNode_type.tp_new(&ptVaultAgeInfoListNode_type, NULL, NULL);
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->DecRef();
+    }
+
     newObj->fThis->fNode = nfsNode;
-    if (newObj->fThis->fNode)
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->IncRef();
+    }
+
     return (PyObject*)newObj;
 }
 
-PyObject *pyVaultAgeInfoListNode::New(int n /* =0 */)
+PyObject* pyVaultAgeInfoListNode::New(int n /* =0 */)
 {
-    ptVaultAgeInfoListNode *newObj = (ptVaultAgeInfoListNode*)ptVaultAgeInfoListNode_type.tp_new(&ptVaultAgeInfoListNode_type, NULL, NULL);
+    ptVaultAgeInfoListNode* newObj = (ptVaultAgeInfoListNode*)ptVaultAgeInfoListNode_type.tp_new(&ptVaultAgeInfoListNode_type, NULL, NULL);
     // oddly enough, nothing to do here
     return (PyObject*)newObj;
 }
@@ -133,7 +143,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptVaultAgeInfoListNode, pyVaultAgeInfoListNode)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyVaultAgeInfoListNode::AddPlasmaClasses(PyObject *m)
+void pyVaultAgeInfoListNode::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptVaultAgeInfoListNode);

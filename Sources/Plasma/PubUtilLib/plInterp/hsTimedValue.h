@@ -62,31 +62,60 @@ protected:
     T                       fFrom;
 
 public:
-    hsTimedValue() : fFlags(kIdle|kInstant), fDuration(0) {}
-    hsTimedValue(const T& v) : fFlags(kIdle|kInstant), fDuration(0) { SetValue(v); }
+    hsTimedValue() : fFlags(kIdle | kInstant), fDuration(0) {}
+    hsTimedValue(const T& v) : fFlags(kIdle | kInstant), fDuration(0) {
+        SetValue(v);
+    }
 
-    uint32_t GetFlags() { return fFlags; }
+    uint32_t GetFlags() {
+        return fFlags;
+    }
 
     void SetDuration(float duration);
-    float GetDuration() const { return fDuration; }
+    float GetDuration() const {
+        return fDuration;
+    }
 
     bool32 operator==(const hsTimedValue<T>& v);
-    hsTimedValue<T>& operator=(const T& v) { SetValue(v); return *this; }
-    hsTimedValue<T>& operator+=(const T& v) { SetValue(v + fValue); return *this; }
+    hsTimedValue<T>& operator=(const T& v) {
+        SetValue(v);
+        return *this;
+    }
+    hsTimedValue<T>& operator+=(const T& v) {
+        SetValue(v + fValue);
+        return *this;
+    }
 
-    void SetTempValue(const T& v) { fValue = v; }
-    void SetValue(const T& v) { fFrom = fGoal = fValue = v; fFlags |= kIdle; }
-    const T& GetValue() const { return fValue; }
+    void SetTempValue(const T& v) {
+        fValue = v;
+    }
+    void SetValue(const T& v) {
+        fFrom = fGoal = fValue = v;
+        fFlags |= kIdle;
+    }
+    const T& GetValue() const {
+        return fValue;
+    }
 
-    void SetGoal(const T& g) { fGoal = g; }
-    const T& GetGoal() const { return fGoal; }
+    void SetGoal(const T& g) {
+        fGoal = g;
+    }
+    const T& GetGoal() const {
+        return fGoal;
+    }
 
-    void Reset() { fFlags |= (kIdle | kInstant); }
+    void Reset() {
+        fFlags |= (kIdle | kInstant);
+    }
 
     void StartClock(float s);
-    float GetStartTime() const { return fStartTime; }
+    float GetStartTime() const {
+        return fStartTime;
+    }
 
-    const T& GetFrom() const { return fFrom; }
+    const T& GetFrom() const {
+        return fFrom;
+    }
 
     void Update(float s);
 
@@ -103,9 +132,8 @@ void hsTimedValue<T>::WriteScalar(hsStream* s, float currSecs)
     s->WriteLE32(fFlags);
 
     s->WriteLEScalar(fValue);
-    
-    if( !(fFlags & kIdle) )
-    {
+
+    if (!(fFlags & kIdle)) {
         s->WriteLEScalar(fDuration);
         s->WriteLEScalar(currSecs - fStartTime);
 
@@ -120,9 +148,8 @@ void hsTimedValue<T>::Write(hsStream* s, float currSecs)
     s->WriteLE32(fFlags);
 
     fValue.Write(s);
-    
-    if( !(fFlags & kIdle) )
-    {
+
+    if (!(fFlags & kIdle)) {
         s->WriteLEScalar(fDuration);
         s->WriteLEScalar(currSecs - fStartTime);
 
@@ -138,8 +165,7 @@ void hsTimedValue<T>::ReadScalar(hsStream* s, float currSecs)
 
     fValue = s->ReadLEScalar();
 
-    if( !(fFlags & kIdle) )
-    {
+    if (!(fFlags & kIdle)) {
         fDuration = s->ReadLEScalar();
         fStartTime = currSecs - s->ReadLEScalar();
 
@@ -155,8 +181,7 @@ void hsTimedValue<T>::Read(hsStream* s, float currSecs)
 
     fValue.Read(s);
 
-    if( !(fFlags & kIdle) )
-    {
+    if (!(fFlags & kIdle)) {
         fDuration = s->ReadLEScalar();
         fStartTime = currSecs - s->ReadLEScalar();
 
@@ -166,25 +191,26 @@ void hsTimedValue<T>::Read(hsStream* s, float currSecs)
 }
 
 template <class T>
-void hsTimedValue<T>::SetDuration(float duration) 
-{ 
-    fDuration = duration; 
-    if( fDuration > 0 )
+void hsTimedValue<T>::SetDuration(float duration)
+{
+    fDuration = duration;
+
+    if (fDuration > 0) {
         fFlags &= ~kInstant;
-    else
+    } else {
         fFlags |= kInstant;
+    }
 }
 
 template <class T>
 bool32 hsTimedValue<T>::operator==(const hsTimedValue<T>& v)
 {
     if ((fFlags == v.fFlags) &&
-        (fDuration == v.fDuration) &&
-        (fStartTime == v.fStartTime) &&
-        (fValue == v.fValue) &&
-        (fGoal == v.fGoal) &&
-        (fFrom == v.fFrom))
-    {
+            (fDuration == v.fDuration) &&
+            (fStartTime == v.fStartTime) &&
+            (fValue == v.fValue) &&
+            (fGoal == v.fGoal) &&
+            (fFrom == v.fFrom)) {
         return true;
     }
 
@@ -196,8 +222,7 @@ void hsTimedValue<T>::StartClock(float s)
 {
     fStartTime = s;
 
-    if( fFlags & kInstant )
-    {
+    if (fFlags & kInstant) {
         fFlags |= kIdle;
         fValue = fGoal;
         return;
@@ -205,8 +230,9 @@ void hsTimedValue<T>::StartClock(float s)
 
     fFlags &= ~kIdle;
 
-    if( fValue == fGoal )
+    if (fValue == fGoal) {
         fFlags |= kIdle;
+    }
 
     fFrom = fValue;
 }
@@ -214,21 +240,21 @@ void hsTimedValue<T>::StartClock(float s)
 template <class T>
 void hsTimedValue<T>::Update(float s)
 {
-    if( fFlags & kIdle )
+    if (fFlags & kIdle) {
         return;
+    }
 
     hsAssert(fDuration > 0, "Instant should always be idle");
 
     float interp = (s - fStartTime) / fDuration;
 
-    if( interp >= 1.f )
-    {
+    if (interp >= 1.f) {
         fValue = fGoal;
         interp = 1.f;
         fFlags |= kIdle;
-    }
-    else
+    } else {
         fValue = fFrom + (fGoal - fFrom) * interp;
+    }
 }
 
 

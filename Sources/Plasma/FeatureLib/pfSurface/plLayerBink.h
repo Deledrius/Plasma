@@ -45,20 +45,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plLayerMovie.h"
 
-class plLayerBink : public plLayerMovie
-{
+class plLayerBink : public plLayerMovie {
 protected:
-    virtual int32_t             ISecsToFrame(float secs) { return 0; }
-    virtual bool                IInit() { return true; }
-    virtual bool                IGetCurrentFrame() { return true; }
-    virtual bool                IRelease() { return true; }
+    virtual int32_t             ISecsToFrame(float secs) {
+        return 0;
+    }
+    virtual bool                IInit() {
+        return true;
+    }
+    virtual bool                IGetCurrentFrame() {
+        return true;
+    }
+    virtual bool                IRelease() {
+        return true;
+    }
 
 public:
     plLayerBink() { }
     virtual ~plLayerBink() { }
 
-    CLASSNAME_REGISTER( plLayerBink );
-    GETINTERFACE_ANY( plLayerBink, plLayerMovie );
+    CLASSNAME_REGISTER(plLayerBink);
+    GETINTERFACE_ANY(plLayerBink, plLayerMovie);
 
 };
 

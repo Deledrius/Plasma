@@ -68,13 +68,11 @@ plPageOptimizer::plPageOptimizer(const plFileName& pagePath) :
 
 void plPageOptimizer::IFindLoc()
 {
-    class plPageIt : public plRegistryPageIterator 
-    {
+    class plPageIt : public plRegistryPageIterator {
     public:
         plLocation fLoc;
 
-        virtual bool EatPage(plRegistryPageNode* keyNode)
-        {
+        virtual bool EatPage(plRegistryPageNode* keyNode) {
             fLoc = keyNode->GetPageInfo().GetLocation();
             return true;
         }
@@ -96,19 +94,21 @@ void plPageOptimizer::Optimize()
 
     // Get the key for the scene node, we'll load it to force a load on all the objects
     plKey snKey = plKeyFinder::Instance().FindSceneNodeKey(fLoc);
-    if (snKey)
-    {
+
+    if (snKey) {
         // Load all the keys
         fPageNode = fResMgr->FindPage(fLoc);
         fResMgr->LoadPageKeys(fPageNode);
 
         // Put all the keys in a vector, so they won't get unreffed
-        class plVecKeyCollector : public plRegistryKeyIterator
-        {
+        class plVecKeyCollector : public plRegistryKeyIterator {
         public:
             KeyVec& fKeys;
             plVecKeyCollector(KeyVec& keys) : fKeys(keys) {}
-            virtual bool EatKey(const plKey& key) { fKeys.push_back(key); return true; }
+            virtual bool EatKey(const plKey& key) {
+                fKeys.push_back(key);
+                return true;
+            }
         };
         plVecKeyCollector keyIt(fAllKeys);
         fResMgr->IterateKeys(&keyIt);
@@ -123,36 +123,28 @@ void plPageOptimizer::Optimize()
         snKey->RefObject();
         snKey->UnRefObject();
         snKey = nil;
-    }
-    else
-    {
+    } else {
         loaded = false;
     }
 
-    if (loaded)
+    if (loaded) {
         IRewritePage();
+    }
 
     uint64_t oldSize = plFileInfo(fPagePath).FileSize();
     uint64_t newSize = plFileInfo(fTempPagePath).FileSize();
 
-    if (!loaded)
-    {
+    if (!loaded) {
         puts("no scene node.");
-    }
-    else if (fOptimized)
-    {
+    } else if (fOptimized) {
         plFileSystem::Unlink(fTempPagePath);
         puts("already optimized.");
-    }
-    else if (oldSize == newSize)
-    {
+    } else if (oldSize == newSize) {
         plFileSystem::Unlink(fPagePath);
         plFileSystem::Move(fTempPagePath, fPagePath);
 
         puts("complete");
-    }
-    else
-    {
+    } else {
         plFileSystem::Unlink(fTempPagePath);
         puts("failed.  File sizes different");
     }
@@ -164,19 +156,18 @@ void plPageOptimizer::KeyedObjectProc(plKey key)
     const char* className = plFactory::GetNameOfClass(key->GetUoid().GetClassType());
 
     // For now, ignore any key that isn't in the location we're looking at.  That means stuff like textures.
-    if (fInstance->fLoc != key->GetUoid().GetLocation())
+    if (fInstance->fLoc != key->GetUoid().GetLocation()) {
         return;
+    }
 
     KeySet& loadedKeys = fInstance->fLoadedKeys;
     KeyVec& loadOrder = fInstance->fKeyLoadOrder;
 
     KeySet::iterator it = loadedKeys.lower_bound(key);
-    if (it != loadedKeys.end() && *it == key)
-    {
+
+    if (it != loadedKeys.end() && *it == key) {
         printf("Keyed object %s(%s) loaded more than once\n", keyName.c_str(), className);
-    }
-    else
-    {
+    } else {
         loadedKeys.insert(it, key);
         loadOrder.push_back(key);
     }
@@ -184,10 +175,11 @@ void plPageOptimizer::KeyedObjectProc(plKey key)
 
 void plPageOptimizer::IWriteKeyData(hsStream* oldPage, hsStream* newPage, plKey key)
 {
-    class plUpdateKeyImp : public plKeyImp
-    {
+    class plUpdateKeyImp : public plKeyImp {
     public:
-        void SetStartPos(uint32_t startPos) { fStartPos = startPos; }
+        void SetStartPos(uint32_t startPos) {
+            fStartPos = startPos;
+        }
     };
 
     plUpdateKeyImp* keyImp = (plUpdateKeyImp*)(plKeyImp*)key;
@@ -195,15 +187,19 @@ void plPageOptimizer::IWriteKeyData(hsStream* oldPage, hsStream* newPage, plKey 
     uint32_t len = keyImp->GetDataLen();
 
     oldPage->SetPosition(startPos);
-    if (len > fBuf.size())
+
+    if (len > fBuf.size()) {
         fBuf.resize(len);
+    }
+
     oldPage->Read(len, &fBuf[0]);
 
     uint32_t newStartPos = newPage->GetPosition();
 
     // If we move any buffers, this page wasn't optimized already
-    if (newStartPos != startPos)
+    if (newStartPos != startPos) {
         fOptimized = false;
+    }
 
     keyImp->SetStartPos(newStartPos);
     newPage->Write(len, &fBuf[0]);
@@ -213,8 +209,7 @@ void plPageOptimizer::IRewritePage()
 {
     hsUNIXStream newPage;
 
-    if (newPage.Open(fTempPagePath, "wb"))
-    {
+    if (newPage.Open(fTempPagePath, "wb")) {
         hsUNIXStream oldPage;
         oldPage.Open(fPagePath);
 
@@ -228,16 +223,19 @@ void plPageOptimizer::IRewritePage()
         newPage.Write(dataStart, &fBuf[0]);
 
         int size = (int)fKeyLoadOrder.size();
-        for (int i = 0; i < size; i++)
+
+        for (int i = 0; i < size; i++) {
             IWriteKeyData(&oldPage, &newPage, fKeyLoadOrder[i]);
+        }
 
         // If there are any objects that we didn't write (because they didn't load for
         // some reason), put them at the end
-        for (int i = 0; i < fAllKeys.size(); i++)
-        {
+        for (int i = 0; i < fAllKeys.size(); i++) {
             bool found = (fLoadedKeys.find(fAllKeys[i]) != fLoadedKeys.end());
-            if (!found)
+
+            if (!found) {
                 IWriteKeyData(&oldPage, &newPage, fAllKeys[i]);
+            }
         }
 
         uint32_t newKeyStart = newPage.GetPosition();
@@ -247,8 +245,7 @@ void plPageOptimizer::IRewritePage()
         uint32_t numTypes = oldPage.ReadLE32();
         newPage.WriteLE32(numTypes);
 
-        for (uint32_t i = 0; i < numTypes; i++)
-        {
+        for (uint32_t i = 0; i < numTypes; i++) {
             uint16_t classType = oldPage.ReadLE16();
             uint32_t len = oldPage.ReadLE32();
             uint8_t flags = oldPage.ReadByte();
@@ -259,8 +256,7 @@ void plPageOptimizer::IRewritePage()
             newPage.WriteByte(flags);
             newPage.WriteLE32(numKeys);
 
-            for (uint32_t j = 0; j < numKeys; j++)
-            {
+            for (uint32_t j = 0; j < numKeys; j++) {
                 plUoid uoid;
                 uoid.Read(&oldPage);
                 uint32_t startPos = oldPage.ReadLE32();

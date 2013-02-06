@@ -73,55 +73,59 @@ DWORD       sVolControlID = 0;
 
 //// Local Static Helpers ////////////////////////////////////////////////////
 
-bool    IGetMuxMicVolumeControl( void );
-bool    IGetBaseMicVolumeControl( void );
+bool    IGetMuxMicVolumeControl(void);
+bool    IGetBaseMicVolumeControl(void);
 
-bool    IGetControlValue( DWORD &value );
-bool    ISetControlValue( DWORD value );
+bool    IGetControlValue(DWORD& value);
+bool    ISetControlValue(DWORD value);
 
-MIXERLINE       *IGetLineByType( DWORD type );
-MIXERLINE       *IGetLineByID( DWORD id );
-MIXERCONTROL    *IGetControlByType( MIXERLINE *line, DWORD type );
-MIXERLINE       *IGetMixerSubLineByType( MIXERCONTROL *mux, DWORD type );
+MIXERLINE*       IGetLineByType(DWORD type);
+MIXERLINE*       IGetLineByID(DWORD id);
+MIXERCONTROL*    IGetControlByType(MIXERLINE* line, DWORD type);
+MIXERLINE*       IGetMixerSubLineByType(MIXERCONTROL* mux, DWORD type);
 #endif
 
 //// The Publics /////////////////////////////////////////////////////////////
 
-float    plWinMicLevel::GetLevel( void )
+float    plWinMicLevel::GetLevel(void)
 {
-    if( !CanSetLevel() )
+    if (!CanSetLevel()) {
         return -1;
+    }
 
 #if HS_BUILD_FOR_WIN32
     DWORD   rawValue;
-    if( !IGetControlValue( rawValue ) ) 
-        return -1;
 
-    return (float)( rawValue - sMinValue ) / (float)( sMaxValue - sMinValue );
+    if (!IGetControlValue(rawValue)) {
+        return -1;
+    }
+
+    return (float)(rawValue - sMinValue) / (float)(sMaxValue - sMinValue);
 #else
     return -1;
 #endif
 }
 
-void    plWinMicLevel::SetLevel( float level )
+void    plWinMicLevel::SetLevel(float level)
 {
-    if( !CanSetLevel() )
+    if (!CanSetLevel()) {
         return;
+    }
 
 #if HS_BUILD_FOR_WIN32
-    DWORD   rawValue = (DWORD)(( level * ( sMaxValue - sMinValue ) ) + sMinValue);
+    DWORD   rawValue = (DWORD)((level * (sMaxValue - sMinValue)) + sMinValue);
 
-    ISetControlValue( rawValue );
+    ISetControlValue(rawValue);
 #endif
 }
 
-bool    plWinMicLevel::CanSetLevel( void )
+bool    plWinMicLevel::CanSetLevel(void)
 {
     // Just to init
-    plWinMicLevel   &instance = IGetInstance();
+    plWinMicLevel&   instance = IGetInstance();
 
 #if HS_BUILD_FOR_WIN32
-    return ( sMixerHandle != nil ) ? true : false;
+    return (sMixerHandle != nil) ? true : false;
 #else
     return false;
 #endif
@@ -130,7 +134,7 @@ bool    plWinMicLevel::CanSetLevel( void )
 
 //// Protected Init Stuff ////////////////////////////////////////////////////
 
-plWinMicLevel   &plWinMicLevel::IGetInstance( void )
+plWinMicLevel&   plWinMicLevel::IGetInstance(void)
 {
     static plWinMicLevel    sInstance;
     return sInstance;
@@ -140,38 +144,36 @@ plWinMicLevel::plWinMicLevel()
 {
 #if HS_BUILD_FOR_WIN32
     sMixerHandle = nil;
-    memset( &sMixerCaps, 0, sizeof( sMixerCaps ) );
+    memset(&sMixerCaps, 0, sizeof(sMixerCaps));
 
     // Get the number of mixers in the system
     sNumMixers = ::mixerGetNumDevs();
 
     // So long as we have one, open the first one
-    if( sNumMixers == 0 )
+    if (sNumMixers == 0) {
         return;
+    }
 
-    if( ::mixerOpen( &sMixerHandle, 0,
-                     0,    // Window handle to receive callback messages
-                     0, MIXER_OBJECTF_MIXER ) != MMSYSERR_NOERROR )
-    {
+    if (::mixerOpen(&sMixerHandle, 0,
+                    0,    // Window handle to receive callback messages
+                    0, MIXER_OBJECTF_MIXER) != MMSYSERR_NOERROR) {
         sMixerHandle = nil; // Just to be sure
         return;
     }
 
-    if( ::mixerGetDevCaps( (UINT)sMixerHandle, &sMixerCaps, sizeof( sMixerCaps ) ) != MMSYSERR_NOERROR )
-    {
+    if (::mixerGetDevCaps((UINT)sMixerHandle, &sMixerCaps, sizeof(sMixerCaps)) != MMSYSERR_NOERROR) {
         // Oh well, who cares
     }
 
     // Try to get the Mux/mixer-based mic volume control first, since that seems to work better/more often/at all
-    if( !IGetMuxMicVolumeControl() )
-    {
+    if (!IGetMuxMicVolumeControl()) {
         // Failed, so try getting the volume control from the base mic-in line
-        if( !IGetBaseMicVolumeControl() )
-        {
+        if (!IGetBaseMicVolumeControl()) {
             IShutdown();
             return;
         }
     }
+
 #endif
 }
 
@@ -180,11 +182,13 @@ plWinMicLevel::~plWinMicLevel()
     IShutdown();
 }
 
-void    plWinMicLevel::IShutdown( void )
+void    plWinMicLevel::IShutdown(void)
 {
 #if HS_BUILD_FOR_WIN32
-    if( sMixerHandle != nil )
-        ::mixerClose( sMixerHandle );
+
+    if (sMixerHandle != nil) {
+        ::mixerClose(sMixerHandle);
+    }
 
     sMixerHandle = nil;
 #endif
@@ -197,37 +201,48 @@ void    plWinMicLevel::IShutdown( void )
 //  Note: testing indcates that this works but the direct SRC_MICROPHONE
 //  doesn't, hence we try this one first.
 
-bool    IGetMuxMicVolumeControl( void )
+bool    IGetMuxMicVolumeControl(void)
 {
-    if( sMixerHandle == nil )
+    if (sMixerHandle == nil) {
         return false;
+    }
 
     // Get the WaveIn destination line
-    MIXERLINE *waveInLine = IGetLineByType( MIXERLINE_COMPONENTTYPE_DST_WAVEIN );
-    if( waveInLine == nil )
+    MIXERLINE* waveInLine = IGetLineByType(MIXERLINE_COMPONENTTYPE_DST_WAVEIN);
+
+    if (waveInLine == nil) {
         return false;
+    }
 
     // Get the mixer or MUX controller from the line
-    MIXERCONTROL *control = IGetControlByType( waveInLine, MIXERCONTROL_CONTROLTYPE_MIXER );
-    if( control == nil )
-        control = IGetControlByType( waveInLine, MIXERCONTROL_CONTROLTYPE_MUX );
-    if( control == nil )
+    MIXERCONTROL* control = IGetControlByType(waveInLine, MIXERCONTROL_CONTROLTYPE_MIXER);
+
+    if (control == nil) {
+        control = IGetControlByType(waveInLine, MIXERCONTROL_CONTROLTYPE_MUX);
+    }
+
+    if (control == nil) {
         return false;
+    }
 
     // Get the microphone sub-component
     // Note: this eventually calls IGetLineByType(), which destroys the waveInLine pointer we had before
-    MIXERLINE *micLine = IGetMixerSubLineByType( control, MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE );
-    if( micLine == nil )
+    MIXERLINE* micLine = IGetMixerSubLineByType(control, MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE);
+
+    if (micLine == nil) {
         return false;
+    }
 
     // Get the volume subcontroller
-    MIXERCONTROL *micVolCtrl = IGetControlByType( micLine, MIXERCONTROL_CONTROLTYPE_VOLUME );
-    if( micVolCtrl == nil )
+    MIXERCONTROL* micVolCtrl = IGetControlByType(micLine, MIXERCONTROL_CONTROLTYPE_VOLUME);
+
+    if (micVolCtrl == nil) {
         return false;
+    }
 
     // Found it! store our values
-    char *dbgLineName = micLine->szName;
-    char *dbgControlName = micVolCtrl->szName;
+    char* dbgLineName = micLine->szName;
+    char* dbgControlName = micVolCtrl->szName;
     sMinValue = micVolCtrl->Bounds.dwMinimum;
     sMaxValue = micVolCtrl->Bounds.dwMaximum;
     sVolControlID = micVolCtrl->dwControlID;
@@ -236,27 +251,32 @@ bool    IGetMuxMicVolumeControl( void )
 }
 
 //// IGetBaseMicVolumeControl ////////////////////////////////////////////////
-//  Tries to get the volume control of the mic-in line. See 
+//  Tries to get the volume control of the mic-in line. See
 //  IGetMuxMicVolumeControl for why we don't do this one first.
 
-bool    IGetBaseMicVolumeControl( void )
+bool    IGetBaseMicVolumeControl(void)
 {
-    if( sMixerHandle == nil )
+    if (sMixerHandle == nil) {
         return false;
+    }
 
     // Get the mic source line
-    MIXERLINE *micLine = IGetLineByType( MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE );
-    if( micLine == nil )
+    MIXERLINE* micLine = IGetLineByType(MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE);
+
+    if (micLine == nil) {
         return false;
+    }
 
     // Get the volume subcontroller
-    MIXERCONTROL *micVolCtrl = IGetControlByType( micLine, MIXERCONTROL_CONTROLTYPE_VOLUME );
-    if( micVolCtrl == nil )
+    MIXERCONTROL* micVolCtrl = IGetControlByType(micLine, MIXERCONTROL_CONTROLTYPE_VOLUME);
+
+    if (micVolCtrl == nil) {
         return false;
+    }
 
     // Found it! store our values
-    char *dbgLineName = micLine->szName;
-    char *dbgControlName = micVolCtrl->szName;
+    char* dbgLineName = micLine->szName;
+    char* dbgControlName = micVolCtrl->szName;
     sMinValue = micVolCtrl->Bounds.dwMinimum;
     sMaxValue = micVolCtrl->Bounds.dwMaximum;
     sVolControlID = micVolCtrl->dwControlID;
@@ -268,24 +288,26 @@ bool    IGetBaseMicVolumeControl( void )
 //// IGetControlValue ////////////////////////////////////////////////////////
 //  Gets the raw value of the current volume control.
 
-bool    IGetControlValue( DWORD &value )
+bool    IGetControlValue(DWORD& value)
 {
-    if( sMixerHandle == nil )
+    if (sMixerHandle == nil) {
         return false;
+    }
 
     MIXERCONTROLDETAILS_UNSIGNED mxcdVolume;
     MIXERCONTROLDETAILS mxcd;
-    mxcd.cbStruct = sizeof( MIXERCONTROLDETAILS );
+    mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
     mxcd.dwControlID = sVolControlID;
     mxcd.cChannels = 1;
     mxcd.cMultipleItems = 0;
-    mxcd.cbDetails = sizeof( MIXERCONTROLDETAILS_UNSIGNED );
+    mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
     mxcd.paDetails = &mxcdVolume;
-    
-    if( ::mixerGetControlDetails( (HMIXEROBJ)sMixerHandle, &mxcd, 
-            MIXER_OBJECTF_HMIXER | MIXER_GETCONTROLDETAILSF_VALUE ) != MMSYSERR_NOERROR )
+
+    if (::mixerGetControlDetails((HMIXEROBJ)sMixerHandle, &mxcd,
+                                 MIXER_OBJECTF_HMIXER | MIXER_GETCONTROLDETAILSF_VALUE) != MMSYSERR_NOERROR) {
         return false;
-    
+    }
+
     value = mxcdVolume.dwValue;
     return true;
 }
@@ -293,98 +315,107 @@ bool    IGetControlValue( DWORD &value )
 //// ISetControlValue ////////////////////////////////////////////////////////
 //  Sets the raw value of the current volume control.
 
-bool    ISetControlValue( DWORD value )
+bool    ISetControlValue(DWORD value)
 {
-    if( sMixerHandle == nil )
+    if (sMixerHandle == nil) {
         return false;
+    }
 
     MIXERCONTROLDETAILS_UNSIGNED mxcdVolume = { value };
     MIXERCONTROLDETAILS mxcd;
-    mxcd.cbStruct = sizeof( MIXERCONTROLDETAILS );
+    mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
     mxcd.dwControlID = sVolControlID;
     mxcd.cChannels = 1;
     mxcd.cMultipleItems = 0;
-    mxcd.cbDetails = sizeof( MIXERCONTROLDETAILS_UNSIGNED );
+    mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
     mxcd.paDetails = &mxcdVolume;
 
-    if( ::mixerSetControlDetails( (HMIXEROBJ)sMixerHandle, &mxcd, 
-            MIXER_OBJECTF_HMIXER | MIXER_SETCONTROLDETAILSF_VALUE ) != MMSYSERR_NOERROR )
+    if (::mixerSetControlDetails((HMIXEROBJ)sMixerHandle, &mxcd,
+                                 MIXER_OBJECTF_HMIXER | MIXER_SETCONTROLDETAILSF_VALUE) != MMSYSERR_NOERROR) {
         return false;
-    
+    }
+
     return true;
 }
 
 
 //// Helper Functions ////////////////////////////////////////////////////////
 
-MIXERLINE *IGetLineByType( DWORD type )
+MIXERLINE* IGetLineByType(DWORD type)
 {
     static MIXERLINE mxl;
 
-    mxl.cbStruct = sizeof( MIXERLINE );
+    mxl.cbStruct = sizeof(MIXERLINE);
     mxl.dwComponentType = type;
-    if( ::mixerGetLineInfo( (HMIXEROBJ)sMixerHandle, &mxl, MIXER_OBJECTF_HMIXER | MIXER_GETLINEINFOF_COMPONENTTYPE ) != MMSYSERR_NOERROR )
+
+    if (::mixerGetLineInfo((HMIXEROBJ)sMixerHandle, &mxl, MIXER_OBJECTF_HMIXER | MIXER_GETLINEINFOF_COMPONENTTYPE) != MMSYSERR_NOERROR) {
         return nil;
+    }
 
     return &mxl;
 }
 
-MIXERLINE *IGetLineByID( DWORD id )
+MIXERLINE* IGetLineByID(DWORD id)
 {
     static MIXERLINE mxl;
 
-    mxl.cbStruct = sizeof( MIXERLINE );
+    mxl.cbStruct = sizeof(MIXERLINE);
     mxl.dwLineID = id;
-    if( ::mixerGetLineInfo( (HMIXEROBJ)sMixerHandle, &mxl, MIXER_OBJECTF_HMIXER | MIXER_GETLINEINFOF_LINEID ) != MMSYSERR_NOERROR )
+
+    if (::mixerGetLineInfo((HMIXEROBJ)sMixerHandle, &mxl, MIXER_OBJECTF_HMIXER | MIXER_GETLINEINFOF_LINEID) != MMSYSERR_NOERROR) {
         return nil;
+    }
 
     return &mxl;
 }
 
-MIXERCONTROL    *IGetControlByType( MIXERLINE *line, DWORD type )
+MIXERCONTROL*    IGetControlByType(MIXERLINE* line, DWORD type)
 {
     static MIXERCONTROL mxc;
 
     MIXERLINECONTROLS mxlc;
-    mxlc.cbStruct = sizeof( MIXERLINECONTROLS );
+    mxlc.cbStruct = sizeof(MIXERLINECONTROLS);
     mxlc.dwLineID = line->dwLineID;
     mxlc.dwControlType = type;
     mxlc.cControls = 1;
-    mxlc.cbmxctrl = sizeof( MIXERCONTROL );
+    mxlc.cbmxctrl = sizeof(MIXERCONTROL);
     mxlc.pamxctrl = &mxc;
-    if( ::mixerGetLineControls( (HMIXEROBJ)sMixerHandle, &mxlc, MIXER_OBJECTF_HMIXER | MIXER_GETLINECONTROLSF_ONEBYTYPE ) != MMSYSERR_NOERROR )
+
+    if (::mixerGetLineControls((HMIXEROBJ)sMixerHandle, &mxlc, MIXER_OBJECTF_HMIXER | MIXER_GETLINECONTROLSF_ONEBYTYPE) != MMSYSERR_NOERROR) {
         return nil;
+    }
 
     return &mxc;
 }
 
-MIXERLINE   *IGetMixerSubLineByType( MIXERCONTROL *mux, DWORD type )
+MIXERLINE*   IGetMixerSubLineByType(MIXERCONTROL* mux, DWORD type)
 {
     // A mixer or MUX is really a combination of MORE lines. And beautifully, you can't
     // just ask for a single one off of it, you have to ask for them all and search through yourself
-    MIXERCONTROLDETAILS_LISTTEXT *lineInfo = new MIXERCONTROLDETAILS_LISTTEXT[ mux->cMultipleItems ];
-    if( lineInfo == nil )
+    MIXERCONTROLDETAILS_LISTTEXT* lineInfo = new MIXERCONTROLDETAILS_LISTTEXT[ mux->cMultipleItems ];
+
+    if (lineInfo == nil) {
         return nil;
+    }
 
     MIXERCONTROLDETAILS details;
-    details.cbStruct = sizeof( MIXERCONTROLDETAILS );
+    details.cbStruct = sizeof(MIXERCONTROLDETAILS);
     details.dwControlID = mux->dwControlID;
     details.cChannels = 1;
     details.cMultipleItems = mux->cMultipleItems;
-    details.cbDetails = sizeof( MIXERCONTROLDETAILS_LISTTEXT );
+    details.cbDetails = sizeof(MIXERCONTROLDETAILS_LISTTEXT);
     details.paDetails = lineInfo;
-    if( ::mixerGetControlDetails( (HMIXEROBJ)sMixerHandle, &details, MIXER_OBJECTF_HMIXER | MIXER_GETCONTROLDETAILSF_LISTTEXT ) != MMSYSERR_NOERROR )
-    {
+
+    if (::mixerGetControlDetails((HMIXEROBJ)sMixerHandle, &details, MIXER_OBJECTF_HMIXER | MIXER_GETCONTROLDETAILSF_LISTTEXT) != MMSYSERR_NOERROR) {
         delete [] lineInfo;
         return nil;
     }
 
     // Loop through and find the one with the right component type. But of course it doesn't give us that offhand...
-    for( unsigned int i = 0; i < mux->cMultipleItems; i++ )
-    {
-        MIXERLINE *line = IGetLineByID( lineInfo[ i ].dwParam1 );
-        if( line->dwComponentType == type )
-        {
+    for (unsigned int i = 0; i < mux->cMultipleItems; i++) {
+        MIXERLINE* line = IGetLineByID(lineInfo[ i ].dwParam1);
+
+        if (line->dwComponentType == type) {
             delete [] lineInfo;
             return line;
         }

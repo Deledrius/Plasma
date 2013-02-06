@@ -66,8 +66,10 @@ void plAnimEventModifier::Read(hsStream* stream, hsResMgr* mgr)
 
     int numReceivers = stream->ReadLE32();
     fReceivers.Expand(numReceivers);
-    for (int i = 0; i < numReceivers; i++)
+
+    for (int i = 0; i < numReceivers; i++) {
         fReceivers.Push(mgr->ReadKey(stream));
+    }
 
     fCallback = plMessage::ConvertNoRef(mgr->ReadCreatable(stream));
 
@@ -77,8 +79,8 @@ void plAnimEventModifier::Read(hsStream* stream, hsResMgr* mgr)
     //
     plKey animKey = fCallback->GetReceiver(0);
     hsgResMgr::ResMgr()->AddViaNotify(animKey,
-                                    new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, 0),
-                                    plRefFlags::kPassiveRef);
+                                      new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, 0),
+                                      plRefFlags::kPassiveRef);
 }
 
 void plAnimEventModifier::Write(hsStream* stream, hsResMgr* mgr)
@@ -87,8 +89,10 @@ void plAnimEventModifier::Write(hsStream* stream, hsResMgr* mgr)
 
     int numReceivers = fReceivers.Count();
     stream->WriteLE32(numReceivers);
-    for (int i = 0; i < numReceivers; i++)
+
+    for (int i = 0; i < numReceivers; i++) {
         mgr->WriteKey(stream, fReceivers[i]);
+    }
 
     mgr->WriteCreatable(stream, fCallback);
 }
@@ -98,41 +102,45 @@ bool plAnimEventModifier::MsgReceive(plMessage* msg)
     // Assuming we only have one ref, the anim time convert.  When it loads, we
     // send our callback setup message.
     plGenRefMsg* genRefMsg = plGenRefMsg::ConvertNoRef(msg);
-    if (genRefMsg && (genRefMsg->GetContext() & plRefMsg::kOnCreate) && fCallback)
-    {
+
+    if (genRefMsg && (genRefMsg->GetContext() & plRefMsg::kOnCreate) && fCallback) {
         hsRefCnt_SafeRef(fCallback);
         fCallback->Send();
     }
 
     plEventCallbackMsg* callbackMsg = plEventCallbackMsg::ConvertNoRef(msg);
-    if (callbackMsg)
-    {
+
+    if (callbackMsg) {
         ISendNotify(true);
         ISendNotify(false);
     }
 
     plEnableMsg* pEnable = plEnableMsg::ConvertNoRef(msg);
-    if (pEnable)
-    {
-        if (pEnable->Cmd(plEnableMsg::kDisable))
+
+    if (pEnable) {
+        if (pEnable->Cmd(plEnableMsg::kDisable)) {
             fDisabled = true;
-        else
-        if (pEnable->Cmd(plEnableMsg::kEnable))
+        } else if (pEnable->Cmd(plEnableMsg::kEnable)) {
             fDisabled = false;
+        }
+
         return true;
     }
+
     return plSingleModifier::MsgReceive(msg);
 }
 
 void plAnimEventModifier::ISendNotify(bool triggered)
 {
-    if (fDisabled)
+    if (fDisabled) {
         return;
+    }
+
     plNotifyMsg* notify = new plNotifyMsg;
-    
+
     // Setup the event data in case this is a OneShot responder that needs it
     plKey playerKey = plNetClientApp::GetInstance()->GetLocalPlayerKey();
-    notify->AddPickEvent(playerKey, nil, true, hsPoint3(0,0,0) );
+    notify->AddPickEvent(playerKey, nil, true, hsPoint3(0, 0, 0));
 
     notify->SetSender(GetKey());
     notify->AddReceivers(fReceivers);

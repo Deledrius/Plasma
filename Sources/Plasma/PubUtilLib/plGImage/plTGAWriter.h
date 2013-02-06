@@ -60,19 +60,20 @@ class plMipmap;
 
 //// Class Definition /////////////////////////////////////////////////////////
 
-class plTGAWriter
-{
-    private:
+class plTGAWriter {
+private:
 
-        static plTGAWriter  fInstance;
+    static plTGAWriter  fInstance;
 
-        plTGAWriter() {}
-        
-    public:
+    plTGAWriter() {}
 
-        static plTGAWriter  &Instance( void ) { return fInstance; }
+public:
 
-        void    WriteMipmap( const char *fileName, plMipmap *mipmap );
+    static plTGAWriter&  Instance(void) {
+        return fInstance;
+    }
+
+    void    WriteMipmap(const char* fileName, plMipmap* mipmap);
 
 };
 

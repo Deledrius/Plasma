@@ -45,31 +45,34 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "HeadSpin.h"
 
 template < class T >
-class plDataContainerT
-{
-    typedef std::map<uint32_t,T*> Items;
+class plDataContainerT {
+    typedef std::map<uint32_t, T*> Items;
     Items       fItems;
     uint32_t      fNextKey;
 public:
     plDataContainerT()
-    : fNextKey( 1 )
+        : fNextKey(1)
     {}
-    uint32_t Add( T* data )
-    {
+    uint32_t Add(T* data) {
         uint32_t key = fNextKey;
         fItems[ key ] = data;
         fNextKey++;
         return key;
     }
-    bool Get( uint32_t key, T*& outItem, bool remove=true )
-    {
+    bool Get(uint32_t key, T*& outItem, bool remove = true) {
         outItem = nil;
-        Items::iterator ii = fItems.find( key );
-        if ( ii==fItems.end() )
+        Items::iterator ii = fItems.find(key);
+
+        if (ii == fItems.end()) {
             return false;
+        }
+
         outItem = ii->second;
-        if ( remove )
-            fItems.erase( ii );
+
+        if (remove) {
+            fItems.erase(ii);
+        }
+
         return true;
     }
 };

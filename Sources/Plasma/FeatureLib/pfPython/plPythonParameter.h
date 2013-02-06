@@ -55,17 +55,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // the fID being the same.
 //
 
-typedef struct plPythonParameter
-{
+typedef struct plPythonParameter {
 public:
     // this is a unique (within one Python mod) id for this parameter
     int32_t   fID;
 
     // then comes the value, which is a type followed by the data
 
-    enum valueType
-    {
-        kInt=1,
+    enum valueType {
+        kInt = 1,
         kFloat,
         kbool,
         kString,
@@ -93,8 +91,7 @@ public:
     int32_t       fValueType;     // what type of value (dataType enum)
 
     // the data of the value
-    union
-    {
+    union {
         int32_t     fIntNumber;
 
         float       fFloatNumber;
@@ -107,249 +104,245 @@ public:
     plString    fString;
 
 
-    plPythonParameter()
-    {
+    plPythonParameter() {
         fID = 0;
         fValueType = kNone;
     }
 
-    plPythonParameter(int32_t id)
-    {
+    plPythonParameter(int32_t id) {
         fID = id;
         fValueType = kNone;
     }
 
-    plPythonParameter& operator=(const plPythonParameter& other)
-    {
+    plPythonParameter& operator=(const plPythonParameter& other) {
         return Copy(other);
     }
     // copy constructor
-    plPythonParameter(const plPythonParameter& other)
-    {
+    plPythonParameter(const plPythonParameter& other) {
         fID = 0;
         fValueType = kNone;
 
         Copy(other);
     }
 
-    plPythonParameter& Copy(const plPythonParameter& other)
-    {
+    plPythonParameter& Copy(const plPythonParameter& other) {
         fID = other.fID;
-        switch ( other.fValueType )
-        {
-            case kInt:
-                SetToInt(other.datarecord.fIntNumber);
-                break;
-            case kFloat:
-                SetToFloat(other.datarecord.fFloatNumber);
-                break;
-            case kbool:
-                SetTobool(other.datarecord.fBool);
-                break;
-            case kString:
-                SetToString(other.fString);
-                break;
-            case kSceneObject:
-                SetToSceneObject(other.fObjectKey);
-                break;
-            case kSceneObjectList:
-                SetToSceneObject(other.fObjectKey,true);
-                break;
-            case kActivatorList:
-                SetToActivator(other.fObjectKey);
-                break;
-            case kResponderList:
-                SetToResponder(other.fObjectKey);
-                break;
-            case kDynamicText:
-                SetToDynamicText(other.fObjectKey);
-                break;
-            case kGUIDialog:
-                SetToGUIDialog(other.fObjectKey);
-                break;
-            case kExcludeRegion:
-                SetToExcludeRegion(other.fObjectKey);
-                break;
-            case kAnimation:
-                SetToAnimation(other.fObjectKey);
-                break;
-            case kAnimationName:
-                SetToAnimationName(other.fString);
-                break;
-            case kBehavior:
-                SetToBehavior(other.fObjectKey);
-                break;
-            case kMaterial:
-                SetToMaterial(other.fObjectKey);
-                break;
-            case kGUIPopUpMenu:
-                SetToGUIPopUpMenu(other.fObjectKey);
-                break;
-            case kGUISkin:
-                SetToGUISkin(other.fObjectKey);
-                break;
-            case kWaterComponent:
-                SetToWaterComponent(other.fObjectKey);
-                break;
-            case kSwimCurrentInterface:
-                SetToSwimCurrentInterface(other.fObjectKey);
-                break;
-            case kClusterComponentList:
-                SetToClusterComponent(other.fObjectKey);
-                break;
-            case kMaterialAnimation:
-                SetToMaterialAnimation(other.fObjectKey);
-                break;
-            case kGrassShaderComponent:
-                SetToGrassShaderComponent(other.fObjectKey);
-                break;
+
+        switch (other.fValueType) {
+        case kInt:
+            SetToInt(other.datarecord.fIntNumber);
+            break;
+
+        case kFloat:
+            SetToFloat(other.datarecord.fFloatNumber);
+            break;
+
+        case kbool:
+            SetTobool(other.datarecord.fBool);
+            break;
+
+        case kString:
+            SetToString(other.fString);
+            break;
+
+        case kSceneObject:
+            SetToSceneObject(other.fObjectKey);
+            break;
+
+        case kSceneObjectList:
+            SetToSceneObject(other.fObjectKey, true);
+            break;
+
+        case kActivatorList:
+            SetToActivator(other.fObjectKey);
+            break;
+
+        case kResponderList:
+            SetToResponder(other.fObjectKey);
+            break;
+
+        case kDynamicText:
+            SetToDynamicText(other.fObjectKey);
+            break;
+
+        case kGUIDialog:
+            SetToGUIDialog(other.fObjectKey);
+            break;
+
+        case kExcludeRegion:
+            SetToExcludeRegion(other.fObjectKey);
+            break;
+
+        case kAnimation:
+            SetToAnimation(other.fObjectKey);
+            break;
+
+        case kAnimationName:
+            SetToAnimationName(other.fString);
+            break;
+
+        case kBehavior:
+            SetToBehavior(other.fObjectKey);
+            break;
+
+        case kMaterial:
+            SetToMaterial(other.fObjectKey);
+            break;
+
+        case kGUIPopUpMenu:
+            SetToGUIPopUpMenu(other.fObjectKey);
+            break;
+
+        case kGUISkin:
+            SetToGUISkin(other.fObjectKey);
+            break;
+
+        case kWaterComponent:
+            SetToWaterComponent(other.fObjectKey);
+            break;
+
+        case kSwimCurrentInterface:
+            SetToSwimCurrentInterface(other.fObjectKey);
+            break;
+
+        case kClusterComponentList:
+            SetToClusterComponent(other.fObjectKey);
+            break;
+
+        case kMaterialAnimation:
+            SetToMaterialAnimation(other.fObjectKey);
+            break;
+
+        case kGrassShaderComponent:
+            SetToGrassShaderComponent(other.fObjectKey);
+            break;
         }
+
         return *this;
     }
 
-    ~plPythonParameter()
-    {
+    ~plPythonParameter() {
         SetToNone();
     }
 
-    void SetToNone()
-    {
+    void SetToNone() {
         fValueType = kNone;
     }
 
-    void SetToInt(int32_t number)
-    {
+    void SetToInt(int32_t number) {
         SetToNone();
         fValueType = kInt;
         datarecord.fIntNumber = number;
     }
-    void SetToFloat(float number)
-    {
+    void SetToFloat(float number) {
         SetToNone();
         fValueType = kFloat;
         datarecord.fFloatNumber = number;
     }
-    void SetTobool(bool state)
-    {
+    void SetTobool(bool state) {
         SetToNone();
         fValueType = kbool;
         datarecord.fBool = state;
     }
-    void SetToString(const plString& string)
-    {
+    void SetToString(const plString& string) {
         SetToNone();
         fValueType = kString;
         fString = string;
     }
-    void SetToSceneObject(plKey key, bool list=false)
-    {
+    void SetToSceneObject(plKey key, bool list = false) {
         SetToNone();
-        if (list)
+
+        if (list) {
             fValueType = kSceneObjectList;
-        else
+        } else {
             fValueType = kSceneObject;
+        }
+
         fObjectKey = key;
     }
-    void SetToActivator(plKey key)
-    {
+    void SetToActivator(plKey key) {
         SetToNone();
         fValueType = kActivatorList;
         fObjectKey = key;
     }
-    void SetToResponder(plKey key)
-    {
+    void SetToResponder(plKey key) {
         SetToNone();
         fValueType = kResponderList;
         fObjectKey = key;
     }
-    void SetToDynamicText(plKey key)
-    {
+    void SetToDynamicText(plKey key) {
         SetToNone();
         fValueType = kDynamicText;
         fObjectKey = key;
     }
-    void SetToGUIDialog(plKey key)
-    {
+    void SetToGUIDialog(plKey key) {
         SetToNone();
         fValueType = kGUIDialog;
         fObjectKey = key;
     }
-    void SetToExcludeRegion(plKey key)
-    {
+    void SetToExcludeRegion(plKey key) {
         SetToNone();
         fValueType = kExcludeRegion;
         fObjectKey = key;
     }
-    void SetToWaterComponent(plKey key)
-    {
+    void SetToWaterComponent(plKey key) {
         SetToNone();
         fValueType = kWaterComponent;
         fObjectKey = key;
     }
-    void SetToSwimCurrentInterface(plKey key)
-    {
+    void SetToSwimCurrentInterface(plKey key) {
         SetToNone();
         fValueType = kSwimCurrentInterface;
         fObjectKey = key;
     }
-    void SetToAnimation(plKey key)
-    {
+    void SetToAnimation(plKey key) {
         SetToNone();
         fValueType = kAnimation;
         fObjectKey = key;
     }
-    void SetToAnimationName(const plString& string)
-    {
+    void SetToAnimationName(const plString& string) {
         SetToNone();
         fValueType = kAnimationName;
         fString = string;
     }
-    void SetToBehavior(plKey key)
-    {
+    void SetToBehavior(plKey key) {
         SetToNone();
         fValueType = kBehavior;
         fObjectKey = key;
     }
-    void SetToMaterial(plKey key)
-    {
+    void SetToMaterial(plKey key) {
         SetToNone();
         fValueType = kMaterial;
         fObjectKey = key;
     }
-    void SetToGUIPopUpMenu(plKey key)
-    {
+    void SetToGUIPopUpMenu(plKey key) {
         SetToNone();
         fValueType = kGUIPopUpMenu;
         fObjectKey = key;
     }
-    void SetToGUISkin(plKey key)
-    {
+    void SetToGUISkin(plKey key) {
         SetToNone();
         fValueType = kGUISkin;
         fObjectKey = key;
     }
-    void SetToClusterComponent(plKey key)
-    {
+    void SetToClusterComponent(plKey key) {
         SetToNone();
         fValueType = kClusterComponentList;
         fObjectKey = key;
     }
-    void SetToMaterialAnimation(plKey key)
-    {
+    void SetToMaterialAnimation(plKey key) {
         SetToNone();
         fValueType = kMaterialAnimation;
         fObjectKey = key;
     }
-    void SetToGrassShaderComponent(plKey key)
-    {
+    void SetToGrassShaderComponent(plKey key) {
         SetToNone();
         fValueType = kGrassShaderComponent;
         fObjectKey = key;
     }
 
     // read and write routines for export and reading in at runtime
-    void Read(hsStream *stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         SetToNone();
 
         fID = stream->ReadLE32();
@@ -357,105 +350,107 @@ public:
 
         // read the different types of data
         int count;
-        switch ( fValueType )
-        {
-            case kInt:
-                datarecord.fIntNumber = stream->ReadLE32();
-                break;
 
-            case kFloat:
-                stream->ReadLE(&datarecord.fFloatNumber);
-                break;
+        switch (fValueType) {
+        case kInt:
+            datarecord.fIntNumber = stream->ReadLE32();
+            break;
 
-            case kbool:
-                datarecord.fBool = stream->ReadLE32();
-                break;
+        case kFloat:
+            stream->ReadLE(&datarecord.fFloatNumber);
+            break;
 
-            case kString:
-            case kAnimationName:
-                count = stream->ReadLE32();
-                if ( count != 0 )
-                {
-                    plStringBuffer<char> str;
-                    char *buffer = str.CreateWritableBuffer(count-1);
-                    stream->ReadLE(count, buffer);
-                    buffer[count-1] = 0;
-                    fString = str;
-                }
-                else
-                    fString = plString::Null;
-                break;
+        case kbool:
+            datarecord.fBool = stream->ReadLE32();
+            break;
 
-            case kSceneObject:
-            case kSceneObjectList:
-            case kActivatorList:
-            case kResponderList:
-            case kDynamicText:
-            case kGUIDialog:
-            case kExcludeRegion:
-            case kAnimation:
-            case kBehavior:
-            case kMaterial:
-            case kGUIPopUpMenu:
-            case kGUISkin:
-            case kWaterComponent:
-            case kSwimCurrentInterface:
-            case kClusterComponentList:
-            case kMaterialAnimation:
-            case kGrassShaderComponent:
-                fObjectKey = mgr->ReadKey(stream);
-                break;
+        case kString:
+        case kAnimationName:
+            count = stream->ReadLE32();
+
+            if (count != 0) {
+                plStringBuffer<char> str;
+                char* buffer = str.CreateWritableBuffer(count - 1);
+                stream->ReadLE(count, buffer);
+                buffer[count - 1] = 0;
+                fString = str;
+            } else {
+                fString = plString::Null;
+            }
+
+            break;
+
+        case kSceneObject:
+        case kSceneObjectList:
+        case kActivatorList:
+        case kResponderList:
+        case kDynamicText:
+        case kGUIDialog:
+        case kExcludeRegion:
+        case kAnimation:
+        case kBehavior:
+        case kMaterial:
+        case kGUIPopUpMenu:
+        case kGUISkin:
+        case kWaterComponent:
+        case kSwimCurrentInterface:
+        case kClusterComponentList:
+        case kMaterialAnimation:
+        case kGrassShaderComponent:
+            fObjectKey = mgr->ReadKey(stream);
+            break;
         }
     }
 
-    void Write(hsStream * stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         int count;
         stream->WriteLE32(fID);
         stream->WriteLE32(fValueType);
-        switch ( fValueType )
-        {
-            case kInt:
-                stream->WriteLE32(datarecord.fIntNumber);
-                break;
 
-            case kFloat:
-                stream->WriteLE(datarecord.fFloatNumber);
-                break;
+        switch (fValueType) {
+        case kInt:
+            stream->WriteLE32(datarecord.fIntNumber);
+            break;
 
-            case kbool:
-                stream->WriteLE32(datarecord.fBool);
-                break;
+        case kFloat:
+            stream->WriteLE(datarecord.fFloatNumber);
+            break;
 
-            case kString:
-            case kAnimationName:
-                if ( !fString.IsNull() )
-                    count = fString.GetSize()+1;
-                else
-                    count = 0;
-                stream->WriteLE(count);
-                stream->WriteLE(count, fString.c_str());
-                break;
+        case kbool:
+            stream->WriteLE32(datarecord.fBool);
+            break;
 
-            case kSceneObject:
-            case kSceneObjectList:
-            case kActivatorList:
-            case kResponderList:
-            case kDynamicText:
-            case kGUIDialog:
-            case kExcludeRegion:
-            case kAnimation:
-            case kBehavior:
-            case kMaterial:
-            case kGUIPopUpMenu:
-            case kGUISkin:
-            case kWaterComponent:
-            case kSwimCurrentInterface:
-            case kClusterComponentList:
-            case kMaterialAnimation:
-            case kGrassShaderComponent:
-                mgr->WriteKey(stream, fObjectKey);
-                break;
+        case kString:
+        case kAnimationName:
+            if (!fString.IsNull()) {
+                count = fString.GetSize() + 1;
+            } else {
+                count = 0;
+            }
+
+            stream->WriteLE(count);
+            stream->WriteLE(count, fString.c_str());
+            break;
+
+        case kSceneObject:
+        case kSceneObjectList:
+        case kActivatorList:
+        case kResponderList:
+        case kDynamicText:
+        case kGUIDialog:
+        case kExcludeRegion:
+        case kAnimation:
+        case kBehavior:
+        case kMaterial:
+        case kGUIPopUpMenu:
+        case kGUISkin:
+        case kWaterComponent:
+        case kSwimCurrentInterface:
+        case kClusterComponentList:
+        case kMaterialAnimation:
+        case kGrassShaderComponent:
+            mgr->WriteKey(stream, fObjectKey);
+            break;
 
         }
     }

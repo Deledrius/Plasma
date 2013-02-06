@@ -57,59 +57,51 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Local Helpers ///////////////////////////////////////////////////////////
 
-class plRIFFChunk
-{
-    public:
-        char    fID[ 4 ];
-        uint32_t  fSize;
+class plRIFFChunk {
+public:
+    char    fID[ 4 ];
+    uint32_t  fSize;
 
-        void    Read( FILE *fp )
-        {
-            fread( fID, 1, 4, fp );
-            fread( &fSize, sizeof( uint32_t ), 1, fp );
-        }
+    void    Read(FILE* fp) {
+        fread(fID, 1, 4, fp);
+        fread(&fSize, sizeof(uint32_t), 1, fp);
+    }
 
-        bool    IsA( const char *type )
-        {
-            return ( memcmp( fID, type, 4 ) == 0 ) ? true : false;
-        }
+    bool    IsA(const char* type) {
+        return (memcmp(fID, type, 4) == 0) ? true : false;
+    }
 };
 
-class plRIFFHeader
-{
-    protected:
-        plRIFFChunk     fChunk;
-        bool            fValid;
-        char            fFormat[ 4 ];
+class plRIFFHeader {
+protected:
+    plRIFFChunk     fChunk;
+    bool            fValid;
+    char            fFormat[ 4 ];
 
-    public:
-        plRIFFHeader( FILE *fp )
-        {
-            fValid = false;
-            fChunk.Read( fp );
-            if( fChunk.IsA( "RIFF" ) )
-            {
-                if( fread( &fFormat, 1, 4, fp ) == 4 )
-                {
-                    fValid = true;
-                }
+public:
+    plRIFFHeader(FILE* fp) {
+        fValid = false;
+        fChunk.Read(fp);
+
+        if (fChunk.IsA("RIFF")) {
+            if (fread(&fFormat, 1, 4, fp) == 4) {
+                fValid = true;
             }
         }
+    }
 
-        bool    IsValid( void )
-        {
-            return fValid;
-        }
+    bool    IsValid(void) {
+        return fValid;
+    }
 
-        bool    IsA( const char *type )
-        {
-            return ( memcmp( fFormat, type, 4 ) == 0 ) ? true : false;
-        }
+    bool    IsA(const char* type) {
+        return (memcmp(fFormat, type, 4) == 0) ? true : false;
+    }
 };
 
 //// Constructor/Destructor //////////////////////////////////////////////////
 
-plFastWAV::plFastWAV( const plFileName &path, plAudioCore::ChannelSelect whichChan ) : fFileHandle( nil )
+plFastWAV::plFastWAV(const plFileName& path, plAudioCore::ChannelSelect whichChan) : fFileHandle(nil)
 {
     hsAssert(path.IsValid(), "Invalid path specified in plFastWAV reader");
 
@@ -117,65 +109,58 @@ plFastWAV::plFastWAV( const plFileName &path, plAudioCore::ChannelSelect whichCh
     fWhichChannel = whichChan;
 
     fFileHandle = plFileSystem::Open(path, "rb");
-    if( fFileHandle != nil )
-    {
+
+    if (fFileHandle != nil) {
         /// Read in our header and calc our start position
-        plRIFFHeader    riffHdr( fFileHandle );
+        plRIFFHeader    riffHdr(fFileHandle);
 
-        if( !riffHdr.IsValid() )
-        {
-            IError( "Invalid RIFF file header in plFastWAV" );
+        if (!riffHdr.IsValid()) {
+            IError("Invalid RIFF file header in plFastWAV");
             return;
         }
 
-        if( !riffHdr.IsA( "WAVE" ) )
-        {
-            IError( "Invalid RIFF file type in plFastWAV" );
+        if (!riffHdr.IsA("WAVE")) {
+            IError("Invalid RIFF file type in plFastWAV");
             return;
         }
 
-        fChunkStart = ftell( fFileHandle );
+        fChunkStart = ftell(fFileHandle);
 
         // Seek and read the "fmt " header
         plRIFFChunk     chunk;
-        if( !ISeekToChunk( "fmt ", &chunk ) )
-        {
-            IError( "Unable to find fmt chunk in WAV file" );
+
+        if (!ISeekToChunk("fmt ", &chunk)) {
+            IError("Unable to find fmt chunk in WAV file");
             return;
         }
 
-        if( fread( &fHeader, 1, sizeof( plWAVHeader ), fFileHandle ) != sizeof( plWAVHeader ) )
-        {
-            IError( "Invalid WAV file header in plFastWAV" );
+        if (fread(&fHeader, 1, sizeof(plWAVHeader), fFileHandle) != sizeof(plWAVHeader)) {
+            IError("Invalid WAV file header in plFastWAV");
             return;
         }
 
         // Check format
-        if( fHeader.fFormatTag != kPCMFormatTag )
-        {
-            IError( "Invalid format in plFastWAV" );
+        if (fHeader.fFormatTag != kPCMFormatTag) {
+            IError("Invalid format in plFastWAV");
             return;
         }
 
         // Seek to and get the position of the data chunk
-        if( !ISeekToChunk( "data", &chunk ) )
-        {
-            IError( "Unable to find data chunk in WAV file" );
+        if (!ISeekToChunk("data", &chunk)) {
+            IError("Unable to find data chunk in WAV file");
             return;
         }
-        fDataStartPos = ftell( fFileHandle );
+
+        fDataStartPos = ftell(fFileHandle);
         fDataSize = chunk.fSize;
 
         // HACKY FIX FOR BAD WAV FILES
-        fDataSize -= ( fDataSize & ( fHeader.fBlockAlign - 1 ) );
+        fDataSize -= (fDataSize & (fHeader.fBlockAlign - 1));
 
-        if( fWhichChannel != plAudioCore::kAll )
-        {
+        if (fWhichChannel != plAudioCore::kAll) {
             fChannelAdjust = 2;
-            fChannelOffset = ( fWhichChannel == plAudioCore::kLeft ) ? 0 : 1;
-        }
-        else
-        {
+            fChannelOffset = (fWhichChannel == plAudioCore::kLeft) ? 0 : 1;
+        } else {
             fChannelAdjust = 1;
             fChannelOffset = 0;
         }
@@ -185,35 +170,36 @@ plFastWAV::plFastWAV( const plFileName &path, plAudioCore::ChannelSelect whichCh
         fFakeHeader.fNumChannels /= (uint16_t)fChannelAdjust;
         fFakeHeader.fBlockAlign /= (uint16_t)fChannelAdjust;
 
-        SetPosition( 0 );
+        SetPosition(0);
 //      fCurrDataPos = 0;
     }
 }
 
 plFastWAV::~plFastWAV()
 {
-    if( fFileHandle != nil )
-        fclose( fFileHandle );
+    if (fFileHandle != nil) {
+        fclose(fFileHandle);
+    }
 }
 
-bool    plFastWAV::ISeekToChunk( const char *type, plRIFFChunk *c )
+bool    plFastWAV::ISeekToChunk(const char* type, plRIFFChunk* c)
 {
     plRIFFChunk     chunk;
 
 
     // Start from chunk start and search through all the, well, chunks :)
-    fseek( fFileHandle, fChunkStart, SEEK_SET );
-    while( !feof( fFileHandle ) )
-    {
-        chunk.Read( fFileHandle );
-        if( chunk.IsA( type ) )
-        {
+    fseek(fFileHandle, fChunkStart, SEEK_SET);
+
+    while (!feof(fFileHandle)) {
+        chunk.Read(fFileHandle);
+
+        if (chunk.IsA(type)) {
             *c = chunk;
             return true;
         }
 
         // Seek past this one
-        fseek( fFileHandle, chunk.fSize, SEEK_CUR );
+        fseek(fFileHandle, chunk.fSize, SEEK_CUR);
     }
 
     return false;
@@ -221,127 +207,131 @@ bool    plFastWAV::ISeekToChunk( const char *type, plRIFFChunk *c )
 
 void plFastWAV::Open()
 {
-    if(fFileHandle)
+    if (fFileHandle) {
         return;
+    }
 
     fFileHandle = plFileSystem::Open(fFilename, "rb");
-    if(!fFileHandle) 
+
+    if (!fFileHandle) {
         return;
+    }
 
     fCurrDataPos = 0;
 
-    fseek( fFileHandle, fDataStartPos, SEEK_SET );
+    fseek(fFileHandle, fDataStartPos, SEEK_SET);
 }
 
-void    plFastWAV::Close( void )
+void    plFastWAV::Close(void)
 {
-    if( fFileHandle != nil )
-    {
-        fclose( fFileHandle );
+    if (fFileHandle != nil) {
+        fclose(fFileHandle);
         fFileHandle = nil;
     }
 }
 
-void    plFastWAV::IError( const char *msg )
+void    plFastWAV::IError(const char* msg)
 {
-    hsAssert( false, msg );
+    hsAssert(false, msg);
     Close();
 }
 
-plWAVHeader &plFastWAV::GetHeader( void )
+plWAVHeader& plFastWAV::GetHeader(void)
 {
-    hsAssert( IsValid(), "GetHeader() called on an invalid WAV file" );
+    hsAssert(IsValid(), "GetHeader() called on an invalid WAV file");
 
     return fFakeHeader;
 }
 
-float   plFastWAV::GetLengthInSecs( void )
+float   plFastWAV::GetLengthInSecs(void)
 {
-    hsAssert( IsValid(), "GetLengthInSecs() called on an invalid WAV file" );
+    hsAssert(IsValid(), "GetLengthInSecs() called on an invalid WAV file");
 
-    return (float)( fDataSize / fChannelAdjust ) / (float)fHeader.fAvgBytesPerSec;
+    return (float)(fDataSize / fChannelAdjust) / (float)fHeader.fAvgBytesPerSec;
 }
 
-bool    plFastWAV::SetPosition( uint32_t numBytes )
+bool    plFastWAV::SetPosition(uint32_t numBytes)
 {
-    hsAssert( IsValid(), "GetHeader() called on an invalid WAV file" );
+    hsAssert(IsValid(), "GetHeader() called on an invalid WAV file");
 
 
-    fCurrDataPos = numBytes * fChannelAdjust + ( fChannelOffset * fHeader.fBlockAlign / fChannelAdjust );
-    
-    hsAssert( fCurrDataPos <= fDataSize, "Invalid new position while seeking WAV file" );
+    fCurrDataPos = numBytes * fChannelAdjust + (fChannelOffset * fHeader.fBlockAlign / fChannelAdjust);
 
-    return ( fseek( fFileHandle, fDataStartPos + fCurrDataPos, SEEK_SET ) == 0 ) ? true : false;
+    hsAssert(fCurrDataPos <= fDataSize, "Invalid new position while seeking WAV file");
+
+    return (fseek(fFileHandle, fDataStartPos + fCurrDataPos, SEEK_SET) == 0) ? true : false;
 }
 
-bool    plFastWAV::Read( uint32_t numBytes, void *buffer )
+bool    plFastWAV::Read(uint32_t numBytes, void* buffer)
 {
-    hsAssert( IsValid(), "GetHeader() called on an invalid WAV file" );
+    hsAssert(IsValid(), "GetHeader() called on an invalid WAV file");
 
 
-    if( fWhichChannel != plAudioCore::kAll )
-    {
+    if (fWhichChannel != plAudioCore::kAll) {
         size_t  numRead, sampleSize = fHeader.fBlockAlign / fChannelAdjust;
         static uint8_t    trashBuffer[ 32 ];
 
         uint32_t numBytesFull = numBytes;
-        if( fCurrDataPos + ( numBytes * fChannelAdjust ) > fDataSize )
+
+        if (fCurrDataPos + (numBytes * fChannelAdjust) > fDataSize) {
             numBytesFull -= sampleSize;
-
-        for( numRead = 0; numRead < numBytesFull; numRead += sampleSize )
-        {
-            size_t thisRead = fread( buffer, 1, sampleSize, fFileHandle );
-            if( thisRead != sampleSize )
-                return false;
-
-//          fseek( fFileHandle, sampleSize * ( fChannelAdjust - 1 ), SEEK_CUR );
-            thisRead = fread( trashBuffer, 1, sampleSize, fFileHandle );
-            if( thisRead != sampleSize )
-                return false;
-
-            buffer = (void *)( (uint8_t *)buffer + sampleSize );
-            fCurrDataPos += sampleSize * fChannelAdjust;
         }
 
-        if( numRead < numBytes )
-        {
-            if( numBytes - numRead > sampleSize )
-            {
-                hsAssert( false, "Invalid logic in plFastWAV::Read()" );
+        for (numRead = 0; numRead < numBytesFull; numRead += sampleSize) {
+            size_t thisRead = fread(buffer, 1, sampleSize, fFileHandle);
+
+            if (thisRead != sampleSize) {
                 return false;
             }
 
-    
-            // Must not have enough room left, so no more skipping
-            size_t thisRead = fread( buffer, 1, sampleSize, fFileHandle );
+//          fseek( fFileHandle, sampleSize * ( fChannelAdjust - 1 ), SEEK_CUR );
+            thisRead = fread(trashBuffer, 1, sampleSize, fFileHandle);
 
-            if( thisRead != sampleSize )
+            if (thisRead != sampleSize) {
                 return false;
+            }
 
-            buffer = (void *)( (uint8_t *)buffer + sampleSize );
+            buffer = (void*)((uint8_t*)buffer + sampleSize);
+            fCurrDataPos += sampleSize * fChannelAdjust;
+        }
+
+        if (numRead < numBytes) {
+            if (numBytes - numRead > sampleSize) {
+                hsAssert(false, "Invalid logic in plFastWAV::Read()");
+                return false;
+            }
+
+
+            // Must not have enough room left, so no more skipping
+            size_t thisRead = fread(buffer, 1, sampleSize, fFileHandle);
+
+            if (thisRead != sampleSize) {
+                return false;
+            }
+
+            buffer = (void*)((uint8_t*)buffer + sampleSize);
             fCurrDataPos += sampleSize;
         }
 
-        hsAssert( fCurrDataPos <= fDataSize, "Invalid new position while reading WAV file" );
-    }
-    else
-    {   
-        size_t numRead = fread( buffer, 1, numBytes, fFileHandle );
-        
-        fCurrDataPos += numRead;
-        hsAssert( fCurrDataPos <= fDataSize, "Invalid new position while reading WAV file" );
+        hsAssert(fCurrDataPos <= fDataSize, "Invalid new position while reading WAV file");
+    } else {
+        size_t numRead = fread(buffer, 1, numBytes, fFileHandle);
 
-        if( numRead < numBytes )
+        fCurrDataPos += numRead;
+        hsAssert(fCurrDataPos <= fDataSize, "Invalid new position while reading WAV file");
+
+        if (numRead < numBytes) {
             return false;
+        }
     }
 
     return true;
 }
 
-uint32_t  plFastWAV::NumBytesLeft( void )
+uint32_t  plFastWAV::NumBytesLeft(void)
 {
-    hsAssert( IsValid(), "GetHeader() called on an invalid WAV file" );
-    hsAssert( fCurrDataPos <= fDataSize, "Invalid current position while reading WAV file" );
+    hsAssert(IsValid(), "GetHeader() called on an invalid WAV file");
+    hsAssert(fCurrDataPos <= fDataSize, "Invalid current position while reading WAV file");
 
-    return ( fDataSize - fCurrDataPos ) / fChannelAdjust;
+    return (fDataSize - fCurrDataPos) / fChannelAdjust;
 }

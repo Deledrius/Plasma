@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsResMgr;
 
-class plMeshRefMsg : public plRefMsg
-{
+class plMeshRefMsg : public plRefMsg {
 public:
     enum {
         kVertexPool     = 1,
@@ -57,24 +56,22 @@ public:
     };
 
     plMeshRefMsg() : fType(-1), fWhich(-1) {}
-    plMeshRefMsg(const plKey &r, int which, int type) : plRefMsg(r, kOnCreate), fWhich(which), fType(type) {}
+    plMeshRefMsg(const plKey& r, int which, int type) : plRefMsg(r, kOnCreate), fWhich(which), fType(type) {}
 
-    CLASSNAME_REGISTER( plMeshRefMsg );
-    GETINTERFACE_ANY( plMeshRefMsg, plRefMsg );
+    CLASSNAME_REGISTER(plMeshRefMsg);
+    GETINTERFACE_ANY(plMeshRefMsg, plRefMsg);
 
     uint8_t       fType;
     uint8_t       fWhich;
 
     // IO - not really applicable to ref msgs, but anyway
-    virtual void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    virtual void Read(hsStream* stream, hsResMgr* mgr) {
         plRefMsg::Read(stream, mgr);
         stream->ReadLE(&fType);
         stream->ReadLE(&fWhich);
     }
 
-    virtual void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    virtual void Write(hsStream* stream, hsResMgr* mgr) {
         plRefMsg::Write(stream, mgr);
         stream->WriteLE(fType);
         stream->WriteLE(fWhich);

@@ -49,15 +49,13 @@ class plAvBrainCritter;
 struct hsPoint3;
 
 // simply here so we can pass our message types on to python
-class pyAIMsg
-{
+class pyAIMsg {
 public:
-    static void AddPlasmaConstantsClasses(PyObject *m);
+    static void AddPlasmaConstantsClasses(PyObject* m);
 };
 
 // python glue class for the critter brain
-class pyCritterBrain
-{
+class pyCritterBrain {
 private:
     plAvBrainCritter* fBrain;
 
@@ -71,10 +69,12 @@ public:
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyCritterBrain object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyCritterBrain); // converts a PyObject to a pyCritterBrain (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     bool operator==(const pyCritterBrain& other) const;
-    bool operator!=(const pyCritterBrain& other) const {return !(*this == other);}
+    bool operator!=(const pyCritterBrain& other) const {
+        return !(*this == other);
+    }
 
     void AddReceiver(pyKey& newReceiver);
     void RemoveReceiver(pyKey& oldReceiver);
@@ -82,7 +82,7 @@ public:
     PyObject* GetSceneObject();
 
     void AddBehavior(const std::string& animationName, const std::string& behaviorName, bool loop = true, bool randomStartPos = true,
-        float fadeInLen = 2.f, float fadeOutLen = 2.f);
+                     float fadeInLen = 2.f, float fadeOutLen = 2.f);
     void StartBehavior(const std::string& behaviorName, bool fade = true);
     bool RunningBehavior(const std::string& behaviorName) const;
 

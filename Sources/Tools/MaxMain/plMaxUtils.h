@@ -45,8 +45,7 @@ class IUtil;
 class UtilityObj;
 
 // This a central repository for handy debugging tools for Max that don't fit in anywhere else.
-class plMaxUtils : public UtilityObj
-{
+class plMaxUtils : public UtilityObj {
 protected:
     HWND fhPanel;
     HWND fhResDlg;
@@ -57,8 +56,8 @@ public:
     static plMaxUtils& Instance();
     void DeleteThis() {};
 
-    void BeginEditParams(Interface *ip, IUtil *iu);
-    void EndEditParams(Interface *ip, IUtil *iu);
+    void BeginEditParams(Interface* ip, IUtil* iu);
+    void EndEditParams(Interface* ip, IUtil* iu);
 
     static BOOL CALLBACK ForwardDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
     BOOL DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);

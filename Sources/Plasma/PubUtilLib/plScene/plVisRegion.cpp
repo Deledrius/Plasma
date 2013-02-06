@@ -52,9 +52,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plIntersect/plRegionBase.h"
 
 plVisRegion::plVisRegion()
-:   fIndex(0),
-    fRegion(nil),
-    fMgr(nil)
+    :   fIndex(0),
+        fRegion(nil),
+        fMgr(nil)
 {
     fMgr = plGlobalVisMgr::Instance();
 
@@ -63,17 +63,20 @@ plVisRegion::plVisRegion()
 
 plVisRegion::~plVisRegion()
 {
-    if( fMgr )
+    if (fMgr) {
         fMgr->UnRegister(this, GetProperty(kIsNot));
+    }
 }
 
 bool plVisRegion::Eval(const hsPoint3& pos) const
 {
-    if( GetProperty(kDisable) )
+    if (GetProperty(kDisable)) {
         return false;
+    }
 
-    if( !fRegion )
+    if (!fRegion) {
         return true;
+    }
 
     return fRegion->IsInside(pos);
 }
@@ -81,45 +84,45 @@ bool plVisRegion::Eval(const hsPoint3& pos) const
 bool plVisRegion::MsgReceive(plMessage* msg)
 {
     plEnableMsg* enaMsg = plEnableMsg::ConvertNoRef(msg);
-    if( enaMsg )
-    {
+
+    if (enaMsg) {
         SetProperty(kDisable, enaMsg->Cmd(plEnableMsg::kDisable));
         return true;
     }
+
     plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
-    if( refMsg )
-    {
-        switch( refMsg->fType )
-        {
+
+    if (refMsg) {
+        switch (refMsg->fType) {
         case kRefRegion:
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-            {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fRegion = plRegionBase::ConvertNoRef(refMsg->GetRef());
-            }
-            else
-            {
+            } else {
                 fRegion = nil;
             }
+
             return true;
+
         case kRefVisMgr:
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-            {
-                if( fMgr )
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+                if (fMgr) {
                     fMgr->UnRegister(this, GetProperty(kIsNot));
+                }
+
                 fMgr = plVisMgr::ConvertNoRef(refMsg->GetRef());
                 hsAssert(fMgr, "Just set my manager to nil.");
                 fMgr->Register(this, GetProperty(kIsNot));
-            }
-            else
-            {
+            } else {
                 fMgr = nil;
             }
+
             return true;
 
         default:
             break;
         }
     }
+
     return plObjInterface::MsgReceive(msg);
 }
 
@@ -130,8 +133,9 @@ void plVisRegion::Read(hsStream* s, hsResMgr* mgr)
     mgr->ReadKeyNotifyMe(s, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, kRefRegion), plRefFlags::kActiveRef);
     mgr->ReadKeyNotifyMe(s, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, kRefVisMgr), plRefFlags::kActiveRef);
 
-    if( fMgr )
+    if (fMgr) {
         fMgr->Register(this, GetProperty(kIsNot));
+    }
 }
 
 void plVisRegion::Write(hsStream* s, hsResMgr* mgr)

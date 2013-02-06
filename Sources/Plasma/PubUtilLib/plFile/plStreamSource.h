@@ -49,11 +49,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // A class for holding and accessing file streams. The preloader will insert
 // files in here once they are loaded. In internal builds, if a requested file
 // is not found, it will be retrieved from disk.
-class plStreamSource
-{
+class plStreamSource {
 private:
-    struct fileData
-    {
+    struct fileData {
         plFileName      fFilename; // includes path
         plFileName      fDir; // parent directory
         plString        fExt;
@@ -65,10 +63,14 @@ private:
 
     plStreamSource() {}
 public:
-    ~plStreamSource() {ICleanup();}
+    ~plStreamSource() {
+        ICleanup();
+    }
 
     // Force a cleanup of all data (some apps need to get at those file again, and they can't while we have them open)
-    void Cleanup() {ICleanup();}
+    void Cleanup() {
+        ICleanup();
+    }
 
     // File access functions
     hsStream* GetFile(const plFileName& filename); // internal builds will read from disk if it doesn't exist

@@ -60,7 +60,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plStatusLog/plStatusLog.h"
 
 #define MAX_NUM_SOURCES 128
-#define kLogMe if( fLog != nil ) fLog->AddLineF( 
+#define kLogMe if( fLog != nil ) fLog->AddLineF(
 #define MAX_AUDIOCARD_NAME 256
 
 //////////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 plAudioCaps plAudioCapsDetector::fCaps;
 bool plAudioCapsDetector::fGotCaps = false;
 
-plStatusLog *plAudioCapsDetector::fLog = nil;
+plStatusLog* plAudioCapsDetector::fLog = nil;
 
 plAudioCapsDetector::plAudioCapsDetector()
 {
@@ -83,68 +83,77 @@ plAudioCapsDetector::~plAudioCapsDetector()
 //// Detect //////////////////////////////////////////////////////////////////
 //  Our big function that does all of our work
 
-plAudioCaps &plAudioCapsDetector::Detect( bool logIt, bool init )
+plAudioCaps& plAudioCapsDetector::Detect(bool logIt, bool init)
 {
     // If we already have the device capabilities, just return them
-    if(fGotCaps) return fCaps;
+    if (fGotCaps) {
+        return fCaps;
+    }
+
     fCaps.fIsAvailable = true;
-    
-    ALCdevice *     device;
-    ALCcontext *    context;
-    
-    if(init)
-    {
+
+    ALCdevice*      device;
+    ALCcontext*     context;
+
+    if (init) {
         device = alcOpenDevice(0);
-        if(!device)
-        {
+
+        if (!device) {
             fCaps.fIsAvailable = false;
         }
 
         context = alcCreateContext(device, 0);
-        if(alGetError() != AL_NO_ERROR)
-        {
+
+        if (alGetError() != AL_NO_ERROR) {
             fCaps.fIsAvailable = false;
         }
+
         alcMakeContextCurrent(context);
-        if(alGetError() != AL_NO_ERROR)
-        {
+
+        if (alGetError() != AL_NO_ERROR) {
             fCaps.fIsAvailable = false;
         }
     }
-    
-    if( logIt )
-        fLog = plStatusLogMgr::GetInstance().CreateStatusLog( 30, "audioCaps.log" );
-    else
-        fLog = nil;
 
-    kLogMe 0xff00ff00, "Starting audio caps detection..." );
+    if (logIt) {
+        fLog = plStatusLogMgr::GetInstance().CreateStatusLog(30, "audioCaps.log");
+    } else {
+        fLog = nil;
+    }
+
+    kLogMe 0xff00ff00, "Starting audio caps detection...");
 
     // find the max number of sources
     ALuint sources[MAX_NUM_SOURCES];
     ALuint i = 0;
-    for(; i < MAX_NUM_SOURCES; i++)
-    {
-        alGenSources(1, &sources[i]);
-        if(alGetError() != AL_NO_ERROR)
+
+    for (;
+
+i < MAX_NUM_SOURCES;
+i++) {
+    alGenSources(1, &sources[i]);
+
+        if (alGetError() != AL_NO_ERROR) {
             break;
+        }
+
         fCaps.fMaxNumSources++;
     }
-    alDeleteSources(i, sources); 
+    alDeleteSources(i, sources);
     kLogMe 0xffffffff, "Max Number of sources: %d", i);
     plStatusLog::AddLineS("audio.log", "Max Number of sources: %d", i);
 
     // Detect EAX support
-    kLogMe 0xff00ff00, "Attempting to detect EAX support..." );
-    fCaps.fEAXAvailable = IDetectEAX( );
+    kLogMe 0xff00ff00, "Attempting to detect EAX support...");
+    fCaps.fEAXAvailable = IDetectEAX();
 
-    kLogMe 0xff00ff00, "Audio caps detection COMPLETE." );
-    delete fLog;
-    
-    fGotCaps = true; // We've got the device capabilities
+                          kLogMe 0xff00ff00, "Audio caps detection COMPLETE.");
+                          delete fLog;
 
-    if(init)
-    {   
-        alcMakeContextCurrent(nil);
+                          fGotCaps = true; // We've got the device capabilities
+
+    if (init) {
+    alcMakeContextCurrent(nil);
         alcDestroyContext(context);
         alcCloseDevice(device);
     }
@@ -153,33 +162,28 @@ plAudioCaps &plAudioCapsDetector::Detect( bool logIt, bool init )
 
 //// IDetectEAX //////////////////////////////////////////////////////////////
 //  Attempt to actually init the EAX listener.Note that we can potentially do
-//  this even if we didn't load the EAX Unified driver (we could just be 
-//  running EAX 3.0 native), so you can really just think of the EAX Unified 
-//  init code above as a way of trying to make sure this line here will 
+//  this even if we didn't load the EAX Unified driver (we could just be
+//  running EAX 3.0 native), so you can really just think of the EAX Unified
+//  init code above as a way of trying to make sure this line here will
 //  succeed as often as possible.
 
-bool    plAudioCapsDetector::IDetectEAX(  )
+       bool    plAudioCapsDetector::IDetectEAX()
 {
 #ifdef EAX_SDK_AVAILABLE
     bool gotSupport = true;
 
-    if(!alIsExtensionPresent((ALchar *)"EAX4.0"))       // is eax 4 supported
-    {
-        if(!alIsExtensionPresent((ALchar *) "EAX4.0Emulated"))      // is an earlier version of eax supported
-        {
+    if (!alIsExtensionPresent((ALchar*)"EAX4.0")) {     // is eax 4 supported
+        if (!alIsExtensionPresent((ALchar*) "EAX4.0Emulated")) {    // is an earlier version of eax supported
             kLogMe 0xff00ff00, "EAX not supported");
             gotSupport = false;
-        }
-        else
-        {
+        } else {
             fCaps.fEAXUnified = true;
             kLogMe 0xff00ff00, "EAX 4 Emulated supported");
         }
-    }
-    else
-    {
+    } else {
         kLogMe 0xff00ff00, "EAX 4 available");
-    }   
+    }
+
     return gotSupport;
 #else
     kLogMe 0xff00ff00, "EAX disabled in this build");

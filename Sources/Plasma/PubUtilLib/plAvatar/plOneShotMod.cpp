@@ -57,34 +57,34 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // CTOR()
 plOneShotMod::plOneShotMod()
-: fDrivable(false),
-  fReversable(false),
-  fSeekDuration(1.0f),
-  fSmartSeek(false),
-  fAnimName(nil),
-  fNoSeek(false)
+    : fDrivable(false),
+      fReversable(false),
+      fSeekDuration(1.0f),
+      fSmartSeek(false),
+      fAnimName(nil),
+      fNoSeek(false)
 {
-    // this constructor is called from the loader. 
+    // this constructor is called from the loader.
 }
 
 // CTOR(char *)
-plOneShotMod::plOneShotMod(const char *animName,
+plOneShotMod::plOneShotMod(const char* animName,
                            bool drivable,
                            bool reversable,
                            float seekDuration,
                            bool smartSeek,
                            bool noSeek)
-: fDrivable(drivable),
-  fReversable(reversable),
-  fSeekDuration(seekDuration),
-  fSmartSeek((float)smartSeek),
-  fNoSeek(noSeek)
+    : fDrivable(drivable),
+      fReversable(reversable),
+      fSeekDuration(seekDuration),
+      fSmartSeek((float)smartSeek),
+      fNoSeek(noSeek)
 {
     fAnimName = hsStrcpy(animName);
 }
 
 // INIT
-void plOneShotMod::Init(const char *animName,
+void plOneShotMod::Init(const char* animName,
                         bool drivable,
                         bool reversable,
                         float seekDuration,
@@ -102,7 +102,7 @@ void plOneShotMod::Init(const char *animName,
 // DTOR()
 plOneShotMod::~plOneShotMod()
 {
-    if(fAnimName) {
+    if (fAnimName) {
         delete[] fAnimName;
         fAnimName = nil;
     }
@@ -112,29 +112,27 @@ plOneShotMod::~plOneShotMod()
 // MSGRECEIVE
 bool plOneShotMod::MsgReceive(plMessage* msg)
 {
-    plOneShotMsg *oneShotMsg = plOneShotMsg::ConvertNoRef(msg);
-    if (oneShotMsg)
-    {
+    plOneShotMsg* oneShotMsg = plOneShotMsg::ConvertNoRef(msg);
+
+    if (oneShotMsg) {
         // Send a one shot task request to the given target, which darn well better have an avatar modifier on it.
         plKey myKey = GetKey();
         plKey objKey = GetTarget(0)->GetKey();
         plKey avKey = oneShotMsg->fPlayerKey;
-        hsAssert(avKey,"The avatar key is missing in the one shot!");
+        hsAssert(avKey, "The avatar key is missing in the one shot!");
 
-        if ( avKey )
-        {
-            plSceneObject *avObj = (plSceneObject *)avKey->ObjectIsLoaded();
-            if(avObj)
-            {
-                const plArmatureMod *avMod = (plArmatureMod*)avObj->GetModifierByType(plArmatureMod::Index());
+        if (avKey) {
+            plSceneObject* avObj = (plSceneObject*)avKey->ObjectIsLoaded();
 
-                if(avMod)
-                {
+            if (avObj) {
+                const plArmatureMod* avMod = (plArmatureMod*)avObj->GetModifierByType(plArmatureMod::Index());
+
+                if (avMod) {
                     plString animName = avMod->MakeAnimationName(fAnimName);
 
-                    plAvOneShotMsg *avOSmsg = new plAvOneShotMsg(myKey, oneShotMsg->fPlayerKey, objKey,
-                                                                 fSeekDuration, (bool)fSmartSeek, animName, fDrivable,
-                                                                 fReversable);
+                    plAvOneShotMsg* avOSmsg = new plAvOneShotMsg(myKey, oneShotMsg->fPlayerKey, objKey,
+                            fSeekDuration, (bool)fSmartSeek, animName, fDrivable,
+                            fReversable);
 
                     avOSmsg->fNoSeek = fNoSeek;
                     avOSmsg->SetBCastFlag(plMessage::kPropagateToModifiers);
@@ -145,8 +143,10 @@ bool plOneShotMod::MsgReceive(plMessage* msg)
             }
 
         }
+
         return true;
     }
+
     return plMultiModifier::MsgReceive(msg);
 }
 
@@ -155,11 +155,11 @@ bool plOneShotMod::MsgReceive(plMessage* msg)
 void plOneShotMod::AddTarget(plSceneObject* so)
 {
     plMultiModifier::AddTarget(so);
-    
+
     plAvatarMgr::GetInstance()->AddOneShot(this);
 }
 
-void plOneShotMod::Read(hsStream *stream, hsResMgr *mgr)
+void plOneShotMod::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMultiModifier::Read(stream, mgr);
 
@@ -172,7 +172,7 @@ void plOneShotMod::Read(hsStream *stream, hsResMgr *mgr)
     fNoSeek = stream->ReadBool();
 }
 
-void plOneShotMod::Write(hsStream *stream, hsResMgr *mgr)
+void plOneShotMod::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMultiModifier::Write(stream, mgr);
 

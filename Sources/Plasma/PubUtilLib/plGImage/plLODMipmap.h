@@ -45,16 +45,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plMipmap.h"
 
-class plLODMipmap : public plMipmap
-{
+class plLODMipmap : public plMipmap {
 protected:
-    enum 
-    {
+    enum {
         kRefBase    = 0
     };
 
-    enum
-    {
+    enum {
         kNumLODs    = 5
     };
 
@@ -73,36 +70,42 @@ public:
     plLODMipmap();
     plLODMipmap(plMipmap* mip);
     virtual ~plLODMipmap();
-    
-    CLASSNAME_REGISTER( plLODMipmap );
-    GETINTERFACE_ANY( plLODMipmap, plMipmap );
 
-    virtual bool MsgReceive(plMessage *msg);
+    CLASSNAME_REGISTER(plLODMipmap);
+    GETINTERFACE_ANY(plLODMipmap, plMipmap);
+
+    virtual bool MsgReceive(plMessage* msg);
 
     void            SetLOD(int lod);
-    int             GetLOD() const { return fLOD; }
+    int             GetLOD() const {
+        return fLOD;
+    }
 
     virtual hsGDeviceRef*   GetDeviceRef() const;
-    virtual void            SetDeviceRef( hsGDeviceRef *const devRef );
+    virtual void            SetDeviceRef(hsGDeviceRef* const devRef);
 
     virtual void    Reset();
 
-    virtual void    Read(hsStream *s, hsResMgr *mgr);
-    virtual void    Write(hsStream *s, hsResMgr *mgr);
+    virtual void    Read(hsStream* s, hsResMgr* mgr);
+    virtual void    Write(hsStream* s, hsResMgr* mgr);
 
-    virtual plMipmap*   Clone() const { return fBase->Clone(); }
-    virtual void        CopyFrom(const plMipmap *source);
+    virtual plMipmap*   Clone() const {
+        return fBase->Clone();
+    }
+    virtual void        CopyFrom(const plMipmap* source);
 
-    virtual void    Composite(plMipmap *source, uint16_t x, uint16_t y, CompositeOptions *options = nil);
+    virtual void    Composite(plMipmap* source, uint16_t x, uint16_t y, CompositeOptions* options = nil);
 
-    virtual void    ScaleNicely(uint32_t *destPtr, uint16_t destWidth, uint16_t destHeight,
-                            uint16_t destStride, plMipmap::ScaleFilter filter) const;
+    virtual void    ScaleNicely(uint32_t* destPtr, uint16_t destWidth, uint16_t destHeight,
+                                uint16_t destStride, plMipmap::ScaleFilter filter) const;
 
     virtual bool    ResizeNicely(uint16_t newWidth, uint16_t newHeight, plMipmap::ScaleFilter filter);
 
     virtual void    SetCurrLevel(uint8_t level);
 
-    const plMipmap* GetBase() const { return fBase; }
+    const plMipmap* GetBase() const {
+        return fBase;
+    }
 };
 
 

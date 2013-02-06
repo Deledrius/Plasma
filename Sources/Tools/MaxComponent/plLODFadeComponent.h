@@ -52,11 +52,9 @@ const Class_ID LOSFADE_COMP_CID(0x6308608a, 0x7fa34929);
 class plMaxNode;
 class plExportProgressBar;
 
-class plLODFadeComponent : public plComponent
-{
+class plLODFadeComponent : public plComponent {
 public:
-    enum
-    {
+    enum {
         kHasBase,
         kBase,
         kDistance,
@@ -69,40 +67,40 @@ protected:
 
 public:
     plLODFadeComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
-class plBlendOntoComponent : public plComponent
-{
+class plBlendOntoComponent : public plComponent {
 public:
-    enum
-    {
+    enum {
         kBaseNodes,
         kSortFaces
     };
 
 public:
     plBlendOntoComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
-class plBlendOntoAdvComponent : public plComponent
-{
+class plBlendOntoAdvComponent : public plComponent {
 public:
-    enum
-    {
+    enum {
         kBaseNodes,
         kSortFaces,
         kSortObjects,
@@ -111,20 +109,20 @@ public:
 
 public:
     plBlendOntoAdvComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
-class plDistFadeComponent : public plComponent
-{
+class plDistFadeComponent : public plComponent {
 public:
-    enum
-    {
+    enum {
         kFadeInActive,
         kFadeInStart,
         kFadeInEnd,
@@ -139,13 +137,15 @@ protected:
 
 public:
     plDistFadeComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 #endif // plLODFadeComponent_inc

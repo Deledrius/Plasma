@@ -70,16 +70,22 @@ std::vector<unsigned> pyGameCli::GetGameIDs()
     ARRAY(unsigned) gameIDs;
     std::vector<unsigned> retVal;
     pfGameMgr::GetInstance()->GetGameIds(&gameIDs);
-    for (unsigned i = 0; i < gameIDs.Count(); ++i)
+
+    for (unsigned i = 0; i < gameIDs.Count(); ++i) {
         retVal.push_back(gameIDs[i]);
+    }
+
     return retVal;
 }
 
 PyObject* pyGameCli::GetGameCli(unsigned gameID)
 {
     pfGameCli* client = pfGameMgr::GetInstance()->GetGameCli(gameID);
-    if (client)
+
+    if (client) {
         return pyGameCli::New(client);
+    }
+
     PYTHON_RETURN_NONE;
 }
 
@@ -96,90 +102,111 @@ void pyGameCli::JoinGame(pyKey& callbackKey, unsigned gameID)
 
 unsigned pyGameCli::GameID() const
 {
-    if (gameClient)
+    if (gameClient) {
         return gameClient->GetGameId();
+    }
+
     return 0;
 }
 
 plUUID pyGameCli::GameTypeID() const
 {
-    if (gameClient)
-    {
+    if (gameClient) {
         return gameClient->GetGameTypeId();
     }
+
     return kNilUuid;
 }
 
 std::wstring pyGameCli::Name() const
 {
-    if (gameClient)
+    if (gameClient) {
         return gameClient->GetName();
+    }
+
     return L"";
 }
 
 unsigned pyGameCli::PlayerCount() const
 {
-    if (gameClient)
+    if (gameClient) {
         return gameClient->GetPlayerCount();
+    }
+
     return 0;
 }
 
 void pyGameCli::InvitePlayer(unsigned playerID)
 {
-    if (gameClient)
+    if (gameClient) {
         gameClient->InvitePlayer(playerID);
+    }
 }
 
 void pyGameCli::UninvitePlayer(unsigned playerID)
 {
-    if (gameClient)
+    if (gameClient) {
         gameClient->UninvitePlayer(playerID);
+    }
 }
 
 void pyGameCli::LeaveGame()
 {
-    if (gameClient)
+    if (gameClient) {
         gameClient->LeaveGame();
+    }
 }
 
 PyObject* pyGameCli::UpcastToTTTGame()
 {
-    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_TicTacToe))
+    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_TicTacToe)) {
         return pyTTTGame::New(gameClient);
+    }
+
     PYTHON_RETURN_NONE;
 }
 
 PyObject* pyGameCli::UpcastToHeekGame()
 {
-    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_Heek))
+    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_Heek)) {
         return pyHeekGame::New(gameClient);
+    }
+
     PYTHON_RETURN_NONE;
 }
 
 PyObject* pyGameCli::UpcastToMarkerGame()
 {
-    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_Marker))
+    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_Marker)) {
         return pyMarkerGame::New(gameClient);
+    }
+
     PYTHON_RETURN_NONE;
 }
 
 PyObject* pyGameCli::UpcastToBlueSpiralGame()
 {
-    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_BlueSpiral))
+    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_BlueSpiral)) {
         return pyBlueSpiralGame::New(gameClient);
+    }
+
     PYTHON_RETURN_NONE;
 }
 
 PyObject* pyGameCli::UpcastToClimbingWallGame()
 {
-    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_ClimbingWall))
+    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_ClimbingWall)) {
         return pyClimbingWallGame::New(gameClient);
+    }
+
     PYTHON_RETURN_NONE;
 }
 
 PyObject* pyGameCli::UpcastToVarSyncGame()
 {
-    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_VarSync))
+    if (gameClient && (gameClient->GetGameTypeId() == kGameTypeId_VarSync)) {
         return pyVarSyncGame::New(gameClient);
+    }
+
     PYTHON_RETURN_NONE;
 }

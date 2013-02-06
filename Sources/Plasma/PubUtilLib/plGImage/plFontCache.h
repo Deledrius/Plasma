@@ -65,42 +65,41 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //// Class Definition /////////////////////////////////////////////////////////
 
 class plFont;
-class plFontCache : public hsKeyedObject
-{
-    protected:  
+class plFontCache : public hsKeyedObject {
+protected:
 
-        hsTArray<plFont *>      fCache;
-        plFileName              fCustFontDir;
+    hsTArray<plFont*>      fCache;
+    plFileName              fCustFontDir;
 
-        static plFontCache     *fInstance;
+    static plFontCache*     fInstance;
 
-        void    ILoadCustomFonts( void );
+    void    ILoadCustomFonts(void);
 
-    public:
+public:
 
-        CLASSNAME_REGISTER( plFontCache );
-        GETINTERFACE_ANY( plFontCache, hsKeyedObject );
+    CLASSNAME_REGISTER(plFontCache);
+    GETINTERFACE_ANY(plFontCache, hsKeyedObject);
 
-        plFontCache();
-        virtual ~plFontCache();
+    plFontCache();
+    virtual ~plFontCache();
 
-        virtual void    Read( hsStream *s, hsResMgr *mgr ) {}
-        virtual void    Write( hsStream *s, hsResMgr *mgr ) {}
+    virtual void    Read(hsStream* s, hsResMgr* mgr) {}
+    virtual void    Write(hsStream* s, hsResMgr* mgr) {}
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        static plFontCache  &GetInstance( void );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        plFont  *GetFont( const char *face, uint8_t size, uint32_t fontFlags );
+    static plFontCache&  GetInstance(void);
+
+    plFont*  GetFont(const char* face, uint8_t size, uint32_t fontFlags);
 
 //      HFONT   GetMeAFont( const char *face, int height, int weight, bool italic, uint32_t quality );
 //      void    FreeFont( HFONT font );
-        void    Clear( void );
+    void    Clear(void);
 
-        void    LoadCustomFonts( const plFileName &dir );
+    void    LoadCustomFonts(const plFileName& dir);
 
-        // Our custom font extension
-        static const char* kCustFontExtension;
+    // Our custom font extension
+    static const char* kCustFontExtension;
 };
 
 

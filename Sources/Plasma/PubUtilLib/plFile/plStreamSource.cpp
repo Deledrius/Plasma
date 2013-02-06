@@ -53,8 +53,8 @@ void plStreamSource::ICleanup()
 {
     // loop through all the file data records, and delete the streams
     decltype(fFileData.begin()) curData;
-    for (curData = fFileData.begin(); curData != fFileData.end(); curData++)
-    {
+
+    for (curData = fFileData.begin(); curData != fFileData.end(); curData++) {
         curData->second.fStream->Close();
         delete curData->second.fStream;
         curData->second.fStream = nil;
@@ -66,35 +66,37 @@ void plStreamSource::ICleanup()
 hsStream* plStreamSource::GetFile(const plFileName& filename)
 {
     plFileName sFilename = filename.Normalize('/');
-    if (fFileData.find(sFilename) == fFileData.end())
-    {
+
+    if (fFileData.find(sFilename) == fFileData.end()) {
 #ifndef PLASMA_EXTERNAL_RELEASE
+
         // internal releases can pull from disk
-        if (plFileInfo(filename).Exists())
-        {
+        if (plFileInfo(filename).Exists()) {
             // file exists on disk, cache it
             fFileData[sFilename].fFilename = sFilename;
             fFileData[sFilename].fDir = sFilename.StripFileName();
             fFileData[sFilename].fExt = sFilename.GetFileExt();
-            if (plSecureStream::IsSecureFile(filename))
-            {
+
+            if (plSecureStream::IsSecureFile(filename)) {
                 uint32_t encryptionKey[4];
-                if (!plSecureStream::GetSecureEncryptionKey(filename, encryptionKey, 4))
-                {
+
+                if (!plSecureStream::GetSecureEncryptionKey(filename, encryptionKey, 4)) {
                     FATAL("Hey camper... You need an NTD key file!");
                     return nil;
                 }
 
                 fFileData[sFilename].fStream = plSecureStream::OpenSecureFile(filename, 0, encryptionKey);
-            }
-            else // otherwise it is an encrypted or plain stream, this call handles both
+            } else { // otherwise it is an encrypted or plain stream, this call handles both
                 fFileData[sFilename].fStream = plEncryptedStream::OpenEncryptedFile(filename);
+            }
 
             return fFileData[sFilename].fStream;
         }
+
 #endif // PLASMA_EXTERNAL_RELEASE
         return nil;
     }
+
     return fFileData[sFilename].fStream;
 }
 
@@ -105,22 +107,25 @@ std::vector<plFileName> plStreamSource::GetListOfNames(const plFileName& dir, co
 
     // loop through all the file data records, and create the list
     std::vector<plFileName> retVal;
-    for (auto curData = fFileData.begin(); curData != fFileData.end(); curData++)
-    {
+
+    for (auto curData = fFileData.begin(); curData != fFileData.end(); curData++) {
         if ((curData->second.fDir.AsString().CompareI(sDir.AsString()) == 0) &&
-            (curData->second.fExt.CompareI(ext) == 0))
+                (curData->second.fExt.CompareI(ext) == 0)) {
             retVal.push_back(curData->second.fFilename);
+        }
     }
 
 #ifndef PLASMA_EXTERNAL_RELEASE
     // in internal releases, we can use on-disk files if they exist
     // Build the search string as "dir/*.ext"
     std::vector<plFileName> files = plFileSystem::ListDir(sDir, ("*." + ext).c_str());
-    for (auto iter = files.begin(); iter != files.end(); ++iter)
-    {
-        if (fFileData.find(*iter) == fFileData.end()) // we haven't added it yet
+
+    for (auto iter = files.begin(); iter != files.end(); ++iter) {
+        if (fFileData.find(*iter) == fFileData.end()) { // we haven't added it yet
             retVal.push_back(*iter);
+        }
     }
+
 #endif // PLASMA_EXTERNAL_RELEASE
 
     return retVal;
@@ -130,8 +135,9 @@ bool plStreamSource::InsertFile(const plFileName& filename, hsStream* stream)
 {
     plFileName sFilename = filename.Normalize('/');
 
-    if (fFileData.find(sFilename) != fFileData.end())
-        return false; // duplicate entry, return failure
+    if (fFileData.find(sFilename) != fFileData.end()) {
+        return false;    // duplicate entry, return failure
+    }
 
     // copy the data over (takes ownership of the stream!)
     fFileData[sFilename].fFilename = sFilename;

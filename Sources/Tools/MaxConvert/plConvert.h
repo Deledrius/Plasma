@@ -51,8 +51,7 @@ class plMessage;
 class plLightMapGen;
 class hsVertexShader;
 
-class plConvertSettings
-{
+class plConvertSettings {
 public:
     plConvertSettings() : fSceneViewer(false), fReconvert(false), fDoPreshade(true), fDoLightMap(true),
         fLightMapGen(nil), fVertexShader(nil), fPhysicalsOnly(false), fExportPage(nil) {}
@@ -68,8 +67,7 @@ public:
     hsVertexShader*     fVertexShader;
 };
 
-class plConvert
-{
+class plConvert {
 protected:
     bool                fQuit;
     plErrorMsg*         fpErrorMsg;
@@ -85,7 +83,7 @@ protected:
 
 public:
     static plConvert& Instance();
-    uint32_t fWarned; 
+    uint32_t fWarned;
     enum {
         kWarnedDecalOnBlendObj          = 0x1,
         kWarnedBadMaterialOnParticle    = 0x2,
@@ -100,25 +98,29 @@ public:
     };
 
     // Init the converter.  Only good for one call of Convert.
-    bool Init(Interface *ip, plErrorMsg* msg, plConvertSettings *settings);
+    bool Init(Interface* ip, plErrorMsg* msg, plConvertSettings* settings);
     void   DeInit();
 
     bool Convert();
     bool Convert(hsTArray<plMaxNode*>& nodes);    // Convert a set of nodes (for SceneViewer update)
-    
+
     plMaxNode* GetRootNode();
     void SendEnvironmentMessage(plMaxNode* pNode, plMaxNode* efxRegion, plMessage* msg, bool ignorePhysicals = false); // iterates through scene to find nodes contained by the efxRegion
     void AddMessageToQueue(plMessage* msg);
 
     // Because components don't get the convert settings (too much work to retrofit all of them)
-    plConvertSettings* GetConvertSettings() { return fSettings; }
-    bool IsForSceneViewer() { return fSettings->fSceneViewer; }
+    plConvertSettings* GetConvertSettings() {
+        return fSettings;
+    }
+    bool IsForSceneViewer() {
+        return fSettings->fSceneViewer;
+    }
 
     // Search for nodes with the same name.  Returns true if any are found and stops the export
     bool IFindDuplicateNames();
     // IFindDuplicateNames helper functions
-    const char *ISearchNames(INode *node, INode *root);
-    int ICountNameOccurances(INode *node, const char *name);
+    const char* ISearchNames(INode* node, INode* root);
+    int ICountNameOccurances(INode* node, const char* name);
     // Does any pre-export generation necessary for distributors, then cleans up after export.
     BOOL IAutoClusterRecur(INode* node);
     BOOL IAutoUnClusterRecur(INode* node);

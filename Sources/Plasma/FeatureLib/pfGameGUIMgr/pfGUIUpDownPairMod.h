@@ -54,47 +54,48 @@ class plMessage;
 class pfGUIButtonMod;
 class pfUpDownBtnProc;
 
-class pfGUIUpDownPairMod : public pfGUIValueCtrl
-{
+class pfGUIUpDownPairMod : public pfGUIValueCtrl {
     friend class pfUpDownBtnProc;
 
-    protected:
+protected:
 
-        enum
-        {
-            kRefUpControl = kRefDerivedStart,
-            kRefDownControl
-        };
+    enum {
+        kRefUpControl = kRefDerivedStart,
+        kRefDownControl
+    };
 
-        pfGUIButtonMod  *fUpControl, *fDownControl;
-        pfUpDownBtnProc *fButtonProc;
-
-
-        virtual bool IEval( double secs, float del, uint32_t dirty ); // called only by owner object's Eval()
-        virtual void    IUpdate( void );
-
-    public:
-
-        pfGUIUpDownPairMod();
-        virtual ~pfGUIUpDownPairMod();
-
-        CLASSNAME_REGISTER( pfGUIUpDownPairMod );
-        GETINTERFACE_ANY( pfGUIUpDownPairMod, pfGUIValueCtrl );
+    pfGUIButtonMod*  fUpControl, *fDownControl;
+    pfUpDownBtnProc* fButtonProc;
 
 
-        virtual bool    MsgReceive( plMessage* pMsg );
+    virtual bool IEval(double secs, float del, uint32_t dirty);   // called only by owner object's Eval()
+    virtual void    IUpdate(void);
 
-        virtual void    Update( void );
+public:
 
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    pfGUIUpDownPairMod();
+    virtual ~pfGUIUpDownPairMod();
 
-        virtual void    SetRange( float min, float max );
-        virtual void    SetCurrValue( float v );
+    CLASSNAME_REGISTER(pfGUIUpDownPairMod);
+    GETINTERFACE_ANY(pfGUIUpDownPairMod, pfGUIValueCtrl);
 
-        /// Export ONLY
 
-        void    SetControls( pfGUIButtonMod *up, pfGUIButtonMod *down ) { fUpControl = up; fDownControl = down; }
+    virtual bool    MsgReceive(plMessage* pMsg);
+
+    virtual void    Update(void);
+
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
+
+    virtual void    SetRange(float min, float max);
+    virtual void    SetCurrValue(float v);
+
+    /// Export ONLY
+
+    void    SetControls(pfGUIButtonMod* up, pfGUIButtonMod* down) {
+        fUpControl = up;
+        fDownControl = down;
+    }
 };
 
 #endif // _pfGUIUpDownPairMod_h

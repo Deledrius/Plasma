@@ -55,7 +55,7 @@ bool plZlibCompress::Uncompress(uint8_t* bufOut, uint32_t* bufLenOut, const uint
 bool plZlibCompress::Compress(uint8_t* bufOut, uint32_t* bufLenOut, const uint8_t* bufIn, uint32_t bufLenIn)
 {
     // according to compress doc, the bufOut buffer should be at least .1% larger than source buffer, plus 12 bytes.
-    hsAssert(*bufLenOut>=(int)(bufLenIn*1.1+12), "bufOut compress buffer is not large enough");
+    hsAssert(*bufLenOut >= (int)(bufLenIn * 1.1 + 12), "bufOut compress buffer is not large enough");
     unsigned long buflen_out = *bufLenOut;
     bool result = (compress(bufOut, &buflen_out, bufIn, bufLenIn) == Z_OK);
     *bufLenOut = buflen_out;
@@ -67,18 +67,18 @@ bool plZlibCompress::Compress(uint8_t* bufOut, uint32_t* bufLenOut, const uint8_
 //
 bool plZlibCompress::ICopyBuffers(uint8_t** bufIn, uint32_t* bufLenIn, char* bufOut, uint32_t bufLenOut, int offset, bool ok)
 {
-    if (ok)
-    {
-        *bufLenIn = bufLenOut+offset;
+    if (ok) {
+        *bufLenIn = bufLenOut + offset;
         uint8_t* newBuf = new uint8_t[*bufLenIn];           // alloc new buffer
         HSMemory::BlockMove(*bufIn, newBuf, offset);    // copy offset (uncompressed) part
         delete [] *bufIn;                               // delete original buffer
 
-        HSMemory::BlockMove(bufOut, newBuf+offset, bufLenOut);  // copy compressed part
+        HSMemory::BlockMove(bufOut, newBuf + offset, bufLenOut); // copy compressed part
         delete [] bufOut;
         *bufIn = newBuf;
         return true;
     }
+
     delete [] bufOut;
     return false;
 }
@@ -93,11 +93,11 @@ bool plZlibCompress::Compress(uint8_t** bufIn, uint32_t* bufLenIn, int offset)
     uint8_t* adjBufIn = *bufIn + offset;
 
     // according to compress doc, the bufOut buffer should be at least .1% larger than source buffer, plus 12 bytes.
-    uint32_t bufLenOut = (int)(adjBufLenIn*1.1+12);
+    uint32_t bufLenOut = (int)(adjBufLenIn * 1.1 + 12);
     char* bufOut = new char[bufLenOut];
-    
-    bool ok=(Compress((uint8_t*)bufOut, &bufLenOut, (uint8_t*)adjBufIn, adjBufLenIn) && 
-        bufLenOut < adjBufLenIn);
+
+    bool ok = (Compress((uint8_t*)bufOut, &bufLenOut, (uint8_t*)adjBufIn, adjBufLenIn) &&
+               bufLenOut < adjBufLenIn);
     return ICopyBuffers(bufIn, bufLenIn, bufOut, bufLenOut, offset, ok);
 }
 
@@ -110,8 +110,8 @@ bool plZlibCompress::Uncompress(uint8_t** bufIn, uint32_t* bufLenIn, uint32_t bu
     uint8_t* adjBufIn = *bufIn + offset;
 
     char* bufOut = new char[bufLenOut];
-    
-    bool ok=Uncompress((uint8_t*)bufOut, &bufLenOut, (uint8_t*)adjBufIn, adjBufLenIn) ? true : false;
+
+    bool ok = Uncompress((uint8_t*)bufOut, &bufLenOut, (uint8_t*)adjBufIn, adjBufLenIn) ? true : false;
     return ICopyBuffers(bufIn, bufLenIn, bufOut, bufLenOut, offset, ok);
 }
 
@@ -120,51 +120,55 @@ bool plZlibCompress::Uncompress(uint8_t** bufIn, uint32_t* bufLenIn, uint32_t bu
 #define kGzBufferSize   64 * 1024
 #if 1
 
-bool  plZlibCompress::UncompressFile( const char *compressedPath, const char *destPath )
+bool  plZlibCompress::UncompressFile(const char* compressedPath, const char* destPath)
 {
     gzFile  inFile;
-    FILE    *outFile;
+    FILE*    outFile;
     bool    worked = false;
     int     length, err;
 
     uint8_t   buffer[ kGzBufferSize ];
 
 
-    outFile = fopen( destPath, "wb" );
-    if( outFile != nil )
-    {
-        inFile = gzopen( compressedPath, "rb" );
-        if( inFile != nil )
-        {
-            for( ;; )
-            {
-                length = gzread( inFile, buffer, sizeof( buffer ) );
-                if( length < 0 )
-                {
-                    gzerror( inFile, &err );
+    outFile = fopen(destPath, "wb");
+
+    if (outFile != nil) {
+        inFile = gzopen(compressedPath, "rb");
+
+        if (inFile != nil) {
+            for (;;) {
+                length = gzread(inFile, buffer, sizeof(buffer));
+
+                if (length < 0) {
+                    gzerror(inFile, &err);
                     break;
                 }
-                if( length == 0 )
-                {
+
+                if (length == 0) {
                     worked = true;
                     break;
                 }
-                if( fwrite( buffer, 1, length, outFile ) != length )
+
+                if (fwrite(buffer, 1, length, outFile) != length) {
                     break;
+                }
             }
-            if( gzclose( inFile ) != Z_OK )
+
+            if (gzclose(inFile) != Z_OK) {
                 worked = false;
+            }
         }
-        fclose( outFile );
+
+        fclose(outFile);
     }
 
     return worked;
 }
 
 
-bool  plZlibCompress::CompressFile( const char *uncompressedPath, const char *destPath )
+bool  plZlibCompress::CompressFile(const char* uncompressedPath, const char* destPath)
 {
-    FILE    *inFile;
+    FILE*    inFile;
     gzFile  outFile;
     bool    worked = false;
     int     length, err;
@@ -172,33 +176,36 @@ bool  plZlibCompress::CompressFile( const char *uncompressedPath, const char *de
     uint8_t   buffer[ kGzBufferSize ];
 
 
-    inFile = fopen( uncompressedPath, "rb" );
-    if( inFile != nil )
-    {
-        outFile = gzopen( destPath, "wb" );
-        if( outFile != nil )
-        {
-            for( ;; )
-            {
-                length = fread( buffer, 1, sizeof( buffer ), inFile );
-                if( ferror( inFile ) )
-                    break;
+    inFile = fopen(uncompressedPath, "rb");
 
-                if( length == 0 )
-                {
+    if (inFile != nil) {
+        outFile = gzopen(destPath, "wb");
+
+        if (outFile != nil) {
+            for (;;) {
+                length = fread(buffer, 1, sizeof(buffer), inFile);
+
+                if (ferror(inFile)) {
+                    break;
+                }
+
+                if (length == 0) {
                     worked = true;
                     break;
                 }
-                if( gzwrite( outFile, buffer, (unsigned)length ) != length )
-                {
-                    gzerror( outFile, &err );
+
+                if (gzwrite(outFile, buffer, (unsigned)length) != length) {
+                    gzerror(outFile, &err);
                     break;
                 }
             }
-            if( gzclose( outFile ) != Z_OK )
+
+            if (gzclose(outFile) != Z_OK) {
                 worked = false;
+            }
         }
-        fclose( inFile );
+
+        fclose(inFile);
     }
 
     return worked;
@@ -207,7 +214,7 @@ bool  plZlibCompress::CompressFile( const char *uncompressedPath, const char *de
 
 //// file <-> stream ///////////////////////////////////////////////////////
 
-bool  plZlibCompress::UncompressToStream( const char * filename, hsStream * s )
+bool  plZlibCompress::UncompressToStream(const char* filename, hsStream* s)
 {
     gzFile  inFile;
     bool    worked = false;
@@ -216,33 +223,35 @@ bool  plZlibCompress::UncompressToStream( const char * filename, hsStream * s )
     uint8_t   buffer[ kGzBufferSize ];
 
 
-    inFile = gzopen( filename, "rb" );
-    if( inFile != nil )
-    {
-        for( ;; )
-        {
-            length = gzread( inFile, buffer, sizeof( buffer ) );
-            if( length < 0 )
-            {
-                gzerror( inFile, &err );
+    inFile = gzopen(filename, "rb");
+
+    if (inFile != nil) {
+        for (;;) {
+            length = gzread(inFile, buffer, sizeof(buffer));
+
+            if (length < 0) {
+                gzerror(inFile, &err);
                 break;
             }
-            if( length == 0 )
-            {
+
+            if (length == 0) {
                 worked = true;
                 break;
             }
-            s->Write( length, buffer );
+
+            s->Write(length, buffer);
         }
-        if( gzclose( inFile ) != Z_OK )
+
+        if (gzclose(inFile) != Z_OK) {
             worked = false;
+        }
     }
 
     return worked;
 }
 
 
-bool  plZlibCompress::CompressToFile( hsStream * s, const char * filename )
+bool  plZlibCompress::CompressToFile(hsStream* s, const char* filename)
 {
     gzFile  outFile;
     bool    worked = false;
@@ -251,36 +260,34 @@ bool  plZlibCompress::CompressToFile( hsStream * s, const char * filename )
     uint8_t   buffer[ kGzBufferSize ];
 
 
-    outFile = gzopen( filename, "wb" );
-    if( outFile != nil )
-    {
-        for( ;; )
-        {
-            int avail = s->GetEOF()-s->GetPosition();
-            int n = ( avail>sizeof( buffer ) ) ? sizeof( buffer ) : avail;
+    outFile = gzopen(filename, "wb");
 
-            if( n == 0 )
-            {
+    if (outFile != nil) {
+        for (;;) {
+            int avail = s->GetEOF() - s->GetPosition();
+            int n = (avail > sizeof(buffer)) ? sizeof(buffer) : avail;
+
+            if (n == 0) {
                 worked = true;
                 break;
             }
 
-            length = s->Read( n, buffer );
+            length = s->Read(n, buffer);
 
-            if( length == 0 )
-            {
+            if (length == 0) {
                 worked = true;
                 break;
             }
 
-            if( gzwrite( outFile, buffer, (unsigned)length ) != length )
-            {
-                gzerror( outFile, &err );
+            if (gzwrite(outFile, buffer, (unsigned)length) != length) {
+                gzerror(outFile, &err);
                 break;
             }
         }
-        if( gzclose( outFile ) != Z_OK )
+
+        if (gzclose(outFile) != Z_OK) {
             worked = false;
+        }
     }
 
     return worked;

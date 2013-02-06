@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetProtocol/Private/Protocols/Cli2Game/pnNpCli2Game.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNNETPROTOCOL_PRIVATE_PROTOCOLS_CLI2GAME_PNNPCLI2GAME_H
@@ -62,7 +62,7 @@ enum {
     // Game
     kCli2Game_PropagateBuffer,
     kCli2Game_GameMgrMsg,
-    
+
     kNumCli2GameMessages
 };
 static_assert(kNumCli2GameMessages <= 0xFFFF, "Cli2Game message types overflow uint16");
@@ -77,7 +77,7 @@ enum {
     // Game
     kGame2Cli_PropagateBuffer,
     kGame2Cli_GameMgrMsg,
-    
+
     kNumGame2CliMessages
 };
 static_assert(kNumGame2CliMessages <= 0xFFFF, "Game2Cli message types overflow uint16");
@@ -156,7 +156,7 @@ struct Cli2Game_GameMgrMsg {
 
 // PingReply
 extern const NetMsg kNetMsg_Game2Cli_PingReply;
-struct Game2Cli_PingReply{
+struct Game2Cli_PingReply {
     uint32_t       messageId;
     uint32_t       pingTimeMs;
 };

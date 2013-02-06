@@ -77,65 +77,73 @@ pfGUIProgressCtrl::pfGUIProgressCtrl() : fStopSoundTimer(99)
 
 //// IEval ///////////////////////////////////////////////////////////////////
 
-bool    pfGUIProgressCtrl::IEval( double secs, float del, uint32_t dirty )
+bool    pfGUIProgressCtrl::IEval(double secs, float del, uint32_t dirty)
 {
-    return pfGUIValueCtrl::IEval( secs, del, dirty );
+    return pfGUIValueCtrl::IEval(secs, del, dirty);
 }
 
 //// MsgReceive //////////////////////////////////////////////////////////////
 
-bool    pfGUIProgressCtrl::MsgReceive( plMessage *msg )
+bool    pfGUIProgressCtrl::MsgReceive(plMessage* msg)
 {
-    plTimerCallbackMsg *timerMsg = plTimerCallbackMsg::ConvertNoRef(msg);
-    if (timerMsg)
-    {
-        if (timerMsg->fID == fStopSoundTimer)
-        {
+    plTimerCallbackMsg* timerMsg = plTimerCallbackMsg::ConvertNoRef(msg);
+
+    if (timerMsg) {
+        if (timerMsg->fID == fStopSoundTimer) {
             // we've finished animating, stop the sound that's playing
             StopSound(kAnimateSound);
         }
     }
-    return pfGUIValueCtrl::MsgReceive( msg );
+
+    return pfGUIValueCtrl::MsgReceive(msg);
 }
 
 //// Read/Write //////////////////////////////////////////////////////////////
 
-void    pfGUIProgressCtrl::Read( hsStream *s, hsResMgr *mgr )
+void    pfGUIProgressCtrl::Read(hsStream* s, hsResMgr* mgr)
 {
     pfGUIValueCtrl::Read(s, mgr);
 
     fAnimationKeys.Reset();
     uint32_t i, count = s->ReadLE32();
-    for( i = 0; i < count; i++ )
-        fAnimationKeys.Append( mgr->ReadKey( s ) );
+
+    for (i = 0; i < count; i++) {
+        fAnimationKeys.Append(mgr->ReadKey(s));
+    }
+
     fAnimName = s->ReadSafeString_TEMP();
 
     fAnimTimesCalced = false;
 }
 
-void    pfGUIProgressCtrl::Write( hsStream *s, hsResMgr *mgr )
+void    pfGUIProgressCtrl::Write(hsStream* s, hsResMgr* mgr)
 {
-    pfGUIValueCtrl::Write( s, mgr );
+    pfGUIValueCtrl::Write(s, mgr);
 
     uint32_t i, count = fAnimationKeys.GetCount();
-    s->WriteLE32( count );
-    for( i = 0; i < count; i++ )
-        mgr->WriteKey( s, fAnimationKeys[ i ] );
-    s->WriteSafeString( fAnimName );
+    s->WriteLE32(count);
+
+    for (i = 0; i < count; i++) {
+        mgr->WriteKey(s, fAnimationKeys[ i ]);
+    }
+
+    s->WriteSafeString(fAnimName);
 }
 
 //// UpdateBounds ////////////////////////////////////////////////////////////
 
-void    pfGUIProgressCtrl::UpdateBounds( hsMatrix44 *invXformMatrix, bool force )
+void    pfGUIProgressCtrl::UpdateBounds(hsMatrix44* invXformMatrix, bool force)
 {
-    pfGUIValueCtrl::UpdateBounds( invXformMatrix, force );
-    if( fAnimationKeys.GetCount() > 0 )
+    pfGUIValueCtrl::UpdateBounds(invXformMatrix, force);
+
+    if (fAnimationKeys.GetCount() > 0) {
         fBoundsValid = false;
+    }
 }
 
 //// SetAnimationKeys ////////////////////////////////////////////////////////
 
-void    pfGUIProgressCtrl::SetAnimationKeys( hsTArray<plKey> &keys, const plString &name )
+void    pfGUIProgressCtrl::SetAnimationKeys(hsTArray<plKey>& keys, const plString& name)
 {
     fAnimationKeys = keys;
     fAnimName = name;
@@ -145,47 +153,56 @@ void    pfGUIProgressCtrl::SetAnimationKeys( hsTArray<plKey> &keys, const plStri
 //  Loops through and computes the max begin and end for our animations. If
 //  none of them are loaded and we're not already calced, returns false.
 
-bool    pfGUIProgressCtrl::ICalcAnimTimes( void )
+bool    pfGUIProgressCtrl::ICalcAnimTimes(void)
 {
-    if( fAnimTimesCalced )
+    if (fAnimTimesCalced) {
         return true;
+    }
 
     float tBegin = 1e30, tEnd = -1e30;
     bool     foundOne = false;
 
-    for( int i = 0; i < fAnimationKeys.GetCount(); i++ )
-    {
+    for (int i = 0; i < fAnimationKeys.GetCount(); i++) {
         // Handle AGMasterMods
-        plAGMasterMod *mod = plAGMasterMod::ConvertNoRef( fAnimationKeys[ i ]->ObjectIsLoaded() );
-        if( mod != nil )
-        {
-            for( int j = 0; j < mod->GetNumAnimations(); j++ )
-            {
-                float begin = mod->GetAnimInstance( j )->GetTimeConvert()->GetBegin();
-                float end = mod->GetAnimInstance( j )->GetTimeConvert()->GetEnd();
-                if( begin < tBegin )
+        plAGMasterMod* mod = plAGMasterMod::ConvertNoRef(fAnimationKeys[ i ]->ObjectIsLoaded());
+
+        if (mod != nil) {
+            for (int j = 0; j < mod->GetNumAnimations(); j++) {
+                float begin = mod->GetAnimInstance(j)->GetTimeConvert()->GetBegin();
+                float end = mod->GetAnimInstance(j)->GetTimeConvert()->GetEnd();
+
+                if (begin < tBegin) {
                     tBegin = begin;
-                if( end > tEnd )
+                }
+
+                if (end > tEnd) {
                     tEnd = end;
+                }
             }
+
             foundOne = true;
         }
+
         // Handle layer animations
-        plLayerAnimation *layer = plLayerAnimation::ConvertNoRef( fAnimationKeys[ i ]->ObjectIsLoaded() );
-        if( layer != nil )
-        {
+        plLayerAnimation* layer = plLayerAnimation::ConvertNoRef(fAnimationKeys[ i ]->ObjectIsLoaded());
+
+        if (layer != nil) {
             float begin = layer->GetTimeConvert().GetBegin();
             float end = layer->GetTimeConvert().GetEnd();
-            if( begin < tBegin )
+
+            if (begin < tBegin) {
                 tBegin = begin;
-            if( end > tEnd )
+            }
+
+            if (end > tEnd) {
                 tEnd = end;
+            }
+
             foundOne = true;
         }
     }
 
-    if( foundOne )
-    {
+    if (foundOne) {
         fAnimBegin = tBegin;
         fAnimEnd = tEnd;
 
@@ -197,60 +214,57 @@ bool    pfGUIProgressCtrl::ICalcAnimTimes( void )
 
 //// SetCurrValue ////////////////////////////////////////////////////////////
 
-void    pfGUIProgressCtrl::SetCurrValue( float v )
+void    pfGUIProgressCtrl::SetCurrValue(float v)
 {
     int old = (int)fValue;
 
-    pfGUIValueCtrl::SetCurrValue( v );
+    pfGUIValueCtrl::SetCurrValue(v);
 
 //  if( old == (int)fValue )
 //      return;
 
-    if( fAnimationKeys.GetCount() > 0 )
-    {
+    if (fAnimationKeys.GetCount() > 0) {
         ICalcAnimTimes();
 
         float tLength = fAnimEnd - fAnimBegin;
         float newTime;
 
-        if( HasFlag( kReverseValues ) )
-            newTime = ( ( fMax - fValue ) / ( fMax - fMin ) ) * tLength + fAnimBegin;
-        else
-            newTime = ( ( fValue - fMin ) / ( fMax - fMin ) ) * tLength + fAnimBegin;
+        if (HasFlag(kReverseValues)) {
+            newTime = ((fMax - fValue) / (fMax - fMin)) * tLength + fAnimBegin;
+        } else {
+            newTime = ((fValue - fMin) / (fMax - fMin)) * tLength + fAnimBegin;
+        }
 
-        plAnimCmdMsg *msg = new plAnimCmdMsg();
-        msg->SetCmd( plAnimCmdMsg::kGoToTime ); 
-        msg->SetAnimName( fAnimName );
+        plAnimCmdMsg* msg = new plAnimCmdMsg();
+        msg->SetCmd(plAnimCmdMsg::kGoToTime);
+        msg->SetAnimName(fAnimName);
         msg->fTime = newTime;
-        msg->AddReceivers( fAnimationKeys );
-        plgDispatch::MsgSend( msg );
+        msg->AddReceivers(fAnimationKeys);
+        plgDispatch::MsgSend(msg);
     }
 }
 
-void pfGUIProgressCtrl::AnimateToPercentage( float percent )
+void pfGUIProgressCtrl::AnimateToPercentage(float percent)
 {
     // percent should be a value in range 0.0 to 1.0
-    if (percent >= 0.0f && percent <= 1.0f)
-    {
-        pfGUIValueCtrl::SetCurrValue( (fMax - fMin) * percent + fMin );
+    if (percent >= 0.0f && percent <= 1.0f) {
+        pfGUIValueCtrl::SetCurrValue((fMax - fMin) * percent + fMin);
 
-        if( fAnimationKeys.GetCount() > 0 )
-        {
-            plAnimCmdMsg *msg = new plAnimCmdMsg();
-            msg->SetCmd( plAnimCmdMsg::kPlayToPercentage ); 
-            msg->SetAnimName( fAnimName );
+        if (fAnimationKeys.GetCount() > 0) {
+            plAnimCmdMsg* msg = new plAnimCmdMsg();
+            msg->SetCmd(plAnimCmdMsg::kPlayToPercentage);
+            msg->SetAnimName(fAnimName);
             msg->fTime = percent;
-            msg->AddReceivers( fAnimationKeys );
-            plgDispatch::MsgSend( msg );
+            msg->AddReceivers(fAnimationKeys);
+            plgDispatch::MsgSend(msg);
 
-            if (fPlaySound)
-            {
+            if (fPlaySound) {
                 // play the sound, looping
                 PlaySound(kAnimateSound, true);
 
                 // setup a timer to call back when we finish animating
                 float elapsedTime = (fAnimEnd - fAnimBegin) * percent;
-                plTimerCallbackMsg *timerMsg = new plTimerCallbackMsg(GetKey(), fStopSoundTimer);
+                plTimerCallbackMsg* timerMsg = new plTimerCallbackMsg(GetKey(), fStopSoundTimer);
                 plgTimerCallbackMgr::NewTimer(elapsedTime, timerMsg);
             }
         }

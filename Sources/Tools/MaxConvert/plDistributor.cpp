@@ -50,7 +50,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include <stdmat.h>
 #include <bmmlib.h>
 #include <iparamb2.h>
-#include <meshdlib.h> 
+#include <meshdlib.h>
 #pragma hdrstop
 
 #include "MaxExport/plExportProgressBar.h"
@@ -75,7 +75,7 @@ static const float kMaxHeight = 10.f;
 //  rnd pos radius  - replicants spread uniformly about nominal spacing by +- radius
 //  alignment vector- preferred up direction for replicants
 //  alignment weight- weight between alignment vector and interpolated face normal
-//  normal range    - amount to randomize the weighted normal 
+//  normal range    - amount to randomize the weighted normal
 //  normal bunch    - amount randomized normals bunch around input normal
 //  rotation range  - amount to randomize the azimuthal rotation about the randomized normal
 //  prob bitmap     - describes probability that a seed planted here on the surface will sprout
@@ -83,11 +83,17 @@ static const float kMaxHeight = 10.f;
 //  overall rnd     - overall probability that a candidate seed point (passing all other criteria) will be used
 //
 
-static inline hsPoint3& hsP3(const Point3& p) { return *(hsPoint3*)&p; }
-static inline hsVector3& hsV3(const Point3& p) { return *(hsVector3*)&p; }
+static inline hsPoint3& hsP3(const Point3& p)
+{
+    return *(hsPoint3*)&p;
+}
+static inline hsVector3& hsV3(const Point3& p)
+{
+    return *(hsVector3*)&p;
+}
 static inline Matrix3 Transpose(const Matrix3& m)
 {
-    return Matrix3(m.GetColumn3(0), m.GetColumn3(1), m.GetColumn3(2), Point3(0,0,0));
+    return Matrix3(m.GetColumn3(0), m.GetColumn3(1), m.GetColumn3(2), Point3(0, 0, 0));
 }
 
 plDistributor::plDistributor()
@@ -104,8 +110,9 @@ plDistributor::~plDistributor()
 void plDistributor::Reset()
 {
     // Let stuff go...
-    if( fSurfObjToDelete )
+    if (fSurfObjToDelete) {
         fSurfObjToDelete->DeleteThis();
+    }
 
     // Then clear
     IClear();
@@ -134,7 +141,7 @@ void plDistributor::IClear()
     fSpacing = 5.f;
     fRndPosRadius = 2.5f;
 
-    fAlignVec.Set(0,0,1.f);
+    fAlignVec.Set(0, 0, 1.f);
     fAlignWgt = 0;
 
     fOffsetMin = fOffsetMax = 0;
@@ -148,8 +155,8 @@ void plDistributor::IClear()
     fPolarBunch = 0;
 
     fScaleLock = kLockNone;
-    fScaleLo.Set(1.f,1.f,1.f);
-    fScaleHi.Set(1.f,1.f,1.f);
+    fScaleLo.Set(1.f, 1.f, 1.f);
+    fScaleHi.Set(1.f, 1.f, 1.f);
 
     fProbBitmapTex = nil;
     fProbLayerTex = nil;
@@ -167,71 +174,81 @@ void plDistributor::IClear()
     fAltProbHi = fAltProbLo = 0;
     fAltProbTrans = 0;
 
-    fFade.pmin = fFade.pmax = Point3(0,0,0);
+    fFade.pmin = fFade.pmax = Point3(0, 0, 0);
 
     fBone = nil;
 }
 
 BOOL plDistributor::IGetMesh(INode* node, TriObject*& objToDelete, Mesh*& retMesh) const
 {
-    if( objToDelete )
+    if (objToDelete) {
         objToDelete->DeleteThis();
+    }
 
     retMesh = nil;
     objToDelete = nil;
 
     // Get da object
-    Object *obj = node->EvalWorldState(TimeValue(0)).obj;
-    if( !obj )
-        return false;
+    Object* obj = node->EvalWorldState(TimeValue(0)).obj;
 
-    if( !obj->CanConvertToType( triObjectClassID ) )
+    if (!obj) {
         return false;
+    }
+
+    if (!obj->CanConvertToType(triObjectClassID)) {
+        return false;
+    }
 
     // Convert to triMesh object
-    TriObject   *meshObj = (TriObject*)obj->ConvertToType(TimeValue(0), triObjectClassID);
-    if( !meshObj )
-        return false;
+    TriObject*   meshObj = (TriObject*)obj->ConvertToType(TimeValue(0), triObjectClassID);
 
-    if( meshObj != obj )
+    if (!meshObj) {
+        return false;
+    }
+
+    if (meshObj != obj) {
         objToDelete = meshObj;
+    }
 
     // Get the mesh
     Mesh* mesh = &(meshObj->mesh);
-    if( !mesh->getNumFaces() )
-    {
-        if( objToDelete )
+
+    if (!mesh->getNumFaces()) {
+        if (objToDelete) {
             objToDelete->DeleteThis();
+        }
+
         objToDelete = nil;
         return false;
     }
 
     retMesh = mesh;
     retMesh->checkNormals(true);
-    
+
     return true;
 }
 
 void plDistributor::ISetAngProbCosines() const
 {
-    if( fAngProbHi == fAngProbLo )
+    if (fAngProbHi == fAngProbLo) {
         return;
+    }
 
     float maxAng, minAng;
-    if( fAngProbHi > fAngProbLo )
-    {
+
+    if (fAngProbHi > fAngProbLo) {
         maxAng = hsDegreesToRadians(fAngProbHi);
         minAng = hsDegreesToRadians(fAngProbLo);
-    }
-    else
-    {
+    } else {
         maxAng = hsDegreesToRadians(fAngProbLo);
         minAng = hsDegreesToRadians(fAngProbHi);
     }
 
     float transAng = hsDegreesToRadians(fAngProbTrans);
-    if( transAng > (maxAng - minAng) * 0.5f )
+
+    if (transAng > (maxAng - minAng) * 0.5f) {
         transAng = (maxAng - minAng) * 0.5f;
+    }
 
     float transAngMax = maxAng < M_PI ? transAng : 0;
     float transAngMin = minAng > 0 ? transAng : 0;
@@ -244,10 +261,10 @@ void plDistributor::ISetAngProbCosines() const
 
 BOOL plDistributor::ISetSurfaceNode(INode* surfNode) const
 {
-    if( !IGetMesh(surfNode, fSurfObjToDelete, fSurfMesh) )
-    {
+    if (!IGetMesh(surfNode, fSurfObjToDelete, fSurfMesh)) {
         return false;
     }
+
     fSurfNode = surfNode;
 
     fSurfToWorld = surfNode->GetObjectTM(TimeValue(0));
@@ -264,22 +281,23 @@ BOOL plDistributor::ISetSurfaceNode(INode* surfNode) const
 
     fSurfAlignVec = FNormalize(fWorldToSurfVec * fAlignVec);
 
-    if( INeedMeshTree() )
+    if (INeedMeshTree()) {
         IMakeMeshTree();
+    }
 
     return true;
 }
 
 BOOL plDistributor::INeedMeshTree() const
 {
-    switch( fConformity )
-    {
+    switch (fConformity) {
     case kConformAll:
     case kConformHeight:
     case kConformCheck:
     case kConformBase:
         return true;
     }
+
     return false;
 }
 
@@ -289,8 +307,8 @@ void plDistributor::IMakeMeshTree() const
 
     const Box3 nonFade = fMeshTree.NonFade();
     int i;
-    for( i = 0; i < fSurfMesh->getNumFaces(); i++ )
-    {
+
+    for (i = 0; i < fSurfMesh->getNumFaces(); i++) {
         Point3 p0 = fSurfMesh->getVert(fSurfMesh->faces[i].getVert(0)) * fSurfToWorld;
         Point3 p1 = fSurfMesh->getVert(fSurfMesh->faces[i].getVert(1)) * fSurfToWorld;
         Point3 p2 = fSurfMesh->getVert(fSurfMesh->faces[i].getVert(2)) * fSurfToWorld;
@@ -309,8 +327,8 @@ void plDistributor::IFindFaceSet(const Box3& box, Tab<int32_t>& faces) const
     Tab<int32_t> distNodes;
     fMeshTree.HarvestBox(box, distNodes);
     int i;
-    for( i = 0; i < distNodes.Count(); i++ )
-    {
+
+    for (i = 0; i < distNodes.Count(); i++) {
         int32_t iFace = int32_t(fMeshTree.GetBox(distNodes[i]).fIData);
         faces.Append(1, &iFace);
     }
@@ -318,14 +336,17 @@ void plDistributor::IFindFaceSet(const Box3& box, Tab<int32_t>& faces) const
 
 BOOL plDistributor::IValidateSettings(INode* surfNode, plMeshCacheTab& cache) const
 {
-    if( !fInterface )
+    if (!fInterface) {
         return false;
+    }
 
-    if( !ISetSurfaceNode(surfNode) )
+    if (!ISetSurfaceNode(surfNode)) {
         return false;
+    }
 
-    if( !IReadyRepNodes(cache) )
+    if (!IReadyRepNodes(cache)) {
         return false;
+    }
 
     return true;
 }
@@ -333,8 +354,9 @@ BOOL plDistributor::IValidateSettings(INode* surfNode, plMeshCacheTab& cache) co
 BOOL plDistributor::Distribute(INode* surfNode, plDistribInstTab& reps, plMeshCacheTab& cache, plExportProgressBar& bar) const
 {
     // Validate current settings.
-    if( !IValidateSettings(surfNode, cache) )
+    if (!IValidateSettings(surfNode, cache)) {
         return false;
+    }
 
 
     return IDistributeOverMesh(reps, cache, bar);
@@ -344,16 +366,17 @@ BOOL plDistributor::IDistributeOverMesh(plDistribInstTab& reps, plMeshCacheTab& 
 {
     int iUpdate = (fSurfMesh->getNumFaces() >> 4) + 1;
     int i;
-    for( i = 0; i < fSurfMesh->getNumFaces(); i++ )
-    {
+
+    for (i = 0; i < fSurfMesh->getNumFaces(); i++) {
         IDistributeOverFace(i, reps, cache);
 
-        if( ((i / iUpdate) * iUpdate) == i )
-        {
-            if( bar.Update(nil) )
+        if (((i / iUpdate) * iUpdate) == i) {
+            if (bar.Update(nil)) {
                 return false;
+            }
         }
     }
+
     return true;
 }
 
@@ -374,8 +397,8 @@ Box3 plDistributor::ISetupGrid(const Point3& p0, const Point3& p1, const Point3&
 
     Point3 mins, maxs;
     int i;
-    for( i = 0; i < 3; i++ )
-    {
+
+    for (i = 0; i < 3; i++) {
         float t = box.Min()[i];
         t /= fSpacing;
         t = floor(t);
@@ -386,8 +409,9 @@ Box3 plDistributor::ISetupGrid(const Point3& p0, const Point3& p1, const Point3&
         t /= fSpacing;
         t = ceil(t);
         t *= fSpacing;
-        maxs[i] = t + fSpacing*0.5f;
+        maxs[i] = t + fSpacing * 0.5f;
     }
+
     box = Box3(mins, maxs);
 
     return box;
@@ -402,32 +426,30 @@ bool plDistributor::IFailsProbBitmap(int iFace, const Point3& bary) const
     Matrix3 uvtrans(true);
     Bitmap* bm = nil;
     UINT filtType = BMM_FILTER_PYRAMID;
-    if( fProbBitmapTex )
-    {
+
+    if (fProbBitmapTex) {
         uvwChan = fProbBitmapTex->GetMapChannel();
         fProbBitmapTex->GetUVTransform(uvtrans);
 
         bm = fProbBitmapTex->GetBitmap(TimeValue(0));
 
-        if( bm && !bm->HasFilter() )
-        {
-            switch( fProbBitmapTex->GetFilterType() )
-            {
+        if (bm && !bm->HasFilter()) {
+            switch (fProbBitmapTex->GetFilterType()) {
             default:
             case FILTER_PYR:
                 filtType = BMM_FILTER_PYRAMID;
                 break;
+
             case FILTER_SAT:
                 filtType = BMM_FILTER_SUM;
                 break;
+
             case FILTER_NADA:
                 filtType = BMM_FILTER_NONE;
                 break;
             }
         }
-    }
-    else if( fProbLayerTex )
-    {
+    } else if (fProbLayerTex) {
         uvwChan = fProbLayerTex->GetMapChannel();
         fProbLayerTex->GetUVTransform(uvtrans);
 
@@ -435,19 +457,23 @@ bool plDistributor::IFailsProbBitmap(int iFace, const Point3& bary) const
 
     }
 
-    if( !bm )
+    if (!bm) {
         return false;
+    }
 
-    if( !bm->HasFilter() )
+    if (!bm->HasFilter()) {
         bm->SetFilter(filtType);
+    }
 
     bm->PrepareGChannels(&bm->Storage()->bi);
 
-    if( !fSurfMesh->mapSupport(uvwChan) )
+    if (!fSurfMesh->mapSupport(uvwChan)) {
         return false;
+    }
 
-    if( !fSurfMesh->mapFaces(uvwChan) || !fSurfMesh->mapVerts(uvwChan) )
+    if (!fSurfMesh->mapFaces(uvwChan) || !fSurfMesh->mapVerts(uvwChan)) {
         return false;
+    }
 
     // Lookup the appropriate texel value
     Point3 uvw;
@@ -458,63 +484,81 @@ bool plDistributor::IFailsProbBitmap(int iFace, const Point3& bary) const
     uvw = uvw * uvtrans;
 
     float fu = uvw.x - int(uvw.x);
-    if( fu < 0 )
+
+    if (fu < 0) {
         fu += 1.f;
+    }
+
     float fv = 1.0f - (uvw.y - int(uvw.y));
-    if( fv < 0 )
+
+    if (fv < 0) {
         fv += 1.f;
+    }
+
     float du = 1.f / bm->Width();
     float dv = 1.f / bm->Height();
 
     BMM_Color_fl evCol;
     bm->GetFiltered(fu, fv, du, dv, &evCol);
-    
+
     float frac;
-    switch( fProbColorChan )
-    {
+
+    switch (fProbColorChan) {
     case kRed:
         frac = evCol.r;
         break;
+
     case kGreen:
         frac = evCol.g;
         break;
+
     case kBlue:
         frac = evCol.b;
         break;
+
     case kAlpha:
         frac = evCol.a;
         break;
+
     case kAverageRedGreen:
         frac = (evCol.r + evCol.g) / 2.f;
         break;
+
     case kAverageRedGreenTimesAlpha:
         frac = (evCol.r + evCol.g) / 2.f * evCol.a;
         break;
+
     case kAverage:
-        frac = (evCol.r + evCol.g + evCol.b ) / 3.f;
+        frac = (evCol.r + evCol.g + evCol.b) / 3.f;
         break;
+
     case kAverageTimesAlpha:
-        frac = (evCol.r + evCol.g + evCol.b ) / 3.f * evCol.a;
+        frac = (evCol.r + evCol.g + evCol.b) / 3.f * evCol.a;
         break;
+
     case kMax:
     case kMaxColor:
         frac = hsMaximum(evCol.r, hsMaximum(evCol.g, evCol.b));
         break;
+
     case kMaxColorTimesAlpha:
         frac = hsMaximum(evCol.r, hsMaximum(evCol.g, evCol.b)) * evCol.a;
         break;
+
     case kMaxRedGreen:
         frac = hsMaximum(evCol.r, evCol.g);
         break;
+
     case kMaxRedGreenTimesAlpha:
         frac = hsMaximum(evCol.r, evCol.g) * evCol.a;
         break;
     }
 
-    if( fProbRemapFromHi != fProbRemapFromLo )
+    if (fProbRemapFromHi != fProbRemapFromLo) {
         frac = fProbRemapToLo + (frac - fProbRemapFromLo) / (fProbRemapFromHi - fProbRemapFromLo) * (fProbRemapToHi - fProbRemapToLo);
-    else
+    } else {
         frac = frac > fProbRemapFromHi ? fProbRemapToHi : fProbRemapToLo;
+    }
 
     return frac < fRand.RandZeroToOne();
 }
@@ -523,8 +567,7 @@ Point3 plDistributor::IGetSurfaceNormal(int iFace, const Point3& bary) const
 {
     fSurfMesh->checkNormals(true);
 
-    if( !fFaceNormals )
-    {
+    if (!fFaceNormals) {
         Face& face = fSurfMesh->faces[iFace];
         Point3 norm = FNormalize(fSurfMesh->getNormal(face.getVert(0))) * bary[0];
         norm += FNormalize(fSurfMesh->getNormal(face.getVert(1))) * bary[1];
@@ -539,27 +582,29 @@ Point3 plDistributor::IGetSurfaceNormal(int iFace, const Point3& bary) const
 
 bool plDistributor::IFailsAngProb(int iFace, const Point3& bary) const
 {
-    if( fAngProbLo == fAngProbHi )
+    if (fAngProbLo == fAngProbHi) {
         return false;
+    }
 
     Point3 norm = IGetSurfaceNormal(iFace, bary);
 
     float dot = DotProd(norm, fSurfAngProbVec);
 
-    if( dot > fCosAngProbHi )
+    if (dot > fCosAngProbHi) {
         return true;
-    if( dot < fCosAngProbLo )
-        return true;
+    }
 
-    if( dot > fCosAngProbHiTrans )
-    {
+    if (dot < fCosAngProbLo) {
+        return true;
+    }
+
+    if (dot > fCosAngProbHiTrans) {
         float prob = fCosAngProbHi - dot;
         prob /= fCosAngProbHi - fCosAngProbHiTrans;
         return fRand.RandZeroToOne() >= prob;
     }
 
-    if( dot < fCosAngProbLoTrans )
-    {
+    if (dot < fCosAngProbLoTrans) {
         float prob = dot - fCosAngProbLo;
         prob /= fCosAngProbLoTrans - fCosAngProbLo;
         return fRand.RandZeroToOne() >= prob;
@@ -571,8 +616,9 @@ bool plDistributor::IFailsAngProb(int iFace, const Point3& bary) const
 
 bool plDistributor::IFailsAltProb(int iFace, const Point3& bary) const
 {
-    if( fAltProbLo == fAltProbHi )
+    if (fAltProbLo == fAltProbHi) {
         return false;
+    }
 
     Face& face = fSurfMesh->faces[iFace];
     Point3 pos = fSurfMesh->getVert(fSurfMesh->faces[iFace].getVert(0)) * bary[0];
@@ -581,17 +627,20 @@ bool plDistributor::IFailsAltProb(int iFace, const Point3& bary) const
 
     pos = pos * fSurfToWorld;
 
-    if( pos.z > fAltProbHi )
+    if (pos.z > fAltProbHi) {
         return true;
-    if( pos.z < fAltProbLo )
+    }
+
+    if (pos.z < fAltProbLo) {
         return true;
-    if( pos.z < fAltProbLo + fAltProbTrans )
-    {
+    }
+
+    if (pos.z < fAltProbLo + fAltProbTrans) {
         float prob = (pos.z - fAltProbLo) / fAltProbTrans;
         return fRand.RandZeroToOne() >= prob;
     }
-    if( pos.z > fAltProbHi - fAltProbTrans )
-    {
+
+    if (pos.z > fAltProbHi - fAltProbTrans) {
         float prob = (fAltProbHi - pos.z) / fAltProbTrans;
         return fRand.RandZeroToOne() >= prob;
     }
@@ -605,37 +654,31 @@ bool plDistributor::IFailsAltProb(int iFace, const Point3& bary) const
 // Also a generic random factor.
 bool plDistributor::IProbablyDoIt(int iFace, Point3& del, const Point3& bary) const
 {
-    if( fRand.RandZeroToOne() >= fOverallProb )
-    {
+    if (fRand.RandZeroToOne() >= fOverallProb) {
         return false;
     }
 
-    if( (kIsoNone == fIsolation) || (kIsoLow == fIsolation) )
-    {
-        if( LengthSquared(del) >= fSpacing*fSpacing )
-        {
+    if ((kIsoNone == fIsolation) || (kIsoLow == fIsolation)) {
+        if (LengthSquared(del) >= fSpacing * fSpacing) {
             return false;
         }
 
         Point3 faceNorm = fSurfMesh->FaceNormal(iFace, FALSE);
-        if( DotProd(del, faceNorm) < 0 )
-        {
+
+        if (DotProd(del, faceNorm) < 0) {
             return false;
         }
     }
 
-    if( IFailsAngProb(iFace, bary) )
-    {
+    if (IFailsAngProb(iFace, bary)) {
         return false;
     }
 
-    if( IFailsAltProb(iFace, bary) )
-    {
+    if (IFailsAltProb(iFace, bary)) {
         return false;
     }
 
-    if( IFailsProbBitmap(iFace, bary) )
-    {
+    if (IFailsProbBitmap(iFace, bary)) {
         return false;
     }
 
@@ -647,12 +690,12 @@ Point3 plDistributor::IPerpAxis(const Point3& p) const
     const float kMinLengthSquared = 1.e-1f;
 
     int minAx = p.MinComponent();
-    Point3 ax(0,0,0);
+    Point3 ax(0, 0, 0);
     ax[minAx] = 1.f;
 
     Point3 perp = p ^ ax;
-    if( perp.LengthSquared() < kMinLengthSquared )
-    {
+
+    if (perp.LengthSquared() < kMinLengthSquared) {
         // hmm, think we might be screwed, but this shouldn't happen.
     }
 
@@ -667,17 +710,19 @@ Matrix3 plDistributor::IGenerateTransform(int iRepNode, int iFace, const Point3&
 
     // First, set the scale
     Point3 scale;
-    switch( fScaleLock )
-    {
+
+    switch (fScaleLock) {
     case kLockX | kLockY:
         scale.x = fRand.RandRangeF(fScaleLo.x, fScaleHi.x);
         scale.y = scale.x;
         scale.z = fRand.RandRangeF(fScaleLo.z, fScaleHi.z);
         break;
+
     case kLockX | kLockY | kLockZ:
         scale.x = fRand.RandRangeF(fScaleLo.x, fScaleHi.x);
         scale.y = scale.z = scale.x;
         break;
+
     default:
         scale.x = fRand.RandRangeF(fScaleLo.x, fScaleHi.x);
         scale.y = fRand.RandRangeF(fScaleLo.y, fScaleHi.y);
@@ -706,15 +751,16 @@ Matrix3 plDistributor::IGenerateTransform(int iRepNode, int iFace, const Point3&
     alignVec = FNormalize(alignVec);
 
     Point3 norm = surfNorm + (alignVec - surfNorm) * fAlignWgt;
+
     // The norm can come out of this zero length, if the surace normal
     // is directly opposite the "natural" up direction and the weight
     // is 50% (for example). In that case, this is just a bad place
     // to drop this replicant.
-    if( norm.LengthSquared() < kMinVecLengthSq )
-    {
+    if (norm.LengthSquared() < kMinVecLengthSq) {
         l2w.IdentityMatrix();
         return l2w;
     }
+
     norm = norm.Normalize();
 
     // Randomize through the cone around that.
@@ -724,8 +770,11 @@ Matrix3 plDistributor::IGenerateTransform(int iRepNode, int iFace, const Point3&
     rndDir *= fRand.RandMinusOneToOne();
     float len = sqrt(1.f - rndDir.LengthSquared());
     rndOut *= len;
-    if( fRand.RandMinusOneToOne() < 0 )
+
+    if (fRand.RandMinusOneToOne() < 0) {
         rndOut *= -1.f;
+    }
+
     Point3 rndPol = rndDir + rndOut;
 
     float polScale = fRand.RandZeroToOne() * fTanPolarRange;
@@ -741,19 +790,17 @@ Matrix3 plDistributor::IGenerateTransform(int iRepNode, int iFace, const Point3&
     Point3 dir = repNodeTM.GetRow(1);
     dir = dir * fWorldToSurfVec;
     Point3 out = dir ^ norm;
-    if( out.LengthSquared() < kMinVecLengthSq )
-    {
-        if( fAzimuthRange < M_PI * 0.5f )
-        {
+
+    if (out.LengthSquared() < kMinVecLengthSq) {
+        if (fAzimuthRange < M_PI * 0.5f) {
             l2w.IdentityMatrix();
             return l2w;
-        }
-        else
-        {
+        } else {
             dir = IPerpAxis(norm);
             out = dir ^ norm;
         }
     }
+
     out = FNormalize(out);
     dir = norm ^ out;
 
@@ -766,22 +813,22 @@ Matrix3 plDistributor::IGenerateTransform(int iRepNode, int iFace, const Point3&
     // exactly opposed to the destination normal. This usually means the
     // surface normal is directly opposite the alignVec. In that
     // case, we just want to bag it.
-    if( DotProd(norm, surfNorm) < 0 )
-    {
+    if (DotProd(norm, surfNorm) < 0) {
         dir = surfNorm;
         dir = dir.Normalize();
         out = dir ^ norm;
-        if( out.LengthSquared() < kMinVecLengthSq )
-        {
+
+        if (out.LengthSquared() < kMinVecLengthSq) {
             l2w.IdentityMatrix();
             return l2w;
         }
+
         out = out.Normalize();
         norm = out ^ dir;
     }
 
     Matrix3 align;
-    align.Set(out, dir, norm, Point3(0,0,0));
+    align.Set(out, dir, norm, Point3(0, 0, 0));
 
     l2w = l2w * align;
 
@@ -799,10 +846,11 @@ Matrix3 plDistributor::IGenerateTransform(int iRepNode, int iFace, const Point3&
 
 int plDistributor::ISelectRepNode() const
 {
-    if( fRepNodes.Count() < 2 )
+    if (fRepNodes.Count() < 2) {
         return 0;
+    }
 
-    int i = fRand.RandRangeI(0, fRepNodes.Count()-1);
+    int i = fRand.RandRangeI(0, fRepNodes.Count() - 1);
 
     return i;
 }
@@ -811,10 +859,10 @@ BOOL plDistributor::ISetupNormals(plMaxNode* node, Mesh* mesh, BOOL radiateNorm)
 {
     const char* dbgNodeName = node->GetName();
 
-    UVVert *normMap = mesh->mapVerts(kNormMapChan); 
+    UVVert* normMap = mesh->mapVerts(kNormMapChan);
     int numNormVerts = mesh->getNumMapVerts(kNormMapChan);
-    if( !mesh->mapSupport(kNormMapChan) || !mesh->mapVerts(kNormMapChan) || !mesh->mapFaces(kNormMapChan) )
-    {
+
+    if (!mesh->mapSupport(kNormMapChan) || !mesh->mapVerts(kNormMapChan) || !mesh->mapFaces(kNormMapChan)) {
         mesh->setMapSupport(kNormMapChan);
 
         mesh->setNumMapVerts(kNormMapChan, mesh->getNumVerts());
@@ -822,27 +870,23 @@ BOOL plDistributor::ISetupNormals(plMaxNode* node, Mesh* mesh, BOOL radiateNorm)
     }
 
     int i;
-    if( radiateNorm )
-    {
+
+    if (radiateNorm) {
         Matrix3 otm = node->GetOTM();
         Matrix3 invOtm = Inverse(otm);
-        invOtm.SetTrans(Point3(0,0,0));
+        invOtm.SetTrans(Point3(0, 0, 0));
         invOtm.ValidateFlags();
 
-        for( i = 0; i < mesh->getNumVerts(); i++ )
-        {
+        for (i = 0; i < mesh->getNumVerts(); i++) {
             Point3 pos = mesh->getVert(i) * otm;
             pos = pos * invOtm;
 
             mesh->setMapVert(kNormMapChan, i, pos);
         }
-    }
-    else
-    {
+    } else {
         mesh->checkNormals(true);
 
-        for( i = 0; i < mesh->getNumVerts(); i++ )
-        {
+        for (i = 0; i < mesh->getNumVerts(); i++) {
             Point3 norm = mesh->getNormal(i);
 
             mesh->setMapVert(kNormMapChan, i, norm);
@@ -851,8 +895,8 @@ BOOL plDistributor::ISetupNormals(plMaxNode* node, Mesh* mesh, BOOL radiateNorm)
 
     TVFace* mapFaces = mesh->mapFaces(kNormMapChan);
     Face* faces = mesh->faces;
-    for( i = 0; i < mesh->getNumFaces(); i++ )
-    {
+
+    for (i = 0; i < mesh->getNumFaces(); i++) {
         mapFaces[i].setTVerts(faces[i].getVert(0), faces[i].getVert(1), faces[i].getVert(2));
     }
 
@@ -870,16 +914,19 @@ BOOL plDistributor::ISetupSkinWeights(plMaxNode* node, Mesh* mesh, const Point3&
 
     float meshHeight = bnd.Max().z;
     float maxHeight = kMaxHeight;
-    if( meshHeight > maxHeight )
+
+    if (meshHeight > maxHeight) {
         maxHeight = meshHeight;
+    }
+
     float maxNorm = meshHeight / maxHeight;
 
     float flexibility = flex[0];
 
-    UVVert *wgtMap = mesh->mapVerts(kWgtMapChan);   
+    UVVert* wgtMap = mesh->mapVerts(kWgtMapChan);
     int numWgtVerts = mesh->getNumMapVerts(kWgtMapChan);
-    if( !mesh->mapSupport(kWgtMapChan) || !mesh->mapVerts(kWgtMapChan) || !mesh->mapFaces(kWgtMapChan) )
-    {
+
+    if (!mesh->mapSupport(kWgtMapChan) || !mesh->mapVerts(kWgtMapChan) || !mesh->mapFaces(kWgtMapChan)) {
         mesh->setMapSupport(kWgtMapChan);
 
         mesh->setNumMapVerts(kWgtMapChan, mesh->getNumVerts());
@@ -887,8 +934,8 @@ BOOL plDistributor::ISetupSkinWeights(plMaxNode* node, Mesh* mesh, const Point3&
     }
 
     int i;
-    for( i = 0; i < mesh->getNumVerts(); i++ )
-    {
+
+    for (i = 0; i < mesh->getNumVerts(); i++) {
         Point3 pos = mesh->getVert(i) * otm;
         float wgt = pos.z / meshHeight;
         wgt *= wgt > 0 ? wgt : 0;
@@ -904,8 +951,8 @@ BOOL plDistributor::ISetupSkinWeights(plMaxNode* node, Mesh* mesh, const Point3&
 
     TVFace* mapFaces = mesh->mapFaces(kWgtMapChan);
     Face* faces = mesh->faces;
-    for( i = 0; i < mesh->getNumFaces(); i++ )
-    {
+
+    for (i = 0; i < mesh->getNumFaces(); i++) {
         mapFaces[i].setTVerts(faces[i].getVert(0), faces[i].getVert(1), faces[i].getVert(2));
     }
 
@@ -923,17 +970,17 @@ BOOL plDistributor::IDuplicate2Sided(plMaxNode* node, Mesh* mesh) const
     int origNumFaces = mesh->getNumFaces();
 
     int i;
-    for( i = 0; i < mesh->getNumFaces(); i++ )
-    {
-        if( hsMaterialConverter::IsTwoSided(mtl, mesh->faces[i].getMatID()) )
-        {
+
+    for (i = 0; i < mesh->getNumFaces(); i++) {
+        if (hsMaterialConverter::IsTwoSided(mtl, mesh->faces[i].getMatID())) {
             num2Sided++;
             faces.Set(i);
         }
     }
 
-    if( !num2Sided )
+    if (!num2Sided) {
         return false;
+    }
 
     MeshDelta meshDelta(*mesh);
     meshDelta.CloneFaces(*mesh, faces);
@@ -947,10 +994,10 @@ BOOL plDistributor::IDuplicate2Sided(plMaxNode* node, Mesh* mesh) const
 
     hsAssert(origNumFaces + num2Sided == mesh->getNumFaces(), "Whoa, lost or gained, unexpected");
 
-    for( i = origNumFaces; i < mesh->getNumFaces(); i++ )
-    {
+    for (i = origNumFaces; i < mesh->getNumFaces(); i++) {
         meshDelta.FlipNormal(*mesh, i);
     }
+
     meshDelta.Apply(*mesh);
 
     return true;
@@ -959,12 +1006,12 @@ BOOL plDistributor::IDuplicate2Sided(plMaxNode* node, Mesh* mesh) const
 BOOL plDistributor::IReadyRepNodes(plMeshCacheTab& cache) const
 {
     int i;
-    for( i = 0; i < fRepNodes.Count(); i++ )
-    {
+
+    for (i = 0; i < fRepNodes.Count(); i++) {
         Mesh* mesh = nil;
         TriObject* obj = nil;
-        if( IGetMesh(fRepNodes[i], obj, mesh) )
-        {
+
+        if (IGetMesh(fRepNodes[i], obj, mesh)) {
             plMaxNode* repNode = (plMaxNode*)fRepNodes[i];
 
             int iCache = cache.Count();
@@ -972,18 +1019,17 @@ BOOL plDistributor::IReadyRepNodes(plMeshCacheTab& cache) const
 
             cache[iCache].fMesh = new Mesh(*mesh);
             cache[iCache].fFlex = repNode->GetFlexibility();
-            
-            if( obj )
+
+            if (obj) {
                 obj->DeleteThis();
+            }
 
             BOOL hasXImp = nil != repNode->GetXImposterComp();
 
             ISetupNormals(repNode, cache[iCache].fMesh, hasXImp);
 
             ISetupSkinWeights(repNode, cache[iCache].fMesh, cache[iCache].fFlex);
-        }
-        else
-        {
+        } else {
             fRepNodes.Delete(i, 1);
             i--;
         }
@@ -992,38 +1038,38 @@ BOOL plDistributor::IReadyRepNodes(plMeshCacheTab& cache) const
     return fRepNodes.Count() > 0;
 }
 
-void plDistributor::ClearReplicateNodes() 
-{ 
-    fRepNodes.ZeroCount(); 
+void plDistributor::ClearReplicateNodes()
+{
+    fRepNodes.ZeroCount();
 }
 
-void plDistributor::AddReplicateNode(INode* node) 
-{ 
-    fRepNodes.Append(1, &node); 
+void plDistributor::AddReplicateNode(INode* node)
+{
+    fRepNodes.Append(1, &node);
 }
 
-BOOL plDistributor::IProjectVertex(const Point3& pt, const Point3& dir, float maxDist, Tab<int32_t>&faces, Point3& projPt) const
+BOOL plDistributor::IProjectVertex(const Point3& pt, const Point3& dir, float maxDist, Tab<int32_t>& faces, Point3& projPt) const
 {
     BOOL retVal = false;
     plTriUtils triUtil;
     int i;
-    for( i = 0; i < faces.Count(); i++ )
-    {
+
+    for (i = 0; i < faces.Count(); i++) {
         int iFace = faces[i];
         const hsPoint3& p0 = hsP3(fSurfMesh->getVert(fSurfMesh->faces[iFace].getVert(0)) * fSurfToWorld);
         const hsPoint3& p1 = hsP3(fSurfMesh->getVert(fSurfMesh->faces[iFace].getVert(1)) * fSurfToWorld);
         const hsPoint3& p2 = hsP3(fSurfMesh->getVert(fSurfMesh->faces[iFace].getVert(2)) * fSurfToWorld);
 
         Point3 plnPt = pt;
-        if( triUtil.ProjectOntoPlaneAlongVector(p0, p1, p2, hsV3(dir), hsP3(plnPt)) )
-        {
+
+        if (triUtil.ProjectOntoPlaneAlongVector(p0, p1, p2, hsV3(dir), hsP3(plnPt))) {
             Point3 bary = plnPt;
             plTriUtils::Bary baryVal = triUtil.ComputeBarycentric(p0, p1, p2, hsP3(plnPt), hsP3(bary));
-            if( (plTriUtils::kOutsideTri != baryVal) && (plTriUtils::kDegenerateTri != baryVal) )
-            {
+
+            if ((plTriUtils::kOutsideTri != baryVal) && (plTriUtils::kDegenerateTri != baryVal)) {
                 float dist = DotProd((pt - plnPt), dir);
-                if( (dist <= maxDist) && (dist >= -maxDist) )
-                {
+
+                if ((dist <= maxDist) && (dist >= -maxDist)) {
                     projPt = plnPt;
                     maxDist = dist >= 0 ? dist : -dist;
                     retVal = true;
@@ -1032,6 +1078,7 @@ BOOL plDistributor::IProjectVertex(const Point3& pt, const Point3& dir, float ma
         }
 
     }
+
     return retVal;
 }
 
@@ -1055,17 +1102,20 @@ BOOL plDistributor::IConformCheck(Matrix3& l2w, int iRepNode, plMeshCacheTab& ca
     IFindFaceSet(bnd, faces);
 
     int i;
-    for( i = 0; i < mesh->getNumVerts(); i++ )
-    {
+
+    for (i = 0; i < mesh->getNumVerts(); i++) {
         Point3 pt = mesh->getVert(i) * OTM;
         pt.z = 0;
 
         pt = pt * l2w;
 
         Point3 projPt;
-        if( !IProjectVertex(pt, dir, maxScaledDist, faces, projPt) )
+
+        if (!IProjectVertex(pt, dir, maxScaledDist, faces, projPt)) {
             return false;
+        }
     }
+
     return true;
 }
 
@@ -1101,16 +1151,16 @@ BOOL plDistributor::IConformAll(Matrix3& l2w, int iRepNode, plMeshCacheTab& cach
 
     BOOL retVal = true;
     int i;
-    for( i = 0; i < mesh->getNumVerts(); i++ )
-    {
+
+    for (i = 0; i < mesh->getNumVerts(); i++) {
         Point3 pt = mesh->getVert(i) * OTM;
         pt.z = 0;
 
         pt = pt * l2w;
 
         Point3 projPt;
-        if( !IProjectVertex(pt, dir, maxScaledDist, faces, projPt) )
-        {
+
+        if (!IProjectVertex(pt, dir, maxScaledDist, faces, projPt)) {
             retVal = false;
             break;
         }
@@ -1118,13 +1168,14 @@ BOOL plDistributor::IConformAll(Matrix3& l2w, int iRepNode, plMeshCacheTab& cach
         Point3 del = w2v.VectorTransform(projPt - pt);
         mesh->getVert(i) += del;
     }
-    if( !retVal )
-    {
+
+    if (!retVal) {
 //      delete cache[iCache].fMesh;
         delete mesh;
         cache.SetCount(iCache);
         iCache = iRepNode;
     }
+
     return retVal;
 }
 
@@ -1163,23 +1214,25 @@ BOOL plDistributor::IConformHeight(Matrix3& l2w, int iRepNode, plMeshCacheTab& c
 
     BOOL retVal = true;
     int i;
-    for( i = 0; i < mesh->getNumVerts(); i++ )
-    {
+
+    for (i = 0; i < mesh->getNumVerts(); i++) {
         Point3 pt = mesh->getVert(i) * OTM;
 
         float conScale = 1.f - pt.z / maxZ;
-        if( conScale > 1.f )
+
+        if (conScale > 1.f) {
             conScale = 1.f;
-        else if( conScale < 0 )
+        } else if (conScale < 0) {
             conScale = 0;
+        }
 
         pt.z = 0;
 
         pt = pt * l2w;
 
         Point3 projPt;
-        if( !IProjectVertex(pt, dir, maxScaledDist, faces, projPt) )
-        {
+
+        if (!IProjectVertex(pt, dir, maxScaledDist, faces, projPt)) {
             retVal = false;
             break;
         }
@@ -1188,12 +1241,13 @@ BOOL plDistributor::IConformHeight(Matrix3& l2w, int iRepNode, plMeshCacheTab& c
         del *= conScale;
         mesh->getVert(i) += del;
     }
-    if( !retVal )
-    {
+
+    if (!retVal) {
         delete cache[iCache].fMesh;
         cache.SetCount(iCache);
         iCache = iRepNode;
     }
+
     return retVal;
 }
 
@@ -1232,20 +1286,20 @@ BOOL plDistributor::IConformBase(Matrix3& l2w, int iRepNode, plMeshCacheTab& cac
 
     BOOL retVal = true;
     int i;
-    for( i = 0; i < mesh->getNumVerts(); i++ )
-    {
+
+    for (i = 0; i < mesh->getNumVerts(); i++) {
         Point3 pt = mesh->getVert(i) * OTM;
 
         const float kMaxConformZ = 0.5f;
-        if( pt.z < kMaxConformZ )
-        {
+
+        if (pt.z < kMaxConformZ) {
             pt.z = 0;
 
             pt = pt * l2w;
 
             Point3 projPt;
-            if( !IProjectVertex(pt, dir, maxScaledDist, faces, projPt) )
-            {
+
+            if (!IProjectVertex(pt, dir, maxScaledDist, faces, projPt)) {
                 retVal = false;
                 break;
             }
@@ -1254,29 +1308,34 @@ BOOL plDistributor::IConformBase(Matrix3& l2w, int iRepNode, plMeshCacheTab& cac
             mesh->getVert(i) += del;
         }
     }
-    if( !retVal )
-    {
+
+    if (!retVal) {
         delete cache[iCache].fMesh;
         cache.SetCount(iCache);
         iCache = iRepNode;
     }
+
     return retVal;
 }
 
 BOOL plDistributor::IConform(Matrix3& l2w, int iRepNode, plMeshCacheTab& cache, int& iCache) const
 {
     iCache = iRepNode;
-    switch( fConformity )
-    {
+
+    switch (fConformity) {
     case kConformAll:
         return IConformAll(l2w, iRepNode, cache, iCache);
+
     case kConformHeight:
         return IConformHeight(l2w, iRepNode, cache, iCache);
+
     case kConformCheck:
         return IConformCheck(l2w, iRepNode, cache, iCache);
+
     case kConformBase:
         return IConformBase(l2w, iRepNode, cache, iCache);
     }
+
     return true;
 }
 
@@ -1315,12 +1374,10 @@ void plDistributor::IDistributeOverFace(int iFace, plDistribInstTab& reps, plMes
     float delta = fSpacing;
 
     float x, y, z;
-    for( x = grid.Min().x; x < grid.Max().x; x += delta )
-    {
-        for( y = grid.Min().y; y < grid.Max().y; y += delta )
-        {
-            for( z = grid.Min().z; z < grid.Max().z; z += delta )
-            {
+
+    for (x = grid.Min().x; x < grid.Max().x; x += delta) {
+        for (y = grid.Min().y; y < grid.Max().y; y += delta) {
+            for (z = grid.Min().z; z < grid.Max().z; z += delta) {
                 Point3 pt(x, y, z);
 
                 pt = IPerturbPoint(pt);
@@ -1331,35 +1388,33 @@ void plDistributor::IDistributeOverFace(int iFace, plDistribInstTab& reps, plMes
                 // Get Barycentric coord of projection of grid pt onto face
                 plTriUtils triUtil;
                 plTriUtils::Bary baryVal = triUtil.ComputeBarycentricProjection(hsP3(p0), hsP3(p1), hsP3(p2), hsP3(plnPt), hsP3(bary));
-                if( !(baryVal & (plTriUtils::kOutsideTri | plTriUtils::kDegenerateTri)) )
-                {
+
+                if (!(baryVal & (plTriUtils::kOutsideTri | plTriUtils::kDegenerateTri))) {
                     int iRepNode = ISelectRepNode();
 
                     Matrix3 l2w = IGenerateTransform(iRepNode, iFace, plnPt, bary);
 
                     // l2w as ident means this position turned out to be not so good afterall.
-                    if( l2w.IsIdentity() )
-                    {
+                    if (l2w.IsIdentity()) {
                         continue;
                     }
 
                     Box3 clearBox;
-                    if( !ISpaceClear(iRepNode, l2w, clearBox, cache) )
-                    {
+
+                    if (!ISpaceClear(iRepNode, l2w, clearBox, cache)) {
                         continue;
                     }
 
                     int iCacheNode = iRepNode;
-                    if( !IConform(l2w, iRepNode, cache, iCacheNode) )
-                    {
+
+                    if (!IConform(l2w, iRepNode, cache, iCacheNode)) {
                         continue;
                     }
 
                     // If |projGridPt - GridPt| < gridCubeRadius
                     // and probBitmap->GetPixel(src->UVW(bary)) < RandomZeroToOne()
                     // Also a generic random factor.
-                    if( IProbablyDoIt(iFace, pt - plnPt, bary) )
-                    {
+                    if (IProbablyDoIt(iFace, pt - plnPt, bary)) {
                         IReplicate(l2w, iRepNode, reps, cache[iCacheNode]);
 
                         IReserveSpace(clearBox);
@@ -1395,8 +1450,9 @@ Matrix3 plDistributor::IOTM(int iRepNode) const
 
 BOOL plDistributor::ISpaceClear(int iRepNode, const Matrix3& l2w, Box3& clearBox, plMeshCacheTab& cache) const
 {
-    if( !fDistTree )
+    if (!fDistTree) {
         return true;
+    }
 
     // If we have high isolation,
     //      clearBox = Box3(Point3(-fSpacing*0.5f, -fSpacing*0.5f, 0), Point3(fSpacing*0.5f, fSpacing*0.5f, fSpacing));
@@ -1412,30 +1468,30 @@ BOOL plDistributor::ISpaceClear(int iRepNode, const Matrix3& l2w, Box3& clearBox
     // invOTM * objectTM = nodeTM
     // invOTM = nodeTM * invObjectTM
     const float kSmallSpace = 0.5f;
-    switch( fIsolation )
-    {
-    case kIsoHigh:
-        {
+
+    switch (fIsolation) {
+    case kIsoHigh: {
             INode* repNode = fRepNodes[iRepNode];
             Matrix3 objectTM = repNode->GetObjectTM(TimeValue(0));
             Matrix3 nodeTM = repNode->GetNodeTM(TimeValue(0));
             Matrix3 invOTM = nodeTM * Inverse(objectTM);
-            clearBox = Box3(Point3(-fSpacing*0.5f, -fSpacing*0.5f, 0.f), Point3(fSpacing*0.5f, fSpacing*0.5f, fSpacing));
+            clearBox = Box3(Point3(-fSpacing * 0.5f, -fSpacing * 0.5f, 0.f), Point3(fSpacing * 0.5f, fSpacing * 0.5f, fSpacing));
             clearBox = clearBox * invOTM;
         }
         break;
+
     case kIsoMedium:
         clearBox = cache[iRepNode].fMesh->getBoundingBox(); // The mesh's bounds
         break;
+
     case kIsoLow:
     case kIsoNone:
-    default:
-        {
+    default: {
             INode* repNode = fRepNodes[iRepNode];
             Matrix3 objectTM = repNode->GetObjectTM(TimeValue(0));
             Matrix3 nodeTM = repNode->GetNodeTM(TimeValue(0));
             Matrix3 invOTM = nodeTM * Inverse(objectTM);
-            clearBox = Box3(Point3(-kSmallSpace, -kSmallSpace, 0.f), Point3(kSmallSpace, kSmallSpace, kSmallSpace)); 
+            clearBox = Box3(Point3(-kSmallSpace, -kSmallSpace, 0.f), Point3(kSmallSpace, kSmallSpace, kSmallSpace));
             clearBox = clearBox * invOTM;
         }
         break;
@@ -1449,8 +1505,9 @@ BOOL plDistributor::ISpaceClear(int iRepNode, const Matrix3& l2w, Box3& clearBox
 void plDistributor::IReserveSpace(const Box3& clearBox) const
 {
     // if isolation isn't None, add the box.
-    if( fDistTree && (fIsolation != kIsoNone) )
+    if (fDistTree && (fIsolation != kIsoNone)) {
         fDistTree->AddBox(clearBox, fFade);
+    }
 }
 
 uint32_t plDistributor::GetRandSeed() const
@@ -1463,10 +1520,10 @@ void plDistributor::SetRandSeed(int seed)
     fRand.SetSeed(seed);
 }
 
-void plDistributor::SetPolarRange(float deg) 
-{ 
-    fPolarRange = hsDegreesToRadians(deg); 
-    fTanPolarRange = tan(fPolarRange); 
+void plDistributor::SetPolarRange(float deg)
+{
+    fPolarRange = hsDegreesToRadians(deg);
+    fTanPolarRange = tan(fPolarRange);
 }
 
 void plDistributor::SetProbabilityBitmapTex(BitmapTex* t)

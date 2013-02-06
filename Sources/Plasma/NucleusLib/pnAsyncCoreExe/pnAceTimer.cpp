@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCoreExe/pnAceTimer.cpp
-*   
+*
 ***/
 
 #include "Pch.h"
@@ -60,7 +60,7 @@ struct AsyncTimer {
     PRIORITY_TIME(AsyncTimer)   priority;
     FAsyncTimerProc             timerProc;
     FAsyncTimerProc             destroyProc;
-    void *                      param;
+    void*                       param;
     LINK(AsyncTimer)            deleteLink;
 };
 
@@ -89,27 +89,28 @@ static LISTDECL(
 ***/
 
 //===========================================================================
-static void UpdateTimer (
-    AsyncTimer *    timer,
+static void UpdateTimer(
+    AsyncTimer*     timer,
     unsigned        timeMs,
     unsigned        flags
-) {
+)
+{
     // If the timer isn't already linked then it doesn't
     // matter whether kAsyncTimerUpdateSetPriorityHigher is
     // set; just add the timer to the queue
     if (!timer->priority.IsLinked()) {
         timer->priority.Set(timeMs);
         s_timerProcs.Enqueue(timer);
-    }
-    else if (((flags & kAsyncTimerUpdateSetPriorityHigher) == 0)
-    || !timer->priority.IsPriorityHigher(timeMs)
-    ) {
+    } else if (((flags & kAsyncTimerUpdateSetPriorityHigher) == 0)
+               || !timer->priority.IsPriorityHigher(timeMs)
+              ) {
         timer->priority.Set(timeMs);
     }
 }
 
 //===========================================================================
-static unsigned CallTimerProc (AsyncTimer * t, FAsyncTimerProc timerProc) {
+static unsigned CallTimerProc(AsyncTimer* t, FAsyncTimerProc timerProc)
+{
     // Cache parameters to make timer callback outside critical section
     s_timerCurr = timerProc;
 
@@ -126,25 +127,33 @@ static unsigned CallTimerProc (AsyncTimer * t, FAsyncTimerProc timerProc) {
 
 //===========================================================================
 // inline because it is called only once
-static inline unsigned RunTimers () {
+static inline unsigned RunTimers()
+{
     unsigned currTimeMs = TimeGetMs();
+
     for (;;) {
         // Delete old timers
-        while (AsyncTimer * t = s_timerDelete.Head()) {
-            if (t->destroyProc)
+        while (AsyncTimer* t = s_timerDelete.Head()) {
+            if (t->destroyProc) {
                 CallTimerProc(t, t->destroyProc);
+            }
+
             delete t;
         }
 
         // Get first timer to run
-        AsyncTimer * t = s_timerProcs.Root();
-        if (!t)
+        AsyncTimer* t = s_timerProcs.Root();
+
+        if (!t) {
             return INFINITE;
+        }
 
         // If it isn't time to run this timer then exit
         unsigned sleepMs;
-        if (0 < (signed) (sleepMs = (unsigned) t->priority.Get() - currTimeMs))
+
+        if (0 < (signed)(sleepMs = (unsigned) t->priority.Get() - currTimeMs)) {
             return sleepMs;
+        }
 
         // Remove from timer queue and call timer
         s_timerProcs.Dequeue();
@@ -157,13 +166,16 @@ static inline unsigned RunTimers () {
 
         // Requeue timer
         currTimeMs = TimeGetMs();
-        if (sleepMs != kAsyncTimeInfinite)
+
+        if (sleepMs != kAsyncTimeInfinite) {
             UpdateTimer(t, sleepMs + currTimeMs, kAsyncTimerUpdateSetPriorityHigher);
+        }
     }
 }
 
 //===========================================================================
-static unsigned THREADCALL TimerThreadProc (AsyncThread *) {
+static unsigned THREADCALL TimerThreadProc(AsyncThread*)
+{
     do {
         s_timerCrit.Enter();
         const unsigned sleepMs = RunTimers();
@@ -171,29 +183,33 @@ static unsigned THREADCALL TimerThreadProc (AsyncThread *) {
 
         WaitForSingleObject(s_timerEvent, sleepMs);
     } while (s_running);
+
     return 0;
 }
 
 //===========================================================================
 // inline because it is called only once
-static inline void InitializeTimer () {
+static inline void InitializeTimer()
+{
     if (!s_timerThread) {
         s_running = true;
 
         s_timerEvent = CreateEvent(
-            (LPSECURITY_ATTRIBUTES) nil,
-            false,                  // auto-reset event
-            false,                  // initial state = off
-            (LPCTSTR) nil
-        );
-        if (!s_timerEvent)
+                           (LPSECURITY_ATTRIBUTES) nil,
+                           false,                  // auto-reset event
+                           false,                  // initial state = off
+                           (LPCTSTR) nil
+                       );
+
+        if (!s_timerEvent) {
             ErrorAssert(__LINE__, __FILE__, "CreateEvent %u", GetLastError());
+        }
 
         s_timerThread = (HANDLE) AsyncThreadCreate(
-            TimerThreadProc,
-            nil,
-            L"AsyncTimerThread"
-        );
+                            TimerThreadProc,
+                            nil,
+                            L"AsyncTimerThread"
+                        );
     }
 }
 
@@ -205,7 +221,8 @@ static inline void InitializeTimer () {
 ***/
 
 //===========================================================================
-void TimerDestroy (unsigned exitThreadWaitMs) {
+void TimerDestroy(unsigned exitThreadWaitMs)
+{
     s_running = false;
 
     if (s_timerThread) {
@@ -222,15 +239,20 @@ void TimerDestroy (unsigned exitThreadWaitMs) {
 
     // Cleanup any timers that have been stopped but not deleted
     s_timerCrit.Enter();
-    while (AsyncTimer * t = s_timerDelete.Head()) {
-        if (t->destroyProc)
+
+    while (AsyncTimer* t = s_timerDelete.Head()) {
+        if (t->destroyProc) {
             CallTimerProc(t, t->destroyProc);
+        }
+
         delete t;
     }
+
     s_timerCrit.Leave();
 
-    if (AsyncTimer * timer = s_timerProcs.Root())
+    if (AsyncTimer* timer = s_timerProcs.Root()) {
         ErrorAssert(__LINE__, __FILE__, "TimerProc not destroyed: %p", timer->timerProc);
+    }
 }
 
 
@@ -243,17 +265,18 @@ void TimerDestroy (unsigned exitThreadWaitMs) {
 //===========================================================================
 // 1. Timer procs do not get starved by I/O, they are called periodically.
 // 2. Timer procs will never be called by multiple threads simultaneously.
-void AsyncTimerCreate (
-    AsyncTimer **   timer,
-    FAsyncTimerProc timerProc, 
+void AsyncTimerCreate(
+    AsyncTimer**    timer,
+    FAsyncTimerProc timerProc,
     unsigned        callbackMs,
-    void *          param
-) {
+    void*           param
+)
+{
     ASSERT(timer);
     ASSERT(timerProc);
 
     // Allocate timer outside critical section
-    AsyncTimer * t  = new AsyncTimer;
+    AsyncTimer* t  = new AsyncTimer;
     t->timerProc    = timerProc;
     t->destroyProc  = nil;
     t->param        = param;
@@ -269,16 +292,18 @@ void AsyncTimerCreate (
         InitializeTimer();
 
         // Does this timer need to be queued?
-        if (callbackMs != kAsyncTimeInfinite)
+        if (callbackMs != kAsyncTimeInfinite) {
             s_timerProcs.Enqueue(t);
+        }
 
         // Does the timer thread need to be awakened?
         setEvent = t == s_timerProcs.Root();
     }
     s_timerCrit.Leave();
 
-    if (setEvent)
+    if (setEvent) {
         SetEvent(s_timerEvent);
+    }
 }
 
 //===========================================================================
@@ -289,35 +314,40 @@ void AsyncTimerCreate (
 //    be set by init/destruct threads, not I/O worker threads. In addition, extreme
 //    care should be used to avoid a deadlock when this flag is set; in general, it
 //    is a good idea not to hold any locks or critical sections when setting the flag.
-void AsyncTimerDelete (
-    AsyncTimer *    timer,
+void AsyncTimerDelete(
+    AsyncTimer*     timer,
     unsigned        flags
-) {
+)
+{
     // If the timer has already been destroyed then exit
     ASSERT(timer);
 
     // Wait for timer before exiting function?
     FAsyncTimerProc timerProc;
-    if (flags & kAsyncTimerDestroyWaitComplete)
+
+    if (flags & kAsyncTimerDestroyWaitComplete) {
         timerProc = timer->timerProc;
-    else
+    } else {
         timerProc = nil;
+    }
 
     AsyncTimerDeleteCallback(timer, nil);
 
     // Wait until the timer procedure completes
     if (timerProc) {
 
-        while (s_timerCurr == timerProc)
+        while (s_timerCurr == timerProc) {
             Sleep(1);
+        }
     }
 }
 
 //===========================================================================
-void AsyncTimerDeleteCallback (
-    AsyncTimer *    timer,
+void AsyncTimerDeleteCallback(
+    AsyncTimer*     timer,
     FAsyncTimerProc destroyProc
-) {
+)
+{
     // If the timer has already been destroyed then exit
     ASSERT(timer);
     ASSERT(!timer->deleteLink.IsLinked());
@@ -331,18 +361,20 @@ void AsyncTimerDeleteCallback (
     s_timerCrit.Leave();
 
     // Force the timer thread to wake up and perform the deletion
-    if (destroyProc)
+    if (destroyProc) {
         SetEvent(s_timerEvent);
+    }
 }
 
 //===========================================================================
 // To set the time value for a timer, use this function with flags = 0.
 // To set the time to MoreRecentOf(nextTimerCallbackMs, callbackMs), use SETPRIORITYHIGHER
-void AsyncTimerUpdate (
-    AsyncTimer *    timer,
+void AsyncTimerUpdate(
+    AsyncTimer*     timer,
     unsigned        callbackMs,
     unsigned        flags
-) {
+)
+{
     ASSERT(timer);
 
     bool setEvent;
@@ -351,15 +383,17 @@ void AsyncTimerUpdate (
         if (callbackMs != kAsyncTimeInfinite) {
             UpdateTimer(timer, callbackMs + TimeGetMs(), flags);
             setEvent = timer == s_timerProcs.Root();
-        }
-        else {
-            if ((flags & kAsyncTimerUpdateSetPriorityHigher) == 0)
+        } else {
+            if ((flags & kAsyncTimerUpdateSetPriorityHigher) == 0) {
                 timer->priority.Unlink();
+            }
+
             setEvent = false;
         }
     }
     s_timerCrit.Leave();
 
-    if (setEvent)
+    if (setEvent) {
         SetEvent(s_timerEvent);
+    }
 }

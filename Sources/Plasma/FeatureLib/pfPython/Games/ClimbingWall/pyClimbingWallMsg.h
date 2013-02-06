@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCliMsg.h"
 
-class pyClimbingWallMsg : public pyGameCliMsg
-{
+class pyClimbingWallMsg : public pyGameCliMsg {
 protected:
     pyClimbingWallMsg();
     pyClimbingWallMsg(pfGameCliMsg* msg);
@@ -76,8 +75,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyClimbingWallNumBlockersChangedMsg : public pyClimbingWallMsg
-{
+class pyClimbingWallNumBlockersChangedMsg : public pyClimbingWallMsg {
 protected:
     pyClimbingWallNumBlockersChangedMsg();
     pyClimbingWallNumBlockersChangedMsg(pfGameCliMsg* msg);
@@ -96,8 +94,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyClimbingWallReadyMsg : public pyClimbingWallMsg
-{
+class pyClimbingWallReadyMsg : public pyClimbingWallMsg {
 protected:
     pyClimbingWallReadyMsg();
     pyClimbingWallReadyMsg(pfGameCliMsg* msg);
@@ -118,8 +115,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyClimbingWallBlockersChangedMsg : public pyClimbingWallMsg
-{
+class pyClimbingWallBlockersChangedMsg : public pyClimbingWallMsg {
 protected:
     pyClimbingWallBlockersChangedMsg();
     pyClimbingWallBlockersChangedMsg(pfGameCliMsg* msg);
@@ -139,8 +135,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyClimbingWallPlayerEnteredMsg : public pyClimbingWallMsg
-{
+class pyClimbingWallPlayerEnteredMsg : public pyClimbingWallMsg {
 protected:
     pyClimbingWallPlayerEnteredMsg();
     pyClimbingWallPlayerEnteredMsg(pfGameCliMsg* msg);
@@ -156,8 +151,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyClimbingWallSuitMachineLockedMsg : public pyClimbingWallMsg
-{
+class pyClimbingWallSuitMachineLockedMsg : public pyClimbingWallMsg {
 protected:
     pyClimbingWallSuitMachineLockedMsg();
     pyClimbingWallSuitMachineLockedMsg(pfGameCliMsg* msg);
@@ -177,8 +171,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyClimbingWallGameOverMsg : public pyClimbingWallMsg
-{
+class pyClimbingWallGameOverMsg : public pyClimbingWallMsg {
 protected:
     pyClimbingWallGameOverMsg();
     pyClimbingWallGameOverMsg(pfGameCliMsg* msg);

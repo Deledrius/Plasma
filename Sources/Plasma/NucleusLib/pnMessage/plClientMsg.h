@@ -50,22 +50,20 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plUoid.h"
 
 //
-// Handles various types of client (app) msgs, relating 
+// Handles various types of client (app) msgs, relating
 // to loading rooms, players, camera, and progress bars
 //
-class plClientMsg : public plMessage
-{
+class plClientMsg : public plMessage {
     int fMsgFlag;
     plString fAgeName;
     std::vector<plLocation> fRoomLocs;
 
     void IReset();
 
-    class GraphicsSettings
-    {
+    class GraphicsSettings {
     public:
-        GraphicsSettings() : fWidth (800), fHeight(600), fColorDepth(32), fWindowed(false), fNumAASamples(0),
-                             fMaxAnisoSamples(0), fVSync(false) {}
+        GraphicsSettings() : fWidth(800), fHeight(600), fColorDepth(32), fWindowed(false), fNumAASamples(0),
+            fMaxAnisoSamples(0), fVSync(false) {}
         int fWidth;
         int fHeight;
         int fColorDepth;
@@ -77,8 +75,7 @@ class plClientMsg : public plMessage
 
 
 public:
-    enum
-    {
+    enum {
         kLoadRoom,
         kLoadRoomHold,
         kUnloadRoom,
@@ -101,37 +98,56 @@ public:
     GraphicsSettings fGraphicsSettings;
 
 
-    plClientMsg() { IReset();}
-    plClientMsg(const plKey &s) { IReset();}  
-    plClientMsg(int i) { IReset(); fMsgFlag = i; }  
-    plClientMsg(const plKey &s, const plKey &r, const double* t) { IReset(); }
+    plClientMsg() {
+        IReset();
+    }
+    plClientMsg(const plKey& s) {
+        IReset();
+    }
+    plClientMsg(int i) {
+        IReset();
+        fMsgFlag = i;
+    }
+    plClientMsg(const plKey& s, const plKey& r, const double* t) {
+        IReset();
+    }
 
     CLASSNAME_REGISTER(plClientMsg);
     GETINTERFACE_ANY(plClientMsg, plMessage);
 
-    int GetClientMsgFlag() const { return fMsgFlag; }
+    int GetClientMsgFlag() const {
+        return fMsgFlag;
+    }
 
     void AddRoomLoc(plLocation loc);
 
     // Used for kLoadAgeKeys, kLetGoOfAgeKeys only
-    plString    GetAgeName() const { return fAgeName; }
-    void        SetAgeName(const plString& age) { fAgeName = age; }
+    plString    GetAgeName() const {
+        return fAgeName;
+    }
+    void        SetAgeName(const plString& age) {
+        fAgeName = age;
+    }
 
-    int GetNumRoomLocs() { return fRoomLocs.size(); }
-    const plLocation& GetRoomLoc(int i) const { return fRoomLocs[i]; }
-    const std::vector<plLocation>& GetRoomLocs() { return fRoomLocs; }
+    int GetNumRoomLocs() {
+        return fRoomLocs.size();
+    }
+    const plLocation& GetRoomLoc(int i) const {
+        return fRoomLocs[i];
+    }
+    const std::vector<plLocation>& GetRoomLocs() {
+        return fRoomLocs;
+    }
 
-    // IO 
+    // IO
     void Read(hsStream* stream, hsResMgr* mgr);
     void Write(hsStream* stream, hsResMgr* mgr);
 };
 
-class plClientRefMsg : public plRefMsg
-{
+class plClientRefMsg : public plRefMsg {
 
 public:
-    enum 
-    {
+    enum {
         kLoadRoom   = 0,
         kLoadRoomHold,
         kManualRoom,
@@ -139,26 +155,24 @@ public:
 
     plClientRefMsg(): fType(-1), fWhich(-1) {};
 
-    plClientRefMsg(const plKey &r, uint8_t refMsgFlags, int8_t which , int8_t type)
+    plClientRefMsg(const plKey& r, uint8_t refMsgFlags, int8_t which , int8_t type)
         : plRefMsg(r, refMsgFlags), fType(type), fWhich(which) {}
 
 
-    CLASSNAME_REGISTER( plClientRefMsg );
-    GETINTERFACE_ANY( plClientRefMsg, plRefMsg );
+    CLASSNAME_REGISTER(plClientRefMsg);
+    GETINTERFACE_ANY(plClientRefMsg, plRefMsg);
 
     int8_t                    fType;
     int8_t                    fWhich;
 
     // IO - not really applicable to ref msgs, but anyway
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plRefMsg::Read(stream, mgr);
         stream->ReadLE(&fType);
         stream->ReadLE(&fWhich);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plRefMsg::Write(stream, mgr);
         stream->WriteLE(fType);
         stream->WriteLE(fWhich);

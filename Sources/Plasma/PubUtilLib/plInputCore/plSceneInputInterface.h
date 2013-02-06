@@ -54,95 +54,105 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnUUID/pnUUID.h"
 
 //// Class Definition ////////////////////////////////////////////////////////
-        
+
 class plPipeline;
 class plSceneObject;
 
-class plSceneInputInterface : public plInputInterface
-{
-    enum 
-    {
+class plSceneInputInterface : public plInputInterface {
+    enum {
         kNotOffering = 0,
         kOfferBook,
         kBookOffered,
         kOfferAccepted,
         kOfferLinkPending,
     };
-    protected:
-        static plSceneInputInterface        *fInstance;
-        
-        uint32_t  fCurrentCursor;
-        uint8_t   fButtonState;
-        bool    fClickability;      
-        plKey   fCurrentClickable, fLastClicked, fCurrentClickableLogicMod;
-        hsPoint3 fCurrentClickPoint;
-        bool    fCurrClickIsAvatar, fLastClickIsAvatar,fFadedLocalAvatar;
-        bool fPendingLink;
+protected:
+    static plSceneInputInterface*        fInstance;
 
-        int     fBookMode; // are we in offer book mode?
-        plKey   fBookKey;  // key for the python file modifier for the book we are offering
-        plKey   fOffereeKey;
-        uint32_t  fOffereeID; // ID for the guy who's accepted our link offer
-        const char* fOfferedAgeFile;
-        const char* fOfferedAgeInstance;
-        const char* fSpawnPoint;
-        plUUID fAgeInstanceGuid;
-        struct clickableTest
-        {
-            clickableTest(plKey k)
-            {
-                key = k;
-                val = false;
-            }
-            plKey key;
-            bool val;
-        };
+    uint32_t  fCurrentCursor;
+    uint8_t   fButtonState;
+    bool    fClickability;
+    plKey   fCurrentClickable, fLastClicked, fCurrentClickableLogicMod;
+    hsPoint3 fCurrentClickPoint;
+    bool    fCurrClickIsAvatar, fLastClickIsAvatar, fFadedLocalAvatar;
+    bool fPendingLink;
 
-        hsTArray<clickableTest *> fClickableMap;
-        hsTArray<plKey> fIgnoredAvatars; // these are ignored because they are engaged in avatar-avatar interactions which need to be left undisturbed
-        hsTArray<plKey> fGUIIgnoredAvatars; // these are ignored because they have a GUI in their face right now
-        hsTArray<plKey> fLocalIgnoredAvatars; // these are ALL avatars currently in your age.  they are ignored when you press the 'ignore' key so you can
-                                              // select clickable non-avatar objects through them.
-        hsPoint3    fLastStartPt, fLastEndPt;
-        plPipeline  *fPipe;
+    int     fBookMode; // are we in offer book mode?
+    plKey   fBookKey;  // key for the python file modifier for the book we are offering
+    plKey   fOffereeKey;
+    uint32_t  fOffereeID; // ID for the guy who's accepted our link offer
+    const char* fOfferedAgeFile;
+    const char* fOfferedAgeInstance;
+    const char* fSpawnPoint;
+    plUUID fAgeInstanceGuid;
+    struct clickableTest {
+        clickableTest(plKey k) {
+            key = k;
+            val = false;
+        }
+        plKey key;
+        bool val;
+    };
 
-        virtual bool IEval( double secs, float del, uint32_t dirty );
+    hsTArray<clickableTest*> fClickableMap;
+    hsTArray<plKey> fIgnoredAvatars; // these are ignored because they are engaged in avatar-avatar interactions which need to be left undisturbed
+    hsTArray<plKey> fGUIIgnoredAvatars; // these are ignored because they have a GUI in their face right now
+    hsTArray<plKey> fLocalIgnoredAvatars; // these are ALL avatars currently in your age.  they are ignored when you press the 'ignore' key so you can
+    // select clickable non-avatar objects through them.
+    hsPoint3    fLastStartPt, fLastEndPt;
+    plPipeline*  fPipe;
 
-        
-        void    IRequestLOSCheck( float xPos, float yPos, int ID );
-        void    ISetLastClicked( plKey obj, hsPoint3 hitPoint );
-        void    IHalfFadeAvatar(bool out);
+    virtual bool IEval(double secs, float del, uint32_t dirty);
 
-        bool    IWorldPosMovedSinceLastLOSCheck( void );
-        void ClearClickableMap();
-        void ISendOfferNotification(plKey& offeree, int ID, bool net);
-        void IManageIgnoredAvatars(plKey& offeree, bool add);
-        void ISendAvatarDisabledNotification(bool enabled);
-        void ILinkOffereeToAge();
-    public:
 
-        plSceneInputInterface();
-        virtual ~plSceneInputInterface();
+    void    IRequestLOSCheck(float xPos, float yPos, int ID);
+    void    ISetLastClicked(plKey obj, hsPoint3 hitPoint);
+    void    IHalfFadeAvatar(bool out);
 
-        static bool     fShowLOS;
+    bool    IWorldPosMovedSinceLastLOSCheck(void);
+    void ClearClickableMap();
+    void ISendOfferNotification(plKey& offeree, int ID, bool net);
+    void IManageIgnoredAvatars(plKey& offeree, bool add);
+    void ISendAvatarDisabledNotification(bool enabled);
+    void ILinkOffereeToAge();
+public:
 
-        // Always return true, since the cursor should be representing how we control the avatar
-        virtual bool    HasInterestingCursorID( void ) const { return ( fCurrentCursor != kNullCursor ) ? true : false; }
-        virtual uint32_t  GetPriorityLevel( void ) const { return kSceneInteractionPriority; }
-        virtual uint32_t  GetCurrentCursorID( void ) const {return fCurrentCursor;}
-        uint32_t          SetCurrentCursorID(uint32_t id);
-        virtual bool    InterpretInputEvent( plInputEventMsg *pMsg );
-        void            RequestAvatarTurnToPointLOS();
+    plSceneInputInterface();
+    virtual ~plSceneInputInterface();
 
-        virtual bool    MsgReceive( plMessage *msg );
+    static bool     fShowLOS;
 
-        virtual void    Init( plInputInterfaceMgr *manager );
-        virtual void    Shutdown( void );
-        
-        virtual void ResetClickableState();
+    // Always return true, since the cursor should be representing how we control the avatar
+    virtual bool    HasInterestingCursorID(void) const {
+        return (fCurrentCursor != kNullCursor) ? true : false;
+    }
+    virtual uint32_t  GetPriorityLevel(void) const {
+        return kSceneInteractionPriority;
+    }
+    virtual uint32_t  GetCurrentCursorID(void) const {
+        return fCurrentCursor;
+    }
+    uint32_t          SetCurrentCursorID(uint32_t id);
+    virtual bool    InterpretInputEvent(plInputEventMsg* pMsg);
+    void            RequestAvatarTurnToPointLOS();
 
-        plKey           GetCurrMousedAvatar( void ) const { if( fCurrClickIsAvatar ) return fCurrentClickable; else return nil; }
-        static plSceneInputInterface *GetInstance( void ) { return fInstance; }     
+    virtual bool    MsgReceive(plMessage* msg);
+
+    virtual void    Init(plInputInterfaceMgr* manager);
+    virtual void    Shutdown(void);
+
+    virtual void ResetClickableState();
+
+    plKey           GetCurrMousedAvatar(void) const {
+        if (fCurrClickIsAvatar) {
+            return fCurrentClickable;
+        } else {
+            return nil;
+        }
+    }
+    static plSceneInputInterface* GetInstance(void) {
+        return fInstance;
+    }
 };
 
 

@@ -48,59 +48,112 @@ struct hsPoint3;
 
 #include "plAudible.h"
 
-class plAudibleNull : public plAudible
-{
+class plAudibleNull : public plAudible {
 public:
 
-    plAudibleNull() : fSceneNode(nil),fSceneObj(nil) {;}
+    plAudibleNull() : fSceneNode(nil), fSceneObj(nil) {
+        ;
+    }
 
-    CLASSNAME_REGISTER( plAudibleNull );
-    GETINTERFACE_ANY( plAudibleNull, plAudible );
+    CLASSNAME_REGISTER(plAudibleNull);
+    GETINTERFACE_ANY(plAudibleNull, plAudible);
 
-    virtual plKey GetSceneNode() const { return fSceneNode; }
+    virtual plKey GetSceneNode() const {
+        return fSceneNode;
+    }
     virtual void SetSceneNode(plKey newNode);
 
-    virtual plKey GetSceneObject() const { return fSceneObj; }
+    virtual plKey GetSceneObject() const {
+        return fSceneObj;
+    }
     virtual void SetSceneObject(plKey newNode) { }
 
-    virtual plAudible& SetProperty(int prop, bool on) { return *this; }
-    virtual bool GetProperty(int prop) { return false; }
+    virtual plAudible& SetProperty(int prop, bool on) {
+        return *this;
+    }
+    virtual bool GetProperty(int prop) {
+        return false;
+    }
 
-    void        Play(int index = -1){;}
-    void        SynchedPlay(int index = -1) {;}
-    void        Stop(int index = -1){;}
-    void        FastForwardPlay(int index = -1){;}
-    void        FastForwardToggle(int index = -1){;}
-    void        SetMin(const float m,int index = -1){;} // sets minimum falloff distance
-    void        SetMax(const float m,int index = -1){;} // sets maximum falloff distance
-    virtual plAudible& SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, int index = -1){return *this;}
-    float    GetMin(int index = -1) const{return 0;}
-    float    GetMax(int index = -1) const{return 0;}
-    void        SetVelocity(const hsVector3 vel,int index = -1){;}
+    void        Play(int index = -1) {
+        ;
+    }
+    void        SynchedPlay(int index = -1) {
+        ;
+    }
+    void        Stop(int index = -1) {
+        ;
+    }
+    void        FastForwardPlay(int index = -1) {
+        ;
+    }
+    void        FastForwardToggle(int index = -1) {
+        ;
+    }
+    void        SetMin(const float m, int index = -1) {
+        ;   // sets minimum falloff distance
+    }
+    void        SetMax(const float m, int index = -1) {
+        ;   // sets maximum falloff distance
+    }
+    virtual plAudible& SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, int index = -1) {
+        return *this;
+    }
+    float    GetMin(int index = -1) const {
+        return 0;
+    }
+    float    GetMax(int index = -1) const {
+        return 0;
+    }
+    void        SetVelocity(const hsVector3 vel, int index = -1) {
+        ;
+    }
     hsVector3   GetVelocity(int index = -1) const;
     hsPoint3    GetPosition(int index = -1);
-    void        SetLooping(bool loop,int index = -1){;} // sets continuous loop or stops looping
-    bool        IsPlaying(int index = -1){return false;}
+    void        SetLooping(bool loop, int index = -1) {
+        ;   // sets continuous loop or stops looping
+    }
+    bool        IsPlaying(int index = -1) {
+        return false;
+    }
     virtual void        SetTime(double t, int index = -1) {}
-    virtual void        Activate(){}
-    virtual void        DeActivate(){}
-    virtual void        GetStatus(plSoundMsg* pMsg) {;}
-    virtual int         GetNumSounds() const {return 0;}
-    virtual plSound*    GetSound(int i) const { return nil; }
-    virtual int         GetSoundIndex(const char *keyname) const { return -1; }
-    virtual void        SetVolume(const float volume,int index = -1) {;}
-    virtual void        SetFilename(int index, const char *filename, bool isCompressed){}
+    virtual void        Activate() {}
+    virtual void        DeActivate() {}
+    virtual void        GetStatus(plSoundMsg* pMsg) {
+        ;
+    }
+    virtual int         GetNumSounds() const {
+        return 0;
+    }
+    virtual plSound*    GetSound(int i) const {
+        return nil;
+    }
+    virtual int         GetSoundIndex(const char* keyname) const {
+        return -1;
+    }
+    virtual void        SetVolume(const float volume, int index = -1) {
+        ;
+    }
+    virtual void        SetFilename(int index, const char* filename, bool isCompressed) {}
 
     virtual void    RemoveCallbacks(plSoundMsg* pMsg) {}
     virtual void    AddCallbacks(plSoundMsg* pMsg) {}
 
-    virtual void    SetMuted( bool muted, int index = -1 ) {;}
-    virtual void    ToggleMuted( int index = -1 ) {;}
-    virtual void    SetTalkIcon(int index, uint32_t str){;}
-    virtual void    ClearTalkIcon(){;}
+    virtual void    SetMuted(bool muted, int index = -1) {
+        ;
+    }
+    virtual void    ToggleMuted(int index = -1) {
+        ;
+    }
+    virtual void    SetTalkIcon(int index, uint32_t str) {
+        ;
+    }
+    virtual void    ClearTalkIcon() {
+        ;
+    }
 
-    virtual void        SetFadeIn( const int type, const float length, int index = -1 ) {}
-    virtual void        SetFadeOut( const int type, const float length, int index = -1 ) {}
+    virtual void        SetFadeIn(const int type, const float length, int index = -1) {}
+    virtual void        SetFadeOut(const int type, const float length, int index = -1) {}
 
 protected:
     plKey               fSceneNode, fSceneObj;

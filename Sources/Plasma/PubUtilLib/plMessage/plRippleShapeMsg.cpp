@@ -48,13 +48,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 plRippleShapeMsg::plRippleShapeMsg()
-:   fShape(nil)
+    :   fShape(nil)
 {
 }
 
 plRippleShapeMsg::plRippleShapeMsg(const plKey& r, const plPrintShape* shape)
-:   plMessage(nil, r, nil),
-    fShape(shape)
+    :   plMessage(nil, r, nil),
+        fShape(shape)
 {
 }
 

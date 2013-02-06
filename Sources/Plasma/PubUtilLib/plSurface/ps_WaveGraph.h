@@ -64,7 +64,7 @@ static const uint8_t ps_WaveGraphCodes[] = {
     0x0,    0x0,    0xe4,   0x80,
     0x0,    0x0,    0xe4,   0x90,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl ps_WaveGraphDecl("sha/ps_WaveGraph.inl", ps_WaveGraph, ps_WaveGraphbyteLen, ps_WaveGraphCodes);
 

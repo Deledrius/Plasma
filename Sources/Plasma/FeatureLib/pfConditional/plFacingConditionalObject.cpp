@@ -52,8 +52,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnNetCommon/plNetApp.h"
 
 plFacingConditionalObject::plFacingConditionalObject() :
-fTolerance(-1.0f),
-fDirectional(false)
+    fTolerance(-1.0f),
+    fDirectional(false)
 {
     SetSatisfied(true);
 }
@@ -81,69 +81,69 @@ void plFacingConditionalObject::Read(hsStream* stream, hsResMgr* mgr)
 bool plFacingConditionalObject::Verify(plMessage* msg)
 {
     plActivatorMsg* pActivateMsg = plActivatorMsg::ConvertNoRef(msg);
-    if (pActivateMsg && pActivateMsg->fHitterObj)
-    {   
+
+    if (pActivateMsg && pActivateMsg->fHitterObj) {
         plSceneObject* pPlayer = plSceneObject::ConvertNoRef(pActivateMsg->fHitterObj->ObjectIsLoaded());
-        if (pPlayer)
-        {
+
+        if (pPlayer) {
             hsVector3 playerView = pPlayer->GetCoordinateInterface()->GetLocalToWorld().GetAxis(hsMatrix44::kView);
             hsVector3 ourView;
-            if (fDirectional)
+
+            if (fDirectional) {
                 ourView = fLogicMod->GetTarget()->GetCoordinateInterface()->GetLocalToWorld().GetAxis(hsMatrix44::kView);
-            else
-            {
+            } else {
                 hsVector3 v(fLogicMod->GetTarget()->GetCoordinateInterface()->GetLocalToWorld().GetTranslate() - pPlayer->GetCoordinateInterface()->GetLocalToWorld().GetTranslate());
                 ourView = v;
                 ourView.Normalize();
             }
+
             float dot = playerView * ourView;
-            if (dot >= fTolerance)
-            {
-                fLogicMod->GetNotify()->AddFacingEvent( pActivateMsg->fHitterObj, fLogicMod->GetTarget()->GetKey(), dot, true);
-                return true;            
-            }
-            else
-            {
+
+            if (dot >= fTolerance) {
+                fLogicMod->GetNotify()->AddFacingEvent(pActivateMsg->fHitterObj, fLogicMod->GetTarget()->GetKey(), dot, true);
+                return true;
+            } else {
                 return false;
             }
         }
     }
+
     plFakeOutMsg* pFakeMsg = plFakeOutMsg::ConvertNoRef(msg);
-    if (pFakeMsg && plNetClientApp::GetInstance()->GetLocalPlayerKey())
-    {
+
+    if (pFakeMsg && plNetClientApp::GetInstance()->GetLocalPlayerKey()) {
         // sanity check
-        if (!fLogicMod->GetTarget()->GetCoordinateInterface())
+        if (!fLogicMod->GetTarget()->GetCoordinateInterface()) {
             return false;
+        }
 
         plSceneObject* pPlayer = plSceneObject::ConvertNoRef(plNetClientApp::GetInstance()->GetLocalPlayerKey()->ObjectIsLoaded());
-        if (pPlayer)
-        {
+
+        if (pPlayer) {
             hsVector3 playerView = pPlayer->GetCoordinateInterface()->GetLocalToWorld().GetAxis(hsMatrix44::kView);
             hsVector3 ourView;
-            if (fDirectional)
+
+            if (fDirectional) {
                 ourView = fLogicMod->GetTarget()->GetCoordinateInterface()->GetLocalToWorld().GetAxis(hsMatrix44::kView);
-            else
-            {
+            } else {
                 hsVector3 v(fLogicMod->GetTarget()->GetCoordinateInterface()->GetLocalToWorld().GetTranslate() - pPlayer->GetCoordinateInterface()->GetLocalToWorld().GetTranslate());
                 ourView = v;
                 ourView.fZ = playerView.fZ;
                 ourView.Normalize();
             }
+
             float dot = playerView * ourView;
-            if (dot >= fTolerance)
-            {
-                return true;            
-            }
-            else
-            {
-                if (!IsToggle())
-                {
-                    fLogicMod->GetNotify()->AddFacingEvent( pPlayer->GetKey(), fLogicMod->GetTarget()->GetKey(), dot, false);
+
+            if (dot >= fTolerance) {
+                return true;
+            } else {
+                if (!IsToggle()) {
+                    fLogicMod->GetNotify()->AddFacingEvent(pPlayer->GetKey(), fLogicMod->GetTarget()->GetKey(), dot, false);
                     fLogicMod->RequestUnTrigger();
                     return false;
                 }
             }
         }
     }
+
     return false;
 }

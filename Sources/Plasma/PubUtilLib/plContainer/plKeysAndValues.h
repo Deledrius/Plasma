@@ -50,8 +50,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #pragma warning(disable:4284)
 
-enum KAddValueMode
-{
+enum KAddValueMode {
     kAlwaysAdd,         // Add another value if key already exists
     kReplaceIfExists,   // Replace any existing key with new value.
     kFailIfExists,      // Do not add if key already exists.
@@ -60,13 +59,12 @@ enum KAddValueMode
 
 // class plKeysAndValues
 //  A multimap class. Stores multiple values per key.
-class plKeysAndValues : public hsStreamable
-{
-public:    
+class plKeysAndValues : public hsStreamable {
+public:
     typedef std::list<plString>
-        Values;
+    Values;
     typedef std::map<plString, Values, plString::less_i>
-        Keys;
+    Keys;
 
 private:
     mutable Keys fKeys;
@@ -74,42 +72,44 @@ private:
 public:
     // ctor
     plKeysAndValues();
-    plKeysAndValues(const plKeysAndValues & src);
-    virtual ~plKeysAndValues(){}
+    plKeysAndValues(const plKeysAndValues& src);
+    virtual ~plKeysAndValues() {}
     // assign
-    plKeysAndValues & operator =(const plKeysAndValues & src);
+    plKeysAndValues& operator =(const plKeysAndValues& src);
     // clear
     void Clear();
-    void RemoveKey(const plString & key);
+    void RemoveKey(const plString& key);
     // query
-    bool HasKey(const plString & key) const;
-    bool KeyHasValue(const plString & key, const plString & value);
-    bool KeyHasValue(const plString & key, int value);
-    bool KeyHasValue(const plString & key, double value);
+    bool HasKey(const plString& key) const;
+    bool KeyHasValue(const plString& key, const plString& value);
+    bool KeyHasValue(const plString& key, int value);
+    bool KeyHasValue(const plString& key, double value);
     // add
-    bool AddValue(const plString & key, const plString & value, KAddValueMode mode=kAlwaysAdd);
-    bool AddValue(const plString & key, int value, KAddValueMode mode=kAlwaysAdd);
-    bool AddValue(const plString & key, double value, KAddValueMode mode=kAlwaysAdd);
-    bool AddValues(const plString & key, const std::vector<plString> & values, KAddValueMode mode=kAlwaysAdd);
+    bool AddValue(const plString& key, const plString& value, KAddValueMode mode = kAlwaysAdd);
+    bool AddValue(const plString& key, int value, KAddValueMode mode = kAlwaysAdd);
+    bool AddValue(const plString& key, double value, KAddValueMode mode = kAlwaysAdd);
+    bool AddValues(const plString& key, const std::vector<plString>& values, KAddValueMode mode = kAlwaysAdd);
     // set (clear and add)
-    bool SetValue(const plString & key, const plString & value);
-    bool SetValue(const plString & key, int value);
-    bool SetValue(const plString & key, double value);
+    bool SetValue(const plString& key, const plString& value);
+    bool SetValue(const plString& key, int value);
+    bool SetValue(const plString& key, double value);
     // get single value
-    plString GetValue(const plString & key, const plString & defval="", bool * outFound=nil) const;
-    uint32_t GetValue(const plString & key, uint32_t defval, bool * outFound=nil) const;
-    int GetValue(const plString & key, int defval, bool * outFound=nil) const;
-    double GetValue(const plString & key, double defval, bool * outFound=nil) const;
-    std::vector<plString> GetAllValues(const plString & key);
+    plString GetValue(const plString& key, const plString& defval = "", bool* outFound = nil) const;
+    uint32_t GetValue(const plString& key, uint32_t defval, bool* outFound = nil) const;
+    int GetValue(const plString& key, int defval, bool* outFound = nil) const;
+    double GetValue(const plString& key, double defval, bool* outFound = nil) const;
+    std::vector<plString> GetAllValues(const plString& key);
     // key iterator
-    bool GetKeyIterators(Keys::const_iterator & iter, Keys::const_iterator & end) const;
+    bool GetKeyIterators(Keys::const_iterator& iter, Keys::const_iterator& end) const;
     // value iterator (use for getting all values for key)
-    bool GetValueIterators(const plString & key, Values::const_iterator & iter, Values::const_iterator & end) const;
+    bool GetValueIterators(const plString& key, Values::const_iterator& iter, Values::const_iterator& end) const;
     // streamable
-    void Read(hsStream * s);
-    void Write(hsStream * s);
+    void Read(hsStream* s);
+    void Write(hsStream* s);
     // TODO:
-    uint32_t GetStreamSize() { return 0;}
+    uint32_t GetStreamSize() {
+        return 0;
+    }
 };
 
 

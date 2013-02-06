@@ -44,7 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "HeadSpin.h"
 
-// #define HS_NO_EXCEPTIONS -- this will turn off execptions you might want 
+// #define HS_NO_EXCEPTIONS -- this will turn off execptions you might want
 // to do it with -D or equivalent instead of here since who knows who includes this.
 
 
@@ -64,7 +64,7 @@ class hsException {
 public:
     hsErrorEnum fError;
     long            fParam;
-    
+
     hsException(hsErrorEnum error, long param = 0) : fError(error), fParam(param) {}
 };
 
@@ -104,63 +104,56 @@ public:
 
 inline void hsThrowIfNilParam(const void* p)
 {
-    if (p == nil)
-    {
-        hsAssert(0,"hsNilParamException");
+    if (p == nil) {
+        hsAssert(0, "hsNilParamException");
         throw hsNilParamException();
     }
 }
 
 inline void hsThrowIfBadParam(bool trueIfBadParam)
 {
-    if (trueIfBadParam)
-    {
-        hsAssert(0,"hsBadParamException");
+    if (trueIfBadParam) {
+        hsAssert(0, "hsBadParamException");
         throw hsBadParamException();
     }
 }
 
 inline void hsThrowIfOSErr(long osErr)
 {
-    if (osErr != 0)
-    {
-        hsAssert(0,"hsOSException");
+    if (osErr != 0) {
+        hsAssert(0, "hsOSException");
         throw hsOSException(osErr);
     }
 }
 
 inline void hsThrowIfTrue(bool condition)
 {
-    if (condition)
-    {
-        hsAssert(0,"hsThrowIfTrue");
+    if (condition) {
+        hsAssert(0, "hsThrowIfTrue");
         throw hsInternalException();
     }
 }
 
 inline void hsThrowIfFalse(bool condition)
 {
-    if (condition == false)
-    {
-        hsAssert(0,"hsThrowIfFalse");
+    if (condition == false) {
+        hsAssert(0, "hsThrowIfFalse");
         throw hsInternalException();
     }
 }
 
 inline void hsThrowIfTrue(bool condition, const char message[])
 {
-    if (condition)
-    {
-        hsAssert(0,message);
+    if (condition) {
+        hsAssert(0, message);
         throw message;
     }
 }
 
 inline void hsThrowIfFalse(bool condition, const char message[])
 {
-    if (condition == false)
-    {
-        hsAssert(0,message);
+    if (condition == false) {
+        hsAssert(0, message);
         throw message;
     }
 }
@@ -169,41 +162,41 @@ inline void hsThrowIfFalse(bool condition, const char message[])
 #define hsThrow(a) {hsAssert(0,#a);}
 #define hsCatch(a) if(0)
 #define hsCatch2(a,b) if(0)
-#define hsTry 
+#define hsTry
 
 inline void hsThrowIfNilParam(const void* p)
 {
-    hsAssert(p!=nil,"hsThrowIfNilParam");
+    hsAssert(p != nil, "hsThrowIfNilParam");
 }
 
 inline void hsThrowIfBadParam(bool trueIfBadParam)
 {
-    hsAssert(!trueIfBadParam,"hsThrowIfBadParam");
+    hsAssert(!trueIfBadParam, "hsThrowIfBadParam");
 }
 
 inline void hsThrowIfOSErr(long osErr)
 {
-    hsAssert(osErr==0,"hsThrowIfOSErr");
+    hsAssert(osErr == 0, "hsThrowIfOSErr");
 }
 
 inline void hsThrowIfTrue(bool condition)
 {
-    hsAssert(!condition,"hsThrowIfTrue");
+    hsAssert(!condition, "hsThrowIfTrue");
 }
 
 inline void hsThrowIfFalse(bool condition)
 {
-    hsAssert(condition,"hsThrowIfFalse");
+    hsAssert(condition, "hsThrowIfFalse");
 }
 
 inline void hsThrowIfTrue(bool condition, const char message[])
 {
-    hsAssert(!condition,message);
+    hsAssert(!condition, message);
 }
 
 inline void hsThrowIfFalse(bool condition, const char message[])
 {
-    hsAssert(condition,message);
+    hsAssert(condition, message);
 }
 
 

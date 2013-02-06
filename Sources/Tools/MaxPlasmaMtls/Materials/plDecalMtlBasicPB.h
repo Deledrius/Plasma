@@ -43,8 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define PL_DECALMTLBASICPB_H
 
 // Param ID's
-enum
-{
+enum {
     kDecalBasColorLock,
     kDecalBasColorAmb,
     kDecalBasColor,
@@ -57,7 +56,7 @@ enum
     kDecalBasUseSpec,
     kDecalBasShine,
     kDecalBasShineStr,
-    
+
     // New color stuff
     kDecalBasDiffuseLock,
     kDecalBasRunColor,

@@ -61,36 +61,37 @@ class plKIMiniProc;
 class plPlayerBookProc;
 class pfKITextVaultCallback;
 
-class pfKI : public hsKeyedObject 
-{
-    protected:
+class pfKI : public hsKeyedObject {
+protected:
 
-        plKIYesNoBox    *fYesNoProc;
-        plKIAddEditBox  *fAddEditProc;
-        plKIMainProc    *fMainProc;
-        plKIMiniProc    *fMiniProc;
+    plKIYesNoBox*    fYesNoProc;
+    plKIAddEditBox*  fAddEditProc;
+    plKIMainProc*    fMainProc;
+    plKIMiniProc*    fMiniProc;
 
-        plPlayerBookProc    *fPBProc;
+    plPlayerBookProc*    fPBProc;
 
-        pfKITextVaultCallback   *fKIVaultCallback;
+    pfKITextVaultCallback*   fKIVaultCallback;
 
-        static pfKI *fInstance;
+    static pfKI* fInstance;
 
-        void    IInitPlayerBook( void );
+    void    IInitPlayerBook(void);
 
-    public:
+public:
 
-        pfKI();
-        ~pfKI();
+    pfKI();
+    ~pfKI();
 
-        CLASSNAME_REGISTER( pfKI );
-        GETINTERFACE_ANY( pfKI, plReceiver );
+    CLASSNAME_REGISTER(pfKI);
+    GETINTERFACE_ANY(pfKI, plReceiver);
 
-        virtual bool    MsgReceive( plMessage *msg );
+    virtual bool    MsgReceive(plMessage* msg);
 
-        void    Init( void );
+    void    Init(void);
 
-        static pfKI *GetInstance( void ) { return fInstance; }
+    static pfKI* GetInstance(void) {
+        return fInstance;
+    }
 };
 
 

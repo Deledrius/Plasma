@@ -55,46 +55,39 @@ const float TimeBasedAvgRing<T>::kPercision = 0.001;
 template <class T>
 void TimeBasedAvgRing<T>::AddItem(T value, double time)
 {
-    hsTempMutexLock lock( fLock );
+    hsTempMutexLock lock(fLock);
 
-    if ( fList.empty() )
-    {
+    if (fList.empty()) {
         // initialize with the first time and zero the first value
-        fList.insert(fList.end(),Item<T>(0.0,time));
+        fList.insert(fList.end(), Item<T>(0.0, time));
         fRingStart = fRingEnd = fList.begin();
         fAvg = (float)value;
-    }
-    else
-    {
+    } else {
         // if we're within the percision amount subtract the RingEnd value from total
         // and update the RingEnd value by adding the current value to it
-        if (time - (*fRingEnd).GetTime() <= kPercision)
-        {
+        if (time - (*fRingEnd).GetTime() <= kPercision) {
             fTotal -= PercisionRoundUp((*fRingEnd).GetValue());
             (*fRingEnd).SetValue((*fRingEnd).GetValue() + value);
-        }
-        else
-        {
+        } else {
             // clean up the begining of the ring
             //// there can be some precision loss in the loop time calc
             //// check to see if the difference is within 1 milli
             while (time - (*fRingStart).GetTime() > fLen + kPercision
-                && fRingStart != fRingEnd)
-            {
+                    && fRingStart != fRingEnd) {
                 // remove RingStart from the avg part of the average calc
                 fTotal -= (*fRingStart).GetValue();
 
                 typename TimeList::iterator prev = fRingStart++;
 
                 // loop the ring if needed
-                if (fRingStart == fList.end())
+                if (fRingStart == fList.end()) {
                     fRingStart = fList.begin();
+                }
 
 
                 // if the new ring start is in the range, interpolate
                 //   and reuse prev
-                if (time - (*fRingStart).GetTime() < fLen)
-                {
+                if (time - (*fRingStart).GetTime() < fLen) {
                     // remove RingStart from the avg part of the average calc
                     fTotal -= PercisionRoundUp((*fRingStart).GetValue());
 
@@ -104,13 +97,13 @@ void TimeBasedAvgRing<T>::AddItem(T value, double time)
                     (*prev).SetTime((*fRingStart).GetTime() - remainder);
                     (*prev).SetValue(0);
                     // rounding loss occurs here if T is not floting point
-                    double scale = remainder/timedelta;
-                    hsAssert(scale < 1.0 && scale > 0.0,"Interp Scale Out of Bounds");
+                    double scale = remainder / timedelta;
+                    hsAssert(scale < 1.0 && scale > 0.0, "Interp Scale Out of Bounds");
                     (*fRingStart).SetValue((float)((*fRingStart).GetValue() * scale));
-                    
+
                     // add the new  value in
                     fTotal += (*fRingStart).GetValue();
-                    
+
                     // put prev back as ring start
                     fRingStart = prev;
                 }
@@ -118,8 +111,7 @@ void TimeBasedAvgRing<T>::AddItem(T value, double time)
             }
 
             // zero total & fAvg if we looped or neg
-            if (fRingStart == fRingEnd || fTotal < 0.0)
-            {
+            if (fRingStart == fRingEnd || fTotal < 0.0) {
                 fTotal = 0.0;
                 fAvg = 0.0;
             }
@@ -127,33 +119,35 @@ void TimeBasedAvgRing<T>::AddItem(T value, double time)
             // put the new value in the ring by expanding the ring if needed
             //  or replacing an empty value
             fRingEnd++;
-            if (fRingEnd == fList.end())
+
+            if (fRingEnd == fList.end()) {
                 fRingEnd = fList.begin();
-            // Do we have free space?
-            if (fRingEnd == fRingStart)
-            {
-                // no free space
-                fList.insert(fRingEnd,Item<T>(value,time));
-                fRingEnd--;
             }
-            else
-            {
+
+            // Do we have free space?
+            if (fRingEnd == fRingStart) {
+                // no free space
+                fList.insert(fRingEnd, Item<T>(value, time));
+                fRingEnd--;
+            } else {
                 // yes free space @ fRingEnd
-                (*fRingEnd) = Item<T>(value,time);
+                (*fRingEnd) = Item<T>(value, time);
             }
         }
 
         //update the avg
         fTotal += (*fRingEnd).GetValue();
         double currentLen = (*fRingEnd).GetTime() - (*fRingStart).GetTime();
-        if (currentLen < 1.0)
+
+        if (currentLen < 1.0) {
             fAvg = (float)fTotal;
-        else
+        } else {
             fAvg = (float)(fTotal / currentLen);
+        }
     }
 
     // update the max avg
-    fMaxAvg = hsMaximum( fMaxAvg, fAvg );
+    fMaxAvg = hsMaximum(fMaxAvg, fAvg);
 
 }
 

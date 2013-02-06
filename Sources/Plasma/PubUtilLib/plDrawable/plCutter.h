@@ -58,17 +58,20 @@ class plPrintCollect;
 class plAccTriIterator;
 class plAccessSpan;
 
-class plCutoutHit
-{
+class plCutoutHit {
 public:
     hsPoint3    fPos;
     hsVector3   fNorm;
 };
 
-class plCutoutVtx
-{
+class plCutoutVtx {
 public:
-    plCutoutVtx& Init(const hsPoint3& p, const hsVector3& n, const hsColorRGBA& c) { fPos = p; fNorm = n; fColor = c; return *this; }
+    plCutoutVtx& Init(const hsPoint3& p, const hsVector3& n, const hsColorRGBA& c) {
+        fPos = p;
+        fNorm = n;
+        fColor = c;
+        return *this;
+    }
 
     hsPoint3    fPos;
     hsVector3   fNorm;
@@ -76,32 +79,31 @@ public:
     hsPoint3    fUVW;
 };
 
-class plCutoutPoly
-{
+class plCutoutPoly {
 public:
     hsTArray<plCutoutVtx>       fVerts;
 
     bool                        fBaseHasAlpha;
 };
 
-class plCutoutMiniVtx
-{
+class plCutoutMiniVtx {
 public:
     hsPoint3    fPos;
     hsPoint3    fUVW;
 };
 
-class plFlatGridMesh
-{
+class plFlatGridMesh {
 public:
     hsTArray<plCutoutMiniVtx>   fVerts;
     hsTArray<uint16_t>            fIdx;
 
-    void Reset() { fVerts.SetCount(0); fIdx.SetCount(0); }
+    void Reset() {
+        fVerts.SetCount(0);
+        fIdx.SetCount(0);
+    }
 };
 
-class plCutter : public plCreatable
-{
+class plCutter : public plCreatable {
 protected:
 
     // Permanent attributes
@@ -123,7 +125,7 @@ protected:
 
     void            IConstruct(hsTArray<plCutoutPoly>& dst, hsTArray<plCutoutVtx>& poly, bool baseHasAlpha) const;
     bool            IPolyClip(hsTArray<plCutoutVtx>& poly, const hsPoint3 vPos[]) const;
-    
+
     inline void     ICutoutVtxHiU(const plCutoutVtx& inVtx, const plCutoutVtx& outVtx, plCutoutVtx& dst) const;
     inline void     ICutoutVtxHiV(const plCutoutVtx& inVtx, const plCutoutVtx& outVtx, plCutoutVtx& dst) const;
     inline void     ICutoutVtxHiW(const plCutoutVtx& inVtx, const plCutoutVtx& outVtx, plCutoutVtx& dst) const;
@@ -147,8 +149,8 @@ public:
     plCutter() {}
     virtual ~plCutter() {}
 
-    CLASSNAME_REGISTER( plCutter );
-    GETINTERFACE_ANY( plCutter, plCreatable );
+    CLASSNAME_REGISTER(plCutter);
+    GETINTERFACE_ANY(plCutter, plCreatable);
 
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
@@ -157,19 +159,35 @@ public:
     bool        FindHitPoints(const hsTArray<plCutoutPoly>& src, hsTArray<plCutoutHit>& hits) const;
     bool        FindHitPointsConstHeight(const hsTArray<plCutoutPoly>& src, hsTArray<plCutoutHit>& hits, float height) const;
 
-    void        Set(const hsPoint3& pos, const hsVector3& dir, const hsVector3& out, bool flip=false);
+    void        Set(const hsPoint3& pos, const hsVector3& dir, const hsVector3& out, bool flip = false);
 
     void        Cutout(plAccessSpan& src, hsTArray<plCutoutPoly>& dst) const;
     bool        CutoutGrid(int nWid, int nLen, plFlatGridMesh& dst) const;
 
-    void        SetLength(const hsVector3& s) { fLengthU = s.fX; fLengthV = s.fY; fLengthW = s.fZ; }
-    float    GetLengthU() const { return fLengthU; }
-    float    GetLengthV() const { return fLengthV; }
-    float    GetLengthW() const { return fLengthW; }
+    void        SetLength(const hsVector3& s) {
+        fLengthU = s.fX;
+        fLengthV = s.fY;
+        fLengthW = s.fZ;
+    }
+    float    GetLengthU() const {
+        return fLengthU;
+    }
+    float    GetLengthV() const {
+        return fLengthV;
+    }
+    float    GetLengthW() const {
+        return fLengthW;
+    }
 
-    const hsBounds3Ext& GetWorldBounds() const { return fWorldBounds; }
-    plBoundsIsect& GetIsect() { return fIsect; }
-    hsVector3 GetBackDir() const { return fBackDir; }
+    const hsBounds3Ext& GetWorldBounds() const {
+        return fWorldBounds;
+    }
+    plBoundsIsect& GetIsect() {
+        return fIsect;
+    }
+    hsVector3 GetBackDir() const {
+        return fBackDir;
+    }
 
     static bool MakeGrid(int nWid, int nLen, const hsPoint3& center, const hsVector3& halfU, const hsVector3& halfV, plFlatGridMesh& grid);
 

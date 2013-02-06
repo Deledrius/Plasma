@@ -79,8 +79,7 @@ class plSoundVolumeApplicator;
 #define MCN_HACK_OUR_ATTEN  0
 #define MAX_INCIDENTALS 4
 
-class plSound : public plSynchedObject
-{
+class plSound : public plSynchedObject {
     friend class plSoundSDLModifier;
     friend class plSoundVolumeApplicator;
 
@@ -88,11 +87,10 @@ public:
     plSound();
     virtual ~plSound();
 
-    CLASSNAME_REGISTER( plSound );
-    GETINTERFACE_ANY( plSound, plSynchedObject );
+    CLASSNAME_REGISTER(plSound);
+    GETINTERFACE_ANY(plSound, plSynchedObject);
 
-    enum Property
-    {
+    enum Property {
         kPropIs3DSound      = 0x00000001,
         kPropDisableLOD     = 0x00000002,
         kPropLooping        = 0x00000004,
@@ -100,13 +98,12 @@ public:
         kPropLocalOnly      = 0x00000010,   // Disables network synching and triggering
         kPropLoadOnlyOnCall = 0x00000020,   // Only load and unload when we're told to
         kPropFullyDisabled  = 0x00000040,   // This sound should never play while this is set
-                                            // Only plWin32LinkSound uses it. Placed here as a TODO though...
+        // Only plWin32LinkSound uses it. Placed here as a TODO though...
         kPropDontFade       = 0x00000080,
         kPropIncidental     = 0x00000100    // Incidental sound, will be played thru the incidental manager
     };
 
-    enum Type
-    {
+    enum Type {
         kStartType,
         kSoundFX = kStartType,              // For now, 3D sounds are always marked as this
         kAmbience,
@@ -116,70 +113,76 @@ public:
         kNumTypes
     };
 
-    enum Refs
-    {
+    enum Refs {
         kRefSoftVolume = 0,
         kRefDataBuffer,     // plugins only
         kRefParentSceneObject,
         kRefSoftOcclusionRegion
     };
 
-    enum 
-    {
+    enum {
         kSoftRegion = 0
     };
 
-    enum StreamType
-    { 
-        kNoStream, 
-        kStreamFromRAM, 
-        kStreamFromDisk, 
-        kStreamCompressed 
+    enum StreamType {
+        kNoStream,
+        kStreamFromRAM,
+        kStreamFromDisk,
+        kStreamCompressed
     };
 
-    class plFadeParams
-    {
+    class plFadeParams {
         friend class plSound;
 
-        public:
-            enum Type
-            {
-                kLinear,
-                kLogarithmic,
-                kExponential
-            };
+    public:
+        enum Type {
+            kLinear,
+            kLogarithmic,
+            kExponential
+        };
 
-            float    fLengthInSecs;      // Time to take to fade
-            float    fVolStart;          // Set one of these two for fade in/out,
-            float    fVolEnd;            // the other becomes the current volume
-            uint8_t  fType;
-            bool     fStopWhenDone;      // Actually stop the sound once the fade is complete
-            bool     fFadeSoftVol;       // Fade the soft volume instead of fCurrVolume
+        float    fLengthInSecs;      // Time to take to fade
+        float    fVolStart;          // Set one of these two for fade in/out,
+        float    fVolEnd;            // the other becomes the current volume
+        uint8_t  fType;
+        bool     fStopWhenDone;      // Actually stop the sound once the fade is complete
+        bool     fFadeSoftVol;       // Fade the soft volume instead of fCurrVolume
 
-            plFadeParams() { fLengthInSecs = 0.f; fCurrTime = -1.f; fStopWhenDone = false; fFadeSoftVol = false; fVolStart = fVolEnd = 0.f; fType = kLinear; }
+        plFadeParams() {
+            fLengthInSecs = 0.f;
+            fCurrTime = -1.f;
+            fStopWhenDone = false;
+            fFadeSoftVol = false;
+            fVolStart = fVolEnd = 0.f;
+            fType = kLinear;
+        }
 
-            plFadeParams( Type type, float len, float start, float end )
-            {
-                fLengthInSecs = len; fVolStart = start; fVolEnd = end; fType = type;
-                fStopWhenDone = false;
-                fFadeSoftVol = false;
-            }
+        plFadeParams(Type type, float len, float start, float end) {
+            fLengthInSecs = len;
+            fVolStart = start;
+            fVolEnd = end;
+            fType = type;
+            fStopWhenDone = false;
+            fFadeSoftVol = false;
+        }
 
-            void    Read( hsStream *s );
-            void    Write( hsStream *s );
+        void    Read(hsStream* s);
+        void    Write(hsStream* s);
 
-            float    InterpValue( void );
+        float    InterpValue(void);
 
-        protected:
-            float    fCurrTime;          // -1 if we aren't active, else it's how far we're into the animation
+    protected:
+        float    fCurrTime;          // -1 if we aren't active, else it's how far we're into the animation
     };
 
-    virtual bool        LoadSound( bool is3D ) = 0;
-    float            GetVirtualStartTime( void ) const { return (float)fVirtualStartTime; }
+    virtual bool        LoadSound(bool is3D) = 0;
+    float            GetVirtualStartTime(void) const {
+        return (float)fVirtualStartTime;
+    }
 
     virtual void        Play();
-    void                SynchedPlay( unsigned bytes );
-    void                SynchedPlay( float virtualStartTime );
+    void                SynchedPlay(unsigned bytes);
+    void                SynchedPlay(float virtualStartTime);
     virtual void        Stop();
     virtual void        FastForwardPlay();
     virtual void        FastForwardToggle();
@@ -188,93 +191,141 @@ public:
     virtual int         GetMin() const;
     virtual int         GetMax() const;
     virtual void        SetVolume(const float volume);
-    virtual float       GetVolume(void) const { return fCurrVolume; }
-    float            GetMaxVolume() { return fMaxVolume; }
-    virtual bool        IsPlaying() { return fPlaying; }
+    virtual float       GetVolume(void) const {
+        return fCurrVolume;
+    }
+    float            GetMaxVolume() {
+        return fMaxVolume;
+    }
+    virtual bool        IsPlaying() {
+        return fPlaying;
+    }
     void                SetTime(double t);
-    virtual double      GetTime( void ) { return 0.f; }
+    virtual double      GetTime(void) {
+        return 0.f;
+    }
     virtual void        Activate(bool forcePlay = false);
     virtual void        DeActivate();
-    virtual void        SetLength(double l) { fLength = l; }
-    virtual void        SetMuted( bool muted );
-    virtual bool        IsMuted( void ) { return fMuted; }
-    void                Disable() { fDistAttenuation = 0; }
-    virtual plSoundMsg* GetStatus(plSoundMsg* pMsg){return NULL;}
+    virtual void        SetLength(double l) {
+        fLength = l;
+    }
+    virtual void        SetMuted(bool muted);
+    virtual bool        IsMuted(void) {
+        return fMuted;
+    }
+    void                Disable() {
+        fDistAttenuation = 0;
+    }
+    virtual plSoundMsg* GetStatus(plSoundMsg* pMsg) {
+        return NULL;
+    }
     virtual void        SetConeOrientation(float x, float y, float z);
-    virtual void        SetOuterVolume( const int v ); // volume for the outer cone (if applicable)
-    virtual void        SetConeAngles( int inner, int outer );
+    virtual void        SetOuterVolume(const int v);   // volume for the outer cone (if applicable)
+    virtual void        SetConeAngles(int inner, int outer);
     virtual void        SetPosition(const hsPoint3 pos);
     virtual void        SetVelocity(const hsVector3 vel);
     virtual hsPoint3    GetPosition() const;
     virtual hsVector3   GetVelocity() const;
 
     virtual void        Update();
-    
-    plSoundBuffer *     GetDataBuffer( void ) const { return (plSoundBuffer *)fDataBufferKey->ObjectIsLoaded(); }
-    float               QueryCurrVolume( void ) const;  // Returns the current volume, attenuated
 
-    plFileName          GetFileName( void ) const;
+    plSoundBuffer*      GetDataBuffer(void) const {
+        return (plSoundBuffer*)fDataBufferKey->ObjectIsLoaded();
+    }
+    float               QueryCurrVolume(void) const;    // Returns the current volume, attenuated
+
+    plFileName          GetFileName(void) const;
     virtual double      GetLength();
 
-    void                SetProperty( Property prop, bool on ) { if( on ) fProperties |= prop; else fProperties &= ~prop; }
-    bool                IsPropertySet( Property prop ) const { return ( fProperties & prop ) ? true : false; }
+    void                SetProperty(Property prop, bool on) {
+        if (on) {
+            fProperties |= prop;
+        } else {
+            fProperties &= ~prop;
+        }
+    }
+    bool                IsPropertySet(Property prop) const {
+        return (fProperties & prop) ? true : false;
+    }
 
-    virtual void        RefreshVolume( void );
+    virtual void        RefreshVolume(void);
 
     virtual void        SetStartPos(unsigned bytes) = 0;
-    virtual unsigned    GetByteOffset(){return 0;}
+    virtual unsigned    GetByteOffset() {
+        return 0;
+    }
     virtual float       GetActualTimeSec() = 0;
 
     virtual void        AddCallbacks(plSoundMsg* pMsg) = 0;
     virtual void        RemoveCallbacks(plSoundMsg* pMsg) = 0;
 
-    virtual uint8_t       GetChannelSelect( void ) const { return 0; }    // Only defined on Win32Sound right now, should be here tho
+    virtual uint8_t       GetChannelSelect(void) const {
+        return 0;    // Only defined on Win32Sound right now, should be here tho
+    }
 
     virtual void        Read(hsStream* s, hsResMgr* mgr);
     virtual void        Write(hsStream* s, hsResMgr* mgr);
-    
-    virtual void        SetFadeInEffect( plFadeParams::Type type, float length );
-    virtual void        SetFadeOutEffect( plFadeParams::Type type, float length );
-    virtual float    CalcSoftVolume( bool enable, float distToListenerSquared );
-    virtual void        UpdateSoftVolume( bool enable, bool firstTime = false );
 
-    virtual bool        MsgReceive( plMessage* pMsg );
-    virtual bool        DirtySynchState( const char *sdlName = nil, uint32_t sendFlags = 0 ); // call when state has changed
+    virtual void        SetFadeInEffect(plFadeParams::Type type, float length);
+    virtual void        SetFadeOutEffect(plFadeParams::Type type, float length);
+    virtual float    CalcSoftVolume(bool enable, float distToListenerSquared);
+    virtual void        UpdateSoftVolume(bool enable, bool firstTime = false);
+
+    virtual bool        MsgReceive(plMessage* pMsg);
+    virtual bool        DirtySynchState(const char* sdlName = nil, uint32_t sendFlags = 0);   // call when state has changed
 
     // Tests whether this sound is within range of the given position, not counting soft regions
-    bool                IsWithinRange( const hsPoint3 &listenerPos, float *distSquared );
+    bool                IsWithinRange(const hsPoint3& listenerPos, float* distSquared);
 
     // Type setting and getting, from the Types enum
-    void                SetType( uint8_t type ) { fType = type; }
-    uint8_t               GetType( void ) const { return fType; }
+    void                SetType(uint8_t type) {
+        fType = type;
+    }
+    uint8_t               GetType(void) const {
+        return fType;
+    }
 
     // Priority stuff
-    void                SetPriority( uint8_t pri ) { fPriority = pri; }
-    uint8_t               GetPriority( void ) const { return fPriority; }
+    void                SetPriority(uint8_t pri) {
+        fPriority = pri;
+    }
+    uint8_t               GetPriority(void) const {
+        return fPriority;
+    }
 
     // Visualization
     virtual plDrawableSpans*    CreateProxy(const hsMatrix44& l2w, hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo);
 
     // Forced loading/unloading (for when the audio system's LOD just doesn't cut it)
-    virtual void        ForceLoad(  );
-    virtual void        ForceUnload( void );
+    virtual void        ForceLoad();
+    virtual void        ForceUnload(void);
 
     // Note: ONLY THE AUDIOSYS SHOULD CALL THIS. If you're not the audioSys, get lost.
-    static void         SetCurrDebugPlate( const plKey soundKey );
+    static void         SetCurrDebugPlate(const plKey soundKey);
 
-    void                RegisterOnAudioSys( void );
-    void                UnregisterOnAudioSys( void );
+    void                RegisterOnAudioSys(void);
+    void                UnregisterOnAudioSys(void);
 
     // Also only for the audio system
-    float            GetVolumeRank( void );
-    void                ForceUnregisterFromAudioSys( void );
+    float            GetVolumeRank(void);
+    void                ForceUnregisterFromAudioSys(void);
 
-    static void         SetLoadOnDemand( bool activate ) { fLoadOnDemandFlag = activate; }
-    static void         SetLoadFromDiskOnDemand( bool activate ) { fLoadFromDiskOnDemand = activate; }
+    static void         SetLoadOnDemand(bool activate) {
+        fLoadOnDemandFlag = activate;
+    }
+    static void         SetLoadFromDiskOnDemand(bool activate) {
+        fLoadFromDiskOnDemand = activate;
+    }
 
-    const plEAXSourceSettings   &GetEAXSettings( void ) const { return fEAXSettings; }
-    plEAXSourceSettings         &GetEAXSettings( void ) { return fEAXSettings; }
-    virtual StreamType          GetStreamType() const { return kNoStream; }
+    const plEAXSourceSettings&   GetEAXSettings(void) const {
+        return fEAXSettings;
+    }
+    plEAXSourceSettings&         GetEAXSettings(void) {
+        return fEAXSettings;
+    }
+    virtual StreamType          GetStreamType() const {
+        return kNoStream;
+    }
     virtual void    FreeSoundData();
 
 
@@ -293,14 +344,14 @@ protected:
     int         fInnerCone;
     int         fOuterCone;
     double      fLength;
-    
+
     int         fProperties;
     uint8_t       fType;
     uint8_t       fPriority;
 
     bool        fMuted, fFading, fRegisteredForTime, fPlayOnReactivate, fFreeData;
     bool        fNotHighEnoughPriority;     // Set whenever the audioSys calls UpdateSoftVolume() with enable=false,
-                                            // thus indicating that we slipped off the top 16 most wanted list. 
+    // thus indicating that we slipped off the top 16 most wanted list.
 
     // Do these need to be synched values? They weren't before...
     hsVector3   fConeOrientation;
@@ -309,9 +360,9 @@ protected:
     bool        fPlayWhenLoaded;
 
     double      fSynchedStartTimeSec;
-    
+
     // Just around for reference and sending messages upward (synched state)
-    plSceneObject       *fOwningSceneObject;
+    plSceneObject*       fOwningSceneObject;
 
     // EAX Settings storage here
     plEAXSourceSettings fEAXSettings;
@@ -319,61 +370,61 @@ protected:
 
     plFadeParams    fFadeInParams, fFadeOutParams;
     plFadeParams    fCoolSoftVolumeTrickParams;
-    plFadeParams    *fCurrFadeParams;
+    plFadeParams*    fCurrFadeParams;
 
-    plSoftVolume    *fSoftRegion;
+    plSoftVolume*    fSoftRegion;
     float        fSoftVolume;
     float        fDistAttenuation, fDistToListenerSquared;
     double          fVirtualStartTime;
     bool            fRegistered;
     static unsigned fIncidentalsPlaying;
 
-    plSoftVolume    *fSoftOcclusionRegion;
+    plSoftVolume*    fSoftOcclusionRegion;
 
-    plSoundBuffer   *fDataBuffer;           // Not always around
+    plSoundBuffer*   fDataBuffer;           // Not always around
     bool            fDataBufferLoaded;
     plKey           fDataBufferKey;     // Always around
 
-    static plGraphPlate *fDebugPlate;
-    static plSound      *fCurrDebugPlateSound;
+    static plGraphPlate* fDebugPlate;
+    static plSound*      fCurrDebugPlateSound;
 
     static bool         fLoadOnDemandFlag, fLoadFromDiskOnDemand;
     bool                fLoading;
 
-    void            IUpdateDebugPlate( void );
-    void            IPrintDbgMessage( const char *msg, bool isErr = false );
+    void            IUpdateDebugPlate(void);
+    void            IPrintDbgMessage(const char* msg, bool isErr = false);
 
     virtual void    ISetActualVolume(const float v) = 0;
-    virtual void    IActuallyStop( void );
-    virtual bool    IActuallyPlaying( void ) = 0;
-    virtual void    IActuallyPlay( void ) = 0;
-    virtual void    IFreeBuffers( void ) = 0;
+    virtual void    IActuallyStop(void);
+    virtual bool    IActuallyPlaying(void) = 0;
+    virtual void    IActuallyPlay(void) = 0;
+    virtual void    IFreeBuffers(void) = 0;
 
-    //NOTE: if isIncidental is true the entire sound will be loaded. 
-    virtual plSoundBuffer::ELoadReturnVal   IPreLoadBuffer( bool playWhenLoaded, bool isIncidental = false );   
-    virtual void        ISetActualTime( double t ) = 0;
-    
-    virtual bool        IActuallyLoaded( void ) = 0;
-    virtual void        IRefreshEAXSettings( bool force = false ) = 0;
+    //NOTE: if isIncidental is true the entire sound will be loaded.
+    virtual plSoundBuffer::ELoadReturnVal   IPreLoadBuffer(bool playWhenLoaded, bool isIncidental = false);
+    virtual void        ISetActualTime(double t) = 0;
 
-    virtual float    IGetChannelVolume( void ) const;
+    virtual bool        IActuallyLoaded(void) = 0;
+    virtual void        IRefreshEAXSettings(bool force = false) = 0;
 
-    void    ISynchToStartTime( void );
-    void    ISynchedPlay( double virtualStartTime );
-    void    IStartFade( plFadeParams *params, float offsetIntoFade = 0.f );
-    void    IStopFade( bool shuttingDown = false, bool SetVolEnd = true);
-    
-    bool    IWillBeAbleToPlay( void );
+    virtual float    IGetChannelVolume(void) const;
 
-    void        ISetSoftRegion( plSoftVolume *region );
-    float    IAttenuateActualVolume( float volume ) const;
-    void        ISetSoftOcclusionRegion( plSoftVolume *region );
+    void    ISynchToStartTime(void);
+    void    ISynchedPlay(double virtualStartTime);
+    void    IStartFade(plFadeParams* params, float offsetIntoFade = 0.f);
+    void    IStopFade(bool shuttingDown = false, bool SetVolEnd = true);
+
+    bool    IWillBeAbleToPlay(void);
+
+    void        ISetSoftRegion(plSoftVolume* region);
+    float    IAttenuateActualVolume(float volume) const;
+    void        ISetSoftOcclusionRegion(plSoftVolume* region);
 
     // Override to make sure the buffer is available before the base class is called
-    virtual void    IRefreshParams( void );
+    virtual void    IRefreshParams(void);
 
-    virtual bool    ILoadDataBuffer( void );
-    virtual void    IUnloadDataBuffer( void );
+    virtual bool    ILoadDataBuffer(void);
+    virtual void    IUnloadDataBuffer(void);
 
     //virtual void  ISetMinDistance( const int m ) = 0;
     //virtual void  ISetMaxDistance( const int m ) = 0;
@@ -383,30 +434,31 @@ protected:
     //virtual void  ISetVelocity( const hsVector3 vel ) = 0;
     //virtual void  ISetPosition( const hsPoint3 pos ) = 0;
 
-    virtual void    IRead( hsStream *s, hsResMgr *mgr );
-    virtual void    IWrite( hsStream *s, hsResMgr *mgr );
+    virtual void    IRead(hsStream* s, hsResMgr* mgr);
+    virtual void    IWrite(hsStream* s, hsResMgr* mgr);
 };
 
 
 //// plSoundVolumeApplicator /////////////////////////////////////////////////
 //  Tiny helper for handling animated volumes
 
-class plSoundVolumeApplicator : public plAGApplicator
-{
+class plSoundVolumeApplicator : public plAGApplicator {
 public:
     plSoundVolumeApplicator() { }
-    plSoundVolumeApplicator( uint32_t index ) { fIndex = index; }
+    plSoundVolumeApplicator(uint32_t index) {
+        fIndex = index;
+    }
 
-    CLASSNAME_REGISTER( plSoundVolumeApplicator );
-    GETINTERFACE_ANY( plSoundVolumeApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plSoundVolumeApplicator);
+    GETINTERFACE_ANY(plSoundVolumeApplicator, plAGApplicator);
 
-    virtual plAGApplicator *CloneWithChannel( plAGChannel *channel );
-    virtual void            Write( hsStream *stream, hsResMgr *mgr );
-    virtual void            Read( hsStream *s, hsResMgr *mgr );
+    virtual plAGApplicator* CloneWithChannel(plAGChannel* channel);
+    virtual void            Write(hsStream* stream, hsResMgr* mgr);
+    virtual void            Read(hsStream* s, hsResMgr* mgr);
 
 protected:
     uint32_t      fIndex;
-    virtual void IApply( const plAGModifier *mod, double time );
+    virtual void IApply(const plAGModifier* mod, double time);
 };
 
 #endif //plWin32Sound_h

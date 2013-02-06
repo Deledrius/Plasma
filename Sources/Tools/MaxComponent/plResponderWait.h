@@ -49,20 +49,19 @@ class IParamBlock2;
 class plResponderModifier;
 class plString;
 
-namespace ResponderWait
-{
-    void SetDesc(ClassDesc2 *desc);
+namespace ResponderWait {
+void SetDesc(ClassDesc2* desc);
 
-    void InitDlg(IParamBlock2 *curStatePB, int curCmd, HWND hList);
+void InitDlg(IParamBlock2* curStatePB, int curCmd, HWND hList);
 
-    IParamBlock2 *CreatePB();
-    void FixupWaitBlock(IParamBlock2 *waitPB);
+IParamBlock2* CreatePB();
+void FixupWaitBlock(IParamBlock2* waitPB);
 
-    bool ValidateCmdMove(IParamBlock2 *state, int oldIdx, int newIdx);
-    void CmdMoved(IParamBlock2 *state, int oldIdx, int newIdx);
-    void CmdRemoved(IParamBlock2 *state, int delIdx);
-    
-    bool        GetWaitOnMe(IParamBlock2* waitPB);
-    int         GetWaitingOn(IParamBlock2* waitPB);
-    plString    GetWaitPoint(IParamBlock2* waitPB);
+bool ValidateCmdMove(IParamBlock2* state, int oldIdx, int newIdx);
+void CmdMoved(IParamBlock2* state, int oldIdx, int newIdx);
+void CmdRemoved(IParamBlock2* state, int delIdx);
+
+bool        GetWaitOnMe(IParamBlock2* waitPB);
+int         GetWaitingOn(IParamBlock2* waitPB);
+plString    GetWaitPoint(IParamBlock2* waitPB);
 }

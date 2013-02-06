@@ -55,16 +55,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 static const float kMinMinZ = 1.f; // totally random arbitrary number (has to be > 0).
 
-static inline void QuickNorm( hsVector3& a, float& b ) 
-{ 
-    float len = hsFastMath::InvSqrtAppr((a).MagnitudeSquared()); 
-    a *= len; 
-    b *= len; 
+static inline void QuickNorm(hsVector3& a, float& b)
+{
+    float len = hsFastMath::InvSqrtAppr((a).MagnitudeSquared());
+    a *= len;
+    b *= len;
 }
 
 static inline hsVector3 CrossProd(const hsVector3& a, const hsPoint3& b)
 {
-    return hsVector3(a.fY*b.fZ - a.fZ*b.fY, a.fZ*b.fX - a.fX*b.fZ, a.fX*b.fY - a.fY*b.fX);
+    return hsVector3(a.fY * b.fZ - a.fZ * b.fY, a.fZ * b.fX - a.fX * b.fZ, a.fX * b.fY - a.fY * b.fX);
 }
 
 static inline void InverseOfPureRotTran(const hsMatrix44& src, hsMatrix44& inv)
@@ -94,15 +94,17 @@ static inline void InverseOfPureRotTran(const hsMatrix44& src, hsMatrix44& inv)
 ////////////////////////////////////////////////////////////////////////////////////
 plPointShadowMaster::plPointShadowMaster()
 {
-    fLastUp.Set(0,0,0);
+    fLastUp.Set(0, 0, 0);
 }
 
 plPointShadowMaster::~plPointShadowMaster()
 {
     fIsectPool.SetCount(fIsectPool.GetNumAlloc());
     int i;
-    for( i = 0; i < fIsectPool.GetCount(); i++ )
+
+    for (i = 0; i < fIsectPool.GetCount(); i++) {
         delete fIsectPool[i];
+    }
 }
 
 plShadowSlave* plPointShadowMaster::INewSlave(const plShadowCaster* caster)
@@ -135,17 +137,18 @@ void plPointShadowMaster::IComputeWorldToLight(const hsBounds3Ext& bnd, plShadow
     float dist = fromDepth - depth.fY;
 
     static float kMinDist = 3.f;
-    if( dist < kMinDist )
-    {
+
+    if (dist < kMinDist) {
         atToFrom *= kMinDist - dist;
         from += atToFrom;
     }
 
-    hsVector3 up(0,0,1.f);
-    if( CrossProd(up, (at - from)).MagnitudeSquared() < kMinMag )
-    {
+    hsVector3 up(0, 0, 1.f);
+
+    if (CrossProd(up, (at - from)).MagnitudeSquared() < kMinMag) {
         up.Set(0, 1.f, 0);
     }
+
     hsMatrix44 w2light;
     w2light.MakeCamera(&from, &at, &up); // mf_flip_up - mf
 
@@ -172,11 +175,12 @@ void plPointShadowMaster::IComputeProjections(plShadowCastMsg* castMsg, plShadow
 void plPointShadowMaster::IComputeISect(const hsBounds3Ext& bnd, plShadowSlave* slave) const
 {
     int iIsect = fIsectPool.GetCount();
-    fIsectPool.ExpandAndZero(iIsect+1);
-    if( !fIsectPool[iIsect] )
-    {
+    fIsectPool.ExpandAndZero(iIsect + 1);
+
+    if (!fIsectPool[iIsect]) {
         fIsectPool[iIsect] = new plBoundsIsect;
     }
+
     plBoundsIsect* isect = fIsectPool[iIsect];
 
     const hsBounds3Ext& wBnd = slave->fWorldBounds;

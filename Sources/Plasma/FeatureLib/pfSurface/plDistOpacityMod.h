@@ -52,8 +52,7 @@ class plRenderMsg;
 class plFadeOpacityLay;
 
 
-class plDistOpacityMod : public plSingleModifier
-{
+class plDistOpacityMod : public plSingleModifier {
 public:
 
     enum {
@@ -84,15 +83,16 @@ protected:
     hsTArray<plFadeOpacityLay*> fFadeLays;
 
     // We only act in response to messages.
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return false; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return false;
+    }
 
     float ICalcOpacity(const hsPoint3& targPos, const hsPoint3& refPos) const;
     void ISetOpacity();
 
     void ISetup();
 
-    void ICheckDists()
-    {
+    void ICheckDists() {
         hsAssert(fDists[kNearTrans] <= fDists[kNearOpaq], "Bad transition values");
         hsAssert(fDists[kNearOpaq] <= fDists[kFarOpaq], "Bad transition values");
         hsAssert(fDists[kFarOpaq] <= fDists[kFarTrans], "Bad transition values");
@@ -102,8 +102,8 @@ public:
     plDistOpacityMod();
     virtual ~plDistOpacityMod();
 
-    CLASSNAME_REGISTER( plDistOpacityMod );
-    GETINTERFACE_ANY( plDistOpacityMod, plSingleModifier );
+    CLASSNAME_REGISTER(plDistOpacityMod);
+    GETINTERFACE_ANY(plDistOpacityMod, plSingleModifier);
 
     virtual void            SetKey(plKey k);
 
@@ -119,10 +119,18 @@ public:
     void SetFarDist(float opaque, float transparent);
     void SetNearDist(float transparent, float opaque);
 
-    float GetFarTransparent() const { return fDists[kFarTrans]; }
-    float GetNearTransparent() const { return fDists[kNearTrans]; }
-    float GetFarOpaque() const { return fDists[kFarOpaq]; }
-    float GetNearOpaque() const { return fDists[kNearOpaq]; }
+    float GetFarTransparent() const {
+        return fDists[kFarTrans];
+    }
+    float GetNearTransparent() const {
+        return fDists[kNearTrans];
+    }
+    float GetFarOpaque() const {
+        return fDists[kFarOpaq];
+    }
+    float GetNearOpaque() const {
+        return fDists[kNearOpaq];
+    }
 };
 
 #endif // plDistOpacityMod_inc

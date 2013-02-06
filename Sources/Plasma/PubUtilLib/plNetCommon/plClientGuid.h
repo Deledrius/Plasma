@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnFactory/plCreatable.h"
 #include "pnUUID/pnUUID.h"
 
-class plClientGuid : public plCreatable
-{
+class plClientGuid : public plCreatable {
     uint16_t  fFlags;
     plUUID    fAccountUUID;
     uint32_t  fPlayerID;
@@ -61,81 +60,126 @@ class plClientGuid : public plCreatable
     plString  fClientKey;
 
 public:
-    enum Flags // 16 bits.
-    {
-        kAccountUUID    = 1<<0,
-        kPlayerID       = 1<<1,
-        kTempPlayerID   = 1<<2,
-        kCCRLevel       = 1<<3,
-        kProtectedLogin = 1<<4,
-        kBuildType      = 1<<5,
-        kPlayerName     = 1<<6,
-        kSrcAddr        = 1<<7,
-        kSrcPort        = 1<<8,
-        kReserved       = 1<<9,
-        kClientKey  = 1<<10,
+    enum Flags { // 16 bits.
+        kAccountUUID    = 1 << 0,
+        kPlayerID       = 1 << 1,
+        kTempPlayerID   = 1 << 2,
+        kCCRLevel       = 1 << 3,
+        kProtectedLogin = 1 << 4,
+        kBuildType      = 1 << 5,
+        kPlayerName     = 1 << 6,
+        kSrcAddr        = 1 << 7,
+        kSrcPort        = 1 << 8,
+        kReserved       = 1 << 9,
+        kClientKey  = 1 << 10,
     };
     plClientGuid();
-    CLASSNAME_REGISTER( plClientGuid );
-    GETINTERFACE_ANY( plClientGuid, plCreatable );
+    CLASSNAME_REGISTER(plClientGuid);
+    GETINTERFACE_ANY(plClientGuid, plCreatable);
 
     plString AsString() const;
     plString AsLogString() const;
     void    Clear();
-    void    CopyFrom(const plClientGuid * other);
-    void    UpdateFrom(const plClientGuid * other);
-    bool    IsEqualTo(const plClientGuid * other) const;
-    bool    IsFlagSet( uint16_t flag ) const { return (fFlags&flag)!=0; }
-    bool    IsFullyQualified() const { return HasAccountUUID()&&HasPlayerID();}
+    void    CopyFrom(const plClientGuid* other);
+    void    UpdateFrom(const plClientGuid* other);
+    bool    IsEqualTo(const plClientGuid* other) const;
+    bool    IsFlagSet(uint16_t flag) const {
+        return (fFlags & flag) != 0;
+    }
+    bool    IsFullyQualified() const {
+        return HasAccountUUID() && HasPlayerID();
+    }
 
-    void    Read(hsStream * s, hsResMgr* =nil);
-    void    Write(hsStream * s, hsResMgr* =nil);
+    void    Read(hsStream* s, hsResMgr* = nil);
+    void    Write(hsStream* s, hsResMgr* = nil);
 
-    bool    HasAccountUUID() const { return (fFlags&kAccountUUID&&!fAccountUUID.IsNull())?true:false;}
-    bool    HasPlayerID() const { return (fFlags&kPlayerID&&fPlayerID>0)?true:false;}
-    bool    HasPlayerName() const { return (fFlags&kPlayerName&&!fPlayerName.IsEmpty())?true:false; }
-    bool    HasCCRLevel() const { return (fFlags&kCCRLevel)?true:false;}
-    bool    HasProtectedLogin() const { return (fFlags&kProtectedLogin)?true:false;}
-    bool    HasBuildType() const { return (fFlags&kBuildType)?true:false;}
-    bool    HasSrcAddr() const { return (fFlags&kSrcAddr)!=0;}
-    bool    HasSrcPort() const { return (fFlags&kSrcPort)!=0;}
-    bool    HasReservedBit() const { return (fFlags&kReserved)!=0;}
-    bool    HasClientKey() const { return (fFlags&kClientKey)!=0;}
-    
-    const plUUID * GetAccountUUID() const { return &fAccountUUID;}
-    uint32_t  GetPlayerID() const { return fPlayerID;}
-    const plString & GetPlayerName() const { return fPlayerName; }
-    uint8_t   GetCCRLevel() const { return fCCRLevel; }
-    bool    GetProtectedLogin() const { return ( fProtectedLogin!=0 ); }
-    uint8_t   GetFlags() const { return (uint8_t)fFlags;}
-    uint8_t   GetBuildType() const { return fBuildType;}
-    uint32_t  GetSrcAddr() const { return fSrcAddr; }
-    const char * GetSrcAddrStr() const;
-    uint16_t  GetSrcPort() const { return fSrcPort; }
-    bool    IsReserved() const { return fReserved!=0; }
-    const plString& GetClientKey() const { return fClientKey; }
+    bool    HasAccountUUID() const {
+        return (fFlags & kAccountUUID && !fAccountUUID.IsNull()) ? true : false;
+    }
+    bool    HasPlayerID() const {
+        return (fFlags & kPlayerID && fPlayerID > 0) ? true : false;
+    }
+    bool    HasPlayerName() const {
+        return (fFlags & kPlayerName && !fPlayerName.IsEmpty()) ? true : false;
+    }
+    bool    HasCCRLevel() const {
+        return (fFlags & kCCRLevel) ? true : false;
+    }
+    bool    HasProtectedLogin() const {
+        return (fFlags & kProtectedLogin) ? true : false;
+    }
+    bool    HasBuildType() const {
+        return (fFlags & kBuildType) ? true : false;
+    }
+    bool    HasSrcAddr() const {
+        return (fFlags & kSrcAddr) != 0;
+    }
+    bool    HasSrcPort() const {
+        return (fFlags & kSrcPort) != 0;
+    }
+    bool    HasReservedBit() const {
+        return (fFlags & kReserved) != 0;
+    }
+    bool    HasClientKey() const {
+        return (fFlags & kClientKey) != 0;
+    }
 
-    void    SetAccountUUID(const plUUID * v);
-    void    SetAccountUUID(const plUUID & v);
+    const plUUID* GetAccountUUID() const {
+        return &fAccountUUID;
+    }
+    uint32_t  GetPlayerID() const {
+        return fPlayerID;
+    }
+    const plString& GetPlayerName() const {
+        return fPlayerName;
+    }
+    uint8_t   GetCCRLevel() const {
+        return fCCRLevel;
+    }
+    bool    GetProtectedLogin() const {
+        return (fProtectedLogin != 0);
+    }
+    uint8_t   GetFlags() const {
+        return (uint8_t)fFlags;
+    }
+    uint8_t   GetBuildType() const {
+        return fBuildType;
+    }
+    uint32_t  GetSrcAddr() const {
+        return fSrcAddr;
+    }
+    const char* GetSrcAddrStr() const;
+    uint16_t  GetSrcPort() const {
+        return fSrcPort;
+    }
+    bool    IsReserved() const {
+        return fReserved != 0;
+    }
+    const plString& GetClientKey() const {
+        return fClientKey;
+    }
+
+    void    SetAccountUUID(const plUUID* v);
+    void    SetAccountUUID(const plUUID& v);
     void    SetPlayerID(uint32_t v);
-    void    SetPlayerName( const plString & v );
+    void    SetPlayerName(const plString& v);
     void    SetCCRLevel(uint8_t v);
     void    SetProtectedLogin(bool v);
     void    SetBuildType(uint8_t v);
-    void    SetSrcAddr( uint32_t v );
-    void    SetSrcAddrFromStr( const char * s );
-    void    SetSrcPort( uint16_t v );
-    void    SetReserved( bool v );
-    void    SetClientKey( const plString& key );
+    void    SetSrcAddr(uint32_t v);
+    void    SetSrcAddrFromStr(const char* s);
+    void    SetSrcPort(uint16_t v);
+    void    SetReserved(bool v);
+    void    SetClientKey(const plString& key);
     // When a client hasn't selected a player yet,
     // we need to uniquely identify them in the lobby server.
     // We do this by stuffing a temp value into the fPlayerID
     // while keeping the kPlayerID flag cleared.
     void    SetTempPlayerID(uint32_t id);
 
-    friend bool operator==(const plClientGuid & X, const plClientGuid & Y);
-    friend bool operator!=(const plClientGuid & X, const plClientGuid & Y);
-    friend bool operator<(const plClientGuid & X, const plClientGuid & Y);
+    friend bool operator==(const plClientGuid& X, const plClientGuid& Y);
+    friend bool operator!=(const plClientGuid& X, const plClientGuid& Y);
+    friend bool operator<(const plClientGuid& X, const plClientGuid& Y);
 };
 
 

@@ -49,43 +49,45 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plResMgr/plResManagerHelper.h"
 
 class plResManagerHelper;
-class plResMgrHelperMsg : public plMessage
-{
+class plResMgrHelperMsg : public plMessage {
 protected:
 
     friend class plResManagerHelper;
 
-    plResPageKeyRefList *fKeyList;
+    plResPageKeyRefList* fKeyList;
 
     uint8_t       fCommand;
 
 public:
 
-    enum Commands
-    {
+    enum Commands {
         kKeyRefList,
         kUpdateDebugScreen,
         kEnableDebugScreen,
         kDisableDebugScreen
     };
 
-    plResMgrHelperMsg( uint8_t command = 0 ) : plMessage(nil, nil, nil), fKeyList( nil ) { fCommand = command; }
-    ~plResMgrHelperMsg() { delete fKeyList; }
-
-    CLASSNAME_REGISTER( plResMgrHelperMsg );
-    GETINTERFACE_ANY( plResMgrHelperMsg, plMessage );
-
-    virtual void Read(hsStream* s, hsResMgr* mgr) 
-    { 
-        hsAssert( false, "This should never get read" );
+    plResMgrHelperMsg(uint8_t command = 0) : plMessage(nil, nil, nil), fKeyList(nil) {
+        fCommand = command;
     }
-    
-    virtual void Write(hsStream* s, hsResMgr* mgr) 
-    { 
-        hsAssert( false, "This should never get written" );
+    ~plResMgrHelperMsg() {
+        delete fKeyList;
     }
 
-    uint8_t   GetCommand( void ) const { return fCommand; }
+    CLASSNAME_REGISTER(plResMgrHelperMsg);
+    GETINTERFACE_ANY(plResMgrHelperMsg, plMessage);
+
+    virtual void Read(hsStream* s, hsResMgr* mgr) {
+        hsAssert(false, "This should never get read");
+    }
+
+    virtual void Write(hsStream* s, hsResMgr* mgr) {
+        hsAssert(false, "This should never get written");
+    }
+
+    uint8_t   GetCommand(void) const {
+        return fCommand;
+    }
 };
 
 #endif // _plResMgrHelperMsg_h

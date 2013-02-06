@@ -47,41 +47,55 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plPipeline;
 
-class plRenderMsg : public plMessage
-{
+class plRenderMsg : public plMessage {
 protected:
     plPipeline*             fPipe;
 
 public:
-    plRenderMsg() : plMessage(nil, nil, nil), fPipe(nil) { SetBCastFlag(kBCastByExactType); }
-    plRenderMsg(plPipeline* pipe) : plMessage(nil, nil, nil), fPipe(pipe) { SetBCastFlag(kBCastByExactType); }
+    plRenderMsg() : plMessage(nil, nil, nil), fPipe(nil) {
+        SetBCastFlag(kBCastByExactType);
+    }
+    plRenderMsg(plPipeline* pipe) : plMessage(nil, nil, nil), fPipe(pipe) {
+        SetBCastFlag(kBCastByExactType);
+    }
 
     ~plRenderMsg() {}
-    
-    CLASSNAME_REGISTER( plRenderMsg );
-    GETINTERFACE_ANY( plRenderMsg, plMessage );
 
-    plPipeline* Pipeline() const { return fPipe; }
+    CLASSNAME_REGISTER(plRenderMsg);
+    GETINTERFACE_ANY(plRenderMsg, plMessage);
 
-    virtual void Read(hsStream* s, hsResMgr* mgr) { plMessage::IMsgRead(s, mgr); }
-    virtual void Write(hsStream* s, hsResMgr* mgr) { plMessage::IMsgWrite(s, mgr); }
+    plPipeline* Pipeline() const {
+        return fPipe;
+    }
+
+    virtual void Read(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgRead(s, mgr);
+    }
+    virtual void Write(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgWrite(s, mgr);
+    }
 };
 
-class plPreResourceMsg : public plMessage
-{
+class plPreResourceMsg : public plMessage {
 protected:
     plPipeline*             fPipe;
 
 public:
-    plPreResourceMsg() : plMessage(nil, nil, nil), fPipe(nil) { SetBCastFlag(kBCastByExactType); }
-    plPreResourceMsg(plPipeline* pipe) : plMessage(nil, nil, nil), fPipe(pipe) { SetBCastFlag(kBCastByExactType); }
+    plPreResourceMsg() : plMessage(nil, nil, nil), fPipe(nil) {
+        SetBCastFlag(kBCastByExactType);
+    }
+    plPreResourceMsg(plPipeline* pipe) : plMessage(nil, nil, nil), fPipe(pipe) {
+        SetBCastFlag(kBCastByExactType);
+    }
 
     ~plPreResourceMsg() {}
 
-    CLASSNAME_REGISTER( plPreResourceMsg );
-    GETINTERFACE_ANY( plPreResourceMsg, plMessage );
+    CLASSNAME_REGISTER(plPreResourceMsg);
+    GETINTERFACE_ANY(plPreResourceMsg, plMessage);
 
-    plPipeline* Pipeline() const { return fPipe; }
+    plPipeline* Pipeline() const {
+        return fPipe;
+    }
 
     virtual void Read(hsStream* s, hsResMgr* mgr) {}
     virtual void Write(hsStream* s, hsResMgr* mgr) {}

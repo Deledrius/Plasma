@@ -53,24 +53,22 @@ class hsStream;
 class hsResMgr;
 
 
-class plCoordinateInterface : public plObjInterface
-{
+class plCoordinateInterface : public plObjInterface {
 public:
     enum plCoordinateProperties {
         kDisable                = 0, // prop 0 is always disable, declared in plObjInterface
         kCanEverDelayTransform  = 1, // we can sometimes delay our transform eval (i.e. we're on a physics object)
         kDelayedTransformEval   = 2, // we're currently registering for the DelayedTransformMsg (we, and all our
-                                     // descendants, have the kCanEverDelayTransform prop)
+        // descendants, have the kCanEverDelayTransform prop)
 
         kNumProps                    // last in the list
     };
 
-    enum plCoordinateTransformPhases
-    {
+    enum plCoordinateTransformPhases {
         kTransformPhaseNormal,
         kTransformPhaseDelayed,
     };
-    
+
 protected:
     enum {
         kTransformDirty     = 0x1,
@@ -92,7 +90,7 @@ protected:
     // Set by the client in IUpdate(). This tells us where we are in the update loop so that we know
     // which transform message to register for when our transform is dirtied.
     static uint8_t                          fTransformPhase;
-    
+
     // Temp debugging tool, so we can quickly (dis/en)able delayed transforms at runtime.
     static bool                             fDelayedTransformsEnabled;
 
@@ -140,8 +138,8 @@ public:
     plCoordinateInterface();
     ~plCoordinateInterface();
 
-    CLASSNAME_REGISTER( plCoordinateInterface );
-    GETINTERFACE_ANY( plCoordinateInterface, plObjInterface );
+    CLASSNAME_REGISTER(plCoordinateInterface);
+    GETINTERFACE_ANY(plCoordinateInterface, plObjInterface);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -172,31 +170,55 @@ public:
     // synced up, so fromRoot=true.
     // fromRoot=true is always safe, just potentially wasteful, so if you don't know, use fromRoot=true or
     // preferably, don't use this function.
-    void FlushTransform(bool fromRoot=true); 
+    void FlushTransform(bool fromRoot = true);
 
-    virtual const hsMatrix44& GetLocalToParent() const { return fLocalToParent; }
-    virtual const hsMatrix44& GetParentToLocal() const { return fParentToLocal; }
-    
-    virtual const hsMatrix44& GetLocalToWorld() const { return fLocalToWorld; }
-    virtual const hsMatrix44& GetWorldToLocal() const { return fWorldToLocal; }
+    virtual const hsMatrix44& GetLocalToParent() const {
+        return fLocalToParent;
+    }
+    virtual const hsMatrix44& GetParentToLocal() const {
+        return fParentToLocal;
+    }
 
-    virtual const hsPoint3 GetWorldPos() const { return fLocalToWorld.GetTranslate(); }
+    virtual const hsMatrix44& GetLocalToWorld() const {
+        return fLocalToWorld;
+    }
+    virtual const hsMatrix44& GetWorldToLocal() const {
+        return fWorldToLocal;
+    }
 
-    virtual int GetNumChildren() const { return fChildren.GetCount(); }
+    virtual const hsPoint3 GetWorldPos() const {
+        return fLocalToWorld.GetTranslate();
+    }
+
+    virtual int GetNumChildren() const {
+        return fChildren.GetCount();
+    }
     virtual plCoordinateInterface* GetChild(int i) const;
-    virtual plCoordinateInterface* GetParent() const { return fParent; }
+    virtual plCoordinateInterface* GetParent() const {
+        return fParent;
+    }
 
     virtual bool MsgReceive(plMessage* msg);
 
     uint16_t GetReasons();
     void ClearReasons();
 
-    int32_t   GetNumProperties() const { return kNumProps; }
-    static uint8_t    GetTransformPhase() { return fTransformPhase; }
-    static void     SetTransformPhase(uint8_t phase) { fTransformPhase = phase; }
+    int32_t   GetNumProperties() const {
+        return kNumProps;
+    }
+    static uint8_t    GetTransformPhase() {
+        return fTransformPhase;
+    }
+    static void     SetTransformPhase(uint8_t phase) {
+        fTransformPhase = phase;
+    }
 
-    static bool     GetDelayedTransformsEnabled() { return fDelayedTransformsEnabled; }
-    static void     SetDelayedTransformsEnabled(bool val) { fDelayedTransformsEnabled = val; }
+    static bool     GetDelayedTransformsEnabled() {
+        return fDelayedTransformsEnabled;
+    }
+    static void     SetDelayedTransformsEnabled(bool val) {
+        fDelayedTransformsEnabled = val;
+    }
 };
 
 

@@ -52,22 +52,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class hsResMgr;
 
-class plCursorChangeMsg : public plMessage
-{
+class plCursorChangeMsg : public plMessage {
 protected:
 
 public:
-    plCursorChangeMsg() : fType(0),fPriority(0){;}
-    plCursorChangeMsg(int i, int p) { fType = i;fPriority =p; }
-    plCursorChangeMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t) : fType(0),fPriority(0){;}
-    
-    CLASSNAME_REGISTER( plCursorChangeMsg );
-    GETINTERFACE_ANY( plCursorChangeMsg, plMessage );
+    plCursorChangeMsg() : fType(0), fPriority(0) {
+        ;
+    }
+    plCursorChangeMsg(int i, int p) {
+        fType = i;
+        fPriority = p;
+    }
+    plCursorChangeMsg(const plKey& s,
+                      const plKey& r,
+                      const double* t) : fType(0), fPriority(0) {
+        ;
+    }
 
-    enum 
-    {
+    CLASSNAME_REGISTER(plCursorChangeMsg);
+    GETINTERFACE_ANY(plCursorChangeMsg, plMessage);
+
+    enum {
         kNoChange   = 0,
         kCursorUp,
         kCursorLeft,
@@ -88,15 +93,13 @@ public:
 
 
     // IO
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fType = stream->ReadLE32();
         fPriority = stream->ReadLE32();
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         stream->WriteLE32(fType);
         stream->WriteLE32(fPriority);

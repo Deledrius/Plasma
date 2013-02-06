@@ -59,40 +59,39 @@ void plRelevanceMgr::Init()
 
 void plRelevanceMgr::DeInit()
 {
-    if (fInstance)
-    {
+    if (fInstance) {
         fInstance->UnRegisterAs(kRelevanceMgr_KEY);
         fInstance = nil;
     }
 }
 
-void plRelevanceMgr::IAddRegion(plRelevanceRegion *region)
+void plRelevanceMgr::IAddRegion(plRelevanceRegion* region)
 {
     int i;
     int dstIdx = fRegions.GetCount();
-    for (i = 0; i < fRegions.GetCount(); i++)
-    {
-        if (fRegions[i] == nil)
-        {
+
+    for (i = 0; i < fRegions.GetCount(); i++) {
+        if (fRegions[i] == nil) {
             dstIdx = i;
             break;
         }
     }
-    
-    if (dstIdx == fRegions.GetCount())
+
+    if (dstIdx == fRegions.GetCount()) {
         fRegions.Append(region);
-    else
+    } else {
         fRegions[i] = region;
+    }
 
     region->SetMgrIndex(dstIdx + 1);
 }
 
-void plRelevanceMgr::IRemoveRegion(plRelevanceRegion *region)
+void plRelevanceMgr::IRemoveRegion(plRelevanceRegion* region)
 {
     fRegions[region->fMgrIdx - 1] = nil;
 }
 
-void plRelevanceMgr::SetRegionVectors(const hsPoint3 &pos, hsBitVector &regionsImIn, hsBitVector &regionsICareAbout)
+void plRelevanceMgr::SetRegionVectors(const hsPoint3& pos, hsBitVector& regionsImIn, hsBitVector& regionsICareAbout)
 {
     regionsImIn.Clear();
     regionsICareAbout.Clear();
@@ -101,10 +100,9 @@ void plRelevanceMgr::SetRegionVectors(const hsPoint3 &pos, hsBitVector &regionsI
     bool inAnyRegion = false;
 
     int i;
-    for (i = 0; i < fRegions.GetCount(); i++)
-    { 
-        if (fRegions[i] && fRegions[i]->fRegion->IsInside(pos))
-        {
+
+    for (i = 0; i < fRegions.GetCount(); i++) {
+        if (fRegions[i] && fRegions[i]->fRegion->IsInside(pos)) {
             regionsImIn.SetBit(i + 1, true);
             regionsICareAbout |= fRegions[i]->fRegionsICareAbout;
             inAnyRegion = true;
@@ -112,13 +110,12 @@ void plRelevanceMgr::SetRegionVectors(const hsPoint3 &pos, hsBitVector &regionsI
     }
 
     // If I'm not in any region, that means I'm in the special zero region and care about everything.
-    if (!inAnyRegion)
-    {
+    if (!inAnyRegion) {
         regionsImIn.SetBit(0, true);
         regionsICareAbout.Set(fRegions.GetCount());
     }
 }
-    
+
 uint32_t plRelevanceMgr::GetNumRegions() const
 {
     int i;
@@ -127,35 +124,35 @@ uint32_t plRelevanceMgr::GetNumRegions() const
 
     return i + 1; // Add 1 for the special zero-region
 }
-        
+
 
 bool plRelevanceMgr::MsgReceive(plMessage* msg)
 {
-    plGenRefMsg *genMsg = plGenRefMsg::ConvertNoRef(msg);
-    if (genMsg)
-    {
-        plRelevanceRegion *region = plRelevanceRegion::ConvertNoRef(genMsg->GetRef());
-        if( genMsg->GetContext() & (plRefMsg::kOnCreate) )
-        {
+    plGenRefMsg* genMsg = plGenRefMsg::ConvertNoRef(msg);
+
+    if (genMsg) {
+        plRelevanceRegion* region = plRelevanceRegion::ConvertNoRef(genMsg->GetRef());
+
+        if (genMsg->GetContext() & (plRefMsg::kOnCreate)) {
             IAddRegion(region);
-        }
-        else if( genMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-        {
+        } else if (genMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
             IRemoveRegion(region);
         }
+
         return true;
-    }       
-    
+    }
+
     return hsKeyedObject::MsgReceive(msg);
 }
 
-uint32_t plRelevanceMgr::GetIndex(const plString &regionName)
+uint32_t plRelevanceMgr::GetIndex(const plString& regionName)
 {
     int i;
-    for (i = 0; i < fRegions.GetCount(); i++)
-    {
-        if (fRegions[i] && !regionName.Compare(fRegions[i]->GetKeyName(), plString::kCaseInsensitive))
+
+    for (i = 0; i < fRegions.GetCount(); i++) {
+        if (fRegions[i] && !regionName.Compare(fRegions[i]->GetKeyName(), plString::kCaseInsensitive)) {
             return i + 1;
+        }
     }
 
     return -1;
@@ -163,29 +160,32 @@ uint32_t plRelevanceMgr::GetIndex(const plString &regionName)
 
 void plRelevanceMgr::MarkRegion(uint32_t localIdx, uint32_t remoteIdx, bool doICare)
 {
-    if (localIdx == (uint32_t)-1 || remoteIdx == (uint32_t)-1)
+    if (localIdx == (uint32_t) - 1 || remoteIdx == (uint32_t) - 1) {
         return;
+    }
 
-    if (localIdx - 1 >= fRegions.GetCount() || remoteIdx - 1 >= fRegions.GetCount() || fRegions[localIdx - 1] == nil)
+    if (localIdx - 1 >= fRegions.GetCount() || remoteIdx - 1 >= fRegions.GetCount() || fRegions[localIdx - 1] == nil) {
         return;
+    }
 
     fRegions[localIdx - 1]->fRegionsICareAbout.SetBit(remoteIdx, doICare);
 }
 
 // tiny class for the function below
-class plRegionInfo
-{
+class plRegionInfo {
 public:
-    char *fName;
+    char* fName;
     int fIndex;
-    
+
     plRegionInfo() : fName(nil), fIndex(-1) {}
-    ~plRegionInfo() { delete [] fName; }
+    ~plRegionInfo() {
+        delete [] fName;
+    }
 };
 
 /*
 *   This function expects a CSV file representing the matrix
-*   
+*
 *               name1       name2       name3
 *       name1   value       value       value
 *       name2   value       value       value
@@ -196,45 +196,44 @@ public:
 *       0: Doesn't care
 *       1 or greater: row cares about column
 */
-void plRelevanceMgr::ParseCsvInput(hsStream *s)
+void plRelevanceMgr::ParseCsvInput(hsStream* s)
 {
     const int kBufSize = 512;
     char buff[kBufSize];
-    hsTArray<plRegionInfo*> regions;    
-    hsStringTokenizer toke; 
+    hsTArray<plRegionInfo*> regions;
+    hsStringTokenizer toke;
     bool firstLine = true;
-    
-    while (!s->AtEnd())
-    {
-        if (!s->ReadLn(buff, kBufSize))
+
+    while (!s->AtEnd()) {
+        if (!s->ReadLn(buff, kBufSize)) {
             break;
-        
-        if (firstLine)
-        {
+        }
+
+        if (firstLine) {
             firstLine = false;
             toke.Reset(buff, ",");
-            
-            while (toke.Next(buff, kBufSize))
-            {
-                if (strcmp(buff, "") == 0)
-                    continue; // ignore the initial blank one
 
-                plRegionInfo *info = new plRegionInfo;
+            while (toke.Next(buff, kBufSize)) {
+                if (strcmp(buff, "") == 0) {
+                    continue;    // ignore the initial blank one
+                }
+
+                plRegionInfo* info = new plRegionInfo;
                 regions.Append(info);
                 info->fName = hsStrcpy(buff);
                 info->fIndex = GetIndex(buff);
             }
-        }
-        else // parsing actual settings.
-        {
+        } else { // parsing actual settings.
             toke.Reset(buff, ",");
-            if (!toke.Next(buff, kBufSize))
+
+            if (!toke.Next(buff, kBufSize)) {
                 continue;
-            
+            }
+
             int rowIndex = GetIndex(buff);
             int column = 0;
-            while (toke.Next(buff, kBufSize) && column < regions.GetCount())
-            {
+
+            while (toke.Next(buff, kBufSize) && column < regions.GetCount()) {
                 int value = atoi(buff);
                 MarkRegion(rowIndex, regions[column]->fIndex, value != 0);
 
@@ -244,28 +243,35 @@ void plRelevanceMgr::ParseCsvInput(hsStream *s)
     }
 
     int i;
-    for (i = regions.GetCount() - 1; i >= 0; i--)
+
+    for (i = regions.GetCount() - 1; i >= 0; i--) {
         delete regions[i];
+    }
 }
 
 plString plRelevanceMgr::GetRegionNames(hsBitVector regions)
 {
     plString retVal;
-    if (regions.IsBitSet(0))
-        retVal = "-Nowhere (0)-";
 
-    for (int i = 0; i < fRegions.GetCount(); ++i)
-    {
-        if (regions.IsBitSet(i + 1))
-        {
-            if (!retVal.IsEmpty())
+    if (regions.IsBitSet(0)) {
+        retVal = "-Nowhere (0)-";
+    }
+
+    for (int i = 0; i < fRegions.GetCount(); ++i) {
+        if (regions.IsBitSet(i + 1)) {
+            if (!retVal.IsEmpty()) {
                 retVal += ", ";
-            if (fRegions[i])
+            }
+
+            if (fRegions[i]) {
                 retVal += fRegions[i]->GetKeyName();
+            }
         }
     }
 
-    if (retVal.IsEmpty())
+    if (retVal.IsEmpty()) {
         retVal = "<NONE>";
+    }
+
     return retVal;
 }

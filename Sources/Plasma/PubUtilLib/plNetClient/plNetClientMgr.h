@@ -83,17 +83,15 @@ class plNetMsgPagingRoom;
 
 
 struct plNetClientCommMsgHandler : plNetClientComm::MsgHandler {
-    int HandleMessage( plNetMessage* msg ); 
+    int HandleMessage(plNetMessage* msg);
 };
 
-class plNetClientMgr : public plNetClientApp
-{
+class plNetClientMgr : public plNetClientApp {
 private:
     typedef std::vector<plKey> plKeyVec;
 public:
 
-    enum NetChannels
-    {
+    enum NetChannels {
         kNetChanDefault,
         kNetChanVoice,
         kNetChanListenListUpdate,
@@ -101,26 +99,22 @@ public:
         kNetNumChannels
     };
 
-    enum DirectedSendFlags
-    {
+    enum DirectedSendFlags {
         kInterAgeMsg = 0x1
     };
-    
-    enum ListenListMode
-    {
+
+    enum ListenListMode {
         kListenList_Distance    = 0,
         kListenList_Forced,
         kListenList_End,
     };
 
-    enum RefContext
-    {
+    enum RefContext {
         kVaultImage = 0,
         kAgeSDLHook = 1
     };
 
-    struct PendingLoad
-    {
+    struct PendingLoad {
         // must be set by user
         plStateDataRecord* fSDRec;  // the sdl data record
         plUoid  fUoid;              // the object it's meant for
@@ -131,17 +125,17 @@ public:
         double fQueuedTime;
         int     fQueueTimeResets;
 
-        PendingLoad() : fSDRec(nil),fPlayerID(0),fKey(nil),fQueuedTime(0.0),fQueueTimeResets(0) {}
+        PendingLoad() : fSDRec(nil), fPlayerID(0), fKey(nil), fQueuedTime(0.0), fQueueTimeResets(0) {}
         ~PendingLoad();
     };
 
 private:
     // plOperationProgress  *fProgressBar;
-    plOperationProgress *fTaskProgBar;
-    
+    plOperationProgress* fTaskProgBar;
+
     typedef std::list<PendingLoad*> PendingLoadsList;
     PendingLoadsList fPendingLoads;
-            
+
     // pending room page msgs
     std::vector<plNetMsgPagingRoom*>    fPendingPagingRoomMsgs;
 
@@ -154,8 +148,8 @@ private:
     plKey       fLocalPlayerKey;
     plKeyVec    fRemotePlayerKeys;
     plKeyVec    fNPCKeys;
-    
-    class plNetClientMgrMsg *   fDisableMsg;
+
+    class plNetClientMgrMsg*    fDisableMsg;
 
     // ini info
     std::string         fIniAccountName;
@@ -163,16 +157,16 @@ private:
     std::string         fIniAuthServer;
     uint32_t              fIniPlayerID;   // the player we want to load from vault.
     std::string         fSPDesiredPlayerName;   // SP: the player we want to load from vault.
-    
+
     // server info
     double              fServerTimeOffset;      // diff between our unified time and server's unified time
     uint32_t              fTimeSamples;
     double              fLastTimeUpdate;
 
     uint8_t               fJoinOrder;         // returned by the server
-    
+
     // voice lists
-    int     fListenListMode;            // how we are generating our listen list    
+    int     fListenListMode;            // how we are generating our listen list
     plNetListenList fListenList;        // other players I'm listening to
     plNetTalkList fTalkList;            // other players I'm talking to
 
@@ -199,32 +193,32 @@ private:
     //
     void ICheckPendingStateLoad(double secs);
     int IDeduceLocallyOwned(const plUoid& loc) const;
-    bool IHandlePlayerPageMsg(plPlayerPageMsg *playerMsg);  // *** 
+    bool IHandlePlayerPageMsg(plPlayerPageMsg* playerMsg);  // ***
 
     void IShowLists();
     void IShowRooms();
     void IShowAvatars();
     void IShowRelevanceRegions();
-    
+
     int ISendDirtyState(double secs);
     int ISendMembersListRequest();
     int ISendRoomsReset();
-    void ISendCCRPetition(plCCRPetitionMsg* petMsg);    
+    void ISendCCRPetition(plCCRPetitionMsg* petMsg);
     void ISendCameraReset(bool bEnteringAge);
-    
+
     bool IUpdateListenList(double secs);
     void IHandleNetVoiceListMsg(plNetVoiceListMsg* msg);
     bool IApplyNewListenList(std::vector<DistSqInfo>& newListenList, bool forceSynch);
     int IPrepMsg(plNetMessage* msg);
-    void IPlayerChangeAge(bool exiting, int32_t spawnPt);   
-    
+    void IPlayerChangeAge(bool exiting, int32_t spawnPt);
+
     void IAddCloneRoom();
     void IRemoveCloneRoom();
 
     void IUnloadRemotePlayers();
     void IUnloadNPCs();
-    
-    plKey ILoadClone(plLoadCloneMsg *cloneMsg);
+
+    plKey ILoadClone(plLoadCloneMsg* cloneMsg);
 
     bool IFindModifier(plSynchedObject* obj, int16_t classIdx);
     void IClearPendingLoads();
@@ -238,111 +232,167 @@ private:
     void    IDumpOSVersionInfo() const;
 
     int ISendGameMessage(plMessage* msg);
-    void IDisableNet ();
+    void IDisableNet();
 
 public:
     plNetClientMgr();
     ~plNetClientMgr();
 
-    CLASSNAME_REGISTER( plNetClientMgr );
-    GETINTERFACE_ANY( plNetClientMgr, plNetClientApp );
+    CLASSNAME_REGISTER(plNetClientMgr);
+    GETINTERFACE_ANY(plNetClientMgr, plNetClientApp);
 
-    static plNetClientMgr* GetInstance() { return plNetClientMgr::ConvertNoRef(fInstance); }
+    static plNetClientMgr* GetInstance() {
+        return plNetClientMgr::ConvertNoRef(fInstance);
+    }
 
     bool MsgReceive(plMessage* msg);
     void Shutdown();
     int  Init();
 
-    void QueueDisableNet (bool showDlg, const char msg[]);
+    void QueueDisableNet(bool showDlg, const char msg[]);
 
     int SendMsg(plNetMessage* msg);
     int Update(double secs);
     int IsLocallyOwned(const plSynchedObject* obj) const;   // returns yes/no/maybe
-    int IsLocallyOwned(const plUoid&) const;        // for special cases, like sceneNodes. returns yes/no/maybe 
+    int IsLocallyOwned(const plUoid&) const;        // for special cases, like sceneNodes. returns yes/no/maybe
     plNetGroupId GetEffectiveNetGroup(const plSynchedObject*& obj) const;
     plNetGroupId SelectNetGroup(plSynchedObject* objIn, plKey groupKey);
 
     void SendLocalPlayerAvatarCustomizations();
-    void SendApplyAvatarCustomizationsMsg(const plKey msgReceiver, bool netPropagate=true, bool localPropagate=true);
+    void SendApplyAvatarCustomizationsMsg(const plKey msgReceiver, bool netPropagate = true, bool localPropagate = true);
 
     // plLoggable
     bool Log(const char* str) const;
 
     // setters
-    void SetIniAuthServer(const char * value)  { fIniAuthServer=value;}
-    void SetIniAccountName(const char * value) { fIniAccountName=value;}
-    void SetIniAccountPass(const char * value) { fIniAccountPass=value;}
-    void SetIniPlayerID(uint32_t value)          { fIniPlayerID=value;}
+    void SetIniAuthServer(const char* value)  {
+        fIniAuthServer = value;
+    }
+    void SetIniAccountName(const char* value) {
+        fIniAccountName = value;
+    }
+    void SetIniAccountPass(const char* value) {
+        fIniAccountPass = value;
+    }
+    void SetIniPlayerID(uint32_t value)          {
+        fIniPlayerID = value;
+    }
 
-    void SetSPDesiredPlayerName( const char * value ) { fSPDesiredPlayerName=value;}
-    const char * GetSPDesiredPlayerName() const { return fSPDesiredPlayerName.c_str(); }
+    void SetSPDesiredPlayerName(const char* value) {
+        fSPDesiredPlayerName = value;
+    }
+    const char* GetSPDesiredPlayerName() const {
+        return fSPDesiredPlayerName.c_str();
+    }
 
-    void SetLocalPlayerKey(plKey l, bool pageOut=false);
+    void SetLocalPlayerKey(plKey l, bool pageOut = false);
     void SetNullSend(bool on);        // turn null send on/off
-    void SetPingServer(uint8_t serverType) { fPingServerType = serverType; }
-    
+    void SetPingServer(uint8_t serverType) {
+        fPingServerType = serverType;
+    }
+
     // getters
-    uint32_t            GetPlayerID( void ) const;
-    plString            GetPlayerName( const plKey avKey=nil ) const;
-    plString            GetPlayerNameById (unsigned playerId) const;
-    unsigned            GetPlayerIdByName(const plString & name) const;
+    uint32_t            GetPlayerID(void) const;
+    plString            GetPlayerName(const plKey avKey = nil) const;
+    plString            GetPlayerNameById(unsigned playerId) const;
+    unsigned            GetPlayerIdByName(const plString& name) const;
 
-    uint8_t GetJoinOrder()              const { return fJoinOrder; }    // only valid at join time
+    uint8_t GetJoinOrder()              const {
+        return fJoinOrder;    // only valid at join time
+    }
 
-    plKey GetLocalPlayerKey()           const { return fLocalPlayerKey; }
-    plSynchedObject* GetLocalPlayer(bool forceLoad=false) const;
-    
-    bool IsPeerToPeer()               const { return false; }
-    bool IsConnected()                const { return true; }
+    plKey GetLocalPlayerKey()           const {
+        return fLocalPlayerKey;
+    }
+    plSynchedObject* GetLocalPlayer(bool forceLoad = false) const;
+
+    bool IsPeerToPeer()               const {
+        return false;
+    }
+    bool IsConnected()                const {
+        return true;
+    }
 
     void IncNumInitialSDLStates();
-    void ResetNumInitialSDLStates() { fNumInitialSDLStates=0; }
-    int GetNumInitialSDLStates() const { return fNumInitialSDLStates; }
-    void SetRequiredNumInitialSDLStates( int v ) { fRequiredNumInitialSDLStates=v; }
-    int GetRequiredNumInitialSDLStates() const { return fRequiredNumInitialSDLStates; }
+    void ResetNumInitialSDLStates() {
+        fNumInitialSDLStates = 0;
+    }
+    int GetNumInitialSDLStates() const {
+        return fNumInitialSDLStates;
+    }
+    void SetRequiredNumInitialSDLStates(int v) {
+        fRequiredNumInitialSDLStates = v;
+    }
+    int GetRequiredNumInitialSDLStates() const {
+        return fRequiredNumInitialSDLStates;
+    }
 
     // Linking progress
-    void    StartTaskProgress( const char *msg, int numSteps );
-    void    IncTaskProgress( const char *msg );
+    void    StartTaskProgress(const char* msg, int numSteps);
+    void    IncTaskProgress(const char* msg);
 
     // avatar vault actions
     int UploadPlayerVault(uint32_t vaultFlags);
 
     // npc clones
-    const plKeyVec& NPCKeys() const { return fNPCKeys; }
+    const plKeyVec& NPCKeys() const {
+        return fNPCKeys;
+    }
     plSynchedObject* GetNPC(uint32_t i) const;
     void AddNPCKey(const plKey& npc);
-    bool IsNPCKey(const plKey& npc, int* idx=nil) const;
-    
+    bool IsNPCKey(const plKey& npc, int* idx = nil) const;
+
     // remote players
-    const plKeyVec& RemotePlayerKeys() const { return fRemotePlayerKeys;  }
+    const plKeyVec& RemotePlayerKeys() const {
+        return fRemotePlayerKeys;
+    }
     plSynchedObject* GetRemotePlayer(int i) const;
     void AddRemotePlayerKey(plKey p);
-    bool IsRemotePlayerKey(const plKey p, int* idx=nil);
-    bool IsAPlayerKey(const plKey pKey) { return (pKey==GetLocalPlayerKey() || IsRemotePlayerKey(pKey));    }
+    bool IsRemotePlayerKey(const plKey p, int* idx = nil);
+    bool IsAPlayerKey(const plKey pKey) {
+        return (pKey == GetLocalPlayerKey() || IsRemotePlayerKey(pKey));
+    }
 
-    void SetConsoleOutput( bool b ) { SetFlagsBit(kConsoleOutput, b); }
-    bool GetConsoleOutput() const { return GetFlagsBit(kConsoleOutput); }
-    
+    void SetConsoleOutput(bool b) {
+        SetFlagsBit(kConsoleOutput, b);
+    }
+    bool GetConsoleOutput() const {
+        return GetFlagsBit(kConsoleOutput);
+    }
+
     // Net groups
-    const plNetClientGroups* GetNetGroups()     const { return &fNetGroups; }
-    plNetClientGroups* GetNetGroups()   { return &fNetGroups;   }
+    const plNetClientGroups* GetNetGroups()     const {
+        return &fNetGroups;
+    }
+    plNetClientGroups* GetNetGroups()   {
+        return &fNetGroups;
+    }
 
     // Voice Lists
-    plNetListenList* GetListenList() { return &fListenList; }
-    plNetTalkList* GetTalkList() { return &fTalkList; }
-    void SetListenListMode (int i); 
+    plNetListenList* GetListenList() {
+        return &fListenList;
+    }
+    plNetTalkList* GetTalkList() {
+        return &fTalkList;
+    }
+    void SetListenListMode(int i);
     void SynchTalkList();
-    int GetListenListMode() { return fListenListMode; }
-        
-    // network activity-generated events, passed to current task
-    bool CanSendMsg(plNetMessage * msg);
+    int GetListenListMode() {
+        return fListenListMode;
+    }
 
-    const plNetTransport& TransportMgr() const { return fTransport; }
-    plNetTransport& TransportMgr() { return fTransport; }
-    
+    // network activity-generated events, passed to current task
+    bool CanSendMsg(plNetMessage* msg);
+
+    const plNetTransport& TransportMgr() const {
+        return fTransport;
+    }
+    plNetTransport& TransportMgr() {
+        return fTransport;
+    }
+
     bool ObjectInLocalAge(const plSynchedObject* obj) const;
-    
+
     // time converters
     plUnifiedTime GetServerTime() const;
     const char* GetServerLogTimeAsString(plString& ts) const;
@@ -353,29 +403,41 @@ public:
     bool PlaybackMsgs(const char* recName);
 
     void MakeCCRInvisible(plKey avKey, int level);
-    bool CCRVaultConnected() const { return GetFlagsBit(kCCRVaultConnected); }
+    bool CCRVaultConnected() const {
+        return GetFlagsBit(kCCRVaultConnected);
+    }
 
-    uint8_t GetExperimentalLevel() const { return fExperimentalLevel; }
+    uint8_t GetExperimentalLevel() const {
+        return fExperimentalLevel;
+    }
 
-    void AddPendingLoad(PendingLoad *pl);
-    const plKey& GetAgeSDLObjectKey() const { return fAgeSDLObjectKey; }
+    void AddPendingLoad(PendingLoad* pl);
+    const plKey& GetAgeSDLObjectKey() const {
+        return fAgeSDLObjectKey;
+    }
     plUoid GetAgeSDLObjectUoid(const char* ageName) const;
-    plNetClientComm& GetNetClientComm()  { return fNetClientComm; }
+    plNetClientComm& GetNetClientComm()  {
+        return fNetClientComm;
+    }
     const char* GetNextAgeFilename();
-    void SetOverrideAgeTimeOfDayPercent(float f) { fOverrideAgeTimeOfDayPercent=f;  }
+    void SetOverrideAgeTimeOfDayPercent(float f) {
+        fOverrideAgeTimeOfDayPercent = f;
+    }
 
-    void AddPendingPagingRoomMsg( plNetMsgPagingRoom * msg );
+    void AddPendingPagingRoomMsg(plNetMsgPagingRoom* msg);
     void MaybeSendPendingPagingRoomMsgs();
     void SendPendingPagingRoomMsgs();
     void ClearPendingPagingRoomMsgs();
-    
+
     void NotifyRcvdAllSDLStates();
 
-    plOperationProgress* GetTaskProgBar() { return fTaskProgBar;    }
-    
+    plOperationProgress* GetTaskProgBar() {
+        return fTaskProgBar;
+    }
+
     bool DebugMsgV(const char* fmt, va_list args) const;
-    bool ErrorMsgV(const char* fmt, va_list args) const; 
-    bool WarningMsgV(const char* fmt, va_list args) const; 
+    bool ErrorMsgV(const char* fmt, va_list args) const;
+    bool WarningMsgV(const char* fmt, va_list args) const;
     bool AppMsgV(const char* fmt, va_list args) const;
 
     bool IsObjectOwner();
@@ -384,12 +446,12 @@ public:
     void StoreSDLState(const plStateDataRecord* sdRec, const plUoid& uoid, uint32_t sendFlags, uint32_t writeOptions);
 
     void UpdateServerTimeOffset(plNetMessage* msg);
-    void ResetServerTimeOffset(bool delayed=false);
+    void ResetServerTimeOffset(bool delayed = false);
 
 private:
     plNetClientComm             fNetClientComm;
     plNetClientCommMsgHandler   fNetClientCommMsgHandler;
-    
+
     int IInitNetClientComm();
     int IDeInitNetClientComm();
     void INetClientCommOpStarted(uint32_t context);

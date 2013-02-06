@@ -54,11 +54,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class pyColor;
 
-class pyGUIDialog
-{
+class pyGUIDialog {
 private:
     plKey                   fGCkey;
-    
+
 protected:
     pyGUIDialog(pyKey& gckey);
     pyGUIDialog(plKey objkey);
@@ -69,35 +68,36 @@ public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptGUIDialog);
     PYTHON_CLASS_NEW_DEFINITION;
-    static PyObject *New(pyKey& gckey);
-    static PyObject *New(plKey objkey);
+    static PyObject* New(pyKey& gckey);
+    static PyObject* New(plKey objkey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGUIDialog object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGUIDialog); // converts a PyObject to a pyGUIDialog (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
-    static void AddPlasmaMethods(std::vector<PyMethodDef> &methods);
+    static void AddPlasmaClasses(PyObject* m);
+    static void AddPlasmaMethods(std::vector<PyMethodDef>& methods);
 
     static bool IsGUIDialog(pyKey& gckey);
 
-    void setKey(plKey key) {fGCkey = key;} // used by python glue, do NOT call
+    void setKey(plKey key) {
+        fGCkey = key;   // used by python glue, do NOT call
+    }
 
-    enum            // these enums are used in Python so they have to match PlasmaTypes.py
-    {
-        kDialog=1,
-        kButton=2,
-        kDraggable=3,
-        kListBox=4,
-        kTextBox=5,
-        kEditBox=6,
-        kUpDownPair=7,
-        kKnob=8,
-        kDragBar=9,
-        kCheckBox=10,
-        kRadioGroup=11,
-        kDynamicText=12,
-        kMultiLineEdit=13,
-        kPopUpMenu=14,
-        kClickMap=15,
+    enum {          // these enums are used in Python so they have to match PlasmaTypes.py
+        kDialog = 1,
+        kButton = 2,
+        kDraggable = 3,
+        kListBox = 4,
+        kTextBox = 5,
+        kEditBox = 6,
+        kUpDownPair = 7,
+        kKnob = 8,
+        kDragBar = 9,
+        kCheckBox = 10,
+        kRadioGroup = 11,
+        kDynamicText = 12,
+        kMultiLineEdit = 13,
+        kPopUpMenu = 14,
+        kClickMap = 15,
     };
     static uint32_t WhatControlType(pyKey& gckey);
     static void GUICursorOff();
@@ -105,8 +105,10 @@ public:
     static void GUICursorDimmed();
 
     // override the equals to operator
-    bool operator==(const pyGUIDialog &gdobj) const;
-    bool operator!=(const pyGUIDialog &gdobj) const { return !(gdobj == *this);   }
+    bool operator==(const pyGUIDialog& gdobj) const;
+    bool operator!=(const pyGUIDialog& gdobj) const {
+        return !(gdobj == *this);
+    }
 
     // getter and setters
     virtual plKey getObjKey();
@@ -115,21 +117,25 @@ public:
     // interface functions
     virtual uint32_t  GetTagID();
 
-    virtual void    SetEnabled( bool e );
-    virtual void    Enable() { SetEnabled(true); }
-    virtual void    Disable() { SetEnabled(false); }
-    virtual bool        IsEnabled( void );
-    virtual const char  *GetName( void );
+    virtual void    SetEnabled(bool e);
+    virtual void    Enable() {
+        SetEnabled(true);
+    }
+    virtual void    Disable() {
+        SetEnabled(false);
+    }
+    virtual bool        IsEnabled(void);
+    virtual const char*  GetName(void);
     virtual uint32_t      GetVersion(void);
 
-    virtual uint32_t      GetNumControls( void );
-    virtual PyObject*   GetControl( uint32_t idx ); // returns pyKey
-    virtual void        SetFocus( pyKey& gcKey );
-    virtual void        NoFocus( );
-    virtual void        Show( void );
-    virtual void        ShowNoReset( void );
-    virtual void        Hide( void );
-    virtual PyObject*   GetControlFromTag( uint32_t tagID );  // returns pyKey
+    virtual uint32_t      GetNumControls(void);
+    virtual PyObject*   GetControl(uint32_t idx);   // returns pyKey
+    virtual void        SetFocus(pyKey& gcKey);
+    virtual void        NoFocus();
+    virtual void        Show(void);
+    virtual void        ShowNoReset(void);
+    virtual void        Hide(void);
+    virtual PyObject*   GetControlFromTag(uint32_t tagID);    // returns pyKey
 
     // get color schemes
     virtual PyObject*   GetForeColor(); // returns pyColor
@@ -138,14 +144,14 @@ public:
     virtual PyObject*   GetBackSelColor(); // returns pyColor
     virtual uint32_t      GetFontSize();
     // set color scheme
-    virtual void        SetForeColor( float r, float g, float b, float a );
-    virtual void        SetSelColor( float r, float g, float b, float a );
-    virtual void        SetBackColor( float r, float g, float b, float a );
-    virtual void        SetBackSelColor( float r, float g, float b, float a );
+    virtual void        SetForeColor(float r, float g, float b, float a);
+    virtual void        SetSelColor(float r, float g, float b, float a);
+    virtual void        SetBackColor(float r, float g, float b, float a);
+    virtual void        SetBackSelColor(float r, float g, float b, float a);
     virtual void        SetFontSize(uint32_t fontsize);
 
-    virtual void        UpdateAllBounds( void );
-    virtual void        RefreshAllControls( void );
+    virtual void        UpdateAllBounds(void);
+    virtual void        RefreshAllControls(void);
 };
 
 #endif // _pyGUIDialog_h_

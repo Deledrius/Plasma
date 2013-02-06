@@ -70,11 +70,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptNetLinkingMgr, isEnabled)
 PYTHON_METHOD_DEFINITION(ptNetLinkingMgr, setEnabled, args)
 {
     char enable;
-    if (!PyArg_ParseTuple(args, "b", &enable))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &enable)) {
         PyErr_SetString(PyExc_TypeError, "setEnabled expects a boolean");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetEnabled(enable != 0);
     PYTHON_RETURN_NONE;
 }
@@ -86,16 +87,17 @@ PYTHON_METHOD_DEFINITION_WKEY(ptNetLinkingMgr, linkToAge, args, kwargs)
     char* linkAnim = NULL;
     bool linkInSfx = true;
     bool linkOutSfx = true;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|sbb", kwlist, &ageLinkObj, &linkAnim, &linkInSfx, &linkOutSfx))
-    {
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|sbb", kwlist, &ageLinkObj, &linkAnim, &linkInSfx, &linkOutSfx)) {
         PyErr_SetString(PyExc_TypeError, "linkToAge expects a ptAgeLinkStruct and an optional link anim name");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyAgeLinkStruct::Check(ageLinkObj))
-    {
+
+    if (!pyAgeLinkStruct::Check(ageLinkObj)) {
         PyErr_SetString(PyExc_TypeError, "linkToAge expects a ptAgeLinkStruct and an optional link anim name");
         PYTHON_RETURN_ERROR;
     }
+
     pyAgeLinkStruct* ageLink = pyAgeLinkStruct::ConvertFrom(ageLinkObj);
     self->fThis->LinkToAge(*ageLink, linkAnim, linkInSfx, linkOutSfx);
     PYTHON_RETURN_NONE;
@@ -108,11 +110,12 @@ PYTHON_BASIC_METHOD_DEFINITION(ptNetLinkingMgr, linkToMyNeighborhoodAge, LinkToM
 PYTHON_METHOD_DEFINITION(ptNetLinkingMgr, linkPlayerHere, args)
 {
     unsigned long pid;
-    if (!PyArg_ParseTuple(args, "l", &pid))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &pid)) {
         PyErr_SetString(PyExc_TypeError, "linkPlayerHere expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->LinkPlayerHere(pid);
     PYTHON_RETURN_NONE;
 }
@@ -121,16 +124,17 @@ PYTHON_METHOD_DEFINITION(ptNetLinkingMgr, linkPlayerToAge, args)
 {
     PyObject* ageLinkObj = NULL;
     unsigned long pid;
-    if (!PyArg_ParseTuple(args, "Ol", &ageLinkObj, &pid))
-    {
+
+    if (!PyArg_ParseTuple(args, "Ol", &ageLinkObj, &pid)) {
         PyErr_SetString(PyExc_TypeError, "linkPlayerToAge expects a ptAgeLinkStruct and an unsigned long");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyAgeLinkStruct::Check(ageLinkObj))
-    {
+
+    if (!pyAgeLinkStruct::Check(ageLinkObj)) {
         PyErr_SetString(PyExc_TypeError, "linkPlayerToAge expects a ptAgeLinkStruct and an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     pyAgeLinkStruct* ageLink = pyAgeLinkStruct::ConvertFrom(ageLinkObj);
     self->fThis->LinkPlayerToAge(*ageLink, pid);
     PYTHON_RETURN_NONE;
@@ -139,11 +143,12 @@ PYTHON_METHOD_DEFINITION(ptNetLinkingMgr, linkPlayerToAge, args)
 PYTHON_METHOD_DEFINITION(ptNetLinkingMgr, linkToPlayersAge, args)
 {
     unsigned long pid;
-    if (!PyArg_ParseTuple(args, "l", &pid))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &pid)) {
         PyErr_SetString(PyExc_TypeError, "linkToPlayersAge expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->LinkToPlayersAge(pid);
     PYTHON_RETURN_NONE;
 }
@@ -159,18 +164,18 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptNetLinkingMgr, getPrevAgeLink)
 }
 
 PYTHON_START_METHODS_TABLE(ptNetLinkingMgr)
-    PYTHON_METHOD_NOARGS(ptNetLinkingMgr, isEnabled, "True if linking is enabled."),
-    PYTHON_METHOD(ptNetLinkingMgr, setEnabled, "Params: enable\nEnable/Disable linking."),
-    PYTHON_METHOD_WKEY(ptNetLinkingMgr, linkToAge, "Params: ageLink, linkAnim\nLinks to ageLink (ptAgeLinkStruct, string)"),
-    PYTHON_BASIC_METHOD(ptNetLinkingMgr, linkToMyPersonalAge, "Link to my Personal Age"),
-    PYTHON_BASIC_METHOD(ptNetLinkingMgr, linkToMyPersonalAgeWithYeeshaBook, "Link to my Personal Age with the YeeshaBook"),
-    PYTHON_BASIC_METHOD(ptNetLinkingMgr, linkToMyNeighborhoodAge, "Link to my Neighborhood Age"),
-    PYTHON_METHOD(ptNetLinkingMgr, linkPlayerHere, "Params: pid\nlink player(pid) to where I am"),
-    PYTHON_METHOD(ptNetLinkingMgr, linkPlayerToAge, "Params: ageLink,pid\nLink player(pid) to ageLink"),
-    PYTHON_METHOD(ptNetLinkingMgr, linkToPlayersAge, "Params: pid\nLink me to where player(pid) is"),
-    PYTHON_METHOD_NOARGS(ptNetLinkingMgr, getCurrAgeLink, "Get the ptAgeLinkStruct for the current age"),
-    PYTHON_METHOD_NOARGS(ptNetLinkingMgr, getPrevAgeLink, "Get the ptAgeLinkStruct for the previous age"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptNetLinkingMgr, isEnabled, "True if linking is enabled."),
+                     PYTHON_METHOD(ptNetLinkingMgr, setEnabled, "Params: enable\nEnable/Disable linking."),
+                     PYTHON_METHOD_WKEY(ptNetLinkingMgr, linkToAge, "Params: ageLink, linkAnim\nLinks to ageLink (ptAgeLinkStruct, string)"),
+                     PYTHON_BASIC_METHOD(ptNetLinkingMgr, linkToMyPersonalAge, "Link to my Personal Age"),
+                     PYTHON_BASIC_METHOD(ptNetLinkingMgr, linkToMyPersonalAgeWithYeeshaBook, "Link to my Personal Age with the YeeshaBook"),
+                     PYTHON_BASIC_METHOD(ptNetLinkingMgr, linkToMyNeighborhoodAge, "Link to my Neighborhood Age"),
+                     PYTHON_METHOD(ptNetLinkingMgr, linkPlayerHere, "Params: pid\nlink player(pid) to where I am"),
+                     PYTHON_METHOD(ptNetLinkingMgr, linkPlayerToAge, "Params: ageLink,pid\nLink player(pid) to ageLink"),
+                     PYTHON_METHOD(ptNetLinkingMgr, linkToPlayersAge, "Params: pid\nLink me to where player(pid) is"),
+                     PYTHON_METHOD_NOARGS(ptNetLinkingMgr, getCurrAgeLink, "Get the ptAgeLinkStruct for the current age"),
+                     PYTHON_METHOD_NOARGS(ptNetLinkingMgr, getPrevAgeLink, "Get the ptAgeLinkStruct for the previous age"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptNetLinkingMgr, "Constructor to get access to the net link manager");
@@ -185,7 +190,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptNetLinkingMgr, pyNetLinkingMgr)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyNetLinkingMgr::AddPlasmaClasses(PyObject *m)
+void pyNetLinkingMgr::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptNetLinkingMgr);
@@ -194,7 +199,7 @@ void pyNetLinkingMgr::AddPlasmaClasses(PyObject *m)
 
 #endif // BUILDING_PYPLASMA
 
-void pyNetLinkingMgr::AddPlasmaConstantsClasses(PyObject *m)
+void pyNetLinkingMgr::AddPlasmaConstantsClasses(PyObject* m)
 {
     PYTHON_ENUM_START(PtLinkingRules);
     PYTHON_ENUM_ELEMENT(PtLinkingRules, kBasicLink,     plNetCommon::LinkingRules::kBasicLink);

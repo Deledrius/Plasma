@@ -43,8 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define PL_PASSMTLADVPB_H
 
 // Param ID's
-enum
-{
+enum {
     // Specular
     kPassAdvUseSpec,    // Not used anymore, feel free to replace with new fields as necessary
     kPassAdvSpecType,   // ditto

@@ -57,30 +57,41 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // Only Accurate to kPercision (0.001) of whatever units
 //  of time are used
 
-template <class T> class TimeBasedAvgRing
-{
-/* T must be a simple type
+template <class T> class TimeBasedAvgRing {
+    /* T must be a simple type
 
-  If T is not a floating point type then rounding
-  loss may occur when samples are interpolated
-  at window boundries
-*/
+      If T is not a floating point type then rounding
+      loss may occur when samples are interpolated
+      at window boundries
+    */
 private:
     static const float kPercision;
 
-    template <class S> class Item
-    {
+    template <class S> class Item {
     private:
         T fValue;
         double fTime;
     public:
-        Item() { Reset(); }
+        Item() {
+            Reset();
+        }
         Item(const T val, const double time) : fValue(val), fTime(time) { }
-        void Reset() { fValue = 0; fTime = 0; }
-        void SetValue(const T val) { fValue = val; }
-        void SetTime(const double time) { fTime = time; }
-        T GetValue() const { return fValue; }
-        double GetTime() const { return fTime; }
+        void Reset() {
+            fValue = 0;
+            fTime = 0;
+        }
+        void SetValue(const T val) {
+            fValue = val;
+        }
+        void SetTime(const double time) {
+            fTime = time;
+        }
+        T GetValue() const {
+            return fValue;
+        }
+        double GetTime() const {
+            return fTime;
+        }
     };
     typedef std::list< Item<T> > TimeList;
     typedef typename TimeList::iterator TimeListIterator; // .NET added typename to be C++ ISO compliant - JL
@@ -93,16 +104,31 @@ private:
     TimeListIterator fRingStart, fRingEnd;
     hsMutex fLock;
 public:
-    TimeBasedAvgRing():fLen(0.f),fAvg(0.f),fMaxAvg(0.f),fTotal(0.0) {}
+    TimeBasedAvgRing(): fLen(0.f), fAvg(0.f), fMaxAvg(0.f), fTotal(0.0) {}
 
-    void SetRingLen(const float len) { fLen = len; }
-    float GetRingLen() const { return fLen; }
+    void SetRingLen(const float len) {
+        fLen = len;
+    }
+    float GetRingLen() const {
+        return fLen;
+    }
     void AddItem(T value, double time);
-    float GetAvg() const { return fAvg; }
-    double GetTotal() const { return fTotal; }
-    float GetMaxAvg() const { return fMaxAvg; }
-    void ResetMaxAvg() { fMaxAvg=fAvg; }
-    void Reset() { fRingStart=fRingEnd; ResetMaxAvg(); }
+    float GetAvg() const {
+        return fAvg;
+    }
+    double GetTotal() const {
+        return fTotal;
+    }
+    float GetMaxAvg() const {
+        return fMaxAvg;
+    }
+    void ResetMaxAvg() {
+        fMaxAvg = fAvg;
+    }
+    void Reset() {
+        fRingStart = fRingEnd;
+        ResetMaxAvg();
+    }
 };
 
 

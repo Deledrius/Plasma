@@ -51,7 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plFile/plEncryptedStream.h"
 
 pyStream::pyStream()
-: fStream( nil )
+    : fStream(nil)
 {
 }
 
@@ -66,74 +66,77 @@ bool pyStream::Open(const plFileName& fileName, const char* flags)
     // make sure its closed first
     Close();
 
-    if (fileName.IsValid())
-    {
-        if (flags)
-        {
+    if (fileName.IsValid()) {
+        if (flags) {
             bool readflag = false;
             bool writeflag = false;
             bool encryptflag = false;
             int i;
-            for (i=0 ; i < strlen(flags) ; i++ )
-            {
-                if ( flags[i] == 'r' || flags[i] == 'R' )
+
+            for (i = 0 ; i < strlen(flags) ; i++) {
+                if (flags[i] == 'r' || flags[i] == 'R') {
                     readflag = true;
-                if ( flags[i] == 'w' || flags[i] == 'W' )
+                }
+
+                if (flags[i] == 'w' || flags[i] == 'W') {
                     writeflag = true;
-                if ( flags[i] == 'e' || flags[i] == 'E' )
+                }
+
+                if (flags[i] == 'e' || flags[i] == 'E') {
                     encryptflag = true;
+                }
             }
+
             // if there is a write flag, it takes priorty over read
-            if (writeflag)
-            {
+            if (writeflag) {
                 // force encryption?
-                if (encryptflag)
-                {
+                if (encryptflag) {
                     fStream = new plEncryptedStream;
                     fStream->Open(fileName, "wb");
-                }
-                else
+                } else {
                     fStream = plEncryptedStream::OpenEncryptedFileWrite(fileName);
-            }
-            else
+                }
+            } else {
                 fStream = plEncryptedStream::OpenEncryptedFile(fileName);
+            }
+
             return true;
         }
     }
+
     return false;
 }
 
 std::vector<std::string> pyStream::ReadLines()
 {
-    
+
     // read all the lines in the file and put in a python list object
     // create the list
     std::vector<std::string> pyPL;
 
-    if (fStream)
-    {
+    if (fStream) {
         char buf[4096];
-        
-        while (!fStream->AtEnd())
-        {
-            if (fStream->ReadLn(buf, sizeof(buf), 0, 0))
+
+        while (!fStream->AtEnd()) {
+            if (fStream->ReadLn(buf, sizeof(buf), 0, 0)) {
                 pyPL.push_back(buf);
+            }
         }
     }
 
     return pyPL;
 }
 
-bool pyStream::WriteLines(const std::vector<std::string> & lines)
+bool pyStream::WriteLines(const std::vector<std::string>& lines)
 {
-    if (fStream)
-    {
+    if (fStream) {
         int i;
-        for ( i=0 ; i<lines.size() ; i++ )
-        {
+
+        for (i = 0 ; i < lines.size() ; i++) {
             std::string element = lines[i];
-            fStream->Write(element.length(),element.c_str());
+            fStream->Write(element.length(), element.c_str());
         }
+
         return true;
     }
 
@@ -143,10 +146,10 @@ bool pyStream::WriteLines(const std::vector<std::string> & lines)
 
 void pyStream::Close()
 {
-    if (fStream)
-    {
+    if (fStream) {
         fStream->Close();
         delete fStream;
     }
+
     fStream = nil;
 }

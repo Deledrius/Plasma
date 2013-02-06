@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plVault/plVaultClientApi.h
-*   
+*
 ***/
 
 #ifdef CLIENT
@@ -63,25 +63,25 @@ struct RelVaultNode;
 class plUUID;
 
 struct VaultCallback {
-    struct IVaultCallback * internal;
-    
-    virtual void AddedChildNode (
-        RelVaultNode *  parent,
-        RelVaultNode *  child
+    struct IVaultCallback* internal;
+
+    virtual void AddedChildNode(
+        RelVaultNode*   parent,
+        RelVaultNode*   child
     ) = 0;
 
-    virtual void RemovingChildNode (
-        RelVaultNode *  parent,
-        RelVaultNode *  child
+    virtual void RemovingChildNode(
+        RelVaultNode*   parent,
+        RelVaultNode*   child
     ) = 0;
 
-    virtual void ChangedNode (
-        RelVaultNode * changedNode
+    virtual void ChangedNode(
+        RelVaultNode* changedNode
     ) = 0;
 };
 
-void VaultRegisterCallback (VaultCallback * cb);
-void VaultUnregisterCallback (VaultCallback * cb);
+void VaultRegisterCallback(VaultCallback* cb);
+void VaultUnregisterCallback(VaultCallback* cb);
 
 
 /*****************************************************************************
@@ -94,96 +94,96 @@ void VaultUnregisterCallback (VaultCallback * cb);
 *
 ***/
 struct RelVaultNode : NetVaultNode {
-    struct IRelVaultNode *  state;
+    struct IRelVaultNode*   state;
 
-    RelVaultNode ();
-    ~RelVaultNode ();
-    
-    bool IsParentOf (unsigned nodeId, unsigned maxDepth);
-    bool IsChildOf (unsigned nodeId, unsigned maxDepth);
-    
-    void GetRootIds (ARRAY(unsigned) * nodeIds);
-    
-    unsigned RemoveChildNodes (unsigned maxDepth);  // returns # of nodes removed
+    RelVaultNode();
+    ~RelVaultNode();
 
-    void GetChildNodeIds (
+    bool IsParentOf(unsigned nodeId, unsigned maxDepth);
+    bool IsChildOf(unsigned nodeId, unsigned maxDepth);
+
+    void GetRootIds(ARRAY(unsigned) * nodeIds);
+
+    unsigned RemoveChildNodes(unsigned maxDepth);   // returns # of nodes removed
+
+    void GetChildNodeIds(
         ARRAY(unsigned) *   nodeIds,
         unsigned            maxDepth
     );
-    void GetParentNodeIds (
-        ARRAY(unsigned) *   nodeIds,
-        unsigned            maxDepth
-    );
-    
-    void GetMatchingChildNodeIds (
-        NetVaultNode *      templateNode,
-        ARRAY(unsigned) *   nodeIds,
-        unsigned            maxDepth
-    );
-    void GetMatchingParentNodeIds (
-        NetVaultNode *      templateNode,
+    void GetParentNodeIds(
         ARRAY(unsigned) *   nodeIds,
         unsigned            maxDepth
     );
 
-    // returns first matching node found    
-    RelVaultNode * GetParentNodeIncRef (
-        NetVaultNode *      templateNode,
+    void GetMatchingChildNodeIds(
+        NetVaultNode*       templateNode,
+        ARRAY(unsigned) *   nodeIds,
         unsigned            maxDepth
     );
-    RelVaultNode * GetChildNodeIncRef (
-        NetVaultNode *      templateNode,
+    void GetMatchingParentNodeIds(
+        NetVaultNode*       templateNode,
+        ARRAY(unsigned) *   nodeIds,
         unsigned            maxDepth
     );
-    RelVaultNode * GetChildNodeIncRef (
+
+    // returns first matching node found
+    RelVaultNode* GetParentNodeIncRef(
+        NetVaultNode*       templateNode,
+        unsigned            maxDepth
+    );
+    RelVaultNode* GetChildNodeIncRef(
+        NetVaultNode*       templateNode,
+        unsigned            maxDepth
+    );
+    RelVaultNode* GetChildNodeIncRef(
         unsigned            nodeType,
         unsigned            maxDepth
     );
-    RelVaultNode * GetChildFolderNodeIncRef (
+    RelVaultNode* GetChildFolderNodeIncRef(
         unsigned            folderType,
         unsigned            maxDepth
     );
-    RelVaultNode * GetChildPlayerInfoListNodeIncRef (
+    RelVaultNode* GetChildPlayerInfoListNodeIncRef(
         unsigned            folderType,
         unsigned            maxDepth
     );
-    RelVaultNode * GetChildAgeInfoListNodeIncRef (
+    RelVaultNode* GetChildAgeInfoListNodeIncRef(
         unsigned            folderType,
         unsigned            maxDepth
     );
 
-    // returns all matching nodes found 
-    void GetChildNodesIncRef (
+    // returns all matching nodes found
+    void GetChildNodesIncRef(
         unsigned                maxDepth,
         ARRAY(RelVaultNode*) *  nodes
     );
-    void GetChildNodesIncRef (
-        NetVaultNode *          templateNode,
+    void GetChildNodesIncRef(
+        NetVaultNode*           templateNode,
         unsigned                maxDepth,
         ARRAY(RelVaultNode*) *  nodes
     );
-    void GetChildNodesIncRef (
+    void GetChildNodesIncRef(
         unsigned                nodeType,
         unsigned                maxDepth,
         ARRAY(RelVaultNode*) *  nodes
     );
-    void GetChildFolderNodesIncRef (
+    void GetChildFolderNodesIncRef(
         unsigned                folderType,
         unsigned                maxDepth,
         ARRAY(RelVaultNode*) *  nodes
     );
-    
-    unsigned GetRefOwnerId (unsigned parentId);
 
-    bool BeenSeen (unsigned parentId) const;
-    void SetSeen (unsigned parentId, bool seen);
-    
+    unsigned GetRefOwnerId(unsigned parentId);
+
+    bool BeenSeen(unsigned parentId) const;
+    void SetSeen(unsigned parentId, bool seen);
+
     // logging
-    void Print (const wchar_t tag[], FStateDump dumpProc, unsigned level);
-    void PrintTree (FStateDump dumpProc, unsigned level);
-    
+    void Print(const wchar_t tag[], FStateDump dumpProc, unsigned level);
+    void PrintTree(FStateDump dumpProc, unsigned level);
+
     // AgeInfoNode-specific (and it checks!)
-    RelVaultNode * GetParentAgeLinkIncRef ();
+    RelVaultNode* GetParentAgeLinkIncRef();
 };
 
 
@@ -193,9 +193,9 @@ struct RelVaultNode : NetVaultNode {
 *
 ***/
 
-void VaultInitialize ();
-void VaultDestroy ();
-void VaultUpdate ();
+void VaultInitialize();
+void VaultDestroy();
+void VaultUpdate();
 
 
 /*****************************************************************************
@@ -204,123 +204,123 @@ void VaultUpdate ();
 *
 ***/
 
-RelVaultNode * VaultGetNodeIncRef (
+RelVaultNode* VaultGetNodeIncRef(
     unsigned    nodeId
 );
-RelVaultNode * VaultGetNodeIncRef (
-    NetVaultNode *  templateNode
+RelVaultNode* VaultGetNodeIncRef(
+    NetVaultNode*   templateNode
 );
 // VaultAddChildNode will download the child node if necessary
 // the parent exists locally before making the callback.
 typedef void (*FVaultAddChildNodeCallback)(
     ENetError       result,
-    void *          param
+    void*           param
 );
-void VaultAddChildNode (
+void VaultAddChildNode(
     unsigned                    parentId,
     unsigned                    childId,
     unsigned                    ownerId,
     FVaultAddChildNodeCallback  callback,   // optional
-    void *                      param       // optional
+    void*                       param       // optional
 );
-void VaultAddChildNodeAndWait (
+void VaultAddChildNodeAndWait(
     unsigned                    parentId,
     unsigned                    childId,
     unsigned                    ownerId
 );
 typedef void (*FVaultRemoveChildNodeCallback)(
     ENetError       result,
-    void *          param
+    void*           param
 );
-void VaultRemoveChildNode (
+void VaultRemoveChildNode(
     unsigned                        parentId,
     unsigned                        childId,
     FVaultRemoveChildNodeCallback   callback,
-    void *                          param
+    void*                           param
 );
-void VaultSetNodeSeen (
+void VaultSetNodeSeen(
     unsigned    nodeId,
     bool        seen
 );
-void VaultDeleteNode (
+void VaultDeleteNode(
     unsigned    nodeId
 );
-void VaultPublishNode (
+void VaultPublishNode(
     unsigned        nodeId,
     const wchar_t     deviceName[]
 );
-void VaultSendNode (
+void VaultSendNode(
     RelVaultNode*   srcNode,
     unsigned        dstPlayerId
 );
 
 typedef void (*FVaultCreateNodeCallback)(
     ENetError       result,
-    void *          state,
-    void *          param,
-    RelVaultNode *  node
+    void*           state,
+    void*           param,
+    RelVaultNode*   node
 );
-void VaultCreateNode (          // non-blocking
+void VaultCreateNode(           // non-blocking
     plVault::NodeTypes          nodeType,
     FVaultCreateNodeCallback    callback,
-    void *                      state,
-    void *                      param
+    void*                       state,
+    void*                       param
 );
-void VaultCreateNode (          // non-blocking
-    NetVaultNode *              templateNode,
+void VaultCreateNode(           // non-blocking
+    NetVaultNode*               templateNode,
     FVaultCreateNodeCallback    callback,
-    void *                      state,
-    void *                      param
+    void*                       state,
+    void*                       param
 );
-RelVaultNode * VaultCreateNodeAndWaitIncRef (   // block until completion. returns node. nil --> failure
+RelVaultNode* VaultCreateNodeAndWaitIncRef(     // block until completion. returns node. nil --> failure
     plVault::NodeTypes          nodeType,
-    ENetError *                 result
+    ENetError*                  result
 );
-RelVaultNode * VaultCreateNodeAndWaitIncRef (   // block until completion. returns node. nil --> failure
-    NetVaultNode *              templateNode,
-    ENetError *                 result
+RelVaultNode* VaultCreateNodeAndWaitIncRef(     // block until completion. returns node. nil --> failure
+    NetVaultNode*               templateNode,
+    ENetError*                  result
 );
-void VaultForceSaveNodeAndWait (
-    NetVaultNode *      node
+void VaultForceSaveNodeAndWait(
+    NetVaultNode*       node
 );
 
 typedef void (*FVaultFindNodeCallback)(
     ENetError           result,
-    void *              param,
+    void*               param,
     unsigned            nodeIdCount,
     const unsigned      nodeIds[]
 );
-void VaultFindNodes (
-    NetVaultNode *          templateNode,
+void VaultFindNodes(
+    NetVaultNode*           templateNode,
     FVaultFindNodeCallback  callback,
-    void *                  param
+    void*                   param
 );
-void VaultFindNodesAndWait (
-    NetVaultNode *          templateNode,
+void VaultFindNodesAndWait(
+    NetVaultNode*           templateNode,
     ARRAY(unsigned) *       nodeIds
 );
-void VaultLocalFindNodes (
-    NetVaultNode *          templateNode,
+void VaultLocalFindNodes(
+    NetVaultNode*           templateNode,
     ARRAY(unsigned) *       nodeIds
 );
-void VaultFetchNodesAndWait (   // Use VaultGetNodeIncRef to access the fetched nodes
+void VaultFetchNodesAndWait(    // Use VaultGetNodeIncRef to access the fetched nodes
     const unsigned          nodeIds[],
     unsigned                count,
     bool                    force = false
 );
 typedef void (*FVaultInitAgeCallback)(
     ENetError       result,
-    void *          state,
-    void *          param,
+    void*           state,
+    void*           param,
     unsigned        ageVaultId,
     unsigned        ageInfoVaultId
 );
-void VaultInitAge (
-    const class plAgeInfoStruct *   info,
+void VaultInitAge(
+    const class plAgeInfoStruct*    info,
     const plUUID                    parentAgeInstId,
     FVaultInitAgeCallback           callback,
-    void *                          state,
-    void *                          param
+    void*                           state,
+    void*                           param
 );
 
 
@@ -330,56 +330,56 @@ void VaultInitAge (
 *
 ***/
 
-unsigned        VaultGetPlayerId ();
-RelVaultNode *  VaultGetPlayerNodeIncRef ();
-RelVaultNode *  VaultGetPlayerInfoNodeIncRef ();
-RelVaultNode *  VaultGetAvatarOutfitFolderIncRef ();
-RelVaultNode *  VaultGetAvatarClosetFolderIncRef ();
-bool            VaultGetLinkToMyNeighborhood (plAgeLinkStruct * link);
-bool            VaultGetLinkToMyPersonalAge (plAgeLinkStruct * link);
-bool            VaultGetLinkToCity (plAgeLinkStruct * link);
-RelVaultNode *  VaultGetAgesIOwnFolderIncRef ();
-RelVaultNode *  VaultGetAgesICanVisitFolderIncRef ();
-RelVaultNode *  VaultGetPlayerInboxFolderIncRef ();
-RelVaultNode *  VaultGetOwnedAgeLinkIncRef (const plAgeInfoStruct * info);
-RelVaultNode *  VaultGetOwnedAgeInfoIncRef (const plAgeInfoStruct * info);
-bool            VaultGetOwnedAgeLink (const plAgeInfoStruct * info, plAgeLinkStruct * link);
-bool            VaultAddOwnedAgeSpawnPoint (const plUUID& ageInstId, const plSpawnPointInfo & spawnPt);
-bool            VaultSetOwnedAgePublicAndWait (const plAgeInfoStruct * info, bool publicOrNot);
-RelVaultNode *  VaultGetVisitAgeLinkIncRef (const plAgeInfoStruct * info);
-bool            VaultGetVisitAgeLink (const plAgeInfoStruct * info, class plAgeLinkStruct * link);
-bool            VaultRegisterOwnedAgeAndWait (const plAgeLinkStruct * link);
+unsigned        VaultGetPlayerId();
+RelVaultNode*   VaultGetPlayerNodeIncRef();
+RelVaultNode*   VaultGetPlayerInfoNodeIncRef();
+RelVaultNode*   VaultGetAvatarOutfitFolderIncRef();
+RelVaultNode*   VaultGetAvatarClosetFolderIncRef();
+bool            VaultGetLinkToMyNeighborhood(plAgeLinkStruct* link);
+bool            VaultGetLinkToMyPersonalAge(plAgeLinkStruct* link);
+bool            VaultGetLinkToCity(plAgeLinkStruct* link);
+RelVaultNode*   VaultGetAgesIOwnFolderIncRef();
+RelVaultNode*   VaultGetAgesICanVisitFolderIncRef();
+RelVaultNode*   VaultGetPlayerInboxFolderIncRef();
+RelVaultNode*   VaultGetOwnedAgeLinkIncRef(const plAgeInfoStruct* info);
+RelVaultNode*   VaultGetOwnedAgeInfoIncRef(const plAgeInfoStruct* info);
+bool            VaultGetOwnedAgeLink(const plAgeInfoStruct* info, plAgeLinkStruct* link);
+bool            VaultAddOwnedAgeSpawnPoint(const plUUID& ageInstId, const plSpawnPointInfo& spawnPt);
+bool            VaultSetOwnedAgePublicAndWait(const plAgeInfoStruct* info, bool publicOrNot);
+RelVaultNode*   VaultGetVisitAgeLinkIncRef(const plAgeInfoStruct* info);
+bool            VaultGetVisitAgeLink(const plAgeInfoStruct* info, class plAgeLinkStruct* link);
+bool            VaultRegisterOwnedAgeAndWait(const plAgeLinkStruct* link);
 void            VaultRegisterOwnedAge(const plAgeLinkStruct* link);
-bool            VaultRegisterVisitAgeAndWait (const plAgeLinkStruct * link);
-void            VaultRegisterVisitAge (const plAgeLinkStruct* link);
-bool            VaultUnregisterOwnedAgeAndWait (const plAgeInfoStruct * info);
-bool            VaultUnregisterVisitAgeAndWait (const plAgeInfoStruct * info);
-RelVaultNode *  VaultFindChronicleEntryIncRef (const wchar_t entryName[], int entryType = -1);
-bool            VaultHasChronicleEntry (const wchar_t entryName[], int entryType = -1);
+bool            VaultRegisterVisitAgeAndWait(const plAgeLinkStruct* link);
+void            VaultRegisterVisitAge(const plAgeLinkStruct* link);
+bool            VaultUnregisterOwnedAgeAndWait(const plAgeInfoStruct* info);
+bool            VaultUnregisterVisitAgeAndWait(const plAgeInfoStruct* info);
+RelVaultNode*   VaultFindChronicleEntryIncRef(const wchar_t entryName[], int entryType = -1);
+bool            VaultHasChronicleEntry(const wchar_t entryName[], int entryType = -1);
 // if entry of same name and type already exists, value is updated
-void            VaultAddChronicleEntryAndWait (
+void            VaultAddChronicleEntryAndWait(
     const wchar_t entryName[],
     int         entryType,
     const wchar_t entryValue[]
 );
-bool        VaultAmIgnoringPlayer (unsigned playerId);
-unsigned    VaultGetKILevel ();
-bool        VaultGetCCRStatus ();               // true=online, false=away
-bool        VaultSetCCRStatus (bool online);    // true=online, false=away
-void        VaultDump (const wchar_t tag[], unsigned vaultId, FStateDump dumpProc);
-void        VaultDump (const wchar_t tag[], unsigned vaultId);
+bool        VaultAmIgnoringPlayer(unsigned playerId);
+unsigned    VaultGetKILevel();
+bool        VaultGetCCRStatus();                // true=online, false=away
+bool        VaultSetCCRStatus(bool online);     // true=online, false=away
+void        VaultDump(const wchar_t tag[], unsigned vaultId, FStateDump dumpProc);
+void        VaultDump(const wchar_t tag[], unsigned vaultId);
 
-bool VaultAmInMyPersonalAge ();
-bool VaultAmInMyNeighborhoodAge ();
-bool VaultAmOwnerOfCurrentAge ();
-bool VaultAmCzarOfCurrentAge ();
-bool VaultAmOwnerOfAge (const plUUID& ageInstId);
-bool VaultAmCzarOfAge (const plUUID& ageInstId);
-bool VaultRegisterMTStationAndWait (
+bool VaultAmInMyPersonalAge();
+bool VaultAmInMyNeighborhoodAge();
+bool VaultAmOwnerOfCurrentAge();
+bool VaultAmCzarOfCurrentAge();
+bool VaultAmOwnerOfAge(const plUUID& ageInstId);
+bool VaultAmCzarOfAge(const plUUID& ageInstId);
+bool VaultRegisterMTStationAndWait(
     const wchar_t stationName[],
     const wchar_t linkBackSpawnPtObjName[]
 );
-void VaultProcessPlayerInbox ();
+void VaultProcessPlayerInbox();
 
 
 /*****************************************************************************
@@ -390,54 +390,54 @@ void VaultProcessPlayerInbox ();
 
 #define DEFAULT_DEVICE_INBOX L"DevInbox"
 
-RelVaultNode * VaultGetAgeNodeIncRef ();
-RelVaultNode * VaultGetAgeInfoNodeIncRef ();
-RelVaultNode * VaultGetAgeChronicleFolderIncRef ();
-RelVaultNode * VaultGetAgeDevicesFolderIncRef ();
-RelVaultNode * VaultGetAgeSubAgesFolderIncRef ();
-RelVaultNode * VaultGetAgeChildAgesFolderIncRef ();
-RelVaultNode * VaultGetAgeAgeOwnersFolderIncRef ();
-RelVaultNode * VaultGetAgeCanVisitFolderIncRef ();
-RelVaultNode * VaultGetAgePeopleIKnowAboutFolderIncRef ();
-RelVaultNode * VaultGetAgePublicAgesFolderIncRef ();
-RelVaultNode * VaultAgeGetBookshelfFolderIncRef ();
-RelVaultNode * VaultFindAgeSubAgeLinkIncRef (const plAgeInfoStruct * info);
-RelVaultNode * VaultFindAgeChildAgeLinkIncRef (const plAgeInfoStruct * info);
-RelVaultNode * VaultFindAgeChronicleEntryIncRef (const wchar_t entryName[], int entryType = -1);
+RelVaultNode* VaultGetAgeNodeIncRef();
+RelVaultNode* VaultGetAgeInfoNodeIncRef();
+RelVaultNode* VaultGetAgeChronicleFolderIncRef();
+RelVaultNode* VaultGetAgeDevicesFolderIncRef();
+RelVaultNode* VaultGetAgeSubAgesFolderIncRef();
+RelVaultNode* VaultGetAgeChildAgesFolderIncRef();
+RelVaultNode* VaultGetAgeAgeOwnersFolderIncRef();
+RelVaultNode* VaultGetAgeCanVisitFolderIncRef();
+RelVaultNode* VaultGetAgePeopleIKnowAboutFolderIncRef();
+RelVaultNode* VaultGetAgePublicAgesFolderIncRef();
+RelVaultNode* VaultAgeGetBookshelfFolderIncRef();
+RelVaultNode* VaultFindAgeSubAgeLinkIncRef(const plAgeInfoStruct* info);
+RelVaultNode* VaultFindAgeChildAgeLinkIncRef(const plAgeInfoStruct* info);
+RelVaultNode* VaultFindAgeChronicleEntryIncRef(const wchar_t entryName[], int entryType = -1);
 // if entry of same name and type already exists, value is updated
-void           VaultAddAgeChronicleEntry (
+void           VaultAddAgeChronicleEntry(
     const wchar_t entryName[],
     int         entryType,
     const wchar_t entryValue[]
 );
-RelVaultNode * VaultAgeAddDeviceAndWaitIncRef (const wchar_t deviceName[]);   // blocks until completion
-void VaultAgeRemoveDevice (const wchar_t deviceName[]);
-bool VaultAgeHasDevice (const wchar_t deviceName[]);
-RelVaultNode * VaultAgeGetDeviceIncRef (const wchar_t deviceName[]);
-RelVaultNode * VaultAgeSetDeviceInboxAndWaitIncRef (const wchar_t deviceName[], const wchar_t inboxName[]); // blocks until completion
-RelVaultNode * VaultAgeGetDeviceInboxIncRef (const wchar_t deviceName[]);
-void VaultClearDeviceInboxMap ();
+RelVaultNode* VaultAgeAddDeviceAndWaitIncRef(const wchar_t deviceName[]);     // blocks until completion
+void VaultAgeRemoveDevice(const wchar_t deviceName[]);
+bool VaultAgeHasDevice(const wchar_t deviceName[]);
+RelVaultNode* VaultAgeGetDeviceIncRef(const wchar_t deviceName[]);
+RelVaultNode* VaultAgeSetDeviceInboxAndWaitIncRef(const wchar_t deviceName[], const wchar_t inboxName[]);   // blocks until completion
+RelVaultNode* VaultAgeGetDeviceInboxIncRef(const wchar_t deviceName[]);
+void VaultClearDeviceInboxMap();
 
-bool VaultAgeGetAgeSDL (class plStateDataRecord * out);
-void VaultAgeUpdateAgeSDL (const class plStateDataRecord * rec);
+bool VaultAgeGetAgeSDL(class plStateDataRecord* out);
+void VaultAgeUpdateAgeSDL(const class plStateDataRecord* rec);
 
-unsigned VaultAgeGetAgeTime ();
+unsigned VaultAgeGetAgeTime();
 
-RelVaultNode * VaultGetSubAgeLinkIncRef (const plAgeInfoStruct * info);
-bool VaultAgeGetSubAgeLink (
-    const plAgeInfoStruct * info,
-    plAgeLinkStruct *       link
+RelVaultNode* VaultGetSubAgeLinkIncRef(const plAgeInfoStruct* info);
+bool VaultAgeGetSubAgeLink(
+    const plAgeInfoStruct* info,
+    plAgeLinkStruct*        link
 );
-bool VaultAgeFindOrCreateSubAgeLinkAndWait (
-    const plAgeInfoStruct * info,
-    plAgeLinkStruct *       link,
+bool VaultAgeFindOrCreateSubAgeLinkAndWait(
+    const plAgeInfoStruct* info,
+    plAgeLinkStruct*        link,
     const plUUID&           parentAgeInstId
 );
 bool VaultAgeFindOrCreateSubAgeLink(const plAgeInfoStruct* info, plAgeLinkStruct* link, const plUUID& arentUuid);
-bool VaultAgeFindOrCreateChildAgeLinkAndWait (
+bool VaultAgeFindOrCreateChildAgeLinkAndWait(
     const wchar_t             parentAgeName[],    // nil --> current age, non-nil --> owned age by given name
-    const plAgeInfoStruct * info,
-    plAgeLinkStruct *       link
+    const plAgeInfoStruct* info,
+    plAgeLinkStruct*        link
 );
 uint8_t VaultAgeFindOrCreateChildAgeLink(const wchar_t parentAgeName[], const plAgeInfoStruct* info, plAgeLinkStruct* link);
 
@@ -461,30 +461,30 @@ void VaultCCRDumpPlayers();
 
 typedef void (*FVaultDownloadCallback)(
     ENetError                   result,
-    void *                      param
+    void*                       param
 );
 typedef void (*FVaultProgressCallback)(
     unsigned                    total,
     unsigned                    curr,
-    void *                      param
+    void*                       param
 );
 
-void VaultDownload (
+void VaultDownload(
     const wchar_t                 tag[],
     unsigned                    vaultId,
     FVaultDownloadCallback      callback,
-    void *                      cbParam,
+    void*                       cbParam,
     FVaultProgressCallback      progressCallback,
-    void *                      cbProgressParam
+    void*                       cbProgressParam
 );
-void VaultDownloadAndWait (
+void VaultDownloadAndWait(
     const wchar_t                 tag[],
     unsigned                    vaultId,
     FVaultProgressCallback      progressCallback,
-    void *                      cbProgressParam
+    void*                       cbProgressParam
 );
 
-void VaultCull (
+void VaultCull(
     unsigned                    vaultId
 );
 
@@ -494,7 +494,7 @@ void VaultCull (
 *
 ***/
 
-RelVaultNode * VaultGetSystemNodeIncRef ();
-RelVaultNode * VaultGetGlobalInboxIncRef ();
+RelVaultNode* VaultGetSystemNodeIncRef();
+RelVaultNode* VaultGetGlobalInboxIncRef();
 
 #endif // def CLIENT

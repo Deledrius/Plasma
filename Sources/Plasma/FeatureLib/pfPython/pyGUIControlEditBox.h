@@ -55,8 +55,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class pyColor;
 
-class pyGUIControlEditBox : public pyGUIControl
-{
+class pyGUIControlEditBox : public pyGUIControl {
 protected:
     pyGUIControlEditBox(): pyGUIControl() {} // for python glue only, do NOT call
     pyGUIControlEditBox(pyKey& gckey);
@@ -65,21 +64,21 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptGUIControlEditBox);
-    static PyObject *New(pyKey& gckey);
-    static PyObject *New(plKey objkey);
+    static PyObject* New(pyKey& gckey);
+    static PyObject* New(plKey objkey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGUIControlEditBox object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGUIControlEditBox); // converts a PyObject to a pyGUIControlEditBox (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     static bool IsGUIControlEditBox(pyKey& gckey);
 
-    virtual void    SetBufferSize( uint32_t size );
-    virtual std::string GetBuffer( void );
-    virtual std::wstring GetBufferW( void );
-    virtual void    ClearBuffer( void );
-    virtual void    SetText( const char *str );
-    virtual void    SetTextW( const wchar_t *str );
+    virtual void    SetBufferSize(uint32_t size);
+    virtual std::string GetBuffer(void);
+    virtual std::wstring GetBufferW(void);
+    virtual void    ClearBuffer(void);
+    virtual void    SetText(const char* str);
+    virtual void    SetTextW(const wchar_t* str);
     virtual void    SetCursorToHome(void);
     virtual void    SetCursorToEnd(void);
     virtual void    SetColor(pyColor& forecolor, pyColor& backcolor);

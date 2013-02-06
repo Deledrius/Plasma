@@ -54,14 +54,16 @@ void plMaxAccelerators::Enable()
 {
     fNumDisables--;
 
-    if (fNumDisables <= 0)
+    if (fNumDisables <= 0) {
         EnableAccelerators();
+    }
 }
 
 void plMaxAccelerators::Disable()
 {
     fNumDisables++;
 
-    if (fNumDisables > 0)
+    if (fNumDisables > 0) {
         DisableAccelerators();
+    }
 }

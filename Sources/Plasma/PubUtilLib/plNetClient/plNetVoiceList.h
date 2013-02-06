@@ -49,22 +49,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // for voice filtering.
 //
 class plNetTransportMember;
-class plNetVoiceList
-{
+class plNetVoiceList {
 protected:
-    typedef std::vector<plNetTransportMember*> VoiceListType;   
+    typedef std::vector<plNetTransportMember*> VoiceListType;
 protected:
-    VoiceListType fMembers; 
+    VoiceListType fMembers;
 
-public: 
+public:
     plNetVoiceList() {}
     virtual ~plNetVoiceList() {}
-    
-    int GetNumMembers() const { return fMembers.size(); }
-    plNetTransportMember* GetMember(int i) const { return fMembers[i];  }
+
+    int GetNumMembers() const {
+        return fMembers.size();
+    }
+    plNetTransportMember* GetMember(int i) const {
+        return fMembers[i];
+    }
     virtual void AddMember(plNetTransportMember* e) = 0;
     virtual void RemoveMember(plNetTransportMember* e) = 0;
-    virtual void Clear() { fMembers.clear(); }
+    virtual void Clear() {
+        fMembers.clear();
+    }
     int FindMember(plNetTransportMember* e);    // return index or -1
 };
 
@@ -72,8 +77,7 @@ public:
 // Specialized version for listen list
 // a list of other player I am listening to
 //
-class plNetListenList : public plNetVoiceList
-{
+class plNetListenList : public plNetVoiceList {
 private:
     double fLastUpdateTime;
     int fNumUpdates;
@@ -84,11 +88,23 @@ public:
     static float kUpdateInterval;
     static int kMaxListenListSize;
     static float kMaxListenDistSq;
-    
-    void SetLastUpdateTime(double t) { fLastUpdateTime=t; fNumUpdates++;    }
-    double GetLastUpdateTime() { return fLastUpdateTime;    }
 
-    bool CheckForceSynch() { if (fNumUpdates>10) { fNumUpdates=0; return true;} return false; }
+    void SetLastUpdateTime(double t) {
+        fLastUpdateTime = t;
+        fNumUpdates++;
+    }
+    double GetLastUpdateTime() {
+        return fLastUpdateTime;
+    }
+
+    bool CheckForceSynch() {
+        if (fNumUpdates > 10) {
+            fNumUpdates = 0;
+            return true;
+        }
+
+        return false;
+    }
 
     virtual void AddMember(plNetTransportMember* e);
     virtual void RemoveMember(plNetTransportMember* e);
@@ -100,11 +116,9 @@ public:
 // a list of other players I am talking to
 //
 class plNetClientMgr;
-class plNetTalkList : public plNetVoiceList
-{
+class plNetTalkList : public plNetVoiceList {
 private:
-    enum
-    {
+    enum {
         kDirty  = 0x1
     };
     uint32_t fFlags;

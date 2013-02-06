@@ -66,45 +66,45 @@ void DummyCodeIncludeFuncLODFade()
 CLASS_DESC(plLODFadeComponent, gLODFadeCompDesc, "LOD Blend",  "LODBlend", COMP_TYPE_GRAPHICS, LODFADE_COMP_CID)
 
 ParamBlockDesc2 gLODFadeBk
-(   
+(
     plComponent::kBlkComp, _T("LODFade"), 0, &gLODFadeCompDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_LODFADE, IDS_COMP_LODFADE, 0, 0, NULL,
 
     plLODFadeComponent::kHasBase,   _T("HasBase"),  TYPE_BOOL, 0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LODFADE_HASBASE,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LODFADE_HASBASE,
+    end,
 
     plLODFadeComponent::kBase, _T("Base"),  TYPE_INODE,     0, 0,
-        p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_LODFADE_BASE,
-        p_prompt, IDS_COMP_LODFADE_BASE,
-        end,
+    p_ui,   TYPE_PICKNODEBUTTON, IDC_COMP_LODFADE_BASE,
+    p_prompt, IDS_COMP_LODFADE_BASE,
+    end,
 
-    plLODFadeComponent::kDistance, _T("Distance"), TYPE_FLOAT,  0, 0,   
-        p_default, 50.0,
-        p_range, 0.0, 1000.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_LODFADE_DISTANCE, IDC_COMP_LODFADE_DISTANCE_SPIN, 1.0,
-        end,    
+    plLODFadeComponent::kDistance, _T("Distance"), TYPE_FLOAT,  0, 0,
+    p_default, 50.0,
+    p_range, 0.0, 1000.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_LODFADE_DISTANCE, IDC_COMP_LODFADE_DISTANCE_SPIN, 1.0,
+    end,
 
-    plLODFadeComponent::kTransition, _T("Transition"), TYPE_FLOAT,  0, 0,   
-        p_default, 10.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_LODFADE_TRANSITION, IDC_COMP_LODFADE_TRANSITION_SPIN, 1.0,
-        end,    
+    plLODFadeComponent::kTransition, _T("Transition"), TYPE_FLOAT,  0, 0,
+    p_default, 10.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_LODFADE_TRANSITION, IDC_COMP_LODFADE_TRANSITION_SPIN, 1.0,
+    end,
 
     plLODFadeComponent::kFadeBase,  _T("FadeBase"), TYPE_BOOL, 0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LODFADE_FADEBASE,
-        p_enable_ctrls,     1, plLODFadeComponent::kBaseFirst,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LODFADE_FADEBASE,
+    p_enable_ctrls,     1, plLODFadeComponent::kBaseFirst,
+    end,
 
     plLODFadeComponent::kBaseFirst, _T("BaseFirst"),    TYPE_BOOL, 0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LODFADE_BASEFIRST,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LODFADE_BASEFIRST,
+    end,
 
 
     end
@@ -112,16 +112,20 @@ ParamBlockDesc2 gLODFadeBk
 
 void plLODFadeComponent::ISetToFadeBase(plMaxNode* node, plMaxNode* base, plErrorMsg* pErrMsg)
 {
-    if( fCompPB->GetInt(kBaseFirst) )
+    if (fCompPB->GetInt(kBaseFirst)) {
         node->AddRenderDependency(base);
-    else
+    } else {
         base->AddRenderDependency(node);
+    }
 
     Box3 fade = base->GetFade();
     Point3 maxs = fade.Max();
     float fadeInStart = fCompPB->GetFloat(kDistance) - fCompPB->GetFloat(kTransition);
-    if( fadeInStart < 0 )
+
+    if (fadeInStart < 0) {
         fadeInStart = 0;
+    }
+
     float fadeInEnd = fCompPB->GetFloat(kDistance);
     Point3 mins(fadeInStart, fadeInEnd, -1.f);
     fade = Box3(mins, maxs);
@@ -133,22 +137,19 @@ void plLODFadeComponent::ISetToFadeBase(plMaxNode* node, plMaxNode* base, plErro
 
 bool plLODFadeComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if( fCompPB->GetInt(kHasBase) )
-    {
+    if (fCompPB->GetInt(kHasBase)) {
         plMaxNode* base = (plMaxNode*)fCompPB->GetINode(kBase, TimeValue(0));
-        if( base )
-        {
-            if( fCompPB->GetInt(kFadeBase) )
-            {
+
+        if (base) {
+            if (fCompPB->GetInt(kFadeBase)) {
                 ISetToFadeBase(node, base, pErrMsg);
-            }
-            else
-            {
+            } else {
                 node->AddRenderDependency(base);
                 node->SetNoDeferDraw(true);
             }
         }
     }
+
     Box3 fade = node->GetFade();
     Point3 mins = fade.Min();
     float fadeOutStart = fCompPB->GetFloat(kDistance);
@@ -165,9 +166,9 @@ bool plLODFadeComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
     return true;
 }
 
-bool plLODFadeComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg) 
-{ 
-    return true; 
+bool plLODFadeComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
+{
+    return true;
 }
 
 plLODFadeComponent::plLODFadeComponent()
@@ -181,20 +182,20 @@ plLODFadeComponent::plLODFadeComponent()
 CLASS_DESC(plBlendOntoComponent, gBlendOntoCompDesc, "Blend Onto",  "BlendOnto", COMP_TYPE_GRAPHICS, BLENDONTO_COMP_CID)
 
 ParamBlockDesc2 gBlendOntoBk
-(   
+(
     plComponent::kBlkComp, _T("BlendOnto"), 0, &gBlendOntoCompDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_BLENDONTO, IDS_COMP_BLENDONTO, 0, 0, NULL,
 
     plBlendOntoComponent::kBaseNodes,   _T("BaseNodes"),    TYPE_INODE_TAB, 0,      P_CAN_CONVERT, 0,
-        p_ui,           TYPE_NODELISTBOX, IDC_LIST_TARGS, IDC_ADD_TARGS, 0, IDC_DEL_TARGS,
-        p_classID,      triObjectClassID,
-        end,
+    p_ui,           TYPE_NODELISTBOX, IDC_LIST_TARGS, IDC_ADD_TARGS, 0, IDC_DEL_TARGS,
+    p_classID,      triObjectClassID,
+    end,
 
     plBlendOntoComponent::kSortFaces,   _T("SortFaces"),    TYPE_BOOL, 0, 0,
-        p_default,  TRUE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_BLENDONTO_SORTFACES,
-        end,
+    p_default,  TRUE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_BLENDONTO_SORTFACES,
+    end,
 
 
     end
@@ -205,22 +206,23 @@ bool plBlendOntoComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
     bool someBase = false;
     int numBase = fCompPB->Count(kBaseNodes);
     int i;
-    for( i = 0; i < numBase; i++ )
-    {
+
+    for (i = 0; i < numBase; i++) {
         plMaxNode* base = (plMaxNode*)fCompPB->GetINode(kBaseNodes, TimeValue(0), i);
 
-        if( base )
-        {
+        if (base) {
             node->AddRenderDependency(base);
             node->SetNoDeferDraw(true);
-            if( !fCompPB->GetInt(kSortFaces) )
+
+            if (!fCompPB->GetInt(kSortFaces)) {
                 node->SetNoFaceSort(true);
+            }
 
             someBase = true;
         }
     }
-    if( !someBase )
-    {
+
+    if (!someBase) {
         node->SetBlendToFB(true);
     }
 
@@ -232,9 +234,9 @@ bool plBlendOntoComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
     return true;
 }
 
-bool plBlendOntoComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg) 
-{ 
-    return true; 
+bool plBlendOntoComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
+{
+    return true;
 }
 
 plBlendOntoComponent::plBlendOntoComponent()
@@ -248,30 +250,30 @@ plBlendOntoComponent::plBlendOntoComponent()
 CLASS_DESC(plBlendOntoAdvComponent, gBlendOntoAdvCompDesc, "Blend Onto Advanced",  "BlendOntoAdv", COMP_TYPE_GRAPHICS, BLENDONTOADV_COMP_CID)
 
 ParamBlockDesc2 gBlendOntoAdvBk
-(   
+(
     plComponent::kBlkComp, _T("BlendOntoAdv"), 0, &gBlendOntoAdvCompDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_BLENDONTOADV, IDS_COMP_BLENDONTOADV, 0, 0, NULL,
 
     plBlendOntoAdvComponent::kBaseNodes,    _T("BaseNodes"),    TYPE_INODE_TAB, 0,      P_CAN_CONVERT, 0,
-        p_ui,           TYPE_NODELISTBOX, IDC_LIST_TARGS, IDC_ADD_TARGS, 0, IDC_DEL_TARGS,
-        p_classID,      triObjectClassID,
-        end,
+    p_ui,           TYPE_NODELISTBOX, IDC_LIST_TARGS, IDC_ADD_TARGS, 0, IDC_DEL_TARGS,
+    p_classID,      triObjectClassID,
+    end,
 
     plBlendOntoAdvComponent::kSortFaces,    _T("SortFaces"),    TYPE_BOOL, 0, 0,
-        p_default,  TRUE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_BLENDONTOADV_SORTFACES,
-        end,
+    p_default,  TRUE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_BLENDONTOADV_SORTFACES,
+    end,
 
     plBlendOntoAdvComponent::kSortObjects,  _T("SortObjects"),  TYPE_BOOL, 0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_BLENDONTOADV_SORTOBJECTS,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_BLENDONTOADV_SORTOBJECTS,
+    end,
 
     plBlendOntoAdvComponent::kOntoBlending, _T("OntoBlending"), TYPE_BOOL, 0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_BLENDONTOADV_ONTOBLENDING,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_BLENDONTOADV_ONTOBLENDING,
+    end,
 
 
     end
@@ -282,23 +284,26 @@ bool plBlendOntoAdvComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrM
     bool someBase = false;
     int numBase = fCompPB->Count(kBaseNodes);
     int i;
-    for( i = 0; i < numBase; i++ )
-    {
+
+    for (i = 0; i < numBase; i++) {
         plMaxNode* base = (plMaxNode*)fCompPB->GetINode(kBaseNodes, TimeValue(0), i);
 
-        if( base )
-        {
+        if (base) {
             node->AddRenderDependency(base);
-            if( !fCompPB->GetInt(kOntoBlending) )
+
+            if (!fCompPB->GetInt(kOntoBlending)) {
                 node->SetNoDeferDraw(true);
-            if( !fCompPB->GetInt(kSortFaces) )
+            }
+
+            if (!fCompPB->GetInt(kSortFaces)) {
                 node->SetNoFaceSort(true);
+            }
 
             someBase = true;
         }
     }
-    if( !someBase )
-    {
+
+    if (!someBase) {
         node->SetBlendToFB(true);
     }
 
@@ -310,9 +315,9 @@ bool plBlendOntoAdvComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
     return true;
 }
 
-bool plBlendOntoAdvComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg) 
-{ 
-    return true; 
+bool plBlendOntoAdvComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
+{
+    return true;
 }
 
 plBlendOntoAdvComponent::plBlendOntoAdvComponent()
@@ -326,24 +331,25 @@ plBlendOntoAdvComponent::plBlendOntoAdvComponent()
 
 const Class_ID B4AV_COMP_CID(0x14536d5b, 0x17dc623b);
 
-class plB4AvComponent : public plComponent
-{
+class plB4AvComponent : public plComponent {
 public:
     plB4AvComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 
 CLASS_DESC(plB4AvComponent, gB4AvCompDesc, "Draw B4 Avatar",  "B4Av", COMP_TYPE_GRAPHICS, B4AV_COMP_CID)
 
 ParamBlockDesc2 gB4AvBk
-(   
+(
     plComponent::kBlkComp, _T("B4Av"), 0, &gB4AvCompDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_SORT_AS_OPAQUE, IDS_COMP_SORT_AS_OPAQUE, 0, 0, NULL,
@@ -362,9 +368,9 @@ bool plB4AvComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
     return true;
 }
 
-bool plB4AvComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg) 
-{ 
-    return true; 
+bool plB4AvComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
+{
+    return true;
 }
 
 plB4AvComponent::plB4AvComponent()
@@ -379,50 +385,50 @@ plB4AvComponent::plB4AvComponent()
 CLASS_DESC(plDistFadeComponent, gDistFadeCompDesc, "Distance Fade",  "DistFade", COMP_TYPE_GRAPHICS, DISTFADE_COMP_CID)
 
 ParamBlockDesc2 gDistFadeBk
-(   
+(
     plComponent::kBlkComp, _T("DistFade"), 0, &gDistFadeCompDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_DISTFADE, IDS_COMP_DISTFADE, 0, 0, NULL,
 
     plDistFadeComponent::kFadeInActive, _T("FadeInActive"), TYPE_BOOL, 0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_DISTFADE_IN_ACTIVE,
-        p_enable_ctrls,     2, plDistFadeComponent::kFadeInStart, plDistFadeComponent::kFadeInEnd,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_DISTFADE_IN_ACTIVE,
+    p_enable_ctrls,     2, plDistFadeComponent::kFadeInStart, plDistFadeComponent::kFadeInEnd,
+    end,
 
-    plDistFadeComponent::kFadeInStart, _T("FadeInStart"), TYPE_FLOAT,   0, 0,   
-        p_default, 5.0,
-        p_range, 0.0, 1000.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_DISTFADE_INSTART, IDC_COMP_DISTFADE_INSTART_SPIN, 1.0,
-        end,    
+    plDistFadeComponent::kFadeInStart, _T("FadeInStart"), TYPE_FLOAT,   0, 0,
+    p_default, 5.0,
+    p_range, 0.0, 1000.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_DISTFADE_INSTART, IDC_COMP_DISTFADE_INSTART_SPIN, 1.0,
+    end,
 
-    plDistFadeComponent::kFadeInEnd, _T("FadeInEnd"), TYPE_FLOAT,   0, 0,   
-        p_default, 10.0,
-        p_range, 0.0, 1000.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_DISTFADE_INEND, IDC_COMP_DISTFADE_INEND_SPIN, 1.0,
-        end,    
+    plDistFadeComponent::kFadeInEnd, _T("FadeInEnd"), TYPE_FLOAT,   0, 0,
+    p_default, 10.0,
+    p_range, 0.0, 1000.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_DISTFADE_INEND, IDC_COMP_DISTFADE_INEND_SPIN, 1.0,
+    end,
 
     plDistFadeComponent::kFadeOutActive,    _T("FadeOutActive"),    TYPE_BOOL, 0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_DISTFADE_OUT_ACTIVE,
-        p_enable_ctrls,     2, plDistFadeComponent::kFadeOutStart, plDistFadeComponent::kFadeOutEnd,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_DISTFADE_OUT_ACTIVE,
+    p_enable_ctrls,     2, plDistFadeComponent::kFadeOutStart, plDistFadeComponent::kFadeOutEnd,
+    end,
 
-    plDistFadeComponent::kFadeOutStart, _T("FadeOutStart"), TYPE_FLOAT,     0, 0,   
-        p_default, 50.0,
-        p_range, 0.0, 1000.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_DISTFADE_OUTSTART, IDC_COMP_DISTFADE_OUTSTART_SPIN, 1.0,
-        end,    
+    plDistFadeComponent::kFadeOutStart, _T("FadeOutStart"), TYPE_FLOAT,     0, 0,
+    p_default, 50.0,
+    p_range, 0.0, 1000.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_DISTFADE_OUTSTART, IDC_COMP_DISTFADE_OUTSTART_SPIN, 1.0,
+    end,
 
-    plDistFadeComponent::kFadeOutEnd, _T("FadeOutEnd"), TYPE_FLOAT,     0, 0,   
-        p_default, 100.0,
-        p_range, 0.0, 1000.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_DISTFADE_OUTEND, IDC_COMP_DISTFADE_OUTEND_SPIN, 1.0,
-        end,    
+    plDistFadeComponent::kFadeOutEnd, _T("FadeOutEnd"), TYPE_FLOAT,     0, 0,
+    p_default, 100.0,
+    p_range, 0.0, 1000.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_DISTFADE_OUTEND, IDC_COMP_DISTFADE_OUTEND_SPIN, 1.0,
+    end,
 
 
     end
@@ -431,21 +437,21 @@ ParamBlockDesc2 gDistFadeBk
 bool plDistFadeComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     // If we're turned off, just return.
-    if( !fCompPB->GetInt(kFadeInActive) && !fCompPB->GetInt(kFadeOutActive) )
+    if (!fCompPB->GetInt(kFadeInActive) && !fCompPB->GetInt(kFadeOutActive)) {
         return true;
+    }
 
     Box3 fade;
     Point3 mins(0.f, 0.f, 0.f);
     Point3 maxs(0.f, 0.f, 0.f);
 
 
-    if( fCompPB->GetInt(kFadeInActive) )
-    {
+    if (fCompPB->GetInt(kFadeInActive)) {
         mins[0] = fCompPB->GetFloat(kFadeInStart);
         mins[1] = fCompPB->GetFloat(kFadeInEnd);
     }
-    if( fCompPB->GetInt(kFadeOutActive) )
-    {
+
+    if (fCompPB->GetInt(kFadeOutActive)) {
         maxs[0] = fCompPB->GetFloat(kFadeOutStart);
         maxs[1] = fCompPB->GetFloat(kFadeOutEnd);
     }
@@ -468,23 +474,18 @@ bool plDistFadeComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
     // above model.
     //
     // So first thing to do is figure out how many (valid) distances we have.
-    if( (mins[0] == 0) && (mins[1] == 0) && (maxs[0] == 0) && (maxs[1] == 0) )
-    {
+    if ((mins[0] == 0) && (mins[1] == 0) && (maxs[0] == 0) && (maxs[1] == 0)) {
         // Okay, they gave no valid distances. Just pretend we were never here.
         return true;
     }
-    if( (mins[0] == 0) && (mins[1] == 0) )
-    {
+
+    if ((mins[0] == 0) && (mins[1] == 0)) {
         // maxs must be valid, just go with them.
         fade = IFadeFromPoint(maxs);
-    }
-    else if( (maxs[0] == 0) && (maxs[1] == 0) )
-    {
+    } else if ((maxs[0] == 0) && (maxs[1] == 0)) {
         // mins must be valid, just go with them.
         fade = IFadeFromPoint(mins);
-    }
-    else
-    {
+    } else {
         // They're both "valid". Give it a shot.
         fade = IFadeFromPair(mins, maxs);
     }
@@ -504,40 +505,46 @@ void plDistFadeComponent::ISwap(float& p0, float& p1)
 Box3 plDistFadeComponent::IFadeFromPoint(Point3& mins)
 {
     Point3 maxs(0.f, 0.f, 0.f);
-    if( mins[0] < mins[1] )
+
+    if (mins[0] < mins[1]) {
         mins[2] = -1.f;
-    else if( mins[0] > mins[1] )
+    } else if (mins[0] > mins[1]) {
         mins[2] = 1.f;
-    else
+    } else {
         mins[2] = 0;
+    }
 
     return Box3(mins, maxs);
 }
 
 Box3 plDistFadeComponent::IFadeFromPair(Point3& mins, Point3& maxs)
 {
-    if( mins[0] > maxs[0] )
-    {
+    if (mins[0] > maxs[0]) {
         ISwap(mins[0], maxs[0]);
         ISwap(mins[1], maxs[1]);
     }
-    if( mins[0] > mins[1] )
-    {
+
+    if (mins[0] > mins[1]) {
         ISwap(mins[0], mins[1]);
     }
-    if( maxs[0] < maxs[1] )
-    {
+
+    if (maxs[0] < maxs[1]) {
         // Poor confused bastard, take a guess what he wants.
         ISwap(maxs[0], maxs[1]);
     }
-    if( mins[0] < mins[1] )
+
+    if (mins[0] < mins[1]) {
         mins[2] = -1.f;
-    else
+    } else {
         mins[2] = 0;
-    if( maxs[0] > maxs[1] )
+    }
+
+    if (maxs[0] > maxs[1]) {
         maxs[2] = 1.f;
-    else
+    } else {
         maxs[2] = 0;
+    }
+
     return Box3(mins, maxs);
 }
 
@@ -547,9 +554,9 @@ bool plDistFadeComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
     return true;
 }
 
-bool plDistFadeComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg) 
-{ 
-    return true; 
+bool plDistFadeComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
+{
+    return true;
 }
 
 plDistFadeComponent::plDistFadeComponent()
@@ -561,11 +568,9 @@ plDistFadeComponent::plDistFadeComponent()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // LOS Fade component next.
 
-class plLOSFadeComponent : public plComponent
-{
+class plLOSFadeComponent : public plComponent {
 public:
-    enum
-    {
+    enum {
         kBoundsCenter,
         kFadeInTime,
         kFadeOutTime
@@ -573,44 +578,46 @@ public:
 
 public:
     plLOSFadeComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 
 CLASS_DESC(plLOSFadeComponent, gLOSFadeCompDesc, "LOS Fade",  "LOSFade", COMP_TYPE_GRAPHICS, LOSFADE_COMP_CID)
 
 ParamBlockDesc2 gLOSFadeBk
-(   
+(
     plComponent::kBlkComp, _T("LOSFade"), 0, &gLOSFadeCompDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_LOSFADE, IDS_COMP_LOSFADE, 0, 0, NULL,
 
     plLOSFadeComponent::kBoundsCenter,  _T("BoundsCenter"), TYPE_BOOL, 0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_BOUNDSCENTER,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_BOUNDSCENTER,
+    end,
 
-    plLOSFadeComponent::kFadeInTime, _T("kFadeInTime"), TYPE_FLOAT,     0, 0,   
-        p_default, 0.5,
-        p_range, 0.0, 5.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_FADEINTIME, IDC_COMP_FADEINTIME_SPIN, 1.0,
-        end,    
-    
+    plLOSFadeComponent::kFadeInTime, _T("kFadeInTime"), TYPE_FLOAT,     0, 0,
+    p_default, 0.5,
+    p_range, 0.0, 5.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_FADEINTIME, IDC_COMP_FADEINTIME_SPIN, 1.0,
+    end,
 
-    plLOSFadeComponent::kFadeOutTime, _T("kFadeOutTime"), TYPE_FLOAT,   0, 0,   
-        p_default, 1.0,
-        p_range, 0.0, 5.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_FADEOUTTIME, IDC_COMP_FADEOUTTIME_SPIN, 1.0,
-        end,    
-    
+
+    plLOSFadeComponent::kFadeOutTime, _T("kFadeOutTime"), TYPE_FLOAT,   0, 0,
+    p_default, 1.0,
+    p_range, 0.0, 5.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_FADEOUTTIME, IDC_COMP_FADEOUTTIME_SPIN, 1.0,
+    end,
+
 
     end
 );
@@ -628,21 +635,22 @@ bool plLOSFadeComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
     return true;
 }
 
-bool plLOSFadeComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg) 
-{ 
+bool plLOSFadeComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
+{
     plFadeOpacityMod* fade = new plFadeOpacityMod;
-    
-    if( fCompPB->GetInt(kBoundsCenter) )
+
+    if (fCompPB->GetInt(kBoundsCenter)) {
         fade->SetFlag(plFadeOpacityMod::kBoundsCenter);
-    else
+    } else {
         fade->ClearFlag(plFadeOpacityMod::kBoundsCenter);
+    }
 
     fade->SetFadeUp(fCompPB->GetFloat(kFadeInTime));
     fade->SetFadeDown(fCompPB->GetFloat(kFadeOutTime));
 
     node->AddModifier(fade, node->GetKey()->GetName());
 
-    return true; 
+    return true;
 }
 
 plLOSFadeComponent::plLOSFadeComponent()
@@ -656,49 +664,49 @@ plLOSFadeComponent::plLOSFadeComponent()
 
 const Class_ID GZFADE_COMP_CID(0x27173270, 0x4f4486f);
 
-class plGZFadeComponent : public plComponent
-{
+class plGZFadeComponent : public plComponent {
 public:
-    enum
-    {
+    enum {
         kOpaque,
         kTransp
     };
 
 public:
     plGZFadeComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 
 CLASS_DESC(plGZFadeComponent, gGZFadeCompDesc, "GZ Fade",  "GZFade", COMP_TYPE_GRAPHICS, GZFADE_COMP_CID)
 
 ParamBlockDesc2 gGZFadeBk
-(   
+(
     plComponent::kBlkComp, _T("GZFade"), 0, &gGZFadeCompDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_GZFADE, IDS_COMP_GZ_FADE, 0, 0, NULL,
 
-    plGZFadeComponent::kOpaque, _T("kOpaque"), TYPE_FLOAT,  0, 0,   
-        p_default, 15.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_GZ_OPAQUE, IDC_COMP_GZ_OPAQUE_SPIN, 1.0,
-        end,    
-    
-    plGZFadeComponent::kTransp, _T("kTransp"), TYPE_FLOAT,  0, 0,   
-        p_default, 20.0,
-        p_range, 0.0, 100.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_COMP_GZ_TRANSP, IDC_COMP_GZ_TRANSP_SPIN, 1.0,
-        end,    
-    
+    plGZFadeComponent::kOpaque, _T("kOpaque"), TYPE_FLOAT,  0, 0,
+    p_default, 15.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_GZ_OPAQUE, IDC_COMP_GZ_OPAQUE_SPIN, 1.0,
+    end,
+
+    plGZFadeComponent::kTransp, _T("kTransp"), TYPE_FLOAT,  0, 0,
+    p_default, 20.0,
+    p_range, 0.0, 100.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_COMP_GZ_TRANSP, IDC_COMP_GZ_TRANSP_SPIN, 1.0,
+    end,
+
 
     end
 );
@@ -722,8 +730,8 @@ bool plGZFadeComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
     return true;
 }
 
-bool plGZFadeComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg) 
-{ 
+bool plGZFadeComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
+{
     plDistOpacityMod* fade = new plDistOpacityMod;
 
     float opaq = fCompPB->GetFloat(kOpaque);
@@ -733,7 +741,7 @@ bool plGZFadeComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 
     node->AddModifier(fade, node->GetKey()->GetName());
 
-    return true; 
+    return true;
 }
 
 plGZFadeComponent::plGZFadeComponent()
@@ -748,31 +756,31 @@ plGZFadeComponent::plGZFadeComponent()
 
 const Class_ID DYNMAT_COMP_CID(0x2ea4671f, 0x163b12ac);
 
-class plDynMatComponent : public plComponent
-{
+class plDynMatComponent : public plComponent {
 public:
-    enum
-    {
+    enum {
         kOpaque,
         kTransp
     };
 
 public:
     plDynMatComponent();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 };
 
 
 CLASS_DESC(plDynMatComponent, gDynMatCompDesc, "Force Dyn Mat",  "DynMat", COMP_TYPE_GRAPHICS, DYNMAT_COMP_CID)
 
 ParamBlockDesc2 gDynMatBk
-(   
+(
     plComponent::kBlkComp, _T("DynMat"), 0, &gDynMatCompDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_DYNMAT, IDS_COMP_DYNMAT, 0, 0, NULL,
@@ -791,9 +799,9 @@ bool plDynMatComponent::PreConvert(plMaxNode* node, plErrorMsg* pErrMsg)
     return true;
 }
 
-bool plDynMatComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg) 
-{ 
-    return true; 
+bool plDynMatComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
+{
+    return true;
 }
 
 plDynMatComponent::plDynMatComponent()

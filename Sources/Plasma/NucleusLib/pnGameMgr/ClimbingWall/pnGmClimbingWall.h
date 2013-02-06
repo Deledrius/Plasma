@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnGameMgr/ClimbingWall/pnGmClimbingWall.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNGAMEMGR_CLIMBINGWALL_PNGMCLIMBINGWALL_H
@@ -109,73 +109,73 @@ enum {
 #pragma pack(push,1)
 //============================================================================
 
-    //========================================================================
-    // Message parameters
-    //========================================================================
-    struct ClimbingWall_CreateParam {
-        // no params
-    };
+//========================================================================
+// Message parameters
+//========================================================================
+struct ClimbingWall_CreateParam {
+    // no params
+};
 
-    //========================================================================
-    // Climbing Wall message structures
-    //========================================================================
+//========================================================================
+// Climbing Wall message structures
+//========================================================================
 
-    // Cli2Srv
-    struct Cli2Srv_ClimbingWall_ChangeNumBlockers : GameMsgHeader {
-        int         amountToAdjust;     // + or - value to adjust the number of blockers by
-    };
-    struct Cli2Srv_ClimbingWall_Ready : GameMsgHeader {
-        uint8_t        readyType;          // the type of ready this message represents (EClimbingWallReadyType)
-        uint8_t        teamNumber;         // the team that you are saying is ready (1 or 2)
-    };
-    struct Cli2Srv_ClimbingWall_BlockerChanged : GameMsgHeader {
-        uint8_t        teamNumber;         // the team that is adjusting their blockers
-        uint8_t        blockerNumber;      // the number of the blocker that was added/removed
-        bool        added;              // was the blocker added, or removed?
-    };
-    struct Cli2Srv_ClimbingWall_Reset : GameMsgHeader {
-        // <no data>
-    };
-    struct Cli2Srv_ClimbingWall_PlayerEntered : GameMsgHeader {
-        uint8_t        teamNumber;         // the team this player is playing for
-    };
-    struct Cli2Srv_ClimbingWall_FinishedGame : GameMsgHeader {
-        // <no data>
-    };
-    struct Cli2Srv_ClimbingWall_Panic : GameMsgHeader {
-        // <no data>
-    };
+// Cli2Srv
+struct Cli2Srv_ClimbingWall_ChangeNumBlockers : GameMsgHeader {
+    int         amountToAdjust;     // + or - value to adjust the number of blockers by
+};
+struct Cli2Srv_ClimbingWall_Ready : GameMsgHeader {
+    uint8_t        readyType;          // the type of ready this message represents (EClimbingWallReadyType)
+    uint8_t        teamNumber;         // the team that you are saying is ready (1 or 2)
+};
+struct Cli2Srv_ClimbingWall_BlockerChanged : GameMsgHeader {
+    uint8_t        teamNumber;         // the team that is adjusting their blockers
+    uint8_t        blockerNumber;      // the number of the blocker that was added/removed
+    bool        added;              // was the blocker added, or removed?
+};
+struct Cli2Srv_ClimbingWall_Reset : GameMsgHeader {
+    // <no data>
+};
+struct Cli2Srv_ClimbingWall_PlayerEntered : GameMsgHeader {
+    uint8_t        teamNumber;         // the team this player is playing for
+};
+struct Cli2Srv_ClimbingWall_FinishedGame : GameMsgHeader {
+    // <no data>
+};
+struct Cli2Srv_ClimbingWall_Panic : GameMsgHeader {
+    // <no data>
+};
 
-    // Srv2Cli
-    struct Srv2Cli_ClimbingWall_NumBlockersChanged : GameMsgHeader {
-        uint8_t        newBlockerCount;    // the new number of blocker we are playing with
-        bool        localOnly;          // only adjust your local display, don't net prop
-    };
-    struct Srv2Cli_ClimbingWall_Ready : GameMsgHeader {
-        uint8_t        readyType;          // the type of ready this message represents (EClimbingWallReadyType)
-        bool        team1Ready;
-        bool        team2Ready;
-        bool        localOnly;          // only adjust your local display, don't net prop
-    };
-    struct Srv2Cli_ClimbingWall_BlockersChanged : GameMsgHeader {
-        uint8_t        teamNumber;         // the team this set of blockers is for
-        int         blockersSet[kClimbingWallMaxBlockers];  // which blockers are set
-        bool        localOnly;          // only adjust your local display, don't net prop
-    };
-    struct Srv2Cli_ClimbingWall_PlayerEntered : GameMsgHeader {
-        // <no data>
-    };
-    struct Srv2Cli_ClimbingWall_SuitMachineLocked : GameMsgHeader {
-        bool        team1MachineLocked;
-        bool        team2MachineLocked;
-        bool        localOnly;          // only adjust your local display, don't net prop
-    };
-    struct Srv2Cli_ClimbingWall_GameOver : GameMsgHeader {
-        uint8_t        teamWon;            // which team won the game
-        int         team1Blockers[kClimbingWallMaxBlockers];
-        int         team2Blockers[kClimbingWallMaxBlockers];
-        bool        localOnly;          // only adjust your local display, don't net prop
-    };
+// Srv2Cli
+struct Srv2Cli_ClimbingWall_NumBlockersChanged : GameMsgHeader {
+    uint8_t        newBlockerCount;    // the new number of blocker we are playing with
+    bool        localOnly;          // only adjust your local display, don't net prop
+};
+struct Srv2Cli_ClimbingWall_Ready : GameMsgHeader {
+    uint8_t        readyType;          // the type of ready this message represents (EClimbingWallReadyType)
+    bool        team1Ready;
+    bool        team2Ready;
+    bool        localOnly;          // only adjust your local display, don't net prop
+};
+struct Srv2Cli_ClimbingWall_BlockersChanged : GameMsgHeader {
+    uint8_t        teamNumber;         // the team this set of blockers is for
+    int         blockersSet[kClimbingWallMaxBlockers];  // which blockers are set
+    bool        localOnly;          // only adjust your local display, don't net prop
+};
+struct Srv2Cli_ClimbingWall_PlayerEntered : GameMsgHeader {
+    // <no data>
+};
+struct Srv2Cli_ClimbingWall_SuitMachineLocked : GameMsgHeader {
+    bool        team1MachineLocked;
+    bool        team2MachineLocked;
+    bool        localOnly;          // only adjust your local display, don't net prop
+};
+struct Srv2Cli_ClimbingWall_GameOver : GameMsgHeader {
+    uint8_t        teamWon;            // which team won the game
+    int         team1Blockers[kClimbingWallMaxBlockers];
+    int         team2Blockers[kClimbingWallMaxBlockers];
+    bool        localOnly;          // only adjust your local display, don't net prop
+};
 
 
 //============================================================================

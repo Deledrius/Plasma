@@ -62,18 +62,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plUnifiedTime;
 class plAudioFileReader;
-class plSoundBuffer : public hsKeyedObject
-{
+class plSoundBuffer : public hsKeyedObject {
 public:
     plSoundBuffer();
-    plSoundBuffer( const plFileName &fileName, uint32_t flags = 0 );
+    plSoundBuffer(const plFileName& fileName, uint32_t flags = 0);
     ~plSoundBuffer();
-    
-    CLASSNAME_REGISTER( plSoundBuffer );
-    GETINTERFACE_ANY( plSoundBuffer, hsKeyedObject );
-    
-    enum Flags
-    {
+
+    CLASSNAME_REGISTER(plSoundBuffer);
+    GETINTERFACE_ANY(plSoundBuffer, hsKeyedObject);
+
+    enum Flags {
         kIsExternal         = 0x0001,
         kAlwaysExternal     = 0x0002,
         kOnlyLeftChannel    = 0x0004,
@@ -81,61 +79,86 @@ public:
         kStreamCompressed   = 0x0010,
     };
 
-    enum ELoadReturnVal
-    {
+    enum ELoadReturnVal {
         kSuccess,
         kError,
         kPending,
     };
 
-    void            RoundDataPos( uint32_t &pos );
+    void            RoundDataPos(uint32_t& pos);
 
-    virtual void    Read( hsStream *s, hsResMgr *mgr );
-    virtual void    Write( hsStream *s, hsResMgr *mgr );
+    virtual void    Read(hsStream* s, hsResMgr* mgr);
+    virtual void    Write(hsStream* s, hsResMgr* mgr);
 
-    plWAVHeader &GetHeader( void )              { return fHeader; }
-    uint32_t    GetDataLength( void ) const     { return fDataLength; }
-    void        SetDataLength(unsigned length)  { fDataLength = length; } 
-    void       *GetData( void ) const           { return fData; }
-    plFileName  GetFileName( void ) const       { return fFileName; }
-    bool        IsValid( void ) const           { return fValid; }
-    float       GetDataLengthInSecs( void ) const;
+    plWAVHeader& GetHeader(void)              {
+        return fHeader;
+    }
+    uint32_t    GetDataLength(void) const     {
+        return fDataLength;
+    }
+    void        SetDataLength(unsigned length)  {
+        fDataLength = length;
+    }
+    void*       GetData(void) const           {
+        return fData;
+    }
+    plFileName  GetFileName(void) const       {
+        return fFileName;
+    }
+    bool        IsValid(void) const           {
+        return fValid;
+    }
+    float       GetDataLengthInSecs(void) const;
 
-    void                SetFileName( const plFileName &name );
-    bool                HasFlag( uint32_t flag ) { return ( fFlags & flag ) ? true : false; }
-    void                SetFlag( uint32_t flag, bool yes = true ) { if( yes ) fFlags |= flag; else fFlags &= ~flag; }
+    void                SetFileName(const plFileName& name);
+    bool                HasFlag(uint32_t flag) {
+        return (fFlags & flag) ? true : false;
+    }
+    void                SetFlag(uint32_t flag, bool yes = true) {
+        if (yes) {
+            fFlags |= flag;
+        } else {
+            fFlags &= ~flag;
+        }
+    }
 
     // Must be called until return value is kSuccess. starts an asynchronous load first time called. returns kSuccess when finished.
-    ELoadReturnVal      AsyncLoad( plAudioFileReader::StreamType type, unsigned length = 0 );   
-    void                UnLoad( );
+    ELoadReturnVal      AsyncLoad(plAudioFileReader::StreamType type, unsigned length = 0);
+    void                UnLoad();
 
-    plAudioCore::ChannelSelect  GetReaderSelect( void ) const;
+    plAudioCore::ChannelSelect  GetReaderSelect(void) const;
 
-    
+
     static void         Init();
     static void         Shutdown();
-    plAudioFileReader * GetAudioReader();   // transfers ownership to caller
-    void                SetAudioReader(plAudioFileReader *reader);
+    plAudioFileReader* GetAudioReader();    // transfers ownership to caller
+    void                SetAudioReader(plAudioFileReader* reader);
     void                SetLoaded(bool loaded);
 
-    plAudioFileReader::StreamType   GetAudioReaderType() { return fStreamType; }
-    unsigned                        GetAsyncLoadLength() { return fAsyncLoadLength ? fAsyncLoadLength : fDataLength; }
+    plAudioFileReader::StreamType   GetAudioReaderType() {
+        return fStreamType;
+    }
+    unsigned                        GetAsyncLoadLength() {
+        return fAsyncLoadLength ? fAsyncLoadLength : fDataLength;
+    }
 
     // for plugins only
-    void                SetInternalData( plWAVHeader &header, uint32_t length, uint8_t *data );
-    ELoadReturnVal      EnsureInternal( );  
-    void                SetError() { fError = true; }
+    void                SetInternalData(plWAVHeader& header, uint32_t length, uint8_t* data);
+    ELoadReturnVal      EnsureInternal();
+    void                SetError() {
+        fError = true;
+    }
 
 protected:
 
     // plSoundBuffers can be two ways--they can either have a filename and no
     // data, in which case they reference a file in the sfx folder, or they
     // can store the data directly
-    
+
     void            IInitBuffer();
 
-    bool            IGrabHeaderInfo( void );
-    void            IAddBuffers( void *base, void *toAdd, uint32_t lengthInBytes, uint8_t bitsPerSample );
+    bool            IGrabHeaderInfo(void);
+    void            IAddBuffers(void* base, void* toAdd, uint32_t lengthInBytes, uint8_t bitsPerSample);
     plFileName      IGetFullPath();
 
     uint32_t        fFlags;
@@ -146,21 +169,20 @@ protected:
     bool            fLoaded;
     bool            fLoading;
     bool            fError;
-    
-    plAudioFileReader * fReader;
-    uint8_t *           fData;
+
+    plAudioFileReader* fReader;
+    uint8_t*            fData;
     plWAVHeader         fHeader;
     uint32_t            fDataLength;
     uint32_t            fAsyncLoadLength;
     plAudioFileReader::StreamType fStreamType;
 
     // for plugins only
-    plAudioFileReader   *IGetReader( bool fullpath );
+    plAudioFileReader*   IGetReader(bool fullpath);
 };
 
 
-class plSoundPreloader : public hsThread
-{
+class plSoundPreloader : public hsThread {
 protected:
     hsTArray<plSoundBuffer*> fBuffers;
     hsEvent fEvent;
@@ -181,7 +203,9 @@ public:
         hsThread::Stop();
     }
 
-    bool IsRunning() const { return fRunning; }
+    bool IsRunning() const {
+        return fRunning;
+    }
 
     void AddBuffer(plSoundBuffer* buffer) {
         fCritSect.Lock();

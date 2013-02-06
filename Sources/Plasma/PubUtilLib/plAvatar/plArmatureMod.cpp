@@ -94,7 +94,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnKeyedObject/plFixedKey.h"
 #include "pnKeyedObject/plKey.h"
-#include "pnKeyedObject/plKeyImp.h" 
+#include "pnKeyedObject/plKeyImp.h"
 
 #include "plDrawable/plInstanceDrawInterface.h"
 #include "plDrawable/plDrawableSpans.h"
@@ -140,283 +140,311 @@ plArmatureModBase::~plArmatureModBase()
 {
     delete fController;
 
-    while (fUnusedBones.size() > 0)
-    {
+    while (fUnusedBones.size() > 0) {
         delete fUnusedBones.back();
         fUnusedBones.pop_back();
-    }   
+    }
 }
 
 bool plArmatureModBase::MsgReceive(plMessage* msg)
-{   
+{
     bool result = false;
-    
-    plArmatureBrain *curBrain = nil;
-    if (fBrains.size() > 0)
-    {
+
+    plArmatureBrain* curBrain = nil;
+
+    if (fBrains.size() > 0) {
         curBrain = fBrains.back();
-        if(curBrain->MsgReceive(msg))
+
+        if (curBrain->MsgReceive(msg)) {
             return true;
+        }
     }
-    
+
     return plAGMasterMod::MsgReceive(msg);
-}   
+}
 
 void plArmatureModBase::AddTarget(plSceneObject* so)
 {
     plAGMasterMod::AddTarget(so);
-    
+
     plgDispatch::Dispatch()->RegisterForExactType(plEvalMsg::Index(), GetKey());
 }
 
 void plArmatureModBase::RemoveTarget(plSceneObject* so)
 {
     int count = fBrains.size();
-    for(int i = count - 1; i >= 0; i--)
-    {
-        plArmatureBrain *brain = fBrains[i];
-        if (brain)
+
+    for (int i = count - 1; i >= 0; i--) {
+        plArmatureBrain* brain = fBrains[i];
+
+        if (brain) {
             brain->Deactivate();
+        }
+
         delete brain;
         fBrains.pop_back();
     }
-    
+
     plAGMasterMod::RemoveTarget(so);
 }
 
 bool plArmatureModBase::IEval(double time, float elapsed, uint32_t dirty)
 {
-    if (IsFinal())
-    {
-        if (fBrains.size())
-        {
-            plArmatureBrain *curBrain = fBrains.back();
-            if (curBrain)
-            {
+    if (IsFinal()) {
+        if (fBrains.size()) {
+            plArmatureBrain* curBrain = fBrains.back();
+
+            if (curBrain) {
                 bool result = curBrain->Apply(time, elapsed);
-                if (!result)
-                {
+
+                if (!result) {
                     PopBrain();
                     delete curBrain;
                 }
             }
         }
-        AdjustLOD();        
-    }
-    else
+
+        AdjustLOD();
+    } else {
         IFinalize();
-    
+    }
+
     return true;
 }
 
-void plArmatureModBase::Read(hsStream * stream, hsResMgr *mgr)
+void plArmatureModBase::Read(hsStream* stream, hsResMgr* mgr)
 {
     plAGMasterMod::Read(stream, mgr);
 
     int i;
     int meshKeyCount = stream->ReadLE32();
-    for(i = 0; i < meshKeyCount; i++)
-    {
+
+    for (i = 0; i < meshKeyCount; i++) {
         plKey meshKey = mgr->ReadKey(stream);
         fMeshKeys.push_back(meshKey);
-        
-        plKeyVector *vec = new plKeyVector;
+
+        plKeyVector* vec = new plKeyVector;
         int boneCount = stream->ReadLE32();
-        for(int j = 0; j < boneCount; j++)
+
+        for (int j = 0; j < boneCount; j++) {
             vec->push_back(mgr->ReadKey(stream));
+        }
+
         fUnusedBones.push_back(vec);
     }
 
     int nBrains = stream->ReadLE32();
-    for (i = 0; i < nBrains; i++)
-    {
-        plArmatureBrain * brain = (plArmatureBrain *)mgr->ReadCreatable(stream);
+
+    for (i = 0; i < nBrains; i++) {
+        plArmatureBrain* brain = (plArmatureBrain*)mgr->ReadCreatable(stream);
         this->PushBrain(brain);
     }
 }
 
-void plArmatureModBase::Write(hsStream *stream, hsResMgr *mgr)
+void plArmatureModBase::Write(hsStream* stream, hsResMgr* mgr)
 {
     plAGMasterMod::Write(stream, mgr);
 
     int i;
     int meshKeyCount = fMeshKeys.size();
-    stream->WriteLE32(meshKeyCount);  
-    for (i = 0; i < meshKeyCount; i++)
-    {
+    stream->WriteLE32(meshKeyCount);
+
+    for (i = 0; i < meshKeyCount; i++) {
         plKey meshKey = fMeshKeys[i];
         mgr->WriteKey(stream, meshKey);
-        
+
         // Should be a list per mesh key
         stream->WriteLE32(fUnusedBones[i]->size());
-        for(int j = 0; j < fUnusedBones[i]->size(); j++)
+
+        for (int j = 0; j < fUnusedBones[i]->size(); j++) {
             mgr->WriteKey(stream, (*fUnusedBones[i])[j]);
+        }
     }
-    
+
     int nBrains = fBrains.size();
     stream->WriteLE32(nBrains);
-    for (i = 0; i < nBrains; i++)
-    {
+
+    for (i = 0; i < nBrains; i++) {
         mgr->WriteCreatable(stream, fBrains[i]);
     }
 }
 
-void plArmatureModBase::AddressMessageToDescendants(const plCoordinateInterface * CI, plMessage *msg)
+void plArmatureModBase::AddressMessageToDescendants(const plCoordinateInterface* CI, plMessage* msg)
 {
-    if (!CI)
+    if (!CI) {
         return;
-    
+    }
+
     msg->AddReceiver(CI->GetOwnerKey());
-    for (int i = 0; i < CI->GetNumChildren(); i++)
+
+    for (int i = 0; i < CI->GetNumChildren(); i++) {
         AddressMessageToDescendants(CI->GetChild(i), msg);
+    }
 }
 
-void plArmatureModBase::EnableDrawingTree(const plSceneObject *object, bool status)
+void plArmatureModBase::EnableDrawingTree(const plSceneObject* object, bool status)
 {
-    if (!object)
+    if (!object) {
         return;
-    
-    plEnableMsg *msg = new plEnableMsg;
-    if (status)
-        msg->SetCmd( plEnableMsg::kEnable );
-    else
-        msg->SetCmd( plEnableMsg::kDisable );
-    msg->SetCmd( plEnableMsg::kDrawable );
-    
-    const plCoordinateInterface *pCI = object->GetCoordinateInterface();
+    }
+
+    plEnableMsg* msg = new plEnableMsg;
+
+    if (status) {
+        msg->SetCmd(plEnableMsg::kEnable);
+    } else {
+        msg->SetCmd(plEnableMsg::kDisable);
+    }
+
+    msg->SetCmd(plEnableMsg::kDrawable);
+
+    const plCoordinateInterface* pCI = object->GetCoordinateInterface();
     AddressMessageToDescendants(pCI, msg);
     plgDispatch::MsgSend(msg);
 }
 
 plKey plArmatureModBase::GetWorldKey() const
 {
-    if (fController)
+    if (fController) {
         return fController->GetSubworld();
-    else
+    } else {
         return nil;
+    }
 }
 
 bool plArmatureModBase::ValidatePhysics()
 {
-    if (!fTarget)
+    if (!fTarget) {
         return false;
+    }
 
-    if (fController)
-    {
+    if (fController) {
         EnablePhysics(true);
         fWaitFlags &= ~kNeedPhysics;
     }
-    
+
     return !(fWaitFlags & kNeedPhysics);
 }
 
 bool plArmatureModBase::ValidateMesh()
 {
-    if (fWaitFlags & kNeedMesh)
-    {
+    if (fWaitFlags & kNeedMesh) {
         fWaitFlags &= ~kNeedMesh;
         int n = fMeshKeys.size();
-        
-        for(int i = 0; i < n; i++)
-        {
+
+        for (int i = 0; i < n; i++) {
             plKey meshKey = fMeshKeys[i];
-            plSceneObject *meshObj = (plSceneObject *)meshKey->GetObjectPtr();
-            
-            if (!meshObj)
-            {
+            plSceneObject* meshObj = (plSceneObject*)meshKey->GetObjectPtr();
+
+            if (!meshObj) {
                 fWaitFlags |= kNeedMesh;
                 break;
             }
+
             bool visible = (i == fCurLOD ? true : false);
             EnableDrawingTree(meshObj, visible);
-        }   
+        }
     }
-    
+
     return !(fWaitFlags & kNeedMesh);
 }
 
-void plArmatureModBase::PushBrain(plArmatureBrain *brain)
+void plArmatureModBase::PushBrain(plArmatureBrain* brain)
 {
-    plArmatureBrain *oldBrain = GetCurrentBrain();
-    if (oldBrain)
-        oldBrain->Suspend();
+    plArmatureBrain* oldBrain = GetCurrentBrain();
 
-    
+    if (oldBrain) {
+        oldBrain->Suspend();
+    }
+
+
     fBrains.push_back(brain);
+
     // don't activate brains until we are attached to our target
     // addTarget will do activation...
-    if (GetTarget(0))
+    if (GetTarget(0)) {
         brain->Activate(this);
+    }
 
     DirtySynchState(kSDLAvatar, 0);
 }
 
 void plArmatureModBase::PopBrain()
 {
-    plArmatureBrain *oldBrain = nil;
-    if (fBrains.size() > 0)
-    {
+    plArmatureBrain* oldBrain = nil;
+
+    if (fBrains.size() > 0) {
         oldBrain = fBrains.back();
         oldBrain->Deactivate();
         fBrains.pop_back();
     }
-    
-    plArmatureBrain *newBrain = GetCurrentBrain();
-    if (newBrain)
+
+    plArmatureBrain* newBrain = GetCurrentBrain();
+
+    if (newBrain) {
         newBrain->Resume();
-    
+    }
+
     DirtySynchState(kSDLAvatar, 0);
 }
 
-plArmatureBrain *plArmatureModBase::GetCurrentBrain() const
+plArmatureBrain* plArmatureModBase::GetCurrentBrain() const
 {
-    plArmatureBrain *result = nil;
-    if (fBrains.size() > 0)
+    plArmatureBrain* result = nil;
+
+    if (fBrains.size() > 0) {
         result = fBrains.back();
-    
+    }
+
     return result;
 }
 
-plDrawable *plArmatureModBase::FindDrawable() const
+plDrawable* plArmatureModBase::FindDrawable() const
 {
-    if (fMeshKeys[0] == nil)
+    if (fMeshKeys[0] == nil) {
         return nil;
-    
-    plSceneObject *so = plSceneObject::ConvertNoRef(fMeshKeys[0]->ObjectIsLoaded());
-    if (so == nil)
-        return nil;
-    
-    const plDrawInterface *di = so->GetDrawInterface();
-    if (di && di->GetNumDrawables() > 0)
-    {
-        plDrawable *spans = plDrawable::ConvertNoRef(di->GetDrawable(0));
-        if (spans)
-            return spans;
     }
-    
-    const plInstanceDrawInterface *idi = plInstanceDrawInterface::ConvertNoRef(di);
-    if (idi)
+
+    plSceneObject* so = plSceneObject::ConvertNoRef(fMeshKeys[0]->ObjectIsLoaded());
+
+    if (so == nil) {
+        return nil;
+    }
+
+    const plDrawInterface* di = so->GetDrawInterface();
+
+    if (di && di->GetNumDrawables() > 0) {
+        plDrawable* spans = plDrawable::ConvertNoRef(di->GetDrawable(0));
+
+        if (spans) {
+            return spans;
+        }
+    }
+
+    const plInstanceDrawInterface* idi = plInstanceDrawInterface::ConvertNoRef(di);
+
+    if (idi) {
         return idi->GetInstanceDrawable();
-    
+    }
+
     return nil;
 }
 
 void plArmatureModBase::LeaveAge()
 {
     int nBrains = fBrains.size();
-    for (int i = nBrains - 1; i >= 0; i--)
-    {
-        plArmatureBrain * curBrain = fBrains[i];
-        if (curBrain->LeaveAge())
-        {
-            if (curBrain == GetCurrentBrain())
-            {
+
+    for (int i = nBrains - 1; i >= 0; i--) {
+        plArmatureBrain* curBrain = fBrains[i];
+
+        if (curBrain->LeaveAge()) {
+            if (curBrain == GetCurrentBrain()) {
                 PopBrain();
                 delete curBrain;
             }
         }
     }
-}   
+}
 
 bool plArmatureModBase::IsFinal()
 {
@@ -425,67 +453,69 @@ bool plArmatureModBase::IsFinal()
 
 void plArmatureModBase::AdjustLOD()
 {
-    if (!IsDrawEnabled())
+    if (!IsDrawEnabled()) {
         return;
+    }
 
     hsPoint3 camPos = plVirtualCam1::Instance()->GetCameraPos();
-        
-    plSceneObject * SO = GetTarget(0);
-    if (SO)
-    {
+
+    plSceneObject* SO = GetTarget(0);
+
+    if (SO) {
         hsMatrix44  l2w = SO->GetLocalToWorld();
         hsPoint3 ourPos = l2w.GetTranslate();
         hsPoint3 delta = ourPos - camPos;
         float distanceSquared = delta.MagnitudeSquared();
-        if (distanceSquared < fLODDistance * fLODDistance)
+
+        if (distanceSquared < fLODDistance * fLODDistance) {
             SetLOD(max(0, fMinLOD));
-        else if (distanceSquared < fLODDistance * fLODDistance * 4.0) 
+        } else if (distanceSquared < fLODDistance * fLODDistance * 4.0) {
             SetLOD(max(1, fMinLOD));
-        else 
+        } else {
             SetLOD(2);
+        }
     }
 }
 
 // Should always be called from AdjustLOD
 bool plArmatureModBase::SetLOD(int iNewLOD)
 {
-    if (iNewLOD >= fMeshKeys.size())
+    if (iNewLOD >= fMeshKeys.size()) {
         iNewLOD = fMeshKeys.size() - 1;
-    
+    }
+
     int oldLOD = fCurLOD;
-    if (iNewLOD != fCurLOD)
-    {
+
+    if (iNewLOD != fCurLOD) {
         int oldLOD = fCurLOD;
-        if(fMeshKeys.size() > iNewLOD)
-        {
-            if (fCurLOD != -1)
-            {
-                plSceneObject * oldMesh = (plSceneObject *)fMeshKeys[oldLOD]->GetObjectPtr();
+
+        if (fMeshKeys.size() > iNewLOD) {
+            if (fCurLOD != -1) {
+                plSceneObject* oldMesh = (plSceneObject*)fMeshKeys[oldLOD]->GetObjectPtr();
                 EnableDrawingTree(oldMesh, false);
-            } 
-            else 
-            {
+            } else {
                 // just starting up; turn all except current off
-                for (int i = 0; i < fMeshKeys.size(); i++)
-                {
-                    if (i != iNewLOD)
-                    {
+                for (int i = 0; i < fMeshKeys.size(); i++) {
+                    if (i != iNewLOD) {
                         plKey offKey = fMeshKeys[i];
-                        plSceneObject * offMesh = (plSceneObject *)offKey->GetObjectPtr();
+                        plSceneObject* offMesh = (plSceneObject*)offKey->GetObjectPtr();
                         EnableDrawingTree(offMesh, false);
                     }
                 }
             }
-            
+
             fCurLOD = iNewLOD;
-            plSceneObject * newMesh = (plSceneObject *)fMeshKeys[fCurLOD]->GetObjectPtr();
+            plSceneObject* newMesh = (plSceneObject*)fMeshKeys[fCurLOD]->GetObjectPtr();
             EnableDrawingTree(newMesh, true);
-            
+
             int boneLOD;
-            for (boneLOD = 0; boneLOD < fMeshKeys.size(); boneLOD++)
-                IEnableBones(boneLOD, boneLOD <= iNewLOD ? false: true);
+
+            for (boneLOD = 0; boneLOD < fMeshKeys.size(); boneLOD++) {
+                IEnableBones(boneLOD, boneLOD <= iNewLOD ? false : true);
+            }
         }
     }
+
     return oldLOD;
 }
 
@@ -501,7 +531,7 @@ int plArmatureModBase::AppendMeshKey(plKey meshKey)
     return fMeshKeys.size() - 1;
 }
 
-int plArmatureModBase::AppendBoneVec(plKeyVector *boneVec)
+int plArmatureModBase::AppendBoneVec(plKeyVector* boneVec)
 {
     fUnusedBones.push_back(boneVec);
     return fUnusedBones.size() - 1;
@@ -514,15 +544,17 @@ uint8_t plArmatureModBase::GetNumLOD() const
 
 void plArmatureModBase::EnablePhysics(bool status, uint16_t reason /* = kDisableReasonUnknown */)
 {
-    if (status)
+    if (status) {
         fDisabledPhysics &= ~reason;
-    else
+    } else {
         fDisabledPhysics |= reason;
-    
+    }
+
     bool newStatus = !fDisabledPhysics;
 
-    if (fController)
+    if (fController) {
         fController->Enable(newStatus);
+    }
 }
 
 //
@@ -540,73 +572,87 @@ void plArmatureModBase::EnablePhysicsKinematic(bool status)
 void plArmatureModBase::EnableDrawing(bool status, uint16_t reason /* = kDisableReasonUnknown */)
 {
     bool oldStatus = !fDisabledDraw;
-    if (status)
+
+    if (status) {
         fDisabledDraw &= ~reason;
-    else
+    } else {
         fDisabledDraw |= reason;
-    
-    bool newStatus = !fDisabledDraw;
-    if (oldStatus == newStatus)
-        return;
-    
-    int i;
-    for (i = 0; i < fMeshKeys.size(); i++)
-    {
-        plSceneObject *obj = plSceneObject::ConvertNoRef(fMeshKeys[i]->ObjectIsLoaded());
-        if (obj)
-            EnableDrawingTree(obj, newStatus);
     }
-    
-    if (status)
-        fCurLOD = -1; // We just enabled all LOD. Need to force ourselves to recompute current LOD  
+
+    bool newStatus = !fDisabledDraw;
+
+    if (oldStatus == newStatus) {
+        return;
+    }
+
+    int i;
+
+    for (i = 0; i < fMeshKeys.size(); i++) {
+        plSceneObject* obj = plSceneObject::ConvertNoRef(fMeshKeys[i]->ObjectIsLoaded());
+
+        if (obj) {
+            EnableDrawingTree(obj, newStatus);
+        }
+    }
+
+    if (status) {
+        fCurLOD = -1;    // We just enabled all LOD. Need to force ourselves to recompute current LOD
+    }
 }
 
 void plArmatureModBase::IFinalize()
 {
-    if (fWaitFlags & kNeedMesh)
+    if (fWaitFlags & kNeedMesh) {
         ValidateMesh();
-    if (fWaitFlags & kNeedPhysics)
+    }
+
+    if (fWaitFlags & kNeedPhysics) {
         ValidatePhysics();
-    if (fWaitFlags & kNeedApplicator)
+    }
+
+    if (fWaitFlags & kNeedApplicator) {
         ICustomizeApplicator();
-    if (fWaitFlags & kNeedBrainActivation)
-    {
+    }
+
+    if (fWaitFlags & kNeedBrainActivation) {
         int nBrains = fBrains.size();
-        for (int i = 0; i < nBrains; i++)
-        {
+
+        for (int i = 0; i < nBrains; i++) {
             // every brain gets activated, but all except the top brain
             // also get suspended when the one above them is activated.
-            if (i > 0)
+            if (i > 0) {
                 fBrains[i - 1]->Suspend();
+            }
 
             fBrains[i]->Activate(this);
-        }   
+        }
+
         fWaitFlags &= ~kNeedBrainActivation;
     }
 }
 
 void plArmatureModBase::ICustomizeApplicator()
 {
-    const plAGModifier *agMod = plAGModifier::ConvertNoRef(FindModifierByClass(GetTarget(0), plAGModifier::Index()));
-    if (agMod)
-    {
-        plAGApplicator *app = agMod->GetApplicator(kAGPinTransform);
-        if (app)
-        {
-            plMatrixDifferenceApp *differ = plMatrixDifferenceApp::ConvertNoRef(app);
-            
-            if (differ)
-            {
+    const plAGModifier* agMod = plAGModifier::ConvertNoRef(FindModifierByClass(GetTarget(0), plAGModifier::Index()));
+
+    if (agMod) {
+        plAGApplicator* app = agMod->GetApplicator(kAGPinTransform);
+
+        if (app) {
+            plMatrixDifferenceApp* differ = plMatrixDifferenceApp::ConvertNoRef(app);
+
+            if (differ) {
                 fRootAnimator = differ;
                 fWaitFlags &= ~kNeedApplicator;
                 return; // already there
             }
         }
-        plAGModifier *volAGMod = const_cast<plAGModifier *>(agMod);
-        plMatrixDifferenceApp *differ = new plMatrixDifferenceApp();
-        
+
+        plAGModifier* volAGMod = const_cast<plAGModifier*>(agMod);
+        plMatrixDifferenceApp* differ = new plMatrixDifferenceApp();
+
         fRootAnimator = differ;
-        volAGMod->SetApplicator(differ);        
+        volAGMod->SetApplicator(differ);
         differ->Enable(false);
         fWaitFlags &= ~kNeedApplicator;
     }
@@ -614,18 +660,19 @@ void plArmatureModBase::ICustomizeApplicator()
 
 void plArmatureModBase::IEnableBones(int lod, bool enable)
 {
-    if (lod < fUnusedBones.size())
-    {
-        plKeyVector *vec = fUnusedBones[lod];
+    if (lod < fUnusedBones.size()) {
+        plKeyVector* vec = fUnusedBones[lod];
         int i;
-        for (i = 0; i < vec->size(); i++)
-            ((plAGModifier *)(*vec)[i]->GetObjectPtr())->Enable(enable);
+
+        for (i = 0; i < vec->size(); i++) {
+            ((plAGModifier*)(*vec)[i]->GetObjectPtr())->Enable(enable);
+        }
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-const char *plArmatureMod::BoneStrings[] = {"Male", "Female", "Critter", "Actor"};
+const char* plArmatureMod::BoneStrings[] = {"Male", "Female", "Critter", "Actor"};
 
 float plArmatureMod::fMouseTurnSensitivity = 1.f;
 bool plArmatureMod::fClickToTurn = true;
@@ -676,50 +723,54 @@ plArmatureMod::~plArmatureMod()
 {
     delete fBoneMap;
 
-    if (fUpdateMsg)
+    if (fUpdateMsg) {
         fUpdateMsg->UnRef();
+    }
 }
 
 void plArmatureMod::SetPositionAndRotationSim(const hsPoint3* position, const hsQuat* rotation)
 {
     const plCoordinateInterface* subworldCI = nil;
-    if (fController)
+
+    if (fController) {
         subworldCI = fController->GetSubworldCI();
+    }
 
     hsMatrix44 l2w, w2l;
 
     // If we need the position or rotation, grab it from the avatar
-    if (!position || !rotation)
-    {
+    if (!position || !rotation) {
         // Get the current position of the avatar in sim space
         hsMatrix44 avatarL2S = GetTarget(0)->GetLocalToWorld();
-        if (subworldCI)
+
+        if (subworldCI) {
             avatarL2S = subworldCI->GetWorldToLocal() * avatarL2S;
+        }
 
-        if (!rotation)
+        if (!rotation) {
             l2w = avatarL2S;
-        else
+        } else {
             rotation->MakeMatrix(&l2w);
+        }
 
-        if (!position)
-        {
+        if (!position) {
             hsPoint3 simPos;
             avatarL2S.GetTranslate(&simPos);
             l2w.SetTranslate(&simPos);
-        }
-        else
+        } else {
             l2w.SetTranslate(position);
-    }
-    else
-    {
+        }
+    } else {
         rotation->MakeMatrix(&l2w);
         l2w.SetTranslate(position);
     }
 
     // We've got the requested position of the avatar in subworld space, convert
     // it to world space if necessary
-    if (subworldCI)
+    if (subworldCI) {
         l2w = subworldCI->GetLocalToWorld() * l2w;
+    }
+
     l2w.GetInverse(&w2l);
 
     GetTarget(0)->SetTransform(l2w, w2l);
@@ -730,159 +781,177 @@ void plArmatureMod::GetPositionAndRotationSim(hsPoint3* position, hsQuat* rotati
 {
     hsMatrix44 l2s = GetTarget(0)->GetLocalToWorld();
 
-    if (fController)
-    {
+    if (fController) {
         const plCoordinateInterface* subworldCI = fController->GetSubworldCI();
-        if (subworldCI)
-            l2s = subworldCI->GetWorldToLocal() * l2s;
 
-        if (position)
+        if (subworldCI) {
+            l2s = subworldCI->GetWorldToLocal() * l2s;
+        }
+
+        if (position) {
             l2s.GetTranslate(position);
-        if (rotation)
+        }
+
+        if (rotation) {
             rotation->SetFromMatrix(&l2s);
+        }
     }
 }
 
-const plSceneObject *plArmatureMod::FindBone(const plString & name) const
+const plSceneObject* plArmatureMod::FindBone(const plString& name) const
 {
-    plSceneObject *result = nil;
+    plSceneObject* result = nil;
 
-    plAGModifier * mod = GetChannelMod(name);
+    plAGModifier* mod = GetChannelMod(name);
 
-    if (mod)
+    if (mod) {
         result = mod->GetTarget(0);
+    }
 
     return result;
 }
 
-const plSceneObject *plArmatureMod::FindBone(uint32_t id) const
+const plSceneObject* plArmatureMod::FindBone(uint32_t id) const
 {
-    if(fBoneMap)
+    if (fBoneMap) {
         return fBoneMap->FindBone(id);
-    else
+    } else {
         return nil;
+    }
 }
 
-void plArmatureMod::AddBoneMapping(uint32_t id, const plSceneObject *bone)
+void plArmatureMod::AddBoneMapping(uint32_t id, const plSceneObject* bone)
 {
-    if(!fBoneMap)
+    if (!fBoneMap) {
         fBoneMap = new plAvBoneMap();
+    }
 
     fBoneMap->AddBoneMapping(id, bone);
 }
 
 void plArmatureMod::WindowActivate(bool active)
 {
-    if (!active) // We don't want the avatar to move while we don't have focus
-    {
-        if (!plAvatarMgr::GetInstance())
+    if (!active) { // We don't want the avatar to move while we don't have focus
+        if (!plAvatarMgr::GetInstance()) {
             return;
+        }
 
-        plArmatureMod *localAv = plAvatarMgr::GetInstance()->GetLocalAvatar();
-        if (localAv)
+        plArmatureMod* localAv = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+        if (localAv) {
             localAv->ClearInputFlags(true, true);
+        }
     }
 }
 
-char    *plArmatureMod::fSpawnPointOverride = nil;
+char*    plArmatureMod::fSpawnPointOverride = nil;
 
-void    plArmatureMod::SetSpawnPointOverride( const char *overrideObjName )
+void    plArmatureMod::SetSpawnPointOverride(const char* overrideObjName)
 {
     delete [] fSpawnPointOverride;
-    if( overrideObjName == nil )
+
+    if (overrideObjName == nil) {
         fSpawnPointOverride = nil;
-    else
-    {
-        fSpawnPointOverride = hsStrcpy( overrideObjName );
-        strlwr( fSpawnPointOverride );
+    } else {
+        fSpawnPointOverride = hsStrcpy(overrideObjName);
+        strlwr(fSpawnPointOverride);
     }
 }
 
-int plArmatureMod::IFindSpawnOverride( void )
+int plArmatureMod::IFindSpawnOverride(void)
 {
-    if( fSpawnPointOverride == nil || fSpawnPointOverride[ 0 ] == 0 )
+    if (fSpawnPointOverride == nil || fSpawnPointOverride[ 0 ] == 0) {
         return -1;
-    int     i;
-    plAvatarMgr *mgr = plAvatarMgr::GetInstance();
-    for( i = 0; i < mgr->NumSpawnPoints(); i++ )
-    {
-        const plString &name = mgr->GetSpawnPoint( i )->GetTarget(0)->GetKeyName();
-        if (name.Find(fSpawnPointOverride, plString::kCaseInsensitive) >= 0)
-            return i; // Found it!
     }
+
+    int     i;
+    plAvatarMgr* mgr = plAvatarMgr::GetInstance();
+
+    for (i = 0; i < mgr->NumSpawnPoints(); i++) {
+        const plString& name = mgr->GetSpawnPoint(i)->GetTarget(0)->GetKeyName();
+
+        if (name.Find(fSpawnPointOverride, plString::kCaseInsensitive) >= 0) {
+            return i;    // Found it!
+        }
+    }
+
     return -1;
 }
 
 void plArmatureMod::Spawn(double timeNow)
 {
-    plAvatarMgr *mgr = plAvatarMgr::GetInstance();
+    plAvatarMgr* mgr = plAvatarMgr::GetInstance();
     int numSpawnPoints = mgr->NumSpawnPoints();
 
     int spawnNum = IFindSpawnOverride();
-    if( spawnNum == -1 )
-    {
-        spawnNum = plAvatarMgr::GetInstance()->FindSpawnPoint( "LinkInPointDefault" );
-        if( spawnNum == -1 )
-        {
+
+    if (spawnNum == -1) {
+        spawnNum = plAvatarMgr::GetInstance()->FindSpawnPoint("LinkInPointDefault");
+
+        if (spawnNum == -1) {
             spawnNum = plNetClientApp::GetInstance()->GetJoinOrder();
         }
     }
-    
+
     hsAssert(numSpawnPoints, "No spawn points! You are about to crash!");
-    
-    if ( numSpawnPoints )
+
+    if (numSpawnPoints) {
         spawnNum %= numSpawnPoints;
-    
+    }
+
     ValidatePhysics();
-    
+
     SpawnAt(spawnNum, timeNow);
 }
 
 void plArmatureMod::SpawnAt(int spawnNum, double time)
 {
-    plAvatarMgr *mgr = plAvatarMgr::GetInstance();
-    const plSpawnModifier * spawn = mgr->GetSpawnPoint(spawnNum);
-    
+    plAvatarMgr* mgr = plAvatarMgr::GetInstance();
+    const plSpawnModifier* spawn = mgr->GetSpawnPoint(spawnNum);
+
     hsMatrix44 l2w;
     hsMatrix44 w2l;
-    if ( spawn )
-    {
-        const plSceneObject * spawnObj = spawn->GetTarget(0);
+
+    if (spawn) {
+        const plSceneObject* spawnObj = spawn->GetTarget(0);
         l2w = spawnObj->GetLocalToWorld();
         w2l = spawnObj->GetWorldToLocal();
     }
-    
-    if (fController)
+
+    if (fController) {
         fController->ResetAchievedLinearVelocity();
+    }
+
     plCoordinateInterface* ci = (plCoordinateInterface*)GetTarget(0)->GetCoordinateInterface();
     l2w.RemoveScale();
     w2l.RemoveScale();
     ci->SetTransform(l2w, w2l);
     ci->FlushTransform();
-    
-    if (plVirtualCam1::Instance())
+
+    if (plVirtualCam1::Instance()) {
         plVirtualCam1::Instance()->SetCutNextTrans();
-    
-    if (GetFollowerParticleSystemSO())
-    {
+    }
+
+    if (GetFollowerParticleSystemSO()) {
         // Since particles are in world space, if we've got some surrounding us, we've got to translate them to compensate for our warp.
-        plParticleSystem *sys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(GetFollowerParticleSystemSO()->GetModifierByType(plParticleSystem::Index())));
-        if (sys)
-        {
+        plParticleSystem* sys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(GetFollowerParticleSystemSO()->GetModifierByType(plParticleSystem::Index())));
+
+        if (sys) {
             hsPoint3 trans = l2w.GetTranslate() - GetTarget(0)->GetLocalToWorld().GetTranslate();
             sys->TranslateAllParticles(trans);
         }
     }
-    
+
     int nBrains = fBrains.size();
-    for (int i = 0; i < nBrains; i++)
-    {
-        plArmatureBrain * curBrain = fBrains[i];    
+
+    for (int i = 0; i < nBrains; i++) {
+        plArmatureBrain* curBrain = fBrains[i];
         curBrain->Spawn(time);
     }
+
     fWaitFlags &= ~kNeedSpawn;
-    
-    plAvatarSpawnNotifyMsg *notify = new plAvatarSpawnNotifyMsg();
+
+    plAvatarSpawnNotifyMsg* notify = new plAvatarSpawnNotifyMsg();
     notify->SetTimeStamp(hsTimer::GetSysSeconds() + 0.1);
     notify->SetBCastFlag(plMessage::kBCastByExactType);
     notify->Send();
@@ -890,35 +959,36 @@ void plArmatureMod::SpawnAt(int spawnNum, double time)
     EnablePhysics(true);
 }
 
-void plArmatureMod::SetFollowerParticleSystemSO(plSceneObject *follower)
+void plArmatureMod::SetFollowerParticleSystemSO(plSceneObject* follower)
 {
     // TODO: Check for old one and clean up.
     hsPoint3 trans = GetTarget(0)->GetLocalToWorld().GetTranslate() - follower->GetLocalToWorld().GetTranslate();
-    
-    plWarpMsg *warp = new plWarpMsg(GetKey(), follower->GetKey(), plWarpMsg::kFlushTransform | plWarpMsg::kZeroVelocity,
-        GetTarget(0)->GetLocalToWorld());
+
+    plWarpMsg* warp = new plWarpMsg(GetKey(), follower->GetKey(), plWarpMsg::kFlushTransform | plWarpMsg::kZeroVelocity,
+                                    GetTarget(0)->GetLocalToWorld());
     warp->Send();
     hsgResMgr::ResMgr()->AddViaNotify(follower->GetKey(), new plAttachMsg(GetTarget(0)->GetKey(), nil, plRefMsg::kOnRequest), plRefFlags::kActiveRef);
     fFollowerParticleSystemSO = follower;
 
-    plParticleSystem *sys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(follower->GetModifierByType(plParticleSystem::Index())));
-    if (sys)
-    {
+    plParticleSystem* sys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(follower->GetModifierByType(plParticleSystem::Index())));
+
+    if (sys) {
         sys->fMiscFlags |= plParticleSystem::kParticleSystemAlwaysUpdate;
         sys->TranslateAllParticles(trans);
         sys->SetAttachedToAvatar(true);
     }
 }
 
-plSceneObject *plArmatureMod::GetFollowerParticleSystemSO()
+plSceneObject* plArmatureMod::GetFollowerParticleSystemSO()
 {
     return fFollowerParticleSystemSO;
 }
 
 void plArmatureMod::RegisterForBehaviorNotify(plKey key)
 {
-    if (fNotifyKeys.Find(key) == fNotifyKeys.kMissingIndex)
+    if (fNotifyKeys.Find(key) == fNotifyKeys.kMissingIndex) {
         fNotifyKeys.Append(key);
+    }
 }
 
 void plArmatureMod::UnRegisterForBehaviorNotify(plKey key)
@@ -928,9 +998,8 @@ void plArmatureMod::UnRegisterForBehaviorNotify(plKey key)
 
 void plArmatureMod::IFireBehaviorNotify(uint32_t type, bool behaviorStart)
 {
-    if (fNotifyKeys.GetCount() > 0)
-    {
-        plAvatarBehaviorNotifyMsg *msg = new plAvatarBehaviorNotifyMsg();
+    if (fNotifyKeys.GetCount() > 0) {
+        plAvatarBehaviorNotifyMsg* msg = new plAvatarBehaviorNotifyMsg();
         msg->SetSender(GetKey());
         msg->AddReceivers(fNotifyKeys);
         msg->fType = type;
@@ -945,19 +1014,18 @@ void plArmatureMod::EnterAge(bool reSpawn)
     fAlreadyPanicLinking = false;
     EnablePhysics(true, kDisableReasonLinking);
     ValidatePhysics();
-    
+
     // force regions to send an update whenever we enter an age
     fOldRegionsICareAbout.Clear();
     fOldRegionsImIn.Clear();
-    
-    if (GetFollowerParticleSystemSO())
-    {
-        const plParticleSystem *sys = plParticleSystem::ConvertNoRef(GetFollowerParticleSystemSO()->GetModifierByType(plParticleSystem::Index()));
+
+    if (GetFollowerParticleSystemSO()) {
+        const plParticleSystem* sys = plParticleSystem::ConvertNoRef(GetFollowerParticleSystemSO()->GetModifierByType(plParticleSystem::Index()));
         hsAssert(sys, "We have a particle system SO, but no system?");
-        if (sys)
-        {
+
+        if (sys) {
             // Need to tell other clients about this
-            plLoadCloneMsg *clone = new plLoadCloneMsg(GetFollowerParticleSystemSO()->GetKey(), plAvatarMgr::GetInstance()->GetKey(), GetKey()->GetUoid().GetClonePlayerID(), true);
+            plLoadCloneMsg* clone = new plLoadCloneMsg(GetFollowerParticleSystemSO()->GetKey(), plAvatarMgr::GetInstance()->GetKey(), GetKey()->GetUoid().GetClonePlayerID(), true);
             clone->SetBCastFlag(plMessage::kLocalPropagate, false);
             clone->Send();
 
@@ -966,334 +1034,347 @@ void plArmatureMod::EnterAge(bool reSpawn)
     }
 
     ClearInputFlags(true, false);
-    if (reSpawn)
+
+    if (reSpawn) {
         fWaitFlags |= kNeedSpawn;
-    
+    }
+
     // In case we personal age linked out of a situation and didn't properly
     // re-enable input...
     plAvatarInputInterface::GetInstance()->EnableForwardMovement(true);
     plAvatarInputInterface::GetInstance()->EnableJump(true);
-    while (fSuspendInputCount > 0)
+
+    while (fSuspendInputCount > 0) {
         ResumeInput();
+    }
+
     plAvatarInputInterface::GetInstance()->EnableMouseMovement();
 }
 
 void plArmatureMod::LeaveAge()
 {
     plArmatureModBase::LeaveAge();
-    
+
     fMidLink = true;
 
-    if (fController)
-    {
+    if (fController) {
         fController->LeaveAge();
     }
-    
-    if (GetFollowerParticleSystemSO())
-    {
+
+    if (GetFollowerParticleSystemSO()) {
         // Need to tell other clients to remove this
-        plLoadCloneMsg *clone = new plLoadCloneMsg(GetFollowerParticleSystemSO()->GetKey(), plAvatarMgr::GetInstance()->GetKey(), GetKey()->GetUoid().GetClonePlayerID(), false);
+        plLoadCloneMsg* clone = new plLoadCloneMsg(GetFollowerParticleSystemSO()->GetKey(), plAvatarMgr::GetInstance()->GetKey(), GetKey()->GetUoid().GetClonePlayerID(), false);
         clone->SetBCastFlag(plMessage::kLocalPropagate, false);
         clone->Send();
     }
 
     GetArmatureEffects()->ResetEffects();
-    ClearInputFlags(true, false);   
+    ClearInputFlags(true, false);
 }
 
 void plArmatureMod::PanicLink(bool playLinkOutAnim /* = true */)
 {
     // console override... just go back to the beginning
-    if (fDontPanicLink)
-    {
+    if (fDontPanicLink) {
         Spawn(0.f);
         return;
     }
 
-    if (fAlreadyPanicLinking)
+    if (fAlreadyPanicLinking) {
         return;
+    }
+
     fAlreadyPanicLinking = true;
 
 
     plNetApp::StaticDebugMsg("plArmatureMod::PanicLink()");
 
     // make the player book blink as they are linking out
-    pfKIMsg *msg = new pfKIMsg( pfKIMsg::kStartBookAlert );
-    plgDispatch::MsgSend( msg );
+    pfKIMsg* msg = new pfKIMsg(pfKIMsg::kStartBookAlert);
+    plgDispatch::MsgSend(msg);
 
     // Can't depend on the anim to link if the human brain isn't ready to deal with it
-    plAvBrainHuman *brain = plAvBrainHuman::ConvertNoRef(GetCurrentBrain());
-    // If things break then uncomment the code below
-    if (!brain)//  || brain->IsRunningTask())
-        playLinkOutAnim = false;
+    plAvBrainHuman* brain = plAvBrainHuman::ConvertNoRef(GetCurrentBrain());
 
-    if (playLinkOutAnim)
-    {
-        plAvOneShotLinkTask *task = new plAvOneShotLinkTask;
+    // If things break then uncomment the code below
+    if (!brain) { //  || brain->IsRunningTask())
+        playLinkOutAnim = false;
+    }
+
+    if (playLinkOutAnim) {
+        plAvOneShotLinkTask* task = new plAvOneShotLinkTask;
 
         plString animName = MakeAnimationName("FallingLinkOut");
         task->SetAnimName(animName);
         task->SetMarkerName("touch");
-    
-        plAvTaskMsg *taskMsg = new plAvTaskMsg(GetKey(), GetKey(), task);
+
+        plAvTaskMsg* taskMsg = new plAvTaskMsg(GetKey(), GetKey(), task);
         taskMsg->Send();
-    }
-    else
-    {
+    } else {
         EnablePhysics(false, plArmatureMod::kDisableReasonLinking);
         ILinkToPersonalAge();
     }
-}   
+}
 
 void plArmatureMod::PersonalLink()
 {
     // Can't depend on the anim to link if the human brain isn't ready to deal with it
-    plAvBrainHuman *brain = plAvBrainHuman::ConvertNoRef(GetCurrentBrain());
-    if (!brain || brain->IsRunningTask())
+    plAvBrainHuman* brain = plAvBrainHuman::ConvertNoRef(GetCurrentBrain());
+
+    if (!brain || brain->IsRunningTask()) {
         ILinkToPersonalAge();
-    else
-    {
-        plAvOneShotLinkTask *task = new plAvOneShotLinkTask;
+    } else {
+        plAvOneShotLinkTask* task = new plAvOneShotLinkTask;
         plString animName = MakeAnimationName("PersonalLink");
         task->SetAnimName(animName);
         task->SetMarkerName("touch");
-        
-        plAvTaskMsg *taskMsg = new plAvTaskMsg(GetKey(), GetKey(), task);
-        taskMsg->SetBCastFlag(plMessage::kNetPropagate);    
+
+        plAvTaskMsg* taskMsg = new plAvTaskMsg(GetKey(), GetKey(), task);
+        taskMsg->SetBCastFlag(plMessage::kNetPropagate);
         taskMsg->Send();
     }
 }
 
 bool plArmatureMod::MsgReceive(plMessage* msg)
-{   
+{
     bool result = false;
-    
-    plArmatureBrain *curBrain = nil;
-    if (fBrains.size() > 0)
-    {
-        curBrain = fBrains.back();
-        if(curBrain->MsgReceive(msg))
-            return true;
-    }   
 
-    plAvatarInputStateMsg *aisMsg = plAvatarInputStateMsg::ConvertNoRef(msg);
-    if (aisMsg)
-    {
+    plArmatureBrain* curBrain = nil;
+
+    if (fBrains.size() > 0) {
+        curBrain = fBrains.back();
+
+        if (curBrain->MsgReceive(msg)) {
+            return true;
+        }
+    }
+
+    plAvatarInputStateMsg* aisMsg = plAvatarInputStateMsg::ConvertNoRef(msg);
+
+    if (aisMsg) {
         IHandleInputStateMsg(aisMsg);
         return true;
     }
-    
-    plControlEventMsg *control = plControlEventMsg::ConvertNoRef(msg);
-    if(control)
-    {
+
+    plControlEventMsg* control = plControlEventMsg::ConvertNoRef(msg);
+
+    if (control) {
         IHandleControlMsg(control);
         return true;
     }
 
-    plCorrectionMsg *corMsg = plCorrectionMsg::ConvertNoRef(msg);
-    if (corMsg)
-    {
+    plCorrectionMsg* corMsg = plCorrectionMsg::ConvertNoRef(msg);
+
+    if (corMsg) {
         hsMatrix44 correction = corMsg->fWorldToLocal * GetTarget(0)->GetLocalToWorld();
-        if (fBoneRootAnimator)
+
+        if (fBoneRootAnimator) {
             fBoneRootAnimator->SetCorrection(correction);
+        }
     }
-        
-    plGenRefMsg *refMsg = plGenRefMsg::ConvertNoRef(msg);
-    if (refMsg) 
-    {
-        plClothingOutfit *outfit = plClothingOutfit::ConvertNoRef(refMsg->GetRef());
-        if (outfit) 
-        {
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-            {
+
+    plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
+
+    if (refMsg) {
+        plClothingOutfit* outfit = plClothingOutfit::ConvertNoRef(refMsg->GetRef());
+
+        if (outfit) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fClothingOutfit = outfit;
                 fClothingOutfit->fAvatar = this;
                 plgDispatch::Dispatch()->RegisterForExactType(plPipeRTMakeMsg::Index(), fClothingOutfit->GetKey());
-            }
-            else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-            {
-                if (fClothingOutfit)
+            } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
+                if (fClothingOutfit) {
                     plgDispatch::Dispatch()->UnRegisterForExactType(plPipeRTMakeMsg::Index(), fClothingOutfit->GetKey());
+                }
+
                 fClothingOutfit = nil;
                 outfit->fAvatar = nil;
             }
+
             return true;
         }
-        plArmatureEffectsMgr *effects = plArmatureEffectsMgr::ConvertNoRef(refMsg->GetRef());
-        if (effects)
-        {
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-            {
+
+        plArmatureEffectsMgr* effects = plArmatureEffectsMgr::ConvertNoRef(refMsg->GetRef());
+
+        if (effects) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fEffects = effects;
                 fEffects->fArmature = this;
-            }
-            else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-            {
+            } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                 fEffects->fArmature = nil;
                 fEffects = nil;
             }
-            return true;        
+
+            return true;
         }
-        plSceneObject *so = plSceneObject::ConvertNoRef(refMsg->GetRef());
-        if (so)
-        {
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-            {
+
+        plSceneObject* so = plSceneObject::ConvertNoRef(refMsg->GetRef());
+
+        if (so) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fClothToSOMap.ExpandAndZero(refMsg->fWhich + 1);
                 fClothToSOMap[refMsg->fWhich] = so;
-            }
-            else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-            {
+            } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                 fClothToSOMap[refMsg->fWhich] = nil;
             }
+
             return true;
         }
     }
-    
-    if (fEffects)
-    {
-        plArmatureEffectMsg *aeMsg = plArmatureEffectMsg::ConvertNoRef(msg);
-        plArmatureEffectStateMsg *aesMsg = plArmatureEffectStateMsg::ConvertNoRef(msg);
-        if (aeMsg || aesMsg)
+
+    if (fEffects) {
+        plArmatureEffectMsg* aeMsg = plArmatureEffectMsg::ConvertNoRef(msg);
+        plArmatureEffectStateMsg* aesMsg = plArmatureEffectStateMsg::ConvertNoRef(msg);
+
+        if (aeMsg || aesMsg) {
             return fEffects->MsgReceive(msg);
+        }
     }
-    
-    plAttachMsg *aMsg = plAttachMsg::ConvertNoRef(msg);
-    if (aMsg)
-    {
+
+    plAttachMsg* aMsg = plAttachMsg::ConvertNoRef(msg);
+
+    if (aMsg) {
         GetTarget(0)->MsgReceive(aMsg);
         return true;
     }
-    
-    plEnableMsg *enMsg = plEnableMsg::ConvertNoRef(msg);    
-    if(enMsg && enMsg->Type(plEnableMsg::kDrawable))
-    {
+
+    plEnableMsg* enMsg = plEnableMsg::ConvertNoRef(msg);
+
+    if (enMsg && enMsg->Type(plEnableMsg::kDrawable)) {
         bool enable = enMsg->Cmd(plEnableMsg::kEnable);
         bool disable = enMsg->Cmd(plEnableMsg::kDisable);
-        
+
         hsAssert(enable != disable, "Conflicting or missing commands to enable message");
-        
-        if(enable != disable)
+
+        if (enable != disable) {
             EnableDrawing(enable);
-        return true;
-    }
-    if(enMsg && enMsg->Cmd(plEnableMsg::kPhysical))
-    {
-        EnablePhysics( enMsg->Cmd(plEnableMsg::kEnable));
-    }
-    
-    plAvatarOpacityCallbackMsg *opacMsg = plAvatarOpacityCallbackMsg::ConvertNoRef(msg);
-    if (opacMsg)
-    {
-        plLayerLinkAnimation *linkAnim = IFindLayerLinkAnim();
-        if (linkAnim)
-        {
-            bool trans = (linkAnim->GetTimeConvert().CurrentAnimTime() != 0.f);
-            ISetTransparentDrawOrder(trans);
         }
+
         return true;
     }
 
-    plAvatarPhysicsEnableCallbackMsg *epMsg = plAvatarPhysicsEnableCallbackMsg::ConvertNoRef(msg);
-    if (epMsg)
-    {
+    if (enMsg && enMsg->Cmd(plEnableMsg::kPhysical)) {
+        EnablePhysics(enMsg->Cmd(plEnableMsg::kEnable));
+    }
+
+    plAvatarOpacityCallbackMsg* opacMsg = plAvatarOpacityCallbackMsg::ConvertNoRef(msg);
+
+    if (opacMsg) {
+        plLayerLinkAnimation* linkAnim = IFindLayerLinkAnim();
+
+        if (linkAnim) {
+            bool trans = (linkAnim->GetTimeConvert().CurrentAnimTime() != 0.f);
+            ISetTransparentDrawOrder(trans);
+        }
+
+        return true;
+    }
+
+    plAvatarPhysicsEnableCallbackMsg* epMsg = plAvatarPhysicsEnableCallbackMsg::ConvertNoRef(msg);
+
+    if (epMsg) {
         EnablePhysics(true);
         return true;
     }
 
-    plAvatarStealthModeMsg *stealthMsg = plAvatarStealthModeMsg::ConvertNoRef(msg);
+    plAvatarStealthModeMsg* stealthMsg = plAvatarStealthModeMsg::ConvertNoRef(msg);
+
     if (stealthMsg && stealthMsg->GetSender() == GetTarget(0)->GetKey() &&
-        (stealthMsg->fLevel != fStealthLevel || stealthMsg->fMode != fStealthMode))
-    {
+            (stealthMsg->fLevel != fStealthLevel || stealthMsg->fMode != fStealthMode)) {
         fStealthMode = stealthMsg->fMode;
         fStealthLevel = (stealthMsg->fMode == plAvatarStealthModeMsg::kStealthVisible) ? 0 : stealthMsg->fLevel;
 
-        if (fStealthMode == plAvatarStealthModeMsg::kStealthCloaked)
-        {
-            if (fUpdateMsg)
+        if (fStealthMode == plAvatarStealthModeMsg::kStealthCloaked) {
+            if (fUpdateMsg) {
                 fUpdateMsg->SetInvis(true);
-        }
-        else
-        {
-            if (fUpdateMsg)
+            }
+        } else {
+            if (fUpdateMsg) {
                 fUpdateMsg->SetInvis(false);
-        }       
-        
-        if (fEffects)
+            }
+        }
+
+        if (fEffects) {
             fEffects->MsgReceive(stealthMsg);
-        
-        if (stealthMsg->fMode == plAvatarStealthModeMsg::kStealthCloaked)
+        }
+
+        if (stealthMsg->fMode == plAvatarStealthModeMsg::kStealthCloaked) {
             EnableDrawing(false, kDisableReasonCCR);
-        else
+        } else {
             EnableDrawing(true, kDisableReasonCCR);
+        }
 
         DirtySynchState(kSDLAvatar, 0);     // changed invisibility state
         plNetApp::StaticDebugMsg("ArmatureMod: rcvd avatarStealth msg, cloaked=%d", stealthMsg->fMode == plAvatarStealthModeMsg::kStealthCloaked);
         return true;
     }
 
-    plParticleTransferMsg *partMsg = plParticleTransferMsg::ConvertNoRef(msg);
-    if (partMsg)
-    {
+    plParticleTransferMsg* partMsg = plParticleTransferMsg::ConvertNoRef(msg);
+
+    if (partMsg) {
         // First, do we have the system?
-        plSceneObject *dstSysSO = GetFollowerParticleSystemSO();
-        if (!dstSysSO || ((plKeyImp*)dstSysSO->GetKey())->GetCloneOwner() != partMsg->fSysSOKey) 
-        {
+        plSceneObject* dstSysSO = GetFollowerParticleSystemSO();
+
+        if (!dstSysSO || ((plKeyImp*)dstSysSO->GetKey())->GetCloneOwner() != partMsg->fSysSOKey) {
             // Need to clone and resend.
-            if (plNetClientApp::GetInstance()->GetLocalPlayer() != GetTarget(0))
-                return true; // Only the local player can create the clone.
+            if (plNetClientApp::GetInstance()->GetLocalPlayer() != GetTarget(0)) {
+                return true;    // Only the local player can create the clone.
+            }
 
             // Clone is sent to all players.
-            plLoadCloneMsg *cloneMsg = new plLoadCloneMsg(partMsg->fSysSOKey->GetUoid(), plAvatarMgr::GetInstance()->GetKey(), GetKey()->GetUoid().GetClonePlayerID());
+            plLoadCloneMsg* cloneMsg = new plLoadCloneMsg(partMsg->fSysSOKey->GetUoid(), plAvatarMgr::GetInstance()->GetKey(), GetKey()->GetUoid().GetClonePlayerID());
             cloneMsg->SetTriggerMsg(partMsg);
             cloneMsg->SetBCastFlag(plMessage::kNetForce);
             cloneMsg->Send();
 
             // Expect to receive a clone message later. Return for now.
             return true;
-        }
-        else
-        {   
-            plParticleSystem *dstSys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(dstSysSO->GetModifierByType(plParticleSystem::Index())));
-            if (dstSys)
-            {
+        } else {
+            plParticleSystem* dstSys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(dstSysSO->GetModifierByType(plParticleSystem::Index())));
+
+            if (dstSys) {
                 // Got the system. Time to steal particles!
-                plParticleSystem *srcSys = nil;
-                plSceneObject *srcSysSO = plSceneObject::ConvertNoRef(partMsg->fSysSOKey->ObjectIsLoaded());
-                if (srcSysSO)
+                plParticleSystem* srcSys = nil;
+                plSceneObject* srcSysSO = plSceneObject::ConvertNoRef(partMsg->fSysSOKey->ObjectIsLoaded());
+
+                if (srcSysSO) {
                     srcSys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(srcSysSO->GetModifierByType(plParticleSystem::Index())));
-                
+                }
+
                 // A nil source system is ok. It just won't copy anything.
                 int numToGen = partMsg->fNumToTransfer - dstSys->StealParticlesFrom(srcSys, partMsg->fNumToTransfer);
-                if (numToGen > 0)
-                {
+
+                if (numToGen > 0) {
                     dstSys->GenerateParticles(numToGen);
                 }
             }
+
             return true;
         }
     }
 
-    plLoadAvatarMsg *avLoadMsg = plLoadAvatarMsg::ConvertNoRef(msg);
-    if (avLoadMsg)
-    {
+    plLoadAvatarMsg* avLoadMsg = plLoadAvatarMsg::ConvertNoRef(msg);
+
+    if (avLoadMsg) {
         bool isPlayer = avLoadMsg->GetIsPlayer();
-        if (!isPlayer)
+
+        if (!isPlayer) {
             plgDispatch::Dispatch()->UnRegisterForExactType(plAgeLoadedMsg::Index(), GetKey());
-        
+        }
+
         // see if we're being spawned explictly
         plKey spawnPoint = avLoadMsg->GetSpawnPoint();
-        
-        if (spawnPoint)
-        {
-            hsKeyedObject * spawnKO = spawnPoint->ObjectIsLoaded();
-            if (spawnKO)
-            {
-                plSceneObject * spawnSO = plSceneObject::ConvertNoRef(spawnKO);
-                if(spawnSO)
-                {
+
+        if (spawnPoint) {
+            hsKeyedObject* spawnKO = spawnPoint->ObjectIsLoaded();
+
+            if (spawnKO) {
+                plSceneObject* spawnSO = plSceneObject::ConvertNoRef(spawnKO);
+
+                if (spawnSO) {
                     hsMatrix44 l2w = spawnSO->GetLocalToWorld();
-                    plWarpMsg *warpM = new plWarpMsg(nil, GetTarget(0)->GetKey(), plWarpMsg::kFlushTransform, l2w);
+                    plWarpMsg* warpM = new plWarpMsg(nil, GetTarget(0)->GetKey(), plWarpMsg::kFlushTransform, l2w);
                     warpM->Send();
                     fWaitFlags &= ~kNeedSpawn;
                 }
@@ -1302,103 +1383,102 @@ bool plArmatureMod::MsgReceive(plMessage* msg)
 
         // copy the user string over
         const char* userStr = avLoadMsg->GetUserStr();
-        if (userStr)
+
+        if (userStr) {
             fUserStr = userStr;
-        else
+        } else {
             fUserStr = "";
+        }
 
         return true;
-    }   
+    }
 
-    plLoadCloneMsg *cloneMsg = plLoadCloneMsg::ConvertNoRef(msg);
-    if (cloneMsg)
-    {
-        if (cloneMsg->GetIsLoading())
-        {
-            plSceneObject *so = plSceneObject::ConvertNoRef(cloneMsg->GetCloneKey()->ObjectIsLoaded());
-            if (so)
-            {
+    plLoadCloneMsg* cloneMsg = plLoadCloneMsg::ConvertNoRef(msg);
+
+    if (cloneMsg) {
+        if (cloneMsg->GetIsLoading()) {
+            plSceneObject* so = plSceneObject::ConvertNoRef(cloneMsg->GetCloneKey()->ObjectIsLoaded());
+
+            if (so) {
                 so->SetSynchFlagsBit(plSynchedObject::kAllStateIsVolatile);
-                plParticleSystem *sys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(so->GetModifierByType(plParticleSystem::Index())));
+                plParticleSystem* sys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(so->GetModifierByType(plParticleSystem::Index())));
                 hsAssert(sys, "Modifier not loaded yet.");
-                if (sys)
-                {
+
+                if (sys) {
                     sys->DisableGenerators();
                     sys->MsgReceive(cloneMsg); // Let the system know to finish its init stuff
                     SetFollowerParticleSystemSO(so);
-                    if (!plNetClientApp::GetInstance()->IsLoadingInitialAgeState())
-                    {
+
+                    if (!plNetClientApp::GetInstance()->IsLoadingInitialAgeState()) {
                         // Just happened. Redirect the trigger and transfer the particles
                         MsgReceive(cloneMsg->GetTriggerMsg());
                     }
+
                     // otherwise we'll get SDL state about it and handle it in plParticleSDLMod
 
                     return true;
                 }
             }
-        }
-        else
-        {
-            if (cloneMsg->GetCloneKey() == GetFollowerParticleSystemSO()->GetKey())
-            {
+        } else {
+            if (cloneMsg->GetCloneKey() == GetFollowerParticleSystemSO()->GetKey()) {
                 SetFollowerParticleSystemSO(nil);
                 return true;
             }
         }
     }
 
-    plLinkEffectBCMsg *linkBCMsg = plLinkEffectBCMsg::ConvertNoRef(msg);
-    if (linkBCMsg)
-    {
-        if (GetTarget(0)->GetKey() == linkBCMsg->fLinkKey)
-        {
-            if (linkBCMsg->HasLinkFlag(plLinkEffectBCMsg::kLeavingAge))
-            {
+    plLinkEffectBCMsg* linkBCMsg = plLinkEffectBCMsg::ConvertNoRef(msg);
+
+    if (linkBCMsg) {
+        if (GetTarget(0)->GetKey() == linkBCMsg->fLinkKey) {
+            if (linkBCMsg->HasLinkFlag(plLinkEffectBCMsg::kLeavingAge)) {
                 fMidLink = true;
                 IFireBehaviorNotify(plHBehavior::kBehaviorTypeLinkOut, true);
-            }
-            else
+            } else {
                 IFireBehaviorNotify(plHBehavior::kBehaviorTypeLinkIn, true);
+            }
         }
+
         return true;
     }
 
-    plLinkInDoneMsg *doneMsg = plLinkInDoneMsg::ConvertNoRef(msg);
-    if (doneMsg)
-    {
+    plLinkInDoneMsg* doneMsg = plLinkInDoneMsg::ConvertNoRef(msg);
+
+    if (doneMsg) {
         fIsLinkedIn = true;
         IFireBehaviorNotify(plHBehavior::kBehaviorTypeLinkIn, false);
         return true;
     }
-    
-    plAgeLoadedMsg *ageLoadMsg = plAgeLoadedMsg::ConvertNoRef(msg);
-    if (ageLoadMsg) 
-    {
-        if (ageLoadMsg->fLoaded)
-        {
+
+    plAgeLoadedMsg* ageLoadMsg = plAgeLoadedMsg::ConvertNoRef(msg);
+
+    if (ageLoadMsg) {
+        if (ageLoadMsg->fLoaded) {
             // only the local player gets these
             NetworkSynch(hsTimer::GetSysSeconds(), true);
             EnablePhysics(true);
-        } else
+        } else {
             fIsLinkedIn = false;
+        }
+
         return true;
     }
-    
-    plAnimCmdMsg *cmdMsg = plAnimCmdMsg::ConvertNoRef(msg);
-    if (cmdMsg)
-    {
+
+    plAnimCmdMsg* cmdMsg = plAnimCmdMsg::ConvertNoRef(msg);
+
+    if (cmdMsg) {
         hsAssert(false, "Illegal use of plAnimCmdMsg on an avatar.");
-        return true; 
+        return true;
     }
 
     plSubWorldMsg* subMsg = plSubWorldMsg::ConvertNoRef(msg);
-    if (subMsg)
-    {
-        if (fController)
-        {
+
+    if (subMsg) {
+        if (fController) {
             fController->SetSubworld(subMsg->fWorldKey);
             DirtySynchState(kSDLAvatar, plSynchedObject::kBCastToClients);
         }
+
         return true;
     }
 
@@ -1412,169 +1492,168 @@ bool plArmatureMod::IHandleControlMsg(plControlEventMsg* pMsg)
     // When things change (that a remote client would care about),
     // we call SynchInputState and that sends off the bit vector
     // for the state of all avatar input controls.
-    // 
+    //
     // This means a remote player will only know which controls are
     // active at a certain point. It might miss a particular keypress.
     // Don't rely on them receiving it.
-    
-    if (fSuspendInputCount > 0)
-    {
+
+    if (fSuspendInputCount > 0) {
         fQueuedCtrlMessages.push_back(pMsg);
         pMsg->Ref();
-    }
-    else 
-    {
+    } else {
         ControlEventCode moveCode = pMsg->GetControlCode();
 
         bool flagChanged = false;
-        if(pMsg->ControlActivated())
-        {
-            if (moveCode == B_CONTROL_TURN_TO && fClickToTurn)
-            {
+
+        if (pMsg->ControlActivated()) {
+            if (moveCode == B_CONTROL_TURN_TO && fClickToTurn) {
 #if 0
                 // This will do an LOS and call TurnToPoint()
                 plSceneInputInterface::GetInstance()->RequestAvatarTurnToPointLOS();
 #else
                 plVisHit hit;
-                if( plVisLOSMgr::Instance()->CursorCheck(hit) )
+
+                if (plVisLOSMgr::Instance()->CursorCheck(hit)) {
                     TurnToPoint(hit.fPos);
+                }
+
 #endif
                 return true;
             }
-            
+
             // This control is intended for turning while walking/running.
             // It is never net propagated. We just flag our physics state
             // as dirty, and let the physics synch (with dead reckoning) handle it.
-            if (moveCode == A_CONTROL_TURN)
-            {
+            if (moveCode == A_CONTROL_TURN) {
                 // Filter out the messages that are just the mouse recentering
-                if (pMsg->GetPct() < 0.4 && pMsg->GetPct() > -0.4)
-                {
+                if (pMsg->GetPct() < 0.4 && pMsg->GetPct() > -0.4) {
                     fMouseFrameTurnStrength += pMsg->GetPct() * fMouseTurnSensitivity;
                     SynchIfLocal(hsTimer::GetSysSeconds(), false);
                 }
             }
 
-            if (!GetInputFlag( moveCode ) )
-            {
-                SetInputFlag( moveCode, true );
+            if (!GetInputFlag(moveCode)) {
+                SetInputFlag(moveCode, true);
                 flagChanged = true;
 
-                if (moveCode == B_CONTROL_JUMP)
+                if (moveCode == B_CONTROL_JUMP) {
                     SetInputFlag(B_CONTROL_CONSUMABLE_JUMP, true);
-                
-                if(plNetClientMgr::GetInstance()->AmCCR())
-                {
+                }
+
+                if (plNetClientMgr::GetInstance()->AmCCR()) {
                     // special case for clipping: synch every key change
-                    SynchIfLocal( hsTimer::GetSysSeconds(), false);
+                    SynchIfLocal(hsTimer::GetSysSeconds(), false);
                 }
             }
         } else {
-            if ( GetInputFlag( moveCode ) )
-            {
-                SetInputFlag( moveCode, false );
+            if (GetInputFlag(moveCode)) {
+                SetInputFlag(moveCode, false);
                 flagChanged = true;
 
-                if (fReverseFBOnIdle && (moveCode == B_CONTROL_MOVE_FORWARD || moveCode == B_CONTROL_MOVE_BACKWARD))
-                {
-                    if (!GetInputFlag(B_CONTROL_MOVE_FORWARD) && !GetInputFlag(B_CONTROL_MOVE_BACKWARD))
+                if (fReverseFBOnIdle && (moveCode == B_CONTROL_MOVE_FORWARD || moveCode == B_CONTROL_MOVE_BACKWARD)) {
+                    if (!GetInputFlag(B_CONTROL_MOVE_FORWARD) && !GetInputFlag(B_CONTROL_MOVE_BACKWARD)) {
                         SetInputFlag(B_CONTROL_LADDER_INVERTED, true);
+                    }
                 }
             }
         }
-        if (flagChanged && plAvatarInputStateMsg::IsCodeInMap(moveCode))
+
+        if (flagChanged && plAvatarInputStateMsg::IsCodeInMap(moveCode)) {
             SynchInputState();
+        }
     }
+
     return true;
 }
 
-void plArmatureMod::IHandleInputStateMsg(plAvatarInputStateMsg *msg)
+void plArmatureMod::IHandleInputStateMsg(plAvatarInputStateMsg* msg)
 {
     int i;
     uint32_t curBit;
-    for (i = 0, curBit = 0x1; i < plAvatarInputStateMsg::fMapSize; i++, curBit <<= 1)
-    {
+
+    for (i = 0, curBit = 0x1; i < plAvatarInputStateMsg::fMapSize; i++, curBit <<= 1) {
         SetInputFlag(msg->fCodeMap[i], msg->fState & curBit);
     }
-    
+
 }
 
 void plArmatureMod::SynchInputState(uint32_t rcvID /* = kInvalidPlayerID */)
 {
-    if (plAvatarMgr::GetInstance()->GetLocalAvatar() != this)
+    if (plAvatarMgr::GetInstance()->GetLocalAvatar() != this) {
         return;
-    
-    plAvatarInputStateMsg *msg = new plAvatarInputStateMsg();
+    }
+
+    plAvatarInputStateMsg* msg = new plAvatarInputStateMsg();
     int i;
     uint32_t curBit;
-    for (i = 0, curBit = 0x1; i < plAvatarInputStateMsg::fMapSize; i++, curBit <<= 1)
-    {
-        if (GetInputFlag(msg->fCodeMap[i]))
+
+    for (i = 0, curBit = 0x1; i < plAvatarInputStateMsg::fMapSize; i++, curBit <<= 1) {
+        if (GetInputFlag(msg->fCodeMap[i])) {
             msg->fState |= curBit;
+        }
     }
+
     msg->AddReceiver(GetKey());
     msg->SetBCastFlag(plMessage::kNetPropagate);
     msg->SetBCastFlag(plMessage::kNetUseRelevanceRegions);
     msg->SetBCastFlag(plMessage::kLocalPropagate, false);
     msg->SetBCastFlag(plMessage::kNetSendUnreliable, true);
-    if (rcvID != kInvalidPlayerID)
+
+    if (rcvID != kInvalidPlayerID) {
         msg->AddNetReceiver(rcvID);
-    
+    }
+
     msg->Send();
 }
 
 void plArmatureMod::ILinkToPersonalAge()
 {
-    plNetClientMgr * nc = plNetClientMgr::GetInstance();
-    
+    plNetClientMgr* nc = plNetClientMgr::GetInstance();
+
     plAgeLinkStruct link;
-    link.GetAgeInfo()->SetAgeFilename( kPersonalAgeFilename );
-    link.GetAgeInfo()->SetAgeInstanceName( kPersonalAgeInstanceName );
-    
+    link.GetAgeInfo()->SetAgeFilename(kPersonalAgeFilename);
+    link.GetAgeInfo()->SetAgeInstanceName(kPersonalAgeInstanceName);
+
     plSpawnPointInfo hutSpawnPoint;
     hutSpawnPoint.SetName(kPersonalAgeLinkInPointCloset);
     link.SetSpawnPoint(hutSpawnPoint);
-    
-    link.SetLinkingRules( plNetCommon::LinkingRules::kOriginalBook );
-    plLinkToAgeMsg* pMsg = new plLinkToAgeMsg( &link );
+
+    link.SetLinkingRules(plNetCommon::LinkingRules::kOriginalBook);
+    plLinkToAgeMsg* pMsg = new plLinkToAgeMsg(&link);
     pMsg->SetLinkInAnimName("PersonalBookEnter");
     pMsg->AddReceiver(nc->GetKey());
-    pMsg->Send();   
+    pMsg->Send();
 }
 
 bool plArmatureMod::IEval(double time, float elapsed, uint32_t dirty)
 {
-    if (IsFinal())
-    {
+    if (IsFinal()) {
         bool noOverlap = false;
 
-        const plArmatureMod *localPlayer = plAvatarMgr::GetInstance()->GetLocalAvatar();
-        if (plRelevanceMgr::Instance()->GetEnabled() && (localPlayer != nil))
-        {
+        const plArmatureMod* localPlayer = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+        if (plRelevanceMgr::Instance()->GetEnabled() && (localPlayer != nil)) {
             // (May decide to update this elsewhere instead.)
-            plRelevanceMgr::Instance()->SetRegionVectors(GetTarget(0)->GetLocalToWorld().GetTranslate(), fRegionsImIn, fRegionsICareAbout); 
-            if (localPlayer != this)
-            {
-                if (!fRegionsImIn.Overlap(localPlayer->fRegionsICareAbout))
-                {
+            plRelevanceMgr::Instance()->SetRegionVectors(GetTarget(0)->GetLocalToWorld().GetTranslate(), fRegionsImIn, fRegionsICareAbout);
+
+            if (localPlayer != this) {
+                if (!fRegionsImIn.Overlap(localPlayer->fRegionsICareAbout)) {
                     noOverlap = true;
                 }
-            }
-            else // Bookkeeping for the local player...
-            {
+            } else { // Bookkeeping for the local player...
                 bool update = false;
-                if (fOldRegionsICareAbout != fRegionsICareAbout)
-                {
+
+                if (fOldRegionsICareAbout != fRegionsICareAbout) {
                     update = true;
                     fOldRegionsICareAbout = fRegionsICareAbout;
                 }
-                if (fOldRegionsImIn != fRegionsImIn)
-                {
+
+                if (fOldRegionsImIn != fRegionsImIn) {
                     update = true;
                     fOldRegionsImIn = fRegionsImIn;
                 }
-                if (update)
-                {
+
+                if (update) {
                     // Send message to the server here.
                     plNetMsgRelevanceRegions relRegionsNetMsg;
                     relRegionsNetMsg.SetNetProtocol(kNetProtocolCli2Game);
@@ -1584,56 +1663,57 @@ bool plArmatureMod::IEval(double time, float elapsed, uint32_t dirty)
                 }
             }
         }
-        
-        if (noOverlap)
-        {
+
+        if (noOverlap) {
             EnablePhysics(false, kDisableReasonRelRegion);
             EnableDrawing(false, kDisableReasonRelRegion);
-        }
-        else
-        {
+        } else {
             EnablePhysics(true, kDisableReasonRelRegion);
             EnableDrawing(true, kDisableReasonRelRegion);
         }
-        
-        if (fMouseFrameTurnStrength == 0 && GetInputFlag(A_CONTROL_TURN))
+
+        if (fMouseFrameTurnStrength == 0 && GetInputFlag(A_CONTROL_TURN)) {
             SetInputFlag(A_CONTROL_TURN, false);
-        
-        if (!fMidLink)
+        }
+
+        if (!fMidLink) {
             plArmatureModBase::IEval(time, elapsed, dirty);
-        
+        }
+
         fUpdateMsg->Ref();
         fUpdateMsg->Send();
 
-        if (fPendingSynch)
+        if (fPendingSynch) {
             NetworkSynch(time, false);
-        if (fDebugOn)
+        }
+
+        if (fDebugOn) {
             RefreshDebugDisplay();
-    
+        }
+
         fMouseFrameTurnStrength = 0.f; // Processed this frame. Clear it.
 
         // update our attached particle system if necessary
-        if (GetFollowerParticleSystemSO())
-        {
+        if (GetFollowerParticleSystemSO()) {
             plSceneObject* follower = GetFollowerParticleSystemSO();
             hsPoint3 trans = GetTarget(0)->GetLocalToWorld().GetTranslate() - follower->GetLocalToWorld().GetTranslate();
-            if (trans.MagnitudeSquared() > 1) // we can be a bit fuzzy about this, since the particle system is rather large and people won't notice it being off
-            {
-                plWarpMsg *warp = new plWarpMsg(GetKey(), follower->GetKey(), plWarpMsg::kFlushTransform | plWarpMsg::kZeroVelocity,
-                    GetTarget(0)->GetLocalToWorld());
+
+            if (trans.MagnitudeSquared() > 1) { // we can be a bit fuzzy about this, since the particle system is rather large and people won't notice it being off
+                plWarpMsg* warp = new plWarpMsg(GetKey(), follower->GetKey(), plWarpMsg::kFlushTransform | plWarpMsg::kZeroVelocity,
+                                                GetTarget(0)->GetLocalToWorld());
                 warp->Send();
 
-                plParticleSystem *sys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(follower->GetModifierByType(plParticleSystem::Index())));
-                if (sys)
-                {
+                plParticleSystem* sys = const_cast<plParticleSystem*>(plParticleSystem::ConvertNoRef(follower->GetModifierByType(plParticleSystem::Index())));
+
+                if (sys) {
                     sys->fMiscFlags |= plParticleSystem::kParticleSystemAlwaysUpdate;
                     sys->TranslateAllParticles(trans);
                 }
             }
         }
-    }
-    else
+    } else {
         IFinalize();
+    }
 
     return true;
 }
@@ -1649,9 +1729,10 @@ void plArmatureMod::AddTarget(plSceneObject* so)
     // all avatars will register for the age loaded message.
     // only players need it, but we don't know that we're a player until it's too late to get it.
     // non-players will unregister when they learn the truth.
-    if (IsLocallyOwned())
+    if (IsLocallyOwned()) {
         plgDispatch::Dispatch()->RegisterForExactType(plAgeLoadedMsg::Index(), GetKey());
-    
+    }
+
     // attach a clothingSDLModifier to handle clothing saveState
     delete fClothingSDLMod;
     fClothingSDLMod = new plClothingSDLModifier;
@@ -1668,28 +1749,37 @@ void plArmatureMod::AddTarget(plSceneObject* so)
     so->AddModifier(fAvatarPhysicalSDLMod);
 
     // At export time, this key will be nil. This is important, or else we'll overwrite the page the key comes from.
-    if (fFootSoundSOKey != nil)
+    if (fFootSoundSOKey != nil) {
         hsgResMgr::ResMgr()->AddViaNotify(fFootSoundSOKey, new plAttachMsg(so->GetKey(), nil, plRefMsg::kOnRequest), plRefFlags::kActiveRef);
-    if (fLinkSoundSOKey != nil)
-        hsgResMgr::ResMgr()->AddViaNotify(fLinkSoundSOKey, new plAttachMsg(so->GetKey(), nil, plRefMsg::kOnRequest), plRefFlags::kActiveRef);
+    }
 
-    if (fUpdateMsg)
-        fUpdateMsg->UnRef(); // delete an old one.
-    
-    fUpdateMsg = new plArmatureUpdateMsg(GetKey(), so->IsLocallyOwned(), true, this);       
+    if (fLinkSoundSOKey != nil) {
+        hsgResMgr::ResMgr()->AddViaNotify(fLinkSoundSOKey, new plAttachMsg(so->GetKey(), nil, plRefMsg::kOnRequest), plRefFlags::kActiveRef);
+    }
+
+    if (fUpdateMsg) {
+        fUpdateMsg->UnRef();    // delete an old one.
+    }
+
+    fUpdateMsg = new plArmatureUpdateMsg(GetKey(), so->IsLocallyOwned(), true, this);
 }
 
 void plArmatureMod::RemoveTarget(plSceneObject* so)
 {
-    if (so)
-    {
-        if (fClothingSDLMod)
+    if (so) {
+        if (fClothingSDLMod) {
             so->RemoveModifier(fClothingSDLMod);
-        if (fAvatarSDLMod)
+        }
+
+        if (fAvatarSDLMod) {
             so->RemoveModifier(fAvatarSDLMod);
-        if (fAvatarPhysicalSDLMod)
+        }
+
+        if (fAvatarPhysicalSDLMod) {
             so->RemoveModifier(fAvatarPhysicalSDLMod);
+        }
     }
+
     delete fClothingSDLMod;
     fClothingSDLMod = nil;
     delete fAvatarSDLMod;
@@ -1700,7 +1790,7 @@ void plArmatureMod::RemoveTarget(plSceneObject* so)
     plArmatureModBase::RemoveTarget(so);
 }
 
-void plArmatureMod::Write(hsStream *stream, hsResMgr *mgr)
+void plArmatureMod::Write(hsStream* stream, hsResMgr* mgr)
 {
     // Temporarily going around plArmatureModBase so that we don't
     // break format
@@ -1710,25 +1800,24 @@ void plArmatureMod::Write(hsStream *stream, hsResMgr *mgr)
     stream->WriteSafeString(fRootName);
     int nBrains = fBrains.size();
     stream->WriteLE32(nBrains);
-    for (int i = 0; i < nBrains; i++)
-        mgr->WriteCreatable(stream, fBrains[i]);
 
-    if (fClothingOutfit == nil)
-    {
-        stream->WriteBool( false );
+    for (int i = 0; i < nBrains; i++) {
+        mgr->WriteCreatable(stream, fBrains[i]);
     }
-    else
-    {
-        stream->WriteBool( true );
+
+    if (fClothingOutfit == nil) {
+        stream->WriteBool(false);
+    } else {
+        stream->WriteBool(true);
         mgr->WriteKey(stream, fClothingOutfit->GetKey());
     }
 
     stream->WriteLE32(fBodyType);
-    if( fEffects == nil )
-        stream->WriteBool( false );
-    else
-    {
-        stream->WriteBool( true );
+
+    if (fEffects == nil) {
+        stream->WriteBool(false);
+    } else {
+        stream->WriteBool(true);
         mgr->WriteKey(stream, fEffects->GetKey());
     }
 
@@ -1740,7 +1829,7 @@ void plArmatureMod::Write(hsStream *stream, hsResMgr *mgr)
     stream->WriteSafeString(fBodyFootstepSoundPage.c_str());
 }
 
-void plArmatureMod::Read(hsStream * stream, hsResMgr *mgr)
+void plArmatureMod::Read(hsStream* stream, hsResMgr* mgr)
 {
     // Temporarily going around plArmatureModBase so that we don't
     // break format
@@ -1753,37 +1842,36 @@ void plArmatureMod::Read(hsStream * stream, hsResMgr *mgr)
 
     // read in the brains
     int nBrains = stream->ReadLE32();
-    for (int i = 0; i < nBrains; i++)
-    {
-        plArmatureBrain * brain = (plArmatureBrain *)mgr->ReadCreatable(stream);
+
+    for (int i = 0; i < nBrains; i++) {
+        plArmatureBrain* brain = (plArmatureBrain*)mgr->ReadCreatable(stream);
         this->PushBrain(brain);
     }
-        
-    if( stream->ReadBool() )
-        mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1), plRefFlags::kActiveRef); // plClothingBase     
-    else
+
+    if (stream->ReadBool()) {
+        mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1), plRefFlags::kActiveRef);    // plClothingBase
+    } else {
         fClothingOutfit = nil;
+    }
 
     fBodyType = stream->ReadLE32();
 
-    if( stream->ReadBool() )
-    {
+    if (stream->ReadBool()) {
         plKey effectMgrKey = mgr->ReadKey(stream);
-        mgr->AddViaNotify(effectMgrKey, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1), plRefFlags::kActiveRef); // plArmatureEffects       
+        mgr->AddViaNotify(effectMgrKey, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, -1, -1), plRefFlags::kActiveRef); // plArmatureEffects
 
         // Attach the Footstep emitter scene object
-        hsResMgr *mgr = hsgResMgr::ResMgr();
-        const char *age = fBodyAgeName.c_str();
-        const char *page = fBodyFootstepSoundPage.c_str();
-        const plLocation &gLoc = plKeyFinder::Instance().FindLocation(age, page);
-        
-        if (gLoc.IsValid())
-        {
-            const plUoid &myUoid = GetKey()->GetUoid();
+        hsResMgr* mgr = hsgResMgr::ResMgr();
+        const char* age = fBodyAgeName.c_str();
+        const char* page = fBodyFootstepSoundPage.c_str();
+        const plLocation& gLoc = plKeyFinder::Instance().FindLocation(age, page);
+
+        if (gLoc.IsValid()) {
+            const plUoid& myUoid = GetKey()->GetUoid();
             plUoid SOUoid(gLoc, plSceneObject::Index(), "FootstepSoundObject");
             fFootSoundSOKey = mgr->FindKey(SOUoid);
-            if (fFootSoundSOKey)
-            {
+
+            if (fFootSoundSOKey) {
                 // So it exists... but FindKey won't properly create our clone. So we do.
                 SOUoid.SetClone(myUoid.GetClonePlayerID(), myUoid.GetCloneID());
                 fFootSoundSOKey = mgr->ReRegister(plString::Null, SOUoid);
@@ -1792,59 +1880,62 @@ void plArmatureMod::Read(hsStream * stream, hsResMgr *mgr)
             // Add the effect to our effects manager
             plUoid effectUoid(gLoc, plArmatureEffectFootSound::Index(), "FootstepSounds");
             plKey effectKey = mgr->FindKey(effectUoid);
-            if (effectKey)
-            {
+
+            if (effectKey) {
                 effectUoid.SetClone(myUoid.GetClonePlayerID(), myUoid.GetCloneID());
                 effectKey = mgr->ReRegister(plString::Null, effectUoid);
             }
-            if (effectKey != nil)
+
+            if (effectKey != nil) {
                 mgr->AddViaNotify(effectKey, new plGenRefMsg(effectMgrKey, plRefMsg::kOnCreate, -1, -1), plRefFlags::kActiveRef);
+            }
 
             // Get the linking sound
             plUoid LinkUoid(gLoc, plSceneObject::Index(), "LinkSoundSource");
             fLinkSoundSOKey = mgr->FindKey(LinkUoid);
-            if (fLinkSoundSOKey)
-            {
+
+            if (fLinkSoundSOKey) {
                 LinkUoid.SetClone(myUoid.GetClonePlayerID(), myUoid.GetCloneID());
                 fLinkSoundSOKey = mgr->ReRegister(plString::Null, LinkUoid);
             }
         }
-    }
-    else
+    } else {
         fEffects = nil;
+    }
 
     fPhysHeight = stream->ReadLEFloat();
     fPhysWidth = stream->ReadLEFloat();
 
     fAnimationPrefix = stream->ReadSafeString_TEMP();
 
-    char *temp = stream->ReadSafeString();
+    char* temp = stream->ReadSafeString();
     fBodyAgeName = temp;
     delete [] temp;
 
     temp = stream->ReadSafeString();
     fBodyFootstepSoundPage = temp;
     delete [] temp;
-    
+
     plgDispatch::Dispatch()->RegisterForExactType(plAvatarStealthModeMsg::Index(), GetKey());
 }
 
 bool plArmatureMod::DirtySynchState(const char* SDLStateName, uint32_t synchFlags)
 {
     // skip requests to synch non-avatar state
-    if (SDLStateName && stricmp(SDLStateName, kSDLAvatar))
-    {
+    if (SDLStateName && stricmp(SDLStateName, kSDLAvatar)) {
         return false;
     }
-    
+
     synchFlags |= plSynchedObject::kForceFullSend;  // TEMP
-    
-    if(GetNumTargets() > 0)
-    {
-        plSceneObject *sObj = GetTarget(0);
-        if(sObj) 
+
+    if (GetNumTargets() > 0) {
+        plSceneObject* sObj = GetTarget(0);
+
+        if (sObj) {
             sObj->DirtySynchState(SDLStateName, synchFlags);
+        }
     }
+
     return false;
 }
 
@@ -1852,40 +1943,39 @@ bool plArmatureMod::DirtyPhysicalSynchState(uint32_t synchFlags)
 {
     synchFlags |= plSynchedObject::kForceFullSend;  // TEMP
     synchFlags |= plSynchedObject::kBCastToClients;
-    
-    if(GetNumTargets() > 0)
-    {
-        plSceneObject *sObj = GetTarget(0);
-        if(sObj)
+
+    if (GetNumTargets() > 0) {
+        plSceneObject* sObj = GetTarget(0);
+
+        if (sObj) {
             sObj->DirtySynchState(kSDLAvatarPhysical, synchFlags);
+        }
     }
+
     return false;
 }
 
 void plArmatureMod::IFinalize()
 {
     plArmatureModBase::IFinalize();
-    
-    if (fWaitFlags & kNeedAudio)
-    {
-        plSetListenerMsg *msg = new plSetListenerMsg( plSetListenerMsg::kVelocity, GetTarget(0)->GetKey(), true );
+
+    if (fWaitFlags & kNeedAudio) {
+        plSetListenerMsg* msg = new plSetListenerMsg(plSetListenerMsg::kVelocity, GetTarget(0)->GetKey(), true);
         msg->Send();
         fWaitFlags &= ~kNeedAudio;
     }
-    
-    if (fWaitFlags & kNeedCamera)
-    {
+
+    if (fWaitFlags & kNeedCamera) {
         plCameraMsg* pMsg = new plCameraMsg;
         pMsg->SetCmd(plCameraMsg::kCreateNewDefaultCam);
         pMsg->SetCmd(plCameraMsg::kSetSubject);
         pMsg->SetSubject(GetTarget(0));
-        pMsg->SetBCastFlag( plMessage::kBCastByExactType );
+        pMsg->SetBCastFlag(plMessage::kBCastByExactType);
         pMsg->Send();
         fWaitFlags &= ~kNeedCamera;
-    }   
+    }
 
-    if (fWaitFlags & kNeedSpawn)
-    {
+    if (fWaitFlags & kNeedSpawn) {
         Spawn(hsTimer::GetSysSeconds());
         fWaitFlags &= ~kNeedSpawn;
     }
@@ -1895,32 +1985,34 @@ void plArmatureMod::ICustomizeApplicator()
 {
     plArmatureModBase::ICustomizeApplicator();
 
-    const plAGModifier *agMod = GetChannelMod("Bone_Root", true);
-    if (agMod)
-    {
+    const plAGModifier* agMod = GetChannelMod("Bone_Root", true);
+
+    if (agMod) {
         // are there any applicators that manipulate the transform?
-        plAGApplicator *app = agMod->GetApplicator(kAGPinTransform);
-        if(app)
-        {
-            plMatrixDelayedCorrectionApplicator *corApp = plMatrixDelayedCorrectionApplicator::ConvertNoRef(app);
-            if (corApp)
-            {
+        plAGApplicator* app = agMod->GetApplicator(kAGPinTransform);
+
+        if (app) {
+            plMatrixDelayedCorrectionApplicator* corApp = plMatrixDelayedCorrectionApplicator::ConvertNoRef(app);
+
+            if (corApp) {
                 fBoneRootAnimator = corApp;
                 fWaitFlags &= ~kNeedApplicator;
                 return; // already there
             }
         }
-        plAGModifier *volAGMod = const_cast<plAGModifier *>(agMod);
+
+        plAGModifier* volAGMod = const_cast<plAGModifier*>(agMod);
         fBoneRootAnimator = new plMatrixDelayedCorrectionApplicator();
         volAGMod->SetApplicator(fBoneRootAnimator);
         fWaitFlags &= ~kNeedApplicator;
-    }       
-}   
+    }
+}
 
-const plSceneObject *plArmatureMod::GetClothingSO(uint8_t lod) const 
+const plSceneObject* plArmatureMod::GetClothingSO(uint8_t lod) const
 {
-    if (fClothToSOMap.GetCount() <= lod)
+    if (fClothToSOMap.GetCount() <= lod) {
         return nil;
+    }
 
     return fClothToSOMap[lod];
 }
@@ -1929,19 +2021,21 @@ const plSceneObject *plArmatureMod::GetClothingSO(uint8_t lod) const
 
 void plArmatureMod::NetworkSynch(double timeNow, int force)
 {
-    if (force || ((timeNow - fLastSynch) > kSynchInterval))
-    {
+    if (force || ((timeNow - fLastSynch) > kSynchInterval)) {
         // make sure state change gets sent out over the network
         // avatar state should use relevance region filtering
         uint32_t flags = kBCastToClients | kUseRelevanceRegions;
-        if (force)
+
+        if (force) {
             flags |= kForceFullSend;
+        }
+
         DirtyPhysicalSynchState(flags);
         fLastSynch = timeNow;
         fPendingSynch = false;
-    }
-    else
+    } else {
         fPendingSynch = true;
+    }
 }
 
 bool plArmatureMod::IsLocalAvatar()
@@ -1959,120 +2053,118 @@ bool plArmatureMod::IsLocalAI()
 
 void plArmatureMod::SynchIfLocal(double timeNow, int force)
 {
-    if (IsLocalAvatar() || IsLocalAI())
-    {
+    if (IsLocalAvatar() || IsLocalAI()) {
         NetworkSynch(timeNow, force);
     }
 }
 
-plLayerLinkAnimation *plArmatureMod::IFindLayerLinkAnim()
+plLayerLinkAnimation* plArmatureMod::IFindLayerLinkAnim()
 {
     int i;
-    hsGMaterial *mat = fClothingOutfit->fMaterial;
-    if (!mat)
-        return nil;
+    hsGMaterial* mat = fClothingOutfit->fMaterial;
 
-    for (i = 0; i < mat->GetNumLayers(); i++)
-    {
-        plLayerInterface *li = mat->GetLayer(i);
-        while (li != nil)
-        {
-            plLayerLinkAnimation *anim = plLayerLinkAnimation::ConvertNoRef(li);
-            if (anim)
+    if (!mat) {
+        return nil;
+    }
+
+    for (i = 0; i < mat->GetNumLayers(); i++) {
+        plLayerInterface* li = mat->GetLayer(i);
+
+        while (li != nil) {
+            plLayerLinkAnimation* anim = plLayerLinkAnimation::ConvertNoRef(li);
+
+            if (anim) {
                 return anim;
+            }
 
             li = li->GetUnderLay();
         }
     }
+
     return nil;
 }
 
 bool plArmatureMod::ValidatePhysics()
 {
-    if (!fTarget)
+    if (!fTarget) {
         return false;
+    }
 
-    if (!fController)
-    {
+    if (!fController) {
         // The kinematic actor is made taller if the avatar is human (male or female)
         fController = plPhysicalControllerCore::Create(GetTarget(0)->GetKey(), fPhysHeight,
                       fPhysWidth, (fBodyType == kBoneBaseMale || fBodyType == kBoneBaseFemale));
     }
 
-    if (fController)
-    {
-        if (GetTarget(0)->GetKey() == plNetClientApp::GetInstance()->GetLocalPlayerKey())
-        {
+    if (fController) {
+        if (GetTarget(0)->GetKey() == plNetClientApp::GetInstance()->GetLocalPlayerKey()) {
             // local avatars get added to a special LOS db just for them.
             fController->SetLOSDB(plSimDefs::kLOSDBLocalAvatar);
-        }
-        else
-        {
+        } else {
             // non-local avatars are in the same LOS db as clickables
             fController->SetLOSDB(plSimDefs::kLOSDBUIItems);
         }
 
         hsClearBits(fWaitFlags, kNeedPhysics);
         return true;
-    }
-    else
-    {
+    } else {
         return false;
     }
-    
+
 }
 
 bool plArmatureMod::ValidateMesh()
 {
-    if (fWaitFlags & kNeedMesh)
-    {
+    if (fWaitFlags & kNeedMesh) {
         fWaitFlags &= ~kNeedMesh;
         int n = fMeshKeys.size();
-        
-        for(int i = 0; i < n; i++)
-        {
+
+        for (int i = 0; i < n; i++) {
             plKey meshKey = fMeshKeys[i];
-            plSceneObject * meshObj = (plSceneObject *)meshKey->GetObjectPtr();
-            
-            if( ! meshObj)
-            {
+            plSceneObject* meshObj = (plSceneObject*)meshKey->GetObjectPtr();
+
+            if (! meshObj) {
                 fWaitFlags |= kNeedMesh;
                 break;
             }
+
             bool visible = (i == fCurLOD) ? true : false;
-            
+
             EnableDrawingTree(meshObj, visible);
-            
+
             // If we haven't created the mapping yet...
-            if (fClothToSOMap.GetCount() <= i || fClothToSOMap[i] == nil)
-            {
-                plGenRefMsg *refMsg = new plGenRefMsg(GetKey(), plRefMsg::kOnRequest, i, 0);
-                hsgResMgr::ResMgr()->SendRef(meshObj->GetKey(), refMsg, plRefFlags::kPassiveRef); 
+            if (fClothToSOMap.GetCount() <= i || fClothToSOMap[i] == nil) {
+                plGenRefMsg* refMsg = new plGenRefMsg(GetKey(), plRefMsg::kOnRequest, i, 0);
+                hsgResMgr::ResMgr()->SendRef(meshObj->GetKey(), refMsg, plRefFlags::kPassiveRef);
             }
         }
-        if (!GetTarget(0)->GetKeyName().Compare("Yeesha"))
+
+        if (!GetTarget(0)->GetKeyName().Compare("Yeesha")) {
             ISetTransparentDrawOrder(true);
-        else
+        } else {
             ISetTransparentDrawOrder(false);
+        }
     }
-        
+
     return !(fWaitFlags & kNeedMesh);
 }
 
-plArmatureBrain * plArmatureMod::GetNextBrain(plArmatureBrain *brain)
+plArmatureBrain* plArmatureMod::GetNextBrain(plArmatureBrain* brain)
 {
-    plArmatureBrain * result = nil;
+    plArmatureBrain* result = nil;
     bool passedTarget = false;
 
     int count = fBrains.size();
-    for(int i = count - 1; i >= 0; i--)
-    {
-        plArmatureBrain *curBrain = fBrains.at(i);
-        if(passedTarget)
+
+    for (int i = count - 1; i >= 0; i--) {
+        plArmatureBrain* curBrain = fBrains.at(i);
+
+        if (passedTarget) {
             result = curBrain;
-        else {
-            if(curBrain == brain)
+        } else {
+            if (curBrain == brain) {
                 passedTarget = true;
+            }
         }
     }
 
@@ -2084,33 +2176,33 @@ int plArmatureMod::GetBrainCount()
     return fBrains.size();
 }
 
-plArmatureBrain * plArmatureMod::FindBrainByClass(uint32_t classID) const
+plArmatureBrain* plArmatureMod::FindBrainByClass(uint32_t classID) const
 {
     int n = fBrains.size();
 
-    for(int i = 0; i < n; i++)
-    {
-        plArmatureBrain *brain = fBrains.at(i);
+    for (int i = 0; i < n; i++) {
+        plArmatureBrain* brain = fBrains.at(i);
 
-        if(brain->ClassIndex() == classID)
-        {
+        if (brain->ClassIndex() == classID) {
             return brain;
         }
     }
+
     return nil;
 }
 
-void plArmatureMod::TurnToPoint(hsPoint3 &point)
+void plArmatureMod::TurnToPoint(hsPoint3& point)
 {
-    plAvBrainHuman *brain = plAvBrainHuman::ConvertNoRef(FindBrainByClass(plAvBrainHuman::Index()));
-    if (brain)
+    plAvBrainHuman* brain = plAvBrainHuman::ConvertNoRef(FindBrainByClass(plAvBrainHuman::Index()));
+
+    if (brain) {
         brain->TurnToPoint(point);
+    }
 }
 
 void plArmatureMod::SuspendInput()
 {
-    if (fSuspendInputCount == 0 && plNetClientApp::GetInstance()->GetLocalPlayer() == GetTarget(0))
-    {
+    if (fSuspendInputCount == 0 && plNetClientApp::GetInstance()->GetLocalPlayer() == GetTarget(0)) {
         plAvatarInputInterface::GetInstance()->SuspendMouseMovement();
         PreserveInputState();
         ClearInputFlags(false, false);
@@ -2121,14 +2213,17 @@ void plArmatureMod::SuspendInput()
 
 void plArmatureMod::ResumeInput()
 {
-    if (fSuspendInputCount > 0) // decrementing an unsigned variable set to 0 is BAD
+    if (fSuspendInputCount > 0) { // decrementing an unsigned variable set to 0 is BAD
         fSuspendInputCount--;
-    if(fSuspendInputCount == 0)
-    {
+    }
+
+    if (fSuspendInputCount == 0) {
         RestoreInputState();
         IProcessQueuedInput();
-        if (plNetClientApp::GetInstance()->GetLocalPlayer() == GetTarget(0))
-            plAvatarInputInterface::GetInstance()->EnableMouseMovement();       
+
+        if (plNetClientApp::GetInstance()->GetLocalPlayer() == GetTarget(0)) {
+            plAvatarInputInterface::GetInstance()->EnableMouseMovement();
+        }
     }
 }
 
@@ -2136,14 +2231,15 @@ void plArmatureMod::IProcessQueuedInput()
 {
     CtrlMessageVec::iterator i = fQueuedCtrlMessages.begin();
     CtrlMessageVec::iterator end = fQueuedCtrlMessages.end();
-    while(i != end)
-    {
-        plControlEventMsg *ctrlMsg = *i;
+
+    while (i != end) {
+        plControlEventMsg* ctrlMsg = *i;
         IHandleControlMsg(ctrlMsg);
         ctrlMsg->UnRef();
         (*i) = nil;
         i++;
     }
+
     fQueuedCtrlMessages.clear();
 }
 
@@ -2158,15 +2254,14 @@ void plArmatureMod::RestoreInputState()
 
 }
 
-bool plArmatureMod::GetInputFlag (int which) const
+bool plArmatureMod::GetInputFlag(int which) const
 {
     return fMoveFlags.IsBitSet(which);
 }
 
 void plArmatureMod::SetInputFlag(int which, bool status)
 {
-    if(status)
-    {
+    if (status) {
         fMoveFlags.SetBit(which);
     } else {
         fMoveFlags.ClearBit(which);
@@ -2282,36 +2377,42 @@ float plArmatureMod::GetTurnStrength() const
 
 float plArmatureMod::GetKeyTurnStrength() const
 {
-    if (StrafeKeyDown())
-        return 0.f; 
+    if (StrafeKeyDown()) {
+        return 0.f;
+    }
 
-    return (TurnLeftKeyDown() ? 1.f : 0.f) + (TurnRightKeyDown() ? -1.f: 0.f);
+    return (TurnLeftKeyDown() ? 1.f : 0.f) + (TurnRightKeyDown() ? -1.f : 0.f);
 }
 
 float plArmatureMod::GetAnalogTurnStrength() const
 {
-    if (StrafeKeyDown())
+    if (StrafeKeyDown()) {
         return 0.f;
+    }
 
     float elapsed = hsTimer::GetDelSysSeconds();
-    if (elapsed > 0)
+
+    if (elapsed > 0) {
         return fMouseFrameTurnStrength / elapsed;
-    else
+    } else {
         return 0;
-}   
+    }
+}
 
 void plArmatureMod::SetReverseFBOnIdle(bool val)
 {
     fReverseFBOnIdle = val;
-    if (val)
+
+    if (val) {
         SetInputFlag(B_CONTROL_LADDER_INVERTED, !(ForwardKeyDown() || BackwardKeyDown()));
-    else
+    } else {
         SetInputFlag(B_CONTROL_LADDER_INVERTED, false);
+    }
 }
-        
+
 bool plArmatureMod::IsFBReversed()
-{ 
-    return GetInputFlag(B_CONTROL_LADDER_INVERTED); 
+{
+    return GetInputFlag(B_CONTROL_LADDER_INVERTED);
 }
 
 void plArmatureMod::ClearInputFlags(bool saveAlwaysRun, bool clearBackup)
@@ -2320,39 +2421,42 @@ void plArmatureMod::ClearInputFlags(bool saveAlwaysRun, bool clearBackup)
     bool fast = (fMoveFlags.IsBitSet(B_CONTROL_MODIFIER_FAST) != 0);
     fMoveFlags.Clear();
 
-    if (saveAlwaysRun)
-    {
-        if (alwaysRun)
+    if (saveAlwaysRun) {
+        if (alwaysRun) {
             fMoveFlags.SetBit(B_CONTROL_ALWAYS_RUN);
-        if (fast)
+        }
+
+        if (fast) {
             fMoveFlags.SetBit(B_CONTROL_MODIFIER_FAST);
+        }
     }
 
-    if (clearBackup)
-    {
+    if (clearBackup) {
         alwaysRun = (fMoveFlagsBackup.IsBitSet(B_CONTROL_ALWAYS_RUN) != 0);
         fast = (fMoveFlagsBackup.IsBitSet(B_CONTROL_MODIFIER_FAST) != 0);
         fMoveFlagsBackup.Clear();
 
-        if (saveAlwaysRun)
-        {
-            if (alwaysRun)
+        if (saveAlwaysRun) {
+            if (alwaysRun) {
                 fMoveFlagsBackup.SetBit(B_CONTROL_ALWAYS_RUN);
-            if (fast)
+            }
+
+            if (fast) {
                 fMoveFlagsBackup.SetBit(B_CONTROL_MODIFIER_FAST);
+            }
         }
     }
 }
 
-plAGModifier * plArmatureMod::GetRootAGMod()
+plAGModifier* plArmatureMod::GetRootAGMod()
 {
-    if(fRootAGMod)
+    if (fRootAGMod) {
         return fRootAGMod;
+    }
 
-    if(fTarget)
-    {
-        const plAGModifier * shit = plAGModifier::ConvertNoRef(FindModifierByClass(fTarget, plAGModifier::Index()));
-        fRootAGMod = const_cast<plAGModifier *>(shit);
+    if (fTarget) {
+        const plAGModifier* shit = plAGModifier::ConvertNoRef(FindModifierByClass(fTarget, plAGModifier::Index()));
+        fRootAGMod = const_cast<plAGModifier*>(shit);
     }
 
     return fRootAGMod;
@@ -2360,23 +2464,27 @@ plAGModifier * plArmatureMod::GetRootAGMod()
 
 int plArmatureMod::GetCurrentGenericType()
 {
-    plAvBrainGeneric *brain = plAvBrainGeneric::ConvertNoRef(GetCurrentBrain());
+    plAvBrainGeneric* brain = plAvBrainGeneric::ConvertNoRef(GetCurrentBrain());
 
-    if (!brain)
+    if (!brain) {
         return plAvBrainGeneric::kNonGeneric;
-    else
+    } else {
         return brain->GetType();
+    }
 }
 
-bool plArmatureMod::FindMatchingGenericBrain(const char *names[], int count)
+bool plArmatureMod::FindMatchingGenericBrain(const char* names[], int count)
 {
     int i;
-    for (i = 0; i < GetBrainCount(); i++)
-    {
-        plAvBrainGeneric *brain = plAvBrainGeneric::ConvertNoRef(GetBrain(i));
-        if (brain && brain->MatchAnimNames(names, count))
+
+    for (i = 0; i < GetBrainCount(); i++) {
+        plAvBrainGeneric* brain = plAvBrainGeneric::ConvertNoRef(GetBrain(i));
+
+        if (brain && brain->MatchAnimNames(names, count)) {
             return true;
+        }
     }
+
     return false;
 }
 
@@ -2390,45 +2498,46 @@ plString plArmatureMod::GetRootName()
     return fRootName;
 }
 
-void plArmatureMod::SetRootName(const plString &name)
+void plArmatureMod::SetRootName(const plString& name)
 {
     fRootName = name;
 }
 
-plAGAnim *plArmatureMod::FindCustomAnim(const plString& baseName) const
+plAGAnim* plArmatureMod::FindCustomAnim(const plString& baseName) const
 {
     plString customName = MakeAnimationName(baseName);
-    plAGAnim *result = plAGAnim::FindAnim(customName);
+    plAGAnim* result = plAGAnim::FindAnim(customName);
     return result;
 }
 
-void plArmatureMod::ISetupMarkerCallbacks(plATCAnim *anim, plAnimTimeConvert *atc)
+void plArmatureMod::ISetupMarkerCallbacks(plATCAnim* anim, plAnimTimeConvert* atc)
 {
     std::vector<plString> markers;
     anim->CopyMarkerNames(markers);
 
     int i;
-    for (i = 0; i < markers.size(); i++)
-    {
-        
+
+    for (i = 0; i < markers.size(); i++) {
+
         float time = -1;
         bool isLeft = false;
-        if (markers[i].Find("SndLeftFootDown") == 0)
-        {
-            isLeft = true;      
+
+        if (markers[i].Find("SndLeftFootDown") == 0) {
+            isLeft = true;
             time = anim->GetMarker(markers[i]);
         }
-        if (markers[i].Find("SndRightFootDown") == 0)
+
+        if (markers[i].Find("SndRightFootDown") == 0) {
             time = anim->GetMarker(markers[i]);
+        }
 
-        if (time >= 0)
-        {
-            plEventCallbackInterceptMsg *iMsg;
+        if (time >= 0) {
+            plEventCallbackInterceptMsg* iMsg;
 
-            plArmatureEffectMsg *msg = new plArmatureEffectMsg(fEffects->GetKey(), kTime);
+            plArmatureEffectMsg* msg = new plArmatureEffectMsg(fEffects->GetKey(), kTime);
             msg->fEventTime = time;
             msg->fTriggerIdx = AnimNameToIndex(anim->GetName());
-            
+
             iMsg = new plEventCallbackInterceptMsg();
             iMsg->AddReceiver(fEffects->GetKey());
             iMsg->fEventTime = time;
@@ -2453,42 +2562,43 @@ void plArmatureMod::ISetupMarkerCallbacks(plATCAnim *anim, plAnimTimeConvert *at
     }
 }
 
-plString plArmatureMod::GetAnimRootName(const plString &name)
+plString plArmatureMod::GetAnimRootName(const plString& name)
 {
     return name.Substr(fAnimationPrefix.GetSize());
 }
 
-int8_t plArmatureMod::AnimNameToIndex(const plString &name)
+int8_t plArmatureMod::AnimNameToIndex(const plString& name)
 {
     plString rootName = GetAnimRootName(name);
     int8_t result = -1;
-    
+
     if (!rootName.Compare("Walk") || !rootName.Compare("WalkBack") ||
-        !rootName.Compare("LadderDown") || !rootName.Compare("LadderDownOn") ||
-        !rootName.Compare("LadderDownOff") || !rootName.Compare("LadderUp") ||
-        !rootName.Compare("LadderUpOn") || !rootName.Compare("LadderUpOff") ||
-        !rootName.Compare("SwimSlow") || !rootName.Compare("SwimBackward") ||
-        !rootName.Compare("BallPushWalk"))
+            !rootName.Compare("LadderDown") || !rootName.Compare("LadderDownOn") ||
+            !rootName.Compare("LadderDownOff") || !rootName.Compare("LadderUp") ||
+            !rootName.Compare("LadderUpOn") || !rootName.Compare("LadderUpOff") ||
+            !rootName.Compare("SwimSlow") || !rootName.Compare("SwimBackward") ||
+            !rootName.Compare("BallPushWalk")) {
         result = kWalk;
-    else if (!rootName.Compare("Run") || !rootName.Compare("SwimFast"))
+    } else if (!rootName.Compare("Run") || !rootName.Compare("SwimFast")) {
         result = kRun;
-    else if (!rootName.Compare("TurnLeft") || !rootName.Compare("TurnRight") ||
-             !rootName.Compare("StepLeft") || !rootName.Compare("StepRight") ||
-             !rootName.Compare("SideSwimLeft") || !rootName.Compare("SideSwimRight") ||
-             !rootName.Compare("TreadWaterTurnLeft") || !rootName.Compare("TreadWaterTurnRight"))
+    } else if (!rootName.Compare("TurnLeft") || !rootName.Compare("TurnRight") ||
+               !rootName.Compare("StepLeft") || !rootName.Compare("StepRight") ||
+               !rootName.Compare("SideSwimLeft") || !rootName.Compare("SideSwimRight") ||
+               !rootName.Compare("TreadWaterTurnLeft") || !rootName.Compare("TreadWaterTurnRight")) {
         result = kTurn;
-    else if (!rootName.Compare("GroundImpact") || !rootName.Compare("RunningImpact"))
+    } else if (!rootName.Compare("GroundImpact") || !rootName.Compare("RunningImpact")) {
         result = kImpact;
-    else if (rootName.Find("Run") >= 0) // Critters
+    } else if (rootName.Find("Run") >= 0) { // Critters
         result = kRun;
-    else if (rootName.Find("Idle") >= 0) // Critters
+    } else if (rootName.Find("Idle") >= 0) { // Critters
         result = kWalk;
-        
+    }
+
     return result;
 }
 
-bool plArmatureMod::IsInStealthMode() const 
-{ 
+bool plArmatureMod::IsInStealthMode() const
+{
     return (fStealthMode != plAvatarStealthModeMsg::kStealthVisible);
 }
 
@@ -2509,8 +2619,9 @@ bool plArmatureMod::IsLinkedIn()
 
 bool plArmatureMod::ConsumeJump()
 {
-    if (!GetInputFlag(B_CONTROL_CONSUMABLE_JUMP))
+    if (!GetInputFlag(B_CONTROL_CONSUMABLE_JUMP)) {
         return false;
+    }
 
     SetInputFlag(B_CONTROL_CONSUMABLE_JUMP, false);
     return true;
@@ -2518,35 +2629,35 @@ bool plArmatureMod::ConsumeJump()
 
 void plArmatureMod::ISetTransparentDrawOrder(bool val)
 {
-    if (fOpaque != val)
+    if (fOpaque != val) {
         return;
+    }
 
     fOpaque = !val;
 
-    plDrawableSpans *spans = plDrawableSpans::ConvertNoRef(FindDrawable());
-    if (spans)
-    {
+    plDrawableSpans* spans = plDrawableSpans::ConvertNoRef(FindDrawable());
+
+    if (spans) {
         spans->SetNativeProperty(plDrawable::kPropPartialSort, true);
         spans->SetNativeProperty(plDrawable::kPropSortAsOne, true);
-        if (val)
-        {
+
+        if (val) {
             spans->SetNativeProperty(plDrawable::kPropSortSpans, true);
             spans->SetRenderLevel(plRenderLevel(plRenderLevel::kBlendRendMajorLevel, plRenderLevel::kDefRendMinorLevel));
-        }
-        else
-        {
+        } else {
             spans->SetNativeProperty(plDrawable::kPropSortSpans, false);
-            spans->SetRenderLevel(plRenderLevel(0, plRenderLevel::kAvatarRendMinorLevel));          
+            spans->SetRenderLevel(plRenderLevel(0, plRenderLevel::kAvatarRendMinorLevel));
         }
     }
 }
 
 bool plArmatureMod::IsKILowestLevel()
 {
-    if ( GetKILevel() == pfKIMsg::kNanoKI )
+    if (GetKILevel() == pfKIMsg::kNanoKI) {
         return true;
-    else
+    } else {
         return false;
+    }
 }
 
 int  plArmatureMod::GetKILevel()
@@ -2554,15 +2665,14 @@ int  plArmatureMod::GetKILevel()
     return VaultGetKILevel();
 }
 
-void plArmatureMod::SetLinkInAnim(const char *animName)
+void plArmatureMod::SetLinkInAnim(const char* animName)
 {
-    if (animName)
-    {
-        plAGAnim *anim = FindCustomAnim(animName);
+    if (animName) {
+        plAGAnim* anim = FindCustomAnim(animName);
         fLinkInAnimKey = (anim ? anim->GetKey() : nil);
-    }
-    else
+    } else {
         fLinkInAnimKey = nil;
+    }
 }
 
 plKey plArmatureMod::GetLinkInAnimKey() const
@@ -2583,7 +2693,7 @@ plArmatureLODMod::plArmatureLODMod()
 
 // CTOR (physical, name)
 plArmatureLODMod::plArmatureLODMod(const plString& root_name)
-: plArmatureMod()
+    : plArmatureMod()
 {
     fRootName = root_name;
 }
@@ -2592,42 +2702,46 @@ plArmatureLODMod::~plArmatureLODMod()
 {
 }
 
-void plArmatureLODMod::Read(hsStream *stream, hsResMgr *mgr)
+void plArmatureLODMod::Read(hsStream* stream, hsResMgr* mgr)
 {
     plArmatureMod::Read(stream, mgr);
 
     fMeshKeys.clear();
     int meshKeyCount = stream->ReadLE32();
-    for(int i = 0; i < meshKeyCount; i++)
-    {
+
+    for (int i = 0; i < meshKeyCount; i++) {
         plKey meshKey = mgr->ReadKey(stream);
         fMeshKeys.push_back(meshKey);
-        
-        plKeyVector *vec = new plKeyVector;
+
+        plKeyVector* vec = new plKeyVector;
         int boneCount = stream->ReadLE32();
-        for(int j = 0; j < boneCount; j++)
+
+        for (int j = 0; j < boneCount; j++) {
             vec->push_back(mgr->ReadKey(stream));
+        }
+
         fUnusedBones.push_back(vec);
     }
 }
 
 // WRITE
-void plArmatureLODMod::Write(hsStream *stream, hsResMgr *mgr)
+void plArmatureLODMod::Write(hsStream* stream, hsResMgr* mgr)
 {
     plArmatureMod::Write(stream, mgr);
-    
+
     int meshKeyCount = fMeshKeys.size();
     stream->WriteLE32(meshKeyCount);
-    
-    for(int i = 0; i < meshKeyCount; i++)
-    {
+
+    for (int i = 0; i < meshKeyCount; i++) {
         plKey meshKey = fMeshKeys[i];
         mgr->WriteKey(stream, meshKey);
-        
+
         // Should be a list per mesh key
         stream->WriteLE32(fUnusedBones[i]->size());
-        for(int j = 0; j < fUnusedBones[i]->size(); j++)
+
+        for (int j = 0; j < fUnusedBones[i]->size(); j++) {
             mgr->WriteKey(stream, (*fUnusedBones[i])[j]);
+        }
     }
 }
 
@@ -2641,12 +2755,12 @@ void plArmatureLODMod::Write(hsStream *stream, hsResMgr *mgr)
 
 int plArmatureMod::RefreshDebugDisplay()
 {
-    plDebugText     &debugTxt = plDebugText::Instance();
+    plDebugText&     debugTxt = plDebugText::Instance();
     char            strBuf[ 2048 ];
     int             lineHeight = debugTxt.GetFontSize() + 4;
     uint32_t          scrnWidth, scrnHeight;
 
-    debugTxt.GetScreenSize( &scrnWidth, &scrnHeight );
+    debugTxt.GetScreenSize(&scrnWidth, &scrnHeight);
     int y = 10;
     int x = 10;
 
@@ -2654,48 +2768,51 @@ int plArmatureMod::RefreshDebugDisplay()
     return y;
 }
 
-void plArmatureMod::DumpToDebugDisplay(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt)
+void plArmatureMod::DumpToDebugDisplay(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt)
 {
     sprintf(strBuf, "Armature <%s>:", fRootName.c_str());
     debugTxt.DrawString(x, y, strBuf, 255, 128, 128);
     y += lineHeight;
 
-    plSceneObject * SO = GetTarget(0);
-    if(SO)
-    {
+    plSceneObject* SO = GetTarget(0);
+
+    if (SO) {
         // global location
         hsMatrix44  l2w = SO->GetLocalToWorld();
         hsPoint3 worldPos = l2w.GetTranslate();
 
-        const char *opaque = IsOpaque() ? "yes" : "no"; 
-        sprintf(strBuf, "position(world): %.2f, %.2f, %.2f Opaque: %3s", 
+        const char* opaque = IsOpaque() ? "yes" : "no";
+        sprintf(strBuf, "position(world): %.2f, %.2f, %.2f Opaque: %3s",
                 worldPos.fX, worldPos.fY, worldPos.fZ, opaque);
         debugTxt.DrawString(x, y, strBuf);
         y += lineHeight;
 
         const char* frozen = "n.a.";
-        if (fController)
+
+        if (fController) {
             frozen = fController->IsEnabled() ? "no" : "yes";
+        }
 
         // are we in a subworld?
         plKey world = nil;
-        if (fController)
-            world = fController->GetSubworld();
-        sprintf(strBuf, "In world: %s  Frozen: %s", world ? world->GetName().c_str() : "nil", frozen);
-        debugTxt.DrawString(x,y, strBuf);
-        y+= lineHeight;
 
-        if (fController)
-        {
+        if (fController) {
+            world = fController->GetSubworld();
+        }
+
+        sprintf(strBuf, "In world: %s  Frozen: %s", world ? world->GetName().c_str() : "nil", frozen);
+        debugTxt.DrawString(x, y, strBuf);
+        y += lineHeight;
+
+        if (fController) {
             hsPoint3 physPos;
             GetPositionAndRotationSim(&physPos, nil);
             const hsVector3& vel = fController->GetLinearVelocity();
             sprintf(strBuf, "position(physical): <%.2f, %.2f, %.2f> velocity: <%5.2f, %5.2f, %5.2f>", physPos.fX, physPos.fY, physPos.fZ, vel.fX, vel.fY, vel.fZ);
-        }
-        else
-        {
+        } else {
             sprintf(strBuf, "position(physical): no controller");
         }
+
         debugTxt.DrawString(x, y, strBuf);
         y += lineHeight;
     }
@@ -2703,48 +2820,47 @@ void plArmatureMod::DumpToDebugDisplay(int &x, int &y, int lineHeight, char *str
     DebugDumpMoveKeys(x, y, lineHeight, strBuf, debugTxt);
 
     int i;
-    for(i = 0; i < fBrains.size(); i++)
-    {
-        plArmatureBrain *brain = fBrains[i];
+
+    for (i = 0; i < fBrains.size(); i++) {
+        plArmatureBrain* brain = fBrains[i];
         brain->DumpToDebugDisplay(x, y, lineHeight, strBuf, debugTxt);
     }
-    
-    if (fClothingOutfit)
-    {
+
+    if (fClothingOutfit) {
         y += lineHeight;
 
         debugTxt.DrawString(x, y, "ItemsWorn:");
         y += lineHeight;
         strBuf[0] = '\0';
-        int itemCount = 0; 
-        for (i = 0; i < fClothingOutfit->fItems.GetCount(); i++)
-        {
-            if (itemCount == 0)
+        int itemCount = 0;
+
+        for (i = 0; i < fClothingOutfit->fItems.GetCount(); i++) {
+            if (itemCount == 0) {
                 strcat(strBuf, "    ");
+            }
 
             strcat(strBuf, fClothingOutfit->fItems[i]->fName);
             itemCount++;
 
-            if (itemCount == 4)
-            {
+            if (itemCount == 4) {
                 debugTxt.DrawString(x, y, strBuf);
                 itemCount = 0;
                 strBuf[0] = '\0';
                 y += lineHeight;
             }
 
-            if (itemCount > 0)
+            if (itemCount > 0) {
                 strcat(strBuf, ", ");
+            }
         }
-        if (itemCount > 0)
-        {
+
+        if (itemCount > 0) {
             debugTxt.DrawString(x, y, strBuf);
             y += lineHeight;
         }
     }
 
-    if (plRelevanceMgr::Instance()->GetEnabled())
-    {
+    if (plRelevanceMgr::Instance()->GetEnabled()) {
         y += lineHeight;
 
         debugTxt.DrawString(x, y, "Relevance Regions:");
@@ -2758,10 +2874,9 @@ void plArmatureMod::DumpToDebugDisplay(int &x, int &y, int lineHeight, char *str
     }
 }
 
-class plAvBoneMap::BoneMapImp 
-{
-public: 
-    typedef std::map<uint32_t, const plSceneObject *> id2SceneObjectMap;
+class plAvBoneMap::BoneMapImp {
+public:
+    typedef std::map<uint32_t, const plSceneObject*> id2SceneObjectMap;
     id2SceneObjectMap fMap;
 };
 
@@ -2775,59 +2890,76 @@ plAvBoneMap::~plAvBoneMap()
     delete fImp;
 }
 
-const plSceneObject * plAvBoneMap::FindBone(uint32_t boneID)
+const plSceneObject* plAvBoneMap::FindBone(uint32_t boneID)
 {
     BoneMapImp::id2SceneObjectMap::iterator i = fImp->fMap.find(boneID);
-    const plSceneObject *result = nil;
+    const plSceneObject* result = nil;
 
-    if(i != fImp->fMap.end())
-    {
+    if (i != fImp->fMap.end()) {
         result = (*i).second;
     }
+
     return result;
 }
 
-void plAvBoneMap::AddBoneMapping(uint32_t boneID, const plSceneObject *SO)
+void plAvBoneMap::AddBoneMapping(uint32_t boneID, const plSceneObject* SO)
 {
     (fImp->fMap)[boneID] = SO;
 }
 
-void plArmatureMod::DebugDumpMoveKeys(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt)
+void plArmatureMod::DebugDumpMoveKeys(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt)
 {
     char buff[256];
     sprintf(buff, "Mouse Input Map: %s", plAvatarInputInterface::GetInstance()->GetInputMapName());
     debugTxt.DrawString(x, y, buff);
     y += lineHeight;
-    
+
     sprintf(buff, "Turn strength: %.2f (key: %.2f, analog: %.2f)", GetTurnStrength(), GetKeyTurnStrength(), GetAnalogTurnStrength());
     debugTxt.DrawString(x, y, buff);
     y += lineHeight;
-    
+
     GetMoveKeyString(buff);
     debugTxt.DrawString(x, y, buff);
     y += lineHeight;
 }
 
-void plArmatureMod::GetMoveKeyString(char *buff)
+void plArmatureMod::GetMoveKeyString(char* buff)
 {
     sprintf(buff, "Move keys: ");
 
-    if(FastKeyDown())
+    if (FastKeyDown()) {
         strcat(buff, "FAST ");
-    if(StrafeKeyDown())
+    }
+
+    if (StrafeKeyDown()) {
         strcat(buff, "STRAFE ");
-    if(ForwardKeyDown())
+    }
+
+    if (ForwardKeyDown()) {
         strcat(buff, "FORWARD ");
-    if(BackwardKeyDown())
+    }
+
+    if (BackwardKeyDown()) {
         strcat(buff, "BACKWARD ");
-    if(TurnLeftKeyDown())
+    }
+
+    if (TurnLeftKeyDown()) {
         strcat(buff, "TURNLEFT ");
-    if(TurnRightKeyDown())
+    }
+
+    if (TurnRightKeyDown()) {
         strcat(buff, "TURNRIGHT ");
-    if(StrafeLeftKeyDown())
+    }
+
+    if (StrafeLeftKeyDown()) {
         strcat(buff, "STRAFELEFT ");
-    if(StrafeRightKeyDown())
+    }
+
+    if (StrafeRightKeyDown()) {
         strcat(buff, "STRAFERIGHT ");
-    if(JumpKeyDown())
+    }
+
+    if (JumpKeyDown()) {
         strcat(buff, "JUMP ");
+    }
 }

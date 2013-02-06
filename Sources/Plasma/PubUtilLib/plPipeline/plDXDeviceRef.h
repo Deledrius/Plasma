@@ -59,23 +59,26 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Definition ///////////////////////////////////////////////////////////////
 
-class plDXDeviceRef : public hsGDeviceRef
-{
-    protected:
-        plDXDeviceRef   *fNext;
-        plDXDeviceRef   **fBack;
+class plDXDeviceRef : public hsGDeviceRef {
+protected:
+    plDXDeviceRef*   fNext;
+    plDXDeviceRef**   fBack;
 
-    public:
+public:
 
-        void            Unlink( void );
-        void            Link( plDXDeviceRef **back );
-        plDXDeviceRef   *GetNext( void ) { return fNext; }
-        bool            IsLinked( void ) { return fBack != nil; }
-        virtual void            Release( void ) { }
+    void            Unlink(void);
+    void            Link(plDXDeviceRef** back);
+    plDXDeviceRef*   GetNext(void) {
+        return fNext;
+    }
+    bool            IsLinked(void) {
+        return fBack != nil;
+    }
+    virtual void            Release(void) { }
 
-        plDXDeviceRef();
+    plDXDeviceRef();
 
-        virtual ~plDXDeviceRef();
+    virtual ~plDXDeviceRef();
 };
 
 

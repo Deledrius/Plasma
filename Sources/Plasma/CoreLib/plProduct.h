@@ -46,20 +46,19 @@ class plString;
 
 // Note:  These are all implemented in plProduct.cpp, so that only CoreLib
 //        has to get the product product ID compiler flags passed in.
-namespace plProduct
-{
-    uint32_t BuildId();
-    uint32_t BuildType();
-    uint32_t BranchId();
+namespace plProduct {
+uint32_t BuildId();
+uint32_t BuildType();
+uint32_t BranchId();
 
-    plString CoreName();
-    plString ShortName();
-    plString LongName();
+plString CoreName();
+plString ShortName();
+plString LongName();
 
-    const char *UUID();
+const char* UUID();
 
-    /** Returns: "<ProductCoreName>.<BranchId>.<BuildId> - <External|Internal>.<Debug|Release>"
-     *  Example: "Uru.3.204 - External.Release"
-     */
-    plString ProductString();
+/** Returns: "<ProductCoreName>.<BranchId>.<BuildId> - <External|Internal>.<Debug|Release>"
+ *  Example: "Uru.3.204 - External.Release"
+ */
+plString ProductString();
 }

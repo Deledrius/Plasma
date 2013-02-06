@@ -62,8 +62,7 @@ class plPipeline;
 
 typedef struct _object PyObject;
 
-class plPythonFileMod   : public plMultiModifier
-{
+class plPythonFileMod   : public plMultiModifier {
 protected:
     friend class plPythonSDLModifier;
 
@@ -80,7 +79,7 @@ protected:
     hsTArray<plKey>         fReceivers;
 
     PyObject*   fSelfKey;
-    plPipeline  *fPipe;
+    plPipeline*  fPipe;
 
     // the list of parameters (attributes)
     hsTArray<plPythonParameter> fParameters;
@@ -91,16 +90,15 @@ protected:
     static bool     fAtConvertTime; // flag for when in convert time within Max, don't run code
     bool        fLocalNotify;   // True when This Mod was Notified by a local plNotify
     bool        fIsFirstTimeEval;   // flag to determine when the first time at the eval,
-                                // so the Python coders can hava a chance to run initialization
-                                // code after the system is up, but before things are displayed
+    // so the Python coders can hava a chance to run initialization
+    // code after the system is up, but before things are displayed
     bool        fAmIAttachedToClone;    // is this python file mod attached to a cloned object
-    
-    // callback class for the KI
-    PythonVaultCallback *fVaultCallback;
-    pfPythonKeyCatcher  *fKeyCatcher;
 
-    struct NamedComponent
-    {
+    // callback class for the KI
+    PythonVaultCallback* fVaultCallback;
+    pfPythonKeyCatcher*  fKeyCatcher;
+
+    struct NamedComponent {
         plString    name;
         int32_t     id;
         bool        isActivator;
@@ -108,14 +106,13 @@ protected:
 
     hsTArray<NamedComponent> fNamedCompQueue;
 
-    virtual void IFindResponderAndAdd(const plString &responderName, int32_t id);
-    virtual void IFindActivatorAndAdd(const plString &activatorName, int32_t id);
+    virtual void IFindResponderAndAdd(const plString& responderName, int32_t id);
+    virtual void IFindActivatorAndAdd(const plString& activatorName, int32_t id);
     void ISetKeyValue(const plKey& key, int32_t id);
 
     bool ILoadPythonCode();
 
-    enum genref_whats
-    {
+    enum genref_whats {
         kNotSure = 0,
         kAddNotify
     };
@@ -125,33 +122,55 @@ public:
     plPythonFileMod();
     ~plPythonFileMod();
 
-    CLASSNAME_REGISTER( plPythonFileMod );
-    GETINTERFACE_ANY( plPythonFileMod, plMultiModifier );
+    CLASSNAME_REGISTER(plPythonFileMod);
+    GETINTERFACE_ANY(plPythonFileMod, plMultiModifier);
 
-    plPythonSDLModifier* GetSDLMod() { return fSDLMod; }
-    bool WasLocalNotify() { return fLocalNotify; }
-    plPipeline* GetPipeline() { return fPipe; }
+    plPythonSDLModifier* GetSDLMod() {
+        return fSDLMod;
+    }
+    bool WasLocalNotify() {
+        return fLocalNotify;
+    }
+    plPipeline* GetPipeline() {
+        return fPipe;
+    }
     virtual void SetSourceFile(const char* filename);
     virtual int getPythonOutput(std::string* line);
     virtual void ReportError();
     virtual void DisplayPythonOutput();
-    static void SetAtConvertTime() { fAtConvertTime=true; }
-    virtual bool AmIAttachedToClone() { return fAmIAttachedToClone; }
+    static void SetAtConvertTime() {
+        fAtConvertTime = true;
+    }
+    virtual bool AmIAttachedToClone() {
+        return fAmIAttachedToClone;
+    }
 
-    virtual void AddToNotifyList(plKey pKey) { fReceivers.Append(pKey); }
-    virtual int32_t NotifyListCount() { return fReceivers.Count(); }
-    virtual plKey GetNotifyListItem(int32_t i) { return fReceivers[i]; }
+    virtual void AddToNotifyList(plKey pKey) {
+        fReceivers.Append(pKey);
+    }
+    virtual int32_t NotifyListCount() {
+        return fReceivers.Count();
+    }
+    virtual plKey GetNotifyListItem(int32_t i) {
+        return fReceivers[i];
+    }
 
-    virtual void AddParameter(plPythonParameter param) { fParameters.Append(param); }
-    virtual int32_t GetParameterListCount() { return fParameters.Count(); }
-    virtual plPythonParameter GetParameterItem(int32_t i) { return fParameters[i]; }
-    
+    virtual void AddParameter(plPythonParameter param) {
+        fParameters.Append(param);
+    }
+    virtual int32_t GetParameterListCount() {
+        return fParameters.Count();
+    }
+    virtual plPythonParameter GetParameterItem(int32_t i) {
+        return fParameters[i];
+    }
+
     virtual void AddTarget(plSceneObject* sobj);
-    virtual void RemoveTarget(plSceneObject* so); 
+    virtual void RemoveTarget(plSceneObject* so);
 
     virtual void EnableControlKeyEvents();
     virtual void DisableControlKeyEvents();
-    
+
     virtual bool MsgReceive(plMessage* msg);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
@@ -159,8 +178,7 @@ public:
 
     // this is to keep track of what python functions are available and working,
     // so there is no need to keep trying and banging our head until its bloody
-    enum func_num
-    {
+    enum func_num {
         kfunc_FirstUpdate = 0,      // these enums _have_ to match the static names in fEventFunctionNames
         kfunc_Update,
         kfunc_Notify,       // OnNotify
@@ -211,7 +229,7 @@ public:
     static plString kGlobalNameKonstant;
 
     // API for processing discarded keys as the deafult key catcher
-    void    HandleDiscardedKey( plKeyEventMsg *msg );
+    void    HandleDiscardedKey(plKeyEventMsg* msg);
 };
 
 #endif // _plPythonFileMod_h

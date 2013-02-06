@@ -52,11 +52,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // MAXR4 HACK
 // Coming in the backdoor...
-class hsHackWinFindThread : public hsThread
-{
+class hsHackWinFindThread : public hsThread {
 protected:
-    enum
-    {
+    enum {
         kOK = 1,
 
         kMtlLibrary = 0x9c6a,
@@ -68,13 +66,11 @@ protected:
     };
 
 public:
-    hsError Run()
-    {
-        while (1)
-        {
+    hsError Run() {
+        while (1) {
             HWND hMtlDlg = FindWindow(NULL, "Material/Map Browser");
-            if (hMtlDlg && IsWindowVisible(GetDlgItem(hMtlDlg, kOK)))
-            {
+
+            if (hMtlDlg && IsWindowVisible(GetDlgItem(hMtlDlg, kOK))) {
                 SendMessage(GetDlgItem(hMtlDlg, kScene), BM_CLICK, 0, 0);
                 EnableWindow(GetDlgItem(hMtlDlg, kMtlLibrary), FALSE);
                 EnableWindow(GetDlgItem(hMtlDlg, kMtlEditor), FALSE);
@@ -86,7 +82,7 @@ public:
     }
 };
 
-static bool IPickMaterial(IParamBlock2 *pb, int id, int flags)
+static bool IPickMaterial(IParamBlock2* pb, int id, int flags)
 {
     BOOL newMat, cancel;
 
@@ -94,21 +90,22 @@ static bool IPickMaterial(IParamBlock2 *pb, int id, int flags)
     winFind.Start();
 
     // Get a material
-    MtlBase *mtl = GetCOREInterface()->DoMaterialBrowseDlg(
-        GetCOREInterface()->GetMAXHWnd(),
-        flags | BROWSE_INSTANCEONLY,
-        newMat,
-        cancel);
+    MtlBase* mtl = GetCOREInterface()->DoMaterialBrowseDlg(
+                       GetCOREInterface()->GetMAXHWnd(),
+                       flags | BROWSE_INSTANCEONLY,
+                       newMat,
+                       cancel);
 
     winFind.Stop();
 
-    if (!cancel)
+    if (!cancel) {
         pb->SetValue(id, 0, (ReferenceTarget*)mtl);
+    }
 
     return !cancel;
 }
 
-bool plPickMaterialMap::PickTexmap(IParamBlock2 *pb, int id)
+bool plPickMaterialMap::PickTexmap(IParamBlock2* pb, int id)
 {
     return IPickMaterial(pb, id, BROWSE_MAPSONLY);
 }
@@ -120,8 +117,8 @@ static bool GetPickedMtl(HWND hDlg, Mtl** mtl)
 {
     HWND hList = GetDlgItem(hDlg, IDC_MTL_LIST);
     int sel = ListBox_GetCurSel(hList);
-    if (sel != LB_ERR)
-    {
+
+    if (sel != LB_ERR) {
         *mtl = (Mtl*)ListBox_GetItemData(hList, sel);
         return true;
     }
@@ -133,32 +130,26 @@ static BOOL CALLBACK PickMtlProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 {
     static plPickMaterialInfo* info;
 
-    if (msg == WM_INITDIALOG)
-    {
+    if (msg == WM_INITDIALOG) {
         info = (plPickMaterialInfo*)lParam;
 
         MtlSet mtls;
         plMtlCollector::GetMtls(&mtls, nil, info->fFlags);
-        
+
         HWND hList = GetDlgItem(hDlg, IDC_MTL_LIST);
 
         MtlSet::iterator it = mtls.begin();
-        for (; it != mtls.end(); it++)
-        {
+
+        for (; it != mtls.end(); it++) {
             int idx = ListBox_AddString(hList, (*it)->GetName());
             ListBox_SetItemData(hList, idx, (*it));
         }
 
         return TRUE;
-    }
-    else if (msg == WM_COMMAND)
-    {
-        if (HIWORD(wParam) == BN_CLICKED && (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL))
-        {
-            if (LOWORD(wParam) == IDOK)
-            {
-                if (GetPickedMtl(hDlg, &info->fMtl))
-                {
+    } else if (msg == WM_COMMAND) {
+        if (HIWORD(wParam) == BN_CLICKED && (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)) {
+            if (LOWORD(wParam) == IDOK) {
+                if (GetPickedMtl(hDlg, &info->fMtl)) {
                     EndDialog(hDlg, 1);
                     return TRUE;
                 }
@@ -166,11 +157,11 @@ static BOOL CALLBACK PickMtlProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 
             EndDialog(hDlg, 0);
             return TRUE;
-        }
-        else if (HIWORD(wParam) == LBN_DBLCLK && LOWORD(wParam) == IDC_MTL_LIST)
-        {
-            if (GetPickedMtl(hDlg, &info->fMtl))
+        } else if (HIWORD(wParam) == LBN_DBLCLK && LOWORD(wParam) == IDC_MTL_LIST) {
+            if (GetPickedMtl(hDlg, &info->fMtl)) {
                 EndDialog(hDlg, 1);
+            }
+
             return TRUE;
         }
     }
@@ -178,7 +169,7 @@ static BOOL CALLBACK PickMtlProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
     return FALSE;
 }
 
-Mtl *plPickMaterialMap::PickMaterial(unsigned int flags)
+Mtl* plPickMaterialMap::PickMaterial(unsigned int flags)
 {
     plPickMaterialInfo info;
     info.fMtl = NULL;
@@ -187,8 +178,7 @@ Mtl *plPickMaterialMap::PickMaterial(unsigned int flags)
     //Mtl *mtl = NULL;
     int ret = DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_PICK_MTL), GetCOREInterface()->GetMAXHWnd(), PickMtlProc, (LPARAM)&info);
 
-    if (ret == 1)
-    {
+    if (ret == 1) {
         //pb->SetValue(id, 0, (ReferenceTarget*)mtl);
         //return true;
         return info.fMtl;

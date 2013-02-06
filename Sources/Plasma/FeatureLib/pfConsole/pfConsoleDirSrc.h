@@ -63,37 +63,40 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// pfConsoleDirSrc Class Definition ////////////////////////////////////////
 
-class pfConsoleDirSrc
-{
-    protected:
-        pfConsoleEngine     *fEngine;
-        struct FileName
-        {
-            plFileName fPath;
-            plFileName fFile;
-            FileName() {}
-            FileName(const plFileName& p, const plFileName& f) : fPath(p), fFile(f) {}
-        };
-        std::vector<FileName*> fProcessedFiles;     // list of init files we've already executed
-        bool fCheckProcessedFiles;        // set to check and skip files init files we've already executed
-    public:
-        pfConsoleDirSrc(pfConsoleEngine *engine) : fCheckProcessedFiles(false) { fEngine = engine; }
-        pfConsoleDirSrc(pfConsoleEngine *engine, const plFileName& path, const char* mask = "*.ini")
-            : fCheckProcessedFiles(false)
-        {
-            fEngine = engine;
-            ParseDirectory(path, mask);
-        }
+class pfConsoleDirSrc {
+protected:
+    pfConsoleEngine*     fEngine;
+    struct FileName {
+        plFileName fPath;
+        plFileName fFile;
+        FileName() {}
+        FileName(const plFileName& p, const plFileName& f) : fPath(p), fFile(f) {}
+    };
+    std::vector<FileName*> fProcessedFiles;     // list of init files we've already executed
+    bool fCheckProcessedFiles;        // set to check and skip files init files we've already executed
+public:
+    pfConsoleDirSrc(pfConsoleEngine* engine) : fCheckProcessedFiles(false) {
+        fEngine = engine;
+    }
+    pfConsoleDirSrc(pfConsoleEngine* engine, const plFileName& path, const char* mask = "*.ini")
+        : fCheckProcessedFiles(false) {
+        fEngine = engine;
+        ParseDirectory(path, mask);
+    }
 
-        ~pfConsoleDirSrc() { ResetProcessedFiles(); }
+    ~pfConsoleDirSrc() {
+        ResetProcessedFiles();
+    }
 
-        // Steps through the given directory and executes all files with the console engine
-        bool ParseDirectory(const plFileName& path, const char* mask = "*.*");
+    // Steps through the given directory and executes all files with the console engine
+    bool ParseDirectory(const plFileName& path, const char* mask = "*.*");
 
-        void ResetProcessedFiles();
-        bool AlreadyProcessedFile(const plFileName& path, const plFileName& file);
-        void AddProcessedFile(const plFileName& path, const plFileName& file);
-        void SetCheckProcessedFiles(bool c) { fCheckProcessedFiles=c; }       
+    void ResetProcessedFiles();
+    bool AlreadyProcessedFile(const plFileName& path, const plFileName& file);
+    void AddProcessedFile(const plFileName& path, const plFileName& file);
+    void SetCheckProcessedFiles(bool c) {
+        fCheckProcessedFiles = c;
+    }
 };
 
 

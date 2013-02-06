@@ -68,35 +68,42 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // new stuff
 
 plCameraModifier1::plCameraModifier1() :
-fBrain(nil),
-fSubObj(nil),
-fFOVw(45.0f),
-fFOVh(33.75f),
-fAnimated(false),
-fStartAnimOnPush(false),
-fStopAnimOnPop(false),
-fResetAnimOnPop(false),
-fInSubLastUpdate(false),
-fUpdateBrainTarget(false)
+    fBrain(nil),
+    fSubObj(nil),
+    fFOVw(45.0f),
+    fFOVh(33.75f),
+    fAnimated(false),
+    fStartAnimOnPush(false),
+    fStopAnimOnPop(false),
+    fResetAnimOnPop(false),
+    fInSubLastUpdate(false),
+    fUpdateBrainTarget(false)
 {
-    fFrom.Set(0,0,0);
-    fAt.Set(0,1,0);
+    fFrom.Set(0, 0, 0);
+    fAt.Set(0, 1, 0);
 }
 
 
 plCameraModifier1::~plCameraModifier1()
 {
     int i;
-    for (i = 0; i < GetNumTrans(); i++)
+
+    for (i = 0; i < GetNumTrans(); i++) {
         delete(GetTrans(i));
+    }
+
     fTrans.SetCountAndZero(0);
-    
-    for (i = 0; i < fMessageQueue.Count(); i++)
+
+    for (i = 0; i < fMessageQueue.Count(); i++) {
         hsRefCnt_SafeUnRef(fMessageQueue[i]);
+    }
+
     fMessageQueue.SetCountAndZero(0);
 
-    for (i = 0; i < fFOVInstructions.Count(); i++)
+    for (i = 0; i < fFOVInstructions.Count(); i++) {
         hsRefCnt_SafeUnRef(fFOVInstructions[i]);
+    }
+
     fFOVInstructions.SetCountAndZero(0);
 
 }
@@ -105,138 +112,152 @@ plCameraModifier1::~plCameraModifier1()
 void plCameraModifier1::AddTarget(plSceneObject* so)
 {
     fTarget = so;
-    if( plVirtualCam1::Instance() )
+
+    if (plVirtualCam1::Instance()) {
         plVirtualCam1::Instance()->AddCameraLoaded(so);
-    fFrom = (so->GetWorldToLocal().GetTranslate());
-    if (GetBrain())
-    {
-        if (fTarget->GetCoordinateInterface())
-            GetBrain()->AddTarget();
-        else
-            fUpdateBrainTarget = true; // update the brain later
     }
-    if (GetKey())
-    {   
+
+    fFrom = (so->GetWorldToLocal().GetTranslate());
+
+    if (GetBrain()) {
+        if (fTarget->GetCoordinateInterface()) {
+            GetBrain()->AddTarget();
+        } else {
+            fUpdateBrainTarget = true;    // update the brain later
+        }
+    }
+
+    if (GetKey()) {
         plgDispatch::Dispatch()->RegisterForExactType(plEvalMsg::Index(), GetKey());
     }
 }
 
 void plCameraModifier1::SetSubject(plSceneObject* pObj)
-{ 
-    if (GetBrain())
-        GetBrain()->SetSubject(pObj); 
-    else 
-        fSubObj = pObj; 
+{
+    if (GetBrain()) {
+        GetBrain()->SetSubject(pObj);
+    } else {
+        fSubObj = pObj;
+    }
 }
 
 plSceneObject* plCameraModifier1::GetSubject()
 {
-    if (GetBrain())
+    if (GetBrain()) {
         return GetBrain()->GetSubject();
-    else
+    } else {
         return fSubObj;
-}   
-
-void plCameraModifier1::SetFOVw(float f, bool fUpdateVCam) 
-{ 
-    fFOVw = f; 
-    if (plVirtualCam1::Instance() && fUpdateVCam)
-        plVirtualCam1::SetFOV(fFOVw, fFOVh, this); 
+    }
 }
 
-void plCameraModifier1::SetFOVh(float f, bool fUpdateVCam) 
-{ 
-    fFOVh = f; 
-    if (plVirtualCam1::Instance() && fUpdateVCam)
-        plVirtualCam1::SetFOV(fFOVw, fFOVh, this); 
+void plCameraModifier1::SetFOVw(float f, bool fUpdateVCam)
+{
+    fFOVw = f;
+
+    if (plVirtualCam1::Instance() && fUpdateVCam) {
+        plVirtualCam1::SetFOV(fFOVw, fFOVh, this);
+    }
+}
+
+void plCameraModifier1::SetFOVh(float f, bool fUpdateVCam)
+{
+    fFOVh = f;
+
+    if (plVirtualCam1::Instance() && fUpdateVCam) {
+        plVirtualCam1::SetFOV(fFOVw, fFOVh, this);
+    }
 }
 
 bool plCameraModifier1::SetFaded(bool b)
 {
-    if (GetBrain())
+    if (GetBrain()) {
         return GetBrain()->SetFaded(b);
+    }
+
     return false;
 }
 
 bool plCameraModifier1::GetFaded()
 {
-    if (GetBrain())
+    if (GetBrain()) {
         return GetBrain()->GetFaded();
+    }
+
     return false;
 }
 bool plCameraModifier1::MsgReceive(plMessage* msg)
 {
-    if (GetBrain())
+    if (GetBrain()) {
         GetBrain()->MsgReceive(msg);
-        
+    }
+
     plCameraMsg* pCamMsg = plCameraMsg::ConvertNoRef(msg);
-    if (pCamMsg)
-    {
-        if (pCamMsg->Cmd(plCameraMsg::kAddFOVKeyframe))
-        {
+
+    if (pCamMsg) {
+        if (pCamMsg->Cmd(plCameraMsg::kAddFOVKeyframe)) {
             hsRefCnt_SafeRef(msg);
             fFOVInstructions.Append(pCamMsg);
             return true;
-        }
-        else
-        if (pCamMsg->Cmd(plCameraMsg::kSetAnimated))
-        {
+        } else if (pCamMsg->Cmd(plCameraMsg::kSetAnimated)) {
             fAnimated = true;
             return true;
         }
     }
+
     plEventCallbackMsg* pEventMsg = plEventCallbackMsg::ConvertNoRef(msg);
-    if (pEventMsg)
-    {
+
+    if (pEventMsg) {
         double time = (double)fFOVInstructions[pEventMsg->fIndex]->GetConfig()->fAccel;
         double time2 = (double)pEventMsg->fEventTime;
         time = hsABS(time - time2);
         float h = fFOVInstructions[pEventMsg->fIndex]->GetConfig()->fFOVh;
-        if (GetBrain())
+
+        if (GetBrain()) {
             GetBrain()->SetFOVGoal(h, time);
+        }
     }
 
     plAnimCmdMsg* pAnimMsg = plAnimCmdMsg::ConvertNoRef(msg);
-    if (pAnimMsg)
-    {
+
+    if (pAnimMsg) {
         hsRefCnt_SafeRef(msg);
         msg->ClearReceivers();
         msg->AddReceiver(msg->GetSender());
         fMessageQueue.Append(msg);
         return true;
     }
+
     plGenRefMsg* pRefMsg = plGenRefMsg::ConvertNoRef(msg);
-    if (pRefMsg )
-    {
-        if( pRefMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest) )
-        {
-            if (pRefMsg->fType == kRefBrain)
-            {
+
+    if (pRefMsg) {
+        if (pRefMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest)) {
+            if (pRefMsg->fType == kRefBrain) {
                 plCameraBrain1* pBrain = plCameraBrain1::ConvertNoRef(pRefMsg->GetRef());
-                if (pBrain)
-                {
+
+                if (pBrain) {
                     pBrain->SetCamera(this);
                     fBrain = pBrain;
-                    if (fSubObj)
+
+                    if (fSubObj) {
                         fBrain->SetSubject(fSubObj);
+                    }
                 }
-            }
-            else
-            if (pRefMsg->fType == kRefCallbackMsg && fMessageQueue[pRefMsg->fWhich] != nil)
-            {
-                
+            } else if (pRefMsg->fType == kRefCallbackMsg && fMessageQueue[pRefMsg->fWhich] != nil) {
+
                 plgDispatch::MsgSend(fMessageQueue[pRefMsg->fWhich]);
                 fMessageQueue[pRefMsg->fWhich] = nil;
             }
-        }
-        else if( pRefMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove) )
-        {
+        } else if (pRefMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
             plCameraBrain1* pBrain = (plCameraBrain1*)(pRefMsg->GetRef());
-            if (fBrain == pBrain)
+
+            if (fBrain == pBrain) {
                 fBrain = nil;
+            }
         }
+
         return true;
-     }
+    }
+
     return plSingleModifier::MsgReceive(msg);
 }
 
@@ -245,79 +266,76 @@ void plCameraModifier1::Update()
 {
     // update the brain
 
-    // this freeze thing is a useful debugging tool...  
-    if (plVirtualCam1::Instance()->freeze)
+    // this freeze thing is a useful debugging tool...
+    if (plVirtualCam1::Instance()->freeze) {
         return;
-    
-    if (GetBrain())
-    {
-        if (fUpdateBrainTarget && fTarget->GetCoordinateInterface()) // if we need to update the brain and the target is loaded
-        {
+    }
+
+    if (GetBrain()) {
+        if (fUpdateBrainTarget && fTarget->GetCoordinateInterface()) { // if we need to update the brain and the target is loaded
             fUpdateBrainTarget = false;
             GetBrain()->AddTarget(); // update the brain's target
         }
 
         bool moveInSub = !(GetBrain()->HasFlag(plCameraBrain1::kIgnoreSubworldMovement));
 
-        if (moveInSub && GetBrain()->GetSubject())
-        {
+        if (moveInSub && GetBrain()->GetSubject()) {
             plKey worldKey = nil;
 
             // First check if this is a physical.  If so, grab the subworld from that
-            if (GetBrain()->GetSubject()->GetSimulationInterface())
-            {
+            if (GetBrain()->GetSubject()->GetSimulationInterface()) {
                 plPhysical* phys = GetBrain()->GetSubject()->GetSimulationInterface()->GetPhysical();
-                if (phys)
+
+                if (phys) {
                     worldKey = phys->GetWorldKey();
-            }
-            // Also, check if this is an avatar.  They don't have physicals, you
-            // have to ask the avatar controller for the subworld key.
-            if (!worldKey)
-            {
-                plKey subject = plKey(GetBrain()->GetSubject()->GetKey());
-                plArmatureMod* armMod = plAvatarMgr::FindAvatar(subject);
-                if (armMod && armMod->GetController() )
-                    worldKey = armMod->GetController()->GetSubworld();
+                }
             }
 
-            if (worldKey)
-            {
+            // Also, check if this is an avatar.  They don't have physicals, you
+            // have to ask the avatar controller for the subworld key.
+            if (!worldKey) {
+                plKey subject = plKey(GetBrain()->GetSubject()->GetKey());
+                plArmatureMod* armMod = plAvatarMgr::FindAvatar(subject);
+
+                if (armMod && armMod->GetController()) {
+                    worldKey = armMod->GetController()->GetSubworld();
+                }
+            }
+
+            if (worldKey) {
                 // this picks up and moves the camera to it's previous subworld coordinate (so the subworld isn't moving out from underneath us)
                 hsMatrix44 l2w, w2l;
                 plSceneObject* so = plSceneObject::ConvertNoRef(worldKey->ObjectIsLoaded());
-                if (so)
-                {
+
+                if (so) {
                     l2w = so->GetLocalToWorld();
                     w2l = so->GetWorldToLocal();
 
-                    if (fInSubLastUpdate)
-                    {
-                        if (!(fLastSubPos == fFrom && fLastSubPOA == fAt))
-                        {
+                    if (fInSubLastUpdate) {
+                        if (!(fLastSubPos == fFrom && fLastSubPOA == fAt)) {
                             SetTargetPos(l2w * fLastSubPos);
                             SetTargetPOA(l2w * fLastSubPOA);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         fInSubLastUpdate = true;
                     }
+
                     GetBrain()->Update();
                     fLastSubPos = w2l * GetTargetPos();
                     fLastSubPOA = w2l * GetTargetPOA();
                 }
+
                 return;
-            }
-            else
-            {
+            } else {
                 fInSubLastUpdate = false;
             }
         }
+
         GetBrain()->Update();
         fLastSubPos = GetTargetPos();
         fLastSubPOA = GetTargetPOA();
     }
-}   
+}
 
 void plCameraModifier1::Read(hsStream* stream, hsResMgr* mgr)
 {
@@ -326,9 +344,9 @@ void plCameraModifier1::Read(hsStream* stream, hsResMgr* mgr)
     mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, kRefBrain), plRefFlags::kActiveRef);
     int count = stream->ReadLE32();
     int i;
-    for (i = 0; i < count; i++)
-    {
-        
+
+    for (i = 0; i < count; i++) {
+
         plKey key = mgr->ReadKey(stream);
         bool cutpos = stream->ReadBool();
         bool cutpoa = stream->ReadBool();
@@ -353,44 +371,48 @@ void plCameraModifier1::Read(hsStream* stream, hsResMgr* mgr)
 
         fTrans.Append(camTrans);
     }
+
     fFOVw = stream->ReadLEFloat();
     fFOVh = stream->ReadLEFloat();
     int n = stream->ReadLE32();
     fMessageQueue.SetCountAndZero(n);
-    for(i = 0; i < n; i++ )
-    {   
+
+    for (i = 0; i < n; i++) {
         plMessage* pMsg =  plMessage::ConvertNoRef(mgr->ReadCreatable(stream));
         fMessageQueue[i] = pMsg;
     }
-    for(i = 0; i < n; i++ )
-    {   
+
+    for (i = 0; i < n; i++) {
         mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, i, kRefCallbackMsg), plRefFlags::kActiveRef);
     }
 
     n = stream->ReadLE32();
     fFOVInstructions.SetCountAndZero(n);
-    for(i = 0; i < n; i++ )
-    {   
+
+    for (i = 0; i < n; i++) {
         plCameraMsg* pMsg =  plCameraMsg::ConvertNoRef(mgr->ReadCreatable(stream));
         fFOVInstructions[i] = pMsg;
     }
+
     fAnimated = stream->ReadBool();
     fStartAnimOnPush = stream->ReadBool();
     fStopAnimOnPop = stream->ReadBool();
     fResetAnimOnPop = stream->ReadBool();
-    
+
 }
 
 void plCameraModifier1::Write(hsStream* stream, hsResMgr* mgr)
 {
     hsKeyedObject::Write(stream, mgr);
-    if (fBrain)
-        mgr->WriteKey(stream, fBrain );
-    
+
+    if (fBrain) {
+        mgr->WriteKey(stream, fBrain);
+    }
+
     int i = fTrans.Count();
     stream->WriteLE32(i);
-    for (i = 0; i < fTrans.Count(); i++)
-    {   
+
+    for (i = 0; i < fTrans.Count(); i++) {
         mgr->WriteKey(stream, fTrans[i]->fTransTo);
         stream->WriteBool(fTrans[i]->fCutPos);
         stream->WriteBool(fTrans[i]->fCutPOA);
@@ -402,22 +424,25 @@ void plCameraModifier1::Write(hsStream* stream, hsResMgr* mgr)
         stream->WriteLEScalar(fTrans[i]->fPOAAccel);
         stream->WriteLEScalar(fTrans[i]->fPOADecel);
     }
+
     stream->WriteLEFloat(fFOVw);
     stream->WriteLEFloat(fFOVh);
     stream->WriteLE32(fMessageQueue.Count());
-    for (i = 0; i < fMessageQueue.Count(); i++)
-    {
+
+    for (i = 0; i < fMessageQueue.Count(); i++) {
         mgr->WriteCreatable(stream, fMessageQueue[i]);
     }
-    for (i = 0; i < fMessageQueue.Count(); i++)
-    {
+
+    for (i = 0; i < fMessageQueue.Count(); i++) {
         mgr->WriteKey(stream, fMessageQueue[i]->GetSender());
     }
+
     stream->WriteLE32(fFOVInstructions.Count());
-    for (i = 0; i < fFOVInstructions.Count(); i++)
-    {
+
+    for (i = 0; i < fFOVInstructions.Count(); i++) {
         mgr->WriteCreatable(stream, fFOVInstructions[i]);
     }
+
     stream->WriteBool(fAnimated);
     stream->WriteBool(fStartAnimOnPush);
     stream->WriteBool(fStopAnimOnPop);
@@ -426,70 +451,80 @@ void plCameraModifier1::Write(hsStream* stream, hsResMgr* mgr)
 
 void plCameraModifier1::Push(bool recenter)
 {
-    if (fAnimated)
-    {
-        if (fStartAnimOnPush)
-        {
+    if (fAnimated) {
+        if (fStartAnimOnPush) {
             plAnimCmdMsg* pMsg = new plAnimCmdMsg;
             pMsg->SetCmd(plAnimCmdMsg::kRunForward);
             pMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
             pMsg->AddReceiver(GetTarget()->GetKey());
-            if (GetBrain() && GetBrain()->GetSubject())
+
+            if (GetBrain() && GetBrain()->GetSubject()) {
                 pMsg->AddReceiver(GetBrain()->GetSubject()->GetKey());
+            }
+
             pMsg->Send();
         }
     }
-    if (fBrain)
+
+    if (fBrain) {
         fBrain->Push(recenter);
+    }
 
 
-    if (GetKey())
-    {   
+    if (GetKey()) {
         plgDispatch::Dispatch()->RegisterForExactType(plMouseEventMsg::Index(), GetKey());
     }
 }
 
 void plCameraModifier1::Pop()
 {
-    if (fAnimated)
-    {
-        if (fStopAnimOnPop)
-        {
+    if (fAnimated) {
+        if (fStopAnimOnPop) {
             plAnimCmdMsg* pMsg = new plAnimCmdMsg;
             pMsg->SetCmd(plAnimCmdMsg::kStop);
             pMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
             pMsg->AddReceiver(GetTarget()->GetKey());
-            if (GetBrain() && GetBrain()->GetSubject())
+
+            if (GetBrain() && GetBrain()->GetSubject()) {
                 pMsg->AddReceiver(GetBrain()->GetSubject()->GetKey());
-            pMsg->Send();       
+            }
+
+            pMsg->Send();
         }
-        if (fResetAnimOnPop)
-        {
+
+        if (fResetAnimOnPop) {
             plAnimCmdMsg* pMsg = new plAnimCmdMsg;
             pMsg->SetCmd(plAnimCmdMsg::kGoToBegin);
             pMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
             pMsg->AddReceiver(GetTarget()->GetKey());
-            if (GetBrain() && GetBrain()->GetSubject())
+
+            if (GetBrain() && GetBrain()->GetSubject()) {
                 pMsg->AddReceiver(GetBrain()->GetSubject()->GetKey());
+            }
+
             pMsg->Send();
         }
     }
-    if (fBrain)
+
+    if (fBrain) {
         fBrain->Pop();
-    if (GetKey()) // the reason we might not have a key is a special run-time POA which doesn't need to receive messages...
-    {       
+    }
+
+    if (GetKey()) { // the reason we might not have a key is a special run-time POA which doesn't need to receive messages...
         plgDispatch::Dispatch()->UnRegisterForExactType(plMouseEventMsg::Index(), GetKey());
     }
-}   
+}
 
 void plCameraModifier1::SetTransform(hsPoint3 at)
 {
-    if (!GetTarget())
+    if (!GetTarget()) {
         return;
+    }
+
     hsMatrix44 l2w;
     hsMatrix44 w2l;
-    hsVector3 up(0,0,1);
+    hsVector3 up(0, 0, 1);
     l2w.Make(&fFrom, &at, &up);
     l2w.GetInverse(&w2l);
-    IGetTargetCoordinateInterface(0)->SetTransform( l2w, w2l );
+    IGetTargetCoordinateInterface(0)->SetTransform(l2w, w2l);
 }

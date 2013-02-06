@@ -53,17 +53,17 @@ void DetectorLogYellow(const char* format, ...) {}
 #else
 
 static plStatusLog* gLog =
-plStatusLogMgr::GetInstance().CreateStatusLog(
-                                              20,
-                                              "Detector",
-                                              plStatusLog::kFilledBackground | plStatusLog::kDeleteForMe |
-                                              plStatusLog::kDontWriteFile | plStatusLog::kAlignToTop);
+    plStatusLogMgr::GetInstance().CreateStatusLog(
+        20,
+        "Detector",
+        plStatusLog::kFilledBackground | plStatusLog::kDeleteForMe |
+        plStatusLog::kDontWriteFile | plStatusLog::kAlignToTop);
 
 
 void DetectorDoLogfile()
 {
     delete gLog;
-    gLog = plStatusLogMgr::GetInstance().CreateStatusLog(20,"Detector.log",plStatusLog::kFilledBackground|plStatusLog::kDeleteForMe|plStatusLog::kAlignToTop);
+    gLog = plStatusLogMgr::GetInstance().CreateStatusLog(20, "Detector.log", plStatusLog::kFilledBackground | plStatusLog::kDeleteForMe | plStatusLog::kAlignToTop);
 
 }
 

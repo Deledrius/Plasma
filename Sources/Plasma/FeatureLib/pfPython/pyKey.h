@@ -56,14 +56,13 @@ class plPythonFileMod;
 class pySceneObject;
 class plPipeline;
 
-class pyKey
-{
+class pyKey {
 private:
-        plKey               fKey;       // the plKey that we are holding onto
+    plKey               fKey;       // the plKey that we are holding onto
 #ifndef BUILDING_PYPLASMA // pyPlasma (and other plugins) don't need all this extra junk)
-        plPythonFileMod*    fPyFileMod;     // pointer to the PythonFileModifier
+    plPythonFileMod*    fPyFileMod;     // pointer to the PythonFileModifier
 
-        bool                fNetForce;
+    bool                fNetForce;
 #endif // BUILDING_PYPLASMA
 
 protected:
@@ -77,35 +76,47 @@ public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptKey);
     PYTHON_CLASS_NEW_DEFINITION;
-    static PyObject *New(plKey key);
-    static PyObject *New(pyKey *key);
+    static PyObject* New(plKey key);
+    static PyObject* New(pyKey* key);
 #ifndef BUILDING_PYPLASMA
-    static PyObject *New(plKey key, plPythonFileMod *pyMod);
-    static PyObject *New(pyKey *key, plPythonFileMod *pyMod);
+    static PyObject* New(plKey key, plPythonFileMod* pyMod);
+    static PyObject* New(pyKey* key, plPythonFileMod* pyMod);
 #endif
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyKey object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyKey); // converts a PyObject to a pyKey (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     // override the equals to operator
-    bool operator==(const pyKey &key) const;
-    bool operator!=(const pyKey &key) const { return !(key == *this); }
+    bool operator==(const pyKey& key) const;
+    bool operator!=(const pyKey& key) const {
+        return !(key == *this);
+    }
 
     // getter and setters
-    virtual plKey getKey() { return fKey; }
-    virtual void setKey(plKey key) { fKey=key; }
+    virtual plKey getKey() {
+        return fKey;
+    }
+    virtual void setKey(plKey key) {
+        fKey = key;
+    }
     virtual const char* getName() const;
 #ifndef BUILDING_PYPLASMA
     PyObject* GetPySceneObject();
 
-    virtual void SetNetForce(bool state) { fNetForce = state; }
+    virtual void SetNetForce(bool state) {
+        fNetForce = state;
+    }
 
     // methods to be sent to the plKey
     // send enable message to the plKey
-    virtual void Enable() { IEnable(true); }
+    virtual void Enable() {
+        IEnable(true);
+    }
     // send disable message to the plKey
-    virtual void Disable() { IEnable(false); }
+    virtual void Disable() {
+        IEnable(false);
+    }
     // if this is a modifier then get the (first) object its attached to
     virtual PyObject* GetParentObject();
 

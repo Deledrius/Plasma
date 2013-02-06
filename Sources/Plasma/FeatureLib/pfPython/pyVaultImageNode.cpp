@@ -67,7 +67,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 static unsigned s_keyseq;
 
 //============================================================================
-static plKey CreateAndRefImageKey (unsigned nodeId, plMipmap * mipmap) {
+static plKey CreateAndRefImageKey(unsigned nodeId, plMipmap* mipmap)
+{
     plString keyName = plString::Format("VaultImg_%u_%u", nodeId, s_keyseq++);
 
     plKey key = hsgResMgr::ResMgr()->NewKey(keyName, mipmap, plLocation::kGlobalFixedLoc);
@@ -82,109 +83,120 @@ static plKey CreateAndRefImageKey (unsigned nodeId, plMipmap * mipmap) {
         ),
         plRefFlags::kActiveRef
     );
-    
+
     return key;
 }
 
 // should only be created from C++ side
 pyVaultImageNode::pyVaultImageNode(RelVaultNode* nfsNode)
-: pyVaultNode(nfsNode)
-, fMipmapKey(nil)
-, fMipmap(nil)
+    : pyVaultNode(nfsNode)
+    , fMipmapKey(nil)
+    , fMipmap(nil)
 {
 }
 
 //create from the Python side
 pyVaultImageNode::pyVaultImageNode(int n)
-: pyVaultNode(new RelVaultNode)
-, fMipmapKey(nil)
-, fMipmap(nil)
+    : pyVaultNode(new RelVaultNode)
+    , fMipmapKey(nil)
+    , fMipmap(nil)
 {
     fNode->SetNodeType(plVault::kNodeType_Image);
 }
 
-pyVaultImageNode::~pyVaultImageNode () {
-    if (fMipmap && fMipmapKey)
+pyVaultImageNode::~pyVaultImageNode()
+{
+    if (fMipmap && fMipmapKey) {
         fMipmapKey->UnRefObject();
+    }
 }
 
 
 //==================================================================
 // class RelVaultNode : public plVaultNode
 //
-void pyVaultImageNode::Image_SetTitle( const char * text )
+void pyVaultImageNode::Image_SetTitle(const char* text)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
-        
-    wchar_t * wStr = hsStringToWString(text);
+    }
+
+    wchar_t* wStr = hsStringToWString(text);
 
     VaultImageNode image(fNode);
     image.SetImageTitle(wStr);
     delete [] wStr;
 }
 
-void pyVaultImageNode::Image_SetTitleW( const wchar_t* text )
+void pyVaultImageNode::Image_SetTitleW(const wchar_t* text)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
+    }
 
     VaultImageNode image(fNode);
     image.SetImageTitle(text);
 }
 
-std::string pyVaultImageNode::Image_GetTitle( void )
+std::string pyVaultImageNode::Image_GetTitle(void)
 {
-    if (!fNode)
+    if (!fNode) {
         return "";
+    }
 
     VaultImageNode image(fNode);
 
     std::string retVal = "";
-    if (image.GetImageTitle())
-    {
+
+    if (image.GetImageTitle()) {
         char* temp = hsWStringToString(image.GetImageTitle());
         retVal = temp;
         delete [] temp;
     }
-    
+
     return retVal;
 }
 
-std::wstring pyVaultImageNode::Image_GetTitleW( void )
+std::wstring pyVaultImageNode::Image_GetTitleW(void)
 {
-    if (!fNode)
+    if (!fNode) {
         return L"";
+    }
 
     VaultImageNode image(fNode);
     return image.GetImageTitle() ? image.GetImageTitle() : L"";
 }
 
-PyObject* pyVaultImageNode::Image_GetImage( void )
+PyObject* pyVaultImageNode::Image_GetImage(void)
 {
-    if (!fNode)
+    if (!fNode) {
         PYTHON_RETURN_NONE;
-        
+    }
+
     if (!fMipmap) {
         VaultImageNode access(fNode);
+
         if (access.ExtractImage(&fMipmap)) {
             fMipmapKey = fMipmap->GetKey();
-            if (!fMipmapKey)
+
+            if (!fMipmapKey) {
                 fMipmapKey = CreateAndRefImageKey(fNode->GetNodeId(), fMipmap);
-            else
+            } else {
                 fMipmapKey->RefObject();
-        }
-        else
+            }
+        } else {
             PYTHON_RETURN_NONE;
+        }
     }
-    
-    return pyImage::New(fMipmap);   
+
+    return pyImage::New(fMipmap);
 }
 
 void pyVaultImageNode::Image_SetImage(pyImage& image)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
+    }
 
     if (fMipmapKey) {
         fMipmapKey->UnRefObject();
@@ -193,22 +205,26 @@ void pyVaultImageNode::Image_SetImage(pyImage& image)
     }
 
     fMipmap = image.GetImage();
+
     if (fMipmap) {
         VaultImageNode access(fNode);
         access.StuffImage(fMipmap);
 
         fMipmapKey = image.GetKey();
-        if (!fMipmapKey)
+
+        if (!fMipmapKey) {
             fMipmapKey = CreateAndRefImageKey(fNode->GetNodeId(), fMipmap);
-        else
+        } else {
             fMipmapKey->RefObject();
+        }
     }
 }
 
-void pyVaultImageNode::SetImageFromBuf( PyObject * pybuf )
+void pyVaultImageNode::SetImageFromBuf(PyObject* pybuf)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
+    }
 
     if (fMipmapKey) {
         fMipmapKey->UnRefObject();
@@ -216,9 +232,10 @@ void pyVaultImageNode::SetImageFromBuf( PyObject * pybuf )
         fMipmap = nil;
     }
 
-    uint8_t * buffer = nil;
+    uint8_t* buffer = nil;
     Py_ssize_t bytes;
-    PyObject_AsReadBuffer(pybuf, (const void **)&buffer, &bytes);
+    PyObject_AsReadBuffer(pybuf, (const void**)&buffer, &bytes);
+
     if (buffer) {
         VaultImageNode access(fNode);
         access.SetImageData(buffer, bytes);
@@ -228,8 +245,9 @@ void pyVaultImageNode::SetImageFromBuf( PyObject * pybuf )
 
 void pyVaultImageNode::SetImageFromScrShot()
 {
-    if (!fNode)
+    if (!fNode) {
         return;
+    }
 
     if (fMipmapKey) {
         fMipmapKey->UnRefObject();
@@ -240,15 +258,18 @@ void pyVaultImageNode::SetImageFromScrShot()
     if (cyMisc::GetPipeline()) {
         VaultImageNode access(fNode);
         fMipmap = new plMipmap();
+
         if (cyMisc::GetPipeline()->CaptureScreen(fMipmap, false, 800, 600)) {
             fMipmapKey = fMipmap->GetKey();
-            if (!fMipmapKey)
+
+            if (!fMipmapKey) {
                 fMipmapKey = CreateAndRefImageKey(fNode->GetNodeId(), fMipmap);
-            else
+            } else {
                 fMipmapKey->RefObject();
+            }
+
             access.StuffImage(fMipmap);
-        }
-        else {
+        } else {
             access.SetImageData(nil, 0);
             access.SetImageType(VaultImageNode::kNone);
             delete fMipmap;

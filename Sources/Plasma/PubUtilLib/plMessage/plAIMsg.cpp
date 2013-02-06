@@ -58,10 +58,12 @@ plAIMsg::plAIMsg(const plKey& sender, const plKey& receiver): plMessage(sender, 
 {
     // set up our user string from the sender, if it is the right type
     plArmatureMod* armMod = plArmatureMod::ConvertNoRef(sender->ObjectIsLoaded());
-    if (armMod)
+
+    if (armMod) {
         fBrainUserStr = armMod->GetUserStr();
-    else
+    } else {
         fBrainUserStr = "";
+    }
 }
 
 void plAIMsg::Read(hsStream* stream, hsResMgr* mgr)
@@ -69,8 +71,11 @@ void plAIMsg::Read(hsStream* stream, hsResMgr* mgr)
     plMessage::IMsgRead(stream, mgr);
 
     char* temp = stream->ReadSafeString();
-    if (temp)
+
+    if (temp) {
         fBrainUserStr = temp;
+    }
+
     delete [] temp;
 }
 

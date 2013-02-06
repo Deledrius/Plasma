@@ -48,8 +48,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plProxyDrawMsg.h"
 
 plLightProxy::plLightProxy()
-:   plProxyGen(hsColorRGBA().Set(0,0,0,1.f), hsColorRGBA().Set(0.5f,1.0,0.5f,1.f), 0.2f),
-    fOwner(nil)
+    :   plProxyGen(hsColorRGBA().Set(0, 0, 0, 1.f), hsColorRGBA().Set(0.5f, 1.0, 0.5f, 1.f), 0.2f),
+        fOwner(nil)
 {
 }
 
@@ -67,16 +67,16 @@ bool plLightProxy::Init(plLightInfo* liInfo)
     return fOwner != nil;
 }
 
-plKey plLightProxy::IGetNode() const 
-{ 
-    return fOwner ? fOwner->GetSceneNode() : nil; 
+plKey plLightProxy::IGetNode() const
+{
+    return fOwner ? fOwner->GetSceneNode() : nil;
 }
 
 plDrawableSpans* plLightProxy::ICreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo)
 {
-    if( fOwner )
-    {
+    if (fOwner) {
         return fOwner->CreateProxy(mat, idx, addTo);
     }
+
     return nil;
 }

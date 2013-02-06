@@ -125,18 +125,19 @@ plMipmap* plPNG::IRead(hsStream* inStream)
 
             //  Convert images to RGB color space
             switch (color_type) {
-                case PNG_COLOR_TYPE_PALETTE:
-                    png_set_palette_to_rgb(png_ptr);
-                    channels = 3;
-                    break;
-                case PNG_COLOR_TYPE_GRAY:
+            case PNG_COLOR_TYPE_PALETTE:
+                png_set_palette_to_rgb(png_ptr);
+                channels = 3;
+                break;
 
-                    if (bitdepth < 8) {
-                        png_set_expand_gray_1_2_4_to_8(png_ptr);
-                    }
+            case PNG_COLOR_TYPE_GRAY:
 
-                    bitdepth = 8;
-                    break;
+                if (bitdepth < 8) {
+                    png_set_expand_gray_1_2_4_to_8(png_ptr);
+                }
+
+                bitdepth = 8;
+                break;
             }
 
             //  Convert transparency (if needed) to a full alpha channel

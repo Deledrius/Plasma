@@ -54,25 +54,25 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 
-bool IIsNodeInTab(INodeTab &tab, INode *node)
+bool IIsNodeInTab(INodeTab& tab, INode* node)
 {
     for (int i = 0; i < tab.Count(); i++)
-        if (tab[i] == node)
+        if (tab[i] == node) {
             return true;
+        }
 
     return false;
 }
 
-class ComponentRefs
-{
+class ComponentRefs {
 public:
-    plComponentBase *comp;
+    plComponentBase* comp;
     INodeTab refs;
 };
 
 void plSaveSelected()
 {
-    Interface *ip = GetCOREInterface();
+    Interface* ip = GetCOREInterface();
 
     // Get the Max filename to save to
     char buf[256];
@@ -88,65 +88,64 @@ void plSaveSelected()
     ofn.Flags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
     ofn.lpstrDefExt = "max";
 
-    if (GetSaveFileName(&ofn))
-    {
+    if (GetSaveFileName(&ofn)) {
         int count = ip->GetSelNodeCount();
         int i;
-        
+
         // Put all the selected nodes in a list
         INodeTab selected;
-        for (i = 0; i < count; i++)
-        {
-            plMaxNode *node = (plMaxNode*)ip->GetSelNode(i);
+
+        for (i = 0; i < count; i++) {
+            plMaxNode* node = (plMaxNode*)ip->GetSelNode(i);
             selected.Append(1, (INode**)&node);
         }
 
         // Put all the components attached to those nodes in a list
         INodeTab components;
-        for (i = 0; i < count; i++)
-        {
-            plMaxNode *node = (plMaxNode*)ip->GetSelNode(i);
+
+        for (i = 0; i < count; i++) {
+            plMaxNode* node = (plMaxNode*)ip->GetSelNode(i);
 
             uint32_t compCount = node->NumAttachedComponents();
-            for (int j = 0; j < compCount; j++)
-            {
-                INode *compNode = node->GetAttachedComponent(j)->GetINode();//Node(j);
 
-                if (!IIsNodeInTab(components, compNode))
+            for (int j = 0; j < compCount; j++) {
+                INode* compNode = node->GetAttachedComponent(j)->GetINode();//Node(j);
+
+                if (!IIsNodeInTab(components, compNode)) {
                     components.Append(1, &compNode);
+                }
             }
         }
 
         // Find the objects that the components are reffing that are not part of the selection.
         // Back them up, and delete them out of the components ref list so they won't be saved too.
         std::vector<ComponentRefs> out;
-        for (i = 0; i < components.Count(); i++)
-        {
-            plComponentBase *comp = ((plMaxNode*)components[i])->ConvertToComponent();
 
-            for (int j = comp->NumTargets() - 1; j >= 0; --j)
-            {
-                plMaxNodeBase *node = comp->GetTarget(j);
+        for (i = 0; i < components.Count(); i++) {
+            plComponentBase* comp = ((plMaxNode*)components[i])->ConvertToComponent();
 
-                if (!node)
+            for (int j = comp->NumTargets() - 1; j >= 0; --j) {
+                plMaxNodeBase* node = comp->GetTarget(j);
+
+                if (!node) {
                     continue;
-                
-                const char *t1 = components[i]->GetName();
-                const char *t2 = node->GetName();
+                }
 
-                if (!IIsNodeInTab(selected, node))
-                {
+                const char* t1 = components[i]->GetName();
+                const char* t2 = node->GetName();
+
+                if (!IIsNodeInTab(selected, node)) {
                     uint32_t idx = -1;
-                    for (uint32_t k = 0; k < out.size(); k++)
-                    {
-                        if (out[k].comp == comp)
+
+                    for (uint32_t k = 0; k < out.size(); k++) {
+                        if (out[k].comp == comp) {
                             idx = k;
+                        }
                     }
 
-                    if (idx == -1)
-                    {
+                    if (idx == -1) {
                         idx = out.size();
-                        out.resize(idx+1);
+                        out.resize(idx + 1);
                         out[idx].comp = comp;
                     }
 
@@ -165,10 +164,10 @@ void plSaveSelected()
         ip->FileSaveNodes(&allNodes, buf);
 
         // Restore the component refs to objects that weren't selected
-        for (i = 0; i < out.size(); i++)
-        {
-            for (int j = 0; j < out[i].refs.Count(); j++)
+        for (i = 0; i < out.size(); i++) {
+            for (int j = 0; j < out[i].refs.Count(); j++) {
                 out[i].comp->AddTarget((plMaxNode*)out[i].refs[j]);
+            }
         }
     }
 }
@@ -178,19 +177,22 @@ void plSaveSelected()
 ////////////////////////////////////////////////////////////////////////////////
 
 
-void IFindComponentsRecur(plMaxNode *node, std::vector<plComponentBase*> &components)
+void IFindComponentsRecur(plMaxNode* node, std::vector<plComponentBase*>& components)
 {
-    if (node->IsComponent())
+    if (node->IsComponent()) {
         components.push_back(node->ConvertToComponent());
+    }
 
-    for (int i = 0; i < node->NumberOfChildren(); i++)
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
         IFindComponentsRecur((plMaxNode*)node->GetChildNode(i), components);
+    }
 }
 
-void IMergeComponents(plComponentBase *to, plComponentBase *from)
+void IMergeComponents(plComponentBase* to, plComponentBase* from)
 {
-    for (int i = 0; i < from->NumTargets(); i++)
+    for (int i = 0; i < from->NumTargets(); i++) {
         to->AddTarget(from->GetTarget(i));
+    }
 
     // Delete the component from the scene
     theHold.Begin();
@@ -198,19 +200,20 @@ void IMergeComponents(plComponentBase *to, plComponentBase *from)
     theHold.Accept(_T("Delete Component"));
 }
 
-plMaxNode *IFindComponentRecur(plMaxNode *node, const char *name)
+plMaxNode* IFindComponentRecur(plMaxNode* node, const char* name)
 {
-    if (!strcmp(node->GetName(), name))
-    {
-        if (node->IsComponent())
+    if (!strcmp(node->GetName(), name)) {
+        if (node->IsComponent()) {
             return node;
+        }
     }
 
-    for (int i = 0; i < node->NumberOfChildren(); i++)
-    {
-        plMaxNode *ret = IFindComponentRecur((plMaxNode*)node->GetChildNode(i), name);
-        if (ret)
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
+        plMaxNode* ret = IFindComponentRecur((plMaxNode*)node->GetChildNode(i), name);
+
+        if (ret) {
             return ret;
+        }
     }
 
     return nil;
@@ -218,7 +221,7 @@ plMaxNode *IFindComponentRecur(plMaxNode *node, const char *name)
 
 void plMerge()
 {
-    Interface *ip = GetCOREInterface();
+    Interface* ip = GetCOREInterface();
 
     // Get the Max filename to merge
     char file[MAX_PATH];
@@ -235,8 +238,9 @@ void plMerge()
     ofn.Flags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
     ofn.lpstrTitle = "Merge";
 
-    if (!GetOpenFileName(&ofn))
+    if (!GetOpenFileName(&ofn)) {
         return;
+    }
 
     // Don't actually merge yet, just get the names of every node in the file
     NameTab nodeNames;
@@ -247,11 +251,11 @@ void plMerge()
     // the actual merge.
     std::vector<plMaxNode*> renamedNodes;
     int i;
-    for (i = 0; i < nodeNames.Count(); i++)
-    {
-        plMaxNode *node = IFindComponentRecur((plMaxNode*)ip->GetRootNode(), nodeNames[i]);
-        if (node)
-        {
+
+    for (i = 0; i < nodeNames.Count(); i++) {
+        plMaxNode* node = IFindComponentRecur((plMaxNode*)ip->GetRootNode(), nodeNames[i]);
+
+        if (node) {
             char buf[256];
             strcpy(buf, node->GetName());
             strcat(buf, "Merged");
@@ -265,11 +269,10 @@ void plMerge()
     ip->MergeFromFile(file);
 
     // Rename the components back to their original names
-    for (i = 0; i < renamedNodes.size(); i++)
-    {
+    for (i = 0; i < renamedNodes.size(); i++) {
         char buf[256];
         strcpy(buf, renamedNodes[i]->GetName());
-        buf[strlen(buf)-6] = '\0';
+        buf[strlen(buf) - 6] = '\0';
         renamedNodes[i]->SetName(buf);
     }
 
@@ -281,27 +284,24 @@ void plMerge()
 
     // For each component, search the scene for any other components with the same
     // name and type.  If there are any, merge their target lists and delete one.
-    for (i = 0; i < renamedNodes.size(); i++)
-    {
-        if (!renamedNodes[i])
+    for (i = 0; i < renamedNodes.size(); i++) {
+        if (!renamedNodes[i]) {
             continue;
+        }
 
-        plComponentBase *oldComp = renamedNodes[i]->ConvertToComponent();
-        char *oldCompName = oldComp->GetINode()->GetName();
+        plComponentBase* oldComp = renamedNodes[i]->ConvertToComponent();
+        char* oldCompName = oldComp->GetINode()->GetName();
 
-        for (int j = 0; j < components.size(); j++)
-        {
-            plComponentBase *comp = components[j];
+        for (int j = 0; j < components.size(); j++) {
+            plComponentBase* comp = components[j];
 
-            if (oldComp == comp)
+            if (oldComp == comp) {
                 components[j] = nil;
-            else if (comp)
-            {
-                const char *temp = comp->GetINode()->GetName();
-                
+            } else if (comp) {
+                const char* temp = comp->GetINode()->GetName();
+
                 if (!strcmp(oldCompName, comp->GetINode()->GetName()) &&
-                    comp->ClassID() == comp->ClassID())
-                {
+                        comp->ClassID() == comp->ClassID()) {
                     IMergeComponents(comp, oldComp);
                     nodeNames.AddName(oldCompName);
                     continue;
@@ -315,27 +315,30 @@ void plMerge()
     BroadcastNotification(NOTIFY_FILE_POST_MERGE);
 
 #if 0
-    if (nodeNames.Count() == 0)
+
+    if (nodeNames.Count() == 0) {
         return;
+    }
 
     // Actually calculate the size of all the merged component names, because
     // a static buffer could be too small in large merges
     uint32_t size = 0;
-    for (i = 0; i < nodeNames.Count(); i++)
+
+    for (i = 0; i < nodeNames.Count(); i++) {
         size += strlen(nodeNames[i]) + 1;
+    }
 
     // Put all the component names in a list and show it to the user
-    char *buf = new char[size+25];
+    char* buf = new char[size + 25];
     strcpy(buf, "Components Merged:\n\n");
 
-    for (i = 0; i < nodeNames.Count(); i++)
-    {
+    for (i = 0; i < nodeNames.Count(); i++) {
         strcat(buf, nodeNames[i]);
         strcat(buf, "\n");
     }
 
     MessageBox(ip->GetMAXHWnd(), buf, "Components Merged", MB_OK);
-    
+
     delete [] buf;
 #endif
 }

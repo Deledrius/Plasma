@@ -51,8 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plRegistryPageNode;
 class plResManager;
 
-class plPageOptimizer
-{
+class plPageOptimizer {
 protected:
     typedef std::vector<plKey> KeyVec;
     typedef std::set<plKey> KeySet;

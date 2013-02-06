@@ -55,44 +55,42 @@ class pfGUICheckBoxCtrl;
 class pfGUIButtonMod;
 class pfPlayerBookProc;
 
-class pfPlayerBookMod : public plSingleModifier
-{
-    protected:
+class pfPlayerBookMod : public plSingleModifier {
+protected:
 
-        // We have six preview panes, each with a GUI check box control.
-        // We have to have pointers to all six checkboxes so we can attach
-        // procs to them, as well as all six dynamic layers that are the
-        // preview panes.
+    // We have six preview panes, each with a GUI check box control.
+    // We have to have pointers to all six checkboxes so we can attach
+    // procs to them, as well as all six dynamic layers that are the
+    // preview panes.
 
-        pfGUICheckBoxCtrl   *fCheckBoxes[ 6 ];
-        plKey               fDynLayerKeys[ 6 ];
+    pfGUICheckBoxCtrl*   fCheckBoxes[ 6 ];
+    plKey               fDynLayerKeys[ 6 ];
 
-        // Also got a load and save button somewhere
-        pfGUIButtonMod      *fLoadButton, *fSaveButton;
+    // Also got a load and save button somewhere
+    pfGUIButtonMod*      fLoadButton, *fSaveButton;
 
-        pfPlayerBookProc    *fPBProc;
-        
-        enum
-        {
-            kRefCheckBox,
-            kRefLoadButton,
-            kRefSaveButton
-        };
+    pfPlayerBookProc*    fPBProc;
 
-        virtual bool IEval( double secs, hsScalar del, uint32_t dirty ); // called only by owner object's Eval()
+    enum {
+        kRefCheckBox,
+        kRefLoadButton,
+        kRefSaveButton
+    };
 
-    public:
+    virtual bool IEval(double secs, hsScalar del, uint32_t dirty);   // called only by owner object's Eval()
 
-        pfPlayerBookMod();
-        virtual ~pfPlayerBookMod();
+public:
 
-        CLASSNAME_REGISTER( pfPlayerBookMod );
-        GETINTERFACE_ANY( pfPlayerBookMod, plSingleModifier );
+    pfPlayerBookMod();
+    virtual ~pfPlayerBookMod();
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    CLASSNAME_REGISTER(pfPlayerBookMod);
+    GETINTERFACE_ANY(pfPlayerBookMod, plSingleModifier);
+
+    virtual bool    MsgReceive(plMessage* pMsg);
+
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
 };
 

@@ -56,7 +56,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plRefMsg.h"
 
 plDynaTorpedoVSMgr::plDynaTorpedoVSMgr()
-:   fWaveSetBase(nil)
+    :   fWaveSetBase(nil)
 {
 }
 
@@ -82,22 +82,26 @@ int plDynaTorpedoVSMgr::INewDecal()
 
 bool plDynaTorpedoVSMgr::IHandleShot(plBulletMsg* bull)
 {
-    if( !ICheckRTMat() )
+    if (!ICheckRTMat()) {
         return false;
+    }
 
     return plDynaTorpedoMgr::IHandleShot(bull);
 }
 
 bool plDynaTorpedoVSMgr::ICheckRTMat()
 {
-    if( !fMatRTShade )
+    if (!fMatRTShade) {
         return false;
+    }
 
-    if( !fWaveSetBase )
+    if (!fWaveSetBase) {
         return false;
+    }
 
-    if( fMatRTShade->GetLayer(0)->GetVertexShader() )
+    if (fMatRTShade->GetLayer(0)->GetVertexShader()) {
         return true;
+    }
 
     plRipVSConsts ripConsts = IGetRippleConsts();
 
@@ -125,22 +129,26 @@ plRipVSConsts plDynaTorpedoVSMgr::IGetRippleConsts() const
 bool plDynaTorpedoVSMgr::MsgReceive(plMessage* msg)
 {
     bool retVal = plDynaTorpedoMgr::MsgReceive(msg);
-    if( retVal )
+
+    if (retVal) {
         return true;
+    }
 
     plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
-    if( refMsg )
-    {
-        switch( refMsg->fType )
-        {
+
+    if (refMsg) {
+        switch (refMsg->fType) {
         case kRefWaveSetBase:
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fWaveSetBase = plWaveSetBase::ConvertNoRef(refMsg->GetRef());
-            else
+            } else {
                 fWaveSetBase = nil;
+            }
+
             return true;
         }
     }
+
     return false;
 }
 

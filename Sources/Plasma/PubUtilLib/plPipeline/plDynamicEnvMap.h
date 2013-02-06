@@ -58,8 +58,7 @@ class plSceneObject;
 class plBitmap;
 class plLayer;
 
-class plDynamicEnvMap : public plCubicRenderTarget
-{
+class plDynamicEnvMap : public plCubicRenderTarget {
 public:
     enum {
         kRefVisSet,
@@ -84,7 +83,7 @@ protected:
 
     hsBitVector                 fVisSet;
     hsTArray<plVisRegion*>      fVisRegions;
-    hsTArray<char *>            fVisRegionNames;
+    hsTArray<char*>            fVisRegionNames;
     bool                        fIncCharacters;
 
     void    IUpdatePosition();
@@ -93,8 +92,8 @@ protected:
     void ISetupRenderRequests();
     void ISubmitRenderRequests();
     void ISubmitRenderRequest(int i);
-    void ICheckForRefresh(double t, plPipeline *pipe);
-    
+    void ICheckForRefresh(double t, plPipeline* pipe);
+
     bool    IOnRefMsg(plGenRefMsg* refMsg);
 
 public:
@@ -103,8 +102,8 @@ public:
 
     virtual ~plDynamicEnvMap();
 
-    CLASSNAME_REGISTER( plDynamicEnvMap );
-    GETINTERFACE_ANY( plDynamicEnvMap, plCubicRenderTarget );
+    CLASSNAME_REGISTER(plDynamicEnvMap);
+    GETINTERFACE_ANY(plDynamicEnvMap, plCubicRenderTarget);
 
     virtual void    Read(hsStream* s, hsResMgr* mgr);
     virtual void    Write(hsStream* s, hsResMgr* mgr);
@@ -123,28 +122,40 @@ public:
     void        SetRefreshRate(float secs);
 
     hsPoint3    GetPosition() const;
-    float    GetHither() const { return fHither; }
-    float    GetYon() const { return fYon; }
-    float    GetFogStart() const { return fFogStart; }
-    hsColorRGBA GetColor() const { return fColor; }
-    float    GetRefreshRate() const { return 6.f * fRefreshRate; }
+    float    GetHither() const {
+        return fHither;
+    }
+    float    GetYon() const {
+        return fYon;
+    }
+    float    GetFogStart() const {
+        return fFogStart;
+    }
+    hsColorRGBA GetColor() const {
+        return fColor;
+    }
+    float    GetRefreshRate() const {
+        return 6.f * fRefreshRate;
+    }
 
     void        AddVisRegion(plVisRegion* reg); // Will just send a ref
 
     void        SetIncludeCharacters(bool b);
-    bool        GetIncludeCharacters() const { return fIncCharacters; }
-    void        SetVisRegionName(char *name){ fVisRegionNames.Push(name); }
+    bool        GetIncludeCharacters() const {
+        return fIncCharacters;
+    }
+    void        SetVisRegionName(char* name) {
+        fVisRegionNames.Push(name);
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////
 // Yes, it's lame that a lot of this code is nearly the same as
 // plDynamicEnvMap, but this derives from plRenderTarget, not plCubicRenderTarget
 // and I don't want to touch multiple inheritance.
-class plDynamicCamMap : public plRenderTarget
-{
+class plDynamicCamMap : public plRenderTarget {
 public:
-    enum 
-    {
+    enum {
         kRefVisSet,
         kRefCamera,
         kRefRootNode,
@@ -168,7 +179,7 @@ protected:
 
     hsBitVector                 fVisSet;
     hsTArray<plVisRegion*>      fVisRegions;
-    hsTArray<char *>            fVisRegionNames;    // this allows us to specify vis-regions in other pages.    
+    hsTArray<char*>            fVisRegionNames;     // this allows us to specify vis-regions in other pages.
     bool                        fIncCharacters;
     plCameraModifier1*          fCamera;
     plSceneObject*              fRootNode;
@@ -178,8 +189,7 @@ protected:
     plBitmap*                   fDisableTexture;
     hsTArray<plLayer*>          fMatLayers;
     static uint8_t                fFlags;
-    enum 
-    {
+    enum {
         kReflectionCapable  = 0x01,
         kReflectionEnabled  = 0x02,
         kReflectionMask     = kReflectionCapable | kReflectionEnabled,
@@ -187,9 +197,9 @@ protected:
 
     bool    INeedReRender();
 
-    void ISetupRenderRequest(plPipeline *pipe);
-    void ISubmitRenderRequest(plPipeline *pipe);
-    void ICheckForRefresh(double t, plPipeline *pipe);
+    void ISetupRenderRequest(plPipeline* pipe);
+    void ISubmitRenderRequest(plPipeline* pipe);
+    void ICheckForRefresh(double t, plPipeline* pipe);
     void IPrepTextureLayers();
 
     bool    IOnRefMsg(plRefMsg* refMsg);
@@ -200,8 +210,8 @@ public:
 
     virtual ~plDynamicCamMap();
 
-    CLASSNAME_REGISTER( plDynamicCamMap );
-    GETINTERFACE_ANY( plDynamicCamMap, plRenderTarget );
+    CLASSNAME_REGISTER(plDynamicCamMap);
+    GETINTERFACE_ANY(plDynamicCamMap, plRenderTarget);
 
     virtual void    Read(hsStream* s, hsResMgr* mgr);
     virtual void    Write(hsStream* s, hsResMgr* mgr);
@@ -215,11 +225,17 @@ public:
     void        SetIncludeCharacters(bool b);
     void        SetRefreshRate(float secs);
     void        AddVisRegion(plVisRegion* reg);
-    void        SetVisRegionName(char *name){ fVisRegionNames.Push(name); }
+    void        SetVisRegionName(char* name) {
+        fVisRegionNames.Push(name);
+    }
 
-    static bool     GetEnabled() { return (fFlags & kReflectionEnabled) != 0; }
+    static bool     GetEnabled() {
+        return (fFlags & kReflectionEnabled) != 0;
+    }
     static void     SetEnabled(bool enable);
-    static bool     GetCapable() { return (fFlags & kReflectionCapable) != 0; }
+    static bool     GetCapable() {
+        return (fFlags & kReflectionCapable) != 0;
+    }
     static void     SetCapable(bool capable);
 };
 

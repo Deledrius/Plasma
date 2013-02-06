@@ -46,64 +46,100 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "StringTokenizer.h"
 
 // String Tokenizer routines
-StringTokenizer::StringTokenizer() {
+StringTokenizer::StringTokenizer()
+{
     qAsTok = true;
     inQuote = false;
     this->string = this->seps = 0;
 }
-StringTokenizer::StringTokenizer(const char *string, const char *seps) {
+StringTokenizer::StringTokenizer(const char* string, const char* seps)
+{
     qAsTok = true;
     inQuote = false;
-    this->string = new char[strlen(string)+1];
-    strcpy(this->string,string);
+    this->string = new char[strlen(string) + 1];
+    strcpy(this->string, string);
     numSeps = strlen(seps);
-    this->seps = new char[numSeps+1];
-    strcpy(this->seps,seps);
+    this->seps = new char[numSeps + 1];
+    strcpy(this->seps, seps);
     this->tok = this->string;
-    if (isSep(*tok)) next();
+
+    if (isSep(*tok)) {
+        next();
+    }
 };
-StringTokenizer::~StringTokenizer() {
+StringTokenizer::~StringTokenizer()
+{
     delete string;
     delete seps;
 }
-bool StringTokenizer::hasMoreTokens() {
+bool StringTokenizer::hasMoreTokens()
+{
     return (*tok != '\0');
 };
-char *StringTokenizer::next() {
-    if (*tok == '\0') return NULL;
-    char *cur = tok;
-    while (*tok != '\0' && !isSep(*tok)) tok++;
+char* StringTokenizer::next()
+{
+    if (*tok == '\0') {
+        return NULL;
+    }
+
+    char* cur = tok;
+
+    while (*tok != '\0' && !isSep(*tok)) {
+        tok++;
+    }
+
     if (*tok != '\0') {
         *tok = '\0';
         tok++;
     }
-    while (*tok != '\0' && isSep(*tok)) tok++;
+
+    while (*tok != '\0' && isSep(*tok)) {
+        tok++;
+    }
+
     return cur;
 };
-bool StringTokenizer::isSep(char c) {
+bool StringTokenizer::isSep(char c)
+{
     if (!qAsTok || !inQuote) {
-        for (int i=0; i<numSeps; i++) {
-            if (seps[i] == c) return true;
+        for (int i = 0; i < numSeps; i++) {
+            if (seps[i] == c) {
+                return true;
+            }
         }
     }
-    if (qAsTok && c=='\"') {
+
+    if (qAsTok && c == '\"') {
         inQuote = !inQuote;
         return true;
     }
+
     return false;
 };
-void StringTokenizer::reset(const char *string, const char *seps) {
-    if (this->string) delete this->string;
-    this->string = new char[strlen(string)+1];
-    strcpy(this->string,string);
-    if (this->seps) delete this->seps;
+void StringTokenizer::reset(const char* string, const char* seps)
+{
+    if (this->string) {
+        delete this->string;
+    }
+
+    this->string = new char[strlen(string) + 1];
+    strcpy(this->string, string);
+
+    if (this->seps) {
+        delete this->seps;
+    }
+
     numSeps = strlen(seps);
-    this->seps = new char[numSeps+1];
-    strcpy(this->seps,seps);
+    this->seps = new char[numSeps + 1];
+    strcpy(this->seps, seps);
     this->tok = this->string;
-    if (isSep(*tok)) next();
+
+    if (isSep(*tok)) {
+        next();
+    }
 }
 
-void StringTokenizer::ParseQuotes(bool qAsTok) {
+void StringTokenizer::ParseQuotes(bool qAsTok)
+{
     this->qAsTok = qAsTok;
 }

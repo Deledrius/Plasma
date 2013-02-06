@@ -56,14 +56,13 @@ class pyColor;
 class plStatusLog;
 class plString;
 
-class pyStatusLog
-{
+class pyStatusLog {
 private:
     plStatusLog*    fLog;
     bool    fICreatedLog;
 
 protected:
-    pyStatusLog( plStatusLog* log=nil );
+    pyStatusLog(plStatusLog* log = nil);
 
 public:
     ~pyStatusLog();
@@ -71,19 +70,21 @@ public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptStatusLog);
     PYTHON_CLASS_NEW_DEFINITION;
-    static PyObject *New(plStatusLog* log);
+    static PyObject* New(plStatusLog* log);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyStatusLog object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyStatusLog); // converts a PyObject to a pyStatusLog (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
-    static void AddPlasmaConstantsClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
+    static void AddPlasmaConstantsClasses(PyObject* m);
 
     virtual bool Open(plString logName, uint32_t numLines, uint32_t flags);
     virtual bool Write(plString text);
     virtual bool WriteColor(plString text, pyColor& color);
     virtual void Close();
 
-    virtual bool IsOpen() { return (fLog != nil); }
+    virtual bool IsOpen() {
+        return (fLog != nil);
+    }
 };
 
 

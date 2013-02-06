@@ -51,8 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class pfGameScore;
 
-class pfGameScoreMsg : public plMessage
-{
+class pfGameScoreMsg : public plMessage {
     ENetError fResult;
 
 public:
@@ -64,14 +63,19 @@ public:
     CLASSNAME_REGISTER(pfGameScoreMsg);
     GETINTERFACE_ANY(pfGameScoreMsg, plMessage);
 
-    ENetError GetResult() const { return fResult; }
+    ENetError GetResult() const {
+        return fResult;
+    }
 
-    virtual void Read(hsStream*, hsResMgr*)  { FATAL("wtf are you doing???"); }
-    virtual void Write(hsStream*, hsResMgr*) { FATAL("wtf are you doing???"); }
+    virtual void Read(hsStream*, hsResMgr*)  {
+        FATAL("wtf are you doing???");
+    }
+    virtual void Write(hsStream*, hsResMgr*) {
+        FATAL("wtf are you doing???");
+    }
 };
 
-class pfGameScoreListMsg : public pfGameScoreMsg
-{
+class pfGameScoreListMsg : public pfGameScoreMsg {
     std::vector<pfGameScore*> fScores;
     uint32_t fOwnerId;
     plString fName;
@@ -82,40 +86,44 @@ public:
         : fScores(vec), pfGameScoreMsg(result), fOwnerId(ownerId), fName(name)
     { }
 
-    ~pfGameScoreListMsg()
-    {
-        for (std::vector<pfGameScore*>::iterator it = fScores.begin(); it != fScores.end(); ++it)
+    ~pfGameScoreListMsg() {
+        for (std::vector<pfGameScore*>::iterator it = fScores.begin(); it != fScores.end(); ++it) {
             (*it)->UnRef();
+        }
     }
 
     CLASSNAME_REGISTER(pfGameScoreListMsg);
     GETINTERFACE_ANY(pfGameScoreListMsg, pfGameScoreMsg);
 
-    plString GetName() const { return fName; }
-    uint32_t GetOwnerID() const { return fOwnerId; }
-    size_t GetNumScores() const { return fScores.size(); }
-    pfGameScore* GetScore(size_t idx) const { return fScores.at(idx); }
+    plString GetName() const {
+        return fName;
+    }
+    uint32_t GetOwnerID() const {
+        return fOwnerId;
+    }
+    size_t GetNumScores() const {
+        return fScores.size();
+    }
+    pfGameScore* GetScore(size_t idx) const {
+        return fScores.at(idx);
+    }
 };
 
-class pfGameScoreTransferMsg : public pfGameScoreMsg
-{
+class pfGameScoreTransferMsg : public pfGameScoreMsg {
     pfGameScore* fSource;
     pfGameScore* fDestination;
 
 public:
     pfGameScoreTransferMsg() { }
     pfGameScoreTransferMsg(ENetError result, pfGameScore* to, pfGameScore* from, int32_t points)
-        : fSource(from), fDestination(to), pfGameScoreMsg(result)
-    {
-        if (result == kNetSuccess)
-        {
+        : fSource(from), fDestination(to), pfGameScoreMsg(result) {
+        if (result == kNetSuccess) {
             from->fValue -= points;
             to->fValue   += points;
         }
     }
 
-    ~pfGameScoreTransferMsg()
-    {
+    ~pfGameScoreTransferMsg() {
         fSource->UnRef();
         fDestination->UnRef();
     }
@@ -123,32 +131,36 @@ public:
     CLASSNAME_REGISTER(pfGameScoreTransferMsg);
     GETINTERFACE_ANY(pfGameScoreTransferMsg, pfGameScoreMsg);
 
-    pfGameScore* GetDestination() const { return fDestination; }
-    pfGameScore* GetSource() const { return fSource; }
+    pfGameScore* GetDestination() const {
+        return fDestination;
+    }
+    pfGameScore* GetSource() const {
+        return fSource;
+    }
 };
 
-class pfGameScoreUpdateMsg : public pfGameScoreMsg
-{
+class pfGameScoreUpdateMsg : public pfGameScoreMsg {
     pfGameScore* fScore;
 
 public:
     pfGameScoreUpdateMsg() { }
     pfGameScoreUpdateMsg(ENetError result, pfGameScore* s, int32_t points)
-        : fScore(s), pfGameScoreMsg(result)
-    {
-        if (result == kNetSuccess)
+        : fScore(s), pfGameScoreMsg(result) {
+        if (result == kNetSuccess) {
             s->fValue = points;
+        }
     }
 
-    ~pfGameScoreUpdateMsg()
-    {
+    ~pfGameScoreUpdateMsg() {
         fScore->UnRef();
     }
 
     CLASSNAME_REGISTER(pfGameScoreUpdateMsg);
     GETINTERFACE_ANY(pfGameScoreUpdateMsg, pfGameScoreMsg);
 
-    pfGameScore* GetScore() const { return fScore; }
+    pfGameScore* GetScore() const {
+        return fScore;
+    }
 };
 
 #endif // _pfGameScoreMsg_h_

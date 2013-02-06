@@ -49,63 +49,72 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ///////////////////////////////////////////////////////////////////////////
 
 pySDLStateDataRecord::pySDLStateDataRecord()
-: fRec( nil )
+    : fRec(nil)
 {
 }
 
-pySDLStateDataRecord::pySDLStateDataRecord( plStateDataRecord * rec )
-: fRec( rec )
+pySDLStateDataRecord::pySDLStateDataRecord(plStateDataRecord* rec)
+    : fRec(rec)
 {
 }
 
-pySDLStateDataRecord::~pySDLStateDataRecord() {
-   delete fRec;
+pySDLStateDataRecord::~pySDLStateDataRecord()
+{
+    delete fRec;
 }
 
-plStateDataRecord * pySDLStateDataRecord::GetRec() const
+plStateDataRecord* pySDLStateDataRecord::GetRec() const
 {
     return fRec;
 }
 
-PyObject * pySDLStateDataRecord::FindVar( const plString & name ) const
+PyObject* pySDLStateDataRecord::FindVar(const plString& name) const
 {
-    if ( !fRec )
+    if (!fRec) {
         PYTHON_RETURN_NONE;
+    }
 
-    plSimpleStateVariable * var = fRec->FindVar( name );
-    if ( !var )
+    plSimpleStateVariable* var = fRec->FindVar(name);
+
+    if (!var) {
         PYTHON_RETURN_NONE;
+    }
 
-    return pySimpleStateVariable::New( var );
+    return pySimpleStateVariable::New(var);
 }
 
 plString pySDLStateDataRecord::GetName() const
 {
-    if (!fRec)
+    if (!fRec) {
         return "";
-    const plStateDescriptor *stateDesc = fRec->GetDescriptor();
+    }
+
+    const plStateDescriptor* stateDesc = fRec->GetDescriptor();
     return stateDesc->GetName();
 }
 
 std::vector<plString> pySDLStateDataRecord::GetVarList()
 {
     std::vector<plString> retVal;
-    if (!fRec)
+
+    if (!fRec) {
         return retVal;
-    const plStateDescriptor *stateDesc = fRec->GetDescriptor();
+    }
+
+    const plStateDescriptor* stateDesc = fRec->GetDescriptor();
     int numVars = stateDesc->GetNumVars();
-    for (int i=0; i<numVars; i++)
-    {
-        const plVarDescriptor *varDesc = stateDesc->GetVar(i);
+
+    for (int i = 0; i < numVars; i++) {
+        const plVarDescriptor* varDesc = stateDesc->GetVar(i);
         retVal.push_back(varDesc->GetName());
     }
+
     return retVal;
 }
 
 void pySDLStateDataRecord::SetFromDefaults(bool timeStampNow)
 {
-    if (fRec)
-    {
+    if (fRec) {
         fRec->SetFromDefaults(timeStampNow);
     }
 }
@@ -114,179 +123,228 @@ void pySDLStateDataRecord::SetFromDefaults(bool timeStampNow)
 ///////////////////////////////////////////////////////////////////////////
 
 pySimpleStateVariable::pySimpleStateVariable()
-: fVar( nil )
+    : fVar(nil)
 {
 }
 
-pySimpleStateVariable::pySimpleStateVariable( plSimpleStateVariable * var )
-: fVar( var )
+pySimpleStateVariable::pySimpleStateVariable(plSimpleStateVariable* var)
+    : fVar(var)
 {
 }
 
-plSimpleStateVariable * pySimpleStateVariable::GetVar() const
+plSimpleStateVariable* pySimpleStateVariable::GetVar() const
 {
     return fVar;
 }
 
-bool pySimpleStateVariable::SetByte( uint8_t v, int idx )
+bool pySimpleStateVariable::SetByte(uint8_t v, int idx)
 {
-    if ( !fVar )
+    if (!fVar) {
         return false;
-    return fVar->Set( v, idx );
+    }
+
+    return fVar->Set(v, idx);
 }
 
-bool pySimpleStateVariable::SetShort( short v, int idx )
+bool pySimpleStateVariable::SetShort(short v, int idx)
 {
-    if ( !fVar )
+    if (!fVar) {
         return false;
-    return fVar->Set( v, idx );
+    }
+
+    return fVar->Set(v, idx);
 }
 
-bool pySimpleStateVariable::SetFloat( float v, int idx )
+bool pySimpleStateVariable::SetFloat(float v, int idx)
 {
-    if ( !fVar )
+    if (!fVar) {
         return false;
-    return fVar->Set( v, idx );
+    }
+
+    return fVar->Set(v, idx);
 }
 
-bool pySimpleStateVariable::SetDouble( double v, int idx )
+bool pySimpleStateVariable::SetDouble(double v, int idx)
 {
-    if ( !fVar )
+    if (!fVar) {
         return false;
-    return fVar->Set( v, idx );
+    }
+
+    return fVar->Set(v, idx);
 }
 
-bool pySimpleStateVariable::SetInt( int v, int idx )
+bool pySimpleStateVariable::SetInt(int v, int idx)
 {
-    if ( !fVar )
+    if (!fVar) {
         return false;
-    return fVar->Set( v, idx );
+    }
+
+    return fVar->Set(v, idx);
 }
 
-bool pySimpleStateVariable::SetString( const char * v, int idx )
+bool pySimpleStateVariable::SetString(const char* v, int idx)
 {
-    if ( !fVar )
+    if (!fVar) {
         return false;
-    return fVar->Set( v, idx );
+    }
+
+    return fVar->Set(v, idx);
 }
 
-bool pySimpleStateVariable::SetBool( bool v, int idx )
+bool pySimpleStateVariable::SetBool(bool v, int idx)
 {
-    if ( !fVar )
+    if (!fVar) {
         return false;
-    return fVar->Set( v, idx );
+    }
+
+    return fVar->Set(v, idx);
 }
 
-uint8_t pySimpleStateVariable::GetByte( int idx ) const
+uint8_t pySimpleStateVariable::GetByte(int idx) const
 {
     uint8_t v = 0;
-    if ( fVar )
-        fVar->Get( &v, idx );
+
+    if (fVar) {
+        fVar->Get(&v, idx);
+    }
+
     return v;
 }
 
-short pySimpleStateVariable::GetShort( int idx ) const
+short pySimpleStateVariable::GetShort(int idx) const
 {
     short v = 0;
-    if ( fVar )
-        fVar->Get( &v, idx );
+
+    if (fVar) {
+        fVar->Get(&v, idx);
+    }
+
     return v;
 }
 
-int pySimpleStateVariable::GetInt( int idx ) const
+int pySimpleStateVariable::GetInt(int idx) const
 {
     int v = 0;
-    if ( fVar )
-        fVar->Get( &v, idx );
+
+    if (fVar) {
+        fVar->Get(&v, idx);
+    }
+
     return v;
 }
 
-float pySimpleStateVariable::GetFloat( int idx ) const
+float pySimpleStateVariable::GetFloat(int idx) const
 {
     float v = 0.f;
-    if ( fVar )
-        fVar->Get( &v, idx );
+
+    if (fVar) {
+        fVar->Get(&v, idx);
+    }
+
     return v;
 }
 
-double pySimpleStateVariable::GetDouble( int idx ) const
+double pySimpleStateVariable::GetDouble(int idx) const
 {
     double v = 0.0;
-    if ( fVar )
-        fVar->Get( &v, idx );
+
+    if (fVar) {
+        fVar->Get(&v, idx);
+    }
+
     return v;
 }
 
-bool pySimpleStateVariable::GetBool( int idx ) const
+bool pySimpleStateVariable::GetBool(int idx) const
 {
     bool v = false;
-    if ( fVar )
-        fVar->Get( &v, idx );
+
+    if (fVar) {
+        fVar->Get(&v, idx);
+    }
+
     return v;
 }
 
-plString pySimpleStateVariable::GetString( int idx ) const
+plString pySimpleStateVariable::GetString(int idx) const
 {
-    if ( fVar )
-    {
+    if (fVar) {
         char v[256];
-        if ( fVar->Get( v, idx ) )
+
+        if (fVar->Get(v, idx)) {
             return plString::FromUtf8(v);
+        }
     }
+
     return "";
 }
 
-plKey pySimpleStateVariable::GetKey( int idx ) const
+plKey pySimpleStateVariable::GetKey(int idx) const
 {
     plKey theKey = nil;
-    if (fVar)
+
+    if (fVar) {
         fVar->Get(&theKey, idx);
+    }
+
     return theKey;
 }
 
 int pySimpleStateVariable::GetType() const
 {
-    if (!fVar)
+    if (!fVar) {
         return plVarDescriptor::kNone;
-    plVarDescriptor *varDesc = fVar->GetVarDescriptor();
+    }
+
+    plVarDescriptor* varDesc = fVar->GetVarDescriptor();
     return varDesc->GetType();
 }
 
 plString pySimpleStateVariable::GetDisplayOptions() const
 {
-    if (!fVar)
+    if (!fVar) {
         return "";
-    plVarDescriptor *varDesc = fVar->GetVarDescriptor();
+    }
+
+    plVarDescriptor* varDesc = fVar->GetVarDescriptor();
     return varDesc->GetDisplayOptions();
 }
 
 plString pySimpleStateVariable::GetDefault() const
 {
-    if (!fVar)
+    if (!fVar) {
         return "";
-    plVarDescriptor *varDesc = fVar->GetVarDescriptor();
+    }
+
+    plVarDescriptor* varDesc = fVar->GetVarDescriptor();
     return varDesc->GetDefault();
 }
 
 bool pySimpleStateVariable::IsInternal() const
 {
-    if (!fVar)
+    if (!fVar) {
         return false;
-    plVarDescriptor *varDesc = fVar->GetVarDescriptor();
+    }
+
+    plVarDescriptor* varDesc = fVar->GetVarDescriptor();
     return varDesc->IsInternal();
 }
 
 bool pySimpleStateVariable::IsAlwaysNew() const
 {
-    if (!fVar)
+    if (!fVar) {
         return false;
-    plVarDescriptor *varDesc = fVar->GetVarDescriptor();
+    }
+
+    plVarDescriptor* varDesc = fVar->GetVarDescriptor();
     return varDesc->IsAlwaysNew();
 }
 
 bool pySimpleStateVariable::IsUsed() const
 {
-    if (fVar)
+    if (fVar) {
         return fVar->IsUsed();
+    }
+
     return false;
 }

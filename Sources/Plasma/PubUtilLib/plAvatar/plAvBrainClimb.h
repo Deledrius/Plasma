@@ -67,8 +67,7 @@ class plStateDataRecord;
 // DECLARATION
 //
 /////////////////////////////////////////////////////////////////
-class plAvBrainClimb : public plArmatureBrain
-{
+class plAvBrainClimb : public plArmatureBrain {
 public:
     enum Mode {
         kInactive,
@@ -91,38 +90,38 @@ public:
         kReleasing,
         kFallingOff
     };
-    
+
     plAvBrainClimb();
     plAvBrainClimb(Mode initialMode);
     virtual ~plAvBrainClimb();
 
-    virtual void Activate(plArmatureModBase *avMod);
+    virtual void Activate(plArmatureModBase* avMod);
     virtual void Deactivate();
     virtual bool Apply(double timeNow, float elapsed);
 
-    virtual void SaveToSDL(plStateDataRecord *sdl);
-    virtual void LoadFromSDL(const plStateDataRecord *sdl);
+    virtual void SaveToSDL(plStateDataRecord* sdl);
+    virtual void LoadFromSDL(const plStateDataRecord* sdl);
 
-    void DumpToDebugDisplay(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt);
-    const char * WorldDirStr(plClimbMsg::Direction dir);
-    const char *ModeStr(Mode mode);
+    void DumpToDebugDisplay(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt);
+    const char* WorldDirStr(plClimbMsg::Direction dir);
+    const char* ModeStr(Mode mode);
 
     // plasma protocol
-    virtual bool MsgReceive(plMessage *msg);
+    virtual bool MsgReceive(plMessage* msg);
 
-    CLASSNAME_REGISTER( plAvBrainClimb );
-    GETINTERFACE_ANY( plAvBrainClimb, plArmatureBrain);
+    CLASSNAME_REGISTER(plAvBrainClimb);
+    GETINTERFACE_ANY(plAvBrainClimb, plArmatureBrain);
 
 private:
-    bool IAdvanceCurrentStage(double time, float elapsed, float &overage);
+    bool IAdvanceCurrentStage(double time, float elapsed, float& overage);
     bool ITryStageTransition(double time, float overage);
     bool IChooseNextMode();
 
     /** Handle a climb message. Note that the "start climbing" climb message is handled
         by the human brain, since there's no climb brain there to hear it, since you
         (by definition) haven't started climbing yet... */
-    inline bool IHandleClimbMsg(plClimbMsg *msg);
-    inline bool IHandleLOSMsg(plLOSHitMsg *msg);
+    inline bool IHandleClimbMsg(plClimbMsg* msg);
+    inline bool IHandleLOSMsg(plLOSHitMsg* msg);
 
     /** Allow or block dismounting in the specified direction. */
     void IEnableDismount(plClimbMsg::Direction dir, bool status);
@@ -153,7 +152,7 @@ private:
 
     /** Let go of the wall and fall. */
     void IRelease(bool intentional);
-    
+
     /** Decide how far forward or backward to move in the animation */
     float IGetAnimDelta(double time, float elapsed);
 
@@ -162,8 +161,8 @@ private:
     virtual bool IInitAnimations();
 
     /** Find the animation stage corresponding with a mode */
-    plAnimStage * IGetStageFromMode(Mode mode);
-    Mode IGetModeFromStage(plAnimStage *stage);
+    plAnimStage* IGetStageFromMode(Mode mode);
+    Mode IGetModeFromStage(plAnimStage* stage);
 
     /** The exit stage is a special second stage that runs concurrently with the others.
         It's currently used to blend the "falloff" and "release" animations seamlessly
@@ -173,9 +172,9 @@ private:
     */
     bool IProcessExitStage(double time, float elapsed);
 
-    void IDumpClimbDirections(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt);
-    void IDumpDismountDirections(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt);
-    void IDumpBlockedDirections(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt);
+    void IDumpClimbDirections(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt);
+    void IDumpDismountDirections(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt);
+    void IDumpBlockedDirections(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt);
 
     ////////////////////////////
     //
@@ -196,31 +195,31 @@ private:
     float fHorizontalProbeLength;
 
     // climbing stages
-    plAnimStage *fUp;
-    plAnimStage *fDown;
-    plAnimStage *fLeft;
-    plAnimStage *fRight;
-    plAnimStage *fMountUp;
-    plAnimStage *fMountDown;
-    plAnimStage *fMountLeft;
-    plAnimStage *fMountRight;
-    plAnimStage *fDismountUp;
-    plAnimStage *fDismountDown;
-    plAnimStage *fDismountLeft;
-    plAnimStage *fDismountRight;
-    plAnimStage *fIdle;
-    plAnimStage *fRelease;
-    plAnimStage *fFallOff;
+    plAnimStage* fUp;
+    plAnimStage* fDown;
+    plAnimStage* fLeft;
+    plAnimStage* fRight;
+    plAnimStage* fMountUp;
+    plAnimStage* fMountDown;
+    plAnimStage* fMountLeft;
+    plAnimStage* fMountRight;
+    plAnimStage* fDismountUp;
+    plAnimStage* fDismountDown;
+    plAnimStage* fDismountLeft;
+    plAnimStage* fDismountRight;
+    plAnimStage* fIdle;
+    plAnimStage* fRelease;
+    plAnimStage* fFallOff;
 
 //  /** Current position on the climbing grid. */
 //  int fX;
 //  int fY;
 
     /** The stage that is currently executing. */
-    plAnimStage *fCurStage;
+    plAnimStage* fCurStage;
 
     /** A second stage we use (simultaneously) when we need to blend (fall or release) animations. */
-    plAnimStage *fExitStage;
+    plAnimStage* fExitStage;
 
 };
 

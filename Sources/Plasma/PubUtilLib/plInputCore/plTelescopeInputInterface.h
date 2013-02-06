@@ -52,38 +52,47 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plKey.h"
 
 //// Class Definition ////////////////////////////////////////////////////////
-        
-class plTelescopeInputInterface : public plInputInterface
-{
-    protected:
 
-        virtual bool IEval( double secs, float del, uint32_t dirty );
+class plTelescopeInputInterface : public plInputInterface {
+protected:
 
-    public:
+    virtual bool IEval(double secs, float del, uint32_t dirty);
 
-        plTelescopeInputInterface();
-        virtual ~plTelescopeInputInterface();
+public:
 
-        virtual void        RestoreDefaultKeyMappings( void );
-        
-        virtual bool    InterpretInputEvent( plInputEventMsg *pMsg );
+    plTelescopeInputInterface();
+    virtual ~plTelescopeInputInterface();
 
-        virtual bool    MsgReceive( plMessage *msg );
+    virtual void        RestoreDefaultKeyMappings(void);
 
-        virtual void    Init( plInputInterfaceMgr *manager );
-        virtual void    Shutdown( void ) {;}
+    virtual bool    InterpretInputEvent(plInputEventMsg* pMsg);
 
-        // Returns the priority of this interface layer, based on the Priorities enum
-        virtual uint32_t  GetPriorityLevel( void ) const { return kTelescopeInputPriority; }
+    virtual bool    MsgReceive(plMessage* msg);
 
-        // Returns the currently active mouse cursor for this layer, as defined in pnMessage/plCursorChangeMsg.h
-        virtual uint32_t      GetCurrentCursorID( void ) const { return kCursorUp; }
+    virtual void    Init(plInputInterfaceMgr* manager);
+    virtual void    Shutdown(void) {
+        ;
+    }
 
-        // Returns the current opacity that this layer wants the cursor to be, from 0 (xparent) to 1 (opaque)
-        virtual float    GetCurrentCursorOpacity( void ) const { return 1.f; }
+    // Returns the priority of this interface layer, based on the Priorities enum
+    virtual uint32_t  GetPriorityLevel(void) const {
+        return kTelescopeInputPriority;
+    }
 
-        // Returns true if this layer is wanting to change the mouse, false if it isn't interested
-        virtual bool        HasInterestingCursorID( void ) const { return false; }
+    // Returns the currently active mouse cursor for this layer, as defined in pnMessage/plCursorChangeMsg.h
+    virtual uint32_t      GetCurrentCursorID(void) const {
+        return kCursorUp;
+    }
+
+    // Returns the current opacity that this layer wants the cursor to be, from 0 (xparent) to 1 (opaque)
+    virtual float    GetCurrentCursorOpacity(void) const {
+        return 1.f;
+    }
+
+    // Returns true if this layer is wanting to change the mouse, false if it isn't interested
+    virtual bool        HasInterestingCursorID(void) const {
+        return false;
+    }
 };
 
 

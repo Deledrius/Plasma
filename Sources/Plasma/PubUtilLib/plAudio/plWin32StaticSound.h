@@ -50,43 +50,41 @@ class plEventCallbackMsg;
 
 #include "plSoundEvent.h"
 
-class plWin32StaticSound : public plWin32Sound
-{
+class plWin32StaticSound : public plWin32Sound {
 public:
     plWin32StaticSound();
     ~plWin32StaticSound();
 
-    CLASSNAME_REGISTER( plWin32StaticSound );
-    GETINTERFACE_ANY( plWin32StaticSound, plWin32Sound );
-    
-    virtual void    Activate( bool forcePlay = false );
+    CLASSNAME_REGISTER(plWin32StaticSound);
+    GETINTERFACE_ANY(plWin32StaticSound, plWin32Sound);
+
+    virtual void    Activate(bool forcePlay = false);
     virtual void    DeActivate();
-    virtual bool    LoadSound( bool is3D );
+    virtual bool    LoadSound(bool is3D);
     virtual void    Update();
     virtual bool    MsgReceive(plMessage* pMsg);
-    virtual void    SetStartPos(unsigned bytes){}
+    virtual void    SetStartPos(unsigned bytes) {}
 
 protected:
     bool            fRegisteredOnThread;
 
-    virtual void    IDerivedActuallyPlay( void );
-    virtual void    ISetActualTime( double t );
+    virtual void    IDerivedActuallyPlay(void);
+    virtual void    ISetActualTime(double t);
     virtual float   GetActualTimeSec();
 
-    virtual void    IAddCallback( plEventCallbackMsg *pCBMsg );
-    virtual void    IRemoveCallback( plEventCallbackMsg *pCBMsg );
+    virtual void    IAddCallback(plEventCallbackMsg* pCBMsg);
+    virtual void    IRemoveCallback(plEventCallbackMsg* pCBMsg);
 
 };
 
 // Same as a plWin32StaticSound, except this registers for a plLinkEffectBCMsg to play the sound on linking.
-class plWin32LinkSound : public plWin32StaticSound
-{
+class plWin32LinkSound : public plWin32StaticSound {
 public:
     plWin32LinkSound();
     ~plWin32LinkSound() { }
 
-    CLASSNAME_REGISTER( plWin32LinkSound );
-    GETINTERFACE_ANY( plWin32LinkSound, plWin32StaticSound );
+    CLASSNAME_REGISTER(plWin32LinkSound);
+    GETINTERFACE_ANY(plWin32LinkSound, plWin32StaticSound);
 
     virtual void    Read(hsStream* s, hsResMgr* mgr);
     virtual void    Write(hsStream* s, hsResMgr* mgr);

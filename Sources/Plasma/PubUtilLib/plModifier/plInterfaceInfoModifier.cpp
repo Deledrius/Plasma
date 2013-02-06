@@ -46,7 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plKey.h"
 
 
-plInterfaceInfoModifier::plInterfaceInfoModifier() 
+plInterfaceInfoModifier::plInterfaceInfoModifier()
 {
 }
 plInterfaceInfoModifier::~plInterfaceInfoModifier()
@@ -59,14 +59,18 @@ void plInterfaceInfoModifier::Read(hsStream* s, hsResMgr* mgr)
 {
     plSingleModifier::Read(s, mgr);
     int i = s->ReadLE32();
-    for (int x = 0; x < i; x++)
+
+    for (int x = 0; x < i; x++) {
         fKeyList.Append(mgr->ReadKey(s));
+    }
 }
 
 void plInterfaceInfoModifier::Write(hsStream* s, hsResMgr* mgr)
 {
     plSingleModifier::Write(s, mgr);
     s->WriteLE32(fKeyList.Count());
-    for (int i = 0; i < fKeyList.Count(); i++)
+
+    for (int i = 0; i < fKeyList.Count(); i++) {
         mgr->WriteKey(s, fKeyList[i]);
+    }
 }

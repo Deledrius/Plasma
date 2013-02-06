@@ -48,21 +48,24 @@ class hsResMgr;
 
 #include "pnModifier/plMultiModifier.h"
 
-class plLightSpace : public plMultiModifier
-{
+class plLightSpace : public plMultiModifier {
 protected:
 
     hsKeyedObject*      fLightInfo;
 
-    hsKeyedObject*      IGetLightInfo() const { return fLightInfo; }
+    hsKeyedObject*      IGetLightInfo() const {
+        return fLightInfo;
+    }
 public:
     plLightSpace() : fLightInfo(nil) {}
     virtual ~plLightSpace() {}
 
-    CLASSNAME_REGISTER( plLightSpace );
-    GETINTERFACE_ANY( plLightSpace, plMultiModifier );
+    CLASSNAME_REGISTER(plLightSpace);
+    GETINTERFACE_ANY(plLightSpace, plMultiModifier);
 
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return false; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return false;
+    }
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);

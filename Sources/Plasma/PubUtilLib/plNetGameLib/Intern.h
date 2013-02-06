@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plNetGameLib/Intern.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_PUBUTILLIB_PLNETGAMELIB_INTERN_H
@@ -74,7 +74,7 @@ const unsigned kDisconnectedTimeoutMs               = kPingIntervalMs;
 *
 ***/
 
-void ReportNetError (ENetProtocol protocol, ENetError error);
+void ReportNetError(ENetProtocol protocol, ENetError error);
 
 
 /*****************************************************************************
@@ -83,12 +83,12 @@ void ReportNetError (ENetProtocol protocol, ENetError error);
 *
 ***/
 
-void AuthInitialize ();
-void AuthDestroy (bool wait);
+void AuthInitialize();
+void AuthDestroy(bool wait);
 
-bool AuthQueryConnected ();
-unsigned AuthGetConnId ();
-void AuthPingEnable (bool enable);
+bool AuthQueryConnected();
+unsigned AuthGetConnId();
+void AuthPingEnable(bool enable);
 
 
 /*****************************************************************************
@@ -97,12 +97,12 @@ void AuthPingEnable (bool enable);
 *
 ***/
 
-void GameInitialize ();
-void GameDestroy (bool wait);
+void GameInitialize();
+void GameDestroy(bool wait);
 
-bool GameQueryConnected ();
-unsigned GameGetConnId ();
-void GamePingEnable (bool enable);
+bool GameQueryConnected();
+unsigned GameGetConnId();
+void GamePingEnable(bool enable);
 
 
 /*****************************************************************************
@@ -111,11 +111,11 @@ void GamePingEnable (bool enable);
 *
 ***/
 
-void FileInitialize ();
-void FileDestroy (bool wait);
+void FileInitialize();
+void FileDestroy(bool wait);
 
-bool FileQueryConnected ();
-unsigned FileGetConnId ();
+bool FileQueryConnected();
+unsigned FileGetConnId();
 
 
 /*****************************************************************************
@@ -126,7 +126,7 @@ unsigned FileGetConnId ();
 
 void GateKeeperInitialize();
 void GateKeeperDestroy(bool wait);
-bool GateKeeperQueryConnected ();
+bool GateKeeperQueryConnected();
 unsigned GateKeeperGetConnId();
 
 
@@ -181,20 +181,20 @@ enum ETransType {
     kScoreSetPointsTrans,
     kScoreGetRanksTrans,
     kSendFriendInviteTrans,
-    
+
     //========================================================================
     // NglGame.cpp transactions
     kJoinAgeRequestTrans,
     kGmRcvdPropagatedBufferTrans,
     kGmRcvdGameMgrMsgTrans,
-    
+
     //========================================================================
     // NglFile.cpp transactions
     kBuildIdRequestTrans,
     kManifestRequestTrans,
     kDownloadRequestTrans,
     kFileRcvdFileDownloadChunkTrans,
-    
+
     //========================================================================
     // NglCore.cpp transactions
     kReportNetErrorTrans,
@@ -207,7 +207,7 @@ enum ETransType {
     kNumTransTypes
 };
 
-static const char * s_transTypes[] = {
+static const char* s_transTypes[] = {
     // NglAuth.cpp
     "PingRequestTrans",
     "LoginRequestTrans",
@@ -251,7 +251,7 @@ static const char * s_transTypes[] = {
     "ScoreSetPointsTrans",
     "ScoreGetRanksTrans",
     "SendFriendInviteTrans",
-    
+
     // NglGame.cpp
     "JoinAgeRequestTrans",
     "GmRcvdPropagatedBufferTrans",
@@ -262,7 +262,7 @@ static const char * s_transTypes[] = {
     "ManifestRequestTrans",
     "DownloadRequestTrans",
     "FileRcvdFileDownloadChunkTrans",
-    
+
     // NglCore.cpp
     "ReportNetErrorTrans",
 
@@ -276,10 +276,18 @@ static_assert(arrsize(s_transTypes) == kNumTransTypes, "Ngl Trans array and enum
 static long s_perfTransCount[kNumTransTypes];
 
 
-namespace Auth { struct CliAuConn; }
-namespace Game { struct CliGmConn; }
-namespace File { struct CliFileConn; }
-namespace GateKeeper { struct CliGkConn; }
+namespace Auth {
+struct CliAuConn;
+}
+namespace Game {
+struct CliGmConn;
+}
+namespace File {
+struct CliFileConn;
+}
+namespace GateKeeper {
+struct CliGkConn;
+}
 
 enum ENetTransState {
     kTransStateWaitServerConnect,
@@ -298,82 +306,91 @@ struct NetTrans : AtomicRef {
     unsigned        m_timeoutAtMs;  // curTime + s_timeoutMs (set upon send)
     ETransType      m_transType;
 
-    NetTrans (ENetProtocol protocol, ETransType transType);
-    virtual ~NetTrans ();
+    NetTrans(ENetProtocol protocol, ETransType transType);
+    virtual ~NetTrans();
 
-    virtual bool CanStart () const;
-    virtual bool TimedOut () { return true; } // return true if we really did time out, false to reset the timeout timer
-    virtual bool Send () = 0;
-    virtual void Post () = 0;
-    virtual bool Recv ( // return false to disconnect from server
+    virtual bool CanStart() const;
+    virtual bool TimedOut() {
+        return true;    // return true if we really did time out, false to reset the timeout timer
+    }
+    virtual bool Send() = 0;
+    virtual void Post() = 0;
+    virtual bool Recv(  // return false to disconnect from server
         const uint8_t  msg[],
         unsigned    bytes
     ) = 0;
 };
 
 struct NetAuthTrans : NetTrans {
-    Auth::CliAuConn * m_conn;
+    Auth::CliAuConn* m_conn;
 
-    NetAuthTrans (ETransType transType);
-    ~NetAuthTrans ();
+    NetAuthTrans(ETransType transType);
+    ~NetAuthTrans();
 
-    bool AcquireConn ();
-    void ReleaseConn ();
+    bool AcquireConn();
+    void ReleaseConn();
 };
 
 struct NetGameTrans : NetTrans {
-    Game::CliGmConn * m_conn;
+    Game::CliGmConn* m_conn;
 
-    NetGameTrans (ETransType transType);
-    ~NetGameTrans ();
+    NetGameTrans(ETransType transType);
+    ~NetGameTrans();
 
-    bool AcquireConn ();
-    void ReleaseConn ();
+    bool AcquireConn();
+    void ReleaseConn();
 };
 
 struct NetFileTrans : NetTrans {
-    File::CliFileConn * m_conn;
+    File::CliFileConn* m_conn;
 
-    NetFileTrans (ETransType transType);
-    ~NetFileTrans ();
+    NetFileTrans(ETransType transType);
+    ~NetFileTrans();
 
-    bool AcquireConn ();
-    void ReleaseConn ();
+    bool AcquireConn();
+    void ReleaseConn();
 };
 
 struct NetGateKeeperTrans : NetTrans {
-    GateKeeper::CliGkConn * m_conn;
+    GateKeeper::CliGkConn* m_conn;
 
-    NetGateKeeperTrans (ETransType transType);
-    ~NetGateKeeperTrans ();
+    NetGateKeeperTrans(ETransType transType);
+    ~NetGateKeeperTrans();
 
-    bool AcquireConn ();
-    void ReleaseConn ();
+    bool AcquireConn();
+    void ReleaseConn();
 };
 
 
 struct NetNotifyTrans : NetTrans {
-    NetNotifyTrans (ETransType transType);
-    bool CanStart () const { return true; }
-    bool Send () { m_state = kTransStateComplete; return true; }
-    bool Recv (
+    NetNotifyTrans(ETransType transType);
+    bool CanStart() const {
+        return true;
+    }
+    bool Send() {
+        m_state = kTransStateComplete;
+        return true;
+    }
+    bool Recv(
         const uint8_t [],
         unsigned
-    ) { return true; }
+    ) {
+        return true;
+    }
 };
 
-void NetTransInitialize ();
-void NetTransDestroy (bool wait);
-void NetTransSetTimeoutMs (unsigned ms);
-unsigned NetTransGetTimeoutMs ();
+void NetTransInitialize();
+void NetTransDestroy(bool wait);
+void NetTransSetTimeoutMs(unsigned ms);
+unsigned NetTransGetTimeoutMs();
 
-void NetTransSend (NetTrans * trans);
-bool NetTransRecv (unsigned transId, const uint8_t msg[], unsigned bytes);
-void NetTransCancel (unsigned transId, ENetError error);
-void NetTransCancelByProtocol (ENetProtocol protocol, ENetError error);
-void NetTransCancelByConnId (unsigned connId, ENetError error);
-void NetTransCancelAll (ENetError error);
-void NetTransUpdate ();
+void NetTransSend(NetTrans* trans);
+bool NetTransRecv(unsigned transId, const uint8_t msg[], unsigned bytes);
+void NetTransCancel(unsigned transId, ENetError error);
+void NetTransCancelByProtocol(ENetProtocol protocol, ENetError error);
+void NetTransCancelByConnId(unsigned connId, ENetError error);
+void NetTransCancelAll(ENetError error);
+void NetTransUpdate();
 
 
 /*****************************************************************************
@@ -382,8 +399,8 @@ void NetTransUpdate ();
 *
 ***/
 
-unsigned ConnNextSequence ();
-unsigned ConnGetId (ENetProtocol protocol);
+unsigned ConnNextSequence();
+unsigned ConnGetId(ENetProtocol protocol);
 
 
 } using namespace Ngl;

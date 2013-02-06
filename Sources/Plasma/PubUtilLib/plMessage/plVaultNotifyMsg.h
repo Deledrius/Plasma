@@ -46,21 +46,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plNetCommon/plNetCommonHelpers.h"
 #include "plNetCommon/plNetCommon.h"
 
-class plVaultNotifyMsg : public plMessage
-{
+class plVaultNotifyMsg : public plMessage {
     uint16_t                fType;
     plCreatableListHelper   fArgs;
     int8_t                  fResultCode;
 
 public:
-    enum VaultNotifyTypes
-    {
+    enum VaultNotifyTypes {
         kNothing,
         kRegisteredOwnedAge = plNetCommon::VaultTasks::kRegisterOwnedAge,
         kRegisteredVisitAge = plNetCommon::VaultTasks::kRegisterVisitAge,
         kUnRegisteredOwnedAge = plNetCommon::VaultTasks::kUnRegisterOwnedAge,
         kUnRegisteredVisitAge = plNetCommon::VaultTasks::kUnRegisterVisitAge,
-        kPublicAgeCreated, 
+        kPublicAgeCreated,
         kPublicAgeRemoved,
         kRegisteredSubAgeLink,
         kRegisteredChildAgeLink,
@@ -69,17 +67,29 @@ public:
     plVaultNotifyMsg();
     ~plVaultNotifyMsg();
 
-    CLASSNAME_REGISTER( plVaultNotifyMsg );
-    GETINTERFACE_ANY_AUX( plVaultNotifyMsg, plMessage, plCreatableListHelper, fArgs );
+    CLASSNAME_REGISTER(plVaultNotifyMsg);
+    GETINTERFACE_ANY_AUX(plVaultNotifyMsg, plMessage, plCreatableListHelper, fArgs);
 
-    uint16_t  GetType() const { return fType; }
-    void      SetType( uint16_t v ) { fType=v; }
+    uint16_t  GetType() const {
+        return fType;
+    }
+    void      SetType(uint16_t v) {
+        fType = v;
+    }
 
-    int8_t  GetResultCode() const { return fResultCode; }
-    void    SetResultCode( int8_t v ) { fResultCode=v; }
+    int8_t  GetResultCode() const {
+        return fResultCode;
+    }
+    void    SetResultCode(int8_t v) {
+        fResultCode = v;
+    }
 
-    plCreatableListHelper * GetArgs() { return &fArgs; }
-    const plCreatableListHelper * GetArgs() const { return &fArgs; }
+    plCreatableListHelper* GetArgs() {
+        return &fArgs;
+    }
+    const plCreatableListHelper* GetArgs() const {
+        return &fArgs;
+    }
 
     void Read(hsStream* stream, hsResMgr* mgr);
     void Write(hsStream* stream, hsResMgr* mgr);

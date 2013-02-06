@@ -67,10 +67,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 void plRenderTarget::SetKey(plKey k)
 {
     hsKeyedObject::SetKey(k);
-    if( k )
-    {
-        if( !fParent )
-            plgDispatch::Dispatch()->RegisterForExactType( plPipeRTMakeMsg::Index(), GetKey() );
+
+    if (k) {
+        if (!fParent) {
+            plgDispatch::Dispatch()->RegisterForExactType(plPipeRTMakeMsg::Index(), GetKey());
+        }
     }
 }
 
@@ -79,34 +80,33 @@ void plRenderTarget::SetKey(plKey k)
 bool plRenderTarget::MsgReceive(plMessage* msg)
 {
     plPipeRTMakeMsg* make = plPipeRTMakeMsg::ConvertNoRef(msg);
-    if( make )
-    {
-        if( !GetDeviceRef() || GetDeviceRef()->IsDirty() )
-        {
+
+    if (make) {
+        if (!GetDeviceRef() || GetDeviceRef()->IsDirty()) {
             make->Pipeline()->MakeRenderTargetRef(this);
         }
+
         return true;
     }
+
     return plBitmap::MsgReceive(msg);
 }
 
-uint32_t  plRenderTarget::Read( hsStream *s )
+uint32_t  plRenderTarget::Read(hsStream* s)
 {
-    uint32_t  total = plBitmap::Read( s );
+    uint32_t  total = plBitmap::Read(s);
 
     fWidth = s->ReadLE16();
     fHeight = s->ReadLE16();
 
     fProportionalViewport = s->ReadBool();
-    if( fProportionalViewport )
-    {
+
+    if (fProportionalViewport) {
         fViewport.fProportional.fLeft = s->ReadLEScalar();
         fViewport.fProportional.fTop = s->ReadLEScalar();
         fViewport.fProportional.fRight = s->ReadLEScalar();
         fViewport.fProportional.fBottom = s->ReadLEScalar();
-    }
-    else
-    {
+    } else {
         fViewport.fAbsolute.fLeft = s->ReadLE16();
         fViewport.fAbsolute.fTop = s->ReadLE16();
         fViewport.fAbsolute.fRight = s->ReadLE16();
@@ -116,82 +116,79 @@ uint32_t  plRenderTarget::Read( hsStream *s )
     fZDepth = s->ReadByte();
     fStencilDepth = s->ReadByte();
 
-    return total + 2 * 2 + 2 + 4 * ( fProportionalViewport ? sizeof( float ) : sizeof( uint16_t ) ) + sizeof( bool );
+    return total + 2 * 2 + 2 + 4 * (fProportionalViewport ? sizeof(float) : sizeof(uint16_t)) + sizeof(bool);
 }
 
-uint32_t  plRenderTarget::Write( hsStream *s )
+uint32_t  plRenderTarget::Write(hsStream* s)
 {
-    uint32_t  total = plBitmap::Write( s );
+    uint32_t  total = plBitmap::Write(s);
 
-    s->WriteLE16( fWidth );
-    s->WriteLE16( fHeight );
+    s->WriteLE16(fWidth);
+    s->WriteLE16(fHeight);
 
-    s->WriteBool( fProportionalViewport );
-    if( fProportionalViewport )
-    {
-        s->WriteLEScalar( fViewport.fProportional.fLeft );
-        s->WriteLEScalar( fViewport.fProportional.fTop );
-        s->WriteLEScalar( fViewport.fProportional.fRight );
-        s->WriteLEScalar( fViewport.fProportional.fBottom );
-    }
-    else
-    {
-        s->WriteLE16( fViewport.fAbsolute.fLeft );
-        s->WriteLE16( fViewport.fAbsolute.fTop );
-        s->WriteLE16( fViewport.fAbsolute.fRight );
-        s->WriteLE16( fViewport.fAbsolute.fBottom );
+    s->WriteBool(fProportionalViewport);
+
+    if (fProportionalViewport) {
+        s->WriteLEScalar(fViewport.fProportional.fLeft);
+        s->WriteLEScalar(fViewport.fProportional.fTop);
+        s->WriteLEScalar(fViewport.fProportional.fRight);
+        s->WriteLEScalar(fViewport.fProportional.fBottom);
+    } else {
+        s->WriteLE16(fViewport.fAbsolute.fLeft);
+        s->WriteLE16(fViewport.fAbsolute.fTop);
+        s->WriteLE16(fViewport.fAbsolute.fRight);
+        s->WriteLE16(fViewport.fAbsolute.fBottom);
     }
 
-    s->WriteByte( fZDepth );
-    s->WriteByte( fStencilDepth );
+    s->WriteByte(fZDepth);
+    s->WriteByte(fStencilDepth);
 
-    return total + 2 * 2 + 2 + 4 * ( fProportionalViewport ? sizeof( float ) : sizeof( uint16_t ) ) + sizeof( bool );
+    return total + 2 * 2 + 2 + 4 * (fProportionalViewport ? sizeof(float) : sizeof(uint16_t)) + sizeof(bool);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 //// plCubicRenderTarget Functions ////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-uint32_t  plCubicRenderTarget::Read( hsStream *s )
+uint32_t  plCubicRenderTarget::Read(hsStream* s)
 {
     int     i;
-    uint32_t  total = plRenderTarget::Read( s );
+    uint32_t  total = plRenderTarget::Read(s);
 
 
-    for( i = 0; i < 6; i++ )
-    {
-        if( fFaces[ i ] == nil )
+    for (i = 0; i < 6; i++) {
+        if (fFaces[ i ] == nil) {
             fFaces[ i ] = new plRenderTarget();
+        }
 
         fFaces[ i ]->fParent = this;
-        total += fFaces[ i ]->Read( s );
+        total += fFaces[ i ]->Read(s);
     }
 
     return total;
 }
 
-uint32_t  plCubicRenderTarget::Write( hsStream *s )
+uint32_t  plCubicRenderTarget::Write(hsStream* s)
 {
     int     i;
-    uint32_t  total = plRenderTarget::Write( s );
-    
+    uint32_t  total = plRenderTarget::Write(s);
 
-    for( i = 0; i < 6; i++ )
-    {
-        total += fFaces[ i ]->Write( s );
+
+    for (i = 0; i < 6; i++) {
+        total += fFaces[ i ]->Write(s);
     }
 
     return total;
 }
 
-uint32_t  plCubicRenderTarget::GetTotalSize( void ) const
+uint32_t  plCubicRenderTarget::GetTotalSize(void) const
 {
     uint32_t      size = 0, i;
-    
-    for( i = 0; i < 6; i++ )
-    {
-        if( fFaces[ i ] != nil )
+
+    for (i = 0; i < 6; i++) {
+        if (fFaces[ i ] != nil) {
             size += fFaces[ i ]->GetTotalSize();
+        }
     }
 
     return size;

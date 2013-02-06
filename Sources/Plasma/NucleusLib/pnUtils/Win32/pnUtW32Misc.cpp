@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/Win32/pnUtW32Misc.cpp
-*   
+*
 ***/
 
 #include "../pnUtils.h"
@@ -54,7 +54,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 //============================================================================
-const wchar_t * AppGetCommandLine () {
+const wchar_t* AppGetCommandLine()
+{
     return GetCommandLineW();
 }
 

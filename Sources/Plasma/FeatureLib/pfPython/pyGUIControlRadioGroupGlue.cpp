@@ -54,19 +54,19 @@ PYTHON_DEFAULT_DEALLOC_DEFINITION(ptGUIControlRadioGroup)
 
 PYTHON_INIT_DEFINITION(ptGUIControlRadioGroup, args, keywords)
 {
-    PyObject *keyObject = NULL;
-    if (!PyArg_ParseTuple(args, "O", &keyObject))
-    {
-        PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
-        PYTHON_RETURN_INIT_ERROR;
-    }
-    if (!pyKey::Check(keyObject))
-    {
+    PyObject* keyObject = NULL;
+
+    if (!PyArg_ParseTuple(args, "O", &keyObject)) {
         PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
         PYTHON_RETURN_INIT_ERROR;
     }
 
-    pyKey *key = pyKey::ConvertFrom(keyObject);
+    if (!pyKey::Check(keyObject)) {
+        PyErr_SetString(PyExc_TypeError, "__init__ expects a ptKey");
+        PYTHON_RETURN_INIT_ERROR;
+    }
+
+    pyKey* key = pyKey::ConvertFrom(keyObject);
     self->fThis->setKey(key->getKey());
 
     PYTHON_RETURN_INIT_OK;
@@ -80,34 +80,35 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGUIControlRadioGroup, getValue)
 PYTHON_METHOD_DEFINITION(ptGUIControlRadioGroup, setValue, args)
 {
     long val;
-    if (!PyArg_ParseTuple(args, "l", &val))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &val)) {
         PyErr_SetString(PyExc_TypeError, "setValue expects a long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetValue(val);
     PYTHON_RETURN_NONE;
 }
 
 PYTHON_START_METHODS_TABLE(ptGUIControlRadioGroup)
-    PYTHON_METHOD_NOARGS(ptGUIControlRadioGroup, getValue, "Returns the current selection of the radio group."),
-    PYTHON_METHOD(ptGUIControlRadioGroup, setValue, "Params: value\nSets the current selection to 'value'"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGUIControlRadioGroup, getValue, "Returns the current selection of the radio group."),
+                     PYTHON_METHOD(ptGUIControlRadioGroup, setValue, "Params: value\nSets the current selection to 'value'"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGUIControlRadioGroup, pyGUIControl, "Params: ctrlKey\nPlasma GUI Control Radio Group class");
 
 // required functions for PyObject interoperability
-PyObject *pyGUIControlRadioGroup::New(pyKey& gckey)
+PyObject* pyGUIControlRadioGroup::New(pyKey& gckey)
 {
-    ptGUIControlRadioGroup *newObj = (ptGUIControlRadioGroup*)ptGUIControlRadioGroup_type.tp_new(&ptGUIControlRadioGroup_type, NULL, NULL);
+    ptGUIControlRadioGroup* newObj = (ptGUIControlRadioGroup*)ptGUIControlRadioGroup_type.tp_new(&ptGUIControlRadioGroup_type, NULL, NULL);
     newObj->fThis->fGCkey = gckey.getKey();
     return (PyObject*)newObj;
 }
 
-PyObject *pyGUIControlRadioGroup::New(plKey objkey)
+PyObject* pyGUIControlRadioGroup::New(plKey objkey)
 {
-    ptGUIControlRadioGroup *newObj = (ptGUIControlRadioGroup*)ptGUIControlRadioGroup_type.tp_new(&ptGUIControlRadioGroup_type, NULL, NULL);
+    ptGUIControlRadioGroup* newObj = (ptGUIControlRadioGroup*)ptGUIControlRadioGroup_type.tp_new(&ptGUIControlRadioGroup_type, NULL, NULL);
     newObj->fThis->fGCkey = objkey;
     return (PyObject*)newObj;
 }
@@ -119,7 +120,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptGUIControlRadioGroup, pyGUIControlRadioGroup)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyGUIControlRadioGroup::AddPlasmaClasses(PyObject *m)
+void pyGUIControlRadioGroup::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptGUIControlRadioGroup);

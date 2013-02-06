@@ -48,32 +48,33 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plRenderInstance.h"
 
-class plNilView : public View 
-{
-    
+class plNilView : public View {
+
 public:
-    
-    Point2 ViewToScreen(Point3 p) { return Point2(p.x,p.y); }
-    
-    plNilView() 
-    {       
+
+    Point2 ViewToScreen(Point3 p) {
+        return Point2(p.x, p.y);
+    }
+
+    plNilView() {
         projType = 1;
         fov = M_PI * 0.25f;
         pixelSize = 1.f;
         affineTM.IdentityMatrix();
         worldToView.IdentityMatrix();
-        screenW=640.0f; screenH = 480.0f;
+        screenW = 640.0f;
+        screenH = 480.0f;
     }
-    
+
 };
 
 static plNilView nilView;
 
 plRenderInstance::plRenderInstance()
-:   fNext(nil),
-    fNode(nil),
-    fObject(nil),
-    fDeleteMesh(false)
+    :   fNext(nil),
+        fNode(nil),
+        fObject(nil),
+        fDeleteMesh(false)
 {
     mtl = nil;
     mesh = nil;
@@ -88,7 +89,7 @@ plRenderInstance::plRenderInstance()
     normalObjToCam.IdentityMatrix();
     camToObj.IdentityMatrix();
     obBox.Init();
-    center = Point3(0,0,0);
+    center = Point3(0, 0, 0);
     radsq = 0;
 }
 
@@ -98,8 +99,7 @@ plRenderInstance::~plRenderInstance()
 
 void plRenderInstance::Cleanup()
 {
-    if( mesh && fDeleteMesh )
-    {
+    if (mesh && fDeleteMesh) {
         mesh->DeleteThis();
         mesh = nil;
         fDeleteMesh = false;
@@ -109,32 +109,41 @@ void plRenderInstance::Cleanup()
 BOOL plRenderInstance::Update(TimeValue& t)
 {
     fObject = fNode->EvalWorldState(t).obj;
-    if( !fObject )
-        return false;
 
-    // this shouldn't happen, we shouldn't be trying to make 
+    if (!fObject) {
+        return false;
+    }
+
+    // this shouldn't happen, we shouldn't be trying to make
     // renderinstances from non GEOMOBJECT's
-    if( fObject->SuperClassID() != GEOMOBJECT_CLASS_ID )
+    if (fObject->SuperClassID() != GEOMOBJECT_CLASS_ID) {
         return false;
+    }
 
-    if( mesh && fDeleteMesh )
-    {
+    if (mesh && fDeleteMesh) {
         mesh->DeleteThis();
         mesh = nil;
     }
+
     fDeleteMesh = false;
     mesh = ((GeomObject*)fObject)->GetRenderMesh(t, fNode, nilView, fDeleteMesh);
-    if( !mesh )
+
+    if (!mesh) {
         return false;
+    }
 
     vis = fNode->GetVisibility(t);
-    if( vis < 0.0f ) 
-    {
+
+    if (vis < 0.0f) {
         vis = 0.0f;
         SetFlag(INST_HIDE, 1);
         return false;
     }
-    if (vis > 1.0f) vis = 1.0f;
+
+    if (vis > 1.0f) {
+        vis = 1.0f;
+    }
+
     SetFlag(INST_HIDE, 0);
 
     objMotBlurFrame = NO_MOTBLUR;
@@ -147,8 +156,10 @@ BOOL plRenderInstance::Update(TimeValue& t)
     normalObjToCam.IdentityMatrix();
     Matrix3 inv = camToObj;
     int i;
-    for( i = 0; i < 3; i++ )
+
+    for (i = 0; i < 3; i++) {
         normalObjToCam.SetRow(i, inv.GetColumn3(i));
+    }
 
     obBox = mesh->getBoundingBox(nil);
     center = obBox.Center();
@@ -165,8 +176,8 @@ BOOL plRenderInstance::GetFromNode(INode* node, TimeValue& t, int idx)
 
     fNode = node;
     mtl = node->GetMtl();
-    if( mtl )
-    {
+
+    if (mtl) {
         wireSize = mtl->WireSize();
     }
 
@@ -180,23 +191,22 @@ BOOL plRenderInstance::GetFromNode(INode* node, TimeValue& t, int idx)
 BOOL plRenderInstance::CastsShadowsFrom(const ObjLightDesc& constLt)
 {
     ObjLightDesc& lt = const_cast<ObjLightDesc&>(constLt);
-    if( !fNode->CastShadows() )
-        return false;
 
-    if( !lt.ls.shadow )
+    if (!fNode->CastShadows()) {
         return false;
+    }
 
-    if( lt.GetExclList() && lt.GetExclList()->TestFlag(NT_AFFECT_SHADOWCAST) )
-    {
+    if (!lt.ls.shadow) {
+        return false;
+    }
+
+    if (lt.GetExclList() && lt.GetExclList()->TestFlag(NT_AFFECT_SHADOWCAST)) {
         int idx = lt.GetExclList()->FindNode(fNode);
-        BOOL isInc = lt.GetExclList()->TestFlag(NT_INCLUDE); 
+        BOOL isInc = lt.GetExclList()->TestFlag(NT_INCLUDE);
 
-        if( idx >= 0 )
-        {
+        if (idx >= 0) {
             return isInc;
-        }
-        else
-        {
+        } else {
             return !isInc;
         }
     }
@@ -218,12 +228,12 @@ Point3 plRenderInstance::GetFaceVertNormal(int fnum, int vertNum)
 {
     Point3 retNorm;
 
-    int smGroup=0;
+    int smGroup = 0;
 
     Face* f = &mesh->faces[fnum];
 
-    // Get the rendered vertex.  Don't use the device position, fPos. 
-    RVertex &rv = mesh->getRVert(f->v[vertNum]);
+    // Get the rendered vertex.  Don't use the device position, fPos.
+    RVertex& rv = mesh->getRVert(f->v[vertNum]);
 
     // Number of normals at the vertex
     int numNormalsAtVert = (rv.rFlags & NORCT_MASK);
@@ -231,25 +241,22 @@ Point3 plRenderInstance::GetFaceVertNormal(int fnum, int vertNum)
     // Specified normal ?
     int specNrml = (rv.rFlags & SPECIFIED_NORMAL);
 
-    if (specNrml || (numNormalsAtVert == 1))
-    {
+    if (specNrml || (numNormalsAtVert == 1)) {
         // The normal case is one normal per vertex (a vertex not beng shared by more than one smoothing group)
         // We'll assign vertex normals here.
         // If the object is faceted, this will be the same as the face normal.
         retNorm = rv.rn.getNormal();
-    }
-    else
-    {
+    } else {
         int found = 0;
-        for(int j=0;j<numNormalsAtVert; j++)
-        {
+
+        for (int j = 0; j < numNormalsAtVert; j++) {
             smGroup = rv.ern[j].getSmGroup();
             // Since this vertex is shared by more than one smoothing group, it has multiple normals.
             // This is fairly rare and doesn't occur in faceted objects.
             // Just pick the first normal and use that as the vertex normal.
             int faceSmGroup = f->getSmGroup();
-            if ((smGroup & faceSmGroup) == faceSmGroup)
-            {
+
+            if ((smGroup & faceSmGroup) == faceSmGroup) {
                 retNorm = rv.ern[j].getNormal();
                 found++;
 
@@ -258,6 +265,7 @@ Point3 plRenderInstance::GetFaceVertNormal(int fnum, int vertNum)
             }
         }
     }
+
     retNorm = retNorm * normalObjToCam;
     retNorm.Normalize();
     return retNorm;
@@ -265,7 +273,7 @@ Point3 plRenderInstance::GetFaceVertNormal(int fnum, int vertNum)
 
 Point3 plRenderInstance::GetCamVert(int vertnum)
 {
-    return objToCam*mesh->verts[vertnum];
+    return objToCam * mesh->verts[vertnum];
 }
 
 void plRenderInstance::GetObjVerts(int fnum, Point3 obp[3])
@@ -279,41 +287,41 @@ void plRenderInstance::GetObjVerts(int fnum, Point3 obp[3])
 void plRenderInstance::GetCamVerts(int fnum, Point3 cp[3])
 {
     Face* f = &mesh->faces[fnum];
-    cp[0] = objToCam*mesh->verts[f->v[0]];
-    cp[1] = objToCam*mesh->verts[f->v[1]];
-    cp[2] = objToCam*mesh->verts[f->v[2]];
+    cp[0] = objToCam * mesh->verts[f->v[0]];
+    cp[1] = objToCam * mesh->verts[f->v[1]];
+    cp[2] = objToCam * mesh->verts[f->v[2]];
 }
 
 Mtl* plRenderInstance::GetMtl(int fnum)
 {
-    if( !mtl )
+    if (!mtl) {
         return nil;
+    }
 
-    if( TestFlag(INST_MTL_BYFACE) )
-    {
-        if( mtl->ClassID() != Class_ID(MULTI_CLASS_ID,0) )
+    if (TestFlag(INST_MTL_BYFACE)) {
+        if (mtl->ClassID() != Class_ID(MULTI_CLASS_ID, 0)) {
             return mtl;
+        }
 
         Face* f = &mesh->faces[fnum];
         int matIndex = f->getMatID();
         return mtl->GetSubMtl(matIndex);
 
-    }
-    else
-    {
+    } else {
         return mtl;
     }
 }
 
 ULONG plRenderInstance::MtlRequirements(int mtlNum, int faceNum)
 {
-    if( !mtl )
+    if (!mtl) {
         return 0;
+    }
 
-    if( TestFlag(INST_MTL_BYFACE) )
-    {
+    if (TestFlag(INST_MTL_BYFACE)) {
         Mtl* faceMtl = GetMtl(faceNum);
         return faceMtl ? faceMtl->Requirements(mtlNum) : 0;
     }
+
     return mtl->Requirements(mtlNum);
 }

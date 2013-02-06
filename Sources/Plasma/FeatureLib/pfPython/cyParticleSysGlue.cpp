@@ -58,11 +58,12 @@ PYTHON_NO_INIT_DEFINITION(ptParticle)
 PYTHON_METHOD_DEFINITION(ptParticle, netForce, args)
 {
     char forceFlag;
-    if (!PyArg_ParseTuple(args, "b", &forceFlag))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &forceFlag)) {
         PyErr_SetString(PyExc_TypeError, "netForce requires a boolean argument");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetNetForce(forceFlag != 0);
     PYTHON_RETURN_NONE;
 }
@@ -96,41 +97,42 @@ PARTICLE_FUNC(setParticleLifeMinimum, SetPartLifeMin)
 PARTICLE_FUNC(setParticleLifeMaximum, SetPartLifeMax)
 
 PYTHON_START_METHODS_TABLE(ptParticle)
-    PYTHON_METHOD(ptParticle, netForce, "Params: forceFlag\nSpecify whether this object needs to use messages that are forced to the network\n"
-                "- This is to be used if your Python program is running on only one client\n"
-                "Such as a game master, only running on the client that owns a particular object"),
+PYTHON_METHOD(ptParticle, netForce, "Params: forceFlag\nSpecify whether this object needs to use messages that are forced to the network\n"
+              "- This is to be used if your Python program is running on only one client\n"
+              "Such as a game master, only running on the client that owns a particular object"),
 
-    PYTHON_METHOD(ptParticle, setParticlesPerSecond, "Params: value\nNEEDS DOCSTRING"),
-    PYTHON_METHOD(ptParticle, setInitPitchRange, "Params: value\nNEEDS DOCSTRING"),
-    PYTHON_METHOD(ptParticle, setInitYawRange, "Params: value\nNEEDS DOCSTRING"),
-    PYTHON_METHOD(ptParticle, setVelocityMinimum, "Params: value\nNEEDS DOCSTRING"),
-    PYTHON_METHOD(ptParticle, setVelocityMaximum, "Params: value\nNEEDS DOCSTRING"),
-    PYTHON_METHOD(ptParticle, setWidthSize, "Params: value\nNEEDS DOCSTRING"),
-    PYTHON_METHOD(ptParticle, setHeightSize, "Params: value\nNEEDS DOCSTRING"),
-    PYTHON_METHOD(ptParticle, setScaleMinimum, "Params: value\nNEEDS DOCSTRING"),
-    PYTHON_METHOD(ptParticle, setScaleMaximum, "Params: value\nNEEDS DOCSTRING"),
-    PYTHON_METHOD(ptParticle, setGeneratorLife, "Params: value\nNEEDS DOCSTRING"),
-    PYTHON_METHOD(ptParticle, setParticleLifeMinimum, "Params: value\nNEEDS DOCSTRING"),
-    PYTHON_METHOD(ptParticle, setParticleLifeMaximum, "Params: value\nNEEDS DOCSTRING"),
-PYTHON_END_METHODS_TABLE;
+              PYTHON_METHOD(ptParticle, setParticlesPerSecond, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_METHOD(ptParticle, setInitPitchRange, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_METHOD(ptParticle, setInitYawRange, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_METHOD(ptParticle, setVelocityMinimum, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_METHOD(ptParticle, setVelocityMaximum, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_METHOD(ptParticle, setWidthSize, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_METHOD(ptParticle, setHeightSize, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_METHOD(ptParticle, setScaleMinimum, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_METHOD(ptParticle, setScaleMaximum, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_METHOD(ptParticle, setGeneratorLife, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_METHOD(ptParticle, setParticleLifeMinimum, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_METHOD(ptParticle, setParticleLifeMaximum, "Params: value\nNEEDS DOCSTRING"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptParticle, "Plasma particle system class");
 
 // required functions for PyObject interoperability
-PyObject *cyParticleSys::New(PyObject *sender, PyObject *recvr)
+PyObject* cyParticleSys::New(PyObject* sender, PyObject* recvr)
 {
-    ptParticle *newObj = (ptParticle*)ptParticle_type.tp_new(&ptParticle_type, NULL, NULL);
-    if (sender != NULL)
-    {
+    ptParticle* newObj = (ptParticle*)ptParticle_type.tp_new(&ptParticle_type, NULL, NULL);
+
+    if (sender != NULL) {
         plKey senderKey = pyKey::ConvertFrom(sender)->getKey();
         newObj->fThis->SetSender(senderKey);
     }
-    if (recvr != NULL)
-    {
+
+    if (recvr != NULL) {
         plKey recvrKey = pyKey::ConvertFrom(recvr)->getKey();
         newObj->fThis->AddRecvr(recvrKey);
     }
+
     newObj->fThis->SetNetForce(false);
     return (PyObject*)newObj;
 }
@@ -142,7 +144,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptParticle, cyParticleSys)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void cyParticleSys::AddPlasmaClasses(PyObject *m)
+void cyParticleSys::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptParticle);

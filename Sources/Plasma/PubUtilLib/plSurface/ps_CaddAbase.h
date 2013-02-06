@@ -61,7 +61,7 @@ static const uint8_t ps_CaddAbaseCodes[] = {
     0x0,    0x0,    0xe4,   0x80,
     0x0,    0x0,    0xe4,   0x90,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl ps_CaddAbaseDecl("sha/ps_CaddAbase.inl", ps_CaddAbase, ps_CaddAbasebyteLen, ps_CaddAbaseCodes);
 

@@ -51,23 +51,32 @@ class hsResMgr;
 //
 // Msg from server containing generic sharedState
 //
-class plSharedStateMsg : public plMessage
-{
+class plSharedStateMsg : public plMessage {
 protected:
     plNetSharedState fSharedState;
 public:
     plSharedStateMsg() {}
-    plSharedStateMsg(const plKey &s, const plKey &r, const double* t) : plMessage(s,r,t) {}
+    plSharedStateMsg(const plKey& s, const plKey& r, const double* t) : plMessage(s, r, t) {}
 
-    CLASSNAME_REGISTER( plSharedStateMsg );
-    GETINTERFACE_ANY( plSharedStateMsg, plMessage );
+    CLASSNAME_REGISTER(plSharedStateMsg);
+    GETINTERFACE_ANY(plSharedStateMsg, plMessage);
 
-    void CopySharedState(plNetSharedState* ss) { fSharedState.Copy(ss); }
-    plNetSharedState* GetSharedState() { return &fSharedState; }
+    void CopySharedState(plNetSharedState* ss) {
+        fSharedState.Copy(ss);
+    }
+    plNetSharedState* GetSharedState() {
+        return &fSharedState;
+    }
 
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr)  { plMessage::IMsgRead(stream, mgr); fSharedState.Write(stream); }
-    void Write(hsStream* stream, hsResMgr* mgr) { plMessage::IMsgWrite(stream, mgr); fSharedState.Read(stream); }
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr)  {
+        plMessage::IMsgRead(stream, mgr);
+        fSharedState.Write(stream);
+    }
+    void Write(hsStream* stream, hsResMgr* mgr) {
+        plMessage::IMsgWrite(stream, mgr);
+        fSharedState.Read(stream);
+    }
 };
 
 #endif // plSharedStateMsg_inc

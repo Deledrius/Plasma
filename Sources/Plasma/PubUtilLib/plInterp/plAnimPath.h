@@ -51,11 +51,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plCompoundController;
 
-class plAnimPath : public plCreatable
-{
+class plAnimPath : public plCreatable {
 public:
-    enum Flags
-    {
+    enum Flags {
         kNone           = 0x0,
         kFavorFwdSearch = 0x1,      // only move fwd on the curve when searching
         kFavorBwdSearch = 0x2,      // only move bwd on the curve when searching
@@ -101,84 +99,139 @@ protected:
 
     void                        ICalcBounds();
     float                    ICalcTotalLength();
-    float                    IShiftFore(hsPoint3 &pt) const;
-    float                    IShiftBack(hsPoint3 &pt) const;
-    float                    ISubDivFore(hsPoint3 &pt) const;
-    float                    ISubDivBack(hsPoint3 &pt) const;
-    void                        IInitInterval(float time, float delTime, hsPoint3 &pt) const;
-    float                    ICheckInterval(hsPoint3 &pt) const;
-    float                    IBestTime() const { return fLastDistSq < fThisDistSq 
-                                                        ? (fLastDistSq < fNextDistSq 
-                                                            ? fLastTime
-                                                            : fNextTime)
-                                                        : (fThisDistSq < fNextDistSq
-                                                            ? fThisTime
-                                                            : fNextTime); }
+    float                    IShiftFore(hsPoint3& pt) const;
+    float                    IShiftBack(hsPoint3& pt) const;
+    float                    ISubDivFore(hsPoint3& pt) const;
+    float                    ISubDivBack(hsPoint3& pt) const;
+    void                        IInitInterval(float time, float delTime, hsPoint3& pt) const;
+    float                    ICheckInterval(hsPoint3& pt) const;
+    float                    IBestTime() const {
+        return fLastDistSq < fThisDistSq
+               ? (fLastDistSq < fNextDistSq
+                  ? fLastTime
+                  : fNextTime)
+                   : (fThisDistSq < fNextDistSq
+                      ? fThisTime
+                      : fNextTime);
+    }
 
     // Visualization helper
     void IMakeSegment(hsTArray<uint16_t>& idx, hsTArray<hsPoint3>& pos,
-                                  hsPoint3& p1, hsPoint3& p2);
-    
+                      hsPoint3& p1, hsPoint3& p2);
+
     // For computing arclen
-    struct ArcLenDeltaInfo
-    {
+    struct ArcLenDeltaInfo {
         float    fT;
         float    fArcLenDelta;   // arc len distance from prev sample point (array entry)
-        ArcLenDeltaInfo(float t, float del) : fT(t),fArcLenDelta(del) {}
-        ArcLenDeltaInfo() : fT(0),fArcLenDelta(0) {}
+        ArcLenDeltaInfo(float t, float del) : fT(t), fArcLenDelta(del) {}
+        ArcLenDeltaInfo() : fT(0), fArcLenDelta(0) {}
     };
     hsTArray<ArcLenDeltaInfo>   fArcLenDeltas;
 public:
     plAnimPath();
     virtual ~plAnimPath();
 
-    CLASSNAME_REGISTER( plAnimPath );
-    GETINTERFACE_ANY( plAnimPath, plCreatable );
-    
+    CLASSNAME_REGISTER(plAnimPath);
+    GETINTERFACE_ANY(plAnimPath, plCreatable);
+
     void Reset();
 
     void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);
-    const hsMatrix44& GetLocalToWorld() const { return fLocalToWorld; }
-    const hsMatrix44& GetWorldToLocal() const { return fWorldToLocal; }
+    const hsMatrix44& GetLocalToWorld() const {
+        return fLocalToWorld;
+    }
+    const hsMatrix44& GetWorldToLocal() const {
+        return fWorldToLocal;
+    }
 
     // Visualization helper
     void MakeDrawList(hsTArray<uint16_t>& idx, hsTArray<hsPoint3>& pos);
 
-    void SetAnimPathFlags(uint32_t f) { fAnimPathFlags=f; }
-    uint32_t GetAnimPathFlags() const { return fAnimPathFlags; }
+    void SetAnimPathFlags(uint32_t f) {
+        fAnimPathFlags = f;
+    }
+    uint32_t GetAnimPathFlags() const {
+        return fAnimPathFlags;
+    }
 
-    void SetWrap(bool on) { if(on)fAnimPathFlags |= kWrap; else fAnimPathFlags &= ~kWrap; }
-    bool GetWrap() const { return 0 != (fAnimPathFlags & kWrap); }
+    void SetWrap(bool on) {
+        if (on) {
+            fAnimPathFlags |= kWrap;
+        } else {
+            fAnimPathFlags &= ~kWrap;
+        }
+    }
+    bool GetWrap() const {
+        return 0 != (fAnimPathFlags & kWrap);
+    }
 
-    void SetFarthest(bool on) { if(on)fAnimPathFlags |= kFarthest; else fAnimPathFlags &= ~kFarthest; }
-    bool GetFarthest() const { return 0 != (fAnimPathFlags & kFarthest); }
+    void SetFarthest(bool on) {
+        if (on) {
+            fAnimPathFlags |= kFarthest;
+        } else {
+            fAnimPathFlags &= ~kFarthest;
+        }
+    }
+    bool GetFarthest() const {
+        return 0 != (fAnimPathFlags & kFarthest);
+    }
 
-    void SetCurTime(float t, uint32_t calcFlags=0);
-    float GetCurTime() const { return fTime; }
+    void SetCurTime(float t, uint32_t calcFlags = 0);
+    float GetCurTime() const {
+        return fTime;
+    }
 
     void SetController(plCompoundController* tmc);
-    plCompoundController* GetController() const { return fController; }
-    float GetLength() const { return fLength; } // seconds
+    plCompoundController* GetController() const {
+        return fController;
+    }
+    float GetLength() const {
+        return fLength;    // seconds
+    }
 
-    void SetMinDistance(float d) { fMinDistSq = d*d; }
+    void SetMinDistance(float d) {
+        fMinDistSq = d * d;
+    }
     float GetMinDistance() const;
 
-    hsMatrix44* GetMatrix44(hsMatrix44* xOut) const { *xOut = fXform; return xOut; }
-    hsPoint3*   GetPosition(hsPoint3* pOut) const { *pOut = fPos; return pOut; }
-    hsVector3*  GetVelocity(hsVector3* vOut) const { *vOut = fVel; return vOut; }
-    hsVector3*  GetDirection(hsVector3* dOut) const { dOut->Set(fXform.fMap[0][2], fXform.fMap[1][2], fXform.fMap[2][2]); return dOut; }
-    hsVector3*  GetUp(hsVector3* uOut) const { uOut->Set(fXform.fMap[0][1], fXform.fMap[1][1], fXform.fMap[2][1]); return uOut; }
-    hsVector3*  GetAcceleration(hsVector3* aOut) const { *aOut = fAccel; return aOut; }
-    
-    bool OutOfRange(hsPoint3 &pt, float range) const;
-    const hsAffineParts* Parts() const { return &fParts; }
-    void InitParts(const hsAffineParts& p) { fParts = p; }
+    hsMatrix44* GetMatrix44(hsMatrix44* xOut) const {
+        *xOut = fXform;
+        return xOut;
+    }
+    hsPoint3*   GetPosition(hsPoint3* pOut) const {
+        *pOut = fPos;
+        return pOut;
+    }
+    hsVector3*  GetVelocity(hsVector3* vOut) const {
+        *vOut = fVel;
+        return vOut;
+    }
+    hsVector3*  GetDirection(hsVector3* dOut) const {
+        dOut->Set(fXform.fMap[0][2], fXform.fMap[1][2], fXform.fMap[2][2]);
+        return dOut;
+    }
+    hsVector3*  GetUp(hsVector3* uOut) const {
+        uOut->Set(fXform.fMap[0][1], fXform.fMap[1][1], fXform.fMap[2][1]);
+        return uOut;
+    }
+    hsVector3*  GetAcceleration(hsVector3* aOut) const {
+        *aOut = fAccel;
+        return aOut;
+    }
 
-    float GetExtremePoint(hsPoint3 &worldPt) const; // Exhaustive search
-    float GetExtremePoint(float lastTime, float delTime, hsPoint3 &worldPt) const; // Incremental search
+    bool OutOfRange(hsPoint3& pt, float range) const;
+    const hsAffineParts* Parts() const {
+        return &fParts;
+    }
+    void InitParts(const hsAffineParts& p) {
+        fParts = p;
+    }
+
+    float GetExtremePoint(hsPoint3& worldPt) const; // Exhaustive search
+    float GetExtremePoint(float lastTime, float delTime, hsPoint3& worldPt) const; // Incremental search
 
     // for arclen usage
-    void ComputeArcLenDeltas(int32_t numSamples=256);
+    void ComputeArcLenDeltas(int32_t numSamples = 256);
     float GetLookAheadTime(float startTime, float arcLength, bool bwd, int32_t* startSrchIdx);
 
     virtual void Read(hsStream* s, hsResMgr* mgr);

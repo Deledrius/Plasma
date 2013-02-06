@@ -54,21 +54,20 @@ class Mtl;
 class INode;
 class plResponderModifier;
 
-typedef plKey       (*PAddModFunc) (plMaxNodeBase *, plModifier *);
-typedef plKey       (*PGetNewKeyFunc) (const plString&, plModifier*, plLocation);
-typedef void        (*PSetActivatorKeyFunc) (plMaxNodeBase*, plMaxNodeBase*, plMaxNodeBase*, plResponderModifier*);
-typedef plKey       (*PGetAnimModKeyFunc) (plComponentBase*, plMaxNodeBase*);
-typedef plString    (*PGetAnimNameFunc) (plComponentBase*);
-typedef int         (*PGetMaterialAnimModKeyFunc) (Mtl* mtl, plMaxNodeBase* node, const plString &segName, hsTArray<plKey>& keys);
-typedef int         (*PGetSoundNameAndIndex) (plComponentBase*, plMaxNodeBase* node, const char*& name);
+typedef plKey(*PAddModFunc)(plMaxNodeBase*, plModifier*);
+typedef plKey(*PGetNewKeyFunc)(const plString&, plModifier*, plLocation);
+typedef void (*PSetActivatorKeyFunc)(plMaxNodeBase*, plMaxNodeBase*, plMaxNodeBase*, plResponderModifier*);
+typedef plKey(*PGetAnimModKeyFunc)(plComponentBase*, plMaxNodeBase*);
+typedef plString(*PGetAnimNameFunc)(plComponentBase*);
+typedef int (*PGetMaterialAnimModKeyFunc)(Mtl* mtl, plMaxNodeBase* node, const plString& segName, hsTArray<plKey>& keys);
+typedef int (*PGetSoundNameAndIndex)(plComponentBase*, plMaxNodeBase* node, const char*& name);
 
 //
 // A "toolbox" for external components to do their conversion with.  The idea
 // is to give components the functions they need without pulling in every source
 // file.
 //
-class plComponentTools
-{
+class plComponentTools {
 protected:
     PAddModFunc fAddModFunc;
     PGetNewKeyFunc fNewKey;
@@ -82,15 +81,15 @@ protected:
     plComponentTools() {}
 
 public:
-    plComponentTools(PAddModFunc addMod, 
-                    PGetNewKeyFunc NewKey, 
-                    PSetActivatorKeyFunc activator, 
-                    PGetAnimModKeyFunc animKey,
+    plComponentTools(PAddModFunc addMod,
+                     PGetNewKeyFunc NewKey,
+                     PSetActivatorKeyFunc activator,
+                     PGetAnimModKeyFunc animKey,
 //                  PGetAnimModKeyFunc animLightKey,
-                    PGetAnimNameFunc animName,
-                    PGetMaterialAnimModKeyFunc matMod,
-                    PGetSoundNameAndIndex sndNameAndIdx)
-        : fAddModFunc(addMod), 
+                     PGetAnimNameFunc animName,
+                     PGetMaterialAnimModKeyFunc matMod,
+                     PGetSoundNameAndIndex sndNameAndIdx)
+        : fAddModFunc(addMod),
           fNewKey(NewKey),
           fActivator(activator),
           fAnimKey(animKey),
@@ -98,17 +97,17 @@ public:
           fAnimName(animName),
           fMatMod(matMod),
           fSndNameAndIdx(sndNameAndIdx)
-            {}
+    {}
 
-    plKey AddModifier(plMaxNodeBase *node, plModifier *mod);
-    plKey GetNewKey(const plString &name, plModifier *mod, plLocation loc);
-    void SetActivatorKey(plMaxNodeBase *activatorNode, plMaxNodeBase *responderNode, plMaxNodeBase *convertNode, plResponderModifier *responderLogic);
+    plKey AddModifier(plMaxNodeBase* node, plModifier* mod);
+    plKey GetNewKey(const plString& name, plModifier* mod, plLocation loc);
+    void SetActivatorKey(plMaxNodeBase* activatorNode, plMaxNodeBase* responderNode, plMaxNodeBase* convertNode, plResponderModifier* responderLogic);
 
-    plString GetAnimCompAnimName(plComponentBase *comp);
-    plKey GetAnimCompModKey(plComponentBase *comp, plMaxNodeBase *node);
+    plString GetAnimCompAnimName(plComponentBase* comp);
+    plKey GetAnimCompModKey(plComponentBase* comp, plMaxNodeBase* node);
 //  plKey GetAnimCompLightModKey(plComponentBase *comp, plMaxNodeBase *node);
 
-    int GetMaterialAnimModKey(Mtl* mtl, plMaxNodeBase* node, const plString &segName, hsTArray<plKey>& keys);
+    int GetMaterialAnimModKey(Mtl* mtl, plMaxNodeBase* node, const plString& segName, hsTArray<plKey>& keys);
 
     int GetSoundNameAndIndex(plComponentBase* comp, plMaxNodeBase* node, const char*& name);
 };

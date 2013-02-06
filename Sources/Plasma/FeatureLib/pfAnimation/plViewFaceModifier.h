@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plGenRefMsg;
 class plPipeline;
 
-class plViewFaceModifier : public plSingleModifier
-{
+class plViewFaceModifier : public plSingleModifier {
 public:
     enum plVFFlags {
         kPivotFace          = 0,
@@ -86,8 +85,7 @@ protected:
     virtual bool IFacePoint(plPipeline* pipe, const hsPoint3& at);
     virtual bool IEval(double secs, float del, uint32_t dirty);
 
-    enum RefType
-    {
+    enum RefType {
         kRefFaceObj
     };
     void            IOnReceive(plGenRefMsg* refMsg);
@@ -98,9 +96,9 @@ public:
     plViewFaceModifier();
     virtual ~plViewFaceModifier();
 
-    CLASSNAME_REGISTER( plViewFaceModifier );
-    GETINTERFACE_ANY( plViewFaceModifier, plSingleModifier );
-    
+    CLASSNAME_REGISTER(plViewFaceModifier);
+    GETINTERFACE_ANY(plViewFaceModifier, plSingleModifier);
+
     virtual void SetTarget(plSceneObject* so);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
@@ -109,32 +107,53 @@ public:
     virtual bool MsgReceive(plMessage* msg);
 
     // ViewFace specific
-    void SetScale(const hsVector3& s) { fScale = s; }
-    const hsVector3& GetScale() const { return fScale; }
+    void SetScale(const hsVector3& s) {
+        fScale = s;
+    }
+    const hsVector3& GetScale() const {
+        return fScale;
+    }
 
     void SetOrigTransform(const hsMatrix44& l2p, const hsMatrix44& p2l);
 
     void SetMaxBounds(const hsBounds3Ext& bnd);
-    const hsBounds3Ext& GetMaxBounds() const { return fMaxBounds; }
-    bool HaveMaxBounds() const { return HasFlag(kMaxBounds); }
+    const hsBounds3Ext& GetMaxBounds() const {
+        return fMaxBounds;
+    }
+    bool HaveMaxBounds() const {
+        return HasFlag(kMaxBounds);
+    }
 
-    enum FollowMode
-    {
+    enum FollowMode {
         kFollowCamera           = 0, // Follow the camera
         kFollowListener,
         kFollowPlayer,
         kFollowObject
     };
-    void            SetFollowMode(FollowMode m, plKey soKey=nil); // For follow object, set obj, else it's ignored.
+    void            SetFollowMode(FollowMode m, plKey soKey = nil); // For follow object, set obj, else it's ignored.
     FollowMode      GetFollowMode() const;
-    plSceneObject*  GetFollowObject() const { return fFaceObj; }
+    plSceneObject*  GetFollowObject() const {
+        return fFaceObj;
+    }
 
-    void                SetOffsetActive(bool on) { if(on) SetFlag(kOffset); else ClearFlag(kOffset); }
-    bool                GetOffsetActive() const { return HasFlag(kOffset); }
+    void                SetOffsetActive(bool on) {
+        if (on) {
+            SetFlag(kOffset);
+        } else {
+            ClearFlag(kOffset);
+        }
+    }
+    bool                GetOffsetActive() const {
+        return HasFlag(kOffset);
+    }
 
-    void                SetOffset(const hsVector3& off, bool local=true);
-    const hsVector3&    GetOffset() const { return fOffset; }
-    bool                GetOffsetLocal() const { return HasFlag(kOffsetLocal); }
+    void                SetOffset(const hsVector3& off, bool local = true);
+    const hsVector3&    GetOffset() const {
+        return fOffset;
+    }
+    bool                GetOffsetLocal() const {
+        return HasFlag(kOffsetLocal);
+    }
 };
 
 #endif // plViewFaceModifier_inc

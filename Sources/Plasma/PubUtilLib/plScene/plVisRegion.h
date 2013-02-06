@@ -52,16 +52,13 @@ class plVisMgr;
 class plRegionBase;
 struct hsPoint3;
 
-class plVisRegion : public plObjInterface
-{
+class plVisRegion : public plObjInterface {
 public:
-    enum
-    {
+    enum {
         kRefRegion,
         kRefVisMgr
     };
-    enum
-    {
+    enum {
         kDisable = 0, // Always disable is zero
         kIsNot,
         kReplaceNormal, // Defaults to true
@@ -74,17 +71,21 @@ protected:
 
     int32_t                   fIndex;
 
-    void                    SetIndex(int32_t i) { fIndex = i; }
+    void                    SetIndex(int32_t i) {
+        fIndex = i;
+    }
 
     friend class plVisMgr;
 public:
-    plVisRegion(); 
+    plVisRegion();
     virtual ~plVisRegion();
 
-    CLASSNAME_REGISTER( plVisRegion );
-    GETINTERFACE_ANY( plVisRegion, plObjInterface );
+    CLASSNAME_REGISTER(plVisRegion);
+    GETINTERFACE_ANY(plVisRegion, plObjInterface);
 
-    virtual int32_t   GetNumProperties() const { return 3; } // This is stupid.
+    virtual int32_t   GetNumProperties() const {
+        return 3;    // This is stupid.
+    }
 
     virtual bool MsgReceive(plMessage* msg);
 
@@ -97,13 +98,23 @@ public:
 
     bool            Eval(const hsPoint3& pos) const;
 
-    int32_t           GetIndex() const { return fIndex; }
+    int32_t           GetIndex() const {
+        return fIndex;
+    }
 
-    bool            Registered() const { return GetIndex() > 0; }
+    bool            Registered() const {
+        return GetIndex() > 0;
+    }
 
-    bool            IsNot() const { return GetProperty(kIsNot); }
-    bool            ReplaceNormal() const { return GetProperty(kReplaceNormal); }
-    bool            DisableNormal() const { return GetProperty(kDisableNormal); }
+    bool            IsNot() const {
+        return GetProperty(kIsNot);
+    }
+    bool            ReplaceNormal() const {
+        return GetProperty(kReplaceNormal);
+    }
+    bool            DisableNormal() const {
+        return GetProperty(kDisableNormal);
+    }
 };
 
 #endif // plVisRegion_inc

@@ -53,7 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
     The 'Drive Brain' uses the same input keys as the avatar, with
     a few secret additions for convenience. At the time of this
     writing, you invoke the drive brain by pressing shift-P, and
-    then use the forward and back arrows to move and th e left and 
+    then use the forward and back arrows to move and th e left and
     right arrows to rotate. The 'u' and 'j' keys will move your avatar
     vertically.
     Gravity and collision are completely suspended for avatars in
@@ -62,8 +62,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
     Note that the drive brain inherits from the user brain, which
     parses control input for us.
 */
-class plAvBrainDrive : public plArmatureBrain
-{
+class plAvBrainDrive : public plArmatureBrain {
 public:
     plAvBrainDrive();
     /** Canonical constructer. Use this one.
@@ -75,7 +74,7 @@ public:
 
     // BRAIN PROTOCOL
     /** Suspend physics and get in line to receive keyboard control messages. */
-    virtual void Activate(plArmatureModBase *avMod);
+    virtual void Activate(plArmatureModBase* avMod);
 
     /** Restore physical reality and stop handling input messages */
     virtual void Deactivate();
@@ -85,15 +84,15 @@ public:
 
     // the user brain base handles most of the details of control messages,
     // so this function just looks for the special command which gets us out
-    // of drive mode. 
+    // of drive mode.
     virtual bool MsgReceive(plMessage* pMsg); // handle control input from the user
 
-    CLASSNAME_REGISTER( plAvBrainDrive );
-    GETINTERFACE_ANY( plAvBrainDrive, plArmatureBrain );
+    CLASSNAME_REGISTER(plAvBrainDrive);
+    GETINTERFACE_ANY(plAvBrainDrive, plArmatureBrain);
 
 protected:
     void IEnablePhysics(bool enable, plKey avKey);
-    
+
     float    fMaxVelocity;
     float    fTurnRate;
 };

@@ -50,23 +50,20 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plNotifyMsg;
 class plAnimCmdMsg;
 class plResponderSDLModifier;
-class plResponderModifier : public plSingleModifier
-{
+class plResponderModifier : public plSingleModifier {
     friend class plResponderSDLModifier;
 protected:
-    typedef std::map<int8_t,int8_t> WaitToCmd;
+    typedef std::map<int8_t, int8_t> WaitToCmd;
 
-    class plResponderCmd
-    {
+    class plResponderCmd {
     public:
         plResponderCmd() : fMsg(nil), fWaitOn(-1) {}
-        plResponderCmd(plMessage *msg, int8_t waitOn) : fMsg(msg), fWaitOn(waitOn) {}
+        plResponderCmd(plMessage* msg, int8_t waitOn) : fMsg(msg), fWaitOn(waitOn) {}
 
-        plMessage *fMsg;
+        plMessage* fMsg;
         int8_t fWaitOn;       // Index into fCompletedEvents of who we're waiting on
     };
-    class plResponderState
-    {
+    class plResponderState {
     public:
         hsTArray<plResponderCmd> fCmds;
         int8_t fNumCallbacks;         // So we know how far to search into the bitvector to find out when we're done
@@ -88,8 +85,7 @@ protected:
 
     plResponderSDLModifier* fResponderSDLMod;       // handles saving and restoring state
 
-    enum
-    {
+    enum {
         kDetectTrigger      = 0x1,
         kDetectUnTrigger    = 0x2,
         kSkipFFSound        = 0x4
@@ -97,13 +93,15 @@ protected:
     uint8_t fFlags;
     uint32_t fNotifyMsgFlags; // store the msg flags of the notify which triggered us
 
-    void Trigger(plNotifyMsg *msg);
+    void Trigger(plNotifyMsg* msg);
     bool IIsLocalOnlyCmd(plMessage* cmd);
     bool IContinueSending();
 
     int8_t ICmdFromWait(int8_t waitIdx);
 
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return true; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return true;
+    }
 
     static bool fDebugAnimBox;  // Draws a box on screen when an animation is started
     static void IDebugAnimBox(bool start);
@@ -127,33 +125,38 @@ public:
     plResponderModifier();
     ~plResponderModifier();
 
-    CLASSNAME_REGISTER( plResponderModifier );
-    GETINTERFACE_ANY( plResponderModifier, plSingleModifier );
-    
+    CLASSNAME_REGISTER(plResponderModifier);
+    GETINTERFACE_ANY(plResponderModifier, plSingleModifier);
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     virtual bool MsgReceive(plMessage* msg);
 
-    const plResponderSDLModifier* GetSDLModifier() const { return fResponderSDLMod; }
+    const plResponderSDLModifier* GetSDLModifier() const {
+        return fResponderSDLMod;
+    }
 
-    static bool ToggleDebugAnimBox() { return fDebugAnimBox = !fDebugAnimBox; }
+    static bool ToggleDebugAnimBox() {
+        return fDebugAnimBox = !fDebugAnimBox;
+    }
     static void NoLogString(const char* str);
 
     // Restore callback state after load
     void Restore();
 
-    int8_t GetState() const { return fCurState; }
+    int8_t GetState() const {
+        return fCurState;
+    }
     //
     // Export time only
     //
-    void AddCommand(plMessage* pMsg, int state=0);
+    void AddCommand(plMessage* pMsg, int state = 0);
     void AddCallback(int8_t state, int8_t cmd, int8_t callback);
 };
 
 // Message for changing the enable state in a responder modifier
-class plResponderEnableMsg : public plMessage
-{
+class plResponderEnableMsg : public plMessage {
 public:
     bool fEnable;
 
@@ -163,7 +166,7 @@ public:
     CLASSNAME_REGISTER(plResponderEnableMsg);
     GETINTERFACE_ANY(plResponderEnableMsg, plMessage);
 
-    // IO 
+    // IO
     void Read(hsStream* stream, hsResMgr* mgr);
     void Write(hsStream* stream, hsResMgr* mgr);
 };

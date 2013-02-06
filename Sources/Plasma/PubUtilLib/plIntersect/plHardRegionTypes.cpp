@@ -64,8 +64,10 @@ void plHardRegionComplex::Read(hsStream* s, hsResMgr* mgr)
 
     int n = s->ReadLE32();
     int i;
-    for( i = 0; i < n; i++ )
+
+    for (i = 0; i < n; i++) {
         mgr->ReadKeyNotifyMe(s, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, kSubRegion), plRefFlags::kActiveRef);
+    }
 }
 
 void plHardRegionComplex::Write(hsStream* s, hsResMgr* mgr)
@@ -74,30 +76,33 @@ void plHardRegionComplex::Write(hsStream* s, hsResMgr* mgr)
 
     s->WriteLE32(fSubRegions.GetCount());
     int i;
-    for( i = 0; i < fSubRegions.GetCount(); i++ )
+
+    for (i = 0; i < fSubRegions.GetCount(); i++) {
         mgr->WriteKey(s, fSubRegions[i]);
+    }
 }
 
 bool plHardRegionComplex::MsgReceive(plMessage* msg)
 {
     plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
-    if( refMsg )
-    {
-        if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest) )
-        {
+
+    if (refMsg) {
+        if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest)) {
             plHardRegion* sub = plHardRegion::ConvertNoRef(refMsg->GetRef());
             hsAssert(fSubRegions.kMissingIndex == fSubRegions.Find(sub), "Adding subRegion I already have");
             fSubRegions.Append(sub);
-        }
-        else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-        {
+        } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
             plHardRegion* sub = (plHardRegion*)refMsg->GetRef();
             int idx = fSubRegions.Find(sub);
-            if( idx != fSubRegions.kMissingIndex )
+
+            if (idx != fSubRegions.kMissingIndex) {
                 fSubRegions.Remove(idx);
+            }
         }
+
         return true;
     }
+
     return plHardRegion::MsgReceive(msg);
 }
 
@@ -119,29 +124,30 @@ plHardRegionUnion::~plHardRegionUnion()
 bool plHardRegionUnion::IIsInside(const hsPoint3& pos) const
 {
     int i;
-    for( i = 0; i < fSubRegions.GetCount(); i++ )
-    {
-        if( fSubRegions[i]->IIsInside(pos) )
+
+    for (i = 0; i < fSubRegions.GetCount(); i++) {
+        if (fSubRegions[i]->IIsInside(pos)) {
             return true;
+        }
     }
+
     return false;
 }
 
 bool plHardRegionUnion::ICameraInside() const
 {
-    if( fState & kDirty )
-    {
+    if (fState & kDirty) {
         fState &= ~(kCamInside | kDirty);
         int i;
-        for( i = 0; i < fSubRegions.GetCount(); i++ )
-        {
-            if( fSubRegions[i]->ICameraInside() )
-            {
+
+        for (i = 0; i < fSubRegions.GetCount(); i++) {
+            if (fSubRegions[i]->ICameraInside()) {
                 fState |= kCamInside;
                 return true;
             }
         }
     }
+
     return false;
 }
 
@@ -158,30 +164,31 @@ plHardRegionIntersect::~plHardRegionIntersect()
 bool plHardRegionIntersect::IIsInside(const hsPoint3& pos) const
 {
     int i;
-    for( i = 0; i < fSubRegions.GetCount(); i++ )
-    {
-        if( !fSubRegions[i]->IIsInside(pos) )
+
+    for (i = 0; i < fSubRegions.GetCount(); i++) {
+        if (!fSubRegions[i]->IIsInside(pos)) {
             return false;
+        }
     }
+
     return true;
 }
 
 bool plHardRegionIntersect::ICameraInside() const
 {
-    if( fState & kDirty )
-    {
+    if (fState & kDirty) {
         fState &= ~kDirty;
         fState |= kCamInside;
         int i;
-        for( i = 0; i < fSubRegions.GetCount(); i++ )
-        {
-            if( !fSubRegions[i]->ICameraInside() )
-            {
+
+        for (i = 0; i < fSubRegions.GetCount(); i++) {
+            if (!fSubRegions[i]->ICameraInside()) {
                 fState &= ~kCamInside;
                 return false;
             }
         }
     }
+
     return true;
 }
 
@@ -209,4 +216,4 @@ bool plHardRegionInvert::ICameraInside() const
     return !fSubRegions[0]->ICameraInside();
 }
 
-    ///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////

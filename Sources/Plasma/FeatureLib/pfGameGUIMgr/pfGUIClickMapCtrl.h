@@ -52,54 +52,59 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plMessage;
 
-class pfGUIClickMapCtrl : public pfGUIControlMod
-{
-    protected:
+class pfGUIClickMapCtrl : public pfGUIControlMod {
+protected:
 
-        hsPoint3        fLastMousePt, fLastMouseUpPt, fLastMouseDragPt;
-        bool            fTracking;
-        int32_t           fCustomCursor;
+    hsPoint3        fLastMousePt, fLastMouseUpPt, fLastMouseDragPt;
+    bool            fTracking;
+    int32_t           fCustomCursor;
 
-        virtual bool IEval( double secs, float del, uint32_t dirty ); // called only by owner object's Eval()
+    virtual bool IEval(double secs, float del, uint32_t dirty);   // called only by owner object's Eval()
 
-        virtual uint32_t      IGetDesiredCursor( void ) const;    // As specified in plInputInterface.h
+    virtual uint32_t      IGetDesiredCursor(void) const;      // As specified in plInputInterface.h
 
-    public:
+public:
 
-        pfGUIClickMapCtrl();
-        virtual ~pfGUIClickMapCtrl();
+    pfGUIClickMapCtrl();
+    virtual ~pfGUIClickMapCtrl();
 
-        CLASSNAME_REGISTER( pfGUIClickMapCtrl );
-        GETINTERFACE_ANY( pfGUIClickMapCtrl, pfGUIControlMod );
+    CLASSNAME_REGISTER(pfGUIClickMapCtrl);
+    GETINTERFACE_ANY(pfGUIClickMapCtrl, pfGUIControlMod);
 
-        enum OurFlags
-        {
-            kReportDragging = kDerivedFlagsStart,
-            kReportHovering
-        };
+    enum OurFlags {
+        kReportDragging = kDerivedFlagsStart,
+        kReportHovering
+    };
 
-        // Extended event types
-        enum ExtendedEvents
-        {
-            kMouseDragged,
-            kMouseHovered
-        };
+    // Extended event types
+    enum ExtendedEvents {
+        kMouseDragged,
+        kMouseHovered
+    };
 
-        virtual void    HandleMouseDown( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseUp( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseDrag( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseHover( hsPoint3 &mousePt, uint8_t modifiers );
+    virtual void    HandleMouseDown(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseUp(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseDrag(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseHover(hsPoint3& mousePt, uint8_t modifiers);
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        const hsPoint3  &GetLastMousePt( void ) const { return fLastMousePt; }
-        const hsPoint3  &GetLastMouseUpPt( void ) const { return fLastMouseUpPt; }
-        const hsPoint3  &GetLastMouseDragPt( void ) const { return fLastMouseDragPt; }
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-        void    SetCustomCursor( int32_t cursor = -1 ) { fCustomCursor = cursor; }
+    const hsPoint3&  GetLastMousePt(void) const {
+        return fLastMousePt;
+    }
+    const hsPoint3&  GetLastMouseUpPt(void) const {
+        return fLastMouseUpPt;
+    }
+    const hsPoint3&  GetLastMouseDragPt(void) const {
+        return fLastMouseDragPt;
+    }
+
+    void    SetCustomCursor(int32_t cursor = -1) {
+        fCustomCursor = cursor;
+    }
 };
 
 #endif // _pfGUIClickMapCtrl_h

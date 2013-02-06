@@ -42,12 +42,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plRefFlags_inc
 #define plRefFlags_inc
 
-namespace plRefFlags
-{
-    enum Type {
-        kActiveRef,     // If one is resident, return it, else create and load one to return. Keep it loaded till I release.
-        kPassiveRef     // Just notify me when it is loaded or unloaded until I release.
-    };
+namespace plRefFlags {
+enum Type {
+    kActiveRef,     // If one is resident, return it, else create and load one to return. Keep it loaded till I release.
+    kPassiveRef     // Just notify me when it is loaded or unloaded until I release.
+};
 };
 
 #endif // plRefFlags_inc

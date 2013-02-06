@@ -89,9 +89,9 @@ void DummyCodeIncludeFuncAGComp()
 }
 
 enum    {
-        kShareableBool,         //Added in v1
-        kGlobalBool,            //Added in v1
-        };
+    kShareableBool,         //Added in v1
+    kGlobalBool,            //Added in v1
+};
 
 //////////////////////////////////////////////////////////////
 //
@@ -99,25 +99,28 @@ enum    {
 //
 //
 //
-class plAnimAvatarComponent : public plComponent
-{
+class plAnimAvatarComponent : public plComponent {
 //protected:
 //  static plAGAnimMgr *fManager;
 public:
-        plAnimAvatarComponent();
-        virtual bool SetupProperties(plMaxNode* node, plErrorMsg *pErrMsg);
+    plAnimAvatarComponent();
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
 
-        virtual bool Convert(plMaxNode* node, plErrorMsg *pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
-        virtual plATCAnim * NewAnimation(const plString &name, double begin, double end);
+    virtual plATCAnim* NewAnimation(const plString& name, double begin, double end);
 
-        bool ConvertNode(plMaxNode *node, plErrorMsg *pErrMsg);
-        bool ConvertNodeSegmentBranch(plMaxNode *node, plAGAnim *mod, plErrorMsg *pErrMsg);
-        bool MakePersistent(plMaxNode *node, plAGAnim *anim, const plString &animName, plErrorMsg *pErrMsg);
+    bool ConvertNode(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool ConvertNodeSegmentBranch(plMaxNode* node, plAGAnim* mod, plErrorMsg* pErrMsg);
+    bool MakePersistent(plMaxNode* node, plAGAnim* anim, const plString& animName, plErrorMsg* pErrMsg);
 
-        virtual void CollectNonDrawables(INodeTab& nonDrawables) { AddTargetsToList(nonDrawables); }
+    virtual void CollectNonDrawables(INodeTab& nonDrawables) {
+        AddTargetsToList(nonDrawables);
+    }
 
-        void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 };
 
 //plAGAnimMgr * plAnimAvatarComponent::fManager = nil;
@@ -129,22 +132,22 @@ CLASS_DESC(plAnimAvatarComponent, gAnimAvatarDesc, "Compound Animation",  "Compo
 //
 //
 ParamBlockDesc2 gAnimAvatarBk
-(   
+(
     plComponent::kBlkComp, _T("CompoundAnim"), 0, &gAnimAvatarDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     //Roll out
     IDD_COMP_ANIM_AVATAR, IDS_COMP_ANIM_AVATARS, 0, 0, NULL,
 
     // params
-    kShareableBool, _T("ShareableBool"), TYPE_BOOL, 0, 0,   
-        p_default, FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_ANIM_AVATAR_SHAREBOOL,
-        end,
+    kShareableBool, _T("ShareableBool"), TYPE_BOOL, 0, 0,
+    p_default, FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_ANIM_AVATAR_SHAREBOOL,
+    end,
 
-    kGlobalBool, _T("ShareableBool"), TYPE_BOOL, 0, 0,  
-        p_default, FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_ANIM_AVATAR_GLOBALBOOL,
-        end,
+    kGlobalBool, _T("ShareableBool"), TYPE_BOOL, 0, 0,
+    p_default, FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_ANIM_AVATAR_GLOBALBOOL,
+    end,
 
     //kBoundCondRadio, _T("BoundingConditions"),        TYPE_INT,       0, 0,
     //  p_ui,       TYPE_RADIO, 2, IDC_COMP_PHYS_DETECTOR_RAD1, IDC_COMP_PHYS_DETECTOR_RAD2,
@@ -169,22 +172,21 @@ plAnimAvatarComponent::plAnimAvatarComponent()
 //  Anim Avatar PRECONVERT
 //
 //
-bool plAnimAvatarComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAnimAvatarComponent::SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    if(node->GetMaxNodeData())
-    {
+    if (node->GetMaxNodeData()) {
         node->SetMovable(true);
         node->SetForceLocal(true);
         node->SetDrawable(false);
     }
-    
+
     int childCount = node->NumberOfChildren();
-    for (int i = 0; i < childCount; i++)
-    {
-        SetupProperties((plMaxNode *)node->GetChildNode(i), pErrMsg);
+
+    for (int i = 0; i < childCount; i++) {
+        SetupProperties((plMaxNode*)node->GetChildNode(i), pErrMsg);
     }
 
-    return true; 
+    return true;
 }
 
 //
@@ -194,15 +196,15 @@ bool plAnimAvatarComponent::SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg
 // for each node, search for segments to convert...
 //
 //
-bool plAnimAvatarComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAnimAvatarComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    Interface *theInterface = node->GetInterface();
+    Interface* theInterface = node->GetInterface();
     RemoveBiped(node, theInterface);
 
     ConvertNode(node, pErrMsg);
 
-    ((plSceneNode *)node->GetRoomKey()->GetObjectPtr())->SetFilterGenericsOnly(true);
-    
+    ((plSceneNode*)node->GetRoomKey()->GetObjectPtr())->SetFilterGenericsOnly(true);
+
     return true;
 }
 
@@ -212,32 +214,35 @@ bool plAnimAvatarComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
 // recurse on children
 //
 //
-bool plAnimAvatarComponent::ConvertNode(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plAnimAvatarComponent::ConvertNode(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     plNotetrackAnim noteAnim(node, pErrMsg);
+
     // does this node have any segments specified?
-    if (noteAnim.HasNotetracks())
-    {
+    if (noteAnim.HasNotetracks()) {
         // for each segment we found:
         plString animName;
-        while (!(animName = noteAnim.GetNextAnimName()).IsNull())
-        {
+
+        while (!(animName = noteAnim.GetNextAnimName()).IsNull()) {
             plAnimInfo info = noteAnim.GetAnimInfo(animName);
 
-            plATCAnim *anim = NewAnimation(info.GetAnimName(), info.GetAnimStart(), info.GetAnimEnd());
+            plATCAnim* anim = NewAnimation(info.GetAnimName(), info.GetAnimStart(), info.GetAnimEnd());
 
             plString loopName = info.GetNextLoopName();
-            if (!loopName.IsNull())
-            {
+
+            if (!loopName.IsNull()) {
                 anim->SetLoop(true);
                 float loopStart = info.GetLoopStart(loopName);
                 float loopEnd = info.GetLoopEnd(loopName);
                 anim->SetLoopStart(loopStart == -1 ? anim->GetStart() : loopStart);
                 anim->SetLoopEnd(loopEnd == -1 ? anim->GetEnd() : loopEnd);
             }
+
             plString marker;
-            while (!(marker = info.GetNextMarkerName()).IsNull())
+
+            while (!(marker = info.GetNextMarkerName()).IsNull()) {
                 anim->AddMarker(marker, info.GetMarkerTime(marker));
+            }
 
             ConvertNodeSegmentBranch(node, anim, pErrMsg);
             MakePersistent(node, anim, info.GetAnimName(), pErrMsg);
@@ -246,17 +251,19 @@ bool plAnimAvatarComponent::ConvertNode(plMaxNode *node, plErrorMsg *pErrMsg)
 
     // let's see if the children have any segments specified...
     int childCount = node->NumberOfChildren();
-    for (int i = 0; i < childCount; i++)
-        ConvertNode((plMaxNode *)(node->GetChildNode(i)), pErrMsg);
+
+    for (int i = 0; i < childCount; i++) {
+        ConvertNode((plMaxNode*)(node->GetChildNode(i)), pErrMsg);
+    }
 
     return true;
 }
 
 // NewAnimation -------------------------------------------------------------------------
 // -------------
-plATCAnim * plAnimAvatarComponent::NewAnimation(const plString &name, double begin, double end)
+plATCAnim* plAnimAvatarComponent::NewAnimation(const plString& name, double begin, double end)
 {
-    return new plATCAnim(name, begin, end); 
+    return new plATCAnim(name, begin, end);
 }
 
 
@@ -266,7 +273,7 @@ plATCAnim * plAnimAvatarComponent::NewAnimation(const plString &name, double beg
 // every node gets an animation channel for the time period in question
 //
 //
-bool plAnimAvatarComponent::ConvertNodeSegmentBranch(plMaxNode *node, plAGAnim *mod, plErrorMsg *pErrMsg)
+bool plAnimAvatarComponent::ConvertNodeSegmentBranch(plMaxNode* node, plAGAnim* mod, plErrorMsg* pErrMsg)
 {
     // Check for a suppression marker
     plNotetrackAnim noteAnim(node, pErrMsg);
@@ -274,31 +281,29 @@ bool plAnimAvatarComponent::ConvertNodeSegmentBranch(plMaxNode *node, plAGAnim *
     bool suppressed = info.IsSuppressed(mod->GetName());
 
     // Get the affine parts and the TM Controller
-    plSceneObject *obj = node->GetSceneObject();
-    if(obj && !suppressed) {
+    plSceneObject* obj = node->GetSceneObject();
+
+    if (obj && !suppressed) {
         hsAffineParts parts;
         hsControlConverter::Instance().ReduceKeys(node->GetTMController(), node->GetKeyReduceThreshold());
         plController* tmc = hsControlConverter::Instance().ConvertTMAnim(obj, node, &parts, mod->GetStart(), mod->GetEnd());
-        
-        if (tmc)
-        {
-            plMatrixChannel *channel;
+
+        if (tmc) {
+            plMatrixChannel* channel;
             hsMatrix44 constSetting;
             parts.ComposeMatrix(&constSetting);
 
             // If all our keys match, there's no point in keeping an animation controller
             // around. Just nuke it and replace it with a constant channel.
-            if (tmc->PurgeRedundantSubcontrollers())
-            {
+            if (tmc->PurgeRedundantSubcontrollers()) {
                 channel = new plMatrixConstant(constSetting);
                 delete tmc;
                 tmc = nil;
-            }
-            else
-            {
+            } else {
                 channel = new plMatrixControllerChannel(tmc, &parts);
             }
-            plMatrixChannelApplicator *app = new plMatrixChannelApplicator();
+
+            plMatrixChannelApplicator* app = new plMatrixChannelApplicator();
             app->SetChannelName(node->GetKey()->GetName());
             app->SetChannel(channel);
             mod->AddApplicator(app);
@@ -306,8 +311,10 @@ bool plAnimAvatarComponent::ConvertNodeSegmentBranch(plMaxNode *node, plAGAnim *
 
         // let's see if the children have any segments specified...
         int childCount = node->NumberOfChildren();
-        for (int i = 0; i < childCount; i++)
-            ConvertNodeSegmentBranch((plMaxNode *)(node->GetChildNode(i)), mod, pErrMsg);
+
+        for (int i = 0; i < childCount; i++) {
+            ConvertNodeSegmentBranch((plMaxNode*)(node->GetChildNode(i)), mod, pErrMsg);
+        }
 
         return true;
     } else {
@@ -315,17 +322,16 @@ bool plAnimAvatarComponent::ConvertNodeSegmentBranch(plMaxNode *node, plAGAnim *
     }
 }
 
-plKey FindSceneNode(plMaxNode *node)
+plKey FindSceneNode(plMaxNode* node)
 {
-    plSceneObject *obj = node->GetSceneObject();
-    if(obj)
-    {
+    plSceneObject* obj = node->GetSceneObject();
+
+    if (obj) {
         return obj->GetSceneNode();
     } else {
-        plMaxNode *parent = (plMaxNode *)node->GetParentNode();
+        plMaxNode* parent = (plMaxNode*)node->GetParentNode();
 
-        if(parent)
-        {
+        if (parent) {
             return FindSceneNode(parent);
         } else {
             return nil;
@@ -338,21 +344,19 @@ plKey FindSceneNode(plMaxNode *node)
 // Perform wizardry necessary to make the object save itself.
 //
 //
-bool plAnimAvatarComponent::MakePersistent(plMaxNode *node, plAGAnim *anim, const plString &animName, plErrorMsg *pErrMsg)
+bool plAnimAvatarComponent::MakePersistent(plMaxNode* node, plAGAnim* anim, const plString& animName, plErrorMsg* pErrMsg)
 {
     // new approach: add to the generic pool on the scene node
     plLocation nodeLoc = node->GetLocation();
     plKey sceneNodeKey = FindSceneNode(node);
-    if(sceneNodeKey)
-    {
+
+    if (sceneNodeKey) {
         plKey animKey = hsgResMgr::ResMgr()->NewKey(animName, anim, nodeLoc);
 
         plNodeRefMsg* refMsg = new plNodeRefMsg(sceneNodeKey, plNodeRefMsg::kOnRequest, -1, plNodeRefMsg::kGeneric);
 
         hsgResMgr::ResMgr()->AddViaNotify(animKey, refMsg, plRefFlags::kActiveRef);
-    }
-    else
-    {
+    } else {
         pErrMsg->Set(true, "Sorry", "Can't find node to save animation. Animation will not be saved.");
     }
 
@@ -364,15 +368,14 @@ bool plAnimAvatarComponent::MakePersistent(plMaxNode *node, plAGAnim *anim, cons
 
 // plEmoteComponent ---------------------------------
 // -----------------
-class plEmoteComponent : public plAnimAvatarComponent
-{
+class plEmoteComponent : public plAnimAvatarComponent {
 public:
     enum {
         kBodyUsage,
         kFadeIn,
         kFadeOut
     };
-    
+
     enum {
         kBodyUnknown,
         kBodyUpper,
@@ -380,8 +383,8 @@ public:
     };
 
     plEmoteComponent();
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual plATCAnim * NewAnimation(const plString &name, double begin, double end);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual plATCAnim* NewAnimation(const plString& name, double begin, double end);
 
 protected:
     float fFadeIn;
@@ -405,24 +408,24 @@ ParamBlockDesc2 gEmoteBk
     IDD_COMP_EMOTE, IDS_COMP_EMOTE, 0, 0, NULL,
 
     plEmoteComponent::kBodyUsage, _T("Blend"),      TYPE_INT,       0, 0,
-        p_ui,       TYPE_RADIO, 3,  IDC_BODY_UNKNOWN, IDC_BODY_UPPER, IDC_BODY_FULL,
-        p_vals, plEmoteComponent::kBodyUnknown, plEmoteComponent::kBodyUpper, plEmoteComponent::kBodyFull,
-        p_default, plEmoteComponent::kBodyUnknown,
-        end,
+    p_ui,       TYPE_RADIO, 3,  IDC_BODY_UNKNOWN, IDC_BODY_UPPER, IDC_BODY_FULL,
+    p_vals, plEmoteComponent::kBodyUnknown, plEmoteComponent::kBodyUpper, plEmoteComponent::kBodyFull,
+    p_default, plEmoteComponent::kBodyUnknown,
+    end,
 
-    plEmoteComponent::kFadeIn, _T("Length"), TYPE_FLOAT,    0, 0,   
-        p_default, 2.0,
-        p_range, 0.1, 10.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_EMO_FADEIN, IDC_EMO_FADEIN_SPIN, 0.1,
-        end,    
+    plEmoteComponent::kFadeIn, _T("Length"), TYPE_FLOAT,    0, 0,
+    p_default, 2.0,
+    p_range, 0.1, 10.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_EMO_FADEIN, IDC_EMO_FADEIN_SPIN, 0.1,
+    end,
 
-    plEmoteComponent::kFadeOut, _T("Length"), TYPE_FLOAT,   0, 0,   
-        p_default, 2.0,
-        p_range, 0.1, 10.0,
-        p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT, 
-        IDC_EMO_FADEOUT, IDC_EMO_FADEOUT_SPIN, 0.1,
-        end,    
+    plEmoteComponent::kFadeOut, _T("Length"), TYPE_FLOAT,   0, 0,
+    p_default, 2.0,
+    p_range, 0.1, 10.0,
+    p_ui,   TYPE_SPINNER,   EDITTYPE_POS_FLOAT,
+    IDC_EMO_FADEOUT, IDC_EMO_FADEOUT_SPIN, 0.1,
+    end,
 
 
     end
@@ -440,9 +443,9 @@ plEmoteComponent::plEmoteComponent()
 
 // Convert ------------------------------------------------------------
 // --------
-bool plEmoteComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plEmoteComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
-    Interface *theInterface = node->GetInterface();
+    Interface* theInterface = node->GetInterface();
     RemoveBiped(node, theInterface);
 
     fFadeIn = fCompPB->GetFloat(kFadeIn);
@@ -450,14 +453,14 @@ bool plEmoteComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
     fBodyUsage = static_cast<plEmoteAnim::BodyUsage>(fCompPB->GetInt(kBodyUsage));
 
     ConvertNode(node, pErrMsg);
-    ((plSceneNode *)node->GetRoomKey()->GetObjectPtr())->SetFilterGenericsOnly(true);
+    ((plSceneNode*)node->GetRoomKey()->GetObjectPtr())->SetFilterGenericsOnly(true);
     return true;
 }
 
 
 // NewAnimation ----------------------------------------------------------------------
 // -------------
-plATCAnim * plEmoteComponent::NewAnimation(const plString &name, double begin, double end)
+plATCAnim* plEmoteComponent::NewAnimation(const plString& name, double begin, double end)
 {
     return new plEmoteAnim(name, begin, end, fFadeIn, fFadeOut, fBodyUsage);
 }

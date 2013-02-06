@@ -53,29 +53,34 @@ class plSynchedObject;
 class plEventCallbackMsg;
 class hsStream;
 class hsResMgr;
-class plMessageWithCallbacks : public plMessage
-{
+class plMessageWithCallbacks : public plMessage {
 private:
-    hsTArray<plMessage*>        fCallbacks; 
+    hsTArray<plMessage*>        fCallbacks;
 public:
     plMessageWithCallbacks() {}
-    plMessageWithCallbacks(const plKey &s, const plKey &r, const double* t) : plMessage(s,r,t) {}
+    plMessageWithCallbacks(const plKey& s, const plKey& r, const double* t) : plMessage(s, r, t) {}
     ~plMessageWithCallbacks();
 
-    CLASSNAME_REGISTER( plMessageWithCallbacks );
-    GETINTERFACE_ANY( plMessageWithCallbacks, plMessage );
-    
+    CLASSNAME_REGISTER(plMessageWithCallbacks);
+    GETINTERFACE_ANY(plMessageWithCallbacks, plMessage);
+
     void Clear();
-    
+
     void                AddCallback(plMessage* e); // will RefCnt the message e.
-    int                 GetNumCallbacks() const { return fCallbacks.GetCount(); }
-    plMessage*          GetCallback(int i) const { return fCallbacks[i]; }
-    plEventCallbackMsg* GetEventCallback(int i) const { return plEventCallbackMsg::ConvertNoRef(fCallbacks[i]); }
+    int                 GetNumCallbacks() const {
+        return fCallbacks.GetCount();
+    }
+    plMessage*          GetCallback(int i) const {
+        return fCallbacks[i];
+    }
+    plEventCallbackMsg* GetEventCallback(int i) const {
+        return plEventCallbackMsg::ConvertNoRef(fCallbacks[i]);
+    }
     void SendCallbacks();
-    
+
 #if 0
     // returns true if ok to send in a networked situations
-    static bool     NetOKToSend(plSynchedObject* sender, plEventCallbackMsg* cbmsg);    
+    static bool     NetOKToSend(plSynchedObject* sender, plEventCallbackMsg* cbmsg);
 #endif
 
     // IO

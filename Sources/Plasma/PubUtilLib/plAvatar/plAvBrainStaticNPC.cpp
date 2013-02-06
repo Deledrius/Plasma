@@ -41,7 +41,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *==LICENSE==*/
 //class plAvBrainStaticNPC : public plAvBrain
 //{
-//  
+//
 //};
 //
 ///** \class plAvBrain
@@ -60,7 +60,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //      Brains are always constructed before being Pushed onto the armature
 //      they seek to control. */
 //  plAvBrain();
-//  
+//
 //  /** Destructor. Automatically called on a brain when it is popped from the armature. */
 //  virtual ~plAvBrain();
 //
@@ -107,8 +107,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 //  // TASKS
 //  // tasks are operations that must be done in sequence.
-//  /** Push a new task onto the end of our FIFO task queue. Will not 
-//      run until all the tasks ahead of it have run. 
+//  /** Push a new task onto the end of our FIFO task queue. Will not
+//      run until all the tasks ahead of it have run.
 //      \sa plAvTask
 //  */
 //  virtual void QueueTask(plAvTask *task);
@@ -141,7 +141,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  // -- methods
 //  virtual bool IHandleTaskMsg(plAvTaskMsg *msg);    // respond to a task scheduling message
 //  void IProcessTasks(double time, hsScalar elapsed);  // process current task and start new one if necessary
-//  
+//
 //  bool    fSuspended;
 //};
 //

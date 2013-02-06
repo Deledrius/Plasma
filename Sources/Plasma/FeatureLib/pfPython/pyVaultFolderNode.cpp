@@ -51,70 +51,78 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plVault/plVault.h"
 
 // should only be created from C++ side
-pyVaultFolderNode::pyVaultFolderNode( RelVaultNode* nfsNode )
-: pyVaultNode( nfsNode )
+pyVaultFolderNode::pyVaultFolderNode(RelVaultNode* nfsNode)
+    : pyVaultNode(nfsNode)
 {
 }
 
 //create from the Python side
 pyVaultFolderNode::pyVaultFolderNode(int n)
-: pyVaultNode(new RelVaultNode)
+    : pyVaultNode(new RelVaultNode)
 {
     fNode->SetNodeType(plVault::kNodeType_Folder);
 }
 
-pyVaultFolderNode::~pyVaultFolderNode () {
+pyVaultFolderNode::~pyVaultFolderNode()
+{
 }
 
 //==================================================================
 // class RelVaultNode : public plVaultNode
 //
-void pyVaultFolderNode::Folder_SetType( int type )
+void pyVaultFolderNode::Folder_SetType(int type)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
-        
+    }
+
     VaultFolderNode folder(fNode);
     folder.SetFolderType(type);
 }
 
-int pyVaultFolderNode::Folder_GetType( void )
+int pyVaultFolderNode::Folder_GetType(void)
 {
-    if (!fNode)
+    if (!fNode) {
         return 0;
-        
+    }
+
     VaultFolderNode folder(fNode);
     return folder.GetFolderType();
 }
 
-void pyVaultFolderNode::Folder_SetName( std::string name )
+void pyVaultFolderNode::Folder_SetName(std::string name)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
-        
+    }
+
     wchar_t* wName = hsStringToWString(name.c_str());
     VaultFolderNode folder(fNode);
     folder.SetFolderName(wName);
     delete [] wName;
 }
 
-void pyVaultFolderNode::Folder_SetNameW( std::wstring name )
+void pyVaultFolderNode::Folder_SetNameW(std::wstring name)
 {
-    if (!fNode)
+    if (!fNode) {
         return;
+    }
 
     VaultFolderNode folder(fNode);
     folder.SetFolderName(name.c_str());
 }
 
-std::string pyVaultFolderNode::Folder_GetName( void )
+std::string pyVaultFolderNode::Folder_GetName(void)
 {
-    if (!fNode)
+    if (!fNode) {
         return "";
-        
+    }
+
     VaultFolderNode folder(fNode);
-    if (!folder.GetFolderName())
+
+    if (!folder.GetFolderName()) {
         return "";
+    }
 
     std::string retVal;
     char* sName = hsWStringToString(folder.GetFolderName());
@@ -123,14 +131,17 @@ std::string pyVaultFolderNode::Folder_GetName( void )
     return retVal;
 }
 
-std::wstring pyVaultFolderNode::Folder_GetNameW( void )
+std::wstring pyVaultFolderNode::Folder_GetNameW(void)
 {
-    if (!fNode)
+    if (!fNode) {
         return L"";
+    }
 
     VaultFolderNode folder(fNode);
-    if (!folder.GetFolderName())
+
+    if (!folder.GetFolderName()) {
         return L"";
+    }
 
     return folder.GetFolderName();
 }

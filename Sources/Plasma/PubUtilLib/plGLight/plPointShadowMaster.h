@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plBoundsIsect;
 
-class plPointShadowMaster : public plShadowMaster
-{
+class plPointShadowMaster : public plShadowMaster {
 protected:
     mutable hsVector3                   fLastUp;
 
@@ -68,8 +67,8 @@ public:
     plPointShadowMaster();
     virtual ~plPointShadowMaster();
 
-    CLASSNAME_REGISTER( plPointShadowMaster );
-    GETINTERFACE_ANY( plPointShadowMaster, plShadowMaster );
+    CLASSNAME_REGISTER(plPointShadowMaster);
+    GETINTERFACE_ANY(plPointShadowMaster, plShadowMaster);
 
 };
 

@@ -54,12 +54,13 @@ plPickedConditionalObject::plPickedConditionalObject()
 bool plPickedConditionalObject::MsgReceive(plMessage* msg)
 {
     plActivatorMsg* pDetectorMsg = plActivatorMsg::ConvertNoRef(msg);
-    if (pDetectorMsg && pDetectorMsg->TriggerType() == plActivatorMsg::kPickedTrigger )
-    {
+
+    if (pDetectorMsg && pDetectorMsg->TriggerType() == plActivatorMsg::kPickedTrigger) {
         SetSatisfied(true);
 //      fLogicMod->RequestTrigger();
         return true;
     }
+
     return plConditionalObject::MsgReceive(msg);
 }
 

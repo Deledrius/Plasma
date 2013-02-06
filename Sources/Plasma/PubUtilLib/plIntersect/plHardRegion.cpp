@@ -49,8 +49,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMessage/plRenderMsg.h"
 #include "plPipeline.h"
 
-plHardRegion::plHardRegion() 
-:   fState(kDirty)
+plHardRegion::plHardRegion()
+    :   fState(kDirty)
 {
 }
 
@@ -63,12 +63,13 @@ void plHardRegion::SetKey(plKey k)
     plRegionBase::SetKey(k);
 
 #if 0 // The caching of this probably isn't worth it.
+
     // We'll try evaluation every time first, and try
     // this later as an optimization.
-    if( k )
-    {
+    if (k) {
         plgDispatch::Dispatch()->RegisterForExactType(plRenderMsg::Index(), GetKey());
     }
+
 #endif // Caching
 }
 
@@ -86,22 +87,24 @@ void plHardRegion::Write(hsStream* s, hsResMgr* mgr)
 
 bool plHardRegion::CameraInside() const
 {
-    if( fState & kDirty )
-    {
-        if( ICameraInside() )
+    if (fState & kDirty) {
+        if (ICameraInside()) {
             fState |= kCamInside;
-        else
+        } else {
             fState &= ~kCamInside;
+        }
+
         fState &= ~kDirty;
     }
+
     return 0 != (fState & kCamInside);
 }
 
 bool plHardRegion::MsgReceive(plMessage* msg)
 {
     plRenderMsg* rend = plRenderMsg::ConvertNoRef(msg);
-    if( rend )
-    {
+
+    if (rend) {
         fState |= kDirty;
         fCamPos = rend->Pipeline()->GetViewPositionWorld();
         return true;

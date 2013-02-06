@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 template <class T> class hsTArray;
 class hsStream;
 
-class plLoadMask
-{
+class plLoadMask {
 public:
     enum {
         kMaxCap = 1
@@ -58,53 +57,119 @@ protected:
     static uint8_t    fGlobalQuality;
     static uint8_t    fGlobalCapability;
     union {
-        uint8_t           fQuality[kMaxCap+1];
+        uint8_t           fQuality[kMaxCap + 1];
         uint16_t          fMask;
     };
 
-    static void SetGlobalQuality(int q) { fGlobalQuality = IBitToMask(q); }
-    static void SetGlobalCapability(int c) { if( c > kMaxCap ) c = kMaxCap; else if( c < 0 ) c = 0; fGlobalCapability = c; }
+    static void SetGlobalQuality(int q) {
+        fGlobalQuality = IBitToMask(q);
+    }
+    static void SetGlobalCapability(int c) {
+        if (c > kMaxCap) {
+            c = kMaxCap;
+        } else if (c < 0) {
+            c = 0;
+        }
 
-    static uint8_t IBitToMask(int b) { hsAssert(b<8, "LoadMask: bit too large for uint8_t"); return (1 << b); }
+        fGlobalCapability = c;
+    }
+
+    static uint8_t IBitToMask(int b) {
+        hsAssert(b < 8, "LoadMask: bit too large for uint8_t");
+        return (1 << b);
+    }
 
     friend class plQuality;
 public:
     // Change this to a for loop on kMaxCap+1 if we ever get more caps.
-    plLoadMask() { fQuality[0] = fQuality[1] = 0xff; }
-    plLoadMask(uint8_t qLo, uint8_t qHi) { fQuality[0] = qLo; fQuality[1] = qHi; }
+    plLoadMask() {
+        fQuality[0] = fQuality[1] = 0xff;
+    }
+    plLoadMask(uint8_t qLo, uint8_t qHi) {
+        fQuality[0] = qLo;
+        fQuality[1] = qHi;
+    }
     ~plLoadMask() {}
 
-    bool      DontLoad() const { return !(fQuality[fGlobalCapability] & fGlobalQuality); }
+    bool      DontLoad() const {
+        return !(fQuality[fGlobalCapability] & fGlobalQuality);
+    }
 
-    bool      NeverLoads() const { return !(fQuality[0] && fQuality[1]); }
+    bool      NeverLoads() const {
+        return !(fQuality[0] && fQuality[1]);
+    }
 
-    bool      IsUsed() const { return (fQuality[0] != uint8_t(-1)) || (fQuality[1] != uint8_t(-1));   }
+    bool      IsUsed() const {
+        return (fQuality[0] != uint8_t(-1)) || (fQuality[1] != uint8_t(-1));
+    }
 
-    bool      MatchesQuality(int q) const { return (IBitToMask(q) & (fQuality[0] | fQuality[1])) != 0; }
-    bool      MatchesCapability(int c) const { return fQuality[c] != 0; }
-    bool      MatchesQualityAndCapability(int q, int c) const { return IBitToMask(q) & fQuality[c]; }
+    bool      MatchesQuality(int q) const {
+        return (IBitToMask(q) & (fQuality[0] | fQuality[1])) != 0;
+    }
+    bool      MatchesCapability(int c) const {
+        return fQuality[c] != 0;
+    }
+    bool      MatchesQualityAndCapability(int q, int c) const {
+        return IBitToMask(q) & fQuality[c];
+    }
 
-    bool      MatchesCurrentQuality() const { return MatchesQuality(fGlobalQuality); }
-    bool      MatchesCurrentCapability() const { return MatchesCapability(fGlobalCapability); }
-    bool      MatchesCurrent() const { return !DontLoad(); }
+    bool      MatchesCurrentQuality() const {
+        return MatchesQuality(fGlobalQuality);
+    }
+    bool      MatchesCurrentCapability() const {
+        return MatchesCapability(fGlobalCapability);
+    }
+    bool      MatchesCurrent() const {
+        return !DontLoad();
+    }
 
-    uint8_t   GetQualityMask(int cap) const { return fQuality[cap]; }
+    uint8_t   GetQualityMask(int cap) const {
+        return fQuality[cap];
+    }
 
-    plLoadMask&     SetMask(uint8_t lo, uint8_t hi) { fQuality[0] = lo; fQuality[1] = hi; return *this; }
-    plLoadMask&     SetNever() { return SetMask(0,0); }
-    plLoadMask&     SetAlways() { return SetMask(uint8_t(-1), uint8_t(-1)); }
+    plLoadMask&     SetMask(uint8_t lo, uint8_t hi) {
+        fQuality[0] = lo;
+        fQuality[1] = hi;
+        return *this;
+    }
+    plLoadMask&     SetNever() {
+        return SetMask(0, 0);
+    }
+    plLoadMask&     SetAlways() {
+        return SetMask(uint8_t(-1), uint8_t(-1));
+    }
 
-    plLoadMask& operator|=(const plLoadMask& m) { fMask |= m.fMask; return *this; }
-    plLoadMask& operator&=(const plLoadMask& m) { fMask &= m.fMask; return *this; }
+    plLoadMask& operator|=(const plLoadMask& m) {
+        fMask |= m.fMask;
+        return *this;
+    }
+    plLoadMask& operator&=(const plLoadMask& m) {
+        fMask &= m.fMask;
+        return *this;
+    }
 
-    int operator==(const plLoadMask& m) const { return fMask == m.fMask; }
-    int operator!=(const plLoadMask& m) const { return !(*this == m); }
+    int operator==(const plLoadMask& m) const {
+        return fMask == m.fMask;
+    }
+    int operator!=(const plLoadMask& m) const {
+        return !(*this == m);
+    }
 
     // Only useful for sorting.
-    int operator<(const plLoadMask& m) const { return fMask < m.fMask; }
+    int operator<(const plLoadMask& m) const {
+        return fMask < m.fMask;
+    }
 
-    friend plLoadMask operator|(const plLoadMask& lhs, const plLoadMask& rhs) { plLoadMask r(lhs); r |= rhs; return r; }
-    friend plLoadMask operator&(const plLoadMask& lhs, const plLoadMask& rhs) { plLoadMask r(lhs); r &= rhs; return r; }
+    friend plLoadMask operator|(const plLoadMask& lhs, const plLoadMask& rhs) {
+        plLoadMask r(lhs);
+        r |= rhs;
+        return r;
+    }
+    friend plLoadMask operator&(const plLoadMask& lhs, const plLoadMask& rhs) {
+        plLoadMask r(lhs);
+        r &= rhs;
+        return r;
+    }
 
     void        Read(hsStream* s);
     void        Write(hsStream* s) const;
@@ -122,7 +187,7 @@ public:
     // the latter one will never get loaded (have a load mask of zero).
     // So, just to be a pal, we'll detect that condition and return based on it.
     // i.e. Return true on invalid input (something will never get loaded).
-    // 
+    //
     // You can also pre-validate your input with ValidateReps, and/or validate
     // the output with ValidateMasks. The return value is a bitmask of which
     // items in the list had problems, so return of zero means A-OK.

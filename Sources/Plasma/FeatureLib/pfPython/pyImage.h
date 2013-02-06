@@ -59,25 +59,22 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #   include "plGImage/plMipmap.h"
 #endif
 
-class pyImage
-{
+class pyImage {
 protected:
     plKey           fMipMapKey;
 #ifndef BUILDING_PYPLASMA
     plMipmap*       fMipmap;
 #endif
 
-    pyImage() // for python glue only, do NOT call
-    {
+    pyImage() { // for python glue only, do NOT call
         fMipMapKey = nil;
 #ifndef BUILDING_PYPLASMA
         fMipmap = nil;
 #endif
-    } 
+    }
 
     // Constructor from C++
-    pyImage(plKey mipmapKey)
-    {
+    pyImage(plKey mipmapKey) {
         fMipMapKey = mipmapKey;
 #ifndef BUILDING_PYPLASMA
         fMipmap = nil;
@@ -86,13 +83,11 @@ protected:
 
 #ifndef BUILDING_PYPLASMA
     // Constructor from C++ ... use pointer to instead of plKey
-    pyImage(plMipmap* mipmap)
-    {
+    pyImage(plMipmap* mipmap) {
         fMipmap = mipmap;
         fMipMapKey = fMipmap->GetKey();
 
-        if (fMipMapKey)
-        {
+        if (fMipMapKey) {
             fMipMapKey->RefObject();
         }
     }
@@ -100,47 +95,51 @@ protected:
 
 public:
 #ifndef BUILDING_PYPLASMA
-    ~pyImage()
-    {
-        if (fMipmap && fMipMapKey)
+    ~pyImage() {
+        if (fMipmap && fMipMapKey) {
             fMipMapKey->UnRefObject();
+        }
     }
 #endif
 
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptImage);
 #ifndef BUILDING_PYPLASMA
-    static PyObject *New(plMipmap* mipmap);
+    static PyObject* New(plMipmap* mipmap);
 #endif
-    static PyObject *New(plKey mipmapKey);
-    static PyObject *New(pyKey& mipmapKey);
+    static PyObject* New(plKey mipmapKey);
+    static PyObject* New(pyKey& mipmapKey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyImage object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyImage); // converts a PyObject to a pyImage (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
-    static void AddPlasmaMethods(std::vector<PyMethodDef> &methods);
+    static void AddPlasmaClasses(PyObject* m);
+    static void AddPlasmaMethods(std::vector<PyMethodDef>& methods);
 
     void setKey(pyKey& mipmapKey);
 
     // override the equals to operator
-    bool operator==(const pyImage &image) const
-    {
+    bool operator==(const pyImage& image) const {
         // only thing that needs testing is the plKey, which is unique for all
-        if ( fMipMapKey == ((pyImage&)image).GetKey() )
+        if (fMipMapKey == ((pyImage&)image).GetKey()) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
-    bool operator!=(const pyImage &image) const { return !(image == *this);   }
+    bool operator!=(const pyImage& image) const {
+        return !(image == *this);
+    }
 
     // for C++ access
-    plKey GetKey() { return fMipmap ? fMipmap->GetKey() : fMipMapKey; }
+    plKey GetKey() {
+        return fMipmap ? fMipmap->GetKey() : fMipMapKey;
+    }
 #ifndef BUILDING_PYPLASMA
     plMipmap* GetImage();
 
     // for python access
-    PyObject *GetPixelColor(float x, float y); // returns the color at a specific x,y position (x and y from 0 to 1) - returns pyColor
-    PyObject *GetColorLoc(const pyColor &color); // returns the x,y position of a color (x and y from 0 to 1) - returns pyPoint3
+    PyObject* GetPixelColor(float x, float y); // returns the color at a specific x,y position (x and y from 0 to 1) - returns pyColor
+    PyObject* GetColorLoc(const pyColor& color); // returns the x,y position of a color (x and y from 0 to 1) - returns pyPoint3
     uint32_t GetWidth(); // returns the width of the image
     uint32_t GetHeight(); // returns the height of the image
     void SaveAsJPEG(const plFileName& fileName, uint8_t quality = 75);

@@ -61,213 +61,277 @@ bool pyCritterBrain::operator==(const pyCritterBrain& other) const
 
 void pyCritterBrain::AddReceiver(pyKey& newReceiver)
 {
-    if (!fBrain)
+    if (!fBrain) {
         return;
+    }
+
     fBrain->AddReceiver(newReceiver.getKey());
 }
 
 void pyCritterBrain::RemoveReceiver(pyKey& oldReceiver)
 {
-    if (!fBrain)
+    if (!fBrain) {
         return;
+    }
+
     fBrain->RemoveReceiver(oldReceiver.getKey());
 }
 
 PyObject* pyCritterBrain::GetSceneObject()
 {
     if (fBrain)
-        if (plSceneObject* obj = fBrain->GetTarget())
+        if (plSceneObject* obj = fBrain->GetTarget()) {
             return pySceneObject::New(obj->GetKey());
+        }
+
     PYTHON_RETURN_NONE;
 }
 
 void pyCritterBrain::AddBehavior(const std::string& animationName, const std::string& behaviorName, bool loop /* = true */,
-    bool randomStartPos /* = true */, float fadeInLen /* = 2.f */, float fadeOutLen /* = 2.f */)
+                                 bool randomStartPos /* = true */, float fadeInLen /* = 2.f */, float fadeOutLen /* = 2.f */)
 {
-    if (!fBrain)
+    if (!fBrain) {
         return;
+    }
+
     fBrain->AddBehavior(animationName, behaviorName, loop, randomStartPos, fadeInLen, fadeOutLen);
 }
 
 void pyCritterBrain::StartBehavior(const std::string& behaviorName, bool fade /* = true */)
 {
-    if (!fBrain)
+    if (!fBrain) {
         return;
+    }
+
     fBrain->StartBehavior(behaviorName, fade);
 }
 
 bool pyCritterBrain::RunningBehavior(const std::string& behaviorName) const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return false;
+    }
+
     return fBrain->RunningBehavior(behaviorName);
 }
 
 std::string pyCritterBrain::BehaviorName(int behavior) const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return nil;
+    }
+
     return fBrain->BehaviorName(behavior);
 }
 
 plString pyCritterBrain::AnimationName(int behavior) const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return plString::Null;
+    }
+
     return fBrain->AnimationName(behavior);
 }
 
 int pyCritterBrain::CurBehavior() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return 0;
+    }
+
     return fBrain->CurBehavior();
 }
 
 int pyCritterBrain::NextBehavior() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return 0;
+    }
+
     return fBrain->NextBehavior();
 }
 
 std::string pyCritterBrain::IdleBehaviorName() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return nil;
+    }
+
     return fBrain->IdleBehaviorName();
 }
 
 std::string pyCritterBrain::RunBehaviorName() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return nil;
+    }
+
     return fBrain->RunBehaviorName();
 }
 
 void pyCritterBrain::GoToGoal(hsPoint3 newGoal, bool avoidingAvatars /* = false */)
 {
-    if (!fBrain)
+    if (!fBrain) {
         return;
+    }
+
     fBrain->GoToGoal(newGoal, avoidingAvatars);
 }
 
 PyObject* pyCritterBrain::CurrentGoal() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         PYTHON_RETURN_NONE;
+    }
+
     return pyPoint3::New(fBrain->CurrentGoal());
 }
 
 bool pyCritterBrain::AvoidingAvatars() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return false;
+    }
+
     return fBrain->AvoidingAvatars();
 }
 
 bool pyCritterBrain::AtGoal() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return false;
+    }
+
     return fBrain->AtGoal();
 }
 
 void pyCritterBrain::StopDistance(float stopDistance)
 {
-    if (!fBrain)
+    if (!fBrain) {
         return;
+    }
+
     fBrain->StopDistance(stopDistance);
 }
 
 float pyCritterBrain::StopDistance() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return 0;
+    }
+
     return fBrain->StopDistance();
 }
 
 void pyCritterBrain::SightCone(float coneRad)
 {
-    if (!fBrain)
+    if (!fBrain) {
         return;
+    }
+
     fBrain->SightCone(coneRad);
 }
 
 float pyCritterBrain::SightCone() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return 0;
+    }
+
     return fBrain->SightCone();
 }
 
 void pyCritterBrain::SightDistance(float sightDis)
 {
-    if (!fBrain)
+    if (!fBrain) {
         return;
+    }
+
     fBrain->SightDistance(sightDis);
 }
 
 float pyCritterBrain::SightDistance() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return 0;
+    }
+
     return fBrain->SightDistance();
 }
 
 void pyCritterBrain::HearingDistance(float hearDis)
 {
-    if (!fBrain)
+    if (!fBrain) {
         return;
+    }
+
     fBrain->HearingDistance(hearDis);
 }
 
 float pyCritterBrain::HearingDistance() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return 0;
+    }
+
     return fBrain->HearingDistance();
 }
 
 bool pyCritterBrain::CanSeeAvatar(unsigned long id) const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return false;
+    }
+
     return fBrain->CanSeeAvatar(id);
 }
 
 bool pyCritterBrain::CanHearAvatar(unsigned long id) const
 {
-    if (!fBrain)
+    if (!fBrain) {
         return false;
+    }
+
     return fBrain->CanHearAvatar(id);
 }
 
 PyObject* pyCritterBrain::PlayersICanSee() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         PYTHON_RETURN_NONE;
+    }
+
     std::vector<unsigned long> players = fBrain->PlayersICanSee();
     PyObject* retVal = PyList_New(players.size());
-    for (unsigned i = 0; i < players.size(); ++i)
+
+    for (unsigned i = 0; i < players.size(); ++i) {
         PyList_SetItem(retVal, i, PyLong_FromUnsignedLong(players[i]));
+    }
+
     return retVal;
 }
 
 PyObject* pyCritterBrain::PlayersICanHear() const
 {
-    if (!fBrain)
+    if (!fBrain) {
         PYTHON_RETURN_NONE;
+    }
+
     std::vector<unsigned long> players = fBrain->PlayersICanHear();
     PyObject* retVal = PyList_New(players.size());
-    for (unsigned i = 0; i < players.size(); ++i)
+
+    for (unsigned i = 0; i < players.size(); ++i) {
         PyList_SetItem(retVal, i, PyLong_FromUnsignedLong(players[i]));
+    }
+
     return retVal;
 }
 
 PyObject* pyCritterBrain::VectorToPlayer(unsigned long id) const
 {
-    if (!fBrain)
+    if (!fBrain) {
         PYTHON_RETURN_NONE;
+    }
+
     return pyVector3::New(fBrain->VectorToPlayer(id));
 }

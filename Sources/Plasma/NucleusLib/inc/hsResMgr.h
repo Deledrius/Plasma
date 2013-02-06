@@ -57,58 +57,57 @@ class plLocation;
 class plCreatable;
 class plDispatchBase;
 
-class hsResMgr : public hsRefCnt
-{
+class hsResMgr : public hsRefCnt {
 public:
     //---------------------------
     //  Load and Unload
     //---------------------------
-    virtual void  Load  (const plKey& objKey)=0;     // places on list to be loaded
-    virtual bool  Unload(const plKey& objKey)=0;       // Unregisters (deletes) an object, Return true if successful
-    virtual plKey CloneKey(const plKey& objKey)=0;
+    virtual void  Load(const plKey& objKey) = 0;     // places on list to be loaded
+    virtual bool  Unload(const plKey& objKey) = 0;     // Unregisters (deletes) an object, Return true if successful
+    virtual plKey CloneKey(const plKey& objKey) = 0;
 
     //---------------------------
     //  Finding Functions
     //---------------------------
-    virtual plKey FindKey(const plUoid& uoid)=0;    
+    virtual plKey FindKey(const plUoid& uoid) = 0;
 
     //---------------------------
-    //  Establish reference linkage 
+    //  Establish reference linkage
     //---------------------------
-    virtual bool  AddViaNotify(const plKey& sentKey, plRefMsg* msg, plRefFlags::Type flags)=0;
-    virtual bool  AddViaNotify(plRefMsg* msg, plRefFlags::Type flags)=0; // msg->fRef->GetKey() == sentKey
+    virtual bool  AddViaNotify(const plKey& sentKey, plRefMsg* msg, plRefFlags::Type flags) = 0;
+    virtual bool  AddViaNotify(plRefMsg* msg, plRefFlags::Type flags) = 0; // msg->fRef->GetKey() == sentKey
 
-    virtual bool  SendRef(const plKey& key, plRefMsg* refMsg, plRefFlags::Type flags)=0;
-    virtual bool  SendRef(hsKeyedObject* ko, plRefMsg* refMsg, plRefFlags::Type flags)=0;
+    virtual bool  SendRef(const plKey& key, plRefMsg* refMsg, plRefFlags::Type flags) = 0;
+    virtual bool  SendRef(hsKeyedObject* ko, plRefMsg* refMsg, plRefFlags::Type flags) = 0;
 
     //---------------------------
     //  Reading and Writing keys
     //---------------------------
     // Read a Key in, and Notify me when the Object is loaded
-    virtual plKey ReadKeyNotifyMe(hsStream* s, plRefMsg* retMsg, plRefFlags::Type flags)=0; 
+    virtual plKey ReadKeyNotifyMe(hsStream* s, plRefMsg* retMsg, plRefFlags::Type flags) = 0;
     // Just read the Key data in and find a match in the registry and return it.
-    virtual plKey ReadKey(hsStream* s)=0; 
+    virtual plKey ReadKey(hsStream* s) = 0;
 
     // For convenience you can write a key using the KeyedObject or the Key...same result
-    virtual void WriteKey(hsStream* s, hsKeyedObject* obj)=0; 
-    virtual void WriteKey(hsStream* s, const plKey& key)=0; 
+    virtual void WriteKey(hsStream* s, hsKeyedObject* obj) = 0;
+    virtual void WriteKey(hsStream* s, const plKey& key) = 0;
 
     //---------------------------
     //  Reading and Writing Objects directly
     //---------------------------
-    virtual plCreatable*    ReadCreatable(hsStream* s)=0;
-    virtual void            WriteCreatable(hsStream* s, plCreatable* cre)=0;
+    virtual plCreatable*    ReadCreatable(hsStream* s) = 0;
+    virtual void            WriteCreatable(hsStream* s, plCreatable* cre) = 0;
 
-    virtual plCreatable*    ReadCreatableVersion(hsStream* s)=0;
-    virtual void            WriteCreatableVersion(hsStream* s, plCreatable* cre)=0;
-    
+    virtual plCreatable*    ReadCreatableVersion(hsStream* s) = 0;
+    virtual void            WriteCreatableVersion(hsStream* s, plCreatable* cre) = 0;
+
     //---------------------------
     // Registry Modification Functions
     //---------------------------
-    virtual plKey NewKey(const plString& name, hsKeyedObject* object, const plLocation& loc, const plLoadMask& m = plLoadMask::kAlways)=0;
-    virtual plKey NewKey(plUoid& newUoid, hsKeyedObject* object)=0;
+    virtual plKey NewKey(const plString& name, hsKeyedObject* object, const plLocation& loc, const plLoadMask& m = plLoadMask::kAlways) = 0;
+    virtual plKey NewKey(plUoid& newUoid, hsKeyedObject* object) = 0;
 
-    virtual plDispatchBase* Dispatch()=0;
+    virtual plDispatchBase* Dispatch() = 0;
 
     virtual void BeginShutdown() {}
 
@@ -118,39 +117,49 @@ protected:
     friend class plKeyImp;
     friend class plArmatureMod; // Temp hack until a findkey/clone issue is fixed. -Bob
 
-    virtual plKey   ReRegister(const plString& nm, const plUoid& oid)=0;
-    virtual bool    ReadObject(plKeyImp* key)=0;  // plKeys call this when needed
+    virtual plKey   ReRegister(const plString& nm, const plUoid& oid) = 0;
+    virtual bool    ReadObject(plKeyImp* key) = 0; // plKeys call this when needed
 
     // Sets a key as used or unused in the registry.  When all keys in a page of a
     // particular type in an page are unused, we can free the memory associated with them.
     // Only called by plKeyImp
-    virtual void IKeyReffed(plKeyImp* key)=0;
-    virtual void IKeyUnreffed(plKeyImp* key)=0;
+    virtual void IKeyReffed(plKeyImp* key) = 0;
+    virtual void IKeyUnreffed(plKeyImp* key) = 0;
 
 protected:  // hsgResMgr only
     friend class hsgResMgr;
-    virtual bool IReset()=0;
-    virtual bool IInit()=0;
-    virtual void IShutdown()=0;
+    virtual bool IReset() = 0;
+    virtual bool IInit() = 0;
+    virtual void IShutdown() = 0;
 };
 
 
-class hsgResMgr
-{
+class hsgResMgr {
 private:
     static hsResMgr* fResMgr;
 
 public:
-    static hsResMgr* ResMgr() { return (hsResMgr*)fResMgr; }
+    static hsResMgr* ResMgr() {
+        return (hsResMgr*)fResMgr;
+    }
 
-    static plDispatchBase* Dispatch() { hsAssert(fResMgr, "No resmgr"); return fResMgr->Dispatch(); }
+    static plDispatchBase* Dispatch() {
+        hsAssert(fResMgr, "No resmgr");
+        return fResMgr->Dispatch();
+    }
 
     static bool Init(hsResMgr* m);
-    static bool Reset() { return fResMgr->IReset(); }
+    static bool Reset() {
+        return fResMgr->IReset();
+    }
     static void Shutdown();
-    
-    static bool SendRef(plKey& key, plRefMsg* refMsg, plRefFlags::Type flags) { return fResMgr->SendRef(key, refMsg, flags); }
-    static bool SendRef(hsKeyedObject* ko, plRefMsg* refMsg, plRefFlags::Type flags) { return fResMgr->SendRef(ko, refMsg, flags); }
+
+    static bool SendRef(plKey& key, plRefMsg* refMsg, plRefFlags::Type flags) {
+        return fResMgr->SendRef(key, refMsg, flags);
+    }
+    static bool SendRef(hsKeyedObject* ko, plRefMsg* refMsg, plRefFlags::Type flags) {
+        return fResMgr->SendRef(ko, refMsg, flags);
+    }
 };
 
 #endif // hsResMgr_inc

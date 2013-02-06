@@ -95,7 +95,7 @@ plProfile_Extern(MatrixApplicator);
 // ctor --------------------------
 // -----
 plMatrixChannel::plMatrixChannel()
-: plAGChannel()
+    : plAGChannel()
 {
 }
 
@@ -107,58 +107,58 @@ plMatrixChannel::~plMatrixChannel()
 
 // Value --------------------------------------------------------
 // ------
-const hsMatrix44 & plMatrixChannel::Value(double time, bool peek)
+const hsMatrix44& plMatrixChannel::Value(double time, bool peek)
 {
     return fResult;
 }
 
 // AffineValue -----------------------------------------------------------
 // ------------
-const hsAffineParts & plMatrixChannel::AffineValue(double time, bool peek)
+const hsAffineParts& plMatrixChannel::AffineValue(double time, bool peek)
 {
     return fAP;
 }
 
 // Value --------------------------------------------------------------
 // ------
-void plMatrixChannel::Value(hsMatrix44 &matrix, double time, bool peek)
+void plMatrixChannel::Value(hsMatrix44& matrix, double time, bool peek)
 {
     matrix = Value(time);
 }
 
 // MakeCombine -----------------------------------------------
 // ------------
-plAGChannel * plMatrixChannel::MakeCombine(plAGChannel *other)
+plAGChannel* plMatrixChannel::MakeCombine(plAGChannel* other)
 {
     return nil;
 }
 
 // MakeBlend ---------------------------------------------------
 // ----------
-plAGChannel * plMatrixChannel::MakeBlend(plAGChannel * channelB,
-                                         plScalarChannel * channelBias,
-                                         int blendPriority)
+plAGChannel* plMatrixChannel::MakeBlend(plAGChannel* channelB,
+                                        plScalarChannel* channelBias,
+                                        int blendPriority)
 {
-    plMatrixChannel * matChanB = plMatrixChannel::ConvertNoRef(channelB);
-    plAGChannel * result = this;        // if the blend fails, we keep our position in the graph
+    plMatrixChannel* matChanB = plMatrixChannel::ConvertNoRef(channelB);
+    plAGChannel* result = this;         // if the blend fails, we keep our position in the graph
 
-    if (matChanB)
-    {
+    if (matChanB) {
         result = new plMatrixBlend(this, matChanB, channelBias, blendPriority);
     }
+
     return result;
 }
 
 // MakeZeroState -----------------------------
 // --------------
-plAGChannel * plMatrixChannel::MakeZeroState()
+plAGChannel* plMatrixChannel::MakeZeroState()
 {
     return new plMatrixConstant(Value(0));
 }
 
 // MakeTimeScale --------------------------------------------------------
 // --------------
-plAGChannel * plMatrixChannel::MakeTimeScale(plScalarChannel *timeSource)
+plAGChannel* plMatrixChannel::MakeTimeScale(plScalarChannel* timeSource)
 {
     return new plMatrixTimeScale(this, timeSource);
 }
@@ -168,10 +168,11 @@ plAGChannel * plMatrixChannel::MakeTimeScale(plScalarChannel *timeSource)
 void plMatrixChannel::Dump(int indent, bool optimized, double time)
 {
     std::string indentStr;
-    for(int i = 0; i < indent; i++)
-    {
+
+    for (int i = 0; i < indent; i++) {
         indentStr += "- ";
     }
+
     hsStatusMessageF("%s matChan<%s>", indentStr.c_str(), fName.c_str());
 }
 
@@ -184,7 +185,7 @@ void plMatrixChannel::Dump(int indent, bool optimized, double time)
 // ctor ----------------------------
 // -----
 plMatrixConstant::plMatrixConstant()
-: plMatrixChannel()
+    : plMatrixChannel()
 {
 }
 
@@ -192,27 +193,27 @@ plMatrixConstant::~plMatrixConstant()
 {
 }
 
-plMatrixConstant::plMatrixConstant(const hsMatrix44 &value)
+plMatrixConstant::plMatrixConstant(const hsMatrix44& value)
 {
     Set(value);
 }
 
-void plMatrixConstant::Set(const hsMatrix44 &value)
+void plMatrixConstant::Set(const hsMatrix44& value)
 {
     fResult = value;
 
     gemAffineParts gemParts1;
-    decomp_affine(value.fMap, &gemParts1); 
+    decomp_affine(value.fMap, &gemParts1);
     AP_SET(fAP, gemParts1);
 }
 
-void plMatrixConstant::Write(hsStream *stream, hsResMgr *mgr)
+void plMatrixConstant::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMatrixChannel::Write(stream, mgr);
     fAP.Write(stream);
 }
 
-void plMatrixConstant::Read(hsStream *stream, hsResMgr *mgr)
+void plMatrixConstant::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMatrixChannel::Read(stream, mgr);
     fAP.Read(stream);
@@ -231,16 +232,16 @@ void plMatrixConstant::Read(hsStream *stream, hsResMgr *mgr)
 // ctor ------------------------------
 // -----
 plMatrixTimeScale::plMatrixTimeScale()
-: plMatrixChannel(), fTimeSource(nil), fChannelIn(nil)
+    : plMatrixChannel(), fTimeSource(nil), fChannelIn(nil)
 {
 }
 
 // ctor ------------------------------------------------------------------------
 // -----
-plMatrixTimeScale::plMatrixTimeScale(plMatrixChannel *channel,
-                                     plScalarChannel *timeSource)
-: fChannelIn(channel),
-  fTimeSource(timeSource)
+plMatrixTimeScale::plMatrixTimeScale(plMatrixChannel* channel,
+                                     plScalarChannel* timeSource)
+    : fChannelIn(channel),
+      fTimeSource(timeSource)
 {
 }
 
@@ -259,14 +260,14 @@ bool plMatrixTimeScale::IsStoppedAt(double time)
 
 // Value ----------------------------------------------------------
 // ------
-const hsMatrix44 & plMatrixTimeScale::Value(double time, bool peek)
+const hsMatrix44& plMatrixTimeScale::Value(double time, bool peek)
 {
     fResult = fChannelIn->Value(fTimeSource->Value(time, peek), peek);
 
     return fResult;
 }
 
-const hsAffineParts & plMatrixTimeScale::AffineValue(double time, bool peek)
+const hsAffineParts& plMatrixTimeScale::AffineValue(double time, bool peek)
 {
     fAP = fChannelIn->AffineValue(fTimeSource->Value(time, peek), peek);
     return fAP;
@@ -274,9 +275,9 @@ const hsAffineParts & plMatrixTimeScale::AffineValue(double time, bool peek)
 
 // Detach ----------------------------------------------------
 // -------
-plAGChannel * plMatrixTimeScale::Detach(plAGChannel * detach)
+plAGChannel* plMatrixTimeScale::Detach(plAGChannel* detach)
 {
-    plAGChannel *result = this;
+    plAGChannel* result = this;
 
     // HAVE to recurse on the incoming channel in case there are cycles;
     // even if we're detaching this node it might also be further upstream
@@ -284,11 +285,13 @@ plAGChannel * plMatrixTimeScale::Detach(plAGChannel * detach)
 
     // If you delete a timescale, it is not replaced with its upstream node;
     // it's just gone.
-    if(!fChannelIn || detach == this)
+    if (!fChannelIn || detach == this) {
         result = nil;
+    }
 
-    if(result != this)
+    if (result != this) {
         delete this;
+    }
 
     return result;
 }
@@ -298,10 +301,11 @@ plAGChannel * plMatrixTimeScale::Detach(plAGChannel * detach)
 void plMatrixTimeScale::Dump(int indent, bool optimized, double time)
 {
     std::string indentStr;
-    for(int i = 0; i < indent; i++)
-    {
+
+    for (int i = 0; i < indent; i++) {
         indentStr += "- ";
     }
+
     hsStatusMessageF("%s matTimeScale <%s> at time <%f>", indentStr.c_str(), fName.c_str(), fTimeSource->Value(time, true));
     fChannelIn->Dump(indent + 1, optimized, time);
 
@@ -317,22 +321,22 @@ void plMatrixTimeScale::Dump(int indent, bool optimized, double time)
 // ctor ----------------------
 // -----
 plMatrixBlend::plMatrixBlend()
-: fChannelA(nil),
-  fChannelB(nil),
-  fChannelBias(nil)
+    : fChannelA(nil),
+      fChannelB(nil),
+      fChannelBias(nil)
 {
 }
 
 // ctor ----------------------------------------------------------------------------
 // -----
-plMatrixBlend::plMatrixBlend(plMatrixChannel * channelA, plMatrixChannel * channelB,
-                             plScalarChannel * channelBias, int priority)
-: fChannelA(channelA),
-  fOptimizedA(channelA),
-  fChannelB(channelB),
-  fOptimizedB(channelB),
-  fChannelBias(channelBias),
-  fPriority(priority)
+plMatrixBlend::plMatrixBlend(plMatrixChannel* channelA, plMatrixChannel* channelB,
+                             plScalarChannel* channelBias, int priority)
+    : fChannelA(channelA),
+      fOptimizedA(channelA),
+      fChannelB(channelB),
+      fOptimizedB(channelB),
+      fChannelBias(channelBias),
+      fPriority(priority)
 {
 }
 
@@ -347,18 +351,16 @@ plMatrixBlend::~plMatrixBlend()
 
 // MakeBlend --------------------------------------------------
 // ----------
-plAGChannel * plMatrixBlend::MakeBlend(plAGChannel *newChannel,
-                                       plScalarChannel *channelBias,
-                                       int blendPriority)
+plAGChannel* plMatrixBlend::MakeBlend(plAGChannel* newChannel,
+                                      plScalarChannel* channelBias,
+                                      int blendPriority)
 {
-    plMatrixChannel * newMatChan = plMatrixChannel::ConvertNoRef(newChannel);
-    plAGChannel *result = this;
+    plMatrixChannel* newMatChan = plMatrixChannel::ConvertNoRef(newChannel);
+    plAGChannel* result = this;
     int effectiveBlendPriority = (blendPriority == -1 ? fPriority : blendPriority);
 
-    if(newMatChan)
-    {
-        if(effectiveBlendPriority >= fPriority)
-        {
+    if (newMatChan) {
+        if (effectiveBlendPriority >= fPriority) {
             // if the new channel has higher priority, just do it.
             result = plMatrixChannel::MakeBlend(newMatChan, channelBias, effectiveBlendPriority);
         } else {
@@ -369,29 +371,35 @@ plAGChannel * plMatrixBlend::MakeBlend(plAGChannel *newChannel,
             // this request will get recursively delegated until the priorities work.
         }
     }
+
     return result;
 }
 
-uint16_t plMatrixBlend::GetPriority() {
+uint16_t plMatrixBlend::GetPriority()
+{
     return fPriority;
 }
 
 bool plMatrixBlend::IsStoppedAt(double time)
 {
     float blend = fChannelBias->Value(time);
-    if (blend == 0)
+
+    if (blend == 0) {
         return fChannelA->IsStoppedAt(time);
-    if (blend == 1)
+    }
+
+    if (blend == 1) {
         return fChannelB->IsStoppedAt(time);
+    }
 
     return (fChannelA->IsStoppedAt(time) && fChannelB->IsStoppedAt(time));
 }
 
 // Value ------------------------------------------------------
 // ------
-const hsMatrix44 & plMatrixBlend::Value(double time, bool peek)
+const hsMatrix44& plMatrixBlend::Value(double time, bool peek)
 {
-    const hsAffineParts &parts = AffineValue(time, peek);
+    const hsAffineParts& parts = AffineValue(time, peek);
 
     plProfile_BeginTiming(AffineCompose);
     parts.ComposeMatrix(&fResult);
@@ -401,31 +409,33 @@ const hsMatrix44 & plMatrixBlend::Value(double time, bool peek)
 
 // AffineValue ---------------------------------------------------------
 // ------------
-const hsAffineParts & plMatrixBlend::AffineValue(double time, bool peek)
+const hsAffineParts& plMatrixBlend::AffineValue(double time, bool peek)
 {
-    const float &blend = fChannelBias->Value(time);
-    if(blend == 0) {
+    const float& blend = fChannelBias->Value(time);
+
+    if (blend == 0) {
         return fOptimizedA->AffineValue(time, peek);
     } else {
-        if(blend == 1) {
+        if (blend == 1) {
             return fOptimizedB->AffineValue(time, peek);
         } else {
-            const hsAffineParts &apA = fChannelA->AffineValue(time, peek);
-            const hsAffineParts &apB = fChannelB->AffineValue(time, peek);
+            const hsAffineParts& apA = fChannelA->AffineValue(time, peek);
+            const hsAffineParts& apB = fChannelB->AffineValue(time, peek);
 
             plProfile_BeginTiming(AffineBlend);
             hsInterp::LinInterp(&apA, &apB, blend, &fAP);
             plProfile_EndTiming(AffineBlend);
         }
     }
+
     return fAP;
 }
 
 // Detach ----------------------------------------------
 // -------
-plAGChannel * plMatrixBlend::Detach(plAGChannel *remove)
+plAGChannel* plMatrixBlend::Detach(plAGChannel* remove)
 {
-    plAGChannel *result = this;
+    plAGChannel* result = this;
 
     // it's possible that the incoming channel could reside down *all* of our
     // branches (it's a graph, not a tree,) so we always pass down all limbs
@@ -433,34 +443,40 @@ plAGChannel * plMatrixBlend::Detach(plAGChannel *remove)
     fChannelA = plMatrixChannel::ConvertNoRef(fChannelA->Detach(remove));
     fChannelB = plMatrixChannel::ConvertNoRef(fChannelB->Detach(remove));
 
-    if(!fChannelBias)
+    if (!fChannelBias) {
         result = fChannelA;
-    else if(fChannelA && !fChannelB)
+    } else if (fChannelA && !fChannelB) {
         result = fChannelA;
-    else if(fChannelB && !fChannelA)
+    } else if (fChannelB && !fChannelA) {
         result = fChannelB;
-    else if(!fChannelA && !fChannelB)
+    } else if (!fChannelA && !fChannelB) {
         result = nil;
+    }
 
-    if(result != this)
+    if (result != this) {
         delete this;
+    }
 
     return result;
 }
 
 // Optimize -------------------------------------
 // ---------
-plAGChannel *plMatrixBlend::Optimize(double time)
+plAGChannel* plMatrixBlend::Optimize(double time)
 {
-    fOptimizedA = (plMatrixChannel *)fChannelA->Optimize(time);
-    fOptimizedB = (plMatrixChannel *)fChannelB->Optimize(time);
+    fOptimizedA = (plMatrixChannel*)fChannelA->Optimize(time);
+    fOptimizedB = (plMatrixChannel*)fChannelB->Optimize(time);
     float blend = fChannelBias->Value(time);
-    if(blend == 0.0f)
+
+    if (blend == 0.0f) {
         return fOptimizedA;
-    if(blend == 1.0f)
+    }
+
+    if (blend == 1.0f) {
         return fOptimizedB;
-    else
+    } else {
         return this;
+    }
 }
 
 // Dump -----------------------------------------
@@ -468,13 +484,14 @@ plAGChannel *plMatrixBlend::Optimize(double time)
 void plMatrixBlend::Dump(int indent, bool optimized, double time)
 {
     std::string indentStr;
-    for(int i = 0; i < indent; i++)
-    {
+
+    for (int i = 0; i < indent; i++) {
         indentStr += "- ";
     }
+
     hsStatusMessageF("%s matBlend<%s>, bias:<%f>", indentStr.c_str(), fName.c_str(), fChannelBias->Value(time, true));
-    if(optimized)
-    {
+
+    if (optimized) {
         fOptimizedB->Dump(indent + 1, optimized, time);
         fOptimizedA->Dump(indent + 1, optimized, time);
     } else {
@@ -492,15 +509,15 @@ void plMatrixBlend::Dump(int indent, bool optimized, double time)
 // ctor ----------------------------------------------
 // -----
 plMatrixControllerChannel::plMatrixControllerChannel()
-: plMatrixChannel(), fController(nil)
+    : plMatrixChannel(), fController(nil)
 {
 }
 
 // ctor ---------------------------------------------------------------
 // -----
-plMatrixControllerChannel::plMatrixControllerChannel(plController *controller,
-                                                     hsAffineParts *parts)
-: fController(controller)
+plMatrixControllerChannel::plMatrixControllerChannel(plController* controller,
+        hsAffineParts* parts)
+    : fController(controller)
 {
     fAP = *parts;
 }
@@ -509,7 +526,7 @@ plMatrixControllerChannel::plMatrixControllerChannel(plController *controller,
 // -----
 plMatrixControllerChannel::~plMatrixControllerChannel()
 {
-    if(fController) {
+    if (fController) {
         delete fController;
         fController = nil;
     }
@@ -517,15 +534,15 @@ plMatrixControllerChannel::~plMatrixControllerChannel()
 
 // Value ------------------------------------------------------------------
 // ------
-const hsMatrix44 & plMatrixControllerChannel::Value(double time, bool peek)
+const hsMatrix44& plMatrixControllerChannel::Value(double time, bool peek)
 {
     return Value(time, peek, nil);
 }
 
 // Value ------------------------------------------------------------------
 // ------
-const hsMatrix44 & plMatrixControllerChannel::Value(double time, bool peek,
-                                                    plControllerCacheInfo *cache)
+const hsMatrix44& plMatrixControllerChannel::Value(double time, bool peek,
+        plControllerCacheInfo* cache)
 {
     plProfile_BeginTiming(AffineInterp);
     fController->Interp((float)time, &fAP, cache);
@@ -533,21 +550,21 @@ const hsMatrix44 & plMatrixControllerChannel::Value(double time, bool peek,
 
     plProfile_BeginTiming(AffineCompose);
     fAP.ComposeMatrix(&fResult);
-    plProfile_EndTiming(AffineCompose);     
+    plProfile_EndTiming(AffineCompose);
     return fResult;
 }
 
 // AffineValue ---------------------------------------------------------------------
 // ------------
-const hsAffineParts & plMatrixControllerChannel::AffineValue(double time, bool peek)
+const hsAffineParts& plMatrixControllerChannel::AffineValue(double time, bool peek)
 {
     return AffineValue(time, peek, nil);
 }
 
 // AffineValue ---------------------------------------------------------------------
 // ------------
-const hsAffineParts & plMatrixControllerChannel::AffineValue(double time, bool peek,
-                                                             plControllerCacheInfo *cache)
+const hsAffineParts& plMatrixControllerChannel::AffineValue(double time, bool peek,
+        plControllerCacheInfo* cache)
 {
     plProfile_BeginTiming(AffineInterp);
     fController->Interp((float)time, &fAP, cache);
@@ -557,9 +574,9 @@ const hsAffineParts & plMatrixControllerChannel::AffineValue(double time, bool p
 
 // MakeCacheChannel ------------------------------------------------------------
 // -----------------
-plAGChannel *plMatrixControllerChannel::MakeCacheChannel(plAnimTimeConvert *atc)
+plAGChannel* plMatrixControllerChannel::MakeCacheChannel(plAnimTimeConvert* atc)
 {
-    plControllerCacheInfo *cache = fController->CreateCache();
+    plControllerCacheInfo* cache = fController->CreateCache();
     cache->SetATC(atc);
     return new plMatrixControllerCacheChannel(this, cache);
 }
@@ -567,16 +584,17 @@ plAGChannel *plMatrixControllerChannel::MakeCacheChannel(plAnimTimeConvert *atc)
 void plMatrixControllerChannel::Dump(int indent, bool optimized, double time)
 {
     std::string indentStr;
-    for(int i = 0; i < indent; i++)
-    {
+
+    for (int i = 0; i < indent; i++) {
         indentStr += "- ";
     }
+
     hsStatusMessageF("%s MatController<%s>", indentStr.c_str(), fName.c_str());
 }
 
 // Write -------------------------------------------------------------
 // ------
-void plMatrixControllerChannel::Write(hsStream *stream, hsResMgr *mgr)
+void plMatrixControllerChannel::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMatrixChannel::Write(stream, mgr);
 
@@ -588,7 +606,7 @@ void plMatrixControllerChannel::Write(hsStream *stream, hsResMgr *mgr)
 
 // Read -------------------------------------------------------------
 // ------
-void plMatrixControllerChannel::Read(hsStream *stream, hsResMgr *mgr)
+void plMatrixControllerChannel::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMatrixChannel::Read(stream, mgr);
 
@@ -603,13 +621,13 @@ void plMatrixControllerChannel::Read(hsStream *stream, hsResMgr *mgr)
 
 // CTOR
 plMatrixControllerCacheChannel::plMatrixControllerCacheChannel()
-: plMatrixChannel(), fControllerChannel(nil), fCache(nil)
+    : plMatrixChannel(), fControllerChannel(nil), fCache(nil)
 {
 }
 
 // CTOR(name, controller)
-plMatrixControllerCacheChannel::plMatrixControllerCacheChannel(plMatrixControllerChannel *controller, plControllerCacheInfo *cache)
-: fControllerChannel(controller), fCache(cache)
+plMatrixControllerCacheChannel::plMatrixControllerCacheChannel(plMatrixControllerChannel* controller, plControllerCacheInfo* cache)
+    : fControllerChannel(controller), fCache(cache)
 {
 }
 
@@ -621,32 +639,35 @@ plMatrixControllerCacheChannel::~plMatrixControllerCacheChannel()
 }
 
 // VALUE(time)
-const hsMatrix44 & plMatrixControllerCacheChannel::Value(double time, bool peek)
+const hsMatrix44& plMatrixControllerCacheChannel::Value(double time, bool peek)
 {
     return fControllerChannel->Value(time, peek, fCache);
 }
 
-const hsAffineParts & plMatrixControllerCacheChannel::AffineValue(double time, bool peek)
+const hsAffineParts& plMatrixControllerCacheChannel::AffineValue(double time, bool peek)
 {
     return fControllerChannel->AffineValue(time, peek, fCache);
 }
 
 // DETACH
-plAGChannel * plMatrixControllerCacheChannel::Detach(plAGChannel * detach)
+plAGChannel* plMatrixControllerCacheChannel::Detach(plAGChannel* detach)
 {
-    plAGChannel *result = this;
+    plAGChannel* result = this;
 
     fControllerChannel =
         plMatrixControllerChannel::ConvertNoRef(fControllerChannel->Detach(detach));
 
-    if(detach == this)
+    if (detach == this) {
         result = fControllerChannel;
+    }
 
-    if(!fControllerChannel)
+    if (!fControllerChannel) {
         result = nil;
+    }
 
-    if(result != this)
+    if (result != this) {
         delete this;
+    }
 
     return result;
 }
@@ -657,69 +678,71 @@ plAGChannel * plMatrixControllerCacheChannel::Detach(plAGChannel * detach)
 
 // CTOR
 plQuatPointCombine::plQuatPointCombine()
-: fQuatChannel(nil), fPointChannel(nil)
+    : fQuatChannel(nil), fPointChannel(nil)
 {
 }
 
 // CTOR
-plQuatPointCombine::plQuatPointCombine(plQuatChannel *quatChannel, plPointChannel *pointChannel)
-: fQuatChannel(quatChannel),
-  fPointChannel(pointChannel)
+plQuatPointCombine::plQuatPointCombine(plQuatChannel* quatChannel, plPointChannel* pointChannel)
+    : fQuatChannel(quatChannel),
+      fPointChannel(pointChannel)
 {
 }
 
 // DTOR
 plQuatPointCombine::~plQuatPointCombine()
 {
-    if(fQuatChannel) {
-    //XXX   delete fQuatChannel;
+    if (fQuatChannel) {
+        //XXX   delete fQuatChannel;
         fQuatChannel = nil;
     }
-    if(fPointChannel) {
-    //XXX   delete fPointChannel;
+
+    if (fPointChannel) {
+        //XXX   delete fPointChannel;
         fPointChannel = nil;
     }
 }
 
 // VALUE(time)
-const hsMatrix44 & plQuatPointCombine::Value(double time)
+const hsMatrix44& plQuatPointCombine::Value(double time)
 {
-    if(fQuatChannel)
-    {
-        const hsQuat &quat = fQuatChannel->Value(time);
+    if (fQuatChannel) {
+        const hsQuat& quat = fQuatChannel->Value(time);
         quat.MakeMatrix(&fResult);
     } else {
         fResult.Reset();
     }
-    if(fPointChannel)
-    {
-        const hsPoint3 &point = fPointChannel->Value(time);
+
+    if (fPointChannel) {
+        const hsPoint3& point = fPointChannel->Value(time);
         fResult.SetTranslate(&point);
     }
+
     return fResult;
 }
 
-const hsAffineParts & plQuatPointCombine::AffineValue(double time)
+const hsAffineParts& plQuatPointCombine::AffineValue(double time)
 {
-    // XXX Lame hack to get things to compile for now. 
+    // XXX Lame hack to get things to compile for now.
     // Will fix when we actually start using this channel type.
     gemAffineParts gemParts1;
-    decomp_affine(Value(time).fMap, &gemParts1); 
+    decomp_affine(Value(time).fMap, &gemParts1);
     AP_SET(fAP, gemParts1);
 
     return fAP;
 }
 
 // DETACH
-plAGChannel * plQuatPointCombine::Detach(plAGChannel *channel)
+plAGChannel* plQuatPointCombine::Detach(plAGChannel* channel)
 {
     hsAssert(this != channel, "Can't detach combiners or blenders directly. Detach sub-channels instead.");
-    if(this != channel)
-    {
+
+    if (this != channel) {
         // *** check the types on the replacement channels to make sure they're compatible
-        fQuatChannel = (plQuatChannel *)fQuatChannel->Detach(channel);
-        fPointChannel = (plPointChannel *)fPointChannel->Detach(channel);
+        fQuatChannel = (plQuatChannel*)fQuatChannel->Detach(channel);
+        fPointChannel = (plPointChannel*)fPointChannel->Detach(channel);
     }
+
     return this;
 }
 
@@ -730,20 +753,18 @@ plAGChannel * plQuatPointCombine::Detach(plAGChannel *channel)
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // IAPPLY
-void plMatrixChannelApplicator::IApply(const plAGModifier *mod, double time)
+void plMatrixChannelApplicator::IApply(const plAGModifier* mod, double time)
 {
-    if(fChannel)
-    {
-        plMatrixChannel *matChan = plMatrixChannel::ConvertNoRef(fChannel);
+    if (fChannel) {
+        plMatrixChannel* matChan = plMatrixChannel::ConvertNoRef(fChannel);
 
-        if(matChan)
-        {
+        if (matChan) {
             hsMatrix44 inverse;
 
             plProfile_BeginTiming(AffineValue);
-            const hsAffineParts &ap = matChan->AffineValue(time);
+            const hsAffineParts& ap = matChan->AffineValue(time);
             plProfile_EndTiming(AffineValue);
-            
+
             hsMatrix44 result;
 
             plProfile_BeginTiming(AffineCompose);
@@ -753,9 +774,9 @@ void plMatrixChannelApplicator::IApply(const plAGModifier *mod, double time)
             plProfile_EndTiming(AffineCompose);
 
             plProfile_BeginTiming(MatrixApplicator);
-            plCoordinateInterface *CI = IGetCI(mod);
+            plCoordinateInterface* CI = IGetCI(mod);
             CI->SetLocalToParent(result, inverse);
-            plProfile_EndTiming(MatrixApplicator);  
+            plProfile_EndTiming(MatrixApplicator);
         }
     }
 }
@@ -768,10 +789,9 @@ void plMatrixChannelApplicator::IApply(const plAGModifier *mod, double time)
 
 const float plMatrixDelayedCorrectionApplicator::fDelayLength = 1.f; // seconds
 
-void plMatrixDelayedCorrectionApplicator::SetCorrection(hsMatrix44 &cor)
+void plMatrixDelayedCorrectionApplicator::SetCorrection(hsMatrix44& cor)
 {
-    if (fIgnoreNextCorrection)
-    {
+    if (fIgnoreNextCorrection) {
         // We want the first correction we get from an avatar to be
         // instantaneous, otherwise they float over from (0, 0, 0).
         fIgnoreNextCorrection = false;
@@ -782,7 +802,7 @@ void plMatrixDelayedCorrectionApplicator::SetCorrection(hsMatrix44 &cor)
     // which looks right visually when we interp. If certain cases become
     // visually annoying, we can check and adjust things here.
     gemAffineParts gemParts1;
-    decomp_affine(cor.fMap, &gemParts1); 
+    decomp_affine(cor.fMap, &gemParts1);
     AP_SET(fCorAP, gemParts1);
 
     fDelayStart = hsTimer::GetSysSeconds();
@@ -790,35 +810,32 @@ void plMatrixDelayedCorrectionApplicator::SetCorrection(hsMatrix44 &cor)
 
 
 // CANBLEND
-bool plMatrixDelayedCorrectionApplicator::CanBlend(plAGApplicator *app)
+bool plMatrixDelayedCorrectionApplicator::CanBlend(plAGApplicator* app)
 {
-    plMatrixChannelApplicator *matChannelApp = plMatrixChannelApplicator::ConvertNoRef(app);
+    plMatrixChannelApplicator* matChannelApp = plMatrixChannelApplicator::ConvertNoRef(app);
 
-    if( plMatrixChannelApplicator::ConvertNoRef(app) )
-    {
+    if (plMatrixChannelApplicator::ConvertNoRef(app)) {
         return true;
     }
+
     return false;
 }
 
 // IAPPLY
-void plMatrixDelayedCorrectionApplicator::IApply(const plAGModifier *mod, double time)
+void plMatrixDelayedCorrectionApplicator::IApply(const plAGModifier* mod, double time)
 {
-    if(fChannel)
-    {
-        if(fEnabled)
-        {
-            plMatrixChannel *matChan = plMatrixChannel::ConvertNoRef(fChannel);
+    if (fChannel) {
+        if (fEnabled) {
+            plMatrixChannel* matChan = plMatrixChannel::ConvertNoRef(fChannel);
             hsAssert(matChan, "Invalid channel given to plMatrixChannelApplicator");
 
             plProfile_BeginTiming(MatrixApplicator);
-            plCoordinateInterface *CI = IGetCI(mod);            
-            const hsMatrix44 &animResult = matChan->Value(time);
+            plCoordinateInterface* CI = IGetCI(mod);
+            const hsMatrix44& animResult = matChan->Value(time);
             hsMatrix44 localResult;
             hsMatrix44 localInverse;
 
-            if (time < fDelayStart + fDelayLength)
-            {
+            if (time < fDelayStart + fDelayLength) {
                 hsAffineParts identAP;
                 identAP.Reset();
                 hsAffineParts interpAP;
@@ -827,16 +844,15 @@ void plMatrixDelayedCorrectionApplicator::IApply(const plAGModifier *mod, double
                 float blend = (float)((time - fDelayStart) / fDelayLength);
                 hsInterp::LinInterp(&fCorAP, &identAP, blend, &interpAP);
                 interpAP.ComposeMatrix(&interpResult);
-                
+
                 localResult = interpResult * animResult;
                 localResult.GetInverse(&localInverse);
                 CI->SetLocalToParent(localResult, localInverse);
-            }
-            else
-            {
+            } else {
                 animResult.GetInverse(&localInverse);
-                CI->SetLocalToParent(animResult, localInverse);     
+                CI->SetLocalToParent(animResult, localInverse);
             }
+
             plProfile_EndTiming(MatrixApplicator);
         }
     }
@@ -852,15 +868,15 @@ void plMatrixDelayedCorrectionApplicator::IApply(const plAGModifier *mod, double
 // ------
 void plMatrixDifferenceApp::Reset(double time)
 {
-    hsAssert(fChannel,"Missing input channel when resetting.");
-    if(fChannel)
-    {
-        plMatrixChannel *matChan = plMatrixChannel::ConvertNoRef(fChannel);
+    hsAssert(fChannel, "Missing input channel when resetting.");
+
+    if (fChannel) {
+        plMatrixChannel* matChan = plMatrixChannel::ConvertNoRef(fChannel);
         hsAssert(matChan, "Invalid channel given to plMatrixChannelApplicator");
-        if(matChan)
-        {
+
+        if (matChan) {
             hsMatrix44 L2A, A2L;
-            const hsAffineParts &ap = matChan->AffineValue(time);
+            const hsAffineParts& ap = matChan->AffineValue(time);
             ap.ComposeMatrix(&L2A);             // what comes out of AffineValue is a local-to-animation
             ap.ComposeInverseMatrix(&A2L);
 
@@ -872,19 +888,19 @@ void plMatrixDifferenceApp::Reset(double time)
 
 // CanBlend -----------------------------------------------
 // ---------
-bool plMatrixDifferenceApp::CanBlend(plAGApplicator *app)
+bool plMatrixDifferenceApp::CanBlend(plAGApplicator* app)
 {
-    plMatrixChannelApplicator *matChannelApp = plMatrixChannelApplicator::ConvertNoRef(app);
+    plMatrixChannelApplicator* matChannelApp = plMatrixChannelApplicator::ConvertNoRef(app);
 
-    if( plMatrixChannelApplicator::ConvertNoRef(app) )
-    {
+    if (plMatrixChannelApplicator::ConvertNoRef(app)) {
         return true;
     }
+
     return false;
 }
 
 // *** move this somewhere real
-bool CompareMatrices2(const hsMatrix44 &matA, const hsMatrix44 &matB, float tolerance)
+bool CompareMatrices2(const hsMatrix44& matA, const hsMatrix44& matB, float tolerance)
 {
     bool c00 = fabs(matA.fMap[0][0] - matB.fMap[0][0]) < tolerance;
     bool c01 = fabs(matA.fMap[0][1] - matB.fMap[0][1]) < tolerance;
@@ -910,30 +926,30 @@ bool CompareMatrices2(const hsMatrix44 &matA, const hsMatrix44 &matB, float tole
 }
 
 // IAPPLY
-void plMatrixDifferenceApp::IApply(const plAGModifier *mod, double time)
+void plMatrixDifferenceApp::IApply(const plAGModifier* mod, double time)
 {
-    plMatrixChannel *matChan = plMatrixChannel::ConvertNoRef(fChannel);
+    plMatrixChannel* matChan = plMatrixChannel::ConvertNoRef(fChannel);
     hsAssert(matChan, "Invalid channel given to plMatrixChannelApplicator");
     hsMatrix44 L2A, A2L;
 
-    const hsAffineParts &ap = matChan->AffineValue(time);
+    const hsAffineParts& ap = matChan->AffineValue(time);
 
     plProfile_BeginTiming(AffineCompose);
     ap.ComposeMatrix(&L2A);             // what comes out of AffineValue is a local-to-animation
     ap.ComposeInverseMatrix(&A2L);
     plProfile_EndTiming(AffineCompose);
 
-    plProfile_BeginTiming(MatrixApplicator);    
-    if(fNew)                    // if it's new, there's no previous frame to diff against;
-    {                           // cache the current and don't do anything
+    plProfile_BeginTiming(MatrixApplicator);
+
+    if (fNew) {                 // if it's new, there's no previous frame to diff against;
+        // cache the current and don't do anything
         fLastA2L = A2L;
         fLastL2A = L2A;
 
         fNew = false;
     } else {
-        if( ! CompareMatrices2(fLastA2L, A2L, .0001f) && ! CompareMatrices2(fLastL2A, L2A, .0001f))
-        {
-            plCoordinateInterface *CI = IGetCI(mod);
+        if (! CompareMatrices2(fLastA2L, A2L, .0001f) && ! CompareMatrices2(fLastL2A, L2A, .0001f)) {
+            plCoordinateInterface* CI = IGetCI(mod);
 
             hsMatrix44 l2p = CI->GetLocalToParent();
             hsMatrix44 p2l = CI->GetParentToLocal();
@@ -951,7 +967,8 @@ void plMatrixDifferenceApp::IApply(const plAGModifier *mod, double time)
             fLastA2L = A2L;
         }
     }
-    plProfile_EndTiming(MatrixApplicator);  
+
+    plProfile_EndTiming(MatrixApplicator);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -962,8 +979,7 @@ void plMatrixDifferenceApp::IApply(const plAGModifier *mod, double time)
 
 /** A two-bone IK applicator.
     */
-class plIK2Applicator : public plMatrixChannelApplicator
-{
+class plIK2Applicator : public plMatrixChannelApplicator {
 public:
 
     // The latest time we were asked to evaluate. We won't actually do the evaluation
@@ -973,13 +989,13 @@ public:
     void SetIsEndEffector(bool status);
     bool GetIsEndEffector();
 
-    void SetTarget(hsPoint3 &worldPoint);
+    void SetTarget(hsPoint3& worldPoint);
 
 private:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
     void ISolve();
     // The other bone involved in the IK solution
-    plIK2Applicator *fOtherBone;
+    plIK2Applicator* fOtherBone;
     // The latest time we were asked to evaluate. We won't actually run our
     // process until the other guy is asked to evaluate the same time.
     double  fUpdateTime;
@@ -1004,11 +1020,11 @@ bool plIK2Applicator::GetIsEndEffector()
     return fIsEndEffector;
 }
 
-void plIK2Applicator::IApply(const plAGModifier *mod, double time)
+void plIK2Applicator::IApply(const plAGModifier* mod, double time)
 {
     fUpdateTime = time;
-    if(time == fOtherBone->GetUpdateTime())
-    {
+
+    if (time == fOtherBone->GetUpdateTime()) {
         // we're both up-to-date: go ahead and solve
         ISolve();
     }

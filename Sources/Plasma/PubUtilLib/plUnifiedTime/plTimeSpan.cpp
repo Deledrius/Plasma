@@ -44,7 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 long plTimeSpan::GetTotalDays() const
 {
-    return (long)(fSecs / (24*3600L));
+    return (long)(fSecs / (24 * 3600L));
 }
 
 long plTimeSpan::GetTotalHours() const

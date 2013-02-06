@@ -49,8 +49,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "hsFastMath.h"
 
-class EdgeBin
-{
+class EdgeBin {
 public:
     uint16_t  fVtx;
     uint16_t  fCount;
@@ -60,30 +59,27 @@ public:
 
 void plAccMeshSmooth::FindEdges(uint32_t maxVtxIdx, uint32_t nTris, uint16_t* idxList, hsTArray<uint16_t>& edgeVerts)
 {
-    hsTArray<EdgeBin>*  bins = new hsTArray<EdgeBin>[maxVtxIdx+1];
+    hsTArray<EdgeBin>*  bins = new hsTArray<EdgeBin>[maxVtxIdx + 1];
 
     hsBitVector edgeVertBits;
     // For each vert pair (edge) in idxList
     int i;
-    for( i = 0; i < nTris; i++ )
-    {
+
+    for (i = 0; i < nTris; i++) {
         int j;
-        for( j = 0; j < 3; j++ )
-        {
-            int jPlus = j < 2 ? j+1 : 0;
-            int idx0 = idxList[i*3 + j];
-            int idx1 = idxList[i*3 + jPlus];
+
+        for (j = 0; j < 3; j++) {
+            int jPlus = j < 2 ? j + 1 : 0;
+            int idx0 = idxList[i * 3 + j];
+            int idx1 = idxList[i * 3 + jPlus];
 
             int lo, hi;
-            
+
             // Look in the LUT for the lower index.
-            if( idx0 < idx1 )
-            {
+            if (idx0 < idx1) {
                 lo = idx0;
                 hi = idx1;
-            }
-            else
-            {
+            } else {
                 lo = idx1;
                 hi = idx0;
             }
@@ -91,20 +87,18 @@ void plAccMeshSmooth::FindEdges(uint32_t maxVtxIdx, uint32_t nTris, uint16_t* id
             hsTArray<EdgeBin>& loBin = bins[lo];
             // In that bucket, look for the higher index.
             int k;
-            for( k = 0; k < loBin.GetCount(); k++ )
-            {
-                if( loBin[k].fVtx == hi )
+
+            for (k = 0; k < loBin.GetCount(); k++) {
+                if (loBin[k].fVtx == hi) {
                     break;
+                }
             }
 
             // If we find it, increment it's count,
             // else add it.
-            if( k < loBin.GetCount() )
-            {
+            if (k < loBin.GetCount()) {
                 loBin[k].fCount++;
-            }
-            else
-            {
+            } else {
                 EdgeBin* b = loBin.Push();
                 b->fVtx = hi;
                 b->fCount = 1;
@@ -113,28 +107,27 @@ void plAccMeshSmooth::FindEdges(uint32_t maxVtxIdx, uint32_t nTris, uint16_t* id
     }
 
     // For each bucket in the LUT,
-    for( i = 0; i < maxVtxIdx+1; i++ )
-    {
+    for (i = 0; i < maxVtxIdx + 1; i++) {
         hsTArray<EdgeBin>& loBin = bins[i];
         // For each higher index
         int j;
-        for( j = 0; j < loBin.GetCount(); j++ )
-        {
+
+        for (j = 0; j < loBin.GetCount(); j++) {
             // If the count is one, it's an edge, so set the edge bit for both indices (hi and lo)
-            if( 1 == loBin[j].fCount )
-            {
+            if (1 == loBin[j].fCount) {
                 edgeVertBits.SetBit(i);
                 edgeVertBits.SetBit(loBin[j].fVtx);
             }
         }
     }
-    
+
     // Now translate the bitvector to a list of indices.
-    for( i = 0; i < maxVtxIdx+1; i++ )
-    {
-        if( edgeVertBits.IsBitSet(i) )
+    for (i = 0; i < maxVtxIdx + 1; i++) {
+        if (edgeVertBits.IsBitSet(i)) {
             edgeVerts.Append(i);
+        }
     }
+
     delete [] bins;
 }
 
@@ -143,17 +136,19 @@ void plAccMeshSmooth::FindEdges(hsTArray<plGeometrySpan*>& spans, hsTArray<uint1
     fSpans.SetCount(spans.GetCount());
 
     int i;
-    for( i = 0; i < spans.GetCount(); i++ )
-    {
+
+    for (i = 0; i < spans.GetCount(); i++) {
         fAccGeom.AccessSpanFromGeometrySpan(fSpans[i], spans[i]);
-        if( !fSpans[i].HasAccessTri() )
+
+        if (!fSpans[i].HasAccessTri()) {
             continue;
+        }
 
         plAccessTriSpan& triSpan = fSpans[i].AccessTri();
 
         uint32_t nTris = triSpan.TriCount();
         uint16_t* idxList = triSpan.fTris;
-        uint32_t maxVertIdx = triSpan.VertCount()-1;
+        uint32_t maxVertIdx = triSpan.VertCount() - 1;
 
         FindEdges(maxVertIdx, nTris, idxList, edgeVerts[i]);
     }
@@ -166,21 +161,22 @@ void plAccMeshSmooth::Smooth(hsTArray<plGeometrySpan*>& spans)
     FindEdges(spans, edgeVerts);
 
     int i;
-    for( i = 0; i < spans.GetCount(); i++ )
-    {
-        while( edgeVerts[i].GetCount() )
-        {
-            int j = edgeVerts[i].GetCount()-1;
+
+    for (i = 0; i < spans.GetCount(); i++) {
+        while (edgeVerts[i].GetCount()) {
+            int j = edgeVerts[i].GetCount() - 1;
 
             plAccessTriSpan& triSpan = fSpans[i].AccessTri();
 
             VtxAccum accum;
             accum.fPos = IPositionToWorld(fSpans[i], edgeVerts[i][j]);
             accum.fNorm = INormalToWorld(fSpans[i], edgeVerts[i][j]);
-            if( triSpan.HasDiffuse() )
+
+            if (triSpan.HasDiffuse()) {
                 accum.fDiffuse = triSpan.DiffuseRGBA(edgeVerts[i][j]);
-            else
+            } else {
                 accum.fDiffuse.Set(1.f, 1.f, 1.f, 1.f);
+            }
 
             shareVtx[i].Append(edgeVerts[i][j]);
 
@@ -189,46 +185,42 @@ void plAccMeshSmooth::Smooth(hsTArray<plGeometrySpan*>& spans)
 
             // Now look through the rest of the spans
             int k;
-            for( k = i+1; k < spans.GetCount(); k++ )
-            {
+
+            for (k = i + 1; k < spans.GetCount(); k++) {
                 FindSharedVerts(fSpans[k], edgeVerts[k].GetCount(), edgeVerts[k], shareVtx[k], accum);
             }
 
             accum.fNorm.Normalize();
 
-            if( fFlags & kSmoothNorm )
-            {
-                for( k = i; k < spans.GetCount(); k++ )
-                {
+            if (fFlags & kSmoothNorm) {
+                for (k = i; k < spans.GetCount(); k++) {
                     SetNormals(fSpans[k], shareVtx[k], accum.fNorm);
                 }
             }
-            if( fFlags & kSmoothPos )
-            {
-                for( k = i; k < spans.GetCount(); k++ )
-                {
+
+            if (fFlags & kSmoothPos) {
+                for (k = i; k < spans.GetCount(); k++) {
                     SetPositions(fSpans[k], shareVtx[k], accum.fPos);
                 }
             }
-            if( fFlags & kSmoothDiffuse )
-            {
-                for( k = i; k < spans.GetCount(); k++ )
-                {
+
+            if (fFlags & kSmoothDiffuse) {
+                for (k = i; k < spans.GetCount(); k++) {
                     SetDiffuse(fSpans[k], shareVtx[k], accum.fDiffuse);
                 }
             }
 
             // Now remove all the shared verts (which we just processed)
             // from edgeVerts so we don't process them again.
-            for( k = i; k < spans.GetCount(); k++ )
-            {
+            for (k = i; k < spans.GetCount(); k++) {
                 int m;
-                for( m = 0; m < shareVtx[k].GetCount(); m++ )
-                {
+
+                for (m = 0; m < shareVtx[k].GetCount(); m++) {
                     int idx = edgeVerts[k].Find(shareVtx[k][m]);
                     hsAssert(idx != edgeVerts[k].kMissingIndex, "Lost vertex between find and remove");
                     edgeVerts[k].Remove(idx);
                 }
+
                 shareVtx[k].SetCount(0);
             }
         }
@@ -245,8 +237,7 @@ hsPoint3 plAccMeshSmooth::IPositionToWorld(plAccessSpan& span, int i) const
 
 hsVector3 plAccMeshSmooth::INormalToWorld(plAccessSpan& span, int i) const
 {
-    if( span.GetWorldToLocal().fFlags & hsMatrix44::kIsIdent )
-    {
+    if (span.GetWorldToLocal().fFlags & hsMatrix44::kIsIdent) {
         return span.AccessTri().Normal(i);
     }
 
@@ -265,8 +256,7 @@ hsPoint3 plAccMeshSmooth::IPositionToLocal(plAccessSpan& span, const hsPoint3& w
 
 hsVector3 plAccMeshSmooth::INormalToLocal(plAccessSpan& span, const hsVector3& wNorm) const
 {
-    if( span.GetLocalToWorld().fFlags & hsMatrix44::kIsIdent )
-    {
+    if (span.GetLocalToWorld().fFlags & hsMatrix44::kIsIdent) {
         return wNorm;
     }
 
@@ -282,15 +272,15 @@ void plAccMeshSmooth::FindSharedVerts(plAccessSpan& span, int numEdgeVerts, hsTA
 {
     plAccessTriSpan& triSpan = span.AccessTri();
     int i;
-    for( i = 0; i < numEdgeVerts; i++ )
-    {
+
+    for (i = 0; i < numEdgeVerts; i++) {
         hsPoint3 pos = IPositionToWorld(span, edgeVerts[i]);
         hsVector3 diff(&accum.fPos, &pos);
-        if( diff.MagnitudeSquared() < fDistTolSq )
-        {
+
+        if (diff.MagnitudeSquared() < fDistTolSq) {
             hsVector3 norm = INormalToWorld(span, edgeVerts[i]);
-            if( norm.InnerProduct(accum.fNorm) > fMinNormDot )
-            {
+
+            if (norm.InnerProduct(accum.fNorm) > fMinNormDot) {
                 shareVtx.Append(edgeVerts[i]);
 
                 accum.fPos += pos;
@@ -300,10 +290,13 @@ void plAccMeshSmooth::FindSharedVerts(plAccessSpan& span, int numEdgeVerts, hsTA
                 hsFastMath::NormalizeAppr(accum.fNorm);
 
                 hsColorRGBA diff;
-                if( triSpan.HasDiffuse() )
+
+                if (triSpan.HasDiffuse()) {
                     diff = triSpan.DiffuseRGBA(edgeVerts[i]);
-                else
+                } else {
                     diff.Set(1.f, 1.f, 1.f, 1.f);
+                }
+
                 accum.fDiffuse += diff;
                 accum.fDiffuse *= 0.5f;
             }
@@ -315,16 +308,20 @@ void plAccMeshSmooth::SetPositions(plAccessSpan& span, hsTArray<uint16_t>& share
 {
     plAccessTriSpan& triSpan = span.AccessTri();
     int i;
-    for( i = 0; i < shareVtx.GetCount(); i++ )
+
+    for (i = 0; i < shareVtx.GetCount(); i++) {
         triSpan.Position(shareVtx[i]) = IPositionToLocal(span, pos);
+    }
 }
 
 void plAccMeshSmooth::SetNormals(plAccessSpan& span, hsTArray<uint16_t>& shareVtx, const hsVector3& norm) const
 {
     plAccessTriSpan& triSpan = span.AccessTri();
     int i;
-    for( i = 0; i < shareVtx.GetCount(); i++ )
+
+    for (i = 0; i < shareVtx.GetCount(); i++) {
         triSpan.Normal(shareVtx[i]) = INormalToLocal(span, norm);
+    }
 }
 
 void plAccMeshSmooth::SetDiffuse(plAccessSpan& span, hsTArray<uint16_t>& shareVtx, const hsColorRGBA& diff) const
@@ -332,8 +329,10 @@ void plAccMeshSmooth::SetDiffuse(plAccessSpan& span, hsTArray<uint16_t>& shareVt
     plAccessTriSpan& triSpan = span.AccessTri();
     hsAssert(triSpan.HasDiffuse(), "Calling SetColors on data with no color");
     int i;
-    for( i = 0; i < shareVtx.GetCount(); i++ )
+
+    for (i = 0; i < shareVtx.GetCount(); i++) {
         triSpan.Diffuse32(shareVtx[i]) = diff.ToARGB32();
+    }
 }
 
 void plAccMeshSmooth::SetAngle(float degs)

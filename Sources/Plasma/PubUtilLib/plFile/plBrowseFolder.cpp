@@ -45,7 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include <shlobj.h>
 
-plFileName plBrowseFolder::GetFolder(const plFileName &startPath, const plString &title, HWND hwndOwner)
+plFileName plBrowseFolder::GetFolder(const plFileName& startPath, const plString& title, HWND hwndOwner)
 {
     BROWSEINFOW bi;
     memset(&bi, 0, sizeof(bi));
@@ -56,6 +56,7 @@ plFileName plBrowseFolder::GetFolder(const plFileName &startPath, const plString
 
     LPITEMIDLIST iil = SHBrowseForFolderW(&bi);
     plFileName path;
+
     if (!iil) {
         // Browse failed, or cancel was selected
         path = "";
@@ -77,12 +78,14 @@ plFileName plBrowseFolder::GetFolder(const plFileName &startPath, const plString
 
 int CALLBACK plBrowseFolder::BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
-    switch (uMsg)
-    {
+    switch (uMsg) {
     case BFFM_INITIALIZED:
+
         // lpData should be the lParam passed to SHBrowseForFolder, which is the start path.
-        if (lpData)
+        if (lpData) {
             SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
+        }
+
         break;
     }
 

@@ -55,33 +55,42 @@ pyBlueSpiralMsg::pyBlueSpiralMsg(): pyGameCliMsg() {}
 
 pyBlueSpiralMsg::pyBlueSpiralMsg(pfGameCliMsg* msg): pyGameCliMsg(msg)
 {
-    if (message && (message->gameCli->GetGameTypeId() != kGameTypeId_BlueSpiral))
-        message = nil; // wrong type, just clear it out
+    if (message && (message->gameCli->GetGameTypeId() != kGameTypeId_BlueSpiral)) {
+        message = nil;    // wrong type, just clear it out
+    }
 }
 
 int pyBlueSpiralMsg::GetBlueSpiralMsgType() const
 {
-    if (message)
+    if (message) {
         return message->netMsg->messageId;
+    }
+
     return -1;
 }
 
 PyObject* pyBlueSpiralMsg::UpcastToFinalBlueSpiralMsg() const
 {
-    if (!message)
+    if (!message) {
         PYTHON_RETURN_NONE;
-    switch (message->netMsg->messageId)
-    {
+    }
+
+    switch (message->netMsg->messageId) {
     case kSrv2Cli_BlueSpiral_ClothOrder:
         return pyBlueSpiralClothOrderMsg::New(message);
+
     case kSrv2Cli_BlueSpiral_SuccessfulHit:
         return pyBlueSpiralSuccessfulHitMsg::New(message);
+
     case kSrv2Cli_BlueSpiral_GameWon:
         return pyBlueSpiralGameWonMsg::New(message);
+
     case kSrv2Cli_BlueSpiral_GameOver:
         return pyBlueSpiralGameOverMsg::New(message);
+
     case kSrv2Cli_BlueSpiral_GameStarted:
         return pyBlueSpiralGameStartedMsg::New(message);
+
     default:
         PYTHON_RETURN_NONE;
     }
@@ -97,19 +106,23 @@ pyBlueSpiralClothOrderMsg::pyBlueSpiralClothOrderMsg(): pyBlueSpiralMsg() {}
 
 pyBlueSpiralClothOrderMsg::pyBlueSpiralClothOrderMsg(pfGameCliMsg* msg): pyBlueSpiralMsg(msg)
 {
-    if (message && (message->netMsg->messageId != kSrv2Cli_BlueSpiral_ClothOrder))
-        message = nil; // wrong type, just clear it out
+    if (message && (message->netMsg->messageId != kSrv2Cli_BlueSpiral_ClothOrder)) {
+        message = nil;    // wrong type, just clear it out
+    }
 }
 
 std::vector<int> pyBlueSpiralClothOrderMsg::Order()
 {
     std::vector<int> retVal;
-    if (message)
-    {
+
+    if (message) {
         const Srv2Cli_BlueSpiral_ClothOrder* gmMsg = (const Srv2Cli_BlueSpiral_ClothOrder*)message->netMsg;
-        for (int i = 0; i < arrsize(gmMsg->order); ++i)
+
+        for (int i = 0; i < arrsize(gmMsg->order); ++i) {
             retVal.push_back(gmMsg->order[i]);
+        }
     }
+
     return retVal;
 }
 
@@ -118,8 +131,9 @@ pyBlueSpiralSuccessfulHitMsg::pyBlueSpiralSuccessfulHitMsg(): pyBlueSpiralMsg() 
 
 pyBlueSpiralSuccessfulHitMsg::pyBlueSpiralSuccessfulHitMsg(pfGameCliMsg* msg): pyBlueSpiralMsg(msg)
 {
-    if (message && (message->netMsg->messageId != kSrv2Cli_BlueSpiral_SuccessfulHit))
-        message = nil; // wrong type, just clear it out
+    if (message && (message->netMsg->messageId != kSrv2Cli_BlueSpiral_SuccessfulHit)) {
+        message = nil;    // wrong type, just clear it out
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -127,8 +141,9 @@ pyBlueSpiralGameWonMsg::pyBlueSpiralGameWonMsg(): pyBlueSpiralMsg() {}
 
 pyBlueSpiralGameWonMsg::pyBlueSpiralGameWonMsg(pfGameCliMsg* msg): pyBlueSpiralMsg(msg)
 {
-    if (message && (message->netMsg->messageId != kSrv2Cli_BlueSpiral_GameWon))
-        message = nil; // wrong type, just clear it out
+    if (message && (message->netMsg->messageId != kSrv2Cli_BlueSpiral_GameWon)) {
+        message = nil;    // wrong type, just clear it out
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,8 +151,9 @@ pyBlueSpiralGameOverMsg::pyBlueSpiralGameOverMsg(): pyBlueSpiralMsg() {}
 
 pyBlueSpiralGameOverMsg::pyBlueSpiralGameOverMsg(pfGameCliMsg* msg): pyBlueSpiralMsg(msg)
 {
-    if (message && (message->netMsg->messageId != kSrv2Cli_BlueSpiral_GameOver))
-        message = nil; // wrong type, just clear it out
+    if (message && (message->netMsg->messageId != kSrv2Cli_BlueSpiral_GameOver)) {
+        message = nil;    // wrong type, just clear it out
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,16 +161,17 @@ pyBlueSpiralGameStartedMsg::pyBlueSpiralGameStartedMsg(): pyBlueSpiralMsg() {}
 
 pyBlueSpiralGameStartedMsg::pyBlueSpiralGameStartedMsg(pfGameCliMsg* msg): pyBlueSpiralMsg(msg)
 {
-    if (message && (message->netMsg->messageId != kSrv2Cli_BlueSpiral_GameStarted))
-        message = nil; // wrong type, just clear it out
+    if (message && (message->netMsg->messageId != kSrv2Cli_BlueSpiral_GameStarted)) {
+        message = nil;    // wrong type, just clear it out
+    }
 }
 
 bool pyBlueSpiralGameStartedMsg::StartSpin()
 {
-    if (message)
-    {
+    if (message) {
         const Srv2Cli_BlueSpiral_GameStarted* gmMsg = (const Srv2Cli_BlueSpiral_GameStarted*)message->netMsg;
         return gmMsg->startSpin;
     }
+
     return false;
 }

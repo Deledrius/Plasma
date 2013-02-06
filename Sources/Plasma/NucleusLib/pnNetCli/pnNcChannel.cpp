@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetCli/pnNcChannel.cpp
-*   
+*
 ***/
 
 #include "Pch.h"
@@ -60,12 +60,24 @@ namespace pnNetCli {
 ***/
 
 struct ChannelCrit {
-    ~ChannelCrit ();
-    ChannelCrit ();
-    inline void Enter ()        { m_critsect.Lock();               }
-    inline void Leave ()        { m_critsect.Unlock();             }
-    inline void EnterSafe ()    { if (m_init) m_critsect.Lock();   }
-    inline void LeaveSafe ()    { if (m_init) m_critsect.Unlock(); }
+    ~ChannelCrit();
+    ChannelCrit();
+    inline void Enter()        {
+        m_critsect.Lock();
+    }
+    inline void Leave()        {
+        m_critsect.Unlock();
+    }
+    inline void EnterSafe()    {
+        if (m_init) {
+            m_critsect.Lock();
+        }
+    }
+    inline void LeaveSafe()    {
+        if (m_init) {
+            m_critsect.Unlock();
+        }
+    }
 
 private:
     bool        m_init;
@@ -98,13 +110,16 @@ static std::list<NetMsgChannel*>*   s_channels;
 ***/
 
 //===========================================================================
-ChannelCrit::ChannelCrit () {
+ChannelCrit::ChannelCrit()
+{
     m_init = true;
 }
 
 //===========================================================================
-ChannelCrit::~ChannelCrit () {
+ChannelCrit::~ChannelCrit()
+{
     EnterSafe();
+
     if (s_channels) {
         while (s_channels->size()) {
             NetMsgChannel* const channel = s_channels->front();
@@ -115,6 +130,7 @@ ChannelCrit::~ChannelCrit () {
         delete s_channels;
         s_channels = nil;
     }
+
     LeaveSafe();
 }
 
@@ -127,7 +143,8 @@ ChannelCrit::~ChannelCrit () {
 
 //===========================================================================
 // Returns max size of message in bytes
-static unsigned ValidateMsg (const NetMsg & msg) {
+static unsigned ValidateMsg(const NetMsg& msg)
+{
     ASSERT(msg.fields);
     ASSERT(msg.count);
 
@@ -135,53 +152,66 @@ static unsigned ValidateMsg (const NetMsg & msg) {
     bool prevFieldWasVarCount = false;
 
     for (unsigned i = 0; i < msg.count; i++) {
-        const NetMsgField & field = msg.fields[i];
+        const NetMsgField& field = msg.fields[i];
 
         for (;;) {
             bool gotVarCount = false;
             bool gotVarField = false;
+
             if (field.type == kNetMsgFieldVarCount) {
-                if (gotVarField || gotVarCount)
+                if (gotVarField || gotVarCount) {
                     FATAL("Msg definition may only include one variable length field");
+                }
+
                 gotVarCount = true;
                 break;
             }
+
             if (field.type == kNetMsgFieldVarPtr || field.type == kNetMsgFieldRawVarPtr) {
-                if (gotVarField || gotVarCount)
+                if (gotVarField || gotVarCount) {
                     FATAL("Msg definition may only include one variable length field");
-                if (!prevFieldWasVarCount)
+                }
+
+                if (!prevFieldWasVarCount) {
                     FATAL("Variable length field must preceded by variable length count field");
+                }
+
                 gotVarField = true;
                 break;
             }
-            if (gotVarField)
+
+            if (gotVarField) {
                 FATAL("Variable length field must be the last field in message definition");
+            }
+
             break;
         }
 
         prevFieldWasVarCount = false;
+
         switch (field.type) {
-            case kNetMsgFieldInteger:
-                maxBytes += sizeof(uint64_t);
+        case kNetMsgFieldInteger:
+            maxBytes += sizeof(uint64_t);
             break;
 
-            case kNetMsgFieldReal:
-                maxBytes += sizeof(double);
+        case kNetMsgFieldReal:
+            maxBytes += sizeof(double);
             break;
 
-            case kNetMsgFieldVarPtr:
-            case kNetMsgFieldRawVarPtr:
+        case kNetMsgFieldVarPtr:
+        case kNetMsgFieldRawVarPtr:
             break;
 
-            case kNetMsgFieldVarCount:
-                prevFieldWasVarCount = true;
-                // fall-thru...
-            case kNetMsgFieldString:
-            case kNetMsgFieldPtr:
-            case kNetMsgFieldRawPtr:
-            case kNetMsgFieldData:
-            case kNetMsgFieldRawData:
-                maxBytes += msg.fields[i].count * msg.fields[i].size;
+        case kNetMsgFieldVarCount:
+            prevFieldWasVarCount = true;
+
+            // fall-thru...
+        case kNetMsgFieldString:
+        case kNetMsgFieldPtr:
+        case kNetMsgFieldRawPtr:
+        case kNetMsgFieldData:
+        case kNetMsgFieldRawData:
+            maxBytes += msg.fields[i].count * msg.fields[i].size;
             break;
 
             DEFAULT_FATAL(field.type);
@@ -194,26 +224,29 @@ static unsigned ValidateMsg (const NetMsg & msg) {
 
 //===========================================================================
 template<class T>
-static unsigned MaxMsgId (const T msgs[], unsigned count) {
+static unsigned MaxMsgId(const T msgs[], unsigned count)
+{
     unsigned maxMsgId = 0;
 
     for (unsigned i = 0; i < count; i++) {
         ASSERT(msgs[i].msg.count);
         maxMsgId = max(msgs[i].msg.messageId, maxMsgId);
     }
+
     return maxMsgId;
 }
 
 //===========================================================================
-static void AddSendMsgs_CS (
-    NetMsgChannel *         channel,
+static void AddSendMsgs_CS(
+    NetMsgChannel*          channel,
     const NetMsgInitSend    src[],
     unsigned                count
-) {
+)
+{
     channel->m_sendMsgs.GrowToFit(MaxMsgId(src, count), true);
 
-    for (const NetMsgInitSend * term = src + count; src < term; ++src) {
-        NetMsgInitSend * const dst = &channel->m_sendMsgs[src[0].msg.messageId];
+    for (const NetMsgInitSend* term = src + count; src < term; ++src) {
+        NetMsgInitSend* const dst = &channel->m_sendMsgs[src[0].msg.messageId];
 
         // check to ensure that the message id isn't already used
         ASSERT(!dst->msg.count);
@@ -224,16 +257,17 @@ static void AddSendMsgs_CS (
 }
 
 //===========================================================================
-static void AddRecvMsgs_CS (
-    NetMsgChannel *         channel,
+static void AddRecvMsgs_CS(
+    NetMsgChannel*          channel,
     const NetMsgInitRecv    src[],
     unsigned                count
-) {
+)
+{
     channel->m_recvMsgs.GrowToFit(MaxMsgId(src, count), true);
 
-    for (const NetMsgInitRecv * term = src + count; src < term; ++src) {
+    for (const NetMsgInitRecv* term = src + count; src < term; ++src) {
         ASSERT(src->recv);
-        NetMsgInitRecv * const dst = &channel->m_recvMsgs[src[0].msg.messageId];
+        NetMsgInitRecv* const dst = &channel->m_recvMsgs[src[0].msg.messageId];
 
         // check to ensure that the message id isn't already used
         ASSERT(!dst->msg.count);
@@ -247,27 +281,33 @@ static void AddRecvMsgs_CS (
 }
 
 //===========================================================================
-static NetMsgChannel* FindChannel_CS (uint32_t protocol, bool server) {
-    if (!s_channels)
+static NetMsgChannel* FindChannel_CS(uint32_t protocol, bool server)
+{
+    if (!s_channels) {
         return nil;
+    }
 
     std::list<NetMsgChannel*>::iterator it = s_channels->begin();
+
     for (; it != s_channels->end(); ++it) {
-        if (((*it)->m_protocol == protocol) && ((*it)->m_server == server))
+        if (((*it)->m_protocol == protocol) && ((*it)->m_server == server)) {
             return *it;
+        }
     }
 
     return nil;
 }
 
 //===========================================================================
-static NetMsgChannel* FindOrCreateChannel_CS (uint32_t protocol, bool server) {
+static NetMsgChannel* FindOrCreateChannel_CS(uint32_t protocol, bool server)
+{
     if (!s_channels) {
         s_channels = new std::list<NetMsgChannel*>();
     }
 
     // find or create protocol
-    NetMsgChannel * channel = FindChannel_CS(protocol, server);
+    NetMsgChannel* channel = FindChannel_CS(protocol, server);
+
     if (!channel) {
         channel                 = new NetMsgChannel();
         channel->m_protocol     = protocol;
@@ -289,28 +329,31 @@ static NetMsgChannel* FindOrCreateChannel_CS (uint32_t protocol, bool server) {
 ***/
 
 //============================================================================
-NetMsgChannel * NetMsgChannelLock (
+NetMsgChannel* NetMsgChannelLock(
     unsigned        protocol,
     bool            server,
-    uint32_t *      largestRecv
-) {
-    NetMsgChannel * channel;
+    uint32_t*       largestRecv
+)
+{
+    NetMsgChannel* channel;
     s_channelCrit.Enter();
+
     if (nil != (channel = FindChannel_CS(protocol, server))) {
         *largestRecv = channel->m_largestRecv;
         channel->IncRef("ChannelLock");
-    }
-    else {
+    } else {
         *largestRecv = 0;
     }
+
     s_channelCrit.Leave();
     return channel;
 }
 
 //============================================================================
-void NetMsgChannelUnlock (
-    NetMsgChannel * channel
-) {
+void NetMsgChannelUnlock(
+    NetMsgChannel* channel
+)
+{
     s_channelCrit.Enter();
     {
         channel->DecRef("ChannelLock");
@@ -319,48 +362,62 @@ void NetMsgChannelUnlock (
 }
 
 //============================================================================
-const NetMsgInitRecv * NetMsgChannelFindRecvMessage (
-    NetMsgChannel * channel,
+const NetMsgInitRecv* NetMsgChannelFindRecvMessage(
+    NetMsgChannel* channel,
     unsigned        messageId
-) {
+)
+{
     // Is message in range?
-    if (messageId >= channel->m_recvMsgs.Count())
+    if (messageId >= channel->m_recvMsgs.Count()) {
         return nil;
+    }
 
     // Is message defined?
-    const NetMsgInitRecv * recvMsg = &channel->m_recvMsgs[messageId];
-    if (!recvMsg->msg.count)
+    const NetMsgInitRecv* recvMsg = &channel->m_recvMsgs[messageId];
+
+    if (!recvMsg->msg.count) {
         return nil;
+    }
 
     // Success!
     return recvMsg;
 }
 
 //============================================================================
-const NetMsgInitSend * NetMsgChannelFindSendMessage (
-    NetMsgChannel * channel,
+const NetMsgInitSend* NetMsgChannelFindSendMessage(
+    NetMsgChannel* channel,
     unsigned        messageId
-) {
+)
+{
     // Is message in range?
     ASSERT(messageId < channel->m_sendMsgs.Count());
 
     // Is message defined?
-    const NetMsgInitSend * sendMsg = &channel->m_sendMsgs[messageId];
+    const NetMsgInitSend* sendMsg = &channel->m_sendMsgs[messageId];
     ASSERTMSG(sendMsg->msg.count, "NetMsg not found for send");
 
     return sendMsg;
 }
 
 //============================================================================
-void NetMsgChannelGetDhConstants (
-    const NetMsgChannel *   channel,
-    uint32_t *              dh_g,
+void NetMsgChannelGetDhConstants(
+    const NetMsgChannel*    channel,
+    uint32_t*               dh_g,
     const plBigNum**        dh_xa,
     const plBigNum**        dh_n
-) {
-    if (dh_g) *dh_g   =  channel->m_dh_g;
-    if (dh_xa) *dh_xa  = &channel->m_dh_xa;
-    if (dh_n) *dh_n   = &channel->m_dh_n;
+)
+{
+    if (dh_g) {
+        *dh_g   =  channel->m_dh_g;
+    }
+
+    if (dh_xa) {
+        *dh_xa  = &channel->m_dh_xa;
+    }
+
+    if (dh_n) {
+        *dh_n   = &channel->m_dh_n;
+    }
 }
 
 
@@ -374,7 +431,7 @@ void NetMsgChannelGetDhConstants (
 ***/
 
 //===========================================================================
-void NetMsgProtocolRegister (
+void NetMsgProtocolRegister(
     uint32_t                protocol,
     bool                    server,
     const NetMsgInitSend    sendMsgs[],
@@ -384,10 +441,11 @@ void NetMsgProtocolRegister (
     uint32_t                dh_g,
     const plBigNum&         dh_xa,    // client: dh_x     server: dh_a
     const plBigNum&         dh_n
-) {
+)
+{
     s_channelCrit.EnterSafe();
     {
-        NetMsgChannel * channel = FindOrCreateChannel_CS(protocol, server);
+        NetMsgChannel* channel = FindOrCreateChannel_CS(protocol, server);
 
         // make sure no connections have been established on this protocol, otherwise
         // we'll be modifying a live data structure; NetCli's don't lock their protocol
@@ -398,20 +456,26 @@ void NetMsgProtocolRegister (
         channel->m_dh_xa    = dh_xa;
         channel->m_dh_n     = dh_n;
 
-        if (sendMsgCount)
+        if (sendMsgCount) {
             AddSendMsgs_CS(channel, sendMsgs, sendMsgCount);
-        if (recvMsgCount)
+        }
+
+        if (recvMsgCount) {
             AddRecvMsgs_CS(channel, recvMsgs, recvMsgCount);
+        }
     }
     s_channelCrit.LeaveSafe();
 }
 
 //===========================================================================
-void NetMsgProtocolDestroy (uint32_t protocol, bool server) {
+void NetMsgProtocolDestroy(uint32_t protocol, bool server)
+{
     s_channelCrit.EnterSafe();
+
     if (NetMsgChannel* channel = FindChannel_CS(protocol, server)) {
         s_channels->remove(channel);
         channel->DecRef("ChannelLink");
     }
+
     s_channelCrit.LeaveSafe();
 }

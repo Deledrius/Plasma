@@ -55,85 +55,133 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnUUID/pnUUID.h"
 
 class plInputInterface;
-class plInputIfaceMgrMsg : public plMessage
-{
-    protected:
+class plInputIfaceMgrMsg : public plMessage {
+protected:
 
-        uint8_t   fCommand;
-        plInputInterface    *fInterface;
-        uint32_t  fPageID;
-        const char* ageName;
-        const char* ageFileName;
-        const char* spawnPoint;
-        plUUID ageInstanceGuid;
-        plKey fAvKey;
-    public:
+    uint8_t   fCommand;
+    plInputInterface*    fInterface;
+    uint32_t  fPageID;
+    const char* ageName;
+    const char* ageFileName;
+    const char* spawnPoint;
+    plUUID ageInstanceGuid;
+    plKey fAvKey;
+public:
 
-        enum 
-        {
-            kAddInterface,
-            kRemoveInterface,
-            kEnableClickables,          /// YEEEEEECH!!!!
-            kDisableClickables,
-            kSetOfferBookMode,
-            kClearOfferBookMode,
-            kNotifyOfferAccepted,
-            kNotifyOfferRejected,
-            kNotifyOfferCompleted,
-            kDisableAvatarClickable,
-            kEnableAvatarClickable,
-            kGUIDisableAvatarClickable,
-            kGUIEnableAvatarClickable,
-            kSetShareSpawnPoint,
-            kSetShareAgeInstanceGuid,
-        };
+    enum {
+        kAddInterface,
+        kRemoveInterface,
+        kEnableClickables,          /// YEEEEEECH!!!!
+        kDisableClickables,
+        kSetOfferBookMode,
+        kClearOfferBookMode,
+        kNotifyOfferAccepted,
+        kNotifyOfferRejected,
+        kNotifyOfferCompleted,
+        kDisableAvatarClickable,
+        kEnableAvatarClickable,
+        kGUIDisableAvatarClickable,
+        kGUIEnableAvatarClickable,
+        kSetShareSpawnPoint,
+        kSetShareAgeInstanceGuid,
+    };
 
-        plInputIfaceMgrMsg() : plMessage( nil, nil, nil ) { SetBCastFlag( kBCastByExactType ); fInterface = nil; ageName = ageFileName = spawnPoint = 0; fAvKey = nil; }
-        plInputIfaceMgrMsg( plKey &receiver, uint8_t command ) : plMessage( nil, nil, nil ) { AddReceiver( receiver ); fCommand = command; fInterface = nil; fAvKey = nil; ageName = ageFileName = spawnPoint =  0;}
-        plInputIfaceMgrMsg( uint8_t command ) : plMessage( nil, nil, nil ) { SetBCastFlag( kBCastByExactType ); fCommand = command; fInterface = nil; fAvKey = nil; ageName = ageFileName = spawnPoint =  0;}
-        plInputIfaceMgrMsg( uint8_t command, uint32_t pageID ) : plMessage( nil, nil, nil ) { SetBCastFlag( kBCastByExactType ); fCommand = command; fPageID = pageID; fInterface = nil; fAvKey = nil; ageName = ageFileName = spawnPoint =  0;}
-        ~plInputIfaceMgrMsg();
+    plInputIfaceMgrMsg() : plMessage(nil, nil, nil) {
+        SetBCastFlag(kBCastByExactType);
+        fInterface = nil;
+        ageName = ageFileName = spawnPoint = 0;
+        fAvKey = nil;
+    }
+    plInputIfaceMgrMsg(plKey& receiver, uint8_t command) : plMessage(nil, nil, nil) {
+        AddReceiver(receiver);
+        fCommand = command;
+        fInterface = nil;
+        fAvKey = nil;
+        ageName = ageFileName = spawnPoint =  0;
+    }
+    plInputIfaceMgrMsg(uint8_t command) : plMessage(nil, nil, nil) {
+        SetBCastFlag(kBCastByExactType);
+        fCommand = command;
+        fInterface = nil;
+        fAvKey = nil;
+        ageName = ageFileName = spawnPoint =  0;
+    }
+    plInputIfaceMgrMsg(uint8_t command, uint32_t pageID) : plMessage(nil, nil, nil) {
+        SetBCastFlag(kBCastByExactType);
+        fCommand = command;
+        fPageID = pageID;
+        fInterface = nil;
+        fAvKey = nil;
+        ageName = ageFileName = spawnPoint =  0;
+    }
+    ~plInputIfaceMgrMsg();
 
-        CLASSNAME_REGISTER( plInputIfaceMgrMsg );
-        GETINTERFACE_ANY( plInputIfaceMgrMsg, plMessage );
+    CLASSNAME_REGISTER(plInputIfaceMgrMsg);
+    GETINTERFACE_ANY(plInputIfaceMgrMsg, plMessage);
 
-        virtual void Read(hsStream* s, hsResMgr* mgr) 
-        { 
-            plMessage::IMsgRead( s, mgr ); 
-            s->ReadLE( &fCommand );
-            s->ReadLE( &fPageID );
-            ageName = s->ReadSafeString();
-            ageFileName = s->ReadSafeString();
-            spawnPoint = s->ReadSafeString();
-            fAvKey = mgr->ReadKey(s);
-        }
-        
-        virtual void Write(hsStream* s, hsResMgr* mgr) 
-        { 
-            plMessage::IMsgWrite( s, mgr ); 
-            s->WriteLE( fCommand );
-            s->WriteLE( fPageID );
-            s->WriteSafeString(ageName);
-            s->WriteSafeString(ageFileName);
-            s->WriteSafeString(spawnPoint);
-            mgr->WriteKey(s,fAvKey);
-        }
+    virtual void Read(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgRead(s, mgr);
+        s->ReadLE(&fCommand);
+        s->ReadLE(&fPageID);
+        ageName = s->ReadSafeString();
+        ageFileName = s->ReadSafeString();
+        spawnPoint = s->ReadSafeString();
+        fAvKey = mgr->ReadKey(s);
+    }
 
-        void        SetAgeName(const char* s) { ageName = s;    }
-        const char* GetAgeName() { return ageName; }
-        void        SetAgeFileName(const char* s) { ageFileName = s;    }
-        const char* GetAgeFileName() { return ageFileName; }
-        void        SetSpawnPoint(const char* s) { spawnPoint = s; }
-        const char* GetSpawnPoint() { return spawnPoint; }
-        void        SetAgeInstanceGuid(const plUUID& guid) { ageInstanceGuid = guid; }
-        const plUUID& GetAgeInstanceGuid() { return ageInstanceGuid; }
-        uint8_t       GetCommand( void ) { return fCommand; }
-        uint32_t      GetPageID( void ) { return fPageID; }       
-        void                SetIFace( plInputInterface *iface );
-        plInputInterface    *GetIFace( void ) const { return fInterface; }
-        plKey&      GetAvKey( void ) { return fAvKey; }
-        const plKey&    GetAvKey( void ) const { return fAvKey; }
-        void        SetAvKey( plKey& k ) { fAvKey = k; }
+    virtual void Write(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgWrite(s, mgr);
+        s->WriteLE(fCommand);
+        s->WriteLE(fPageID);
+        s->WriteSafeString(ageName);
+        s->WriteSafeString(ageFileName);
+        s->WriteSafeString(spawnPoint);
+        mgr->WriteKey(s, fAvKey);
+    }
+
+    void        SetAgeName(const char* s) {
+        ageName = s;
+    }
+    const char* GetAgeName() {
+        return ageName;
+    }
+    void        SetAgeFileName(const char* s) {
+        ageFileName = s;
+    }
+    const char* GetAgeFileName() {
+        return ageFileName;
+    }
+    void        SetSpawnPoint(const char* s) {
+        spawnPoint = s;
+    }
+    const char* GetSpawnPoint() {
+        return spawnPoint;
+    }
+    void        SetAgeInstanceGuid(const plUUID& guid) {
+        ageInstanceGuid = guid;
+    }
+    const plUUID& GetAgeInstanceGuid() {
+        return ageInstanceGuid;
+    }
+    uint8_t       GetCommand(void) {
+        return fCommand;
+    }
+    uint32_t      GetPageID(void) {
+        return fPageID;
+    }
+    void                SetIFace(plInputInterface* iface);
+    plInputInterface*    GetIFace(void) const {
+        return fInterface;
+    }
+    plKey&      GetAvKey(void) {
+        return fAvKey;
+    }
+    const plKey&    GetAvKey(void) const {
+        return fAvKey;
+    }
+    void        SetAvKey(plKey& k) {
+        fAvKey = k;
+    }
 };
 
 #endif // _plInputIfaceMgrMsg_h

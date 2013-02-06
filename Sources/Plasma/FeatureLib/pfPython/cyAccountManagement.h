@@ -55,11 +55,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 typedef struct _object PyObject;
 typedef struct PyMethodDef PyMethodDef;
 
-class cyAccountManagement
-{
+class cyAccountManagement {
 public:
-    static void         AddPlasmaMethods(std::vector<PyMethodDef> &methods);
-    static void         AddPlasmaConstantsClasses(PyObject *m);
+    static void         AddPlasmaMethods(std::vector<PyMethodDef>& methods);
+    static void         AddPlasmaConstantsClasses(PyObject* m);
 
     static bool         IsSubscriptionActive();
     static PyObject*    GetPlayerList();

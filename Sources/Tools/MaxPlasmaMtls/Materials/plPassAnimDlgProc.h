@@ -55,47 +55,45 @@ class Interval;
 class IParamMap2;
 class ReferenceTarget;
 
-class plPassAnimDlgProc : public ParamMap2UserDlgProc, public plMtlChangeCallback
-{
-    protected:
-        // Combo itemdata values
-        enum
-        {
-            kName,      // Name of an animation/loop
-            kDefault,   // Default combo value
-            kInvalid,   // Invalid entry (couldn't find)
-        };
+class plPassAnimDlgProc : public ParamMap2UserDlgProc, public plMtlChangeCallback {
+protected:
+    // Combo itemdata values
+    enum {
+        kName,      // Name of an animation/loop
+        kDefault,   // Default combo value
+        kInvalid,   // Invalid entry (couldn't find)
+    };
 
-        plAnimStealthNode   *fCurrStealth;
-        IParamMap2          *fCurrParamMap;
+    plAnimStealthNode*   fCurrStealth;
+    IParamMap2*          fCurrParamMap;
 
-        bool    fInitingNames;
-        HWND fhWnd;
+    bool    fInitingNames;
+    HWND fhWnd;
 
-    public:
-        plPassAnimDlgProc();
-        virtual ~plPassAnimDlgProc();
+public:
+    plPassAnimDlgProc();
+    virtual ~plPassAnimDlgProc();
 
-        virtual BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-        virtual void DeleteThis() {}
-        virtual void SetThing(ReferenceTarget *m);
-        virtual void Update(TimeValue t, Interval& valid, IParamMap2* pmap);
+    virtual BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    virtual void DeleteThis() {}
+    virtual void SetThing(ReferenceTarget* m);
+    virtual void Update(TimeValue t, Interval& valid, IParamMap2* pmap);
 
-        void    SegmentListChanged( void );
+    void    SegmentListChanged(void);
 
-        static plPassAnimDlgProc    &Get( void );
+    static plPassAnimDlgProc&    Get(void);
 
-    protected:
-        // Set all the controls to their stored value
-        void IInitControls(Animatable *anim, IParamBlock2 *pb);
-        void IEnableGlobal(HWND hWnd, bool enable);
+protected:
+    // Set all the controls to their stored value
+    void IInitControls(Animatable* anim, IParamBlock2* pb);
+    void IEnableGlobal(HWND hWnd, bool enable);
 
-        void ILoadNames( IParamBlock2 *pb );
+    void ILoadNames(IParamBlock2* pb);
 
-        void    IExposeStealthNode( HelperObject *stealth, IParamMap2 *thisMap );
-        void    IUpdateSegmentSel( IParamMap2 *thisMap, bool clear = false );
+    void    IExposeStealthNode(HelperObject* stealth, IParamMap2* thisMap);
+    void    IUpdateSegmentSel(IParamMap2* thisMap, bool clear = false);
 
-        void    IEnableEaseStopPoints( IParamMap2 *pm, bool enable );
+    void    IEnableEaseStopPoints(IParamMap2* pm, bool enable);
 };
 
 #endif //_plPassAnimDlgProc_h 

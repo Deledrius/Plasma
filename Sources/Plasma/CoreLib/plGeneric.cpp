@@ -51,7 +51,7 @@ plGeneric::plGeneric(const int& val): fType(kInt), fBoolVal(false), fIntVal(val)
 plGeneric::plGeneric(const double& val): fType(kFloat), fBoolVal(false), fIntVal(0), fFloatVal(val) {}
 
 plGeneric::plGeneric(const plString& val): fType(kString), fBoolVal(false), fIntVal(0), fFloatVal(0.0),
-fStringVal(val) {}
+    fStringVal(val) {}
 
 void plGeneric::IReset()
 {
@@ -98,8 +98,7 @@ int plGeneric::Write(hsStream* stream)
 {
     stream->WriteByte((uint8_t)fType);
 
-    switch (fType)
-    {
+    switch (fType) {
     case kNull:
         break; // nothing to write
 
@@ -119,6 +118,7 @@ int plGeneric::Write(hsStream* stream)
         stream->WriteSafeWString(fStringVal);
         break;
     }
+
     return stream->GetPosition();
 }
 
@@ -126,8 +126,8 @@ int plGeneric::Read(hsStream* stream)
 {
     IReset();
     fType = (GenericType)stream->ReadByte();
-    switch (fType)
-    {
+
+    switch (fType) {
     case kNull:
         break; // nothing to read
 
@@ -147,5 +147,6 @@ int plGeneric::Read(hsStream* stream)
         fStringVal = stream->ReadSafeWString_TEMP();
         break;
     }
+
     return stream->GetPosition();
 }

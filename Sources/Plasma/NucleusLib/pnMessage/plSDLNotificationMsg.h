@@ -45,24 +45,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plMessage.h"
 
 class plSimpleStateVariable;
-class plSDLNotificationMsg : public plMessage
-{
+class plSDLNotificationMsg : public plMessage {
 public:
     float fDelta;               // change threshold
     const plSimpleStateVariable* fVar;
     plString fSDLName;          // name of state descriptor
     int fPlayerID;              // pid of the player who changed the data
     plString fHintString;       // hint from the player who changed the data
-    
+
     plSDLNotificationMsg() : fDelta(0), fVar(nil), fPlayerID(0) {}
     ~plSDLNotificationMsg() { }
 
-    CLASSNAME_REGISTER( plSDLNotificationMsg );
-    GETINTERFACE_ANY( plSDLNotificationMsg, plMessage );
+    CLASSNAME_REGISTER(plSDLNotificationMsg);
+    GETINTERFACE_ANY(plSDLNotificationMsg, plMessage);
 
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr) { hsAssert(false, "NA: LocalOnly msg");  }
-    void Write(hsStream* stream, hsResMgr* mgr) { hsAssert(false, "NA: LocalOnly msg"); }
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
+        hsAssert(false, "NA: LocalOnly msg");
+    }
+    void Write(hsStream* stream, hsResMgr* mgr) {
+        hsAssert(false, "NA: LocalOnly msg");
+    }
 };
 
 #endif  // plSDLNotificationMsg_in

@@ -46,7 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *   This module is the translation layer between simple network types
 *   such as uint8_t arrays, and higher-level Plasma-specific types such
 *   as the plFactory-managed types.
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_PUBUTILLIB_PLNETCLIENTCOMM_PLNETCLIENTCOMM_H
@@ -93,41 +93,40 @@ struct NetCommAge {
     char        ageDatasetName[kMaxAgeNameLength];
     char        spawnPtName[64];
 
-    NetCommAge() : ageVaultId(0)
-    {
+    NetCommAge() : ageVaultId(0) {
         memset(ageDatasetName, 0, sizeof(ageDatasetName));
         memset(spawnPtName, 0, sizeof(spawnPtName));
     }
 };
 
-const NetCommAge *                  NetCommGetAge ();
-const NetCommAge *                  NetCommGetStartupAge ();
-const NetCommAccount *              NetCommGetAccount ();
-const NetCommPlayer *               NetCommGetPlayer ();
-const ARRAY(NetCommPlayer) &        NetCommGetPlayerList ();
-unsigned                            NetCommGetPlayerCount ();
-bool                                NetCommIsLoginComplete ();
-void                                NetCommSetReadIniAccountInfo (bool readFromIni);
-void                                NetCommSetAccountUsernamePassword (const wchar_t username[], const ShaDigest &  namePassHash);
-void                                NetCommSetAuthTokenAndOS (wchar_t authToken[], wchar_t os[]);
-ENetError                           NetCommGetAuthResult ();
+const NetCommAge*                   NetCommGetAge();
+const NetCommAge*                   NetCommGetStartupAge();
+const NetCommAccount*               NetCommGetAccount();
+const NetCommPlayer*                NetCommGetPlayer();
+const ARRAY(NetCommPlayer)&         NetCommGetPlayerList();
+unsigned                            NetCommGetPlayerCount();
+bool                                NetCommIsLoginComplete();
+void                                NetCommSetReadIniAccountInfo(bool readFromIni);
+void                                NetCommSetAccountUsernamePassword(const wchar_t username[], const ShaDigest&   namePassHash);
+void                                NetCommSetAuthTokenAndOS(wchar_t authToken[], wchar_t os[]);
+ENetError                           NetCommGetAuthResult();
 
-bool                                NetCommNeedToLoadAvatar ();
-void                                NetCommSetAvatarLoaded (bool loaded = true);
-void                                NetCommChangeMyPassword (const wchar_t password[]);
+bool                                NetCommNeedToLoadAvatar();
+void                                NetCommSetAvatarLoaded(bool loaded = true);
+void                                NetCommChangeMyPassword(const wchar_t password[]);
 
-void NetCommStartup ();
-void NetCommShutdown ();
-void NetCommUpdate ();
-void NetCommConnect ();
-void NetCommDisconnect ();
-void NetCommSendMsg (
-    plNetMessage *  msg
+void NetCommStartup();
+void NetCommShutdown();
+void NetCommUpdate();
+void NetCommConnect();
+void NetCommDisconnect();
+void NetCommSendMsg(
+    plNetMessage*   msg
 );
-void NetCommRecvMsg (
-    plNetMessage *  msg
+void NetCommRecvMsg(
+    plNetMessage*   msg
 );
-void NetCommEnableNet (
+void NetCommEnableNet(
     bool            enabled,
     bool            wait
 );
@@ -145,40 +144,40 @@ void NetCommActivatePostInitErrorHandler();
 const unsigned kOK_MsgConsumed  = hsOK + 1;
 
 typedef int (FNetCommMsgHandler)(
-    plNetMessage *  msg,
-    void *          userState
+    plNetMessage*   msg,
+    void*           userState
 );
 
 // Adds a msg handler for a msg that is convertable to specified type.
-void NetCommAddMsgHandlerForType (
+void NetCommAddMsgHandlerForType(
     unsigned                msgClassIdx,
-    FNetCommMsgHandler *    handler,
-    void *                  userState
+    FNetCommMsgHandler*     handler,
+    void*                   userState
 );
 // Adds a msg handler for a specific msg type.
-void NetCommAddMsgHandlerForExactType (
+void NetCommAddMsgHandlerForExactType(
     unsigned                msgClassIdx,
-    FNetCommMsgHandler *    handler,
-    void *                  userState
+    FNetCommMsgHandler*     handler,
+    void*                   userState
 );
 
 extern const unsigned       kNetCommAllMsgClasses;
-extern FNetCommMsgHandler * kNetCommAllMsgHandlers;
-extern const void *         kNetCommAllUserStates;
+extern FNetCommMsgHandler* kNetCommAllMsgHandlers;
+extern const void*          kNetCommAllUserStates;
 
-void NetCommRemoveMsgHandler (
+void NetCommRemoveMsgHandler(
     unsigned                msgClassIdx,
-    FNetCommMsgHandler *    handler,
-    const void *            userState
+    FNetCommMsgHandler*     handler,
+    const void*             userState
 );
 
-void NetCommSetDefaultMsgHandler (
-    FNetCommMsgHandler *    handler,
-    void *                  userState
+void NetCommSetDefaultMsgHandler(
+    FNetCommMsgHandler*     handler,
+    void*                   userState
 );
-void NetCommSetMsgPreHandler (
-    FNetCommMsgHandler *    handler,
-    void *                  userState
+void NetCommSetMsgPreHandler(
+    FNetCommMsgHandler*     handler,
+    void*                   userState
 );
 
 /*****************************************************************************
@@ -188,102 +187,102 @@ void NetCommSetMsgPreHandler (
 *
 ***/
 
-void NetCommAuthenticate (  // --> plNetCommAuthMsg
-    void *                  param
+void NetCommAuthenticate(   // --> plNetCommAuthMsg
+    void*                   param
 );
-void NetCommGetFileList (   // --> plNetCommFileListMsg
+void NetCommGetFileList(    // --> plNetCommFileListMsg
     const wchar_t             dir[],
     const wchar_t             ext[],
-    void *                  param
+    void*                   param
 );
-void NetCommGetFile (       // --> plNetCommFileDownloadMsg
+void NetCommGetFile(        // --> plNetCommFileDownloadMsg
     const wchar_t             filename[],
-    hsStream *              writer,
-    void *                  param
+    hsStream*               writer,
+    void*                   param
 );
-void NetCommLinkToAge (     // --> plNetCommLinkToAgeMsg
-    const NetCommAge &      age,
-    void *                  param
+void NetCommLinkToAge(      // --> plNetCommLinkToAgeMsg
+    const NetCommAge&       age,
+    void*                   param
 );
-void NetCommSetActivePlayer (//--> plNetCommActivePlayerMsg
+void NetCommSetActivePlayer( //--> plNetCommActivePlayerMsg
     unsigned                desiredPlayerInt,
-    void *                  param
+    void*                   param
 );
-void NetCommCreatePlayer (  // --> plNetCommCreatePlayerMsg
+void NetCommCreatePlayer(   // --> plNetCommCreatePlayerMsg
     const char              playerName[],
     const char              avatarShape[],
     const char              friendInvite[],
     unsigned                createFlags,
-    void *                  param
+    void*                   param
 );
-void NetCommCreatePlayer (  // --> plNetCommCreatePlayerMsg
+void NetCommCreatePlayer(   // --> plNetCommCreatePlayerMsg
     const wchar_t             playerName[],
     const wchar_t             avatarShape[],
     const wchar_t             friendInvite[],
     unsigned                createFlags,
-    void *                  param
+    void*                   param
 );
-void NetCommDeletePlayer (  // --> plNetCommDeletePlayerMsg
+void NetCommDeletePlayer(   // --> plNetCommDeletePlayerMsg
     unsigned                playerInt,
-    void *                  param
+    void*                   param
 );
-void NetCommGetPublicAgeList (//-> plNetCommPublicAgeListMsg
+void NetCommGetPublicAgeList( //-> plNetCommPublicAgeListMsg
     const char                      ageName[],
-    void *                          param,
+    void*                           param,
     plNetCommReplyMsg::EParamType   ptype = plNetCommReplyMsg::kParamTypeOther
 );
-void NetCommSetAgePublic (  // --> no msg
+void NetCommSetAgePublic(   // --> no msg
     unsigned                ageInfoId,
     bool                    makePublic
 );
-void NetCommCreatePublicAge (// --> plNetCommPublicAgeMsg
+void NetCommCreatePublicAge( // --> plNetCommPublicAgeMsg
     const char              ageName[],
     const plUUID&           ageInstId,
-    void *                  param
+    void*                   param
 );
 void NetCommRemovePublicAge(// --> plNetCommPublicAgeMsg
     const plUUID&           ageInstId,
-    void *                  param
+    void*                   param
 );
-void NetCommRegisterOwnedAge (
-    const NetCommAge &      age,
+void NetCommRegisterOwnedAge(
+    const NetCommAge&       age,
     const char              ageInstDesc[],
     unsigned                playerInt,
-    void *                  param
+    void*                   param
 );
-void NetCommUnregisterOwnedAge (
+void NetCommUnregisterOwnedAge(
     const char              ageName[],
     unsigned                playerInt,
-    void *                  param
+    void*                   param
 );
-void NetCommRegisterVisitAge (
-    const NetCommAge &      age,
+void NetCommRegisterVisitAge(
+    const NetCommAge&       age,
     const char              ageInstDesc[],
     unsigned                playerInt,
-    void *                  param
+    void*                   param
 );
-void NetCommUnregisterVisitAge (
+void NetCommUnregisterVisitAge(
     const plUUID&           ageInstId,
     unsigned                playerInt,
-    void *                  param
+    void*                   param
 );
-void NetCommConnectPlayerVault (
-    void *                  param
+void NetCommConnectPlayerVault(
+    void*                   param
 );
-void NetCommDisconnectPlayerVault ();
-void NetCommConnectAgeVault (
+void NetCommDisconnectPlayerVault();
+void NetCommConnectAgeVault(
     const plUUID&           ageInstId,
-    void *                  param
+    void*                   param
 );
-void NetCommDisconnectAgeVault ();
-void NetCommUpgradeVisitorToExplorer (
+void NetCommDisconnectAgeVault();
+void NetCommUpgradeVisitorToExplorer(
     unsigned                playerInt,
-    void *                  param
+    void*                   param
 );
-void NetCommSetCCRLevel (
+void NetCommSetCCRLevel(
     unsigned                ccrLevel
 );
-void NetCommSendFriendInvite (
+void NetCommSendFriendInvite(
     const wchar_t     emailAddress[],
     const wchar_t     toName[],
     const plUUID&   inviteUuid
@@ -328,15 +327,13 @@ class plPlayerMigrationPkg;
 //  - Checks for server silence.
 //
 
-class plNetClientComm
-{
+class plNetClientComm {
 public:
     ////////////////////////////////////////////////////////////////
     // CALLBACK CLASSES
 
     // Callback object sent with calls to our API as optional arg.
-    class Callback
-    {
+    class Callback {
     public:
         // OPERATION-SPECIFIC RESULT ARGS.
         //-------------------------------
@@ -354,23 +351,21 @@ public:
         // PublicAgeCreated:0=plAgeInfoStruct
         plCreatableListHelper   fCbArgs;
         //-------------------------------
-        virtual ~Callback(){}
-        virtual void OperationStarted( uint32_t context ) = 0;
-        virtual void OperationComplete( uint32_t context, int resultCode ) = 0;
+        virtual ~Callback() {}
+        virtual void OperationStarted(uint32_t context) = 0;
+        virtual void OperationComplete(uint32_t context, int resultCode) = 0;
     };
-    class StubbedCallback : public Callback
-    {
+    class StubbedCallback : public Callback {
     public:
-        void OperationStarted( uint32_t context ) {}
-        void OperationComplete( uint32_t context, int resultCode ) {}
+        void OperationStarted(uint32_t context) {}
+        void OperationComplete(uint32_t context, int resultCode) {}
     };
 
     // Message handler for unsolicited msgs or registered for specific msg types.
-    class MsgHandler
-    {
+    class MsgHandler {
     public:
-        static int StaticMsgHandler(plNetMessage * msg, void * userState);
-        virtual int HandleMessage( plNetMessage* msg ) = 0;
+        static int StaticMsgHandler(plNetMessage* msg, void* userState);
+        virtual int HandleMessage(plNetMessage* msg) = 0;
     };
 
     ////////////////////////////////////////////////////////////////
@@ -381,17 +376,17 @@ public:
     ////////////////////////////////////////////////////////////////
 
     // Adds a msg handler for a msg that is convertable to specified type.
-    void    AddMsgHandlerForType( uint16_t msgClassIdx, MsgHandler* handler );
+    void    AddMsgHandlerForType(uint16_t msgClassIdx, MsgHandler* handler);
 
     // Adds a msg handler for a specific msg type.
-    void    AddMsgHandlerForExactType( uint16_t msgClassIdx, MsgHandler* handler );
+    void    AddMsgHandlerForExactType(uint16_t msgClassIdx, MsgHandler* handler);
 
-    bool    RemoveMsgHandler( MsgHandler* handler );
+    bool    RemoveMsgHandler(MsgHandler* handler);
 
     // Msgs not part of a task controlled by this
     // object, and doesn't have a handler set for its type
     // are sent to this handler (if set).
-    void    SetDefaultHandler( MsgHandler* msgHandler );
+    void    SetDefaultHandler(MsgHandler* msgHandler);
 };
 
 ////////////////////////////////////////////////////////////////////

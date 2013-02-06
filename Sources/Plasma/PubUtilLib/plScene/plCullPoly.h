@@ -53,8 +53,7 @@ struct hsMatrix44;
 
 const float          kCullPolyDegen = 1.e-4f;
 
-class plCullPoly
-{
+class plCullPoly {
 public:
     enum {
         kNone       = 0x0,
@@ -71,18 +70,46 @@ public:
     hsPoint3                fCenter;
     float                fRadius;
 
-    const hsPoint3&         GetCenter() const { return fCenter; }
-    float                GetRadius() const { return fRadius; }
+    const hsPoint3&         GetCenter() const {
+        return fCenter;
+    }
+    float                GetRadius() const {
+        return fRadius;
+    }
 
-    void                    SetHole(bool on) { if( on )fFlags |= kHole; else fFlags &= ~kHole; }
-    void                    SetTwoSided(bool on) { if( on )fFlags |= kTwoSided; else fFlags &= ~kTwoSided; }
+    void                    SetHole(bool on) {
+        if (on) {
+            fFlags |= kHole;
+        } else {
+            fFlags &= ~kHole;
+        }
+    }
+    void                    SetTwoSided(bool on) {
+        if (on) {
+            fFlags |= kTwoSided;
+        } else {
+            fFlags &= ~kTwoSided;
+        }
+    }
 
-    bool                    IsHole() const { return fFlags & kHole; } // Assumes kHole is 0x1
-    bool                    IsTwoSided() const { return 0 != (fFlags & kTwoSided); }
+    bool                    IsHole() const {
+        return fFlags & kHole;    // Assumes kHole is 0x1
+    }
+    bool                    IsTwoSided() const {
+        return 0 != (fFlags & kTwoSided);
+    }
 
-    plCullPoly&             Init(const plCullPoly& p) { fClipped.Clear(); fVerts.SetCount(0); fFlags = p.fFlags; fNorm = p.fNorm; fDist = p.fDist; fCenter = p.fCenter; return *this; }
+    plCullPoly&             Init(const plCullPoly& p) {
+        fClipped.Clear();
+        fVerts.SetCount(0);
+        fFlags = p.fFlags;
+        fNorm = p.fNorm;
+        fDist = p.fDist;
+        fCenter = p.fCenter;
+        return *this;
+    }
     plCullPoly&             Flip(const plCullPoly& p);
-    plCullPoly&             InitFromVerts(uint32_t f=kNone);
+    plCullPoly&             InitFromVerts(uint32_t f = kNone);
     float                ICalcRadius() const;
 
     plCullPoly&             Transform(const hsMatrix44& l2w, const hsMatrix44& w2l, plCullPoly& dst) const;
@@ -90,7 +117,9 @@ public:
     void                    Read(hsStream* s, hsResMgr* mgr);
     void                    Write(hsStream* s, hsResMgr* mgr);
 
-    bool                    DegenerateVert(const hsPoint3& p) const { return fVerts.GetCount() && (kCullPolyDegen > hsVector3(&p, &fVerts[fVerts.GetCount()-1]).MagnitudeSquared()); }
+    bool                    DegenerateVert(const hsPoint3& p) const {
+        return fVerts.GetCount() && (kCullPolyDegen > hsVector3(&p, &fVerts[fVerts.GetCount() - 1]).MagnitudeSquared());
+    }
 
     bool                    Validate() const; // no-op, except for special debugging circumstances.
 };

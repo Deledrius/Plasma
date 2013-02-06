@@ -58,79 +58,90 @@ class hsGMaterial;
 class plTextGenerator;
 
 
-class pfGUIEditBoxMod : public pfGUIControlMod
-{
-    protected:
+class pfGUIEditBoxMod : public pfGUIControlMod {
+protected:
 
-        wchar_t         *fBuffer;
-        uint32_t          fBufferSize, fCursorPos;
-        int32_t           fScrollPos;
-        bool            fEscapedFlag;
-        bool            fFirstHalfExitKeyPushed;
-        
-        bool            fSpecialCaptureKeyEventMode;
+    wchar_t*         fBuffer;
+    uint32_t          fBufferSize, fCursorPos;
+    int32_t           fScrollPos;
+    bool            fEscapedFlag;
+    bool            fFirstHalfExitKeyPushed;
 
-        plKeyDef        fSavedKey;
-        uint8_t           fSavedModifiers;
+    bool            fSpecialCaptureKeyEventMode;
 
-        virtual bool IEval( double secs, float del, uint32_t dirty ); // called only by owner object's Eval()
+    plKeyDef        fSavedKey;
+    uint8_t           fSavedModifiers;
 
-        virtual void    IPostSetUpDynTextMap( void );
-        virtual void    IUpdate( void );
+    virtual bool IEval(double secs, float del, uint32_t dirty);   // called only by owner object's Eval()
 
-    public:
-        enum
-        {
-            kShift  = 0x01,
-            kCtrl   = 0x02
-        };
+    virtual void    IPostSetUpDynTextMap(void);
+    virtual void    IUpdate(void);
 
-        pfGUIEditBoxMod();
-        virtual ~pfGUIEditBoxMod();
+public:
+    enum {
+        kShift  = 0x01,
+        kCtrl   = 0x02
+    };
 
-        CLASSNAME_REGISTER( pfGUIEditBoxMod );
-        GETINTERFACE_ANY( pfGUIEditBoxMod, pfGUIControlMod );
+    pfGUIEditBoxMod();
+    virtual ~pfGUIEditBoxMod();
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    CLASSNAME_REGISTER(pfGUIEditBoxMod);
+    GETINTERFACE_ANY(pfGUIEditBoxMod, pfGUIControlMod);
 
-        virtual void    HandleMouseDown( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseUp( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseDrag( hsPoint3 &mousePt, uint8_t modifiers );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        virtual bool    HandleKeyPress( wchar_t key, uint8_t modifiers );
-        virtual bool    HandleKeyEvent( pfGameGUIMgr::EventType event, plKeyDef key, uint8_t modifiers );
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-        virtual void    PurgeDynaTextMapImage();
+    virtual void    HandleMouseDown(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseUp(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseDrag(hsPoint3& mousePt, uint8_t modifiers);
 
-        void    SetBufferSize( uint32_t size );
+    virtual bool    HandleKeyPress(wchar_t key, uint8_t modifiers);
+    virtual bool    HandleKeyEvent(pfGameGUIMgr::EventType event, plKeyDef key, uint8_t modifiers);
 
-        std::string GetBuffer( void );
-        std::wstring    GetBufferW( void ) { return fBuffer; }
-        void        ClearBuffer( void );
-        void        SetText( const char *str );
-        void        SetText( const wchar_t *str );
+    virtual void    PurgeDynaTextMapImage();
 
-        void        SetCursorToHome( void );
-        void        SetCursorToEnd( void );
+    void    SetBufferSize(uint32_t size);
 
-        bool        WasEscaped( void ) { bool e = fEscapedFlag; fEscapedFlag = false; return e; }
+    std::string GetBuffer(void);
+    std::wstring    GetBufferW(void) {
+        return fBuffer;
+    }
+    void        ClearBuffer(void);
+    void        SetText(const char* str);
+    void        SetText(const wchar_t* str);
 
-        void        SetSpecialCaptureKeyMode(bool state) { fSpecialCaptureKeyEventMode = state; }
-        uint32_t      GetLastKeyCaptured() { return (uint32_t)fSavedKey; }
-        uint8_t       GetLastModifiersCaptured() { return fSavedModifiers; }
-        void        SetLastKeyCapture(uint32_t key, uint8_t modifiers);
+    void        SetCursorToHome(void);
+    void        SetCursorToEnd(void);
 
-        void        SetChatMode(bool state) { plKeyboardDevice::IgnoreCapsLock(state); }
+    bool        WasEscaped(void) {
+        bool e = fEscapedFlag;
+        fEscapedFlag = false;
+        return e;
+    }
 
-        // Extended event types
-        enum ExtendedEvents
-        {
-            kValueChanging,
-            kWantAutocomplete
-        };
+    void        SetSpecialCaptureKeyMode(bool state) {
+        fSpecialCaptureKeyEventMode = state;
+    }
+    uint32_t      GetLastKeyCaptured() {
+        return (uint32_t)fSavedKey;
+    }
+    uint8_t       GetLastModifiersCaptured() {
+        return fSavedModifiers;
+    }
+    void        SetLastKeyCapture(uint32_t key, uint8_t modifiers);
+
+    void        SetChatMode(bool state) {
+        plKeyboardDevice::IgnoreCapsLock(state);
+    }
+
+    // Extended event types
+    enum ExtendedEvents {
+        kValueChanging,
+        kWantAutocomplete
+    };
 };
 
 #endif // _pfGUIEditBoxMod_h

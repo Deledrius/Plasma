@@ -48,7 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plTimerCallbackManager.h"
 
-REGISTER_CREATABLE( plTimerCallbackManager );
+REGISTER_CREATABLE(plTimerCallbackManager);
 
 #endif // pnTimerCreatable_inc
 

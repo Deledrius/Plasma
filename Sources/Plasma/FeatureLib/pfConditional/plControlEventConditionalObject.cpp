@@ -47,26 +47,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 plControlEventConditionalObject::plControlEventConditionalObject()
 {
-    
+
 }
 
 bool plControlEventConditionalObject::MsgReceive(plMessage* msg)
 {
     plControlEventMsg* pControlMsg = plControlEventMsg::ConvertNoRef(msg);
-    if( pControlMsg )
-    {
-        if (pControlMsg->GetControlCode() == fControlEvent && pControlMsg->ControlActivated() && !Satisfied() )
-        {
+
+    if (pControlMsg) {
+        if (pControlMsg->GetControlCode() == fControlEvent && pControlMsg->ControlActivated() && !Satisfied()) {
             SetSatisfied(true);
-    //      fLogicMod->RequestTrigger();
-        }
-        else
-        if (pControlMsg->GetControlCode() == fControlEvent && !pControlMsg->ControlActivated() && Satisfied() )
-        {
+            //      fLogicMod->RequestTrigger();
+        } else if (pControlMsg->GetControlCode() == fControlEvent && !pControlMsg->ControlActivated() && Satisfied()) {
             SetSatisfied(false);
         }
+
         return true;
     }
+
     return plConditionalObject::MsgReceive(msg);
 }
 

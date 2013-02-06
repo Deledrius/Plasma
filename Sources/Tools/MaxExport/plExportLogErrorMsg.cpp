@@ -58,71 +58,74 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 plExportLogErrorMsg::~plExportLogErrorMsg()
 {
-    if ( fErrfile )
-    {
+    if (fErrfile) {
         fprintf(fErrfile, "\n%d total number of error!!!! ", fNumberErrors);
-        if ( fNumberErrors > 10 )
-            if ( fNumberErrors > 20 )
-                if ( fNumberErrors > 50 )
+
+        if (fNumberErrors > 10)
+            if (fNumberErrors > 20)
+                if (fNumberErrors > 50) {
                     fprintf(fErrfile, "(CRISIS CRISIS!)");
-                else
+                } else {
                     fprintf(fErrfile, "(which is a disaster!)");
-            else
+                }
+            else {
                 fprintf(fErrfile, "(which is way too many!)");
+            }
+
         fclose(fErrfile);
     }
+
 #ifdef ERRORLOG_ALWAYS_WRITE_SOMETHING
-    else
-    {
+    else {
         fErrfile = hsFopen(fErrfile_name, "wt");
         setbuf(fErrfile, nil);
         fprintf(fErrfile, "No errors found! Good job.");
         fclose(fErrfile);
     }
+
 #endif // ERRORLOG_ALWAYS_WRITE_SOMETHING
 }
 
 
 bool plExportLogErrorMsg::Show()
 {
-    if( GetBogus() )
-    {
-        IWriteErrorFile(GetLabel(),GetMsg());
+    if (GetBogus()) {
+        IWriteErrorFile(GetLabel(), GetMsg());
     }
+
     return GetBogus();
 }
 bool plExportLogErrorMsg::Ask()
 {
-    if( GetBogus() )
-    {
-        IWriteErrorFile(GetLabel(),GetMsg());
+    if (GetBogus()) {
+        IWriteErrorFile(GetLabel(), GetMsg());
     }
+
     return false;
 }
 
 bool plExportLogErrorMsg::CheckAndAsk()
 {
-    if( GetBogus() )
-    {
+    if (GetBogus()) {
         strncat(GetMsg(), " - File corruption possible!", 255);
-        IWriteErrorFile(GetLabel(),GetMsg());
+        IWriteErrorFile(GetLabel(), GetMsg());
     }
+
     return GetBogus();
 }
 
 bool plExportLogErrorMsg::CheckAskOrCancel()
 {
-    if( GetBogus() )
-    {
-        IWriteErrorFile(GetLabel(),GetMsg());
+    if (GetBogus()) {
+        IWriteErrorFile(GetLabel(), GetMsg());
     }
+
     return false;
 }
 
 bool plExportLogErrorMsg::CheckAndShow()
 {
-    if ( GetBogus() )
-    {
+    if (GetBogus()) {
         Show();
         Check();
     }
@@ -133,11 +136,10 @@ bool plExportLogErrorMsg::CheckAndShow()
 
 bool plExportLogErrorMsg::Check()
 {
-    if( GetBogus() )
-    {
+    if (GetBogus()) {
         // ... how many ways can you say something is bad?
         strncat(GetMsg(), " !Output File Corrupt!", 255);
-        IWriteErrorFile(GetLabel(),GetMsg());
+        IWriteErrorFile(GetLabel(), GetMsg());
         IDebugThrow();
     }
 
@@ -149,12 +151,11 @@ bool plExportLogErrorMsg::Check()
 //
 void plExportLogErrorMsg::Quit()
 {
-    if( GetBogus() )
-    {
+    if (GetBogus()) {
         strncat(GetMsg(), " -- Quit! (must be real bad!)", 255);
-        IWriteErrorFile(GetLabel(),GetMsg());
+        IWriteErrorFile(GetLabel(), GetMsg());
         SetBogus(false);
-        hsThrow( *this );
+        hsThrow(*this);
     }
 }
 
@@ -163,32 +164,31 @@ void plExportLogErrorMsg::Quit()
 //
 void plExportLogErrorMsg::IWriteErrorFile(const char* label, const char* msg)
 {
-    //make sure that there is a filename 
-    if (fErrfile_name[0] != '\0')
-    {
+    //make sure that there is a filename
+    if (fErrfile_name[0] != '\0') {
         // do we have it open, yet?
-        if ( !fErrfile )
-        {
+        if (!fErrfile) {
             // must be the first write... open the error file
             fErrfile = hsFopen(fErrfile_name, "wt");
             setbuf(fErrfile, nil);
             fNumberErrors = 0;
         }
+
         fprintf(fErrfile, "%s: %s\n", label, msg);
         fNumberErrors++;    // oh, boy... another error to count
     }
 
-   // Check to see if we are running an export server
-   // If so, then pass the update on to the export server
-   GUP* exportServerGup = OpenGupPlugIn(Class_ID(470000004,99));
-   if(exportServerGup)
-   {
-      exportServerGup->Control(-5);  // means next control will be error msg
-      char buf[1024];
-      sprintf(buf, "%s: %s", label, msg);
-      exportServerGup->Control((DWORD)buf);
-      exportServerGup->Control(-7); // signal that we're done sending this update sequence
-   }   
+    // Check to see if we are running an export server
+    // If so, then pass the update on to the export server
+    GUP* exportServerGup = OpenGupPlugIn(Class_ID(470000004, 99));
+
+    if (exportServerGup) {
+        exportServerGup->Control(-5);  // means next control will be error msg
+        char buf[1024];
+        sprintf(buf, "%s: %s", label, msg);
+        exportServerGup->Control((DWORD)buf);
+        exportServerGup->Control(-7); // signal that we're done sending this update sequence
+    }
 }
 
 void plExportLogErrorMsg::IDebugThrow()
@@ -197,9 +197,7 @@ void plExportLogErrorMsg::IDebugThrow()
 #if HS_BUILD_FOR_WIN32
         DebugBreak();
 #endif // HS_BUILD_FOR_WIN32
-    }
-    catch(...)
-    {
-        hsThrow( *this );
+    } catch (...) {
+        hsThrow(*this);
     }
 }

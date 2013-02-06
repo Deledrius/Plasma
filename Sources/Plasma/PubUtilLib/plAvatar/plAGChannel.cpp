@@ -75,13 +75,13 @@ plAGChannel::~plAGChannel()
 }
 
 // MAKECOMBINE
-plAGChannel * plAGChannel::MakeCombine(plAGChannel *channelA)
+plAGChannel* plAGChannel::MakeCombine(plAGChannel* channelA)
 {
     return nil;
 }
 
 // MAKEBLEND
-plAGChannel * plAGChannel::MakeBlend(plAGChannel *channelA, plScalarChannel *blend, int blendPriority)
+plAGChannel* plAGChannel::MakeBlend(plAGChannel* channelA, plScalarChannel* blend, int blendPriority)
 {
     return nil;
 }
@@ -89,10 +89,9 @@ plAGChannel * plAGChannel::MakeBlend(plAGChannel *channelA, plScalarChannel *ble
 // DETACH
 // If the channel being detached is us, let our caller know to replace us
 // by return NIL.
-plAGChannel * plAGChannel::Detach(plAGChannel *channel)
+plAGChannel* plAGChannel::Detach(plAGChannel* channel)
 {
-    if (this == channel)
-    {
+    if (this == channel) {
         return nil;
     } else {
         return this;
@@ -100,14 +99,14 @@ plAGChannel * plAGChannel::Detach(plAGChannel *channel)
 }
 
 // OPTIMIZE
-plAGChannel * plAGChannel::Optimize(double time)
+plAGChannel* plAGChannel::Optimize(double time)
 {
     // the basic channel can't optimize...
     return this;
 }
 
 // WRITE
-void plAGChannel::Write(hsStream *stream, hsResMgr *mgr)
+void plAGChannel::Write(hsStream* stream, hsResMgr* mgr)
 {
     plCreatable::Write(stream, mgr);
 
@@ -115,7 +114,7 @@ void plAGChannel::Write(hsStream *stream, hsResMgr *mgr)
 }
 
 // READ
-void plAGChannel::Read(hsStream *stream, hsResMgr *mgr)
+void plAGChannel::Read(hsStream* stream, hsResMgr* mgr)
 {
     plCreatable::Read(stream, mgr);
 

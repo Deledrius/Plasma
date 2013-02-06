@@ -75,17 +75,16 @@ class ISkin;
 //
 // This class should only reference classes that are in the nucleus.  Anything
 // that needs more should go into plMaxNode
-class plMaxNodeBase : public INode
-{
+class plMaxNodeBase : public INode {
 public:
-    plMaxNodeData *GetMaxNodeData();    // perhaps with full getters and Setters, we can make this protected
-    void SetMaxNodeData(plMaxNodeData * pDat);
+    plMaxNodeData* GetMaxNodeData();    // perhaps with full getters and Setters, we can make this protected
+    void SetMaxNodeData(plMaxNodeData* pDat);
 
     //------------------------------
     // Get Data from MaxNodeData
     //------------------------------
     // If recalculate is true the cached value is ignored. (Useful in the SceneViewer)
-    bool            CanConvert(bool recalculate=false);
+    bool            CanConvert(bool recalculate = false);
     plLocation      GetLocation();
     plKey           GetKey();
     plSceneObject*  GetSceneObject();
@@ -149,12 +148,12 @@ public:
 
     int             NumBones();
     plMaxNodeBase*  GetBone(int i);
-    
+
     //------------------------------
     // Set Data from MaxNodeData
     //------------------------------
     void            SetCanConvert(bool b);
-    void            SetMesh(hsGMesh *p);
+    void            SetMesh(hsGMesh* p);
     void            SetRoomKey(plKey p);
     void            SetDrawable(bool b);
     void            SetPhysical(bool b);
@@ -195,16 +194,16 @@ public:
     void            SetInstanced(bool b);
     void            SetParticleRelated(bool b);
     void            SetSoundIdxCounter(uint32_t ctr);
-    void            SetAvatarSO(plSceneObject *so);
+    void            SetAvatarSO(plSceneObject* so);
     void            SetFade(const Box3& b);
     void            SetDup2Sided(bool b);
     void            SetRadiateNorms(bool b);
     void            SetNormalChan(int n);
     void            SetGeoDice(BOOL on, int maxFaces, float maxSize, int minFaces);
     void            SetIsGUI(bool b);
-    void            SetSwappableGeom(plSharedMesh *sm);
+    void            SetSwappableGeom(plSharedMesh* sm);
     void            SetSwappableGeomTarget(uint32_t id);
-    void            SetBoneMap(plMaxBoneMap *bones);
+    void            SetBoneMap(plMaxBoneMap* bones);
     void            SetOverrideHighLevelSDL(bool b);
     void            SetAnimCompress(uint8_t v);
     void            SetKeyReduceThreshold(float v);
@@ -220,7 +219,11 @@ public:
     bool    GetDirty(uint8_t i);
     void    SetDirty(uint8_t i, bool b);
 
-    plKey GetParentKey() { plMaxNodeBase *pPar = (plMaxNodeBase*)GetParentNode(); hsAssert(pPar, "No Parent"); return pPar->GetKey(); }
+    plKey GetParentKey() {
+        plMaxNodeBase* pPar = (plMaxNodeBase*)GetParentNode();
+        hsAssert(pPar, "No Parent");
+        return pPar->GetKey();
+    }
 
     ISkin* FindSkinModifier(); // Returns the object's skin modifier if it has one, else nil
     const plRenderLevel& GetRenderLevel(bool forBlend);
@@ -237,9 +240,9 @@ public:
     //----------
     // Component
     //----------
-    bool IsComponent(Object *obj=nil);        // Object pointer is only necessary for internal use,
-    bool IsExternComponent(Object *obj=nil);
-    plComponentBase *ConvertToComponent();      // Returns nil if node is not a component
+    bool IsComponent(Object* obj = nil);      // Object pointer is only necessary for internal use,
+    bool IsExternComponent(Object* obj = nil);
+    plComponentBase* ConvertToComponent();      // Returns nil if node is not a component
 
 
     // Normally you will only want the components that are attached to you
@@ -247,16 +250,18 @@ public:
     // component will want to know what other components are attached to it. In
     // that case, set all to true, so that the attached components won't be
     // verified to be in your target list.
-    uint32_t NumAttachedComponents(bool all=false);
-    plComponentBase *GetAttachedComponent(uint32_t i, bool all=false);
+    uint32_t NumAttachedComponents(bool all = false);
+    plComponentBase* GetAttachedComponent(uint32_t i, bool all = false);
 
     bool        Contains(const Point3& worldPt); // is the world space point inside my (CONVEX) geometry or dummy box?
     bool        Contains(const Box3& bnd, const Matrix3& l2w); // is the box contained entirely inside my (CONVEX) geometry or dummy box?
     float       BoxVolume(const Box3& bnd, const Matrix3& l2w);
     float       RegionPriority();   // returns a dominance factor. If a point is in more than one environmental
-                                    // region, the region with highest priority wins.
+    // region, the region with highest priority wins.
 
-    Interface *GetInterface() { return ::GetCOREInterface(); }
+    Interface* GetInterface() {
+        return ::GetCOREInterface();
+    }
 
     static hsMatrix44   Matrix3ToMatrix44(const Matrix3& m3);
     static Matrix3      Matrix44ToMatrix3(const hsMatrix44& m44);
@@ -288,8 +293,7 @@ public:
 
 protected:
     // AppDataChunk sub-chunk id's
-    enum
-    {
+    enum {
         kPlasmaAgeChunk,    // No longer in use, but cleared from old files
         kPlasmaDistChunk,   // No longer in use, but cleared from old files
         kPlasmaRoomChunk,   // No longer in use, but cleared from old files
@@ -298,9 +302,9 @@ protected:
         kPlasmaLightChunk,  // No longer in use, but cleared from old files
     };
 
-    uint8_t *IGetSceneViewerChunk();
+    uint8_t* IGetSceneViewerChunk();
     // Attempts to convert a RefMaker pointer to a component.  Returns nil if it is not a component.
-    plComponentBase *IRefMakerToComponent(ReferenceMaker *maker, bool all);
+    plComponentBase* IRefMakerToComponent(ReferenceMaker* maker, bool all);
 
     uint32_t          IGetMajorRenderLevel(bool forBlend);
     uint32_t          IGetMinorRenderLevel(bool forBlend);

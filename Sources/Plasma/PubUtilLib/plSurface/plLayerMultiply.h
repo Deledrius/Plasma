@@ -47,14 +47,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // Instead of overwriting owned channels, this layer type will multiply
 // its source channel data to the underlayer
-class plLayerMultiply : public plLayerInterface
-{
+class plLayerMultiply : public plLayerInterface {
 public:
     plLayerMultiply();
     virtual ~plLayerMultiply();
 
-    CLASSNAME_REGISTER( plLayerMultiply );
-    GETINTERFACE_ANY( plLayerMultiply, plLayerInterface );
+    CLASSNAME_REGISTER(plLayerMultiply);
+    GETINTERFACE_ANY(plLayerMultiply, plLayerInterface);
 
     virtual plLayerInterface*   Attach(plLayerInterface* prev);
     virtual uint32_t              Eval(double secs, uint32_t frame, uint32_t ignore);

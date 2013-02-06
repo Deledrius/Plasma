@@ -49,8 +49,7 @@ class plAuxSpan;
 
 class plDynaDecalBin;
 
-class plDecalVtxFormat
-{
+class plDecalVtxFormat {
 public:
     hsPoint3    fPos;
     hsVector3   fNorm;
@@ -64,11 +63,9 @@ public:
 const uint8_t kDecalVtxFormat = 0x2; // Two UVW's, otherwise vanilla.
 
 
-class plDynaDecal
-{
+class plDynaDecal {
 public:
-    enum
-    {
+    enum {
         kFresh          = 0x1,
         kAttenColor     = 0x2,
         kVertexShader   = 0x4
@@ -89,7 +86,7 @@ protected:
     uint32_t    fFlags;
 
     plDecalVtxFormat*   fVtxBase; // Safe pointer, the buffer data will outlive this decal
-    
+
     plAuxSpan*          fAuxSpan;
 
     friend class plDynaDecalMgr;
@@ -100,8 +97,7 @@ public:
 };
 
 // No expansion
-class plDynaSplot : public plDynaDecal
-{
+class plDynaSplot : public plDynaDecal {
 protected:
 
 public:
@@ -110,8 +106,7 @@ public:
 };
 
 // Expands radially from center
-class plDynaRipple : public plDynaDecal
-{
+class plDynaRipple : public plDynaDecal {
 public:
 
     virtual bool        Age(double t, float ramp, float decay, float life);
@@ -125,8 +120,7 @@ public:
 };
 
 // Expands in V from top (V=0), expands in U from center (U=0.5)
-class plDynaWake : public plDynaDecal
-{
+class plDynaWake : public plDynaDecal {
 public:
 
     virtual bool        Age(double t, float ramp, float decay, float life);
@@ -140,8 +134,7 @@ public:
 };
 
 // Scrolls in V, no change in U
-class plDynaWave : public plDynaDecal
-{
+class plDynaWave : public plDynaDecal {
 public:
 
     virtual bool        Age(double t, float ramp, float decay, float life);
@@ -151,8 +144,7 @@ public:
 
 // About the same as a DynaRipple, but implemented with vertex/pixel shaders.
 // Only useful with plWaveSet.
-class plDynaRippleVS : public plDynaRipple
-{
+class plDynaRippleVS : public plDynaRipple {
 public:
 
     virtual bool        Age(double t, float ramp, float decay, float life);

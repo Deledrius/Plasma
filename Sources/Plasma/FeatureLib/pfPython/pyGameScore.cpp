@@ -47,11 +47,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pfGameScoreMgr/pfGameScoreMgr.h"
 #include "plVault/plVault.h"
 
-pyGameScore::pyGameScore() 
+pyGameScore::pyGameScore()
     : fScore(nil)
 { }
 
-pyGameScore::pyGameScore(pfGameScore * score) 
+pyGameScore::pyGameScore(pfGameScore* score)
     : fScore(score)
 {
     hsRefCnt_SafeRef(score);
@@ -64,42 +64,50 @@ pyGameScore::~pyGameScore()
 
 uint32_t pyGameScore::GetOwnerID() const
 {
-    if (fScore)
+    if (fScore) {
         return fScore->GetOwner();
+    }
+
     return 0;
 }
 
 int32_t pyGameScore::GetGameType() const
 {
-    if (fScore)
+    if (fScore) {
         return fScore->GetGameType();
+    }
+
     return 0;
 }
 
 int32_t pyGameScore::GetPoints() const
 {
-    if (fScore)
+    if (fScore) {
         return fScore->GetPoints();
+    }
+
     return 0;
 }
 
 plString pyGameScore::GetGameName() const
 {
-    if (fScore)
+    if (fScore) {
         return fScore->GetGameName();
+    }
+
     return plString::Null;
 }
 
 void pyGameScore::AddPoints(int32_t numPoints, pyKey& rcvr)
 {
-    if (fScore)
+    if (fScore) {
         fScore->AddPoints(numPoints, rcvr.getKey());
+    }
 }
 
 void pyGameScore::Delete()
 {
-    if (fScore)
-    {
+    if (fScore) {
         fScore->Delete();
         fScore = nil;
     }
@@ -107,31 +115,34 @@ void pyGameScore::Delete()
 
 void pyGameScore::TransferPoints(pyGameScore* dest, pyKey& rcvr)
 {
-    if (fScore && dest->fScore)
+    if (fScore && dest->fScore) {
         fScore->TransferPoints(dest->fScore, rcvr.getKey());
+    }
 }
 
 void pyGameScore::TransferPoints(pyGameScore* dest, int32_t numPoints, pyKey& rcvr)
 {
-    if (fScore && dest->fScore)
+    if (fScore && dest->fScore) {
         fScore->TransferPoints(dest->fScore, numPoints, rcvr.getKey());
+    }
 }
 
 void pyGameScore::SetPoints(int32_t numPoints, pyKey& rcvr)
 {
-    if (fScore)
+    if (fScore) {
         fScore->SetPoints(numPoints, rcvr.getKey());
+    }
 }
 
 void pyGameScore::CreateAgeScore(const plString& name, uint32_t type, int32_t points, pyKey& rcvr)
 {
-    if (RelVaultNode* ageInfo = VaultGetAgeInfoNodeIncRef())
-    {
+    if (RelVaultNode* ageInfo = VaultGetAgeInfoNodeIncRef()) {
         uint32_t ownerId = ageInfo->GetNodeId();
         pfGameScore::Create(ownerId, name, type, points, rcvr.getKey());
         ageInfo->DecRef();
-    } else
+    } else {
         hsAssert(false, "Age has no vault... Need to rewrite score python script?");
+    }
 }
 
 void pyGameScore::CreateGlobalScore(const plString& name, uint32_t type, int32_t points, pyKey& rcvr)
@@ -141,13 +152,13 @@ void pyGameScore::CreateGlobalScore(const plString& name, uint32_t type, int32_t
 
 void pyGameScore::CreatePlayerScore(const plString& name, uint32_t type, int32_t points, pyKey& rcvr)
 {
-    if (RelVaultNode* node = VaultGetPlayerInfoNodeIncRef())
-    {
+    if (RelVaultNode* node = VaultGetPlayerInfoNodeIncRef()) {
         uint32_t ownerId = node->GetNodeId();
         pfGameScore::Create(ownerId, name, type, points, rcvr.getKey());
         node->DecRef();
-    } else
+    } else {
         hsAssert(false, "No PlayerInfo node... Need to rewrite python script?");
+    }
 }
 
 void pyGameScore::CreateScore(uint32_t ownerId, const plString& name, uint32_t type, int32_t points, pyKey& rcvr)
@@ -157,13 +168,13 @@ void pyGameScore::CreateScore(uint32_t ownerId, const plString& name, uint32_t t
 
 void pyGameScore::FindAgeScores(const plString& name, pyKey& rcvr)
 {
-    if (RelVaultNode* ageInfo = VaultGetAgeInfoNodeIncRef())
-    {
+    if (RelVaultNode* ageInfo = VaultGetAgeInfoNodeIncRef()) {
         uint32_t ownerId = ageInfo->GetNodeId();
         pfGameScore::Find(ownerId, name, rcvr.getKey());
         ageInfo->DecRef();
-    } else
+    } else {
         hsAssert(false, "Age has no vault... Need to rewrite score python script?");
+    }
 }
 
 void pyGameScore::FindGlobalScores(const plString& name, pyKey& rcvr)
@@ -173,14 +184,13 @@ void pyGameScore::FindGlobalScores(const plString& name, pyKey& rcvr)
 
 void pyGameScore::FindPlayerScores(const plString& name, pyKey& rcvr)
 {
-    if (RelVaultNode* node = VaultGetPlayerInfoNodeIncRef())
-    {
+    if (RelVaultNode* node = VaultGetPlayerInfoNodeIncRef()) {
         uint32_t ownerId = node->GetNodeId();
         pfGameScore::Find(ownerId, name, rcvr.getKey());
         node->DecRef();
-    }
-    else
+    } else {
         hsAssert(false, "No PlayerInfo node.. Need to rewrite python script?");
+    }
 }
 
 void pyGameScore::FindScores(uint32_t ownerId, const plString& name, pyKey& rcvr)

@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plRippleShapeMsg;
 
-class plActivePrintShape : public plPrintShape
-{
+class plActivePrintShape : public plPrintShape {
 protected:
     hsTArray<plKey>         fDecalMgrs;
 
@@ -61,8 +60,8 @@ public:
     plActivePrintShape();
     virtual ~plActivePrintShape();
 
-    CLASSNAME_REGISTER( plActivePrintShape );
-    GETINTERFACE_ANY( plActivePrintShape, plPrintShape );
+    CLASSNAME_REGISTER(plActivePrintShape);
+    GETINTERFACE_ANY(plActivePrintShape, plPrintShape);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
@@ -71,7 +70,7 @@ public:
 
     // Export construction
     void        AddDecalKey(const plKey& k);
-    
+
 };
 
 #endif // plActivePrintShape_inc

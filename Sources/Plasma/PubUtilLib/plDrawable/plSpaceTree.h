@@ -52,8 +52,7 @@ class hsStream;
 class hsResMgr;
 class plVolumeIsect;
 
-class plSpaceTreeNode 
-{
+class plSpaceTreeNode {
 public:
     enum {
         kNone           = 0x0,
@@ -73,11 +72,23 @@ public:
         int16_t               fLeafIndex;
     };
 
-    int16_t               GetChild(int w) const { hsAssert(!(fFlags & kIsLeaf), "Getting Child of leaf node"); return fChildren[w]; }
-    int16_t               GetParent() const { return fParent; }
-    int16_t               GetLeaf() const { hsAssert(fFlags & kIsLeaf, "Getting leaf idx off interior node"); return fLeafIndex; }
-    bool                IsLeaf() const { return 0 != (fFlags & kIsLeaf); }
-    const hsBounds3Ext& GetWorldBounds() const { return fWorldBounds; }
+    int16_t               GetChild(int w) const {
+        hsAssert(!(fFlags & kIsLeaf), "Getting Child of leaf node");
+        return fChildren[w];
+    }
+    int16_t               GetParent() const {
+        return fParent;
+    }
+    int16_t               GetLeaf() const {
+        hsAssert(fFlags & kIsLeaf, "Getting leaf idx off interior node");
+        return fLeafIndex;
+    }
+    bool                IsLeaf() const {
+        return 0 != (fFlags & kIsLeaf);
+    }
+    const hsBounds3Ext& GetWorldBounds() const {
+        return fWorldBounds;
+    }
 
     // Kind of hate this. Would like to blast the whole thing in, but
     // the bounds are a real class.
@@ -86,8 +97,7 @@ public:
 };
 
 
-class plSpaceTree : public plCreatable
-{
+class plSpaceTree : public plCreatable {
 public:
     enum plHarvestFlags {
         kNone                   = 0x0,
@@ -111,10 +121,10 @@ private:
     hsPoint3                        fViewPos;
 
     void        IRefreshRecur(int16_t which);
-    
+
     void        IHarvestAndCullLeaves(const plSpaceTreeNode& subRoot, hsTArray<int16_t>& list) const;
     void        IHarvestLeaves(const plSpaceTreeNode& subRoot, hsTArray<int16_t>& list) const;
-    
+
     void        IHarvestAndCullLeaves(const plSpaceTreeNode& subRoot, hsBitVector& totList, hsBitVector& list) const;
     void        IHarvestLeaves(const plSpaceTreeNode& subRoot, hsBitVector& totList, hsBitVector& list) const;
 
@@ -130,16 +140,28 @@ public:
     plSpaceTree();
     virtual ~plSpaceTree();
 
-    CLASSNAME_REGISTER( plSpaceTree );
-    GETINTERFACE_ANY( plSpaceTree, plCreatable );
+    CLASSNAME_REGISTER(plSpaceTree);
+    GETINTERFACE_ANY(plSpaceTree, plCreatable);
 
-    void SetViewPos(const hsPoint3& p) { fViewPos = p; }
-    const hsPoint3& GetViewPos() const { return fViewPos; }
+    void SetViewPos(const hsPoint3& p) {
+        fViewPos = p;
+    }
+    const hsPoint3& GetViewPos() const {
+        return fViewPos;
+    }
 
-    const plSpaceTreeNode&  GetNode(int16_t w) const { return fTree[w]; }
-    int16_t                   GetRoot() const { return fRoot; }
-    bool                    IsRoot(int16_t w) const { return fRoot == w; }
-    bool                    IsLeaf(int16_t w) const { return GetNode(w).IsLeaf(); }
+    const plSpaceTreeNode&  GetNode(int16_t w) const {
+        return fTree[w];
+    }
+    int16_t                   GetRoot() const {
+        return fRoot;
+    }
+    bool                    IsRoot(int16_t w) const {
+        return fRoot == w;
+    }
+    bool                    IsLeaf(int16_t w) const {
+        return GetNode(w).IsLeaf();
+    }
 
     void HarvestLeaves(hsBitVector& totList, hsBitVector& list) const;
     void HarvestLeaves(hsBitVector& list) const;
@@ -154,31 +176,51 @@ public:
     void EnableLeaf(int16_t idx, hsBitVector& cache) const;
     void EnableLeaves(const hsTArray<int16_t>& list, hsBitVector& cache) const;
     void HarvestEnabledLeaves(plVolumeIsect* cullFunc, const hsBitVector& cache, hsTArray<int16_t>& list) const;
-    void SetCache(const hsBitVector* cache) { fCache = cache; }
+    void SetCache(const hsBitVector* cache) {
+        fCache = cache;
+    }
 
     void BitVectorToList(hsTArray<int16_t>& list, const hsBitVector& bitVec) const;
 
-    void SetHarvestFlags(plHarvestFlags f) { fHarvestFlags = f; }
-    uint16_t GetHarvestFlags() const { return fHarvestFlags; }
+    void SetHarvestFlags(plHarvestFlags f) {
+        fHarvestFlags = f;
+    }
+    uint16_t GetHarvestFlags() const {
+        return fHarvestFlags;
+    }
 
-    uint16_t HasLeafFlag(int16_t w, uint16_t f) const { return GetNode(w).fFlags & f; }
-    void SetLeafFlag(int16_t w, uint16_t f, bool on=true);
+    uint16_t HasLeafFlag(int16_t w, uint16_t f) const {
+        return GetNode(w).fFlags & f;
+    }
+    void SetLeafFlag(int16_t w, uint16_t f, bool on = true);
     void ClearLeafFlag(int16_t w, uint16_t f);
     void ClearTreeFlag(uint16_t f);
-    void SetTreeFlag(uint16_t f, bool on=true);
+    void SetTreeFlag(uint16_t f, bool on = true);
 
-    bool IsDisabled(uint16_t w) const { return (GetNode(w).fFlags & plSpaceTreeNode::kDisabled) || (fCache && !fCache->IsBitSet(w)); }
+    bool IsDisabled(uint16_t w) const {
+        return (GetNode(w).fFlags & plSpaceTreeNode::kDisabled) || (fCache && !fCache->IsBitSet(w));
+    }
 
     // Should GetWorldBounds check and refresh if needed?
-    const hsBounds3Ext& GetWorldBounds() const { return GetNode(GetRoot()).fWorldBounds; }
+    const hsBounds3Ext& GetWorldBounds() const {
+        return GetNode(GetRoot()).fWorldBounds;
+    }
 
     void MoveLeaf(int16_t idx, const hsBounds3Ext& newWorldBnd);
     void Refresh();
-    bool IsEmpty() const { return 0 != (GetNode(GetRoot()).fFlags & plSpaceTreeNode::kEmpty); }
-    bool IsDirty() const { return 0 != (GetNode(GetRoot()).fFlags & plSpaceTreeNode::kDirty); }
-    void MakeDirty() { fTree[GetRoot()].fFlags |= plSpaceTreeNode::kDirty; }
+    bool IsEmpty() const {
+        return 0 != (GetNode(GetRoot()).fFlags & plSpaceTreeNode::kEmpty);
+    }
+    bool IsDirty() const {
+        return 0 != (GetNode(GetRoot()).fFlags & plSpaceTreeNode::kDirty);
+    }
+    void MakeDirty() {
+        fTree[GetRoot()].fFlags |= plSpaceTreeNode::kDirty;
+    }
 
-    int16_t GetNumLeaves() const { return fNumLeaves; }
+    int16_t GetNumLeaves() const {
+        return fNumLeaves;
+    }
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);

@@ -63,108 +63,156 @@ struct IDirect3DVertexShader9;
 
 //// Definitions //////////////////////////////////////////////////////////////
 
-class plDXVertexBufferRef : public plDXDeviceRef
-{
-    public:
-        IDirect3DVertexBuffer9* fD3DBuffer;
-        uint32_t                  fCount;
-        uint32_t                  fIndex;
-        uint32_t                  fVertexSize;
-        int32_t                   fOffset;
-        uint8_t                   fFormat;
+class plDXVertexBufferRef : public plDXDeviceRef {
+public:
+    IDirect3DVertexBuffer9* fD3DBuffer;
+    uint32_t                  fCount;
+    uint32_t                  fIndex;
+    uint32_t                  fVertexSize;
+    int32_t                   fOffset;
+    uint8_t                   fFormat;
 
-        plGBufferGroup*         fOwner;
-        uint8_t*                  fData;
-        IDirect3DDevice9*       fDevice; // For releasing the VertexShader
+    plGBufferGroup*         fOwner;
+    uint8_t*                  fData;
+    IDirect3DDevice9*       fDevice; // For releasing the VertexShader
 
-        uint32_t                  fRefTime;
+    uint32_t                  fRefTime;
 
-        enum {
-            kRebuiltSinceUsed   = 0x10, // kDirty = 0x1 is in hsGDeviceRef
-            kVolatile           = 0x20,
-            kSkinned            = 0x40
-        };
+    enum {
+        kRebuiltSinceUsed   = 0x10, // kDirty = 0x1 is in hsGDeviceRef
+        kVolatile           = 0x20,
+        kSkinned            = 0x40
+    };
 
-        bool HasFlag(uint32_t f) const { return 0 != (fFlags & f); }
-        void SetFlag(uint32_t f, bool on) { if(on) fFlags |= f; else fFlags &= ~f; }
-
-        bool RebuiltSinceUsed() const { return HasFlag(kRebuiltSinceUsed); }
-        void SetRebuiltSinceUsed(bool b) { SetFlag(kRebuiltSinceUsed, b); }
-
-        bool Volatile() const { return HasFlag(kVolatile); }
-        void SetVolatile(bool b) { SetFlag(kVolatile, b); }
-
-        bool Skinned() const { return HasFlag(kSkinned); }
-        void SetSkinned(bool b) { SetFlag(kSkinned, b); }
-
-        bool Expired(uint32_t t) const { return Volatile() && (IsDirty() || (fRefTime != t)); }
-        void SetRefTime(uint32_t t) { fRefTime = t; }
-
-        void                    Link( plDXVertexBufferRef **back ) { plDXDeviceRef::Link( (plDXDeviceRef **)back ); }
-        plDXVertexBufferRef*    GetNext() { return (plDXVertexBufferRef *)fNext; }
-
-        plDXVertexBufferRef() :
-            fD3DBuffer(nil),
-            fCount(0),
-            fIndex(0),
-            fVertexSize(0),
-            fOffset(0),
-            fOwner(nil),
-            fData(nil),
-            fFormat(0),
-            fRefTime(0),
-            fDevice(nil)
-        {
+    bool HasFlag(uint32_t f) const {
+        return 0 != (fFlags & f);
+    }
+    void SetFlag(uint32_t f, bool on) {
+        if (on) {
+            fFlags |= f;
+        } else {
+            fFlags &= ~f;
         }
+    }
 
-        virtual ~plDXVertexBufferRef();
-        void    Release();
+    bool RebuiltSinceUsed() const {
+        return HasFlag(kRebuiltSinceUsed);
+    }
+    void SetRebuiltSinceUsed(bool b) {
+        SetFlag(kRebuiltSinceUsed, b);
+    }
+
+    bool Volatile() const {
+        return HasFlag(kVolatile);
+    }
+    void SetVolatile(bool b) {
+        SetFlag(kVolatile, b);
+    }
+
+    bool Skinned() const {
+        return HasFlag(kSkinned);
+    }
+    void SetSkinned(bool b) {
+        SetFlag(kSkinned, b);
+    }
+
+    bool Expired(uint32_t t) const {
+        return Volatile() && (IsDirty() || (fRefTime != t));
+    }
+    void SetRefTime(uint32_t t) {
+        fRefTime = t;
+    }
+
+    void                    Link(plDXVertexBufferRef** back) {
+        plDXDeviceRef::Link((plDXDeviceRef**)back);
+    }
+    plDXVertexBufferRef*    GetNext() {
+        return (plDXVertexBufferRef*)fNext;
+    }
+
+    plDXVertexBufferRef() :
+        fD3DBuffer(nil),
+        fCount(0),
+        fIndex(0),
+        fVertexSize(0),
+        fOffset(0),
+        fOwner(nil),
+        fData(nil),
+        fFormat(0),
+        fRefTime(0),
+        fDevice(nil) {
+    }
+
+    virtual ~plDXVertexBufferRef();
+    void    Release();
 };
 
-class plDXIndexBufferRef : public plDXDeviceRef
-{
-    public:
-        IDirect3DIndexBuffer9*  fD3DBuffer;
-        uint32_t                  fCount;
-        uint32_t                  fIndex;
-        int32_t                   fOffset;
-        plGBufferGroup*         fOwner;
-        uint32_t                  fRefTime;
-        D3DPOOL                 fPoolType;
+class plDXIndexBufferRef : public plDXDeviceRef {
+public:
+    IDirect3DIndexBuffer9*  fD3DBuffer;
+    uint32_t                  fCount;
+    uint32_t                  fIndex;
+    int32_t                   fOffset;
+    plGBufferGroup*         fOwner;
+    uint32_t                  fRefTime;
+    D3DPOOL                 fPoolType;
 
-        enum {
-            kRebuiltSinceUsed   = 0x10, // kDirty = 0x1 is in hsGDeviceRef
-            kVolatile           = 0x20
-        };
+    enum {
+        kRebuiltSinceUsed   = 0x10, // kDirty = 0x1 is in hsGDeviceRef
+        kVolatile           = 0x20
+    };
 
-        bool HasFlag(uint32_t f) const { return 0 != (fFlags & f); }
-        void SetFlag(uint32_t f, bool on) { if(on) fFlags |= f; else fFlags &= ~f; }
-
-        bool RebuiltSinceUsed() const { return HasFlag(kRebuiltSinceUsed); }
-        void SetRebuiltSinceUsed(bool b) { SetFlag(kRebuiltSinceUsed, b); }
-
-        bool Volatile() const { return HasFlag(kVolatile); }
-        void SetVolatile(bool b) { SetFlag(kVolatile, b); }
-
-        bool Expired(uint32_t t) const { return Volatile() && (IsDirty() || (fRefTime != t)); }
-        void SetRefTime(uint32_t t) { fRefTime = t; }
-
-        void                    Link( plDXIndexBufferRef **back ) { plDXDeviceRef::Link( (plDXDeviceRef **)back ); }
-        plDXIndexBufferRef* GetNext() { return (plDXIndexBufferRef *)fNext; }
-
-        plDXIndexBufferRef() :
-            fD3DBuffer(nil),
-            fCount(0),
-            fIndex(0),
-            fOffset(0),
-            fOwner(nil),
-            fRefTime(0),
-            fPoolType(D3DPOOL_MANAGED)
-        {
+    bool HasFlag(uint32_t f) const {
+        return 0 != (fFlags & f);
+    }
+    void SetFlag(uint32_t f, bool on) {
+        if (on) {
+            fFlags |= f;
+        } else {
+            fFlags &= ~f;
         }
+    }
 
-        virtual ~plDXIndexBufferRef();
-        void    Release();
+    bool RebuiltSinceUsed() const {
+        return HasFlag(kRebuiltSinceUsed);
+    }
+    void SetRebuiltSinceUsed(bool b) {
+        SetFlag(kRebuiltSinceUsed, b);
+    }
+
+    bool Volatile() const {
+        return HasFlag(kVolatile);
+    }
+    void SetVolatile(bool b) {
+        SetFlag(kVolatile, b);
+    }
+
+    bool Expired(uint32_t t) const {
+        return Volatile() && (IsDirty() || (fRefTime != t));
+    }
+    void SetRefTime(uint32_t t) {
+        fRefTime = t;
+    }
+
+    void                    Link(plDXIndexBufferRef** back) {
+        plDXDeviceRef::Link((plDXDeviceRef**)back);
+    }
+    plDXIndexBufferRef* GetNext() {
+        return (plDXIndexBufferRef*)fNext;
+    }
+
+    plDXIndexBufferRef() :
+        fD3DBuffer(nil),
+        fCount(0),
+        fIndex(0),
+        fOffset(0),
+        fOwner(nil),
+        fRefTime(0),
+        fPoolType(D3DPOOL_MANAGED) {
+    }
+
+    virtual ~plDXIndexBufferRef();
+    void    Release();
 };
 
 

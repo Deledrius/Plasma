@@ -61,8 +61,7 @@ class hsGMaterial;
 // Any function that ends with 'Sim' gets or sets a simulation space value.  If
 // the physical is in the main world, this will be the same as a global value,
 // but if it's in a subworld, it will be relative to that.
-class plPhysical : public plSynchedObject
-{
+class plPhysical : public plSynchedObject {
 public:
     CLASSNAME_REGISTER(plPhysical);
     GETINTERFACE_ANY(plPhysical, plSynchedObject);
@@ -84,14 +83,14 @@ public:
     virtual bool GetAngularVelocitySim(hsVector3& vel) const = 0;
     virtual void SetAngularVelocitySim(const hsVector3& vel) = 0;
 
-    virtual void SetHitForce(const hsVector3& force, const hsPoint3& pos)=0;
+    virtual void SetHitForce(const hsVector3& force, const hsPoint3& pos) = 0;
     /** Standard plasma transform interface, in global coordinates by convention.
     If you send in the same matrix that the physical last sent out in its correction message,
     it will be ignored as an "echo" -- UNLESS you set force to true, in which case the transform
     will be applied regardless.
     Set force to true if you don't want the transform to be ignored for any reason. Without it,
     this will ignore the incoming transform if it's the same one it sent out last time. */
-    virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, bool force=false) = 0;
+    virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, bool force = false) = 0;
     virtual void GetTransform(hsMatrix44& l2w, hsMatrix44& w2l) = 0;
 
     // From plSimDefs::Group

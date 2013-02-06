@@ -13,10 +13,10 @@ set(external_SOURCES
 
 if(PLASMA_EXTERNAL_RELEASE)
     set(Make_Resource_Command
-		python ${CMAKE_CURRENT_SOURCE_DIR}/makeres.py --optimize --render --package -i ${CMAKE_CURRENT_SOURCE_DIR} -o ${CMAKE_CURRENT_BINARY_DIR})
+		${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/makeres.py --optimize --render --package -i ${CMAKE_CURRENT_SOURCE_DIR} -o ${CMAKE_CURRENT_BINARY_DIR})
 else(PLASMA_EXTERNAL_RELEASE)
 	set(Make_Resource_Command
-		python ${CMAKE_CURRENT_SOURCE_DIR}/makeres.py --render --package -i ${CMAKE_CURRENT_SOURCE_DIR} -o ${CMAKE_CURRENT_BINARY_DIR})
+		${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/makeres.py --render --package -i ${CMAKE_CURRENT_SOURCE_DIR} -o ${CMAKE_CURRENT_BINARY_DIR})
 endif(PLASMA_EXTERNAL_RELEASE)
 
 add_custom_command(

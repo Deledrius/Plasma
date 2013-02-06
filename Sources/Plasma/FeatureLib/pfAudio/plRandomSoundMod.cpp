@@ -62,25 +62,29 @@ plRandomSoundModGroup::~plRandomSoundModGroup()
     delete [] fIndices;
 }
 
-void plRandomSoundModGroup::Read(hsStream *s)
+void plRandomSoundModGroup::Read(hsStream* s)
 {
     fNumSounds = s->ReadLE16();
     fGroupedIdx = s->ReadLE16();
     fIndices = new uint16_t[fNumSounds];
 
     int i;
-    for (i = 0; i < fNumSounds; i++)
+
+    for (i = 0; i < fNumSounds; i++) {
         fIndices[i] = s->ReadLE16();
+    }
 }
 
-void plRandomSoundModGroup::Write(hsStream *s)
+void plRandomSoundModGroup::Write(hsStream* s)
 {
     s->WriteLE16(fNumSounds);
     s->WriteLE16(fGroupedIdx);
-    
+
     int i;
-    for (i = 0; i < fNumSounds; i++)
+
+    for (i = 0; i < fNumSounds; i++) {
         s->WriteLE16(fIndices[i]);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -96,11 +100,13 @@ plRandomSoundMod::~plRandomSoundMod()
 
 void plRandomSoundMod::IPlayNextIfMaster()
 {
-    if( !fTarget )
+    if (!fTarget) {
         IRetry(2.f);
-    
-    if( IStopped() )
+    }
+
+    if (IStopped()) {
         return;
+    }
 
     IPlayNext();
 }
@@ -109,25 +115,30 @@ void plRandomSoundMod::IPlayNextIfMaster()
 void plRandomSoundMod::IStop()
 {
     plRandomCommandMod::IStop();
-    
-    plAudioInterface *ai = nil;
-    
-    if( !plgAudioSys::Active() ) return;
+
+    plAudioInterface* ai = nil;
+
+    if (!plgAudioSys::Active()) {
+        return;
+    }
 
     ai = IGetTargetAudioInterface(0);
-    if(!ai) return;
 
-    if( fGroups != nil && fGroups[ fCurrentGroup ].fGroupedIdx != -1 )
-    {
-        plSoundMsg *msg = new plSoundMsg();
+    if (!ai) {
+        return;
+    }
+
+    if (fGroups != nil && fGroups[ fCurrentGroup ].fGroupedIdx != -1) {
+        plSoundMsg* msg = new plSoundMsg();
         msg->SetCmd(plSoundMsg::kStop);
         msg->fIndex = fGroups[ fCurrentGroup ].fIndices[ fCurrent ];
         plgDispatch::MsgSend(msg);
-    }
-    else
-    {
-        if(fCurrent == -1) return;
-        uint16_t currentSndIdx = ( fGroups != nil ) ? fGroups[fCurrentGroup].fIndices[fCurrent] : fActiveList[fCurrent];
+    } else {
+        if (fCurrent == -1) {
+            return;
+        }
+
+        uint16_t currentSndIdx = (fGroups != nil) ? fGroups[fCurrentGroup].fIndices[fCurrent] : fActiveList[fCurrent];
         plSoundMsg* snd = new plSoundMsg(GetKey(), GetTarget()->GetKey(), nil);
         snd->SetCmd(plSoundMsg::kStop);
         snd->fIndex = currentSndIdx;
@@ -137,15 +148,14 @@ void plRandomSoundMod::IStop()
 
 void plRandomSoundMod::IPlayNext()
 {
-    if( !plgAudioSys::Active() )
-    {
+    if (!plgAudioSys::Active()) {
         IRetry(10.f);
         return;
     }
 
     plAudioInterface* ai = IGetTargetAudioInterface(0);
-    if( !ai )
-    {
+
+    if (!ai) {
         IRetry(2.f);
         return;
     }
@@ -154,37 +164,35 @@ void plRandomSoundMod::IPlayNext()
     uint16_t currentSndIdx;
     int nSounds = (fGroups == nil ? ai->GetNumSounds() : fGroups[fCurrentGroup].fNumSounds);
     fEndTimes.ExpandAndZero(nSounds);
-    plSound *pSound = nil;
+    plSound* pSound = nil;
 
     // The global sound priority has changed, update the active random sounds list
-    if(fOldPriority != plgAudioSys::GetPriorityCutoff() && fGroups == nil)
-    {
+    if (fOldPriority != plgAudioSys::GetPriorityCutoff() && fGroups == nil) {
         fActiveList.clear();
         fOldPriority = plgAudioSys::GetPriorityCutoff();
-        for(i = 0; i < nSounds; i++)
-        {
+
+        for (i = 0; i < nSounds; i++) {
             pSound =  ai->GetSound(i);
-            if(pSound && pSound->GetPriority() <= plgAudioSys::GetPriorityCutoff())
-            {
+
+            if (pSound && pSound->GetPriority() <= plgAudioSys::GetPriorityCutoff()) {
                 fActiveList.push_back(i);
             }
         }
+
         // There are no sounds that should play
-        if(fGroups == nil && fActiveList.empty() && nSounds)
-        {
+        if (fGroups == nil && fActiveList.empty() && nSounds) {
             // If no sounds in this component even attempt to play this component gets mad and will never play any sounds again.
-            // So, give it a zero to make it happy. This sound will still be rejected when it tries to play which is exactly what 
+            // So, give it a zero to make it happy. This sound will still be rejected when it tries to play which is exactly what
             // we want since if we get here no sounds in this component should play.
-            fActiveList.push_back(0); 
+            fActiveList.push_back(0);
         }
     }
 
     // if this is the first time this component is going to play a sound check to see if it has a delay time
-    if(fFirstTimePlay)
-    {
+    if (fFirstTimePlay) {
         fFirstTimePlay = false;
-        if( !(fMode & kOneCmd) )
-        {
+
+        if (!(fMode & kOneCmd)) {
             float delay = IGetDelay(0);
             double t = hsTimer::GetSysSeconds() + delay;
 
@@ -194,9 +202,8 @@ void plRandomSoundMod::IPlayNext()
             return;
         }
     }
-    
-    if( !ISelectNext(fGroups == nil ? fActiveList.size() : nSounds) )
-    {
+
+    if (!ISelectNext(fGroups == nil ? fActiveList.size() : nSounds)) {
         plRandomCommandMod::IStop();
         return;
     }
@@ -204,23 +211,23 @@ void plRandomSoundMod::IPlayNext()
     // We don't want random sounds to synch, since we don't synch the randomness. So force this next
     // sound to not synch
     float currLen;
-    if( fGroups != nil && fGroups[ fCurrentGroup ].fGroupedIdx != -1 )
-    {
+
+    if (fGroups != nil && fGroups[ fCurrentGroup ].fGroupedIdx != -1) {
         currentSndIdx = fGroups[ fCurrentGroup ].fIndices[ fCurrent ];
-        plWin32GroupedSound *sound = plWin32GroupedSound::ConvertNoRef( ai->GetSound( fGroups[ fCurrentGroup ].fGroupedIdx ) );
-        
-        if (!sound)
-        {   
-            hsAssert( sound != nil, "Invalid sound type in plRandomSoundMod" );
+        plWin32GroupedSound* sound = plWin32GroupedSound::ConvertNoRef(ai->GetSound(fGroups[ fCurrentGroup ].fGroupedIdx));
+
+        if (!sound) {
+            hsAssert(sound != nil, "Invalid sound type in plRandomSoundMod");
             return;
         }
+
         sound->SetLocalOnly(true);
 
         // Send msg to the grouped sound to switch sounds
-        plSoundMsg *snd = new plSoundMsg();
-        snd->SetCmd( plSoundMsg::kSelectFromGroup );
+        plSoundMsg* snd = new plSoundMsg();
+        snd->SetCmd(plSoundMsg::kSelectFromGroup);
         snd->fIndex = currentSndIdx;
-        snd->Send( sound->GetKey() );
+        snd->Send(sound->GetKey());
 
         // Now tell the audio interface to play the sound (probably should change this....)
         snd = new plSoundMsg(GetKey(), GetTarget()->GetKey(), nil);
@@ -231,37 +238,35 @@ void plRandomSoundMod::IPlayNext()
         snd->fIndex = fGroups[ fCurrentGroup ].fGroupedIdx;
         plgDispatch::MsgSend(snd);
 
-        currLen = sound->GetSoundLength( currentSndIdx );
-    }
-    else
-    {
-        currentSndIdx = ( fGroups != nil ) ? fGroups[fCurrentGroup].fIndices[fCurrent] : fActiveList[fCurrent];
-        if (ai->GetSound(currentSndIdx))
-        {
-            ai->GetSound( currentSndIdx )->SetLocalOnly(true);
+        currLen = sound->GetSoundLength(currentSndIdx);
+    } else {
+        currentSndIdx = (fGroups != nil) ? fGroups[fCurrentGroup].fIndices[fCurrent] : fActiveList[fCurrent];
+
+        if (ai->GetSound(currentSndIdx)) {
+            ai->GetSound(currentSndIdx)->SetLocalOnly(true);
 
             ai->GetSound(currentSndIdx)->Stop();
             ai->GetSound(currentSndIdx)->Play();
         }
 
-        if (ai->GetSound(currentSndIdx))
+        if (ai->GetSound(currentSndIdx)) {
             currLen = (float)(ai->GetSound(currentSndIdx)->GetLength());
-        else
+        } else {
             currLen = 0;
+        }
     }
 
-    if (plgAudioSys::AreExtendedLogsEnabled())
-    {
-        if (fGroups)
+    if (plgAudioSys::AreExtendedLogsEnabled()) {
+        if (fGroups) {
             plStatusLog::AddLineS("audio.log", "%s: Playing sound #%d from group %d", GetTarget(0)->GetKeyName().c_str(), fCurrent, fCurrentGroup);
-        else
+        } else {
             plStatusLog::AddLineS("audio.log", "%s: Playing sound #%d", GetTarget(0)->GetKeyName().c_str(), fCurrent);
+        }
     }
 
     fEndTimes[fCurrent] = hsTimer::GetSysSeconds() + currLen;
 
-    if( !(fMode & kOneCmd) )
-    {
+    if (!(fMode & kOneCmd)) {
         float delay = IGetDelay(currLen);
 
         double t = hsTimer::GetSysSeconds() + delay;
@@ -269,9 +274,7 @@ void plRandomSoundMod::IPlayNext()
         plAnimCmdMsg* anim = new plAnimCmdMsg(GetKey(), GetKey(), &t);
         anim->SetCmd(plAnimCmdMsg::kContinue);
         plgDispatch::MsgSend(anim);
-    }
-    else
-    {
+    } else {
         plRandomCommandMod::IStop();
     }
 }
@@ -280,8 +283,7 @@ void plRandomSoundMod::SetCurrentGroup(uint16_t group)
 {
     hsAssert(group < fNumGroups, "Setting an invalid group on a random sound modifier");
 
-    if (group != fCurrentGroup && group < fNumGroups)
-    {
+    if (group != fCurrentGroup && group < fNumGroups) {
         fGroups[fCurrentGroup].fExcluded = fExcluded;
         fGroups[fCurrentGroup].fCurrent = fCurrent;
         fExcluded = fGroups[group].fExcluded;
@@ -290,81 +292,90 @@ void plRandomSoundMod::SetCurrentGroup(uint16_t group)
     }
 }
 
-void plRandomSoundMod::Read(hsStream *s, hsResMgr *mgr)
+void plRandomSoundMod::Read(hsStream* s, hsResMgr* mgr)
 {
     plRandomCommandMod::Read(s, mgr);
 
     fNumGroups = s->ReadLE16();
-    if (fNumGroups > 0)
-    {
+
+    if (fNumGroups > 0) {
         fGroups = new plRandomSoundModGroup[fNumGroups];
         int i;
-        for (i = 0; i < fNumGroups; i++)
+
+        for (i = 0; i < fNumGroups; i++) {
             fGroups[i].Read(s);
+        }
     }
 }
 
-void plRandomSoundMod::Write(hsStream *s, hsResMgr *mgr)
+void plRandomSoundMod::Write(hsStream* s, hsResMgr* mgr)
 {
     plRandomCommandMod::Write(s, mgr);
 
     s->WriteLE16(fNumGroups);
-    if (fNumGroups > 0)
-    {
+
+    if (fNumGroups > 0) {
         int i;
-        for (i = 0; i < fNumGroups; i++)
+
+        for (i = 0; i < fNumGroups; i++) {
             fGroups[i].Write(s);
+        }
     }
 }
 
-void    plRandomSoundMod::ForceSoundLoadState( bool loaded )
+void    plRandomSoundMod::ForceSoundLoadState(bool loaded)
 {
     uint16_t  i, j;
 
     plAudioInterface* ai = IGetTargetAudioInterface(0);
-    if( ai == nil )
-        return;
 
-    if( fGroups != nil )
-    {
-        for( i = 0; i < fNumGroups; i++ )
-        {
-            if( fGroups[ i ].fGroupedIdx != -1 )
-            {
-                plSound *sound = ai->GetSound( fGroups[ i ].fGroupedIdx );
-                if (!sound)
+    if (ai == nil) {
+        return;
+    }
+
+    if (fGroups != nil) {
+        for (i = 0; i < fNumGroups; i++) {
+            if (fGroups[ i ].fGroupedIdx != -1) {
+                plSound* sound = ai->GetSound(fGroups[ i ].fGroupedIdx);
+
+                if (!sound) {
                     return;
-                if( loaded )
+                }
+
+                if (loaded) {
                     sound->ForceLoad();
-                else
+                } else {
                     sound->ForceUnload();
-            }
-            else
-            {
-                for( j = 0; j < fGroups[ i ].fNumSounds; j++ )
-                {
-                    plSound *sound = ai->GetSound( fGroups[ i ].fIndices[ j ] );
-                    if (!sound)
+                }
+            } else {
+                for (j = 0; j < fGroups[ i ].fNumSounds; j++) {
+                    plSound* sound = ai->GetSound(fGroups[ i ].fIndices[ j ]);
+
+                    if (!sound) {
                         return;
-                    if( loaded )
+                    }
+
+                    if (loaded) {
                         sound->ForceLoad();
-                    else
+                    } else {
                         sound->ForceUnload();
+                    }
                 }
             }
         }
-    }
-    else
-    {
-        for( i = 0; i < ai->GetNumSounds(); i++ )
-        {
-            plSound *sound = ai->GetSound( i );
-            if (!sound)
+    } else {
+        for (i = 0; i < ai->GetNumSounds(); i++) {
+            plSound* sound = ai->GetSound(i);
+
+            if (!sound) {
                 return;
-            if( loaded )
+            }
+
+            if (loaded) {
                 sound->ForceLoad();
-            else
+            } else {
                 sound->ForceUnload();
+            }
         }
     }
 }
@@ -373,11 +384,10 @@ void    plRandomSoundMod::ForceSoundLoadState( bool loaded )
 bool plRandomSoundMod::MsgReceive(plMessage* msg)
 {
     plAnimCmdMsg* anim = plAnimCmdMsg::ConvertNoRef(msg);
-    if( anim )
-    {
+
+    if (anim) {
         // Actually sets the volume
-        if( anim->Cmd(plAnimCmdMsg::kSetSpeed) )
-        {
+        if (anim->Cmd(plAnimCmdMsg::kSetSpeed)) {
             ISetVolume(anim->fSpeed);
         }
     }
@@ -388,44 +398,57 @@ bool plRandomSoundMod::MsgReceive(plMessage* msg)
 
 void plRandomSoundMod::ISetVolume(float volume)
 {
-    plSound *pSound = nil;
-    
+    plSound* pSound = nil;
+
     pSound = IGetSoundPtr();
-    if(pSound)
+
+    if (pSound) {
         pSound->SetVolume(volume);
+    }
 }
 
 float plRandomSoundMod::GetVolume()
 {
     float volume = 1.0;
-    plSound *pSound;
-    
+    plSound* pSound;
+
     pSound = IGetSoundPtr();
-    if(pSound)
+
+    if (pSound) {
         volume = pSound->GetMaxVolume();
+    }
+
     return volume;
 }
 
 void plRandomSoundMod::ISetPosition(hsPoint3 pos)
 {
-    plSound *pSound = IGetSoundPtr();
-    if(pSound)
-    {
+    plSound* pSound = IGetSoundPtr();
+
+    if (pSound) {
         pSound->SetPosition(pos);
     }
 }
 
-plSound *plRandomSoundMod::IGetSoundPtr()
+plSound* plRandomSoundMod::IGetSoundPtr()
 {
-    plSound *pSound = nil;
-    if(fGroups != nil) return nil;
-    if(fCurrent == -1) return nil;  // sound list hasn't been initialized yet, don't try and access it 
+    plSound* pSound = nil;
+
+    if (fGroups != nil) {
+        return nil;
+    }
+
+    if (fCurrent == -1) {
+        return nil;    // sound list hasn't been initialized yet, don't try and access it
+    }
 
     int currentSndIdx = fActiveList[fCurrent];
     plAudioInterface* ai = IGetTargetAudioInterface(0);
-    if( !ai )
+
+    if (!ai) {
         return nil;
-    
-    pSound = ai->GetSound( currentSndIdx );
+    }
+
+    pSound = ai->GetSound(currentSndIdx);
     return pSound;
 }

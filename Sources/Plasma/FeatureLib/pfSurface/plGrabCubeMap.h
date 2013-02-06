@@ -53,8 +53,7 @@ struct hsMatrix44;
 struct hsPoint3;
 struct hsColorRGBA;
 
-class plGrabCubeRenderRequest : public plRenderRequest
-{
+class plGrabCubeRenderRequest : public plRenderRequest {
 public:
     plGrabCubeRenderRequest();
 
@@ -65,15 +64,14 @@ public:
     virtual void    Render(plPipeline* pipe, plPageTreeMgr* pageMgr);
 };
 
-class plGrabCubeMap
-{
+class plGrabCubeMap {
 protected:
     void ISetupRenderRequests(plPipeline* pipe, const hsPoint3& center, const char* pref, const hsColorRGBA& clearColor, uint8_t q) const;
 
 public:
     plGrabCubeMap() {}
-    void GrabCube(plPipeline* pipe, plSceneObject* obj, const char* pref, const hsColorRGBA& clearColor, uint8_t q=75);
-    void GrabCube(plPipeline* pipe, const hsPoint3& pos, const char* pref, const hsColorRGBA& clearColor, uint8_t q=75);
+    void GrabCube(plPipeline* pipe, plSceneObject* obj, const char* pref, const hsColorRGBA& clearColor, uint8_t q = 75);
+    void GrabCube(plPipeline* pipe, const hsPoint3& pos, const char* pref, const hsColorRGBA& clearColor, uint8_t q = 75);
 };
 
 

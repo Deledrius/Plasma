@@ -42,13 +42,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plMessage/plSimStateMsg.h"
 #include "hsResMgr.h"
 
-void plSubWorldMsg::Read(hsStream *stream, hsResMgr *mgr)
+void plSubWorldMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSimulationMsg::Read(stream, mgr);
     fWorldKey = mgr->ReadKey(stream);
 }
 
-void plSubWorldMsg::Write(hsStream *stream, hsResMgr *mgr)
+void plSubWorldMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSimulationMsg::Write(stream, mgr);
     mgr->WriteKey(stream, fWorldKey);

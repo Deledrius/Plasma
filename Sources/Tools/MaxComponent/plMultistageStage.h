@@ -44,8 +44,7 @@ class plAnimStage;
 class plBaseStage;
 class hsStream;
 
-enum StageTypes
-{
+enum StageTypes {
     // Data for the multistage
     kMultiStage,
 
@@ -53,8 +52,7 @@ enum StageTypes
     kStandard
 };
 
-class plBaseStage
-{
+class plBaseStage {
 protected:
     char* fName;
 
@@ -71,29 +69,28 @@ public:
     virtual ~plBaseStage();
 
     // From StageTypes
-    virtual int GetType()=0;
+    virtual int GetType() = 0;
 
     // Derived classes need to call this from their implementation
-    virtual void Read(hsStream *stream);
-    virtual void Write(hsStream *stream);
+    virtual void Read(hsStream* stream);
+    virtual void Write(hsStream* stream);
 
-    virtual void CreateDlg()=0;
-    virtual void DestroyDlg()=0;
+    virtual void CreateDlg() = 0;
+    virtual void DestroyDlg() = 0;
 
-    virtual plAnimStage* CreateStage()=0;
+    virtual plAnimStage* CreateStage() = 0;
 
-    virtual plBaseStage* Clone()=0;
+    virtual plBaseStage* Clone() = 0;
 
     const char* GetName();
     void SetName(const char* name);
 };
 
-class plStandardStage : public plBaseStage
-{
+class plStandardStage : public plBaseStage {
 protected:
     static HWND fDlg;
 
-    char *fAnimName;
+    char* fAnimName;
     uint32_t fNumLoops;
     bool fLoopForever;
     uint8_t fForward;
@@ -116,10 +113,12 @@ public:
     plStandardStage();
     ~plStandardStage();
 
-    int GetType() { return kStandard; }
+    int GetType() {
+        return kStandard;
+    }
 
-    void Read(hsStream *stream);
-    void Write(hsStream *stream);
+    void Read(hsStream* stream);
+    void Write(hsStream* stream);
 
     void CreateDlg();
     void DestroyDlg();

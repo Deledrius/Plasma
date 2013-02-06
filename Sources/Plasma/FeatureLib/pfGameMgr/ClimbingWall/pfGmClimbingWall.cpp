@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/FeatureLib/pfGameMgr/ClimbingWall/pfGmClimbingWall.cpp
-*   
+*
 ***/
 
 #define USES_GAME_CLIMBINGWALL
@@ -57,24 +57,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 struct IClimbingWall {
-    pfGmClimbingWall * gameCli;
+    pfGmClimbingWall* gameCli;
 
-    IClimbingWall (pfGmClimbingWall * gameCli) : gameCli(gameCli) { }
+    IClimbingWall(pfGmClimbingWall* gameCli) : gameCli(gameCli) { }
 
     // pfGameCli event notification handlers
-    void Recv           (GameMsgHeader * msg, void * param);
-    void OnPlayerJoined (const Srv2Cli_Game_PlayerJoined & msg);
-    void OnPlayerLeft   (const Srv2Cli_Game_PlayerLeft & msg);
-    void OnInviteFailed (const Srv2Cli_Game_InviteFailed & msg);
-    void OnOwnerChange  (const Srv2Cli_Game_OwnerChange & msg);
+    void Recv(GameMsgHeader* msg, void* param);
+    void OnPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg);
+    void OnPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg);
+    void OnInviteFailed(const Srv2Cli_Game_InviteFailed& msg);
+    void OnOwnerChange(const Srv2Cli_Game_OwnerChange& msg);
 
-    // ClimbingWall network message handlers    
-    void RecvNumBlockersChanged (const Srv2Cli_ClimbingWall_NumBlockersChanged & msg, void * param);
-    void RecvReady (const Srv2Cli_ClimbingWall_Ready & msg, void * param);
-    void RecvBlockersChanged (const Srv2Cli_ClimbingWall_BlockersChanged & msg, void * param);
-    void RecvPlayerEntered (const Srv2Cli_ClimbingWall_PlayerEntered & msg, void * param);
-    void RecvSuitMachineLocked (const Srv2Cli_ClimbingWall_SuitMachineLocked & msg, void * param);
-    void RecvGameOver (const Srv2Cli_ClimbingWall_GameOver & msg, void * param);
+    // ClimbingWall network message handlers
+    void RecvNumBlockersChanged(const Srv2Cli_ClimbingWall_NumBlockersChanged& msg, void* param);
+    void RecvReady(const Srv2Cli_ClimbingWall_Ready& msg, void* param);
+    void RecvBlockersChanged(const Srv2Cli_ClimbingWall_BlockersChanged& msg, void* param);
+    void RecvPlayerEntered(const Srv2Cli_ClimbingWall_PlayerEntered& msg, void* param);
+    void RecvSuitMachineLocked(const Srv2Cli_ClimbingWall_SuitMachineLocked& msg, void* param);
+    void RecvGameOver(const Srv2Cli_ClimbingWall_GameOver& msg, void* param);
 };
 
 
@@ -85,15 +85,17 @@ struct IClimbingWall {
 ***/
 
 //============================================================================
-static pfGameCli * ClimbingWallFactory (
+static pfGameCli* ClimbingWallFactory(
     unsigned    gameId,
     plKey       receiver
-) {
+)
+{
     return new pfGmClimbingWall(gameId, receiver);
 }
 
 //============================================================================
-AUTO_INIT_FUNC(RegisterClimbingWallFactory) {
+AUTO_INIT_FUNC(RegisterClimbingWallFactory)
+{
 
     static GameTypeReg reg = {
         ClimbingWallFactory,
@@ -112,75 +114,85 @@ AUTO_INIT_FUNC(RegisterClimbingWallFactory) {
 ***/
 
 //============================================================================
-void IClimbingWall::OnPlayerJoined (const Srv2Cli_Game_PlayerJoined & msg) {
+void IClimbingWall::OnPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg)
+{
 
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IClimbingWall::OnPlayerLeft (const Srv2Cli_Game_PlayerLeft & msg) {
+void IClimbingWall::OnPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg)
+{
 
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IClimbingWall::OnInviteFailed (const Srv2Cli_Game_InviteFailed & msg) {
-    
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IClimbingWall::OnInviteFailed(const Srv2Cli_Game_InviteFailed& msg)
+{
+
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IClimbingWall::OnOwnerChange (const Srv2Cli_Game_OwnerChange & msg) {
+void IClimbingWall::OnOwnerChange(const Srv2Cli_Game_OwnerChange& msg)
+{
 
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IClimbingWall::RecvNumBlockersChanged (const Srv2Cli_ClimbingWall_NumBlockersChanged & msg, void * param) {
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IClimbingWall::RecvNumBlockersChanged(const Srv2Cli_ClimbingWall_NumBlockersChanged& msg, void* param)
+{
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IClimbingWall::RecvReady (const Srv2Cli_ClimbingWall_Ready & msg, void * param) {
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IClimbingWall::RecvReady(const Srv2Cli_ClimbingWall_Ready& msg, void* param)
+{
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IClimbingWall::RecvBlockersChanged (const Srv2Cli_ClimbingWall_BlockersChanged & msg, void * param) {
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IClimbingWall::RecvBlockersChanged(const Srv2Cli_ClimbingWall_BlockersChanged& msg, void* param)
+{
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IClimbingWall::RecvPlayerEntered (const Srv2Cli_ClimbingWall_PlayerEntered & msg, void * param) {
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IClimbingWall::RecvPlayerEntered(const Srv2Cli_ClimbingWall_PlayerEntered& msg, void* param)
+{
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IClimbingWall::RecvSuitMachineLocked (const Srv2Cli_ClimbingWall_SuitMachineLocked & msg, void * param) {
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IClimbingWall::RecvSuitMachineLocked(const Srv2Cli_ClimbingWall_SuitMachineLocked& msg, void* param)
+{
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
 
 //============================================================================
-void IClimbingWall::RecvGameOver (const Srv2Cli_ClimbingWall_GameOver & msg, void * param) {
-    pfGameCliMsg * gameCliMsg = new pfGameCliMsg;
+void IClimbingWall::RecvGameOver(const Srv2Cli_ClimbingWall_GameOver& msg, void* param)
+{
+    pfGameCliMsg* gameCliMsg = new pfGameCliMsg;
     gameCliMsg->Set(gameCli, msg);
     gameCliMsg->Send(gameCli->GetReceiver());
 }
@@ -193,29 +205,32 @@ void IClimbingWall::RecvGameOver (const Srv2Cli_ClimbingWall_GameOver & msg, voi
 ***/
 
 //============================================================================
-pfGmClimbingWall::pfGmClimbingWall (
+pfGmClimbingWall::pfGmClimbingWall(
     unsigned    gameId,
     plKey       receiver
 )
-:   pfGameCli(gameId, receiver)
+    :   pfGameCli(gameId, receiver)
 {
     internal = new IClimbingWall(this);
 }
 
 //============================================================================
-pfGmClimbingWall::~pfGmClimbingWall () {
+pfGmClimbingWall::~pfGmClimbingWall()
+{
 
     delete internal;
 }
 
 //============================================================================
-void pfGmClimbingWall::Recv (GameMsgHeader * msg, void * param) {
+void pfGmClimbingWall::Recv(GameMsgHeader* msg, void* param)
+{
 
-    #define DISPATCH(a) case kSrv2Cli_ClimbingWall_##a: {                               \
+#define DISPATCH(a) case kSrv2Cli_ClimbingWall_##a: {                               \
         const Srv2Cli_ClimbingWall_##a & m = *(const Srv2Cli_ClimbingWall_##a *)msg;    \
         internal->Recv##a(m, param);                                                    \
     }                                                                                   \
     break;                                                                              //
+
     switch (msg->messageId) {
         DISPATCH(NumBlockersChanged);
         DISPATCH(Ready);
@@ -225,35 +240,41 @@ void pfGmClimbingWall::Recv (GameMsgHeader * msg, void * param) {
         DISPATCH(GameOver);
         DEFAULT_FATAL(msg->messageId);
     }
-    #undef DISPATCH
+
+#undef DISPATCH
 }
 
 //============================================================================
-void pfGmClimbingWall::OnPlayerJoined (const Srv2Cli_Game_PlayerJoined & msg) {
+void pfGmClimbingWall::OnPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg)
+{
 
     internal->OnPlayerJoined(msg);
 }
 
 //============================================================================
-void pfGmClimbingWall::OnPlayerLeft (const Srv2Cli_Game_PlayerLeft & msg) {
+void pfGmClimbingWall::OnPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg)
+{
 
     internal->OnPlayerLeft(msg);
 }
 
 //============================================================================
-void pfGmClimbingWall::OnInviteFailed (const Srv2Cli_Game_InviteFailed & msg) {
+void pfGmClimbingWall::OnInviteFailed(const Srv2Cli_Game_InviteFailed& msg)
+{
 
     internal->OnInviteFailed(msg);
 }
 
 //============================================================================
-void pfGmClimbingWall::OnOwnerChange (const Srv2Cli_Game_OwnerChange & msg) {
+void pfGmClimbingWall::OnOwnerChange(const Srv2Cli_Game_OwnerChange& msg)
+{
 
     internal->OnOwnerChange(msg);
 }
 
 //============================================================================
-void pfGmClimbingWall::ChangeNumBlockers (int amountToAdjust) {
+void pfGmClimbingWall::ChangeNumBlockers(int amountToAdjust)
+{
 
     Cli2Srv_ClimbingWall_ChangeNumBlockers msg;
     msg.messageId       = kCli2Srv_ClimbingWall_ChangeNumBlockers;
@@ -261,12 +282,13 @@ void pfGmClimbingWall::ChangeNumBlockers (int amountToAdjust) {
     msg.recvGameId      = GetGameId();  // send to GameSrv on server
     msg.transId         = 0;
     msg.amountToAdjust  = amountToAdjust;
-    
+
     GameMgrSend(&msg);
 }
 
 //============================================================================
-void pfGmClimbingWall::Ready (unsigned readyType, unsigned teamNumber) {
+void pfGmClimbingWall::Ready(unsigned readyType, unsigned teamNumber)
+{
 
     Cli2Srv_ClimbingWall_Ready msg;
     msg.messageId       = kCli2Srv_ClimbingWall_Ready;
@@ -280,8 +302,9 @@ void pfGmClimbingWall::Ready (unsigned readyType, unsigned teamNumber) {
 }
 
 //============================================================================
-void pfGmClimbingWall::ChangeBlocker (unsigned teamNumber, unsigned blockerNumber, bool added) {
-    
+void pfGmClimbingWall::ChangeBlocker(unsigned teamNumber, unsigned blockerNumber, bool added)
+{
+
     Cli2Srv_ClimbingWall_BlockerChanged msg;
     msg.messageId       = kCli2Srv_ClimbingWall_BlockerChanged;
     msg.messageBytes    = sizeof(msg);
@@ -295,7 +318,8 @@ void pfGmClimbingWall::ChangeBlocker (unsigned teamNumber, unsigned blockerNumbe
 }
 
 //============================================================================
-void pfGmClimbingWall::Reset () {
+void pfGmClimbingWall::Reset()
+{
 
     Cli2Srv_ClimbingWall_Reset msg;
     msg.messageId       = kCli2Srv_ClimbingWall_Reset;
@@ -307,7 +331,8 @@ void pfGmClimbingWall::Reset () {
 }
 
 //============================================================================
-void pfGmClimbingWall::PlayerEntered (unsigned teamNumber) {
+void pfGmClimbingWall::PlayerEntered(unsigned teamNumber)
+{
 
     Cli2Srv_ClimbingWall_PlayerEntered msg;
     msg.messageId       = kCli2Srv_ClimbingWall_PlayerEntered;
@@ -320,19 +345,21 @@ void pfGmClimbingWall::PlayerEntered (unsigned teamNumber) {
 }
 
 //============================================================================
-void pfGmClimbingWall::FinishedGame () {
+void pfGmClimbingWall::FinishedGame()
+{
 
     Cli2Srv_ClimbingWall_FinishedGame msg;
     msg.messageId       = kCli2Srv_ClimbingWall_FinishedGame;
     msg.messageBytes    = sizeof(msg);
     msg.recvGameId      = GetGameId();  // send to GameSrv on server
     msg.transId         = 0;
-    
+
     GameMgrSend(&msg);
 }
 
 //============================================================================
-void pfGmClimbingWall::Panic () {
+void pfGmClimbingWall::Panic()
+{
 
     Cli2Srv_ClimbingWall_Panic msg;
     msg.messageId       = kCli2Srv_ClimbingWall_Panic;

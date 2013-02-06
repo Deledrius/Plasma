@@ -55,27 +55,37 @@ class plSpanEncoding;
 class plSpanTemplateB;
 struct hsVector3;
 
-class plDeformVert
-{
+class plDeformVert {
 public:
 
     // Begin returns true if it's actually planning to do anything.
     // If it returns false, End will still get called, but GetDel probably won't.
-    virtual bool Begin(INode* templNode, const hsBounds3Ext& wBnd) { return false; }
+    virtual bool Begin(INode* templNode, const hsBounds3Ext& wBnd) {
+        return false;
+    }
     virtual void End() {}
 
-    hsVector3 GetDel(const hsPoint3& p) { return GetDel(Point3(p.fX, p.fY, p.fZ)); }
-    virtual hsVector3 GetDel(const Point3& p) { return hsVector3(0,0,0); }
+    hsVector3 GetDel(const hsPoint3& p) {
+        return GetDel(Point3(p.fX, p.fY, p.fZ));
+    }
+    virtual hsVector3 GetDel(const Point3& p) {
+        return hsVector3(0, 0, 0);
+    }
 };
 
-class plShadeVert
-{
+class plShadeVert {
 public:
-    virtual bool Begin(INode* templNode, const hsBounds3Ext& wBnd) { return false; }
+    virtual bool Begin(INode* templNode, const hsBounds3Ext& wBnd) {
+        return false;
+    }
     virtual void End() {}
 
-    Color GetShade(const hsPoint3& p, const hsVector3& n) { return GetShade(Point3(p.fX, p.fY, p.fZ), Point3(n.fX, n.fY, n.fZ)); }
-    virtual Color GetShade(const Point3& p, const Point3& n) { return Color(0,0,0); }
+    Color GetShade(const hsPoint3& p, const hsVector3& n) {
+        return GetShade(Point3(p.fX, p.fY, p.fZ), Point3(n.fX, n.fY, n.fZ));
+    }
+    virtual Color GetShade(const Point3& p, const Point3& n) {
+        return Color(0, 0, 0);
+    }
 };
 
 class plL2WTab : public Tab<Matrix3> {};
@@ -89,8 +99,7 @@ class plColorTabTab : public Tab<plColorTab*> {};
 
 class plSpanTemplTab : public Tab<plSpanTemplateB*> {};
 
-class plClusterUtil
-{
+class plClusterUtil {
 protected:
     uint32_t                  fIdx;
     plClusterGroup*         fGroup;
@@ -107,13 +116,13 @@ protected:
 
     plSpanEncoding  ISelectEncoding(plPoint3TabTab& delPos, plColorTabTab& colors);
     void            IAllocPosAndColor(plSpanTemplateB* templ, const plL2WTab& insts,
-                                    plPoint3TabTab& delPos, plColorTabTab& colors);
+                                      plPoint3TabTab& delPos, plColorTabTab& colors);
     void            IDelPosAndColor(plSpanTemplateB* templ,
                                     const plL2WTab& insts, plDeformVert* def, plShadeVert* shade,
                                     plPoint3TabTab& delPos, plColorTabTab& colors);
-    void            IAddInstsToCluster(plCluster* cluster, plSpanTemplateB* templ, 
-                                       const plL2WTab& insts, 
-                                       plPoint3TabTab& delPos, 
+    void            IAddInstsToCluster(plCluster* cluster, plSpanTemplateB* templ,
+                                       const plL2WTab& insts,
+                                       plPoint3TabTab& delPos,
                                        plColorTabTab& colors);
     void            IFreePosAndColor(plPoint3TabTab& delPos, plColorTabTab& colors) const;
 
@@ -141,7 +150,9 @@ public:
 
     plClusterGroup* CreateGroup(plMaxNode* node, const char* name);
     plClusterGroup* SetupGroup(plClusterGroup* group, plMaxNode* node, plSpanTemplateB* templ);
-    plClusterGroup* GetGroup() const { return fGroup; }
+    plClusterGroup* GetGroup() const {
+        return fGroup;
+    }
 
     void AddClusters(plL2WTab& insts, plDeformVert* def, plShadeVert* shade);
 

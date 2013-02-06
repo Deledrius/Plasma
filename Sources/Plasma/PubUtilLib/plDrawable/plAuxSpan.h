@@ -53,11 +53,9 @@ class hsGMaterial;
 class plGBufferGroup;
 class plDecalVtxFormat;
 
-class plAuxSpan
-{
+class plAuxSpan {
 public:
-    enum
-    {
+    enum {
         kRTLit                  = 0x1,
         kOverrideLiteModel      = 0x2,
         kAttenColor             = 0x4,
@@ -93,19 +91,17 @@ public:
     uint32_t          fIBufferInit;
     uint32_t          fIBufferLimit;
 
-    plDecalVtxFormat* GetBaseVtxPtr() const
-    {
+    plDecalVtxFormat* GetBaseVtxPtr() const {
         plGBufferGroup* grp = fGroup;
         plGBufferCell* cell = grp->GetCell(fVBufferIdx, fCellIdx);
 
         uint8_t* ptr = grp->GetVertBufferData(fVBufferIdx);
-        
+
         ptr += cell->fVtxStart + fCellOffset;
 
         return (plDecalVtxFormat*)ptr;
     }
-    uint16_t* GetBaseIdxPtr() const
-    {
+    uint16_t* GetBaseIdxPtr() const {
         plGBufferGroup* grp = fGroup;
 
         return grp->GetIndexBufferData(fIBufferIdx) + fIBufferInit;

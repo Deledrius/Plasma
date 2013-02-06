@@ -50,47 +50,46 @@ class Bitmap;
 
 ClassDesc2* GetLayerTexDesc();
 
-extern TCHAR *GetString(int id);
+extern TCHAR* GetString(int id);
 extern HINSTANCE hInstance;
 
-class plLayerTex : public plPlasmaMAXLayer
-{
+class plLayerTex : public plPlasmaMAXLayer {
 protected:
     // Parameter block
-    IParamBlock2    *fBitmapPB;
-    UVGen           *fUVGen;
+    IParamBlock2*    fBitmapPB;
+    UVGen*           fUVGen;
 
-    IMtlParams      *fMtlParams;
+    IMtlParams*      fMtlParams;
 
-    TexHandle *fTexHandle;
+    TexHandle* fTexHandle;
     TimeValue fTexTime;
 
-    Bitmap *fBM;
-    static ParamDlg *fUVGenDlg;
+    Bitmap* fBM;
+    static ParamDlg* fUVGenDlg;
     Interval        fIValid;
-   
+
     friend class BitmapDlgProc;
 
 public:
     // Ref nums
-    enum
-    {
+    enum {
         kRefUVGen,
         kRefBitmap,
     };
 
     // Block ID's
-    enum
-    {
+    enum {
         kBlkBitmap,
     };
 
     plLayerTex();
     ~plLayerTex();
-    void DeleteThis() { delete this; }      
+    void DeleteThis() {
+        delete this;
+    }
 
     //From MtlBase
-    ParamDlg* CreateParamDlg(HWND hwMtlEdit, IMtlParams *imp);
+    ParamDlg* CreateParamDlg(HWND hwMtlEdit, IMtlParams* imp);
     BOOL SetDlgThing(ParamDlg* dlg);
     void Update(TimeValue t, Interval& valid);
     void Reset();
@@ -103,72 +102,96 @@ public:
     Point3 EvalNormalPerturb(ShadeContext& sc);
 
     // For displaying textures in the viewport
-    BOOL SupportTexDisplay() { return TRUE; }
+    BOOL SupportTexDisplay() {
+        return TRUE;
+    }
     void ActivateTexDisplay(BOOL onoff);
-    BITMAPINFO *GetVPDisplayDIB(TimeValue t, TexHandleMaker& thmaker, Interval &valid, BOOL mono=FALSE, int forceW=0, int forceH=0);
+    BITMAPINFO* GetVPDisplayDIB(TimeValue t, TexHandleMaker& thmaker, Interval& valid, BOOL mono = FALSE, int forceW = 0, int forceH = 0);
     DWORD GetActiveTexHandle(TimeValue t, TexHandleMaker& thmaker);
 protected:
     void IChanged();
     void IDiscardTexHandle();
 
 public:
-    void GetUVTransform(Matrix3 &uvtrans) { fUVGen->GetUVTransform(uvtrans); }
-    int GetTextureTiling() { return  fUVGen->GetTextureTiling(); }
-    int GetUVWSource() { return fUVGen->GetUVWSource(); }
-    virtual int GetMapChannel () { return fUVGen->GetMapChannel(); }    // only relevant if above returns UVWSRC_EXPLICIT
-    UVGen *GetTheUVGen() { return fUVGen; }
-    
+    void GetUVTransform(Matrix3& uvtrans) {
+        fUVGen->GetUVTransform(uvtrans);
+    }
+    int GetTextureTiling() {
+        return  fUVGen->GetTextureTiling();
+    }
+    int GetUVWSource() {
+        return fUVGen->GetUVWSource();
+    }
+    virtual int GetMapChannel() {
+        return fUVGen->GetMapChannel();    // only relevant if above returns UVWSRC_EXPLICIT
+    }
+    UVGen* GetTheUVGen() {
+        return fUVGen;
+    }
+
     //TODO: Return anim index to reference index
-    int SubNumToRefNum(int subNum) { return subNum; }
-    
+    int SubNumToRefNum(int subNum) {
+        return subNum;
+    }
+
     virtual BOOL    DiscardColor();
     virtual BOOL    DiscardAlpha();
-    
+
     // Loading/Saving
-    IOResult Load(ILoad *iload);
-    IOResult Save(ISave *isave);
+    IOResult Load(ILoad* iload);
+    IOResult Save(ISave* isave);
 
     //From Animatable
-    Class_ID ClassID() { return LAYER_TEX_CLASS_ID; }       
-    SClass_ID SuperClassID() { return TEXMAP_CLASS_ID; }
+    Class_ID ClassID() {
+        return LAYER_TEX_CLASS_ID;
+    }
+    SClass_ID SuperClassID() {
+        return TEXMAP_CLASS_ID;
+    }
     void GetClassName(TSTR& s);
 
-    RefTargetHandle Clone( RemapDir &remap );
-    RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, 
-        PartID& partID,  RefMessage message);
+    RefTargetHandle Clone(RemapDir& remap);
+    RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
+                               PartID& partID,  RefMessage message);
 
     int NumSubs();
-    Animatable* SubAnim(int i); 
+    Animatable* SubAnim(int i);
     TSTR SubAnimName(int i);
 
-    // TODO: Maintain the number or references here 
+    // TODO: Maintain the number or references here
     int NumRefs();
     RefTargetHandle GetReference(int i);
     void SetReference(int i, RefTargetHandle rtarg);
-    
+
     int NumParamBlocks();   // return number of ParamBlocks in this instance
     IParamBlock2* GetParamBlock(int i); // return i'th ParamBlock
     IParamBlock2* GetParamBlockByID(BlockID id); // return id'd ParamBlock
-    
+
     bool HasAlpha(); // Checks if the bitmap for this layer has an alpha channel
     virtual Bitmap* GetBitmap(TimeValue t);
-        
-    const char *GetTextureName();
-    
+
+    const char* GetTextureName();
+
     // Accessors needed by the base class for the various bitmap related elements
-    virtual Bitmap *GetMaxBitmap(int index = 0) { return fBM; }
-    virtual PBBitmap *GetPBBitmap( int index = 0 ); 
-    virtual int     GetNumBitmaps( void ) { return 1; }
+    virtual Bitmap* GetMaxBitmap(int index = 0) {
+        return fBM;
+    }
+    virtual PBBitmap* GetPBBitmap(int index = 0);
+    virtual int     GetNumBitmaps(void) {
+        return 1;
+    }
 
     // Virtual function called by plBMSampler to get various things while sampling the layer's image
-    virtual bool    GetSamplerInfo( plBMSamplerData *samplerData );
+    virtual bool    GetSamplerInfo(plBMSamplerData* samplerData);
 
     // Backdoor for the texture find and replace util.  Assumes input has the correct aspect ratio and is power of 2.
     virtual void SetExportSize(int x, int y);
-    
+
 protected:
-    virtual void ISetPBBitmap( PBBitmap *pbbm, int index = 0 ); 
-    virtual void ISetMaxBitmap(Bitmap *bitmap, int index = 0) { fBM = bitmap; }
+    virtual void ISetPBBitmap(PBBitmap* pbbm, int index = 0);
+    virtual void ISetMaxBitmap(Bitmap* bitmap, int index = 0) {
+        fBM = bitmap;
+    }
 
 };
 

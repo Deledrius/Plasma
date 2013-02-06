@@ -63,7 +63,7 @@ class plString;
 # endif
 #endif
 
-#define hsDbgLogEntry(x) 
+#define hsDbgLogEntry(x)
 #ifdef NET_LOGGING
 # ifdef HS_DEBUGGING
 #  undef hsDbgLogEntry
@@ -77,27 +77,27 @@ class plString;
 
 ///////////////////////////////////////////////////////////////////
 
-namespace pnNetCommon
-{
+namespace pnNetCommon {
 #ifndef SERVER
 
-    uint32_t GetBinAddr(const char* textAddr);
-    plString GetTextAddr(uint32_t binAddr);
+uint32_t GetBinAddr(const char* textAddr);
+plString GetTextAddr(uint32_t binAddr);
 
 #endif // SERVER
 }
 
 ///////////////////////////////////////////////////////////////////
 
-class plCreatableStream : public plCreatable
-{
+class plCreatableStream : public plCreatable {
     hsRAMStream fStream;
 public:
-    CLASSNAME_REGISTER( plCreatableStream );
-    GETINTERFACE_ANY( plCreatableStream, plCreatable );
-    void Read( hsStream* stream, hsResMgr* mgr=nil );
-    void Write( hsStream* stream, hsResMgr* mgr=nil );
-    hsStream * GetStream( void ) { return &fStream;}
+    CLASSNAME_REGISTER(plCreatableStream);
+    GETINTERFACE_ANY(plCreatableStream, plCreatable);
+    void Read(hsStream* stream, hsResMgr* mgr = nil);
+    void Write(hsStream* stream, hsResMgr* mgr = nil);
+    hsStream* GetStream(void) {
+        return &fStream;
+    }
 };
 
 
@@ -108,33 +108,50 @@ public:
 #ifndef SERVER
 
 template <class T>
-class plSafePtr
-{
-    T * fPtr;
+class plSafePtr {
+    T* fPtr;
 public:
-    plSafePtr(T * ptr = nil): fPtr(ptr) {hsRefCnt_SafeRef(fPtr);}
-    ~plSafePtr() { hsRefCnt_SafeUnRef(fPtr); }
-    operator T*() const { return fPtr; }
-    operator T*&() { return fPtr; }
-    operator const T&() const { return *fPtr; }
-    operator bool() const { return fPtr!=nil;}
-    T * operator->() const { return fPtr; }
-    T * operator *() const { return fPtr; }
-    T * operator=(T * ptr)
-    {
+    plSafePtr(T* ptr = nil): fPtr(ptr) {
+        hsRefCnt_SafeRef(fPtr);
+    }
+    ~plSafePtr() {
+        hsRefCnt_SafeUnRef(fPtr);
+    }
+    operator T* () const {
+        return fPtr;
+    }
+    operator T*& () {
+        return fPtr;
+    }
+    operator const T& () const {
+        return *fPtr;
+    }
+    operator bool() const {
+        return fPtr != nil;
+    }
+    T* operator->() const {
+        return fPtr;
+    }
+    T* operator *() const {
+        return fPtr;
+    }
+    T* operator=(T* ptr) {
         hsRefCnt_SafeRef(ptr);
         hsRefCnt_SafeUnRef(fPtr);
         fPtr = ptr;
         return fPtr;
     }
-    void Attach(T * ptr)
-    {
-        if (fPtr==ptr)
+    void Attach(T* ptr) {
+        if (fPtr == ptr) {
             return;
+        }
+
         hsRefCnt_SafeUnRef(fPtr);
         fPtr = ptr;
     }
-    void Detach() { fPtr=nil;}
+    void Detach() {
+        fPtr = nil;
+    }
 };
 
 #endif // SERVER

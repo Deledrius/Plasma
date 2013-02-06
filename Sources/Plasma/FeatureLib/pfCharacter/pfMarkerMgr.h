@@ -53,8 +53,7 @@ class pfMarkerMsg;
 class pfMarkerGame;
 class pfMarkerInfo;
 
-class pfMarkerMgr : public hsKeyedObject
-{
+class pfMarkerMgr : public hsKeyedObject {
 protected:
     friend class pfMarkerInfo;
     friend class pfMarkerInfoOwned;
@@ -99,8 +98,12 @@ public:
     void SetSelectedMarker(uint32_t id);
     uint32_t GetSelectedMarker();
 
-    void SetMarkersRespawn(bool respawn) {fMarkersRespawn = respawn;}
-    bool GetMarkersRespawn() {return fMarkersRespawn;}
+    void SetMarkersRespawn(bool respawn) {
+        fMarkersRespawn = respawn;
+    }
+    bool GetMarkersRespawn() {
+        return fMarkersRespawn;
+    }
 
     void CaptureMarker(uint32_t id, bool captured); // for QUEST games (no teams)
     void CaptureMarker(uint32_t id, int team); // for TEAM games (0 = not captured)

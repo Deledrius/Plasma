@@ -47,10 +47,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plDrawableSpans;
 class plSharedMesh;
 
-class plInstanceDrawInterface : public plDrawInterface
-{
+class plInstanceDrawInterface : public plDrawInterface {
 protected:
-    plDrawableSpans *fDrawable;
+    plDrawableSpans* fDrawable;
     hsTArray<plSharedMesh*> fMeshes;
 
     virtual void ICheckDrawableIndex(uint8_t which);
@@ -61,23 +60,25 @@ public:
     plInstanceDrawInterface();
     virtual ~plInstanceDrawInterface();
 
-    CLASSNAME_REGISTER( plInstanceDrawInterface );
-    GETINTERFACE_ANY( plInstanceDrawInterface, plDrawInterface );
+    CLASSNAME_REGISTER(plInstanceDrawInterface);
+    GETINTERFACE_ANY(plInstanceDrawInterface, plDrawInterface);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     virtual bool MsgReceive(plMessage* msg);
 
-    void AddSharedMesh(plSharedMesh *mesh, hsGMaterial *mat, bool addToFront, int LOD, bool partialSort);
-    void RemoveSharedMesh(plSharedMesh *mesh);
+    void AddSharedMesh(plSharedMesh* mesh, hsGMaterial* mat, bool addToFront, int LOD, bool partialSort);
+    void RemoveSharedMesh(plSharedMesh* mesh);
 
     virtual void ReleaseData();
-    virtual void SetSharedMesh(uint8_t which, plSharedMesh *mesh);
+    virtual void SetSharedMesh(uint8_t which, plSharedMesh* mesh);
     virtual void IClearIndex(uint8_t which);
-    plDrawableSpans *GetInstanceDrawable() const { return fDrawable; }
+    plDrawableSpans* GetInstanceDrawable() const {
+        return fDrawable;
+    }
 
-    int32_t GetSharedMeshIndex(const plSharedMesh *mesh) const;
+    int32_t GetSharedMeshIndex(const plSharedMesh* mesh) const;
 };
 
 

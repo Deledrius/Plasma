@@ -54,57 +54,60 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 bool plPickingDetector::MsgReceive(plMessage* msg)
 {
-    
+
     plObjRefMsg* refMsg = plObjRefMsg::ConvertNoRef(msg);
-    if( refMsg )
-    {
-        if( refMsg->fType == plObjRefMsg::kModifier) 
-        {
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-            {
+
+    if (refMsg) {
+        if (refMsg->fType == plObjRefMsg::kModifier) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 plModifier* mod = plModifier::ConvertNoRef(refMsg->GetRef());
                 SetRemote(mod);
-            }
-            else if( refMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-            {
+            } else if (refMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                 SetRemote(nil);
             }
         }
+
         return true;
     }
-    
+
     plPickedMsg* pPMsg = plPickedMsg::ConvertNoRef(msg);
-    if (pPMsg)
-    {
-        for (int i = 0; i < fReceivers.Count(); i++)
-        {
+
+    if (pPMsg) {
+        for (int i = 0; i < fReceivers.Count(); i++) {
             plActivatorMsg* pMsg = new plActivatorMsg;
-            pMsg->AddReceiver( fReceivers[i] );
-            if (pPMsg->fPicked)
-                pMsg->SetTriggerType( plActivatorMsg::kPickedTrigger );
-            else
-                pMsg->SetTriggerType( plActivatorMsg::kUnPickedTrigger );
+            pMsg->AddReceiver(fReceivers[i]);
+
+            if (pPMsg->fPicked) {
+                pMsg->SetTriggerType(plActivatorMsg::kPickedTrigger);
+            } else {
+                pMsg->SetTriggerType(plActivatorMsg::kUnPickedTrigger);
+            }
+
             // pass on the hit point
             pMsg->fHitPoint = pPMsg->fHitPoint;
 
-            if (fProxyKey)
+            if (fProxyKey) {
                 pMsg->fPickedObj = fProxyKey;
-            else
+            } else {
                 pMsg->fPickedObj = GetTarget()->GetKey();
+            }
 
             // assume that since this is something that was PICKED that it was done by the local player.
             plKey locPlayerKey = plNetClientApp::GetInstance()->GetLocalPlayerKey();
-            if (locPlayerKey)
+
+            if (locPlayerKey) {
                 pMsg->fHitterObj = locPlayerKey;
+            }
 
             pMsg->SetSender(GetKey());
-            plgDispatch::MsgSend( pMsg );
-            hsStatusMessageF("%s sending activate message to %s\n",GetKey()->GetName().c_str(), fReceivers[i]->GetName().c_str());
+            plgDispatch::MsgSend(pMsg);
+            hsStatusMessageF("%s sending activate message to %s\n", GetKey()->GetName().c_str(), fReceivers[i]->GetName().c_str());
         }
     }
 
-    if (RemoteMod() && RemoteMod()->MsgReceive(msg))
+    if (RemoteMod() && RemoteMod()->MsgReceive(msg)) {
         return true;
+    }
 
     return plDetectorModifier::MsgReceive(msg);
 }

@@ -70,9 +70,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptTTTMsg, upcastToFinalTTTMsg)
 }
 
 PYTHON_START_METHODS_TABLE(ptTTTMsg)
-    PYTHON_METHOD_NOARGS(ptTTTMsg, getTTTMsgType, "Returns the type of the TTT message (see PtTTTMsgTypes)"),
-    PYTHON_METHOD_NOARGS(ptTTTMsg, upcastToFinalTTTMsg, "Returns this message as the TTT msg it is"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptTTTMsg, getTTTMsgType, "Returns the type of the TTT message (see PtTTTMsgTypes)"),
+                     PYTHON_METHOD_NOARGS(ptTTTMsg, upcastToFinalTTTMsg, "Returns this message as the TTT msg it is"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptTTTMsg, pyGameCliMsg, "Base class for TicTacToe game messages");
@@ -81,9 +81,12 @@ PYTHON_EXPOSE_TYPE_DEFINITION(ptTTTMsg, pyTTTMsg);
 // required functions for PyObject interoperability
 PyObject* pyTTTMsg::New(pfGameCliMsg* msg)
 {
-    ptTTTMsg *newObj = (ptTTTMsg*)ptTTTMsg_type.tp_new(&ptTTTMsg_type, NULL, NULL);
-    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_TicTacToe))
+    ptTTTMsg* newObj = (ptTTTMsg*)ptTTTMsg_type.tp_new(&ptTTTMsg_type, NULL, NULL);
+
+    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_TicTacToe)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -125,8 +128,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptTTTGameStartedMsg, yourTurn)
 }
 
 PYTHON_START_METHODS_TABLE(ptTTTGameStartedMsg)
-    PYTHON_METHOD_NOARGS(ptTTTGameStartedMsg, yourTurn, "Returns true if you are the first player (and therefore it's your turn)"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptTTTGameStartedMsg, yourTurn, "Returns true if you are the first player (and therefore it's your turn)"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptTTTGameStartedMsg, pyTTTMsg, "TicTacToe message received when the game is started");
@@ -134,9 +137,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptTTTGameStartedMsg, pyTTTMsg, "TicTacToe message rece
 // required functions for PyObject interoperability
 PyObject* pyTTTGameStartedMsg::New(pfGameCliMsg* msg)
 {
-    ptTTTGameStartedMsg *newObj = (ptTTTGameStartedMsg*)ptTTTGameStartedMsg_type.tp_new(&ptTTTGameStartedMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_TTT_GameStarted))
+    ptTTTGameStartedMsg* newObj = (ptTTTGameStartedMsg*)ptTTTGameStartedMsg_type.tp_new(&ptTTTGameStartedMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_TTT_GameStarted)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -170,9 +176,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptTTTGameOverMsg, winnerID)
 }
 
 PYTHON_START_METHODS_TABLE(ptTTTGameOverMsg)
-    PYTHON_METHOD_NOARGS(ptTTTGameOverMsg, result, "Returns the result of the game (see PtTTTGameResult)"),
-    PYTHON_METHOD_NOARGS(ptTTTGameOverMsg, winnerID, "Returns the winner's ID"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptTTTGameOverMsg, result, "Returns the result of the game (see PtTTTGameResult)"),
+                     PYTHON_METHOD_NOARGS(ptTTTGameOverMsg, winnerID, "Returns the winner's ID"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptTTTGameOverMsg, pyTTTMsg, "TicTacToe message received when the game is over");
@@ -180,9 +186,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptTTTGameOverMsg, pyTTTMsg, "TicTacToe message receive
 // required functions for PyObject interoperability
 PyObject* pyTTTGameOverMsg::New(pfGameCliMsg* msg)
 {
-    ptTTTGameOverMsg *newObj = (ptTTTGameOverMsg*)ptTTTGameOverMsg_type.tp_new(&ptTTTGameOverMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_TTT_GameOver))
+    ptTTTGameOverMsg* newObj = (ptTTTGameOverMsg*)ptTTTGameOverMsg_type.tp_new(&ptTTTGameOverMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_TTT_GameOver)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -221,10 +230,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptTTTMoveMadeMsg, col)
 }
 
 PYTHON_START_METHODS_TABLE(ptTTTMoveMadeMsg)
-    PYTHON_METHOD_NOARGS(ptTTTMoveMadeMsg, playerID, "Returns the the ID of the player that just moved"),
-    PYTHON_METHOD_NOARGS(ptTTTMoveMadeMsg, row, "Returns the row index of the move (1..3)"),
-    PYTHON_METHOD_NOARGS(ptTTTMoveMadeMsg, col, "Returns the col index of the move (1..3)"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptTTTMoveMadeMsg, playerID, "Returns the the ID of the player that just moved"),
+                     PYTHON_METHOD_NOARGS(ptTTTMoveMadeMsg, row, "Returns the row index of the move (1..3)"),
+                     PYTHON_METHOD_NOARGS(ptTTTMoveMadeMsg, col, "Returns the col index of the move (1..3)"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptTTTMoveMadeMsg, pyTTTMsg, "TicTacToe message received when someone makes a move");
@@ -232,9 +241,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptTTTMoveMadeMsg, pyTTTMsg, "TicTacToe message receive
 // required functions for PyObject interoperability
 PyObject* pyTTTMoveMadeMsg::New(pfGameCliMsg* msg)
 {
-    ptTTTMoveMadeMsg *newObj = (ptTTTMoveMadeMsg*)ptTTTMoveMadeMsg_type.tp_new(&ptTTTMoveMadeMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_TTT_MoveMade))
+    ptTTTMoveMadeMsg* newObj = (ptTTTMoveMadeMsg*)ptTTTMoveMadeMsg_type.tp_new(&ptTTTMoveMadeMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_TTT_MoveMade)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 

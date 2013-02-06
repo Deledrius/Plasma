@@ -50,8 +50,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plBoundsIsect;
 
-class plDirectShadowMaster : public plShadowMaster
-{
+class plDirectShadowMaster : public plShadowMaster {
 protected:
     mutable hsTArray<plBoundsIsect*>    fIsectPool;
     hsTArray<plShadowSlave*>            fPerspSlavePool;
@@ -71,8 +70,8 @@ public:
     plDirectShadowMaster();
     virtual ~plDirectShadowMaster();
 
-    CLASSNAME_REGISTER( plDirectShadowMaster );
-    GETINTERFACE_ANY( plDirectShadowMaster, plShadowMaster );
+    CLASSNAME_REGISTER(plDirectShadowMaster);
+    GETINTERFACE_ANY(plDirectShadowMaster, plShadowMaster);
 
 };
 

@@ -48,17 +48,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsSemaphore;
 class plStatusLog;
 
-class plUpdatableClient  : public plClient
-{
+class plUpdatableClient  : public plClient {
 protected:
-    hsSemaphore *fUpdateSignal;
-    const char *fPipeName;
-    const char *fDataPath;
+    hsSemaphore* fUpdateSignal;
+    const char* fPipeName;
+    const char* fDataPath;
 
     bool fActive;
     bool fDirty;
 
-    plStatusLog *fLog;
+    plStatusLog* fLog;
 
     void IEnableProxies(bool enable);
     void IGetUpdate();
@@ -73,7 +72,7 @@ public:
     virtual bool MainLoop();
     virtual bool Shutdown();
 
-    void InitUpdate(const char *semaphoreName, const char *pipeName, const char *dir);
+    void InitUpdate(const char* semaphoreName, const char* pipeName, const char* dir);
 
     virtual void WindowActivate(bool active);
 };

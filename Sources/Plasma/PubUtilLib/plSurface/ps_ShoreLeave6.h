@@ -87,7 +87,7 @@ static const uint8_t ps_ShoreLeave6Codes[] = {
     0x0,    0x0,    0xe4,   0x86,
     0x0,    0x0,    0xe4,   0x90,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl ps_ShoreLeave6Decl("sha/ps_ShoreLeave6.inl", ps_ShoreLeave6, ps_ShoreLeave6byteLen, ps_ShoreLeave6Codes);
 

@@ -48,13 +48,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plgDispatch.h"
 #include "plMessage/plListenerMsg.h"
 
-plSoftVolume::plSoftVolume() 
-:   fListenState(0),
-    fListenStrength(0),
-    fInsideStrength(1.f),
-    fOutsideStrength(0)
+plSoftVolume::plSoftVolume()
+    :   fListenState(0),
+        fListenStrength(0),
+        fInsideStrength(1.f),
+        fOutsideStrength(0)
 {
-    fListenPos.Set(0,0,0);
+    fListenPos.Set(0, 0, 0);
 }
 
 plSoftVolume::~plSoftVolume()
@@ -83,23 +83,23 @@ void plSoftVolume::Write(hsStream* s, hsResMgr* mgr)
     s->WriteLEScalar(fOutsideStrength);
 }
 
-float plSoftVolume::GetStrength(const hsPoint3& pos) const 
-{ 
+float plSoftVolume::GetStrength(const hsPoint3& pos) const
+{
     return IRemapStrength(IGetStrength(pos));
 }
 
 float plSoftVolume::GetListenerStrength() const
 {
-    if( !(fListenState & kListenPosSet) )
-    {
+    if (!(fListenState & kListenPosSet)) {
         // Some screw-up, haven't received a pos yet. Turn it off till we do.
         return fListenStrength = IRemapStrength(0);
     }
-    if( fListenState & kListenDirty )
-    {
+
+    if (fListenState & kListenDirty) {
         fListenStrength = IUpdateListenerStrength();
         fListenState &= ~kListenDirty;
     }
+
     return fListenStrength;
 }
 
@@ -111,13 +111,10 @@ void plSoftVolume::UpdateListenerPosition(const hsPoint3& pos)
 
 void plSoftVolume::SetCheckListener(bool on)
 {
-    if( on )
-    {
+    if (on) {
         plgDispatch::Dispatch()->RegisterForExactType(plListenerMsg::Index(), GetKey());
         fListenState |= kListenCheck | kListenDirty | kListenRegistered;
-    }
-    else
-    {
+    } else {
         plgDispatch::Dispatch()->UnRegisterForExactType(plListenerMsg::Index(), GetKey());
         fListenState &= ~(kListenCheck | kListenDirty | kListenRegistered);
     }
@@ -126,8 +123,8 @@ void plSoftVolume::SetCheckListener(bool on)
 bool plSoftVolume::MsgReceive(plMessage* msg)
 {
     plListenerMsg* list = plListenerMsg::ConvertNoRef(msg);
-    if( list )
-    {
+
+    if (list) {
         UpdateListenerPosition(list->GetPosition());
         return true;
     }
@@ -142,18 +139,22 @@ float plSoftVolume::IUpdateListenerStrength() const
 
 void plSoftVolume::SetInsideStrength(float s)
 {
-    if( s < 0 )
+    if (s < 0) {
         s = 0;
-    else if( s > 1.f )
+    } else if (s > 1.f) {
         s = 1.f;
+    }
+
     fInsideStrength = s;
 }
 
 void plSoftVolume::SetOutsideStrength(float s)
 {
-    if( s < 0 )
+    if (s < 0) {
         s = 0;
-    else if( s > 1.f )
+    } else if (s > 1.f) {
         s = 1.f;
+    }
+
     fOutsideStrength = s;
 }

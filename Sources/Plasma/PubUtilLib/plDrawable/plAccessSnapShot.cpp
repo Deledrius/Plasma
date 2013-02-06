@@ -50,10 +50,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 void plAccessSnapShot::Clear()
 {
     ClearVerts();
-    
+
     int i;
-    for( i = 0; i < kNumValidChans; i++ )
+
+    for (i = 0; i < kNumValidChans; i++) {
         fChanSize[i] = 0;
+    }
 }
 
 void plAccessSnapShot::Destroy()
@@ -61,56 +63,55 @@ void plAccessSnapShot::Destroy()
     Clear();
 
     delete [] fData;
-    
+
     fRefCnt = 0;
 }
 
 void plAccessSnapShot::Release()
 {
     hsAssert(fRefCnt, "Releasing a snapshot with no refs. Check matching TakeSnapShot/ReleaseSnapShot calls.");
-    if( !--fRefCnt )
-    {
+
+    if (!--fRefCnt) {
         Destroy();
     }
 }
 
 uint32_t plAccessSnapShot::ICheckAlloc(const plAccessVtxSpan& src, uint32_t chanMask, uint32_t chan, uint16_t chanSize)
 {
-    if( ((1 << chan) & chanMask) && src.fStrides[chan] )
-    {
-        if( fChanSize[chan] )
-        {
+    if (((1 << chan) & chanMask) && src.fStrides[chan]) {
+        if (fChanSize[chan]) {
             // We already have this one
             chanMask &= ~(1 << chan);
-        }
-        else
-        {
+        } else {
             // We'll get this one
             fChanSize[chan] = chanSize;
         }
-    }
-    else
-    {
+    } else {
         // either we haven't been asked for this or src doesn't have it.
         // either way, we're never going to get it.
         chanMask &= ~(1 << chan);
     }
+
     return chanMask;
 }
 
 void plAccessSnapShot::IRecordSizes(uint16_t sizes[]) const
 {
     int chan;
-    for( chan = 0; chan < kNumValidChans; chan++ )
+
+    for (chan = 0; chan < kNumValidChans; chan++) {
         sizes[chan] = fChanSize[chan];
+    }
 }
 
 uint16_t plAccessSnapShot::IComputeStride() const
 {
     uint16_t stride = 0;
     int chan;
-    for( chan = 0; chan < kNumValidChans; chan++ )
+
+    for (chan = 0; chan < kNumValidChans; chan++) {
         stride += fChanSize[chan];
+    }
 
     return stride;
 }
@@ -122,28 +123,25 @@ void plAccessSnapShot::ICopyOldData(uint8_t* data, const uint16_t* const oldSize
     uint8_t*  srcChannels[kNumValidChans];
     uint8_t*  dstChannels[kNumValidChans];
     int chan;
-    for( chan = 0; chan < kNumValidChans; chan++ )
-    {
-        if( oldSizes[chan] )
-        {
+
+    for (chan = 0; chan < kNumValidChans; chan++) {
+        if (oldSizes[chan]) {
             hsAssert(fChanSize[chan], "Copying a channel we don't have");
             srcChannels[chan] = data + oldOffset;
             oldOffset += oldSizes[chan];
         }
 
-        if( fChanSize[chan] )
-        {
+        if (fChanSize[chan]) {
             dstChannels[chan] = fData + newOffset;
             newOffset += fChanSize[chan];
         }
     }
+
     int i;
-    for( i = 0; i < fNumVerts; i++ )
-    {
-        for( chan = 0; chan < kNumValidChans; chan++ )
-        {
-            if( oldSizes[chan] )
-            {
+
+    for (i = 0; i < fNumVerts; i++) {
+        for (chan = 0; chan < kNumValidChans; chan++) {
+            if (oldSizes[chan]) {
                 memcpy(dstChannels[chan], srcChannels[chan], oldSizes[chan]);
                 dstChannels[chan] += newStride;
                 srcChannels[chan] += oldStride;
@@ -158,10 +156,9 @@ void plAccessSnapShot::ISetupPointers(uint16_t newStride)
 
     int size = 0;
     int chan;
-    for( chan = 0; chan < kNumValidChans; chan++ )
-    {
-        if( fChanSize[chan] )
-        {
+
+    for (chan = 0; chan < kNumValidChans; chan++) {
+        if (fChanSize[chan]) {
             fStrides[chan] = newStride;
             fChannels[chan] = fData + size;
             size += fChanSize[chan];
@@ -186,8 +183,10 @@ uint32_t plAccessSnapShot::CopyFrom(const plAccessVtxSpan& src, uint32_t chanMas
     chanMask = ICheckAlloc(src, chanMask, kPosition, sizeof(hsPoint3));
 
     chanMask = ICheckAlloc(src, chanMask, kWeight, sizeof(float) * src.fNumWeights);
-    if( fChanSize[kWeight] )
+
+    if (fChanSize[kWeight]) {
         fNumWeights = src.fNumWeights;
+    }
 
     chanMask = ICheckAlloc(src, chanMask, kWgtIndex, sizeof(uint32_t));
 
@@ -198,13 +197,16 @@ uint32_t plAccessSnapShot::CopyFrom(const plAccessVtxSpan& src, uint32_t chanMas
     chanMask = ICheckAlloc(src, chanMask, kSpecular, sizeof(uint32_t));
 
     chanMask = ICheckAlloc(src, chanMask, kUVW, sizeof(hsPoint3) * src.fNumUVWsPerVert);
-    if( fChanSize[kUVW] )
+
+    if (fChanSize[kUVW]) {
         fNumUVWsPerVert = src.fNumUVWsPerVert;
+    }
 
     // If our chanMask has gone to zero, we've only been asked to record
     // channels we already have, so there's nothing to do.
-    if( !chanMask )
+    if (!chanMask) {
         return 0;
+    }
 
     uint16_t newStride = IComputeStride();
 
@@ -215,19 +217,17 @@ uint32_t plAccessSnapShot::CopyFrom(const plAccessVtxSpan& src, uint32_t chanMas
     uint8_t*  srcChannels[kNumValidChans];
     uint8_t*  dstChannels[kNumValidChans];
     int chan;
-    for( chan = 0; chan < kNumValidChans; chan++ )
-    {
+
+    for (chan = 0; chan < kNumValidChans; chan++) {
         srcChannels[chan] = src.fChannels[chan];
         dstChannels[chan] = fChannels[chan];
     }
 
     int i;
-    for( i = 0; i < src.VertCount(); i++ )
-    {
-        for( chan = 0; chan < kNumValidChans; chan++ )
-        {
-            if( (1<< chan) & chanMask )
-            {
+
+    for (i = 0; i < src.VertCount(); i++) {
+        for (chan = 0; chan < kNumValidChans; chan++) {
+            if ((1 << chan) & chanMask) {
                 memcpy(dstChannels[chan], srcChannels[chan], fChanSize[chan]);
                 dstChannels[chan] += fStrides[chan];
                 srcChannels[chan] += src.fStrides[chan];
@@ -242,42 +242,43 @@ uint32_t plAccessSnapShot::CopyTo(const plAccessVtxSpan& dst, uint32_t chanMask)
 {
     hsAssert(fNumVerts == dst.fNumVerts, "Vertex count mismatch, is this our real source?");
 
-    int chan; 
-    for( chan = 0; chan < kNumValidChans; chan++ )
-    {
-        if( !(fChanSize[chan] && dst.fStrides[chan]) )
+    int chan;
+
+    for (chan = 0; chan < kNumValidChans; chan++) {
+        if (!(fChanSize[chan] && dst.fStrides[chan])) {
             chanMask &= ~(1 << chan);
+        }
     }
+
     // If chanMask has gone to zero, either we don't have any of the requested channels
     // recorded, or dst doesn't have them. Both being true is valid, but
     // us having a channel recorded that's not in dst is probably an error.
-    if( !chanMask )
+    if (!chanMask) {
         return 0;
+    }
 
     int i;
-    for( i = 0; i < fNumVerts; i++ )
-    {
-        for( chan = 0; chan < kNumValidChans; chan++ )
-        {
-            if( (1 << chan) & chanMask )
-            {
+
+    for (i = 0; i < fNumVerts; i++) {
+        for (chan = 0; chan < kNumValidChans; chan++) {
+            if ((1 << chan) & chanMask) {
                 memcpy(
-                    dst.fChannels[chan] + dst.fStrides[chan] * i, 
-                    fChannels[chan] + fStrides[chan] * i, 
+                    dst.fChannels[chan] + dst.fStrides[chan] * i,
+                    fChannels[chan] + fStrides[chan] * i,
                     fChanSize[chan]);
             }
         }
     }
+
     return chanMask;
 }
 
 void plAccessSnapShot::SetupChannels(plAccessVtxSpan& dst) const
 {
     int chan;
-    for( chan = 0; chan < kNumValidChans; chan++ )
-    {
-        if( fChanSize[chan] )
-        {
+
+    for (chan = 0; chan < kNumValidChans; chan++) {
+        if (fChanSize[chan]) {
             dst.fChannels[chan] = fChannels[chan];
             dst.fStrides[chan] = fStrides[chan];
             dst.fOffsets[chan] = 0;

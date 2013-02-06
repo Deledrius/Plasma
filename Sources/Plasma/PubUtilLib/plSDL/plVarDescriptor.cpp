@@ -48,7 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plUnifiedTime/plUnifiedTime.h"
 
-const uint8_t plVarDescriptor::kVersion=3;        // for Read/Write format
+const uint8_t plVarDescriptor::kVersion = 3;      // for Read/Write format
 
 /////////////////////////////////////////////////////////////////////////////////
 // State Var
@@ -59,71 +59,54 @@ const uint8_t plVarDescriptor::kVersion=3;        // for Read/Write format
 //
 bool plVarDescriptor::SetType(const plString& type)
 {
-    if (type.IsNull())
+    if (type.IsNull()) {
         return false;
+    }
 
-    if (!type.CompareI("vector3"))
-        fType=kVector3;
-    else
-    if (!type.CompareI("point3"))
-        fType=kPoint3;
-    else
-    if (!type.CompareI("rgb"))
-        fType=kRGB;
-    else
-    if (!type.CompareI("rgba"))
-        fType=kRGBA;
-    else
-    if (!type.CompareI("rgb8"))
-        fType=kRGB8;
-    else
-    if (!type.CompareI("rgba8"))
-        fType=kRGBA8;
-    else
-    if (!type.CompareNI("quat", 4))
-        fType=kQuaternion;
-    else
-    if (!type.CompareI("rgba"))
-        fType=kRGBA;
-    else
-    if (!type.CompareI("int"))
-        fType=kInt;
-    else
-    if (!type.CompareI("byte"))
-        fType=kByte;
-    else
-    if (!type.CompareI("short"))
-        fType=kShort;
-    else
-    if (!type.CompareI("float"))
-        fType=kFloat;
-    else
-    if (!type.CompareI("double"))
-        fType=kDouble;
-    else
-    if (!type.CompareI("time"))
-        fType=kTime;
-    else
-    if (!type.CompareI("ageTimeOfDay"))
-        fType=kAgeTimeOfDay;
-    else
-    if (!type.CompareI("bool"))
-        fType=kBool;
-    else
-    if (!type.CompareI("string32"))
-        fType=kString32;
-    else
-    if (!type.CompareI("plKey"))
-        fType=kKey;
-    else
-    if (!type.CompareI("message") || !type.CompareI("creatable") )
-        fType=kCreatable;
-    else
-    if (type.CharAt(0)=='$')
-        fType=kStateDescriptor;
-    else
-        return false;   // err
-    
+    if (!type.CompareI("vector3")) {
+        fType = kVector3;
+    } else if (!type.CompareI("point3")) {
+        fType = kPoint3;
+    } else if (!type.CompareI("rgb")) {
+        fType = kRGB;
+    } else if (!type.CompareI("rgba")) {
+        fType = kRGBA;
+    } else if (!type.CompareI("rgb8")) {
+        fType = kRGB8;
+    } else if (!type.CompareI("rgba8")) {
+        fType = kRGBA8;
+    } else if (!type.CompareNI("quat", 4)) {
+        fType = kQuaternion;
+    } else if (!type.CompareI("rgba")) {
+        fType = kRGBA;
+    } else if (!type.CompareI("int")) {
+        fType = kInt;
+    } else if (!type.CompareI("byte")) {
+        fType = kByte;
+    } else if (!type.CompareI("short")) {
+        fType = kShort;
+    } else if (!type.CompareI("float")) {
+        fType = kFloat;
+    } else if (!type.CompareI("double")) {
+        fType = kDouble;
+    } else if (!type.CompareI("time")) {
+        fType = kTime;
+    } else if (!type.CompareI("ageTimeOfDay")) {
+        fType = kAgeTimeOfDay;
+    } else if (!type.CompareI("bool")) {
+        fType = kBool;
+    } else if (!type.CompareI("string32")) {
+        fType = kString32;
+    } else if (!type.CompareI("plKey")) {
+        fType = kKey;
+    } else if (!type.CompareI("message") || !type.CompareI("creatable")) {
+        fType = kCreatable;
+    } else if (type.CharAt(0) == '$') {
+        fType = kStateDescriptor;
+    } else {
+        return false;    // err
+    }
+
     fTypeString = type;
 
     return true;    // ok
@@ -136,8 +119,8 @@ void plVarDescriptor::CopyFrom(const plVarDescriptor* other)
     SetCount(other->GetCount());
     SetDisplayOptions(other->GetDisplayOptions());
 
-    fTypeString=other->GetTypeString();
-    
+    fTypeString = other->GetTypeString();
+
     fType = other->GetType();
     fFlags = other->fFlags;
 }
@@ -145,25 +128,26 @@ void plVarDescriptor::CopyFrom(const plVarDescriptor* other)
 //
 // Var descriptors are read and written by state descriptors
 //
-bool plVarDescriptor::Read(hsStream* s) 
+bool plVarDescriptor::Read(hsStream* s)
 {
     uint8_t version;
     s->ReadLE(&version);
-    if (version != kVersion)
-    {
+
+    if (version != kVersion) {
         if (plSDLMgr::GetInstance()->GetNetApp())
             plSDLMgr::GetInstance()->GetNetApp()->WarningMsg("SDL VarDescriptor version mismatch, read %d, should be %d - ignoring",
-            version, kVersion);
+                    version, kVersion);
+
         return false;
     }
 
-    fName=s->ReadSafeString_TEMP();
+    fName = s->ReadSafeString_TEMP();
 
     plMsgStdStringHelper::Peek(fDisplayOptions, s);
 
-    fCount=s->ReadLE32();
+    fCount = s->ReadLE32();
 
-    fType=(Type)s->ReadByte();
+    fType = (Type)s->ReadByte();
 
     fDefault = s->ReadSafeString_TEMP();
 
@@ -192,34 +176,42 @@ void plVarDescriptor::Write(hsStream* s) const
 plSimpleVarDescriptor::plSimpleVarDescriptor() :
     fAtomicType(kNone),
     fAtomicCount(1)
-{   
+{
 
 }
 
 // size in bytes
 int plSimpleVarDescriptor::GetAtomicSize() const
 {
-    switch(fAtomicType)
-    {
+    switch (fAtomicType) {
     case kInt:
-        return sizeof(int)*GetAtomicCount();
+        return sizeof(int) * GetAtomicCount();
+
     case kByte:
-        return sizeof(uint8_t)*GetAtomicCount();
+        return sizeof(uint8_t) * GetAtomicCount();
+
     case kShort:
-        return sizeof(short)*GetAtomicCount();
+        return sizeof(short) * GetAtomicCount();
+
     case kAgeTimeOfDay:
     case kFloat:
-        return sizeof(float)*GetAtomicCount();
+        return sizeof(float) * GetAtomicCount();
+
     case kTime:
-        return sizeof(plUnifiedTime)*GetAtomicCount();
+        return sizeof(plUnifiedTime) * GetAtomicCount();
+
     case kDouble:
-        return sizeof(double)*GetAtomicCount();
+        return sizeof(double) * GetAtomicCount();
+
     case kBool:
-        return sizeof(bool)*GetAtomicCount();
+        return sizeof(bool) * GetAtomicCount();
+
     case kString32:
-        return sizeof(String32)*GetAtomicCount();
+        return sizeof(String32) * GetAtomicCount();
+
     case kKey:
-        return sizeof(plUoid)*GetAtomicCount();
+        return sizeof(plUoid) * GetAtomicCount();
+
     default:
         return -1;  // err
     }
@@ -228,8 +220,8 @@ int plSimpleVarDescriptor::GetAtomicSize() const
 // size of var in bytes
 int plSimpleVarDescriptor::GetSize() const
 {
-    int size=GetAtomicSize();
-    return size>=0 ? size*GetCount() : size;
+    int size = GetAtomicSize();
+    return size >= 0 ? size * GetCount() : size;
 }
 
 //
@@ -238,85 +230,56 @@ int plSimpleVarDescriptor::GetSize() const
 //
 bool plSimpleVarDescriptor::SetType(const plString& type)
 {
-    if (!plVarDescriptor::SetType(type))
+    if (!plVarDescriptor::SetType(type)) {
         return false;
+    }
 
-    if (!type.CompareI("vector3"))
-    {
+    if (!type.CompareI("vector3")) {
         fAtomicCount = 3;
-        fAtomicType=kFloat;
-    }
-    else
-    if (!type.CompareI("point3"))
-    {
+        fAtomicType = kFloat;
+    } else if (!type.CompareI("point3")) {
         fAtomicCount = 3;
-        fAtomicType=kFloat;
-    }
-    else
-    if (!type.CompareI("rgb"))
-    {
+        fAtomicType = kFloat;
+    } else if (!type.CompareI("rgb")) {
         fAtomicCount = 3;
-        fAtomicType=kFloat;
-    }
-    else
-    if (!type.CompareI("rgba"))
-    {
+        fAtomicType = kFloat;
+    } else if (!type.CompareI("rgba")) {
         fAtomicCount = 4;
-        fAtomicType=kFloat;
-    }
-    else
-    if (!type.CompareI("rgb8"))
-    {
+        fAtomicType = kFloat;
+    } else if (!type.CompareI("rgb8")) {
         fAtomicCount = 3;
-        fAtomicType=kByte;
-    }
-    else
-    if (!type.CompareI("rgba8"))
-    {
+        fAtomicType = kByte;
+    } else if (!type.CompareI("rgba8")) {
         fAtomicCount = 4;
-        fAtomicType=kByte;
-    }
-    else
-    if (!type.CompareNI("quat", 4))
-    {
+        fAtomicType = kByte;
+    } else if (!type.CompareNI("quat", 4)) {
         fAtomicCount = 4;
-        fAtomicType=kFloat;
+        fAtomicType = kFloat;
+    } else if (!type.CompareI("int")) {
+        fAtomicType = kInt;
+    } else if (!type.CompareI("byte")) {
+        fAtomicType = kByte;
+    } else if (!type.CompareI("short")) {
+        fAtomicType = kShort;
+    } else if (!type.CompareI("float")) {
+        fAtomicType = kFloat;
+    } else if (!type.CompareI("double")) {
+        fAtomicType = kDouble;
+    } else if (!type.CompareI("time")) {
+        fAtomicType = kTime;
+    } else if (!type.CompareI("ageTimeOfDay")) {
+        fAtomicType = kAgeTimeOfDay;
+    } else if (!type.CompareI("bool")) {
+        fAtomicType = kBool;
+    } else if (!type.CompareI("string32")) {
+        fAtomicType = kString32;
+    } else if (!type.CompareI("plKey")) {
+        fAtomicType = kKey;
+    } else if (!type.CompareI("message") || !type.CompareI("creatable")) {
+        fAtomicType = kCreatable;
+    } else {
+        return false;    // err
     }
-    else
-    if (!type.CompareI("int"))
-        fAtomicType=kInt;
-    else
-    if (!type.CompareI("byte"))
-        fAtomicType=kByte;
-    else
-    if (!type.CompareI("short"))
-        fAtomicType=kShort;
-    else
-    if (!type.CompareI("float"))
-        fAtomicType=kFloat;
-    else
-    if (!type.CompareI("double"))
-        fAtomicType=kDouble;
-    else
-    if (!type.CompareI("time"))
-        fAtomicType=kTime;
-    else
-    if (!type.CompareI("ageTimeOfDay"))
-        fAtomicType=kAgeTimeOfDay;
-    else
-    if (!type.CompareI("bool"))
-        fAtomicType=kBool;
-    else
-    if (!type.CompareI("string32"))
-        fAtomicType=kString32;
-    else
-    if (!type.CompareI("plKey"))
-        fAtomicType=kKey;
-    else
-    if (!type.CompareI("message") || !type.CompareI("creatable"))
-        fAtomicType=kCreatable;
-    else
-        return false;   // err
 
     return true;    // ok
 }
@@ -325,20 +288,21 @@ void plSimpleVarDescriptor::CopyFrom(const plSimpleVarDescriptor* other)
 {
     plVarDescriptor::CopyFrom(other);
 
-    fAtomicCount=other->GetAtomicCount();
-    fAtomicType=other->GetAtomicType();
+    fAtomicCount = other->GetAtomicCount();
+    fAtomicType = other->GetAtomicType();
 }
 
 //
 // Var descriptors are read and written by state descriptors
 //
-bool plSimpleVarDescriptor::Read(hsStream* s)   
+bool plSimpleVarDescriptor::Read(hsStream* s)
 {
-    if (!plVarDescriptor::Read(s))
+    if (!plVarDescriptor::Read(s)) {
         return false;
+    }
 
-    fAtomicCount=s->ReadLE16();
-    fAtomicType=(Type)s->ReadByte();
+    fAtomicCount = s->ReadLE16();
+    fAtomicType = (Type)s->ReadByte();
     return true;
 }
 
@@ -349,7 +313,7 @@ void plSimpleVarDescriptor::Write(hsStream* s) const
 {
     plVarDescriptor::Write(s);
 
-    s->WriteLE16((int16_t)fAtomicCount);    
+    s->WriteLE16((int16_t)fAtomicCount);
     s->WriteByte((uint8_t)fAtomicType);
 }
 
@@ -367,15 +331,16 @@ void plSDVarDescriptor::CopyFrom(const plSDVarDescriptor* other)
 //
 // Var descriptors are read and written by state descriptors
 //
-bool plSDVarDescriptor::Read(hsStream* s)   
+bool plSDVarDescriptor::Read(hsStream* s)
 {
-    if (!plVarDescriptor::Read(s))
+    if (!plVarDescriptor::Read(s)) {
         return false;
+    }
 
-    plString sdName=s->ReadSafeString_TEMP();
+    plString sdName = s->ReadSafeString_TEMP();
     uint16_t version = s->ReadLE16();
-    plStateDescriptor* sd=plSDLMgr::GetInstance()->FindDescriptor(sdName, version);
-    hsAssert( sd, plString::Format("Failed to find sdl descriptor: %s,%d. Missing legacy descriptor?", sdName.c_str(), version ).c_str() );
+    plStateDescriptor* sd = plSDLMgr::GetInstance()->FindDescriptor(sdName, version);
+    hsAssert(sd, plString::Format("Failed to find sdl descriptor: %s,%d. Missing legacy descriptor?", sdName.c_str(), version).c_str());
     SetStateDesc(sd);
     return true;
 }
@@ -388,6 +353,6 @@ void plSDVarDescriptor::Write(hsStream* s) const
     plVarDescriptor::Write(s);
 
     s->WriteSafeString(GetStateDescriptor()->GetName());
-    uint16_t version=GetStateDescriptor()->GetVersion();
+    uint16_t version = GetStateDescriptor()->GetVersion();
     s->WriteLE(version);
 }

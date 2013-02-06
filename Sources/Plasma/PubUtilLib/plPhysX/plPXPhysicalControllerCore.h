@@ -53,17 +53,15 @@ class plPXPhysical;
 class plCollideMsg;
 
 #ifndef PLASMA_EXTERNAL_RELEASE
-class plDbgCollisionInfo
-{
+class plDbgCollisionInfo {
 public:
-    plSceneObject *fSO;
+    plSceneObject* fSO;
     hsVector3 fNormal;
     bool fOverlap;
 };
 #endif // PLASMA_EXTERNAL_RELEASE
 
-class plPXPhysicalControllerCore: public plPhysicalControllerCore
-{
+class plPXPhysicalControllerCore: public plPhysicalControllerCore {
 public:
     plPXPhysicalControllerCore(plKey ownerSO, float height, float radius, bool human);
     ~plPXPhysicalControllerCore();
@@ -89,14 +87,14 @@ public:
     virtual void GetPositionSim(hsPoint3& pos);
 
     // Move kinematic controller
-    virtual void Move(hsVector3 displacement, unsigned int collideWith, unsigned int &collisionResults);
+    virtual void Move(hsVector3 displacement, unsigned int collideWith, unsigned int& collisionResults);
 
     // Set linear velocity on dynamic controller
     virtual void SetLinearVelocitySim(const hsVector3& linearVel);
 
     // Sweep the controller path from startPos through endPos
     virtual int SweepControllerPath(const hsPoint3& startPos, const hsPoint3& endPos, bool vsDynamics,
-        bool vsStatics, uint32_t& vsSimGroups, std::vector<plControllerSweepRecord>& hits);
+                                    bool vsStatics, uint32_t& vsSimGroups, std::vector<plControllerSweepRecord>& hits);
 
     // any clean up for the controller should go here
     virtual void LeaveAge();
@@ -136,7 +134,9 @@ public:
 
     // Controller count
     static int NumControllers();
-    static void SetMaxNumberOfControllers(int max) { fPXControllersMax = max; }
+    static void SetMaxNumberOfControllers(int max) {
+        fPXControllersMax = max;
+    }
     static int fPXControllersMax;
 
 #ifndef PLASMA_EXTERNAL_RELEASE

@@ -68,52 +68,49 @@ static const int kClonePlayerID = 0;
 static plKeyData* lastData = nil;
 static const int kLocSeq = -1;
 
-class keyDataFriend : public plKeyData
-{
+class keyDataFriend : public plKeyData {
 public:
-    uint16_t RefCount() const { return fRefCount; }
+    uint16_t RefCount() const {
+        return fRefCount;
+    }
 };
 
 static int IsTracked(const plKeyData* keyData)
 {
-    if( mlfTrack && keyData )
-    {
-        if( !keyData->GetUoid().GetObjectName().CompareI(keyNameToLookFor)
-            && (keyData->GetUoid().GetClassType() == CLASS_TO_TRACK) )
-        {
-            if( (kCloneID < 0)
-                ||(kCloneID == keyData->GetUoid().GetCloneID()) )
-            {
-                if( (kLocSeq < 0)
-                    ||(kLocSeq == keyData->GetUoid().GetLocation().GetSequenceNumber()) )
-                {
+    if (mlfTrack && keyData) {
+        if (!keyData->GetUoid().GetObjectName().CompareI(keyNameToLookFor)
+                && (keyData->GetUoid().GetClassType() == CLASS_TO_TRACK)) {
+            if ((kCloneID < 0)
+                    || (kCloneID == keyData->GetUoid().GetCloneID())) {
+                if ((kLocSeq < 0)
+                        || (kLocSeq == keyData->GetUoid().GetLocation().GetSequenceNumber())) {
                     plConst(uint16_t) kMinRefCount(0);
                     const keyDataFriend* kdf = (keyDataFriend*)keyData;
-                    if( kdf->RefCount() > kMinRefCount )
-                    {
+
+                    if (kdf->RefCount() > kMinRefCount) {
                         return true;
                     }
                 }
             }
         }
     }
+
     return false;
 }
 
 static const char* CloneString(const plKeyData* keyData)
 {
     static char buff[256];
-    if( keyData )
-    {
-        sprintf(buff, "CID:%d, CPID:%d LOC:%d", 
-            keyData->GetUoid().GetCloneID(), 
-            keyData->GetUoid().GetClonePlayerID(), 
-            keyData->GetUoid().GetLocation().GetSequenceNumber());
-    }
-    else
-    {
+
+    if (keyData) {
+        sprintf(buff, "CID:%d, CPID:%d LOC:%d",
+                keyData->GetUoid().GetCloneID(),
+                keyData->GetUoid().GetClonePlayerID(),
+                keyData->GetUoid().GetLocation().GetSequenceNumber());
+    } else {
         sprintf(buff, "nil");
     }
+
     return buff;
 }
 #endif
@@ -122,13 +119,14 @@ static const char* CloneString(const plKeyData* keyData)
 plKey::plKey(const plKey& rhs) : fKeyData(rhs.fKeyData)
 {
 #if TRACK_REFS  // FOR DEBUGGING ONLY
-    if( IsTracked(fKeyData) )
-    {
+
+    if (IsTracked(fKeyData)) {
         char msg[ 512 ];
-        sprintf( msg, "C: Key %s %s is being constructed using the plKey(plKey&) constructor", keyNameToLookFor, CloneString(fKeyData) );
+        sprintf(msg, "C: Key %s %s is being constructed using the plKey(plKey&) constructor", keyNameToLookFor, CloneString(fKeyData));
         //hsAssert( false, msg );
         hsStatusMessageF(msg);
     }
+
 #endif
     IIncRef();
 }
@@ -136,13 +134,14 @@ plKey::plKey(const plKey& rhs) : fKeyData(rhs.fKeyData)
 plKey::plKey(plKeyData* data) : fKeyData(data)
 {
 #if TRACK_REFS  // FOR DEBUGGING ONLY
-    if( IsTracked(fKeyData) )
-    {
+
+    if (IsTracked(fKeyData)) {
         char msg[ 512 ];
-        sprintf( msg, "C: Key %s %s is being constructed using the plKey(plKeyData*) constructor", keyNameToLookFor, CloneString(fKeyData) );
+        sprintf(msg, "C: Key %s %s is being constructed using the plKey(plKeyData*) constructor", keyNameToLookFor, CloneString(fKeyData));
         //hsAssert( false, msg );
         hsStatusMessageF(msg);
     }
+
 #endif
     IIncRef();
 }
@@ -150,52 +149,57 @@ plKey::plKey(plKeyData* data) : fKeyData(data)
 plKey::~plKey()
 {
 #if TRACK_REFS  // FOR DEBUGGING ONLY
-    if( IsTracked(fKeyData) )
-    {
+
+    if (IsTracked(fKeyData)) {
         char msg[ 512 ];
-        sprintf( msg, "D: Key %s %s is being destructed", keyNameToLookFor, CloneString(fKeyData) );
+        sprintf(msg, "D: Key %s %s is being destructed", keyNameToLookFor, CloneString(fKeyData));
         //hsAssert( false, msg );
         hsStatusMessageF(msg);
     }
+
 #endif
     IDecRef();
 }
 
-plKey &plKey::operator=( const plKey &rhs )
+plKey& plKey::operator=(const plKey& rhs)
 {
 #if TRACK_REFS  // FOR DEBUGGING ONLY
-    if( fKeyData != rhs.fKeyData )
-    {
-        if( IsTracked(rhs.fKeyData) )
-        {
+
+    if (fKeyData != rhs.fKeyData) {
+        if (IsTracked(rhs.fKeyData)) {
             char msg[ 512 ];
+
             if (fKeyData == nil)
-                sprintf( msg, "=: Key %s %s is being assigned to a nil key",
-                         keyNameToLookFor, CloneString(rhs.fKeyData) );
+                sprintf(msg, "=: Key %s %s is being assigned to a nil key",
+                        keyNameToLookFor, CloneString(rhs.fKeyData));
             else
-                sprintf( msg, "=: Key %s %s is being assigned to %s",
-                         keyNameToLookFor, CloneString(rhs.fKeyData),
-                         fKeyData->GetUoid().GetObjectName().c_str() );
+                sprintf(msg, "=: Key %s %s is being assigned to %s",
+                        keyNameToLookFor, CloneString(rhs.fKeyData),
+                        fKeyData->GetUoid().GetObjectName().c_str());
+
             //hsAssert( false, msg );
             hsStatusMessageF(msg);
         }
-        if( IsTracked(fKeyData) )
-        {
+
+        if (IsTracked(fKeyData)) {
             char msg[ 512 ];
+
             if (fKeyData == nil)
-                sprintf( msg, "=: Nil key is being assigned to %s %s",
-                         keyNameToLookFor, CloneString(fKeyData) );
+                sprintf(msg, "=: Nil key is being assigned to %s %s",
+                        keyNameToLookFor, CloneString(fKeyData));
             else
-                sprintf( msg, "=: Key %s %s is being assigned to %s",
-                         fKeyData->GetUoid().GetObjectName().c_str(),
-                         CloneString(fKeyData), keyNameToLookFor );
+                sprintf(msg, "=: Key %s %s is being assigned to %s",
+                        fKeyData->GetUoid().GetObjectName().c_str(),
+                        CloneString(fKeyData), keyNameToLookFor);
+
             //hsAssert( false, msg );
             hsStatusMessageF(msg);
         }
     }
+
 #endif
-    if( fKeyData != rhs.fKeyData )
-    {
+
+    if (fKeyData != rhs.fKeyData) {
         IDecRef();
         fKeyData = rhs.fKeyData;
         IIncRef();
@@ -204,82 +208,100 @@ plKey &plKey::operator=( const plKey &rhs )
     return *this;
 }
 
-bool plKey::operator==( const plKey &rhs ) const
+bool plKey::operator==(const plKey& rhs) const
 {
     return fKeyData == rhs.fKeyData;
 }
 
-bool plKey::operator==( const plKeyData *rhs ) const
+bool plKey::operator==(const plKeyData* rhs) const
 {
     return fKeyData == rhs;
 }
 
-plKeyData   *plKey::operator->() const
+plKeyData*   plKey::operator->() const
 {
     return fKeyData;
 }
 
-plKeyData   &plKey::operator*() const
+plKeyData&   plKey::operator*() const
 {
     return *fKeyData;
 }
 
 void plKey::IIncRef()
 {
-    if (!fKeyData)
+    if (!fKeyData) {
         return;
+    }
 
     hsAssert(fKeyData->fRefCount < 0xffff, "Too many refs to plKeyImp");
     fKeyData->fRefCount++;
 
 #if TRACK_REFS  // FOR DEBUGGING ONLY
-    if( IsTracked(fKeyData) )
-    {
+
+    if (IsTracked(fKeyData)) {
         char msg[ 512 ];
         plConst(int) kMaxCnt(30);
-        if( fKeyData->fRefCount > kMaxCnt )
+
+        if (fKeyData->fRefCount > kMaxCnt) {
             *msg = 0;
-        if( lastData && (fKeyData != lastData) )
+        }
+
+        if (lastData && (fKeyData != lastData)) {
             *msg = 0;
+        }
+
         lastData = fKeyData;
-        sprintf( msg, "+: Key %s %s is being reffed! Refcount: %d", keyNameToLookFor, CloneString(fKeyData), fKeyData->fRefCount );
+        sprintf(msg, "+: Key %s %s is being reffed! Refcount: %d", keyNameToLookFor, CloneString(fKeyData), fKeyData->fRefCount);
         //hsAssert( false, msg );
         hsStatusMessageF(msg);
     }
+
 #endif
 
-    if (fKeyData->fRefCount == 1)
+    if (fKeyData->fRefCount == 1) {
         hsgResMgr::ResMgr()->IKeyReffed((plKeyImp*)fKeyData);
+    }
 }
 
 void plKey::IDecRef()
 {
-    if (!fKeyData)
+    if (!fKeyData) {
         return;
+    }
 
     hsAssert(fKeyData->fRefCount, "Dec'ing ref on unreffed key");
     fKeyData->fRefCount--;
 
 #if TRACK_REFS  // FOR DEBUGGING ONLY
-    if( IsTracked(fKeyData) )
-    {
+
+    if (IsTracked(fKeyData)) {
         char msg[ 512 ];
         plConst(int) kMinCnt(2);
-        if( fKeyData->fRefCount < kMinCnt )
+
+        if (fKeyData->fRefCount < kMinCnt) {
             *msg = 0;
-        if( lastData && (fKeyData != lastData) )
+        }
+
+        if (lastData && (fKeyData != lastData)) {
             *msg = 0;
+        }
+
         lastData = fKeyData;
-        sprintf( msg, "-: Key %s %s is being de-reffed! Refcount: %d", keyNameToLookFor, CloneString(fKeyData), fKeyData->fRefCount );
+        sprintf(msg, "-: Key %s %s is being de-reffed! Refcount: %d", keyNameToLookFor, CloneString(fKeyData), fKeyData->fRefCount);
         //hsAssert( false, msg );
         hsStatusMessageF(msg);
-        if( fKeyData->fRefCount == 0 )
+
+        if (fKeyData->fRefCount == 0) {
             *msg = 0;
+        }
     }
+
 #endif
 
-    if (fKeyData->fRefCount == 0)
+    if (fKeyData->fRefCount == 0) {
         hsgResMgr::ResMgr()->IKeyUnreffed((plKeyImp*)fKeyData);
+    }
 }
 
 //// plKeyData ///////////////////////////////////////////////////////////////

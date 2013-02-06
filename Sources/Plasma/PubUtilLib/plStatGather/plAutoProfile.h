@@ -44,8 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnKeyedObject/hsKeyedObject.h"
 
-class plAutoProfile : public hsKeyedObject
-{
+class plAutoProfile : public hsKeyedObject {
 public:
     CLASSNAME_REGISTER(plAutoProfile);
     GETINTERFACE_ANY(plAutoProfile, hsKeyedObject);
@@ -53,10 +52,10 @@ public:
     static plAutoProfile* Instance();
 
     // If ageName is nil, do all ages
-    virtual void StartProfile(const char* ageName = nil)=0;
+    virtual void StartProfile(const char* ageName = nil) = 0;
 
     // For when we just want to link to each age, for other reasons (profiling load times)
-    virtual void LinkToAllAges()=0;
+    virtual void LinkToAllAges() = 0;
 };
 
 #endif // plAutoProfile_h_inc

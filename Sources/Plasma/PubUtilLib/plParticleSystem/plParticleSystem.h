@@ -63,19 +63,18 @@ class plDrawableSpans;
 class plDrawInterface;
 class Mtl;
 
-// This is responsible for creating and maintaining (allocation and update cycle) a related set of particles. 
+// This is responsible for creating and maintaining (allocation and update cycle) a related set of particles.
 // Automatic particle generation is handled by the plParticleEmitters (one for each spawning location).
 
-class plParticleSystem : public plModifier
-{
+class plParticleSystem : public plModifier {
     friend class plParticleEmitter;
     friend class plSimpleParticleGenerator;
 
 protected:
     static const float GRAVITY_ACCEL_FEET_PER_SEC2;
-    plSceneObject *fTarget;
+    plSceneObject* fTarget;
 
-    hsGMaterial *fTexture;          // One texture per system (Tiling is your friend!)  
+    hsGMaterial* fTexture;          // One texture per system (Tiling is your friend!)
     uint32_t fXTiles, fYTiles;        // Width/height of the texture (in tiles) for determining a particle's UVs
 
     double fCurrTime;
@@ -92,107 +91,132 @@ protected:
     uint32_t fMaxEmitters;
     uint32_t fNextEmitterToGo;
 
-    plParticleEmitter **fEmitters;  // Various locations we're emitting particles from (the first one is
-                                    // reserved for particles added explicitly (to keep all the bookkeeping
-                                    // in the hands of plParticleEmitter).
-    
-    hsTArray<plParticleEffect *> fForces;       // Global forces (wind/gravity/etc) that affect accelleration.
-    hsTArray<plParticleEffect *> fEffects;      // Any other non-constraint effects.
-    hsTArray<plParticleEffect *> fConstraints;  // Rigid body, collision, connectivity, etc.
+    plParticleEmitter** fEmitters;  // Various locations we're emitting particles from (the first one is
+    // reserved for particles added explicitly (to keep all the bookkeeping
+    // in the hands of plParticleEmitter).
+
+    hsTArray<plParticleEffect*> fForces;        // Global forces (wind/gravity/etc) that affect accelleration.
+    hsTArray<plParticleEffect*> fEffects;       // Any other non-constraint effects.
+    hsTArray<plParticleEffect*> fConstraints;   // Rigid body, collision, connectivity, etc.
     plParticleContext   fContext; // Rendering context passed to forces/effects/constraints.
 
     hsTArray<plKey>     fPermaLights; // Runtime lights assigned to this system. Currently don't support projected lights on particles.
 
     // Material related animations, mapped over the course of a particle's life
-    plController *fAmbientCtl;
-    plController *fDiffuseCtl;
-    plController *fOpacityCtl;  
-    plController *fWidthCtl;
-    plController *fHeightCtl;
+    plController* fAmbientCtl;
+    plController* fDiffuseCtl;
+    plController* fOpacityCtl;
+    plController* fWidthCtl;
+    plController* fHeightCtl;
 
-    plParticleSDLMod *fParticleSDLMod;
+    plParticleSDLMod* fParticleSDLMod;
 
     bool IShouldUpdate(plPipeline* pipe) const;
     virtual bool IEval(double secs, float del, uint32_t dirty); // required by plModifier
     void IHandleRenderMsg(plPipeline* pipe);
     plDrawInterface* ICheckDrawInterface();
-    void IAddEffect(plParticleEffect *effect, uint32_t type);
-    void IReadEffectsArray(hsTArray<plParticleEffect *> &effects, uint32_t type, hsStream *s, hsResMgr *mgr);
+    void IAddEffect(plParticleEffect* effect, uint32_t type);
+    void IReadEffectsArray(hsTArray<plParticleEffect*>& effects, uint32_t type, hsStream* s, hsResMgr* mgr);
     void IPreSim();
 
 public:
     plParticleSystem();
     virtual ~plParticleSystem();
-    void Init(uint32_t xTiles, uint32_t yTiles, uint32_t maxTotalParticles, uint32_t numEmitters, 
-              plController *ambientCtl, plController *diffuseCtl, plController *opacityCtl, 
-              plController *widthCtl, plController *heightCtl);
+    void Init(uint32_t xTiles, uint32_t yTiles, uint32_t maxTotalParticles, uint32_t numEmitters,
+              plController* ambientCtl, plController* diffuseCtl, plController* opacityCtl,
+              plController* widthCtl, plController* heightCtl);
 
-    enum effectType
-    {
+    enum effectType {
         kEffectForce = 0x1,
         kEffectMisc = 0x2,
         kEffectConstraint = 0x4,
     };
-    
-    enum miscFlags
-    {
+
+    enum miscFlags {
         kParticleSystemAlwaysUpdate = 0x1
     };
     uint8_t fMiscFlags; // Not read/written (could be, but it's not needed yet.)
-    
+
     // There might not be enough particles available. this function returns the number of maxParticles that
     // the emitter actually received.
-    uint32_t AddEmitter(uint32_t maxParticles, plParticleGenerator *gen, uint32_t emitterFlags);
+    uint32_t AddEmitter(uint32_t maxParticles, plParticleGenerator* gen, uint32_t emitterFlags);
 
     plParticleEmitter* GetAvailEmitter();
-    
-    CLASSNAME_REGISTER( plParticleSystem );
-    GETINTERFACE_ANY( plParticleSystem, plModifier);
-    
+
+    CLASSNAME_REGISTER(plParticleSystem);
+    GETINTERFACE_ANY(plParticleSystem, plModifier);
+
     // These are just public wrappers to the equivalent plParticleEmitter functions, provided for the purpose
     // of adding particles to a system explicitly.
-    void AddParticle(hsPoint3 &pos, hsVector3 &velocity, uint32_t tileIndex, 
-        float hSize, float vSize, float scale, float invMass, float life, 
-        hsPoint3 &orientation, uint32_t miscFlags, float radsPerSec=0.f);
+    void AddParticle(hsPoint3& pos, hsVector3& velocity, uint32_t tileIndex,
+                     float hSize, float vSize, float scale, float invMass, float life,
+                     hsPoint3& orientation, uint32_t miscFlags, float radsPerSec = 0.f);
     void GenerateParticles(uint32_t num, float dt = 0.f);
     void WipeExistingParticles(); // Instant nuke
     void KillParticles(float num, float timeToDie, uint8_t flags); // Sets a death timer. They'll get removed on the next update (if time has run out)
-    uint16_t StealParticlesFrom(plParticleSystem *victim, uint16_t num); // Returns the number of particles actually stolen     
-    void TranslateAllParticles(hsPoint3 &amount); // Used to recenter the system when linking between ages. 
-    
+    uint16_t StealParticlesFrom(plParticleSystem* victim, uint16_t num); // Returns the number of particles actually stolen
+    void TranslateAllParticles(hsPoint3& amount); // Used to recenter the system when linking between ages.
+
     void DisableGenerators();
-    uint32_t GetNumTiles() const { return fXTiles * fYTiles; }
-    void SetTileIndex(plParticle &particle, uint32_t index); // Sets the UV coordinates appropriate for the current texture
+    uint32_t GetNumTiles() const {
+        return fXTiles * fYTiles;
+    }
+    void SetTileIndex(plParticle& particle, uint32_t index); // Sets the UV coordinates appropriate for the current texture
     uint32_t GetNumValidParticles(bool immortalOnly = false) const; // Takes a bit longer if we want a count of immortal particles...
-    uint32_t GetMaxTotalParticles() const { return fMaxTotalParticles; }
-    
-    const hsMatrix44 &GetLocalToWorld() const;
-    void SetAccel(const hsVector3& a) { fAccel = GRAVITY_ACCEL_FEET_PER_SEC2 * a; }
-    void SetGravity(float pct) { fAccel.Set(0, 0, -GRAVITY_ACCEL_FEET_PER_SEC2 * pct); }
-    void SetDrag(float d) { fDrag = -d; }
-    void SetWindMult(float m) { fWindMult = m; }
-    void SetPreSim(float time) { fPreSim = time; }
+    uint32_t GetMaxTotalParticles() const {
+        return fMaxTotalParticles;
+    }
+
+    const hsMatrix44& GetLocalToWorld() const;
+    void SetAccel(const hsVector3& a) {
+        fAccel = GRAVITY_ACCEL_FEET_PER_SEC2 * a;
+    }
+    void SetGravity(float pct) {
+        fAccel.Set(0, 0, -GRAVITY_ACCEL_FEET_PER_SEC2 * pct);
+    }
+    void SetDrag(float d) {
+        fDrag = -d;
+    }
+    void SetWindMult(float m) {
+        fWindMult = m;
+    }
+    void SetPreSim(float time) {
+        fPreSim = time;
+    }
     void UpdateGenerator(uint32_t paramID, float value);
-    plParticleGenerator *GetExportedGenerator() const;
-    
-    const hsVector3& GetAccel() const { return fAccel; }
-    float GetDrag() const { return fDrag; }
-    float GetWindMult() const { return fWindMult; }
-    plParticleEffect *GetEffect(uint16_t type) const;
-    
-    plParticleSDLMod* GetSDLMod() {return fParticleSDLMod;}
+    plParticleGenerator* GetExportedGenerator() const;
+
+    const hsVector3& GetAccel() const {
+        return fAccel;
+    }
+    float GetDrag() const {
+        return fDrag;
+    }
+    float GetWindMult() const {
+        return fWindMult;
+    }
+    plParticleEffect* GetEffect(uint16_t type) const;
+
+    plParticleSDLMod* GetSDLMod() {
+        return fParticleSDLMod;
+    }
     // Functions related to/required by plModifier
-    virtual int GetNumTargets() const { return fTarget ? 1 : 0; }
-    virtual plSceneObject* GetTarget(int w) const { hsAssert(w < 1, "Bad target"); return fTarget; }
+    virtual int GetNumTargets() const {
+        return fTarget ? 1 : 0;
+    }
+    virtual plSceneObject* GetTarget(int w) const {
+        hsAssert(w < 1, "Bad target");
+        return fTarget;
+    }
     virtual void AddTarget(plSceneObject* so);
     virtual void RemoveTarget(plSceneObject* so);
-    
-    virtual void Read(hsStream* s, hsResMgr* mgr); 
+
+    virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);
     virtual bool MsgReceive(plMessage* msg);
-    
+
     void SetAttachedToAvatar(bool attached);
-    
+
     // Export only functions for building the system. Not supported at runtime.
     // AddLight allows the particle system to remain in ignorant bliss about runtime lights
     void AddLight(plKey liKey);

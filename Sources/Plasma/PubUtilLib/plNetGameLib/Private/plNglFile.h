@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plNetGameLib/Private/plNglFile.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_PUBUTILLIB_PLNETGAMELIB_PRIVATE_PLNGLFILE_H
@@ -61,12 +61,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //============================================================================
 // Connect
 //============================================================================
-void NetCliFileStartConnect (
+void NetCliFileStartConnect(
     const char*     fileAddrList[],
     unsigned        fileAddrCount,
     bool            isPatcher = false
 );
-void NetCliFileStartConnectAsServer (
+void NetCliFileStartConnectAsServer(
     const char*     fileAddrList[],
     unsigned        fileAddrCount,
     unsigned        serverType,
@@ -76,22 +76,22 @@ void NetCliFileStartConnectAsServer (
 //============================================================================
 // Disconnect
 //============================================================================
-void NetCliFileDisconnect ();
+void NetCliFileDisconnect();
 
 //============================================================================
 // File server related messages
 //============================================================================
 typedef void (*FNetCliFileBuildIdRequestCallback)(
     ENetError       result,
-    void *          param,
+    void*           param,
     unsigned        buildId
 );
-void NetCliFileBuildIdRequest (
+void NetCliFileBuildIdRequest(
     FNetCliFileBuildIdRequestCallback   callback,
-    void *                              param
+    void*                               param
 );
 typedef void (*FNetCliFileBuildIdUpdateCallback)(unsigned buildId);
-void NetCliFileRegisterBuildIdUpdate (FNetCliFileBuildIdUpdateCallback callback);
+void NetCliFileRegisterBuildIdUpdate(FNetCliFileBuildIdUpdateCallback callback);
 
 //============================================================================
 // Manifest
@@ -107,14 +107,14 @@ struct NetCliFileManifestEntry {
 };
 typedef void (*FNetCliFileManifestRequestCallback)(
     ENetError                       result,
-    void *                          param,
+    void*                           param,
     const wchar_t                   group[],
     const NetCliFileManifestEntry   manifest[],
     unsigned                        entryCount
 );
-void NetCliFileManifestRequest (
+void NetCliFileManifestRequest(
     FNetCliFileManifestRequestCallback  callback,
-    void *                              param,
+    void*                               param,
     const wchar_t                       group[], // the group of files you want (empty or nil = all)
     unsigned                            buildId = 0 // 0 = get latest, other = get particular build (servers only)
 );
@@ -124,14 +124,14 @@ void NetCliFileManifestRequest (
 //============================================================================
 typedef void (*FNetCliFileDownloadRequestCallback)(
     ENetError           result,
-    void *              param,
-    const plFileName &  filename,
-    hsStream *          writer
+    void*               param,
+    const plFileName&   filename,
+    hsStream*           writer
 );
-void NetCliFileDownloadRequest (
-    const plFileName &                  filename,
-    hsStream *                          writer,
+void NetCliFileDownloadRequest(
+    const plFileName&                   filename,
+    hsStream*                           writer,
     FNetCliFileDownloadRequestCallback  callback,
-    void *                              param,
+    void*                               param,
     unsigned                            buildId = 0 // 0 = get latest, other = get particular build (servers only)
 );

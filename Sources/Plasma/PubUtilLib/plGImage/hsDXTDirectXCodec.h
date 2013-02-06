@@ -64,49 +64,51 @@ struct IDirectDrawSurface7;
 struct IDirectDraw7;
 #endif
 
-class hsDXTDirectXCodec : public hsCodec
-{
+class hsDXTDirectXCodec : public hsCodec {
 private:
     hsDXTDirectXCodec();
 public:
     ~hsDXTDirectXCodec();
     static hsDXTDirectXCodec& Instance();
 
-    static void Init()  { fRegistered = Register(); }
+    static void Init()  {
+        fRegistered = Register();
+    }
 
-    plMipmap    *CreateCompressedMipmap(plMipmap *uncompressed);
-    plMipmap    *CreateUncompressedMipmap(plMipmap *compressed, uint8_t bitDepth = 0);
+    plMipmap*    CreateCompressedMipmap(plMipmap* uncompressed);
+    plMipmap*    CreateUncompressedMipmap(plMipmap* compressed, uint8_t bitDepth = 0);
 
     // Colorize a compressed mipmap
-    bool    ColorizeCompMipmap( plMipmap *bMap, const uint8_t *colorMask );
+    bool    ColorizeCompMipmap(plMipmap* bMap, const uint8_t* colorMask);
 
 #if HS_BUILD_FOR_WIN32
-    void        Initialize( IDirect3DDevice8 *directDraw );
+    void        Initialize(IDirect3DDevice8* directDraw);
 #endif
-    bool        Initialized()           { return (fFlags & kInitialized) != 0; }
+    bool        Initialized()           {
+        return (fFlags & kInitialized) != 0;
+    }
 
 #if HS_BUILD_FOR_WIN32
 private:
-    uint32_t ICompressedFormat(const plMipmap *uncompressed);
-    IDirectDrawSurface7     *IMakeDirect3DSurface( uint32_t formatType, uint32_t mipMapLevels, uint32_t width, uint32_t height );
-    void                    IFillSurface( hsRGBAColor32* src, uint32_t mmlvs, IDirectDrawSurface7 *pddsDest );
-    void                    IFillFromSurface( hsRGBAColor32* dest, uint32_t mmlvs, IDirectDrawSurface7 *pddsSrc );
-    void                    ICopySurface( IDirectDrawSurface7 *dest, IDirectDrawSurface7 *src, int32_t mipMapLevels );
+    uint32_t ICompressedFormat(const plMipmap* uncompressed);
+    IDirectDrawSurface7*     IMakeDirect3DSurface(uint32_t formatType, uint32_t mipMapLevels, uint32_t width, uint32_t height);
+    void                    IFillSurface(hsRGBAColor32* src, uint32_t mmlvs, IDirectDrawSurface7* pddsDest);
+    void                    IFillFromSurface(hsRGBAColor32* dest, uint32_t mmlvs, IDirectDrawSurface7* pddsSrc);
+    void                    ICopySurface(IDirectDrawSurface7* dest, IDirectDrawSurface7* src, int32_t mipMapLevels);
     void                    CheckErrorCode(HRESULT res);
     bool                    IInitialize();
 #endif
 
 #if HS_BUILD_FOR_WIN32
-    IDirectDraw7    *fDirectDraw;
+    IDirectDraw7*    fDirectDraw;
     HINSTANCE       fDDLibraryInstance;
 #else
     void*           fDirectDraw;
     void*           fDDLibraryInstance;
 #endif
     uint32_t          fFlags;
-    
-    enum
-    {
+
+    enum {
         kInitialized            = 0x1,
         kExternalInit           = 0x2
     };

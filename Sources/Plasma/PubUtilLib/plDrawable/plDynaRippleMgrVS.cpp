@@ -91,7 +91,7 @@ int plDynaRippleVSMgr::INewDecal()
 
 
 plDynaRippleVSMgr::plDynaRippleVSMgr()
-:   fWaveSetBase(nil)
+    :   fWaveSetBase(nil)
 {
 }
 
@@ -116,35 +116,42 @@ void plDynaRippleVSMgr::Write(hsStream* stream, hsResMgr* mgr)
 bool plDynaRippleVSMgr::MsgReceive(plMessage* msg)
 {
     bool retVal = plDynaRippleMgr::MsgReceive(msg);
-    if( retVal )
+
+    if (retVal) {
         return true;
+    }
 
     plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
-    if( refMsg )
-    {
-        switch( refMsg->fType )
-        {
+
+    if (refMsg) {
+        switch (refMsg->fType) {
         case kRefWaveSetBase:
-            if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fWaveSetBase = plWaveSetBase::ConvertNoRef(refMsg->GetRef());
-            else
+            } else {
                 fWaveSetBase = nil;
+            }
+
             return true;
         }
     }
+
     return false;
 }
 
 bool plDynaRippleVSMgr::ICheckRTMat()
 {
-    if( !fMatRTShade )
+    if (!fMatRTShade) {
         return false;
+    }
 
-    if( !fWaveSetBase )
+    if (!fWaveSetBase) {
         return false;
+    }
 
-    if( fMatRTShade->GetLayer(0)->GetVertexShader() )
+    if (fMatRTShade->GetLayer(0)->GetVertexShader()) {
         return true;
+    }
 
     plRipVSConsts ripConsts;
 
@@ -164,11 +171,13 @@ bool plDynaRippleVSMgr::ICheckRTMat()
 
 bool plDynaRippleVSMgr::IRippleFromShape(const plPrintShape* shape, bool force)
 {
-    if( !ICheckRTMat() )
+    if (!ICheckRTMat()) {
         return false;
+    }
 
-    if( !shape )
+    if (!shape) {
         return false;
+    }
 
     bool retVal = false;
 
@@ -183,37 +192,36 @@ bool plDynaRippleVSMgr::IRippleFromShape(const plPrintShape* shape, bool force)
     bool longEnough = (dt >= kMinTime);
     hsPoint3 xlate = shapeL2W.GetTranslate();
     bool farEnough = (hsVector3(&info.fLastPos, &xlate).Magnitude() > kMinDist);
-    if( force || longEnough || farEnough )
-    {
+
+    if (force || longEnough || farEnough) {
         hsPoint3 pos = shapeL2W.GetTranslate();
 
         // We'll perturb the position a little so it doesn't look quite so regular,
         // but we perturb it more if we're just standing still
         hsVector3 randPert(sRand.RandMinusOneToOne(), sRand.RandMinusOneToOne(), 0);
         randPert.Normalize();
-        if( !farEnough )
-        {
+
+        if (!farEnough) {
             plConst(float) kRandPert = 0.5f;
             randPert *= kRandPert;
-        }
-        else
-        {
+        } else {
             plConst(float) kRandPert = 0.15f;
             randPert *= kRandPert;
         }
+
         pos += randPert;
 
         // Are we potentially touching the water?
         float waterHeight = fWaveSetBase->GetHeight();
-        if( (pos.fZ - fScale.fZ * shape->GetHeight() < waterHeight)
-            &&(pos.fZ + fScale.fZ * shape->GetHeight() > waterHeight) )
-        {
+
+        if ((pos.fZ - fScale.fZ * shape->GetHeight() < waterHeight)
+                && (pos.fZ + fScale.fZ * shape->GetHeight() > waterHeight)) {
 
             hsVector3 dir(fWaveSetBase->GetWindDir());
             hsVector3 up(0.f, 0.f, 1.f);
 
             float wid = hsMaximum(shape->GetWidth(), shape->GetLength());
-            
+
             plConst(float) kMaxWaterDepth(1000.f);
 
             hsVector3 size(wid * fScale.fX, wid * fScale.fY, kMaxWaterDepth);
@@ -222,18 +230,17 @@ bool plDynaRippleVSMgr::IRippleFromShape(const plPrintShape* shape, bool force)
 
 
             bool hit = ICutoutTargets(t);
-            if( hit )
-            {
+
+            if (hit) {
                 info.fLastTime = t;
                 info.fLastPos = shapeL2W.GetTranslate();
                 retVal = true;
-            }
-            else
-            {
+            } else {
                 retVal = false; // No-effect else just for break points.
             }
         }
     }
+
     return retVal;
 }
 

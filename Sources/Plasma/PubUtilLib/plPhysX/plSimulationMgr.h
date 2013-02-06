@@ -55,8 +55,7 @@ class NxScene;
 class plCollideMsg;
 struct hsPoint3;
 
-class plSimulationMgr : public hsKeyedObject
-{
+class plSimulationMgr : public hsKeyedObject {
 public:
     CLASSNAME_REGISTER(plSimulationMgr);
     GETINTERFACE_ANY(plSimulationMgr, hsKeyedObject);
@@ -78,9 +77,15 @@ public:
     bool MsgReceive(plMessage* msg);
 
     // The simulation won't run at all if it is suspended
-    void Suspend() { fSuspended = true; }
-    void Resume() { fSuspended = false; }
-    bool IsSuspended() { return fSuspended; }
+    void Suspend() {
+        fSuspended = true;
+    }
+    void Resume() {
+        fSuspended = false;
+    }
+    bool IsSuspended() {
+        return fSuspended;
+    }
 
     // Output the given debug text to the simulation log.
     static void Log(const char* formatStr, ...);
@@ -89,9 +94,11 @@ public:
 
     // We've detected a collision, which may be grounds for synchronizing the involved
     // physicals over the network.
-    void ConsiderSynch(plPXPhysical *physical, plPXPhysical *other);
+    void ConsiderSynch(plPXPhysical* physical, plPXPhysical* other);
 
-    NxPhysicsSDK* GetSDK() const { return fSDK; }
+    NxPhysicsSDK* GetSDK() const {
+        return fSDK;
+    }
     NxScene* GetScene(plKey world);
     // Called when an actor is removed from a scene, checks if it's time to delete
     // the scene
@@ -99,7 +106,9 @@ public:
 
     int GetMaterialIdx(NxScene* scene, float friction, float restitution);
 
-    uint32_t GetStepCount() const { return fStepCount; }
+    uint32_t GetStepCount() const {
+        return fStepCount;
+    }
 
     //Fix to Move collision messages and their handling out of the simulation step
     void AddCollisionMsg(plKey hitee, plKey hitter, bool entering);
@@ -146,8 +155,7 @@ protected:
     // A utility class to keep track of a request for a physical synchronization.
     // These requests must pass a certain criteria (see the code for the latest)
     // before they are actually either sent over the network or rejected.
-    class SynchRequest
-    {
+    class SynchRequest {
     public:
         double fTime;   // when to synch
         plKey fKey;     // key of the object to be synched, so we can make sure it still lives
@@ -161,7 +169,7 @@ protected:
     typedef std::map<plPXPhysical*, SynchRequest> PhysSynchMap;
     PhysSynchMap fPendingSynchs;
 
-    plStatusLog *fLog;
+    plStatusLog* fLog;
 #ifndef PLASMA_EXTERNAL_RELEASE
     void IDrawActiveActorList();
 #endif //PLASMA_EXTERNAL_RELEASE
@@ -172,7 +180,7 @@ protected:
 #ifdef SIM_VERBOSE
 #include <cstdarg>     // only include when we need to call plSimulationMgr::Log
 
-inline void SimLog(const char *str, ...)
+inline void SimLog(const char* str, ...)
 {
     va_list args;
     va_start(args, str);
@@ -182,7 +190,7 @@ inline void SimLog(const char *str, ...)
 
 #else
 
-inline void SimLog(const char *str, ...)
+inline void SimLog(const char* str, ...)
 {
     // will get stripped out
 }

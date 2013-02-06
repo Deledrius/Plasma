@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCoreExe/pnAceIo.cpp
-*   
+*
 ***/
 
 #include "Pch.h"
@@ -73,8 +73,8 @@ struct ISocketConnHash {
     plUUID      productId;
     unsigned    flags;
 
-    unsigned GetHash () const;
-    bool operator== (const ISocketConnHash & rhs) const;
+    unsigned GetHash() const;
+    bool operator== (const ISocketConnHash& rhs) const;
 };
 
 struct ISocketConnType : ISocketConnHash {
@@ -92,61 +92,76 @@ static HASHTABLEDECL(
 
 
 //===========================================================================
-unsigned ISocketConnHash::GetHash () const {
+unsigned ISocketConnHash::GetHash() const
+{
     CHashValue hash;
     hash.Hash32(connType);
-/*
-    if (buildId)
-        hash.Hash32(buildId);
-    if (buildType)
-        hash.Hash32(buildType);
-    if (branchId)
-        hash.Hash32(branchId);
-    if (productId != kNilUuid)
-        hash.Hash(&productId, sizeof(productId));
-*/
+    /*
+        if (buildId)
+            hash.Hash32(buildId);
+        if (buildType)
+            hash.Hash32(buildType);
+        if (branchId)
+            hash.Hash32(branchId);
+        if (productId != kNilUuid)
+            hash.Hash(&productId, sizeof(productId));
+    */
     return hash.GetHash();
 }
 
 //===========================================================================
-bool ISocketConnHash::operator== (const ISocketConnHash & rhs) const {
+bool ISocketConnHash::operator== (const ISocketConnHash& rhs) const
+{
     ASSERT(flags & kConnHashFlagsIgnore);
 
     for (;;) {
         // Check connType
-        if (connType != rhs.connType)
+        if (connType != rhs.connType) {
             break;
+        }
 
         // Check buildId
         if (buildId != rhs.buildId) {
-            if (rhs.flags & kConnHashFlagsExactMatch)
+            if (rhs.flags & kConnHashFlagsExactMatch) {
                 break;
-            if (buildId)
+            }
+
+            if (buildId) {
                 break;
+            }
         }
 
         // Check buildType
         if (buildType != rhs.buildType) {
-            if (rhs.flags & kConnHashFlagsExactMatch)
+            if (rhs.flags & kConnHashFlagsExactMatch) {
                 break;
-            if (buildType)
+            }
+
+            if (buildType) {
                 break;
+            }
         }
 
         // Check branchId
         if (branchId != rhs.branchId) {
-            if (rhs.flags & kConnHashFlagsExactMatch)
+            if (rhs.flags & kConnHashFlagsExactMatch) {
                 break;
-            if (branchId)
+            }
+
+            if (branchId) {
                 break;
+            }
         }
 
         // Check productId
         if (productId != rhs.productId) {
-            if (rhs.flags & kConnHashFlagsExactMatch)
+            if (rhs.flags & kConnHashFlagsExactMatch) {
                 break;
-            if (productId != kNilUuid)
+            }
+
+            if (productId != kNilUuid) {
                 break;
+            }
         }
 
         // Success!
@@ -158,13 +173,15 @@ bool ISocketConnHash::operator== (const ISocketConnHash & rhs) const {
 }
 
 //===========================================================================
-static unsigned GetConnHash (
-    ISocketConnHash *   hash,
+static unsigned GetConnHash(
+    ISocketConnHash*    hash,
     const uint8_t          buffer[],
     unsigned            bytes
-) {
-    if (!bytes)
+)
+{
+    if (!bytes) {
         return 0;
+    }
 
     if (IS_TEXT_CONNTYPE(buffer[0])) {
         hash->connType  = buffer[0];
@@ -176,15 +193,17 @@ static unsigned GetConnHash (
 
         // one uint8_t consumed
         return 1;
-    }
-    else {
-        if (bytes < sizeof(AsyncSocketConnectPacket))
+    } else {
+        if (bytes < sizeof(AsyncSocketConnectPacket)) {
             return 0;
+        }
 
-        const AsyncSocketConnectPacket & connect = * (const AsyncSocketConnectPacket *) buffer;
-        if (connect.hdrBytes < sizeof(connect))
+        const AsyncSocketConnectPacket& connect = * (const AsyncSocketConnectPacket*) buffer;
+
+        if (connect.hdrBytes < sizeof(connect)) {
             return 0;
-        
+        }
+
         hash->connType  = connect.connType;
         hash->buildId   = connect.buildId;
         hash->buildType = connect.buildType;
@@ -204,16 +223,17 @@ static unsigned GetConnHash (
 ***/
 
 //===========================================================================
-void AsyncSocketConnect (
-    AsyncCancelId *         cancelId,
+void AsyncSocketConnect(
+    AsyncCancelId*          cancelId,
     const plNetAddress&     netAddr,
     FAsyncNotifySocketProc  notifyProc,
-    void *                  param,
-    const void *            sendData,
+    void*                   param,
+    const void*             sendData,
     unsigned                sendBytes,
     unsigned                connectMs,
     unsigned                localPort
-) {
+)
+{
     ASSERT(g_api.socketConnect);
     g_api.socketConnect(
         cancelId,
@@ -228,110 +248,121 @@ void AsyncSocketConnect (
 }
 
 //===========================================================================
-void AsyncSocketConnectCancel (
+void AsyncSocketConnectCancel(
     FAsyncNotifySocketProc  notifyProc,
     AsyncCancelId           cancelId
-) {
+)
+{
     ASSERT(g_api.socketConnectCancel);
     g_api.socketConnectCancel(notifyProc, cancelId);
 }
 
 //===========================================================================
-void AsyncSocketDisconnect (
+void AsyncSocketDisconnect(
     AsyncSocket             sock,
     bool                    hardClose
-) {
+)
+{
     ASSERT(g_api.socketDisconnect);
     g_api.socketDisconnect(sock, hardClose);
 }
 
 //===========================================================================
-void AsyncSocketDelete (AsyncSocket sock) {
+void AsyncSocketDelete(AsyncSocket sock)
+{
 
     ASSERT(g_api.socketDelete);
     g_api.socketDelete(sock);
 }
 
 //===========================================================================
-bool AsyncSocketSend (
+bool AsyncSocketSend(
     AsyncSocket             sock,
-    const void *            data,
+    const void*             data,
     unsigned                bytes
-) {
+)
+{
     ASSERT(g_api.socketSend);
     return g_api.socketSend(sock, data, bytes);
 }
 
 //===========================================================================
-bool AsyncSocketWrite (
+bool AsyncSocketWrite(
     AsyncSocket             sock,
-    const void *            buffer,
+    const void*             buffer,
     unsigned                bytes,
-    void *                  param
-) {
+    void*                   param
+)
+{
     ASSERT(g_api.socketWrite);
     return g_api.socketWrite(sock, buffer, bytes, param);
 }
 
 //===========================================================================
-void AsyncSocketSetNotifyProc (
+void AsyncSocketSetNotifyProc(
     AsyncSocket             sock,
     FAsyncNotifySocketProc  notifyProc
-) {
+)
+{
     ASSERT(g_api.socketSetNotifyProc);
     g_api.socketSetNotifyProc(sock, notifyProc);
 }
 
 //===========================================================================
-void AsyncSocketSetBacklogAlloc (
+void AsyncSocketSetBacklogAlloc(
     AsyncSocket             sock,
     unsigned                bufferSize
-) {
+)
+{
     ASSERT(g_api.socketSetBacklogAlloc);
     g_api.socketSetBacklogAlloc(sock, bufferSize);
 }
 
 //===========================================================================
-unsigned AsyncSocketStartListening (
+unsigned AsyncSocketStartListening(
     const plNetAddress&     listenAddr,
     FAsyncNotifySocketProc  notifyProc
-) {
+)
+{
     ASSERT(g_api.socketStartListening);
     return g_api.socketStartListening(listenAddr, notifyProc);
 }
 
 //===========================================================================
-void AsyncSocketStopListening (
+void AsyncSocketStopListening(
     const plNetAddress&     listenAddr,
     FAsyncNotifySocketProc  notifyProc
-) {
+)
+{
     ASSERT(g_api.socketStopListening);
     g_api.socketStopListening(listenAddr, notifyProc);
 }
 
 //============================================================================
-void AsyncSocketEnableNagling (
+void AsyncSocketEnableNagling(
     AsyncSocket             sock,
     bool                    enable
-) {
+)
+{
     ASSERT(g_api.socketEnableNagling);
     g_api.socketEnableNagling(sock, enable);
 }
 
 //===========================================================================
-void AsyncSocketRegisterNotifyProc (
-    uint8_t                    connType, 
+void AsyncSocketRegisterNotifyProc(
+    uint8_t                    connType,
     FAsyncNotifySocketProc  notifyProc,
     unsigned                buildId,
     unsigned                buildType,
     unsigned                branchId,
     const plUUID&           productId
-) {
+)
+{
     ASSERT(connType != kConnTypeNil);
     ASSERT(notifyProc);
 
     // Perform memory allocation outside lock
-    ISocketConnType * ct    = new ISocketConnType;
+    ISocketConnType* ct    = new ISocketConnType;
     ct->notifyProc          = notifyProc;
     ct->connType            = connType;
     ct->buildId             = buildId;
@@ -348,14 +379,15 @@ void AsyncSocketRegisterNotifyProc (
 }
 
 //===========================================================================
-void AsyncSocketUnregisterNotifyProc (
-    uint8_t                    connType, 
+void AsyncSocketUnregisterNotifyProc(
+    uint8_t                    connType,
     FAsyncNotifySocketProc  notifyProc,
     unsigned                buildId,
     unsigned                buildType,
     unsigned                branchId,
     const plUUID&           productId
-) {
+)
+{
     ISocketConnHash hash;
     hash.connType   = connType;
     hash.buildId    = buildId;
@@ -364,13 +396,15 @@ void AsyncSocketUnregisterNotifyProc (
     hash.productId  = productId;
     hash.flags      = kConnHashFlagsExactMatch;
 
-    ISocketConnType * scan;
+    ISocketConnType* scan;
     s_notifyProcLock.LockForWriting();
     {
         scan = s_notifyProcs.Find(hash);
+
         for (; scan; scan = s_notifyProcs.FindNext(hash, scan)) {
-            if (scan->notifyProc != notifyProc)
+            if (scan->notifyProc != notifyProc) {
                 continue;
+            }
 
             // Unlink the object so it can be deleted outside the lock
             s_notifyProcs.Unlink(scan);
@@ -384,33 +418,41 @@ void AsyncSocketUnregisterNotifyProc (
 }
 
 //===========================================================================
-FAsyncNotifySocketProc AsyncSocketFindNotifyProc (
+FAsyncNotifySocketProc AsyncSocketFindNotifyProc(
     const uint8_t  buffer[],
     unsigned    bytes,
-    unsigned *  bytesProcessed,
-    unsigned *  connType,
-    unsigned *  buildId,
-    unsigned *  buildType,
-    unsigned *  branchId,
+    unsigned*   bytesProcessed,
+    unsigned*   connType,
+    unsigned*   buildId,
+    unsigned*   buildType,
+    unsigned*   branchId,
     plUUID*     productId
-) {
+)
+{
     for (;;) {
         // Get the connType
         ISocketConnHash hash;
         *bytesProcessed = GetConnHash(&hash, buffer, bytes);
-        if (!*bytesProcessed)
+
+        if (!*bytesProcessed) {
             break;
+        }
 
         // Lookup notifyProc based on connType
         FAsyncNotifySocketProc proc;
         s_notifyProcLock.LockForReading();
-        if (const ISocketConnType * scan = s_notifyProcs.Find(hash))
+
+        if (const ISocketConnType* scan = s_notifyProcs.Find(hash)) {
             proc = scan->notifyProc;
-        else
+        } else {
             proc = nil;
+        }
+
         s_notifyProcLock.UnlockForReading();
-        if (!proc)
+
+        if (!proc) {
             break;
+        }
 
         // Success!
         *connType   = hash.connType;

@@ -63,13 +63,13 @@ pyDynamicText::pyDynamicText()
     IInit();
 }
 
-pyDynamicText::pyDynamicText(pyKey& key) 
+pyDynamicText::pyDynamicText(pyKey& key)
 {
     IInit();
     fReceivers.Append(key.getKey());
 }
 
-pyDynamicText::pyDynamicText(plKey key) 
+pyDynamicText::pyDynamicText(plKey key)
 {
     IInit();
     fReceivers.Append(key);
@@ -120,26 +120,32 @@ void pyDynamicText::SetNetForce(bool force)
 plDynamicTextMsg* pyDynamicText::ICreateDTMsg()
 {
     // must have a receiver!
-    if ( fReceivers.Count() > 0 )
-    {
+    if (fReceivers.Count() > 0) {
         plDynamicTextMsg* pMsg = new plDynamicTextMsg;
-        if ( fSenderKey )
+
+        if (fSenderKey) {
             pMsg->SetSender(fSenderKey);
-        if ( fNetPropagate )
+        }
+
+        if (fNetPropagate) {
             pMsg->SetBCastFlag(plMessage::kNetPropagate);
-        if ( fNetForce )
+        }
+
+        if (fNetForce) {
             pMsg->SetBCastFlag(plMessage::kNetForce);
+        }
+
         // add all our receivers to the message receiver list
         int i;
-        for ( i=0; i<fReceivers.Count(); i++ )
-        {
+
+        for (i = 0; i < fReceivers.Count(); i++) {
             pMsg->AddReceiver(fReceivers[i]);
         }
 
         return pMsg;
-    }
-    else
+    } else {
         return nil;
+    }
 }
 
 //////////////////////////////////////////////
@@ -150,94 +156,94 @@ plDynamicTextMsg* pyDynamicText::ICreateDTMsg()
 //  Need to determine whether to send over the network (netpropagate) or not
 //
 
-void pyDynamicText::ClearToColor( pyColor& color )
+void pyDynamicText::ClearToColor(pyColor& color)
 {
     // create message
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if ( pMsg )
-    {
+
+    if (pMsg) {
         hsColorRGBA col = color.getColor();
         pMsg->ClearToColor(col);
 
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
-void pyDynamicText::Flush( void )
+void pyDynamicText::Flush(void)
 {
     // create message
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if ( pMsg )
-    {
+
+    if (pMsg) {
         pMsg->Flush();
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
-void pyDynamicText::PurgeImage( void )
+void pyDynamicText::PurgeImage(void)
 {
     // create message
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if ( pMsg )
-    {
+
+    if (pMsg) {
         pMsg->PurgeImage();
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
-void pyDynamicText::SetTextColor( pyColor& color  )
+void pyDynamicText::SetTextColor(pyColor& color)
 {
-    SetTextColor2(color,false);
+    SetTextColor2(color, false);
 }
 
-void pyDynamicText::SetTextColor2( pyColor& color, bool blockRGB )
+void pyDynamicText::SetTextColor2(pyColor& color, bool blockRGB)
 {
     // create message
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if ( pMsg )
-    {
+
+    if (pMsg) {
         hsColorRGBA col = color.getColor();
-        pMsg->SetTextColor(col,blockRGB);
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        pMsg->SetTextColor(col, blockRGB);
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
-void pyDynamicText::SetFont( const char *facename, int16_t size )
+void pyDynamicText::SetFont(const char* facename, int16_t size)
 {
     // create message
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if ( pMsg )
-    {
-        pMsg->SetFont(facename,size);
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+
+    if (pMsg) {
+        pMsg->SetFont(facename, size);
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
-void pyDynamicText::FillRect( uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, pyColor& color )
+void pyDynamicText::FillRect(uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, pyColor& color)
 {
     // create message
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if ( pMsg )
-    {
+
+    if (pMsg) {
         hsColorRGBA col = color.getColor();
-        pMsg->FillRect(left,top,right,bottom,col);
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        pMsg->FillRect(left, top, right, bottom, col);
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
-void pyDynamicText::FrameRect( uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, pyColor& color )
+void pyDynamicText::FrameRect(uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, pyColor& color)
 {
     // create message
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if ( pMsg )
-    {
+
+    if (pMsg) {
         hsColorRGBA col = color.getColor();
-        pMsg->FrameRect(left,top,right,bottom,col);
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        pMsg->FrameRect(left, top, right, bottom, col);
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
-void pyDynamicText::SetClipping( uint16_t clipLeft, uint16_t clipTop, uint16_t clipRight, uint16_t clipBottom)
+void pyDynamicText::SetClipping(uint16_t clipLeft, uint16_t clipTop, uint16_t clipRight, uint16_t clipBottom)
 {
     fClip = true;
     fClipLeft = clipLeft;
@@ -251,7 +257,7 @@ void pyDynamicText::UnsetClipping()
     fClip = false;
 }
 
-void pyDynamicText::SetWrapping( uint16_t wrapWidth, uint16_t wrapHeight )
+void pyDynamicText::SetWrapping(uint16_t wrapWidth, uint16_t wrapHeight)
 {
     fWrap = true;
     fWrapWidth = wrapWidth;
@@ -266,121 +272,132 @@ void pyDynamicText::UnsetWrapping()
 //
 // Draw text paying attention to Clipping and Wrapping if user wanted it
 //
-void pyDynamicText::DrawText( int16_t x, int16_t y, const char *text )
+void pyDynamicText::DrawText(int16_t x, int16_t y, const char* text)
 {
     // create message
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if ( pMsg )
-    {
+
+    if (pMsg) {
         // The priority is:
         //  1) wrap (if you wrap you probably don't need to clip)
         //  2) clip
         //  3) just draw
-        if ( fWrap )
-            pMsg->DrawWrappedString(x,y,fWrapWidth,fWrapHeight,text);
-        else if ( fClip )
-            pMsg->DrawClippedString(x,y,fClipLeft,fClipTop,fClipRight,fClipBottom,text);
-        else
-            pMsg->DrawString(x,y,text);
+        if (fWrap) {
+            pMsg->DrawWrappedString(x, y, fWrapWidth, fWrapHeight, text);
+        } else if (fClip) {
+            pMsg->DrawClippedString(x, y, fClipLeft, fClipTop, fClipRight, fClipBottom, text);
+        } else {
+            pMsg->DrawString(x, y, text);
+        }
 
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
-void pyDynamicText::DrawTextW( int16_t x, int16_t y, std::wstring text )
+void pyDynamicText::DrawTextW(int16_t x, int16_t y, std::wstring text)
 {
     // create message
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if ( pMsg )
-    {
+
+    if (pMsg) {
         // The priority is:
         //  1) wrap (if you wrap you probably don't need to clip)
         //  2) clip
         //  3) just draw
-        if ( fWrap )
-            pMsg->DrawWrappedString(x,y,fWrapWidth,fWrapHeight,text.c_str());
-        else if ( fClip )
-            pMsg->DrawClippedString(x,y,fClipLeft,fClipTop,fClipRight,fClipBottom,text.c_str());
-        else
-            pMsg->DrawString(x,y,text.c_str());
+        if (fWrap) {
+            pMsg->DrawWrappedString(x, y, fWrapWidth, fWrapHeight, text.c_str());
+        } else if (fClip) {
+            pMsg->DrawClippedString(x, y, fClipLeft, fClipTop, fClipRight, fClipBottom, text.c_str());
+        } else {
+            pMsg->DrawString(x, y, text.c_str());
+        }
 
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
 //
 // Draw an image on the DynamicMap
 //
-void pyDynamicText::DrawImage( uint16_t x, uint16_t y, pyImage& image, bool respectAlpha )
+void pyDynamicText::DrawImage(uint16_t x, uint16_t y, pyImage& image, bool respectAlpha)
 {
     // create message
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if ( pMsg )
-    {
+
+    if (pMsg) {
         plKey k = image.GetKey();
-        pMsg->DrawImage( x, y, k, respectAlpha);
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        pMsg->DrawImage(x, y, k, respectAlpha);
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
 //
 // Draw an image on the DynamicMap
 //
-void pyDynamicText::DrawImageClipped( uint16_t x, uint16_t y, pyImage& image, uint16_t cx, uint16_t cy, uint16_t cw, uint16_t ch,
-                                        bool respectAlpha )
+void pyDynamicText::DrawImageClipped(uint16_t x, uint16_t y, pyImage& image, uint16_t cx, uint16_t cy, uint16_t cw, uint16_t ch,
+                                     bool respectAlpha)
 {
     // create message
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if ( pMsg )
-    {
+
+    if (pMsg) {
         plKey k = image.GetKey();
-        pMsg->DrawClippedImage( x, y, k, cx, cy, cw, ch, respectAlpha);
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        pMsg->DrawClippedImage(x, y, k, cx, cy, cw, ch, respectAlpha);
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }
 
 
-uint16_t  pyDynamicText::GetWidth( void )
+uint16_t  pyDynamicText::GetWidth(void)
 {
     // We better just pick our first key. Note that the ONLY time we should be getting multiple receivers
     // is if the export process ends up creating multiple copies of the material. Now, WHY you'd be wanting
     // to draw all of them is a question for wiser men, but they should all be the same size regardless
-    if( fReceivers.GetCount() == 0 )
+    if (fReceivers.GetCount() == 0) {
         return 0;
+    }
 
-    plDynamicTextMap *dtMap = plDynamicTextMap::ConvertNoRef( fReceivers[ 0 ]->ObjectIsLoaded() );
-    if( dtMap == nil )
+    plDynamicTextMap* dtMap = plDynamicTextMap::ConvertNoRef(fReceivers[ 0 ]->ObjectIsLoaded());
+
+    if (dtMap == nil) {
         return 0;
+    }
 
     return (uint16_t)dtMap->GetWidth();
 }
 
-uint16_t  pyDynamicText::GetHeight( void )
+uint16_t  pyDynamicText::GetHeight(void)
 {
     // We better just pick our first key. Note that the ONLY time we should be getting multiple receivers
     // is if the export process ends up creating multiple copies of the material. Now, WHY you'd be wanting
     // to draw all of them is a question for wiser men, but they should all be the same size regardless
-    if( fReceivers.GetCount() == 0 )
+    if (fReceivers.GetCount() == 0) {
         return 0;
+    }
 
-    plDynamicTextMap *dtMap = plDynamicTextMap::ConvertNoRef( fReceivers[ 0 ]->ObjectIsLoaded() );
-    if( dtMap == nil )
+    plDynamicTextMap* dtMap = plDynamicTextMap::ConvertNoRef(fReceivers[ 0 ]->ObjectIsLoaded());
+
+    if (dtMap == nil) {
         return 0;
+    }
 
     return (uint16_t)dtMap->GetHeight();
 }
 
-void pyDynamicText::CalcTextExtents( std::wstring text, unsigned &width, unsigned &height )
+void pyDynamicText::CalcTextExtents(std::wstring text, unsigned& width, unsigned& height)
 {
     width = 0;
     height = 0;
 
-    if (fReceivers.GetCount() == 0)
+    if (fReceivers.GetCount() == 0) {
         return;
+    }
 
     plDynamicTextMap* dtMap = plDynamicTextMap::ConvertNoRef(fReceivers[0]->ObjectIsLoaded());
-    if (!dtMap)
+
+    if (!dtMap) {
         return;
+    }
 
     width = dtMap->CalcStringWidth(text.c_str(), (uint16_t*)&height);
 }
@@ -388,8 +405,8 @@ void pyDynamicText::CalcTextExtents( std::wstring text, unsigned &width, unsigne
 void pyDynamicText::SetJustify(uint8_t justify)
 {
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if (pMsg)
-    {
+
+    if (pMsg) {
         pMsg->SetJustify(justify);
         plgDispatch::MsgSend(pMsg);
     }
@@ -398,8 +415,8 @@ void pyDynamicText::SetJustify(uint8_t justify)
 void pyDynamicText::SetLineSpacing(int16_t spacing)
 {
     plDynamicTextMsg* pMsg = ICreateDTMsg();
-    if (pMsg)
-    {
+
+    if (pMsg) {
         pMsg->SetLineSpacing(spacing);
         plgDispatch::MsgSend(pMsg);
     }
@@ -407,8 +424,9 @@ void pyDynamicText::SetLineSpacing(int16_t spacing)
 
 plKey pyDynamicText::GetImage()
 {
-    if (fReceivers.GetCount() > 0)
+    if (fReceivers.GetCount() > 0) {
         return fReceivers[0];
-    else
+    } else {
         return nil;
+    }
 }

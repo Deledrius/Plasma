@@ -47,12 +47,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "mat_decomp.h"
 
-class hsAffineParts
-{
+class hsAffineParts {
 
 public:
     // Constructors
-    hsAffineParts(gemAffineParts *);    // Convert from Gems struct for now
+    hsAffineParts(gemAffineParts*);     // Convert from Gems struct for now
     hsAffineParts();
 
     void Reset();
@@ -63,15 +62,16 @@ public:
     hsVector3   fK; /* Stretch factors    */
     float       fF; /* Sign of determinant    */
 
-    void ComposeMatrix(hsMatrix44 *out) const;
-    void ComposeInverseMatrix(hsMatrix44 *out) const;
-    void SetFromInterp(const hsAffineParts &ap1, const hsAffineParts &ap2, float t);
+    void ComposeMatrix(hsMatrix44* out) const;
+    void ComposeInverseMatrix(hsMatrix44* out) const;
+    void SetFromInterp(const hsAffineParts& ap1, const hsAffineParts& ap2, float t);
 
-    void Read(hsStream *);
-    void Write(hsStream *);
+    void Read(hsStream*);
+    void Write(hsStream*);
 
-    int operator==(const hsAffineParts& a) const
-        { return (fT == a.fT && fQ == a.fQ && fU == a.fU && fK == a.fK && fF == a.fF); }
+    int operator==(const hsAffineParts& a) const {
+        return (fT == a.fT && fQ == a.fQ && fU == a.fU && fK == a.fK && fF == a.fF);
+    }
 };
 
 //

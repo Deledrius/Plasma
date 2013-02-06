@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/PubUtilLib/plNetClient/plNetCliAgeJoiner.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_PUBUTILLIB_PLNETCLIENT_PLNETCLIAGEJOINER_H
@@ -56,7 +56,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 /*****************************************************************************
 *
-*   
+*
 *
 ***/
 
@@ -70,33 +70,33 @@ enum ENCAgeJoinerNotify {
 
 struct NCAgeJoinerCompleteNotify {
     bool            success;
-    const char *    msg;
+    const char*     msg;
 };
 
 
 typedef void (* FNCAgeJoinerCallback)(
-    plNCAgeJoiner *         joiner,
+    plNCAgeJoiner*          joiner,
     unsigned                type,       // ENCAgeJoinerNotify
-    void *                  notify,
-    void *                  userState
+    void*                   notify,
+    void*                   userState
 );
 
 
-void NCAgeJoinerCreate (
-    plNCAgeJoiner **        joiner,
-    const NetCommAge &      age,
+void NCAgeJoinerCreate(
+    plNCAgeJoiner**         joiner,
+    const NetCommAge&       age,
     bool                    muteSfx,
     FNCAgeJoinerCallback    callback,
-    void *                  userState
+    void*                   userState
 );
-bool NCAgeJoinerMsgReceive (    // returns true of message was processed
-    plNCAgeJoiner *         joiner,
-    plMessage *             msg
+bool NCAgeJoinerMsgReceive(     // returns true of message was processed
+    plNCAgeJoiner*          joiner,
+    plMessage*              msg
 );
-void NCAgeJoinerUpdate (
-    plNCAgeJoiner *         joiner
+void NCAgeJoinerUpdate(
+    plNCAgeJoiner*          joiner
 );
-    
+
 
 
 #endif // PLASMA20_SOURCES_PLASMA_PUBUTILLIB_PLNETCLIENT_PLNETCLIAGEJOINER_H

@@ -53,9 +53,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plDXPipeline.h"
 
 plDXShader::plDXShader(plShader* owner)
-:   fOwner(owner),
-    fErrorString(nil),
-    fPipe(nil)
+    :   fOwner(owner),
+        fErrorString(nil),
+        fPipe(nil)
 {
     owner->SetDeviceRef(this);
 }
@@ -69,8 +69,7 @@ plDXShader::~plDXShader()
 
 void plDXShader::SetOwner(plShader* owner)
 {
-    if( owner != fOwner )
-    {
+    if (owner != fOwner) {
         Release();
         fOwner = owner;
         owner->SetDeviceRef(this);
@@ -80,10 +79,12 @@ void plDXShader::SetOwner(plShader* owner)
 const char* plDXShader::ISetError(const char* errStr)
 {
     delete [] fErrorString;
-    if( errStr )
+
+    if (errStr) {
         fErrorString = hsStrcpy(errStr);
-    else
+    } else {
         fErrorString = nil;
+    }
 
     return fErrorString;
 }

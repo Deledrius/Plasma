@@ -52,21 +52,28 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 bool plNetClientMgr::RecordMsgs(const char* recType, const char* recName)
 {
-    if (!fMsgRecorder)
-    {
-        if (stricmp(recType,"stream") == 0)
+    if (!fMsgRecorder) {
+        if (stricmp(recType, "stream") == 0) {
             fMsgRecorder = new plNetClientStreamRecorder;
-        if (stricmp(recType,"stressstream") == 0)
-            fMsgRecorder = new plNetClientStressStreamRecorder;
-        if (stricmp(recType,"stats") == 0)
-            fMsgRecorder = new plNetClientStatsRecorder;
-        if (stricmp(recType,"streamandstats") == 0)
-            fMsgRecorder = new plNetClientStreamAndStatsRecorder(new plNetClientStreamRecorder(), new plNetClientStatsRecorder());
-        if (stricmp(recType,"stressstreamandstats") == 0)
-            fMsgRecorder = new plNetClientStreamAndStatsRecorder(new plNetClientStressStreamRecorder(), new plNetClientStatsRecorder());
+        }
 
-        if (!fMsgRecorder || !fMsgRecorder->BeginRecording(recName))
-        {
+        if (stricmp(recType, "stressstream") == 0) {
+            fMsgRecorder = new plNetClientStressStreamRecorder;
+        }
+
+        if (stricmp(recType, "stats") == 0) {
+            fMsgRecorder = new plNetClientStatsRecorder;
+        }
+
+        if (stricmp(recType, "streamandstats") == 0) {
+            fMsgRecorder = new plNetClientStreamAndStatsRecorder(new plNetClientStreamRecorder(), new plNetClientStatsRecorder());
+        }
+
+        if (stricmp(recType, "stressstreamandstats") == 0) {
+            fMsgRecorder = new plNetClientStreamAndStatsRecorder(new plNetClientStressStreamRecorder(), new plNetClientStatsRecorder());
+        }
+
+        if (!fMsgRecorder || !fMsgRecorder->BeginRecording(recName)) {
             delete fMsgRecorder;
             fMsgRecorder = nil;
             return false;
@@ -87,14 +94,11 @@ bool plNetClientMgr::PlaybackMsgs(const char* recName)
 
     plNetClientRecorder* player = new plNetClientStreamRecorder;
 
-    if (player->BeginPlayback(recName))
-    {
+    if (player->BeginPlayback(recName)) {
         fMsgPlayers.push_back(player);
 //      plgDispatch::Dispatch()->RegisterForExactType(plEvalMsg::Index(), GetKey());
         return true;
-    }
-    else
-    {
+    } else {
         delete player;
         return false;
     }
@@ -105,24 +109,19 @@ bool plNetClientMgr::PlaybackMsgs(const char* recName)
 //
 void plNetClientMgr::IPlaybackMsgs()
 {
-    for (int i = 0; i < fMsgPlayers.size(); i++)
-    {
+    for (int i = 0; i < fMsgPlayers.size(); i++) {
         plNetClientRecorder* recorder = fMsgPlayers[i];
-        if (recorder->IsQueueEmpty())
-        {
+
+        if (recorder->IsQueueEmpty()) {
             delete recorder;
-            fMsgPlayers.erase(fMsgPlayers.begin()+i);
+            fMsgPlayers.erase(fMsgPlayers.begin() + i);
             i--;
 
-            if (fMsgPlayers.empty())
-            {
+            if (fMsgPlayers.empty()) {
 //              plgDispatch::Dispatch()->UnRegisterForExactType(plEvalMsg::Index(), GetKey());
             }
-        }
-        else
-        {
-            while (plNetMessage* msg = recorder->GetNextMessage())
-            {
+        } else {
+            while (plNetMessage* msg = recorder->GetNextMessage()) {
                 hsLogEntry(DebugMsg("<Recorded Msg>"));
                 fMsgHandler.ReceiveMsg(msg);
             }

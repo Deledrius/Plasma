@@ -53,8 +53,7 @@ class plAvBrainHuman;
 /** \class plAvMotorHuman
     Applies avatar at simulation frequency rather than frame frequency.
 */
-class plAvMotorHuman : public Havok::Action
-{
+class plAvMotorHuman : public Havok::Action {
 public:
     plAvMotorHuman();
 
@@ -62,20 +61,20 @@ public:
         and asks the brain to move. Brain will sample animation at current time
         and apply velocity or forces to the body.
         */
-    virtual void apply(Havok::Subspace &subspace, Havok::hkTime time);
+    virtual void apply(Havok::Subspace& subspace, Havok::hkTime time);
 
     /** Sets the motor to control a different human brain.
         Returns the previously controlled brain, or nil.
         */
-    plAvBrainHuman * SetBrain(plAvBrainHuman *brain);
+    plAvBrainHuman* SetBrain(plAvBrainHuman* brain);
 
     /** Which brain is this motor currently controlling?
         */
-    plAvBrainHuman * GetBrain();
+    plAvBrainHuman* GetBrain();
 
 private:
     /** The brain we get our movement data from */
-    plAvBrainHuman *fBrain;
+    plAvBrainHuman* fBrain;
     double fLastTime;
 };
 
@@ -88,8 +87,8 @@ private:
 #include "plAvBrainHuman.h"
 
 plAvMotorHuman::plAvMotorHuman()
-: fBrain(0),
-  fLastTime(0.0f)
+    : fBrain(0),
+      fLastTime(0.0f)
 {
 }
 
@@ -97,14 +96,13 @@ plAvMotorHuman::plAvMotorHuman()
 //: fBrain(brain),
 //  fLastTime(0.0f);
 
-void plAvMotorHuman::apply(Havok::Subspace &subspace, Havok::hkTime time)
+void plAvMotorHuman::apply(Havok::Subspace& subspace, Havok::hkTime time)
 {
     double timeNow = time.asDouble();
     double elapsedD = timeNow - fLastTime;
     float elapsed = elapsedD;
 
-    if(elapsed > 1.0f)
-    {
+    if (elapsed > 1.0f) {
         elapsed = 0.1f;
         hsStatusMessageF("Clamping plAvMotorHuman::apply interval to <%f>", elapsed);
 
@@ -114,16 +112,16 @@ void plAvMotorHuman::apply(Havok::Subspace &subspace, Havok::hkTime time)
 //  fBrain->MoveViaAnimation(timeNow, elapsed);
 }
 
-plAvBrainHuman * plAvMotorHuman::SetBrain(plAvBrainHuman *brain)
+plAvBrainHuman* plAvMotorHuman::SetBrain(plAvBrainHuman* brain)
 {
-    plAvBrainHuman * oldBrain = fBrain;
+    plAvBrainHuman* oldBrain = fBrain;
 
     fBrain = brain;
 
     return oldBrain;
 }
 
-plAvBrainHuman * plAvMotorHuman::GetBrain()
+plAvBrainHuman* plAvMotorHuman::GetBrain()
 {
     return fBrain;
 }

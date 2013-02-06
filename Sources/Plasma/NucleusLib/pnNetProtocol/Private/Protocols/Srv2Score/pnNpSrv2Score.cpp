@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetProtocol/Private/Protocols/Srv2Score/pnNpSrv2Score.cpp
-*   
+*
 ***/
 
 #ifdef SERVER
@@ -60,23 +60,29 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 ***/
 
 //===========================================================================
-bool Srv2ScoreValidateConnect (
-    AsyncNotifySocketListen *   listen,
-    Srv2Score_ConnData *        connectPtr
-) {
+bool Srv2ScoreValidateConnect(
+    AsyncNotifySocketListen*    listen,
+    Srv2Score_ConnData*         connectPtr
+)
+{
     // Ensure that there are enough bytes for the header
-    const Srv2Score_ConnData & connect = * (const Srv2Score_ConnData *) listen->buffer;
+    const Srv2Score_ConnData& connect = * (const Srv2Score_ConnData*) listen->buffer;
 
     // Validate message size
     const unsigned kMinStructSize = sizeof(uint32_t) * 3;
-    if (listen->bytes < kMinStructSize)
+
+    if (listen->bytes < kMinStructSize) {
         return false;
-    if (listen->bytes < connect.dataBytes)
+    }
+
+    if (listen->bytes < connect.dataBytes) {
         return false;
+    }
 
     // Validate connect server type
-    if (!(connect.srvType == kSrvTypeAuth || connect.srvType == kSrvTypeGame))
+    if (!(connect.srvType == kSrvTypeAuth || connect.srvType == kSrvTypeGame)) {
         return false;
+    }
 
     memset(connectPtr, 0, sizeof(*connectPtr));
     memcpy(connectPtr, &connect, min(sizeof(*connectPtr), connect.dataBytes));

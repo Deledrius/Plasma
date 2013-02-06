@@ -46,17 +46,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plFileName;
 
-namespace PythonInterface
-{
-    void initPython(const plFileName& rootDir);
-    void finiPython();
-    // So the Python packer can add extra paths
-    void addPythonPath(const plFileName& dir);
+namespace PythonInterface {
+void initPython(const plFileName& rootDir);
+void finiPython();
+// So the Python packer can add extra paths
+void addPythonPath(const plFileName& dir);
 
-    PyObject* CompileString(const char *command, const plFileName& filename);
-    bool DumpObject(PyObject* pyobj, char** pickle, int32_t* size);
-    int getOutputAndReset(char** line=nil);
-    PyObject* CreateModule(const char* module);
-    bool RunPYC(PyObject* code, PyObject* module);
-    PyObject* GetModuleItem(const char* item, PyObject* module);
+PyObject* CompileString(const char* command, const plFileName& filename);
+bool DumpObject(PyObject* pyobj, char** pickle, int32_t* size);
+int getOutputAndReset(char** line = nil);
+PyObject* CreateModule(const char* module);
+bool RunPYC(PyObject* code, PyObject* module);
+PyObject* GetModuleItem(const char* item, PyObject* module);
 }

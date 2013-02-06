@@ -46,7 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsColorRGBA.h"
 
 // The meat of the particle. These classes, in combination with the plParticleEmitter that spawned it,
-// should contain everything specific to a particle, necessary to build a renderable poly to represent a 
+// should contain everything specific to a particle, necessary to build a renderable poly to represent a
 // particular particle. (The emitter is necessary for properties (like texture) that are common among all
 // particles that originated from the same emitter.
 
@@ -78,8 +78,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // No initialization on construct. In nearly all cases, a default value won't be appropriate
 // so there's no sense doing extra memory writes
 
-class plParticleCore
-{
+class plParticleCore {
 public:
     hsPoint3 fPos;
     uint32_t fColor; // Particle opacity goes into the color's alpha.
@@ -89,13 +88,12 @@ public:
     hsPoint3 fUVCoords[4];
 };
 
-class plParticleExt
-{
+class plParticleExt {
 public:
     //hsPoint3 fOldPos;
     hsVector3 fVelocity;
     float fInvMass; // The inverse (1 / mass) is what we actually need for calculations. Storing it this
-                       // way allows us to make an object immovable with an inverse mass of 0 (and save a divide).
+    // way allows us to make an object immovable with an inverse mass of 0 (and save a divide).
     hsVector3 fAcceleration; // Accumulated from multiple forces.
     float fLife; // how many seconds before we recycle this? (My particle has more of a life than I do...)
     float fStartLife;
@@ -103,12 +101,11 @@ public:
     float fRadsPerSec;
     //uint32_t fOrigColor;
 
-    enum // Miscellaneous flags for particles
-    {
+    enum { // Miscellaneous flags for particles
         kImmortal                   = 0x00000001,
     };
     uint32_t fMiscFlags;  // I know... 32 bits for a single flag...
-                        // Feel free to change this if you've got something to pack it against.
+    // Feel free to change this if you've got something to pack it against.
 };
 
 #endif

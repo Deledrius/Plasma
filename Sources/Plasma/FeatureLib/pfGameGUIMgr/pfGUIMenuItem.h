@@ -55,74 +55,72 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plMessage;
 
 class pfGUISkin;
-class pfGUIMenuItem : public pfGUIButtonMod
-{
-    public:
-        enum HowToSkin
-        {
-            kTop,
-            kMiddle,
-            kBottom
-        };
+class pfGUIMenuItem : public pfGUIButtonMod {
+public:
+    enum HowToSkin {
+        kTop,
+        kMiddle,
+        kBottom
+    };
 
-    protected:
+protected:
 
-        wchar_t         *fName;
-        bool            fReportingHover;
+    wchar_t*         fName;
+    bool            fReportingHover;
 
-        HowToSkin       fHowToSkin;
-        bool            fSkinBuffersUpdated;
+    HowToSkin       fHowToSkin;
+    bool            fSkinBuffersUpdated;
 
-        virtual void    IGrowDTMDimsToDesiredSize( uint16_t &width, uint16_t &height );
-        virtual void    IPostSetUpDynTextMap( void );
-        virtual void    IUpdate( void );
+    virtual void    IGrowDTMDimsToDesiredSize(uint16_t& width, uint16_t& height);
+    virtual void    IPostSetUpDynTextMap(void);
+    virtual void    IUpdate(void);
 
-        void            IUpdateSkinBuffers( void );
-        void            IUpdateSingleSkinBuffer( uint16_t y, bool sel );
+    void            IUpdateSkinBuffers(void);
+    void            IUpdateSingleSkinBuffer(uint16_t y, bool sel);
 
-    public:
+public:
 
-        pfGUIMenuItem();
-        virtual ~pfGUIMenuItem();
+    pfGUIMenuItem();
+    virtual ~pfGUIMenuItem();
 
-        CLASSNAME_REGISTER( pfGUIMenuItem );
-        GETINTERFACE_ANY( pfGUIMenuItem, pfGUIButtonMod );
+    CLASSNAME_REGISTER(pfGUIMenuItem);
+    GETINTERFACE_ANY(pfGUIMenuItem, pfGUIButtonMod);
 
-        enum ItemFlags
-        {
-            kDrawSubMenuArrow = kDerivedFlagsStart,
-            kReportHovers
-        };
+    enum ItemFlags {
+        kDrawSubMenuArrow = kDerivedFlagsStart,
+        kReportHovers
+    };
 
-        // Extended event types
-        enum ExtendedEvents
-        {
-            kMouseHover,
-            kMouseExit
-        };
+    // Extended event types
+    enum ExtendedEvents {
+        kMouseHover,
+        kMouseExit
+    };
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        virtual void    SetInteresting( bool i );
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-        virtual void    HandleMouseDown( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseUp( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseDrag( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseHover( hsPoint3 &mousePt, uint8_t modifiers );
+    virtual void    SetInteresting(bool i);
 
-        virtual void    PurgeDynaTextMapImage();
+    virtual void    HandleMouseDown(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseUp(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseDrag(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseHover(hsPoint3& mousePt, uint8_t modifiers);
+
+    virtual void    PurgeDynaTextMapImage();
 
 
-        void        SetName( const char *name );
-        void        SetName( const wchar_t *name );
-        const wchar_t   *GetName( void ) const { return fName; }
-    
-        void    GetTextExtents( uint16_t &width, uint16_t &height );
+    void        SetName(const char* name);
+    void        SetName(const wchar_t* name);
+    const wchar_t*   GetName(void) const {
+        return fName;
+    }
 
-        void    SetSkin( pfGUISkin *skin, HowToSkin s );
+    void    GetTextExtents(uint16_t& width, uint16_t& height);
+
+    void    SetSkin(pfGUISkin* skin, HowToSkin s);
 };
 
 #endif // _pfGUIMenuItem_h

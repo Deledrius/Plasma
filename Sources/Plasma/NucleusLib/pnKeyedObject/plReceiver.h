@@ -47,15 +47,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plMessage;
 
-class plReceiver : public plCreatable
-{
+class plReceiver : public plCreatable {
 public:
     plReceiver() {}
 
-    CLASSNAME_REGISTER( plReceiver );
-    GETINTERFACE_ANY( plReceiver, plCreatable );
+    CLASSNAME_REGISTER(plReceiver);
+    GETINTERFACE_ANY(plReceiver, plCreatable);
 
-    virtual bool MsgReceive(plMessage* msg) { return false; }
+    virtual bool MsgReceive(plMessage* msg) {
+        return false;
+    }
 };
 
 #endif // plReceiver_inc

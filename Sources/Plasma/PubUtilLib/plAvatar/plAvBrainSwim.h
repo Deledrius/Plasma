@@ -52,30 +52,31 @@ class plControlEventMsg;
 class plLOSRequestMsg;
 class plSwimRegionInterface;
 class plSwimStrategy;
-class plAvBrainSwim : public plArmatureBrain
-{
+class plAvBrainSwim : public plArmatureBrain {
 public:
     plAvBrainSwim();
     virtual ~plAvBrainSwim();
 
-    CLASSNAME_REGISTER( plAvBrainSwim );
-    GETINTERFACE_ANY( plAvBrainSwim, plArmatureBrain );
+    CLASSNAME_REGISTER(plAvBrainSwim);
+    GETINTERFACE_ANY(plAvBrainSwim, plArmatureBrain);
 
-    virtual void Activate(plArmatureModBase *avMod);
+    virtual void Activate(plArmatureModBase* avMod);
     bool Apply(double time, float elapsed);
     virtual void Deactivate();
     virtual void Suspend();
     virtual void Resume();
-    virtual void DumpToDebugDisplay(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt);
-    bool MsgReceive(plMessage *msg);
+    virtual void DumpToDebugDisplay(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt);
+    bool MsgReceive(plMessage* msg);
     bool IsWalking();
     bool IsWading();
     bool IsSwimming();
-    float GetSurfaceDistance() { return fSurfaceDistance; }
+    float GetSurfaceDistance() {
+        return fSurfaceDistance;
+    }
 
-    plSwimStrategy *fSwimStrategy;
+    plSwimStrategy* fSwimStrategy;
     static const float kMinSwimDepth;
-    
+
 protected:
     void IStartWading();
     void IStartSwimming(bool is2D);
@@ -91,9 +92,9 @@ protected:
     float IGetTargetZ();
 
     float fSurfaceDistance;
-    plLOSRequestMsg *fSurfaceProbeMsg;
-    plSwimRegionInterface *fCurrentRegion;
-    
+    plLOSRequestMsg* fSurfaceProbeMsg;
+    plSwimRegionInterface* fCurrentRegion;
+
     enum Mode {
         kWading,
         kSwimming2D,
@@ -103,8 +104,7 @@ protected:
         kWalking,
     } fMode;
 
-    enum
-    {
+    enum {
         kTreadWater,
         kSwimForward,
         kSwimForwardFast,

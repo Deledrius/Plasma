@@ -55,40 +55,43 @@ cyDraw::cyDraw(plKey sender, plKey recvr)
 }
 
 // setters
-void cyDraw::SetSender(plKey &sender)
+void cyDraw::SetSender(plKey& sender)
 {
     fSender = sender;
 }
 
-void cyDraw::AddRecvr(plKey &recvr)
+void cyDraw::AddRecvr(plKey& recvr)
 {
-    if ( recvr != nil )
+    if (recvr != nil) {
         fRecvr.Append(recvr);
+    }
 }
 
 void cyDraw::EnableT(bool state)
 {
     // must have a receiver!
-    if ( fRecvr.Count() > 0 )
-    {
+    if (fRecvr.Count() > 0) {
         // create message
         plEnableMsg* pMsg = new plEnableMsg;
+
         // check if this needs to be network forced to all clients
-        if (fNetForce)
-        {
+        if (fNetForce) {
             // set the network propagate flag to make sure it gets to the other clients
             pMsg->SetBCastFlag(plMessage::kNetPropagate);
             pMsg->SetBCastFlag(plMessage::kNetForce);
         }
-        if ( fSender )
+
+        if (fSender) {
             pMsg->SetSender(fSender);
+        }
 
         // add all our receivers to the message receiver list
         int i;
-        for ( i=0; i<fRecvr.Count(); i++ )
-        {
+
+        for (i = 0; i < fRecvr.Count(); i++) {
             pMsg->AddReceiver(fRecvr[i]);
         }
+
         // set the interface to the draw
         pMsg->SetCmd(plEnableMsg::kDrawable);
         pMsg->AddType(plEnableMsg::kDrawable);
@@ -96,10 +99,12 @@ void cyDraw::EnableT(bool state)
         pMsg->SetBCastFlag(plMessage::kPropagateToModifiers);
 
         // which way are we doin' it?
-        if ( state )
+        if (state) {
             pMsg->SetCmd(plEnableMsg::kEnable);
-        else
+        } else {
             pMsg->SetCmd(plEnableMsg::kDisable);
-        plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+        }
+
+        plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
     }
 }

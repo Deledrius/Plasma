@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class hsKeyedObject;
 
-class plDISpansMsg : public plMessage
-{
+class plDISpansMsg : public plMessage {
 public:
     enum {
         kAddingSpan,
@@ -64,11 +63,11 @@ public:
     int32_t                   fIndex;
 
     plDISpansMsg() : plMessage(), fType(0), fFlags(0), fIndex(-1) {}
-    plDISpansMsg(const plKey &r, uint8_t type, int index, int flags) : plMessage(nil, r, nil), fType(type), fIndex(index), fFlags(flags) {}   
-    
-    CLASSNAME_REGISTER( plDISpansMsg );
-    GETINTERFACE_ANY( plDISpansMsg, plMessage );
-    
+    plDISpansMsg(const plKey& r, uint8_t type, int index, int flags) : plMessage(nil, r, nil), fType(type), fIndex(index), fFlags(flags) {}
+
+    CLASSNAME_REGISTER(plDISpansMsg);
+    GETINTERFACE_ANY(plDISpansMsg, plMessage);
+
     void Read(hsStream* stream, hsResMgr* mgr) {}
     void Write(hsStream* stream, hsResMgr* mgr) {}
 };

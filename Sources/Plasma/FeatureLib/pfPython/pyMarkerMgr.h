@@ -51,8 +51,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "HeadSpin.h"
 #include "pyGlueHelpers.h"
 
-class pyMarkerMgr
-{
+class pyMarkerMgr {
 protected:
     pyMarkerMgr() {}
 
@@ -63,8 +62,8 @@ public:
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyMarkerMgr object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyMarkerMgr); // converts a PyObject to a pyMarkerMgr (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
-    static void AddPlasmaConstantsClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
+    static void AddPlasmaConstantsClasses(PyObject* m);
 
     void AddMarker(double x, double y, double z, uint32_t id, bool justCreated);
     void RemoveMarker(uint32_t id);
@@ -79,7 +78,7 @@ public:
 
     void CaptureQuestMarker(uint32_t id, bool captured); // for QUEST games (no teams)
     void CaptureTeamMarker(uint32_t id, int team); // for TEAM games (0 = not captured)
-    
+
     // Shows your markers locally, so you can see where they are
     void ShowMarkersLocal();
     void HideMarkersLocal();

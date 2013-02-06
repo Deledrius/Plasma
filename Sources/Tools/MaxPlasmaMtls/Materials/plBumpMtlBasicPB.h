@@ -43,8 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define PL_BUMPMTLBASICPB_H
 
 // Param ID's
-enum
-{
+enum {
     kBumpBasSpecular,
     kBumpBasRunColor,
     kBumpBasLayer

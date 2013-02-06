@@ -41,7 +41,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *==LICENSE==*/
 
 #if 1   // for debugging
-#include "plCreatableIndex.h"   
+#include "plCreatableIndex.h"
 #include "plModifier/plResponderModifier.h"
 #include "plSurface/plLayerAnimation.h"
 #endif
@@ -94,35 +94,36 @@ extern  bool    gDataServerLocal;
 
 
 // Load Player object
-// a clone will be created if cloneNum>0 
+// a clone will be created if cloneNum>0
 // returns the playerKey if successful.
 //
 // Don't call this directly. Send a clone message to the NetClientManager instead.
-// Load an object, optionally cloning if necessary. 
-plKey plNetClientMgr::ILoadClone(plLoadCloneMsg *pCloneMsg)
+// Load an object, optionally cloning if necessary.
+plKey plNetClientMgr::ILoadClone(plLoadCloneMsg* pCloneMsg)
 {
     plKey cloneKey = pCloneMsg->GetCloneKey();
 
-    if(pCloneMsg->GetIsLoading())
-    {
-        if (cloneKey->ObjectIsLoaded())
-        {
+    if (pCloneMsg->GetIsLoading()) {
+        if (cloneKey->ObjectIsLoaded()) {
             DebugMsg("ILoadClone: object %s is already loaded, ignoring", cloneKey->GetUoid().StringIze().c_str());
             return cloneKey;
         }
 
         // check if local or remote player before loading
-        plLoadAvatarMsg* loadAvMsg=plLoadAvatarMsg::ConvertNoRef(pCloneMsg);
-        if (loadAvMsg)
-        {
-            bool originating = ( pCloneMsg->GetOriginatingPlayerID() == this->GetPlayerID() );
+        plLoadAvatarMsg* loadAvMsg = plLoadAvatarMsg::ConvertNoRef(pCloneMsg);
+
+        if (loadAvMsg) {
+            bool originating = (pCloneMsg->GetOriginatingPlayerID() == this->GetPlayerID());
+
             if (loadAvMsg->GetIsPlayer())
-                if (originating)
+                if (originating) {
                     fLocalPlayerKey = cloneKey;
-                else
+                } else {
                     AddRemotePlayerKey(cloneKey);
-            else // hey, we got a quab or yeesha... or some other such devilry...
+                }
+            else { // hey, we got a quab or yeesha... or some other such devilry...
                 AddNPCKey(cloneKey);
+            }
         }
 
         plKey cloneNodeKey = hsgResMgr::ResMgr()->FindKey(kNetClientCloneRoom_KEY);
@@ -133,11 +134,8 @@ plKey plNetClientMgr::ILoadClone(plLoadCloneMsg *pCloneMsg)
 
         // Finally, pump the dispatch system so all the new refs get delivered. ?
         plgDispatch::Dispatch()->MsgQueueProcess();
-    }
-    else        // we're unloading a clone
-    {
-        if (!cloneKey->ObjectIsLoaded())
-        {
+    } else {    // we're unloading a clone
+        if (!cloneKey->ObjectIsLoaded()) {
             DebugMsg("ILoadClone: object %s is already unloaded, ignoring", cloneKey->GetName().c_str());
             return cloneKey;
         }
@@ -145,8 +143,10 @@ plKey plNetClientMgr::ILoadClone(plLoadCloneMsg *pCloneMsg)
         // need to drop our ref if it's an NPC
         // remote players handled by plPlayerPageMsg--don't sweat that
         plKeyVec::iterator it = std::find(fNPCKeys.begin(), fNPCKeys.end(), cloneKey);
-        if (it != fNPCKeys.end())
+
+        if (it != fNPCKeys.end()) {
             fNPCKeys.erase(it);
+        }
 
         ICheckPendingStateLoad(hsTimer::GetSysSeconds());
         plSynchEnabler p(false);    // turn off dirty tracking while in this function
@@ -177,23 +177,22 @@ plKey plNetClientMgr::ILoadClone(plLoadCloneMsg *pCloneMsg)
 //
 void plNetClientMgr::IPlayerChangeAge(bool exitAge, int32_t spawnPt)
 {
-    plArmatureMod *avatar = plAvatarMgr::GetInstance()->GetLocalAvatar();
-    
-    if (avatar)
-    {
+    plArmatureMod* avatar = plAvatarMgr::GetInstance()->GetLocalAvatar();
+
+    if (avatar) {
         plSynchEnabler ps(false);   // disable state change tracking while we change ages
-        if (exitAge)
+
+        if (exitAge) {
             avatar->LeaveAge();
-        else
-        {
+        } else {
             bool validSpawn = (spawnPt >= 0);
             avatar->EnterAge(!validSpawn);
-            if (validSpawn)
+
+            if (validSpawn) {
                 avatar->SpawnAt(spawnPt, hsTimer::GetSysSeconds());
+            }
         }
-    }
-    else if (fLocalPlayerKey)
-    {
+    } else if (fLocalPlayerKey) {
         ErrorMsg("Can't find avatarMod %s", fLocalPlayerKey->GetName().c_str());
     }
 }

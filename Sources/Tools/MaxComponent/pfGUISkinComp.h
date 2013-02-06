@@ -48,28 +48,28 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pfGameGUIMgr/pfGUIPopUpMenu.h"
 
 /// skin component class
-class plGUISkinComp : public plComponent
-{
+class plGUISkinComp : public plComponent {
 public:
     plGUISkinComp();
-    void DeleteThis() { delete this; }
+    void DeleteThis() {
+        delete this;
+    }
 
     // SetupProperties - Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    bool SetupProperties(plMaxNode *pNode, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* pNode, plErrorMsg* pErrMsg);
 
-    bool PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    bool DeInit(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool DeInit(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    plLayerTex  *GetSkinBitmap( void );
+    plLayerTex*  GetSkinBitmap(void);
 
-    virtual uint32_t  GetNumMtls( void ) const;
-    virtual Texmap  *GetMtl( uint32_t idx );
+    virtual uint32_t  GetNumMtls(void) const;
+    virtual Texmap*  GetMtl(uint32_t idx);
 
-    enum
-    {
+    enum {
         kRefBitmap = 256,           // So we can share it among other components
         kRefUpLeftCorner        = 257,
         kRefTopSpan             = 257 + 4,
@@ -89,81 +89,80 @@ public:
         kRefBorderMargin
     };
 
-    pfGUISkin   *GetConvertedSkin( void ) const { return fConvertedSkin; }
-    plKey       GetConvertedSkinKey( void ) const;
+    pfGUISkin*   GetConvertedSkin(void) const {
+        return fConvertedSkin;
+    }
+    plKey       GetConvertedSkinKey(void) const;
 
     // Given an INode, gives you a pointer to the GUI component if it actually is one, nil otherwise
-    static plGUISkinComp        *GetGUIComp( INode *node );
-    
+    static plGUISkinComp*        GetGUIComp(INode* node);
+
 protected:
 
-    pfGUISkin   *fConvertedSkin;
+    pfGUISkin*   fConvertedSkin;
 };
 
 /// skin editor proc class
-class pfGUISkinEditProc
-{
-    protected:
-        static pfGUISkinEditProc    *fInstance;
+class pfGUISkinEditProc {
+protected:
+    static pfGUISkinEditProc*    fInstance;
 
-        static int      fZoom;
+    static int      fZoom;
 
-        plGUISkinComp   *fComp;
-        RECT            fPreviewRect, fCurrElemRect;
-        HDC             fDblDC, fImageDC;
-        HBITMAP         fDblBitmap, fImageBitmap;
-        int             fDblWidth, fDblHeight;
-        int             fXOffset, fYOffset;
-        int             fCurrPBRefSet;
-        HWND            fHWnd;
-        HPEN            fDefPen, fOtherPen;
+    plGUISkinComp*   fComp;
+    RECT            fPreviewRect, fCurrElemRect;
+    HDC             fDblDC, fImageDC;
+    HBITMAP         fDblBitmap, fImageBitmap;
+    int             fDblWidth, fDblHeight;
+    int             fXOffset, fYOffset;
+    int             fCurrPBRefSet;
+    HWND            fHWnd;
+    HPEN            fDefPen, fOtherPen;
 
-        bool            fDragging;
-        uint8_t           fDragType;
-        int             fDragTimer;
-        int             fDragOffsetX, fDragOffsetY;
-        HCURSOR         fOrigCursor;
+    bool            fDragging;
+    uint8_t           fDragType;
+    int             fDragTimer;
+    int             fDragOffsetX, fDragOffsetY;
+    HCURSOR         fOrigCursor;
 
-        pfGUISkin::pfSRect  fBackups[ pfGUISkin::kNumElements ];
+    pfGUISkin::pfSRect  fBackups[ pfGUISkin::kNumElements ];
 
 
-        void    IRefreshDblBuffer( void );
-        void    IRefreshImageBuffer( void );
-        void    IInitDblBuffer( void );
-        void    IKillDblBuffer( void );
+    void    IRefreshDblBuffer(void);
+    void    IRefreshImageBuffer(void);
+    void    IInitDblBuffer(void);
+    void    IKillDblBuffer(void);
 
-        void    ISetScrollRanges( void );
+    void    ISetScrollRanges(void);
 
-        enum
-        {
-            kRangeSlop = 4
-        };
+    enum {
+        kRangeSlop = 4
+    };
 
-        bool    IPointWithinRange( int x, int y, int ptX, int ptY );
-        bool    IPointWithinVertRange( int x, int y, int ptX, int ptY1, int ptY2 );
-        bool    IPointWithinHorzRange( int x, int y, int ptX1, int ptX2, int ptY );
+    bool    IPointWithinRange(int x, int y, int ptX, int ptY);
+    bool    IPointWithinVertRange(int x, int y, int ptX, int ptY1, int ptY2);
+    bool    IPointWithinHorzRange(int x, int y, int ptX1, int ptX2, int ptY);
 
-        enum DragTypeFlags
-        {
-            kLeft   = 0x01,
-            kTop    = 0x02,
-            kRight  = 0x04,
-            kBottom = 0x08,
-            kDragAll = kLeft | kTop | kRight | kBottom
-        };
+    enum DragTypeFlags {
+        kLeft   = 0x01,
+        kTop    = 0x02,
+        kRight  = 0x04,
+        kBottom = 0x08,
+        kDragAll = kLeft | kTop | kRight | kBottom
+    };
 
-        uint8_t   IGetDragTypeFlags( int x, int y );
+    uint8_t   IGetDragTypeFlags(int x, int y);
 
-        void    IJustDrawOneRect( int whichElement, IParamBlock2 *pb, HDC hDC, HPEN whichPen, int refToIgnore );
+    void    IJustDrawOneRect(int whichElement, IParamBlock2* pb, HDC hDC, HPEN whichPen, int refToIgnore);
 
-    public:
+public:
 
-        pfGUISkinEditProc( plGUISkinComp *comp );
-        ~pfGUISkinEditProc();
+    pfGUISkinEditProc(plGUISkinComp* comp);
+    ~pfGUISkinEditProc();
 
-        static INT_PTR CALLBACK DlgProc( HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam );
+    static INT_PTR CALLBACK DlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
-        INT_PTR CALLBACK    DialogProc( HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam );
+    INT_PTR CALLBACK    DialogProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
 

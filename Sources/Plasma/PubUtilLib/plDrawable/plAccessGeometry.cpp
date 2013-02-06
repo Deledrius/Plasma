@@ -66,8 +66,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //////////////////////////////////////////////////////////////////////////////////
 // Dropping these here, because they have no place else to go except a header.
 void plAccessSpan::SetSource(plSpan* s)
-{ 
-    fLocalToWorld = &s->fLocalToWorld; 
+{
+    fLocalToWorld = &s->fLocalToWorld;
     fWorldToLocal = &s->fWorldToLocal;
     fLocalBounds = &s->fLocalBounds;
     fWorldBounds = &s->fWorldBounds;
@@ -75,8 +75,8 @@ void plAccessSpan::SetSource(plSpan* s)
     fWaterHeight = s->fProps & plSpan::kWaterHeight ? &s->fWaterHeight : nil;
 }
 void plAccessSpan::SetSource(plGeometrySpan* s)
-{ 
-    fLocalToWorld = &s->fLocalToWorld; 
+{
+    fLocalToWorld = &s->fLocalToWorld;
     fWorldToLocal = &s->fWorldToLocal;
     fLocalBounds = &s->fLocalBounds;
     fWorldBounds = &s->fWorldBounds;
@@ -91,7 +91,7 @@ void plAccessSpan::SetSource(plGeometrySpan* s)
 // Simple constructor
 
 plAccessGeometry::plAccessGeometry(plPipeline* pipe)
-:   fPipe(pipe)
+    :   fPipe(pipe)
 {
 }
 
@@ -111,8 +111,10 @@ void plAccessGeometry::Init(plPipeline* pipe)
 
 void plAccessGeometry::DeInit()
 {
-    if( fInstance )
+    if (fInstance) {
         fInstance->Nilify();
+    }
+
     hsRefCnt_SafeUnRef(fInstance);
 }
 
@@ -138,20 +140,20 @@ void plAccessGeometry::OpenRO(const plDrawInterface* di, hsTArray<plAccessSpan>&
     accs.SetCount(di->GetNumDrawables());
     accs.SetCount(0);
     int j;
-    for( j = 0; j < di->GetNumDrawables(); j++ )
-    {
+
+    for (j = 0; j < di->GetNumDrawables(); j++) {
         plDrawableSpans* dr = plDrawableSpans::ConvertNoRef(di->GetDrawable(j));
+
         // Nil dr - it hasn't loaded yet or something.
-        if( dr )
-        {
+        if (dr) {
             plDISpanIndex& diIndex = dr->GetDISpans(di->GetDrawableMeshIndex(j));
-            if( !diIndex.IsMatrixOnly() )
-            {
+
+            if (!diIndex.IsMatrixOnly()) {
                 int k;
-                for( k = 0; k < diIndex.GetCount(); k++ )
-                {
-                    accs.Expand(numGot+1);
-                    accs.SetCount(numGot+1);
+
+                for (k = 0; k < diIndex.GetCount(); k++) {
+                    accs.Expand(numGot + 1);
+                    accs.SetCount(numGot + 1);
                     OpenRO(dr, diIndex[k], accs[numGot++]);
                 }
             }
@@ -166,20 +168,20 @@ void plAccessGeometry::OpenRW(const plDrawInterface* di, hsTArray<plAccessSpan>&
     accs.Expand(di->GetNumDrawables());
     accs.SetCount(0);
     int j;
-    for( j = 0; j < di->GetNumDrawables(); j++ )
-    {
+
+    for (j = 0; j < di->GetNumDrawables(); j++) {
         plDrawableSpans* dr = plDrawableSpans::ConvertNoRef(di->GetDrawable(j));
+
         // Nil dr - it hasn't loaded yet or something.
-        if( dr )
-        {
+        if (dr) {
             plDISpanIndex& diIndex = dr->GetDISpans(di->GetDrawableMeshIndex(j));
-            if( !diIndex.IsMatrixOnly() )
-            {
+
+            if (!diIndex.IsMatrixOnly()) {
                 int k;
-                for( k = 0; k < diIndex.GetCount(); k++ )
-                {
-                    accs.Expand(numGot+1);
-                    accs.SetCount(numGot+1);
+
+                for (k = 0; k < diIndex.GetCount(); k++) {
+                    accs.Expand(numGot + 1);
+                    accs.SetCount(numGot + 1);
                     OpenRW(dr, diIndex[k], accs[numGot++], idxToo);
                 }
             }
@@ -190,25 +192,27 @@ void plAccessGeometry::OpenRW(const plDrawInterface* di, hsTArray<plAccessSpan>&
 void plAccessGeometry::Close(hsTArray<plAccessSpan>& accs) const
 {
     int i;
-    for( i = 0; i < accs.GetCount(); i++ )
+
+    for (i = 0; i < accs.GetCount(); i++) {
         Close(accs[i]);
+    }
 }
 
 void plAccessGeometry::TakeSnapShot(const plDrawInterface* di, uint32_t channels) const
 {
     int j;
-    for( j = 0; j < di->GetNumDrawables(); j++ )
-    {
+
+    for (j = 0; j < di->GetNumDrawables(); j++) {
         plDrawableSpans* dr = plDrawableSpans::ConvertNoRef(di->GetDrawable(j));
+
         // Nil dr - it hasn't loaded yet or something.
-        if( dr )
-        {
+        if (dr) {
             plDISpanIndex& diIndex = dr->GetDISpans(di->GetDrawableMeshIndex(j));
-            if( !diIndex.IsMatrixOnly() )
-            {
+
+            if (!diIndex.IsMatrixOnly()) {
                 int k;
-                for( k = 0; k < diIndex.GetCount(); k++ )
-                {
+
+                for (k = 0; k < diIndex.GetCount(); k++) {
                     TakeSnapShot(dr, diIndex[k], channels);
                 }
             }
@@ -219,18 +223,18 @@ void plAccessGeometry::TakeSnapShot(const plDrawInterface* di, uint32_t channels
 void plAccessGeometry::RestoreSnapShot(const plDrawInterface* di, uint32_t channels) const
 {
     int j;
-    for( j = 0; j < di->GetNumDrawables(); j++ )
-    {
+
+    for (j = 0; j < di->GetNumDrawables(); j++) {
         plDrawableSpans* dr = plDrawableSpans::ConvertNoRef(di->GetDrawable(j));
+
         // Nil dr - it hasn't loaded yet or something.
-        if( dr )
-        {
+        if (dr) {
             plDISpanIndex& diIndex = dr->GetDISpans(di->GetDrawableMeshIndex(j));
-            if( !diIndex.IsMatrixOnly() )
-            {
+
+            if (!diIndex.IsMatrixOnly()) {
                 int k;
-                for( k = 0; k < diIndex.GetCount(); k++ )
-                {
+
+                for (k = 0; k < diIndex.GetCount(); k++) {
                     RestoreSnapShot(dr, diIndex[k], channels);
                 }
             }
@@ -241,18 +245,18 @@ void plAccessGeometry::RestoreSnapShot(const plDrawInterface* di, uint32_t chann
 void plAccessGeometry::ReleaseSnapShot(const plDrawInterface* di) const
 {
     int j;
-    for( j = 0; j < di->GetNumDrawables(); j++ )
-    {
+
+    for (j = 0; j < di->GetNumDrawables(); j++) {
         plDrawableSpans* dr = plDrawableSpans::ConvertNoRef(di->GetDrawable(j));
+
         // Nil dr - it hasn't loaded yet or something.
-        if( dr )
-        {
+        if (dr) {
             plDISpanIndex& diIndex = dr->GetDISpans(di->GetDrawableMeshIndex(j));
-            if( !diIndex.IsMatrixOnly() )
-            {
+
+            if (!diIndex.IsMatrixOnly()) {
                 int k;
-                for( k = 0; k < diIndex.GetCount(); k++ )
-                {
+
+                for (k = 0; k < diIndex.GetCount(); k++) {
                     ReleaseSnapShot(dr, diIndex[k]);
                 }
             }
@@ -265,8 +269,9 @@ void plAccessGeometry::ReleaseSnapShot(const plDrawInterface* di) const
 
 void plAccessGeometry::Close(plAccessSpan& acc) const
 {
-    if( !fPipe )
+    if (!fPipe) {
         return;
+    }
 
     fPipe->CloseAccess(acc);
 }
@@ -276,28 +281,31 @@ void plAccessGeometry::IOpen(plDrawable* d, uint32_t spanIdx, plAccessSpan& acc,
     acc.SetType(plAccessSpan::kUndefined);
 
     plDrawableSpans* drawable = plDrawableSpans::ConvertNoRef(d);
-    if( !drawable )
+
+    if (!drawable) {
         return;
+    }
 
-    if( drawable->GetSourceSpans().GetCount() && !drawable->GetNumSpans() )
+    if (drawable->GetSourceSpans().GetCount() && !drawable->GetNumSpans()) {
         IAccessSpanFromSourceSpan(acc, drawable->GetSourceSpans()[spanIdx]);
-    else
+    } else {
         IAccessSpanFromSpan(acc, drawable, drawable->GetSpan(spanIdx), useSnap, readOnly);
+    }
 
-    if( !readOnly )
-    {
+    if (!readOnly) {
         // Need to mark the drawable's data as dirty.
         plDrawableSpans* ds = plDrawableSpans::ConvertNoRef(drawable);
-        if( !ds )
+
+        if (!ds) {
             return;
-        if( acc.HasAccessVtx() )
-        {
+        }
+
+        if (acc.HasAccessVtx()) {
             plVertexSpan* vtx = (plVertexSpan*)ds->GetSpan(spanIdx);
             ds->DirtyVertexBuffer(vtx->fGroupIdx, vtx->fVBufferIdx);
         }
 
-        if( idxToo && acc.HasAccessTri() )
-        {
+        if (idxToo && acc.HasAccessTri()) {
             plIcicle* ice = (plIcicle*)ds->GetSpan(spanIdx);
             ds->DirtyIndexBuffer(ice->fGroupIdx, ice->fIBufferIdx);
         }
@@ -321,18 +329,21 @@ void plAccessGeometry::OpenRW(plDrawable* drawable, uint32_t spanIdx, plAccessSp
 void plAccessGeometry::TakeSnapShot(plDrawable* drawable, uint32_t spanIdx, uint32_t channels) const
 {
     plDrawableSpans* ds = plDrawableSpans::ConvertNoRef(drawable);
-    if( !ds )
+
+    if (!ds) {
         return;
+    }
+
     const plSpan* span = ds->GetSpan(spanIdx);
 
-    if( !span->fSnapShot )
+    if (!span->fSnapShot) {
         span->fSnapShot = new plAccessSnapShot;
+    }
 
     plAccessSpan tmp;
     OpenRO(drawable, spanIdx, tmp, false);
 
-    if( tmp.HasAccessVtx() )
-    {
+    if (tmp.HasAccessVtx()) {
         span->fSnapShot->IncRef();
         span->fSnapShot->CopyFrom(tmp.AccessVtx(), channels);
     }
@@ -341,29 +352,38 @@ void plAccessGeometry::TakeSnapShot(plDrawable* drawable, uint32_t spanIdx, uint
 void plAccessGeometry::RestoreSnapShot(plDrawable* drawable, uint32_t spanIdx, uint32_t channels) const
 {
     plDrawableSpans* ds = plDrawableSpans::ConvertNoRef(drawable);
-    if( !ds )
+
+    if (!ds) {
         return;
+    }
+
     const plSpan* span = ds->GetSpan(spanIdx);
 
-    if( !span->fSnapShot )
+    if (!span->fSnapShot) {
         return;
+    }
 
     plAccessSpan tmp;
     OpenRW(drawable, spanIdx, tmp);
 
-    if( tmp.HasAccessVtx() )
+    if (tmp.HasAccessVtx()) {
         span->fSnapShot->CopyTo(tmp.AccessVtx(), channels);
+    }
 }
 
 void plAccessGeometry::ReleaseSnapShot(plDrawable* drawable, uint32_t spanIdx) const
 {
     plDrawableSpans* ds = plDrawableSpans::ConvertNoRef(drawable);
-    if( !ds )
+
+    if (!ds) {
         return;
+    }
+
     const plSpan* span = ds->GetSpan(spanIdx);
 
-    if( !span->fSnapShot )
+    if (!span->fSnapShot) {
         return;
+    }
 
     span->fSnapShot->Release();
 }
@@ -402,17 +422,15 @@ void plAccessGeometry::IAccessSpanFromSourceSpan(plAccessSpan& dst, const plGeom
 void plAccessGeometry::IAccessSpanFromSpan(plAccessSpan& dst, plDrawableSpans* drawable, const plSpan* span, bool useSnap, bool readOnly) const
 {
     dst.SetType(plAccessSpan::kUndefined);
-    dst.SetSource(const_cast<plSpan*> (span));
-    if( span->fTypeMask & plSpan::kIcicleSpan )
-    {
+    dst.SetSource(const_cast<plSpan*>(span));
+
+    if (span->fTypeMask & plSpan::kIcicleSpan) {
         IAccessSpanFromIcicle(dst, drawable, (const plIcicle*)span, readOnly);
-    }
-    else if( span->fTypeMask & plSpan::kParticleSpan )
-    {
+    } else if (span->fTypeMask & plSpan::kParticleSpan) {
         IAccessSpanFromParticle(dst, drawable, (const plParticleSpan*)span, readOnly);
     }
-    if( useSnap )
-    {
+
+    if (useSnap) {
         IAccessSpanFromSnap(dst, drawable, span);
     }
 }
@@ -420,8 +438,8 @@ void plAccessGeometry::IAccessSpanFromSpan(plAccessSpan& dst, plDrawableSpans* d
 void plAccessGeometry::IAccessSpanFromSnap(plAccessSpan& dst, plDrawableSpans* drawable, const plSpan* span) const
 {
     plAccessVtxSpan& acc = dst.AccessVtx();
-    if( span->fSnapShot )
-    {
+
+    if (span->fSnapShot) {
         span->fSnapShot->SetupChannels(acc);
     }
 }
@@ -431,7 +449,7 @@ void plAccessGeometry::IAccessSpanFromVertexSpan(plAccessSpan& dst, plDrawableSp
     dst.SetMaterial(drawable->GetMaterial(span->fMaterialIdx));
 
     plAccessVtxSpan& acc = dst.AccessVtx();
-    
+
     plGBufferGroup* grp = drawable->GetBufferGroup(span->fGroupIdx);
 
 //#define MF_TOSSER
@@ -440,8 +458,8 @@ void plAccessGeometry::IAccessSpanFromVertexSpan(plAccessSpan& dst, plDrawableSp
 #else // MF_TOSSER
     plConst(bool) useDev(true);
 #endif // MF_TOSSER
-    if( useDev && !drawable->GetNativeProperty(plDrawable::kPropVolatile) && grp->GetVertexBufferRef(span->fVBufferIdx) )
-    {
+
+    if (useDev && !drawable->GetNativeProperty(plDrawable::kPropVolatile) && grp->GetVertexBufferRef(span->fVBufferIdx)) {
         fPipe->OpenAccess(dst, drawable, span, readOnly);
         return;
     }
@@ -453,8 +471,7 @@ void plAccessGeometry::IAccessSpanFromVertexSpan(plAccessSpan& dst, plDrawableSp
     uint8_t* ptr = grp->GetVertBufferData(span->fVBufferIdx);
 
     // Interleaved
-    if( cell->fColorStart == uint32_t(-1) )
-    {
+    if (cell->fColorStart == uint32_t(-1)) {
         uint32_t stride = grp->GetVertexSize();
 
         ptr += cell->fVtxStart + span->fCellOffset * stride;
@@ -464,23 +481,19 @@ void plAccessGeometry::IAccessSpanFromVertexSpan(plAccessSpan& dst, plDrawableSp
         ptr += sizeof(hsPoint3);
 
         int numWgts = grp->GetNumWeights();
-        if( numWgts )
-        {
+
+        if (numWgts) {
             acc.SetNumWeights(numWgts);
             acc.WeightStream(ptr, (uint16_t)stride, offset);
             ptr += numWgts * sizeof(float);
-            if( grp->GetVertexFormat() & plGBufferGroup::kSkinIndices )
-            {
+
+            if (grp->GetVertexFormat() & plGBufferGroup::kSkinIndices) {
                 acc.WgtIndexStream(ptr, (uint16_t)stride, offset);
                 ptr += sizeof(uint32_t);
-            }
-            else
-            {
+            } else {
                 acc.WgtIndexStream(nil, 0, offset);
             }
-        }
-        else
-        {
+        } else {
             acc.SetNumWeights(0);
         }
 
@@ -497,9 +510,7 @@ void plAccessGeometry::IAccessSpanFromVertexSpan(plAccessSpan& dst, plDrawableSp
 
         acc.SetNumUVWs(grp->GetNumUVs());
 
-    }
-    else
-    {
+    } else {
         uint32_t stride = grp->GetVertexLiteStride();
 
         ptr += cell->fVtxStart + span->fCellOffset * stride;
@@ -509,23 +520,19 @@ void plAccessGeometry::IAccessSpanFromVertexSpan(plAccessSpan& dst, plDrawableSp
         ptr += sizeof(hsPoint3);
 
         int numWgts = grp->GetNumWeights();
-        if( numWgts )
-        {
+
+        if (numWgts) {
             acc.SetNumWeights(numWgts);
             acc.WeightStream(ptr, (uint16_t)stride, posOffset);
             ptr += numWgts * sizeof(float);
-            if( grp->GetVertexFormat() & plGBufferGroup::kSkinIndices )
-            {
+
+            if (grp->GetVertexFormat() & plGBufferGroup::kSkinIndices) {
                 acc.WgtIndexStream(ptr, (uint16_t)stride, posOffset);
                 ptr += sizeof(uint32_t);
-            }
-            else
-            {
+            } else {
                 acc.WgtIndexStream(nil, 0, 0);
             }
-        }
-        else
-        {
+        } else {
             acc.SetNumWeights(0);
         }
 
@@ -551,14 +558,13 @@ void plAccessGeometry::IAccessSpanFromVertexSpan(plAccessSpan& dst, plDrawableSp
 
 void plAccessGeometry::IAccessConnectivity(plAccessSpan& dst, plDrawableSpans* drawable, const plSpan* src) const
 {
-    if( src->fTypeMask & plSpan::kIcicleSpan )
-    {
+    if (src->fTypeMask & plSpan::kIcicleSpan) {
         const plIcicle* span = (const plIcicle*)src;
 
         dst.SetType(plAccessSpan::kTri);
 
         plAccessTriSpan& acc = dst.AccessTri();
-        
+
         acc.fNumTris = span->fILength / 3;
         plGBufferGroup* grp = drawable->GetBufferGroup(span->fGroupIdx);
         acc.fTris = grp->GetIndexBufferData(span->fIBufferIdx) + span->fIStartIdx;
@@ -566,8 +572,7 @@ void plAccessGeometry::IAccessConnectivity(plAccessSpan& dst, plDrawableSpans* d
         acc.fIdxDeviceRef = nil;
     }
     // Hmm, particle should probably go here...
-    else 
-    {
+    else {
         dst.SetType(plAccessSpan::kVtx);
     }
 
@@ -578,9 +583,9 @@ void plAccessGeometry::IAccessSpanFromIcicle(plAccessSpan& dst, plDrawableSpans*
     dst.SetType(plAccessSpan::kTri);
 
     plAccessTriSpan& acc = dst.AccessTri();
-    
+
     IAccessSpanFromVertexSpan(dst, drawable, span, readOnly);
-    
+
     acc.fNumTris = span->fILength / 3;
     plGBufferGroup* grp = drawable->GetBufferGroup(span->fGroupIdx);
     acc.fTris = grp->GetIndexBufferData(span->fIBufferIdx) + span->fIStartIdx;

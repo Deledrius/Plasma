@@ -50,17 +50,22 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  (whenever the netClientMgr's remote player list changes).
 // Also sent initially when we first join a game.
 //
-class plMemberUpdateMsg : public plMessage
-{
+class plMemberUpdateMsg : public plMessage {
 public:
-   CLASSNAME_REGISTER( plMemberUpdateMsg );
-   GETINTERFACE_ANY( plMemberUpdateMsg, plMessage );
+    CLASSNAME_REGISTER(plMemberUpdateMsg);
+    GETINTERFACE_ANY(plMemberUpdateMsg, plMessage);
 
-   plMemberUpdateMsg() { SetBCastFlag( kBCastByExactType ); }
+    plMemberUpdateMsg() {
+        SetBCastFlag(kBCastByExactType);
+    }
 
-   // IO 
-   void Read(hsStream* stream, hsResMgr* mgr) { plMessage::IMsgRead(stream, mgr); }
-   void Write(hsStream* stream, hsResMgr* mgr)  {   plMessage::IMsgWrite(stream, mgr); }
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
+        plMessage::IMsgRead(stream, mgr);
+    }
+    void Write(hsStream* stream, hsResMgr* mgr)  {
+        plMessage::IMsgWrite(stream, mgr);
+    }
 };
 
 #endif      // plMemberUpdateMsg

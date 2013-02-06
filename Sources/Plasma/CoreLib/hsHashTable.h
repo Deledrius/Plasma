@@ -47,54 +47,84 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsTemplates.h"
 
 template <class T>
-class hsHashTableIterator
-{
+class hsHashTableIterator {
 public:
     hsHashTableIterator() : fList(nil), fIndex(-1)  { }
     explicit hsHashTableIterator(hsTArray<T>* list, uint32_t idx) : fList(list), fIndex(idx) { }
-    
-    T* operator->() const   { return &((*fList)[fIndex]); }
-    T& operator*() const    { return (*fList)[fIndex]; }
-    
-    hsHashTableIterator<T>& operator++()            { fIndex--; return *this; }
-    const hsHashTableIterator<T>& operator++(int)   { hsHashTableIterator<T> temp(*this); --(*this); return temp; }
-    
-    hsHashTableIterator<T>& operator--()            { fIndex++; return *this; }
-    const hsHashTableIterator<T>& operator--(int)   { hsHashTableIterator<T> temp(*this); ++(*this); return temp; }
-    
-    bool operator==(const hsHashTableIterator<T>& other) const    { return fList==other.fList && fIndex==other.fIndex; }
-    bool operator!=(const hsHashTableIterator<T>& other) const    { return !(*this == other); }
-    
+
+    T* operator->() const   {
+        return &((*fList)[fIndex]);
+    }
+    T& operator*() const    {
+        return (*fList)[fIndex];
+    }
+
+    hsHashTableIterator<T>& operator++()            {
+        fIndex--;
+        return *this;
+    }
+    const hsHashTableIterator<T>& operator++(int)   {
+        hsHashTableIterator<T> temp(*this);
+        --(*this);
+        return temp;
+    }
+
+    hsHashTableIterator<T>& operator--()            {
+        fIndex++;
+        return *this;
+    }
+    const hsHashTableIterator<T>& operator--(int)   {
+        hsHashTableIterator<T> temp(*this);
+        ++(*this);
+        return temp;
+    }
+
+    bool operator==(const hsHashTableIterator<T>& other) const    {
+        return fList == other.fList && fIndex == other.fIndex;
+    }
+    bool operator!=(const hsHashTableIterator<T>& other) const    {
+        return !(*this == other);
+    }
+
 private:
     hsTArray<T>* fList;
     uint32_t fIndex;
 };
 
 
-template <class T> 
-class hsHashTable
-{
+template <class T>
+class hsHashTable {
 public:
-    hsHashTable(uint32_t size=150001, uint32_t step=1);
+    hsHashTable(uint32_t size = 150001, uint32_t step = 1);
     ~hsHashTable();
 
     typedef hsHashTableIterator<T> iterator;
 
-    iterator begin()    { return iterator(&fItemList,fItemList.Count()-1); }
-    iterator end()      { return iterator(&fItemList,0); }
+    iterator begin()    {
+        return iterator(&fItemList, fItemList.Count() - 1);
+    }
+    iterator end()      {
+        return iterator(&fItemList, 0);
+    }
     void clear();
 
-    uint32_t count()          { return fItemList.Count()-1; }
-    uint32_t size()           { return fSize; }
+    uint32_t count()          {
+        return fItemList.Count() - 1;
+    }
+    uint32_t size()           {
+        return fSize;
+    }
 
-    uint32_t CollisionCount() { return fCollisionCount; }
+    uint32_t CollisionCount() {
+        return fCollisionCount;
+    }
 
     inline void insert(T& item);
     inline void erase(T& item);
     inline iterator find(const T& item);
 
     iterator GetItem(uint32_t i);
-    
+
 private:
     hsTArray<T>         fItemList;
     hsTArray<uint32_t>    fClearList;
@@ -106,18 +136,18 @@ private:
 
     // No copy or assignment
     hsHashTable(const hsHashTable&);
-    hsHashTable &operator=(const hsHashTable&);
+    hsHashTable& operator=(const hsHashTable&);
 };
 
 template <class T>
 hsHashTable<T>::hsHashTable(uint32_t size, uint32_t step) :
-fSize(size),
-fCollisionStep(step),
-fCollisionCount(0)
+    fSize(size),
+    fCollisionStep(step),
+    fCollisionCount(0)
 {
     fItemList.SetCount(1);
     fHashTable = new uint32_t[fSize];
-    memset(fHashTable,0,fSize*sizeof(uint32_t));
+    memset(fHashTable, 0, fSize * sizeof(uint32_t));
 }
 
 template <class T>
@@ -130,28 +160,32 @@ template <class T>
 void hsHashTable<T>::clear()
 {
     fItemList.SetCount(1);
-    for (int32_t i=0; i<fClearList.Count(); i++)
+
+    for (int32_t i = 0; i < fClearList.Count(); i++) {
         fHashTable[ fClearList[i] ] = 0;
+    }
+
     fClearList.Reset();
 }
 
 template <class T>
 void hsHashTable<T>::insert(T& item)
 {
-    hsAssert(fClearList.Count() < fSize,"Hash table overflow!  Increase the table size.");
+    hsAssert(fClearList.Count() < fSize, "Hash table overflow!  Increase the table size.");
     uint32_t h = item.GetHash();
     h %= fSize;
-    while (uint32_t it = fHashTable[h])
-    {
-        if ( fItemList[it] == item)
-        {
+
+    while (uint32_t it = fHashTable[h]) {
+        if (fItemList[it] == item) {
             fItemList[it] = item;
             return;
         }
+
         h += fCollisionStep;
         h %= fSize;
         fCollisionCount++;
     }
+
     fHashTable[h] = fItemList.Count();
     fItemList.Append(item);
     fClearList.Append(h);
@@ -162,10 +196,9 @@ void hsHashTable<T>::erase(T& item)
 {
     uint32_t h = item.GetHash();
     h %= fSize;
-    while (uint32_t it = fHashTable[h])
-    {
-        if ( fItemList[it] == item )
-        {
+
+    while (uint32_t it = fHashTable[h]) {
+        if (fItemList[it] == item) {
             fHashTable[h] = 0;
             return;
         }
@@ -177,23 +210,24 @@ hsHashTableIterator<T> hsHashTable<T>::find(const T& item)
 {
     uint32_t h = item.GetHash();
     h %= fSize;
-    while (uint32_t it = fHashTable[h])
-    {
-        if ( fItemList[it] == item )
-        {
-            return iterator(&fItemList,it);
+
+    while (uint32_t it = fHashTable[h]) {
+        if (fItemList[it] == item) {
+            return iterator(&fItemList, it);
         }
+
         h += fCollisionStep;
         h %= fSize;
         fCollisionCount++;
     }
+
     return end();
 }
 
 template <class T>
 hsHashTableIterator<T> hsHashTable<T>::GetItem(uint32_t i)
 {
-    return iterator(&fItemList,i+1);
+    return iterator(&fItemList, i + 1);
 }
 
 #endif // _hsHashTable_Included_

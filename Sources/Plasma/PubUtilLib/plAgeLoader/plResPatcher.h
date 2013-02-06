@@ -49,11 +49,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plOperationProgress;
 
-class plResPatcher
-{
+class plResPatcher {
     enum { kManifest, kFile };
-    struct Request
-    {
+    struct Request {
         plFileName  fFile;
         plFileName  fFriendlyName;
         uint8_t     fType;
@@ -74,7 +72,9 @@ public:
     static plResPatcher* GetInstance();
     static void Shutdown();
 
-    plOperationProgress* GetProgress() { return fProgress; }
+    plOperationProgress* GetProgress() {
+        return fProgress;
+    }
 
     void Finish(bool success = true);
     void IssueRequest();
@@ -83,8 +83,7 @@ public:
     void Start();
 };
 
-enum PatcherLogType
-{
+enum PatcherLogType {
     kHeader,
     kInfo,
     kMajorStatus,

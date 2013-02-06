@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 // Abstract base class for compression code
 //
-class plCompress
-{
+class plCompress {
 public:
     plCompress() {}
     virtual ~plCompress() {}
@@ -58,8 +57,8 @@ public:
     virtual bool Compress(uint8_t* bufOut, uint32_t* bufLenOut, const uint8_t* bufIn, uint32_t bufLenIn) = 0;
 
     // in place versions
-    virtual bool Uncompress(uint8_t** bufIn, uint32_t* bufLenIn, uint32_t maxBufLenOut, int offset=0) = 0;
-    virtual bool Compress(uint8_t** bufIn, uint32_t* bufLenIn, int offset=0) = 0;
+    virtual bool Uncompress(uint8_t** bufIn, uint32_t* bufLenIn, uint32_t maxBufLenOut, int offset = 0) = 0;
+    virtual bool Compress(uint8_t** bufIn, uint32_t* bufLenIn, int offset = 0) = 0;
 };
 
 

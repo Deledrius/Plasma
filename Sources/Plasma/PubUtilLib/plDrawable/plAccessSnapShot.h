@@ -48,8 +48,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // All functions and fields here (including constructor) are private,
 // because the only valid user of this is the friend class plAccessGeometry.
 // Use this only via plAccessGeometry.
-class plAccessSnapShot : public plAccessVtxSpan
-{
+class plAccessSnapShot : public plAccessVtxSpan {
 public:
     void            Destroy(); // Free up and reset to zero.
 
@@ -75,10 +74,16 @@ protected:
     void            Release(); // Decrements refcnt, calls Destroy on zero
     void            Clear(); // Initialize to zeros
 
-    void            IncRef() { fRefCnt++; }
-    void            DecRef() { Release(); }
+    void            IncRef() {
+        fRefCnt++;
+    }
+    void            DecRef() {
+        Release();
+    }
 
-    plAccessSnapShot() : fRefCnt(0), fData(nil) { Clear(); }
+    plAccessSnapShot() : fRefCnt(0), fData(nil) {
+        Clear();
+    }
 
     friend class plAccessGeometry;
 };

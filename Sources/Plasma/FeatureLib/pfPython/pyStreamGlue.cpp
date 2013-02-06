@@ -62,30 +62,26 @@ PYTHON_METHOD_DEFINITION(ptStream, open, args)
 {
     PyObject* filenameObj;
     PyObject* flagsObj;
-    if (!PyArg_ParseTuple(args, "OO", &filenameObj, &flagsObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "OO", &filenameObj, &flagsObj)) {
         PyErr_SetString(PyExc_TypeError, "open expects two strings");
         PYTHON_RETURN_ERROR;
     }
 
     plFileName filename;
-    if (PyString_CheckEx(filenameObj))
-    {
+
+    if (PyString_CheckEx(filenameObj)) {
         filename = PyString_AsStringEx(filenameObj);
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "open expects two strings");
         PYTHON_RETURN_ERROR;
     }
 
     plString flags;
-    if (PyString_CheckEx(flagsObj))
-    {
+
+    if (PyString_CheckEx(flagsObj)) {
         flags = PyString_AsStringEx(flagsObj);
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "open expects two strings");
         PYTHON_RETURN_ERROR;
     }
@@ -97,36 +93,42 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptStream, readlines)
 {
     std::vector<std::string> lines = self->fThis->ReadLines();
     PyObject* retVal = PyList_New(lines.size());
-    for (int i = 0; i < lines.size(); i++)
+
+    for (int i = 0; i < lines.size(); i++) {
         PyList_SetItem(retVal, i, PyString_FromString(lines[i].c_str()));
+    }
+
     return retVal;
 }
 
 PYTHON_METHOD_DEFINITION(ptStream, writelines, args)
 {
     PyObject* stringList = NULL;
-    if (!PyArg_ParseTuple(args, "O", &stringList))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &stringList)) {
         PyErr_SetString(PyExc_TypeError, "writelines expects a list of strings");
         PYTHON_RETURN_ERROR;
     }
-    if (!PyList_Check(stringList))
-    {
+
+    if (!PyList_Check(stringList)) {
         PyErr_SetString(PyExc_TypeError, "writelines expects a list of strings");
         PYTHON_RETURN_ERROR;
     }
+
     std::vector<std::string> strings;
     int len = PyList_Size(stringList);
-    for (int i = 0; i < len; i++)
-    {
+
+    for (int i = 0; i < len; i++) {
         PyObject* element = PyList_GetItem(stringList, i);
-        if (!PyString_Check(element))
-        {
+
+        if (!PyString_Check(element)) {
             PyErr_SetString(PyExc_TypeError, "writelines expects a list of strings");
             PYTHON_RETURN_ERROR;
         }
+
         strings.push_back(PyString_AsString(element));
     }
+
     PYTHON_RETURN_BOOL(self->fThis->WriteLines(strings));
 }
 
@@ -138,12 +140,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptStream, isOpen)
 }
 
 PYTHON_START_METHODS_TABLE(ptStream)
-    PYTHON_METHOD(ptStream, open, "Params: fileName,flags\nOpen a stream file for reading or writing"),
-    PYTHON_METHOD_NOARGS(ptStream, readlines, "Reads a list of strings from the file"),
-    PYTHON_METHOD(ptStream, writelines, "Params: lines\nWrite a list of strings to the file"),
-    PYTHON_BASIC_METHOD(ptStream, close, "Close the status log file"),
-    PYTHON_METHOD_NOARGS(ptStream, isOpen, "Returns whether the stream file is currently opened"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptStream, open, "Params: fileName,flags\nOpen a stream file for reading or writing"),
+              PYTHON_METHOD_NOARGS(ptStream, readlines, "Reads a list of strings from the file"),
+              PYTHON_METHOD(ptStream, writelines, "Params: lines\nWrite a list of strings to the file"),
+              PYTHON_BASIC_METHOD(ptStream, close, "Close the status log file"),
+              PYTHON_METHOD_NOARGS(ptStream, isOpen, "Returns whether the stream file is currently opened"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptStream, "A basic stream class");
@@ -158,7 +160,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptStream, pyStream)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyStream::AddPlasmaClasses(PyObject *m)
+void pyStream::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptStream);

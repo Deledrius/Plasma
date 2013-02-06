@@ -44,7 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetProtocol/Private/Protocols/pnNpCli2GateKeeper.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNNETPROTOCOL_PRIVATE_PROTOCOLS_PNNPCLI2GATEKEEPER_H
@@ -69,7 +69,7 @@ enum {
     kGateKeeper2Cli_PingReply,
     kGateKeeper2Cli_FileSrvIpAddressReply,
     kGateKeeper2Cli_AuthSrvIpAddressReply,
-   
+
     kNumGateKeeper2CliMessages
 };
 static_assert(kNumGateKeeper2CliMessages <= 0xFFFF, "GateKeeper2Cli message types overflow uint16");

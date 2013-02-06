@@ -54,9 +54,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 
 
-int plNetClientCommMsgHandler::HandleMessage( plNetMessage* msg ) 
+int plNetClientCommMsgHandler::HandleMessage(plNetMessage* msg)
 {
-    plNetClientMgr* nc=plNetClientMgr::GetInstance();
+    plNetClientMgr* nc = plNetClientMgr::GetInstance();
     int ret = nc->fMsgHandler.ReceiveMsg(msg);
 
     return ret;
@@ -70,7 +70,7 @@ int plNetClientMgr::IInitNetClientComm()
     fNetClientComm.SetDefaultHandler(&fNetClientCommMsgHandler);
 
     SetFlagsBit(kNetClientCommInited);
-    
+
     return hsOK;
 }
 

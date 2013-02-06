@@ -43,7 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define plNetCommonStats_inc
 /*
 //
-// abstract class for NetCore stats 
+// abstract class for NetCore stats
 //
 class hsStream;
 class plNetCommonStats

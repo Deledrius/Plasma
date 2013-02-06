@@ -48,16 +48,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // use a nil key to return to main world
 // otherwise pass in the key of the world you're going to.
-class plSubWorldMsg : public plSimulationMsg
-{
+class plSubWorldMsg : public plSimulationMsg {
 public:
-    plSubWorldMsg()
-    {
+    plSubWorldMsg() {
         fWorldKey = nil;
     }
-    plSubWorldMsg(const plKey &sender, const plKey &receiver, const plKey &worldKey)
-        : plSimulationMsg(sender, receiver, 0)
-    {
+    plSubWorldMsg(const plKey& sender, const plKey& receiver, const plKey& worldKey)
+        : plSimulationMsg(sender, receiver, 0) {
         fWorldKey = worldKey;
         SetBCastFlag(plMessage::kNetPropagate);
     }
@@ -65,10 +62,10 @@ public:
     plKey fWorldKey;
 
     CLASSNAME_REGISTER(plSubWorldMsg);
-    GETINTERFACE_ANY( plSubWorldMsg, plSimulationMsg);
+    GETINTERFACE_ANY(plSubWorldMsg, plSimulationMsg);
 
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 };
 
 #endif // PLSIMSTATEMSG_INC

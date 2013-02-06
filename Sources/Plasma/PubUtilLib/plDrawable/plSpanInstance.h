@@ -50,7 +50,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //      array of templates
 //      array of materials (indexed by templates)
 //      array of clusters
-//      array of LOD blend 
+//      array of LOD blend
 //      array of vis sets
 
 // plCluster
@@ -68,7 +68,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // plSpanInstance
 //      template idx
 //      3x4 transform
-//      encoding flags 
+//      encoding flags
 //          (what components does it include, delPos? color?)
 //          (what's the encoding? 32bit RGBA? 16Bit/Chan? 10Bit/Chan? 8Bit/Chan?)
 //          (need an encoding per channel)
@@ -86,11 +86,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //      fWeights
 
 
-class plSpanEncoding
-{
+class plSpanEncoding {
 public:
-    enum
-    {
+    enum {
         kPosNone            = 0x0,
         kPos888             = 0x1,
         kPos161616          = 0x2,
@@ -105,28 +103,31 @@ public:
         kColRGB888          = 0x80,
         kColARGB8888        = 0x100,
         kColMask            = kColNone
-                                | kColA8
-                                | kColI8
-                                | kColAI88
-                                | kColRGB888
-                                | kColARGB8888,
+                              | kColA8
+                              | kColI8
+                              | kColAI88
+                              | kColRGB888
+                              | kColARGB8888,
     };
 
     uint32_t          fCode;
     float        fPosScale;
 
-    plSpanEncoding() : fCode(kPosNone|kColNone), fPosScale(0) {}
+    plSpanEncoding() : fCode(kPosNone | kColNone), fPosScale(0) {}
     plSpanEncoding(uint32_t c, float s) : fCode(c), fPosScale(s) {}
 
-    uint32_t      Code() const { return fCode; }
-    float    Scale() const { return fPosScale; }
+    uint32_t      Code() const {
+        return fCode;
+    }
+    float    Scale() const {
+        return fPosScale;
+    }
 
     void Read(hsStream* s);
     void Write(hsStream* s) const;
 };
 
-class plSpanInstance
-{
+class plSpanInstance {
 protected:
     uint8_t*          fPosDelta;
     uint8_t*          fCol;
@@ -151,47 +152,56 @@ public:
 
     void SetLocalToWorld(const hsMatrix44& l2w);
 
-    bool HasPosDelta() const { return fPosDelta != nil; }
-    bool HasColor() const { return fCol != nil; }
+    bool HasPosDelta() const {
+        return fPosDelta != nil;
+    }
+    bool HasColor() const {
+        return fCol != nil;
+    }
 
-    static uint16_t PosStrideFromEncoding(const plSpanEncoding& encoding)
-    {
-        switch(encoding.fCode & plSpanEncoding::kPosMask)
-        {
+    static uint16_t PosStrideFromEncoding(const plSpanEncoding& encoding) {
+        switch (encoding.fCode & plSpanEncoding::kPosMask) {
         case plSpanEncoding::kPos888:
             return 3;
+
         case plSpanEncoding::kPos161616:
             return 6;
+
         case plSpanEncoding::kPos101010:
             return 4;
+
         case plSpanEncoding::kPos008:
             return 1;
         }
+
         return 0;
     }
-    static uint16_t ColStrideFromEncoding(const plSpanEncoding& encoding)
-    {
-        switch(encoding.fCode & plSpanEncoding::kPosMask)
-        {
+    static uint16_t ColStrideFromEncoding(const plSpanEncoding& encoding) {
+        switch (encoding.fCode & plSpanEncoding::kPosMask) {
         case plSpanEncoding::kColNone:
             return 0;
+
         case plSpanEncoding::kColA8:
             return 1;
+
         case plSpanEncoding::kColI8:
             return 1;
+
         case plSpanEncoding::kColAI88:
             return 2;
+
         case plSpanEncoding::kColRGB888:
             return 3;
+
         case plSpanEncoding::kColARGB8888:
             return 4;
         }
+
         return 0;
     }
 };
 
-class plSpanInstanceIter
-{
+class plSpanInstanceIter {
 protected:
     plSpanInstance*     fInst;
     plSpanEncoding      fEncoding;
@@ -215,10 +225,11 @@ protected:
 
 public:
     plSpanInstanceIter();
-    plSpanInstanceIter(plSpanInstance* inst, const plSpanEncoding& encoding, uint32_t numVerts) { Init(inst, encoding, numVerts); }
+    plSpanInstanceIter(plSpanInstance* inst, const plSpanEncoding& encoding, uint32_t numVerts) {
+        Init(inst, encoding, numVerts);
+    }
 
-    void Init(plSpanInstance* inst, const plSpanEncoding& encoding, uint32_t numVerts)
-    {
+    void Init(plSpanInstance* inst, const plSpanEncoding& encoding, uint32_t numVerts) {
         fInst = inst;
         fEncoding = encoding;
         fNumVerts = numVerts;
@@ -227,77 +238,80 @@ public:
         fNumVertsLeft = 0;
     }
 
-    void        Begin()
-    {
+    void        Begin() {
         fPos888 = (int8_t*)fInst->fPosDelta;
         fA8 = fInst->fCol;
 
         fNumVertsLeft = fNumVerts;
     }
-    void        Advance()
-    {
+    void        Advance() {
         fPos888 += fPosStride;
         fA8 += fColStride;
 
         fNumVertsLeft--;
     }
-    bool        More() const { return fNumVertsLeft > 0; }
+    bool        More() const {
+        return fNumVertsLeft > 0;
+    }
 
-    hsVector3   DelPos() const
-    {
-        switch(fEncoding.fCode & plSpanEncoding::kPosMask)
-        {
+    hsVector3   DelPos() const {
+        switch (fEncoding.fCode & plSpanEncoding::kPosMask) {
         case plSpanEncoding::kPos888:
-            return hsVector3(fPos888[0] * fEncoding.fPosScale, 
-                                fPos888[1] * fEncoding.fPosScale, 
-                                fPos888[2] * fEncoding.fPosScale);
+            return hsVector3(fPos888[0] * fEncoding.fPosScale,
+                             fPos888[1] * fEncoding.fPosScale,
+                             fPos888[2] * fEncoding.fPosScale);
+
         case plSpanEncoding::kPos161616:
-            return hsVector3(fPos161616[0] * fEncoding.fPosScale, 
-                                fPos161616[1] * fEncoding.fPosScale, 
-                                fPos161616[2] * fEncoding.fPosScale);
+            return hsVector3(fPos161616[0] * fEncoding.fPosScale,
+                             fPos161616[1] * fEncoding.fPosScale,
+                             fPos161616[2] * fEncoding.fPosScale);
+
         case plSpanEncoding::kPos101010:
             return hsVector3(int(*fPos101010 & 0x3f) * fEncoding.fPosScale,
-                int((*fPos101010 >> 10) & 0x3f) * fEncoding.fPosScale,
-                int((*fPos101010 >> 20) & 0x3f) * fEncoding.fPosScale);
+                             int((*fPos101010 >> 10) & 0x3f) * fEncoding.fPosScale,
+                             int((*fPos101010 >> 20) & 0x3f) * fEncoding.fPosScale);
+
         case plSpanEncoding::kPos008:
-            return hsVector3(0,0, *fPos888 * fEncoding.fPosScale);
+            return hsVector3(0, 0, *fPos888 * fEncoding.fPosScale);
         }
-        return hsVector3(0,0,0);
+
+        return hsVector3(0, 0, 0);
     };
-    hsPoint3 Position(const hsPoint3& p) const
-    {
+    hsPoint3 Position(const hsPoint3& p) const {
         hsPoint3 pos(p);
         pos += DelPos();
         return pos;
     };
-    uint32_t      Color(uint32_t c) const 
-    { 
-        switch(fEncoding.fCode & plSpanEncoding::kColMask)
-        {
+    uint32_t      Color(uint32_t c) const {
+        switch (fEncoding.fCode & plSpanEncoding::kColMask) {
         case plSpanEncoding::kColA8:
             return (c & 0x00ffffff) | *fA8;
+
         case plSpanEncoding::kColI8:
-            return (c & 0xff000000) 
-                | (*fI8 << 16)
-                | (*fI8 << 8)
-                | (*fI8 << 0);
-        case plSpanEncoding::kColAI88:
-            {
+            return (c & 0xff000000)
+                   | (*fI8 << 16)
+                   | (*fI8 << 8)
+                   | (*fI8 << 0);
+
+        case plSpanEncoding::kColAI88: {
                 const uint32_t col = *fAI88 & 0xff;
                 return ((*fAI88 & 0xff00) << 24)
-                    | (col << 16)
-                    | (col << 8)
-                    | (col << 0);
+                       | (col << 16)
+                       | (col << 8)
+                       | (col << 0);
             }
+
         case plSpanEncoding::kColRGB888:
             return (c & 0xff000000)
-                | (fRGB888[0] << 16)
-                | (fRGB888[1] << 8)
-                | (fRGB888[2] << 0);
+                   | (fRGB888[0] << 16)
+                   | (fRGB888[1] << 8)
+                   | (fRGB888[2] << 0);
+
         case plSpanEncoding::kColARGB8888:
             return *fARGB8888;
         }
-        return c; 
+
+        return c;
     };
 };
 

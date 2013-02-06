@@ -87,7 +87,7 @@ bool plNetAddress::SetPort(uint16_t port)
 
 void plNetAddress::Clear()
 {
-    memset(&fAddr,0,sizeof(fAddr));
+    memset(&fAddr, 0, sizeof(fAddr));
     fAddr.sin_family = AF_INET;
     fAddr.sin_addr.s_addr = INADDR_ANY;
 }
@@ -123,7 +123,7 @@ bool plNetAddress::SetHost(const char* hostname)
 
 bool plNetAddress::SetHost(uint32_t addr)
 {
-    memcpy(&fAddr.sin_addr, &addr,sizeof(addr));
+    memcpy(&fAddr.sin_addr, &addr, sizeof(addr));
     fAddr.sin_family = AF_INET;
     return true;
 }
@@ -137,14 +137,14 @@ plString plNetAddress::AsString() const
     return ss.GetString();
 }
 
-void plNetAddress::Read(hsStream * s)
+void plNetAddress::Read(hsStream* s)
 {
     s->ReadLE((uint32_t*)&fAddr.sin_addr.s_addr);
     s->ReadLE(&fAddr.sin_port);
     s->ReadLE(&fAddr.sin_family);
 }
 
-void plNetAddress::Write(hsStream * s)
+void plNetAddress::Write(hsStream* s)
 {
     s->WriteLE((uint32_t)fAddr.sin_addr.s_addr);
     s->WriteLE(fAddr.sin_port);

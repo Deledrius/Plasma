@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCoreExe/Private/Win32/pnAceW32Thread.cpp
-*   
+*
 ***/
 
 #include "../../Pch.h"
@@ -57,14 +57,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 struct AsyncThreadTaskList : AtomicRef {
     ENetError error;
-    AsyncThreadTaskList ();
-    ~AsyncThreadTaskList ();
+    AsyncThreadTaskList();
+    ~AsyncThreadTaskList();
 };
 
 struct ThreadTask {
-    AsyncThreadTaskList *   taskList;
+    AsyncThreadTaskList*    taskList;
     FAsyncThreadTask        callback;
-    void *                  param;
+    void*                   param;
     wchar_t                   debugStr[256];
 };
 
@@ -78,14 +78,15 @@ static HANDLE   s_taskPort;
 ***/
 
 //===========================================================================
-AsyncThreadTaskList::AsyncThreadTaskList ()
-:   error(kNetSuccess)
+AsyncThreadTaskList::AsyncThreadTaskList()
+    :   error(kNetSuccess)
 {
     PerfAddCounter(kAsyncPerfThreadTaskListCount, 1);
 }
 
 //============================================================================
-AsyncThreadTaskList::~AsyncThreadTaskList () {
+AsyncThreadTaskList::~AsyncThreadTaskList()
+{
     PerfSubCounter(kAsyncPerfThreadTaskListCount, 1);
 }
 
@@ -103,34 +104,40 @@ AsyncThreadTaskList::~AsyncThreadTaskList () {
 ***/
 
 //===========================================================================
-static unsigned THREADCALL ThreadTaskProc (AsyncThread * thread) {
+static unsigned THREADCALL ThreadTaskProc(AsyncThread* thread)
+{
     PerfAddCounter(kAsyncPerfThreadTaskThreadsActive, 1);
 
     for (;;) {
         long desired = AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsDesired);
+
         if (AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsRunning) > desired) {
             long runningCount = PerfSubCounter(kAsyncPerfThreadTaskThreadsRunning, 1) - 1;
+
             if (runningCount >= desired) {
-                if (runningCount > desired)
+                if (runningCount > desired) {
                     PostQueuedCompletionStatus(s_taskPort, 0, 0, 0);
+                }
+
                 break;
             }
+
             PerfAddCounter(kAsyncPerfThreadTaskThreadsRunning, 1);
         }
 
         // Get the next work item
         DWORD bytes;
-        ThreadTask * task;
+        ThreadTask* task;
         LPOVERLAPPED op;
         PerfSubCounter(kAsyncPerfThreadTaskThreadsActive, 1);
         (void) GetQueuedCompletionStatus(
             s_taskPort,
             &bytes,
-            #ifdef _WIN64
+#ifdef _WIN64
             (PULONG_PTR) &task,
-            #else
+#else
             (LPDWORD) &task,
-            #endif
+#endif
             &op,
             INFINITE
         );
@@ -143,13 +150,15 @@ static unsigned THREADCALL ThreadTaskProc (AsyncThread * thread) {
             delete task;
         }
     }
+
     PerfSubCounter(kAsyncPerfThreadTaskThreadsActive, 1);
 
     return 0;
 }
 
 //===========================================================================
-static unsigned THREADCALL FirstThreadTaskProc (AsyncThread * param) {
+static unsigned THREADCALL FirstThreadTaskProc(AsyncThread* param)
+{
     while (AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsRunning) < AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsDesired)) {
         PerfAddCounter(kAsyncPerfThreadTaskThreadsRunning, 1);
         AsyncThreadCreate(ThreadTaskProc, nil, L"AsyncThreadTaskList");
@@ -171,7 +180,8 @@ static unsigned THREADCALL FirstThreadTaskProc (AsyncThread * param) {
 ***/
 
 //============================================================================
-void AsyncThreadTaskInitialize (unsigned threads) {
+void AsyncThreadTaskInitialize(unsigned threads)
+{
     // Create completion port
     s_taskPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
     ASSERT(s_taskPort);
@@ -181,7 +191,8 @@ void AsyncThreadTaskInitialize (unsigned threads) {
 }
 
 //============================================================================
-void AsyncThreadTaskDestroy () {
+void AsyncThreadTaskDestroy()
+{
     ASSERT(!AsyncPerfGetCounter(kAsyncPerfThreadTaskListCount));
 
     if (s_taskPort) {
@@ -189,10 +200,13 @@ void AsyncThreadTaskDestroy () {
         PostQueuedCompletionStatus(s_taskPort, 0, 0, 0);
 
         // Wait until all threads have exited
-        while (AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsActive))
+        while (AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsActive)) {
             AsyncSleep(10);
-        while (AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsRunning))
+        }
+
+        while (AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsRunning)) {
             AsyncSleep(10);
+        }
 
         // Cleanup completion port
         CloseHandle(s_taskPort);
@@ -201,41 +215,46 @@ void AsyncThreadTaskDestroy () {
 }
 
 //===========================================================================
-unsigned AsyncThreadTaskGetThreadCount () {
+unsigned AsyncThreadTaskGetThreadCount()
+{
     return AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsDesired);
 }
 
 //===========================================================================
-void AsyncThreadTaskSetThreadCount (unsigned threads) {
+void AsyncThreadTaskSetThreadCount(unsigned threads)
+{
     ASSERT(threads >= kThreadTaskMinThreads);
     ASSERT(threads <= kThreadTaskMaxThreads);
 
-    if (AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsDesired) == (long) threads)
+    if (AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsDesired) == (long) threads) {
         return;
+    }
+
     PerfSetCounter(kAsyncPerfThreadTaskThreadsDesired, (long) threads);
 
     if (AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsRunning) < AsyncPerfGetCounter(kAsyncPerfThreadTaskThreadsDesired)) {
         PerfAddCounter(kAsyncPerfThreadTaskThreadsRunning, 1);
         AsyncThreadCreate(FirstThreadTaskProc, nil, L"ThreadTaskList");
-    }
-    else {
+    } else {
         PostQueuedCompletionStatus(s_taskPort, 0, 0, 0);
     }
 }
 
 //===========================================================================
-AsyncThreadTaskList * AsyncThreadTaskListCreate () {
+AsyncThreadTaskList* AsyncThreadTaskListCreate()
+{
     ASSERT(s_taskPort);
-    AsyncThreadTaskList * taskList = new AsyncThreadTaskList;
+    AsyncThreadTaskList* taskList = new AsyncThreadTaskList;
     taskList->IncRef("TaskList");
     return taskList;
 }
 
 //===========================================================================
-void AsyncThreadTaskListDestroy (
-    AsyncThreadTaskList *   taskList,
+void AsyncThreadTaskListDestroy(
+    AsyncThreadTaskList*    taskList,
     ENetError               error
-) {
+)
+{
     ASSERT(taskList);
     ASSERT(error);
     ASSERT(!taskList->error);
@@ -245,20 +264,21 @@ void AsyncThreadTaskListDestroy (
 }
 
 //===========================================================================
-void AsyncThreadTaskAdd (
-    AsyncThreadTaskList *   taskList,
+void AsyncThreadTaskAdd(
+    AsyncThreadTaskList*    taskList,
     FAsyncThreadTask        callback,
-    void *                  param,
+    void*                   param,
     const wchar_t             debugStr[],
     EThreadTaskPriority     priority /* = kThreadTaskPriorityNormal */
-) {
+)
+{
     ASSERT(s_taskPort);
     ASSERT(taskList);
     ASSERT(callback);
     ASSERT(priority == kThreadTaskPriorityNormal);
 
     // Allocate a new task record
-    ThreadTask * task   = new ThreadTask;
+    ThreadTask* task   = new ThreadTask;
     task->taskList      = taskList;
     task->callback      = callback;
     task->param         = param;

@@ -60,31 +60,37 @@ plCrashCli::plCrashCli()
     // Initialize the shared memory
     fLinkH = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(plCrashMemLink), mapname);
     hsAssert(fLinkH, "Failed to create plCrashHandler mapping");
-    if (!fLinkH)
+
+    if (!fLinkH) {
         return;
+    }
 
     // Map the shared memory
     fLink = (plCrashMemLink*)MapViewOfFile(fLinkH, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(plCrashMemLink));
     hsAssert(fLink, "Failed to map plCrashLinkedMem");
-    if (!fLink)
+
+    if (!fLink) {
         return;
+    }
+
     memset(fLink, 0, sizeof(plCrashMemLink));
     fLink->fClientProcessID = GetCurrentProcessId();
 
     // Start the plCrashHandler before a crash
-    STARTUPINFOA info; memset(&info, 0, sizeof(info));
+    STARTUPINFOA info;
+    memset(&info, 0, sizeof(info));
     info.cb = sizeof(STARTUPINFOA);
     CreateProcessA(
-                   CRASH_HANDLER_EXE, // plCrashHandler.exe
-                   cmdline,           // plCrashHandler.exe Plasma20CrashHandler-%u
-                   NULL,
-                   NULL,
-                   FALSE,
-                   CREATE_NO_WINDOW, // Don't create any new windows or consoles
-                   NULL,
-                   NULL,             // Use the directory of the current plClient
-                   &info,
-                   &fCrashSrv        // Save the CrashSrv handles
+        CRASH_HANDLER_EXE, // plCrashHandler.exe
+        cmdline,           // plCrashHandler.exe Plasma20CrashHandler-%u
+        NULL,
+        NULL,
+        FALSE,
+        CREATE_NO_WINDOW, // Don't create any new windows or consoles
+        NULL,
+        NULL,             // Use the directory of the current plClient
+        &info,
+        &fCrashSrv        // Save the CrashSrv handles
     );
 
     HANDLE curProc = GetCurrentProcess();
@@ -95,30 +101,36 @@ plCrashCli::plCrashCli()
                     0,                        // Ignored
                     FALSE,
                     DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS
-    );
+                   );
 }
 
 plCrashCli::~plCrashCli()
 {
     fCrashed->Signal(); // forces the CrashSrv to exit, if it's still running
-    if (fCrashSrv.hProcess)
-    {
+
+    if (fCrashSrv.hProcess) {
         TerminateProcess(fCrashSrv.hProcess, 0);
         CloseHandle(fCrashSrv.hProcess);
     }
-    if (fCrashSrv.hThread)
+
+    if (fCrashSrv.hThread) {
         CloseHandle(fCrashSrv.hThread);
-    if (fLink)
+    }
+
+    if (fLink) {
         UnmapViewOfFile((LPCVOID)fLink);
-    if (fLinkH)
+    }
+
+    if (fLinkH) {
         CloseHandle(fLinkH);
+    }
 }
 
 void plCrashCli::ReportCrash(PEXCEPTION_POINTERS e)
 {
     hsAssert(fLink, "plCrashMemLink is nil");
-    if (fLink)
-    {
+
+    if (fLink) {
         fLink->fClientThreadID = GetCurrentThreadId();
         fLink->fCrashed = true;
         fLink->fExceptionPtrs  = e;
@@ -134,6 +146,7 @@ void plCrashCli::ReportCrash(PEXCEPTION_POINTERS e)
 void plCrashCli::WaitForHandle()
 {
     // Don't deadlock... Only wait if the CrashSrv is attached
-    if (fLink && fLink->fSrvReady)
+    if (fLink && fLink->fSrvReady) {
         fHandled->Wait();
+    }
 }

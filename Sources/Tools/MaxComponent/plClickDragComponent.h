@@ -46,8 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #define CLICK_DRAG_CID Class_ID(0x61880560, 0x348d72d3)
 
-class plClickDragComponent : public plClickableComponent
-{
+class plClickDragComponent : public plClickableComponent {
 protected:
     LogicKeys fAxisKeys;
 
@@ -56,11 +55,11 @@ public:
 
     // Internal setup and write-only set properties on the MaxNode. No reading
     // of properties on the MaxNode, as it's still indeterminant.
-    bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
+    bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    bool PreConvert(plMaxNode *node, plErrorMsg* pErrMsg);
-    bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
-    bool DeInit(plMaxNode *node, plErrorMsg* pErrMsg);
+    bool PreConvert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
+    bool DeInit(plMaxNode* node, plErrorMsg* pErrMsg);
 
     virtual plKey GetAxisKey(plMaxNode* node);
     const LogicKeys& GetAxisKeys();

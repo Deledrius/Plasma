@@ -57,12 +57,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
     We can't use the "PhysFlags," below, for this, because those only cover boolean properties.
     *** We should use the same enum for both and just not worry that some of the enums aren't
         usable as "ignore" flags, -- the readability & simplification gain would be worth it. */
-enum CanIgnore
-{
+enum CanIgnore {
     kMemberGroup                = 0x1,
     kBounceGroup                = 0x2,
     kReportGroup                = 0x4,
-    kMass                       = 0x8,      
+    kMass                       = 0x8,
     kFriction                   = 0x10,
     kRestitution                = 0x20,
     kBoundsType                 = 0x40,
@@ -82,8 +81,7 @@ enum CanIgnore
     kAll                        = 0xffffffff
 };
 
-enum PhysFlags
-{
+enum PhysFlags {
     kFlagPinned             = 0x1,
     kFlagAlignToOwner       = 0x2,
     kFlagCameraAvoid        = 0x4,
@@ -117,47 +115,50 @@ plPhysicalProps::plPhysicalProps() :
 {
 }
 
-bool plPhysicalProps::SetGroup(uint32_t group, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetGroup(uint32_t group, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetParam(fGroup, group, kMemberGroup, canIgnore, node, errMsg);
 }
 
-bool plPhysicalProps::SetReportGroup(uint32_t notifyGroup, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetReportGroup(uint32_t notifyGroup, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetParam(fReportGroup, notifyGroup, kReportGroup, canIgnore, node, errMsg);
 }
 
-bool plPhysicalProps::SetMass(float mass, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetMass(float mass, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
-    if(mass != 0.0f)
-    {
-        if (!GetPinned())
+    if (mass != 0.0f) {
+        if (!GetPinned()) {
             node->SetMovable(true);
+        }
+
         node->SetForceLocal(true);
     }
+
     return ISetParam(fMass, mass, kMass, canIgnore, node, errMsg);
 }
 
-bool plPhysicalProps::SetFriction(float friction, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetFriction(float friction, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetParam(fFriction, friction, kFriction, canIgnore, node, errMsg);
 }
 
-bool plPhysicalProps::SetRestitution(float restitution, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetRestitution(float restitution, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetParam(fRestitution, restitution, kRestitution, canIgnore, node, errMsg);
 }
 
-bool plPhysicalProps::SetBoundsType(int boundsType, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetBoundsType(int boundsType, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     hsAssert(boundsType >= 1 && boundsType < plSimDefs::kNumBounds, "Bad bounds type");
     return ISetParam(fBoundsType, boundsType, kBoundsType, canIgnore, node, errMsg);
 }
 
-bool plPhysicalProps::SetProxyNode(plMaxNode *proxyNode, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetProxyNode(plMaxNode* proxyNode, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
-    if( proxyNode )
+    if (proxyNode) {
         proxyNode->SetDrawable(false);
+    }
 
     return ISetParam(fProxyNode, proxyNode, kProxyNode, canIgnore, node, errMsg);
 }
@@ -167,27 +168,29 @@ bool plPhysicalProps::IGetFlagParam(int flagType)
     return ((fFlags & flagType) != 0);
 }
 
-bool plPhysicalProps::ISetFlagParam(bool val, int flagType, int type, bool canIgnore, plMaxNode *node, plErrorMsg *errMsg)
+bool plPhysicalProps::ISetFlagParam(bool val, int flagType, int type, bool canIgnore, plMaxNode* node, plErrorMsg* errMsg)
 {
     bool ourVal = IGetFlagParam(flagType);
-    if (ISetParam(ourVal, val, type, canIgnore, node, errMsg))
-    {
-        if (ourVal)
+
+    if (ISetParam(ourVal, val, type, canIgnore, node, errMsg)) {
+        if (ourVal) {
             fFlags |= flagType;
-        else
+        } else {
             fFlags &= ~flagType;
+        }
+
         return true;
     }
-    
+
     return false;
 }
 
-bool plPhysicalProps::SetPinned(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetPinned(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetFlagParam(status, kFlagPinned, kPinned, canIgnore, node, errMsg);
 }
 
-bool plPhysicalProps::SetLOSBlockCamera(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetLOSBlockCamera(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetFlagParam(status, kFlagLOSBlockCamera, kCanIgnoreLOSBlockCamera, canIgnore, node, errMsg);
 }
@@ -197,7 +200,7 @@ bool plPhysicalProps::GetLOSBlockCamera()
     return IGetFlagParam(kFlagLOSBlockCamera);
 }
 
-bool plPhysicalProps::SetLOSBlockUI(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetLOSBlockUI(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetFlagParam(status, kFlagLOSBlockUI, kCanIgnoreLOSBlockUI, canIgnore, node, errMsg);
 }
@@ -207,9 +210,9 @@ bool plPhysicalProps::GetLOSBlockUI()
     return IGetFlagParam(kFlagLOSBlockUI);
 }
 
-bool plPhysicalProps::SetLOSUIItem(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetLOSUIItem(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
-    return ISetFlagParam(status, kFlagLOSUIItem, kCanIgnoreLOSUIItem, canIgnore, node, errMsg); 
+    return ISetFlagParam(status, kFlagLOSUIItem, kCanIgnoreLOSUIItem, canIgnore, node, errMsg);
 }
 
 bool plPhysicalProps::GetLOSUIItem()
@@ -217,7 +220,7 @@ bool plPhysicalProps::GetLOSUIItem()
     return IGetFlagParam(kFlagLOSUIItem);
 }
 
-bool plPhysicalProps::SetLOSBlockCustom(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetLOSBlockCustom(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetFlagParam(status, kFlagLOSBlockCustom, kCanIgnoreLOSBlockCustom, canIgnore, node, errMsg);
 }
@@ -227,12 +230,12 @@ bool plPhysicalProps::GetLOSBlockCustom()
     return IGetFlagParam(kFlagLOSBlockCustom);
 }
 
-bool plPhysicalProps::SetCameraAvoidFlag(bool allowLOS, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetCameraAvoidFlag(bool allowLOS, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetFlagParam(allowLOS, kFlagCameraAvoid, kCameraAvoid, canIgnore, node, errMsg);
 }
 
-bool plPhysicalProps::SetLOSShootable(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetLOSShootable(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetFlagParam(status, kFlagLOSShootable, kCanIgnoreLOSShootable, canIgnore, node, errMsg);
 }
@@ -241,7 +244,7 @@ bool plPhysicalProps::GetLOSShootable()
     return IGetFlagParam(kFlagLOSShootable);
 }
 
-bool plPhysicalProps::SetLOSAvatarWalkable(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetLOSAvatarWalkable(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetFlagParam(status, kFlagLOSAvatarWalkable, kCanIgnoreLOSAvatarWalkable, canIgnore, node, errMsg);
 }
@@ -251,7 +254,7 @@ bool plPhysicalProps::GetLOSAvatarWalkable()
     return IGetFlagParam(kFlagLOSAvatarWalkable);
 }
 
-bool plPhysicalProps::SetLOSSwimRegion(bool status, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetLOSSwimRegion(bool status, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetFlagParam(status, kFlagLOSSwimRegion, kCanIgnoreLOSSwimRegion, canIgnore, node, errMsg);
 }
@@ -266,7 +269,7 @@ bool plPhysicalProps::GetLOSSwimRegion()
 //  return ISetFlagParam(allowLOS, kFlagUILOS, kUILOS, canIgnore, node, errMsg);
 //}
 
-bool plPhysicalProps::SetAlignToOwner(bool alignToOwner, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetAlignToOwner(bool alignToOwner, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetFlagParam(alignToOwner, kFlagAlignToOwner, kAlignToOwner, canIgnore, node, errMsg);
 }
@@ -279,7 +282,7 @@ bool plPhysicalProps::SetSubworld(plMaxNode* subworld)
     return true;
 }
 
-bool plPhysicalProps::SetPhysAnim(bool anim, plMaxNode *node, plErrorMsg *errMsg, bool canIgnore)
+bool plPhysicalProps::SetPhysAnim(bool anim, plMaxNode* node, plErrorMsg* errMsg, bool canIgnore)
 {
     return ISetFlagParam(anim, kFlagPhysAnim, kPhysAnim, canIgnore, node, errMsg);
 }
@@ -306,10 +309,11 @@ bool plPhysicalProps::GetPhysAnim()
 
 void plPhysicalProps::SetCanIgnore(uint32_t type, bool canIgnore)
 {
-    if (canIgnore)
+    if (canIgnore) {
         fCanIgnore |= type;
-    else
+    } else {
         fCanIgnore &= ~type;
+    }
 }
 
 bool plPhysicalProps::CanIgnore(uint32_t type)
@@ -317,13 +321,12 @@ bool plPhysicalProps::CanIgnore(uint32_t type)
     return ((fCanIgnore & type) != 0);
 }
 
-void plPhysicalProps::IDisplayErrorMsg(plMaxNode *node, plErrorMsg *errMsg)
+void plPhysicalProps::IDisplayErrorMsg(plMaxNode* node, plErrorMsg* errMsg)
 {
-    if (!errMsg->IsBogus())
-    {
+    if (!errMsg->IsBogus()) {
         errMsg->Set(true,
-            "Physics Conflict",
-            "The node \"%s\" has a conflict in its physical settings.\nMake sure the physical components on it are compatible.",
-            node->GetName()).Show();
+                    "Physics Conflict",
+                    "The node \"%s\" has a conflict in its physical settings.\nMake sure the physical components on it are compatible.",
+                    node->GetName()).Show();
     }
 }

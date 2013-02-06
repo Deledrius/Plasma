@@ -47,27 +47,36 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plKey;
 
-class plLocalPlayerIntersectPlaneConditionalObject : public plConditionalObject
-{
+class plLocalPlayerIntersectPlaneConditionalObject : public plConditionalObject {
 protected:
     plKey   fTarget;
     plKey   fPlane;
 
 public:
-    
+
     plLocalPlayerIntersectPlaneConditionalObject();
-    ~plLocalPlayerIntersectPlaneConditionalObject(){;}
-    
-    CLASSNAME_REGISTER( plLocalPlayerIntersectPlaneConditionalObject );
-    GETINTERFACE_ANY( plLocalPlayerIntersectPlaneConditionalObject, plConditionalObject );
-    
+    ~plLocalPlayerIntersectPlaneConditionalObject() {
+        ;
+    }
+
+    CLASSNAME_REGISTER(plLocalPlayerIntersectPlaneConditionalObject);
+    GETINTERFACE_ANY(plLocalPlayerIntersectPlaneConditionalObject, plConditionalObject);
+
     bool MsgReceive(plMessage* msg);
 
-    void SetTarget(plKey pKey) { fTarget = pKey; }
-    void SetPlane(plKey pKey) { fPlane = pKey; }
-    
-    void Evaluate(){;}
-    void Reset() { SetSatisfied(false); }
+    void SetTarget(plKey pKey) {
+        fTarget = pKey;
+    }
+    void SetPlane(plKey pKey) {
+        fPlane = pKey;
+    }
+
+    void Evaluate() {
+        ;
+    }
+    void Reset() {
+        SetSatisfied(false);
+    }
 
 };
 

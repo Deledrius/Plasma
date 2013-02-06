@@ -41,20 +41,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *==LICENSE==*/
 #include "plAvBrainHuman.h"
 
-class plAvBrainRideAnimatedPhysical : public plAvBrainHuman
-{
+class plAvBrainRideAnimatedPhysical : public plAvBrainHuman {
 public:
     enum mode {
         kWalking,
         kAbort
     };
-    CLASSNAME_REGISTER( plAvBrainRideAnimatedPhysical );
-    GETINTERFACE_ANY( plAvBrainRideAnimatedPhysical, plArmatureBrain );
-    plAvBrainRideAnimatedPhysical() : plAvBrainHuman(false),fMode(kWalking){};
+    CLASSNAME_REGISTER(plAvBrainRideAnimatedPhysical);
+    GETINTERFACE_ANY(plAvBrainRideAnimatedPhysical, plArmatureBrain);
+    plAvBrainRideAnimatedPhysical() : plAvBrainHuman(false), fMode(kWalking) {};
     ~plAvBrainRideAnimatedPhysical();
-    virtual void Activate(plArmatureModBase *avMod);
+    virtual void Activate(plArmatureModBase* avMod);
     virtual void Deactivate();
-    virtual bool MsgReceive(plMessage *msg);
+    virtual bool MsgReceive(plMessage* msg);
     virtual bool LeaveAge();
     virtual bool Apply(double timeNow, float elapsed);
 protected:

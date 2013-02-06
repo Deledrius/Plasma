@@ -52,55 +52,54 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plMessage;
 
-class pfGUIDraggableMod : public pfGUIControlMod
-{
-    protected:
+class pfGUIDraggableMod : public pfGUIControlMod {
+protected:
 
-        hsPoint3    fDragOffset, fLastMousePt;
-        hsPoint3    fOrigCenter;
-        bool        fDragging;
+    hsPoint3    fDragOffset, fLastMousePt;
+    hsPoint3    fOrigCenter;
+    bool        fDragging;
 
-        
-        virtual bool IEval( double secs, float del, uint32_t dirty ); // called only by owner object's Eval()
 
-        virtual uint32_t      IGetDesiredCursor( void ) const;    // As specified in plInputInterface.h
+    virtual bool IEval(double secs, float del, uint32_t dirty);   // called only by owner object's Eval()
 
-    public:
+    virtual uint32_t      IGetDesiredCursor(void) const;      // As specified in plInputInterface.h
 
-        pfGUIDraggableMod();
-        virtual ~pfGUIDraggableMod();
+public:
 
-        CLASSNAME_REGISTER( pfGUIDraggableMod );
-        GETINTERFACE_ANY( pfGUIDraggableMod, pfGUIControlMod );
+    pfGUIDraggableMod();
+    virtual ~pfGUIDraggableMod();
 
-        enum OurFlags
-        {
-            kReportDragging = kDerivedFlagsStart,
-            kHideCursorWhileDragging,
-            kAlwaysSnapBackToStart
-        };
+    CLASSNAME_REGISTER(pfGUIDraggableMod);
+    GETINTERFACE_ANY(pfGUIDraggableMod, pfGUIControlMod);
 
-        // Extended event types (endDrag is the default event)
-        enum ExtendedEvents
-        {
-            kDragging,
-            kCancelled,
-            kStartingDrag
-        };
+    enum OurFlags {
+        kReportDragging = kDerivedFlagsStart,
+        kHideCursorWhileDragging,
+        kAlwaysSnapBackToStart
+    };
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    // Extended event types (endDrag is the default event)
+    enum ExtendedEvents {
+        kDragging,
+        kCancelled,
+        kStartingDrag
+    };
 
-        virtual void    HandleMouseDown( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseUp( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseDrag( hsPoint3 &mousePt, uint8_t modifiers );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        virtual void    UpdateBounds( hsMatrix44 *invXformMatrix = nil, bool force = false );
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-        void            StopDragging( bool cancel );
-        const hsPoint3  &GetLastMousePt( void ) const { return fLastMousePt; }
+    virtual void    HandleMouseDown(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseUp(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseDrag(hsPoint3& mousePt, uint8_t modifiers);
+
+    virtual void    UpdateBounds(hsMatrix44* invXformMatrix = nil, bool force = false);
+
+    void            StopDragging(bool cancel);
+    const hsPoint3&  GetLastMousePt(void) const {
+        return fLastMousePt;
+    }
 };
 
 #endif // _pfGUIDraggableMod_h

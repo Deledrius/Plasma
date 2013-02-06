@@ -79,28 +79,32 @@ hsDebugMessageProc hsSetDebugMessageProc(hsDebugMessageProc newProc)
 }
 
 #ifdef HS_DEBUGGING
-void hsDebugMessage (const char message[], long val)
+void hsDebugMessage(const char message[], long val)
 {
     char    s[1024];
 
-    if (val)
+    if (val) {
         s[0] = snprintf(&s[1], 1022, "%s: %ld", message, val);
-    else
+    } else {
         s[0] = snprintf(&s[1], 1022, "%s", message);
+    }
 
-    if (gHSDebugProc)
+    if (gHSDebugProc) {
         gHSDebugProc(&s[1]);
-    else
+    } else
 #if HS_BUILD_FOR_WIN32
-    {   OutputDebugString(&s[1]);
+    {
+        OutputDebugString(&s[1]);
         OutputDebugString("\n");
     }
+
 #elif HS_BUILD_FOR_UNIX
-    {   fprintf(stderr, "%s\n", &s[1]);
+    {
+        fprintf(stderr, "%s\n", &s[1]);
 //      hsThrow(&s[1]);
     }
 #else
-    hsThrow(&s[1]);
+        hsThrow(&s[1]);
 #endif
 }
 #endif
@@ -119,16 +123,18 @@ void ErrorAssert(int line, const char file[], const char fmt[], ...)
     va_start(args, fmt);
     vsnprintf(msg, sizeof(msg), fmt, args);
 #ifdef HS_DEBUGGING
-    if (s_GuiAsserts)
-    {
-        if(_CrtDbgReport(_CRT_ASSERT, file, line, NULL, msg))
+
+    if (s_GuiAsserts) {
+        if (_CrtDbgReport(_CRT_ASSERT, file, line, NULL, msg)) {
             DebugBreak();
+        }
     } else
 #endif // HS_DEBUGGING
-      if (DebugIsDebuggerPresent()) {
-        char str[] = "-------\nASSERTION FAILED:\nFile: %s   Line: %i\nMessage: %s\n-------";
-        DebugMsg(str, file, line, msg);
-    }
+        if (DebugIsDebuggerPresent()) {
+            char str[] = "-------\nASSERTION FAILED:\nFile: %s   Line: %i\nMessage: %s\n-------";
+            DebugMsg(str, file, line, msg);
+        }
+
 #else
     DebugBreakIfDebuggerPresent();
 #endif // defined(HS_DEBUGGING) || !defined(PLASMA_EXTERNAL_RELEASE)
@@ -147,13 +153,14 @@ bool DebugIsDebuggerPresent()
 void DebugBreakIfDebuggerPresent()
 {
 #ifdef _MSC_VER
-    __try
-    {
+
+    __try {
         __debugbreak();
-    } __except(EXCEPTION_EXECUTE_HANDLER) {
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
         // Debugger not present or some such shwiz.
         // Whatever. Don't crash here.
     }
+
 #endif // _MSC_VER
 }
 
@@ -164,8 +171,7 @@ void DebugMsg(const char fmt[], ...)
     va_start(args, fmt);
     vsnprintf(msg, sizeof(msg), fmt, args);
 
-    if (DebugIsDebuggerPresent())
-    {
+    if (DebugIsDebuggerPresent()) {
 #ifdef _MSC_VER
         OutputDebugStringA(msg);
         OutputDebugStringA("\n");
@@ -181,51 +187,57 @@ void DebugMsg(const char fmt[], ...)
 
 void hsStatusMessage(const char message[])
 {
-  if (gHSStatusProc) {
-    gHSStatusProc(message);
-  } else {
+    if (gHSStatusProc) {
+        gHSStatusProc(message);
+    } else {
 #if HS_BUILD_FOR_UNIX
-    printf("%s",message);
-    int len = strlen(message);
-    if (len>0 && message[len-1]!='\n')
-        printf("\n");
+        printf("%s", message);
+        int len = strlen(message);
+
+        if (len > 0 && message[len - 1] != '\n') {
+            printf("\n");
+        }
+
 #elif HS_BUILD_FOR_WIN32
-    OutputDebugString(message);
-    int len = strlen(message);
-    if (len>0 && message[len-1]!='\n')
-        OutputDebugString("\n");
+        OutputDebugString(message);
+        int len = strlen(message);
+
+        if (len > 0 && message[len - 1] != '\n') {
+            OutputDebugString("\n");
+        }
+
 #endif
-  }
+    }
 }
 
-void hsStatusMessageV(const char * fmt, va_list args)
+void hsStatusMessageV(const char* fmt, va_list args)
 {
     char  buffer[2000];
     vsprintf(buffer, fmt, args);
     hsStatusMessage(buffer);
 }
 
-void hsStatusMessageF(const char * fmt, ...)
+void hsStatusMessageF(const char* fmt, ...)
 {
     va_list args;
-    va_start(args,fmt);
-    hsStatusMessageV(fmt,args);
+    va_start(args, fmt);
+    hsStatusMessageV(fmt, args);
     va_end(args);
 }
 
 #endif
 
 // TODO: Deprecate these in favor of plString
-char * hsFormatStr(const char * fmt, ...)
+char* hsFormatStr(const char* fmt, ...)
 {
     va_list args;
-    va_start(args,fmt);
-    char * result = hsFormatStrV(fmt,args);
+    va_start(args, fmt);
+    char* result = hsFormatStrV(fmt, args);
     va_end(args);
     return result;
 }
 
-char * hsFormatStrV(const char * fmt, va_list args)
+char* hsFormatStrV(const char* fmt, va_list args)
 {
     plString buf = plString::IFormat(fmt, args);
     return hsStrcpy(buf.c_str());
@@ -233,30 +245,30 @@ char * hsFormatStrV(const char * fmt, va_list args)
 
 static char hsStrBuf[100];
 
-char *hsScalarToStr(float s)
+char* hsScalarToStr(float s)
 {
     sprintf(hsStrBuf, "%f", s);
     return hsStrBuf;
 }
 
-class hsMinimizeClientGuard
-{
+class hsMinimizeClientGuard {
 #ifdef CLIENT
     hsWindowHndl fWnd;
 
 public:
-    hsMinimizeClientGuard()
-    {
+    hsMinimizeClientGuard() {
 #ifdef HS_BUILD_FOR_WIN32
         fWnd = GetActiveWindow();
+
         // If the application's topmost window is fullscreen, minimize it before displaying an error
-        if ((GetWindowLong(fWnd, GWL_STYLE) & WS_POPUP) != 0)
+        if ((GetWindowLong(fWnd, GWL_STYLE) & WS_POPUP) != 0) {
             ShowWindow(fWnd, SW_MINIMIZE);
+        }
+
 #endif // HS_BUILD_FOR_WIN32
     }
 
-    ~hsMinimizeClientGuard()
-    {
+    ~hsMinimizeClientGuard() {
 #ifdef HS_BUILD_FOR_WIN32
         ShowWindow(fWnd, SW_RESTORE);
 #endif // HS_BUILD_FOR_WIN32
@@ -268,51 +280,68 @@ bool hsMessageBox_SuppressPrompts = false;
 
 int hsMessageBoxWithOwner(hsWindowHndl owner, const char message[], const char caption[], int kind, int icon)
 {
-    if (hsMessageBox_SuppressPrompts)
+    if (hsMessageBox_SuppressPrompts) {
         return hsMBoxOk;
+    }
 
 #if HS_BUILD_FOR_WIN32
     uint32_t flags = 0;
 
-    if (kind == hsMessageBoxNormal)
+    if (kind == hsMessageBoxNormal) {
         flags |= MB_OK;
-    else if (kind == hsMessageBoxAbortRetyIgnore)
+    } else if (kind == hsMessageBoxAbortRetyIgnore) {
         flags |= MB_ABORTRETRYIGNORE;
-    else if (kind == hsMessageBoxOkCancel)
+    } else if (kind == hsMessageBoxOkCancel) {
         flags |= MB_OKCANCEL;
-    else if (kind == hsMessageBoxRetryCancel)
+    } else if (kind == hsMessageBoxRetryCancel) {
         flags |= MB_RETRYCANCEL;
-    else if (kind == hsMessageBoxYesNo)
+    } else if (kind == hsMessageBoxYesNo) {
         flags |= MB_YESNO;
-    else if (kind == hsMessageBoxYesNoCancel)
+    } else if (kind == hsMessageBoxYesNoCancel) {
         flags |= MB_YESNOCANCEL;
-    else
+    } else {
         flags |= MB_OK;
+    }
 
-    if (icon == hsMessageBoxIconError)
+    if (icon == hsMessageBoxIconError) {
         flags |= MB_ICONERROR;
-    else if (icon == hsMessageBoxIconQuestion)
+    } else if (icon == hsMessageBoxIconQuestion) {
         flags |= MB_ICONQUESTION;
-    else if (icon == hsMessageBoxIconExclamation)
+    } else if (icon == hsMessageBoxIconExclamation) {
         flags |= MB_ICONEXCLAMATION;
-    else if (icon == hsMessageBoxIconAsterisk)
+    } else if (icon == hsMessageBoxIconAsterisk) {
         flags |= MB_ICONASTERISK;
-    else
+    } else {
         flags |= MB_ICONERROR;
+    }
 
     hsMinimizeClientGuard guard;
     int ans = MessageBox(owner, message, caption, flags);
 
-    switch (ans)
-    {
-    case IDOK:          return hsMBoxOk;
-    case IDCANCEL:      return hsMBoxCancel;
-    case IDABORT:       return hsMBoxAbort;
-    case IDRETRY:       return hsMBoxRetry;
-    case IDIGNORE:      return hsMBoxIgnore;
-    case IDYES:         return hsMBoxYes;
-    case IDNO:          return hsMBoxNo;
-    default:            return hsMBoxCancel;
+    switch (ans) {
+    case IDOK:
+        return hsMBoxOk;
+
+    case IDCANCEL:
+        return hsMBoxCancel;
+
+    case IDABORT:
+        return hsMBoxAbort;
+
+    case IDRETRY:
+        return hsMBoxRetry;
+
+    case IDIGNORE:
+        return hsMBoxIgnore;
+
+    case IDYES:
+        return hsMBoxYes;
+
+    case IDNO:
+        return hsMBoxNo;
+
+    default:
+        return hsMBoxCancel;
     }
 
 #endif
@@ -321,51 +350,68 @@ int hsMessageBoxWithOwner(hsWindowHndl owner, const char message[], const char c
 
 int hsMessageBoxWithOwner(hsWindowHndl owner, const wchar_t message[], const wchar_t caption[], int kind, int icon)
 {
-    if (hsMessageBox_SuppressPrompts)
+    if (hsMessageBox_SuppressPrompts) {
         return hsMBoxOk;
+    }
 
 #if HS_BUILD_FOR_WIN32
     uint32_t flags = 0;
 
-    if (kind == hsMessageBoxNormal)
+    if (kind == hsMessageBoxNormal) {
         flags |= MB_OK;
-    else if (kind == hsMessageBoxAbortRetyIgnore)
+    } else if (kind == hsMessageBoxAbortRetyIgnore) {
         flags |= MB_ABORTRETRYIGNORE;
-    else if (kind == hsMessageBoxOkCancel)
+    } else if (kind == hsMessageBoxOkCancel) {
         flags |= MB_OKCANCEL;
-    else if (kind == hsMessageBoxRetryCancel)
+    } else if (kind == hsMessageBoxRetryCancel) {
         flags |= MB_RETRYCANCEL;
-    else if (kind == hsMessageBoxYesNo)
+    } else if (kind == hsMessageBoxYesNo) {
         flags |= MB_YESNO;
-    else if (kind == hsMessageBoxYesNoCancel)
+    } else if (kind == hsMessageBoxYesNoCancel) {
         flags |= MB_YESNOCANCEL;
-    else
+    } else {
         flags |= MB_OK;
+    }
 
-    if (icon == hsMessageBoxIconError)
+    if (icon == hsMessageBoxIconError) {
         flags |= MB_ICONERROR;
-    else if (icon == hsMessageBoxIconQuestion)
+    } else if (icon == hsMessageBoxIconQuestion) {
         flags |= MB_ICONQUESTION;
-    else if (icon == hsMessageBoxIconExclamation)
+    } else if (icon == hsMessageBoxIconExclamation) {
         flags |= MB_ICONEXCLAMATION;
-    else if (icon == hsMessageBoxIconAsterisk)
+    } else if (icon == hsMessageBoxIconAsterisk) {
         flags |= MB_ICONASTERISK;
-    else
+    } else {
         flags |= MB_ICONERROR;
+    }
 
     hsMinimizeClientGuard guard;
     int ans = MessageBoxW(owner, message, caption, flags);
 
-    switch (ans)
-    {
-    case IDOK:          return hsMBoxOk;
-    case IDCANCEL:      return hsMBoxCancel;
-    case IDABORT:       return hsMBoxAbort;
-    case IDRETRY:       return hsMBoxRetry;
-    case IDIGNORE:      return hsMBoxIgnore;
-    case IDYES:         return hsMBoxYes;
-    case IDNO:          return hsMBoxNo;
-    default:            return hsMBoxCancel;
+    switch (ans) {
+    case IDOK:
+        return hsMBoxOk;
+
+    case IDCANCEL:
+        return hsMBoxCancel;
+
+    case IDABORT:
+        return hsMBoxAbort;
+
+    case IDRETRY:
+        return hsMBoxRetry;
+
+    case IDIGNORE:
+        return hsMBoxIgnore;
+
+    case IDYES:
+        return hsMBoxYes;
+
+    case IDNO:
+        return hsMBoxNo;
+
+    default:
+        return hsMBoxCancel;
     }
 
 #endif
@@ -374,57 +420,62 @@ int hsMessageBoxWithOwner(hsWindowHndl owner, const wchar_t message[], const wch
 
 int hsMessageBox(const char message[], const char caption[], int kind, int icon)
 {
-    return hsMessageBoxWithOwner((hsWindowHndl)nil,message,caption,kind,icon);
+    return hsMessageBoxWithOwner((hsWindowHndl)nil, message, caption, kind, icon);
 }
 
 int hsMessageBox(const wchar_t message[], const wchar_t caption[], int kind, int icon)
 {
-    return hsMessageBoxWithOwner((hsWindowHndl)nil,message,caption,kind,icon);
+    return hsMessageBoxWithOwner((hsWindowHndl)nil, message, caption, kind, icon);
 }
 
 /**************************************/
 char* hsStrcpy(char dst[], const char src[])
 {
-    if (src)
-    {
-        if (dst == nil)
-        {
+    if (src) {
+        if (dst == nil) {
             int count = strlen(src);
-            dst = (char *)malloc(count + 1);
+            dst = (char*)malloc(count + 1);
             memcpy(dst, src, count);
             dst[count] = 0;
             return dst;
         }
 
         int32_t i;
-        for (i = 0; src[i] != 0; i++)
+
+        for (i = 0; src[i] != 0; i++) {
             dst[i] = src[i];
+        }
+
         dst[i] = 0;
     }
 
     return dst;
 }
 
-void hsStrLower(char *s)
+void hsStrLower(char* s)
 {
-    if (s)
-    {
+    if (s) {
         int i;
-        for (i = 0; i < strlen(s); i++)
+
+        for (i = 0; i < strlen(s); i++) {
             s[i] = tolower(s[i]);
+        }
     }
 }
 
 //// IStringToWString /////////////////////////////////////////////////////////
 // Converts a char * string to a wchar_t * string
 
-wchar_t *hsStringToWString( const char *str )
+wchar_t* hsStringToWString(const char* str)
 {
     // convert the char string to a wchar_t string
     int len = strlen(str);
-    wchar_t *wideString = new wchar_t[len+1];
-    for (int i=0; i<len; i++)
+    wchar_t* wideString = new wchar_t[len + 1];
+
+    for (int i = 0; i < len; i++) {
         wideString[i] = btowc(str[i]);
+    }
+
     wideString[len] = L'\0';
     return wideString;
 }
@@ -432,24 +483,25 @@ wchar_t *hsStringToWString( const char *str )
 //// IWStringToString /////////////////////////////////////////////////////////
 // Converts a wchar_t * string to a char * string
 
-char    *hsWStringToString( const wchar_t *str )
+char*    hsWStringToString(const wchar_t* str)
 {
     // convert the wchar_t string to a char string
     int len = wcslen(str);
-    char *sStr = new char[len+1];
+    char* sStr = new char[len + 1];
 
     int i;
-    for (i = 0; i < len; i++)
-    {
+
+    for (i = 0; i < len; i++) {
         char temp = wctob(str[i]);
-        if (temp == EOF)
-        {
+
+        if (temp == EOF) {
             sStr[i] = '\0';
             i = len;
-        }
-        else
+        } else {
             sStr[i] = temp;
+        }
     }
+
     sStr[len] = '\0';
 
     return sStr;
@@ -478,124 +530,133 @@ char** DisplaySystemVersion()
     ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-    if( !(bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi)) )
-    {
+    if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO*) &osvi))) {
         // If OSVERSIONINFOEX doesn't work, try OSVERSIONINFO.
 
-        osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-        if (! GetVersionEx ( (OSVERSIONINFO *) &osvi) )
+        osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+        if (! GetVersionEx((OSVERSIONINFO*) &osvi)) {
             return FALSE;
+        }
     }
 
-    switch (osvi.dwPlatformId)
-    {
+    switch (osvi.dwPlatformId) {
     case VER_PLATFORM_WIN32_NT:
 
         // Test for the product.
 
-        if ( osvi.dwMajorVersion <= 4 )
+        if (osvi.dwMajorVersion <= 4) {
             versionStrs.Append(hsStrcpy("Microsoft Windows NT "));
+        }
 
-        if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 )
-            versionStrs.Append(hsStrcpy ("Microsoft Windows 2000 "));
+        if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0) {
+            versionStrs.Append(hsStrcpy("Microsoft Windows 2000 "));
+        }
 
-        if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1 )
-            versionStrs.Append(hsStrcpy ("Microsoft Windows XP "));
+        if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
+            versionStrs.Append(hsStrcpy("Microsoft Windows XP "));
+        }
 
-        if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 )
-            versionStrs.Append(hsStrcpy ("Microsoft Windows Vista "));
+        if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0) {
+            versionStrs.Append(hsStrcpy("Microsoft Windows Vista "));
+        }
 
-        if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 )
-            versionStrs.Append(hsStrcpy ("Microsoft Windows 7 "));
+        if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1) {
+            versionStrs.Append(hsStrcpy("Microsoft Windows 7 "));
+        }
 
-        if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2 )
-            versionStrs.Append(hsStrcpy ("Microsoft Windows 8 "));
+        if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2) {
+            versionStrs.Append(hsStrcpy("Microsoft Windows 8 "));
+        }
 
         // Test for product type.
 
-        if( bOsVersionInfoEx )
-        {
-            if ( osvi.wProductType == VER_NT_WORKSTATION )
-            {
-                if( osvi.wSuiteMask & VER_SUITE_PERSONAL )
-                    versionStrs.Append(hsStrcpy ( "Personal " ));
-                else
-                    versionStrs.Append(hsStrcpy ( "Professional " ));
+        if (bOsVersionInfoEx) {
+            if (osvi.wProductType == VER_NT_WORKSTATION) {
+                if (osvi.wSuiteMask & VER_SUITE_PERSONAL) {
+                    versionStrs.Append(hsStrcpy("Personal "));
+                } else {
+                    versionStrs.Append(hsStrcpy("Professional "));
+                }
             }
 
-            else if ( osvi.wProductType == VER_NT_SERVER )
-            {
-                if( osvi.wSuiteMask & VER_SUITE_DATACENTER )
-                    versionStrs.Append(hsStrcpy ( "DataCenter Server " ));
-                else if( osvi.wSuiteMask & VER_SUITE_ENTERPRISE )
-                    versionStrs.Append(hsStrcpy ( "Advanced Server " ));
-                else
-                    versionStrs.Append(hsStrcpy ( "Server " ));
+            else if (osvi.wProductType == VER_NT_SERVER) {
+                if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
+                    versionStrs.Append(hsStrcpy("DataCenter Server "));
+                } else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
+                    versionStrs.Append(hsStrcpy("Advanced Server "));
+                } else {
+                    versionStrs.Append(hsStrcpy("Server "));
+                }
             }
-        }
-        else
-        {
+        } else {
             HKEY hKey;
             char szProductType[80];
             DWORD dwBufLen;
 
-            RegOpenKeyEx( HKEY_LOCAL_MACHINE,
-                "SYSTEM\\CurrentControlSet\\Control\\ProductOptions",
-                0, KEY_QUERY_VALUE, &hKey );
-            RegQueryValueEx( hKey, "ProductType", NULL, NULL,
-                (LPBYTE) szProductType, &dwBufLen);
-            RegCloseKey( hKey );
-            if ( lstrcmpi( "WINNT", szProductType) == 0 )
-                versionStrs.Append(hsStrcpy( "Professional " ));
-            if ( lstrcmpi( "LANMANNT", szProductType) == 0 )
-                versionStrs.Append(hsStrcpy( "Server " ));
-            if ( lstrcmpi( "SERVERNT", szProductType) == 0 )
-                versionStrs.Append(hsStrcpy( "Advanced Server " ));
+            RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+                         "SYSTEM\\CurrentControlSet\\Control\\ProductOptions",
+                         0, KEY_QUERY_VALUE, &hKey);
+            RegQueryValueEx(hKey, "ProductType", NULL, NULL,
+                            (LPBYTE) szProductType, &dwBufLen);
+            RegCloseKey(hKey);
+
+            if (lstrcmpi("WINNT", szProductType) == 0) {
+                versionStrs.Append(hsStrcpy("Professional "));
+            }
+
+            if (lstrcmpi("LANMANNT", szProductType) == 0) {
+                versionStrs.Append(hsStrcpy("Server "));
+            }
+
+            if (lstrcmpi("SERVERNT", szProductType) == 0) {
+                versionStrs.Append(hsStrcpy("Advanced Server "));
+            }
         }
 
         // Display version, service pack (if any), and build number.
 
-        if ( osvi.dwMajorVersion <= 4 )
-        {
-            versionStrs.Append(hsStrcpy (plString::Format("version %d.%d %s (Build %d)\n",
-                osvi.dwMajorVersion,
-                osvi.dwMinorVersion,
-                osvi.szCSDVersion,
-                osvi.dwBuildNumber & 0xFFFF).c_str()));
+        if (osvi.dwMajorVersion <= 4) {
+            versionStrs.Append(hsStrcpy(plString::Format("version %d.%d %s (Build %d)\n",
+                                        osvi.dwMajorVersion,
+                                        osvi.dwMinorVersion,
+                                        osvi.szCSDVersion,
+                                        osvi.dwBuildNumber & 0xFFFF).c_str()));
+        } else {
+            versionStrs.Append(hsStrcpy(plString::Format("%s (Build %d)\n",
+                                        osvi.szCSDVersion,
+                                        osvi.dwBuildNumber & 0xFFFF).c_str()));
         }
-        else
-        {
-            versionStrs.Append(hsStrcpy (plString::Format("%s (Build %d)\n",
-                osvi.szCSDVersion,
-                osvi.dwBuildNumber & 0xFFFF).c_str()));
-        }
+
         break;
 
     case VER_PLATFORM_WIN32_WINDOWS:
 
-        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0)
-        {
-            versionStrs.Append(hsStrcpy ("Microsoft Windows 95 "));
-            if ( osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B' )
-                versionStrs.Append(hsStrcpy("OSR2 " ));
+        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0) {
+            versionStrs.Append(hsStrcpy("Microsoft Windows 95 "));
+
+            if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B') {
+                versionStrs.Append(hsStrcpy("OSR2 "));
+            }
         }
 
-        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
-        {
-            versionStrs.Append(hsStrcpy ("Microsoft Windows 98 "));
-            if ( osvi.szCSDVersion[1] == 'A' )
-                versionStrs.Append(hsStrcpy("SE " ));
+        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10) {
+            versionStrs.Append(hsStrcpy("Microsoft Windows 98 "));
+
+            if (osvi.szCSDVersion[1] == 'A') {
+                versionStrs.Append(hsStrcpy("SE "));
+            }
         }
 
-        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
-        {
-            versionStrs.Append(hsStrcpy ("Microsoft Windows Me "));
+        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90) {
+            versionStrs.Append(hsStrcpy("Microsoft Windows Me "));
         }
+
         break;
 
     case VER_PLATFORM_WIN32s:
 
-        versionStrs.Append(hsStrcpy ("Microsoft Win32s "));
+        versionStrs.Append(hsStrcpy("Microsoft Win32s "));
         break;
     }
 

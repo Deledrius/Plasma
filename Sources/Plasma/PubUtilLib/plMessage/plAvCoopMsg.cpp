@@ -56,11 +56,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // plAvCoopMsg -----------
 // ------------
 plAvCoopMsg::plAvCoopMsg()
-: plMessage(nil, nil, nil),
-  fInitiatorID(0),
-  fInitiatorSerial(0),
-  fCommand(kNone),
-  fCoordinator(nil)
+    : plMessage(nil, nil, nil),
+      fInitiatorID(0),
+      fInitiatorSerial(0),
+      fCommand(kNone),
+      fCoordinator(nil)
 {
 }
 
@@ -73,34 +73,35 @@ plAvCoopMsg::~plAvCoopMsg()
 // plAvCoopMsg -----------------------------------
 // ------------
 plAvCoopMsg::plAvCoopMsg(Command cmd, uint32_t id, uint16_t serial)
-: plMessage(nil, plAvatarMgr::GetInstance()->GetKey(), nil),
-  fInitiatorID(id),
-  fInitiatorSerial(serial),
-  fCommand(cmd),
-  fCoordinator(nil)
+    : plMessage(nil, plAvatarMgr::GetInstance()->GetKey(), nil),
+      fInitiatorID(id),
+      fInitiatorSerial(serial),
+      fCommand(cmd),
+      fCoordinator(nil)
 {
 
 }
 
 // plAvCoopMsg ----------------------------------
 // ------------
-plAvCoopMsg::plAvCoopMsg(plKey sender, plCoopCoordinator *coordinator)
-: plMessage(sender, plAvatarMgr::GetInstance()->GetKey(), nil),
-  fInitiatorID(coordinator->GetInitiatorID()),
-  fInitiatorSerial(coordinator->GetInitiatorSerial()),
-  fCommand(kStartNew),
-  fCoordinator(coordinator)
+plAvCoopMsg::plAvCoopMsg(plKey sender, plCoopCoordinator* coordinator)
+    : plMessage(sender, plAvatarMgr::GetInstance()->GetKey(), nil),
+      fInitiatorID(coordinator->GetInitiatorID()),
+      fInitiatorSerial(coordinator->GetInitiatorSerial()),
+      fCommand(kStartNew),
+      fCoordinator(coordinator)
 {
 }
 
 // Read -----------------------------------------------
 // -----
-void plAvCoopMsg::Read(hsStream *stream, hsResMgr *mgr)
+void plAvCoopMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
 
-    if(stream->ReadBool())
-        fCoordinator = reinterpret_cast<plCoopCoordinator *>(mgr->ReadCreatable(stream));
+    if (stream->ReadBool()) {
+        fCoordinator = reinterpret_cast<plCoopCoordinator*>(mgr->ReadCreatable(stream));
+    }
 
     fInitiatorID = stream->ReadLE32();
     fInitiatorSerial = stream->ReadLE16();
@@ -110,13 +111,15 @@ void plAvCoopMsg::Read(hsStream *stream, hsResMgr *mgr)
 
 // Write -----------------------------------------------
 // ------
-void plAvCoopMsg::Write(hsStream *stream, hsResMgr *mgr)
+void plAvCoopMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(stream, mgr);
 
     stream->WriteBool(fCoordinator != nil);
-    if(fCoordinator)
+
+    if (fCoordinator) {
         mgr->WriteCreatable(stream, fCoordinator);
+    }
 
     stream->WriteLE32(fInitiatorID);
     stream->WriteLE16(fInitiatorSerial);

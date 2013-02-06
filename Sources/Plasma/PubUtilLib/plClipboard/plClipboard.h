@@ -47,18 +47,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Class Definition /////////////////////////////////////////////////////////
 
-class plClipboard
-{
-    private:
-    
-        plClipboard() {}
-        plClipboard(const plClipboard& rhs) {}
-        
-    public:
-        bool IsTextInClipboard();
-        plString GetClipboardText();
-        void SetClipboardText(const plString& text);
-        static plClipboard& GetInstance( void );
+class plClipboard {
+private:
+
+    plClipboard() {}
+    plClipboard(const plClipboard& rhs) {}
+
+public:
+    bool IsTextInClipboard();
+    plString GetClipboardText();
+    void SetClipboardText(const plString& text);
+    static plClipboard& GetInstance(void);
 };
 
 #endif // _Clipboard_h

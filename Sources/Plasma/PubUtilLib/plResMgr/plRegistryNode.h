@@ -54,8 +54,7 @@ class plKeyImp;
 class plRegistryKeyIterator;
 class plString;
 
-enum PageCond
-{
+enum PageCond {
     kPageOk,
     kPageOutOfDate,
     kPageTooNew,
@@ -66,8 +65,7 @@ enum PageCond
 // Represents one entire (age,page) location and contains all keys in that
 // location. Note: just because the node exists does not mean that the keys are loaded.
 //
-class plRegistryPageNode 
-{
+class plRegistryPageNode {
 protected:
     friend class plKeyFinder;
 
@@ -82,7 +80,7 @@ protected:
 
     hsBufferedStream fStream;   // Stream for reading/writing our page
     uint8_t fOpenRequests;        // How many handles there are to fStream (or
-                                // zero if it's closed)
+    // zero if it's closed)
     bool fIsNewPage;          // True if this page is new (not read off disk)
 
     plRegistryPageNode() {}
@@ -99,21 +97,35 @@ public:
                        const plString& page, const plFileName& dataPath);
     ~plRegistryPageNode();
 
-    bool IsValid() const { return fValid == kPageOk; }
-    PageCond GetPageCondition() { return fValid; }
+    bool IsValid() const {
+        return fValid == kPageOk;
+    }
+    PageCond GetPageCondition() {
+        return fValid;
+    }
 
     // True if we have any static or dynamic keys loaded
-    bool IsLoaded() const     { return fLoadedTypes > 0; }
+    bool IsLoaded() const     {
+        return fLoadedTypes > 0;
+    }
     // True if all of our static keys are loaded
-    bool IsFullyLoaded() const    { return (fLoadedTypes == fKeyLists.size() && !fKeyLists.empty()) || fIsNewPage; }
+    bool IsFullyLoaded() const    {
+        return (fLoadedTypes == fKeyLists.size() && !fKeyLists.empty()) || fIsNewPage;
+    }
 
     // Export time only.  If we want to reuse a page, load the keys we want then
     // call SetNewPage, so it will be considered a new page from now on.  That
     // way we won't try to load it's keys again.
-    bool IsNewPage() const    { return fIsNewPage; }
-    void SetNewPage()       { fIsNewPage = true; }
+    bool IsNewPage() const    {
+        return fIsNewPage;
+    }
+    void SetNewPage()       {
+        fIsNewPage = true;
+    }
 
-    const plPageInfo& GetPageInfo() const { return fPageInfo; }
+    const plPageInfo& GetPageInfo() const {
+        return fPageInfo;
+    }
 
     void LoadKeys();    // Loads the keys off disk
     void UnloadKeys();  // Frees all our keys
@@ -122,7 +134,7 @@ public:
     plKeyImp* FindKey(uint16_t classType, const plString& name) const;
     // Find a key by direct uoid lookup (or fallback to name lookup if that doesn't work)
     plKeyImp* FindKey(const plUoid& uoid) const;
-    
+
     void AddKey(plKeyImp* key);
 
     // Sets a key as used or unused, ie there aren't any refs to it anymore.
@@ -143,7 +155,9 @@ public:
     void Write();
     void DeleteSource();
 
-    const plFileName& GetPagePath() const { return fPath; }
+    const plFileName& GetPagePath() const {
+        return fPath;
+    }
 };
 
 #endif // plRegistryNode_h_inc

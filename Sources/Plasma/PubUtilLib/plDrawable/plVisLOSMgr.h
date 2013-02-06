@@ -55,21 +55,18 @@ class plPageTreeMgr;
 class plPipeline;
 class hsBounds3Ext;
 
-class plVisHit
-{
+class plVisHit {
 public:
     hsPoint3        fPos;
 };
 
-class plSpaceHit
-{
+class plSpaceHit {
 public:
     int         fIdx;
     float    fClosest;
 };
 
-class plVisLOSMgr
-{
+class plVisLOSMgr {
 protected:
     plPageTreeMgr*  fPageMgr;
     plPipeline*     fPipe;
@@ -86,15 +83,21 @@ protected:
     bool ICheckSceneNode(plSceneNode* node, plVisHit& hit);
     bool ICheckDrawable(plDrawable* d, plVisHit& hit);
     bool ICheckSpan(plDrawableSpans* dr, uint32_t spanIdx, plVisHit& hit);
-    
+
 public:
     bool Check(const hsPoint3& pStart, const hsPoint3& pEnd, plVisHit& hit);
     bool CursorCheck(plVisHit& hit);
 
     static plVisLOSMgr* Instance();
 
-    static void Init(plPipeline* pipe, plPageTreeMgr* mgr) { Instance()->fPipe = pipe; Instance()->fPageMgr = mgr; }
-    static void DeInit() { Instance()->fPipe = nil; Instance()->fPageMgr = nil; }
+    static void Init(plPipeline* pipe, plPageTreeMgr* mgr) {
+        Instance()->fPipe = pipe;
+        Instance()->fPageMgr = mgr;
+    }
+    static void DeInit() {
+        Instance()->fPipe = nil;
+        Instance()->fPageMgr = nil;
+    }
 };
 
 #endif // plVisLOSMgr_inc

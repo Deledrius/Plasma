@@ -46,8 +46,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 static inline void byteswap(size_t size, uint8_t* data)
 {
-    for (size_t i = 0; i < (size / 2); ++i)
+    for (size_t i = 0; i < (size / 2); ++i) {
         std::swap(data[i], data[size - i - 1]);
+    }
 }
 
 /****************************************************************************
@@ -56,7 +57,7 @@ static inline void byteswap(size_t size, uint8_t* data)
 *
 ***/
 
-plBigNum::plBigNum () : m_context(nil)
+plBigNum::plBigNum() : m_context(nil)
 {
     BN_init(&m_number);
 }
@@ -76,16 +77,20 @@ plBigNum::plBigNum(unsigned a) : m_context(nil)
 plBigNum::plBigNum(unsigned bytes, const void* data, bool le) : m_context(nil)
 {
     BN_init(&m_number);
-    if (le)
+
+    if (le) {
         FromData_LE(bytes, data);
-    else
+    } else {
         FromData_BE(bytes, data);
+    }
 }
 
-plBigNum::~plBigNum ()
+plBigNum::~plBigNum()
 {
-    if (m_context)
+    if (m_context) {
         BN_CTX_free(m_context);
+    }
+
     BN_free(&m_number);
 }
 
@@ -95,13 +100,15 @@ int plBigNum::Compare(uint32_t a) const
     //  0 if (this == a)
     //  1 if (this >  a)
 
-    if (BN_is_word(&m_number, a))
+    if (BN_is_word(&m_number, a)) {
         return 0;
+    }
 
     // This returns 0xFFFFFFFFL if the number is bigger than one uint16_t, so
     // it doesn't need any size check
-    if (BN_get_word(&m_number) < a)
+    if (BN_get_word(&m_number) < a) {
         return -1;
+    }
 
     // Not less or equal, must be greater
     return 1;

@@ -70,9 +70,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptHeekMsg, upcastToFinalHeekMsg)
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekMsg)
-    PYTHON_METHOD_NOARGS(ptHeekMsg, getHeekMsgType, "Returns the type of the Heek message (see PtHeekMsgTypes)"),
-    PYTHON_METHOD_NOARGS(ptHeekMsg, upcastToFinalHeekMsg, "Returns this message as the Heek message it is"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptHeekMsg, getHeekMsgType, "Returns the type of the Heek message (see PtHeekMsgTypes)"),
+                     PYTHON_METHOD_NOARGS(ptHeekMsg, upcastToFinalHeekMsg, "Returns this message as the Heek message it is"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekMsg, pyGameCliMsg, "Base class for Heek game messages");
@@ -81,9 +81,12 @@ PYTHON_EXPOSE_TYPE_DEFINITION(ptHeekMsg, pyHeekMsg);
 // required functions for PyObject interoperability
 PyObject* pyHeekMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekMsg *newObj = (ptHeekMsg*)ptHeekMsg_type.tp_new(&ptHeekMsg_type, NULL, NULL);
-    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_Heek))
+    ptHeekMsg* newObj = (ptHeekMsg*)ptHeekMsg_type.tp_new(&ptHeekMsg_type, NULL, NULL);
+
+    if (msg && (msg->gameCli->GetGameTypeId() == kGameTypeId_Heek)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -143,10 +146,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptHeekPlayGameMsg, enableButtons)
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekPlayGameMsg)
-    PYTHON_METHOD_NOARGS(ptHeekPlayGameMsg, isPlaying, "Returns true if the server accepted the play game request"),
-    PYTHON_METHOD_NOARGS(ptHeekPlayGameMsg, isSinglePlayer, "Returns true if you are the only player at the table"),
-    PYTHON_METHOD_NOARGS(ptHeekPlayGameMsg, enableButtons, "Returns true if we should enable the buttons at the place we sat down"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptHeekPlayGameMsg, isPlaying, "Returns true if the server accepted the play game request"),
+                     PYTHON_METHOD_NOARGS(ptHeekPlayGameMsg, isSinglePlayer, "Returns true if you are the only player at the table"),
+                     PYTHON_METHOD_NOARGS(ptHeekPlayGameMsg, enableButtons, "Returns true if we should enable the buttons at the place we sat down"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekPlayGameMsg, pyHeekMsg, "Heek message received when the server processes your play game request");
@@ -154,9 +157,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekPlayGameMsg, pyHeekMsg, "Heek message received w
 // required functions for PyObject interoperability
 PyObject* pyHeekPlayGameMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekPlayGameMsg *newObj = (ptHeekPlayGameMsg*)ptHeekPlayGameMsg_type.tp_new(&ptHeekPlayGameMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_PlayGame))
+    ptHeekPlayGameMsg* newObj = (ptHeekPlayGameMsg*)ptHeekPlayGameMsg_type.tp_new(&ptHeekPlayGameMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_PlayGame)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -188,9 +194,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekGoodbyeMsg, pyHeekMsg, "Heek message received wh
 // required functions for PyObject interoperability
 PyObject* pyHeekGoodbyeMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekGoodbyeMsg *newObj = (ptHeekGoodbyeMsg*)ptHeekGoodbyeMsg_type.tp_new(&ptHeekGoodbyeMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_Goodbye))
+    ptHeekGoodbyeMsg* newObj = (ptHeekGoodbyeMsg*)ptHeekGoodbyeMsg_type.tp_new(&ptHeekGoodbyeMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_Goodbye)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -230,10 +239,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptHeekWelcomeMsg, name)
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekWelcomeMsg)
-    PYTHON_METHOD_NOARGS(ptHeekWelcomeMsg, points, "Returns the new player's points"),
-    PYTHON_METHOD_NOARGS(ptHeekWelcomeMsg, rank, "Returns the new player's rank"),
-    PYTHON_METHOD_NOARGS(ptHeekWelcomeMsg, name, "Returns the new player's name"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptHeekWelcomeMsg, points, "Returns the new player's points"),
+                     PYTHON_METHOD_NOARGS(ptHeekWelcomeMsg, rank, "Returns the new player's rank"),
+                     PYTHON_METHOD_NOARGS(ptHeekWelcomeMsg, name, "Returns the new player's name"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekWelcomeMsg, pyHeekMsg, "Heek message received when a new player sits down");
@@ -241,9 +250,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekWelcomeMsg, pyHeekMsg, "Heek message received wh
 // required functions for PyObject interoperability
 PyObject* pyHeekWelcomeMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekWelcomeMsg *newObj = (ptHeekWelcomeMsg*)ptHeekWelcomeMsg_type.tp_new(&ptHeekWelcomeMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_Welcome))
+    ptHeekWelcomeMsg* newObj = (ptHeekWelcomeMsg*)ptHeekWelcomeMsg_type.tp_new(&ptHeekWelcomeMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_Welcome)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -272,8 +284,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptHeekDropMsg, position)
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekDropMsg)
-    PYTHON_METHOD_NOARGS(ptHeekDropMsg, position, "Returns player position to cleanup and dump"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptHeekDropMsg, position, "Returns player position to cleanup and dump"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekDropMsg, pyHeekMsg, "Heek message received when another player's position needs to be reset/modified");
@@ -281,9 +293,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekDropMsg, pyHeekMsg, "Heek message received when 
 // required functions for PyObject interoperability
 PyObject* pyHeekDropMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekDropMsg *newObj = (ptHeekDropMsg*)ptHeekDropMsg_type.tp_new(&ptHeekDropMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_Drop))
+    ptHeekDropMsg* newObj = (ptHeekDropMsg*)ptHeekDropMsg_type.tp_new(&ptHeekDropMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_Drop)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -320,16 +335,19 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptHeekSetupMsg, lightOn)
 {
     std::vector<bool> lights = self->fThis->LightOn();
     PyObject* retVal = PyList_New(lights.size());
-    for (unsigned i = 0; i < lights.size(); ++i)
+
+    for (unsigned i = 0; i < lights.size(); ++i) {
         PyList_SetItem(retVal, i, PyInt_FromLong(lights[i] ? 1 : 0));
+    }
+
     return retVal;
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekSetupMsg)
-    PYTHON_METHOD_NOARGS(ptHeekSetupMsg, position, "Returns the position this message is for"),
-    PYTHON_METHOD_NOARGS(ptHeekSetupMsg, buttonState, "Returns whether the buttons are enabled or not"),
-    PYTHON_METHOD_NOARGS(ptHeekSetupMsg, lightOn, "Returns a list of bools representing lights on or off"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptHeekSetupMsg, position, "Returns the position this message is for"),
+                     PYTHON_METHOD_NOARGS(ptHeekSetupMsg, buttonState, "Returns whether the buttons are enabled or not"),
+                     PYTHON_METHOD_NOARGS(ptHeekSetupMsg, lightOn, "Returns a list of bools representing lights on or off"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekSetupMsg, pyHeekMsg, "Heek message for setting up each position's state");
@@ -337,9 +355,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekSetupMsg, pyHeekMsg, "Heek message for setting u
 // required functions for PyObject interoperability
 PyObject* pyHeekSetupMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekSetupMsg *newObj = (ptHeekSetupMsg*)ptHeekSetupMsg_type.tp_new(&ptHeekSetupMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_Setup))
+    ptHeekSetupMsg* newObj = (ptHeekSetupMsg*)ptHeekSetupMsg_type.tp_new(&ptHeekSetupMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_Setup)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -373,9 +394,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptHeekLightStateMsg, state)
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekLightStateMsg)
-    PYTHON_METHOD_NOARGS(ptHeekLightStateMsg, lightNum, "Returns the index of the light this refers to"),
-    PYTHON_METHOD_NOARGS(ptHeekLightStateMsg, state, "Returns state the light should be switched to (see PtHeekLightStates)"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptHeekLightStateMsg, lightNum, "Returns the index of the light this refers to"),
+                     PYTHON_METHOD_NOARGS(ptHeekLightStateMsg, state, "Returns state the light should be switched to (see PtHeekLightStates)"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekLightStateMsg, pyHeekMsg, "Heek message received when one of your local lights needs to change state");
@@ -383,9 +404,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekLightStateMsg, pyHeekMsg, "Heek message received
 // required functions for PyObject interoperability
 PyObject* pyHeekLightStateMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekLightStateMsg *newObj = (ptHeekLightStateMsg*)ptHeekLightStateMsg_type.tp_new(&ptHeekLightStateMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_LightState))
+    ptHeekLightStateMsg* newObj = (ptHeekLightStateMsg*)ptHeekLightStateMsg_type.tp_new(&ptHeekLightStateMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_LightState)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -423,8 +447,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptHeekInterfaceStateMsg, buttonsEnabled)
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekInterfaceStateMsg)
-    PYTHON_METHOD_NOARGS(ptHeekInterfaceStateMsg, buttonsEnabled, "Returns whether your buttons should be enabled"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptHeekInterfaceStateMsg, buttonsEnabled, "Returns whether your buttons should be enabled"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekInterfaceStateMsg, pyHeekMsg, "Heek message received when your interface buttons need to enable or disable");
@@ -432,9 +456,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekInterfaceStateMsg, pyHeekMsg, "Heek message rece
 // required functions for PyObject interoperability
 PyObject* pyHeekInterfaceStateMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekInterfaceStateMsg *newObj = (ptHeekInterfaceStateMsg*)ptHeekInterfaceStateMsg_type.tp_new(&ptHeekInterfaceStateMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_InterfaceState))
+    ptHeekInterfaceStateMsg* newObj = (ptHeekInterfaceStateMsg*)ptHeekInterfaceStateMsg_type.tp_new(&ptHeekInterfaceStateMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_InterfaceState)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -463,8 +490,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptHeekCountdownStateMsg, state)
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekCountdownStateMsg)
-    PYTHON_METHOD_NOARGS(ptHeekCountdownStateMsg, state, "Returns state the countdown should be switched to (see PtHeekCountdownStates)"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptHeekCountdownStateMsg, state, "Returns state the countdown should be switched to (see PtHeekCountdownStates)"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekCountdownStateMsg, pyHeekMsg, "Heek message received by game admin when the countdown state needs to change");
@@ -472,9 +499,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekCountdownStateMsg, pyHeekMsg, "Heek message rece
 // required functions for PyObject interoperability
 PyObject* pyHeekCountdownStateMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekCountdownStateMsg *newObj = (ptHeekCountdownStateMsg*)ptHeekCountdownStateMsg_type.tp_new(&ptHeekCountdownStateMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_CountdownState))
+    ptHeekCountdownStateMsg* newObj = (ptHeekCountdownStateMsg*)ptHeekCountdownStateMsg_type.tp_new(&ptHeekCountdownStateMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_CountdownState)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -517,9 +547,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptHeekWinLoseMsg, choice)
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekWinLoseMsg)
-    PYTHON_METHOD_NOARGS(ptHeekWinLoseMsg, win, "Returns true if you won"),
-    PYTHON_METHOD_NOARGS(ptHeekWinLoseMsg, choice, "Returns the choice that won or lost (see PtHeekGameChoice)"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptHeekWinLoseMsg, win, "Returns true if you won"),
+                     PYTHON_METHOD_NOARGS(ptHeekWinLoseMsg, choice, "Returns the choice that won or lost (see PtHeekGameChoice)"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekWinLoseMsg, pyHeekMsg, "Heek message received when the round is over and you won or lost");
@@ -527,9 +557,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekWinLoseMsg, pyHeekMsg, "Heek message received wh
 // required functions for PyObject interoperability
 PyObject* pyHeekWinLoseMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekWinLoseMsg *newObj = (ptHeekWinLoseMsg*)ptHeekWinLoseMsg_type.tp_new(&ptHeekWinLoseMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_WinLose))
+    ptHeekWinLoseMsg* newObj = (ptHeekWinLoseMsg*)ptHeekWinLoseMsg_type.tp_new(&ptHeekWinLoseMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_WinLose)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -558,8 +591,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptHeekGameWinMsg, choice)
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekGameWinMsg)
-    PYTHON_METHOD_NOARGS(ptHeekGameWinMsg, choice, "Returns the choice that won (see PtHeekGameChoice)"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptHeekGameWinMsg, choice, "Returns the choice that won (see PtHeekGameChoice)"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekGameWinMsg, pyHeekMsg, "Heek message received by game admin when a game is won");
@@ -567,9 +600,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekGameWinMsg, pyHeekMsg, "Heek message received by
 // required functions for PyObject interoperability
 PyObject* pyHeekGameWinMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekGameWinMsg *newObj = (ptHeekGameWinMsg*)ptHeekGameWinMsg_type.tp_new(&ptHeekGameWinMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_GameWin))
+    ptHeekGameWinMsg* newObj = (ptHeekGameWinMsg*)ptHeekGameWinMsg_type.tp_new(&ptHeekGameWinMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_GameWin)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 
@@ -608,10 +644,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptHeekPointUpdateMsg, rank)
 }
 
 PYTHON_START_METHODS_TABLE(ptHeekPointUpdateMsg)
-    PYTHON_METHOD_NOARGS(ptHeekPointUpdateMsg, displayUpdate, "Returns whether you should display a message to the user"),
-    PYTHON_METHOD_NOARGS(ptHeekPointUpdateMsg, points, "Returns your new amount of points"),
-    PYTHON_METHOD_NOARGS(ptHeekPointUpdateMsg, rank, "Returns your new rank"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptHeekPointUpdateMsg, displayUpdate, "Returns whether you should display a message to the user"),
+                     PYTHON_METHOD_NOARGS(ptHeekPointUpdateMsg, points, "Returns your new amount of points"),
+                     PYTHON_METHOD_NOARGS(ptHeekPointUpdateMsg, rank, "Returns your new rank"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptHeekPointUpdateMsg, pyHeekMsg, "Heek message received when the number of points you have needs to be changed");
@@ -619,9 +655,12 @@ PLASMA_DEFAULT_TYPE_WBASE(ptHeekPointUpdateMsg, pyHeekMsg, "Heek message receive
 // required functions for PyObject interoperability
 PyObject* pyHeekPointUpdateMsg::New(pfGameCliMsg* msg)
 {
-    ptHeekPointUpdateMsg *newObj = (ptHeekPointUpdateMsg*)ptHeekPointUpdateMsg_type.tp_new(&ptHeekPointUpdateMsg_type, NULL, NULL);
-    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_PointUpdate))
+    ptHeekPointUpdateMsg* newObj = (ptHeekPointUpdateMsg*)ptHeekPointUpdateMsg_type.tp_new(&ptHeekPointUpdateMsg_type, NULL, NULL);
+
+    if (msg && (msg->netMsg->messageId == kSrv2Cli_Heek_PointUpdate)) {
         newObj->fThis->message = msg;
+    }
+
     return (PyObject*)newObj;
 }
 

@@ -43,11 +43,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plQuality_inc
 #define plQuality_inc
 
-class plQuality
-{
+class plQuality {
 public:
-    enum
-    {
+    enum {
         kMinimum    = 0,
 
         kPS_1_1     = 2, // DirectX 8.0
@@ -58,7 +56,7 @@ public:
 protected:
     // These two are instanciated in plLoadMask.cpp, as well as
     // function implementations.
-    static      int         fQuality; 
+    static      int         fQuality;
     static      int         fCapability;
 
     friend class plClient;
@@ -73,10 +71,14 @@ protected:
 
 public:
     // Set by the app according to user preference.
-    static      int GetQuality() { return fQuality; }
+    static      int GetQuality() {
+        return fQuality;
+    }
 
     // Set by the pipeline according to platform capabilities.
-    static      int GetCapability() { return fCapability; }
+    static      int GetCapability() {
+        return fCapability;
+    }
 
 };
 

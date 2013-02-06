@@ -52,8 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCli.h"
 
-class pyBlueSpiralGame : public pyGameCli
-{
+class pyBlueSpiralGame : public pyGameCli {
 protected:
     pyBlueSpiralGame();
     pyBlueSpiralGame(pfGameCli* client);

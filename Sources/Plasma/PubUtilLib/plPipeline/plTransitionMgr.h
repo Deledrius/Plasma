@@ -59,46 +59,44 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plPlate;
 class plEventCallbackMsg;
 
-class plTransitionMgr : public hsKeyedObject
-{
-    protected:
+class plTransitionMgr : public hsKeyedObject {
+protected:
 
-        plPlate     *fEffectPlate;
-        
-        enum
-        {
-            kIdle,
-            kFadeOut,
-            kFadeIn,
-            kTransitionFadeIn,
-            kTransitionFadeOut
-        };
+    plPlate*     fEffectPlate;
 
-        uint8_t       fCurrentEffect;
-        bool        fRegisteredForTime, fHoldAtEnd, fPlaying, fNoSoundFade;
-        float    fEffectLength, fCurrOpacity, fOpacDelta;
-        float    fLastTime;
+    enum {
+        kIdle,
+        kFadeOut,
+        kFadeIn,
+        kTransitionFadeIn,
+        kTransitionFadeOut
+    };
 
-        void    IStartFadeIn( float lengthInSecs, uint8_t effect = kFadeIn );
-        void    IStartFadeOut( float lengthInSecs, uint8_t effect = kFadeOut );
+    uint8_t       fCurrentEffect;
+    bool        fRegisteredForTime, fHoldAtEnd, fPlaying, fNoSoundFade;
+    float    fEffectLength, fCurrOpacity, fOpacDelta;
+    float    fLastTime;
 
-        void    ICreatePlate( void );
+    void    IStartFadeIn(float lengthInSecs, uint8_t effect = kFadeIn);
+    void    IStartFadeOut(float lengthInSecs, uint8_t effect = kFadeOut);
 
-        void    IStop( bool aboutToStartAgain = false );
+    void    ICreatePlate(void);
 
-        hsTArray<plEventCallbackMsg *>  fCallbacks;
+    void    IStop(bool aboutToStartAgain = false);
 
-    public:
+    hsTArray<plEventCallbackMsg*>  fCallbacks;
 
-        plTransitionMgr();
-        virtual ~plTransitionMgr();
-        
-        CLASSNAME_REGISTER( plTransitionMgr );
-        GETINTERFACE_ANY( plTransitionMgr, hsKeyedObject );
+public:
 
-        void    Init( void );
+    plTransitionMgr();
+    virtual ~plTransitionMgr();
 
-        virtual bool MsgReceive( plMessage* msg );
+    CLASSNAME_REGISTER(plTransitionMgr);
+    GETINTERFACE_ANY(plTransitionMgr, hsKeyedObject);
+
+    void    Init(void);
+
+    virtual bool MsgReceive(plMessage* msg);
 };
 
 

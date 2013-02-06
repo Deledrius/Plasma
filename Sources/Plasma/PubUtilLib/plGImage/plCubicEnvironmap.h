@@ -62,51 +62,57 @@ class plMipmap;
 
 //// Class Definition /////////////////////////////////////////////////////////
 
-class plCubicEnvironmap : public plBitmap
-{
-    public:
+class plCubicEnvironmap : public plBitmap {
+public:
 
-        //// Public Data ////
+    //// Public Data ////
 
-        enum Faces
-        {
-            kLeftFace = 0,
-            kRightFace,
-            kFrontFace,
-            kBackFace,
-            kTopFace,
-            kBottomFace
-        };
+    enum Faces {
+        kLeftFace = 0,
+        kRightFace,
+        kFrontFace,
+        kBackFace,
+        kTopFace,
+        kBottomFace
+    };
 
-        //// Public Members ////
+    //// Public Members ////
 
-        plCubicEnvironmap();
-        virtual ~plCubicEnvironmap();
+    plCubicEnvironmap();
+    virtual ~plCubicEnvironmap();
 
-        CLASSNAME_REGISTER( plCubicEnvironmap );
-        GETINTERFACE_ANY( plCubicEnvironmap, plBitmap );
+    CLASSNAME_REGISTER(plCubicEnvironmap);
+    GETINTERFACE_ANY(plCubicEnvironmap, plBitmap);
 
 
-        // Get the total size in bytes
-        virtual uint32_t  GetTotalSize( void ) const;
+    // Get the total size in bytes
+    virtual uint32_t  GetTotalSize(void) const;
 
-        virtual void    Read( hsStream *s, hsResMgr *mgr ) { hsKeyedObject::Read( s, mgr ); this->Read( s ); }
-        virtual void    Write( hsStream *s, hsResMgr *mgr ) { hsKeyedObject::Write( s, mgr ); this->Write( s ); }
+    virtual void    Read(hsStream* s, hsResMgr* mgr) {
+        hsKeyedObject::Read(s, mgr);
+        this->Read(s);
+    }
+    virtual void    Write(hsStream* s, hsResMgr* mgr) {
+        hsKeyedObject::Write(s, mgr);
+        this->Write(s);
+    }
 
-        plMipmap    *GetFace( uint8_t face ) const { return fFaces[ face ]; }
+    plMipmap*    GetFace(uint8_t face) const {
+        return fFaces[ face ];
+    }
 
-        // Export-only: Copy the mipmap given into a face
-        void        CopyToFace( plMipmap *mip, uint8_t face );
+    // Export-only: Copy the mipmap given into a face
+    void        CopyToFace(plMipmap* mip, uint8_t face);
 
-    protected:
+protected:
 
-        //// Protected Members ////
+    //// Protected Members ////
 
-        plMipmap        *fFaces[ 6 ];
-        bool            fInitialized;
+    plMipmap*        fFaces[ 6 ];
+    bool            fInitialized;
 
-        virtual uint32_t  Read( hsStream *s );
-        virtual uint32_t  Write( hsStream *s );
+    virtual uint32_t  Read(hsStream* s);
+    virtual uint32_t  Write(hsStream* s);
 
 };
 

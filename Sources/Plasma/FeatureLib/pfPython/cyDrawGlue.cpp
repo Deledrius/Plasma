@@ -57,11 +57,12 @@ PYTHON_NO_INIT_DEFINITION(ptDraw)
 PYTHON_METHOD_DEFINITION(ptDraw, netForce, args)
 {
     char forceFlag;
-    if (!PyArg_ParseTuple(args, "b", &forceFlag))
-    {
+
+    if (!PyArg_ParseTuple(args, "b", &forceFlag)) {
         PyErr_SetString(PyExc_TypeError, "netForce requires a boolean argument");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->SetNetForce(forceFlag != 0);
     PYTHON_RETURN_NONE;
 }
@@ -69,8 +70,8 @@ PYTHON_METHOD_DEFINITION(ptDraw, netForce, args)
 PYTHON_METHOD_DEFINITION(ptDraw, enable, args)
 {
     char state = 1;
-    if (!PyArg_ParseTuple(args, "|b", &state))
-    {
+
+    if (!PyArg_ParseTuple(args, "|b", &state)) {
         PyErr_SetString(PyExc_TypeError, "enable expects an optional boolean argument");
         PYTHON_RETURN_ERROR;
     }
@@ -82,31 +83,32 @@ PYTHON_METHOD_DEFINITION(ptDraw, enable, args)
 PYTHON_BASIC_METHOD_DEFINITION(ptDraw, disable, Disable)
 
 PYTHON_START_METHODS_TABLE(ptDraw)
-    PYTHON_METHOD(ptDraw, netForce, "Params: forceFlag\nSpecify whether this object needs to use messages that are forced to the network\n"
-                "- This is to be used if your Python program is running on only one client\n"
-                "Such as a game master, only running on the client that owns a particular object"),
-    PYTHON_METHOD(ptDraw, enable, "Params: state=1\nSets the draw enable for the sceneobject attached"),
-    PYTHON_BASIC_METHOD(ptDraw, disable, "Disables the draw on the sceneobject attached\n"
-                "In other words, makes it invisible"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD(ptDraw, netForce, "Params: forceFlag\nSpecify whether this object needs to use messages that are forced to the network\n"
+              "- This is to be used if your Python program is running on only one client\n"
+              "Such as a game master, only running on the client that owns a particular object"),
+              PYTHON_METHOD(ptDraw, enable, "Params: state=1\nSets the draw enable for the sceneobject attached"),
+              PYTHON_BASIC_METHOD(ptDraw, disable, "Disables the draw on the sceneobject attached\n"
+                                  "In other words, makes it invisible"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE(ptDraw, "Plasma Draw class");
 
 // required functions for PyObject interoperability
-PyObject *cyDraw::New(PyObject *sender, PyObject *recvr)
+PyObject* cyDraw::New(PyObject* sender, PyObject* recvr)
 {
-    ptDraw *newObj = (ptDraw*)ptDraw_type.tp_new(&ptDraw_type, NULL, NULL);
-    if (sender != NULL)
-    {
+    ptDraw* newObj = (ptDraw*)ptDraw_type.tp_new(&ptDraw_type, NULL, NULL);
+
+    if (sender != NULL) {
         plKey senderKey = pyKey::ConvertFrom(sender)->getKey();
         newObj->fThis->SetSender(senderKey);
     }
-    if (recvr != NULL)
-    {
+
+    if (recvr != NULL) {
         plKey recvrKey = pyKey::ConvertFrom(recvr)->getKey();
         newObj->fThis->AddRecvr(recvrKey);
     }
+
     newObj->fThis->fNetForce = false;
 
     return (PyObject*)newObj;
@@ -119,7 +121,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptDraw, cyDraw)
 //
 // AddPlasmaClasses - the python module definitions
 //
-void cyDraw::AddPlasmaClasses(PyObject *m)
+void cyDraw::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptDraw);

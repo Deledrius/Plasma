@@ -55,8 +55,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pyGlueHelpers.h"
 
-class pyGUIControlRadioGroup :public pyGUIControl
-{
+class pyGUIControlRadioGroup : public pyGUIControl {
 protected:
     pyGUIControlRadioGroup(): pyGUIControl() {} // for python glue only, do NOT call
     pyGUIControlRadioGroup(pyKey& gckey);
@@ -65,17 +64,17 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptGUIControlRadioGroup);
-    static PyObject *New(pyKey& gckey);
-    static PyObject *New(plKey objkey);
+    static PyObject* New(pyKey& gckey);
+    static PyObject* New(plKey objkey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGUIControlRadioGroup object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGUIControlRadioGroup); // converts a PyObject to a pyGUIControlRadioGroup (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     static bool IsGUIControlRadioGroup(pyKey& gckey);
 
-    virtual int32_t   GetValue( void );
-    virtual void    SetValue( int32_t value );
+    virtual int32_t   GetValue(void);
+    virtual void    SetValue(int32_t value);
 
 };
 

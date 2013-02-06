@@ -73,24 +73,42 @@ extern HINSTANCE hInstance;
 
 static PlasmaMax gPlasmaMax;
 
-class PlasmaMaxClassDesc : public ClassDesc
-{
+class PlasmaMaxClassDesc : public ClassDesc {
 public:
-    int             IsPublic()              { return TRUE; }
-    void*           Create(BOOL loading)    { return &gPlasmaMax; }
-    const TCHAR*    ClassName()             { return _T("PlasmaMax"); }
-    SClass_ID       SuperClassID()          { return GUP_CLASS_ID; }
-    Class_ID        ClassID()               { return PLASMA_MAX_CLASSID; }
-    const TCHAR*    Category()              { return _T("");  }
+    int             IsPublic()              {
+        return TRUE;
+    }
+    void*           Create(BOOL loading)    {
+        return &gPlasmaMax;
+    }
+    const TCHAR*    ClassName()             {
+        return _T("PlasmaMax");
+    }
+    SClass_ID       SuperClassID()          {
+        return GUP_CLASS_ID;
+    }
+    Class_ID        ClassID()               {
+        return PLASMA_MAX_CLASSID;
+    }
+    const TCHAR*    Category()              {
+        return _T("");
+    }
 
     //  ************************* action table
     //  The following 2 lines are added for action tables and menu work
-    int NumActionTables() { return theActionTableMgr.NumActionTables(); }
-    ActionTable* GetActionTable(int i) { return theActionTableMgr.GetActionTable(i); }
+    int NumActionTables() {
+        return theActionTableMgr.NumActionTables();
+    }
+    ActionTable* GetActionTable(int i) {
+        return theActionTableMgr.GetActionTable(i);
+    }
 };
 
 static PlasmaMaxClassDesc PlasmaMaxCD;
-ClassDesc* GetGUPDesc() { return &PlasmaMaxCD; }
+ClassDesc* GetGUPDesc()
+{
+    return &PlasmaMaxCD;
+}
 
 //////////////////////////////////////////
 
@@ -108,13 +126,12 @@ PlasmaMax::PlasmaMax()
 {
 }
 
-void DoAllRecur(PMaxNodeFunc p, plMaxNode *node)
+void DoAllRecur(PMaxNodeFunc p, plMaxNode* node)
 {
     (node->*p)(nil, nil);
-    
-    for (int i = 0; i < node->NumberOfChildren(); i++)
-    {
-        plMaxNode *child = (plMaxNode*)node->GetChildNode(i);
+
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
+        plMaxNode* child = (plMaxNode*)node->GetChildNode(i);
         DoAllRecur(p, child);
     }
 }
@@ -125,25 +142,23 @@ void DoAllRecur(PMaxNodeFunc p, plMaxNode *node)
 #include "MaxExport/plExportErrorMsg.h"
 #include "MaxExport/plExportDlg.h"
 
-static void NotifyProc(void *param, NotifyInfo *info)
+static void NotifyProc(void* param, NotifyInfo* info)
 {
-    if (info->intcode == NOTIFY_FILE_POST_OPEN)
-    {
-        plMaxNode *pNode = (plMaxNode*)GetCOREInterface()->GetRootNode();
+    if (info->intcode == NOTIFY_FILE_POST_OPEN) {
+        plMaxNode* pNode = (plMaxNode*)GetCOREInterface()->GetRootNode();
         DoAllRecur(&plMaxNode::ClearData, pNode);
-    }
-    else if (info->intcode == NOTIFY_SYSTEM_STARTUP)
-    {
+    } else if (info->intcode == NOTIFY_SYSTEM_STARTUP) {
         int type;
         float scale;
         GetMasterUnitInfo(&type, &scale);
-        if (type != UNITS_FEET || scale != 1.f)
-        {
+
+        if (type != UNITS_FEET || scale != 1.f) {
             hsMessageBoxWithOwner(GetCOREInterface()->GetMAXHWnd(),
-                "Please set your system units to 1 unit = 1 foot.\n\n"
-                "Customize -> Units Setup... -> System Unit Setup",
-                "Plasma Units Error", hsMessageBoxNormal);
+                                  "Please set your system units to 1 unit = 1 foot.\n\n"
+                                  "Customize -> Units Setup... -> System Unit Setup",
+                                  "Plasma Units Error", hsMessageBoxNormal);
         }
+
         plExportDlg::Instance().StartAutoExport();
     }
 }
@@ -202,7 +217,7 @@ DWORD PlasmaMax::Start()
     DummyCodeIncludeFuncClimbTrigger();
     DummyCodeIncludeFuncObjectFlocker();
     DummyCodeIncludeFuncGrassShader();
-    
+
     // Register the SceneViewer with Max
 #ifdef MAXSCENEVIEWER_ENABLED
     SceneSync::Instance();
@@ -223,12 +238,10 @@ DWORD PlasmaMax::Start()
     // Setup the localization mgr
     // Dirty hacks are because Cyan sucks...
     plFileName pathTemp = plMaxConfig::GetClientPath(false, true);
-    if (!pathTemp.IsValid())
-    {
+
+    if (!pathTemp.IsValid()) {
         hsMessageBox("PlasmaMAX2.ini is missing or invalid", "Plasma/2.0 Error", hsMessageBoxNormal);
-    }
-    else
-    {
+    } else {
         plFileName clientPath = plFileName::Join(pathTemp, "dat");
         pfLocalizationMgr::Initialize(clientPath);
     }
@@ -243,7 +256,7 @@ void PlasmaMax::Stop()
     pfLocalizationMgr::Shutdown();
 
     PythonInterface::WeAreInShutdown();
-    PythonInterface::finiPython();  
+    PythonInterface::finiPython();
     hsgResMgr::Shutdown();
 }
 
@@ -255,47 +268,49 @@ void PlasmaMax::Stop()
 void TextureSet(Texmap* texmap, int iBmp, uint64_t assetId)
 {
     plPlasmaMAXLayer* layer = plPlasmaMAXLayer::GetPlasmaMAXLayer(texmap);
-    if (layer)
-    {
+
+    if (layer) {
         int numBitmaps = layer->GetNumBitmaps();
 #ifdef MAXASS_AVAILABLE
-        if (iBmp < numBitmaps)
+
+        if (iBmp < numBitmaps) {
             layer->SetBitmapAssetId(jvUniqueId(assetId), iBmp);
+        }
+
 #endif
     }
 }
 
 DWORD PlasmaMax::Control(DWORD parameter)
 {
-    if (parameter == kGetTextures)
-    {
+    if (parameter == kGetTextures) {
         TexSet texmaps;
         plMtlCollector::GetMtls(nil, &texmaps);
 
         std::vector<TexInfo> texInfo;
 
         TexSet::iterator texIt = texmaps.begin();
-        for (; texIt != texmaps.end(); texIt++)
-        {
+
+        for (; texIt != texmaps.end(); texIt++) {
             Texmap* texmap = (*texIt);
             plPlasmaMAXLayer* layer = plPlasmaMAXLayer::GetPlasmaMAXLayer(texmap);
-            if (layer)
-            {
+
+            if (layer) {
                 int numBitmaps = layer->GetNumBitmaps();
-                for (int iBmp = 0; iBmp < numBitmaps; iBmp++)
-                {
+
+                for (int iBmp = 0; iBmp < numBitmaps; iBmp++) {
                     // UPDATE: If someone merges in a material from another AssetMan
                     // controled scene the texture ID will already be set, when it
                     // shouldn't be.  Because of that, we redo all the texture ID's
                     // every time.
                     // - Colin
-    //              if (assetId.IsEmpty())
+                    //              if (assetId.IsEmpty())
                     {
                         char fileName[MAX_PATH];
-                        if (layer->GetBitmapFileName(fileName, sizeof(fileName), iBmp))
-                        {
+
+                        if (layer->GetBitmapFileName(fileName, sizeof(fileName), iBmp)) {
                             int texIdx = texInfo.size();
-                            texInfo.resize(texIdx+1);
+                            texInfo.resize(texIdx + 1);
                             texInfo[texIdx].texmap  = texmap;
                             texInfo[texIdx].iBmp    = iBmp;
                             texInfo[texIdx].texName = fileName;
@@ -307,15 +322,16 @@ DWORD PlasmaMax::Control(DWORD parameter)
 
 #ifdef MAXASS_AVAILABLE
         jvArray<TexInfo>* textures = new jvArray<TexInfo>(texInfo.size());
-        for (int i = 0; i < texInfo.size(); i++)
+
+        for (int i = 0; i < texInfo.size(); i++) {
             (*textures)[i] = texInfo[i];
+        }
+
         return DWORD(textures);
 #else
         return 0;
 #endif
-    }
-    else if (parameter == kGetTextureSetFunc)
-    {
+    } else if (parameter == kGetTextureSetFunc) {
         return DWORD(&TextureSet);
     }
 

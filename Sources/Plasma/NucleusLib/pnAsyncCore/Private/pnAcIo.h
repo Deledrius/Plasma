@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnAsyncCore/Private/pnAcIo.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNASYNCCORE_PRIVATE_PNACIO_H
@@ -60,10 +60,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *
 ***/
 
-typedef struct AsyncIdStruct *         AsyncId;
-typedef struct AsyncFileStruct *       AsyncFile;
-typedef struct AsyncSocketStruct *     AsyncSocket;
-typedef struct AsyncCancelIdStruct *   AsyncCancelId;
+typedef struct AsyncIdStruct*          AsyncId;
+typedef struct AsyncFileStruct*        AsyncFile;
+typedef struct AsyncSocketStruct*      AsyncSocket;
+typedef struct AsyncCancelIdStruct*    AsyncCancelId;
 
 const unsigned kAsyncSocketBufferSize   = 1460;
 
@@ -101,7 +101,7 @@ enum EAsyncNotifySocket {
 };
 
 struct AsyncNotifySocket {
-    void *          param;
+    void*           param;
     AsyncId         asyncId;
 
     AsyncNotifySocket() : param(nil), asyncId(nil) { }
@@ -121,7 +121,7 @@ struct AsyncNotifySocketListen : AsyncNotifySocketConnect {
     unsigned        branchId;
     plUUID          productId;
     plNetAddress    addr;
-    uint8_t *       buffer;
+    uint8_t*        buffer;
     unsigned        bytes;
     unsigned        bytesProcessed;
 
@@ -131,7 +131,7 @@ struct AsyncNotifySocketListen : AsyncNotifySocketConnect {
 };
 
 struct AsyncNotifySocketRead : AsyncNotifySocket {
-    uint8_t *       buffer;
+    uint8_t*        buffer;
     unsigned        bytes;
     unsigned        bytesProcessed;
 
@@ -140,11 +140,11 @@ struct AsyncNotifySocketRead : AsyncNotifySocket {
 
 typedef AsyncNotifySocketRead AsyncNotifySocketWrite;
 
-typedef bool (* FAsyncNotifySocketProc) (    // return false to disconnect
+typedef bool (* FAsyncNotifySocketProc)(     // return false to disconnect
     AsyncSocket         sock,
     EAsyncNotifySocket  code,
-    AsyncNotifySocket * notify,
-    void **             userState
+    AsyncNotifySocket* notify,
+    void**              userState
 );
 
 
@@ -158,7 +158,7 @@ typedef bool (* FAsyncNotifySocketProc) (    // return false to disconnect
 // simultaneously replaced; so basically forget it =)
 enum EConnType {
     kConnTypeNil                    = 0,
-    
+
     // For test applications
     kConnTypeDebug                  = 1,
 
@@ -176,7 +176,7 @@ enum EConnType {
     kConnTypeCliToCsr               = 20, // DEAD
     kConnTypeSimpleNet              = 21, // DEAD
     kConnTypeCliToGateKeeper        = 22,
-    
+
     // Text connections
     kConnTypeAdminInterface         = 97,   // 'a'
 
@@ -188,7 +188,7 @@ static_assert(kNumConnTypes <= 0xFF, "EConnType overflows uint8");
     (((int)(c)) == kConnTypeAdminInterface)
 
 
-void AsyncSocketRegisterNotifyProc (
+void AsyncSocketRegisterNotifyProc(
     uint8_t                 connType,
     FAsyncNotifySocketProc  notifyProc,
     unsigned                buildId = 0,
@@ -197,7 +197,7 @@ void AsyncSocketRegisterNotifyProc (
     const plUUID&           productId = kNilUuid
 );
 
-void AsyncSocketUnregisterNotifyProc (
+void AsyncSocketUnregisterNotifyProc(
     uint8_t                 connType,
     FAsyncNotifySocketProc  notifyProc,
     unsigned                buildId = 0,
@@ -206,14 +206,14 @@ void AsyncSocketUnregisterNotifyProc (
     const plUUID&           productId = kNilUuid
 );
 
-FAsyncNotifySocketProc AsyncSocketFindNotifyProc (
+FAsyncNotifySocketProc AsyncSocketFindNotifyProc(
     const uint8_t           buffer[],
     unsigned                bytes,
-    unsigned *              bytesProcessed,
-    unsigned *              connType,
-    unsigned *              buildId,
-    unsigned *              buildType,
-    unsigned *              branchId,
+    unsigned*               bytesProcessed,
+    unsigned*               connType,
+    unsigned*               buildId,
+    unsigned*               buildType,
+    unsigned*               branchId,
     plUUID*                 productId
 );
 
@@ -224,12 +224,12 @@ FAsyncNotifySocketProc AsyncSocketFindNotifyProc (
 *
 ***/
 
-void AsyncSocketConnect (
-    AsyncCancelId *         cancelId,
+void AsyncSocketConnect(
+    AsyncCancelId*          cancelId,
     const plNetAddress&     netAddr,
     FAsyncNotifySocketProc  notifyProc,
-    void *                  param = nil,
-    const void *            sendData = nil,
+    void*                   param = nil,
+    const void*             sendData = nil,
     unsigned                sendBytes = 0,
     unsigned                connectMs = 0,      // 0 => use default value
     unsigned                localPort = 0       // 0 => don't bind local port
@@ -237,38 +237,38 @@ void AsyncSocketConnect (
 
 // Due to the asynchronous nature of sockets, the connect may complete
 // before the cancel does... you have been warned.
-void AsyncSocketConnectCancel (
+void AsyncSocketConnectCancel(
     FAsyncNotifySocketProc  notifyProc,
     AsyncCancelId           cancelId
 );
 
-void AsyncSocketDisconnect (
+void AsyncSocketDisconnect(
     AsyncSocket             sock,
     bool                    hardClose
 );
 
 // This function must only be called after receiving a kNotifySocketDisconnect
-void AsyncSocketDelete (AsyncSocket sock);
+void AsyncSocketDelete(AsyncSocket sock);
 
 // Returns false of socket has been closed
-bool AsyncSocketSend (
+bool AsyncSocketSend(
     AsyncSocket             sock,
-    const void *            data,
+    const void*             data,
     unsigned                bytes
 );
 
 // Buffer must stay valid until I/O has completed
 // Returns false if socket has been closed
-bool AsyncSocketWrite (
+bool AsyncSocketWrite(
     AsyncSocket             sock,
-    const void *            buffer,
+    const void*             buffer,
     unsigned                bytes,
-    void *                  param
+    void*                   param
 );
 
 // This function must only be called from with a socket notification callback.
 // Calling at any other time is a crash bug waiting to happen!
-void AsyncSocketSetNotifyProc (
+void AsyncSocketSetNotifyProc(
     AsyncSocket             sock,
     FAsyncNotifySocketProc  notifyProc
 );
@@ -276,7 +276,7 @@ void AsyncSocketSetNotifyProc (
 // A backlog of zero (the default) means that no buffering is performed when
 // the TCP send buffer is full, and the send() function will close the socket
 // on send fail
-void AsyncSocketSetBacklogAlloc (
+void AsyncSocketSetBacklogAlloc(
     AsyncSocket             sock,
     unsigned                bufferSize
 );
@@ -287,16 +287,16 @@ void AsyncSocketSetBacklogAlloc (
 // the handler will be found when connection packet is received.
 // for connections with hard-coded behavior, set the notifyProc here (e.g. for use
 // protocols like SNMP on port 25)
-unsigned AsyncSocketStartListening (
+unsigned AsyncSocketStartListening(
     const plNetAddress&     listenAddr,
     FAsyncNotifySocketProc  notifyProc = nil
 );
-void AsyncSocketStopListening (
+void AsyncSocketStopListening(
     const plNetAddress&     listenAddr,
     FAsyncNotifySocketProc  notifyProc = nil
 );
 
-void AsyncSocketEnableNagling (
+void AsyncSocketEnableNagling(
     AsyncSocket             sock,
     bool                    enable
 );
@@ -308,29 +308,29 @@ void AsyncSocketEnableNagling (
 *
 ***/
 
-typedef void (* FAsyncLookupProc) (
-    void *              param,
+typedef void (* FAsyncLookupProc)(
+    void*               param,
     const char          name[],
     unsigned            addrCount,
     const plNetAddress  addrs[]
 );
 
-void AsyncAddressLookupName (
-    AsyncCancelId *     cancelId,
+void AsyncAddressLookupName(
+    AsyncCancelId*      cancelId,
     FAsyncLookupProc    lookupProc,
     const char          name[],
     unsigned            port,
-    void *              param
+    void*               param
 );
 
-void AsyncAddressLookupAddr (
-    AsyncCancelId *     cancelId,
+void AsyncAddressLookupAddr(
+    AsyncCancelId*      cancelId,
     FAsyncLookupProc    lookupProc,
     const plNetAddress& address,
-    void *              param
+    void*               param
 );
 
-void AsyncAddressLookupCancel (
+void AsyncAddressLookupCancel(
     FAsyncLookupProc    lookupProc,
     AsyncCancelId       cancelId
 );

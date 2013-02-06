@@ -51,15 +51,14 @@ class Class_ID;
 class plAutoUIParam;
 class plAutoUIClassDesc;
 
-class plAutoUIBase
-{
+class plAutoUIBase {
 protected:
     HWND fhDlg;
     std::vector<plAutoUIParam*> fParams;
 
-    ParamBlockDesc2 *fDesc;
-    IParamBlock2 *fPBlock;
-    char *fName;
+    ParamBlockDesc2* fDesc;
+    IParamBlock2* fPBlock;
+    char* fName;
 
     HWND fhRollup;
 
@@ -82,48 +81,50 @@ public:
     // 'name' is the name that will show up in the user interface (a copy is made, so you
     // can free the pointer after this function returns if it was allocated)
     //
-    void AddCheckBox    (int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates,
-                        bool def=false);
-    void AddFloatSpinner(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates,
-                        float def=0.f, float min=0.f, float max=1.f);
-    void AddIntSpinner  (int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates,
-                        int def=1, int min=0, int max=1);
-    void AddEditBox     (int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates,
-                        const char *def=nil, int lines=1);
-    void AddPickNodeList(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates,
-                        std::vector<Class_ID>* filter=nil);
-    void AddPickNodeButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates,
-                        std::vector<Class_ID>* filter=nil, bool canConvertToType=false);
-    void AddPickComponentButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates,
-                        std::vector<Class_ID>* filter=nil, bool canConvertToType=false);
-    void AddPickComponentList(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates,
-                        std::vector<Class_ID>* filter=nil);
-    void AddPickActivatorList(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickActivatorButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickDynamicTextButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickGUIDialogButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickExcludeRegionButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickAnimationButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickBehaviorButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickMaterialButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickMaterialAnimationButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickWaterComponentButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickSwimCurrentInterfaceButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickClusterComponentButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
+    void AddCheckBox(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates,
+                     bool def = false);
+    void AddFloatSpinner(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates,
+                         float def = 0.f, float min = 0.f, float max = 1.f);
+    void AddIntSpinner(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates,
+                       int def = 1, int min = 0, int max = 1);
+    void AddEditBox(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates,
+                    const char* def = nil, int lines = 1);
+    void AddPickNodeList(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates,
+                         std::vector<Class_ID>* filter = nil);
+    void AddPickNodeButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates,
+                           std::vector<Class_ID>* filter = nil, bool canConvertToType = false);
+    void AddPickComponentButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates,
+                                std::vector<Class_ID>* filter = nil, bool canConvertToType = false);
+    void AddPickComponentList(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates,
+                              std::vector<Class_ID>* filter = nil);
+    void AddPickActivatorList(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickActivatorButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickDynamicTextButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickGUIDialogButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickExcludeRegionButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickAnimationButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickBehaviorButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickMaterialButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickMaterialAnimationButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickWaterComponentButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickSwimCurrentInterfaceButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickClusterComponentButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
 
-    void AddPickGUIPopUpMenuButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    void AddPickGUISkinButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
-    
-    void AddDropDownList(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates, std::vector<std::string>* options = nil);
-    void AddPickGrassComponentButton(int16_t id, const char *scriptName, const char *name, int vid, std::vector<std::string>* vstates);
+    void AddPickGUIPopUpMenuButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+    void AddPickGUISkinButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
 
-    void CreateAutoRollup(IParamBlock2 *pb);
+    void AddDropDownList(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates, std::vector<std::string>* options = nil);
+    void AddPickGrassComponentButton(int16_t id, const char* scriptName, const char* name, int vid, std::vector<std::string>* vstates);
+
+    void CreateAutoRollup(IParamBlock2* pb);
     void DestroyAutoRollup();
 
-    const char *GetName() { return fName; }
+    const char* GetName() {
+        return fName;
+    }
 
 protected:
-    char *IMakeScriptName(const char *fullName);
+    char* IMakeScriptName(const char* fullName);
     void ICreateControls();
 
     static BOOL CALLBACK ForwardDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);

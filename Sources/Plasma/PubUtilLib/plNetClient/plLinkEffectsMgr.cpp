@@ -79,16 +79,16 @@ plLinkEffectsMgr::plLinkEffectsMgr()
 plLinkEffectsMgr::~plLinkEffectsMgr()
 {
     int i;
-    for( i = 0; i < fLinks.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fLinks.GetCount(); i++) {
         hsRefCnt_SafeUnRef(fLinks[i]);
     }
-    for( i = 0; i < fWaitlist.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fWaitlist.GetCount(); i++) {
         hsRefCnt_SafeUnRef(fWaitlist[i]);
     }
-    for( i = 0; i < fDeadlist.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fDeadlist.GetCount(); i++) {
         hsRefCnt_SafeUnRef(fDeadlist[i]);
     }
 }
@@ -97,58 +97,59 @@ void plLinkEffectsMgr::Init()
 {
     plgDispatch::Dispatch()->RegisterForExactType(plPlayerPageMsg::Index(), GetKey());
     plgDispatch::Dispatch()->RegisterForExactType(plPseudoLinkEffectMsg::Index(), GetKey());
-}   
+}
 
-plLinkEffectsTriggerMsg *plLinkEffectsMgr::IFindLinkTriggerMsg(plKey linkKey)
+plLinkEffectsTriggerMsg* plLinkEffectsMgr::IFindLinkTriggerMsg(plKey linkKey)
 {
     int i;
-    for (i = 0; i < fLinks.GetCount(); i++)
-    {
-        if (fLinks[i]->GetLinkKey() == linkKey)
+
+    for (i = 0; i < fLinks.GetCount(); i++) {
+        if (fLinks[i]->GetLinkKey() == linkKey) {
             return fLinks[i];
+        }
     }
+
     return nil;
 }
 
-void plLinkEffectsMgr::IAddLink(plLinkEffectsTriggerMsg *msg)
+void plLinkEffectsMgr::IAddLink(plLinkEffectsTriggerMsg* msg)
 {
     hsRefCnt_SafeRef(msg);
     fLinks.Append(msg);
 }
 
-void plLinkEffectsMgr::IAddWait(plLinkEffectsTriggerMsg *msg)
+void plLinkEffectsMgr::IAddWait(plLinkEffectsTriggerMsg* msg)
 {
     hsRefCnt_SafeRef(msg);
     fWaitlist.Append(msg);
 }
 
-void plLinkEffectsMgr::IAddDead(plLinkEffectsTriggerMsg *msg)
+void plLinkEffectsMgr::IAddDead(plLinkEffectsTriggerMsg* msg)
 {
     hsRefCnt_SafeRef(msg);
     fDeadlist.Append(msg);
 }
 
-void plLinkEffectsMgr::IAddPsuedo(plPseudoLinkEffectMsg *msg)
+void plLinkEffectsMgr::IAddPsuedo(plPseudoLinkEffectMsg* msg)
 {
     hsRefCnt_SafeRef(msg);
     fPseudolist.Append(msg);
 }
 
-bool plLinkEffectsMgr::IHuntWaitlist(plLinkEffectsTriggerMsg *msg)
+bool plLinkEffectsMgr::IHuntWaitlist(plLinkEffectsTriggerMsg* msg)
 {
     int i;
     bool found = false;
-    for (i = fWaitlist.GetCount() - 1; i >= 0; i--)
-    {
-        if (fWaitlist[i] == msg)
-        {
+
+    for (i = fWaitlist.GetCount() - 1; i >= 0; i--) {
+        if (fWaitlist[i] == msg) {
             found = true;
-            hsRefCnt_SafeUnRef(fWaitlist[i]);           
+            hsRefCnt_SafeUnRef(fWaitlist[i]);
             fWaitlist.Remove(i);
-            plNetApp::GetInstance()->DebugMsg("Received backup LinkEffectsTriggerMsg. Never got remote trigger!\n");            
+            plNetApp::GetInstance()->DebugMsg("Received backup LinkEffectsTriggerMsg. Never got remote trigger!\n");
         }
     }
-    
+
     return found || IHuntWaitlist(msg->GetLinkKey());
 }
 
@@ -156,10 +157,9 @@ bool plLinkEffectsMgr::IHuntWaitlist(plKey linkKey)
 {
     int i;
     bool found = false;
-    for (i = fWaitlist.GetCount() - 1; i >= 0; i--)
-    {
-        if (fWaitlist[i]->GetLinkKey() == linkKey)
-        {
+
+    for (i = fWaitlist.GetCount() - 1; i >= 0; i--) {
+        if (fWaitlist[i]->GetLinkKey() == linkKey) {
             found = true;
             IAddDead(fWaitlist[i]);
 
@@ -172,14 +172,13 @@ bool plLinkEffectsMgr::IHuntWaitlist(plKey linkKey)
     return found;
 }
 
-bool plLinkEffectsMgr::IHuntDeadlist(plLinkEffectsTriggerMsg *msg)
+bool plLinkEffectsMgr::IHuntDeadlist(plLinkEffectsTriggerMsg* msg)
 {
     int i;
     bool found = false;
-    for (i = fDeadlist.GetCount() - 1; i >= 0; i--)
-    {
-        if (fDeadlist[i] == msg)
-        {
+
+    for (i = fDeadlist.GetCount() - 1; i >= 0; i--) {
+        if (fDeadlist[i] == msg) {
             found = true;
             hsRefCnt_SafeUnRef(fDeadlist[i]);
             fDeadlist.Remove(i);
@@ -195,30 +194,24 @@ bool plLinkEffectsMgr::IHuntDeadlist(plLinkEffectsTriggerMsg *msg)
 void plLinkEffectsMgr::ISendAllReadyCallbacks()
 {
     int i;
-    for (i = fLinks.GetCount() - 1; i >= 0; i--)
-    {
-        if (fLinks[i]->fEffects <= 0)
-        {
-            if (fLinks[i]->IsLeavingAge())
-            {
-                if (fLinks[i]->GetLinkKey() == plNetClientApp::GetInstance()->GetLocalPlayerKey())
-                {
+
+    for (i = fLinks.GetCount() - 1; i >= 0; i--) {
+        if (fLinks[i]->fEffects <= 0) {
+            if (fLinks[i]->IsLeavingAge()) {
+                if (fLinks[i]->GetLinkKey() == plNetClientApp::GetInstance()->GetLocalPlayerKey()) {
                     plLinkOutUnloadMsg* lam = new plLinkOutUnloadMsg;   // derived from LoadAgeMsg
-                    lam->SetAgeFilename( NetCommGetAge()->ageDatasetName );
+                    lam->SetAgeFilename(NetCommGetAge()->ageDatasetName);
                     lam->AddReceiver(plNetClientMgr::GetInstance()->GetKey());
                     lam->SetPlayerID(plNetClientMgr::GetInstance()->GetPlayerID());
                     lam->Send();
                 }
-            }
-            else
-            {
+            } else {
                 plLinkInDoneMsg* lid = new plLinkInDoneMsg;
                 lid->AddReceiver(fLinks[i]->GetLinkKey());
                 lid->SetBCastFlag(plMessage::kPropagateToModifiers);
-                lid->Send();                    
+                lid->Send();
 
-                if (fLinks[i]->GetLinkKey() == plNetClientApp::GetInstance()->GetLocalPlayerKey())
-                {
+                if (fLinks[i]->GetLinkKey() == plNetClientApp::GetInstance()->GetLocalPlayerKey()) {
                     plLinkInDoneMsg* lid = new plLinkInDoneMsg;
                     lid->AddReceiver(plNetClientMgr::GetInstance()->GetKey());
                     lid->Send();
@@ -233,23 +226,31 @@ void plLinkEffectsMgr::ISendAllReadyCallbacks()
     }
 }
 
-bool plLinkEffectsMgr::MsgReceive(plMessage *msg)
+bool plLinkEffectsMgr::MsgReceive(plMessage* msg)
 {
     plNetClientMgr* nc = plNetClientMgr::GetInstance();
     plNetLinkingMgr* lm = plNetLinkingMgr::GetInstance();
 
     plPseudoLinkEffectMsg* pSeudoMsg = plPseudoLinkEffectMsg::ConvertNoRef(msg);
-    if (pSeudoMsg)
-    {
+
+    if (pSeudoMsg) {
         // verify valid avatar and "link" objects
-        if (!pSeudoMsg->fAvatarKey) 
+        if (!pSeudoMsg->fAvatarKey) {
             return true;
-        if (!pSeudoMsg->fLinkObjKey)
+        }
+
+        if (!pSeudoMsg->fLinkObjKey) {
             return true;
-        if (!pSeudoMsg->fLinkObjKey->ObjectIsLoaded())
+        }
+
+        if (!pSeudoMsg->fLinkObjKey->ObjectIsLoaded()) {
             return true;
-        if (!plNetClientMgr::GetInstance()->IsAPlayerKey(pSeudoMsg->fAvatarKey))
+        }
+
+        if (!plNetClientMgr::GetInstance()->IsAPlayerKey(pSeudoMsg->fAvatarKey)) {
             return true;
+        }
+
         // send the trigger message to the avatar...
         plPseudoLinkAnimTriggerMsg* pMsg = new plPseudoLinkAnimTriggerMsg(true, pSeudoMsg->fAvatarKey);
         pMsg->SetSender(GetKey());
@@ -258,15 +259,15 @@ bool plLinkEffectsMgr::MsgReceive(plMessage *msg)
     }
 
     plPseudoLinkAnimCallbackMsg* pSeudoCallback = plPseudoLinkAnimCallbackMsg::ConvertNoRef(msg);
-    if (pSeudoCallback)
-    {
+
+    if (pSeudoCallback) {
         // warp the avatar to his new position
         plPseudoLinkEffectMsg* pMsg = IFindPseudo(pSeudoCallback->fAvatarKey);
-        if (pMsg)
-        {
+
+        if (pMsg) {
             plSceneObject* pObj = plSceneObject::ConvertNoRef(pMsg->fLinkObjKey->ObjectIsLoaded());
-            if (pObj && pObj->GetCoordinateInterface())
-            {
+
+            if (pObj && pObj->GetCoordinateInterface()) {
                 hsMatrix44 mat = pObj->GetCoordinateInterface()->GetLocalToWorld();
                 // create message
                 plWarpMsg* pMsg = new plWarpMsg(mat);
@@ -274,26 +275,28 @@ bool plLinkEffectsMgr::MsgReceive(plMessage *msg)
                 pMsg->AddReceiver(pSeudoCallback->fAvatarKey);
                 plUoid U(kVirtualCamera1_KEY);
                 plKey pCamKey = hsgResMgr::ResMgr()->FindKey(U);
-                if (pCamKey)
-                {
+
+                if (pCamKey) {
                     pMsg->AddReceiver(pCamKey);
                 }
-                plgDispatch::MsgSend( pMsg );   // whoosh... off it goes
+
+                plgDispatch::MsgSend(pMsg);     // whoosh... off it goes
                 // now make him re-appear
                 plPseudoLinkAnimTriggerMsg* pTrigMsg = new plPseudoLinkAnimTriggerMsg(false, pSeudoCallback->fAvatarKey);
                 pTrigMsg->SetSender(GetKey());
                 pTrigMsg->Send();
                 IRemovePseudo(pSeudoCallback->fAvatarKey);
-                
+
             }
         }
     }
-    plLinkEffectsTriggerPrepMsg *tpMsg = plLinkEffectsTriggerPrepMsg::ConvertNoRef(msg);
-    if (tpMsg)
-    {
+
+    plLinkEffectsTriggerPrepMsg* tpMsg = plLinkEffectsTriggerPrepMsg::ConvertNoRef(msg);
+
+    if (tpMsg) {
         plNetApp::GetInstance()->DebugMsg("Received LinkEffectsTriggerPREPMsg\n");
         IAddWait(tpMsg->GetTrigger());
-        plLinkEffectPrepBCMsg *bcpMsg = new plLinkEffectPrepBCMsg;
+        plLinkEffectPrepBCMsg* bcpMsg = new plLinkEffectPrepBCMsg;
         bcpMsg->fLeavingAge = tpMsg->fLeavingAge;
         bcpMsg->fLinkKey = tpMsg->fLinkKey;
         bcpMsg->Send();
@@ -302,143 +305,143 @@ bool plLinkEffectsMgr::MsgReceive(plMessage *msg)
     }
 
     plLinkEffectsTriggerMsg* pTriggerMsg = plLinkEffectsTriggerMsg::ConvertNoRef(msg);
-    if (pTriggerMsg)
-    {
-        plNetApp::GetInstance()->DebugMsg("Received LinkEffectsTriggerMsg, local=%d, linkingIn=%d, stealth=%d", 
-            !msg->HasBCastFlag(plMessage::kNetNonLocal),
-            !pTriggerMsg->IsLeavingAge(), pTriggerMsg->GetInvisLevel());
+
+    if (pTriggerMsg) {
+        plNetApp::GetInstance()->DebugMsg("Received LinkEffectsTriggerMsg, local=%d, linkingIn=%d, stealth=%d",
+                                          !msg->HasBCastFlag(plMessage::kNetNonLocal),
+                                          !pTriggerMsg->IsLeavingAge(), pTriggerMsg->GetInvisLevel());
 
         plKey linkKey = pTriggerMsg->GetLinkKey();
-        if (linkKey == nil)
+
+        if (linkKey == nil) {
             return true;
+        }
 
         if ((linkKey != nc->GetLocalPlayerKey()) &&
-            (!pTriggerMsg->IsLeavingAge()))
-        {
-            if (IHuntDeadlist(pTriggerMsg)) // Just an obselete safety trigger
+                (!pTriggerMsg->IsLeavingAge())) {
+            if (IHuntDeadlist(pTriggerMsg)) { // Just an obselete safety trigger
                 return true;
-            
-            if (!IHuntWaitlist(pTriggerMsg))
-            {
+            }
+
+            if (!IHuntWaitlist(pTriggerMsg)) {
                 plNetApp::GetInstance()->DebugMsg("Unexpected linkEffectsTriggerMsg. Ignoring\n");
                 return true;
             }
         }
 
-        plSceneObject *avatar = plSceneObject::ConvertNoRef(linkKey->ObjectIsLoaded());
-        if (avatar == nil)
-        {
+        plSceneObject* avatar = plSceneObject::ConvertNoRef(linkKey->ObjectIsLoaded());
+
+        if (avatar == nil) {
             plNetApp::GetInstance()->DebugMsg("Can't find avatar, mod=%s\n", linkKey->GetName().c_str());
             return true;
         }
 
         // This is not the right place to catch this problem.
 //      if (IFindLinkTriggerMsg(linkKey) != nil)
-//      { 
+//      {
 //          hsAssert(false, "Trying to link an Avatar already in the process of linking.");
 //          return true;
 //      }
 
-        if (pTriggerMsg->GetInvisLevel() && linkKey != nc->GetLocalPlayerKey())
-        {
+        if (pTriggerMsg->GetInvisLevel() && linkKey != nc->GetLocalPlayerKey()) {
 #ifdef PLASMA_EXTERNAL_RELEASE
             // Verify that the server told us that the invisible avatar is a CCR
-            plNetTransportMember* mbr=nc->TransportMgr().GetMember(nc->TransportMgr().FindMember(linkKey));
-            if (!mbr || mbr->GetCCRLevel()<pTriggerMsg->GetInvisLevel())
-            {
+            plNetTransportMember* mbr = nc->TransportMgr().GetMember(nc->TransportMgr().FindMember(linkKey));
+
+            if (!mbr || mbr->GetCCRLevel() < pTriggerMsg->GetInvisLevel()) {
                 plNetApp::StaticErrorMsg("Remote Avatar trying to be stealthy - REJECTING since he's not a CCR");
-            }
-            else
+            } else
 #endif
             {
                 plNetApp::StaticDebugMsg("Remote Avatar is in stealth mode - making invisible");
                 nc->MakeCCRInvisible(pTriggerMsg->GetLinkKey(), pTriggerMsg->GetInvisLevel());
             }
         }
-        
-        if (pTriggerMsg->IsLeavingAge())
+
+        if (pTriggerMsg->IsLeavingAge()) {
             hsStatusMessage("Starting LinkOut FX\n");
-        else
+        } else {
             hsStatusMessage("Starting LinkIn FX\n");
-        
-        plLinkEffectBCMsg *BCMsg = new plLinkEffectBCMsg();
+        }
+
+        plLinkEffectBCMsg* BCMsg = new plLinkEffectBCMsg();
         BCMsg->fLinkKey = linkKey;
         BCMsg->SetLinkFlag(plLinkEffectBCMsg::kLeavingAge, pTriggerMsg->IsLeavingAge());
         BCMsg->SetLinkFlag(plLinkEffectBCMsg::kSendCallback, true);
         BCMsg->SetLinkFlag(plLinkEffectBCMsg::kMute, pTriggerMsg->MuteLinkSfx());
-        
+
         // Check if you have a Yeesha book, and mute sound if you don't.
         // 'CleftSolved' gets set when you click on the linking panel in the cleft,
         // so we use that instead of checking KILevel.
         // Also, check if you're going to/from the ACA, or through the fissure, and mute sound if you are.
-        if (linkKey == nc->GetLocalPlayerKey())
-        {
-            if(lm) {
-                const char *ageName = lm->GetAgeLink()->GetAgeInfo()->GetAgeFilename();
-                const char *prevAgeName = lm->GetPrevAgeLink()->GetAgeInfo()->GetAgeFilename();
+        if (linkKey == nc->GetLocalPlayerKey()) {
+            if (lm) {
+                const char* ageName = lm->GetAgeLink()->GetAgeInfo()->GetAgeFilename();
+                const char* prevAgeName = lm->GetPrevAgeLink()->GetAgeInfo()->GetAgeFilename();
 
-                bool linkToStartup = ageName && !stricmp(ageName, kStartUpAgeFilename   );      // To Startup
+                bool linkToStartup = ageName && !stricmp(ageName, kStartUpAgeFilename);         // To Startup
                 bool linkFromStartup = prevAgeName && !stricmp(prevAgeName, kStartUpAgeFilename);   // Leaving Startup
 
-                bool cleftSolved = VaultHasChronicleEntry( kCleftSolved );
+                bool cleftSolved = VaultHasChronicleEntry(kCleftSolved);
 
                 bool linkToACA = ageName && !stricmp(ageName, kAvCustomizationFilename);
                 bool linkFromACA = prevAgeName && !stricmp(prevAgeName, kAvCustomizationFilename);
 
-                bool linkToFissureDrop = lm && 
-                                        lm->GetAgeLink()->HasSpawnPt() &&
-                                        !lm->GetAgeLink()->SpawnPoint().GetName().CompareI(kCleftAgeLinkInPointFissureDrop);
-                bool linkToDsntFromShell = lm && 
-                                        lm->GetAgeLink()->HasSpawnPt() &&
-                                        !lm->GetAgeLink()->SpawnPoint().GetTitle().CompareI(kDescentLinkFromShell);
-                if ( linkToACA || linkFromACA || linkToStartup || linkFromStartup || linkToFissureDrop || linkToDsntFromShell)
-                {
+                bool linkToFissureDrop = lm &&
+                                         lm->GetAgeLink()->HasSpawnPt() &&
+                                         !lm->GetAgeLink()->SpawnPoint().GetName().CompareI(kCleftAgeLinkInPointFissureDrop);
+                bool linkToDsntFromShell = lm &&
+                                           lm->GetAgeLink()->HasSpawnPt() &&
+                                           !lm->GetAgeLink()->SpawnPoint().GetTitle().CompareI(kDescentLinkFromShell);
+
+                if (linkToACA || linkFromACA || linkToStartup || linkFromStartup || linkToFissureDrop || linkToDsntFromShell) {
                     BCMsg->SetLinkFlag(plLinkEffectBCMsg::kMute);
                 }
             }
         }
-        
+
         BCMsg->SetSender(GetKey());
+
         if (msg->HasBCastFlag(plMessage::kNetNonLocal))
             // terminate the remote cascade and start a new (local) cascade, since the rcvr is localOnly and will reject remote msgs
-            BCMsg->SetBCastFlag(plMessage::kNetStartCascade);   
-        plgDispatch::MsgSend(BCMsg);
-        
-        if (!pTriggerMsg->IsLeavingAge()) // Avatar is currently entering a new age
         {
-            plATCAnim *linkInAnim = nil;
+            BCMsg->SetBCastFlag(plMessage::kNetStartCascade);
+        }
+
+        plgDispatch::MsgSend(BCMsg);
+
+        if (!pTriggerMsg->IsLeavingAge()) { // Avatar is currently entering a new age
+            plATCAnim* linkInAnim = nil;
             plKey linkInAnimKey = nil;
-            const plArmatureMod *avMod = plArmatureMod::ConvertNoRef(avatar->GetModifierByType(plArmatureMod::Index()));
-            if (pTriggerMsg->HasBCastFlag(plMessage::kNetNonLocal))
-            {
+            const plArmatureMod* avMod = plArmatureMod::ConvertNoRef(avatar->GetModifierByType(plArmatureMod::Index()));
+
+            if (pTriggerMsg->HasBCastFlag(plMessage::kNetNonLocal)) {
                 // Remote trigger, they should tell us how they linked in.
                 linkInAnimKey = pTriggerMsg->GetLinkInAnimKey();
-            }
-            else
-            {
+            } else {
                 // this is our backup trigger we send ourselves. We've already received the remote player's SDL.
                 linkInAnimKey = avMod ? avMod->GetLinkInAnimKey() : nil;
             }
+
             linkInAnim = plATCAnim::ConvertNoRef(linkInAnimKey ? linkInAnimKey->ObjectIsLoaded() : nil);
-            
-            if (avMod && linkInAnim)
-            {   
-                plAvOneShotTask *task = new plAvOneShotTask(linkInAnim->GetName(), false, false, nil);
+
+            if (avMod && linkInAnim) {
+                plAvOneShotTask* task = new plAvOneShotTask(linkInAnim->GetName(), false, false, nil);
                 task->fBackwards = true;
                 task->fDisableLooping = true;
                 task->fDisablePhysics = false;
                 (new plAvTaskMsg(GetKey(), avMod->GetKey(), task))->Send();
             }
-                
+
         }
-        
+
         IAddLink(pTriggerMsg); // refs the avatarMod
-        
+
         // Dummy msg sent after the broadcast. This guarantees we have a callback to actually trigger the
         // link, plus we know any effect broadcast messages will have processed before this (and therefore
         // have told us to wait for them.)
         pTriggerMsg->fEffects++;
-        plLinkCallbackMsg *dummyMsg = new plLinkCallbackMsg();
+        plLinkCallbackMsg* dummyMsg = new plLinkCallbackMsg();
         dummyMsg->AddReceiver(GetKey());
         dummyMsg->fLinkKey = linkKey;
         plgDispatch::MsgSend(dummyMsg);
@@ -448,51 +451,46 @@ bool plLinkEffectsMgr::MsgReceive(plMessage *msg)
 
     // callbacks from linkout events
     plLinkCallbackMsg* pLinkCallbackMsg = plLinkCallbackMsg::ConvertNoRef(msg);
-    if (pLinkCallbackMsg)
-    {
-        plNetApp::GetInstance()->DebugMsg("Received pLinkCallbackMsg, localmsg=%d\n", 
-            !msg->HasBCastFlag(plMessage::kNetNonLocal));
+
+    if (pLinkCallbackMsg) {
+        plNetApp::GetInstance()->DebugMsg("Received pLinkCallbackMsg, localmsg=%d\n",
+                                          !msg->HasBCastFlag(plMessage::kNetNonLocal));
 
         static char str[ 128 ];
-        plLinkEffectsTriggerMsg *pTriggerMsg = IFindLinkTriggerMsg(pLinkCallbackMsg->fLinkKey);
-        if (pTriggerMsg == nil)
-        {
+        plLinkEffectsTriggerMsg* pTriggerMsg = IFindLinkTriggerMsg(pLinkCallbackMsg->fLinkKey);
+
+        if (pTriggerMsg == nil) {
             hsAssert(true, "Received a callback for an avatar that isn't linking.");
             return true;
         }
 
-        if (--pTriggerMsg->fEffects == 0)
-        {
-            plNetApp::GetInstance()->DebugMsg("All link callbacks received.\n" );
+        if (--pTriggerMsg->fEffects == 0) {
+            plNetApp::GetInstance()->DebugMsg("All link callbacks received.\n");
             plgDispatch::Dispatch()->RegisterForExactType(plTimeMsg::Index(), GetKey());
-        }
-        else if (pTriggerMsg->fEffects < 0 )
-        {
+        } else if (pTriggerMsg->fEffects < 0) {
             plNetApp::GetInstance()->DebugMsg("Too many link callbacks received for avatar %s. Ignoring extras.\n",
-                    pTriggerMsg->GetLinkKey()->GetName().c_str());
+                                              pTriggerMsg->GetLinkKey()->GetName().c_str());
+        } else {
+            plNetApp::GetInstance()->DebugMsg("%d link callbacks left until avatar %s links...\n",
+                                              pTriggerMsg->fEffects, pTriggerMsg->GetLinkKey()->GetName().c_str());
         }
-        else
-        {
-            plNetApp::GetInstance()->DebugMsg("%d link callbacks left until avatar %s links...\n", 
-                     pTriggerMsg->fEffects, pTriggerMsg->GetLinkKey()->GetName().c_str());
-        }
+
         return true;
     }
 
-    plTimeMsg *time = plTimeMsg::ConvertNoRef(msg);
-    if (time) // This is how we know we're out of the render function, and it's safe to pageIn/Out nodes
-    {
+    plTimeMsg* time = plTimeMsg::ConvertNoRef(msg);
+
+    if (time) { // This is how we know we're out of the render function, and it's safe to pageIn/Out nodes
         plgDispatch::Dispatch()->UnRegisterForExactType(plTimeMsg::Index(), GetKey());
         ISendAllReadyCallbacks();
 
         return true;
     }
 
-    plPlayerPageMsg *pageMsg = plPlayerPageMsg::ConvertNoRef(msg);
-    if (pageMsg)
-    {
-        if (pageMsg->fUnload)
-        {
+    plPlayerPageMsg* pageMsg = plPlayerPageMsg::ConvertNoRef(msg);
+
+    if (pageMsg) {
+        if (pageMsg->fUnload) {
             IHuntWaitlist(pageMsg->fPlayer);
             return true;
         }
@@ -501,15 +499,14 @@ bool plLinkEffectsMgr::MsgReceive(plMessage *msg)
 
         // If we're not loading state, we're in the age. So this avatar coming in must be linking in.
         // If the player is us, no prep is necessary.
-        if (!plNetClientApp::GetInstance()->IsLoadingInitialAgeState() && 
-            (pageMsg->fPlayer != nc->GetLocalPlayerKey()))
-        {
-            plLinkEffectsTriggerMsg *trigMsg = new plLinkEffectsTriggerMsg;
+        if (!plNetClientApp::GetInstance()->IsLoadingInitialAgeState() &&
+                (pageMsg->fPlayer != nc->GetLocalPlayerKey())) {
+            plLinkEffectsTriggerMsg* trigMsg = new plLinkEffectsTriggerMsg;
             trigMsg->SetLeavingAge(false);
             trigMsg->SetLinkKey(pageMsg->fPlayer);
 
             // Send off the prep message right away
-            plLinkEffectsTriggerPrepMsg *trigPrepMsg = new plLinkEffectsTriggerPrepMsg;
+            plLinkEffectsTriggerPrepMsg* trigPrepMsg = new plLinkEffectsTriggerPrepMsg;
             trigPrepMsg->fLinkKey = pageMsg->fPlayer;
             trigPrepMsg->SetTrigger(trigMsg);
             trigPrepMsg->Send(GetKey());
@@ -521,7 +518,7 @@ bool plLinkEffectsMgr::MsgReceive(plMessage *msg)
             trigMsg->SetTimeStamp(timeToDeliver);
             trigMsg->Send(GetKey());
         }
-        
+
         return true;
     }
 
@@ -530,47 +527,47 @@ bool plLinkEffectsMgr::MsgReceive(plMessage *msg)
 
 void plLinkEffectsMgr::WaitForEffect(plKey linkKey, float time)
 {
-    plLinkEffectsTriggerMsg *msg = IFindLinkTriggerMsg(linkKey);
-    if (msg == nil)
-    {
+    plLinkEffectsTriggerMsg* msg = IFindLinkTriggerMsg(linkKey);
+
+    if (msg == nil) {
         hsAssert(true, "Request to wait on an effect for an avatar that isn't linking.");
         return;
     }
 
     msg->fEffects++;
-    plLinkCallbackMsg *callback = new plLinkCallbackMsg();
+    plLinkCallbackMsg* callback = new plLinkCallbackMsg();
     callback->fEvent = kStop;
     callback->fRepeats = 0;
     callback->fLinkKey = linkKey;
     double timeToDeliver = hsTimer::GetSysSeconds() + time;
-    callback->SetTimeStamp( timeToDeliver );
-    callback->Send( GetKey() );
+    callback->SetTimeStamp(timeToDeliver);
+    callback->Send(GetKey());
 }
 
-plMessage *plLinkEffectsMgr::WaitForEffect(plKey linkKey)
+plMessage* plLinkEffectsMgr::WaitForEffect(plKey linkKey)
 {
-    plLinkEffectsTriggerMsg *msg = IFindLinkTriggerMsg(linkKey);
-    if (msg == nil)
-    {
+    plLinkEffectsTriggerMsg* msg = IFindLinkTriggerMsg(linkKey);
+
+    if (msg == nil) {
         hsAssert(true, "Request to wait on an effect for an avatar that isn't linking.");
         return nil;
     }
 
     msg->fEffects++;
 
-    plLinkCallbackMsg *callback = new plLinkCallbackMsg();
+    plLinkCallbackMsg* callback = new plLinkCallbackMsg();
     callback->fEvent = kStop;
     callback->fRepeats = 0;
     callback->fLinkKey = linkKey;
-    callback->AddReceiver( GetKey() );
+    callback->AddReceiver(GetKey());
     return callback;
 }
 
 void plLinkEffectsMgr::WaitForPseudoEffect(plKey linkKey, float time)
 {
     plPseudoLinkEffectMsg* msg = IFindPseudo(linkKey);
-    if (msg == nil)
-    {
+
+    if (msg == nil) {
         hsAssert(true, "Request to wait on an fake effect for an avatar that isn't fake linking.");
         return;
     }
@@ -578,18 +575,20 @@ void plLinkEffectsMgr::WaitForPseudoEffect(plKey linkKey, float time)
     plPseudoLinkAnimCallbackMsg* callback = new plPseudoLinkAnimCallbackMsg();
     callback->fAvatarKey = linkKey;
     double timeToDeliver = hsTimer::GetSysSeconds() + time;
-    callback->SetTimeStamp( timeToDeliver );
-    callback->Send( GetKey() );
+    callback->SetTimeStamp(timeToDeliver);
+    callback->Send(GetKey());
 }
 
 plPseudoLinkEffectMsg* plLinkEffectsMgr::IFindPseudo(plKey avatarKey)
 {
     int i;
-    for (i = 0; i < fPseudolist.GetCount(); i++)
-    {
-        if (fPseudolist[i]->fAvatarKey == avatarKey)
+
+    for (i = 0; i < fPseudolist.GetCount(); i++) {
+        if (fPseudolist[i]->fAvatarKey == avatarKey) {
             return fPseudolist[i];
+        }
     }
+
     return nil;
 
 }
@@ -597,10 +596,9 @@ plPseudoLinkEffectMsg* plLinkEffectsMgr::IFindPseudo(plKey avatarKey)
 void plLinkEffectsMgr::IRemovePseudo(plKey avatarKey)
 {
     int i;
-    for (i = 0; i < fPseudolist.GetCount(); i++)
-    {
-        if (fPseudolist[i]->fAvatarKey == avatarKey)
-        {   
+
+    for (i = 0; i < fPseudolist.GetCount(); i++) {
+        if (fPseudolist[i]->fAvatarKey == avatarKey) {
             fPseudolist.Remove(i);
             return;
         }

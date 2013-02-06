@@ -50,11 +50,9 @@ class hsGMaterial;
 class hsTriangle3;
 struct hsGSplat3;
 
-class plDrawPrim : public hsRefCnt
-{
+class plDrawPrim : public hsRefCnt {
 public:
-    enum plDPPrimType
-    {
+    enum plDPPrimType {
         kTypeNone               = 0x0,
         kTypeTriList            = 0x1,
         kTypeSplatList          = 0x2
@@ -72,15 +70,22 @@ public:
 
     virtual const hsBounds3Ext& GetLocalBounds() const = 0;
 
-    hsGMaterial*    GetMaterial() { return fMaterial; }
-    uint32_t          GetPrimType() { return fPrimType; }
-    uint32_t          GetDrawProps() { return fDrawProps; }
+    hsGMaterial*    GetMaterial() {
+        return fMaterial;
+    }
+    uint32_t          GetPrimType() {
+        return fPrimType;
+    }
+    uint32_t          GetDrawProps() {
+        return fDrawProps;
+    }
 };
 
-class plTriListPrim : public plDrawPrim
-{
+class plTriListPrim : public plDrawPrim {
 public:
-    plTriListPrim() { fPrimType |= kTypeTriList; }
+    plTriListPrim() {
+        fPrimType |= kTypeTriList;
+    }
     virtual ~plTriListPrim();
 
     virtual const hsBounds3Ext& GetLocalBounds() const = 0;
@@ -89,10 +94,11 @@ public:
 
 };
 
-class plSplatListPrim : public plDrawPrim
-{
+class plSplatListPrim : public plDrawPrim {
 public:
-    plSplatListPrim() { fPrimType |= kTypeSplatList; }
+    plSplatListPrim() {
+        fPrimType |= kTypeSplatList;
+    }
 
     virtual const hsBounds3Ext& GetLocalBounds() const = 0;
 

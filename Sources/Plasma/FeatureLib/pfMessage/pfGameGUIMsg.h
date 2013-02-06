@@ -52,52 +52,73 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsStream.h"
 #include "pnMessage/plMessage.h"
 
-class pfGameGUIMsg : public plMessage
-{
-    protected:
+class pfGameGUIMsg : public plMessage {
+protected:
 
-        uint8_t   fCommand;
-        char    fString[ 128 ];     
-        char    *fAge;
+    uint8_t   fCommand;
+    char    fString[ 128 ];
+    char*    fAge;
 
-    public:
-        enum 
-        {
-            kShowDialog,
-            kHideDialog,
-            kLoadDialog
-        };
+public:
+    enum {
+        kShowDialog,
+        kHideDialog,
+        kLoadDialog
+    };
 
-        pfGameGUIMsg() : plMessage( nil, nil, nil ) { SetBCastFlag( kBCastByExactType ); fAge = nil; }
-        pfGameGUIMsg( plKey &receiver, uint8_t command ) : plMessage( nil, nil, nil ) { AddReceiver( receiver ); fCommand = command; fAge = nil; }
-        ~pfGameGUIMsg() { delete [] fAge; }
+    pfGameGUIMsg() : plMessage(nil, nil, nil) {
+        SetBCastFlag(kBCastByExactType);
+        fAge = nil;
+    }
+    pfGameGUIMsg(plKey& receiver, uint8_t command) : plMessage(nil, nil, nil) {
+        AddReceiver(receiver);
+        fCommand = command;
+        fAge = nil;
+    }
+    ~pfGameGUIMsg() {
+        delete [] fAge;
+    }
 
-        CLASSNAME_REGISTER( pfGameGUIMsg );
-        GETINTERFACE_ANY( pfGameGUIMsg, plMessage );
+    CLASSNAME_REGISTER(pfGameGUIMsg);
+    GETINTERFACE_ANY(pfGameGUIMsg, plMessage);
 
-        virtual void Read(hsStream* s, hsResMgr* mgr) 
-        { 
-            plMessage::IMsgRead( s, mgr ); 
-            s->ReadLE( &fCommand );
-            s->Read( sizeof( fString ), fString );
-            fAge = s->ReadSafeString();
+    virtual void Read(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgRead(s, mgr);
+        s->ReadLE(&fCommand);
+        s->Read(sizeof(fString), fString);
+        fAge = s->ReadSafeString();
+    }
+
+    virtual void Write(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgWrite(s, mgr);
+        s->WriteLE(fCommand);
+        s->Write(sizeof(fString), fString);
+        s->WriteSafeString(fAge);
+    }
+
+    uint8_t       GetCommand(void) {
+        return fCommand;
+    }
+
+    void        SetString(const char* str) {
+        hsStrncpy(fString, str, sizeof(fString) - 1);
+    }
+    const char*  GetString(void) {
+        return fString;
+    }
+
+    void        SetAge(const char* str) {
+        delete [] fAge;
+
+        if (str == nil) {
+            fAge = nil;
+        } else {
+            fAge = hsStrcpy(str);
         }
-        
-        virtual void Write(hsStream* s, hsResMgr* mgr) 
-        { 
-            plMessage::IMsgWrite( s, mgr ); 
-            s->WriteLE( fCommand );
-            s->Write( sizeof( fString ), fString );
-            s->WriteSafeString( fAge );
-        }
-
-        uint8_t       GetCommand( void ) { return fCommand; }
-
-        void        SetString( const char *str ) { hsStrncpy( fString, str, sizeof( fString ) - 1 ); }
-        const char  *GetString( void ) { return fString; }
-
-        void        SetAge( const char *str ) { delete [] fAge; if( str == nil ) fAge = nil; else fAge = hsStrcpy( str ); }
-        const char  *GetAge( void ) { return fAge; }
+    }
+    const char*  GetAge(void) {
+        return fAge;
+    }
 };
 
 #endif // _pfGameGUIMsg_h

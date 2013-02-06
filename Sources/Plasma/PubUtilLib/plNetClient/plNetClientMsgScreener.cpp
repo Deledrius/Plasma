@@ -66,7 +66,7 @@ plNetClientMsgScreener::plNetClientMsgScreener()
 void plNetClientMsgScreener::ICreateStatusLog() const
 {
     fStatusLog = plStatusLogMgr::GetInstance().CreateStatusLog(40, "NetScreener.log",
-            plStatusLog::kTimestamp | plStatusLog::kFilledBackground | plStatusLog::kAlignToTop);   
+                 plStatusLog::kTimestamp | plStatusLog::kFilledBackground | plStatusLog::kAlignToTop);
 }
 
 //
@@ -74,7 +74,7 @@ void plNetClientMsgScreener::ICreateStatusLog() const
 //
 const char* plNetClientMsgScreener::IGetAgeName() const
 {
-    plNetLinkingMgr *lm = plNetLinkingMgr::GetInstance();
+    plNetLinkingMgr* lm = plNetLinkingMgr::GetInstance();
     return lm && lm->GetAgeLink()->GetAgeInfo() ? lm->GetAgeLink()->GetAgeInfo()->GetAgeFilename() : "?";
 }
 
@@ -83,14 +83,14 @@ const char* plNetClientMsgScreener::IGetAgeName() const
 //
 bool plNetClientMsgScreener::IIsLocalAvatarKey(plKey key, const plNetGameMember* gm) const
 {
-    return (!key || key==plNetClientApp::GetInstance()->GetLocalPlayerKey());
+    return (!key || key == plNetClientApp::GetInstance()->GetLocalPlayerKey());
 }
 
-bool plNetClientMsgScreener::IIsLocalArmatureModKey(plKey key, const plNetGameMember* gm) const 
+bool plNetClientMsgScreener::IIsLocalArmatureModKey(plKey key, const plNetGameMember* gm) const
 {
     plKey playerKey = plNetClientApp::GetInstance()->GetLocalPlayerKey();
-    plArmatureMod* aMod = playerKey ? plAvatarMgr::GetInstance()->FindAvatar(playerKey) : nil; 
-    return (!key || key==(aMod ? aMod->GetKey() : nil));
+    plArmatureMod* aMod = playerKey ? plAvatarMgr::GetInstance()->FindAvatar(playerKey) : nil;
+    return (!key || key == (aMod ? aMod->GetKey() : nil));
 }
 
 //
@@ -106,23 +106,26 @@ bool plNetClientMsgScreener::IIsSenderCCR(const plNetGameMember* gm) const
 //
 bool plNetClientMsgScreener::AllowOutgoingMessage(const plMessage* msg) const
 {
-    if (!msg)
+    if (!msg) {
         return false;
+    }
 
-    Answer ans=IAllowMessageType(msg->ClassIndex());
-    if (ans==kYes)
+    Answer ans = IAllowMessageType(msg->ClassIndex());
+
+    if (ans == kYes) {
         return true;
-    if (ans==kNo)
-    {
+    }
+
+    if (ans == kNo) {
         WarningMsg("Rejected: (Outgoing) %s [Illegal Message]", msg->ClassName());
         return false;
     }
 
-    if (!IValidateMessage(msg))
-    {
+    if (!IValidateMessage(msg)) {
         WarningMsg("Rejected: (Outgoing) %s [Validation Failed]", msg->ClassName());
         return false;
     }
+
     return true;
 }
 
@@ -132,12 +135,15 @@ bool plNetClientMsgScreener::AllowOutgoingMessage(const plMessage* msg) const
 //
 bool plNetClientMsgScreener::AllowIncomingMessage(const plMessage* msg) const
 {
-    if (!msg)
+    if (!msg) {
         return false;
+    }
 
     bool result = IScreenIncoming(msg);
-    if (!result)
+
+    if (!result) {
         WarningMsg("Rejected: (Incoming) %s", msg->ClassName());
+    }
 
     return result;
 }
@@ -145,26 +151,31 @@ bool plNetClientMsgScreener::AllowIncomingMessage(const plMessage* msg) const
 bool plNetClientMsgScreener::IScreenIncoming(const plMessage* msg) const
 {
     // Why would you EVER send a RefMsg accross the network???
-    if (plFactory::DerivesFrom(CLASS_INDEX_SCOPED(plRefMsg), msg->ClassIndex()))
+    if (plFactory::DerivesFrom(CLASS_INDEX_SCOPED(plRefMsg), msg->ClassIndex())) {
         return false;
+    }
 
     // Blacklist some obvious hacks here...
-    switch (msg->ClassIndex())
-    {
+    switch (msg->ClassIndex()) {
     case CLASS_INDEX_SCOPED(plAudioSysMsg):
         // This message has a flawed read/write
         return false;
+
     case CLASS_INDEX_SCOPED(plConsoleMsg):
         // Python remote code execution vunerability
         return false;
-    case CLASS_INDEX_SCOPED(pfKIMsg):
-        {
+
+    case CLASS_INDEX_SCOPED(pfKIMsg): {
             // Only accept Chat Messages!
             const pfKIMsg* ki = pfKIMsg::ConvertNoRef(msg);
-            if (ki->GetCommand() != pfKIMsg::kHACKChatMsg)
+
+            if (ki->GetCommand() != pfKIMsg::kHACKChatMsg) {
                 return false;
+            }
+
             return true;
         }
+
     default:
         // Default allow everything else, otherweise we
         // might break something that we really shouldn't...

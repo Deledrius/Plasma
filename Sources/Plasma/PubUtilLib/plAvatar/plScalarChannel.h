@@ -71,8 +71,7 @@ class plControllerCacheInfo;
 // PLSCALARCHANNEL
 //////////////////
 // an animation channel that outputs a scalar value
-class plScalarChannel : public plAGChannel
-{
+class plScalarChannel : public plAGChannel {
 protected:
     float fResult;
 
@@ -81,46 +80,49 @@ public:
     virtual ~plScalarChannel();
 
     // AG PROTOCOL
-    virtual const float & Value(double time, bool peek = false);
-    virtual void Value(float &result, double time, bool peek = false);
+    virtual const float& Value(double time, bool peek = false);
+    virtual void Value(float& result, double time, bool peek = false);
 
     // combine it (allocates combine object)
-    virtual plAGChannel * MakeCombine(plAGChannel * channelB);
+    virtual plAGChannel* MakeCombine(plAGChannel* channelB);
 
     // blend it (allocates blend object)
-    virtual plAGChannel * MakeBlend(plAGChannel * channelB, plScalarChannel * channelBias, int blendPriority);
+    virtual plAGChannel* MakeBlend(plAGChannel* channelB, plScalarChannel* channelBias, int blendPriority);
 
     // const eval at time zero
-    virtual plAGChannel * MakeZeroState();
-    
+    virtual plAGChannel* MakeZeroState();
+
     // make a timeScale instance
-    virtual plAGChannel * MakeTimeScale(plScalarChannel *timeSource);
+    virtual plAGChannel* MakeTimeScale(plScalarChannel* timeSource);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plScalarChannel );
-    GETINTERFACE_ANY( plScalarChannel, plAGChannel );
+    CLASSNAME_REGISTER(plScalarChannel);
+    GETINTERFACE_ANY(plScalarChannel, plAGChannel);
 };
 
 ///////////////////
 // PLSCALARCONSTANT
 ///////////////////
 // A scalar source that just keeps handing out the same value
-class plScalarConstant : public plScalarChannel
-{
+class plScalarConstant : public plScalarChannel {
 public:
     plScalarConstant();
     plScalarConstant(float value);
     virtual ~plScalarConstant();
 
-    void Set(float value) { fResult = value; }
-    float Get() { return fResult; }
+    void Set(float value) {
+        fResult = value;
+    }
+    float Get() {
+        return fResult;
+    }
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plScalarConstant );
-    GETINTERFACE_ANY( plScalarConstant, plScalarChannel );
+    CLASSNAME_REGISTER(plScalarConstant);
+    GETINTERFACE_ANY(plScalarConstant, plScalarChannel);
 
-    void Read(hsStream *stream, hsResMgr *mgr);
-    void Write(hsStream *stream, hsResMgr *mgr);
+    void Read(hsStream* stream, hsResMgr* mgr);
+    void Write(hsStream* stream, hsResMgr* mgr);
 };
 
 
@@ -129,120 +131,128 @@ public:
 ////////////////////
 // Adapts the time scale before passing it to the next channel in line.
 // Use to instance animations while allowing each instance to run at different speeds.
-class plScalarTimeScale : public plScalarChannel
-{
+class plScalarTimeScale : public plScalarChannel {
 protected:
-    plScalarChannel *fTimeSource;
-    plScalarChannel *fChannelIn;
+    plScalarChannel* fTimeSource;
+    plScalarChannel* fChannelIn;
 
 public:
     plScalarTimeScale();
-    plScalarTimeScale(plScalarChannel *channel, plScalarChannel *timeSource);
+    plScalarTimeScale(plScalarChannel* channel, plScalarChannel* timeSource);
     virtual ~plScalarTimeScale();
 
     virtual bool IsStoppedAt(double time);
-    virtual const float & Value(double time, bool peek = false);
-    virtual plAGChannel * Detach(plAGChannel * channel);
+    virtual const float& Value(double time, bool peek = false);
+    virtual plAGChannel* Detach(plAGChannel* channel);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plScalarTimeScale );
-    GETINTERFACE_ANY( plScalarTimeScale, plScalarChannel );
+    CLASSNAME_REGISTER(plScalarTimeScale);
+    GETINTERFACE_ANY(plScalarTimeScale, plScalarChannel);
 };
 
 ////////////////
 // PLSCALARBLEND
 ////////////////
 // blends two scalars into one with weighting
-class plScalarBlend : public plScalarChannel
-{
+class plScalarBlend : public plScalarChannel {
 protected:
-    plScalarChannel * fChannelA;
-    plScalarChannel * fChannelB;
-    plScalarChannel * fChannelBias;
-    
+    plScalarChannel* fChannelA;
+    plScalarChannel* fChannelB;
+    plScalarChannel* fChannelBias;
+
 public:
     // xTORs
     plScalarBlend();
-    plScalarBlend(plScalarChannel * channelA, plScalarChannel * channelB, plScalarChannel * channelBias);
+    plScalarBlend(plScalarChannel* channelA, plScalarChannel* channelB, plScalarChannel* channelBias);
     virtual ~plScalarBlend();
 
     // SPECIFICS
-    const plScalarChannel * GetChannelA() const { return fChannelA; }
-    void SetChannelA(plScalarChannel * channel) { fChannelA = channel; }
+    const plScalarChannel* GetChannelA() const {
+        return fChannelA;
+    }
+    void SetChannelA(plScalarChannel* channel) {
+        fChannelA = channel;
+    }
 
-    const plScalarChannel * GetChannelB() const { return fChannelB; }
-    void SetChannelB(plScalarChannel * channel) { fChannelB = channel; }
+    const plScalarChannel* GetChannelB() const {
+        return fChannelB;
+    }
+    void SetChannelB(plScalarChannel* channel) {
+        fChannelB = channel;
+    }
 
-    const plScalarChannel * GetChannelBias() const { return fChannelBias; }
-    void SetChannelBias(plScalarChannel * channel) { fChannelBias = channel; }
+    const plScalarChannel* GetChannelBias() const {
+        return fChannelBias;
+    }
+    void SetChannelBias(plScalarChannel* channel) {
+        fChannelBias = channel;
+    }
 
     virtual bool IsStoppedAt(double time);
 
     // AG PROTOCOL
-    virtual const float & Value(double time, bool peek = false);
-    
+    virtual const float& Value(double time, bool peek = false);
+
     // remove the specified channel from our graph
-    virtual plAGChannel * Detach(plAGChannel * channel);
-    
+    virtual plAGChannel* Detach(plAGChannel* channel);
+
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plScalarBlend );
-    GETINTERFACE_ANY( plScalarBlend, plScalarChannel );
+    CLASSNAME_REGISTER(plScalarBlend);
+    GETINTERFACE_ANY(plScalarBlend, plScalarChannel);
 };
 
 ////////////////////////////
 // PLSCALARCONTROLLERCHANNEL
 ////////////////////////////
 // converts a plController-style animation into a plScalarChannel
-class plScalarControllerChannel : public plScalarChannel
-{
+class plScalarControllerChannel : public plScalarChannel {
 protected:
-    plController *fController;
-    
+    plController* fController;
+
 public:
     // xTORs
     plScalarControllerChannel();
-    plScalarControllerChannel(plController *controller);
+    plScalarControllerChannel(plController* controller);
     virtual ~plScalarControllerChannel();
-    
+
     // AG PROTOCOL
-    virtual const float & Value(double time, bool peek = false);
-    virtual const float & Value(double time, bool peek, plControllerCacheInfo *cache);
-    
-    virtual plAGChannel *MakeCacheChannel(plAnimTimeConvert *atc);
-        
+    virtual const float& Value(double time, bool peek = false);
+    virtual const float& Value(double time, bool peek, plControllerCacheInfo* cache);
+
+    virtual plAGChannel* MakeCacheChannel(plAnimTimeConvert* atc);
+
     // PLASMA PROTOCOL
     // rtti
-    CLASSNAME_REGISTER( plScalarControllerChannel );
-    GETINTERFACE_ANY( plScalarControllerChannel, plScalarChannel );
-    
+    CLASSNAME_REGISTER(plScalarControllerChannel);
+    GETINTERFACE_ANY(plScalarControllerChannel, plScalarChannel);
+
     // persistence
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
-    virtual void Read(hsStream *s, hsResMgr *mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
 };
 
 /////////////////////////////////
 // PLSCALARCONTROLLERCACHECHANNEL
 /////////////////////////////////
 // Same as plScalarController, but with caching info
-class plScalarControllerCacheChannel : public plScalarChannel
-{
+class plScalarControllerCacheChannel : public plScalarChannel {
 protected:
-    plControllerCacheInfo *fCache;
-    plScalarControllerChannel *fControllerChannel;
-    
+    plControllerCacheInfo* fCache;
+    plScalarControllerChannel* fControllerChannel;
+
 public:
     plScalarControllerCacheChannel();
-    plScalarControllerCacheChannel(plScalarControllerChannel *channel, plControllerCacheInfo *cache);
+    plScalarControllerCacheChannel(plScalarControllerChannel* channel, plControllerCacheInfo* cache);
     virtual ~plScalarControllerCacheChannel();
-    
-    virtual const float & Value(double time, bool peek = false);
-    
-    virtual plAGChannel * Detach(plAGChannel * channel);
-    
+
+    virtual const float& Value(double time, bool peek = false);
+
+    virtual plAGChannel* Detach(plAGChannel* channel);
+
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plScalarControllerCacheChannel );
-    GETINTERFACE_ANY( plScalarControllerCacheChannel, plScalarChannel );
-    
+    CLASSNAME_REGISTER(plScalarControllerCacheChannel);
+    GETINTERFACE_ANY(plScalarControllerCacheChannel, plScalarChannel);
+
     // Created at runtime only, so no Read/Write
 };
 
@@ -250,32 +260,30 @@ public:
 // PLATCChannel
 ////////////////////
 // Channel interface for a plAnimTimeConvert object
-class plATCChannel : public plScalarChannel
-{
+class plATCChannel : public plScalarChannel {
 protected:
-    plAnimTimeConvert *fConvert;
+    plAnimTimeConvert* fConvert;
 
 public:
     plATCChannel();
-    plATCChannel(plAnimTimeConvert *convert);
+    plATCChannel(plAnimTimeConvert* convert);
     virtual ~plATCChannel();
 
     virtual bool IsStoppedAt(double time);
-    virtual const float & Value(double time, bool peek = false);
+    virtual const float& Value(double time, bool peek = false);
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plATCChannel );
-    GETINTERFACE_ANY( plATCChannel, plScalarChannel );
+    CLASSNAME_REGISTER(plATCChannel);
+    GETINTERFACE_ANY(plATCChannel, plScalarChannel);
 };
 
 ////////////////////
 // PLSCALARSDLCHANNEL
 ////////////////////
 // Returns the value of an SDL scalar variable
-class plScalarSDLChannel : public plScalarChannel
-{
+class plScalarSDLChannel : public plScalarChannel {
 protected:
-    plSimpleStateVariable *fVar;
+    plSimpleStateVariable* fVar;
     float fLength;
 
 public:
@@ -284,78 +292,74 @@ public:
     virtual ~plScalarSDLChannel();
 
     virtual bool IsStoppedAt(double time);
-    virtual const float & Value(double time, bool peek = false);
+    virtual const float& Value(double time, bool peek = false);
 
-    void SetVar(plSimpleStateVariable *var) { fVar = var; }
+    void SetVar(plSimpleStateVariable* var) {
+        fVar = var;
+    }
 
     // PLASMA PROTOCOL
-    CLASSNAME_REGISTER( plScalarSDLChannel );
-    GETINTERFACE_ANY( plScalarSDLChannel, plScalarChannel );
+    CLASSNAME_REGISTER(plScalarSDLChannel);
+    GETINTERFACE_ANY(plScalarSDLChannel, plScalarChannel);
 };
 
 
 ////////////////////////////
-// 
+//
 // Channel Applicator classes
 
-class plScalarChannelApplicator : public plAGApplicator
-{
+class plScalarChannelApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plScalarChannelApplicator );
-    GETINTERFACE_ANY( plScalarChannelApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plScalarChannelApplicator);
+    GETINTERFACE_ANY(plScalarChannelApplicator, plAGApplicator);
 };
 
-class plSpotInnerApplicator : public plAGApplicator
-{
+class plSpotInnerApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plSpotInnerApplicator );
-    GETINTERFACE_ANY( plSpotInnerApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plSpotInnerApplicator);
+    GETINTERFACE_ANY(plSpotInnerApplicator, plAGApplicator);
 };
 
-class plSpotOuterApplicator : public plAGApplicator
-{
+class plSpotOuterApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plSpotOuterApplicator );
-    GETINTERFACE_ANY( plSpotOuterApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plSpotOuterApplicator);
+    GETINTERFACE_ANY(plSpotOuterApplicator, plAGApplicator);
 };
 
-class plOmniApplicator : public plAGApplicator
-{
+class plOmniApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plOmniApplicator );
-    GETINTERFACE_ANY( plOmniApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plOmniApplicator);
+    GETINTERFACE_ANY(plOmniApplicator, plAGApplicator);
 };
 
-class plOmniSqApplicator : public plAGApplicator
-{
+class plOmniSqApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plOmniSqApplicator );
-    GETINTERFACE_ANY( plOmniSqApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plOmniSqApplicator);
+    GETINTERFACE_ANY(plOmniSqApplicator, plAGApplicator);
 };
 
-class plOmniCutoffApplicator : public plAGApplicator
-{
+class plOmniCutoffApplicator : public plAGApplicator {
 protected:
-    virtual void IApply(const plAGModifier *mod, double time);
+    virtual void IApply(const plAGModifier* mod, double time);
 
 public:
-    CLASSNAME_REGISTER( plOmniCutoffApplicator );
-    GETINTERFACE_ANY( plOmniCutoffApplicator, plAGApplicator );
+    CLASSNAME_REGISTER(plOmniCutoffApplicator);
+    GETINTERFACE_ANY(plOmniCutoffApplicator, plAGApplicator);
 };
 
 

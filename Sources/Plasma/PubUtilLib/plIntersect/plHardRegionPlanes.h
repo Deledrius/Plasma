@@ -45,11 +45,9 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plHardRegion.h"
 
-class plHardRegionPlanes : public plHardRegion
-{
+class plHardRegionPlanes : public plHardRegion {
 protected:
-    class HardPlane
-    {
+    class HardPlane {
     public:
         hsVector3           fNorm;
         hsPoint3            fPos;
@@ -65,8 +63,8 @@ public:
     plHardRegionPlanes();
     virtual ~plHardRegionPlanes();
 
-    CLASSNAME_REGISTER( plHardRegionPlanes );
-    GETINTERFACE_ANY( plHardRegionPlanes, plHardRegion );
+    CLASSNAME_REGISTER(plHardRegionPlanes);
+    GETINTERFACE_ANY(plHardRegionPlanes, plHardRegion);
 
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);
 
@@ -75,9 +73,17 @@ public:
 
     // Now Planes specifics
     void AddPlane(const hsVector3& n, const hsPoint3& p);
-    uint32_t GetNumPlanes() const { return fPlanes.GetCount(); }
-    void GetPlane(int i, hsVector3& n, hsPoint3& p) const { n = fPlanes[i].fNorm; p = fPlanes[i].fPos; }
-    void GetWorldPlane(int i, hsVector3& n, hsPoint3& p) const { n = fPlanes[i].fWorldNorm; p = fPlanes[i].fWorldPos; }
+    uint32_t GetNumPlanes() const {
+        return fPlanes.GetCount();
+    }
+    void GetPlane(int i, hsVector3& n, hsPoint3& p) const {
+        n = fPlanes[i].fNorm;
+        p = fPlanes[i].fPos;
+    }
+    void GetWorldPlane(int i, hsVector3& n, hsPoint3& p) const {
+        n = fPlanes[i].fWorldNorm;
+        p = fPlanes[i].fWorldPos;
+    }
 
     virtual bool IIsInside(const hsPoint3& pos) const;
     virtual bool ICameraInside() const;

@@ -49,7 +49,7 @@ void plDynamicEnvMapMsg::Read(hsStream* s, hsResMgr* mgr)
     plMessage::IMsgRead(s, mgr);
 
     fCmd = s->ReadLE32();
-    
+
     fPos.Read(s);
     fHither = s->ReadLEScalar();
     fYon = s->ReadLEScalar();

@@ -52,19 +52,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // physical on clear message.  Makes the SO non-physical again on release message.
 //
 class plExcludeRegionSDLModifier;
-class plExcludeRegionModifier : public plSingleModifier
-{
+class plExcludeRegionModifier : public plSingleModifier {
 protected:
-    enum
-    {
-        kBlockCameras,  
+    enum {
+        kBlockCameras,
     };
     std::vector<plKey> fSafePoints; // Safe positions to move avatars to
     hsTArray<plKey> fContainedAvatars;      // Avatars inside our volume
-    plExcludeRegionSDLModifier  *fSDLModifier;
+    plExcludeRegionSDLModifier*  fSDLModifier;
     bool fSeek; // use smart seek or teleport?
     float fSeekTime; // how long to seek for
-    virtual bool IEval(double secs, float del, uint32_t dirty) { return true; }
+    virtual bool IEval(double secs, float del, uint32_t dirty) {
+        return true;
+    }
 
     void ISetPhysicalState(bool cleared);
 
@@ -87,16 +87,21 @@ public:
     virtual bool MsgReceive(plMessage* msg);
 
     virtual void AddTarget(plSceneObject* so);
-    virtual void RemoveTarget( plSceneObject *so );
+    virtual void RemoveTarget(plSceneObject* so);
 
     void AddSafePoint(plKey& key);
-    void UseSmartSeek() { fSeek = true; }
-    void SetSeekTime(float s) { fSeekTime = s; }
-    void SetBlockCameras(bool block) { fFlags.SetBit(kBlockCameras, block); }
+    void UseSmartSeek() {
+        fSeek = true;
+    }
+    void SetSeekTime(float s) {
+        fSeekTime = s;
+    }
+    void SetBlockCameras(bool block) {
+        fFlags.SetBit(kBlockCameras, block);
+    }
 };
 
-class plExcludeRegionSDLModifier : public plSDLModifier
-{
+class plExcludeRegionSDLModifier : public plSDLModifier {
 protected:
     plExcludeRegionModifier* fXRegion;
 
@@ -110,7 +115,9 @@ public:
     CLASSNAME_REGISTER(plExcludeRegionSDLModifier);
     GETINTERFACE_ANY(plExcludeRegionSDLModifier, plSDLModifier);
 
-    const char* GetSDLName() const { return kSDLXRegion; }
+    const char* GetSDLName() const {
+        return kSDLXRegion;
+    }
 };
 
 #endif // plExcludeRegionModifier_inc

@@ -76,8 +76,7 @@ typedef sockaddr_in  AddressType;
  * structure, but provides methods to transparently get and set the host
  * address and port.
  */
-class plNetAddress
-{
+class plNetAddress {
     // fAddr must be first field
     AddressType     fAddr;
 
@@ -106,7 +105,7 @@ public:
      */
     plNetAddress(const char* addr, uint16_t port);
 
-    virtual ~plNetAddress(){}
+    virtual ~plNetAddress() {}
 
     bool operator==(const plNetAddress& other) const {
         return (GetHost() == other.GetHost()) && (GetPort() == other.GetPort());
@@ -173,14 +172,18 @@ public:
      *
      * @return A constant sockaddr_in.
      */
-    const AddressType& GetAddressInfo() const { return fAddr; }
+    const AddressType& GetAddressInfo() const {
+        return fAddr;
+    }
 
     /**
      * Retrieves the internal address type.
      *
      * @return A sockaddr_in.
      */
-    AddressType& GetAddressInfo() { return fAddr; }
+    AddressType& GetAddressInfo() {
+        return fAddr;
+    }
 
     /**
      * Returns the IPv4 address of the host as a string in 4-octet dotted
@@ -210,14 +213,14 @@ public:
      *
      * @param stream The stream from which to read the address.
      */
-    void Read(hsStream * stream);
+    void Read(hsStream* stream);
 
     /**
      * Serializes and writes the address to a stream.
      *
      * @param stream The stream to which to write the address.
      */
-    void Write(hsStream * stream);
+    void Write(hsStream* stream);
 };
 
 

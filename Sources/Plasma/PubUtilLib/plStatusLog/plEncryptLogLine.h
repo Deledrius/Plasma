@@ -54,9 +54,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "HeadSpin.h"
 
-namespace plStatusEncrypt
-{
-    void    Decrypt( uint8_t *line, int32_t length, uint8_t hint );
+namespace plStatusEncrypt {
+void    Decrypt(uint8_t* line, int32_t length, uint8_t hint);
 };
 
 #endif //_plEncryptLogLine_h

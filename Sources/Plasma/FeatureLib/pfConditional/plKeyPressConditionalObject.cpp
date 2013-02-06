@@ -47,26 +47,24 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 plKeyPressConditionalObject::plKeyPressConditionalObject()
 {
-    SetFlag(kLocalElement);     // since it relies on user input    
+    SetFlag(kLocalElement);     // since it relies on user input
 }
 
 bool plKeyPressConditionalObject::MsgReceive(plMessage* msg)
 {
     plKeyEventMsg* pKeyMsg = plKeyEventMsg::ConvertNoRef(msg);
-    if( pKeyMsg )
-    {
-        if (pKeyMsg && pKeyMsg->GetKeyCode() == fKeyEvent && pKeyMsg->GetKeyDown() && !Satisfied() )
-        {
+
+    if (pKeyMsg) {
+        if (pKeyMsg && pKeyMsg->GetKeyCode() == fKeyEvent && pKeyMsg->GetKeyDown() && !Satisfied()) {
             SetSatisfied(true);
             //      fLogicMod->RequestTrigger();
-        }
-        else
-        if (pKeyMsg && pKeyMsg->GetKeyCode() == fKeyEvent && !pKeyMsg->GetKeyDown() && Satisfied() )
-        {
+        } else if (pKeyMsg && pKeyMsg->GetKeyCode() == fKeyEvent && !pKeyMsg->GetKeyDown() && Satisfied()) {
             SetSatisfied(false);
         }
+
         return true;
     }
+
     return plConditionalObject::MsgReceive(msg);
 }
 

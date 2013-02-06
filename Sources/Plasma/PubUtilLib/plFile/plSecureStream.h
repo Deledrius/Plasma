@@ -46,7 +46,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsStream.h"
 
 #if HS_BUILD_FOR_WIN32
-    typedef void* HANDLE;
+typedef void* HANDLE;
 #   define hsFD HANDLE
 #else
 #   define hsFD FILE*
@@ -57,8 +57,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // to download the file from a server into a temporary directory (with a mangled name) and
 // delete that file on close, thereby minimizing the chance of having that file examined or
 // edited.
-class plSecureStream: public hsStream
-{
+class plSecureStream: public hsStream {
 protected:
     hsFD fRef;
     uint32_t fKey[4];
@@ -105,13 +104,14 @@ public:
     virtual void FastFwd();
     virtual uint32_t GetEOF();
 
-    uint32_t GetActualFileSize() const {return fActualFileSize;}
+    uint32_t GetActualFileSize() const {
+        return fActualFileSize;
+    }
 
     static bool FileEncrypt(const plFileName& fileName, uint32_t* key = nil);
     static bool FileDecrypt(const plFileName& fileName, uint32_t* key = nil);
 
-    enum OpenSecureFileFlags
-    {
+    enum OpenSecureFileFlags {
         kRequireEncryption = 0x01,
         kDeleteOnExit = 0x02,
     };

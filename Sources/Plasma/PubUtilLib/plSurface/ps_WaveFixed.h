@@ -71,7 +71,7 @@ static const uint8_t ps_WaveFixedCodes[] = {
     0x0,    0x0,    0x8,    0x80,
     0x0,    0x0,    0xe4,   0x90,
     0xff,   0xff,   0x0,    0x0
-    };
+};
 
 static const plShaderDecl ps_WaveFixedDecl("sha/ps_WaveFixed.inl", ps_WaveFixed, ps_WaveFixedbyteLen, ps_WaveFixedCodes);
 

@@ -53,41 +53,48 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 //// Class Definition ////////////////////////////////////////////////////////
-        
+
 class plMouseEventMsg;
 
-class plDebugInputInterface : public plInputInterface
-{
-    protected:
+class plDebugInputInterface : public plInputInterface {
+protected:
 
-        virtual bool IEval( double secs, float del, uint32_t dirty );
-        bool CursorInBox(plMouseEventMsg* pMsg, hsPoint4 box);
+    virtual bool IEval(double secs, float del, uint32_t dirty);
+    bool CursorInBox(plMouseEventMsg* pMsg, hsPoint4 box);
 
-        plMouseMap  fMouseMap;
-        uint32_t      fButtonState;
-        hsBitVector fControlFlags;
+    plMouseMap  fMouseMap;
+    uint32_t      fButtonState;
+    hsBitVector fControlFlags;
 
-        static plDebugInputInterface    *fInstance;
+    static plDebugInputInterface*    fInstance;
 
-    public:
+public:
 
-        plDebugInputInterface();
-        virtual ~plDebugInputInterface();
+    plDebugInputInterface();
+    virtual ~plDebugInputInterface();
 
-        // Always return false, 
-        virtual bool    HasInterestingCursorID( void ) const { return false; }
-        virtual uint32_t  GetPriorityLevel( void ) const { return kDebugCmdPrioity; }
-        virtual void    RestoreDefaultKeyMappings( void );
-        virtual uint32_t  GetCurrentCursorID( void ) const { return 0; }
+    // Always return false,
+    virtual bool    HasInterestingCursorID(void) const {
+        return false;
+    }
+    virtual uint32_t  GetPriorityLevel(void) const {
+        return kDebugCmdPrioity;
+    }
+    virtual void    RestoreDefaultKeyMappings(void);
+    virtual uint32_t  GetCurrentCursorID(void) const {
+        return 0;
+    }
 
-        virtual bool    InterpretInputEvent( plInputEventMsg *pMsg );
+    virtual bool    InterpretInputEvent(plInputEventMsg* pMsg);
 
-        virtual bool    MsgReceive( plMessage *msg );
+    virtual bool    MsgReceive(plMessage* msg);
 
-        virtual void    Init( plInputInterfaceMgr *manager );
-        virtual void    Shutdown( void );
+    virtual void    Init(plInputInterfaceMgr* manager);
+    virtual void    Shutdown(void);
 
-        static plDebugInputInterface    *GetInstance( void ) { return fInstance; }
+    static plDebugInputInterface*    GetInstance(void) {
+        return fInstance;
+    }
 };
 
 

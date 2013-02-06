@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtTime.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNUTILS_PRIVATE_PNUTTIME_H
@@ -63,13 +63,13 @@ const uint64_t kTimeIntervalsPerHour       = 60 * kTimeIntervalsPerMinute;
 const uint64_t kTimeIntervalsPerDay        = 24 * kTimeIntervalsPerHour;
 
 // millisecond timer; wraps ~49 days
-uint32_t TimeGetMs ();
+uint32_t TimeGetMs();
 
 // 100 nanosecond intervals; won't wrap in our lifetimes
-uint64_t TimeGetTime ();
+uint64_t TimeGetTime();
 
 // Seconds elapsed since 00:00:00 January 1, 2001 UTC
-uint32_t TimeGetSecondsSince2001Utc ();
+uint32_t TimeGetSecondsSince2001Utc();
 
 
 // These magic numbers taken from Microsoft's "Shared Source CLI implementation" source code.

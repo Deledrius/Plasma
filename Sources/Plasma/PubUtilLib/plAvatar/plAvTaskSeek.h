@@ -53,19 +53,17 @@ class plAvBrainHuman;
 class plSceneObject;
 
 // PLAVTASKSEEK
-class plAvTaskSeek : public plAvTask
-{
+class plAvTaskSeek : public plAvTask {
 public:
     static bool fLogProcess;
-        
+
     enum State {
         kSeekRunNormal,
         kSeekAbort,
     };
     uint8_t fState;
 
-    enum 
-    {
+    enum {
         kSeekFlagUnForce3rdPersonOnFinish   = 0x1,
         kSeekFlagForce3rdPersonOnStart      = 0x2,
         kSeekFlagNoWarpOnTimeout            = 0x4,
@@ -74,34 +72,34 @@ public:
 
     plAvTaskSeek();
     plAvTaskSeek(plKey target);
-    plAvTaskSeek(plAvSeekMsg *msg);
+    plAvTaskSeek(plAvSeekMsg* msg);
     plAvTaskSeek(plKey target, plAvAlignment align, const plString& animName, bool moving);
 
     void SetTarget(plKey target);
-    void SetTarget(hsPoint3 &pos, hsPoint3 &lookAt);
+    void SetTarget(hsPoint3& pos, hsPoint3& lookAt);
 
     /** Initiate the task; make sure we're running on the right type of brain, save off
         user input state, and turn off any other running behaviors.*/
-    virtual bool Start(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed);
+    virtual bool Start(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed);
 
     /** Progress towards the goal using a combination of walking and cheating-via-sliding.
         Returns true if we're still working on it; false if we're done. */
-    
-    virtual bool Process(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed);
+
+    virtual bool Process(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed);
 
     /** Restore user input state, etc. */
-    virtual void Finish(plArmatureMod *avatar, plArmatureBrain *brain, double time, float elapsed);
-    
+    virtual void Finish(plArmatureMod* avatar, plArmatureBrain* brain, double time, float elapsed);
+
     /** clear our target, and when we try to eval, we'll just finish */
-    virtual void LeaveAge(plArmatureMod *avatar);
+    virtual void LeaveAge(plArmatureMod* avatar);
 
     /** Spew "useful" information to the game screen. Used when Avatar.Debug is active. */
-    virtual void DumpDebug(const char *name, int &x, int&y, int lineHeight, char *strBuf, plDebugText &debugTxt);
+    virtual void DumpDebug(const char* name, int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt);
 
-    void DumpToAvatarLog(plArmatureMod *avatar);
-        
-    CLASSNAME_REGISTER( plAvTaskSeek );
-    GETINTERFACE_ANY( plAvTaskSeek, plAvTask );
+    void DumpToAvatarLog(plArmatureMod* avatar);
+
+    CLASSNAME_REGISTER(plAvTaskSeek);
+    GETINTERFACE_ANY(plAvTaskSeek, plAvTask);
 
 protected:
 
@@ -110,33 +108,33 @@ protected:
     // METHODS
     //
     /////////////////////////////////////////////////////////////////////////////////////
-    
+
     /** Called by constructors */
     void IInitDefaults();
 
     /** Make some observations about our current relation to our target.
         Done every frame. */
-    bool IAnalyze(plArmatureMod *avatar);
+    bool IAnalyze(plArmatureMod* avatar);
 
     /** Progress towards the goal. We get as close as we can by just pushing the same
         buttons as the user (forward, turn, etc.) when we're really close we slide
         around a bit so we can wind up on the *exact* initial orientation. */
-    bool IMoveTowardsGoal(plArmatureMod *avatar, plAvBrainHuman *brain, double time, float elapsed);
+    bool IMoveTowardsGoal(plArmatureMod* avatar, plAvBrainHuman* brain, double time, float elapsed);
 
     /** Okay, we're in the pure cheating mode now. Try to wrap it up;
         returns true when it's finally there. */
-    bool ITryFinish(plArmatureMod *avatar, plAvBrainHuman *brain, double time, float elapsed);
+    bool ITryFinish(plArmatureMod* avatar, plAvBrainHuman* brain, double time, float elapsed);
 
     /** Final cheating for position */
-    bool IFinishPosition(hsPoint3 &newPosition, plArmatureMod *avatar, plAvBrainHuman *brain,
-                           double time, float elapsed);
+    bool IFinishPosition(hsPoint3& newPosition, plArmatureMod* avatar, plAvBrainHuman* brain,
+                         double time, float elapsed);
 
     /** Final cheating for rotation */
-    bool IFinishRotation(hsQuat &newRotation, plArmatureMod *avatar, plAvBrainHuman *brain,
-                           double time, float elapsed);
+    bool IFinishRotation(hsQuat& newRotation, plArmatureMod* avatar, plAvBrainHuman* brain,
+                         double time, float elapsed);
 
     /** If our target's moving, cache its new position and orientation for later math */
-    bool IUpdateObjective(plArmatureMod *avatar);
+    bool IUpdateObjective(plArmatureMod* avatar);
 
     /////////////////////////////////////////////////////////////////////////////////////
     //
@@ -144,7 +142,7 @@ protected:
     //
     /////////////////////////////////////////////////////////////////////////////////////
 
-    plSceneObject * fSeekObject;            // the seek target....  
+    plSceneObject* fSeekObject;             // the seek target....
     hsQuat fSeekRot;                        // The (current) orientation of our objective
     hsPoint3 fSeekPos;                      // The (current) position of our objective
     bool fMovingTarget;                     // do we check our target's position each frame?
@@ -154,12 +152,12 @@ protected:
     // and have your handle wind up here" i.e: aligntype = "kAlignHandleAnimEnd"
     plAvAlignment   fAlign;     // how to line up with the seek point
     plString fAnimName;                     // an (optional) anim to use to line up our target
-                                            // so you can say "seek to a place where your hand
-                                            // will be here after you play animation foo"
+    // so you can say "seek to a place where your hand
+    // will be here after you play animation foo"
 
     hsPoint3 fPosition;                     // our current position
     hsQuat fRotation;                       // our current rotation
-    
+
     // These are set to true once we EVER get close enough to the goal, so that if we fall out
     // of range from the anim blend out, we don't later try and correct again, and get in a fun
     // little back-and-forth loop.
@@ -168,7 +166,7 @@ protected:
 
     bool fStillPositioning;               // haven't yet reached the final position
     bool fStillRotating;                  // haven't yet reached the final orientation
-    
+
     hsVector3 fGoalVec;                     // vec from us to the goal
     float fDistance;                     // how far to the goal?
     float fAngForward;                   // 1.0 = goal is forward; -1.0 = goal is backward
@@ -181,7 +179,7 @@ protected:
     float fMaxSidleRange;        // in feet
     float fMinFwdAngle;          // in fwd . goal
     float fMaxBackAngle;         // in fwd . goal
-    
+
     double   fStartTime;
     uint8_t    fFlags;
     plKey    fNotifyFinishedKey;    // Send a message to this key when we're done.

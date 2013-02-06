@@ -45,37 +45,42 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 plLoggable::~plLoggable()
-{ 
+{
     IDeleteLog();
 }
 
 void plLoggable::IDeleteLog()
 {
-    if ( fWeCreatedLog )
+    if (fWeCreatedLog) {
         delete fStatusLog;
+    }
+
     fWeCreatedLog = false;
     fStatusLog = nil;
 }
 
 plStatusLog* plLoggable::GetLog() const
-{ 
+{
     // create status log if necessary
-    if(fStatusLog==nil)
-    {
+    if (fStatusLog == nil) {
         ICreateStatusLog();     // Usually overridden by derived class
-        if ( fStatusLog )
+
+        if (fStatusLog) {
             fWeCreatedLog = true;
+        }
     }
+
 #ifdef HS_DEBUGGING
-    if ( fComplainAboutMissingLog )
-    {
+
+    if (fComplainAboutMissingLog) {
         hsAssert(fStatusLog, "nil fStatusLog.  Should override ICreateStatusLog()");
     }
+
 #endif
     return fStatusLog;
 }
 
-void plLoggable::SetLog( plStatusLog * log, bool deleteOnDestruct/*=false */)
+void plLoggable::SetLog(plStatusLog* log, bool deleteOnDestruct/*=false */)
 {
     IDeleteLog();
     fStatusLog = log;
@@ -83,7 +88,7 @@ void plLoggable::SetLog( plStatusLog * log, bool deleteOnDestruct/*=false */)
 }
 
 
-bool plLoggable::Log( const char * str ) const
+bool plLoggable::Log(const char* str) const
 {
     return Log(plString::FromUtf8(str));
 }
@@ -103,7 +108,7 @@ bool plLoggable::Log(const plString& str) const
     return true;
 }
 
-bool plLoggable::LogF( const char * fmt, ... ) const
+bool plLoggable::LogF(const char* fmt, ...) const
 {
     va_list args;
     va_start(args, fmt);
@@ -113,7 +118,7 @@ bool plLoggable::LogF( const char * fmt, ... ) const
     return ret;
 }
 
-bool plLoggable::LogV( const char * fmt, va_list args ) const
+bool plLoggable::LogV(const char* fmt, va_list args) const
 {
     return Log(plString::IFormat(fmt, args));
 }

@@ -57,8 +57,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class plFileName;
 
-class pyStream
-{
+class pyStream {
 private:
     hsStream*   fStream;
 
@@ -74,14 +73,16 @@ public:
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyStream object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyStream); // converts a PyObject to a pyStream (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     virtual bool Open(const plFileName& fileName, const char* flags);
     virtual std::vector<std::string> ReadLines();
-    virtual bool WriteLines(const std::vector<std::string> & lines);
+    virtual bool WriteLines(const std::vector<std::string>& lines);
     virtual void Close();
 
-    virtual bool IsOpen() { return (fStream != nil); }
+    virtual bool IsOpen() {
+        return (fStream != nil);
+    }
 };
 
 

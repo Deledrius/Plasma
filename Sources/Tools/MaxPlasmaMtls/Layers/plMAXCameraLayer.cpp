@@ -52,31 +52,47 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../plBMSampler.h"
 #include "MaxMain/plPlasmaRefMsgs.h"
 
-class plMAXCameraLayerClassDesc : public ClassDesc2
-{
+class plMAXCameraLayerClassDesc : public ClassDesc2 {
 public:
-    int             IsPublic()      { return TRUE; }
-    void*           Create(BOOL loading = FALSE) { return new plMAXCameraLayer(); }
-    const TCHAR*    ClassName()     { return GetString(IDS_MAX_CAMERA_LAYER); }
-    SClass_ID       SuperClassID()  { return TEXMAP_CLASS_ID; }
-    Class_ID        ClassID()       { return MAX_CAMERA_LAYER_CLASS_ID; }
-    const TCHAR*    Category()      { return TEXMAP_CAT_COLMOD; }
-    const TCHAR*    InternalName()  { return _T("PlasmaMAXCameraLayer"); }
-    HINSTANCE       HInstance()     { return hInstance; }
+    int             IsPublic()      {
+        return TRUE;
+    }
+    void*           Create(BOOL loading = FALSE) {
+        return new plMAXCameraLayer();
+    }
+    const TCHAR*    ClassName()     {
+        return GetString(IDS_MAX_CAMERA_LAYER);
+    }
+    SClass_ID       SuperClassID()  {
+        return TEXMAP_CLASS_ID;
+    }
+    Class_ID        ClassID()       {
+        return MAX_CAMERA_LAYER_CLASS_ID;
+    }
+    const TCHAR*    Category()      {
+        return TEXMAP_CAT_COLMOD;
+    }
+    const TCHAR*    InternalName()  {
+        return _T("PlasmaMAXCameraLayer");
+    }
+    HINSTANCE       HInstance()     {
+        return hInstance;
+    }
 };
 static plMAXCameraLayerClassDesc plMAXCameraLayerDesc;
-ClassDesc2* GetMAXCameraLayerDesc() { return &plMAXCameraLayerDesc; }
-
-class MAXCameraLayerDlgProc : public ParamMap2UserDlgProc
+ClassDesc2* GetMAXCameraLayerDesc()
 {
+    return &plMAXCameraLayerDesc;
+}
+
+class MAXCameraLayerDlgProc : public ParamMap2UserDlgProc {
 public:
     MAXCameraLayerDlgProc() {}
     ~MAXCameraLayerDlgProc() {}
 
-    void UpdateDisplay(IParamMap2 *pmap)
-    {
+    void UpdateDisplay(IParamMap2* pmap) {
         HWND hWnd = pmap->GetHWnd();
-        IParamBlock2 *pb = pmap->GetParamBlock();
+        IParamBlock2* pb = pmap->GetParamBlock();
         HWND cbox;
         cbox = GetDlgItem(hWnd, IDC_CAM_LAYER_UV_SRC);
         SendMessage(cbox, CB_SETCURSEL, pb->GetInt(plMAXCameraLayer::kUVSource), 0);
@@ -84,41 +100,41 @@ public:
         EnableWindow(GetDlgItem(hWnd, IDC_CAM_LAYER_UV_SRC), !reflect);
     }
 
-    virtual void Update(TimeValue t, Interval& valid, IParamMap2* pmap) { UpdateDisplay(pmap); }
+    virtual void Update(TimeValue t, Interval& valid, IParamMap2* pmap) {
+        UpdateDisplay(pmap);
+    }
 
-    virtual BOOL DlgProc(TimeValue t, IParamMap2 *map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-    {
+    virtual BOOL DlgProc(TimeValue t, IParamMap2* map, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         int id = LOWORD(wParam);
         int code = HIWORD(wParam);
 
-        IParamBlock2 *pb = map->GetParamBlock();
+        IParamBlock2* pb = map->GetParamBlock();
         HWND cbox = NULL;
 
-        switch (msg)
-        {
+        switch (msg) {
         case WM_INITDIALOG:
             int i;
-            for (i = 0; i < plMAXCameraLayer::kMaxUVSrc; i++)
-            {
+
+            for (i = 0; i < plMAXCameraLayer::kMaxUVSrc; i++) {
                 cbox = GetDlgItem(hWnd, IDC_CAM_LAYER_UV_SRC);
                 SendMessage(cbox, CB_ADDSTRING, 0, (LPARAM)plMAXCameraLayer::kUVStrings[i]);
             }
+
             UpdateDisplay(map);
             return TRUE;
 
         case WM_COMMAND:
-            if (id == IDC_CAM_LAYER_UV_SRC)
-            {
+            if (id == IDC_CAM_LAYER_UV_SRC) {
                 pb->SetValue(plMAXCameraLayer::kUVSource, t, SendMessage(GetDlgItem(hWnd, id), CB_GETCURSEL, 0, 0));
                 return TRUE;
-            }
-            else if (id == IDC_CAM_LAYER_EXPLICIT_CAM)
-            {
+            } else if (id == IDC_CAM_LAYER_EXPLICIT_CAM) {
                 UpdateDisplay(map);
                 return TRUE;
             }
+
             break;
         }
+
         return FALSE;
     }
     virtual void DeleteThis() {}
@@ -136,47 +152,47 @@ static ParamBlockDesc2 gMAXCameraLayerParamBlk
     IDD_MAX_CAMERA_LAYER, IDS_MAX_CAMERA_LAYER_PROPS, 0, 0, &gMAXCameraLayerDlgProc,
 
     plMAXCameraLayer::kCamera, _T("camera"),    TYPE_INODE, P_CAN_CONVERT, 0,
-        p_ui, TYPE_PICKNODEBUTTON, IDC_CAM_LAYER_CAMERA,
-        p_classID, Class_ID(LOOKAT_CAM_CLASS_ID, 0),
-        p_prompt, IDS_CAM_LAYER_CAMERA,
-        end,
+    p_ui, TYPE_PICKNODEBUTTON, IDC_CAM_LAYER_CAMERA,
+    p_classID, Class_ID(LOOKAT_CAM_CLASS_ID, 0),
+    p_prompt, IDS_CAM_LAYER_CAMERA,
+    end,
 
     plMAXCameraLayer::kUVSource, _T("UVSource"),    TYPE_INT,   0, 0,
-        p_default, 0,
-        end,
+    p_default, 0,
+    end,
 
     plMAXCameraLayer::kExplicitCam, _T("explicitCam"),  TYPE_BOOL,      0, 0,
-        p_ui, TYPE_SINGLECHEKBOX, IDC_CAM_LAYER_EXPLICIT_CAM,
-        p_default, false,
-        p_enable_ctrls, 1, plMAXCameraLayer::kCamera,
-        end,
+    p_ui, TYPE_SINGLECHEKBOX, IDC_CAM_LAYER_EXPLICIT_CAM,
+    p_default, false,
+    p_enable_ctrls, 1, plMAXCameraLayer::kCamera,
+    end,
 
     plMAXCameraLayer::kRootNode, _T("rootNode"),    TYPE_INODE, 0, 0,
-        p_ui, TYPE_PICKNODEBUTTON, IDC_CAM_LAYER_ROOT_NODE,
-        p_prompt, IDS_CAM_LAYER_ROOT_NODE,
-        end,
+    p_ui, TYPE_PICKNODEBUTTON, IDC_CAM_LAYER_ROOT_NODE,
+    p_prompt, IDS_CAM_LAYER_ROOT_NODE,
+    end,
 
     plMAXCameraLayer::kDisableColor, _T("disableColor"), TYPE_RGBA, 0, 0,
-        p_ui,           TYPE_COLORSWATCH, IDC_CAM_LAYER_DISABLE_COLOR,
-        p_default,      Color(0,0,0),
-        end,
+    p_ui,           TYPE_COLORSWATCH, IDC_CAM_LAYER_DISABLE_COLOR,
+    p_default,      Color(0, 0, 0),
+    end,
 
     plMAXCameraLayer::kForce, _T("force"),  TYPE_BOOL,      0, 0,
-        p_ui, TYPE_SINGLECHEKBOX, IDC_CAM_LAYER_FORCE,
-        p_default, false,
-        end,
+    p_ui, TYPE_SINGLECHEKBOX, IDC_CAM_LAYER_FORCE,
+    p_default, false,
+    end,
 
     end
 );
 
 /////////////////////////////////////////////////////////////////////////////
 
-const char *plMAXCameraLayer::kUVStrings[] = { "1", "2", "3", "4", "5", "6", "7", "8" };
+const char* plMAXCameraLayer::kUVStrings[] = { "1", "2", "3", "4", "5", "6", "7", "8" };
 const uint8_t plMAXCameraLayer::kMaxUVSrc = 8;
 
 plMAXCameraLayer::plMAXCameraLayer() :
-fParmsPB(NULL),
-fIValid(NEVER)
+    fParmsPB(NULL),
+    fIValid(NEVER)
 {
     plMAXCameraLayerDesc.MakeAutoParamBlocks(this);
 }
@@ -201,8 +217,7 @@ void plMAXCameraLayer::Reset()
 
 void plMAXCameraLayer::Update(TimeValue t, Interval& valid)
 {
-    if (!fIValid.InInterval(t))
-    {
+    if (!fIValid.InInterval(t)) {
         fIValid.SetInfinite();
     }
 
@@ -215,7 +230,7 @@ Interval plMAXCameraLayer::Validity(TimeValue t)
     return v;
 }
 
-ParamDlg* plMAXCameraLayer::CreateParamDlg(HWND hwMtlEdit, IMtlParams *imp)
+ParamDlg* plMAXCameraLayer::CreateParamDlg(HWND hwMtlEdit, IMtlParams* imp)
 {
     IAutoMParamDlg* masterDlg = plMAXCameraLayerDesc.CreateParamDlgs(hwMtlEdit, imp, this);
 
@@ -235,10 +250,12 @@ int plMAXCameraLayer::NumRefs()
 //From ReferenceMaker
 RefTargetHandle plMAXCameraLayer::GetReference(int i)
 {
-    switch (i)
-    {
-    case kRefMain:      return fParmsPB;
-    default:                return NULL;
+    switch (i) {
+    case kRefMain:
+        return fParmsPB;
+
+    default:
+        return NULL;
     }
 }
 
@@ -246,10 +263,9 @@ void plMAXCameraLayer::SetReference(int i, RefTargetHandle rtarg)
 {
     Interval    garbage;
 
-    switch (i)
-    {
+    switch (i) {
     case kRefMain:
-        fParmsPB = (IParamBlock2 *)rtarg;
+        fParmsPB = (IParamBlock2*)rtarg;
         break;
     }
 }
@@ -261,25 +277,28 @@ int plMAXCameraLayer::NumParamBlocks()
 
 IParamBlock2* plMAXCameraLayer::GetParamBlock(int i)
 {
-    switch (i)
-    {
-    case 0: return fParmsPB;
-    default: return NULL;
+    switch (i) {
+    case 0:
+        return fParmsPB;
+
+    default:
+        return NULL;
     }
 }
 
 IParamBlock2* plMAXCameraLayer::GetParamBlockByID(BlockID id)
 {
-    if (fParmsPB->ID() == id)
+    if (fParmsPB->ID() == id) {
         return fParmsPB;
-    else
+    } else {
         return NULL;
+    }
 }
 
 //From ReferenceTarget
-RefTargetHandle plMAXCameraLayer::Clone(RemapDir &remap)
+RefTargetHandle plMAXCameraLayer::Clone(RemapDir& remap)
 {
-    plMAXCameraLayer *mnew = new plMAXCameraLayer();
+    plMAXCameraLayer* mnew = new plMAXCameraLayer();
     *((MtlBase*)mnew) = *((MtlBase*)this); // copy superclass stuff
     mnew->ReplaceReference(kRefMain, remap.CloneRef(fParmsPB));
     BaseClone(this, mnew, remap);
@@ -293,40 +312,42 @@ int plMAXCameraLayer::NumSubs()
 
 Animatable* plMAXCameraLayer::SubAnim(int i)
 {
-    switch (i)
-    {
-        case kRefMain:      return fParmsPB;
-        default: return NULL;
+    switch (i) {
+    case kRefMain:
+        return fParmsPB;
+
+    default:
+        return NULL;
     }
 }
 
 TSTR plMAXCameraLayer::SubAnimName(int i)
 {
-    switch (i)
-    {
-        case kRefMain:      return "Main";
-        default: return "";
+    switch (i) {
+    case kRefMain:
+        return "Main";
+
+    default:
+        return "";
     }
 }
 
 RefResult plMAXCameraLayer::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
-                                              PartID& partID, RefMessage message)
+        PartID& partID, RefMessage message)
 {
-    switch (message)
-    {
-    case REFMSG_CHANGE:
-        {
+    switch (message) {
+    case REFMSG_CHANGE: {
             fIValid.SetEmpty();
 
-            if (hTarget == fParmsPB)
-            {
+            if (hTarget == fParmsPB) {
                 // see if this message came from a changing parameter in the pblock,
                 // if so, limit rollout update to the changing item
                 ParamID changingParam = fParmsPB->LastNotifyParamID();
                 fParmsPB->GetDesc()->InvalidateUI(changingParam);
 
-                if (changingParam != -1)
+                if (changingParam != -1) {
                     IChanged();
+                }
             }
         }
         break;
@@ -350,31 +371,36 @@ void plMAXCameraLayer::IChanged()
 
 #define TEX_HDR_CHUNK 0x5000
 
-IOResult plMAXCameraLayer::Save(ISave *isave)
+IOResult plMAXCameraLayer::Save(ISave* isave)
 {
     IOResult res;
 
     isave->BeginChunk(TEX_HDR_CHUNK);
     res = MtlBase::Save(isave);
-    if (res != IO_OK)
+
+    if (res != IO_OK) {
         return res;
+    }
+
     isave->EndChunk();
 
     return IO_OK;
 }
 
-IOResult plMAXCameraLayer::Load(ILoad *iload)
+IOResult plMAXCameraLayer::Load(ILoad* iload)
 {
     IOResult res;
-    while (IO_OK == (res = iload->OpenChunk()))
-    {
-        if (iload->CurChunkID() == TEX_HDR_CHUNK)
-        {
+
+    while (IO_OK == (res = iload->OpenChunk())) {
+        if (iload->CurChunkID() == TEX_HDR_CHUNK) {
             res = MtlBase::Load(iload);
         }
+
         iload->CloseChunk();
-        if (res != IO_OK)
+
+        if (res != IO_OK) {
             return res;
+        }
     }
 
     return IO_OK;
@@ -406,7 +432,7 @@ void plMAXCameraLayer::ActivateTexDisplay(BOOL onoff)
 {
 }
 
-BITMAPINFO *plMAXCameraLayer::GetVPDisplayDIB(TimeValue t, TexHandleMaker& thmaker, Interval &valid, BOOL mono, BOOL forceW, BOOL forceH)
+BITMAPINFO* plMAXCameraLayer::GetVPDisplayDIB(TimeValue t, TexHandleMaker& thmaker, Interval& valid, BOOL mono, BOOL forceW, BOOL forceH)
 {
     return nil;
 }
@@ -416,7 +442,7 @@ DWORD plMAXCameraLayer::GetActiveTexHandle(TimeValue t, TexHandleMaker& thmaker)
     return 0;
 }
 
-const char *plMAXCameraLayer::GetTextureName( int which )
+const char* plMAXCameraLayer::GetTextureName(int which)
 {
     return NULL;
 }

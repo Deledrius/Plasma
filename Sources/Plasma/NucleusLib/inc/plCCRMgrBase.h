@@ -48,12 +48,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnKeyedObject/hsKeyedObject.h"
 
-class plCCRMgrBase : public hsKeyedObject
-{
+class plCCRMgrBase : public hsKeyedObject {
 protected:
     static plCCRMgrBase* fBaseInstance;
 public:
-    static plCCRMgrBase* GetInstance() { return fBaseInstance; }
+    static plCCRMgrBase* GetInstance() {
+        return fBaseInstance;
+    }
 };
 
 

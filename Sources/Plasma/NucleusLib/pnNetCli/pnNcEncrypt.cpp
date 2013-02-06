@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetCli/pnNcEncrypt.cpp
-*   
+*
 ***/
 
 #include "Pch.h"
@@ -89,11 +89,12 @@ static_assert(IS_POW2(kNetDiffieHellmanKeyBits), "DH Key bit count is not a powe
 
 //============================================================================
 // TODO: Cache computed keys
-static void GetCachedServerKey (
+static void GetCachedServerKey(
     NetMsgChannel*   channel,
     plBigNum*        ka,
     const plBigNum&  dh_y
-) {
+)
+{
     // Get diffie-hellman constants
     unsigned         DH_G;
     const plBigNum*  DH_A;
@@ -113,26 +114,28 @@ static void GetCachedServerKey (
 ***/
 
 //============================================================================
-void NetMsgCryptClientStart (
+void NetMsgCryptClientStart(
     NetMsgChannel*  channel,
     unsigned        seedBytes,
     const uint8_t   seedData[],
     plBigNum*       clientSeed,
     plBigNum*       serverSeed
-) {
+)
+{
     unsigned DH_G;
     const plBigNum* DH_X;
     const plBigNum* DH_N;
     NetMsgChannelGetDhConstants(channel, &DH_G, &DH_X, &DH_N);
+
     if (DH_N->isZero()) { // no actual encryption, but the caller expects a seed
         clientSeed->SetZero();
         serverSeed->SetZero();
-    }
-    else {
+    } else {
         // Client chooses b and y on connect
         plBigNum g(DH_G);
         plBigNum seed(seedBytes, seedData);
-        plBigNum b; b.Rand(kNetDiffieHellmanKeyBits, &seed);
+        plBigNum b;
+        b.Rand(kNetDiffieHellmanKeyBits, &seed);
 
         // Client computes key: kb = x^b mod n
         clientSeed->PowMod(*DH_X, b, *DH_N);
@@ -143,12 +146,13 @@ void NetMsgCryptClientStart (
 }
 
 //============================================================================
-void NetMsgCryptServerConnect (
+void NetMsgCryptServerConnect(
     NetMsgChannel*  channel,
     unsigned        seedBytes,
     const uint8_t   seedData[],
     plBigNum*       clientSeed
-) {
+)
+{
     // Server computes client key: ka = y^a mod n
     const plBigNum dh_y(seedBytes, seedData);
     GetCachedServerKey(channel, clientSeed, dh_y);

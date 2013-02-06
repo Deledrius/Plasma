@@ -49,15 +49,14 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // The transport class handles the details of sending net msgs to
 // the server or to groups of clients (members).
 // It hides whether we are playing in P2P mode or C/S mode.
-// It is currently used only clientside but is general enough to 
+// It is currently used only clientside but is general enough to
 // be used by a server as well.
 //
 class plKey;
 class plNetTransportMember;
 typedef std::vector<plNetTransportMember*> plMembersList;
 class plNetMessage;
-class plNetTransport
-{
+class plNetTransport {
 private:
     plMembersList fMembers;                     // master list of all members in the game, server is member[0]
     std::vector<plMembersList> fChannelGroups;  // members grouped by channel
@@ -69,17 +68,21 @@ public:
     ~plNetTransport();
 
     void DumpState();
-    
+
     // master list ops
-    void GetMemberListDistSorted(plNetTransportMember**& listPtr) const;    // allocates and sorts array
+    void GetMemberListDistSorted(plNetTransportMember**& listPtr) const;   // allocates and sorts array
     int FindMember(const plKey avKey) const;                    // return array index or -1
     int FindMember(uint32_t playerID) const;                      // return array index or -1
     int FindMember(const plNetTransportMember* mbr);            // return array index or -1
     int AddMember(plNetTransportMember* mbr);                   // to master list, if not there
     bool RemoveMember(plNetTransportMember* mbr);             // from master list and all channels
     bool RemoveMember(int idx);                               // from master list and all channels
-    int GetNumMembers() const { return fMembers.size(); }
-    plNetTransportMember* GetMember(int i) const { return i>=0 && i<fMembers.size() ? fMembers[i] : nil; }
+    int GetNumMembers() const {
+        return fMembers.size();
+    }
+    plNetTransportMember* GetMember(int i) const {
+        return i >= 0 && i < fMembers.size() ? fMembers[i] : nil;
+    }
     void ClearMembers();
 
     // channel group ops

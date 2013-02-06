@@ -47,23 +47,28 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plKey;
 
-class plPickedConditionalObject : public plConditionalObject
-{
+class plPickedConditionalObject : public plConditionalObject {
 protected:
 
 
 public:
-    
+
     plPickedConditionalObject();
-    ~plPickedConditionalObject(){;}
-    
-    CLASSNAME_REGISTER( plPickedConditionalObject );
-    GETINTERFACE_ANY( plPickedConditionalObject, plConditionalObject );
-    
+    ~plPickedConditionalObject() {
+        ;
+    }
+
+    CLASSNAME_REGISTER(plPickedConditionalObject);
+    GETINTERFACE_ANY(plPickedConditionalObject, plConditionalObject);
+
     bool MsgReceive(plMessage* msg);
-    
-    void Evaluate(){;}
-    void Reset() { SetSatisfied(false); }
+
+    void Evaluate() {
+        ;
+    }
+    void Reset() {
+        SetSatisfied(false);
+    }
 
 };
 

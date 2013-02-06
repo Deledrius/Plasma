@@ -58,39 +58,35 @@ void plLayerMultiply::Read(hsStream* s, hsResMgr* mgr)
     plLayerInterface::Read(s, mgr);
 
     fOwnedChannels = s->ReadLE32();
-    if (fOwnedChannels & kOpacity)
-    {
+
+    if (fOwnedChannels & kOpacity) {
         fOpacity = new float;
         *fOpacity = fSrcOpacity = s->ReadLEScalar();
         fDirtyChannels |= kOpacity;
     }
-    
-    if (fOwnedChannels & kPreshadeColor)
-    {
+
+    if (fOwnedChannels & kPreshadeColor) {
         fPreshadeColor = new hsColorRGBA;
         fSrcPreshadeColor.Read(s);
         *fPreshadeColor = fSrcPreshadeColor;
         fDirtyChannels |= kPreshadeColor;
     }
 
-    if (fOwnedChannels & kRuntimeColor)
-    {
+    if (fOwnedChannels & kRuntimeColor) {
         fRuntimeColor = new hsColorRGBA;
         fSrcRuntimeColor.Read(s);
         *fRuntimeColor = fSrcRuntimeColor;
         fDirtyChannels |= kRuntimeColor;
     }
 
-    if (fOwnedChannels & kAmbientColor)
-    {
+    if (fOwnedChannels & kAmbientColor) {
         fAmbientColor = new hsColorRGBA;
         fSrcAmbientColor.Read(s);
         *fAmbientColor = fSrcAmbientColor;
         fDirtyChannels |= kAmbientColor;
     }
 
-    if (fOwnedChannels & kTransform)
-    {
+    if (fOwnedChannels & kTransform) {
         fTransform = new hsMatrix44;
         fSrcTransform.Read(s);
         *fTransform = fSrcTransform;
@@ -103,20 +99,26 @@ void plLayerMultiply::Write(hsStream* s, hsResMgr* mgr)
     plLayerInterface::Write(s, mgr);
 
     s->WriteLE32(fOwnedChannels);
-    if (fOwnedChannels & kOpacity)
+
+    if (fOwnedChannels & kOpacity) {
         s->WriteLEScalar(fSrcOpacity);
+    }
 
-    if (fOwnedChannels & kPreshadeColor)
+    if (fOwnedChannels & kPreshadeColor) {
         fSrcPreshadeColor.Write(s);
+    }
 
-    if (fOwnedChannels & kRuntimeColor)
+    if (fOwnedChannels & kRuntimeColor) {
         fSrcRuntimeColor.Write(s);
+    }
 
-    if (fOwnedChannels & kAmbientColor)
+    if (fOwnedChannels & kAmbientColor) {
         fSrcAmbientColor.Write(s);
+    }
 
-    if (fOwnedChannels & kTransform)
+    if (fOwnedChannels & kTransform) {
         fSrcTransform.Write(s);
+    }
 }
 
 plLayerInterface* plLayerMultiply::Attach(plLayerInterface* prev)
@@ -129,20 +131,25 @@ uint32_t plLayerMultiply::Eval(double wSecs, uint32_t frame, uint32_t ignore)
     uint32_t dirtyChannels = fDirtyChannels | plLayerInterface::Eval(wSecs, frame, ignore);
     uint32_t evalChannels = dirtyChannels & fOwnedChannels;
 
-    if (evalChannels & kPreshadeColor)
+    if (evalChannels & kPreshadeColor) {
         *fPreshadeColor = fSrcPreshadeColor * fUnderLay->GetPreshadeColor();
+    }
 
-    if (evalChannels & kRuntimeColor)
+    if (evalChannels & kRuntimeColor) {
         *fRuntimeColor = fSrcRuntimeColor * fUnderLay->GetRuntimeColor();
+    }
 
-    if (evalChannels & kAmbientColor)
+    if (evalChannels & kAmbientColor) {
         *fAmbientColor = fSrcAmbientColor * fUnderLay->GetAmbientColor();
+    }
 
-    if (evalChannels & kOpacity)
+    if (evalChannels & kOpacity) {
         *fOpacity = fSrcOpacity * fUnderLay->GetOpacity();
+    }
 
-    if (evalChannels & kTransform)
+    if (evalChannels & kTransform) {
         *fTransform = fSrcTransform * fUnderLay->GetTransform();
+    }
 
     fDirtyChannels = 0;
     return dirtyChannels;

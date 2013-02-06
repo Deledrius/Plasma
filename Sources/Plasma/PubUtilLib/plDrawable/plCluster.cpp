@@ -50,15 +50,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsFastMath.h"
 
 plCluster::plCluster()
-:   fGroup(nil)
+    :   fGroup(nil)
 {
 }
 
 plCluster::~plCluster()
 {
     int i;
-    for( i = 0; i < fInsts.GetCount(); i++ )
+
+    for (i = 0; i < fInsts.GetCount(); i++) {
         delete fInsts[i];
+    }
 }
 
 void plCluster::Read(hsStream* s, plClusterGroup* grp)
@@ -72,8 +74,8 @@ void plCluster::Read(hsStream* s, plClusterGroup* grp)
     const int numInst = s->ReadLE32();
     fInsts.SetCount(numInst);
     int i;
-    for( i = 0; i < numInst; i++ )
-    {
+
+    for (i = 0; i < numInst; i++) {
         fInsts[i] = new plSpanInstance;
         fInsts[i]->Read(s, fEncoding, numVerts);
     }
@@ -87,30 +89,33 @@ void plCluster::Write(hsStream* s) const
     const int numVerts = fGroup->GetTemplate()->NumVerts();
     s->WriteLE32(fInsts.GetCount());
     int i;
-    for( i = 0; i < fInsts.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fInsts.GetCount(); i++) {
         fInsts[i]->Write(s, fEncoding, numVerts);
     }
 }
 
-inline void inlTESTPOINT(const hsPoint3& destP, 
-                         float& minX, float& minY, float& minZ, 
+inline void inlTESTPOINT(const hsPoint3& destP,
+                         float& minX, float& minY, float& minZ,
                          float& maxX, float& maxY, float& maxZ)
 {
-    if( destP.fX < minX )
+    if (destP.fX < minX) {
         minX = destP.fX;
-    else if( destP.fX > maxX )
+    } else if (destP.fX > maxX) {
         maxX = destP.fX;
+    }
 
-    if( destP.fY < minY )
+    if (destP.fY < minY) {
         minY = destP.fY;
-    else if( destP.fY > maxY )
+    } else if (destP.fY > maxY) {
         maxY = destP.fY;
+    }
 
-    if( destP.fZ < minZ )
+    if (destP.fZ < minZ) {
         minZ = destP.fZ;
-    else if( destP.fZ > maxZ )
+    } else if (destP.fZ > maxZ) {
         maxZ = destP.fZ;
+    }
 }
 
 void plCluster::UnPack(uint8_t* vDst, uint16_t* iDst, int idxOffset, hsBounds3Ext& wBnd) const
@@ -126,17 +131,18 @@ void plCluster::UnPack(uint8_t* vDst, uint16_t* iDst, int idxOffset, hsBounds3Ex
     hsAssert(fGroup->GetTemplate(), "Can't unpack without a template");
     const plSpanTemplate& templ = *fGroup->GetTemplate();
     int i;
-    for( i = 0; i < fInsts.GetCount(); i++ )
-    {
+
+    for (i = 0; i < fInsts.GetCount(); i++) {
         // First, just copy our template, offsetting by prescribed amount.
         const uint16_t* iSrc = templ.IndexData();
         int n = templ.NumIndices();
-        while( n-- )
-        {
+
+        while (n--) {
             *iDst = *iSrc + idxOffset;
             iDst++;
             iSrc++;
         }
+
         idxOffset += templ.NumVerts();
 
         memcpy(vDst, templ.VertData(), templ.VertSize());
@@ -148,8 +154,7 @@ void plCluster::UnPack(uint8_t* vDst, uint16_t* iDst, int idxOffset, hsBounds3Ex
 
         // If we have individual position and/or color info, apply
         // it, along with the transform.
-        if( GetInst(i).HasPosDelta() || GetInst(i).HasColor() )
-        {
+        if (GetInst(i).HasPosDelta() || GetInst(i).HasColor()) {
             const int posOff = templ.PositionOffset();
             const int normOff = templ.NormalOffset();
             const int colOff = templ.ColorOffset();
@@ -158,12 +163,12 @@ void plCluster::UnPack(uint8_t* vDst, uint16_t* iDst, int idxOffset, hsBounds3Ex
             const hsMatrix44 l2w = GetInst(i).LocalToWorld();
             hsMatrix44 w2l;
             GetInst(i).WorldToLocal().GetTranspose(&w2l);
-            
+
             plSpanInstanceIter iter(fInsts[i], fEncoding, templ.NumVerts());
             const int numVerts = templ.NumVerts();
             int iVert;
-            for( iVert = 0, iter.Begin(); iVert < numVerts; iVert++, iter.Advance() )
-            {
+
+            for (iVert = 0, iter.Begin(); iVert < numVerts; iVert++, iter.Advance()) {
                 hsPoint3* pos = (hsPoint3*)(vDst + posOff);
                 *pos = iter.Position(*pos);
                 *pos = l2w * *pos;
@@ -178,22 +183,20 @@ void plCluster::UnPack(uint8_t* vDst, uint16_t* iDst, int idxOffset, hsBounds3Ex
 
                 vDst += stride;
             }
-        }
-        else
-        {
+        } else {
             // Just transform the position and normal.
             const int posOff = templ.PositionOffset();
             const int normOff = templ.NormalOffset();
             const int stride = templ.Stride();
-            
+
             const hsMatrix44 l2w = GetInst(i).LocalToWorld();
             hsMatrix44 w2l;
             GetInst(i).WorldToLocal().GetTranspose(&w2l);
-            
+
             const int numVerts = templ.NumVerts();
             int iVert;
-            for( iVert = 0; iVert < numVerts; iVert++ )
-            {
+
+            for (iVert = 0; iVert < numVerts; iVert++) {
                 hsPoint3* pos = (hsPoint3*)(vDst + posOff);
                 *pos = l2w * *pos;
                 inlTESTPOINT(*pos, minX, minY, minZ, maxX, maxY, maxZ);
@@ -205,6 +208,7 @@ void plCluster::UnPack(uint8_t* vDst, uint16_t* iDst, int idxOffset, hsBounds3Ex
             }
         }
     }
+
     hsPoint3 min(minX, minY, minZ);
     wBnd.Reset(&min);
     hsPoint3 max(maxX, maxY, maxZ);

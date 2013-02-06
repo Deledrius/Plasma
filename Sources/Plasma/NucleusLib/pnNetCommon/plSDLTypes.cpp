@@ -41,15 +41,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 *==LICENSE==*/
 #include "plSDLTypes.h"
 
-const char kSDLPhysical[]="Physical";
-const char kSDLAGMaster[]="AGMaster";
-const char kSDLResponder[]="Responder";
-const char kSDLClothing[]="Clothing";
-const char kSDLAvatar[]="Avatar";
-const char kSDLAvatarPhysical[]="AvatarPhysical";
-const char kSDLLayer[]="Layer";
-const char kSDLSound[]="Sound";
-const char kSDLXRegion[]="XRegion";
-const char kSDLMorphSequence[]="MorphSequence";
-const char kSDLParticleSystem[]="ParticleSystem";
-const char kSDLCloneMessage[]="CloneMessage";
+const char kSDLPhysical[] = "Physical";
+const char kSDLAGMaster[] = "AGMaster";
+const char kSDLResponder[] = "Responder";
+const char kSDLClothing[] = "Clothing";
+const char kSDLAvatar[] = "Avatar";
+const char kSDLAvatarPhysical[] = "AvatarPhysical";
+const char kSDLLayer[] = "Layer";
+const char kSDLSound[] = "Sound";
+const char kSDLXRegion[] = "XRegion";
+const char kSDLMorphSequence[] = "MorphSequence";
+const char kSDLParticleSystem[] = "ParticleSystem";
+const char kSDLCloneMessage[] = "CloneMessage";

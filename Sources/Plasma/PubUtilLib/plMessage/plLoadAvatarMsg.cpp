@@ -57,32 +57,32 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 // CTOR (default)
 plLoadAvatarMsg::plLoadAvatarMsg()
-: fIsPlayer(false),
-  fSpawnPoint(nil),
-  fInitialTask(nil),
-  fUserStr(nil)
+    : fIsPlayer(false),
+      fSpawnPoint(nil),
+      fInitialTask(nil),
+      fUserStr(nil)
 {
 }
 
 // CTOR uoidToClone, requestorKey, userData, isPlayer, spawnPOint, initialTask
-plLoadAvatarMsg::plLoadAvatarMsg(const plUoid &uoidToClone, const plKey &requestorKey, uint32_t userData,
-                                 bool isPlayer, const plKey &spawnPoint, plAvTask *initialTask, const char* userStr /*= nil*/)
-: plLoadCloneMsg(uoidToClone, requestorKey, userData),
-  fIsPlayer(isPlayer),
-  fSpawnPoint(spawnPoint),
-  fInitialTask(initialTask),
-  fUserStr(nil) // setting to nil so SetUserStr doesn't try to nuke garbage
+plLoadAvatarMsg::plLoadAvatarMsg(const plUoid& uoidToClone, const plKey& requestorKey, uint32_t userData,
+                                 bool isPlayer, const plKey& spawnPoint, plAvTask* initialTask, const char* userStr /*= nil*/)
+    : plLoadCloneMsg(uoidToClone, requestorKey, userData),
+      fIsPlayer(isPlayer),
+      fSpawnPoint(spawnPoint),
+      fInitialTask(initialTask),
+      fUserStr(nil) // setting to nil so SetUserStr doesn't try to nuke garbage
 {
     SetUserStr(userStr);
 }
 
-plLoadAvatarMsg::plLoadAvatarMsg(const plKey &existing, const plKey &requestor, uint32_t userData,
-                                bool isPlayer, bool isLoading, const char* userStr /*= nil*/)
-:   plLoadCloneMsg(existing, requestor, userData, isLoading),
-    fIsPlayer(isPlayer),
-    fSpawnPoint(nil),
-    fInitialTask(nil),
-    fUserStr(nil) // setting to nil so SetUserStr doesn't try to nuke garbage
+plLoadAvatarMsg::plLoadAvatarMsg(const plKey& existing, const plKey& requestor, uint32_t userData,
+                                 bool isPlayer, bool isLoading, const char* userStr /*= nil*/)
+    :   plLoadCloneMsg(existing, requestor, userData, isLoading),
+        fIsPlayer(isPlayer),
+        fSpawnPoint(nil),
+        fInitialTask(nil),
+        fUserStr(nil) // setting to nil so SetUserStr doesn't try to nuke garbage
 {
     SetUserStr(userStr);
 }
@@ -91,8 +91,7 @@ plLoadAvatarMsg::plLoadAvatarMsg(const plKey &existing, const plKey &requestor, 
 // DTOR
 plLoadAvatarMsg::~plLoadAvatarMsg()
 {
-    if (fUserStr)
-    {
+    if (fUserStr) {
         delete [] fUserStr;
         fUserStr = nil;
     }
@@ -103,35 +102,36 @@ void plLoadAvatarMsg::Read(hsStream* stream, hsResMgr* mgr)
     plLoadCloneMsg::Read(stream, mgr);
     fIsPlayer = stream->ReadBool();
     fSpawnPoint = mgr->ReadKey(stream);
-    if(stream->ReadBool())
-    {
+
+    if (stream->ReadBool()) {
         fInitialTask = plAvTask::ConvertNoRef(mgr->ReadCreatable(stream));
     }
-    if (fUserStr)
-    {
+
+    if (fUserStr) {
         delete [] fUserStr;
         fUserStr = nil;
     }
+
     fUserStr = stream->ReadSafeString();
 }
 
-void plLoadAvatarMsg::Write(hsStream *stream, hsResMgr *mgr)
+void plLoadAvatarMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plLoadCloneMsg::Write(stream, mgr);
     stream->WriteBool(fIsPlayer);
     mgr->WriteKey(stream, fSpawnPoint);
-    if(fInitialTask)
-    {
+
+    if (fInitialTask) {
         stream->WriteBool(true);
         mgr->WriteCreatable(stream, fInitialTask);
     } else {
         stream->WriteBool(false);
     }
+
     stream->WriteSafeString(fUserStr);
 }
 
-enum LoadAvatarMsgFlags
-{
+enum LoadAvatarMsgFlags {
     kLoadAvatarMsgIsPlayer,
     kLoadAvatarMsgSpawnPoint,
     kLoadAvatarMsgUserStr,
@@ -144,19 +144,22 @@ void plLoadAvatarMsg::ReadVersion(hsStream* stream, hsResMgr* mgr)
     hsBitVector contentFlags;
     contentFlags.Read(stream);
 
-    if (contentFlags.IsBitSet(kLoadAvatarMsgIsPlayer))
+    if (contentFlags.IsBitSet(kLoadAvatarMsgIsPlayer)) {
         fIsPlayer = stream->ReadBool();
+    }
 
-    if (contentFlags.IsBitSet(kLoadAvatarMsgSpawnPoint))
+    if (contentFlags.IsBitSet(kLoadAvatarMsgSpawnPoint)) {
         fSpawnPoint = mgr->ReadKey(stream);
+    }
 
-    if (fUserStr)
-    {
+    if (fUserStr) {
         delete [] fUserStr;
         fUserStr = nil;
     }
-    if (contentFlags.IsBitSet(kLoadAvatarMsgUserStr))
+
+    if (contentFlags.IsBitSet(kLoadAvatarMsgUserStr)) {
         fUserStr = stream->ReadSafeString();
+    }
 }
 
 void plLoadAvatarMsg::WriteVersion(hsStream* stream, hsResMgr* mgr)
@@ -192,7 +195,7 @@ bool plLoadAvatarMsg::GetIsPlayer()
 }
 
 // SETSPAWNPOINT
-void plLoadAvatarMsg::SetSpawnPoint(const plKey &spawnPoint)
+void plLoadAvatarMsg::SetSpawnPoint(const plKey& spawnPoint)
 {
     fSpawnPoint = spawnPoint;
 }
@@ -204,24 +207,25 @@ plKey plLoadAvatarMsg::GetSpawnPoint()
 }
 
 // SETINITIALTASK
-void plLoadAvatarMsg::SetInitialTask(plAvTask *initialTask)
+void plLoadAvatarMsg::SetInitialTask(plAvTask* initialTask)
 {
     fInitialTask = initialTask;
 }
 
 // GETINITIALTASK
-plAvTask * plLoadAvatarMsg::GetInitialTask()
+plAvTask* plLoadAvatarMsg::GetInitialTask()
 {
     return fInitialTask;
 }
 
 // SETUSERSTR
-void plLoadAvatarMsg::SetUserStr(const char *userStr)
+void plLoadAvatarMsg::SetUserStr(const char* userStr)
 {
-    if (fUserStr)
+    if (fUserStr) {
         delete [] fUserStr;
-    if (!userStr)
-    {
+    }
+
+    if (!userStr) {
         fUserStr = nil;
         return;
     }

@@ -58,8 +58,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 struct RelVaultNode;
 class plUUID;
 
-class pyVaultMarkerGameNode : public pyVaultNode
-{
+class pyVaultMarkerGameNode : public pyVaultNode {
 private:
     mutable char fGameName[kMaxVaultNodeStringLength];
 
@@ -68,26 +67,26 @@ protected:
     pyVaultMarkerGameNode(RelVaultNode* vaultNode);
 
     //create from the Python side
-    pyVaultMarkerGameNode(int n=0);
+    pyVaultMarkerGameNode(int n = 0);
 
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptVaultMarkerGameNode);
-    static PyObject *New(RelVaultNode* vaultNode);
-    static PyObject *New(int n=0);
+    static PyObject* New(RelVaultNode* vaultNode);
+    static PyObject* New(int n = 0);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyVaultMarkerGameNode object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyVaultMarkerGameNode); // converts a PyObject to a pyVaultMarkerGameNode (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
 //==================================================================
 // class RelVaultNode : public plVaultNode
 //
-    const char *    GetGameName () const;
-    void            SetGameName (const char v[]);
+    const char*     GetGameName() const;
+    void            SetGameName(const char v[]);
 
     plUUID          GetGameGuid() const;
-    void            SetGameGuid (const char v[]);
+    void            SetGameGuid(const char v[]);
 };
 
 #endif // _pyVaultMarkerGameNode_h_

@@ -49,21 +49,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 ControlEventCode plInputMap::ConvertCharToControlCode(const char* c)
 {
-    for (int i = 0; fCmdConvert[i].fCode != END_CONTROLS; i++)
-    {
-        if (stricmp(fCmdConvert[i].fDesc, c) == 0)
+    for (int i = 0; fCmdConvert[i].fCode != END_CONTROLS; i++) {
+        if (stricmp(fCmdConvert[i].fDesc, c) == 0) {
             return (fCmdConvert[i].fCode);
+        }
     }
+
     return (END_CONTROLS);
 }
 
-const char      *plInputMap::ConvertControlCodeToString( ControlEventCode code )
+const char*      plInputMap::ConvertControlCodeToString(ControlEventCode code)
 {
-    for( int i = 0; fCmdConvert[ i ].fCode != END_CONTROLS; i++ )
-    {
-        if( fCmdConvert[ i ].fCode == code )
+    for (int i = 0; fCmdConvert[ i ].fCode != END_CONTROLS; i++) {
+        if (fCmdConvert[ i ].fCode == code) {
             return fCmdConvert[ i ].fDesc;
+        }
     }
+
     return nil;
 }
 
@@ -74,18 +76,21 @@ const char      *plInputMap::ConvertControlCodeToString( ControlEventCode code )
 
 plMouseMap::~plMouseMap()
 {
-    for (int i = 0; i < fMap.Count(); i++)
+    for (int i = 0; i < fMap.Count(); i++) {
         delete(fMap[i]);
+    }
+
     fMap.SetCountAndZero(0);
 }
 
 int plMouseMap::AddMapping(plMouseInfo* pNfo)
 {
-    for (int i = 0; i < fMap.Count(); i++)
-    {
-        if (fMap[i] == pNfo)
+    for (int i = 0; i < fMap.Count(); i++) {
+        if (fMap[i] == pNfo) {
             return -1;
+        }
     }
+
     fMap.Append(pNfo);
     return (fMap.Count() - 1);
 }
@@ -99,20 +104,25 @@ plKeyCombo::plKeyCombo()
     fFlags = 0;
 }
 
-bool plKeyCombo::IsSatisfiedBy(const plKeyCombo &combo) const
+bool plKeyCombo::IsSatisfiedBy(const plKeyCombo& combo) const
 {
-    if (fKey != combo.fKey)
+    if (fKey != combo.fKey) {
         return false;
-    if ((fFlags & kShift) && !(combo.fFlags & kShift))
+    }
+
+    if ((fFlags & kShift) && !(combo.fFlags & kShift)) {
         return false;
-    if ((fFlags & kCtrl) && !(combo.fFlags & kCtrl))
+    }
+
+    if ((fFlags & kCtrl) && !(combo.fFlags & kCtrl)) {
         return false;
+    }
 
     return true;
 }
 
 // Handy konstant for plKeyCombos
-plKeyCombo  plKeyCombo::kUnmapped = plKeyCombo( KEY_UNMAPPED, 0 );
+plKeyCombo  plKeyCombo::kUnmapped = plKeyCombo(KEY_UNMAPPED, 0);
 
 
 
@@ -125,13 +135,13 @@ plKeyBinding::plKeyBinding()
     fString = nil;
 }
 
-plKeyBinding::plKeyBinding( ControlEventCode code, uint32_t codeFlags, const plKeyCombo &key1, const plKeyCombo &key2, const char *string /*= nil*/ )
+plKeyBinding::plKeyBinding(ControlEventCode code, uint32_t codeFlags, const plKeyCombo& key1, const plKeyCombo& key2, const char* string /*= nil*/)
 {
     fCode = code;
     fCodeFlags = codeFlags;
     fKey1 = key1;
     fKey2 = key2;
-    fString = ( string == nil ) ? nil : hsStrcpy( string );
+    fString = (string == nil) ? nil : hsStrcpy(string);
 }
 
 plKeyBinding::~plKeyBinding()
@@ -139,27 +149,30 @@ plKeyBinding::~plKeyBinding()
     delete [] fString;
 }
 
-const plKeyCombo &plKeyBinding::GetMatchingKey( plKeyDef keyDef ) const
+const plKeyCombo& plKeyBinding::GetMatchingKey(plKeyDef keyDef) const
 {
-    if (fKey1.fKey == keyDef)
+    if (fKey1.fKey == keyDef) {
         return fKey1;
-    if (fKey2.fKey == keyDef)
+    }
+
+    if (fKey2.fKey == keyDef) {
         return fKey2;
+    }
 
     return plKeyCombo::kUnmapped;
 }
 
-void    plKeyBinding::SetKey1( const plKeyCombo &newCombo )
+void    plKeyBinding::SetKey1(const plKeyCombo& newCombo)
 {
     fKey1 = newCombo;
 }
 
-void    plKeyBinding::SetKey2( const plKeyCombo &newCombo )
+void    plKeyBinding::SetKey2(const plKeyCombo& newCombo)
 {
     fKey2 = newCombo;
 }
 
-void    plKeyBinding::ClearKeys( void )
+void    plKeyBinding::ClearKeys(void)
 {
     fKey1 = fKey2 = plKeyCombo::kUnmapped;
 }
@@ -182,57 +195,61 @@ plKeyMap::~plKeyMap()
     ClearAll();
 }
 
-void    plKeyMap::ClearAll( void )
+void    plKeyMap::ClearAll(void)
 {
     uint32_t  i;
 
 
-    for( i = 0; i < fBindings.GetCount(); i++ )
+    for (i = 0; i < fBindings.GetCount(); i++) {
         delete fBindings[ i ];
+    }
+
     fBindings.Reset();
 }
 
 //// AddCode //////////////////////////////////////////////////////////////////////////
-//  Adds a given control code to the map. Once you add it, you can't change its flags. 
+//  Adds a given control code to the map. Once you add it, you can't change its flags.
 //  Returns false if the code is already present
 
-bool    plKeyMap::AddCode( ControlEventCode code, uint32_t codeFlags )
+bool    plKeyMap::AddCode(ControlEventCode code, uint32_t codeFlags)
 {
-    if( IFindBinding( code ) != nil )
+    if (IFindBinding(code) != nil) {
         return false;
+    }
 
-    fBindings.Append( new plKeyBinding( code, codeFlags, plKeyCombo::kUnmapped, plKeyCombo::kUnmapped ) );
+    fBindings.Append(new plKeyBinding(code, codeFlags, plKeyCombo::kUnmapped, plKeyCombo::kUnmapped));
     return true;
 }
 
 //// AddConsoleCommand ///////////////////////////////////////////////////////
-//  Same but for console commands. No flags b/c console commands always use 
+//  Same but for console commands. No flags b/c console commands always use
 //  the same flags.
 
-bool    plKeyMap::AddConsoleCommand( const char *command )
+bool    plKeyMap::AddConsoleCommand(const char* command)
 {
-    if( IFindConsoleBinding( command ) != nil )
+    if (IFindConsoleBinding(command) != nil) {
         return false;
+    }
 
-    fBindings.Append( new plKeyBinding( B_CONTROL_CONSOLE_COMMAND, 
-                                        kControlFlagDownEvent | kControlFlagNoRepeat | kControlFlagNoDeactivate,
-                                        plKeyCombo::kUnmapped, plKeyCombo::kUnmapped, 
-                                        command ) );
+    fBindings.Append(new plKeyBinding(B_CONTROL_CONSOLE_COMMAND,
+                                      kControlFlagDownEvent | kControlFlagNoRepeat | kControlFlagNoDeactivate,
+                                      plKeyCombo::kUnmapped, plKeyCombo::kUnmapped,
+                                      command));
     return true;
 }
 
 //// IFindBinding ////////////////////////////////////////////////////////////
 //  Find the binding for a given code.
 
-plKeyBinding    *plKeyMap::IFindBinding( ControlEventCode code ) const
+plKeyBinding*    plKeyMap::IFindBinding(ControlEventCode code) const
 {
     uint32_t  i;
 
 
-    for( i = 0; i < fBindings.GetCount(); i++ )
-    {
-        if( fBindings[ i ]->GetCode() == code )
+    for (i = 0; i < fBindings.GetCount(); i++) {
+        if (fBindings[ i ]->GetCode() == code) {
             return fBindings[ i ];
+        }
     }
 
     return nil;
@@ -241,15 +258,15 @@ plKeyBinding    *plKeyMap::IFindBinding( ControlEventCode code ) const
 //// IFindBindingByKey ///////////////////////////////////////////////////////
 //  Find the binding for a given key.
 
-plKeyBinding    *plKeyMap::IFindBindingByKey( const plKeyCombo &combo ) const
+plKeyBinding*    plKeyMap::IFindBindingByKey(const plKeyCombo& combo) const
 {
     uint32_t  i;
 
 
-    for( i = 0; i < fBindings.GetCount(); i++ )
-    {
-        if( fBindings[ i ]->GetKey1() == combo || fBindings[ i ]->GetKey2() == combo )
+    for (i = 0; i < fBindings.GetCount(); i++) {
+        if (fBindings[ i ]->GetKey1() == combo || fBindings[ i ]->GetKey2() == combo) {
             return fBindings[ i ];
+        }
     }
 
     return nil;
@@ -259,45 +276,49 @@ plKeyBinding    *plKeyMap::IFindBindingByKey( const plKeyCombo &combo ) const
 // bindings for a key with different shift/ctrl combinations, we want any that are satisfied with
 // the given combo.
 // We guarantee that the first binding in the result array is that one with priority.
-void plKeyMap::IFindAllBindingsByKey(const plKeyCombo &combo, hsTArray<plKeyBinding*> &result) const
+void plKeyMap::IFindAllBindingsByKey(const plKeyCombo& combo, hsTArray<plKeyBinding*>& result) const
 {
     uint32_t i;
     uint8_t bestScore = 0;
-    for (i = 0; i < fBindings.GetCount(); i++)
-    {
+
+    for (i = 0; i < fBindings.GetCount(); i++) {
         bool s1, s2;
         s1 = fBindings[i]->GetKey1().IsSatisfiedBy(combo);
         s2 = fBindings[i]->GetKey2().IsSatisfiedBy(combo);
-        if (s1 || s2)
-        {
-            uint8_t myScore = 0;
-            if (s1)
-                myScore = fBindings[i]->GetKey1().fFlags;
-            if (s2 && (fBindings[i]->GetKey2().fFlags > myScore))
-                myScore = fBindings[i]->GetKey2().fFlags;
 
-            if (myScore >= bestScore)
+        if (s1 || s2) {
+            uint8_t myScore = 0;
+
+            if (s1) {
+                myScore = fBindings[i]->GetKey1().fFlags;
+            }
+
+            if (s2 && (fBindings[i]->GetKey2().fFlags > myScore)) {
+                myScore = fBindings[i]->GetKey2().fFlags;
+            }
+
+            if (myScore >= bestScore) {
                 result.Insert(0, fBindings[i]);
-            else
+            } else {
                 result.Append(fBindings[i]);
+            }
         }
-    }       
+    }
 }
 
 //// IFindConsoleBinding /////////////////////////////////////////////////////
 //  You should be able to figure this out by now.
 
-plKeyBinding    *plKeyMap::IFindConsoleBinding( const char *command ) const
+plKeyBinding*    plKeyMap::IFindConsoleBinding(const char* command) const
 {
     uint32_t  i;
 
 
-    for( i = 0; i < fBindings.GetCount(); i++ )
-    {
-        if( fBindings[ i ]->GetCode() == B_CONTROL_CONSOLE_COMMAND )
-        {
-            if( stricmp( fBindings[ i ]->GetExtendedString(), command ) == 0 )
+    for (i = 0; i < fBindings.GetCount(); i++) {
+        if (fBindings[ i ]->GetCode() == B_CONTROL_CONSOLE_COMMAND) {
+            if (stricmp(fBindings[ i ]->GetExtendedString(), command) == 0) {
                 return fBindings[ i ];
+            }
         }
     }
 
@@ -307,227 +328,248 @@ plKeyBinding    *plKeyMap::IFindConsoleBinding( const char *command ) const
 //// IActuallyBind ///////////////////////////////////////////////////////////
 //  Does the nitty gritty of binding by pref
 
-void    plKeyMap::IActuallyBind( plKeyBinding *binding, const plKeyCombo &combo, BindPref pref )
+void    plKeyMap::IActuallyBind(plKeyBinding* binding, const plKeyCombo& combo, BindPref pref)
 {
     // Bind according to preference
-    switch( pref )
-    {
-        case kNoPreference:
-            // Pick a free slot, or 1st one if none
-            if( binding->GetKey1() == plKeyCombo::kUnmapped )
-                binding->SetKey1( combo );
-            else if( binding->GetKey2() == plKeyCombo::kUnmapped )
-                binding->SetKey2( combo );
-            else
-                binding->SetKey1( combo );
-            break;
+    switch (pref) {
+    case kNoPreference:
 
-        case kNoPreference2nd:
-            // Pick a free slot, or 2nd one if none
-            if( binding->GetKey1() == plKeyCombo::kUnmapped )
-                binding->SetKey1( combo );
-            else if( binding->GetKey2() == plKeyCombo::kUnmapped )
-                binding->SetKey2( combo );
-            else
-                binding->SetKey2( combo );
-            break;
+        // Pick a free slot, or 1st one if none
+        if (binding->GetKey1() == plKeyCombo::kUnmapped) {
+            binding->SetKey1(combo);
+        } else if (binding->GetKey2() == plKeyCombo::kUnmapped) {
+            binding->SetKey2(combo);
+        } else {
+            binding->SetKey1(combo);
+        }
 
-        case kFirstAlways:
-            // Always bind to the first key
-            binding->SetKey1( combo );
-            break;
+        break;
 
-        case kSecondAlways:
-            // You get the idea
-            binding->SetKey2( combo );
-            break;
+    case kNoPreference2nd:
 
-        default:
-            hsAssert( false, "Invalid bind preference in IActuallyBind()" );
+        // Pick a free slot, or 2nd one if none
+        if (binding->GetKey1() == plKeyCombo::kUnmapped) {
+            binding->SetKey1(combo);
+        } else if (binding->GetKey2() == plKeyCombo::kUnmapped) {
+            binding->SetKey2(combo);
+        } else {
+            binding->SetKey2(combo);
+        }
+
+        break;
+
+    case kFirstAlways:
+        // Always bind to the first key
+        binding->SetKey1(combo);
+        break;
+
+    case kSecondAlways:
+        // You get the idea
+        binding->SetKey2(combo);
+        break;
+
+    default:
+        hsAssert(false, "Invalid bind preference in IActuallyBind()");
     }
 }
 
 //// BindKey /////////////////////////////////////////////////////////////////
-//  Adds a key binding to a given code. Returns false if the code isn't in 
+//  Adds a key binding to a given code. Returns false if the code isn't in
 //  this map or if key is already mapped.
 
-bool    plKeyMap::BindKey( const plKeyCombo &combo, ControlEventCode code, BindPref pref /*= kNoPreference*/ )
+bool    plKeyMap::BindKey(const plKeyCombo& combo, ControlEventCode code, BindPref pref /*= kNoPreference*/)
 {
     plKeyBinding* binding = nil;
 
     // Control combos are ok. Binding directly to control is not.
-    if ( combo.fKey == KEY_CTRL )
+    if (combo.fKey == KEY_CTRL) {
         return false;
+    }
 
     // unless we are bindind to unmappped...
-    if ( combo.fKey != KEY_UNMAPPED)
-    {
+    if (combo.fKey != KEY_UNMAPPED) {
         // Make sure key isn't already used
-        binding = IFindBindingByKey( combo );
-        if( binding != nil )
+        binding = IFindBindingByKey(combo);
+
+        if (binding != nil) {
             return false;
+        }
     }
 
     // Get binding for this code
-    binding = IFindBinding( code );
-    if( binding == nil )
-        return false;
+    binding = IFindBinding(code);
 
-    IActuallyBind( binding, combo, pref );
+    if (binding == nil) {
+        return false;
+    }
+
+    IActuallyBind(binding, combo, pref);
     return true;
 }
 
 //// BindKeyToConsoleCmd /////////////////////////////////////////////////////
 //  Console command version
 
-bool    plKeyMap::BindKeyToConsoleCmd( const plKeyCombo &combo, const char *command, BindPref pref /*= kNoPreference*/ )
+bool    plKeyMap::BindKeyToConsoleCmd(const plKeyCombo& combo, const char* command, BindPref pref /*= kNoPreference*/)
 {
     plKeyBinding* binding = nil;
 
     // Control combos are ok. Binding directly to control is not.
-    if ( combo.fKey == KEY_CTRL )
+    if (combo.fKey == KEY_CTRL) {
         return false;
+    }
 
     // unless we are bindind to unmappped...
-    if ( combo.fKey != KEY_UNMAPPED)
-    {
+    if (combo.fKey != KEY_UNMAPPED) {
         // Make sure key isn't already used
-        binding = IFindBindingByKey( combo );
-        if( binding != nil )
+        binding = IFindBindingByKey(combo);
+
+        if (binding != nil) {
             return false;
+        }
     }
 
     // Get binding for this code
-    binding = IFindConsoleBinding( command );
-    if( binding == nil )
-        return false;
+    binding = IFindConsoleBinding(command);
 
-    IActuallyBind( binding, combo, pref );
+    if (binding == nil) {
+        return false;
+    }
+
+    IActuallyBind(binding, combo, pref);
     return true;
 }
 
 //// FindBinding /////////////////////////////////////////////////////////////
 //  Searches for the binding for a given code. Returns nil if not found
 
-const plKeyBinding  *plKeyMap::FindBinding( ControlEventCode code ) const
+const plKeyBinding*  plKeyMap::FindBinding(ControlEventCode code) const
 {
-    return IFindBinding( code );
+    return IFindBinding(code);
 }
 
 //// FindBindingByKey ////////////////////////////////////////////////////////
 //  Same thing but by key
 
-const plKeyBinding  *plKeyMap::FindBindingByKey( const plKeyCombo &combo ) const
+const plKeyBinding*  plKeyMap::FindBindingByKey(const plKeyCombo& combo) const
 {
-    return IFindBindingByKey( combo );
+    return IFindBindingByKey(combo);
 }
 
 //  Same thing, but returns multiple matches (see IFindAllBindingsByKey)
-void plKeyMap::FindAllBindingsByKey( const plKeyCombo &combo, hsTArray<const plKeyBinding*> &result ) const
+void plKeyMap::FindAllBindingsByKey(const plKeyCombo& combo, hsTArray<const plKeyBinding*>& result) const
 {
     hsTArray<plKeyBinding*> bindings;
-    IFindAllBindingsByKey( combo, bindings );
+    IFindAllBindingsByKey(combo, bindings);
 
     int i;
-    for (i = 0; i < bindings.GetCount(); i++)
+
+    for (i = 0; i < bindings.GetCount(); i++) {
         result.Append(bindings[i]);
+    }
 }
 
 
-const plKeyBinding* plKeyMap::FindConsoleBinding( const char *command ) const
+const plKeyBinding* plKeyMap::FindConsoleBinding(const char* command) const
 {
     return IFindConsoleBinding(command);
 }
 
 //// EnsureKeysClear /////////////////////////////////////////////////////////
-//  Basically UnmapKey(), but for two keys at once and won't assert if you 
+//  Basically UnmapKey(), but for two keys at once and won't assert if you
 //  give it unmapped keys
 
-void    plKeyMap::EnsureKeysClear( const plKeyCombo &key1, const plKeyCombo &key2 )
+void    plKeyMap::EnsureKeysClear(const plKeyCombo& key1, const plKeyCombo& key2)
 {
-    if( key1 != plKeyCombo::kUnmapped )
-        UnmapKey( key1 );
-    if( key2 != plKeyCombo::kUnmapped )
-        UnmapKey( key2 );
+    if (key1 != plKeyCombo::kUnmapped) {
+        UnmapKey(key1);
+    }
+
+    if (key2 != plKeyCombo::kUnmapped) {
+        UnmapKey(key2);
+    }
 }
 
 //// UnmapKey ////////////////////////////////////////////////////////////////
 //  Unmaps the given key, no matter what binding it is in
 
-void    plKeyMap::UnmapKey( const plKeyCombo &combo )
+void    plKeyMap::UnmapKey(const plKeyCombo& combo)
 {
-    if( combo == plKeyCombo::kUnmapped )
-    {
-        hsAssert( false, "Trying to unbind invalid key" );
+    if (combo == plKeyCombo::kUnmapped) {
+        hsAssert(false, "Trying to unbind invalid key");
         return;
     }
 
-    plKeyBinding *binding;
+    plKeyBinding* binding;
 
     // Just in case we're in multiple bindings, even tho we are guarding against
     // that
-    while( ( binding = IFindBindingByKey( combo ) ) != nil )
-    {
-        if( binding->GetKey1() == combo )
-            binding->SetKey1( plKeyCombo::kUnmapped );
-        if( binding->GetKey2() == combo )
-            binding->SetKey2( plKeyCombo::kUnmapped );
+    while ((binding = IFindBindingByKey(combo)) != nil) {
+        if (binding->GetKey1() == combo) {
+            binding->SetKey1(plKeyCombo::kUnmapped);
+        }
+
+        if (binding->GetKey2() == combo) {
+            binding->SetKey2(plKeyCombo::kUnmapped);
+        }
     }
 }
 
 //// UnmapBinding ////////////////////////////////////////////////////////////
 //  Unmaps the keys for a single binding
 
-void    plKeyMap::UnmapBinding( ControlEventCode code )
+void    plKeyMap::UnmapBinding(ControlEventCode code)
 {
-    plKeyBinding *binding = IFindBinding( code );
-    if( binding != nil )
+    plKeyBinding* binding = IFindBinding(code);
+
+    if (binding != nil) {
         binding->ClearKeys();
+    }
 }
 
 //// UnmapAllBindings ////////////////////////////////////////////////////////
 //  Unmaps all the bindings, but leaves the code records themselves
 
-void    plKeyMap::UnmapAllBindings( void )
+void    plKeyMap::UnmapAllBindings(void)
 {
     uint32_t  i;
 
-    for( i = 0; i < fBindings.GetCount(); i++ )
+    for (i = 0; i < fBindings.GetCount(); i++) {
         fBindings[ i ]->ClearKeys();
+    }
 }
 
 //// EraseBinding ////////////////////////////////////////////////////////////
-//  Erases the given code binding. Note: should never really be used, but 
+//  Erases the given code binding. Note: should never really be used, but
 //  provided here for completeness
 
-void    plKeyMap::EraseBinding( ControlEventCode code )
+void    plKeyMap::EraseBinding(ControlEventCode code)
 {
     uint32_t  i;
 
 
-    for( i = 0; i < fBindings.GetCount(); i++ )
-    {
-        if( fBindings[ i ]->GetCode() == code )
-        {
+    for (i = 0; i < fBindings.GetCount(); i++) {
+        if (fBindings[ i ]->GetCode() == code) {
             delete fBindings[ i ];
-            fBindings.Remove( i );
+            fBindings.Remove(i);
             return;
         }
     }
 }
 
 
-const char* plKeyMap::ConvertVKeyToChar( uint32_t vk )
+const char* plKeyMap::ConvertVKeyToChar(uint32_t vk)
 {
     Win32keyConvert* keyConvert = &fKeyConversionEnglish[0];
-    switch (plLocalization::GetLanguage())
-    {
-        case plLocalization::kFrench:
-            keyConvert = &fKeyConversionFrench[0];
-            break;
-        case plLocalization::kGerman:
-            keyConvert = &fKeyConversionGerman[0];
-            break;
+
+    switch (plLocalization::GetLanguage()) {
+    case plLocalization::kFrench:
+        keyConvert = &fKeyConversionFrench[0];
+        break;
+
+    case plLocalization::kGerman:
+        keyConvert = &fKeyConversionGerman[0];
+        break;
 //      case plLocalization::kSpanish:
 //          keyConvert = &fKeyConversionSpanish[0];
 //          break;
@@ -538,26 +580,28 @@ const char* plKeyMap::ConvertVKeyToChar( uint32_t vk )
         // default is English
 
     }
-    for (int i = 0; keyConvert[i].fVKey != 0xffffffff; i++)
-    {
-        if (keyConvert[i].fVKey == vk)
+
+    for (int i = 0; keyConvert[i].fVKey != 0xffffffff; i++) {
+        if (keyConvert[i].fVKey == vk) {
             return (keyConvert[i].fKeyName);
+        }
     }
 
     return nil;
 }
 
-plKeyDef plKeyMap::ConvertCharToVKey( const char *c )
+plKeyDef plKeyMap::ConvertCharToVKey(const char* c)
 {
     Win32keyConvert* keyConvert = &fKeyConversionEnglish[0];
-    switch (plLocalization::GetLanguage())
-    {
-        case plLocalization::kFrench:
-            keyConvert = &fKeyConversionFrench[0];
-            break;
-        case plLocalization::kGerman:
-            keyConvert = &fKeyConversionGerman[0];
-            break;
+
+    switch (plLocalization::GetLanguage()) {
+    case plLocalization::kFrench:
+        keyConvert = &fKeyConversionFrench[0];
+        break;
+
+    case plLocalization::kGerman:
+        keyConvert = &fKeyConversionGerman[0];
+        break;
 //      case plLocalization::kSpanish:
 //          keyConvert = &fKeyConversionSpanish[0];
 //          break;
@@ -568,43 +612,45 @@ plKeyDef plKeyMap::ConvertCharToVKey( const char *c )
         // default is English
 
     }
-    for (int i = 0; keyConvert[i].fVKey != 0xffffffff; i++)
-    {
-        if (stricmp(keyConvert[i].fKeyName, c) == 0)
+
+    for (int i = 0; keyConvert[i].fVKey != 0xffffffff; i++) {
+        if (stricmp(keyConvert[i].fKeyName, c) == 0) {
             return (plKeyDef)(keyConvert[i].fVKey);
+        }
     }
 
     // Is it just a single character?
-    if( isalnum( *c ) && strlen( c ) == 1 )
-        return (plKeyDef)toupper( *c );
+    if (isalnum(*c) && strlen(c) == 1) {
+        return (plKeyDef)toupper(*c);
+    }
 
     // if we didn't find anything yet...
     // ...then look thru all the other language mappings that we know about,
     // ...just in case they keep switching languages on us
-    if ( plLocalization::GetLanguage() != plLocalization::kEnglish)
-    {
-        for (int i = 0; fKeyConversionEnglish[i].fVKey != 0xffffffff; i++)
-        {
-            if (stricmp(fKeyConversionEnglish[i].fKeyName, c) == 0)
+    if (plLocalization::GetLanguage() != plLocalization::kEnglish) {
+        for (int i = 0; fKeyConversionEnglish[i].fVKey != 0xffffffff; i++) {
+            if (stricmp(fKeyConversionEnglish[i].fKeyName, c) == 0) {
                 return (plKeyDef)(fKeyConversionEnglish[i].fVKey);
+            }
         }
     }
-    if ( plLocalization::GetLanguage() != plLocalization::kFrench)
-    {
-        for (int i = 0; fKeyConversionFrench[i].fVKey != 0xffffffff; i++)
-        {
-            if (stricmp(fKeyConversionFrench[i].fKeyName, c) == 0)
+
+    if (plLocalization::GetLanguage() != plLocalization::kFrench) {
+        for (int i = 0; fKeyConversionFrench[i].fVKey != 0xffffffff; i++) {
+            if (stricmp(fKeyConversionFrench[i].fKeyName, c) == 0) {
                 return (plKeyDef)(fKeyConversionFrench[i].fVKey);
+            }
         }
     }
-    if ( plLocalization::GetLanguage() != plLocalization::kGerman)
-    {
-        for (int i = 0; fKeyConversionGerman[i].fVKey != 0xffffffff; i++)
-        {
-            if (stricmp(fKeyConversionGerman[i].fKeyName, c) == 0)
+
+    if (plLocalization::GetLanguage() != plLocalization::kGerman) {
+        for (int i = 0; fKeyConversionGerman[i].fVKey != 0xffffffff; i++) {
+            if (stricmp(fKeyConversionGerman[i].fKeyName, c) == 0) {
                 return (plKeyDef)(fKeyConversionGerman[i].fVKey);
+            }
         }
     }
+
     /*
     if ( plLocalization::GetLanguage() != plLocalization::kSpanish)
     {
@@ -630,70 +676,73 @@ plKeyDef plKeyMap::ConvertCharToVKey( const char *c )
 
 const char* plKeyMap::GetStringCtrl()
 {
-    switch (plLocalization::GetLanguage())
-    {
-        case plLocalization::kFrench:
-            return "Ctrl+";
-            break;
-        case plLocalization::kGerman:
-            return "Strg+";
-            break;
-/*      case plLocalization::kSpanish:
-            return "Ctrl+";
-            break;
-        case plLocalization::kItalian:
-            return "Ctrl+";
-            break;
-*/
+    switch (plLocalization::GetLanguage()) {
+    case plLocalization::kFrench:
+        return "Ctrl+";
+        break;
+
+    case plLocalization::kGerman:
+        return "Strg+";
+        break;
+        /*      case plLocalization::kSpanish:
+                    return "Ctrl+";
+                    break;
+                case plLocalization::kItalian:
+                    return "Ctrl+";
+                    break;
+        */
         // default is English
 
     }
+
     return "Ctrl+";
 }
 
 const char* plKeyMap::GetStringShift()
 {
-    switch (plLocalization::GetLanguage())
-    {
-        case plLocalization::kFrench:
-            return "Maj+";
-            break;
-        case plLocalization::kGerman:
-            return "Umschalt+";
-            break;
-/*      case plLocalization::kSpanish:
-            return "Mayúsculas+";
-            break;
-        case plLocalization::kItalian:
-            return "Shift+";
-            break;
-*/
+    switch (plLocalization::GetLanguage()) {
+    case plLocalization::kFrench:
+        return "Maj+";
+        break;
+
+    case plLocalization::kGerman:
+        return "Umschalt+";
+        break;
+        /*      case plLocalization::kSpanish:
+                    return "Mayúsculas+";
+                    break;
+                case plLocalization::kItalian:
+                    return "Shift+";
+                    break;
+        */
         // default is English
 
     }
+
     return "Shift+";
 }
 
 const char* plKeyMap::GetStringUnmapped()
 {
-    switch (plLocalization::GetLanguage())
-    {
-        case plLocalization::kFrench:
-            return "(NonDéfini)";
-            break;
-        case plLocalization::kGerman:
-            return "(NichtZugewiesen)";
-            break;
-/*      case plLocalization::kSpanish:
-            return "(SinMapear)";
-            break;
-        case plLocalization::kItalian:
-            return "(NonAssegnato)";
-            break;
-*/
+    switch (plLocalization::GetLanguage()) {
+    case plLocalization::kFrench:
+        return "(NonDéfini)";
+        break;
+
+    case plLocalization::kGerman:
+        return "(NichtZugewiesen)";
+        break;
+        /*      case plLocalization::kSpanish:
+                    return "(SinMapear)";
+                    break;
+                case plLocalization::kItalian:
+                    return "(NonAssegnato)";
+                    break;
+        */
         // default is English
 
     }
+
     return "(unmapped)";
 }
 
@@ -711,30 +760,31 @@ void plKeyMap::ICheckAndBindDupe(plKeyDef origKey, plKeyDef dupeKey)
     plKeyCombo combo;
     combo.fKey = origKey;
     IFindAllBindingsByKey(combo, bindings);
-    
+
     int i;
-    for (i = 0; i < bindings.GetCount(); i++)
-    {
-        plKeyBinding *binding = bindings[i];
-        if (binding->HasUnmappedKey())
-        {
+
+    for (i = 0; i < bindings.GetCount(); i++) {
+        plKeyBinding* binding = bindings[i];
+
+        if (binding->HasUnmappedKey()) {
             combo = binding->GetMatchingKey(origKey);
             combo.fKey = dupeKey;
-            if (IFindBindingByKey(combo) == nil)
+
+            if (IFindBindingByKey(combo) == nil) {
                 IActuallyBind(binding, combo, kNoPreference);
+            }
         }
-    }   
+    }
 }
 
-Win32keyConvert plKeyMap::fKeyConversionEnglish[] =
-{ 
-    { VK_F1,    "F1"}, 
-    { VK_F2,    "F2"}, 
-    { VK_F3,    "F3"}, 
+Win32keyConvert plKeyMap::fKeyConversionEnglish[] = {
+    { VK_F1,    "F1"},
+    { VK_F2,    "F2"},
+    { VK_F3,    "F3"},
     { VK_F4,    "F4"},
     { VK_F5,    "F5"},
     { VK_F6,    "F6"},
-    { VK_F7,    "F7"}, 
+    { VK_F7,    "F7"},
     { VK_F8,    "F8"},
     { VK_F9,    "F9"},
     { VK_F10,   "F10"},
@@ -742,12 +792,12 @@ Win32keyConvert plKeyMap::fKeyConversionEnglish[] =
     { VK_F12,   "F12"},
     { VK_ESCAPE, "Esc"},
     { VK_TAB,   "Tab"},
-    { VK_UP,    "UpArrow"}, 
-    { VK_DOWN,  "DownArrow"}, 
+    { VK_UP,    "UpArrow"},
+    { VK_DOWN,  "DownArrow"},
     { VK_LEFT,  "LeftArrow"},
     { VK_RIGHT, "RightArrow"},
     { VK_BACK,  "Backspace"},
-    { VK_RETURN, "Enter"}, 
+    { VK_RETURN, "Enter"},
     { VK_PAUSE, "Pause"},
     { VK_CAPITAL, "CapsLock"},
     { VK_PRIOR, "PageUp"},
@@ -757,13 +807,13 @@ Win32keyConvert plKeyMap::fKeyConversionEnglish[] =
     { VK_SNAPSHOT,  "PrintScrn"},
     { VK_INSERT,    "Insert"},
     { VK_DELETE,    "Delete"},
-    { VK_NUMPAD0,   "NumPad0"}, 
-    { VK_NUMPAD1,   "NumPad1"}, 
-    { VK_NUMPAD2,   "NumPad2"}, 
+    { VK_NUMPAD0,   "NumPad0"},
+    { VK_NUMPAD1,   "NumPad1"},
+    { VK_NUMPAD2,   "NumPad2"},
     { VK_NUMPAD3,   "NumPad3"},
     { VK_NUMPAD4,   "NumPad4"},
     { VK_NUMPAD5,   "NumPad5"},
-    { VK_NUMPAD6,   "NumPad6"}, 
+    { VK_NUMPAD6,   "NumPad6"},
     { VK_NUMPAD7,   "NumPad7"},
     { VK_NUMPAD8,   "NumPad8"},
     { VK_NUMPAD9,   "NumPad9"},
@@ -774,7 +824,7 @@ Win32keyConvert plKeyMap::fKeyConversionEnglish[] =
     { VK_DIVIDE,    "NumPad/"},
     { VK_SPACE,     "SpaceBar"},
     { VK_OEM_COMMA, "Comma"},
-    { VK_OEM_PERIOD,"Period"},
+    { VK_OEM_PERIOD, "Period"},
     { VK_OEM_MINUS, "Minus"},
     { VK_OEM_PLUS,  "Plus"},
     { VK_SHIFT,     "Shift" },
@@ -783,22 +833,21 @@ Win32keyConvert plKeyMap::fKeyConversionEnglish[] =
     { VK_OEM_2,     "ForewardSlash"},
     { VK_OEM_3,     "Tilde"},
     { VK_OEM_4,     "LeftBracket"},
-    { VK_OEM_5,     "Backslash"},   
+    { VK_OEM_5,     "Backslash"},
     { VK_OEM_6,     "RightBracket"},
     { VK_OEM_7,     "Quote"},
-                
+
     { 0xffffffff,   "Unused"},
 };
 
-Win32keyConvert  plKeyMap::fKeyConversionFrench[] =
-{
-    { VK_F1,    "F1"}, 
-    { VK_F2,    "F2"}, 
-    { VK_F3,    "F3"}, 
+Win32keyConvert  plKeyMap::fKeyConversionFrench[] = {
+    { VK_F1,    "F1"},
+    { VK_F2,    "F2"},
+    { VK_F3,    "F3"},
     { VK_F4,    "F4"},
     { VK_F5,    "F5"},
     { VK_F6,    "F6"},
-    { VK_F7,    "F7"}, 
+    { VK_F7,    "F7"},
     { VK_F8,    "F8"},
     { VK_F9,    "F9"},
     { VK_F10,   "F10"},
@@ -806,12 +855,12 @@ Win32keyConvert  plKeyMap::fKeyConversionFrench[] =
     { VK_F12,   "F12"},
     { VK_ESCAPE, "Échap"},
     { VK_TAB,   "Tab"},
-    { VK_UP,    "FlècheHaut"}, 
-    { VK_DOWN,  "FlècheBas"}, 
+    { VK_UP,    "FlècheHaut"},
+    { VK_DOWN,  "FlècheBas"},
     { VK_LEFT,  "FlècheGauche"},
     { VK_RIGHT, "FlècheDroite"},
     { VK_BACK,  "Retour"},
-    { VK_RETURN, "Entrée"}, 
+    { VK_RETURN, "Entrée"},
     { VK_PAUSE, "Pause"},
     { VK_CAPITAL, "CapsLock"},
     { VK_PRIOR, "PagePréc"},
@@ -821,13 +870,13 @@ Win32keyConvert  plKeyMap::fKeyConversionFrench[] =
     { VK_SNAPSHOT,  "ImprÉcran"},
     { VK_INSERT,    "Inser"},
     { VK_DELETE,    "Suppr"},
-    { VK_NUMPAD0,   "PavNum0"}, 
-    { VK_NUMPAD1,   "PavNum1"}, 
-    { VK_NUMPAD2,   "PavNum2"}, 
+    { VK_NUMPAD0,   "PavNum0"},
+    { VK_NUMPAD1,   "PavNum1"},
+    { VK_NUMPAD2,   "PavNum2"},
     { VK_NUMPAD3,   "PavNum3"},
     { VK_NUMPAD4,   "PavNum4"},
     { VK_NUMPAD5,   "PavNum5"},
-    { VK_NUMPAD6,   "PavNum6"}, 
+    { VK_NUMPAD6,   "PavNum6"},
     { VK_NUMPAD7,   "PavNum7"},
     { VK_NUMPAD8,   "PavNum8"},
     { VK_NUMPAD9,   "PavNum9"},
@@ -838,7 +887,7 @@ Win32keyConvert  plKeyMap::fKeyConversionFrench[] =
     { VK_DIVIDE,    "PavNum/"},
     { VK_SPACE,     "Espace"},
     { VK_OEM_COMMA, "Virgule"},
-    { VK_OEM_PERIOD,"Point"},
+    { VK_OEM_PERIOD, "Point"},
     { VK_OEM_MINUS, "Moins"},
     { VK_OEM_PLUS,  "Plus"},
     { VK_SHIFT,     "Maj"   },
@@ -847,22 +896,21 @@ Win32keyConvert  plKeyMap::fKeyConversionFrench[] =
     { VK_OEM_2,     "BarreOblique"},
     { VK_OEM_3,     "Tilde"},
     { VK_OEM_4,     "ParenthèseG"},
-    { VK_OEM_5,     "BarreInverse"},    
+    { VK_OEM_5,     "BarreInverse"},
     { VK_OEM_6,     "ParenthèseD"},
     { VK_OEM_7,     "Guillemet"},
-                
+
     { 0xffffffff,   "Unused"},
 };
 
-Win32keyConvert  plKeyMap::fKeyConversionGerman[] =
-{
-    { VK_F1,    "F1"}, 
-    { VK_F2,    "F2"}, 
-    { VK_F3,    "F3"}, 
+Win32keyConvert  plKeyMap::fKeyConversionGerman[] = {
+    { VK_F1,    "F1"},
+    { VK_F2,    "F2"},
+    { VK_F3,    "F3"},
     { VK_F4,    "F4"},
     { VK_F5,    "F5"},
     { VK_F6,    "F6"},
-    { VK_F7,    "F7"}, 
+    { VK_F7,    "F7"},
     { VK_F8,    "F8"},
     { VK_F9,    "F9"},
     { VK_F10,   "F10"},
@@ -870,12 +918,12 @@ Win32keyConvert  plKeyMap::fKeyConversionGerman[] =
     { VK_F12,   "F12"},
     { VK_ESCAPE, "Esc"},
     { VK_TAB,   "Tab"},
-    { VK_UP,    "PfeilHoch"}, 
-    { VK_DOWN,  "PfeilRunter"}, 
+    { VK_UP,    "PfeilHoch"},
+    { VK_DOWN,  "PfeilRunter"},
     { VK_LEFT,  "PfeilLinks"},
     { VK_RIGHT, "PfeilRechts"},
     { VK_BACK,  "Backspace"},
-    { VK_RETURN, "Enter"}, 
+    { VK_RETURN, "Enter"},
     { VK_PAUSE, "Pause"},
     { VK_CAPITAL, "Feststelltaste"},
     { VK_PRIOR, "BildHoch"},
@@ -885,13 +933,13 @@ Win32keyConvert  plKeyMap::fKeyConversionGerman[] =
     { VK_SNAPSHOT,  "Druck"},
     { VK_INSERT,    "Einf"},
     { VK_DELETE,    "Entf"},
-    { VK_NUMPAD0,   "ZB0"}, 
-    { VK_NUMPAD1,   "ZB1"}, 
-    { VK_NUMPAD2,   "ZB2"}, 
+    { VK_NUMPAD0,   "ZB0"},
+    { VK_NUMPAD1,   "ZB1"},
+    { VK_NUMPAD2,   "ZB2"},
     { VK_NUMPAD3,   "ZB3"},
     { VK_NUMPAD4,   "ZB4"},
     { VK_NUMPAD5,   "ZB5"},
-    { VK_NUMPAD6,   "ZB6"}, 
+    { VK_NUMPAD6,   "ZB6"},
     { VK_NUMPAD7,   "ZB7"},
     { VK_NUMPAD8,   "ZB8"},
     { VK_NUMPAD9,   "ZB9"},
@@ -902,7 +950,7 @@ Win32keyConvert  plKeyMap::fKeyConversionGerman[] =
     { VK_DIVIDE,    "ZB/"},
     { VK_SPACE,     "Leertaste"},
     { VK_OEM_COMMA, "Komma"},
-    { VK_OEM_PERIOD,"Punkt"},
+    { VK_OEM_PERIOD, "Punkt"},
     { VK_OEM_MINUS, "Minus"},
     { VK_OEM_PLUS,  "Plus"},
     { VK_SHIFT,     "Umschalt"  },
@@ -911,23 +959,23 @@ Win32keyConvert  plKeyMap::fKeyConversionGerman[] =
     { VK_OEM_2,     "#"},
     { VK_OEM_3,     "Ö"},
     { VK_OEM_4,     "ß"},
-    { VK_OEM_5,     "Backslash"},   
+    { VK_OEM_5,     "Backslash"},
     { VK_OEM_6,     "Akzent"},
     { VK_OEM_7,     "Ä"},
-                
+
     { 0xffffffff,   "Unused"},
 };
 
 /*
 Win32keyConvert  plKeyMap::fKeyConversionSpanish[] =
 {
-    { VK_F1,    "F1"}, 
-    { VK_F2,    "F2"}, 
-    { VK_F3,    "F3"}, 
+    { VK_F1,    "F1"},
+    { VK_F2,    "F2"},
+    { VK_F3,    "F3"},
     { VK_F4,    "F4"},
     { VK_F5,    "F5"},
     { VK_F6,    "F6"},
-    { VK_F7,    "F7"}, 
+    { VK_F7,    "F7"},
     { VK_F8,    "F8"},
     { VK_F9,    "F9"},
     { VK_F10,   "F10"},
@@ -935,12 +983,12 @@ Win32keyConvert  plKeyMap::fKeyConversionSpanish[] =
     { VK_F12,   "F12"},
     { VK_ESCAPE, "Esc"},
     { VK_TAB,   "Tabulador"},
-    { VK_UP,    "CursorArriba"}, 
-    { VK_DOWN,  "CursorAbajo"}, 
+    { VK_UP,    "CursorArriba"},
+    { VK_DOWN,  "CursorAbajo"},
     { VK_LEFT,  "CursorIzquierdo"},
     { VK_RIGHT, "CursorDerecho"},
     { VK_BACK,  "Retroceso"},
-    { VK_RETURN, "Intro"}, 
+    { VK_RETURN, "Intro"},
     { VK_PAUSE, "Pausa"},
     { VK_CAPITAL, "BloqMayús"},
     { VK_PRIOR, "RePág"},
@@ -950,13 +998,13 @@ Win32keyConvert  plKeyMap::fKeyConversionSpanish[] =
     { VK_SNAPSHOT,  "ImprPetSis"},
     { VK_INSERT,    "Insert"},
     { VK_DELETE,    "Supr"},
-    { VK_NUMPAD0,   "TecNum0"}, 
-    { VK_NUMPAD1,   "TecNum1"}, 
-    { VK_NUMPAD2,   "TecNum2"}, 
+    { VK_NUMPAD0,   "TecNum0"},
+    { VK_NUMPAD1,   "TecNum1"},
+    { VK_NUMPAD2,   "TecNum2"},
     { VK_NUMPAD3,   "TecNum3"},
     { VK_NUMPAD4,   "TecNum4"},
     { VK_NUMPAD5,   "TecNum5"},
-    { VK_NUMPAD6,   "TecNum6"}, 
+    { VK_NUMPAD6,   "TecNum6"},
     { VK_NUMPAD7,   "TecNum7"},
     { VK_NUMPAD8,   "TecNum8"},
     { VK_NUMPAD9,   "TecNum9"},
@@ -976,22 +1024,22 @@ Win32keyConvert  plKeyMap::fKeyConversionSpanish[] =
     { VK_OEM_2,     "Barra"},
     { VK_OEM_3,     "Tilde"},
     { VK_OEM_4,     "AbrirParéntesis"},
-    { VK_OEM_5,     "BarraInvertida"},  
+    { VK_OEM_5,     "BarraInvertida"},
     { VK_OEM_6,     "CerrarParéntesis"},
     { VK_OEM_7,     "Comillas"},
-                
+
     { 0xffffffff,   "Unused"},
 };
 
 Win32keyConvert  plKeyMap::fKeyConversionItalian[] =
 {
-    { VK_F1,    "F1"}, 
-    { VK_F2,    "F2"}, 
-    { VK_F3,    "F3"}, 
+    { VK_F1,    "F1"},
+    { VK_F2,    "F2"},
+    { VK_F3,    "F3"},
     { VK_F4,    "F4"},
     { VK_F5,    "F5"},
     { VK_F6,    "F6"},
-    { VK_F7,    "F7"}, 
+    { VK_F7,    "F7"},
     { VK_F8,    "F8"},
     { VK_F9,    "F9"},
     { VK_F10,   "F10"},
@@ -999,12 +1047,12 @@ Win32keyConvert  plKeyMap::fKeyConversionItalian[] =
     { VK_F12,   "F12"},
     { VK_ESCAPE, "Esc"},
     { VK_TAB,   "Tab"},
-    { VK_UP,    "FrecciaSu"}, 
-    { VK_DOWN,  "FrecciaGiù"}, 
+    { VK_UP,    "FrecciaSu"},
+    { VK_DOWN,  "FrecciaGiù"},
     { VK_LEFT,  "FrecciaSx"},
     { VK_RIGHT, "FrecciaDx"},
     { VK_BACK,  "Backspace"},
-    { VK_RETURN, "Invio"}, 
+    { VK_RETURN, "Invio"},
     { VK_PAUSE, "Pausa"},
     { VK_CAPITAL, "BlocMaiusc"},
     { VK_PRIOR, "PagSu"},
@@ -1014,13 +1062,13 @@ Win32keyConvert  plKeyMap::fKeyConversionItalian[] =
     { VK_SNAPSHOT,  "Stamp"},
     { VK_INSERT,    "Ins"},
     { VK_DELETE,    "Canc"},
-    { VK_NUMPAD0,   "TastNum0"}, 
-    { VK_NUMPAD1,   "TastNum1"}, 
-    { VK_NUMPAD2,   "TastNum2"}, 
+    { VK_NUMPAD0,   "TastNum0"},
+    { VK_NUMPAD1,   "TastNum1"},
+    { VK_NUMPAD2,   "TastNum2"},
     { VK_NUMPAD3,   "TastNum3"},
     { VK_NUMPAD4,   "TastNum4"},
     { VK_NUMPAD5,   "TastNum5"},
-    { VK_NUMPAD6,   "TastNum6"}, 
+    { VK_NUMPAD6,   "TastNum6"},
     { VK_NUMPAD7,   "TastNum7"},
     { VK_NUMPAD8,   "TastNum8"},
     { VK_NUMPAD9,   "TastNum9"},
@@ -1040,18 +1088,17 @@ Win32keyConvert  plKeyMap::fKeyConversionItalian[] =
     { VK_OEM_2,     "ù"},
     { VK_OEM_3,     "ò"},
     { VK_OEM_4,     "Apostrofo"},
-    { VK_OEM_5,     "\\"},  
+    { VK_OEM_5,     "\\"},
     { VK_OEM_6,     "ì"},
     { VK_OEM_7,     "à"},
-                
+
     { 0xffffffff,   "Unused"},
 };
 */
 
 
 
-CommandConvert plInputMap::fCmdConvert[] =
-{
+CommandConvert plInputMap::fCmdConvert[] = {
 
     { B_CONTROL_ACTION,         "Use Key"   },
     { B_CONTROL_JUMP,               "Jump Key"  },
@@ -1094,7 +1141,7 @@ CommandConvert plInputMap::fCmdConvert[] =
     { S_INCREASE_MIC_VOL,       "Increase Microphone Sensitivity"   },
     { S_DECREASE_MIC_VOL,       "Decrease Microphone Sensitivity"   },
     { S_PUSH_TO_TALK,           "Push to talk" },
-    { S_SET_WALK_MODE,          "Set Walk Mode" },          
+    { S_SET_WALK_MODE,          "Set Walk Mode" },
     { B_CONTROL_TURN_TO,            "Turn To Click" },
     { B_CONTROL_TOGGLE_PHYSICAL,    "Toggle Physical" },
     { S_SET_FIRST_PERSON_MODE,      "Toggle First Person" },
@@ -1108,5 +1155,5 @@ CommandConvert plInputMap::fCmdConvert[] =
 
 
     { END_CONTROLS,             ""},
- 
+
 };

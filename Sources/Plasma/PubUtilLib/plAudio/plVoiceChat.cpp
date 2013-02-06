@@ -80,73 +80,78 @@ bool                    plVoicePlayer::fEnabled =                   true;
 
 plVoiceRecorder::plVoiceRecorder()
 {
-    plPlateManager::Instance().CreatePlate( &fDisabledIcon );
-    fDisabledIcon->CreateFromResource( MICROPHONE );
+    plPlateManager::Instance().CreatePlate(&fDisabledIcon);
+    fDisabledIcon->CreateFromResource(MICROPHONE);
     fDisabledIcon->SetPosition(-0.90, -0.90);
     fDisabledIcon->SetSize(0.064, 0.064, true);
     fDisabledIcon->SetVisible(false);
 
-    plPlateManager::Instance().CreatePlate( &fTalkIcon );
-    fTalkIcon->CreateFromResource( TALKING );
-    fTalkIcon->SetPosition(-0.9,-0.9);
+    plPlateManager::Instance().CreatePlate(&fTalkIcon);
+    fTalkIcon->CreateFromResource(TALKING);
+    fTalkIcon->SetPosition(-0.9, -0.9);
     fTalkIcon->SetSize(0.064, 0.064, true);
     fTalkIcon->SetVisible(false);
 }
 
 plVoiceRecorder::~plVoiceRecorder()
 {
-    if(fDisabledIcon)
-        plPlateManager::Instance().DestroyPlate( fDisabledIcon);
+    if (fDisabledIcon) {
+        plPlateManager::Instance().DestroyPlate(fDisabledIcon);
+    }
+
     fDisabledIcon = nil;
-    
-    if (fTalkIcon)
-        plPlateManager::Instance().DestroyPlate( fTalkIcon );
+
+    if (fTalkIcon) {
+        plPlateManager::Instance().DestroyPlate(fTalkIcon);
+    }
+
     fTalkIcon = nil;
 }
 
 void plVoiceRecorder::IncreaseRecordingThreshhold()
 {
     fRecordThreshhold += (100 * hsTimer::GetDelSysSeconds());
-    if (fRecordThreshhold >= 10000.0f)
+
+    if (fRecordThreshhold >= 10000.0f) {
         fRecordThreshhold = 10000.0f;
-    
-    plDebugText &txt = plDebugText::Instance();
+    }
+
+    plDebugText& txt = plDebugText::Instance();
     char str[256];
     sprintf(str, "RecordThreshhold %f\n", fRecordThreshhold);
-    txt.DrawString(400,300,str);
+    txt.DrawString(400, 300, str);
 }
 
 void plVoiceRecorder::DecreaseRecordingThreshhold()
 {
     fRecordThreshhold -= (100 * hsTimer::GetDelSysSeconds());
-    if (fRecordThreshhold <= 50.0f)
+
+    if (fRecordThreshhold <= 50.0f) {
         fRecordThreshhold = 50.0f;
-    
-    plDebugText &txt = plDebugText::Instance();
+    }
+
+    plDebugText& txt = plDebugText::Instance();
     char str[256];
     sprintf(str, "RecordThreshhold %f\n", fRecordThreshhold);
-    txt.DrawString(400,300,str);
+    txt.DrawString(400, 300, str);
 }
 
 // Set the quality of speex encoder
 void plVoiceRecorder::SetQuality(int quality)
 {
     char str[] = "Voice quality setting out of range. Must be between 1 and 10 inclusive";
-    if(quality < 1 || quality > 10)
-    {
-        plConsoleMsg    *cMsg = new plConsoleMsg( plConsoleMsg::kAddLine, str );
-        plgDispatch::MsgSend( cMsg );
+
+    if (quality < 1 || quality > 10) {
+        plConsoleMsg*    cMsg = new plConsoleMsg(plConsoleMsg::kAddLine, str);
+        plgDispatch::MsgSend(cMsg);
         return;
     }
 
-    if(plSpeex::GetInstance()->IsUsingVBR())
-    {
+    if (plSpeex::GetInstance()->IsUsingVBR()) {
         // Sets average bit rate between 4kb and 13kb
         int AverageBitrate = quality * 1000 + 3000;
         plSpeex::GetInstance()->SetABR(AverageBitrate);
-    }
-    else
-    {
+    } else {
         plSpeex::GetInstance()->SetQuality(quality);
     }
 }
@@ -161,12 +166,13 @@ void plVoiceRecorder::SetVBR(bool vbr)
 void plVoiceRecorder::SetComplexity(int c)
 {
     char str[] = "Voice quality setting out of range. Must be between 1 and 10 inclusive";
-    if(c < 1 || c > 10)
-    {
-        plConsoleMsg    *cMsg = new plConsoleMsg( plConsoleMsg::kAddLine, str );
-        plgDispatch::MsgSend( cMsg );
+
+    if (c < 1 || c > 10) {
+        plConsoleMsg*    cMsg = new plConsoleMsg(plConsoleMsg::kAddLine, str);
+        plgDispatch::MsgSend(cMsg);
         return;
     }
+
     plSpeex::GetInstance()->SetComplexity((uint8_t) c);
 }
 
@@ -177,43 +183,37 @@ void plVoiceRecorder::SetENH(bool b)
 
 void plVoiceRecorder::SetMikeOpen(bool b)
 {
-    ALCdevice *device = plgAudioSys::GetCaptureDevice();
-    if (fRecording && device)
-    {       
-        if (b)
-        {
+    ALCdevice* device = plgAudioSys::GetCaptureDevice();
+
+    if (fRecording && device) {
+        if (b) {
             alcCaptureStart(device);
-        }
-        else
-        {
+        } else {
             alcCaptureStop(device);
         }
+
         DrawTalkIcon(b);
         fMikeOpen = b;
-    }
-    else
-    {
+    } else {
         DrawDisabledIcon(b);        // voice recording is unavailable or disabled
     }
 }
 
 void plVoiceRecorder::DrawDisabledIcon(bool b)
 {
-    if (!fDisabledIcon)
-    {
+    if (!fDisabledIcon) {
         // at least try and make one here...
-        plPlateManager::Instance().CreatePlate( &fDisabledIcon );
-        if (fDisabledIcon)
-        {
-            fDisabledIcon->CreateFromResource( MICROPHONE );
+        plPlateManager::Instance().CreatePlate(&fDisabledIcon);
+
+        if (fDisabledIcon) {
+            fDisabledIcon->CreateFromResource(MICROPHONE);
             fDisabledIcon->SetPosition(-0.90, -0.90);
             fDisabledIcon->SetSize(0.064, 0.064, true);
             fDisabledIcon->SetVisible(false);
         }
     }
 
-    if (fDisabledIcon)
-    {
+    if (fDisabledIcon) {
         fDisabledIcon->SetSize(0.064, 0.064, true);     // Re-compute plate size in case the aspect ratio has changed.
         fDisabledIcon->SetVisible(b);
     }
@@ -221,106 +221,107 @@ void plVoiceRecorder::DrawDisabledIcon(bool b)
 
 void plVoiceRecorder::DrawTalkIcon(bool b)
 {
-    if (!fTalkIcon)
-    {   
-        plPlateManager::Instance().CreatePlate( &fTalkIcon );
-        if (fTalkIcon)
-        {   fTalkIcon->CreateFromResource( TALKING );
-            fTalkIcon->SetPosition(-0.9,-0.9);
+    if (!fTalkIcon) {
+        plPlateManager::Instance().CreatePlate(&fTalkIcon);
+
+        if (fTalkIcon) {
+            fTalkIcon->CreateFromResource(TALKING);
+            fTalkIcon->SetPosition(-0.9, -0.9);
             fTalkIcon->SetSize(0.064, 0.064, true);
             fTalkIcon->SetVisible(false);
-        }   
+        }
     }
 
-    if (fTalkIcon)
-    {
+    if (fTalkIcon) {
         fTalkIcon->SetSize(0.064, 0.064, true);     // Re-compute plate size in case the aspect ratio has changed.
         fTalkIcon->SetVisible(b);
     }
 }
 
 void plVoiceRecorder::Update(double time)
-{   
-    if(!fRecording)
+{
+    if (!fRecording) {
         return;
+    }
 
     int EncoderFrameSize = plSpeex::GetInstance()->GetFrameSize();
-    if(EncoderFrameSize == -1) 
-        return;
 
-    ALCdevice *captureDevice = plgAudioSys::GetCaptureDevice();
-    if(!captureDevice)
+    if (EncoderFrameSize == -1) {
         return;
+    }
+
+    ALCdevice* captureDevice = plgAudioSys::GetCaptureDevice();
+
+    if (!captureDevice) {
+        return;
+    }
 
     unsigned minSamples = EncoderFrameSize * 10;
 
     ALCint samples;
-    alcGetIntegerv(captureDevice, ALC_CAPTURE_SAMPLES, sizeof(samples), &samples );
-    
-    if (samples > 0)
-    {
-        if (samples >= minSamples)
-        {
+    alcGetIntegerv(captureDevice, ALC_CAPTURE_SAMPLES, sizeof(samples), &samples);
+
+    if (samples > 0) {
+        if (samples >= minSamples) {
             int numFrames = (int)(samples / EncoderFrameSize);      // the number of frames that have been captured
             int totalSamples = numFrames * EncoderFrameSize;
 
             // cap uncompressed data
-            if(totalSamples > MAX_DATA_SIZE)
+            if (totalSamples > MAX_DATA_SIZE) {
                 totalSamples = MAX_DATA_SIZE;
+            }
 
             // convert to correct units:
-            short *buffer = new short[totalSamples];
+            short* buffer = new short[totalSamples];
 
             alcCaptureSamples(captureDevice, buffer, totalSamples);
 
-            if (!CompressionEnabled())
-            {
+            if (!CompressionEnabled()) {
                 plNetMsgVoice pMsg;
                 pMsg.SetNetProtocol(kNetProtocolCli2Game);
-                pMsg.SetVoiceData((char *)buffer, totalSamples * sizeof(short));
+                pMsg.SetVoiceData((char*)buffer, totalSamples * sizeof(short));
                 // set frame size here;
                 pMsg.SetPlayerID(plNetClientApp::GetInstance()->GetPlayerID());
                 //if (false) //plNetClientApp::GetInstance()->GetFlagsBit(plNetClientApp::kEchoVoice))
                 //  pMsg.SetBit(plNetMessage::kEchoBackToSender);
                 plNetClientApp::GetInstance()->SendMsg(&pMsg);
-            
-            }
-            else  // use the speex voice compression lib
-            {
-                uint8_t *packet = new uint8_t[totalSamples];      // packet to send encoded data in
+
+            } else { // use the speex voice compression lib
+                uint8_t* packet = new uint8_t[totalSamples];      // packet to send encoded data in
                 int packedLength = 0;                                     // the size of the packet that will be sent
                 hsRAMStream ram;                                          // ram stream to hold output data from speex
                 uint8_t numFrames = totalSamples / EncoderFrameSize;        // number of frames to be encoded
-                
+
                 // encode the data using speex
                 plSpeex::GetInstance()->Encode(buffer, numFrames, &packedLength, &ram);
 
-                if (packedLength)
-                {
+                if (packedLength) {
                     // extract data from ram stream into packet
                     ram.Rewind();
                     ram.Read(packedLength, packet);
                     plNetMsgVoice pMsg;
                     pMsg.SetNetProtocol(kNetProtocolCli2Game);
 
-                    pMsg.SetVoiceData((char *)packet, packedLength);
+                    pMsg.SetVoiceData((char*)packet, packedLength);
                     pMsg.SetPlayerID(plNetClientApp::GetInstance()->GetPlayerID());
                     pMsg.SetFlag(VOICE_ENCODED);    // Set encoded flag
                     pMsg.SetNumFrames(numFrames);
-                    if (plNetClientApp::GetInstance()->GetFlagsBit(plNetClientApp::kEchoVoice))
+
+                    if (plNetClientApp::GetInstance()->GetFlagsBit(plNetClientApp::kEchoVoice)) {
                         pMsg.SetBit(plNetMessage::kEchoBackToSender);
+                    }
 
                     plNetClientApp::GetInstance()->SendMsg(&pMsg);
                 }
+
                 delete[] packet;
             }
+
             delete[] buffer;
-        }
-        else if(!fMikeOpen)
-        {
-            short *buffer = new short[samples];
+        } else if (!fMikeOpen) {
+            short* buffer = new short[samples];
             // the mike has since closed, and there isn't enough data to meet our minimum, so throw this data out
-            alcCaptureSamples(captureDevice, buffer, samples);      
+            alcCaptureSamples(captureDevice, buffer, samples);
             delete[] buffer;
         }
     }
@@ -335,33 +336,30 @@ plVoicePlayer::~plVoicePlayer()
 }
 
 void plVoicePlayer::PlaybackUncompressedVoiceMessage(void* data, unsigned size)
-{   
-    if(fEnabled)
-    {
-        if(!fSound.IsPlaying())
-        {
-            fSound.Play();      
+{
+    if (fEnabled) {
+        if (!fSound.IsPlaying()) {
+            fSound.Play();
         }
+
         fSound.AddVoiceData(data, size);
     }
 }
 
 void plVoicePlayer::PlaybackVoiceMessage(void* data, unsigned size, int numFramesInBuffer)
 {
-    if(fEnabled)
-    {
-        int numBytes;               // the number of bytes that speex decompressed the data to. 
+    if (fEnabled) {
+        int numBytes;               // the number of bytes that speex decompressed the data to.
         int bufferSize = numFramesInBuffer * plSpeex::GetInstance()->GetFrameSize();
-        short *nBuff = new short[bufferSize];
+        short* nBuff = new short[bufferSize];
         memset(nBuff, 0, bufferSize);
 
         // Decode the encoded voice data using speex
-        if(!plSpeex::GetInstance()->Decode((uint8_t *)data, size, numFramesInBuffer, &numBytes, nBuff))
-        {
+        if (!plSpeex::GetInstance()->Decode((uint8_t*)data, size, numFramesInBuffer, &numBytes, nBuff)) {
             delete[] nBuff;
             return;
         }
-        
+
         uint8_t* newBuff;
         newBuff = (uint8_t*)nBuff;         // Convert to uint8_t data
         PlaybackUncompressedVoiceMessage(newBuff, numBytes);    // playback uncompressed data
@@ -373,12 +371,12 @@ void plVoicePlayer::SetVelocity(const hsVector3 vel)
 {
     fSound.SetVelocity(vel);
 }
-     
+
 void plVoicePlayer::SetPosition(const hsPoint3 pos)
 {
     fSound.SetPosition(pos);
 }
-    
+
 void plVoicePlayer::SetOrientation(const hsPoint3 pos)
 {
     fSound.SetConeOrientation(pos.fX, pos.fY, pos.fZ);
@@ -392,12 +390,12 @@ void plVoicePlayer::SetOrientation(const hsPoint3 pos)
 ***/
 unsigned plVoiceSound::fCount = 0;
 
-plVoiceSound::plVoiceSound() 
+plVoiceSound::plVoiceSound()
 {
     fInnerCone = 90;
     fOuterCone = 240;
     fOuterVol = -2000;
-    
+
     fMinFalloff = 15;
     fMaxFalloff = 75;
 
@@ -420,15 +418,19 @@ plVoiceSound::~plVoiceSound()
 {
 }
 
-bool plVoiceSound::LoadSound( bool is3D )
+bool plVoiceSound::LoadSound(bool is3D)
 {
-    if( fFailed )
+    if (fFailed) {
         return false;
-    if( !plgAudioSys::Active() || fDSoundBuffer )
-        return false;
+    }
 
-    if( fPriority > plgAudioSys::GetPriorityCutoff() )
-        return false;   // Don't set the failed flag, just return
+    if (!plgAudioSys::Active() || fDSoundBuffer) {
+        return false;
+    }
+
+    if (fPriority > plgAudioSys::GetPriorityCutoff()) {
+        return false;    // Don't set the failed flag, just return
+    }
 
     plWAVHeader header;
     header.fFormatTag = 0x1; // WAVE_FORMAT_PCM
@@ -439,12 +441,15 @@ bool plVoiceSound::LoadSound( bool is3D )
     header.fAvgBytesPerSec = header.fNumSamplesPerSec * header.fBlockAlign;
 
     fDSoundBuffer = new plDSoundBuffer(0, header, true, false, false, true);
-    if(!fDSoundBuffer)
+
+    if (!fDSoundBuffer) {
         return false;
+    }
+
     fDSoundBuffer->SetupVoiceSource();
-    
+
     IRefreshParams();
-    IRefreshEAXSettings( true );
+    IRefreshEAXSettings(true);
     fDSoundBuffer->SetScalarVolume(1.0);
     return true;
 }
@@ -452,54 +457,53 @@ bool plVoiceSound::LoadSound( bool is3D )
 void plVoiceSound::Play()
 {
     fPlaying = true;
-    if( IWillBeAbleToPlay() )
-    {
+
+    if (IWillBeAbleToPlay()) {
         IRefreshParams();
-        SetVolume( fDesiredVol );
+        SetVolume(fDesiredVol);
         IActuallyPlay();
     }
 }
 
-void plVoiceSound::IDerivedActuallyPlay( void )
+void plVoiceSound::IDerivedActuallyPlay(void)
 {
-    if( !fReallyPlaying )
-    {
-        fDSoundBuffer->Play(); 
+    if (!fReallyPlaying) {
+        fDSoundBuffer->Play();
         fReallyPlaying = true;
     }
 }
 
-void plVoiceSound::AddVoiceData(void *data, unsigned bytes)
-{   
+void plVoiceSound::AddVoiceData(void* data, unsigned bytes)
+{
     unsigned size;
     unsigned bufferId;
-    if(!fDSoundBuffer)
-    {
-        if(!LoadSound(true))
-        {
+
+    if (!fDSoundBuffer) {
+        if (!LoadSound(true)) {
             return;
         }
     }
-    
+
     fDSoundBuffer->UnQueueVoiceBuffers();       // attempt to unque any buffers that have finished
-    while(bytes > 0)
-    {
+
+    while (bytes > 0) {
         size = bytes < STREAM_BUFFER_SIZE ? bytes : STREAM_BUFFER_SIZE;
-        if(!fDSoundBuffer->GetAvailableBufferId(&bufferId))
-            break;      // if there isn't any room for the data, it is currently thrown out 
+
+        if (!fDSoundBuffer->GetAvailableBufferId(&bufferId)) {
+            break;    // if there isn't any room for the data, it is currently thrown out
+        }
 
         fDSoundBuffer->VoiceFillBuffer(data, size, bufferId);
         bytes -= size;
     }
+
     fLastUpdate = hsTimer::GetMilliSeconds();
 }
 
 void plVoiceSound::Update()
 {
-    if(IsPlaying())
-    {
-        if((hsTimer::GetMilliSeconds() - fLastUpdate) > VOICE_STOP_MS)
-        {
+    if (IsPlaying()) {
+        if ((hsTimer::GetMilliSeconds() - fLastUpdate) > VOICE_STOP_MS) {
             Stop(); // terminating case for playback. Wait for x number of milliseconds, and stop.
         }
     }
@@ -518,17 +522,17 @@ void plVoiceSound::IRefreshParams()
 ***/
 
 plSpeex::plSpeex() :
-fBits(nil),
-fEncoderState(nil),
-fDecoderState(nil),
-fSampleRate(plVoiceRecorder::GetSampleRate()),
-fFrameSize(-1),
-fQuality(7),
-fVBR(true),                 // variable bit rate on     
-fAverageBitrate(8000),      // 8kb bitrate
-fComplexity(3),
-fENH(false),
-fInitialized(false)
+    fBits(nil),
+    fEncoderState(nil),
+    fDecoderState(nil),
+    fSampleRate(plVoiceRecorder::GetSampleRate()),
+    fFrameSize(-1),
+    fQuality(7),
+    fVBR(true),                 // variable bit rate on
+    fAverageBitrate(8000),      // 8kb bitrate
+    fComplexity(3),
+    fENH(false),
+    fInitialized(false)
 {
     fBits = new SpeexBits;
     Init(kNarrowband);      // if no one initialized us initialize using a narrowband encoder
@@ -540,33 +544,30 @@ plSpeex::~plSpeex()
     delete fBits;
     fBits = nil;
 }
-    
-bool plSpeex::Init(Mode mode) 
+
+bool plSpeex::Init(Mode mode)
 {
     int enh = 1;
-    
+
     // setup speex
     speex_bits_init(fBits);
     fBitsInit = true;
 
-    if(mode == kNarrowband)
-    {
+    if (mode == kNarrowband) {
         fEncoderState = speex_encoder_init(speex_lib_get_mode(SPEEX_MODEID_NB));                         // narrowband
         fDecoderState = speex_decoder_init(speex_lib_get_mode(SPEEX_MODEID_NB));
-    }
-    else if(mode == kWideband)
-    {
+    } else if (mode == kWideband) {
         fEncoderState = speex_encoder_init(speex_lib_get_mode(SPEEX_MODEID_WB));
         fDecoderState = speex_decoder_init(speex_lib_get_mode(SPEEX_MODEID_WB));
     }
-    
+
     speex_encoder_ctl(fEncoderState, SPEEX_GET_FRAME_SIZE, &fFrameSize);            // get frame size
     speex_encoder_ctl(fEncoderState, SPEEX_SET_COMPLEXITY, &fComplexity);           // 3
     speex_encoder_ctl(fEncoderState, SPEEX_SET_SAMPLING_RATE, &fSampleRate);        // 8 khz
     speex_encoder_ctl(fEncoderState, SPEEX_SET_VBR_QUALITY, &fQuality);             // 7
     speex_encoder_ctl(fEncoderState, SPEEX_SET_VBR, &fVBR);                         // use variable bit rate
     speex_encoder_ctl(fEncoderState, SPEEX_SET_ABR, &fAverageBitrate);              // default to 8kb
-    
+
     speex_decoder_ctl(fDecoderState, SPEEX_SET_ENH, &fENH);                         // perceptual enhancement
 
     fInitialized = true;
@@ -577,43 +578,39 @@ bool plSpeex::Init(Mode mode)
 bool plSpeex::Shutdown()
 {
     //shutdown speex
-    if(fDecoderState)
-    {
+    if (fDecoderState) {
         speex_decoder_destroy(fDecoderState);
         fDecoderState = nil;
     }
 
-    if(fEncoderState)
-    {
+    if (fEncoderState) {
         speex_encoder_destroy(fEncoderState);
         fEncoderState = nil;
     }
 
-    if(fBitsInit)
-    {
+    if (fBitsInit) {
         speex_bits_destroy(fBits);
         fBitsInit = false;
     }
+
     fInitialized = false;
 
     return true;
 }
 
-bool plSpeex::Encode(short *data, int numFrames, int *packedLength, hsRAMStream *out)
+bool plSpeex::Encode(short* data, int numFrames, int* packedLength, hsRAMStream* out)
 {
     *packedLength = 0;
-    
-    short *pData = data;                        // pointer to input data
-    float *input = new float[fFrameSize];       // input to speex - used as am intermediate array since speex requires float data
+
+    short* pData = data;                        // pointer to input data
+    float* input = new float[fFrameSize];       // input to speex - used as am intermediate array since speex requires float data
     uint8_t frameLength;                           // number of bytes speex compressed frame to
-    uint8_t *frameData = new uint8_t[fFrameSize];     // holds one frame of encoded data
-    
+    uint8_t* frameData = new uint8_t[fFrameSize];     // holds one frame of encoded data
+
     // encode data
-    for( int i = 0; i < numFrames; i++ )
-    {
+    for (int i = 0; i < numFrames; i++) {
         // convert input data to floats
-        for( int j = 0; j < fFrameSize; j++ )
-        {
+        for (int j = 0; j < fFrameSize; j++) {
             input[j] = pData[j];
         }
 
@@ -621,7 +618,7 @@ bool plSpeex::Encode(short *data, int numFrames, int *packedLength, hsRAMStream 
 
         // encode data using speex
         speex_encode(fEncoderState, input, fBits);
-        frameLength = speex_bits_write(fBits, (char *)frameData, fFrameSize);
+        frameLength = speex_bits_write(fBits, (char*)frameData, fFrameSize);
 
         // write data - length and bytes
         out->WriteLE(frameLength);
@@ -631,54 +628,57 @@ bool plSpeex::Encode(short *data, int numFrames, int *packedLength, hsRAMStream 
 
         pData += fFrameSize;                    // move input pointer
     }
-    
-    delete[] frameData; 
+
+    delete[] frameData;
     delete[] input;
     return true;
 }
 
-bool plSpeex::Decode(uint8_t *data, int size, int numFrames, int *numOutputBytes, short *out)
+bool plSpeex::Decode(uint8_t* data, int size, int numFrames, int* numOutputBytes, short* out)
 {
-    if(!fInitialized) return false;
+    if (!fInitialized) {
+        return false;
+    }
+
     *numOutputBytes = 0;
 
-    hsReadOnlyStream stream( size, data );
-    float *speexOutput = new float[fFrameSize];     // holds output from speex
-    short *pOut = out;                              // pointer to output short buffer
-    
+    hsReadOnlyStream stream(size, data);
+    float* speexOutput = new float[fFrameSize];     // holds output from speex
+    short* pOut = out;                              // pointer to output short buffer
+
     // create buffer for input data
-    uint8_t *frameData = new uint8_t[fFrameSize];         // holds the current frames data to be decoded
+    uint8_t* frameData = new uint8_t[fFrameSize];         // holds the current frames data to be decoded
     uint8_t frameLen;                                  // holds the length of the current frame being decoded.
-    
+
 
     // Decode data
-    for (int i = 0; i < numFrames; i++)
-    {
-        stream.ReadLE( &frameLen );           // read the length of the current frame to be decoded
-        stream.Read( frameLen, frameData );     // read the data
+    for (int i = 0; i < numFrames; i++) {
+        stream.ReadLE(&frameLen);             // read the length of the current frame to be decoded
+        stream.Read(frameLen, frameData);       // read the data
 
         memset(speexOutput, 0, fFrameSize * sizeof(float));
-        speex_bits_read_from(fBits, (char *)frameData, frameLen);   // give data to speex
-        speex_decode(fDecoderState, fBits, speexOutput);                    // decode data 
+        speex_bits_read_from(fBits, (char*)frameData, frameLen);    // give data to speex
+        speex_decode(fDecoderState, fBits, speexOutput);                    // decode data
 
-        for(int j = 0; j < fFrameSize; j++)
-        {
+        for (int j = 0; j < fFrameSize; j++) {
             pOut[j] = (short)(speexOutput[j]);          // convert floats to shorts
         }
-        
-        pOut += fFrameSize;                  
+
+        pOut += fFrameSize;
     }
-    
+
     delete[] frameData;
     delete[] speexOutput;
-    
+
     *numOutputBytes = (numFrames * fFrameSize) * sizeof(short);     // length of decoded voice data(out) in bytes
-    if(*numOutputBytes == 0) 
+
+    if (*numOutputBytes == 0) {
         return false;
+    }
 
     return true;
 }
-        
+
 // Sets variable bit rate on/off
 void plSpeex::VBR(bool b)
 {
@@ -688,27 +688,27 @@ void plSpeex::VBR(bool b)
 
 
 // Sets the average bit rate
-void plSpeex::SetABR(uint32_t abr) 
+void plSpeex::SetABR(uint32_t abr)
 {
     fAverageBitrate = abr;
-    speex_encoder_ctl(fEncoderState, SPEEX_SET_ABR, &fAverageBitrate); 
+    speex_encoder_ctl(fEncoderState, SPEEX_SET_ABR, &fAverageBitrate);
 }
 
 // Sets the quality of encoding
-void plSpeex::SetQuality(uint32_t quality) 
-{ 
+void plSpeex::SetQuality(uint32_t quality)
+{
     fQuality = quality;
-    speex_encoder_ctl(fEncoderState, SPEEX_SET_QUALITY, &fQuality); 
+    speex_encoder_ctl(fEncoderState, SPEEX_SET_QUALITY, &fQuality);
 }
 
 void plSpeex::SetENH(bool b)
 {
     fENH = b;
-    speex_decoder_ctl(fDecoderState, SPEEX_SET_ENH, &fENH); 
+    speex_decoder_ctl(fDecoderState, SPEEX_SET_ENH, &fENH);
 }
 
 void plSpeex::SetComplexity(uint8_t c)
 {
     fComplexity = c;
-    speex_encoder_ctl(fEncoderState, SPEEX_SET_COMPLEXITY, &fComplexity);   
+    speex_encoder_ctl(fEncoderState, SPEEX_SET_COMPLEXITY, &fComplexity);
 }

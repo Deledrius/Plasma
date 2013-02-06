@@ -76,10 +76,11 @@ plParticleSystem::plParticleSystem() : fParticleSDLMod(nil), fAttachedToAvatar(f
 plParticleSystem::~plParticleSystem()
 {
     int i;
-    for (i = 0; i < fNumValidEmitters; i++)
-    {
+
+    for (i = 0; i < fNumValidEmitters; i++) {
         delete fEmitters[i];
     }
+
     delete [] fEmitters;
 
     delete fAmbientCtl;
@@ -89,9 +90,9 @@ plParticleSystem::~plParticleSystem()
     delete fHeightCtl;
 }
 
-void plParticleSystem::Init(uint32_t xTiles, uint32_t yTiles, uint32_t maxTotalParticles, uint32_t maxEmitters, 
-                            plController *ambientCtl,   plController *diffuseCtl, plController *opacityCtl, 
-                            plController *widthCtl, plController *heightCtl)
+void plParticleSystem::Init(uint32_t xTiles, uint32_t yTiles, uint32_t maxTotalParticles, uint32_t maxEmitters,
+                            plController* ambientCtl,   plController* diffuseCtl, plController* opacityCtl,
+                            plController* widthCtl, plController* heightCtl)
 {
     fTarget = nil;
     fLastTime = 0;
@@ -115,8 +116,10 @@ void plParticleSystem::Init(uint32_t xTiles, uint32_t yTiles, uint32_t maxTotalP
     fMaxEmitters = maxEmitters;
     fEmitters = new plParticleEmitter *[fMaxEmitters];
     int i;
-    for (i = 0; i < maxEmitters; i++)
-        fEmitters[i] = nil; 
+
+    for (i = 0; i < maxEmitters; i++) {
+        fEmitters[i] = nil;
+    }
 
     fAmbientCtl = ambientCtl;
     fDiffuseCtl = diffuseCtl;
@@ -125,17 +128,18 @@ void plParticleSystem::Init(uint32_t xTiles, uint32_t yTiles, uint32_t maxTotalP
     fHeightCtl = heightCtl;
 }
 
-void plParticleSystem::IAddEffect(plParticleEffect *effect, uint32_t type)
+void plParticleSystem::IAddEffect(plParticleEffect* effect, uint32_t type)
 {
-    switch(type)
-    {
+    switch (type) {
     case kEffectForce:
         fForces.Append(effect);
         break;
+
     case kEffectMisc:
     default:
         fEffects.Append(effect);
         break;
+
     case kEffectConstraint:
         fConstraints.Append(effect);
         break;
@@ -144,24 +148,23 @@ void plParticleSystem::IAddEffect(plParticleEffect *effect, uint32_t type)
 
 plParticleEmitter* plParticleSystem::GetAvailEmitter()
 {
-    if( !fNumValidEmitters ) // got to start with at least one.
+    if (!fNumValidEmitters) { // got to start with at least one.
         return nil;
+    }
 
     float minTTL = 1.e33;
     int iMinTTL = -1;
     int i;
-    for( i = 0; i < fNumValidEmitters; i++ )
-    {
-        if( fEmitters[i]->GetTimeToLive() < minTTL )
-        {
+
+    for (i = 0; i < fNumValidEmitters; i++) {
+        if (fEmitters[i]->GetTimeToLive() < minTTL) {
             minTTL = fEmitters[i]->GetTimeToLive();
             iMinTTL = i;
         }
     }
-    if( minTTL > 0 )
-    {
-        if( fNumValidEmitters < fMaxEmitters )
-        {
+
+    if (minTTL > 0) {
+        if (fNumValidEmitters < fMaxEmitters) {
             minTTL = 0;
             iMinTTL = fNumValidEmitters++;
             fEmitters[iMinTTL] = new plParticleEmitter();
@@ -171,41 +174,47 @@ plParticleEmitter* plParticleSystem::GetAvailEmitter()
             hsAssert(fMaxTotalParticlesLeft >= 0, "Should have planned better");
 
             // Don't really use this. fEmitters[i]->GetSpanIndex() always == i.
-            fNextEmitterToGo = (fNextEmitterToGo + 1) % fMaxEmitters; 
+            fNextEmitterToGo = (fNextEmitterToGo + 1) % fMaxEmitters;
         }
     }
+
     return fEmitters[iMinTTL];
 }
 
-uint32_t plParticleSystem::AddEmitter(uint32_t maxParticles, plParticleGenerator *gen, uint32_t emitterFlags)
+uint32_t plParticleSystem::AddEmitter(uint32_t maxParticles, plParticleGenerator* gen, uint32_t emitterFlags)
 {
-    if (fMaxEmitters == 0) // silly rabbit, Trix are for kids!
+    if (fMaxEmitters == 0) { // silly rabbit, Trix are for kids!
         return 0;
+    }
+
     uint32_t currEmitter;
-    if (fNumValidEmitters == fMaxEmitters) // No more free spots, snag the next in line.
-    {
+
+    if (fNumValidEmitters == fMaxEmitters) { // No more free spots, snag the next in line.
         int i;
-        for (i = 0; i < fMaxEmitters; i++)
-        {
-            if (fEmitters[i]->GetSpanIndex() == fNextEmitterToGo)
+
+        for (i = 0; i < fMaxEmitters; i++) {
+            if (fEmitters[i]->GetSpanIndex() == fNextEmitterToGo) {
                 break;
+            }
         }
+
         currEmitter = i;
 
         fMaxTotalParticlesLeft += fEmitters[currEmitter]->fMaxParticles;
         hsAssert(fMaxTotalParticlesLeft <= fMaxTotalParticles, "Particle system somehow has more particles than it started with.");
         delete fEmitters[currEmitter];
-    }
-    else
-    {
+    } else {
         currEmitter = fNumValidEmitters;
         fNumValidEmitters++;
     }
 
-    if (maxParticles > fMaxTotalParticlesLeft)
+    if (maxParticles > fMaxTotalParticlesLeft) {
         maxParticles = fMaxTotalParticlesLeft;
-    if (maxParticles < 0)
+    }
+
+    if (maxParticles < 0) {
         maxParticles = 0;
+    }
 
     fEmitters[currEmitter] = new plParticleEmitter();
     fEmitters[currEmitter]->Init(this, maxParticles, fNextEmitterToGo, emitterFlags, gen);
@@ -216,92 +225,107 @@ uint32_t plParticleSystem::AddEmitter(uint32_t maxParticles, plParticleGenerator
     return maxParticles;
 }
 
-void plParticleSystem::AddParticle(hsPoint3 &pos, hsVector3 &velocity, uint32_t tileIndex, 
+void plParticleSystem::AddParticle(hsPoint3& pos, hsVector3& velocity, uint32_t tileIndex,
                                    float hSize, float vSize, float scale, float invMass, float life,
-                                   hsPoint3 &orientation, uint32_t miscFlags, float radsPerSec)
+                                   hsPoint3& orientation, uint32_t miscFlags, float radsPerSec)
 {
     hsAssert(fNumValidEmitters > 0, "Trying to explicitly add particles to a system with no valid emitters.");
-    if (fNumValidEmitters == 0)
+
+    if (fNumValidEmitters == 0) {
         return;
+    }
 
     fEmitters[0]->AddParticle(pos, velocity, tileIndex, hSize, vSize, scale, invMass, life, orientation, miscFlags, radsPerSec);
 }
 
 void plParticleSystem::GenerateParticles(uint32_t num, float dt /* = 0.f */)
 {
-    if (num <= 0)
+    if (num <= 0) {
         return;
+    }
 
-    if (fNumValidEmitters > 0 && fEmitters[0]->fGenerator)
+    if (fNumValidEmitters > 0 && fEmitters[0]->fGenerator) {
         fEmitters[0]->fGenerator->AddAutoParticles(fEmitters[0], dt, num);
+    }
 
-    GetTarget(0)->DirtySynchState(kSDLParticleSystem, 0);   
+    GetTarget(0)->DirtySynchState(kSDLParticleSystem, 0);
 }
 
 void plParticleSystem::WipeExistingParticles()
 {
     int i;
-    for (i = 0; i < fNumValidEmitters; i++)
+
+    for (i = 0; i < fNumValidEmitters; i++) {
         fEmitters[i]->WipeExistingParticles();
+    }
 }
 
 void plParticleSystem::KillParticles(float num, float timeToDie, uint8_t flags)
 {
-    if (fEmitters[0])
+    if (fEmitters[0]) {
         fEmitters[0]->KillParticles(num, timeToDie, flags);
+    }
 
-    GetTarget(0)->DirtySynchState(kSDLParticleSystem, 0);   
+    GetTarget(0)->DirtySynchState(kSDLParticleSystem, 0);
 }
 
-void plParticleSystem::TranslateAllParticles(hsPoint3 &amount)
+void plParticleSystem::TranslateAllParticles(hsPoint3& amount)
 {
     int i;
-    for (i = 0; i < fNumValidEmitters; i++)
+
+    for (i = 0; i < fNumValidEmitters; i++) {
         fEmitters[i]->TranslateAllParticles(amount);
+    }
 }
 
 void plParticleSystem::DisableGenerators()
 {
     int i;
-    for (i = 0; i < fNumValidEmitters; i++)
+
+    for (i = 0; i < fNumValidEmitters; i++) {
         fEmitters[i]->UpdateGenerator(plParticleUpdateMsg::kParamEnabled, 0.f);
+    }
 }
 
-uint16_t plParticleSystem::StealParticlesFrom(plParticleSystem *victim, uint16_t num)
+uint16_t plParticleSystem::StealParticlesFrom(plParticleSystem* victim, uint16_t num)
 {
-    if (fNumValidEmitters <= 0)
-        return 0; // you just lose
+    if (fNumValidEmitters <= 0) {
+        return 0;    // you just lose
+    }
 
-    if (victim)
-    {
+    if (victim) {
         uint16_t numStolen = fEmitters[0]->StealParticlesFrom(victim->fNumValidEmitters > 0 ? victim->fEmitters[0] : nil, num);
-        GetTarget(0)->DirtySynchState(kSDLParticleSystem, 0);   
-        victim->GetTarget(0)->DirtySynchState(kSDLParticleSystem, 0);   
+        GetTarget(0)->DirtySynchState(kSDLParticleSystem, 0);
+        victim->GetTarget(0)->DirtySynchState(kSDLParticleSystem, 0);
         return numStolen;
     }
-    
+
     return 0;
 }
 
-plParticleGenerator *plParticleSystem::GetExportedGenerator() const 
-{ 
+plParticleGenerator* plParticleSystem::GetExportedGenerator() const
+{
     return (fNumValidEmitters > 0 ? fEmitters[0]->fGenerator : nil);
 }
 
-plParticleEffect *plParticleSystem::GetEffect(uint16_t type) const
+plParticleEffect* plParticleSystem::GetEffect(uint16_t type) const
 {
     int i;
+
     for (i = 0; i < fForces.GetCount(); i++)
-        if (fForces[i]->ClassIndex() == type)
+        if (fForces[i]->ClassIndex() == type) {
             return fForces[i];
+        }
 
     for (i = 0; i < fEffects.GetCount(); i++)
-        if (fEffects[i]->ClassIndex() == type)
+        if (fEffects[i]->ClassIndex() == type) {
             return fEffects[i];
+        }
 
     for (i = 0; i < fConstraints.GetCount(); i++)
-        if (fConstraints[i]->ClassIndex() == type)
+        if (fConstraints[i]->ClassIndex() == type) {
             return fConstraints[i];
+        }
 
     return nil;
 }
@@ -310,26 +334,26 @@ uint32_t plParticleSystem::GetNumValidParticles(bool immortalOnly /* = false */)
 {
     uint32_t count = 0;
     int i, j;
-    for (i = 0; i < fNumValidEmitters; i++)
-    {
-        if (immortalOnly)
-        {
-            for (j = 0; j < fEmitters[i]->fNumValidParticles; j++)
-            {
-                if (fEmitters[i]->fParticleExts[j].fMiscFlags & plParticleExt::kImmortal)
+
+    for (i = 0; i < fNumValidEmitters; i++) {
+        if (immortalOnly) {
+            for (j = 0; j < fEmitters[i]->fNumValidParticles; j++) {
+                if (fEmitters[i]->fParticleExts[j].fMiscFlags & plParticleExt::kImmortal) {
                     count++;
+                }
             }
-        }
-        else
+        } else {
             count += fEmitters[i]->fNumValidParticles;
+        }
     }
+
     return count;
 }
 
 
-const hsMatrix44 &plParticleSystem::GetLocalToWorld() const
-{ 
-    return fTarget->GetCoordinateInterface()->GetLocalToWorld(); 
+const hsMatrix44& plParticleSystem::GetLocalToWorld() const
+{
+    return fTarget->GetCoordinateInterface()->GetLocalToWorld();
 }
 
 bool plParticleSystem::IEval(double secs, float del, uint32_t dirty)
@@ -342,25 +366,27 @@ bool plParticleSystem::IEval(double secs, float del, uint32_t dirty)
 bool plParticleSystem::IShouldUpdate(plPipeline* pipe) const
 {
 
-    if (fMiscFlags & kParticleSystemAlwaysUpdate)
+    if (fMiscFlags & kParticleSystemAlwaysUpdate) {
         return true;
+    }
 
-    if (IGetTargetDrawInterface(0) && IGetTargetDrawInterface(0)->GetProperty(plDrawInterface::kDisable))
+    if (IGetTargetDrawInterface(0) && IGetTargetDrawInterface(0)->GetProperty(plDrawInterface::kDisable)) {
         return false;
+    }
 
     // First, what are the cumulative bounds for this system.
     hsBounds3Ext wBnd;
     wBnd.MakeEmpty();
     int i;
-    for( i = 0; i < fNumValidEmitters; i++ )
-    {
-        if( fEmitters[i]->GetBoundingBox().GetType() == kBoundsNormal )
+
+    for (i = 0; i < fNumValidEmitters; i++) {
+        if (fEmitters[i]->GetBoundingBox().GetType() == kBoundsNormal) {
             wBnd.Union(&fEmitters[i]->GetBoundingBox());
+        }
     }
 
     // Always update if we are currently empty
-    if( wBnd.GetType() == kBoundsEmpty )
-    {
+    if (wBnd.GetType() == kBoundsEmpty) {
         return true;
     }
 
@@ -368,8 +394,8 @@ bool plParticleSystem::IShouldUpdate(plPipeline* pipe) const
     bool isVisible = pipe->TestVisibleWorld(wBnd);
 
     float delta = fLastTime > 0 ? float(fCurrTime - fLastTime) : hsTimer::GetDelSysSeconds();
-    if( isVisible )
-    {
+
+    if (isVisible) {
         // If we know how fast the fastest particle is moving, then we can
         // decide if the system is too far away to need to update every single frame.
         // In fact, based on the speed of the fastest particle, we can determine an
@@ -386,16 +412,17 @@ bool plParticleSystem::IShouldUpdate(plPipeline* pipe) const
         float dist = depth.fX - eyeDist;
 
         static float kUpdateCutoffDist = 100.f;
-        if( dist > kUpdateCutoffDist )
-        {
+
+        if (dist > kUpdateCutoffDist) {
             static float kDistantUpdateSecs = 0.1f;
             return delta >= kDistantUpdateSecs;
         }
+
 #endif // ALWAYS_IF_VISIBLE
 
         return true;
     }
-    
+
 
     static float kOffscreenUpdateSecs = 1.f;
     return delta >= kOffscreenUpdateSecs;
@@ -404,38 +431,48 @@ bool plParticleSystem::IShouldUpdate(plPipeline* pipe) const
 plDrawInterface* plParticleSystem::ICheckDrawInterface()
 {
     plDrawInterface* di = IGetTargetDrawInterface(0);
-    if( !di )
-        return nil;
 
-    if( di->GetDrawableMeshIndex(0) == uint32_t(-1) )
-    {
-        di->SetUpForParticleSystem( fMaxEmitters + 1, fMaxTotalParticles, fTexture, fPermaLights );
-        hsAssert(di->GetDrawableMeshIndex( 0 ) != (uint32_t)-1, "SetUpForParticleSystem should never fail"); // still invalid, didn't fix it.
+    if (!di) {
+        return nil;
+    }
+
+    if (di->GetDrawableMeshIndex(0) == uint32_t(-1)) {
+        di->SetUpForParticleSystem(fMaxEmitters + 1, fMaxTotalParticles, fTexture, fPermaLights);
+        hsAssert(di->GetDrawableMeshIndex(0) != (uint32_t) - 1, "SetUpForParticleSystem should never fail"); // still invalid, didn't fix it.
     }
 
     return di;
 }
 
 void plParticleSystem::IHandleRenderMsg(plPipeline* pipe)
-{   
-    fCurrTime = hsTimer::GetSysSeconds(); 
+{
+    fCurrTime = hsTimer::GetSysSeconds();
     float delta = float(fCurrTime - fLastTime);
-    if (delta == 0)
+
+    if (delta == 0) {
         return;
+    }
+
     plConst(float) kMaxDelta(0.3f);
-    if( delta > kMaxDelta )
+
+    if (delta > kMaxDelta) {
         delta = kMaxDelta;
+    }
 
     plDrawInterface* di = ICheckDrawInterface();
-    if( !di )
+
+    if (!di) {
         return;
+    }
 
     bool disabled = di->GetProperty(plDrawInterface::kDisable);
-    if (!IShouldUpdate(pipe))
-    {
-        if (disabled)
-            di->ResetParticleSystem(); // Need to call this, otherwise particles get drawn, even though the DI is disabled.
-                                       // (Yes, it's lame.)
+
+    if (!IShouldUpdate(pipe)) {
+        if (disabled) {
+            di->ResetParticleSystem();    // Need to call this, otherwise particles get drawn, even though the DI is disabled.
+        }
+
+        // (Yes, it's lame.)
 
         // Otherwise, we leave the DI alone, and the particles draw in the same place they were last frame.
         return;
@@ -448,21 +485,23 @@ void plParticleSystem::IHandleRenderMsg(plPipeline* pipe)
 
     di->ResetParticleSystem();
 
-    if (fPreSim > 0)
+    if (fPreSim > 0) {
         IPreSim();
-    
+    }
+
     int i;
-    for (i = 0; i < fNumValidEmitters; i++)
-    {
+
+    for (i = 0; i < fNumValidEmitters; i++) {
         fEmitters[i]->IUpdate(delta);
         plProfile_IncCount(NumParticles, fEmitters[i]->fNumValidParticles);
-        if (!disabled)
-        {
-            if( fEmitters[ i ]->GetParticleCount() > 0 )
-                di->AssignEmitterToParticleSystem( fEmitters[ i ] ); // Go make those polys!
+
+        if (!disabled) {
+            if (fEmitters[ i ]->GetParticleCount() > 0) {
+                di->AssignEmitterToParticleSystem(fEmitters[ i ]);    // Go make those polys!
+            }
         }
     }
-    
+
 //  plParticleFiller::FillParticlePolys(pipe, di);
 
     fLastTime = fCurrTime;
@@ -476,77 +515,77 @@ plProfile_CreateTimer("ParticleSys", "RenderSetup", ParticleSys);
 bool plParticleSystem::MsgReceive(plMessage* msg)
 {
     plGenRefMsg* refMsg;
-    plParticleUpdateMsg *partMsg;
-    plParticleKillMsg *killMsg;
-    plSceneObject *scene;
-    plParticleEffect *effect;
-    hsGMaterial *mat;
-    plRenderMsg *rend;
+    plParticleUpdateMsg* partMsg;
+    plParticleKillMsg* killMsg;
+    plSceneObject* scene;
+    plParticleEffect* effect;
+    hsGMaterial* mat;
+    plRenderMsg* rend;
     plAgeLoadedMsg* ageLoaded;
 
-    if ((rend = plRenderMsg::ConvertNoRef(msg)))
-    {
+    if ((rend = plRenderMsg::ConvertNoRef(msg))) {
         plProfile_BeginLap(ParticleSys, this->GetKey()->GetUoid().GetObjectName().c_str());
         IHandleRenderMsg(rend->Pipeline());
         plProfile_EndLap(ParticleSys, this->GetKey()->GetUoid().GetObjectName().c_str());
         return true;
-    }
-    else if ((refMsg = plGenRefMsg::ConvertNoRef(msg)))
-    {
-        if ((scene = plSceneObject::ConvertNoRef(refMsg->GetRef())))
-        {
-            if (refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace))
+    } else if ((refMsg = plGenRefMsg::ConvertNoRef(msg))) {
+        if ((scene = plSceneObject::ConvertNoRef(refMsg->GetRef()))) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 AddTarget(scene);
-            else
+            } else {
                 RemoveTarget(scene);
+            }
+
             return true;
         }
-        if ((mat = hsGMaterial::ConvertNoRef(refMsg->GetRef())))
-        {
-            if (refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace))
+
+        if ((mat = hsGMaterial::ConvertNoRef(refMsg->GetRef()))) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 fTexture = mat;
-            else
+            } else {
                 fTexture = nil;
+            }
+
             return true;
         }
-        if ((effect = plParticleEffect::ConvertNoRef(refMsg->GetRef())))
-        {
-            if (refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace))
+
+        if ((effect = plParticleEffect::ConvertNoRef(refMsg->GetRef()))) {
+            if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 IAddEffect(effect, refMsg->fType);
+            }
+
             //else
             //  IRemoveEffect(effect, refMsg->fType);
             return true;
         }
-    }
-    else if ((partMsg = plParticleUpdateMsg::ConvertNoRef(msg)))
-    {
+    } else if ((partMsg = plParticleUpdateMsg::ConvertNoRef(msg))) {
         UpdateGenerator(partMsg->GetParamID(), partMsg->GetParamValue());
         return true;
-    }
-    else if ((killMsg = plParticleKillMsg::ConvertNoRef(msg)))
-    {
+    } else if ((killMsg = plParticleKillMsg::ConvertNoRef(msg))) {
         KillParticles(killMsg->fNumToKill, killMsg->fTimeLeft, killMsg->fFlags);
         return true;
-    }
-    else if( (ageLoaded = plAgeLoadedMsg::ConvertNoRef(msg)) && ageLoaded->fLoaded )
-    {
+    } else if ((ageLoaded = plAgeLoadedMsg::ConvertNoRef(msg)) && ageLoaded->fLoaded) {
         ICheckDrawInterface();
         return true;
     }
+
     return plModifier::MsgReceive(msg);
 }
 
 void plParticleSystem::UpdateGenerator(uint32_t paramID, float value)
 {
     int i;
-    for (i = 0; i < fNumValidEmitters; i++)
+
+    for (i = 0; i < fNumValidEmitters; i++) {
         fEmitters[i]->UpdateGenerator(paramID, value);
+    }
 }
 
-void plParticleSystem::AddTarget(plSceneObject *so)
+void plParticleSystem::AddTarget(plSceneObject* so)
 {
-    if (fTarget != nil)
+    if (fTarget != nil) {
         RemoveTarget(fTarget);
+    }
 
     fTarget = so;
     plgDispatch::Dispatch()->RegisterForExactType(plTimeMsg::Index(), GetKey());
@@ -559,16 +598,15 @@ void plParticleSystem::AddTarget(plSceneObject *so)
     so->AddModifier(fParticleSDLMod);
 }
 
-void plParticleSystem::RemoveTarget(plSceneObject *so)
+void plParticleSystem::RemoveTarget(plSceneObject* so)
 {
-    if (so == fTarget && so != nil)
-    {
-        if (fParticleSDLMod)
-        {
+    if (so == fTarget && so != nil) {
+        if (fParticleSDLMod) {
             so->RemoveModifier(fParticleSDLMod);
             delete fParticleSDLMod;
             fParticleSDLMod = nil;
         }
+
         fTarget = nil;
     }
 }
@@ -580,11 +618,11 @@ void plParticleSystem::IPreSim()
     const double PRESIM_UPDATE_TICK = 0.1;
 
     int i;
-    for (i = 0; i < fNumValidEmitters; i++)
-    {
+
+    for (i = 0; i < fNumValidEmitters; i++) {
         double secs = fPreSim;
-        while (secs > 0)
-        {
+
+        while (secs > 0) {
             fEmitters[i]->IUpdateParticles((float)PRESIM_UPDATE_TICK);
             secs -= PRESIM_UPDATE_TICK;
         }
@@ -593,20 +631,20 @@ void plParticleSystem::IPreSim()
     fPreSim = 0;
 }
 
-void plParticleSystem::IReadEffectsArray(hsTArray<plParticleEffect *> &effects, uint32_t type, hsStream *s, hsResMgr *mgr)
+void plParticleSystem::IReadEffectsArray(hsTArray<plParticleEffect*>& effects, uint32_t type, hsStream* s, hsResMgr* mgr)
 {
-    plGenRefMsg *msg;
+    plGenRefMsg* msg;
     effects.Reset();
     uint32_t count = s->ReadLE32();
     int i;
-    for (i = 0; i < count; i++)
-    {
+
+    for (i = 0; i < count; i++) {
         msg = new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, (int8_t)type);
         mgr->ReadKeyNotifyMe(s, msg, plRefFlags::kActiveRef);
     }
 }
 
-void plParticleSystem::Read(hsStream *s, hsResMgr *mgr)
+void plParticleSystem::Read(hsStream* s, hsResMgr* mgr)
 {
     plModifier::Read(s, mgr);
 
@@ -614,7 +652,7 @@ void plParticleSystem::Read(hsStream *s, hsResMgr *mgr)
     msg = new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, 0); // Material
     mgr->ReadKeyNotifyMe(s, msg, plRefFlags::kActiveRef);
 
-    fAmbientCtl = plController::ConvertNoRef(mgr->ReadCreatable(s));    
+    fAmbientCtl = plController::ConvertNoRef(mgr->ReadCreatable(s));
     fDiffuseCtl = plController::ConvertNoRef(mgr->ReadCreatable(s));
     fOpacityCtl = plController::ConvertNoRef(mgr->ReadCreatable(s));
     fWidthCtl = plController::ConvertNoRef(mgr->ReadCreatable(s));
@@ -633,8 +671,8 @@ void plParticleSystem::Read(hsStream *s, hsResMgr *mgr)
 
     fNumValidEmitters = s->ReadLE32();
     int i;
-    for (i = 0; i < fNumValidEmitters; i++)
-    {
+
+    for (i = 0; i < fNumValidEmitters; i++) {
         fEmitters[i] = plParticleEmitter::ConvertNoRef(mgr->ReadCreatable(s));
         fEmitters[i]->ISetSystem(this);
     }
@@ -645,13 +683,13 @@ void plParticleSystem::Read(hsStream *s, hsResMgr *mgr)
 
     int count = s->ReadLE32();
     fPermaLights.SetCount(count);
-    for( i = 0; i < count; i++ )
-    {
+
+    for (i = 0; i < count; i++) {
         fPermaLights[i] = mgr->ReadKey(s);
     }
 }
 
-void plParticleSystem::Write(hsStream *s, hsResMgr *mgr)
+void plParticleSystem::Write(hsStream* s, hsResMgr* mgr)
 {
     plModifier::Write(s, mgr);
 
@@ -665,7 +703,7 @@ void plParticleSystem::Write(hsStream *s, hsResMgr *mgr)
     mgr->WriteCreatable(s, fOpacityCtl);
     mgr->WriteCreatable(s, fWidthCtl);
     mgr->WriteCreatable(s, fHeightCtl);
-    
+
     s->WriteLE32(fXTiles);
     s->WriteLE32(fYTiles);
     s->WriteLE32(fMaxTotalParticles);
@@ -677,38 +715,48 @@ void plParticleSystem::Write(hsStream *s, hsResMgr *mgr)
     s->WriteLEScalar(fWindMult);
 
     s->WriteLE32(fNumValidEmitters);
-    for (i = 0; i < fNumValidEmitters; i++)
-    {
+
+    for (i = 0; i < fNumValidEmitters; i++) {
         mgr->WriteCreatable(s, fEmitters[i]);
     }
 
     int count;
     count = fForces.GetCount();
     s->WriteLE32(count);
-    for (i = 0; i < count; i++)
+
+    for (i = 0; i < count; i++) {
         mgr->WriteKey(s, fForces.Get(i));
+    }
 
     count = fEffects.GetCount();
     s->WriteLE32(count);
-    for (i = 0; i < count; i++)
+
+    for (i = 0; i < count; i++) {
         mgr->WriteKey(s, fEffects.Get(i));
+    }
 
     count = fConstraints.GetCount();
     s->WriteLE32(count);
-    for (i = 0; i < count; i++)
+
+    for (i = 0; i < count; i++) {
         mgr->WriteKey(s, fConstraints.Get(i));
+    }
 
     count = fPermaLights.GetCount();
     s->WriteLE32(count);
-    for( i = 0; i < count; i++ )
+
+    for (i = 0; i < count; i++) {
         mgr->WriteKey(s, fPermaLights[i]);
+    }
 }
 
 void plParticleSystem::SetAttachedToAvatar(bool attached)
 {
     fAttachedToAvatar = attached;
-    if (fParticleSDLMod)
+
+    if (fParticleSDLMod) {
         fParticleSDLMod->SetAttachedToAvatar(attached);
+    }
 }
 
 void plParticleSystem::AddLight(plKey liKey)

@@ -71,45 +71,41 @@ void CalculateProfiles()
     lastTicks = curTicks;
 
     // KLUDGE - calulate the polys per material
-    if (plProfile_GetValue(MatChange) == 0)
+    if (plProfile_GetValue(MatChange) == 0) {
         plProfile_Set(PolysPerMat, 0);
-    else
+    } else {
         plProfile_Set(PolysPerMat, plProfile_GetValue(DrawTriangles) / plProfile_GetValue(MatChange));
+    }
 
-    #ifdef HS_FIND_MEM_LEAKS
+#ifdef HS_FIND_MEM_LEAKS
 //  plProfile_Set(MemAllocated, MemGetAllocated());
 //  plProfile_Set(MemPeakAlloc, MemGetPeakAllocated());
-    #endif
+#endif
 }
 
 static plGraphPlate* fFPSPlate = nil;
 
 static int ICreateStdPlate(plGraphPlate** graph)
 {
-    if (plPlateManager::InstanceValid())
-    {
+    if (plPlateManager::InstanceValid()) {
         plPlateManager::Instance().CreateGraphPlate(graph);
         (*graph)->SetSize(0.25, 0.25);
         (*graph)->SetDataRange(0, 100, 100);
         return hsOK;
     }
+
     return hsFail;
 }
 
 void CreateStandardGraphs(const char* groupName, bool create)
 {
-    if (strcmp(groupName, "General") == 0)
-    {
-        if (create)
-        {
-            if (ICreateStdPlate(&fFPSPlate) == hsOK)
-            {
-                fFPSPlate->SetTitle("mSecs");       
+    if (strcmp(groupName, "General") == 0) {
+        if (create) {
+            if (ICreateStdPlate(&fFPSPlate) == hsOK) {
+                fFPSPlate->SetTitle("mSecs");
                 fFPSPlate->SetLabelText("Tot", "Draw", "Upd");
             }
-        }
-        else
-        {
+        } else {
             plPlateManager::Instance().DestroyPlate(fFPSPlate);
             fFPSPlate = nil;
         }
@@ -121,13 +117,12 @@ plProfile_CreateTimer("Update", "General", UpdateTime);
 
 void UpdateStandardGraphs(float xPos, float yPos)
 {
-    #define PositionPlate(plate)        \
+#define PositionPlate(plate)        \
         plate->SetPosition(xPos, yPos); \
         yPos += 0.25;                   \
         plate->SetVisible(true);
 
-    if (fFPSPlate)
-    {
+    if (fFPSPlate) {
         fFPSPlate->AddData(
             gVarRFPS.GetValue(),
             plProfile_GetValue(DrawTime),

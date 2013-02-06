@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/FeatureLib/pfGameMgr/pfGameMgr.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_FEATURELIB_PFGAMEMGR_PFGAMEMGR_H
@@ -77,21 +77,25 @@ class pfGameCli;
 //============================================================================
 class pfGameMgrMsg : public plMessage {
 public:
-    #pragma warning(push, 0)
+#pragma warning(push, 0)
     // These macros produce warnings on W4
     CLASSNAME_REGISTER(pfGameMgrMsg);
     GETINTERFACE_ANY(pfGameMgrMsg, plMessage);
-    #pragma warning(pop)
+#pragma warning(pop)
 
-    void Read(hsStream *, hsResMgr *) { FATAL("not impl"); }
-    void Write(hsStream *, hsResMgr *) { FATAL("not impl"); }
+    void Read(hsStream*, hsResMgr*) {
+        FATAL("not impl");
+    }
+    void Write(hsStream*, hsResMgr*) {
+        FATAL("not impl");
+    }
 
-    pfGameMgrMsg () : netMsg(nil) { }
-    ~pfGameMgrMsg ();
-    
-    void Set (const GameMsgHeader & msg);
-    
-    GameMsgHeader * netMsg;
+    pfGameMgrMsg() : netMsg(nil) { }
+    ~pfGameMgrMsg();
+
+    void Set(const GameMsgHeader& msg);
+
+    GameMsgHeader* netMsg;
 };
 
 
@@ -103,22 +107,26 @@ public:
 //============================================================================
 class pfGameCliMsg : public plMessage {
 public:
-    #pragma warning(push, 0)
+#pragma warning(push, 0)
     // These macros produce warnings on W4
     CLASSNAME_REGISTER(pfGameCliMsg);
     GETINTERFACE_ANY(pfGameCliMsg, plMessage);
-    #pragma warning(pop)
+#pragma warning(pop)
 
-    pfGameCliMsg () : gameCli(nil), netMsg(nil) { }
-    ~pfGameCliMsg ();
+    pfGameCliMsg() : gameCli(nil), netMsg(nil) { }
+    ~pfGameCliMsg();
 
-    void Read(hsStream *, hsResMgr *) { FATAL("not impl"); }
-    void Write(hsStream *, hsResMgr *) { FATAL("not impl"); }
+    void Read(hsStream*, hsResMgr*) {
+        FATAL("not impl");
+    }
+    void Write(hsStream*, hsResMgr*) {
+        FATAL("not impl");
+    }
 
-    void Set (pfGameCli * cli, const GameMsgHeader & msg);
-    
-    pfGameCli *     gameCli;
-    GameMsgHeader * netMsg; 
+    void Set(pfGameCli* cli, const GameMsgHeader& msg);
+
+    pfGameCli*      gameCli;
+    GameMsgHeader* netMsg;
 };
 
 
@@ -132,51 +140,51 @@ public:
 //============================================================================
 class pfGameMgr {
     friend struct IGameMgr;
-    struct IGameMgr * internal;
+    struct IGameMgr* internal;
 
-    pfGameMgr ();
-    
+    pfGameMgr();
+
 public:
-    static pfGameMgr * GetInstance ();
+    static pfGameMgr* GetInstance();
 
     //========================================================================
     // Receiver list
     //--------------
     // When notificatons are received from SrvGameMgr, they are dispatched
     // as pfGameMgrMsgs to the receiver list maintained by these functions.
-    void AddReceiver (plKey receiver);
-    void RemoveReceiver (plKey receiver);
+    void AddReceiver(plKey receiver);
+    void RemoveReceiver(plKey receiver);
     //========================================================================
-    
+
     //========================================================================
     // GameMgr properties
     //-------------------
     // Get a list of ids of games to which player is joined
-    void            GetGameIds (ARRAY(unsigned) * arr)              const;
-    // Return interface to the specified game   
-    pfGameCli *     GetGameCli (unsigned gameId)                    const;
+    void            GetGameIds(ARRAY(unsigned) * arr)              const;
+    // Return interface to the specified game
+    pfGameCli*      GetGameCli(unsigned gameId)                    const;
     // Get the name of a game by its typeid
-    const wchar_t*  GetGameNameByTypeId (const plUUID& gameTypeId)  const;
+    const wchar_t*  GetGameNameByTypeId(const plUUID& gameTypeId)  const;
     //========================================================================
 
     //========================================================================
     // pfGameCli creation
     //-------------------
     // Join an existing game
-    void JoinGame (
+    void JoinGame(
         plKey           receiver,       // Receiver of pfGameCliMsgs for this game
         unsigned        gameId          // id of the game to join
     );
     // Create a new game
-    void CreateGame (
+    void CreateGame(
         plKey           receiver,       // Receiver of pfGameCliMsgs for this game
         const plUUID&   gameTypeId,     // typeid of game to create
         unsigned        createOptions,  // Game create options from pnGameMgr.h
         unsigned        initBytes,      // Game-specific initialization data
-        const void *    initData
+        const void*     initData
     );
     // Join or create the specified common game
-    void JoinCommonGame (
+    void JoinCommonGame(
         plKey           receiver,       // Receiver of pfGameCliMsgs for this game
         const plUUID&   gameTypeId,     // typeid of common game to create/join
         unsigned        gameNumber,     // "table number" of common game to create/join
@@ -184,7 +192,7 @@ public:
         // be created on the server, these
         // are its creation parameters:
         unsigned        initBytes,      // Game-specific initialization data
-        const void *    initData
+        const void*     initData
     );
     //========================================================================
 
@@ -202,48 +210,48 @@ public:
 class pfGameCli : public plCreatable {
     friend struct IGameMgr;
     friend struct IGameCli;
-    struct IGameCli * internal;
+    struct IGameCli* internal;
 
     //========================================================================
     // sub-classes must implement these
-    virtual void Recv           (GameMsgHeader * msg, void * param) = 0;
-    virtual void OnPlayerJoined (const Srv2Cli_Game_PlayerJoined & msg) = 0;
-    virtual void OnPlayerLeft   (const Srv2Cli_Game_PlayerLeft & msg) = 0;
-    virtual void OnInviteFailed (const Srv2Cli_Game_InviteFailed & msg) = 0;
-    virtual void OnOwnerChange  (const Srv2Cli_Game_OwnerChange & msg) = 0;
+    virtual void Recv(GameMsgHeader* msg, void* param) = 0;
+    virtual void OnPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg) = 0;
+    virtual void OnPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg) = 0;
+    virtual void OnInviteFailed(const Srv2Cli_Game_InviteFailed& msg) = 0;
+    virtual void OnOwnerChange(const Srv2Cli_Game_OwnerChange& msg) = 0;
     //========================================================================
-    
+
 public:
-    #pragma warning(push, 0)
+#pragma warning(push, 0)
     // These macros produce warnings on W4
     CLASSNAME_REGISTER(pfGameCli);
     GETINTERFACE_ANY(pfGameCli, plCreatable);
-    #pragma warning(pop)
-    
-    pfGameCli (unsigned gameId, plKey receiver);
-    ~pfGameCli ();
-    
+#pragma warning(pop)
+
+    pfGameCli(unsigned gameId, plKey receiver);
+    ~pfGameCli();
+
     //========================================================================
     // Game client properties
     //-----------------------
-    unsigned         GetGameId ()        const;
-    const plUUID&    GetGameTypeId ()    const;
-    const wchar_t*   GetName ()          const;
-    plKey            GetReceiver ()      const;
-    unsigned         GetPlayerCount ()   const;
+    unsigned         GetGameId()        const;
+    const plUUID&    GetGameTypeId()    const;
+    const wchar_t*   GetName()          const;
+    plKey            GetReceiver()      const;
+    unsigned         GetPlayerCount()   const;
     //========================================================================
 
     //========================================================================
     // Player invitation management
     //-----------------------------
-    void InvitePlayer (unsigned playerId);
-    void UninvitePlayer (unsigned playerId);
+    void InvitePlayer(unsigned playerId);
+    void UninvitePlayer(unsigned playerId);
     //========================================================================
 
     //========================================================================
     // Game methods
     //-------------
-    void LeaveGame ();
+    void LeaveGame();
     //========================================================================
 
     //========================================================================

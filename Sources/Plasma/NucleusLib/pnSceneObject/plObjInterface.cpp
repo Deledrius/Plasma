@@ -50,7 +50,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 plObjInterface::plObjInterface()
-:   fOwner(nil)
+    :   fOwner(nil)
 {
 }
 
@@ -60,11 +60,12 @@ plObjInterface::~plObjInterface()
 
 void plObjInterface::ISetOwner(plSceneObject* owner)
 {
-    if( fOwner != owner )
-    {
+    if (fOwner != owner) {
         fOwner = owner;
-        if( fOwner )
+
+        if (fOwner) {
             fOwner->ISetInterface(this);
+        }
     }
 }
 
@@ -88,29 +89,28 @@ void plObjInterface::Write(hsStream* s, hsResMgr* mgr)
 bool plObjInterface::MsgReceive(plMessage* msg)
 {
     plEnableMsg* enaMsg = plEnableMsg::ConvertNoRef(msg);
-    if( enaMsg )
-    {
+
+    if (enaMsg) {
         SetProperty(kDisable, enaMsg->Cmd(plEnableMsg::kDisable));
         return true;
     }
+
     plIntRefMsg* intRefMsg = plIntRefMsg::ConvertNoRef(msg);
-    if( intRefMsg )
-    {
-        switch( intRefMsg->fType )
-        {
+
+    if (intRefMsg) {
+        switch (intRefMsg->fType) {
         case plIntRefMsg::kOwner:
-            if( intRefMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-            {
+            if (intRefMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
                 plSceneObject* owner = plSceneObject::ConvertNoRef(intRefMsg->GetRef());
                 ISetOwner(owner);
-            }
-            else if( intRefMsg->GetContext() & (plRefMsg::kOnDestroy|plRefMsg::kOnRemove) )
-            {
+            } else if (intRefMsg->GetContext() & (plRefMsg::kOnDestroy | plRefMsg::kOnRemove)) {
                 ISetOwner(nil);
             }
+
             break;
         }
     }
+
     return plSynchedObject::MsgReceive(msg);
 }
 
@@ -119,12 +119,14 @@ bool plObjInterface::MsgReceive(plMessage* msg)
 //
 void plObjInterface::ISetAllProperties(const hsBitVector& b)
 {
-//  if (&b != &fProps)  // don't copy if they are the same variable 
+//  if (&b != &fProps)  // don't copy if they are the same variable
 
-        fProps = b;
+    fProps = b;
 
     int i;
-    for(i=0;i<GetNumProperties(); i++)
+
+    for (i = 0; i < GetNumProperties(); i++) {
         SetProperty(i, GetProperty(i));
+    }
 }
 

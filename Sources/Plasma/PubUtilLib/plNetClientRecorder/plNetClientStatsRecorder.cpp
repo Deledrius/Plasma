@@ -57,10 +57,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 plNetClientStatsRecorder::plNetClientStatsRecorder(TimeWrapper* timeWrapper) :
-plNetClientLoggingRecorder(timeWrapper)
+    plNetClientLoggingRecorder(timeWrapper)
 {
-    if (fLog)
+    if (fLog) {
         delete fLog;
+    }
+
     fLog = plStatusLogMgr::GetInstance().CreateStatusLog(30, "StatsRecorder.log", plStatusLog::kAlignToTop);
 }
 
@@ -75,49 +77,84 @@ bool plNetClientStatsRecorder::BeginRecording(const char* recName)
 
 void plNetClientStatsRecorder::RecordMsg(plNetMessage* msg, double secs)
 {
-    if (IProcessRecordMsg(msg,secs))
-    {
+    if (IProcessRecordMsg(msg, secs)) {
         char stats[256];
-        sprintf(stats,"tm:%4.2f;sz:%u,plrid:%s%u : ",secs,msg->GetPackSize(),msg->GetHasPlayerID()?"":"XX",msg->GetHasPlayerID()?msg->GetPlayerID():0);
+        sprintf(stats, "tm:%4.2f;sz:%u,plrid:%s%u : ", secs, msg->GetPackSize(), msg->GetHasPlayerID() ? "" : "XX", msg->GetHasPlayerID() ? msg->GetPlayerID() : 0);
         // GetPackSize might compress the buffer on us, so uncompress it
         plNetMsgStreamedObject* so = plNetMsgStreamedObject::ConvertNoRef(msg);
-        if (so)
+
+        if (so) {
             so->StreamInfo()->Uncompress();
-        ILogMsg(msg,stats);
+        }
+
+        ILogMsg(msg, stats);
     }
 }
 
 
 void plNetClientStatsRecorder::ILogMsg(plNetMessage* msg, const char* preText)
 {
-    if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plNetMsgGameMessage))
-    {
+    if (msg->ClassIndex() == CLASS_INDEX_SCOPED(plNetMsgGameMessage)) {
         plNetMsgGameMessage* gameMsg = plNetMsgGameMessage::ConvertNoRef(msg);
         fLog->AddLineF("%s%s(%s)", preText, msg->ClassName(), plFactory::GetNameOfClass(gameMsg->StreamInfo()->GetStreamType()));
 
-        if (gameMsg->StreamInfo()->GetStreamType() == CLASS_INDEX_SCOPED(plNotifyMsg))
-        {
+        if (gameMsg->StreamInfo()->GetStreamType() == CLASS_INDEX_SCOPED(plNotifyMsg)) {
             plNotifyMsg* notifyMsg = plNotifyMsg::ConvertNoRef(gameMsg->GetContainedMsg());
             int numEvents = notifyMsg->GetEventCount();
-            for (int i = 0; i < numEvents; i++)
-            {
+
+            for (int i = 0; i < numEvents; i++) {
                 const char* eventName = "";
 
                 proEventData* event = notifyMsg->GetEventRecord(i);
-                switch (event->fEventType)
-                {
-                case proEventData::kCollision:      eventName = "Collision";        break;
-                case proEventData::kPicked:         eventName = "Picked";           break;
-                case proEventData::kControlKey:     eventName = "ControlKey";       break;
-                case proEventData::kVariable:       eventName = "Variable";         break;
-                case proEventData::kFacing:         eventName = "Facing";           break;
-                case proEventData::kContained:      eventName = "Contained";        break;
-                case proEventData::kActivate:       eventName = "Activate";         break;
-                case proEventData::kCallback:       eventName = "Callback";         break;
-                case proEventData::kResponderState: eventName = "ResponderState";   break;
-                case proEventData::kMultiStage:     eventName = "MultiStage";       break;
-                case proEventData::kSpawned:        eventName = "Spawned";          break;
-                case proEventData::kClickDrag:      eventName = "ClickDrag";        break;
+
+                switch (event->fEventType) {
+                case proEventData::kCollision:
+                    eventName = "Collision";
+                    break;
+
+                case proEventData::kPicked:
+                    eventName = "Picked";
+                    break;
+
+                case proEventData::kControlKey:
+                    eventName = "ControlKey";
+                    break;
+
+                case proEventData::kVariable:
+                    eventName = "Variable";
+                    break;
+
+                case proEventData::kFacing:
+                    eventName = "Facing";
+                    break;
+
+                case proEventData::kContained:
+                    eventName = "Contained";
+                    break;
+
+                case proEventData::kActivate:
+                    eventName = "Activate";
+                    break;
+
+                case proEventData::kCallback:
+                    eventName = "Callback";
+                    break;
+
+                case proEventData::kResponderState:
+                    eventName = "ResponderState";
+                    break;
+
+                case proEventData::kMultiStage:
+                    eventName = "MultiStage";
+                    break;
+
+                case proEventData::kSpawned:
+                    eventName = "Spawned";
+                    break;
+
+                case proEventData::kClickDrag:
+                    eventName = "ClickDrag";
+                    break;
                 }
 
                 fLog->AddLineF("\t%s", eventName);
@@ -125,14 +162,12 @@ void plNetClientStatsRecorder::ILogMsg(plNetMessage* msg, const char* preText)
 
             hsRefCnt_SafeUnRef(notifyMsg);
         }
-    }
-    else if (plNetMsgSDLState* sdlMsg = plNetMsgSDLState::ConvertNoRef(msg))
-    {
-        hsReadOnlyStream stream(sdlMsg->StreamInfo()->GetStreamLen(), sdlMsg->StreamInfo()->GetStreamBuf());        
+    } else if (plNetMsgSDLState* sdlMsg = plNetMsgSDLState::ConvertNoRef(msg)) {
+        hsReadOnlyStream stream(sdlMsg->StreamInfo()->GetStreamLen(), sdlMsg->StreamInfo()->GetStreamBuf());
         plString descName;
         int ver;
-        if (plStateDataRecord::ReadStreamHeader(&stream, &descName, &ver))
-        {
+
+        if (plStateDataRecord::ReadStreamHeader(&stream, &descName, &ver)) {
             fLog->AddLineF("%s%s(%s)", preText, msg->ClassName(), descName.c_str());
 
             int i;
@@ -141,19 +176,19 @@ void plNetClientStatsRecorder::ILogMsg(plNetMessage* msg, const char* preText)
             sdRec.Read(&stream, 0);
             plStateDataRecord::SimpleVarsList vars;
             sdRec.GetDirtyVars(&vars);
-            for (i = 0; i < vars.size(); i++)
-            {
+
+            for (i = 0; i < vars.size(); i++) {
                 fLog->AddLineF("\t%s", vars[i]->GetVarDescriptor()->GetName().c_str());
             }
 
             plStateDataRecord::SDVarsList sdVars;
             sdRec.GetDirtySDVars(&sdVars);
-            for (i = 0; i < sdVars.size(); i++)
-            {
+
+            for (i = 0; i < sdVars.size(); i++) {
                 fLog->AddLineF("\t%s", sdVars[i]->GetSDVarDescriptor()->GetName().c_str());
             }
         }
-    }
-    else
+    } else {
         fLog->AddLineF("%s%s", preText, msg->ClassName());
+    }
 }

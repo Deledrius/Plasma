@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #error "Not implemented for this platform"
 #endif
 
-namespace pnNetCommon
-{
+namespace pnNetCommon {
 
 #ifndef SERVER
 
@@ -67,22 +66,24 @@ plString GetTextAddr(uint32_t binAddr)
 }
 
 // NOTE: On Win32, WSAStartup() must be called before GetBinAddr() will work.
-uint32_t GetBinAddr(const char * textAddr)
+uint32_t GetBinAddr(const char* textAddr)
 {
     uint32_t addr = 0;
-    if (!textAddr)
+
+    if (!textAddr) {
         return addr;
+    }
 
     addr = inet_addr(textAddr);
-    if(addr == INADDR_NONE)
-    {
+
+    if (addr == INADDR_NONE) {
         struct addrinfo* ai = nil;
         struct addrinfo hints;
         memset(&hints, 0, sizeof(struct addrinfo));
         hints.ai_family = PF_INET;
         hints.ai_flags  = AI_CANONNAME;
-        if (getaddrinfo(textAddr, nil, &hints, &ai) != 0)
-        {
+
+        if (getaddrinfo(textAddr, nil, &hints, &ai) != 0) {
             hsAssert(false, "getaddrinfo failed");
             return addr;
         }
@@ -102,12 +103,12 @@ uint32_t GetBinAddr(const char * textAddr)
 
 ////////////////////////////////////////////////////////////////////
 
-void plCreatableStream::Write( hsStream* stream, hsResMgr* mgr )
+void plCreatableStream::Write(hsStream* stream, hsResMgr* mgr)
 {
     fStream.Rewind();
 
     uint32_t len = fStream.GetEOF();
-    stream->WriteLE( len );
+    stream->WriteLE(len);
 
     uint8_t* buf = new uint8_t[len];
     fStream.Read(len, (void*)buf);
@@ -117,12 +118,12 @@ void plCreatableStream::Write( hsStream* stream, hsResMgr* mgr )
     delete[] buf;
 }
 
-void plCreatableStream::Read( hsStream* stream, hsResMgr* mgr )
+void plCreatableStream::Read(hsStream* stream, hsResMgr* mgr)
 {
     fStream.Rewind();
 
     uint32_t len;
-    stream->LogReadLE( &len,"CreatableStream Len");
+    stream->LogReadLE(&len, "CreatableStream Len");
 
     uint8_t* buf = new uint8_t[len];
     stream->LogRead(len, (void*)buf, "CreatableStream Data");

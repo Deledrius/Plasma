@@ -63,28 +63,31 @@ class plArmatureUpdateMsg;
 class plClimbMsg;
 class plControlEventMsg;
 
-class plAvBrainHuman : public plArmatureBrain
-{
+class plAvBrainHuman : public plArmatureBrain {
 public:
     plAvBrainHuman(bool isActor = false);
     virtual ~plAvBrainHuman();
 
-    CLASSNAME_REGISTER( plAvBrainHuman );
-    GETINTERFACE_ANY( plAvBrainHuman, plArmatureBrain );
+    CLASSNAME_REGISTER(plAvBrainHuman);
+    GETINTERFACE_ANY(plAvBrainHuman, plArmatureBrain);
 
     virtual bool Apply(double timeNow, float elapsed);
-    virtual void Activate(plArmatureModBase *avMod);
+    virtual void Activate(plArmatureModBase* avMod);
     virtual void Deactivate();
     virtual void Suspend();
     virtual void Resume();
     virtual void Spawn(double timeNow);
     virtual bool LeaveAge();
 
-    bool IsActor() const {return fIsActor;}
-    void IsActor(bool isActor) {fIsActor = isActor;}
+    bool IsActor() const {
+        return fIsActor;
+    }
+    void IsActor(bool isActor) {
+        fIsActor = isActor;
+    }
 
     bool IsMovementZeroBlend();
-    void TurnToPoint(hsPoint3 point);   
+    void TurnToPoint(hsPoint3 point);
     bool RunStandardBehaviors(double timeNow, float elapsed);
     void SetStartedTurning(double when);
 
@@ -94,10 +97,10 @@ public:
 
     bool IsBehaviorPlaying(int behavior); // returns whether the specified behavior is playing at all (see list of behaviors below)
 
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual bool MsgReceive(plMessage *msg);
-    virtual void DumpToDebugDisplay(int &x, int &y, int lineHeight, char *strBuf, plDebugText &debugTxt);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual bool MsgReceive(plMessage* msg);
+    virtual void DumpToDebugDisplay(int& x, int& y, int lineHeight, char* strBuf, plDebugText& debugTxt);
 
     // Hardwired Identifiers for all the canonical bones.
     enum HumanBoneID {
@@ -109,30 +112,28 @@ public:
         RThigh, RCalf, RFoot, RFootPrint, RToe0,
 
         // spine and head, starting at base of spine
-        Spine, TrunkPrint, Spine1, Spine2, Neck, Head, Jaw, LMouthLower, RMouthLower, 
-        LBrowInner, LBrowOuter, LCheek, LEye, LEyeLid01, LEyeLid02, LMouthCorner, LMouthUpper, 
+        Spine, TrunkPrint, Spine1, Spine2, Neck, Head, Jaw, LMouthLower, RMouthLower,
+        LBrowInner, LBrowOuter, LCheek, LEye, LEyeLid01, LEyeLid02, LMouthCorner, LMouthUpper,
         RBrowInner, RBrowOuter, RCheek, REye, REyeLid01, REyeLid02, RMouthCorner, RMouthUpper,
-        
+
         // Left Arm
         LClavicle, LUpperArm, LForearm, LHand, LHandPrint, LMiddleFinger1, LMiddleFinger2, LMiddleFinger3,
         LPinkyFinger1, LPinkyFinger2, LPinkyFinger3, LPointerFinger1, LPointerFinger2, LPointerFinger3,
         LRingFinger1, LRingFinger2, LRingFinger3, LThumb1, LThumb2, LThumb3,
-        
+
         // Right Arm
         RClavicle, RUpperArm, RForearm, RHand, RHandPrint, RMiddleFinger1, RMiddleFinger2, RMiddleFinger3,
         RPinkyFinger1, RPinkyFinger2, RPinkyFinger3, RPointerFinger1, RPointerFinger2, RPointerFinger3,
         RRingFinger1, RRingFinger2, RRingFinger3, RThumb1, RThumb2, RThumb3
     };
 
-    enum TurnCurve
-    {
+    enum TurnCurve {
         kTurnLinear,
         kTurnExponential,
         kTurnLogarithmic
     };
 
-    enum // Indicies for the brains array of behaviors
-    {
+    enum { // Indicies for the brains array of behaviors
         kIdle,
         kWalk,
         kRun,
@@ -153,33 +154,33 @@ public:
         //kPushIdle,
         kHuBehaviorMax,
     };
-    
+
     static void SetTimeToMaxTurn(float time, bool walk);
     static float GetTimeToMaxTurn(bool walk);
     static void SetMaxTurnSpeed(float radsPerSec, bool walk);
     static float GetMaxTurnSpeed(bool walk);
     static void SetTurnCurve(TurnCurve curve, bool walk);
     static TurnCurve GetTurnCurve(bool walk);
-    
+
     static const float kControlledFlightThreshold;
     static const float kAirTimeThreshold;
     static const float kAirTimePanicThreshold;
     plWalkingStrategy* fWalkingStrategy;
-    
+
 protected:
-    plAGAnim *FindCustomAnim(const char *baseName);
-    virtual bool IHandleControlMsg(plControlEventMsg *ctrlMsg);
-    virtual bool IHandleClimbMsg(plClimbMsg *msg);
-    virtual bool IHandleTaskMsg(plAvTaskMsg *msg);
+    plAGAnim* FindCustomAnim(const char* baseName);
+    virtual bool IHandleControlMsg(plControlEventMsg* ctrlMsg);
+    virtual bool IHandleClimbMsg(plClimbMsg* msg);
+    virtual bool IHandleTaskMsg(plAvTaskMsg* msg);
     virtual bool IInitAnimations();
     virtual void IInitBoneMap();
     float IGetTurnStrength(double timeNow);
     void IChatOn();
     void IChatOff();
     bool IValidateAnimations();
-    
-    plAGModifier    *fHandleAGMod;      // the ag modifier that's attached to our top object
-    double fStartedTurning;         // when did we start turning?   
+
+    plAGModifier*    fHandleAGMod;      // the ag modifier that's attached to our top object
+    double fStartedTurning;         // when did we start turning?
     uint32_t fPreconditions;
     bool fIsActor; // are we an actor with special privileges?
     static float fWalkTimeToMaxTurn;
@@ -192,8 +193,7 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class plHBehavior : public plArmatureBehavior
-{
+class plHBehavior : public plArmatureBehavior {
     friend class plAvBrainHuman;
     friend class plAvBrainCritter;
 
@@ -202,8 +202,7 @@ public:
     // to identify what type of behavior just triggered.
     // This is an old way of doing things. I'd like to remove it, but a lot of
     // python scripts use it as is.
-    enum BehaviorType
-    {
+    enum BehaviorType {
         kBehaviorTypeStandingJump       = 0x00000001,
         kBehaviorTypeWalkingJump        = 0x00000002,
         kBehaviorTypeRunningJump        = 0x00000004,
@@ -232,21 +231,25 @@ public:
                                           kBehaviorTypeTurnRight | kBehaviorTypeSidestepLeft |
                                           kBehaviorTypeSidestepRight | kBehaviorTypePushWalk,
     };
-    
+
     plHBehavior();
     ~plHBehavior();
 
-    void Init(plAGAnim *anim, bool loop, plAvBrainHuman *brain, plArmatureMod *body,
+    void Init(plAGAnim* anim, bool loop, plAvBrainHuman* brain, plArmatureMod* body,
               float fadeIn, float fadeOut, uint8_t index, uint32_t type = 0);
-    virtual bool PreCondition(double time, float elapsed) { return true; }
-    uint32_t GetType() const { return fType; }
+    virtual bool PreCondition(double time, float elapsed) {
+        return true;
+    }
+    uint32_t GetType() const {
+        return fType;
+    }
 
 protected:
     virtual void IStart();
     virtual void IStop();
 
-    plArmatureMod *fAvMod;
-    plAvBrainHuman *fHuBrain;
+    plArmatureMod* fAvMod;
+    plAvBrainHuman* fHuBrain;
     float fFadeIn;                      // speed at which the animation fades in, in blend units per second
     float fFadeOut;                     // speed at which the animation fades out, in blend units per second
     float fMaxBlend;                    // the maximum blend the animation should reach
@@ -256,104 +259,88 @@ protected:
     bool fStopMsgSent;
 };
 
-class Idle : public plHBehavior
-{
+class Idle : public plHBehavior {
     virtual void IStart();
 };
 
-class Run : public plHBehavior
-{
+class Run : public plHBehavior {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class Walk : public plHBehavior
-{
+class Walk : public plHBehavior {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class WalkBack : public plHBehavior
-{
+class WalkBack : public plHBehavior {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class StepLeft : public plHBehavior
-{
+class StepLeft : public plHBehavior {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class StepRight : public plHBehavior
-{
+class StepRight : public plHBehavior {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class StandingTurnLeft : public plHBehavior
-{
+class StandingTurnLeft : public plHBehavior {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class StandingTurnRight : public plHBehavior
-{
+class StandingTurnRight : public plHBehavior {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class MovingTurn : public plHBehavior
-{
+class MovingTurn : public plHBehavior {
 public:
 
 protected:
     void IStart();
 };
 
-class MovingTurnLeft : public MovingTurn
-{
+class MovingTurnLeft : public MovingTurn {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class MovingTurnRight : public MovingTurn
-{
+class MovingTurnRight : public MovingTurn {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class Jump : public plHBehavior
-{
+class Jump : public plHBehavior {
 protected:
     bool fReleased;
     virtual void IStart();
     virtual void IStop();
-    
+
 public:
     Jump() : plHBehavior(), fReleased(true) {}
 };
 
-class StandingJump : public Jump
-{
+class StandingJump : public Jump {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class WalkingJump : public Jump
-{
+class WalkingJump : public Jump {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class RunningJump : public Jump
-{
+class RunningJump : public Jump {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-class GroundImpact : public plHBehavior
-{
+class GroundImpact : public plHBehavior {
 public:
     GroundImpact();
     virtual bool PreCondition(double time, float elapsed);
@@ -363,8 +350,7 @@ private:
     float fDuration;
 };
 
-class RunningImpact : public plHBehavior
-{
+class RunningImpact : public plHBehavior {
 public:
     RunningImpact();
     virtual bool PreCondition(double time, float elapsed);
@@ -374,15 +360,13 @@ private:
     float fDuration;
 };
 
-class Fall : public plHBehavior
-{
+class Fall : public plHBehavior {
 public:
     virtual bool PreCondition(double time, float elapsed);
     virtual void Process(double time, float elapsed);
 };
 
-class Push : public plHBehavior
-{
+class Push : public plHBehavior {
 public:
     virtual void Process(double time, float elapsed);
 };
@@ -393,17 +377,16 @@ public:
 //  virtual bool PreCondition(double time, float elapsed);
 //};
 
-class PushWalk : public Push
-{
+class PushWalk : public Push {
 public:
     virtual bool PreCondition(double time, float elapsed);
 };
 
-bool PushSimpleMultiStage(plArmatureMod *avatar, const char *enterAnim, const char *idleAnim,
-                          const char *exitAnim, bool netPropagate, bool autoExit, plAGAnim::BodyUsage bodyUsage,
+bool PushSimpleMultiStage(plArmatureMod* avatar, const char* enterAnim, const char* idleAnim,
+                          const char* exitAnim, bool netPropagate, bool autoExit, plAGAnim::BodyUsage bodyUsage,
                           plAvBrainGeneric::BrainType type = plAvBrainGeneric::kGeneric);
 
-bool AvatarEmote(plArmatureMod *avatar, const char *emoteName);
+bool AvatarEmote(plArmatureMod* avatar, const char* emoteName);
 
 
 #endif // PLAVBRAINHUMAN_INC

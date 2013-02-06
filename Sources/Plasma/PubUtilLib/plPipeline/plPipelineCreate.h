@@ -70,19 +70,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plPipeline;
 
-class plPipelineCreate
-{
-    protected:
+class plPipelineCreate {
+protected:
 
-        static plPipeline   *ICreateDXPipeline( hsWinRef hWnd, const hsG3DDeviceModeRecord *devMode );
+    static plPipeline*   ICreateDXPipeline(hsWinRef hWnd, const hsG3DDeviceModeRecord* devMode);
 
-    public:
+public:
 
-        static plPipeline   *CreatePipeline( hsWinRef hWnd, const hsG3DDeviceModeRecord *devMode )
-        {
-            // Just this for now. Later we'll key off of the devMode
-            return ICreateDXPipeline( hWnd, devMode );
-        }
+    static plPipeline*   CreatePipeline(hsWinRef hWnd, const hsG3DDeviceModeRecord* devMode) {
+        // Just this for now. Later we'll key off of the devMode
+        return ICreateDXPipeline(hWnd, devMode);
+    }
 
 };
 

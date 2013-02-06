@@ -56,8 +56,7 @@ class pyDynamicText;
 class pyKey;
 class plKey;
 
-class pyGUIControlDynamicText : public pyGUIControl
-{
+class pyGUIControlDynamicText : public pyGUIControl {
 protected:
     pyGUIControlDynamicText(): pyGUIControl() {} // for python glue only, do NOT call
     pyGUIControlDynamicText(pyKey& gckey);
@@ -66,12 +65,12 @@ protected:
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptGUIControlDynamicText);
-    static PyObject *New(pyKey& gckey);
-    static PyObject *New(plKey objkey);
+    static PyObject* New(pyKey& gckey);
+    static PyObject* New(plKey objkey);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyGUIControlDynamicText object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyGUIControlDynamicText); // converts a PyObject to a pyGUIControlDynamicText (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     static bool IsGUIControlDynamicText(pyKey& gckey);
 

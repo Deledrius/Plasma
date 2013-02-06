@@ -58,36 +58,44 @@ static const float DEFAULT_INVERSE_MASS = 1.f;
 
 static plRandom sRandom;
 
-void plParticleGenerator::ComputeDirection(float pitch, float yaw, hsVector3 &direction)
+void plParticleGenerator::ComputeDirection(float pitch, float yaw, hsVector3& direction)
 {
     float cosPitch, sinPitch;
     float cosYaw, sinYaw;
     hsFastMath::SinCos(pitch, sinPitch, cosPitch);
-    hsFastMath::SinCos(yaw, sinYaw, cosYaw);        
+    hsFastMath::SinCos(yaw, sinYaw, cosYaw);
 
     direction.Set(-sinYaw * cosPitch, sinPitch, cosPitch * cosYaw);
 }
 
 // Inverse function of ComputeDirection. Give it a normalized vector, and it will tell you a
 // pitch and yaw (angles for the unit Z vector) to get there.
-void plParticleGenerator::ComputePitchYaw(float &pitch, float &yaw, const hsVector3 &dir)
+void plParticleGenerator::ComputePitchYaw(float& pitch, float& yaw, const hsVector3& dir)
 {
     const float PI = 3.14159f;
     pitch = asin(dir.fY);
     float cos_pitch = cos(pitch);
-    if (cos_pitch == 0)
-    {
+
+    if (cos_pitch == 0) {
         yaw = 0;
         return;
     }
+
     float inv = -dir.fX / cos_pitch;
-    if (inv > 1.0f)
+
+    if (inv > 1.0f) {
         inv = 1.0f;
-    if (inv < -1.0f)
+    }
+
+    if (inv < -1.0f) {
         inv = -1.0f;
+    }
+
     yaw = asin(inv);
-    if (dir.fZ < 0)
+
+    if (dir.fZ < 0) {
         yaw = PI - yaw;
+    }
 }
 
 plSimpleParticleGenerator::plSimpleParticleGenerator()
@@ -102,10 +110,10 @@ plSimpleParticleGenerator::~plSimpleParticleGenerator()
 }
 
 void plSimpleParticleGenerator::Init(float genLife, float partLifeMin, float partLifeMax,
-                                     float particlesPerSecond, uint32_t numSources, hsPoint3 *initPos,
-                                     float *initPitch, float *initYaw, float angleRange, 
+                                     float particlesPerSecond, uint32_t numSources, hsPoint3* initPos,
+                                     float* initPitch, float* initYaw, float angleRange,
                                      float initVelMin, float initVelMax,
-                                     float xSize, float ySize, 
+                                     float xSize, float ySize,
                                      float scaleMin, float scaleMax,
                                      float massRange, float radsPerSecRange)
 {
@@ -132,31 +140,34 @@ void plSimpleParticleGenerator::Init(float genLife, float partLifeMin, float par
 
     fParticleSum = 0;
     fMiscFlags = 0;
-    if (fGenLife < 0) fMiscFlags |= kImmortal;
+
+    if (fGenLife < 0) {
+        fMiscFlags |= kImmortal;
+    }
 }
 
-bool plSimpleParticleGenerator::AddAutoParticles(plParticleEmitter *emitter, float dt, uint32_t numForced /* = 0 */)
+bool plSimpleParticleGenerator::AddAutoParticles(plParticleEmitter* emitter, float dt, uint32_t numForced /* = 0 */)
 {
     int32_t numNewParticles;
 
-    if (numForced == 0)
-    {
+    if (numForced == 0) {
         fGenLife -= dt;
-        if ((fGenLife < 0 && !(fMiscFlags & kImmortal)) || (fMiscFlags & kDisabled))
-            return true; // Leave it around so that a message can bring it back to life.
+
+        if ((fGenLife < 0 && !(fMiscFlags & kImmortal)) || (fMiscFlags & kDisabled)) {
+            return true;    // Leave it around so that a message can bring it back to life.
+        }
 
         fParticleSum += fParticlesPerSecond * dt;
         numNewParticles = (int32_t)fParticleSum;
-    
-        if (numNewParticles <= 0 || fParticlesPerSecond == 0)
+
+        if (numNewParticles <= 0 || fParticlesPerSecond == 0) {
             return true;
-    }
-    else
-    {
+        }
+    } else {
         numNewParticles = numForced;
     }
 
-    uint32_t miscFlags = 0; 
+    uint32_t miscFlags = 0;
     hsPoint3 currStart;
     fParticleSum -= numNewParticles;
 
@@ -177,48 +188,53 @@ bool plSimpleParticleGenerator::AddAutoParticles(plParticleEmitter *emitter, flo
 
     const float lifeDiff = dt / numNewParticles;
     float lifeSoFar;
-    int i;  
-    for (i = 0, lifeSoFar = 0; i < numNewParticles; i++, lifeSoFar += lifeDiff)
-    {
+    int i;
+
+    for (i = 0, lifeSoFar = 0; i < numNewParticles; i++, lifeSoFar += lifeDiff) {
         initLife = life + lifeRange * sRandom.RandMinusOneToOne() - lifeSoFar;
 
         // Careful here... if we're supposed to generate immortal particles, we do so
         // by giving them a negative life. This is different that generating one with
         // a positive lifetime that is now negative because of "lifeSoFar". The if is
         // saying "if it's dead, but it was alive before we took away lifeSoFar, ignore it"
-        if (initLife <= 0 && initLife + lifeSoFar >= 0)
+        if (initLife <= 0 && initLife + lifeSoFar >= 0) {
             continue;
+        }
 
         sourceIndex = (uint32_t)(sRandom.RandZeroToOne() * fNumSources);
 
-        ComputeDirection(fInitPitch[sourceIndex] + fAngleRange * sRandom.RandMinusOneToOne(), 
+        ComputeDirection(fInitPitch[sourceIndex] + fAngleRange * sRandom.RandMinusOneToOne(),
                          fInitYaw[sourceIndex] + fAngleRange * sRandom.RandMinusOneToOne(), initDirection);
         initDirection = emitter->GetLocalToWorld() * initDirection;
         initVelocity = (vel + velRange * sRandom.RandMinusOneToOne());
-        
+
         currStart = (emitter->GetLocalToWorld() * fInitPos[sourceIndex])
                     + (initDirection * initVelocity * lifeSoFar) // Vo * t
                     + (emitter->fSystem->fAccel * lifeSoFar * lifeSoFar); // at^2
-        
-        if (emitter->fMiscFlags & emitter->kOrientationUp)
+
+        if (emitter->fMiscFlags & emitter->kOrientationUp) {
             orientation.Set(0.0f, -1.0f, 0.0f);
-        else
+        } else {
             orientation.Set(&initDirection);
+        }
 
         tile = (uint32_t)(sRandom.RandZeroToOne() * emitter->GetNumTiles());
         currSizeVar = scale + scaleRange * sRandom.RandMinusOneToOne();
 
         float invMass = fPartInvMassMin;
-        // Might be faster to just do the math instead of checking for zero...
-        if( fPartInvMassRange > 0 )
-            invMass += fPartInvMassRange * sRandom.RandZeroToOne();
 
-        if( fPartRadsPerSecRange > 0 )
+        // Might be faster to just do the math instead of checking for zero...
+        if (fPartInvMassRange > 0) {
+            invMass += fPartInvMassRange * sRandom.RandZeroToOne();
+        }
+
+        if (fPartRadsPerSecRange > 0) {
             radsPerSec = fPartRadsPerSecRange * sRandom.RandMinusOneToOne();
+        }
 
         hsVector3 tmp = initDirection * initVelocity;
-        emitter->AddParticle(currStart, tmp, tile, fXSize, fYSize, currSizeVar, 
-                         invMass, initLife, orientation, miscFlags, radsPerSec);
+        emitter->AddParticle(currStart, tmp, tile, fXSize, fYSize, currSizeVar,
+                             invMass, initLife, orientation, miscFlags, radsPerSec);
     }
 
     return true;
@@ -226,15 +242,16 @@ bool plSimpleParticleGenerator::AddAutoParticles(plParticleEmitter *emitter, flo
 
 void plSimpleParticleGenerator::UpdateParam(uint32_t paramID, float paramValue)
 {
-    switch (paramID)
-    {
+    switch (paramID) {
     case plParticleUpdateMsg::kParamParticlesPerSecond:
         fParticlesPerSecond = paramValue;
         break;
+
     case plParticleUpdateMsg::kParamInitPitchRange:
     case plParticleUpdateMsg::kParamInitYawRange:
         fAngleRange = paramValue;
         break;
+
 //  case plParticleUpdateMsg::kParamInitVel:
 //      fInitVel = paramValue;
 //      break;
@@ -244,31 +261,41 @@ void plSimpleParticleGenerator::UpdateParam(uint32_t paramID, float paramValue)
     case plParticleUpdateMsg::kParamVelMin:
         fVelMin = paramValue;
         break;
+
     case plParticleUpdateMsg::kParamVelMax:
         fVelMax = paramValue;
         break;
+
     case plParticleUpdateMsg::kParamXSize:
         fXSize = paramValue;
         break;
+
     case plParticleUpdateMsg::kParamYSize:
         fYSize = paramValue;
         break;
+
 //  case plParticleUpdateMsg::kParamSizeRange:
 //      fSizeRange = paramValue;
 //      break;
     case plParticleUpdateMsg::kParamScaleMin:
         fScaleMin = paramValue;
         break;
+
     case plParticleUpdateMsg::kParamScaleMax:
         fScaleMax = paramValue;
         break;
+
     case plParticleUpdateMsg::kParamGenLife:
         fGenLife = paramValue;
-        if (fGenLife < 0)
+
+        if (fGenLife < 0) {
             fMiscFlags |= kImmortal;
-        else
+        } else {
             fMiscFlags &= ~kImmortal;
+        }
+
         break;
+
 //  case plParticleUpdateMsg::kParamPartLife:
 //      fPartLife = paramValue;
 //      if (fPartLife < 0)
@@ -280,37 +307,43 @@ void plSimpleParticleGenerator::UpdateParam(uint32_t paramID, float paramValue)
     case plParticleUpdateMsg::kParamPartLifeMin:
         fPartLifeMin = paramValue;
         break;
+
     case plParticleUpdateMsg::kParamPartLifeMax:
         fPartLifeMax = paramValue;
         break;
+
     case plParticleUpdateMsg::kParamEnabled:
-        if (paramValue == 0.f)
+        if (paramValue == 0.f) {
             fMiscFlags |= kDisabled;
-        else
+        } else {
             fMiscFlags &= ~kDisabled;
+        }
+
         break;
+
     default:
         break;
     }
 }
 
-void plSimpleParticleGenerator::Read(hsStream* s, hsResMgr *mgr)
+void plSimpleParticleGenerator::Read(hsStream* s, hsResMgr* mgr)
 {
     float genLife = s->ReadLEScalar();
     float partLifeMin = s->ReadLEScalar();
     float partLifeMax = s->ReadLEScalar();
     float pps = s->ReadLEScalar();
     uint32_t numSources = s->ReadLE32();
-    hsPoint3 *pos = new hsPoint3[numSources];
-    float *pitch = new float[numSources];
-    float *yaw = new float[numSources];
+    hsPoint3* pos = new hsPoint3[numSources];
+    float* pitch = new float[numSources];
+    float* yaw = new float[numSources];
     int i;
-    for (i = 0; i < numSources; i++)
-    {
+
+    for (i = 0; i < numSources; i++) {
         pos[i].Read(s);
         pitch[i] = s->ReadLEScalar();
         yaw[i] = s->ReadLEScalar();
     }
+
     float angleRange = s->ReadLEScalar();
     float velMin = s->ReadLEScalar();
     float velMax = s->ReadLEScalar();
@@ -325,7 +358,7 @@ void plSimpleParticleGenerator::Read(hsStream* s, hsResMgr *mgr)
          xSize, ySize, scaleMin, scaleMax, massRange, radsPerSec);
 }
 
-void plSimpleParticleGenerator::Write(hsStream* s, hsResMgr *mgr)
+void plSimpleParticleGenerator::Write(hsStream* s, hsResMgr* mgr)
 {
     s->WriteLEScalar(fGenLife);
     s->WriteLEScalar(fPartLifeMin);
@@ -333,12 +366,13 @@ void plSimpleParticleGenerator::Write(hsStream* s, hsResMgr *mgr)
     s->WriteLEScalar(fParticlesPerSecond);
     s->WriteLE32(fNumSources);
     int i;
-    for (i = 0; i < fNumSources; i++)
-    {
+
+    for (i = 0; i < fNumSources; i++) {
         fInitPos[i].Write(s);
         s->WriteLEScalar(fInitPitch[i]);
         s->WriteLEScalar(fInitYaw[i]);
     }
+
     s->WriteLEScalar(fAngleRange);
     s->WriteLEScalar(fVelMin);
     s->WriteLEScalar(fVelMax);
@@ -364,7 +398,7 @@ plOneTimeParticleGenerator::~plOneTimeParticleGenerator()
     delete [] fDirection;
 }
 
-void plOneTimeParticleGenerator::Init(float count, hsPoint3 *pointArray, hsVector3 *dirArray, 
+void plOneTimeParticleGenerator::Init(float count, hsPoint3* pointArray, hsVector3* dirArray,
                                       float xSize, float ySize, float scaleMin, float scaleMax, float radsPerSecRange)
 {
     fCount = count;
@@ -378,7 +412,7 @@ void plOneTimeParticleGenerator::Init(float count, hsPoint3 *pointArray, hsVecto
 }
 
 // The numForced param is required by the parent class, but ignored by this particular generator
-bool plOneTimeParticleGenerator::AddAutoParticles(plParticleEmitter *emitter, float dt, uint32_t numForced /* = 0 */)
+bool plOneTimeParticleGenerator::AddAutoParticles(plParticleEmitter* emitter, float dt, uint32_t numForced /* = 0 */)
 {
     float currSizeVar;
     float scale = (fScaleMax + fScaleMin) / 2;
@@ -392,30 +426,33 @@ bool plOneTimeParticleGenerator::AddAutoParticles(plParticleEmitter *emitter, fl
     float radsPerSec = 0;
 
     int i;
-    for (i = 0; i < fCount; i++)
-    {
+
+    for (i = 0; i < fCount; i++) {
         currStart = emitter->GetLocalToWorld() * fPosition[i];
         initDirection = emitter->GetLocalToWorld() * fDirection[i];
 
-        if (emitter->fMiscFlags & emitter->kOrientationUp)
+        if (emitter->fMiscFlags & emitter->kOrientationUp) {
             orientation.Set(0.0f, -1.0f, 0.0f);
-        else
+        } else {
             orientation.Set(&initDirection);
+        }
 
         tile = (float)(sRandom.Rand() % emitter->GetNumTiles());
         currSizeVar = scale + scaleRange * sRandom.RandMinusOneToOne();
 
-        if( fPartRadsPerSecRange > 0 )
+        if (fPartRadsPerSecRange > 0) {
             radsPerSec = fPartRadsPerSecRange * sRandom.RandMinusOneToOne();
+        }
 
-        emitter->AddParticle(currStart, zeroVel, (uint32_t)tile, fXSize, fYSize, currSizeVar, 
+        emitter->AddParticle(currStart, zeroVel, (uint32_t)tile, fXSize, fYSize, currSizeVar,
                              DEFAULT_INVERSE_MASS, -1, orientation, 0, radsPerSec);
     }
+
     emitter->fMiscFlags &= ~plParticleEmitter::kNeedsUpdate;
     return false; // We've done our one-time job. Let the emitter know to delete us.
 }
 
-void plOneTimeParticleGenerator::Read(hsStream* s, hsResMgr *mgr)
+void plOneTimeParticleGenerator::Read(hsStream* s, hsResMgr* mgr)
 {
     uint32_t count = s->ReadLE32();
     float xSize = s->ReadLEScalar();
@@ -424,12 +461,12 @@ void plOneTimeParticleGenerator::Read(hsStream* s, hsResMgr *mgr)
     float scaleMax = s->ReadLEScalar();
     float radsPerSecRange = s->ReadLEScalar();
 
-    hsPoint3 *pos = new hsPoint3[count];
-    hsVector3 *dir = new hsVector3[count];
+    hsPoint3* pos = new hsPoint3[count];
+    hsVector3* dir = new hsVector3[count];
 
     int i;
-    for (i = 0; i < count; i++)
-    {
+
+    for (i = 0; i < count; i++) {
         pos[i].Read(s);
         dir[i].Read(s);
     }
@@ -437,7 +474,7 @@ void plOneTimeParticleGenerator::Read(hsStream* s, hsResMgr *mgr)
     Init((float)count, pos, dir, xSize, ySize, scaleMin, scaleMax, radsPerSecRange);
 }
 
-void plOneTimeParticleGenerator::Write(hsStream* s, hsResMgr *mgr)
+void plOneTimeParticleGenerator::Write(hsStream* s, hsResMgr* mgr)
 {
     s->WriteLE32((uint32_t)fCount);
     s->WriteLEScalar(fXSize);
@@ -447,8 +484,8 @@ void plOneTimeParticleGenerator::Write(hsStream* s, hsResMgr *mgr)
     s->WriteLEScalar(fPartRadsPerSecRange);
 
     int i;
-    for (i = 0; i < fCount; i++)
-    {
+
+    for (i = 0; i < fCount; i++) {
         fPosition[i].Write(s);
         fDirection[i].Write(s);
     }

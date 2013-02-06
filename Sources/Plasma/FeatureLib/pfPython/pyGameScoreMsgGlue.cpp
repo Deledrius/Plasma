@@ -58,8 +58,8 @@ PYTHON_DEFAULT_DEALLOC_DEFINITION(ptGameScoreMsg);
 PYTHON_NO_INIT_DEFINITION(ptGameScoreMsg);
 
 PYTHON_START_METHODS_TABLE(ptGameScoreMsg)
-    // We have no methods, but our helpers want a table...
-    // Eh. Not the end of the world.
+// We have no methods, but our helpers want a table...
+// Eh. Not the end of the world.
 PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
@@ -98,12 +98,14 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameScoreListMsg, getOwnerID)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGameScoreListMsg, getScores)
 {
-    if (self->fThis->IsValid())
-    {
+    if (self->fThis->IsValid()) {
         size_t count = self->fThis->GetNumScores();
         PyObject* tup = PyTuple_New(count);
-        for (size_t i = 0; i < count; ++i)
+
+        for (size_t i = 0; i < count; ++i) {
             PyTuple_SetItem(tup, i, self->fThis->GetScore(i));
+        }
+
         return tup;
     }
 
@@ -112,10 +114,10 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameScoreListMsg, getScores)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameScoreListMsg)
-    PYTHON_METHOD_NOARGS(ptGameScoreListMsg, getName, "Returns the template score name"),
-    PYTHON_METHOD_NOARGS(ptGameScoreListMsg, getOwnerID, "Returns the template score ownerID"),
-    PYTHON_METHOD_NOARGS(ptGameScoreListMsg, getScores, "Returns a list of scores found by the server"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameScoreListMsg, getName, "Returns the template score name"),
+                     PYTHON_METHOD_NOARGS(ptGameScoreListMsg, getOwnerID, "Returns the template score ownerID"),
+                     PYTHON_METHOD_NOARGS(ptGameScoreListMsg, getScores, "Returns a list of scores found by the server"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGameScoreListMsg, pyGameScoreMsg, "Game Score message for scores found on the server");
@@ -152,8 +154,7 @@ PYTHON_NO_INIT_DEFINITION(ptGameScoreTransferMsg);
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGameScoreTransferMsg, getDestination)
 {
-    if (self->fThis->IsValid())
-    {
+    if (self->fThis->IsValid()) {
         return self->fThis->GetDestinationScore();
     }
 
@@ -163,8 +164,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameScoreTransferMsg, getDestination)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGameScoreTransferMsg, getSource)
 {
-    if (self->fThis->IsValid())
-    {
+    if (self->fThis->IsValid()) {
         return self->fThis->GetSourceScore();
     }
 
@@ -173,9 +173,9 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameScoreTransferMsg, getSource)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameScoreTransferMsg)
-    PYTHON_METHOD_NOARGS(ptGameScoreTransferMsg, getDestination, "Returns the score points were transferred to"),
-    PYTHON_METHOD_NOARGS(ptGameScoreTransferMsg, getSource, "Returns the score points were transferred from"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameScoreTransferMsg, getDestination, "Returns the score points were transferred to"),
+                     PYTHON_METHOD_NOARGS(ptGameScoreTransferMsg, getSource, "Returns the score points were transferred from"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGameScoreTransferMsg, pyGameScoreMsg, "Game Score message indicating a score point transfer");
@@ -212,8 +212,7 @@ PYTHON_NO_INIT_DEFINITION(ptGameScoreUpdateMsg);
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGameScoreUpdateMsg, getScore)
 {
-    if (self->fThis->IsValid())
-    {
+    if (self->fThis->IsValid()) {
         return self->fThis->GetScore();
     }
 
@@ -222,8 +221,8 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameScoreUpdateMsg, getScore)
 }
 
 PYTHON_START_METHODS_TABLE(ptGameScoreUpdateMsg)
-    PYTHON_METHOD_NOARGS(ptGameScoreUpdateMsg, getScore, "Returns the updated game score"),
-PYTHON_END_METHODS_TABLE;
+PYTHON_METHOD_NOARGS(ptGameScoreUpdateMsg, getScore, "Returns the updated game score"),
+                     PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptGameScoreUpdateMsg, pyGameScoreMsg, "Game Score message for a score update operation");

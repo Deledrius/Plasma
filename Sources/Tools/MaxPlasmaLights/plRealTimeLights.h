@@ -64,48 +64,76 @@ class plMaxNode;
 //// Omni Light ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-class plRTOmniLight : public plRTLightBase
-{
-    public:
+class plRTOmniLight : public plRTLightBase {
+public:
 
-        Class_ID ClassID() { return RTOMNI_LIGHT_CLASSID; }     
-        SClass_ID SuperClassID() { return LIGHT_CLASS_ID; }
+    Class_ID ClassID() {
+        return RTOMNI_LIGHT_CLASSID;
+    }
+    SClass_ID SuperClassID() {
+        return LIGHT_CLASS_ID;
+    }
 
-        int CanConvertToType(Class_ID obtype) { return (obtype ==  RTOMNI_LIGHT_CLASSID ) ? 1 : 0; }
-        plRTOmniLight();
-            
-        ObjLightDesc *CreateLightDesc(INode *n, BOOL forceShadowBuf= FALSE);
-        GenLight* NewLight(int type) {return new plRTOmniLight();} 
-        RefTargetHandle Clone(RemapDir &remap);
+    int CanConvertToType(Class_ID obtype) {
+        return (obtype ==  RTOMNI_LIGHT_CLASSID) ? 1 : 0;
+    }
+    plRTOmniLight();
 
-        virtual void            InitNodeName( TSTR &s ) { s = _T( "RTOmniLight" ); }
+    ObjLightDesc* CreateLightDesc(INode* n, BOOL forceShadowBuf = FALSE);
+    GenLight* NewLight(int type) {
+        return new plRTOmniLight();
+    }
+    RefTargetHandle Clone(RemapDir& remap);
 
-        virtual int             DrawConeAndLine( TimeValue t, INode* inode, GraphicsWindow *gw, int drawing );
-        virtual void            DrawCone( TimeValue t, GraphicsWindow *gw, float dist );
-        virtual void            DrawArrows( TimeValue t, GraphicsWindow *gw, float dist );
-        virtual void            GetLocalBoundBox( TimeValue t, INode *node, ViewExp *vpt, Box3 &box );
+    virtual void            InitNodeName(TSTR& s) {
+        s = _T("RTOmniLight");
+    }
 
-    protected:
-        virtual void    IBuildMeshes( BOOL isNew );
-        virtual bool    IHasAttenuation( void ) { return true; }
+    virtual int             DrawConeAndLine(TimeValue t, INode* inode, GraphicsWindow* gw, int drawing);
+    virtual void            DrawCone(TimeValue t, GraphicsWindow* gw, float dist);
+    virtual void            DrawArrows(TimeValue t, GraphicsWindow* gw, float dist);
+    virtual void            GetLocalBoundBox(TimeValue t, INode* node, ViewExp* vpt, Box3& box);
+
+protected:
+    virtual void    IBuildMeshes(BOOL isNew);
+    virtual bool    IHasAttenuation(void) {
+        return true;
+    }
 };
 
-class plRTOmniLightDesc : public ClassDesc2 
-{
-    public:
-    int             IsPublic()                      { return TRUE; }
-    void*           Create(BOOL loading)            { return new plRTOmniLight; }
-    const TCHAR*    ClassName()                     { return GetString(IDS_DB_OMNI); }
-    SClass_ID       SuperClassID()                  { return LIGHT_CLASS_ID; }
-    Class_ID        ClassID()                       { return RTOMNI_LIGHT_CLASSID; }
-    const TCHAR*    Category()                      { return _T("Plasma RunTime");}
-    const TCHAR*    InternalName()                  { return _T("plRTOmni"); }  // returns fixed parsable name (scripter-visible name)
-    HINSTANCE       HInstance()                     { return hInstance; }
+class plRTOmniLightDesc : public ClassDesc2 {
+public:
+    int             IsPublic()                      {
+        return TRUE;
+    }
+    void*           Create(BOOL loading)            {
+        return new plRTOmniLight;
+    }
+    const TCHAR*    ClassName()                     {
+        return GetString(IDS_DB_OMNI);
+    }
+    SClass_ID       SuperClassID()                  {
+        return LIGHT_CLASS_ID;
+    }
+    Class_ID        ClassID()                       {
+        return RTOMNI_LIGHT_CLASSID;
+    }
+    const TCHAR*    Category()                      {
+        return _T("Plasma RunTime");
+    }
+    const TCHAR*    InternalName()                  {
+        return _T("plRTOmni");    // returns fixed parsable name (scripter-visible name)
+    }
+    HINSTANCE       HInstance()                     {
+        return hInstance;
+    }
 
 
     static plRTOmniLightDesc    fStaticDesc;
 
-    static ClassDesc2   *GetDesc( void )        { return &fStaticDesc; }
+    static ClassDesc2*   GetDesc(void)        {
+        return &fStaticDesc;
+    }
 };
 
 
@@ -113,53 +141,85 @@ class plRTOmniLightDesc : public ClassDesc2
 //// Spotlight ////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-class plRTSpotLight : public plRTLightBase
-{
-    public:
-        
-        plRTSpotLight(BOOL loading);
+class plRTSpotLight : public plRTLightBase {
+public:
 
-        plRTSpotLight();
+    plRTSpotLight(BOOL loading);
 
-        Class_ID ClassID() { return RTSPOT_LIGHT_CLASSID; }     
-        SClass_ID SuperClassID() { return LIGHT_CLASS_ID; }
+    plRTSpotLight();
 
-        int CanConvertToType(Class_ID obtype) { return (obtype ==  RTSPOT_LIGHT_CLASSID ) ? 1 : 0; }
-        ObjLightDesc *CreateLightDesc(INode *n, BOOL forceShadowBuf= FALSE);
-        GenLight* NewLight(int type) {return new plRTSpotLight();}
-        RefTargetHandle Clone(RemapDir &remap);
-        
-        virtual Texmap  *GetProjMap();
+    Class_ID ClassID() {
+        return RTSPOT_LIGHT_CLASSID;
+    }
+    SClass_ID SuperClassID() {
+        return LIGHT_CLASS_ID;
+    }
 
-        virtual BOOL    IsSpot( void )  { return TRUE; }
-        virtual int     GetProjector() { return fLightPB->GetInt( kUseProjectorBool, 0 ); }
+    int CanConvertToType(Class_ID obtype) {
+        return (obtype ==  RTSPOT_LIGHT_CLASSID) ? 1 : 0;
+    }
+    ObjLightDesc* CreateLightDesc(INode* n, BOOL forceShadowBuf = FALSE);
+    GenLight* NewLight(int type) {
+        return new plRTSpotLight();
+    }
+    RefTargetHandle Clone(RemapDir& remap);
 
-        virtual void            InitNodeName( TSTR &s ) { s = _T( "RTSpotLight" ); }
+    virtual Texmap*  GetProjMap();
 
-        virtual int     DrawConeAndLine( TimeValue t, INode* inode, GraphicsWindow *gw, int drawing );
-        virtual void    DrawCone( TimeValue t, GraphicsWindow *gw, float dist );
-        virtual void    GetLocalBoundBox( TimeValue t, INode *node, ViewExp *vpt, Box3 &box );
+    virtual BOOL    IsSpot(void)  {
+        return TRUE;
+    }
+    virtual int     GetProjector() {
+        return fLightPB->GetInt(kUseProjectorBool, 0);
+    }
 
-    protected:
-        virtual void    IBuildMeshes( BOOL isNew );
-        virtual bool    IHasAttenuation( void ) { return true; }
+    virtual void            InitNodeName(TSTR& s) {
+        s = _T("RTSpotLight");
+    }
+
+    virtual int     DrawConeAndLine(TimeValue t, INode* inode, GraphicsWindow* gw, int drawing);
+    virtual void    DrawCone(TimeValue t, GraphicsWindow* gw, float dist);
+    virtual void    GetLocalBoundBox(TimeValue t, INode* node, ViewExp* vpt, Box3& box);
+
+protected:
+    virtual void    IBuildMeshes(BOOL isNew);
+    virtual bool    IHasAttenuation(void) {
+        return true;
+    }
 };
 
-class plRTSpotLightDesc : public ClassDesc2 
-{
-    public:
-    int             IsPublic()                      { return TRUE; }
-    void*           Create(BOOL loading = FALSE)    { return new plRTSpotLight; }
-    const TCHAR*    ClassName()                     { return GetString(IDS_DB_FREE_SPOT); }
-    SClass_ID       SuperClassID()                  { return LIGHT_CLASS_ID; }
-    Class_ID        ClassID()                       { return RTSPOT_LIGHT_CLASSID; }
-    const TCHAR*    Category()                      { return _T("Plasma RunTime"); }
-    const TCHAR*    InternalName()                  { return _T("RTSpot"); }    // returns fixed parsable name (scripter-visible name)
-    HINSTANCE       HInstance()                     { return hInstance; }
+class plRTSpotLightDesc : public ClassDesc2 {
+public:
+    int             IsPublic()                      {
+        return TRUE;
+    }
+    void*           Create(BOOL loading = FALSE)    {
+        return new plRTSpotLight;
+    }
+    const TCHAR*    ClassName()                     {
+        return GetString(IDS_DB_FREE_SPOT);
+    }
+    SClass_ID       SuperClassID()                  {
+        return LIGHT_CLASS_ID;
+    }
+    Class_ID        ClassID()                       {
+        return RTSPOT_LIGHT_CLASSID;
+    }
+    const TCHAR*    Category()                      {
+        return _T("Plasma RunTime");
+    }
+    const TCHAR*    InternalName()                  {
+        return _T("RTSpot");    // returns fixed parsable name (scripter-visible name)
+    }
+    HINSTANCE       HInstance()                     {
+        return hInstance;
+    }
 
     static plRTSpotLightDesc    fStaticDesc;
 
-    static ClassDesc2   *GetDesc( void )        { return &fStaticDesc; }
+    static ClassDesc2*   GetDesc(void)        {
+        return &fStaticDesc;
+    }
 
 };
 
@@ -168,49 +228,77 @@ class plRTSpotLightDesc : public ClassDesc2
 //// Directional Light ////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-class plRTDirLight : public plRTLightBase
-{
-    public:
+class plRTDirLight : public plRTLightBase {
+public:
 
-        plRTDirLight();
+    plRTDirLight();
 
-        Class_ID ClassID() { return RTDIR_LIGHT_CLASSID; }      
-        SClass_ID SuperClassID() { return LIGHT_CLASS_ID; }
+    Class_ID ClassID() {
+        return RTDIR_LIGHT_CLASSID;
+    }
+    SClass_ID SuperClassID() {
+        return LIGHT_CLASS_ID;
+    }
 
-        ObjLightDesc *CreateLightDesc(INode *n, BOOL forceShadowBuf= FALSE);
-        GenLight* NewLight(int type) {return new plRTDirLight();}
-        RefTargetHandle Clone(RemapDir &remap);
+    ObjLightDesc* CreateLightDesc(INode* n, BOOL forceShadowBuf = FALSE);
+    GenLight* NewLight(int type) {
+        return new plRTDirLight();
+    }
+    RefTargetHandle Clone(RemapDir& remap);
 
-        int CanConvertToType(Class_ID obtype) { return (obtype ==  RTDIR_LIGHT_CLASSID ) ? 1 : 0; }
+    int CanConvertToType(Class_ID obtype) {
+        return (obtype ==  RTDIR_LIGHT_CLASSID) ? 1 : 0;
+    }
 
-        virtual void    DrawCone(TimeValue t, GraphicsWindow *gw, float dist);
-        virtual void    GetLocalBoundBox( TimeValue t, INode *node, ViewExp *vpt, Box3 &box );
+    virtual void    DrawCone(TimeValue t, GraphicsWindow* gw, float dist);
+    virtual void    GetLocalBoundBox(TimeValue t, INode* node, ViewExp* vpt, Box3& box);
 
-        virtual BOOL IsDir( void )  { return TRUE; }
+    virtual BOOL IsDir(void)  {
+        return TRUE;
+    }
 
-        virtual void            InitNodeName( TSTR &s ) { s = _T( "RTDirLight" ); }
+    virtual void            InitNodeName(TSTR& s) {
+        s = _T("RTDirLight");
+    }
 
-    protected:
-        virtual void    IBuildMeshes( BOOL isNew );
+protected:
+    virtual void    IBuildMeshes(BOOL isNew);
 
-        void    IBuildZArrow( float x, float y, float zDist, float arrowSize, Point3 *pts );
+    void    IBuildZArrow(float x, float y, float zDist, float arrowSize, Point3* pts);
 };
 
-class plRTDirLightDesc : public ClassDesc2 
-{
-    public:
-    int             IsPublic()                      { return TRUE; }
-    void*           Create(BOOL loading)            { return new plRTDirLight; }
-    const TCHAR*    ClassName()                     { return GetString(IDS_DB_DIRECTIONAL); }
-    SClass_ID       SuperClassID()                  { return LIGHT_CLASS_ID; }
-    Class_ID        ClassID()                       { return RTDIR_LIGHT_CLASSID; }
-    const TCHAR*    Category()                      { return _T("Plasma RunTime");}
-    const TCHAR*    InternalName()                  { return _T("RTDir"); } // returns fixed parsable name (scripter-visible name)
-    HINSTANCE       HInstance()                     { return hInstance; }
+class plRTDirLightDesc : public ClassDesc2 {
+public:
+    int             IsPublic()                      {
+        return TRUE;
+    }
+    void*           Create(BOOL loading)            {
+        return new plRTDirLight;
+    }
+    const TCHAR*    ClassName()                     {
+        return GetString(IDS_DB_DIRECTIONAL);
+    }
+    SClass_ID       SuperClassID()                  {
+        return LIGHT_CLASS_ID;
+    }
+    Class_ID        ClassID()                       {
+        return RTDIR_LIGHT_CLASSID;
+    }
+    const TCHAR*    Category()                      {
+        return _T("Plasma RunTime");
+    }
+    const TCHAR*    InternalName()                  {
+        return _T("RTDir");    // returns fixed parsable name (scripter-visible name)
+    }
+    HINSTANCE       HInstance()                     {
+        return hInstance;
+    }
 
     static plRTDirLightDesc     fStaticDesc;
 
-    static ClassDesc2   *GetDesc( void )        { return &fStaticDesc; }
+    static ClassDesc2*   GetDesc(void)        {
+        return &fStaticDesc;
+    }
 
 };
 

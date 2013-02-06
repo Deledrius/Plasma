@@ -55,82 +55,81 @@ pyAgeInfoStruct::pyAgeInfoStruct()
 {
 }
 
-pyAgeInfoStruct::pyAgeInfoStruct(plAgeInfoStruct * info)
+pyAgeInfoStruct::pyAgeInfoStruct(plAgeInfoStruct* info)
 {
-    fAgeInfo.CopyFrom( info );
+    fAgeInfo.CopyFrom(info);
 }
 
 pyAgeInfoStruct::~pyAgeInfoStruct()
 {
 }
 
-bool pyAgeInfoStruct::operator==(const pyAgeInfoStruct &other) const
+bool pyAgeInfoStruct::operator==(const pyAgeInfoStruct& other) const
 {
-    return fAgeInfo.IsEqualTo( other.GetAgeInfo() );
+    return fAgeInfo.IsEqualTo(other.GetAgeInfo());
 }
 
 /////////////////////////////////////////////////////////////////////
 
-void pyAgeInfoStruct::CopyFrom( const pyAgeInfoStruct & other )
+void pyAgeInfoStruct::CopyFrom(const pyAgeInfoStruct& other)
 {
-    fAgeInfo.CopyFrom( other.GetAgeInfo() );
+    fAgeInfo.CopyFrom(other.GetAgeInfo());
 }
 
-void pyAgeInfoStruct::CopyFromRef( const pyAgeInfoStructRef & other )
+void pyAgeInfoStruct::CopyFromRef(const pyAgeInfoStructRef& other)
 {
-    fAgeInfo.CopyFrom( other.GetAgeInfo() );
+    fAgeInfo.CopyFrom(other.GetAgeInfo());
 }
 
-const char * pyAgeInfoStruct::GetAgeFilename() const
+const char* pyAgeInfoStruct::GetAgeFilename() const
 {
     return fAgeInfo.GetAgeFilename();
 }
 
-void pyAgeInfoStruct::SetAgeFilename( const char * v )
+void pyAgeInfoStruct::SetAgeFilename(const char* v)
 {
-    fAgeInfo.SetAgeFilename( v );
+    fAgeInfo.SetAgeFilename(v);
 }
 
-const char * pyAgeInfoStruct::GetAgeInstanceName() const
+const char* pyAgeInfoStruct::GetAgeInstanceName() const
 {
     return fAgeInfo.GetAgeInstanceName();
 }
 
-void pyAgeInfoStruct::SetAgeInstanceName( const char * v )
+void pyAgeInfoStruct::SetAgeInstanceName(const char* v)
 {
-    fAgeInfo.SetAgeInstanceName( v );
+    fAgeInfo.SetAgeInstanceName(v);
 }
 
-const char * pyAgeInfoStruct::GetAgeUserDefinedName() const
+const char* pyAgeInfoStruct::GetAgeUserDefinedName() const
 {
     return fAgeInfo.GetAgeUserDefinedName();
 }
 
-void pyAgeInfoStruct::SetAgeUserDefinedName( const char * v )
+void pyAgeInfoStruct::SetAgeUserDefinedName(const char* v)
 {
-    fAgeInfo.SetAgeUserDefinedName( v );
+    fAgeInfo.SetAgeUserDefinedName(v);
 }
 
-const char * pyAgeInfoStruct::GetAgeDescription() const
+const char* pyAgeInfoStruct::GetAgeDescription() const
 {
     return fAgeInfo.GetAgeDescription();
 }
 
-void pyAgeInfoStruct::SetAgeDescription( const char * v )
+void pyAgeInfoStruct::SetAgeDescription(const char* v)
 {
-    fAgeInfo.SetAgeDescription( v );
+    fAgeInfo.SetAgeDescription(v);
 }
 
-const char * pyAgeInfoStruct::GetAgeInstanceGuid() const
+const char* pyAgeInfoStruct::GetAgeInstanceGuid() const
 {
     fAgeInstanceGuidStr = fAgeInfo.GetAgeInstanceGuid()->AsString();
     return fAgeInstanceGuidStr.c_str();
 }
 
-void pyAgeInfoStruct::SetAgeInstanceGuid( const char * guid )
+void pyAgeInfoStruct::SetAgeInstanceGuid(const char* guid)
 {
-    if ( guid[0] == '@' )
-    {
+    if (guid[0] == '@') {
         // if it starts with an @ then do a meta kind of GUID
         std::string curInst = fAgeInfo.GetAgeInstanceName();
         std::string y = curInst + guid;
@@ -142,19 +141,21 @@ void pyAgeInfoStruct::SetAgeInstanceGuid( const char * guid )
 
         const char* md5sum = hash.GetAsHexString();
         plStringStream ss;
-        for (size_t i = 0; i < 16; i++) {
-            ss << md5sum[2*i];
-            ss << md5sum[(2*i)+1];
 
-            if (i == 3 || i == 5 || i == 7 || i == 9)
+        for (size_t i = 0; i < 16; i++) {
+            ss << md5sum[2 * i];
+            ss << md5sum[(2 * i) + 1];
+
+            if (i == 3 || i == 5 || i == 7 || i == 9) {
                 ss << '-';
+            }
         }
+
         plUUID instanceGuid(ss.GetString());
         fAgeInfo.SetAgeInstanceGuid(&instanceGuid);
-    }
-    else {
+    } else {
         plUUID temp(guid);
-        fAgeInfo.SetAgeInstanceGuid( &temp );
+        fAgeInfo.SetAgeInstanceGuid(&temp);
     }
 }
 
@@ -163,9 +164,9 @@ int32_t pyAgeInfoStruct::GetAgeSequenceNumber() const
     return fAgeInfo.GetAgeSequenceNumber();
 }
 
-void pyAgeInfoStruct::SetAgeSequenceNumber( int32_t v )
+void pyAgeInfoStruct::SetAgeSequenceNumber(int32_t v)
 {
-    fAgeInfo.SetAgeSequenceNumber( v );
+    fAgeInfo.SetAgeSequenceNumber(v);
 }
 
 int32_t pyAgeInfoStruct::GetAgeLanguage() const
@@ -173,18 +174,21 @@ int32_t pyAgeInfoStruct::GetAgeLanguage() const
     return fAgeInfo.GetAgeLanguage();
 }
 
-void pyAgeInfoStruct::SetAgeLanguage( int32_t v )
+void pyAgeInfoStruct::SetAgeLanguage(int32_t v)
 {
-    fAgeInfo.SetAgeLanguage( v );
+    fAgeInfo.SetAgeLanguage(v);
 }
 
-const char * pyAgeInfoStruct::GetDisplayName() const
+const char* pyAgeInfoStruct::GetDisplayName() const
 {
     int32_t seq = GetAgeSequenceNumber();
-    if ( seq>0 )
-        fDisplayName = plString::Format( "%s (%d) %s", GetAgeUserDefinedName(), seq, GetAgeInstanceName() );
-    else
-        fDisplayName = plString::Format( "%s %s", GetAgeUserDefinedName(), GetAgeInstanceName() );
+
+    if (seq > 0) {
+        fDisplayName = plString::Format("%s (%d) %s", GetAgeUserDefinedName(), seq, GetAgeInstanceName());
+    } else {
+        fDisplayName = plString::Format("%s %s", GetAgeUserDefinedName(), GetAgeInstanceName());
+    }
+
     return fDisplayName.c_str();
 }
 
@@ -193,56 +197,56 @@ const char * pyAgeInfoStruct::GetDisplayName() const
 
 plAgeInfoStruct pyAgeInfoStructRef::fDefaultAgeInfo; // created so a default constructor could be made for python. Do NOT use
 
-void pyAgeInfoStructRef::CopyFrom( const pyAgeInfoStruct & other )
+void pyAgeInfoStructRef::CopyFrom(const pyAgeInfoStruct& other)
 {
-    fAgeInfo.CopyFrom( other.GetAgeInfo() );
+    fAgeInfo.CopyFrom(other.GetAgeInfo());
 }
 
-void pyAgeInfoStructRef::CopyFromRef( const pyAgeInfoStructRef & other )
+void pyAgeInfoStructRef::CopyFromRef(const pyAgeInfoStructRef& other)
 {
-    fAgeInfo.CopyFrom( other.GetAgeInfo() );
+    fAgeInfo.CopyFrom(other.GetAgeInfo());
 }
 
-const char * pyAgeInfoStructRef::GetAgeFilename() const
+const char* pyAgeInfoStructRef::GetAgeFilename() const
 {
     return fAgeInfo.GetAgeFilename();
 }
 
-void pyAgeInfoStructRef::SetAgeFilename( const char * v )
+void pyAgeInfoStructRef::SetAgeFilename(const char* v)
 {
-    fAgeInfo.SetAgeFilename( v );
+    fAgeInfo.SetAgeFilename(v);
 }
 
-const char * pyAgeInfoStructRef::GetAgeInstanceName() const
+const char* pyAgeInfoStructRef::GetAgeInstanceName() const
 {
     return fAgeInfo.GetAgeInstanceName();
 }
 
-void pyAgeInfoStructRef::SetAgeInstanceName( const char * v )
+void pyAgeInfoStructRef::SetAgeInstanceName(const char* v)
 {
-    fAgeInfo.SetAgeInstanceName( v );
+    fAgeInfo.SetAgeInstanceName(v);
 }
 
-const char * pyAgeInfoStructRef::GetAgeUserDefinedName() const
+const char* pyAgeInfoStructRef::GetAgeUserDefinedName() const
 {
     return fAgeInfo.GetAgeUserDefinedName();
 }
 
-void pyAgeInfoStructRef::SetAgeUserDefinedName( const char * v )
+void pyAgeInfoStructRef::SetAgeUserDefinedName(const char* v)
 {
-    fAgeInfo.SetAgeUserDefinedName( v );
+    fAgeInfo.SetAgeUserDefinedName(v);
 }
 
-const char * pyAgeInfoStructRef::GetAgeInstanceGuid() const
+const char* pyAgeInfoStructRef::GetAgeInstanceGuid() const
 {
     fAgeInstanceGuidStr = fAgeInfo.GetAgeInstanceGuid()->AsString();
     return fAgeInstanceGuidStr.c_str();
 }
 
-void pyAgeInfoStructRef::SetAgeInstanceGuid( const char * guid )
+void pyAgeInfoStructRef::SetAgeInstanceGuid(const char* guid)
 {
     plUUID tmp(guid);
-    fAgeInfo.SetAgeInstanceGuid( &tmp );
+    fAgeInfo.SetAgeInstanceGuid(&tmp);
 }
 
 int32_t pyAgeInfoStructRef::GetAgeSequenceNumber() const
@@ -250,17 +254,20 @@ int32_t pyAgeInfoStructRef::GetAgeSequenceNumber() const
     return fAgeInfo.GetAgeSequenceNumber();
 }
 
-void pyAgeInfoStructRef::SetAgeSequenceNumber( int32_t v )
+void pyAgeInfoStructRef::SetAgeSequenceNumber(int32_t v)
 {
-    fAgeInfo.SetAgeSequenceNumber( v );
+    fAgeInfo.SetAgeSequenceNumber(v);
 }
 
-const char * pyAgeInfoStructRef::GetDisplayName() const
+const char* pyAgeInfoStructRef::GetDisplayName() const
 {
     int32_t seq = GetAgeSequenceNumber();
-    if ( seq>0 )
-        fDisplayName = plString::Format( "%s (%d) %s", GetAgeUserDefinedName(), seq, GetAgeInstanceName() );
-    else
-        fDisplayName = plString::Format( "%s %s", GetAgeUserDefinedName(), GetAgeInstanceName() );
+
+    if (seq > 0) {
+        fDisplayName = plString::Format("%s (%d) %s", GetAgeUserDefinedName(), seq, GetAgeInstanceName());
+    } else {
+        fDisplayName = plString::Format("%s %s", GetAgeUserDefinedName(), GetAgeInstanceName());
+    }
+
     return fDisplayName.c_str();
 }

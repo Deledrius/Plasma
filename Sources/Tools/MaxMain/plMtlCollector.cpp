@@ -63,117 +63,124 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "MaxComponent/pfGUISkinComp.h"
 
 
-static bool IsPlasmaMtl(Mtl *mtl)
+static bool IsPlasmaMtl(Mtl* mtl)
 {
     if (mtl->ClassID() == COMP_MTL_CLASS_ID ||
-        mtl->ClassID() == DECAL_MTL_CLASS_ID ||
-        mtl->ClassID() == MULTIMTL_CLASS_ID ||
-        mtl->ClassID() == PARTICLE_MTL_CLASS_ID ||
-        mtl->ClassID() == PASS_MTL_CLASS_ID ||
-        mtl->ClassID() == CLOTHING_MTL_CLASS_ID)
+            mtl->ClassID() == DECAL_MTL_CLASS_ID ||
+            mtl->ClassID() == MULTIMTL_CLASS_ID ||
+            mtl->ClassID() == PARTICLE_MTL_CLASS_ID ||
+            mtl->ClassID() == PASS_MTL_CLASS_ID ||
+            mtl->ClassID() == CLOTHING_MTL_CLASS_ID) {
         return true;
+    }
+
     return false;
 }
 
-static bool IsTexmapOK(Texmap *tex, uint8_t flags)
+static bool IsTexmapOK(Texmap* tex, uint8_t flags)
 {
-    if (flags & plMtlCollector::kPlasmaOnly && !plPlasmaMAXLayer::GetPlasmaMAXLayer(tex))
+    if (flags & plMtlCollector::kPlasmaOnly && !plPlasmaMAXLayer::GetPlasmaMAXLayer(tex)) {
         return false;
-
-    return true;
-}
-
-static bool IsMtlOK(Mtl *mtl, uint8_t flags)
-{
-    if (flags & plMtlCollector::kPlasmaOnly && !IsPlasmaMtl(mtl))
-        return false;
-
-    if (flags & plMtlCollector::kNoMultiMtl && mtl->ClassID() == MULTIMTL_CLASS_ID)
-        return false;
-
-    if (flags & plMtlCollector::kClothingMtlOnly && mtl->ClassID() != CLOTHING_MTL_CLASS_ID)
-        return false;
-
-    return true;
-}
-
-void GetMtlsRecur(MtlBase *mtlBase, MtlSet* mtls, TexSet* texmaps, uint32_t flags)
-{
-    if (!mtlBase)
-        return;
-
-    if (mtlBase->SuperClassID() == TEXMAP_CLASS_ID)
-    {
-        Texmap* tex = (Texmap*)mtlBase;
-        if (texmaps && IsTexmapOK(tex, flags))
-            texmaps->insert(tex);
     }
-    else if(mtlBase->SuperClassID() == MATERIAL_CLASS_ID)
-    {
+
+    return true;
+}
+
+static bool IsMtlOK(Mtl* mtl, uint8_t flags)
+{
+    if (flags & plMtlCollector::kPlasmaOnly && !IsPlasmaMtl(mtl)) {
+        return false;
+    }
+
+    if (flags & plMtlCollector::kNoMultiMtl && mtl->ClassID() == MULTIMTL_CLASS_ID) {
+        return false;
+    }
+
+    if (flags & plMtlCollector::kClothingMtlOnly && mtl->ClassID() != CLOTHING_MTL_CLASS_ID) {
+        return false;
+    }
+
+    return true;
+}
+
+void GetMtlsRecur(MtlBase* mtlBase, MtlSet* mtls, TexSet* texmaps, uint32_t flags)
+{
+    if (!mtlBase) {
+        return;
+    }
+
+    if (mtlBase->SuperClassID() == TEXMAP_CLASS_ID) {
+        Texmap* tex = (Texmap*)mtlBase;
+
+        if (texmaps && IsTexmapOK(tex, flags)) {
+            texmaps->insert(tex);
+        }
+    } else if (mtlBase->SuperClassID() == MATERIAL_CLASS_ID) {
         Mtl* mtl = (Mtl*)mtlBase;
 
-        if (mtls && IsMtlOK(mtl, flags))
+        if (mtls && IsMtlOK(mtl, flags)) {
             mtls->insert(mtl);
+        }
 
         // Get the bitmaps from all the textures this material contains
         int i;
         int numTex = mtl->NumSubTexmaps();
-        for (i = 0; i < numTex; i++)
-        {
-            Texmap *tex = mtl->GetSubTexmap(i);
-            if (tex)
-            {
-                if (texmaps && IsTexmapOK(tex, flags))
+
+        for (i = 0; i < numTex; i++) {
+            Texmap* tex = mtl->GetSubTexmap(i);
+
+            if (tex) {
+                if (texmaps && IsTexmapOK(tex, flags)) {
                     texmaps->insert(tex);
+                }
             }
         }
 
         // Do the same for any submtls
-        if (!(flags & plMtlCollector::kNoSubMtls))
-        {
+        if (!(flags & plMtlCollector::kNoSubMtls)) {
             int numMtl = mtl->NumSubMtls();
-            for (i = 0; i < numMtl; i++)
+
+            for (i = 0; i < numMtl; i++) {
                 GetMtlsRecur(mtl->GetSubMtl(i), mtls, texmaps, flags);
+            }
         }
-    }
-    else
-    {
+    } else {
         hsAssert(0, "What kind of material is this?");
     }
 }
 
 static void GetTexmapPBs(Texmap* tex, PBSet& pbs)
 {
-    if (!tex)
+    if (!tex) {
         return;
-
-    plPlasmaMAXLayer *plasma = plPlasmaMAXLayer::GetPlasmaMAXLayer( tex );
-    if( plasma != nil )
-    {
-        int i;
-        for( i = 0; i < plasma->GetNumBitmaps(); i++ )
-        {
-            PBBitmap *pbbm = plasma->GetPBBitmap( i );
-            if( pbbm != nil )
-                pbs.insert( pbbm );
-        }
     }
-    else
-    {
-        for (int i = 0; i < tex->NumRefs(); i++)
-        {
+
+    plPlasmaMAXLayer* plasma = plPlasmaMAXLayer::GetPlasmaMAXLayer(tex);
+
+    if (plasma != nil) {
+        int i;
+
+        for (i = 0; i < plasma->GetNumBitmaps(); i++) {
+            PBBitmap* pbbm = plasma->GetPBBitmap(i);
+
+            if (pbbm != nil) {
+                pbs.insert(pbbm);
+            }
+        }
+    } else {
+        for (int i = 0; i < tex->NumRefs(); i++) {
             ReferenceTarget* r = tex->GetReference(i);
-            if (r && r->SuperClassID() == PARAMETER_BLOCK2_CLASS_ID)
-            {
+
+            if (r && r->SuperClassID() == PARAMETER_BLOCK2_CLASS_ID) {
                 IParamBlock2* pb = (IParamBlock2*)r;
-                for (int j = 0; j < pb->NumParams(); j++)
-                {
-                    if (pb->GetParameterType(pb->IndextoID(j)) == TYPE_BITMAP)
-                    {
-                        PBBitmap *pbbm = pb->GetBitmap(j);
-                        
-                        if (pbbm)
+
+                for (int j = 0; j < pb->NumParams(); j++) {
+                    if (pb->GetParameterType(pb->IndextoID(j)) == TYPE_BITMAP) {
+                        PBBitmap* pbbm = pb->GetBitmap(j);
+
+                        if (pbbm) {
                             pbs.insert(pbbm);
+                        }
                     }
                 }
             }
@@ -183,95 +190,98 @@ static void GetTexmapPBs(Texmap* tex, PBSet& pbs)
 
 #include "MaxPlasmaLights/plRealTimeLightBase.h"
 
-static void GetNodeMtlsRecur(INode *node, MtlSet* mtls, TexSet* texmaps, uint32_t flags)
+static void GetNodeMtlsRecur(INode* node, MtlSet* mtls, TexSet* texmaps, uint32_t flags)
 {
-    Mtl *mtl = node->GetMtl();
+    Mtl* mtl = node->GetMtl();
     GetMtlsRecur(mtl, mtls, texmaps, flags);
 
     Object* obj = node->GetObjectRef();
-    if (obj && (obj->ClassID() == RTSPOT_LIGHT_CLASSID || obj->ClassID() == RTPDIR_LIGHT_CLASSID))
-    {
+
+    if (obj && (obj->ClassID() == RTSPOT_LIGHT_CLASSID || obj->ClassID() == RTPDIR_LIGHT_CLASSID)) {
         Texmap* texmap = ((plRTLightBase*)obj)->GetProjMap();
         GetMtlsRecur(texmap, mtls, texmaps, flags);
     }
 
-    plGUIControlBase *gui = plGUIControlBase::GetGUIComp( node );
-    if( gui != nil )
-    {
+    plGUIControlBase* gui = plGUIControlBase::GetGUIComp(node);
+
+    if (gui != nil) {
         uint32_t i;
-        for( i = 0; i < gui->GetNumMtls(); i++ )
-            GetMtlsRecur( gui->GetMtl( i ), mtls, texmaps, flags );
-    }
-    else
-    {
-        // Skins aren't controls
-        plGUISkinComp *guiSkin = plGUISkinComp::GetGUIComp( node );
-        if( guiSkin != nil )
-        {
-            uint32_t i;
-            for( i = 0; i < guiSkin->GetNumMtls(); i++ )
-                GetMtlsRecur( guiSkin->GetMtl( i ), mtls, texmaps, flags );
+
+        for (i = 0; i < gui->GetNumMtls(); i++) {
+            GetMtlsRecur(gui->GetMtl(i), mtls, texmaps, flags);
         }
-        else
-        {
+    } else {
+        // Skins aren't controls
+        plGUISkinComp* guiSkin = plGUISkinComp::GetGUIComp(node);
+
+        if (guiSkin != nil) {
+            uint32_t i;
+
+            for (i = 0; i < guiSkin->GetNumMtls(); i++) {
+                GetMtlsRecur(guiSkin->GetMtl(i), mtls, texmaps, flags);
+            }
+        } else {
             // Um, other components
-            plComponentBase *base = ( ( plMaxNodeBase *)node )->ConvertToComponent();
-            if( base != nil )
-            {
-                if( base->ClassID() == IMAGE_LIB_CID )
-                {
-                    pfImageLibComponent *iLib = (pfImageLibComponent *)base;
+            plComponentBase* base = ((plMaxNodeBase*)node)->ConvertToComponent();
+
+            if (base != nil) {
+                if (base->ClassID() == IMAGE_LIB_CID) {
+                    pfImageLibComponent* iLib = (pfImageLibComponent*)base;
                     uint32_t i;
-                    for( i = 0; i < iLib->GetNumBitmaps(); i++ )
-                        GetMtlsRecur( iLib->GetBitmap( i ), mtls, texmaps, flags );
+
+                    for (i = 0; i < iLib->GetNumBitmaps(); i++) {
+                        GetMtlsRecur(iLib->GetBitmap(i), mtls, texmaps, flags);
+                    }
                 }
             }
         }
     }
 
-    for (int i = 0; i < node->NumberOfChildren(); i++)
+    for (int i = 0; i < node->NumberOfChildren(); i++) {
         GetNodeMtlsRecur(node->GetChildNode(i), mtls, texmaps, flags);
+    }
 }
 
 static void GetEditorMtls(MtlSet* mtls, TexSet* texmaps, uint32_t flags)
 {
     static const int kNumEditorSlots = 24;
 
-    Interface *ip = GetCOREInterface();
-    for (int i = 0; i < kNumEditorSlots; i++)
-    {
-        MtlBase *mtlBase = ip->GetMtlSlot(i);
+    Interface* ip = GetCOREInterface();
+
+    for (int i = 0; i < kNumEditorSlots; i++) {
+        MtlBase* mtlBase = ip->GetMtlSlot(i);
         GetMtlsRecur(mtlBase, mtls, texmaps, flags);
     }
 }
 
 void plMtlCollector::GetMtls(MtlSet* mtls, TexSet* texmaps, uint32_t flags)
 {
-    Interface *ip = GetCOREInterface();
+    Interface* ip = GetCOREInterface();
 
     // Make a list of all the textures from the GetSceneMtls() func
     MtlBaseLib* sceneMtls = ip->GetSceneMtls();
-    for(int i = 0; i < sceneMtls->Count(); i++)
-    {
+
+    for (int i = 0; i < sceneMtls->Count(); i++) {
         GetMtlsRecur((*sceneMtls)[i], mtls, texmaps, flags);
     }
 
     // Add any more we find traversing the node hierarchy
-    INode *root = ip->GetRootNode();
+    INode* root = ip->GetRootNode();
     GetNodeMtlsRecur(root, mtls, texmaps, flags);
 
-    if (!(flags & kUsedOnly))
+    if (!(flags & kUsedOnly)) {
         GetEditorMtls(mtls, texmaps, flags);
+    }
 }
 
-void plMtlCollector::GetMtlLayers(Mtl *mtl, LayerSet& layers)
+void plMtlCollector::GetMtlLayers(Mtl* mtl, LayerSet& layers)
 {
     TexSet tex;
     GetMtlsRecur(mtl, nil, &tex, kPlasmaOnly);
 
     TexSet::iterator it = tex.begin();
-    for (; it != tex.end(); it++)
-    {
+
+    for (; it != tex.end(); it++) {
         layers.insert((plPlasmaMAXLayer*)*it);
     }
 }
@@ -283,12 +293,14 @@ void plMtlCollector::GetAllTextures(TexNameSet& texNames)
 
     PBSet pbs;
     TexSet::iterator it = tex.begin();
-    for (; it != tex.end(); it++)
+
+    for (; it != tex.end(); it++) {
         GetTexmapPBs(*it, pbs);
+    }
 
     PBSet::iterator pbIt = pbs.begin();
-    for (; pbIt != pbs.end(); pbIt++)
-    {
+
+    for (; pbIt != pbs.end(); pbIt++) {
         PBBitmap* pbbm = *pbIt;
         texNames.insert(pbbm->bi.Name());
     }

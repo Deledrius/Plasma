@@ -53,8 +53,7 @@ class plUoid;
 //
 //  List of keys for a single class type.
 //
-class plRegistryKeyList
-{
+class plRegistryKeyList {
 protected:
     friend class plKeyFinder;
 
@@ -67,12 +66,15 @@ protected:
     plRegistryKeyList() {}
 
     void IRepack();
-    void ILock() { ++fLocked; }
-    void IUnlock() { --fLocked; }
+    void ILock() {
+        ++fLocked;
+    }
+    void IUnlock() {
+        --fLocked;
+    }
 
 public:
-    enum LoadStatus
-    {
+    enum LoadStatus {
         kNoChange,
         kTypeLoaded,
         kTypeUnloaded
@@ -83,7 +85,9 @@ public:
     { }
     ~plRegistryKeyList();
 
-    uint16_t GetClassType() const { return fClassType; }
+    uint16_t GetClassType() const {
+        return fClassType;
+    }
 
     plKeyImp* FindKey(const plString& keyName) const;
     plKeyImp* FindKey(const plUoid& uoid) const;
@@ -91,7 +95,9 @@ public:
     bool IterateKeys(plRegistryKeyIterator* iterator);
 
     void AddKey(plKeyImp* key, LoadStatus& loadStatusChange);
-    void SetKeyUsed(plKeyImp* key) { ++fReffedKeys; }
+    void SetKeyUsed(plKeyImp* key) {
+        ++fReffedKeys;
+    }
     bool SetKeyUnused(plKeyImp* key, LoadStatus& loadStatusChange);
 
     void Read(hsStream* s);

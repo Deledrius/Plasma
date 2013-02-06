@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnUtils/Private/pnUtCrypt.h
-*   
+*
 ***/
 
 #ifndef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNUTILS_PRIVATE_PNUTCRYPT_H
@@ -73,27 +73,27 @@ enum ECryptAlgorithm {
 *
 ***/
 
-CryptKey * CryptKeyCreate (
+CryptKey* CryptKeyCreate(
     ECryptAlgorithm algorithm,
     unsigned        bytes,
-    const void *    data
+    const void*     data
 );
 
-void CryptKeyClose (
-    CryptKey *      key
+void CryptKeyClose(
+    CryptKey*       key
 );
 
-void CryptKeyGenerate (
+void CryptKeyGenerate(
     ECryptAlgorithm algorithm,
     unsigned        keyBits,    // used for algorithms with variable key strength
     unsigned        randomBytes,
-    const void *    randomData,
+    const void*     randomData,
     ARRAY(uint8_t) *   privateData,
     ARRAY(uint8_t) *   publicData  // only for public key cryptography
 );
 
-unsigned CryptKeyGetBlockSize (
-    CryptKey *      key
+unsigned CryptKeyGetBlockSize(
+    CryptKey*       key
 );
 
 /*****************************************************************************
@@ -102,29 +102,29 @@ unsigned CryptKeyGetBlockSize (
 *
 ***/
 
-void CryptEncrypt (
-    CryptKey *      key,
+void CryptEncrypt(
+    CryptKey*       key,
     ARRAY(uint8_t) *   dest,
     unsigned        sourceBytes,
-    const void *    sourceData
+    const void*     sourceData
 );
 
-void CryptEncrypt (
-    CryptKey *      key,
+void CryptEncrypt(
+    CryptKey*       key,
     unsigned        bytes,
-    void *          data
+    void*           data
 );
 
-void CryptDecrypt (
-    CryptKey *      key,
+void CryptDecrypt(
+    CryptKey*       key,
     ARRAY(uint8_t) *   dest,       // padded out to the algorithm's block size
     unsigned        sourceBytes,
-    const void *    sourceData
+    const void*     sourceData
 );
 
-void CryptDecrypt (
-    CryptKey *      key,
+void CryptDecrypt(
+    CryptKey*       key,
     unsigned        bytes,
-    void *          data
+    void*           data
 );
 #endif

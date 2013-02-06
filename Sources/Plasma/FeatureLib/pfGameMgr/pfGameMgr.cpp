@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/FeatureLib/pfGameMgr/pfGameMgr.cpp
-*   
+*
 ***/
 
 #include "Pch.h"
@@ -58,12 +58,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //============================================================================
 // pfGameCli factory
 //============================================================================
-struct Factory
-{
+struct Factory {
     const GameTypeReg& reg;
 
-    Factory (const GameTypeReg & reg);
-    Factory& operator= (const Factory &);   // not impl
+    Factory(const GameTypeReg& reg);
+    Factory& operator= (const Factory&);    // not impl
 };
 
 //============================================================================
@@ -72,22 +71,22 @@ struct Factory
 struct IGameCli : THashKeyVal<unsigned> {
 
     HASHLINK(IGameCli)  link;
-    pfGameCli *         gameCli;
-    Factory *           factory;
+    pfGameCli*          gameCli;
+    Factory*            factory;
     plKey               receiver;
     unsigned            playerCount;
 
-    IGameCli (
-        pfGameCli * gameCli,
+    IGameCli(
+        pfGameCli* gameCli,
         unsigned    gameId,
         plKey       receiver
     );
 
-    void Recv               (GameMsgHeader * msg, void * param);
-    void RecvPlayerJoined   (const Srv2Cli_Game_PlayerJoined & msg, void * param);
-    void RecvPlayerLeft     (const Srv2Cli_Game_PlayerLeft & msg, void * param);
-    void RecvInviteFailed   (const Srv2Cli_Game_InviteFailed & msg, void * param);
-    void RecvOwnerChange    (const Srv2Cli_Game_OwnerChange & msg, void * param);
+    void Recv(GameMsgHeader* msg, void* param);
+    void RecvPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg, void* param);
+    void RecvPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg, void* param);
+    void RecvInviteFailed(const Srv2Cli_Game_InviteFailed& msg, void* param);
+    void RecvOwnerChange(const Srv2Cli_Game_OwnerChange& msg, void* param);
 };
 
 //============================================================================
@@ -96,14 +95,14 @@ struct IGameCli : THashKeyVal<unsigned> {
 struct TransState : THashKeyVal<unsigned> {
 
     HASHLINK(TransState)    link;
-    void *                  param;
-    TransState (unsigned transId, void * param);
+    void*                   param;
+    TransState(unsigned transId, void* param);
 };
 struct JoinTransState {
 
     plKey receiver;
-    JoinTransState (plKey receiver)
-    :   receiver(receiver)
+    JoinTransState(plKey receiver)
+        :   receiver(receiver)
     { }
 };
 
@@ -112,14 +111,14 @@ struct JoinTransState {
 //============================================================================
 struct IGameMgr {
 
-    pfGameCli * CreateGameCli (const plUUID& gameTypeId, unsigned gameId, plKey receiver);
+    pfGameCli* CreateGameCli(const plUUID& gameTypeId, unsigned gameId, plKey receiver);
 
-    void Recv               (GameMsgHeader * msg);
-    void RecvGameInstance   (const Srv2Cli_GameMgr_GameInstance & msg, void * param);
-    void RecvInviteReceived (const Srv2Cli_GameMgr_InviteReceived & msg, void * param);
-    void RecvInviteRevoked  (const Srv2Cli_GameMgr_InviteRevoked & msg, void * param);
+    void Recv(GameMsgHeader* msg);
+    void RecvGameInstance(const Srv2Cli_GameMgr_GameInstance& msg, void* param);
+    void RecvInviteReceived(const Srv2Cli_GameMgr_InviteReceived& msg, void* param);
+    void RecvInviteRevoked(const Srv2Cli_GameMgr_InviteRevoked& msg, void* param);
 
-    static void StaticRecv (GameMsgHeader * msg);
+    static void StaticRecv(GameMsgHeader* msg);
 };
 
 
@@ -147,26 +146,33 @@ static ARRAYOBJ(plKey)  s_receivers;
 static void ShutdownFactories()
 {
     std::map<plUUID, Factory*>::iterator it;
+
     for (it = s_factories.begin(); it != s_factories.end(); ++it) {
         Factory* factory = it->second;
         delete factory;
     }
+
     s_factories.clear();
 }
 
 //============================================================================
-AUTO_INIT_FUNC (SetGameMgrMsgHandler) {
+AUTO_INIT_FUNC(SetGameMgrMsgHandler)
+{
 
     NetCliGameSetRecvGameMgrMsgHandler(IGameMgr::StaticRecv);
     atexit(ShutdownFactories);
 }
 
 //============================================================================
-static inline unsigned INextTransId () {
+static inline unsigned INextTransId()
+{
 
     unsigned transId = AtomicAdd(&s_transId, 1);
-    while (!transId)
+
+    while (!transId) {
         transId = AtomicAdd(&s_transId, 1);
+    }
+
     return transId;
 }
 
@@ -181,6 +187,7 @@ static inline unsigned INextTransId () {
 pfGameCli* IGameMgr::CreateGameCli(const plUUID& gameTypeId, unsigned gameId, plKey receiver)
 {
     std::map<plUUID, Factory*>::iterator it;
+
     if ((it = s_factories.find(gameTypeId)) != s_factories.end()) {
         pfGameCli* gameCli = it->second->reg.create(gameId, receiver);
         gameCli->internal->factory = it->second;
@@ -191,79 +198,95 @@ pfGameCli* IGameMgr::CreateGameCli(const plUUID& gameTypeId, unsigned gameId, pl
 }
 
 //============================================================================
-void IGameMgr::RecvGameInstance (const Srv2Cli_GameMgr_GameInstance & msg, void * param) {
+void IGameMgr::RecvGameInstance(const Srv2Cli_GameMgr_GameInstance& msg, void* param)
+{
 
-    JoinTransState * state = (JoinTransState *)param;
+    JoinTransState* state = (JoinTransState*)param;
 
-    pfGameCli * cli = nil;
-    IGameCli *  internal = nil;
+    pfGameCli* cli = nil;
+    IGameCli*   internal = nil;
+
     if (msg.result == kGameJoinSuccess) {
-        if (nil == (internal = s_games.Find(msg.newGameId)))
+        if (nil == (internal = s_games.Find(msg.newGameId))) {
             cli = CreateGameCli(msg.gameTypeId, msg.newGameId, state->receiver);
-        else
+        } else {
             cli = internal->gameCli;
+        }
     }
 
     delete state;
 }
 
 //============================================================================
-void IGameMgr::RecvInviteReceived (const Srv2Cli_GameMgr_InviteReceived & msg, void * param) {
-    pfGameMgrMsg * gameMgrMsg = new pfGameMgrMsg;
+void IGameMgr::RecvInviteReceived(const Srv2Cli_GameMgr_InviteReceived& msg, void* param)
+{
+    pfGameMgrMsg* gameMgrMsg = new pfGameMgrMsg;
     gameMgrMsg->Set(msg);
-    for (unsigned i = 0; i < s_receivers.Count(); ++i)
+
+    for (unsigned i = 0; i < s_receivers.Count(); ++i) {
         gameMgrMsg->AddReceiver(s_receivers[i]);
+    }
+
     gameMgrMsg->Send();
 }
 
 //============================================================================
-void IGameMgr::RecvInviteRevoked (const Srv2Cli_GameMgr_InviteRevoked & msg, void * param) {
-    pfGameMgrMsg * gameMgrMsg = new pfGameMgrMsg;
+void IGameMgr::RecvInviteRevoked(const Srv2Cli_GameMgr_InviteRevoked& msg, void* param)
+{
+    pfGameMgrMsg* gameMgrMsg = new pfGameMgrMsg;
     gameMgrMsg->Set(msg);
-    for (unsigned i = 0; i < s_receivers.Count(); ++i)
+
+    for (unsigned i = 0; i < s_receivers.Count(); ++i) {
         gameMgrMsg->AddReceiver(s_receivers[i]);
+    }
+
     gameMgrMsg->Send();
 }
 
 //============================================================================
-void IGameMgr::Recv (GameMsgHeader * msg) {
+void IGameMgr::Recv(GameMsgHeader* msg)
+{
 
-    // Look for transaction state associated with this message  
-    void * param;
-    if (TransState * trans = s_trans.Find(msg->transId)) {
+    // Look for transaction state associated with this message
+    void* param;
+
+    if (TransState* trans = s_trans.Find(msg->transId)) {
         param       = trans->param;
         delete trans;
-    }
-    else {
+    } else {
         param       = nil;
     }
 
     // If the message has a receiver gameId specified, then
     // hand it off to that game client for dispatch.
     if (unsigned gameId = msg->recvGameId) {
-        if (IGameCli * node = s_games.Find(gameId)) {
+        if (IGameCli* node = s_games.Find(gameId)) {
             node->Recv(msg, param);
         }
+
         return;
     }
-    
+
     // The message was meant for the game manager (that's us); dispatch it.
-    #define DISPATCH(a) case kSrv2Cli_GameMgr_##a: {                        \
+#define DISPATCH(a) case kSrv2Cli_GameMgr_##a: {                        \
         const Srv2Cli_GameMgr_##a & m = *(const Srv2Cli_GameMgr_##a *)msg;  \
         Recv##a(m, param);                                                  \
     }                                                                       \
     break;                                                                  //
+
     switch (msg->messageId) {
         DISPATCH(GameInstance);
         DISPATCH(InviteReceived);
         DISPATCH(InviteRevoked);
         DEFAULT_FATAL(msg->messageId);
     }
-    #undef DISPATCH
+
+#undef DISPATCH
 }
 
 //============================================================================
-void IGameMgr::StaticRecv (GameMsgHeader * msg) {
+void IGameMgr::StaticRecv(GameMsgHeader* msg)
+{
 
     pfGameMgr::GetInstance()->internal->Recv(msg);
 }
@@ -276,15 +299,17 @@ void IGameMgr::StaticRecv (GameMsgHeader * msg) {
 ***/
 
 //============================================================================
-pfGameMgrMsg::~pfGameMgrMsg () {
+pfGameMgrMsg::~pfGameMgrMsg()
+{
 
     free(netMsg);
 }
 
 //============================================================================
-void pfGameMgrMsg::Set (const GameMsgHeader & msg) {
+void pfGameMgrMsg::Set(const GameMsgHeader& msg)
+{
 
-    netMsg = (GameMsgHeader *)malloc(msg.messageBytes);
+    netMsg = (GameMsgHeader*)malloc(msg.messageBytes);
     memcpy(netMsg, &msg, msg.messageBytes);
 }
 
@@ -296,15 +321,17 @@ void pfGameMgrMsg::Set (const GameMsgHeader & msg) {
 ***/
 
 //============================================================================
-pfGameCliMsg::~pfGameCliMsg () {
+pfGameCliMsg::~pfGameCliMsg()
+{
 
     free(netMsg);
 }
 
 //============================================================================
-void pfGameCliMsg::Set (pfGameCli * cli, const GameMsgHeader & msg) {
+void pfGameCliMsg::Set(pfGameCli* cli, const GameMsgHeader& msg)
+{
 
-    netMsg = (GameMsgHeader *)malloc(msg.messageBytes);
+    netMsg = (GameMsgHeader*)malloc(msg.messageBytes);
     memcpy(netMsg, &msg, msg.messageBytes);
     gameCli     = cli;
 }
@@ -316,28 +343,35 @@ void pfGameCliMsg::Set (pfGameCli * cli, const GameMsgHeader & msg) {
 ***/
 
 //============================================================================
-pfGameMgr::pfGameMgr () {
+pfGameMgr::pfGameMgr()
+{
 }
 
 //============================================================================
-pfGameMgr * pfGameMgr::GetInstance () {
+pfGameMgr* pfGameMgr::GetInstance()
+{
 
     static pfGameMgr s_instance;
     return &s_instance;
 }
 
 //============================================================================
-void pfGameMgr::GetGameIds (ARRAY(unsigned) * arr) const {
+void pfGameMgr::GetGameIds(ARRAY(unsigned) * arr) const
+{
 
-    for (IGameCli * node = s_games.Head(); node; node = s_games.Next(node))
+    for (IGameCli* node = s_games.Head(); node; node = s_games.Next(node)) {
         arr->Add(node->GetValue());
+    }
 }
 
 //============================================================================
-pfGameCli * pfGameMgr::GetGameCli (unsigned gameId) const {
+pfGameCli* pfGameMgr::GetGameCli(unsigned gameId) const
+{
 
-    if (IGameCli * node = s_games.Find(gameId))
+    if (IGameCli* node = s_games.Find(gameId)) {
         return node->gameCli;
+    }
+
     return nil;
 }
 
@@ -345,14 +379,17 @@ pfGameCli * pfGameMgr::GetGameCli (unsigned gameId) const {
 const wchar_t* pfGameMgr::GetGameNameByTypeId(const plUUID& gameTypeId) const
 {
     std::map<plUUID, Factory*>::iterator it;
+
     if ((it = s_factories.find(gameTypeId)) != s_factories.end()) {
         return it->second->reg.name;
     }
+
     return nil;
 }
 
 //============================================================================
-void pfGameMgr::RemoveReceiver (plKey receiver) {
+void pfGameMgr::RemoveReceiver(plKey receiver)
+{
 
     for (unsigned i = 0; i < s_receivers.Count(); ++i) {
         if (s_receivers[i] == receiver) {
@@ -363,53 +400,56 @@ void pfGameMgr::RemoveReceiver (plKey receiver) {
 }
 
 //============================================================================
-void pfGameMgr::AddReceiver (plKey receiver) {
+void pfGameMgr::AddReceiver(plKey receiver)
+{
 
     RemoveReceiver(receiver);
     s_receivers.Add(receiver);
 }
 
 //============================================================================
-void pfGameMgr::JoinGame (
+void pfGameMgr::JoinGame(
     plKey           receiver,
     unsigned        gameId
-) {
+)
+{
     Cli2Srv_GameMgr_JoinGame msg;
     memset(&msg, 0, sizeof(msg));
-    
+
     msg.messageId       = kCli2Srv_GameMgr_JoinGame;
     msg.recvGameId      = 0;            // send to GameMgr on server
     msg.newGameId       = gameId;       // the GameSrv we wish to join
 
-    // Don't send "common game" message fields  
+    // Don't send "common game" message fields
     unsigned msgBytes
         = sizeof(msg)
-        - sizeof(msg.gameTypeId)
-        - sizeof(msg.createDataBytes)
-        - sizeof(msg.createData);
-        
+          - sizeof(msg.gameTypeId)
+          - sizeof(msg.createDataBytes)
+          - sizeof(msg.createData);
+
     msg.messageBytes    = msgBytes;
 
     GameMgrSend(&msg, new JoinTransState(receiver));
 }
 
 //============================================================================
-void pfGameMgr::CreateGame (
+void pfGameMgr::CreateGame(
     plKey           receiver,
     const plUUID&   gameTypeId,
     unsigned        createOptions,
     unsigned        initBytes,
-    const void *    initData
-) {
-    Cli2Srv_GameMgr_CreateGame * msg;
+    const void*     initData
+)
+{
+    Cli2Srv_GameMgr_CreateGame* msg;
 
     unsigned msgBytes
         = sizeof(*msg)
-        - sizeof(msg->createData)
-        + initBytes;
-        
-    msg = (Cli2Srv_GameMgr_CreateGame *)malloc(msgBytes);
-        
+          - sizeof(msg->createData)
+          + initBytes;
+
+    msg = (Cli2Srv_GameMgr_CreateGame*)malloc(msgBytes);
+
     msg->messageId          = kCli2Srv_GameMgr_CreateGame;
     msg->recvGameId         = 0;            // send to GameMgr on server
     msg->gameTypeId         = gameTypeId;   // The type of game we wish to create
@@ -424,22 +464,23 @@ void pfGameMgr::CreateGame (
 }
 
 //============================================================================
-void pfGameMgr::JoinCommonGame (
+void pfGameMgr::JoinCommonGame(
     plKey           receiver,
     const plUUID&   gameTypeId,
     unsigned        gameNumber,
     unsigned        initBytes,
-    const void *    initData
-) {
-    Cli2Srv_GameMgr_JoinGame * msg;
+    const void*     initData
+)
+{
+    Cli2Srv_GameMgr_JoinGame* msg;
 
     unsigned msgBytes
         = sizeof(*msg)
-        - sizeof(msg->createData)
-        + initBytes;
-        
-    msg = (Cli2Srv_GameMgr_JoinGame *)malloc(msgBytes);
-        
+          - sizeof(msg->createData)
+          + initBytes;
+
+    msg = (Cli2Srv_GameMgr_JoinGame*)malloc(msgBytes);
+
     msg->messageId          = kCli2Srv_GameMgr_JoinGame;
     msg->recvGameId         = 0;            // send to GameMgr on server
     msg->gameTypeId         = gameTypeId;   // the type of common game we with to join
@@ -462,51 +503,59 @@ void pfGameMgr::JoinCommonGame (
 ***/
 
 //============================================================================
-pfGameCli::pfGameCli (
+pfGameCli::pfGameCli(
     unsigned    gameId,
     plKey       receiver
-) {
+)
+{
     internal = new IGameCli(this, gameId, receiver);
 }
 
 //============================================================================
-pfGameCli::~pfGameCli () {
+pfGameCli::~pfGameCli()
+{
 
     delete internal;
 }
 
 //============================================================================
-unsigned pfGameCli::GetGameId () const {
+unsigned pfGameCli::GetGameId() const
+{
 
     return internal->GetValue();
 }
 
 //============================================================================
-const plUUID& pfGameCli::GetGameTypeId () const {
+const plUUID& pfGameCli::GetGameTypeId() const
+{
 
     return internal->factory->reg.typeId;
 }
 
 //============================================================================
-const wchar_t * pfGameCli::GetName () const {
+const wchar_t* pfGameCli::GetName() const
+{
 
     return internal->factory->reg.name;
 }
 
 //============================================================================
-plKey pfGameCli::GetReceiver () const {
+plKey pfGameCli::GetReceiver() const
+{
 
     return internal->receiver;
 }
 
 //============================================================================
-unsigned pfGameCli::GetPlayerCount () const {
+unsigned pfGameCli::GetPlayerCount() const
+{
 
     return internal->playerCount;
 }
 
 //============================================================================
-void pfGameCli::InvitePlayer (unsigned playerId) {
+void pfGameCli::InvitePlayer(unsigned playerId)
+{
 
     Cli2Srv_Game_Invite msg;
     msg.messageId       = kCli2Srv_Game_Invite;
@@ -518,7 +567,8 @@ void pfGameCli::InvitePlayer (unsigned playerId) {
 }
 
 //============================================================================
-void pfGameCli::UninvitePlayer (unsigned playerId) {
+void pfGameCli::UninvitePlayer(unsigned playerId)
+{
 
     Cli2Srv_Game_Uninvite msg;
     msg.messageId       = kCli2Srv_Game_Uninvite;
@@ -530,8 +580,9 @@ void pfGameCli::UninvitePlayer (unsigned playerId) {
 }
 
 //============================================================================
-void pfGameCli::LeaveGame () {
-    
+void pfGameCli::LeaveGame()
+{
+
     Cli2Srv_Game_LeaveGame msg;
     msg.messageId       = kCli2Srv_Game_LeaveGame;
     msg.recvGameId      = GetGameId();  // send to GameSrv on server
@@ -548,57 +599,65 @@ void pfGameCli::LeaveGame () {
 ***/
 
 //============================================================================
-IGameCli::IGameCli (
-    pfGameCli * gameCli,
+IGameCli::IGameCli(
+    pfGameCli* gameCli,
     unsigned    gameId,
     plKey       receiver
 ) : THashKeyVal<unsigned>(gameId)
-,   gameCli(gameCli)
-,   factory(nil)
-,   receiver(receiver)
-,   playerCount(0)
+    ,   gameCli(gameCli)
+    ,   factory(nil)
+    ,   receiver(receiver)
+    ,   playerCount(0)
 {
     s_games.Add(this);
 }
 
 //============================================================================
-void IGameCli::Recv (GameMsgHeader * msg, void * param) {
+void IGameCli::Recv(GameMsgHeader* msg, void* param)
+{
 
-    #define DISPATCH(a) case kSrv2Cli_Game_##a: {                       \
+#define DISPATCH(a) case kSrv2Cli_Game_##a: {                       \
         const Srv2Cli_Game_##a & m = *(const Srv2Cli_Game_##a *)msg;    \
         Recv##a(m, param);                                              \
     }                                                                   \
     break;
+
     switch (msg->messageId) {
         DISPATCH(PlayerJoined);
         DISPATCH(PlayerLeft);
         DISPATCH(InviteFailed);
         DISPATCH(OwnerChange);
-        default:
-            gameCli->Recv(msg, param);
+
+    default:
+        gameCli->Recv(msg, param);
     }
-    #undef DISPATCH
+
+#undef DISPATCH
 }
 
 //============================================================================
-void IGameCli::RecvPlayerJoined (const Srv2Cli_Game_PlayerJoined & msg, void * param) {
+void IGameCli::RecvPlayerJoined(const Srv2Cli_Game_PlayerJoined& msg, void* param)
+{
     ++playerCount;
     gameCli->OnPlayerJoined(msg);
 }
 
 //============================================================================
-void IGameCli::RecvPlayerLeft (const Srv2Cli_Game_PlayerLeft & msg, void * param) {
+void IGameCli::RecvPlayerLeft(const Srv2Cli_Game_PlayerLeft& msg, void* param)
+{
     --playerCount;
     gameCli->OnPlayerLeft(msg);
 }
 
 //============================================================================
-void IGameCli::RecvInviteFailed (const Srv2Cli_Game_InviteFailed & msg, void * param) {
+void IGameCli::RecvInviteFailed(const Srv2Cli_Game_InviteFailed& msg, void* param)
+{
     gameCli->OnInviteFailed(msg);
 }
 
 //============================================================================
-void IGameCli::RecvOwnerChange (const Srv2Cli_Game_OwnerChange & msg, void * param) {
+void IGameCli::RecvOwnerChange(const Srv2Cli_Game_OwnerChange& msg, void* param)
+{
     gameCli->OnOwnerChange(msg);
 }
 
@@ -623,9 +682,9 @@ Factory::Factory(const GameTypeReg& reg) : reg(reg)
 ***/
 
 //============================================================================
-TransState::TransState (unsigned transId, void * param)
-:   THashKeyVal<unsigned>(transId)
-,   param(param)
+TransState::TransState(unsigned transId, void* param)
+    :   THashKeyVal<unsigned>(transId)
+    ,   param(param)
 {
     s_trans.Add(this);
 }
@@ -638,19 +697,20 @@ TransState::TransState (unsigned transId, void * param)
 ***/
 
 //============================================================================
-void GameMgrRegisterGameType (const GameTypeReg & reg) {
+void GameMgrRegisterGameType(const GameTypeReg& reg)
+{
 
     (void)new Factory(reg);
 }
 
 //============================================================================
-void GameMgrSend (GameMsgHeader * msg, void * param) {
+void GameMgrSend(GameMsgHeader* msg, void* param)
+{
 
     if (param) {
         msg->transId = INextTransId();
         (void)new TransState(msg->transId, param);
-    }
-    else {
+    } else {
         msg->transId = 0;
     }
 

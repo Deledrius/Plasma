@@ -61,75 +61,76 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 //// Class Definition /////////////////////////////////////////////////////////
 
-class plCubicRenderTarget : public plRenderTarget
-{
-    protected:
+class plCubicRenderTarget : public plRenderTarget {
+protected:
 
-        //// Protected Members ////
+    //// Protected Members ////
 
-        plRenderTarget  *fFaces[6];
-        hsMatrix44      fWorldToCameras[6];
-        hsMatrix44      fCameraToWorlds[6];
-    
-    public:
+    plRenderTarget*  fFaces[6];
+    hsMatrix44      fWorldToCameras[6];
+    hsMatrix44      fCameraToWorlds[6];
 
-        //// Public Data ////
+public:
 
-        enum Faces
-        {
-            kLeftFace = 0,
-            kRightFace,
-            kFrontFace,
-            kBackFace,
-            kTopFace,
-            kBottomFace
-        };
+    //// Public Data ////
 
-        //// Public Members ////
+    enum Faces {
+        kLeftFace = 0,
+        kRightFace,
+        kFrontFace,
+        kBackFace,
+        kTopFace,
+        kBottomFace
+    };
 
-        CLASSNAME_REGISTER( plCubicRenderTarget );
-        GETINTERFACE_ANY( plCubicRenderTarget, plRenderTarget );
+    //// Public Members ////
 
-        plCubicRenderTarget()
-        {
-            fFaces[0] = fFaces[1] = fFaces[2] = fFaces[3] = fFaces[4] = fFaces[5] = nil;
+    CLASSNAME_REGISTER(plCubicRenderTarget);
+    GETINTERFACE_ANY(plCubicRenderTarget, plRenderTarget);
+
+    plCubicRenderTarget() {
+        fFaces[0] = fFaces[1] = fFaces[2] = fFaces[3] = fFaces[4] = fFaces[5] = nil;
+    }
+
+    plCubicRenderTarget(uint16_t flags, uint16_t width, uint16_t height, uint8_t bitDepth, uint8_t zDepth = -1, uint8_t sDepth = -1)
+        : plRenderTarget(flags, width, height, bitDepth, zDepth, sDepth) {
+        int     i;
+
+
+        for (i = 0; i < 6; i++) {
+            fFaces[i] = new plRenderTarget(flags, width, height, bitDepth, zDepth, sDepth);
+            fFaces[i]->fParent = this;
+            fWorldToCameras[i].Reset();
+            fCameraToWorlds[i].Reset();
         }
+    }
 
-        plCubicRenderTarget( uint16_t flags, uint16_t width, uint16_t height, uint8_t bitDepth, uint8_t zDepth = -1, uint8_t sDepth = -1 ) 
-            : plRenderTarget( flags, width, height, bitDepth, zDepth, sDepth )
-        {
-            int     i;
+    virtual ~plCubicRenderTarget() {
+        int         i;
 
 
-            for( i = 0; i < 6; i++ )
-            {
-                fFaces[i] = new plRenderTarget( flags, width, height, bitDepth, zDepth, sDepth );
-                fFaces[i]->fParent = this;
-                fWorldToCameras[i].Reset();
-                fCameraToWorlds[i].Reset();
-            }
+        for (i = 0; i < 6; i++) {
+            delete fFaces[i];
         }
+    }
 
-        virtual ~plCubicRenderTarget()
-        {
-            int         i;
+    // Get the total size in bytes
+    virtual uint32_t  GetTotalSize(void) const;
 
+    virtual void                SetCameraMatrix(const hsPoint3& pos);
+    virtual const hsMatrix44&   GetWorldToCamera(uint8_t face) const {
+        return fWorldToCameras[face];
+    }
+    virtual const hsMatrix44&   GetCameraToWorld(uint8_t face) const {
+        return fCameraToWorlds[face];
+    }
 
-            for( i = 0; i < 6; i++ ) 
-                delete fFaces[i];
-        }
+    plRenderTarget*  GetFace(uint8_t face) const {
+        return fFaces[face];
+    }
 
-        // Get the total size in bytes
-        virtual uint32_t  GetTotalSize( void ) const;
-
-        virtual void                SetCameraMatrix(const hsPoint3& pos);
-        virtual const hsMatrix44&   GetWorldToCamera(uint8_t face) const { return fWorldToCameras[face]; }
-        virtual const hsMatrix44&   GetCameraToWorld(uint8_t face) const { return fCameraToWorlds[face]; }
-
-        plRenderTarget  *GetFace(uint8_t face) const { return fFaces[face]; }
-
-        virtual uint32_t  Read(hsStream *s);
-        virtual uint32_t  Write(hsStream *s);
+    virtual uint32_t  Read(hsStream* s);
+    virtual uint32_t  Write(hsStream* s);
 
 };
 

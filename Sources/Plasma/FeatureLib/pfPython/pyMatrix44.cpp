@@ -87,7 +87,7 @@ void pyMatrix44::MakeUpPreserving(const pyPoint3& from, const pyPoint3& at, cons
 
 PyObject* pyMatrix44::GetInverse(PyObject* inverse) const
 {
-    pyMatrix44 *obj = pyMatrix44::ConvertFrom(inverse);
+    pyMatrix44* obj = pyMatrix44::ConvertFrom(inverse);
     fMatrix.GetInverse(&(obj->fMatrix));
     Py_INCREF(inverse); // incref it because we need to return a new ref
     return inverse;
@@ -95,7 +95,7 @@ PyObject* pyMatrix44::GetInverse(PyObject* inverse) const
 
 PyObject* pyMatrix44::GetTranspose(PyObject* transpose) const
 {
-    pyMatrix44 *obj = pyMatrix44::ConvertFrom(transpose);
+    pyMatrix44* obj = pyMatrix44::ConvertFrom(transpose);
     fMatrix.GetTranspose(&(obj->fMatrix));
     Py_INCREF(transpose); // incref it because we need to return a new ref
     return transpose;
@@ -103,7 +103,7 @@ PyObject* pyMatrix44::GetTranspose(PyObject* transpose) const
 
 PyObject* pyMatrix44::GetAdjoint(PyObject* adjoint) const
 {
-    pyMatrix44 *obj = pyMatrix44::ConvertFrom(adjoint);
+    pyMatrix44* obj = pyMatrix44::ConvertFrom(adjoint);
     fMatrix.GetAdjoint(&(obj->fMatrix));
     Py_INCREF(adjoint); // incref it because we need to return a new ref
     return adjoint;
@@ -111,7 +111,7 @@ PyObject* pyMatrix44::GetAdjoint(PyObject* adjoint) const
 
 PyObject* pyMatrix44::GetTranslate(PyObject* pt) const
 {
-    pyVector3 *obj = pyVector3::ConvertFrom(pt);
+    pyVector3* obj = pyVector3::ConvertFrom(pt);
     fMatrix.GetTranslate(&(obj->fVector));
     Py_INCREF(pt); // incref it because we need to return a new ref
     return pt;
@@ -134,11 +134,23 @@ PyObject* pyMatrix44::GetRightAxis() const
 
 float* pyMatrix44::GetData() const
 {
-    float *res = new float[4*4];
-    res[0] = fMatrix.fMap[0][0];  res[1] = fMatrix.fMap[0][1];  res[2] = fMatrix.fMap[0][2];  res[3] = fMatrix.fMap[0][3];
-    res[4] = fMatrix.fMap[1][0];  res[5] = fMatrix.fMap[1][1];  res[6] = fMatrix.fMap[1][2];  res[7] = fMatrix.fMap[1][3];
-    res[8] = fMatrix.fMap[2][0];  res[9] = fMatrix.fMap[2][1];  res[10] = fMatrix.fMap[2][2]; res[11] = fMatrix.fMap[2][3];
-    res[12] = fMatrix.fMap[3][0]; res[13] = fMatrix.fMap[3][1]; res[14] = fMatrix.fMap[3][2]; res[15] = fMatrix.fMap[3][3];
+    float* res = new float[4 * 4];
+    res[0] = fMatrix.fMap[0][0];
+    res[1] = fMatrix.fMap[0][1];
+    res[2] = fMatrix.fMap[0][2];
+    res[3] = fMatrix.fMap[0][3];
+    res[4] = fMatrix.fMap[1][0];
+    res[5] = fMatrix.fMap[1][1];
+    res[6] = fMatrix.fMap[1][2];
+    res[7] = fMatrix.fMap[1][3];
+    res[8] = fMatrix.fMap[2][0];
+    res[9] = fMatrix.fMap[2][1];
+    res[10] = fMatrix.fMap[2][2];
+    res[11] = fMatrix.fMap[2][3];
+    res[12] = fMatrix.fMap[3][0];
+    res[13] = fMatrix.fMap[3][1];
+    res[14] = fMatrix.fMap[3][2];
+    res[15] = fMatrix.fMap[3][3];
 
     return res;
 }

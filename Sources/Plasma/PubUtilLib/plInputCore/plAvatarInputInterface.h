@@ -58,7 +58,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 
 //// Class Definition ////////////////////////////////////////////////////////
-        
+
 class plInputEventMsg;
 class plMouseEventMsg;
 class plKeyMap;
@@ -72,195 +72,230 @@ class plAvatarInputInterface;
 
 //// Little Input Map Helpers ////////////////////////////////////////////////
 
-class plAvatarInputMap 
-{
-    protected:
+class plAvatarInputMap {
+protected:
 
-        plAvatarInputInterface  *fInterface;
+    plAvatarInputInterface*  fInterface;
 
-    public:
+public:
 
-        plAvatarInputMap();
-        virtual ~plAvatarInputMap();
-        virtual const char *GetName() = 0;
-        virtual bool IsBasic() { return false; }
+    plAvatarInputMap();
+    virtual ~plAvatarInputMap();
+    virtual const char* GetName() = 0;
+    virtual bool IsBasic() {
+        return false;
+    }
 
-        plMouseMap      *fMouseMap;
-        uint32_t          fButtonState;
+    plMouseMap*      fMouseMap;
+    uint32_t          fButtonState;
 };
 
 // Basic avatar mappings, for when the avatar is in "suspended input" mode.
-class plSuspendedMovementMap : public plAvatarInputMap
-{
+class plSuspendedMovementMap : public plAvatarInputMap {
 public:
     plSuspendedMovementMap();
-    virtual const char *GetName() { return "Suspended Movement"; }
+    virtual const char* GetName() {
+        return "Suspended Movement";
+    }
 };
 
 // The above, plus movement
-class plBasicControlMap : public plSuspendedMovementMap
-{
+class plBasicControlMap : public plSuspendedMovementMap {
 public:
     plBasicControlMap();
-    virtual const char *GetName() { return "Basic"; }
-    virtual bool IsBasic() { return true; }
+    virtual const char* GetName() {
+        return "Basic";
+    }
+    virtual bool IsBasic() {
+        return true;
+    }
 
 };
 // The above, plus movement
-class plBasicThirdPersonControlMap : public plBasicControlMap
-{
+class plBasicThirdPersonControlMap : public plBasicControlMap {
 public:
     plBasicThirdPersonControlMap();
-    virtual const char *GetName() { return "Basic Third Person"; }
+    virtual const char* GetName() {
+        return "Basic Third Person";
+    }
 };
 
-class plLadderControlMap : public plSuspendedMovementMap
-{
+class plLadderControlMap : public plSuspendedMovementMap {
 public:
     plLadderControlMap();
-    virtual const char *GetName() { return "LadderClimb"; }
+    virtual const char* GetName() {
+        return "LadderClimb";
+    }
 };
 
-class plLadderMountMap : public plSuspendedMovementMap
-{
+class plLadderMountMap : public plSuspendedMovementMap {
 public:
     plLadderMountMap();
-    virtual const char *GetName() { return "Ladder Mount"; }
+    virtual const char* GetName() {
+        return "Ladder Mount";
+    }
 };
 
-class plLadderDismountMap : public plSuspendedMovementMap
-{
+class plLadderDismountMap : public plSuspendedMovementMap {
 public:
     plLadderDismountMap();
-    virtual const char *GetName() { return "Ladder Dismount"; }
+    virtual const char* GetName() {
+        return "Ladder Dismount";
+    }
 };
 
 
-class plBasicFirstPersonControlMap : public plBasicControlMap
-{
+class plBasicFirstPersonControlMap : public plBasicControlMap {
 public:
     plBasicFirstPersonControlMap();
-    virtual const char *GetName() { return "Basic First Person"; }
+    virtual const char* GetName() {
+        return "Basic First Person";
+    }
 };
 
 // Mouse walk mode
-class pl3rdWalkMap : public plAvatarInputMap
-{
+class pl3rdWalkMap : public plAvatarInputMap {
 public:
     pl3rdWalkMap();
     virtual ~pl3rdWalkMap();
 };
 
-class pl3rdWalkForwardMap : public pl3rdWalkMap
-{
+class pl3rdWalkForwardMap : public pl3rdWalkMap {
 public:
     pl3rdWalkForwardMap();
-    virtual const char *GetName() { return "Walking Forward"; }
+    virtual const char* GetName() {
+        return "Walking Forward";
+    }
 };
 
-class pl3rdWalkBackwardMap : public pl3rdWalkMap
-{
+class pl3rdWalkBackwardMap : public pl3rdWalkMap {
 public:
     pl3rdWalkBackwardMap();
-    virtual const char *GetName() { return "Walking Backward"; }
+    virtual const char* GetName() {
+        return "Walking Backward";
+    }
 };
 
-class pl3rdWalkBackwardLBMap : public pl3rdWalkMap
-{
+class pl3rdWalkBackwardLBMap : public pl3rdWalkMap {
 public:
     pl3rdWalkBackwardLBMap();
-    virtual const char *GetName() { return "Walking Backward (LB)"; }
+    virtual const char* GetName() {
+        return "Walking Backward (LB)";
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-class plAvatarInputInterface : public plInputInterface
-{
-    protected:
+class plAvatarInputInterface : public plInputInterface {
+protected:
 
-        uint32_t      fCurrentCursor;
-        float    fCursorOpacity, fCursorTimeout, fCursorFadeDelay;
+    uint32_t      fCurrentCursor;
+    float    fCursorOpacity, fCursorTimeout, fCursorFadeDelay;
 
-        plAvatarInputMap        *fInputMap;
+    plAvatarInputMap*        fInputMap;
 
-        static plAvatarInputInterface       *fInstance;
+    static plAvatarInputInterface*       fInstance;
 
-        virtual bool    IHandleCtrlCmd( plCtrlCmd *cmd );
+    virtual bool    IHandleCtrlCmd(plCtrlCmd* cmd);
 
-        // Gets called once per IUpdate(), just like normal IEval()s
-        virtual bool IEval( double secs, float del, uint32_t dirty );
+    // Gets called once per IUpdate(), just like normal IEval()s
+    virtual bool IEval(double secs, float del, uint32_t dirty);
 
-        void    IDeactivateCommand(plMouseInfo *info);
-        void    IChangeInputMaps(plAvatarInputMap *newMap);
-        void    ISetSuspendMovementMode();
-        void    ISetBasicMode();
-        void    ISetMouseWalkMode(ControlEventCode code);
-        void    ISetLadderMap();
-        void    ISetPreLadderMap();
-        void    ISetPostLadderMap();
+    void    IDeactivateCommand(plMouseInfo* info);
+    void    IChangeInputMaps(plAvatarInputMap* newMap);
+    void    ISetSuspendMovementMode();
+    void    ISetBasicMode();
+    void    ISetMouseWalkMode(ControlEventCode code);
+    void    ISetLadderMap();
+    void    ISetPreLadderMap();
+    void    ISetPostLadderMap();
 
-        bool    IHasControlFlag(int f) const    { return fControlFlags.IsBitSet(f); }
-        void    IClearControlFlag(int which)    { fControlFlags.ClearBit( which ); }
+    bool    IHasControlFlag(int f) const    {
+        return fControlFlags.IsBitSet(f);
+    }
+    void    IClearControlFlag(int which)    {
+        fControlFlags.ClearBit(which);
+    }
 
-        bool    CursorInBox(plMouseEventMsg* pMsg, hsPoint4 box);
-        void    ClearMouseCursor();
-        void    DisableMouseInput() { fMouseDisabled = true; }
-        void    EnableMouseInput() { fMouseDisabled = false; }
-        
-        void    Reset();
+    bool    CursorInBox(plMouseEventMsg* pMsg, hsPoint4 box);
+    void    ClearMouseCursor();
+    void    DisableMouseInput() {
+        fMouseDisabled = true;
+    }
+    void    EnableMouseInput() {
+        fMouseDisabled = false;
+    }
 
-        void    RequestCursorToWorldPos(float xPos, float yPos, int ID);
+    void    Reset();
 
-        hsBitVector     fControlFlags;
-        bool            fMouseDisabled;
+    void    RequestCursorToWorldPos(float xPos, float yPos, int ID);
 
-        plPipeline*     fPipe;
-        int             fCursorState;
-        int             fCursorPriority;
-        bool    f3rdPerson;
+    hsBitVector     fControlFlags;
+    bool            fMouseDisabled;
 
-    public:
+    plPipeline*     fPipe;
+    int             fCursorState;
+    int             fCursorPriority;
+    bool    f3rdPerson;
 
-        plAvatarInputInterface();
-        virtual ~plAvatarInputInterface();
-    
-        void CameraInThirdPerson(bool state);
-    
-        // Always return true, since the cursor should be representing how we control the avatar
-        virtual bool        HasInterestingCursorID( void ) const { return true; }
-        virtual uint32_t      GetPriorityLevel( void ) const { return kAvatarInputPriority; }
-        virtual uint32_t      GetCurrentCursorID( void ) const { return fCurrentCursor; }
-        virtual float    GetCurrentCursorOpacity( void ) const { return fCursorOpacity; }
-        const char*         GetInputMapName() { return fInputMap ? fInputMap->GetName() : ""; }
+public:
 
-        virtual bool        InterpretInputEvent( plInputEventMsg *pMsg );
-        virtual void        MissedInputEvent( plInputEventMsg *pMsg );
+    plAvatarInputInterface();
+    virtual ~plAvatarInputInterface();
 
-        virtual bool        MsgReceive( plMessage *msg );
+    void CameraInThirdPerson(bool state);
 
-        virtual void        Init( plInputInterfaceMgr *manager );
-        virtual void        Shutdown( void );
+    // Always return true, since the cursor should be representing how we control the avatar
+    virtual bool        HasInterestingCursorID(void) const {
+        return true;
+    }
+    virtual uint32_t      GetPriorityLevel(void) const {
+        return kAvatarInputPriority;
+    }
+    virtual uint32_t      GetCurrentCursorID(void) const {
+        return fCurrentCursor;
+    }
+    virtual float    GetCurrentCursorOpacity(void) const {
+        return fCursorOpacity;
+    }
+    const char*         GetInputMapName() {
+        return fInputMap ? fInputMap->GetName() : "";
+    }
 
-        virtual void        RestoreDefaultKeyMappings( void );
-        virtual void        ClearKeyMap(); 
-        
-        // [dis/en]able mouse commands for avatar movement
-        void SuspendMouseMovement();
-        void EnableMouseMovement();
-        void EnableJump(bool val);
-        void EnableForwardMovement(bool val);
-        void EnableControl(bool val, ControlEventCode code);
-        void ClearLadderMode();
-        void SetLadderMode();
-        void ForceAlwaysRun(bool val);
-        
-        void    SetControlFlag(int f, bool val = true)            { fControlFlags.SetBit(f, val); }
+    virtual bool        InterpretInputEvent(plInputEventMsg* pMsg);
+    virtual void        MissedInputEvent(plInputEventMsg* pMsg);
 
-        void    SetCursorFadeDelay( float delay ) { fCursorFadeDelay = delay; }
+    virtual bool        MsgReceive(plMessage* msg);
 
-        bool    IsEnterChatModeBound();
+    virtual void        Init(plInputInterfaceMgr* manager);
+    virtual void        Shutdown(void);
 
-        static plAvatarInputInterface   *GetInstance( void ) { return fInstance; }
+    virtual void        RestoreDefaultKeyMappings(void);
+    virtual void        ClearKeyMap();
+
+    // [dis/en]able mouse commands for avatar movement
+    void SuspendMouseMovement();
+    void EnableMouseMovement();
+    void EnableJump(bool val);
+    void EnableForwardMovement(bool val);
+    void EnableControl(bool val, ControlEventCode code);
+    void ClearLadderMode();
+    void SetLadderMode();
+    void ForceAlwaysRun(bool val);
+
+    void    SetControlFlag(int f, bool val = true)            {
+        fControlFlags.SetBit(f, val);
+    }
+
+    void    SetCursorFadeDelay(float delay) {
+        fCursorFadeDelay = delay;
+    }
+
+    bool    IsEnterChatModeBound();
+
+    static plAvatarInputInterface*   GetInstance(void) {
+        return fInstance;
+    }
 };
 
 

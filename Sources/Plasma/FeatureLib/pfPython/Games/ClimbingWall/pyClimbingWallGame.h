@@ -52,8 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCli.h"
 
-class pyClimbingWallGame : public pyGameCli
-{
+class pyClimbingWallGame : public pyGameCli {
 protected:
     pyClimbingWallGame();
     pyClimbingWallGame(pfGameCli* client);

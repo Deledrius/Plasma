@@ -59,12 +59,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //  parameters (like %s or %1s) and also can be easily translated to
 //  XML format
 
-class pfLocalizedString
-{
+class pfLocalizedString {
 protected:
     // stores all basic text and param information in a nice, easy-to-use block of data
-    struct textBlock
-    {
+    struct textBlock {
         bool        fIsParam; // if true, then this is a parameter, not a string
         plString    fText;
         uint8_t     fParamIndex;
@@ -77,39 +75,45 @@ protected:
     plString fPlainTextRep;  // the plain text representation of this string
     uint16_t fNumArguments;  // number of arguments this string has
 
-    void IParameterize(const plString & inString);
-    void IConvertFromPlainText(const plString & plainText);
+    void IParameterize(const plString& inString);
+    void IConvertFromPlainText(const plString& plainText);
     void IUpdatePlainText(); // from the internal representation
-    void IConvertFromXML(const plString & xml);
+    void IConvertFromXML(const plString& xml);
     void IUpdateXML(); // from the internal representation
 public:
     pfLocalizedString() : fNumArguments(0) {}
-    pfLocalizedString(const plString & plainText);
+    pfLocalizedString(const plString& plainText);
     virtual ~pfLocalizedString() {}
 
     // To translate to and from xml format (where <, > and other signs can't be used)
-    void FromXML(const plString & xml);
-    plString ToXML() {return fXMLRep;}
+    void FromXML(const plString& xml);
+    plString ToXML() {
+        return fXMLRep;
+    }
 
-    uint16_t GetArgumentCount() {return fNumArguments;}
+    uint16_t GetArgumentCount() {
+        return fNumArguments;
+    }
 
     // Various operators, they all work pretty much the same as the standard string or wstring operators
     // but note that the all work on the plain text representation (not the XML representation)
-    bool operator<(pfLocalizedString &obj);
-    bool operator>(pfLocalizedString &obj);
-    bool operator==(pfLocalizedString &obj);
-    bool operator<=(pfLocalizedString &obj);
-    bool operator>=(pfLocalizedString &obj);
-    bool operator!=(pfLocalizedString &obj);
+    bool operator<(pfLocalizedString& obj);
+    bool operator>(pfLocalizedString& obj);
+    bool operator==(pfLocalizedString& obj);
+    bool operator<=(pfLocalizedString& obj);
+    bool operator>=(pfLocalizedString& obj);
+    bool operator!=(pfLocalizedString& obj);
 
-    operator plString() {return fPlainTextRep;}
+    operator plString() {
+        return fPlainTextRep;
+    }
 
-    pfLocalizedString operator+(pfLocalizedString &obj);
-    pfLocalizedString &operator+=(pfLocalizedString &obj);
-    pfLocalizedString &operator=(const plString & plainText);
+    pfLocalizedString operator+(pfLocalizedString& obj);
+    pfLocalizedString& operator+=(pfLocalizedString& obj);
+    pfLocalizedString& operator=(const plString& plainText);
 
     // Specialized operator for replacing text with arguments
-    plString operator%(const std::vector<plString> & arguments);
+    plString operator%(const std::vector<plString>& arguments);
 };
 
 #endif

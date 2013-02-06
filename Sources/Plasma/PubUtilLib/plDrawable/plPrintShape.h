@@ -45,8 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "pnSceneObject/plObjInterface.h"
 
-class plPrintShape : public plObjInterface
-{
+class plPrintShape : public plObjInterface {
 protected:
     float            fWidth;
     float            fLength;
@@ -55,23 +54,37 @@ public:
     plPrintShape();
     virtual ~plPrintShape();
 
-    CLASSNAME_REGISTER( plPrintShape );
-    GETINTERFACE_ANY( plPrintShape, plObjInterface );
+    CLASSNAME_REGISTER(plPrintShape);
+    GETINTERFACE_ANY(plPrintShape, plObjInterface);
 
 
-    virtual int32_t   GetNumProperties() const { return 1; }
+    virtual int32_t   GetNumProperties() const {
+        return 1;
+    }
     virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l) {}
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    float GetWidth() const { return fWidth; }
-    float GetLength() const { return fLength; }
-    float GetHeight() const { return fHeight; }
+    float GetWidth() const {
+        return fWidth;
+    }
+    float GetLength() const {
+        return fLength;
+    }
+    float GetHeight() const {
+        return fHeight;
+    }
 
-    void SetWidth(float f) { fWidth = f; }
-    void SetLength(float f) { fLength = f; }
-    void SetHeight(float f) { fHeight = f; }
+    void SetWidth(float f) {
+        fWidth = f;
+    }
+    void SetLength(float f) {
+        fLength = f;
+    }
+    void SetHeight(float f) {
+        fHeight = f;
+    }
 };
 
 #endif // plPrintShape_inc

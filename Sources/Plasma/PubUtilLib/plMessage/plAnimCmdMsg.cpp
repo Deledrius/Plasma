@@ -50,10 +50,10 @@ plAnimCmdMsg::~plAnimCmdMsg()
 }
 
 
-void plAnimCmdMsg::ClearCmd() 
-{ 
+void plAnimCmdMsg::ClearCmd()
+{
     plMessageWithCallbacks::Clear();
-    fCmd.Clear(); 
+    fCmd.Clear();
 }
 
 bool plAnimCmdMsg::CmdChangesAnimTime()
@@ -72,7 +72,7 @@ bool plAnimCmdMsg::CmdChangesAnimTime()
             Cmd(kPlayToTime) ||
             Cmd(kPlayToPercentage));
 }
-    
+
 void plAnimCmdMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessageWithCallbacks::Read(stream, mgr);
@@ -114,7 +114,7 @@ plAGCmdMsg::~plAGCmdMsg()
     ClearCmd();
 }
 
-void plAGCmdMsg::SetAnimName(const plString &name)
+void plAGCmdMsg::SetAnimName(const plString& name)
 {
     fAnimName = name;
 }
@@ -152,7 +152,7 @@ void plAGCmdMsg::Write(hsStream* stream, hsResMgr* mgr)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-void plAGDetachCallbackMsg::SetAnimName(const plString &name)
+void plAGDetachCallbackMsg::SetAnimName(const plString& name)
 {
     fAnimName = name;
 }

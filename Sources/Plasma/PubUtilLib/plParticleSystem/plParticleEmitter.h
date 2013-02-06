@@ -59,51 +59,65 @@ class hsResMgr;
 
 // This just holds a bunch of parameters for an emission location. A particle system can have several of these
 
-class plParticleEmitter : public plCreatable
-{
+class plParticleEmitter : public plCreatable {
     friend class plParticleSystem;
     friend class plSimpleParticleGenerator;
 
 public:
     plParticleEmitter();
     ~plParticleEmitter();
-    void Init(plParticleSystem *system, uint32_t maxParticles, uint32_t spanIndex, uint32_t miscFlags,
-              plParticleGenerator *gen = nil);
+    void Init(plParticleSystem* system, uint32_t maxParticles, uint32_t spanIndex, uint32_t miscFlags,
+              plParticleGenerator* gen = nil);
     void Clone(plParticleEmitter* src, uint32_t spanIndex);
 
-    plParticleCore *GetParticleArray() const { return fParticleCores; }
-    uint32_t GetParticleCount() const { return fNumValidParticles; }
+    plParticleCore* GetParticleArray() const {
+        return fParticleCores;
+    }
+    uint32_t GetParticleCount() const {
+        return fNumValidParticles;
+    }
     uint32_t GetNumTiles() const;
-    const hsBounds3Ext &GetBoundingBox() const { return fBoundBox; }
-    uint32_t GetSpanIndex() const { return fSpanIndex; }
-    const hsMatrix44 &GetLocalToWorld() const;
+    const hsBounds3Ext& GetBoundingBox() const {
+        return fBoundBox;
+    }
+    uint32_t GetSpanIndex() const {
+        return fSpanIndex;
+    }
+    const hsMatrix44& GetLocalToWorld() const;
 
-    void AddParticle(hsPoint3 &pos, hsVector3 &velocity, uint32_t tileIndex, 
+    void AddParticle(hsPoint3& pos, hsVector3& velocity, uint32_t tileIndex,
                      float hSize, float vSize, float scale, float invMass, float life,
-                     hsPoint3 &orientation, uint32_t miscFlags, float radsPerSec=0);
+                     hsPoint3& orientation, uint32_t miscFlags, float radsPerSec = 0);
     void WipeExistingParticles();
-    void KillParticles(float num, float timeToDie, uint8_t flags);  
-    uint16_t StealParticlesFrom(plParticleEmitter *victim, uint16_t num); // returns the number actually stolen
-    void TranslateAllParticles(hsPoint3 &amount); // Used to recenter the system when linking between ages. 
+    void KillParticles(float num, float timeToDie, uint8_t flags);
+    uint16_t StealParticlesFrom(plParticleEmitter* victim, uint16_t num); // returns the number actually stolen
+    void TranslateAllParticles(hsPoint3& amount); // Used to recenter the system when linking between ages.
     void UpdateGenerator(uint32_t paramID, float paramValue);
 
-    static uint32_t CreateHexColor(const hsColorRGBA &color);
+    static uint32_t CreateHexColor(const hsColorRGBA& color);
     static uint32_t CreateHexColor(const float r, const float g, const float b, const float a);
 
     void OverrideLocalToWorld(const hsMatrix44& l2w);
-    void UnOverrideLocalToWorld() { fMiscFlags &= ~kOverrideLocalToWorld; }
-    bool LocalToWorldOverridden() const { return 0 != (fMiscFlags & kOverrideLocalToWorld); }
-    void SetTimeToLive(float dt) { fTimeToLive = dt; }
-    float GetTimeToLive() const { return fTimeToLive; } // 0 time to live is never turn off.
+    void UnOverrideLocalToWorld() {
+        fMiscFlags &= ~kOverrideLocalToWorld;
+    }
+    bool LocalToWorldOverridden() const {
+        return 0 != (fMiscFlags & kOverrideLocalToWorld);
+    }
+    void SetTimeToLive(float dt) {
+        fTimeToLive = dt;
+    }
+    float GetTimeToLive() const {
+        return fTimeToLive;    // 0 time to live is never turn off.
+    }
 
-    CLASSNAME_REGISTER( plParticleEmitter );
-    GETINTERFACE_ANY( plParticleEmitter, plCreatable);
+    CLASSNAME_REGISTER(plParticleEmitter);
+    GETINTERFACE_ANY(plParticleEmitter, plCreatable);
 
-    virtual void Read(hsStream* s, hsResMgr *mgr); 
-    virtual void Write(hsStream* s, hsResMgr *mgr);
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-    enum // Miscellaneous flags
-    {
+    enum { // Miscellaneous flags
         kMatIsEmissive              = 0x00000001,
 
         kNormalUp                   = 0x00000010,
@@ -131,14 +145,14 @@ public:
 
 protected:
 
-    plParticleSystem *fSystem;          // The particle system this belongs to.
-    plParticleCore *fParticleCores;     // The particle pool, created on init, initialized as needed, and recycled. 
-    plParticleExt *fParticleExts;       // Same mapping as the Core pool. Contains extra info the render pipeline
-                                        // doesn't need.
+    plParticleSystem* fSystem;          // The particle system this belongs to.
+    plParticleCore* fParticleCores;     // The particle pool, created on init, initialized as needed, and recycled.
+    plParticleExt* fParticleExts;       // Same mapping as the Core pool. Contains extra info the render pipeline
+    // doesn't need.
 
-    plParticleGenerator *fGenerator;    // Optional auto generator (have this be nil if you don't want auto-generation)
+    plParticleGenerator* fGenerator;    // Optional auto generator (have this be nil if you don't want auto-generation)
     uint32_t fSpanIndex;                  // Index of the span that this emitter uses.
-    uint32_t fNumValidParticles;          
+    uint32_t fNumValidParticles;
     uint32_t fMaxParticles;
     hsBounds3Ext fBoundBox;
     plEffectTargetInfo fTargetInfo;     // A collection of pointers and strides that plParticleEffects will manipulate.
@@ -149,7 +163,9 @@ protected:
 
     void IClear();
     void ISetupParticleMem();
-    void ISetSystem(plParticleSystem *sys) { fSystem = sys; }
+    void ISetSystem(plParticleSystem* sys) {
+        fSystem = sys;
+    }
     bool IUpdate(float delta);
     void IUpdateParticles(float delta);
     void IUpdateBoundsAndNormals(float delta);

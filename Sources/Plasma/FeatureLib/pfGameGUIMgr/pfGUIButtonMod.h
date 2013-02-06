@@ -55,82 +55,80 @@ class plPostEffectMod;
 class plAGMasterMod;
 class pfGUIDraggableMod;
 
-class pfGUIButtonMod : public pfGUIControlMod
-{
-    protected:
+class pfGUIButtonMod : public pfGUIControlMod {
+protected:
 
-        hsTArray<plKey> fAnimationKeys;
-        plString        fAnimName;
+    hsTArray<plKey> fAnimationKeys;
+    plString        fAnimName;
 
-        hsTArray<plKey> fMouseOverAnimKeys;
-        plString        fMouseOverAnimName;
+    hsTArray<plKey> fMouseOverAnimKeys;
+    plString        fMouseOverAnimName;
 
-        bool            fClicking;
-        bool            fTriggering;
+    bool            fClicking;
+    bool            fTriggering;
 
-        hsPoint3            fOrigMouseDownPt;
-        pfGUIDraggableMod   *fDraggable;
-        pfGUICtrlProcObject *fOrigHandler;
-        bool                fOrigReportedDrag;
-
-
-        int32_t           fNotifyType;
-
-        virtual bool IEval( double secs, float del, uint32_t dirty ); // called only by owner object's Eval()
-
-        virtual uint32_t      IGetDesiredCursor( void ) const;    // As specified in plInputInterface.h
-
-    public:
-
-        pfGUIButtonMod();
-
-        CLASSNAME_REGISTER( pfGUIButtonMod );
-        GETINTERFACE_ANY( pfGUIButtonMod, pfGUIControlMod );
+    hsPoint3            fOrigMouseDownPt;
+    pfGUIDraggableMod*   fDraggable;
+    pfGUICtrlProcObject* fOrigHandler;
+    bool                fOrigReportedDrag;
 
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    int32_t           fNotifyType;
 
-        virtual void    SetInteresting( bool i );
+    virtual bool IEval(double secs, float del, uint32_t dirty);   // called only by owner object's Eval()
 
-        virtual void    HandleMouseDown( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseUp( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseDrag( hsPoint3 &mousePt, uint8_t modifiers );
+    virtual uint32_t      IGetDesiredCursor(void) const;      // As specified in plInputInterface.h
 
-        virtual void    UpdateBounds( hsMatrix44 *invXformMatrix = nil, bool force = false );
+public:
 
-        virtual void    SetNotifyType(int32_t kind);
-        virtual int32_t   GetNotifyType();
-        virtual bool    IsButtonDown();
-        virtual bool    IsTriggering() { return fTriggering; }
-        enum SoundEvents
-        {
-            kMouseDown,
-            kMouseUp,
-            kMouseOver,
-            kMouseOff
-        };
+    pfGUIButtonMod();
 
-        enum
-        {
-            kRefDraggable = kRefDerivedStart
-        };
+    CLASSNAME_REGISTER(pfGUIButtonMod);
+    GETINTERFACE_ANY(pfGUIButtonMod, pfGUIControlMod);
 
-        enum NotifyType
-        {
-            kNotifyOnUp = 0,
-            kNotifyOnDown,
-            kNotifyOnUpAndDown
-        };
 
-        void    StartDragging( void );
-        void    StopDragging( bool cancel );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        // Export only
-        void    SetAnimationKeys( hsTArray<plKey> &keys, const plString &name );
-        void    SetMouseOverAnimKeys( hsTArray<plKey> &keys, const plString &name );
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
+
+    virtual void    SetInteresting(bool i);
+
+    virtual void    HandleMouseDown(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseUp(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseDrag(hsPoint3& mousePt, uint8_t modifiers);
+
+    virtual void    UpdateBounds(hsMatrix44* invXformMatrix = nil, bool force = false);
+
+    virtual void    SetNotifyType(int32_t kind);
+    virtual int32_t   GetNotifyType();
+    virtual bool    IsButtonDown();
+    virtual bool    IsTriggering() {
+        return fTriggering;
+    }
+    enum SoundEvents {
+        kMouseDown,
+        kMouseUp,
+        kMouseOver,
+        kMouseOff
+    };
+
+    enum {
+        kRefDraggable = kRefDerivedStart
+    };
+
+    enum NotifyType {
+        kNotifyOnUp = 0,
+        kNotifyOnDown,
+        kNotifyOnUpAndDown
+    };
+
+    void    StartDragging(void);
+    void    StopDragging(bool cancel);
+
+    // Export only
+    void    SetAnimationKeys(hsTArray<plKey>& keys, const plString& name);
+    void    SetMouseOverAnimKeys(hsTArray<plKey>& keys, const plString& name);
 };
 
 #endif // _pfGUIButtonMod_h

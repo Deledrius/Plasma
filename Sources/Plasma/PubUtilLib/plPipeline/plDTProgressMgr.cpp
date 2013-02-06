@@ -72,15 +72,14 @@ plDTProgressMgr::~plDTProgressMgr()
 {
 }
 
-void    plDTProgressMgr::DeclareThyself( void )
+void    plDTProgressMgr::DeclareThyself(void)
 {
     static plDTProgressMgr  thyself;
 }
 
 void    plDTProgressMgr::Activate()
 {
-    if (fStaticTextPlate == nil && fCurrentStaticText != plProgressMgr::kNone)
-    {
+    if (fStaticTextPlate == nil && fCurrentStaticText != plProgressMgr::kNone) {
         plPlateManager::Instance().CreatePlate(&fStaticTextPlate);
 
         fStaticTextPlate->CreateFromResource(plProgressMgr::GetStaticTextID(fCurrentStaticText));
@@ -90,9 +89,8 @@ void    plDTProgressMgr::Activate()
         fStaticTextPlate->SetPosition(0, 0.5f, 0);
     }
 
-    if (fActivePlate == nil)
-    {
-        plPlateManager::Instance().CreatePlate( &fActivePlate );
+    if (fActivePlate == nil) {
+        plPlateManager::Instance().CreatePlate(&fActivePlate);
 
         fActivePlate->CreateFromResource(plProgressMgr::GetLoadingFrameID(fCurrentImage));
         fActivePlate->SetVisible(true);
@@ -104,55 +102,57 @@ void    plDTProgressMgr::Activate()
 
 void    plDTProgressMgr::Deactivate()
 {
-    if (fStaticTextPlate)
-    {
+    if (fStaticTextPlate) {
         fStaticTextPlate->SetVisible(false);
-        plPlateManager::Instance().DestroyPlate( fStaticTextPlate );
+        plPlateManager::Instance().DestroyPlate(fStaticTextPlate);
         fStaticTextPlate = nil;
     }
 
-    if (fActivePlate)
-    {
+    if (fActivePlate) {
         fActivePlate->SetVisible(false);
-        plPlateManager::Instance().DestroyPlate( fActivePlate );
+        plPlateManager::Instance().DestroyPlate(fActivePlate);
         fActivePlate = nil;
     }
 }
 
 //// Draw ////////////////////////////////////////////////////////////////////
 
-void    plDTProgressMgr::Draw( plPipeline *p )
+void    plDTProgressMgr::Draw(plPipeline* p)
 {
     uint16_t      scrnWidth, scrnHeight, width, height, x, y;
-    plDebugText &text = plDebugText::Instance();
+    plDebugText& text = plDebugText::Instance();
 
-    plOperationProgress *prog;
+    plOperationProgress* prog;
 
 
-    if( fOperations == nil )
+    if (fOperations == nil) {
         return;
+    }
 
     scrnWidth = (uint16_t)p->Width();
     scrnHeight = (uint16_t)p->Height();
 
     width = scrnWidth - 64;
     height = 16;
-    x = ( scrnWidth - width ) >> 1;
+    x = (scrnWidth - width) >> 1;
     y = scrnHeight - 32 - height;
-    if( fOperations->GetNext() == nil )
+
+    if (fOperations->GetNext() == nil) {
         y -= text.GetFontSize() + 8 + height + 4;
+    }
 
 
-    text.SetDrawOnTopMode( true );
+    text.SetDrawOnTopMode(true);
 
-    if (fActivePlate)
-    {
+    if (fActivePlate) {
         float currentMs = hsTimer::FullTicksToMs(hsTimer::GetFullTickCount());
-        if ((currentMs - fLastDraw) > 30)
-        {
+
+        if ((currentMs - fLastDraw) > 30) {
             fCurrentImage++;
-            if (fCurrentImage >= 18)
+
+            if (fCurrentImage >= 18) {
                 fCurrentImage = 0;
+            }
 
             fLastDraw = currentMs;
 
@@ -164,27 +164,25 @@ void    plDTProgressMgr::Draw( plPipeline *p )
         }
     }
 
-    for( prog = fOperations; prog != nil; prog = prog->GetNext() )
-    {
-        IDrawTheStupidThing( p, prog, x, y, width, height );
+    for (prog = fOperations; prog != nil; prog = prog->GetNext()) {
+        IDrawTheStupidThing(p, prog, x, y, width, height);
         y -= text.GetFontSize() + 8 + height + 4;
     }
 
-    text.SetDrawOnTopMode( false );
+    text.SetDrawOnTopMode(false);
 }
 
 //// IDrawTheStupidThing /////////////////////////////////////////////////////
 
-void    plDTProgressMgr::IDrawTheStupidThing( plPipeline *p, plOperationProgress *prog, 
-                                            uint16_t x, uint16_t y, uint16_t width, uint16_t height )
+void    plDTProgressMgr::IDrawTheStupidThing(plPipeline* p, plOperationProgress* prog,
+        uint16_t x, uint16_t y, uint16_t width, uint16_t height)
 {
-    plDebugText &text = plDebugText::Instance();
+    plDebugText& text = plDebugText::Instance();
 
     // Lets just set the color to blue
     uint32_t color = 0xff302b3a;
 
-    if( prog->GetMax() > 0.f )
-    {
+    if (prog->GetMax() > 0.f) {
         text.Draw3DBorder(x, y, x + width - 1, y + height - 1, color, color);
 
         x += 2;
@@ -196,39 +194,42 @@ void    plDTProgressMgr::IDrawTheStupidThing( plPipeline *p, plOperationProgress
         int16_t drawX         = x;
         uint16_t rightX       = drawX + drawWidth;
 
-        if (prog->GetProgress() <= prog->GetMax())
-            drawWidth = (uint16_t)( (float)width * prog->GetProgress() / prog->GetMax() );
+        if (prog->GetProgress() <= prog->GetMax()) {
+            drawWidth = (uint16_t)((float)width * prog->GetProgress() / prog->GetMax());
+        }
 
         rightX = drawX + drawWidth;
 
-        if( drawWidth > 0 )
-            text.DrawRect( drawX, y, rightX, y + height, color );
+        if (drawWidth > 0) {
+            text.DrawRect(drawX, y, rightX, y + height, color);
+        }
 
         int timeRemain = prog->fRemainingSecs;
         char remainStr[1024];
         strcpy(remainStr, "APPROXIMATELY ");
-        if (timeRemain > 3600)
-        {
+
+        if (timeRemain > 3600) {
             const char* term = ((timeRemain / 3600) > 1) ? "HOURS" : "HOUR";
             sprintf(remainStr, "%s%d %s ", remainStr, (timeRemain / 3600), term);
             timeRemain %= 3600;
         }
-        if (timeRemain > 60)
-        {
+
+        if (timeRemain > 60) {
             const char* term = ((timeRemain / 60) > 1) ? "MINUTES" : "MINUTE";
             sprintf(remainStr, "%s%d %s ", remainStr, (timeRemain / 60), term);
             timeRemain %= 60;
         }
+
         const char* unitTerm = (timeRemain == 1) ? "SECOND" : "SECONDS";
         sprintf(remainStr, "%s%d %s REMAINING", remainStr, timeRemain, unitTerm);
 
-        text.DrawString(x, y + height + 2, remainStr, (uint32_t)0xff635e6d );
+        text.DrawString(x, y + height + 2, remainStr, (uint32_t)0xff635e6d);
 
         x -= 2;
         y -= 2;
     }
 
-    y -= ( text.GetFontSize() << 1 ) + 4;
+    y -= (text.GetFontSize() << 1) + 4;
 
 #ifndef PLASMA_EXTERNAL_RELEASE
     bool drawText = true;
@@ -236,16 +237,15 @@ void    plDTProgressMgr::IDrawTheStupidThing( plPipeline *p, plOperationProgress
     bool drawText = false;
 #endif
 
-    if (drawText)
-    {
-        if( prog->GetTitle()[ 0 ] != 0 )
-        {
-            text.DrawString( x, y, prog->GetTitle(), (uint32_t)0xccb0b0b0 );
-            x += (uint16_t)text.CalcStringWidth( prog->GetTitle() );
+    if (drawText) {
+        if (prog->GetTitle()[ 0 ] != 0) {
+            text.DrawString(x, y, prog->GetTitle(), (uint32_t)0xccb0b0b0);
+            x += (uint16_t)text.CalcStringWidth(prog->GetTitle());
         }
 
-        if( prog->GetStatusText()[ 0 ] != 0 )
-            text.DrawString( x, y, prog->GetStatusText(), (uint32_t)0xccb0b0b0 );
+        if (prog->GetStatusText()[ 0 ] != 0) {
+            text.DrawString(x, y, prog->GetStatusText(), (uint32_t)0xccb0b0b0);
+        }
     }
 }
 

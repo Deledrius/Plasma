@@ -59,22 +59,20 @@ class pySimpleStateVariable;
 class plKey;
 
 // pySDL -- this thing really only exists for the constants
-class pySDL
-{
+class pySDL {
 public:
-    static void AddPlasmaConstantsClasses(PyObject *m);
+    static void AddPlasmaConstantsClasses(PyObject* m);
 };
 
 
 // pySDLStateDataRecord
-class pySDLStateDataRecord
-{
+class pySDLStateDataRecord {
 private:
-    plStateDataRecord * fRec;
+    plStateDataRecord* fRec;
 
 protected:
     pySDLStateDataRecord();
-    pySDLStateDataRecord( plStateDataRecord * rec );
+    pySDLStateDataRecord(plStateDataRecord* rec);
 
 public:
     ~pySDLStateDataRecord();
@@ -82,59 +80,58 @@ public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptSDLStateDataRecord);
     PYTHON_CLASS_NEW_DEFINITION;
-    static PyObject *New(plStateDataRecord* rec);
+    static PyObject* New(plStateDataRecord* rec);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pySDLStateDataRecord object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pySDLStateDataRecord); // converts a PyObject to a pySDLStateDataRecord (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
-    plStateDataRecord * GetRec() const;
+    plStateDataRecord* GetRec() const;
 
     /////////////////////
-    PyObject * FindVar( const plString & name ) const; // returns pySimpleStateVariable
+    PyObject* FindVar(const plString& name) const;     // returns pySimpleStateVariable
     plString GetName() const;
     std::vector<plString> GetVarList();
     void SetFromDefaults(bool timeStampNow);
 };
 
 // pySimpleStateVariable
-class pySimpleStateVariable
-{
+class pySimpleStateVariable {
 private:
-    plSimpleStateVariable * fVar;
+    plSimpleStateVariable* fVar;
 
 protected:
     pySimpleStateVariable();
-    pySimpleStateVariable( plSimpleStateVariable * var );
+    pySimpleStateVariable(plSimpleStateVariable* var);
 
 public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptSimpleStateVariable);
     PYTHON_CLASS_NEW_DEFINITION;
-    static PyObject *New(plSimpleStateVariable* var);
+    static PyObject* New(plSimpleStateVariable* var);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pySimpleStateVariable object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pySimpleStateVariable); // converts a PyObject to a pySimpleStateVariable (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
-    plSimpleStateVariable * GetVar() const;
+    plSimpleStateVariable* GetVar() const;
 
     /////////////////////
-    bool    SetByte( uint8_t v, int idx=0 );
-    bool    SetShort( short v, int idx=0 );
-    bool    SetFloat( float v, int idx=0 );
-    bool    SetDouble( double v, int idx=0 );
-    bool    SetInt( int v, int idx=0 );
-    bool    SetString( const char * v, int idx=0 );
-    bool    SetBool(bool v, int idx=0 );
-    uint8_t GetByte( int idx=0 ) const;
-    short   GetShort( int idx=0 ) const;
-    int     GetInt( int idx=0 ) const;
-    float   GetFloat( int idx=0 ) const;
-    double  GetDouble( int idx=0 ) const;           
-    bool    GetBool( int idx=0 ) const;
-    plString GetString( int idx=0 ) const;
-    plKey   GetKey( int idx=0 ) const;
+    bool    SetByte(uint8_t v, int idx = 0);
+    bool    SetShort(short v, int idx = 0);
+    bool    SetFloat(float v, int idx = 0);
+    bool    SetDouble(double v, int idx = 0);
+    bool    SetInt(int v, int idx = 0);
+    bool    SetString(const char* v, int idx = 0);
+    bool    SetBool(bool v, int idx = 0);
+    uint8_t GetByte(int idx = 0) const;
+    short   GetShort(int idx = 0) const;
+    int     GetInt(int idx = 0) const;
+    float   GetFloat(int idx = 0) const;
+    double  GetDouble(int idx = 0) const;
+    bool    GetBool(int idx = 0) const;
+    plString GetString(int idx = 0) const;
+    plKey   GetKey(int idx = 0) const;
 
     int     GetType() const;
     plString GetDisplayOptions() const;

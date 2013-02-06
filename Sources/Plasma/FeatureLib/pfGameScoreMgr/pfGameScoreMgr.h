@@ -57,8 +57,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
  * Mid-level class that encapsulates game scores and sends pfGameScoreMsg notifications
  * via the dispatcher when network operations complete.
  */
-class pfGameScore : public hsRefCnt
-{
+class pfGameScore : public hsRefCnt {
     uint32_t fScoreId;
     uint32_t fOwnerId;
     plString fName;
@@ -73,15 +72,25 @@ public:
         : fScoreId(scoreId), fOwnerId(owner), fName(name), fGameType(type), fValue(value)
     { }
 
-    plString GetGameName() const { return fName; }
-    uint32_t GetGameType() const { return fGameType; }
-    uint32_t GetOwner() const { return fOwnerId; }
-    int32_t  GetPoints() const { return fValue; }
+    plString GetGameName() const {
+        return fName;
+    }
+    uint32_t GetGameType() const {
+        return fGameType;
+    }
+    uint32_t GetOwner() const {
+        return fOwnerId;
+    }
+    int32_t  GetPoints() const {
+        return fValue;
+    }
     void     SetPoints(int32_t value, plKey rcvr = nil);
 
     void AddPoints(int32_t add, plKey rcvr = nil);
     void Delete();
-    void TransferPoints(pfGameScore* to, plKey rcvr = nil) { TransferPoints(to, fValue, rcvr); }
+    void TransferPoints(pfGameScore* to, plKey rcvr = nil) {
+        TransferPoints(to, fValue, rcvr);
+    }
     void TransferPoints(pfGameScore* to, int32_t points, plKey rcvr = nil);
 
     static void Create(uint32_t ownerId, const plString& name, uint32_t type, int32_t value, plKey rcvr);

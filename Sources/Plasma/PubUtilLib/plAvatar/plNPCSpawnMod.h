@@ -43,35 +43,34 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plNotifyMsg;
 
-class plNPCSpawnMod : public plSingleModifier
-{
+class plNPCSpawnMod : public plSingleModifier {
 public:
     plNPCSpawnMod();
-    plNPCSpawnMod(const char * modelName, const char *accountName, bool autoSpawn);
+    plNPCSpawnMod(const char* modelName, const char* accountName, bool autoSpawn);
     ~plNPCSpawnMod();
 
     bool Trigger();
-    void SetNotify(plNotifyMsg *notify);
-    plNotifyMsg * GetNotify();
-    
-    CLASSNAME_REGISTER( plNPCSpawnMod );
-    GETINTERFACE_ANY( plNPCSpawnMod, plSingleModifier );
-    
+    void SetNotify(plNotifyMsg* notify);
+    plNotifyMsg* GetNotify();
+
+    CLASSNAME_REGISTER(plNPCSpawnMod);
+    GETINTERFACE_ANY(plNPCSpawnMod, plSingleModifier);
+
     virtual void AddTarget(plSceneObject* so);
 //  bool MsgReceive(plMessage* msg);
 
-    virtual void Read(hsStream *stream, hsResMgr *mgr);
-    virtual void Write(hsStream *stream, hsResMgr *mgr);
+    virtual void Read(hsStream* stream, hsResMgr* mgr);
+    virtual void Write(hsStream* stream, hsResMgr* mgr);
 
 protected:
     virtual bool IEval(double secs, float del, uint32_t dirty);
-    void ISendNotify(plKey &avatarKey);     // send our notification message
+    void ISendNotify(plKey& avatarKey);     // send our notification message
 
 private:
-    char *fModelName;
-    char *fAccountName;
+    char* fModelName;
+    char* fAccountName;
     bool fAutoSpawn;            // spawn immediately on loading
     plKey fSpawnedKey;          // if we want to be able to spawn many things, we should make this a vector
-    plNotifyMsg *fNotify;       // notify message that we send when we spawn.
+    plNotifyMsg* fNotify;       // notify message that we send when we spawn.
 };
 

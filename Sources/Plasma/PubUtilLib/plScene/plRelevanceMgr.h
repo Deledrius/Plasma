@@ -51,39 +51,44 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plRelevanceRegion;
 class hsStream;
 
-class plRelevanceMgr : public hsKeyedObject
-{
+class plRelevanceMgr : public hsKeyedObject {
 protected:
-    static plRelevanceMgr *fInstance;
+    static plRelevanceMgr* fInstance;
 public:
-    static plRelevanceMgr *Instance() { return fInstance; }
-    
+    static plRelevanceMgr* Instance() {
+        return fInstance;
+    }
+
     static void Init();
-    static void DeInit();   
+    static void DeInit();
 
 protected:
-    hsTArray<plRelevanceRegion*> fRegions;  
+    hsTArray<plRelevanceRegion*> fRegions;
     bool fEnabled;
 
-    void IAddRegion(plRelevanceRegion *);
-    void IRemoveRegion(plRelevanceRegion *);
-    
+    void IAddRegion(plRelevanceRegion*);
+    void IRemoveRegion(plRelevanceRegion*);
+
 public:
     plRelevanceMgr();
-    
-    CLASSNAME_REGISTER( plRelevanceMgr );
-    GETINTERFACE_ANY( plRelevanceMgr, hsKeyedObject );
-    
+
+    CLASSNAME_REGISTER(plRelevanceMgr);
+    GETINTERFACE_ANY(plRelevanceMgr, hsKeyedObject);
+
     virtual bool MsgReceive(plMessage* msg);
 
-    bool GetEnabled() { return fEnabled; }
-    void SetEnabled(bool val) { fEnabled = val; }
+    bool GetEnabled() {
+        return fEnabled;
+    }
+    void SetEnabled(bool val) {
+        fEnabled = val;
+    }
 
-    uint32_t GetIndex(const plString &regionName);
+    uint32_t GetIndex(const plString& regionName);
     void MarkRegion(uint32_t localIdx, uint32_t remoteIdx, bool doICare);
-    void SetRegionVectors(const hsPoint3 &pos, hsBitVector &regionsImIn, hsBitVector &regionsICareAbout);
+    void SetRegionVectors(const hsPoint3& pos, hsBitVector& regionsImIn, hsBitVector& regionsICareAbout);
     uint32_t GetNumRegions() const; // includes the secret 0 region in its count
-    void ParseCsvInput(hsStream *s);
+    void ParseCsvInput(hsStream* s);
 
     plString GetRegionNames(hsBitVector regions);
 };

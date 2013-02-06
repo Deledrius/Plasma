@@ -108,7 +108,7 @@ enum ENetError {
     kNetErrNeedToPay                = 46,
     kNetErrServerBusy               = 47,
     kNetErrVaultNodeAccessViolation = 48,
-    
+
     // Be sure to add strings for additional error codes in pnNbError.cpp
     // (don't worry, the compiler will tell you if one is missing ;)
     kNumNetErrors,
@@ -123,7 +123,7 @@ enum ENetError {
 #define IS_NET_SUCCESS(a)   (((int)(a)) == kNetSuccess)
 
 
-const wchar_t * NetErrorToString (ENetError code);    // user-friendly string
-const wchar_t * NetErrorAsString (ENetError code);    // string version of enum identifier
+const wchar_t* NetErrorToString(ENetError code);      // user-friendly string
+const wchar_t* NetErrorAsString(ENetError code);      // string version of enum identifier
 
 #endif // pnNbError_inc

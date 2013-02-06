@@ -73,8 +73,7 @@ class plExportMaterialData;
 
 //// Class Definition ////////////////////////////////////////////////////////
 
-class plMeshConverter
-{
+class plMeshConverter {
 private:
     plMeshConverter();
 
@@ -91,51 +90,51 @@ public:
     ~plMeshConverter();
     static plMeshConverter& Instance();
 
-    void    Init( bool save, plErrorMsg *msg );
-    void    DeInit( bool deInitLongRecur = true );
+    void    Init(bool save, plErrorMsg* msg);
+    void    DeInit(bool deInitLongRecur = true);
 
-    void StuffPositionsAndNormals(plMaxNode *node, hsTArray<hsPoint3> *pos, hsTArray<hsVector3> *normals);
-    plConvexVolume *CreateConvexVolume( plMaxNode *node );
+    void StuffPositionsAndNormals(plMaxNode* node, hsTArray<hsPoint3>* pos, hsTArray<hsVector3>* normals);
+    plConvexVolume* CreateConvexVolume(plMaxNode* node);
     // doPreshading - If true, do crappy flat shading now (since we won't do any shading later)
-    bool    CreateSpans( plMaxNode *node, hsTArray<plGeometrySpan *> &spanArray, bool doPreshading );
+    bool    CreateSpans(plMaxNode* node, hsTArray<plGeometrySpan*>& spanArray, bool doPreshading);
 
 private:
     bool IValidateUVs(plMaxNode* node);
 
-    void    ISetBumpUvs(int16_t uvChan, hsTArray<plMAXVertNormal>& vertDPosDuvCache, TVFace* tvFace, uint32_t smGroup, 
-                                      hsPoint3* uvs1, hsPoint3* uvs2, hsPoint3* uvs3);
-    void    ISetBumpUvSrcs(hsTArray<hsTArray<plExportMaterialData> *>& ourMaterials, 
-                                        hsTArray<int16_t>& bumpLayIdx, hsTArray<int16_t>& bumpLayChan, hsTArray<int16_t>& bumpDuChan, hsTArray<int16_t>& bumpDvChan);
-    void    ISetWaterDecEnvUvSrcs(hsTArray<hsTArray<plExportMaterialData> *>& ourMaterials, 
-                                        hsTArray<int16_t>& bumpLayIdx, hsTArray<int16_t>& bumpLayChan, hsTArray<int16_t>& bumpDuChan, hsTArray<int16_t>& bumpDvChan);
-    void    ISmoothUVGradients(plMaxNode* node, Mesh* mesh, 
-                                        hsTArray<hsTArray<plExportMaterialData> *>& ourMaterials, 
-                                        hsTArray<int16_t>& bumpLayIdx, hsTArray<int16_t>& bumpLayChan,
-                                        hsTArray<plMAXVertNormal>* vertDPosDuCache, hsTArray<plMAXVertNormal>* vertDPosDvCache);
+    void    ISetBumpUvs(int16_t uvChan, hsTArray<plMAXVertNormal>& vertDPosDuvCache, TVFace* tvFace, uint32_t smGroup,
+                        hsPoint3* uvs1, hsPoint3* uvs2, hsPoint3* uvs3);
+    void    ISetBumpUvSrcs(hsTArray<hsTArray<plExportMaterialData> *>& ourMaterials,
+                           hsTArray<int16_t>& bumpLayIdx, hsTArray<int16_t>& bumpLayChan, hsTArray<int16_t>& bumpDuChan, hsTArray<int16_t>& bumpDvChan);
+    void    ISetWaterDecEnvUvSrcs(hsTArray<hsTArray<plExportMaterialData> *>& ourMaterials,
+                                  hsTArray<int16_t>& bumpLayIdx, hsTArray<int16_t>& bumpLayChan, hsTArray<int16_t>& bumpDuChan, hsTArray<int16_t>& bumpDvChan);
+    void    ISmoothUVGradients(plMaxNode* node, Mesh* mesh,
+                               hsTArray<hsTArray<plExportMaterialData> *>& ourMaterials,
+                               hsTArray<int16_t>& bumpLayIdx, hsTArray<int16_t>& bumpLayChan,
+                               hsTArray<plMAXVertNormal>* vertDPosDuCache, hsTArray<plMAXVertNormal>* vertDPosDvCache);
     Point3  IGetUvGradient(plMaxNode* node, const hsMatrix44& uvXform44, int16_t bmpUvwSrc,
-                                        Mesh *mesh, int faceIdx, 
-                                        int iUV);
+                           Mesh* mesh, int faceIdx,
+                           int iUV);
 
-    int     IGenerateUVs( plMaxNode *node, Mtl *maxMtl, Mesh *mesh, int faceIdx, int numChan, int numBlend,
-                          hsPoint3 *uvs1, hsPoint3 *uvs2, hsPoint3 *uvs3 );
-    void    IGetUVTransform( plMaxNode *node, Mtl *mtl, Matrix3 *uvTransform, int which );
+    int     IGenerateUVs(plMaxNode* node, Mtl* maxMtl, Mesh* mesh, int faceIdx, int numChan, int numBlend,
+                         hsPoint3* uvs1, hsPoint3* uvs2, hsPoint3* uvs3);
+    void    IGetUVTransform(plMaxNode* node, Mtl* mtl, Matrix3* uvTransform, int which);
 
-    uint32_t  ICreateHexColor( float r, float g, float b );
-    uint32_t  ISetHexAlpha( uint32_t color, float alpha );
+    uint32_t  ICreateHexColor(float r, float g, float b);
+    uint32_t  ISetHexAlpha(uint32_t color, float alpha);
 
-    Mesh*       IGetNodeMesh(plMaxNode *node);
+    Mesh*       IGetNodeMesh(plMaxNode* node);
     void        IDeleteTempGeometry();
-    Mesh*       IDuplicate2Sided(plMaxNode *node, Mesh* mesh);
-        
-    Interface           *fInterface;
+    Mesh*       IDuplicate2Sided(plMaxNode* node, Mesh* mesh);
+
+    Interface*           fInterface;
     hsConverterUtils&   fConverterUtils;
-    plErrorMsg          *fErrorMsg;
+    plErrorMsg*          fErrorMsg;
     bool                fIsInitialized;
 
     // Non-nil if we converted the MAX object and have to delete it when we're done
-    TriObject           *fTriObjToDelete;
+    TriObject*           fTriObjToDelete;
     // Non-nil if we made a copy to mess with that we need to delete when we're done
-    Mesh                *fMeshToDelete;
+    Mesh*                fMeshToDelete;
 };
 
 #endif  // _plMeshConverter_h

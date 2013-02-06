@@ -48,31 +48,38 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plEventCallbackMsg.h" // AnimationEvent's defined here
 
 
-class plAnimationEventConditionalObject : public plConditionalObject
-{
+class plAnimationEventConditionalObject : public plConditionalObject {
 protected:
     CallbackEvent   fAction;
     plKey           fTarget;
 public:
-    
-    
-    plAnimationEventConditionalObject(){;}
+
+
+    plAnimationEventConditionalObject() {
+        ;
+    }
     plAnimationEventConditionalObject(plKey pTargetModifier);
-    ~plAnimationEventConditionalObject(){;}
-    
-    CLASSNAME_REGISTER( plAnimationEventConditionalObject );
-    GETINTERFACE_ANY( plAnimationEventConditionalObject, plConditionalObject );
-    
+    ~plAnimationEventConditionalObject() {
+        ;
+    }
+
+    CLASSNAME_REGISTER(plAnimationEventConditionalObject);
+    GETINTERFACE_ANY(plAnimationEventConditionalObject, plConditionalObject);
+
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
     bool MsgReceive(plMessage* msg);
-    
-    void Evaluate(){;}
-    void Reset() { SetSatisfied(false); }
+
+    void Evaluate() {
+        ;
+    }
+    void Reset() {
+        SetSatisfied(false);
+    }
 
     void SetEvent(const CallbackEvent b, float time = 0.0f);
-    
+
 };
 
 

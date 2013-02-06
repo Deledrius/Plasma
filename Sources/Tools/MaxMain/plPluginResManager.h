@@ -52,13 +52,14 @@ class plRegistryPageNode;
 class plSceneNode;
 class plString;
 
-class plPluginResManager : public plResManager
-{
+class plPluginResManager : public plResManager {
 public:
-    static plPluginResManager* ResMgr() { return (plPluginResManager*)hsgResMgr::ResMgr(); }
+    static plPluginResManager* ResMgr() {
+        return (plPluginResManager*)hsgResMgr::ResMgr();
+    }
 
     //------------------------
-    // Location management 
+    // Location management
     //------------------------
 
     // Given a page string combo, returns the key of the sceneNode for that page. If the page does not exist, it creates one.
@@ -67,15 +68,18 @@ public:
     // Verifies that the given sequence number belongs to the given string combo and ONLY that combo. Returns a new, unique sequenceNumber if not
     int32_t VerifySeqNumber(int32_t sequenceNumber, const plString& age, const plString& page);
 
-    enum VerifyErrors
-    {
+    enum VerifyErrors {
         kNoVerifyError,
         kErrRightPageWrongSeq,
         kErrSeqAlreadyTaken,
         kErrCantFindValid
     };
-    VerifyErrors        GetLastVerifyError() const { return fLastVerifyError; }
-    const plPageInfo*   GetLastVerifyPage() const { return fLastVerifyPage; }
+    VerifyErrors        GetLastVerifyError() const {
+        return fLastVerifyError;
+    }
+    const plPageInfo*   GetLastVerifyPage() const {
+        return fLastVerifyPage;
+    }
 
     // Write all pages. Duh.
     void WriteAllPages();

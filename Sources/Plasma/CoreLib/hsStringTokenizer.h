@@ -50,12 +50,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include <wctype.h>
 #endif
 
-class hsStringTokenizer 
-{
+class hsStringTokenizer {
 private:
-    char *fSeps;
-    char *fTok;
-    char *fLastTerminator;
+    char* fSeps;
+    char* fTok;
+    char* fLastTerminator;
     char fLastRep;
 
     int32_t fNumSeps;
@@ -63,30 +62,31 @@ private:
     bool fInQuote;
     bool fCheckAlphaNum;
 public:
-    hsStringTokenizer(const char *string=nil, const char *seps=nil);
+    hsStringTokenizer(const char* string = nil, const char* seps = nil);
     ~hsStringTokenizer();
-    char *next();
-    bool Next( char *token, uint32_t maxTokLen );
+    char* next();
+    bool Next(char* token, uint32_t maxTokLen);
     bool HasMoreTokens();
-    void Reset(const char *string, const char *seps);
+    void Reset(const char* string, const char* seps);
     void ParseQuotes(bool qAsTok);
 
-    char    *GetRestOfString( void ) const { return fTok; }
+    char*    GetRestOfString(void) const {
+        return fTok;
+    }
 
-    char *fString;
+    char* fString;
 
-    void    RestoreLastTerminator( void );
+    void    RestoreLastTerminator(void);
 
 private:
     bool IsSep(char c);
 };
 
-class hsWStringTokenizer 
-{
+class hsWStringTokenizer {
 private:
-    wchar_t *fSeps;
-    wchar_t *fTok;
-    wchar_t *fLastTerminator;
+    wchar_t* fSeps;
+    wchar_t* fTok;
+    wchar_t* fLastTerminator;
     wchar_t fLastRep;
 
     int32_t fNumSeps;
@@ -94,19 +94,21 @@ private:
     bool fInQuote;
     bool fCheckAlphaNum;
 public:
-    hsWStringTokenizer(const wchar_t *string=nil, const wchar_t *seps=nil);
+    hsWStringTokenizer(const wchar_t* string = nil, const wchar_t* seps = nil);
     ~hsWStringTokenizer();
-    wchar_t *next();
-    bool Next( wchar_t *token, uint32_t maxTokLen );
+    wchar_t* next();
+    bool Next(wchar_t* token, uint32_t maxTokLen);
     bool HasMoreTokens();
-    void Reset(const wchar_t *string, const wchar_t *seps);
+    void Reset(const wchar_t* string, const wchar_t* seps);
     void ParseQuotes(bool qAsTok);
 
-    wchar_t   *GetRestOfString( void ) const { return fTok; }
+    wchar_t*   GetRestOfString(void) const {
+        return fTok;
+    }
 
-    wchar_t *fString;
+    wchar_t* fString;
 
-    void    RestoreLastTerminator( void );
+    void    RestoreLastTerminator(void);
 
 private:
     bool IsSep(wchar_t c);

@@ -49,20 +49,23 @@ class plMipmap;
 
 const Class_ID LIGHTMAP_COMP_CID(0x1b1d0317, 0x3b3821db);
 
-class plLightMapComponent : public plComponent
-{
+class plLightMapComponent : public plComponent {
 protected:
     plKey       fLightMapKey;
 
 public:
     plLightMapComponent();
 
-    virtual bool SetupProperties(plMaxNode *node, plErrorMsg *pErrMsg);
-    virtual bool PreConvert(plMaxNode *pNode, plErrorMsg *pErrMsg);
-    virtual bool Convert(plMaxNode *node, plErrorMsg *pErrMsg);
+    virtual bool SetupProperties(plMaxNode* node, plErrorMsg* pErrMsg);
+    virtual bool PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg);
+    virtual bool Convert(plMaxNode* node, plErrorMsg* pErrMsg);
 
-    void SetLightMapKey(const plKey& key) { fLightMapKey = key; }
-    plKey GetLightMapKey() const { return fLightMapKey; }
+    void SetLightMapKey(const plKey& key) {
+        fLightMapKey = key;
+    }
+    plKey GetLightMapKey() const {
+        return fLightMapKey;
+    }
 
     float GetScale() const;
     uint32_t GetUVWSrc() const;

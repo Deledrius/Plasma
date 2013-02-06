@@ -52,8 +52,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "../../pyGlueHelpers.h"
 #include "../pyGameCliMsg.h"
 
-class pyBlueSpiralMsg : public pyGameCliMsg
-{
+class pyBlueSpiralMsg : public pyGameCliMsg {
 protected:
     pyBlueSpiralMsg();
     pyBlueSpiralMsg(pfGameCliMsg* msg);
@@ -75,8 +74,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyBlueSpiralClothOrderMsg : public pyBlueSpiralMsg
-{
+class pyBlueSpiralClothOrderMsg : public pyBlueSpiralMsg {
 protected:
     pyBlueSpiralClothOrderMsg();
     pyBlueSpiralClothOrderMsg(pfGameCliMsg* msg);
@@ -94,8 +92,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyBlueSpiralSuccessfulHitMsg : public pyBlueSpiralMsg
-{
+class pyBlueSpiralSuccessfulHitMsg : public pyBlueSpiralMsg {
 protected:
     pyBlueSpiralSuccessfulHitMsg();
     pyBlueSpiralSuccessfulHitMsg(pfGameCliMsg* msg);
@@ -111,8 +108,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyBlueSpiralGameWonMsg : public pyBlueSpiralMsg
-{
+class pyBlueSpiralGameWonMsg : public pyBlueSpiralMsg {
 protected:
     pyBlueSpiralGameWonMsg();
     pyBlueSpiralGameWonMsg(pfGameCliMsg* msg);
@@ -128,8 +124,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyBlueSpiralGameOverMsg : public pyBlueSpiralMsg
-{
+class pyBlueSpiralGameOverMsg : public pyBlueSpiralMsg {
 protected:
     pyBlueSpiralGameOverMsg();
     pyBlueSpiralGameOverMsg(pfGameCliMsg* msg);
@@ -145,8 +140,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-class pyBlueSpiralGameStartedMsg : public pyBlueSpiralMsg
-{
+class pyBlueSpiralGameStartedMsg : public pyBlueSpiralMsg {
 protected:
     pyBlueSpiralGameStartedMsg();
     pyBlueSpiralGameStartedMsg(pfGameCliMsg* msg);

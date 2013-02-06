@@ -53,8 +53,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plKey.h"
 #include <string>
 
-class pyPlayer
-{
+class pyPlayer {
 protected:
     plKey           fAvatarKey;
     std::string     fPlayerName;
@@ -73,39 +72,57 @@ public:
 
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptPlayer);
-    static PyObject *New(pyKey& avKey, const char* pname, uint32_t pid, float distsq);
-    static PyObject *New(plKey avKey, const char* pname, uint32_t pid, float distsq);
-    static PyObject *New(const char* pname, uint32_t pid);
+    static PyObject* New(pyKey& avKey, const char* pname, uint32_t pid, float distsq);
+    static PyObject* New(plKey avKey, const char* pname, uint32_t pid, float distsq);
+    static PyObject* New(const char* pname, uint32_t pid);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyPlayer object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyPlayer); // converts a PyObject to a pyPlayer (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
     // override the equals to operator
-    bool operator==(const pyPlayer &player) const
-    {
+    bool operator==(const pyPlayer& player) const {
         // only thing that needs testing is the playerid, which is unique for all
-        if ( ((pyPlayer*)this)->GetPlayerID() == player.GetPlayerID() )
+        if (((pyPlayer*)this)->GetPlayerID() == player.GetPlayerID()) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
-    bool operator!=(const pyPlayer &player) const { return !(player == *this);    }
+    bool operator!=(const pyPlayer& player) const {
+        return !(player == *this);
+    }
 
     // for C++ access
-    plKey GetKey() const { return fAvatarKey; }
+    plKey GetKey() const {
+        return fAvatarKey;
+    }
 
     // for python access
-    const char * GetPlayerName() const { return fPlayerName.c_str();}
-    uint32_t GetPlayerID() const  { return fPlayerID; }
+    const char* GetPlayerName() const {
+        return fPlayerName.c_str();
+    }
+    uint32_t GetPlayerID() const  {
+        return fPlayerID;
+    }
 
-    float GetDistSq() const { return fDistSq; }
+    float GetDistSq() const {
+        return fDistSq;
+    }
 
-    void SetCCRFlag(bool state) { fIsCCR = state; }
-    bool IsCCR() const { return fIsCCR; }
+    void SetCCRFlag(bool state) {
+        fIsCCR = state;
+    }
+    bool IsCCR() const {
+        return fIsCCR;
+    }
 
-    void SetServerFlag(bool state) { fIsServer = state; }
-    bool IsServer() const { return fIsServer; }
+    void SetServerFlag(bool state) {
+        fIsServer = state;
+    }
+    bool IsServer() const {
+        return fIsServer;
+    }
 
 };
 

@@ -53,35 +53,37 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 static Mesh* ExtractMesh(INode* pNode, TriObject** ppDeleteMe)
 {
-    Object *obj = pNode->EvalWorldState(0).obj;
-    Mesh *pRetMesh = nil;
+    Object* obj = pNode->EvalWorldState(0).obj;
+    Mesh* pRetMesh = nil;
 
-    if( obj ) {
+    if (obj) {
 
-        if( obj->CanConvertToType(triObjectClassID) ) {
+        if (obj->CanConvertToType(triObjectClassID)) {
 
             // Convert to triangle object
-            TriObject *tri = (TriObject*)obj->ConvertToType(0, triObjectClassID);
+            TriObject* tri = (TriObject*)obj->ConvertToType(0, triObjectClassID);
 
-            if (tri != obj) *ppDeleteMe = tri;  // if Convert allocated, pass back so caller can delete.
+            if (tri != obj) {
+                *ppDeleteMe = tri;    // if Convert allocated, pass back so caller can delete.
+            }
 
-            if( tri ) {
-                Mesh *pTMesh = &tri->mesh;
+            if (tri) {
+                Mesh* pTMesh = &tri->mesh;
 
-                if( pTMesh->getNumFaces() ) {
+                if (pTMesh->getNumFaces()) {
                     pRetMesh = pTMesh;
                 }
             }
         }
     }
+
     return pRetMesh;
 }
 
 // Return the two points defining the bounding box for the given vertices.
 static void MeshMinMax(hsPoint3& min, hsPoint3& max, int numVerts, hsPoint3* pVerts)
 {
-    for (int i = 0; i < numVerts; i++)
-    {
+    for (int i = 0; i < numVerts; i++) {
         hsPoint3* vert = &pVerts[i];
         min.fX = hsMinimum(vert->fX, min.fX);
         min.fY = hsMinimum(vert->fY, min.fY);
@@ -92,13 +94,14 @@ static void MeshMinMax(hsPoint3& min, hsPoint3& max, int numVerts, hsPoint3* pVe
     }
 }
 
-static bool MakeNormalMesh(plMaxNode *node, plMaxMeshExtractor::NeutralMesh& mesh, Matrix3* w2l)
+static bool MakeNormalMesh(plMaxNode* node, plMaxMeshExtractor::NeutralMesh& mesh, Matrix3* w2l)
 {
-    TriObject *pDeleteMe = nil;
-    Mesh *pMesh = ExtractMesh(node, &pDeleteMe);    // allocates *sometimes*; check pDeleteMe
+    TriObject* pDeleteMe = nil;
+    Mesh* pMesh = ExtractMesh(node, &pDeleteMe);    // allocates *sometimes*; check pDeleteMe
 
-    if (!pMesh)
+    if (!pMesh) {
         return false;
+    }
 
     Matrix3 fullTM = node->GetObjectTM(0);
     int parity = fullTM.Parity();
@@ -106,21 +109,22 @@ static bool MakeNormalMesh(plMaxNode *node, plMaxMeshExtractor::NeutralMesh& mes
     mesh.fNumVerts = pMesh->numVerts;
     mesh.fVerts = new hsPoint3[mesh.fNumVerts];
 
-    for (int i = 0; i < mesh.fNumVerts; i++)
-    {
+    for (int i = 0; i < mesh.fNumVerts; i++) {
         // convert the vertex to global coordinates
         Point3 newVert = fullTM * pMesh->verts[i];
+
         // convert the vertex to the new (requested) coordinate system
-        if (w2l)
+        if (w2l) {
             newVert = (*w2l) * newVert;
+        }
 
         mesh.fVerts[i].Set(newVert.x, newVert.y, newVert.z);
     }
 
     mesh.fNumFaces = pMesh->numFaces;
-    mesh.fFaces = new uint16_t[mesh.fNumFaces*3];
-    for (int i = 0; i < mesh.fNumFaces; i++)
-    {
+    mesh.fFaces = new uint16_t[mesh.fNumFaces * 3];
+
+    for (int i = 0; i < mesh.fNumFaces; i++) {
         Face* pFace = &pMesh->faces[i];
         uint16_t* pNFace = &mesh.fFaces[i * 3];
 
@@ -129,8 +133,9 @@ static bool MakeNormalMesh(plMaxNode *node, plMaxMeshExtractor::NeutralMesh& mes
         pNFace[2] = pFace->v[ parity ? 0 : 2 ]; // ''
     }
 
-    if (pDeleteMe)
+    if (pDeleteMe) {
         delete pDeleteMe;
+    }
 
     return true;
 }
@@ -155,17 +160,18 @@ static void MakeBoxMesh(plMaxNode* node, plMaxMeshExtractor::NeutralMesh& mesh, 
     newVerts[7].Set(maxV.fX, maxV.fY, maxV.fZ);
 
     uint16_t standardFaces[] = { 0, 2, 1,
-        1, 2, 3,
-        0, 1, 4,
-        1, 5, 4,
-        0, 4, 2,
-        2, 4, 6,
-        1, 3, 7,
-        7, 5, 1,
-        3, 2, 7,
-        2, 6, 7,
-        4, 7, 6,
-        4, 5, 7 };
+                                 1, 2, 3,
+                                 0, 1, 4,
+                                 1, 5, 4,
+                                 0, 4, 2,
+                                 2, 4, 6,
+                                 1, 3, 7,
+                                 7, 5, 1,
+                                 3, 2, 7,
+                                 2, 6, 7,
+                                 4, 7, 6,
+                                 4, 5, 7
+                               };
 
     memcpy(newFaces, standardFaces, sizeof(standardFaces));
 
@@ -213,28 +219,26 @@ bool plMaxMeshExtractor::Extract(plMaxMeshExtractor::NeutralMesh& mesh, plMaxNod
     //
     // Create the arrays of verts and faces
     //
-    bool isDummy = (node->EvalWorldState(0).obj->ClassID() == Class_ID(DUMMY_CLASS_ID,0));
-    if (isDummy)
-    {
+    bool isDummy = (node->EvalWorldState(0).obj->ClassID() == Class_ID(DUMMY_CLASS_ID, 0));
+
+    if (isDummy) {
         hsMatrix44 w2l = masterNode->GetWorldToLocal44();
         MakeDummyMesh(node, mesh);
         // Localize the verts
         //for (int i = 0; i < mesh.fNumVerts; i++)
         //  mesh.fVerts[i] = w2l * mesh.fVerts[i];
-    }
-    else
-    {
+    } else {
         // only get the max world-to-local transform if the node is moveable or instanced. otherwise verts stay global.
         Matrix3 w2l = masterNode->GetWorldToLocal();
 //      Matrix3 *localizer = nil;
 //      if (masterNode->IsMovable() || masterNode->GetForceLocal() || masterNode->GetInstanced())
 //          localizer = &w2l;
 
-        if (!MakeNormalMesh(node, mesh, &w2l))
+        if (!MakeNormalMesh(node, mesh, &w2l)) {
             return false;
+        }
 
-        if (makeAABB)
-        {
+        if (makeAABB) {
             hsPoint3 minV(FLT_MAX, FLT_MAX, FLT_MAX), maxV(-FLT_MAX, -FLT_MAX, -FLT_MAX);
             MeshMinMax(minV, maxV, mesh.fNumVerts, mesh.fVerts);
             MakeBoxMesh(node, mesh, minV, maxV);

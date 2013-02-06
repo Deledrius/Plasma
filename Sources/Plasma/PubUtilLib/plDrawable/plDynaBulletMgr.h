@@ -47,8 +47,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plBulletMsg;
 
-class plDynaBulletMgr : public plDynaDecalMgr
-{
+class plDynaBulletMgr : public plDynaDecalMgr {
 public:
 protected:
 
@@ -61,8 +60,8 @@ public:
     plDynaBulletMgr();
     virtual ~plDynaBulletMgr();
 
-    CLASSNAME_REGISTER( plDynaBulletMgr );
-    GETINTERFACE_ANY( plDynaBulletMgr, plDynaDecalMgr );
+    CLASSNAME_REGISTER(plDynaBulletMgr);
+    GETINTERFACE_ANY(plDynaBulletMgr, plDynaDecalMgr);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);

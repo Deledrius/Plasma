@@ -52,23 +52,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class hsResMgr;
 
-class plPlayerMsg : public plMessage
-{
+class plPlayerMsg : public plMessage {
 protected:
     hsPoint3    targPoint;
 
 public:
-    plPlayerMsg() { SetBCastFlag(plMessage::kBCastByExactType); }
-    plPlayerMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t){ SetBCastFlag(plMessage::kBCastByExactType);    }
-    ~plPlayerMsg(){;}
+    plPlayerMsg() {
+        SetBCastFlag(plMessage::kBCastByExactType);
+    }
+    plPlayerMsg(const plKey& s,
+                const plKey& r,
+                const double* t) {
+        SetBCastFlag(plMessage::kBCastByExactType);
+    }
+    ~plPlayerMsg() {
+        ;
+    }
 
-    CLASSNAME_REGISTER( plPlayerMsg );
-    GETINTERFACE_ANY( plPlayerMsg, plMessage ); 
+    CLASSNAME_REGISTER(plPlayerMsg);
+    GETINTERFACE_ANY(plPlayerMsg, plMessage);
 
-    enum ModCmds
-    {
+    enum ModCmds {
         kMovementStarted = 0,
         kMovementStopped,
         kSetDesiredFacing,
@@ -79,22 +83,30 @@ public:
 
     hsBitVector     fCmd;
 
-    bool Cmd(int n) { return fCmd.IsBitSet(n); }
-    void SetCmd(int n) { fCmd.SetBit(n); }
-    void ClearCmd() { fCmd.Clear(); }
-    const hsPoint3 GetTargPoint() { return targPoint; }
-    void SetTargPoint(hsPoint3 pt) { targPoint = pt; }
+    bool Cmd(int n) {
+        return fCmd.IsBitSet(n);
+    }
+    void SetCmd(int n) {
+        fCmd.SetBit(n);
+    }
+    void ClearCmd() {
+        fCmd.Clear();
+    }
+    const hsPoint3 GetTargPoint() {
+        return targPoint;
+    }
+    void SetTargPoint(hsPoint3 pt) {
+        targPoint = pt;
+    }
 
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         targPoint.Read(stream);
         fCmd.Read(stream);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
         targPoint.Write(stream);
         fCmd.Write(stream);

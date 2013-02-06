@@ -46,16 +46,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plResMgr/plResManager.h"
 #include "plNetCommon/plNetCommon.h"
 
-void plCCRPetitionMsg::Read(hsStream* stream, hsResMgr* mgr) 
+void plCCRPetitionMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
-    
+
     plMsgStdStringHelper::Peek(fNote, stream);
     plMsgStdStringHelper::Peek(fTitle, stream);
     stream->ReadLE(&fPetitionType);
 }
 
-void plCCRPetitionMsg::Write(hsStream* stream, hsResMgr* mgr) 
+void plCCRPetitionMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(stream, mgr);
 
@@ -66,22 +66,22 @@ void plCCRPetitionMsg::Write(hsStream* stream, hsResMgr* mgr)
 
 ///////////////////////////////////////////////////////////
 
-plCCRInvisibleMsg::plCCRInvisibleMsg() : fInvisLevel(0) 
-{ 
+plCCRInvisibleMsg::plCCRInvisibleMsg() : fInvisLevel(0)
+{
     // send only to remote NetClientMgrs
     SetBCastFlag(kNetPropagate, true);
     SetBCastFlag(kLocalPropagate, false);
     AddReceiver(plNetApp::GetInstance()->GetKey());
 }
 
-void plCCRInvisibleMsg::Read(hsStream* stream, hsResMgr* mgr) 
+void plCCRInvisibleMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
-    fAvKey=mgr->ReadKey(stream);
+    fAvKey = mgr->ReadKey(stream);
     fInvisLevel = stream->ReadByte();
 }
 
-void plCCRInvisibleMsg::Write(hsStream* stream, hsResMgr* mgr) 
+void plCCRInvisibleMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(stream, mgr);
     mgr->WriteKey(stream, fAvKey);
@@ -91,22 +91,22 @@ void plCCRInvisibleMsg::Write(hsStream* stream, hsResMgr* mgr)
 ///////////////////////////////////////////////////////////
 
 plCCRCommunicationMsg::plCCRCommunicationMsg() : fType(kUnInit), fCCRPlayerID(kInvalidPlayerID)
-{ 
+{
     SetBCastFlag(kBCastByType);
 }
 
-void plCCRCommunicationMsg::Read(hsStream* stream, hsResMgr* mgr) 
+void plCCRCommunicationMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
-    plMsgStdStringHelper::Peek(fString, stream);    
+    plMsgStdStringHelper::Peek(fString, stream);
     fType = (Type)stream->ReadLE32();
     stream->ReadLE(&fCCRPlayerID);
 }
 
-void plCCRCommunicationMsg::Write(hsStream* stream, hsResMgr* mgr) 
+void plCCRCommunicationMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(stream, mgr);
-    
+
     plMsgStdStringHelper::Poke(fString, stream);
     stream->WriteLE32((int)fType);
     stream->WriteLE(fCCRPlayerID);
@@ -114,18 +114,18 @@ void plCCRCommunicationMsg::Write(hsStream* stream, hsResMgr* mgr)
 
 ///////////////////////////////////////////////////////////
 
-plCCRBanLinkingMsg::plCCRBanLinkingMsg() : fBan(true) 
-{ 
+plCCRBanLinkingMsg::plCCRBanLinkingMsg() : fBan(true)
+{
     AddReceiver(plNetApp::GetInstance()->GetKey());
 }
 
-void plCCRBanLinkingMsg::Read(hsStream* stream, hsResMgr* mgr) 
+void plCCRBanLinkingMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
     fBan = stream->ReadBool();
 }
 
-void plCCRBanLinkingMsg::Write(hsStream* stream, hsResMgr* mgr) 
+void plCCRBanLinkingMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(stream, mgr);
     stream->WriteBool(fBan);
@@ -133,18 +133,18 @@ void plCCRBanLinkingMsg::Write(hsStream* stream, hsResMgr* mgr)
 
 ///////////////////////////////////////////////////////////
 
-plCCRSilencePlayerMsg::plCCRSilencePlayerMsg() : fSilence(true) 
-{ 
+plCCRSilencePlayerMsg::plCCRSilencePlayerMsg() : fSilence(true)
+{
     AddReceiver(plNetApp::GetInstance()->GetKey());
 }
 
-void plCCRSilencePlayerMsg::Read(hsStream* stream, hsResMgr* mgr) 
+void plCCRSilencePlayerMsg::Read(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgRead(stream, mgr);
     fSilence = stream->ReadBool();
 }
 
-void plCCRSilencePlayerMsg::Write(hsStream* stream, hsResMgr* mgr) 
+void plCCRSilencePlayerMsg::Write(hsStream* stream, hsResMgr* mgr)
 {
     plMessage::IMsgWrite(stream, mgr);
     stream->WriteBool(fSilence);

@@ -51,8 +51,7 @@ class Animatable;
 
 // SEGMENTSPEC
 // A simple helper class to hold information captured from the note track about animation segments
-class SegmentSpec
-{
+class SegmentSpec {
 public:
     enum SegType { kAnim, kLoop, kMarker, kStopPoint, kSuppress };
 
@@ -61,12 +60,12 @@ public:
     float   fInitial;   // initial position of the animation (-1 for the start)
     plString  fName;    // name of the segment: controls lifespan of the name
     SegType fType;
-    
+
     SegmentSpec();
-    SegmentSpec(float start, float end, const plString & name, SegType);
+    SegmentSpec(float start, float end, const plString& name, SegType);
     ~SegmentSpec();
 
-    bool Contains(SegmentSpec *spec);
+    bool Contains(SegmentSpec* spec);
 };
 
 
@@ -74,17 +73,17 @@ public:
 typedef std::map<plString, SegmentSpec*, plString::less_i> SegmentMap;
 
 // You can pass in nil for pErrMsg for silent operation
-SegmentMap *GetAnimSegmentMap(Animatable *anim, plErrorMsg *pErrMsg);
+SegmentMap* GetAnimSegmentMap(Animatable* anim, plErrorMsg* pErrMsg);
 
-void DeleteSegmentMap(SegmentMap *segMap);
+void DeleteSegmentMap(SegmentMap* segMap);
 
-SegmentMap *GetSharedAnimSegmentMap(std::vector<Animatable*>& anims, plErrorMsg *pErrorMsg);
+SegmentMap* GetSharedAnimSegmentMap(std::vector<Animatable*>& anims, plErrorMsg* pErrorMsg);
 
-bool GetSegMapAnimTime(const plString &animName, SegmentMap *segMap, SegmentSpec::SegType type, float& begin, float& end);
+bool GetSegMapAnimTime(const plString& animName, SegmentMap* segMap, SegmentSpec::SegType type, float& begin, float& end);
 
 // For internal use
-void GetSegment(const char *note, float time, SegmentMap *segMap, plErrorMsg *pErrMsg);
+void GetSegment(const char* note, float time, SegmentMap* segMap, plErrorMsg* pErrMsg);
 
-bool DoesHaveStopPoints(Animatable *anim);
+bool DoesHaveStopPoints(Animatable* anim);
 
 #endif

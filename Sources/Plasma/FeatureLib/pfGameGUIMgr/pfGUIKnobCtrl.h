@@ -53,63 +53,64 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plMessage;
 class plAGMasterMod;
 
-class pfGUIKnobCtrl : public pfGUIValueCtrl
-{
-    protected:
+class pfGUIKnobCtrl : public pfGUIValueCtrl {
+protected:
 
-        hsTArray<plKey> fAnimationKeys;
-        plString        fAnimName;
+    hsTArray<plKey> fAnimationKeys;
+    plString        fAnimName;
 
-        hsPoint3        fDragStart;
-        float           fDragValue;
-        bool            fDragging;
+    hsPoint3        fDragStart;
+    float           fDragValue;
+    bool            fDragging;
 
-        hsPoint3        fAnimStartPos, fAnimEndPos; // Calculated at export time for kMapToScreenRange
-        float           fDragRangeMin, fDragRangeMax;
+    hsPoint3        fAnimStartPos, fAnimEndPos; // Calculated at export time for kMapToScreenRange
+    float           fDragRangeMin, fDragRangeMax;
 
-                        // Computed once, once an anim is loaded that we can compute this with
-        float           fAnimBegin, fAnimEnd;
-        bool            fAnimTimesCalced;
+    // Computed once, once an anim is loaded that we can compute this with
+    float           fAnimBegin, fAnimEnd;
+    bool            fAnimTimesCalced;
 
-        virtual bool IEval( double secs, float del, uint32_t dirty ); // called only by owner object's Eval()
+    virtual bool IEval(double secs, float del, uint32_t dirty);   // called only by owner object's Eval()
 
-        virtual uint32_t      IGetDesiredCursor( void ) const;    // As specified in plInputInterface.h
+    virtual uint32_t      IGetDesiredCursor(void) const;      // As specified in plInputInterface.h
 
-        bool            ICalcAnimTimes( void );
+    bool            ICalcAnimTimes(void);
 
-    public:
+public:
 
-        pfGUIKnobCtrl();
+    pfGUIKnobCtrl();
 
-        CLASSNAME_REGISTER( pfGUIKnobCtrl );
-        GETINTERFACE_ANY( pfGUIKnobCtrl, pfGUIValueCtrl );
+    CLASSNAME_REGISTER(pfGUIKnobCtrl);
+    GETINTERFACE_ANY(pfGUIKnobCtrl, pfGUIValueCtrl);
 
 
-        enum OurFlags
-        {
-            kReverseValues = kDerivedFlagsStart,
-            kLeftRightOrientation,
-            kMapToScreenRange,
-            kTriggerOnlyOnMouseUp,
-            kMapToAnimationRange
-        };
+    enum OurFlags {
+        kReverseValues = kDerivedFlagsStart,
+        kLeftRightOrientation,
+        kMapToScreenRange,
+        kTriggerOnlyOnMouseUp,
+        kMapToAnimationRange
+    };
 
-        virtual bool    MsgReceive( plMessage* pMsg );
-        
-        virtual void Read( hsStream* s, hsResMgr* mgr );
-        virtual void Write( hsStream* s, hsResMgr* mgr );
+    virtual bool    MsgReceive(plMessage* pMsg);
 
-        virtual void    HandleMouseDown( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseUp( hsPoint3 &mousePt, uint8_t modifiers );
-        virtual void    HandleMouseDrag( hsPoint3 &mousePt, uint8_t modifiers );
+    virtual void Read(hsStream* s, hsResMgr* mgr);
+    virtual void Write(hsStream* s, hsResMgr* mgr);
 
-        virtual void    UpdateBounds( hsMatrix44 *invXformMatrix = nil, bool force = false );
+    virtual void    HandleMouseDown(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseUp(hsPoint3& mousePt, uint8_t modifiers);
+    virtual void    HandleMouseDrag(hsPoint3& mousePt, uint8_t modifiers);
 
-        virtual void    SetCurrValue( float v );
+    virtual void    UpdateBounds(hsMatrix44* invXformMatrix = nil, bool force = false);
 
-        // Export only
-        void    SetAnimationKeys( hsTArray<plKey> &keys, const plString &name );
-        void    SetScreenRange( const hsPoint3 &startPos, const hsPoint3 &endPos ) { fAnimStartPos = startPos; fAnimEndPos = endPos; }
+    virtual void    SetCurrValue(float v);
+
+    // Export only
+    void    SetAnimationKeys(hsTArray<plKey>& keys, const plString& name);
+    void    SetScreenRange(const hsPoint3& startPos, const hsPoint3& endPos) {
+        fAnimStartPos = startPos;
+        fAnimEndPos = endPos;
+    }
 };
 
 #endif // _pfGUIKnobCtrl_h

@@ -74,33 +74,32 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plAvatar/plAvBrainHuman.h"
 #include "plModifier/plDetectorLog.h"
 
-enum NotifyType
-{
+enum NotifyType {
     kNotifyTrigger,
     kNotifyAvatarOnLadder,
 };
 
 // CTOR default
 plAvLadderMod::plAvLadderMod()
-: fGoingUp(true),
-  fType(kBig),
-  fLoops(0),
-  fEnabled(true),
-  fAvatarInBox(false),
-  fLadderView(0,0,0),
-  fAvatarMounting(false)
+    : fGoingUp(true),
+      fType(kBig),
+      fLoops(0),
+      fEnabled(true),
+      fAvatarInBox(false),
+      fLadderView(0, 0, 0),
+      fAvatarMounting(false)
 {
     fTarget = nil;
 }
 
 // CTOR goingUp, type, loops
 plAvLadderMod::plAvLadderMod(bool goingUp, int type, int loops, bool enabled, hsVector3& ladderView)
-: fGoingUp(goingUp),
-  fType(type),
-  fLoops(loops),
-  fEnabled(enabled),
-  fAvatarInBox(false),
-  fLadderView(ladderView)
+    : fGoingUp(goingUp),
+      fType(type),
+      fLoops(loops),
+      fEnabled(enabled),
+      fAvatarInBox(false),
+      fLadderView(ladderView)
 {
     fTarget = nil;
 }
@@ -110,13 +109,14 @@ static const float kTolerance = cos(hsDegreesToRadians(45));
 
 bool plAvLadderMod::IIsReadyToClimb()
 {
-    if (fAvatarMounting)
+    if (fAvatarMounting) {
         return false;
+    }
 
     plArmatureMod* armMod = plAvatarMgr::GetInstance()->GetLocalAvatar();
     plSceneObject* avatar = armMod->GetTarget(0);
-    if (avatar)
-    {
+
+    if (avatar) {
         hsVector3 playerView = avatar->GetCoordinateInterface()->GetLocalToWorld().GetAxis(hsMatrix44::kView);
         playerView.fZ = 0;
 
@@ -127,21 +127,20 @@ bool plAvLadderMod::IIsReadyToClimb()
 
         // And are we walking towards it?
         hsAssert(armMod, "Avatar doesn't have an armature mod");
-        if (armMod)
-        {
+
+        if (armMod) {
             plAvBrainHuman* brain = plAvBrainHuman::ConvertNoRef(armMod->GetCurrentBrain());
-            if (brain && brain->IsMovingForward() && brain->fWalkingStrategy->IsOnGround())
+
+            if (brain && brain->IsMovingForward() && brain->fWalkingStrategy->IsOnGround()) {
                 movingForward = true;
+            }
         }
 
-        if (dot >= kTolerance && movingForward)
-        {
+        if (dot >= kTolerance && movingForward) {
             DetectorLogSpecial("%s: Ladder starting climb (%f)",
                                GetKeyName().c_str(), hsRadiansToDegrees(acos(dot)));
             return true;
-        }
-        else if (movingForward)
-        {
+        } else if (movingForward) {
 //          DetectorLog("%s: Ladder rejecting climb (%f)", GetKeyName().c_str(), hsRadiansToDegrees(acos(dot)));
             return false;
         }
@@ -153,11 +152,10 @@ bool plAvLadderMod::IIsReadyToClimb()
 // use a plNotify (to ourself) to propagate across the network
 void plAvLadderMod::ITriggerSelf(plKey avKey)
 {
-    if (fEnabled)
-    {
+    if (fEnabled) {
         plKey avPhysKey = avKey;
         // I'm going to lie and pretend it's from the avatar. the alternative is lengthy and unreadable.
-        plNotifyMsg *notifyMsg = new plNotifyMsg(avPhysKey, GetKey());
+        plNotifyMsg* notifyMsg = new plNotifyMsg(avPhysKey, GetKey());
         notifyMsg->fID = kNotifyTrigger;
         notifyMsg->Send();
         fAvatarMounting = true;
@@ -169,27 +167,26 @@ bool plAvLadderMod::MsgReceive(plMessage* msg)
 {
     // Avatar is entering or exiting our detector box
     plCollideMsg* collMsg = plCollideMsg::ConvertNoRef(msg);
-    if (collMsg)
-    {
+
+    if (collMsg) {
         // make sure this is the local player... the notify will be the thing that propagates over the network
-        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != collMsg->fOtherKey)
+        if (plNetClientApp::GetInstance()->GetLocalPlayerKey() != collMsg->fOtherKey) {
             return true;
+        }
 
         fAvatarInBox = (collMsg->fEntering != 0);
 
         // If entering, check if ready to climb.  If not, register for eval so
         // we can check every frame
-        if (fAvatarInBox)
-        {
+        if (fAvatarInBox) {
             DetectorLogSpecial("%s: Avatar entered ladder region", GetKeyName().c_str());
 
-            if (IIsReadyToClimb())
+            if (IIsReadyToClimb()) {
                 ITriggerSelf(collMsg->fOtherKey);
-            else
+            } else {
                 plgDispatch::Dispatch()->RegisterForExactType(plEvalMsg::Index(), GetKey());
-        }
-        else
-        {
+            }
+        } else {
             DetectorLogSpecial("%s: Avatar exited ladder region", GetKeyName().c_str());
 
             plgDispatch::Dispatch()->UnRegisterForExactType(plEvalMsg::Index(), GetKey());
@@ -198,25 +195,24 @@ bool plAvLadderMod::MsgReceive(plMessage* msg)
         return true;
     }
 
-    // Avatar is inside our detector box, so every frame we check if he's ready to climb 
+    // Avatar is inside our detector box, so every frame we check if he's ready to climb
     plEvalMsg* evalMsg = plEvalMsg::ConvertNoRef(msg);
-    if (evalMsg)
-    {
-        if (IIsReadyToClimb())
+
+    if (evalMsg) {
+        if (IIsReadyToClimb()) {
             ITriggerSelf(plNetClientApp::GetInstance()->GetLocalPlayerKey());
+        }
+
         return true;
     }
 
-    plNotifyMsg *notifyMsg = plNotifyMsg::ConvertNoRef(msg);
-    if (notifyMsg)
-    {
-        if (notifyMsg->fID == kNotifyTrigger && fEnabled)
-        {
+    plNotifyMsg* notifyMsg = plNotifyMsg::ConvertNoRef(msg);
+
+    if (notifyMsg) {
+        if (notifyMsg->fID == kNotifyTrigger && fEnabled) {
             const plKey avPhysKey = notifyMsg->GetSender();
             EmitCommand(avPhysKey);
-        }
-        else if (notifyMsg->fID == kNotifyAvatarOnLadder)
-        {
+        } else if (notifyMsg->fID == kNotifyAvatarOnLadder) {
             DetectorLogSpecial("%s: Avatar mounted ladder", GetKeyName().c_str());
             fAvatarMounting = false;
         }
@@ -224,13 +220,14 @@ bool plAvLadderMod::MsgReceive(plMessage* msg)
         return true;
     }
 
-    plEnableMsg *enableMsg = plEnableMsg::ConvertNoRef(msg);
-    if (enableMsg)
-    {
-        if (enableMsg->Cmd(plEnableMsg::kDisable))
+    plEnableMsg* enableMsg = plEnableMsg::ConvertNoRef(msg);
+
+    if (enableMsg) {
+        if (enableMsg->Cmd(plEnableMsg::kDisable)) {
             fEnabled = false;
-        else if (enableMsg->Cmd(plEnableMsg::kEnable))
+        } else if (enableMsg->Cmd(plEnableMsg::kEnable)) {
             fEnabled = true;
+        }
     }
 
     return plSingleModifier::MsgReceive(msg);
@@ -239,26 +236,24 @@ bool plAvLadderMod::MsgReceive(plMessage* msg)
 // EMITCOMMAND
 void plAvLadderMod::EmitCommand(const plKey receiver)
 {
-    hsKeyedObject *object = receiver->ObjectIsLoaded();
-    plSceneObject *SO = plSceneObject::ConvertNoRef(object);
-    if(SO)
-    {
-        const plArmatureMod *constAvMod = (plArmatureMod*)SO->GetModifierByType(plArmatureMod::Index());
-        if(constAvMod)
-        {
-            plAvBrainGeneric *curGenBrain = (plAvBrainGeneric *)constAvMod->FindBrainByClass(plAvBrainGeneric::Index());
-            // *** warning; if there's more than one generic brain active, this will only look at the first
-            bool alreadyOnLadder =  ( curGenBrain  && curGenBrain->GetType() == plAvBrainGeneric::kLadder );
+    hsKeyedObject* object = receiver->ObjectIsLoaded();
+    plSceneObject* SO = plSceneObject::ConvertNoRef(object);
 
-            if( ! alreadyOnLadder)
-            {
-                plSceneObject *seekObj = GetTarget();
+    if (SO) {
+        const plArmatureMod* constAvMod = (plArmatureMod*)SO->GetModifierByType(plArmatureMod::Index());
+
+        if (constAvMod) {
+            plAvBrainGeneric* curGenBrain = (plAvBrainGeneric*)constAvMod->FindBrainByClass(plAvBrainGeneric::Index());
+            // *** warning; if there's more than one generic brain active, this will only look at the first
+            bool alreadyOnLadder = (curGenBrain  && curGenBrain->GetType() == plAvBrainGeneric::kLadder);
+
+            if (! alreadyOnLadder) {
+                plSceneObject* seekObj = GetTarget();
                 plKey seekKey = seekObj->GetKey();      // this modifier's target is the seek object
 
-                const char *mountName, *dismountName, *traverseName;
+                const char* mountName, *dismountName, *traverseName;
 
-                if(fGoingUp)
-                {
+                if (fGoingUp) {
                     mountName = "LadderUpOn";
                     dismountName = "LadderUpOff";
                     traverseName = "LadderUp";
@@ -268,45 +263,54 @@ void plAvLadderMod::EmitCommand(const plKey receiver)
                     traverseName = "LadderDown";
                 }
 
-                plAnimStageVec *v = new plAnimStageVec;
+                plAnimStageVec* v = new plAnimStageVec;
 
-                plAnimStage *s1 = new plAnimStage(mountName,
+                plAnimStage* s1 = new plAnimStage(mountName,
                                                   0,
                                                   plAnimStage::kForwardAuto,
                                                   plAnimStage::kBackAuto,
                                                   plAnimStage::kAdvanceAuto,
                                                   plAnimStage::kRegressAuto,
                                                   0);
-                if( ! fGoingUp)
+
+                if (! fGoingUp) {
                     s1->SetReverseOnIdle(true);
+                }
+
                 v->push_back(s1);
-                
+
                 // if loops is zero, we don't need the traverse animation at all.
-                if(fLoops)
-                {
-                    plAnimStage *s2 = new plAnimStage(traverseName,
+                if (fLoops) {
+                    plAnimStage* s2 = new plAnimStage(traverseName,
                                                       0,
                                                       plAnimStage::kForwardKey,
                                                       plAnimStage::kBackKey,
                                                       plAnimStage::kAdvanceAuto,
                                                       plAnimStage::kRegressAuto,
                                                       fLoops - 1    // first loop is implied; zero loops means
-                                                                    // play this anim once, 1 loop means "loop
-                                                                    // once after reaching the end."
-                                                      );
-                    if( ! fGoingUp)
+                                                      // play this anim once, 1 loop means "loop
+                                                      // once after reaching the end."
+                                                     );
+
+                    if (! fGoingUp) {
                         s2->SetReverseOnIdle(true);
+                    }
+
                     v->push_back(s2);
                 }
-                plAnimStage *s3 = new plAnimStage(dismountName,
+
+                plAnimStage* s3 = new plAnimStage(dismountName,
                                                   0,
                                                   plAnimStage::kForwardAuto,
                                                   plAnimStage::kBackAuto,
                                                   plAnimStage::kAdvanceAuto,
                                                   plAnimStage::kRegressAuto,
                                                   0);
-                if( ! fGoingUp)
+
+                if (! fGoingUp) {
                     s3->SetReverseOnIdle(true);
+                }
+
                 v->push_back(s3);
 
                 plNotifyMsg* enterNotify = new plNotifyMsg(GetKey(), GetKey());
@@ -314,8 +318,8 @@ void plAvLadderMod::EmitCommand(const plKey receiver)
 
                 uint32_t exitFlags = plAvBrainGeneric::kExitNormal;
 
-                plAvBrainGeneric *ladBrain = new plAvBrainGeneric(v, enterNotify, nil, nil, exitFlags, plAvBrainGeneric::kDefaultFadeIn, 
-                                                                  plAvBrainGeneric::kDefaultFadeOut, plAvBrainGeneric::kMoveRelative);
+                plAvBrainGeneric* ladBrain = new plAvBrainGeneric(v, enterNotify, nil, nil, exitFlags, plAvBrainGeneric::kDefaultFadeIn,
+                        plAvBrainGeneric::kDefaultFadeOut, plAvBrainGeneric::kMoveRelative);
                 ladBrain->SetType(plAvBrainGeneric::kLadder);
                 ladBrain->SetReverseFBControlsOnRelease(!fGoingUp);
 
@@ -323,19 +327,19 @@ void plAvLadderMod::EmitCommand(const plKey receiver)
 
                 // Very important that we dumb seek here. Otherwise you can run off the edge of a ladder, and seek will be helpless
                 // until you hit the ground, at which point you have no hope of successfully seeking.
-                plAvSeekMsg *seeker = new plAvSeekMsg(nil, avKey, seekKey, 1.0f, false);
+                plAvSeekMsg* seeker = new plAvSeekMsg(nil, avKey, seekKey, 1.0f, false);
                 seeker->Send();
-                plAvPushBrainMsg *brainer = new plAvPushBrainMsg(nil, avKey, ladBrain);
+                plAvPushBrainMsg* brainer = new plAvPushBrainMsg(nil, avKey, ladBrain);
                 brainer->Send();
             }
         }
     }
 }
 
-void plAvLadderMod::Read(hsStream *stream, hsResMgr *mgr)
+void plAvLadderMod::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Read(stream, mgr);
-    
+
     fType = stream->ReadLE32();
     fLoops = stream->ReadLE32();
     fGoingUp = stream->ReadBool();
@@ -345,7 +349,7 @@ void plAvLadderMod::Read(hsStream *stream, hsResMgr *mgr)
     fLadderView.fZ = stream->ReadLEScalar();
 }
 
-void plAvLadderMod::Write(hsStream *stream, hsResMgr *mgr)
+void plAvLadderMod::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Write(stream, mgr);
 
@@ -379,15 +383,14 @@ void plAvLadderMod::SetLoops(int loops)
     fLoops = loops;
 }
 
-int plAvLadderMod::GetType() const 
+int plAvLadderMod::GetType() const
 {
     return fType;
 }
 
 void plAvLadderMod::SetType(int type)
 {
-    if(type >= kNumOfTypeFields || type < 0)
-    {
+    if (type >= kNumOfTypeFields || type < 0) {
         hsStatusMessage("Invalid param to plAvLadderMod::SetType: defaulting to kBig");
         fType = kBig;
     } else {

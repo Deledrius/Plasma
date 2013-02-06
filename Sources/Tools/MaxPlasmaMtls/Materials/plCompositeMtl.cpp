@@ -51,25 +51,42 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plPassMtl.h"
 #include "plCompositeMtlDlg.h"
 
-class plCompositeClassDesc : public ClassDesc2
-{
+class plCompositeClassDesc : public ClassDesc2 {
 public:
-    int             IsPublic()      { return TRUE; }
-    void*           Create(BOOL loading) { return new plCompositeMtl(loading); }
-    const TCHAR*    ClassName()     { return GetString(IDS_COMP_MTL); }
-    SClass_ID       SuperClassID()  { return MATERIAL_CLASS_ID; }
-    Class_ID        ClassID()       { return COMP_MTL_CLASS_ID; }
-    const TCHAR*    Category()      { return NULL; }
-    const TCHAR*    InternalName()  { return _T("PlasmaComposite"); }
-    HINSTANCE       HInstance()     { return hInstance; }
+    int             IsPublic()      {
+        return TRUE;
+    }
+    void*           Create(BOOL loading) {
+        return new plCompositeMtl(loading);
+    }
+    const TCHAR*    ClassName()     {
+        return GetString(IDS_COMP_MTL);
+    }
+    SClass_ID       SuperClassID()  {
+        return MATERIAL_CLASS_ID;
+    }
+    Class_ID        ClassID()       {
+        return COMP_MTL_CLASS_ID;
+    }
+    const TCHAR*    Category()      {
+        return NULL;
+    }
+    const TCHAR*    InternalName()  {
+        return _T("PlasmaComposite");
+    }
+    HINSTANCE       HInstance()     {
+        return hInstance;
+    }
 };
 static plCompositeClassDesc plCompositeMtlDesc;
-ClassDesc2* GetCompMtlDesc() { return &plCompositeMtlDesc; }
+ClassDesc2* GetCompMtlDesc()
+{
+    return &plCompositeMtlDesc;
+}
 
 #include "plCompositeMtlPBDec.h"
 
-const char *plCompositeMtl::BlendStrings[] = // Make sure these match up in order with the Blend enum (in the header)
-{
+const char* plCompositeMtl::BlendStrings[] = { // Make sure these match up in order with the Blend enum (in the header)
     "Vertex Alpha",
     "Inverse Vtx Alpha",
     "Vertex Illum Red",
@@ -84,13 +101,14 @@ plCompositeMtl::plCompositeMtl(BOOL loading) : fPassesPB(NULL)
 {
     plCompositeMtlDesc.MakeAutoParamBlocks(this);
 
-    if (!loading) 
+    if (!loading) {
         Reset();
+    }
 
     int i;
-    for (i = 0; i < NSUBMTLS; i++)
-    {
-        plPassMtl *newMtl = new plPassMtl(false);
+
+    for (i = 0; i < NSUBMTLS; i++) {
+        plPassMtl* newMtl = new plPassMtl(false);
         fPassesPB->SetValue(kCompPasses, 0, newMtl, i);
         GetCOREInterface()->AssignNewName(fPassesPB->GetMtl(kCompPasses, 0, i));
     }
@@ -101,27 +119,26 @@ void plCompositeMtl::GetClassName(TSTR& s)
     s = GetString(IDS_COMP_MTL);
 }
 
-void plCompositeMtl::Reset() 
+void plCompositeMtl::Reset()
 {
     fIValid.SetEmpty();
 }
 
-ParamDlg* plCompositeMtl::CreateParamDlg(HWND hwMtlEdit, IMtlParams *imp) 
+ParamDlg* plCompositeMtl::CreateParamDlg(HWND hwMtlEdit, IMtlParams* imp)
 {
     fMtlDlg = new plCompositeMtlDlg(hwMtlEdit, imp, this);
 
-    return fMtlDlg; 
+    return fMtlDlg;
 }
 
-void plCompositeMtl::SetParamDlg(ParamDlg *dlg)
+void plCompositeMtl::SetParamDlg(ParamDlg* dlg)
 {
     fMtlDlg = (plCompositeMtlDlg*)dlg;
 }
 
 BOOL plCompositeMtl::SetDlgThing(ParamDlg* dlg)
 {
-    if (dlg == fMtlDlg)
-    {
+    if (dlg == fMtlDlg) {
         fMtlDlg->SetThing(this);
         return TRUE;
     }
@@ -131,14 +148,14 @@ BOOL plCompositeMtl::SetDlgThing(ParamDlg* dlg)
 
 Interval plCompositeMtl::Validity(TimeValue t)
 {
-    Interval valid = FOREVER;       
+    Interval valid = FOREVER;
 
-/*  for (int i = 0; i < fSubTexmap.Count(); i++) 
-    {
-        if (fSubTexmap[i]) 
-            valid &= fSubTexmap[i]->Validity(t);
-    }
-*/  
+    /*  for (int i = 0; i < fSubTexmap.Count(); i++)
+        {
+            if (fSubTexmap[i])
+                valid &= fSubTexmap[i]->Validity(t);
+        }
+    */
 //  float u;
 //  fPBlock->GetValue(pb_spin,t,u,valid);
     return valid;
@@ -151,8 +168,8 @@ int plCompositeMtl::ComputeMaterialIndex(float opac[][2], int vertCount)
     int index = 0;
     int i;//, j;
     int bitmask = 1;
-    for (i = NumSubMtls() - 1, bitmask <<= i; i >= 0; i--, bitmask >>= 1)
-    {
+
+    for (i = NumSubMtls() - 1, bitmask <<= i; i >= 0; i--, bitmask >>= 1) {
         index |= bitmask;
         /*
         if (i == 0)
@@ -181,6 +198,7 @@ int plCompositeMtl::ComputeMaterialIndex(float opac[][2], int vertCount)
         }
         */
     }
+
     return index;
 }
 
@@ -195,23 +213,25 @@ int plCompositeMtl::GetBlendStyle(int index)
 int plCompositeMtl::CanWriteAlpha()
 {
     int blend[3];
-    blend[0] = ((((plPassMtlBase *)GetSubMtl(0))->GetOutputBlend() == plPassMtlBase::kBlendNone) ? -1 : kCompBlendVertexAlpha);
+    blend[0] = ((((plPassMtlBase*)GetSubMtl(0))->GetOutputBlend() == plPassMtlBase::kBlendNone) ? -1 : kCompBlendVertexAlpha);
     blend[1] = (fPassesPB->GetInt(kCompOn, 0, 0) ? RemoveInverse(GetBlendStyle(1)) : -1);
     blend[2] = (fPassesPB->GetInt(kCompOn, 0, 1) ? RemoveInverse(GetBlendStyle(2)) : -1);
 
     int source = blend[0];
     int i;
-    for (i = 1; i < 3; i++)
-    {
-        if (source < 0) 
-        {
+
+    for (i = 1; i < 3; i++) {
+        if (source < 0) {
             source = blend[i];
             continue;
         }
-        if (source >= 0 && blend[i] >= 0 && blend[i] != source) 
+
+        if (source >= 0 && blend[i] >= 0 && blend[i] != source) {
             return -1;
+        }
     }
-    return source; 
+
+    return source;
 }
 
 /*===========================================================================*\
@@ -223,7 +243,7 @@ int plCompositeMtl::NumSubs()
     return NumSubMtls();
 }
 
-TSTR plCompositeMtl::SubAnimName(int i) 
+TSTR plCompositeMtl::SubAnimName(int i)
 {
     return GetSubMtlSlotName(i);
 }
@@ -240,16 +260,18 @@ int plCompositeMtl::NumRefs()
 
 RefTargetHandle plCompositeMtl::GetReference(int i)
 {
-    if (i == kRefPasses)
+    if (i == kRefPasses) {
         return fPassesPB;
+    }
 
     return NULL;
 }
 
 void plCompositeMtl::SetReference(int i, RefTargetHandle rtarg)
 {
-    if (i == kRefPasses)
-        fPassesPB = (IParamBlock2 *)rtarg;
+    if (i == kRefPasses) {
+        fPassesPB = (IParamBlock2*)rtarg;
+    }
 }
 
 int plCompositeMtl::NumParamBlocks()
@@ -257,34 +279,36 @@ int plCompositeMtl::NumParamBlocks()
     return 1;
 }
 
-IParamBlock2 *plCompositeMtl::GetParamBlock(int i)
+IParamBlock2* plCompositeMtl::GetParamBlock(int i)
 {
-    if (i == kRefPasses)
+    if (i == kRefPasses) {
         return fPassesPB;
+    }
 
     return NULL;
 }
 
-IParamBlock2 *plCompositeMtl::GetParamBlockByID(BlockID id)
+IParamBlock2* plCompositeMtl::GetParamBlockByID(BlockID id)
 {
-    if (fPassesPB->ID() == id)
+    if (fPassesPB->ID() == id) {
         return fPassesPB;
+    }
 
     return NULL;
 }
 
-RefResult plCompositeMtl::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, 
-   PartID& partID, RefMessage message ) 
+RefResult plCompositeMtl::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
+        PartID& partID, RefMessage message)
 {
-    switch (message)
-    {
+    switch (message) {
     case REFMSG_CHANGE:
         fIValid.SetEmpty();
-        if (hTarget == fPassesPB)
-        {
+
+        if (hTarget == fPassesPB) {
             ParamID changingParam = fPassesPB->LastNotifyParamID();
             fPassesPB->GetDesc()->InvalidateUI(changingParam);
         }
+
         break;
     }
 
@@ -300,24 +324,26 @@ int plCompositeMtl::NumSubMtls()
     return NSUBMTLS;
 }
 
-Mtl *plCompositeMtl::GetSubMtl(int i)
+Mtl* plCompositeMtl::GetSubMtl(int i)
 {
-    if (i < NumSubMtls())
+    if (i < NumSubMtls()) {
         return fPassesPB->GetMtl(kCompPasses, 0, i);
+    }
 
     return NULL;
 }
 
-void plCompositeMtl::SetSubMtl(int i, Mtl *m)
+void plCompositeMtl::SetSubMtl(int i, Mtl* m)
 {
-    if (i < NumSubMtls())
+    if (i < NumSubMtls()) {
         fPassesPB->SetValue(kCompPasses, 0, m, i);
+    }
 }
 
 TSTR plCompositeMtl::GetSubMtlSlotName(int i)
 {
     TSTR str;
-    str.printf("Pass %d", i+1);
+    str.printf("Pass %d", i + 1);
     return str;
 }
 
@@ -333,32 +359,38 @@ TSTR plCompositeMtl::GetSubMtlTVName(int i)
 
 #define MTL_HDR_CHUNK 0x4000
 
-IOResult plCompositeMtl::Save(ISave *isave)
-{ 
+IOResult plCompositeMtl::Save(ISave* isave)
+{
     IOResult res;
     isave->BeginChunk(MTL_HDR_CHUNK);
     res = MtlBase::Save(isave);
-    if (res!=IO_OK) return res;
+
+    if (res != IO_OK) {
+        return res;
+    }
+
     isave->EndChunk();
 
     return IO_OK;
-}   
+}
 
-IOResult plCompositeMtl::Load(ILoad *iload)
+IOResult plCompositeMtl::Load(ILoad* iload)
 {
     IOResult res;
     int id;
-    while (IO_OK==(res=iload->OpenChunk()))
-    {
-        switch(id = iload->CurChunkID())
-        {
-            case MTL_HDR_CHUNK:
-                res = MtlBase::Load(iload);
-                break;
+
+    while (IO_OK == (res = iload->OpenChunk())) {
+        switch (id = iload->CurChunkID()) {
+        case MTL_HDR_CHUNK:
+            res = MtlBase::Load(iload);
+            break;
         }
+
         iload->CloseChunk();
-        if (res!=IO_OK) 
+
+        if (res != IO_OK) {
             return res;
+        }
     }
 
     return IO_OK;
@@ -369,34 +401,33 @@ IOResult plCompositeMtl::Load(ILoad *iload)
  |  Updating and cloning
 \*===========================================================================*/
 
-RefTargetHandle plCompositeMtl::Clone(RemapDir &remap)
+RefTargetHandle plCompositeMtl::Clone(RemapDir& remap)
 {
-    plCompositeMtl *mnew = new plCompositeMtl(FALSE);
-    *((MtlBase*)mnew) = *((MtlBase*)this); 
+    plCompositeMtl* mnew = new plCompositeMtl(FALSE);
+    *((MtlBase*)mnew) = *((MtlBase*)this);
     mnew->ReplaceReference(kRefPasses, remap.CloneRef(fPassesPB));
 
-    mnew->fIValid.SetEmpty();   
+    mnew->fIValid.SetEmpty();
     BaseClone(this, mnew, remap);
 
     return (RefTargetHandle)mnew;
 }
 
-void plCompositeMtl::NotifyChanged() 
+void plCompositeMtl::NotifyChanged()
 {
     NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE);
 }
 
-void plCompositeMtl::Update(TimeValue t, Interval& valid) 
-{   
-    if (!fIValid.InInterval(t))
-    {
+void plCompositeMtl::Update(TimeValue t, Interval& valid)
+{
+    if (!fIValid.InInterval(t)) {
         fIValid.SetInfinite();
 //      fPassesPB->GetValue(kMtlLayLayer1On, t, fMapOn[0], fIValid);
 
-        for (int i = 0; i < NumSubMtls(); i++)
-        {
-            if (GetSubMtl(i))
+        for (int i = 0; i < NumSubMtls(); i++) {
+            if (GetSubMtl(i)) {
                 GetSubMtl(i)->Update(t, fIValid);
+            }
         }
     }
 
@@ -406,24 +437,45 @@ void plCompositeMtl::Update(TimeValue t, Interval& valid)
 /*===========================================================================*\
  |  Determine the characteristics of the material
 \*===========================================================================*/
-void plCompositeMtl::SetAmbient(Color c, TimeValue t) {}        
-void plCompositeMtl::SetDiffuse(Color c, TimeValue t) {}        
+void plCompositeMtl::SetAmbient(Color c, TimeValue t) {}
+void plCompositeMtl::SetDiffuse(Color c, TimeValue t) {}
 void plCompositeMtl::SetSpecular(Color c, TimeValue t) {}
 void plCompositeMtl::SetShininess(float v, TimeValue t) {}
-                
-Color plCompositeMtl::GetAmbient(int mtlNum, BOOL backFace) { return Color(0,0,0); }
-Color plCompositeMtl::GetDiffuse(int mtlNum, BOOL backFace) { return Color(0,0,0); }
-Color plCompositeMtl::GetSpecular(int mtlNum, BOOL backFace)    { return Color(0,0,0); }
-float plCompositeMtl::GetXParency(int mtlNum, BOOL backFace)    { return 0.0f; }
-float plCompositeMtl::GetShininess(int mtlNum, BOOL backFace)   { return 0.0f; }
-float plCompositeMtl::GetShinStr(int mtlNum, BOOL backFace) { return 0.0f; }
-float plCompositeMtl::WireSize(int mtlNum, BOOL backFace)       { return 0.0f; }
+
+Color plCompositeMtl::GetAmbient(int mtlNum, BOOL backFace)
+{
+    return Color(0, 0, 0);
+}
+Color plCompositeMtl::GetDiffuse(int mtlNum, BOOL backFace)
+{
+    return Color(0, 0, 0);
+}
+Color plCompositeMtl::GetSpecular(int mtlNum, BOOL backFace)
+{
+    return Color(0, 0, 0);
+}
+float plCompositeMtl::GetXParency(int mtlNum, BOOL backFace)
+{
+    return 0.0f;
+}
+float plCompositeMtl::GetShininess(int mtlNum, BOOL backFace)
+{
+    return 0.0f;
+}
+float plCompositeMtl::GetShinStr(int mtlNum, BOOL backFace)
+{
+    return 0.0f;
+}
+float plCompositeMtl::WireSize(int mtlNum, BOOL backFace)
+{
+    return 0.0f;
+}
 
 /*===========================================================================*\
  |  Actual shading takes place
 \*===========================================================================*/
 
-void plCompositeMtl::Shade(ShadeContext& sc) 
+void plCompositeMtl::Shade(ShadeContext& sc)
 {
     // Get the background color
     Color backColor, backTrans;
@@ -435,54 +487,61 @@ void plCompositeMtl::Shade(ShadeContext& sc)
     plPassMtl::GetInterpVtxValue(MAP_ALPHA, sc, vtxAlpha);
     plPassMtl::GetInterpVtxValue(MAP_SHADING, sc, vtxIllum);
     int count = NumSubMtls();
-    for (int i = 0; i < count; i++)
-    {
-        if (i > 0 && fPassesPB->GetInt(kCompOn, 0, i - 1) == 0) // Material is unchecked, skip it.
-            continue;
 
-        Mtl *mtl = GetSubMtl(i);
-        if (mtl == NULL || mtl->ClassID() != PASS_MTL_CLASS_ID)
+    for (int i = 0; i < count; i++) {
+        if (i > 0 && fPassesPB->GetInt(kCompOn, 0, i - 1) == 0) { // Material is unchecked, skip it.
             continue;
+        }
+
+        Mtl* mtl = GetSubMtl(i);
+
+        if (mtl == NULL || mtl->ClassID() != PASS_MTL_CLASS_ID) {
+            continue;
+        }
 
         float opacity;
-        if (i == 0)
-        {
+
+        if (i == 0) {
             opacity = 1.0f;
-        }
-        else
-        {
+        } else {
             int blendMethod = fPassesPB->GetInt(kCompBlend, 0, i - 1);
-            switch(blendMethod)
-            {
+
+            switch (blendMethod) {
             case kCompBlendVertexAlpha:
             case kCompBlendInverseVtxAlpha:
                 opacity = vtxAlpha.x;
                 break;
+
             case kCompBlendVertexIllumRed:
             case kCompBlendInverseVtxIllumRed:
                 opacity = vtxIllum.x;
                 break;
+
             case kCompBlendVertexIllumGreen:
             case kCompBlendInverseVtxIllumGreen:
                 opacity = vtxIllum.y;
                 break;
+
             case kCompBlendVertexIllumBlue:
             case kCompBlendInverseVtxIllumBlue:
                 opacity = vtxIllum.z;
                 break;
+
             default:
                 opacity = 1.0f;
                 break;
             }
-            if (IsInverseBlend(blendMethod))
+
+            if (IsInverseBlend(blendMethod)) {
                 opacity = 1 - opacity;
+            }
         }
 
-        plPassMtl *passMtl = (plPassMtl*)mtl;
+        plPassMtl* passMtl = (plPassMtl*)mtl;
         passMtl->ShadeWithBackground(sc, backColor, false); // Don't include the vtx alpha, that's OUR job
         float currTrans = (1 - (1 - sc.out.t.r) * opacity);
         backTrans *= currTrans;
-        backColor = backColor * currTrans + sc.out.c * opacity; 
+        backColor = backColor * currTrans + sc.out.c * opacity;
     }
 
     sc.out.t = backTrans;
@@ -499,7 +558,7 @@ Interval plCompositeMtl::DisplacementValidity(TimeValue t)
     Interval iv;
     iv.SetInfinite();
 
-    return iv;  
+    return iv;
 }
 
 /*
@@ -524,46 +583,40 @@ void plCompositeMtl::SetNumSubMtls(int num)
 */
 
 
-void plCompositeMtl::SetOpacityVal(float *target, UVVert *alpha, UVVert *illum, int method)
+void plCompositeMtl::SetOpacityVal(float* target, UVVert* alpha, UVVert* illum, int method)
 {
-    if (method == kCompBlendVertexAlpha || method == kCompBlendInverseVtxAlpha)
-    {
-        if (alpha == NULL)
+    if (method == kCompBlendVertexAlpha || method == kCompBlendInverseVtxAlpha) {
+        if (alpha == NULL) {
             *target = 1.0f;
-        else
+        } else {
             *target = alpha->x;
-    }
-    else if (method == kCompBlendVertexIllumRed || method == kCompBlendInverseVtxIllumRed)
-    {
-        if (illum == NULL)
+        }
+    } else if (method == kCompBlendVertexIllumRed || method == kCompBlendInverseVtxIllumRed) {
+        if (illum == NULL) {
             *target = 1.0f;
-        else
+        } else {
             *target = illum->x;
-    }
-    else if (method == kCompBlendVertexIllumGreen || method == kCompBlendInverseVtxIllumGreen)
-    {
-        if (illum == NULL)
+        }
+    } else if (method == kCompBlendVertexIllumGreen || method == kCompBlendInverseVtxIllumGreen) {
+        if (illum == NULL) {
             *target = 1.0f;
-        else
+        } else {
             *target = illum->y;
-    }
-    else if (method == kCompBlendVertexIllumBlue || method == kCompBlendInverseVtxIllumBlue)
-    {
-        if (illum == NULL)
+        }
+    } else if (method == kCompBlendVertexIllumBlue || method == kCompBlendInverseVtxIllumBlue) {
+        if (illum == NULL) {
             *target = 1.0f;
-        else
+        } else {
             *target = illum->z;
-    }
-    else
-    {
+        }
+    } else {
         *target = 1.0f;
     }
 
     if (method == kCompBlendInverseVtxAlpha ||
-        method == kCompBlendInverseVtxIllumRed ||
-        method == kCompBlendInverseVtxIllumGreen ||
-        method == kCompBlendInverseVtxIllumBlue)
-    {
+            method == kCompBlendInverseVtxIllumRed ||
+            method == kCompBlendInverseVtxIllumGreen ||
+            method == kCompBlendInverseVtxIllumBlue) {
         *target = 1.0f - *target;
     }
 }

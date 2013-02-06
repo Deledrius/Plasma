@@ -55,11 +55,12 @@ PYTHON_DEFAULT_DEALLOC_DEFINITION(ptVaultPlayerInfoListNode)
 PYTHON_INIT_DEFINITION(ptVaultPlayerInfoListNode, args, keywords)
 {
     int n = 0;
-    if (!PyArg_ParseTuple(args, "|i", &n))
-    {
+
+    if (!PyArg_ParseTuple(args, "|i", &n)) {
         PyErr_SetString(PyExc_TypeError, "__init__ expects an optional int");
         PYTHON_RETURN_INIT_ERROR;
     }
+
     // we don't really do anything? Not according to the associated constructor. Odd...
     PYTHON_RETURN_INIT_OK;
 }
@@ -67,33 +68,36 @@ PYTHON_INIT_DEFINITION(ptVaultPlayerInfoListNode, args, keywords)
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoListNode, playerlistHasPlayer, args)
 {
     unsigned long playerID;
-    if (!PyArg_ParseTuple(args, "l", &playerID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &playerID)) {
         PyErr_SetString(PyExc_TypeError, "playerlistHasPlayer expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_BOOL(self->fThis->HasPlayer(playerID));
 }
 
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoListNode, playerlistAddPlayer, args)
 {
     unsigned long playerID;
-    if (!PyArg_ParseTuple(args, "l", &playerID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &playerID)) {
         PyErr_SetString(PyExc_TypeError, "playerlistAddPlayer expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_BOOL(self->fThis->AddPlayer(playerID));
 }
 
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoListNode, playerlistRemovePlayer, args)
 {
     unsigned long playerID;
-    if (!PyArg_ParseTuple(args, "l", &playerID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &playerID)) {
         PyErr_SetString(PyExc_TypeError, "playerlistRemovePlayer expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->RemovePlayer(playerID);
     PYTHON_RETURN_NONE;
 }
@@ -101,44 +105,48 @@ PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoListNode, playerlistRemovePlayer, args
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoListNode, playerlistGetPlayer, args)
 {
     unsigned long playerID;
-    if (!PyArg_ParseTuple(args, "l", &playerID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &playerID)) {
         PyErr_SetString(PyExc_TypeError, "playerlistGetPlayer expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     return self->fThis->GetPlayer(playerID);
 }
 
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoListNode, hasPlayer, args)
 {
     unsigned long playerID;
-    if (!PyArg_ParseTuple(args, "l", &playerID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &playerID)) {
         PyErr_SetString(PyExc_TypeError, "hasPlayer expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_BOOL(self->fThis->HasPlayer(playerID));
 }
 
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoListNode, addPlayer, args)
 {
     unsigned long playerID;
-    if (!PyArg_ParseTuple(args, "l", &playerID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &playerID)) {
         PyErr_SetString(PyExc_TypeError, "addPlayer expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_BOOL(self->fThis->AddPlayer(playerID));
 }
 
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoListNode, removePlayer, args)
 {
     unsigned long playerID;
-    if (!PyArg_ParseTuple(args, "l", &playerID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &playerID)) {
         PyErr_SetString(PyExc_TypeError, "removePlayer expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     self->fThis->RemovePlayer(playerID);
     PYTHON_RETURN_NONE;
 }
@@ -146,48 +154,55 @@ PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoListNode, removePlayer, args)
 PYTHON_METHOD_DEFINITION(ptVaultPlayerInfoListNode, getPlayer, args)
 {
     unsigned long playerID;
-    if (!PyArg_ParseTuple(args, "l", &playerID))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &playerID)) {
         PyErr_SetString(PyExc_TypeError, "getPlayer expects an unsigned long");
         PYTHON_RETURN_ERROR;
     }
+
     return self->fThis->GetPlayer(playerID);
 }
 
 PYTHON_BASIC_METHOD_DEFINITION(ptVaultPlayerInfoListNode, sort, Sort)
 
 PYTHON_START_METHODS_TABLE(ptVaultPlayerInfoListNode)
-    // legacy glue
-    PYTHON_METHOD(ptVaultPlayerInfoListNode, playerlistHasPlayer, "Params: playerID\nLEGACY: Returns whether the 'playerID' is a member of this player info list node."),
-    PYTHON_METHOD(ptVaultPlayerInfoListNode, playerlistAddPlayer, "Params: playerID\nLEGACY: Adds playerID player to this player info list node."),
-    PYTHON_METHOD(ptVaultPlayerInfoListNode, playerlistRemovePlayer, "Params: playerID\nLEGACY: Removes playerID player from this player info list node."),
-    PYTHON_METHOD(ptVaultPlayerInfoListNode, playerlistGetPlayer, "Params: playerID\nLEGACY: Gets the player info node for the specified player."),
-    // new glue
-    PYTHON_METHOD(ptVaultPlayerInfoListNode, hasPlayer, "Params: playerID\nReturns whether the 'playerID' is a member of this player info list node."),
-    PYTHON_METHOD(ptVaultPlayerInfoListNode, addPlayer, "Params: playerID\nAdds playerID player to this player info list node."),
-    PYTHON_METHOD(ptVaultPlayerInfoListNode, removePlayer, "Params: playerID\nRemoves playerID player from this player info list node."),
-    PYTHON_METHOD(ptVaultPlayerInfoListNode, getPlayer, "Params: playerID\nGets the player info node for the specified player."),
-    PYTHON_BASIC_METHOD(ptVaultPlayerInfoListNode, sort, "Sorts the player list by some means...?"),
-PYTHON_END_METHODS_TABLE;
+// legacy glue
+PYTHON_METHOD(ptVaultPlayerInfoListNode, playerlistHasPlayer, "Params: playerID\nLEGACY: Returns whether the 'playerID' is a member of this player info list node."),
+              PYTHON_METHOD(ptVaultPlayerInfoListNode, playerlistAddPlayer, "Params: playerID\nLEGACY: Adds playerID player to this player info list node."),
+              PYTHON_METHOD(ptVaultPlayerInfoListNode, playerlistRemovePlayer, "Params: playerID\nLEGACY: Removes playerID player from this player info list node."),
+              PYTHON_METHOD(ptVaultPlayerInfoListNode, playerlistGetPlayer, "Params: playerID\nLEGACY: Gets the player info node for the specified player."),
+              // new glue
+              PYTHON_METHOD(ptVaultPlayerInfoListNode, hasPlayer, "Params: playerID\nReturns whether the 'playerID' is a member of this player info list node."),
+              PYTHON_METHOD(ptVaultPlayerInfoListNode, addPlayer, "Params: playerID\nAdds playerID player to this player info list node."),
+              PYTHON_METHOD(ptVaultPlayerInfoListNode, removePlayer, "Params: playerID\nRemoves playerID player from this player info list node."),
+              PYTHON_METHOD(ptVaultPlayerInfoListNode, getPlayer, "Params: playerID\nGets the player info node for the specified player."),
+              PYTHON_BASIC_METHOD(ptVaultPlayerInfoListNode, sort, "Sorts the player list by some means...?"),
+              PYTHON_END_METHODS_TABLE;
 
 // Type structure definition
 PLASMA_DEFAULT_TYPE_WBASE(ptVaultPlayerInfoListNode, pyVaultFolderNode, "Params: n=0\nPlasma vault player info list node");
 
 // required functions for PyObject interoperability
-PyObject *pyVaultPlayerInfoListNode::New(RelVaultNode* nfsNode)
+PyObject* pyVaultPlayerInfoListNode::New(RelVaultNode* nfsNode)
 {
-    ptVaultPlayerInfoListNode *newObj = (ptVaultPlayerInfoListNode*)ptVaultPlayerInfoListNode_type.tp_new(&ptVaultPlayerInfoListNode_type, NULL, NULL);
-    if (newObj->fThis->fNode)
+    ptVaultPlayerInfoListNode* newObj = (ptVaultPlayerInfoListNode*)ptVaultPlayerInfoListNode_type.tp_new(&ptVaultPlayerInfoListNode_type, NULL, NULL);
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->DecRef();
+    }
+
     newObj->fThis->fNode = nfsNode;
-    if (newObj->fThis->fNode)
+
+    if (newObj->fThis->fNode) {
         newObj->fThis->fNode->IncRef();
+    }
+
     return (PyObject*)newObj;
 }
 
-PyObject *pyVaultPlayerInfoListNode::New(int n /* =0 */)
+PyObject* pyVaultPlayerInfoListNode::New(int n /* =0 */)
 {
-    ptVaultPlayerInfoListNode *newObj = (ptVaultPlayerInfoListNode*)ptVaultPlayerInfoListNode_type.tp_new(&ptVaultPlayerInfoListNode_type, NULL, NULL);
+    ptVaultPlayerInfoListNode* newObj = (ptVaultPlayerInfoListNode*)ptVaultPlayerInfoListNode_type.tp_new(&ptVaultPlayerInfoListNode_type, NULL, NULL);
     // oddly enough, nothing to do here
     return (PyObject*)newObj;
 }
@@ -199,7 +214,7 @@ PYTHON_CLASS_CONVERT_FROM_IMPL(ptVaultPlayerInfoListNode, pyVaultPlayerInfoListN
 //
 // AddPlasmaClasses - the python module definitions
 //
-void pyVaultPlayerInfoListNode::AddPlasmaClasses(PyObject *m)
+void pyVaultPlayerInfoListNode::AddPlasmaClasses(PyObject* m)
 {
     PYTHON_CLASS_IMPORT_START(m);
     PYTHON_CLASS_IMPORT(m, ptVaultPlayerInfoListNode);

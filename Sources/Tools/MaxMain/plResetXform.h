@@ -49,8 +49,7 @@ class INode;
 class INodeTab;
 class TriObject;
 
-class plResetXform
-{
+class plResetXform {
 public:
     void ResetSelected() const;
 protected:
@@ -59,8 +58,7 @@ protected:
     TriObject*  IGetTriObject(INode* node, BOOL& deleteIt) const;
 };
 
-class plSelectNonRenderables
-{
+class plSelectNonRenderables {
 public:
     void SelectNonRenderables() const;
 protected:

@@ -65,8 +65,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //
 //
 
-enum    
-{
+enum {
     kIncludeChars,
     kAffectedLightSel,
     kTest
@@ -81,50 +80,49 @@ CLASS_DESC(plLightGrpComponent, gLightGrpDesc, "Light Group",  "LightGroup", COM
 
 ParamBlockDesc2 gLightGrpBk
 (
-    plComponent::kBlkComp, _T("LightGroup"), 0, &gLightGrpDesc, P_AUTO_CONSTRUCT+P_AUTO_UI, plComponent::kRefComp,
+    plComponent::kBlkComp, _T("LightGroup"), 0, &gLightGrpDesc, P_AUTO_CONSTRUCT + P_AUTO_UI, plComponent::kRefComp,
 
     IDD_COMP_LIGHTINC, IDS_COMP_LIGHTINCS,  0, 0, nil,
 
     kIncludeChars,  _T("Include characters"), TYPE_BOOL,        0, 0,
-        p_default,  TRUE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LIGHTINC_CHARS,
-        end,
+    p_default,  TRUE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LIGHTINC_CHARS,
+    end,
 
     kAffectedLightSel, _T("AffectedLightChoice"),   TYPE_INODE,     0, 0,
-        end,
+    end,
 
     kTest, _T("TestBox"), TYPE_BOOL, 0, 0,
-        p_default,  FALSE,
-        p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LIGHTINC_FILTER,
-        end,
+    p_default,  FALSE,
+    p_ui,   TYPE_SINGLECHEKBOX, IDC_COMP_LIGHTINC_FILTER,
+    end,
 
     end
 
 );
 
 plLightGrpComponent::plLightGrpComponent()
-:   fValid(false)
+    :   fValid(false)
 {
     fClassDesc = &gLightGrpDesc;
     fClassDesc->MakeAutoParamBlocks(this);
 }
 
-class plLightGrpPostLoadCallback : public PostLoadCallback
-{
+class plLightGrpPostLoadCallback : public PostLoadCallback {
 public:
     plLightGrpComponent*    fLightGrp;
 
     plLightGrpPostLoadCallback(plLightGrpComponent* lg) : fLightGrp(lg) {}
 
-    void proc(ILoad *iload) 
-    {
+    void proc(ILoad* iload) {
         IParamBlock2* compPB = fLightGrp->GetParamBlock(plComponentBase::kBlkComp);
         INode* light = compPB->GetINode(kAffectedLightSel);
-        if( light )
-        {
+
+        if (light) {
             fLightGrp->AddTarget((plMaxNodeBase*)light);
             compPB->SetValue(kAffectedLightSel, TimeValue(0), (INode*)nil);
         }
+
         delete this;
     }
 };
@@ -139,25 +137,27 @@ IOResult plLightGrpComponent::Load(ILoad* iLoad)
 bool plLightGrpComponent::IAddLightsToSpans(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
     int i;
-    for( i = 0; i < fLightInfos.GetCount(); i++ )
-    {
-        if( !fLightInfos[i] )
+
+    for (i = 0; i < fLightInfos.GetCount(); i++) {
+        if (!fLightInfos[i]) {
             continue;
+        }
 
         const plDrawInterface* di = pNode->GetSceneObject()->GetDrawInterface();
 
         int iDraw;
-        for( iDraw = 0; iDraw < di->GetNumDrawables(); iDraw++ )
-        {
+
+        for (iDraw = 0; iDraw < di->GetNumDrawables(); iDraw++) {
             plDrawableSpans* drawable = plDrawableSpans::ConvertNoRef(di->GetDrawable(iDraw));
-            if( drawable )
-            {
+
+            if (drawable) {
                 uint32_t diIndex = di->GetDrawableMeshIndex(iDraw);
 
                 ISendItOff(fLightInfos[i], drawable, diIndex);
             }
         }
     }
+
     return true;
 }
 
@@ -165,27 +165,24 @@ bool plLightGrpComponent::ISendItOff(plLightInfo* liInfo, plDrawableSpans* drawa
 {
     plDISpanIndex spans = drawable->GetDISpans(diIndex);
 
-    if( spans.fFlags & plDISpanIndex::kMatrixOnly )
+    if (spans.fFlags & plDISpanIndex::kMatrixOnly) {
         return false;
+    }
 
-    if( !fCompPB->GetInt(kTest) )
-    {
+    if (!fCompPB->GetInt(kTest)) {
         uint8_t liMsgType = liInfo->GetProjection() ? plDrawable::kMsgPermaProjDI : plDrawable::kMsgPermaLightDI;
         plGenRefMsg* refMsg = new plGenRefMsg(drawable->GetKey(), plRefMsg::kOnCreate, diIndex, liMsgType);
         hsgResMgr::ResMgr()->AddViaNotify(liInfo->GetKey(), refMsg, plRefFlags::kPassiveRef);
-    }
-    else
-    {
+    } else {
 
         hsBitVector litSpans;
         liInfo->GetAffectedForced(drawable->GetSpaceTree(), litSpans, false);
 
         uint8_t liMsgType = liInfo->GetProjection() ? plDrawable::kMsgPermaProj : plDrawable::kMsgPermaLight;
         int i;
-        for( i = 0; i < spans.GetCount(); i++ )
-        {
-            if( litSpans.IsBitSet(spans[i]) )
-            {
+
+        for (i = 0; i < spans.GetCount(); i++) {
+            if (litSpans.IsBitSet(spans[i])) {
                 plGenRefMsg* refMsg = new plGenRefMsg(drawable->GetKey(), plRefMsg::kOnCreate, spans[i], liMsgType);
                 hsgResMgr::ResMgr()->AddViaNotify(liInfo->GetKey(), refMsg, plRefFlags::kPassiveRef);
             }
@@ -197,27 +194,34 @@ bool plLightGrpComponent::ISendItOff(plLightInfo* liInfo, plDrawableSpans* drawa
 
 bool plLightGrpComponent::IGetLightInfos()
 {
-    if( !fLightInfos.GetCount() )
-    {
+    if (!fLightInfos.GetCount()) {
         // Already checked that lightnodes are cool. just get the light interfaces.
         int i;
-        for( i = 0; i < fLightNodes.GetCount(); i++ )
-        {
+
+        for (i = 0; i < fLightNodes.GetCount(); i++) {
             plMaxNode* lightNode = fLightNodes[i];
             plSceneObject* lightSO = lightNode->GetSceneObject();
-            if( !lightSO )
+
+            if (!lightSO) {
                 continue;
+            }
 
             plLightInfo* liInfo = plLightInfo::ConvertNoRef(lightSO->GetGenericInterface(plLightInfo::Index()));
-            if( !liInfo )
+
+            if (!liInfo) {
                 continue;
+            }
 
             liInfo->SetProperty(plLightInfo::kLPHasIncludes, true);
-            if( fCompPB->GetInt(kIncludeChars) )
+
+            if (fCompPB->GetInt(kIncludeChars)) {
                 liInfo->SetProperty(plLightInfo::kLPIncludesChars, true);
+            }
+
             fLightInfos.Append(liInfo);
         }
     }
+
     return fValid = (fLightInfos.GetCount() > 0);
 }
 
@@ -230,70 +234,79 @@ const hsTArray<plLightInfo*>& plLightGrpComponent::GetLightInfos()
 plLightGrpComponent* plLightGrpComponent::GetComp(plMaxNode* node)
 {
     int i;
-    for( i = 0; i < node->NumAttachedComponents(); i++ )
-    {
+
+    for (i = 0; i < node->NumAttachedComponents(); i++) {
         plComponentBase* comp = node->GetAttachedComponent(i);
-        if( comp && comp->ClassID() == LIGHTGRP_COMP_CID )
+
+        if (comp && comp->ClassID() == LIGHTGRP_COMP_CID) {
             return (plLightGrpComponent*)comp;
+        }
     }
+
     return nil;
 }
 
-bool plLightGrpComponent::Convert(plMaxNode *node, plErrorMsg *pErrMsg)
+bool plLightGrpComponent::Convert(plMaxNode* node, plErrorMsg* pErrMsg)
 {
     const char* dbgNodeName = node->GetName();
-    if( !fValid )
-        return true;
 
-    if( !IGetLightInfos() )
+    if (!fValid) {
         return true;
+    }
 
-    if( !node->GetDrawable() )
+    if (!IGetLightInfos()) {
         return true;
+    }
 
-    if( !node->GetSceneObject() || !node->GetSceneObject()->GetDrawInterface() )
+    if (!node->GetDrawable()) {
         return true;
+    }
+
+    if (!node->GetSceneObject() || !node->GetSceneObject()->GetDrawInterface()) {
+        return true;
+    }
 
     // If it's shaded as a character, ignore any light groups attached.
-    if( node->GetItinerant() )
+    if (node->GetItinerant()) {
         return true;
+    }
 
     IAddLightsToSpans(node, pErrMsg);
 
     return true;
 }
 
-bool plLightGrpComponent::SetupProperties(plMaxNode *pNode,  plErrorMsg *pErrMsg)
+bool plLightGrpComponent::SetupProperties(plMaxNode* pNode,  plErrorMsg* pErrMsg)
 {
     fValid = false;
     fLightInfos.Reset();
     fLightNodes.Reset();
 
     int i;
-    for( i = 0; i < NumTargets(); i++ )
-    {
+
+    for (i = 0; i < NumTargets(); i++) {
         plMaxNodeBase* liNode = GetTarget(i);
 
-        if( liNode && liNode->CanConvert() )
-        {
-            Object *obj = liNode->GetObjectRef();
-            if( obj )
-            {
+        if (liNode && liNode->CanConvert()) {
+            Object* obj = liNode->GetObjectRef();
+
+            if (obj) {
                 Class_ID cid = obj->ClassID();
 
-                if( (cid == RTSPOT_LIGHT_CLASSID)
-                    || (cid == RTOMNI_LIGHT_CLASSID)
-                    || (cid == RTDIR_LIGHT_CLASSID)
-                    || (cid == RTPDIR_LIGHT_CLASSID) )
-                {
+                if ((cid == RTSPOT_LIGHT_CLASSID)
+                        || (cid == RTOMNI_LIGHT_CLASSID)
+                        || (cid == RTDIR_LIGHT_CLASSID)
+                        || (cid == RTPDIR_LIGHT_CLASSID)) {
                     fLightNodes.Append((plMaxNode*)liNode);
                 }
             }
         }
 
     }
-    if( !fLightNodes.GetCount() )
+
+    if (!fLightNodes.GetCount()) {
         return true;
+    }
 
     fValid = true;
     return true;
@@ -301,8 +314,9 @@ bool plLightGrpComponent::SetupProperties(plMaxNode *pNode,  plErrorMsg *pErrMsg
 
 bool plLightGrpComponent::PreConvert(plMaxNode* pNode, plErrorMsg* pErrMsg)
 {
-    if( !fValid )
+    if (!fValid) {
         return true;
+    }
 
     fValid = false;
 

@@ -72,13 +72,23 @@ class plMaxNodeBase;
 class plSceneObject : public plSynchedObject {
     friend class plSynchedValueBase;
 private:
-    plDrawInterface*            GetVolatileDrawInterface() { return fDrawInterface; }
-    plSimulationInterface*      GetVolatileSimulationInterface() { return fSimulationInterface; }
-    plCoordinateInterface*      GetVolatileCoordinateInterface() { return fCoordinateInterface; }
-    plAudioInterface*           GetVolatileAudioInterface() { return fAudioInterface; }
+    plDrawInterface*            GetVolatileDrawInterface() {
+        return fDrawInterface;
+    }
+    plSimulationInterface*      GetVolatileSimulationInterface() {
+        return fSimulationInterface;
+    }
+    plCoordinateInterface*      GetVolatileCoordinateInterface() {
+        return fCoordinateInterface;
+    }
+    plAudioInterface*           GetVolatileAudioInterface() {
+        return fAudioInterface;
+    }
     plObjInterface*             GetVolatileGenericInterface(uint16_t classIdx) const;
 
-    plModifier*                 GetVolatileModifier(int i) { return fModifiers[i]; }
+    plModifier*                 GetVolatileModifier(int i) {
+        return fModifiers[i];
+    }
 
     plKey                       fSceneNode;
 
@@ -117,7 +127,7 @@ protected:
 
     void                    ISetInterface(plObjInterface* iface);
     void                    IRemoveInterface(plObjInterface* iface);
-    void                    IRemoveInterface(int16_t idx, plObjInterface* iface=nil);
+    void                    IRemoveInterface(int16_t idx, plObjInterface* iface = nil);
 
     void                    ISetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);
 
@@ -126,24 +136,42 @@ public:
     plSceneObject();
     virtual ~plSceneObject();
 
-    CLASSNAME_REGISTER( plSceneObject );
-    GETINTERFACE_ANY( plSceneObject, plSynchedObject );
+    CLASSNAME_REGISTER(plSceneObject);
+    GETINTERFACE_ANY(plSceneObject, plSynchedObject);
 
     virtual void Read(hsStream* stream, hsResMgr* mgr);
     virtual void Write(hsStream* stream, hsResMgr* mgr);
 
-    virtual const plDrawInterface*              GetDrawInterface() const { return fDrawInterface; }
-    virtual const plSimulationInterface*        GetSimulationInterface() const { return fSimulationInterface; }
-    virtual const plCoordinateInterface*        GetCoordinateInterface() const { return fCoordinateInterface; }
-    virtual const plAudioInterface*             GetAudioInterface() const { return fAudioInterface; }
+    virtual const plDrawInterface*              GetDrawInterface() const {
+        return fDrawInterface;
+    }
+    virtual const plSimulationInterface*        GetSimulationInterface() const {
+        return fSimulationInterface;
+    }
+    virtual const plCoordinateInterface*        GetCoordinateInterface() const {
+        return fCoordinateInterface;
+    }
+    virtual const plAudioInterface*             GetAudioInterface() const {
+        return fAudioInterface;
+    }
 
-    int                     GetNumGenerics() const { return fGenerics.GetCount(); }
-    const plObjInterface*   GetGeneric(int i) const { return fGenerics[i]; }
+    int                     GetNumGenerics() const {
+        return fGenerics.GetCount();
+    }
+    const plObjInterface*   GetGeneric(int i) const {
+        return fGenerics[i];
+    }
 
-    plObjInterface*         GetGenericInterface(uint16_t classIdx) const { return GetVolatileGenericInterface(classIdx); }
+    plObjInterface*         GetGenericInterface(uint16_t classIdx) const {
+        return GetVolatileGenericInterface(classIdx);
+    }
 
-    int                     GetNumModifiers() const { return fModifiers.GetCount(); }
-    const plModifier*       GetModifier(int i) const { return fModifiers[i]; }
+    int                     GetNumModifiers() const {
+        return fModifiers.GetCount();
+    }
+    const plModifier*       GetModifier(int i) const {
+        return fModifiers[i];
+    }
     const plModifier*       GetModifierByType(uint16_t classIdx) const;
 
     virtual bool MsgReceive(plMessage* msg);
@@ -155,18 +183,18 @@ public:
     // Network only strange function. Do not emulate or generalize this functionality.
     virtual void SetNetGroup(plNetGroupId netGroup);
 
-    virtual void    ReleaseData( void );
+    virtual void    ReleaseData(void);
 
     // Force an immediate re-sync of the transforms in the hierarchy this object belongs to,
     // as opposed to waiting for the plTransformMsg to resync.
-    void FlushTransform(); 
+    void FlushTransform();
     void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l);
     hsMatrix44 GetLocalToWorld() const;
     hsMatrix44 GetWorldToLocal() const;
     hsMatrix44 GetLocalToParent() const;
     hsMatrix44 GetParentToLocal() const;
 
-    virtual bool IsFinal();  // "is ready to process Loads"  
+    virtual bool IsFinal();  // "is ready to process Loads"
 
     // Export only
     virtual void SetDrawInterface(plDrawInterface* di);

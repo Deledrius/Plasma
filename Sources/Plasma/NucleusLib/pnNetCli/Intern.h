@@ -42,7 +42,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 /*****************************************************************************
 *
 *   $/Plasma20/Sources/Plasma/NucleusLib/pnNetCli/Intern.h
-*   
+*
 ***/
 
 #ifdef PLASMA20_SOURCES_PLASMA_NUCLEUSLIB_PNNETCLI_INTERN_H
@@ -61,25 +61,25 @@ namespace pnNetCli {
 
 struct NetMsgChannel;
 
-NetMsgChannel * NetMsgChannelLock (
+NetMsgChannel* NetMsgChannelLock(
     unsigned        protocol,
     bool            server,
-    unsigned *      largestRecv
+    unsigned*       largestRecv
 );
-void NetMsgChannelUnlock (
-    NetMsgChannel * channel
+void NetMsgChannelUnlock(
+    NetMsgChannel* channel
 );
-const NetMsgInitRecv * NetMsgChannelFindRecvMessage (
-    NetMsgChannel * channel,
+const NetMsgInitRecv* NetMsgChannelFindRecvMessage(
+    NetMsgChannel* channel,
     unsigned        messageId
 );
-const NetMsgInitSend * NetMsgChannelFindSendMessage (
-    NetMsgChannel * channel,
+const NetMsgInitSend* NetMsgChannelFindSendMessage(
+    NetMsgChannel* channel,
     unsigned        messageId
 );
-void NetMsgChannelGetDhConstants (
-    const NetMsgChannel *   channel,
-    unsigned *              dh_g,
+void NetMsgChannelGetDhConstants(
+    const NetMsgChannel*    channel,
+    unsigned*               dh_g,
     const plBigNum**        dh_xa,  // client: dh_x     server: dh_a
     const plBigNum**        dh_n
 );
@@ -91,7 +91,7 @@ void NetMsgChannelGetDhConstants (
 *
 ***/
 
-void NetMsgCryptClientStart (
+void NetMsgCryptClientStart(
     NetMsgChannel*  channel,
     unsigned        seedBytes,
     const uint8_t   seedData[],
@@ -99,7 +99,7 @@ void NetMsgCryptClientStart (
     plBigNum*       serverSeed
 );
 
-void NetMsgCryptServerConnect (
+void NetMsgCryptServerConnect(
     NetMsgChannel*  channel,
     unsigned        seedBytes,
     const uint8_t   seedData[],
@@ -115,15 +115,15 @@ void NetMsgCryptServerConnect (
 
 class CInputAccumulator {
     ARRAY(uint8_t) buffer;
-    uint8_t *      curr;
+    uint8_t*       curr;
 
 public:
-    CInputAccumulator ();
-    void Add (unsigned count, const uint8_t * data);
-    bool Get (unsigned count, void * dest); // returns false if request cannot be fulfilled
-    bool Eof () const;
-    void Clear ();
-    void Compact ();
+    CInputAccumulator();
+    void Add(unsigned count, const uint8_t* data);
+    bool Get(unsigned count, void* dest);   // returns false if request cannot be fulfilled
+    bool Eof() const;
+    void Clear();
+    void Compact();
 };
 
 

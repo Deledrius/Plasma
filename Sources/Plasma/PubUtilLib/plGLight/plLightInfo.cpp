@@ -82,11 +82,11 @@ static float kMinHither = 1.f;
 #include "plDrawable/plDrawableGenerator.h"
 
 plLightInfo::plLightInfo()
-:   fSceneNode(nil),
-    fDeviceRef(nil),
-    fVolFlags(0),
-    fProjection(nil),
-    fSoftVolume(nil)
+    :   fSceneNode(nil),
+        fDeviceRef(nil),
+        fVolFlags(0),
+        fProjection(nil),
+        fSoftVolume(nil)
 {
     fLightToWorld.Reset();
     fWorldToLight.Reset();
@@ -112,13 +112,13 @@ plLightInfo::plLightInfo()
 
 plLightInfo::~plLightInfo()
 {
-    if( fNextDevPtr != nil || fPrevDevPtr != nil )
+    if (fNextDevPtr != nil || fPrevDevPtr != nil) {
         Unlink();
+    }
 
-    hsRefCnt_SafeUnRef( fDeviceRef );
+    hsRefCnt_SafeUnRef(fDeviceRef);
 
-    if( fRegisteredForRenderMsg )
-    {
+    if (fRegisteredForRenderMsg) {
         plgDispatch::Dispatch()->UnRegisterForExactType(plRenderMsg::Index(), GetKey());
         plgDispatch::Dispatch()->UnRegisterForExactType(plPipeRTMakeMsg::Index(), GetKey());
         fRegisteredForRenderMsg = false;
@@ -127,16 +127,18 @@ plLightInfo::~plLightInfo()
     delete fProxyGen;
 }
 
-void plLightInfo::SetDeviceRef( hsGDeviceRef *ref )
+void plLightInfo::SetDeviceRef(hsGDeviceRef* ref)
 {
-    hsRefCnt_SafeAssign( fDeviceRef, ref ); 
+    hsRefCnt_SafeAssign(fDeviceRef, ref);
 }
 
 void plLightInfo::IRefresh()
 {
     ICheckMaxStrength();
-    if( fDeviceRef )
-        fDeviceRef->SetDirty( true );
+
+    if (fDeviceRef) {
+        fDeviceRef->SetDirty(true);
+    }
 }
 
 void plLightInfo::ICheckMaxStrength()
@@ -144,15 +146,15 @@ void plLightInfo::ICheckMaxStrength()
     float r = GetDiffuse().r >= 0 ? GetDiffuse().r : -GetDiffuse().r;
     float g = GetDiffuse().g >= 0 ? GetDiffuse().g : -GetDiffuse().g;
     float b = GetDiffuse().b >= 0 ? GetDiffuse().b : -GetDiffuse().b;
-    fMaxStrength = 
-        r > g 
-        ?   (
+    fMaxStrength =
+        r > g
+        ? (
             r > b
-                ? r
-                : b
-            )
-        :   (
-            g > b
+            ? r
+            : b
+        )
+            : (
+                g > b
                 ? g
                 : b
             );
@@ -163,8 +165,7 @@ void plLightInfo::ICheckMaxStrength()
 
 void plLightInfo::GetStrengthAndScale(const hsBounds3Ext& bnd, float& strength, float& scale) const
 {
-    if( IsIdle() )
-    {
+    if (IsIdle()) {
         strength = scale = 0.f;
         return;
     }
@@ -172,25 +173,23 @@ void plLightInfo::GetStrengthAndScale(const hsBounds3Ext& bnd, float& strength, 
     strength = fMaxStrength;
 
     scale = 1.f;
-    if( fSoftVolume )
-    {
+
+    if (fSoftVolume) {
         scale = fSoftVolume->GetStrength(bnd.GetCenter());
         strength *= scale;
 
     }
-    return;     
+
+    return;
 }
 
 void plLightInfo::GetAffectedForced(const plSpaceTree* space, hsBitVector& list, bool charac)
 {
     Refresh();
 
-    if( IGetIsect() )
-    {
+    if (IGetIsect()) {
         space->HarvestLeaves(IGetIsect(), list);
-    }
-    else
-    {
+    } else {
         list.Set(space->GetNumLeaves());
     }
 }
@@ -199,17 +198,14 @@ void plLightInfo::GetAffected(const plSpaceTree* space, hsBitVector& list, bool 
 {
     Refresh();
 
-    if( IsIdle() )
+    if (IsIdle()) {
         return;
+    }
 
-    if( !GetProperty(kLPHasIncludes) || (GetProperty(kLPIncludesChars) && charac) )
-    {
-        if( IGetIsect() )
-        {
+    if (!GetProperty(kLPHasIncludes) || (GetProperty(kLPIncludesChars) && charac)) {
+        if (IGetIsect()) {
             space->HarvestLeaves(IGetIsect(), list);
-        }
-        else
-        {
+        } else {
             list.Set(space->GetNumLeaves());
         }
     }
@@ -219,12 +215,9 @@ const hsTArray<int16_t>& plLightInfo::GetAffected(plSpaceTree* space, const hsTA
 {
     Refresh();
 
-    if( !IsIdle() )
-    {
-        if( !GetProperty(kLPHasIncludes) || (GetProperty(kLPIncludesChars) && charac) )
-        {
-            if( IGetIsect() )
-            {
+    if (!IsIdle()) {
+        if (!GetProperty(kLPHasIncludes) || (GetProperty(kLPIncludesChars) && charac)) {
+            if (IGetIsect()) {
                 static hsBitVector cache;
                 cache.Clear();
                 space->EnableLeaves(visList, cache);
@@ -232,9 +225,7 @@ const hsTArray<int16_t>& plLightInfo::GetAffected(plSpaceTree* space, const hsTA
                 space->HarvestEnabledLeaves(IGetIsect(), cache, litList);
 
                 return litList;
-            }
-            else
-            {
+            } else {
                 return visList;
             }
         }
@@ -245,31 +236,34 @@ const hsTArray<int16_t>& plLightInfo::GetAffected(plSpaceTree* space, const hsTA
 }
 
 //// Set/GetProperty /////////////////////////////////////////////////////////
-//  Sets/gets a property just like the normal Set/GetNativeProperty, but the 
-//  flag taken in is from plDrawInterface, not our props flags. So we have to 
+//  Sets/gets a property just like the normal Set/GetNativeProperty, but the
+//  flag taken in is from plDrawInterface, not our props flags. So we have to
 //  translate...
 
-void plLightInfo::SetProperty( int prop, bool on )
+void plLightInfo::SetProperty(int prop, bool on)
 {
     plObjInterface::SetProperty(prop, on);
-    if( kDisable == prop )
+
+    if (kDisable == prop) {
         fProxyGen->SetDisable(on);
+    }
 }
 
 //// SetSpecular /////////////////////////////////////////////////////////////
 //  A bit more complicated here--make sure we set/clear the kLPHasSpecular
 //  flag so we can test more easily for such a condition.
 
-void plLightInfo::SetSpecular( const hsColorRGBA& c ) 
-{ 
-    fSpecular = c; 
+void plLightInfo::SetSpecular(const hsColorRGBA& c)
+{
+    fSpecular = c;
 
-    if( fSpecular.r == 0.f && fSpecular.g == 0.f && fSpecular.b == 0.f )
-        SetProperty( kLPHasSpecular, false );
-    else
-        SetProperty( kLPHasSpecular, true );
+    if (fSpecular.r == 0.f && fSpecular.g == 0.f && fSpecular.b == 0.f) {
+        SetProperty(kLPHasSpecular, false);
+    } else {
+        SetProperty(kLPHasSpecular, true);
+    }
 
-    SetDirty(); 
+    SetDirty();
 }
 
 void plLightInfo::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l)
@@ -277,26 +271,27 @@ void plLightInfo::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l)
     fLocalToWorld = l2w;
     fWorldToLocal = w2l;
 
-    fLightToWorld = l2w * fLightToLocal; 
-    fWorldToLight = fLocalToLight * w2l; 
+    fLightToWorld = l2w * fLightToLocal;
+    fWorldToLight = fLocalToLight * w2l;
 
-    if( IGetIsect() )
+    if (IGetIsect()) {
         IGetIsect()->SetTransform(fLightToWorld, fWorldToLight);
+    }
 
-    if( fDeviceRef != nil )
-        fDeviceRef->SetDirty( true );
+    if (fDeviceRef != nil) {
+        fDeviceRef->SetDirty(true);
+    }
 
     fProxyGen->SetTransform(fLightToWorld, fWorldToLight);
 
     SetDirty(true);
 
-    if( GetProjection() )
-    {
+    if (GetProjection()) {
         Refresh();
         hsMatrix44 w2proj = IGetWorldToProj();
         plLayer* lay = plLayer::ConvertNoRef(GetProjection()->BottomOfStack());
-        if( lay )
-        {
+
+        if (lay) {
             lay->SetTransform(w2proj);
         }
     }
@@ -333,19 +328,20 @@ plProfile_CreateTimer("Light Info", "RenderSetup", LightInfo);
 
 void plLightInfo::IAddVisRegion(plVisRegion* reg)
 {
-    if( reg )
-    {
+    if (reg) {
         int idx = fVisRegions.Find(reg);
-        if( fVisRegions.kMissingIndex == idx )
-        {
+
+        if (fVisRegions.kMissingIndex == idx) {
             fVisRegions.Append(reg);
-            if( reg->GetProperty(plVisRegion::kIsNot) )
+
+            if (reg->GetProperty(plVisRegion::kIsNot)) {
                 fVisNot.SetBit(reg->GetIndex());
-            else
-            {
+            } else {
                 fVisSet.SetBit(reg->GetIndex());
-                if( reg->ReplaceNormal() )
+
+                if (reg->ReplaceNormal()) {
                     fVisSet.ClearBit(plVisMgr::kNormal);
+                }
             }
         }
     }
@@ -353,16 +349,17 @@ void plLightInfo::IAddVisRegion(plVisRegion* reg)
 
 void plLightInfo::IRemoveVisRegion(plVisRegion* reg)
 {
-    if( reg )
-    {
+    if (reg) {
         int idx = fVisRegions.Find(reg);
-        if( fVisRegions.kMissingIndex != idx )
-        {
+
+        if (fVisRegions.kMissingIndex != idx) {
             fVisRegions.Remove(idx);
-            if( reg->GetProperty(plVisRegion::kIsNot) )
+
+            if (reg->GetProperty(plVisRegion::kIsNot)) {
                 fVisNot.ClearBit(reg->GetIndex());
-            else
+            } else {
                 fVisSet.ClearBit(reg->GetIndex());
+            }
         }
     }
 }
@@ -371,13 +368,12 @@ void plLightInfo::IRemoveVisRegion(plVisRegion* reg)
 bool plLightInfo::MsgReceive(plMessage* msg)
 {
     plRenderMsg* rendMsg = plRenderMsg::ConvertNoRef(msg);
-    if( rendMsg )
-    {
+
+    if (rendMsg) {
         plProfile_BeginLap(LightInfo, this->GetKey()->GetUoid().GetObjectName().c_str());
 
-        if( !fDeviceRef && !GetProperty(kLPShadowOnly) )
-        {
-            rendMsg->Pipeline()->RegisterLight( this );
+        if (!fDeviceRef && !GetProperty(kLPShadowOnly)) {
+            rendMsg->Pipeline()->RegisterLight(this);
         }
 
         ICheckMaxStrength();
@@ -385,64 +381,68 @@ bool plLightInfo::MsgReceive(plMessage* msg)
         plProfile_EndLap(LightInfo, this->GetKey()->GetUoid().GetObjectName().c_str());
         return true;
     }
+
     plGenRefMsg* refMsg = plGenRefMsg::ConvertNoRef(msg);
-    if( refMsg )
-    {
-        if( refMsg->GetContext() & (plRefMsg::kOnCreate|plRefMsg::kOnRequest|plRefMsg::kOnReplace) )
-        {
-            switch( refMsg->fType )
-            {
+
+    if (refMsg) {
+        if (refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace)) {
+            switch (refMsg->fType) {
             case kProjection:
                 fProjection = plLayerInterface::ConvertNoRef(refMsg->GetRef());
                 {
-                    if( GetKey() && !GetKey()->GetName().CompareN("RTPatternLight", strlen("RTPatternLight")) )
+                    if (GetKey() && !GetKey()->GetName().CompareN("RTPatternLight", strlen("RTPatternLight"))) {
                         SetProperty(kLPForceProj, true);
+                    }
                 }
                 break;
+
             case kSoftVolume:
                 fSoftVolume = plSoftVolume::ConvertNoRef(refMsg->GetRef());
                 break;
+
             case kVisRegion:
                 IAddVisRegion(plVisRegion::ConvertNoRef(refMsg->GetRef()));
                 break;
             }
-        }
-        else if( refMsg->GetContext() & (plRefMsg::kOnRemove | plRefMsg::kOnDestroy) )
-        {
-            switch( refMsg->fType )
-            {
+        } else if (refMsg->GetContext() & (plRefMsg::kOnRemove | plRefMsg::kOnDestroy)) {
+            switch (refMsg->fType) {
             case kProjection:
                 fProjection = nil;
                 break;
+
             case kSoftVolume:
                 fSoftVolume = nil;
                 break;
+
             case kVisRegion:
                 IRemoveVisRegion(plVisRegion::ConvertNoRef(refMsg->GetRef()));
                 break;
             }
         }
+
         return true;
     }
+
     plPipeRTMakeMsg* rtMake = plPipeRTMakeMsg::ConvertNoRef(msg);
-    if( rtMake )
-    {
+
+    if (rtMake) {
         // Make sure we're registered with the pipeline
         // If we're only here to cast shadows, just don't tell anyone
         // about us.
-        if( !fDeviceRef && !GetProperty(kLPShadowOnly) )
-        {
-            rtMake->Pipeline()->RegisterLight( this );
+        if (!fDeviceRef && !GetProperty(kLPShadowOnly)) {
+            rtMake->Pipeline()->RegisterLight(this);
         }
+
         return true;
     }
+
     plEnableMsg* enaMsg = plEnableMsg::ConvertNoRef(msg);
-    if( enaMsg )
-    {
+
+    if (enaMsg) {
         SetProperty(kDisable, enaMsg->Cmd(plEnableMsg::kDisable));
         return true;
     }
-    
+
 
 
     return plObjInterface::MsgReceive(msg);
@@ -451,7 +451,7 @@ bool plLightInfo::MsgReceive(plMessage* msg)
 
 void plLightInfo::Read(hsStream* s, hsResMgr* mgr)
 {
-    hsRefCnt_SafeUnRef( fDeviceRef );
+    hsRefCnt_SafeUnRef(fDeviceRef);
     fDeviceRef = nil;
 
     plObjInterface::Read(s, mgr);
@@ -480,8 +480,10 @@ void plLightInfo::Read(hsStream* s, hsResMgr* mgr)
     int n = s->ReadLE32();
     fVisRegions.SetCountAndZero(n);
     int i;
-    for( i = 0; i < n; i++ )
+
+    for (i = 0; i < n; i++) {
         mgr->ReadKeyNotifyMe(s, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, kVisRegion), plRefFlags::kActiveRef);
+    }
 
     SetDirty(true);
 }
@@ -508,38 +510,35 @@ void plLightInfo::Write(hsStream* s, hsResMgr* mgr)
 
     s->WriteLE32(fVisRegions.GetCount());
     int i;
-    for( i = 0; i < fVisRegions.GetCount(); i++ )
+
+    for (i = 0; i < fVisRegions.GetCount(); i++) {
         mgr->WriteKey(s, fVisRegions[i]);
+    }
 }
 
 // These two should only be called by the SceneObject
 void plLightInfo::ISetSceneNode(plKey node)
 {
-    if( node != fSceneNode )
-    {
-        if( node )
-        {
+    if (node != fSceneNode) {
+        if (node) {
             plNodeRefMsg* refMsg = new plNodeRefMsg(node, plRefMsg::kOnCreate, -1, plNodeRefMsg::kLight);
             hsgResMgr::ResMgr()->AddViaNotify(GetKey(), refMsg, plRefFlags::kPassiveRef);
         }
-        if( fSceneNode )
-        {
+
+        if (fSceneNode) {
             fSceneNode->Release(GetKey());
         }
     }
+
     fSceneNode = node;
 
-    if( fSceneNode != nil )
-    {
-        if( !fRegisteredForRenderMsg )
-        {
+    if (fSceneNode != nil) {
+        if (!fRegisteredForRenderMsg) {
             plgDispatch::Dispatch()->RegisterForExactType(plRenderMsg::Index(), GetKey());
             plgDispatch::Dispatch()->RegisterForExactType(plPipeRTMakeMsg::Index(), GetKey());
             fRegisteredForRenderMsg = true;
         }
-    }
-    else if( fRegisteredForRenderMsg )
-    {
+    } else if (fRegisteredForRenderMsg) {
         plgDispatch::Dispatch()->UnRegisterForExactType(plRenderMsg::Index(), GetKey());
         plgDispatch::Dispatch()->UnRegisterForExactType(plPipeRTMakeMsg::Index(), GetKey());
         fRegisteredForRenderMsg = false;
@@ -553,24 +552,30 @@ plKey plLightInfo::GetSceneNode() const
 
 //// Link & Unlink ///////////////////////////////////////////////////////
 
-void    plLightInfo::Unlink( void )
+void    plLightInfo::Unlink(void)
 {
-    hsAssert( fPrevDevPtr, "Light info not in list" );
-    if( fNextDevPtr )
+    hsAssert(fPrevDevPtr, "Light info not in list");
+
+    if (fNextDevPtr) {
         fNextDevPtr->fPrevDevPtr = fPrevDevPtr;
+    }
+
     *fPrevDevPtr = fNextDevPtr;
 
     fNextDevPtr = nil;
     fPrevDevPtr = nil;
 }
 
-void    plLightInfo::Link( plLightInfo **back )
+void    plLightInfo::Link(plLightInfo** back)
 {
-    hsAssert( fNextDevPtr == nil && fPrevDevPtr == nil, "Trying to link a lightInfo that's already linked" );
+    hsAssert(fNextDevPtr == nil && fPrevDevPtr == nil, "Trying to link a lightInfo that's already linked");
 
     fNextDevPtr = *back;
-    if( *back )
+
+    if (*back) {
         (*back)->fPrevDevPtr = &fNextDevPtr;
+    }
+
     fPrevDevPtr = back;
     *back = this;
 }
@@ -609,14 +614,14 @@ void plDirectionalLightInfo::Write(hsStream* s, hsResMgr* mgr)
 
 
 hsVector3 plDirectionalLightInfo::GetWorldDirection() const
-{ 
-    return -fLightToWorld.GetAxis( hsMatrix44::kUp );
+{
+    return -fLightToWorld.GetAxis(hsMatrix44::kUp);
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Limited Directional
 plLimitedDirLightInfo::plLimitedDirLightInfo()
-:   fParPlanes(nil)
+    :   fParPlanes(nil)
 {
 }
 
@@ -629,11 +634,11 @@ void plLimitedDirLightInfo::IRefresh()
 {
     plLightInfo::IRefresh();
 
-    if( !IGetIsect() )
+    if (!IGetIsect()) {
         IMakeIsect();
+    }
 
-    if( GetProjection() )
-    {
+    if (GetProjection()) {
         hsMatrix44 l2ndc;
         l2ndc.Reset();
 
@@ -684,17 +689,18 @@ void plLimitedDirLightInfo::Write(hsStream* s, hsResMgr* mgr)
 
 void plLimitedDirLightInfo::IMakeIsect()
 {
-    if( !fParPlanes )
+    if (!fParPlanes) {
         fParPlanes = new plParallelIsect;
+    }
 
     fParPlanes->SetNumPlanes(3);
-    
+
     hsPoint3 p0, p1;
 
     float width = fWidth;
     float height = fHeight;
-    p0.Set(-width*0.5f, 0, 0);
-    p1.Set(width*0.5f, 0, 0);
+    p0.Set(-width * 0.5f, 0, 0);
+    p1.Set(width * 0.5f, 0, 0);
     fParPlanes->SetPlane(0, p0, p1);
 
     p0.Set(0, -height * 0.5f, 0);
@@ -715,19 +721,19 @@ void plLimitedDirLightInfo::IMakeIsect()
 plDrawableSpans* plLimitedDirLightInfo::CreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo)
 {
     hsPoint3 corner;
-    corner.Set(-fWidth*0.5f, -fHeight*0.5f, -fDepth);
+    corner.Set(-fWidth * 0.5f, -fHeight * 0.5f, -fDepth);
     hsVector3 vecs[3];
     vecs[0].Set(fWidth, 0, 0);
     vecs[1].Set(0, fHeight, 0);
     vecs[2].Set(0, 0, fDepth);
-        // Generate a rectangular drawable based on a corner and three vectors
-    plDrawableSpans* draw = plDrawableGenerator::GenerateBoxDrawable( corner, vecs[0], vecs[1], vecs[2], 
-                                                            mat, 
-                                                            fLightToWorld, 
-                                                            true,
-                                                            nil,
-                                                            &idx, 
-                                                            addTo );
+    // Generate a rectangular drawable based on a corner and three vectors
+    plDrawableSpans* draw = plDrawableGenerator::GenerateBoxDrawable(corner, vecs[0], vecs[1], vecs[2],
+                            mat,
+                            fLightToWorld,
+                            true,
+                            nil,
+                            &idx,
+                            addTo);
 
     return draw;
 }
@@ -737,11 +743,11 @@ plDrawableSpans* plLimitedDirLightInfo::CreateProxy(hsGMaterial* mat, hsTArray<u
 //////////////////////////////////////////////////////////////////////////
 // Omni
 plOmniLightInfo::plOmniLightInfo()
-:   fAttenConst(0),
-    fAttenLinear(1.f),
-    fAttenQuadratic(0),
-    fAttenCutoff(0),
-    fSphere(nil)
+    :   fAttenConst(0),
+        fAttenLinear(1.f),
+        fAttenQuadratic(0),
+        fAttenCutoff(0),
+        fSphere(nil)
 {
 }
 
@@ -766,49 +772,42 @@ void plOmniLightInfo::GetStrengthAndScale(const hsBounds3Ext& bnd, float& streng
     hsPoint3 wpos = GetWorldPosition();
     float dist = hsVector3(&pos, &wpos).MagnitudeSquared();
     dist = 1.f / hsFastMath::InvSqrtAppr(dist);
-    if( fAttenQuadratic > 0 )
-    {
+
+    if (fAttenQuadratic > 0) {
         strength /= (fAttenConst + fAttenLinear * dist + fAttenQuadratic * dist * dist);
-    }
-    else if( fAttenLinear > 0 )
-    {
+    } else if (fAttenLinear > 0) {
         strength /= (fAttenConst + fAttenLinear * dist);
-    }
-    else if( fAttenConst > 0 )
-    {
+    } else if (fAttenConst > 0) {
         strength /= fAttenConst;
-    }
-    else if( fAttenCutoff > 0 )
-    {
-        if( dist > fAttenCutoff )
+    } else if (fAttenCutoff > 0) {
+        if (dist > fAttenCutoff) {
             strength = 0;
+        }
     }
 }
 
 float plOmniLightInfo::GetRadius() const
 {
     float radius = 0;
-    if( fAttenQuadratic > 0 )
-    {
+
+    if (fAttenQuadratic > 0) {
         float mult = fDiffuse.a >= 0 ? fDiffuse.a : -fDiffuse.a;
-        float det = fAttenLinear*fAttenLinear - 4.f * fAttenQuadratic * fAttenConst * (1.f - mult * plSillyLightKonstants::GetFarPowerKonst());
-        if( det > 0 )
-        {
+        float det = fAttenLinear * fAttenLinear - 4.f * fAttenQuadratic * fAttenConst * (1.f - mult * plSillyLightKonstants::GetFarPowerKonst());
+
+        if (det > 0) {
             det = sqrt(det);
 
             radius = -fAttenLinear + det;
             radius /= fAttenQuadratic * 2.f;
-            if( radius < 0 )
+
+            if (radius < 0) {
                 radius = 0;
+            }
         }
-    }
-    else if( fAttenLinear > 0 )
-    {
+    } else if (fAttenLinear > 0) {
         float mult = fDiffuse.a >= 0 ? fDiffuse.a : -fDiffuse.a;
-        radius = (mult * plSillyLightKonstants::GetFarPowerKonst() - 1.f ) * fAttenConst / fAttenLinear;
-    }
-    else if( fAttenCutoff > 0 )
-    {
+        radius = (mult * plSillyLightKonstants::GetFarPowerKonst() - 1.f) * fAttenConst / fAttenLinear;
+    } else if (fAttenCutoff > 0) {
         radius = fAttenCutoff;
     }
 
@@ -819,14 +818,13 @@ void plOmniLightInfo::IRefresh()
 {
     plLightInfo::IRefresh();
 
-    if( IsAttenuated() )
-    {
-        if( !fSphere )
+    if (IsAttenuated()) {
+        if (!fSphere) {
             IMakeIsect();
+        }
+
         fSphere->SetRadius(GetRadius());
-    }
-    else
-    {
+    } else {
         delete fSphere;
         fSphere = nil;
     }
@@ -856,7 +854,7 @@ void plOmniLightInfo::Write(hsStream* s, hsResMgr* mgr)
     s->WriteLEScalar(fAttenConst);
     s->WriteLEScalar(fAttenLinear);
     s->WriteLEScalar(fAttenQuadratic);
-    s->WriteLEScalar( fAttenCutoff );
+    s->WriteLEScalar(fAttenCutoff);
 }
 
 
@@ -867,17 +865,19 @@ void plOmniLightInfo::Write(hsStream* s, hsResMgr* mgr)
 plDrawableSpans* plOmniLightInfo::CreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo)
 {
     float   rad = GetRadius();
-    if( rad == 0 )
-        rad = 50;
 
-    plDrawableSpans* draw = plDrawableGenerator::GenerateSphericalDrawable(hsPoint3(0,0,0), 
-                                                        rad, 
-                                                        mat, 
-                                                        fLightToWorld, 
-                                                        true,
-                                                        nil,
-                                                        &idx,
-                                                        addTo);
+    if (rad == 0) {
+        rad = 50;
+    }
+
+    plDrawableSpans* draw = plDrawableGenerator::GenerateSphericalDrawable(hsPoint3(0, 0, 0),
+                            rad,
+                            mat,
+                            fLightToWorld,
+                            true,
+                            nil,
+                            &idx,
+                            addTo);
 
     return draw;
 }
@@ -886,10 +886,10 @@ plDrawableSpans* plOmniLightInfo::CreateProxy(hsGMaterial* mat, hsTArray<uint32_
 //////////////////////////////////////////////////////////////////////////
 // Spot
 plSpotLightInfo::plSpotLightInfo()
-:   fFalloff(1.f),
-    fSpotInner(M_PI * 0.125f),
-    fSpotOuter(M_PI * 0.25f),
-    fCone(nil)
+    :   fFalloff(1.f),
+        fSpotInner(M_PI * 0.125f),
+        fSpotOuter(M_PI * 0.25f),
+        fCone(nil)
 {
 }
 
@@ -904,7 +904,7 @@ void plSpotLightInfo::GetStrengthAndScale(const hsBounds3Ext& bnd, float& streng
 
     // Volume - Want to base this on the closest point on the bounds, instead of just the center.
     const hsPoint3& pos = bnd.GetCenter();
-    
+
     hsVector3 del;
     hsPoint3 wpos = GetWorldPosition();
     del.Set(&pos, &wpos);
@@ -917,10 +917,12 @@ void plSpotLightInfo::GetStrengthAndScale(const hsBounds3Ext& bnd, float& streng
     float cosInner, cosOuter, t;
     hsFastMath::SinCosInRangeAppr(fSpotInner, t, cosInner);
     hsFastMath::SinCosInRangeAppr(fSpotOuter, t, cosOuter);
-    if( dot < cosOuter )
+
+    if (dot < cosOuter) {
         strength = 0;
-    else if( dot < cosInner )
+    } else if (dot < cosInner) {
         strength *= (dot - cosOuter) / (cosInner - cosOuter);
+    }
 }
 
 void plSpotLightInfo::IMakeIsect()
@@ -933,24 +935,26 @@ void plSpotLightInfo::IRefresh()
 {
     plLightInfo::IRefresh();
 
-    if( !fCone )
+    if (!fCone) {
         IMakeIsect();
+    }
 
     float effFOV = fSpotOuter;
     fCone->SetAngle(effFOV);
-    
 
-    if( IsAttenuated() )
-    {
+
+    if (IsAttenuated()) {
         fCone->SetLength(GetRadius());
         fCone->SetTransform(fLightToWorld, fWorldToLight);
     }
 
-    if( GetProjection() )
-    {
+    if (GetProjection()) {
         float yon = GetRadius();
-        if( yon < kMinHither )
+
+        if (yon < kMinHither) {
             yon = kMaxYon;
+        }
+
         float hither = hsMinimum(kMinHither, yon * 0.5f);
 
         float sinFOV, cosFOV;
@@ -992,8 +996,8 @@ void plSpotLightInfo::Write(hsStream* s, hsResMgr* mgr)
 
 
 hsVector3 plSpotLightInfo::GetWorldDirection() const
-{ 
-    return -fLightToWorld.GetAxis( hsMatrix44::kUp );
+{
+    return -fLightToWorld.GetAxis(hsMatrix44::kUp);
 }
 
 //// ICreateProxy //////////////////////////////////////////////////////
@@ -1006,18 +1010,19 @@ plDrawableSpans* plSpotLightInfo::CreateProxy(hsGMaterial* mat, hsTArray<uint32_
     float   x, y;
 
 
-    if( rad == 0 )
+    if (rad == 0) {
         rad = 80;
+    }
 
-    hsFastMath::SinCosAppr( GetSpotOuter(), x, y );
+    hsFastMath::SinCosAppr(GetSpotOuter(), x, y);
 
-    plDrawableSpans* draw = plDrawableGenerator::GenerateConicalDrawable(rad * x / y, -rad, 
-                                                        mat, 
-                                                        fLightToWorld, 
-                                                        true,
-                                                        nil,
-                                                        &idx,
-                                                        addTo);
+    plDrawableSpans* draw = plDrawableGenerator::GenerateConicalDrawable(rad * x / y, -rad,
+                            mat,
+                            fLightToWorld,
+                            true,
+                            nil,
+                            &idx,
+                            addTo);
     return draw;
 }
 

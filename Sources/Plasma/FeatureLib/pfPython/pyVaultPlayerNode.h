@@ -55,11 +55,10 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class pyAgeInfoStruct;
 struct RelVaultNode;
 
-class pyVaultPlayerNode : public pyVaultNode
-{
+class pyVaultPlayerNode : public pyVaultNode {
 protected:
     // should only be created from C++ side
-    pyVaultPlayerNode(RelVaultNode *nfsNode);
+    pyVaultPlayerNode(RelVaultNode* nfsNode);
 
     //create from the Python side
     pyVaultPlayerNode();
@@ -68,42 +67,42 @@ public:
     // required functions for PyObject interoperability
     PYTHON_CLASS_NEW_FRIEND(ptVaultPlayerNode);
     PYTHON_CLASS_NEW_DEFINITION;
-    static PyObject *New(RelVaultNode *nfsNode);
+    static PyObject* New(RelVaultNode* nfsNode);
     PYTHON_CLASS_CHECK_DEFINITION; // returns true if the PyObject is a pyVaultPlayerNode object
     PYTHON_CLASS_CONVERT_FROM_DEFINITION(pyVaultPlayerNode); // converts a PyObject to a pyVaultPlayerNode (throws error if not correct type)
 
-    static void AddPlasmaClasses(PyObject *m);
+    static void AddPlasmaClasses(PyObject* m);
 
 //==================================================================
 // class plVaultPlayerInfoNode : public plVaultNode
 //
-    PyObject *GetInbox(); // returns pyVaultFolderNode
-    PyObject *GetPlayerInfo(); // returns pyVaultPlayerInfoNode
-    PyObject *GetAvatarOutfitFolder(); // returns pyVaultFolderNode
-    PyObject *GetAvatarClosetFolder(); // returns pyVaultFolderNode
-    PyObject *GetChronicleFolder(); // returns pyVaultFolderNode
-    PyObject *GetAgeJournalsFolder(); // returns pyVaultFolderNode
-    PyObject *GetIgnoreListFolder(); // returns pyVaultPlayerInfoListNode
-    PyObject *GetBuddyListFolder(); // returns pyVaultPlayerInfoListNode
-    PyObject *GetPeopleIKnowAboutFolder(); // returns pyVaultPlayerInfoListNode
-    PyObject *GetAgesICanVisitFolder(); // returns pyVaultFolderNode
-    PyObject *GetAgesIOwnFolder(); // returns pyVaultFolderNode
+    PyObject* GetInbox(); // returns pyVaultFolderNode
+    PyObject* GetPlayerInfo(); // returns pyVaultPlayerInfoNode
+    PyObject* GetAvatarOutfitFolder(); // returns pyVaultFolderNode
+    PyObject* GetAvatarClosetFolder(); // returns pyVaultFolderNode
+    PyObject* GetChronicleFolder(); // returns pyVaultFolderNode
+    PyObject* GetAgeJournalsFolder(); // returns pyVaultFolderNode
+    PyObject* GetIgnoreListFolder(); // returns pyVaultPlayerInfoListNode
+    PyObject* GetBuddyListFolder(); // returns pyVaultPlayerInfoListNode
+    PyObject* GetPeopleIKnowAboutFolder(); // returns pyVaultPlayerInfoListNode
+    PyObject* GetAgesICanVisitFolder(); // returns pyVaultFolderNode
+    PyObject* GetAgesIOwnFolder(); // returns pyVaultFolderNode
 
-    PyObject *GetLinkToMyNeighborhood(); // returns pyVaultAgeLinkNode
-    PyObject *GetLinkToCity(); // returns pyVaultAgeLinkNode
+    PyObject* GetLinkToMyNeighborhood(); // returns pyVaultAgeLinkNode
+    PyObject* GetLinkToCity(); // returns pyVaultAgeLinkNode
 
-    PyObject *GetOwnedAgeLink(const pyAgeInfoStruct *info); // returns pyVaultAgeLinkNode
+    PyObject* GetOwnedAgeLink(const pyAgeInfoStruct* info); // returns pyVaultAgeLinkNode
     void RemoveOwnedAgeLink(const char* guid);
 
-    PyObject *GetVisitAgeLink(const pyAgeInfoStruct *info); // returns pyVaultAgeLinkNode
+    PyObject* GetVisitAgeLink(const pyAgeInfoStruct* info); // returns pyVaultAgeLinkNode
     void RemoveVisitAgeLink(const char* guid);
 
-    PyObject *FindChronicleEntry(const char *entryName); // returns pyVaultChronicleNode
+    PyObject* FindChronicleEntry(const char* entryName); // returns pyVaultChronicleNode
 
-    void SetPlayerName(const char *value);
+    void SetPlayerName(const char* value);
     std::string GetPlayerName();
 
-    void SetAvatarShapeName(const char *value);
+    void SetAvatarShapeName(const char* value);
     std::string GetAvatarShapeName();
 
     void SetDisabled(bool value);
@@ -112,8 +111,8 @@ public:
     void SetOnlineTime(uint32_t value);
     uint32_t GetOnlineTime();
 
-    void    SetExplorer (bool b);
-    bool    IsExplorer ();
+    void    SetExplorer(bool b);
+    bool    IsExplorer();
 };
 
 #endif  // pyVaultPlayerNode_h_

@@ -48,19 +48,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plString.h"
 
 //
-// This represents a participant in the game, ie. another 
+// This represents a participant in the game, ie. another
 // remote user.
 // It is a basic net member with a list of channels that it subscribes to.
 //
 class plKey;
 
-class plNetTransportMember : public plNetMember
-{
+class plNetTransportMember : public plNetMember {
 public:
-    enum TransportFlags
-    {
-        kSendingVoice   = 1<<0,
-        kSendingActions = 1<<1,
+    enum TransportFlags {
+        kSendingVoice   = 1 << 0,
+        kSendingActions = 1 << 1,
     };
 protected:
     plKey           fAvatarKey;
@@ -71,54 +69,92 @@ protected:
     float           fDistSq;            // from local player, temp
     uint8_t         fCCRLevel;
 public:
-    CLASSNAME_REGISTER( plNetTransportMember);
-    GETINTERFACE_ANY( plNetTransportMember, plNetMember);
+    CLASSNAME_REGISTER(plNetTransportMember);
+    GETINTERFACE_ANY(plNetTransportMember, plNetMember);
 
     plNetTransportMember() : fAvatarKey(nil),
-        fTransportFlags(0),fPlayerID(0),fDistSq(-1),fCCRLevel(0) {}
+        fTransportFlags(0), fPlayerID(0), fDistSq(-1), fCCRLevel(0) {}
     plNetTransportMember(plNetApp* na) : plNetMember(na),
-        fAvatarKey(nil),fTransportFlags(0),fPlayerID(0),fDistSq(-1),fCCRLevel(0) {}
+        fAvatarKey(nil), fTransportFlags(0), fPlayerID(0), fDistSq(-1), fCCRLevel(0) {}
     ~plNetTransportMember() {}
 
-    void SetDistSq(float s) { fDistSq=s; }
-    float GetDistSq() const { return fDistSq; }
+    void SetDistSq(float s) {
+        fDistSq = s;
+    }
+    float GetDistSq() const {
+        return fDistSq;
+    }
 
-    plKey GetAvatarKey() { return fAvatarKey; }
-    void SetAvatarKey(plKey k)
-        {
-            fAvatarKey=k;
-        }
-    void SetPlayerName(const plString & value) { fPlayerName=value;}
-    plString GetPlayerName() const { return fPlayerName;}
-    void SetPlayerID(uint32_t value) { fPlayerID=value;}
-    uint32_t GetPlayerID() const { return fPlayerID;}
-    void SetIsServer(bool value) { (value)?SetFlags(GetFlags()|kIsServer):SetFlags(GetFlags()&!kIsServer);}
-    bool IsServer() const { return (GetFlags()&kIsServer)?true:false;}
+    plKey GetAvatarKey() {
+        return fAvatarKey;
+    }
+    void SetAvatarKey(plKey k) {
+        fAvatarKey = k;
+    }
+    void SetPlayerName(const plString& value) {
+        fPlayerName = value;
+    }
+    plString GetPlayerName() const {
+        return fPlayerName;
+    }
+    void SetPlayerID(uint32_t value) {
+        fPlayerID = value;
+    }
+    uint32_t GetPlayerID() const {
+        return fPlayerID;
+    }
+    void SetIsServer(bool value) {
+        (value) ? SetFlags(GetFlags() | kIsServer) : SetFlags(GetFlags() & !kIsServer);
+    }
+    bool IsServer() const {
+        return (GetFlags()&kIsServer) ? true : false;
+    }
 
     bool AddSubscription(int chan);
     bool RemoveSubscription(int chan);    // return true on success
     int FindSubscription(int chan);         // return index into subscription array or -1
 
-    int GetNumSubscriptions() { return fSubscriptions.size(); }
-    int GetSubscription(int i) { return fSubscriptions[i]; }
-
-    void CopySubscriptions(std::vector<int>* channels) { *channels = fSubscriptions; }
-
-    void SetTransportFlags(uint32_t f) { fTransportFlags=f; }
-    uint32_t GetTransportFlags() const { return fTransportFlags; }
-
-    bool IsPeerToPeer() const { return hsCheckBits(fFlags, kRequestP2P); }
-    plString AsString() const;
-    bool IsEqualTo(const plNetMember * other) const
-    {
-        const plNetTransportMember * o = plNetTransportMember::ConvertNoRef(other);
-        if (!o) return false;
-        return o->fPlayerID==fPlayerID;
+    int GetNumSubscriptions() {
+        return fSubscriptions.size();
+    }
+    int GetSubscription(int i) {
+        return fSubscriptions[i];
     }
 
-    bool IsCCR() const { return (fCCRLevel>0);  }
-    uint8_t GetCCRLevel() const { return fCCRLevel;   }
-    void SetCCRLevel(uint8_t cl) { fCCRLevel=cl;  }
+    void CopySubscriptions(std::vector<int>* channels) {
+        *channels = fSubscriptions;
+    }
+
+    void SetTransportFlags(uint32_t f) {
+        fTransportFlags = f;
+    }
+    uint32_t GetTransportFlags() const {
+        return fTransportFlags;
+    }
+
+    bool IsPeerToPeer() const {
+        return hsCheckBits(fFlags, kRequestP2P);
+    }
+    plString AsString() const;
+    bool IsEqualTo(const plNetMember* other) const {
+        const plNetTransportMember* o = plNetTransportMember::ConvertNoRef(other);
+
+        if (!o) {
+            return false;
+        }
+
+        return o->fPlayerID == fPlayerID;
+    }
+
+    bool IsCCR() const {
+        return (fCCRLevel > 0);
+    }
+    uint8_t GetCCRLevel() const {
+        return fCCRLevel;
+    }
+    void SetCCRLevel(uint8_t cl) {
+        fCCRLevel = cl;
+    }
 };
 
 #endif  // plNetTransportMember_h

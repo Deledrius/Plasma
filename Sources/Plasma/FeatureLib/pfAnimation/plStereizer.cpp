@@ -61,17 +61,18 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsStream.h"
 
 plStereizer::plStereizer()
-:   fInitPos(0,0,0),
-    fListPos(0,0,0),
-    fListDirection(0,1.f,0),
-    fListUp(0,0,1.f)
+    :   fInitPos(0, 0, 0),
+        fListPos(0, 0, 0),
+        fListDirection(0, 1.f, 0),
+        fListUp(0, 0, 1.f)
 {
 }
 
 plStereizer::~plStereizer()
 {
-    if( !HasMaster() )
+    if (!HasMaster()) {
         plgDispatch::Dispatch()->UnRegisterForExactType(plListenerMsg::Index(), GetKey());
+    }
 }
 
 void plStereizer::Read(hsStream* stream, hsResMgr* mgr)
@@ -88,8 +89,9 @@ void plStereizer::Read(hsStream* stream, hsResMgr* mgr)
 
     fInitPos.Read(stream);
 
-    if( !HasMaster() )
+    if (!HasMaster()) {
         plgDispatch::Dispatch()->RegisterForExactType(plListenerMsg::Index(), GetKey());
+    }
 }
 
 void plStereizer::Write(hsStream* stream, hsResMgr* mgr)
@@ -110,8 +112,8 @@ void plStereizer::Write(hsStream* stream, hsResMgr* mgr)
 bool plStereizer::MsgReceive(plMessage* msg)
 {
     plListenerMsg* listenMsg = plListenerMsg::ConvertNoRef(msg);
-    if( listenMsg )
-    {
+
+    if (listenMsg) {
         SetFromListenerMsg(listenMsg);
         return Stereize();
     }
@@ -127,8 +129,10 @@ bool plStereizer::IEval(double secs, float del, uint32_t dirty)
 bool plStereizer::Stereize()
 {
     plSceneObject* targ = GetTarget();
-    if( !targ )
+
+    if (!targ) {
         return true;
+    }
 
     targ->FlushTransform();
 
@@ -147,16 +151,11 @@ bool plStereizer::Stereize()
     //      Calc pure ambient position
     //      Calc pure localized position
     //      Interpolate between the two.
-    if( dist <= fAmbientDist )
-    {
+    if (dist <= fAmbientDist) {
         ISetNewPos(IGetAmbientPos());
-    }
-    else if( dist >= fAmbientDist + fTransition )
-    {
+    } else if (dist >= fAmbientDist + fTransition) {
         ISetNewPos(IGetLocalizedPos(posToList, dist));
-    }
-    else
-    {
+    } else {
         hsPoint3 ambPos = IGetAmbientPos();
         hsPoint3 localizePos = IGetLocalizedPos(posToList, dist);
 
@@ -200,10 +199,12 @@ hsPoint3 plStereizer::IGetAmbientPos() const
     hsPoint3 pos = fListPos;
     hsVector3 axOut = fListDirection % fListUp;
     hsFastMath::NormalizeAppr(axOut);
-    if( IsLeftChannel() )
+
+    if (IsLeftChannel()) {
         axOut *= -fMinSepDist;
-    else
+    } else {
         axOut *= fMinSepDist;
+    }
 
     pos += axOut;
 
@@ -218,12 +219,16 @@ hsPoint3 plStereizer::IGetLocalizedPos(const hsVector3& posToList, float distToL
     hsFastMath::NormalizeAppr(axOut);
 
     float distOut = distToList * fTanAng;
-    if( distOut > fMaxSepDist )
+
+    if (distOut > fMaxSepDist) {
         distOut = fMaxSepDist;
-    else if( distOut < fMinSepDist )
+    } else if (distOut < fMinSepDist) {
         distOut = fMinSepDist;
-    if( IsLeftChannel() )
+    }
+
+    if (IsLeftChannel()) {
         distOut = -distOut;
+    }
 
     axOut *= distOut;
 
@@ -250,17 +255,21 @@ hsPoint3 plStereizer::IGetUnStereoPos() const
 void plStereizer::SetWorldInitPos(const hsPoint3& pos)
 {
     plCoordinateInterface* parent = IGetParent();
-    if( parent )
+
+    if (parent) {
         fInitPos = parent->GetWorldToLocal() * pos;
-    else
+    } else {
         fInitPos = pos;
+    }
 }
 
 hsPoint3 plStereizer::GetWorldInitPos() const
 {
     plCoordinateInterface* parent = IGetParent();
-    if( parent )
+
+    if (parent) {
         return parent->GetLocalToWorld() * fInitPos;
+    }
 
     return fInitPos;
 }
@@ -268,17 +277,18 @@ hsPoint3 plStereizer::GetWorldInitPos() const
 plCoordinateInterface* plStereizer::IGetParent() const
 {
     plCoordinateInterface* coord = IGetTargetCoordinateInterface(0);
-    if( coord )
-    {
+
+    if (coord) {
         return coord->GetParent();
     }
+
     return nil;
 }
 
 // Note that (along with it's many other hacky defects), this
 // will go down in flames if there are two potential masters.
 // Of course, two line follow mods doesn't really make sense
-// now anyway, but the point is that this is a simplified placeholder 
+// now anyway, but the point is that this is a simplified placeholder
 // to get the job done. If and when a need is shown for sequencing of
 // modifiers, this should be updated to follow that protocol. But
 // the rationale is that one simple example of a need for sequencing
@@ -290,21 +300,24 @@ bool plStereizer::CheckForMaster()
 {
     ISetHasMaster(false);
     plSceneObject* targ = GetTarget();
-    if( !targ )
+
+    if (!targ) {
         return false;
+    }
 
     int n = targ->GetNumModifiers();
     int i;
-    for( i = 0; i < n; i++ )
-    {
+
+    for (i = 0; i < n; i++) {
         plLineFollowMod* line = plLineFollowMod::ConvertNoRef(IGetTargetModifier(0, i));
-        if( line )
-        {
+
+        if (line) {
             ISetHasMaster(true);
             line->AddStereizer(GetKey());
 
             return true;
         }
     }
+
     return false;
 }

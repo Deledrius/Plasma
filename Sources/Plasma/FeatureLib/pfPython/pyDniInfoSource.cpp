@@ -51,46 +51,57 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pyDniCoordinates.h"
 
 pyDniInfoSource::pyDniInfoSource()
-:   fAgeName(nil)
+    :   fAgeName(nil)
 {}
 
-pyDniInfoSource::~pyDniInfoSource() {
+pyDniInfoSource::~pyDniInfoSource()
+{
     free(fAgeName);
 }
 
-PyObject* pyDniInfoSource::GetAgeCoords( void )
+PyObject* pyDniInfoSource::GetAgeCoords(void)
 {
 #if 0 // this may get retooled for another purpose someday...
-    const plDniCoordinateInfo * coords = plNetPlayerVNodeMgr::GetInstance()->GetAgeInfo()->GetAgeCoords();
-    if (coords)
+    const plDniCoordinateInfo* coords = plNetPlayerVNodeMgr::GetInstance()->GetAgeInfo()->GetAgeCoords();
+
+    if (coords) {
         return pyDniCoordinates::New((plDniCoordinateInfo*)coords);
+    }
+
 #endif
     // just return a None object
     PYTHON_RETURN_NONE;
 }
 
-uint32_t pyDniInfoSource::GetAgeTime( void ) const
+uint32_t pyDniInfoSource::GetAgeTime(void) const
 {
-    RelVaultNode * node = VaultGetAgeInfoNodeIncRef();
-    if (!node)
+    RelVaultNode* node = VaultGetAgeInfoNodeIncRef();
+
+    if (!node) {
         return 0;
-    
+    }
+
     uint32_t result;
     VaultAgeInfoNode ageInfo(node);
-    if (const plUnifiedTime * utime = ageInfo.GetAgeTime())
+
+    if (const plUnifiedTime* utime = ageInfo.GetAgeTime()) {
         result = (uint32_t)utime->GetSecs();
-    else
+    } else {
         result = 0;
+    }
+
     node->DecRef();
 
     return result;
 }
 
-const char * pyDniInfoSource::GetAgeName( void ) const
+const char* pyDniInfoSource::GetAgeName(void) const
 {
-    RelVaultNode * node = VaultGetAgeInfoNodeIncRef();
-    if (!node)
+    RelVaultNode* node = VaultGetAgeInfoNodeIncRef();
+
+    if (!node) {
         return "";
+    }
 
     VaultAgeInfoNode ageInfo(node);
 
@@ -100,10 +111,9 @@ const char * pyDniInfoSource::GetAgeName( void ) const
     return fAgeName;
 }
 
-plUUID pyDniInfoSource::GetAgeGuid( void ) const
+plUUID pyDniInfoSource::GetAgeGuid(void) const
 {
-    if (RelVaultNode * node = VaultGetAgeInfoNodeIncRef())
-    {
+    if (RelVaultNode* node = VaultGetAgeInfoNodeIncRef()) {
         VaultAgeInfoNode ageInfo(node);
         plUUID uuid = ageInfo.GetAgeInstanceGuid();
         node->DecRef();

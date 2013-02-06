@@ -43,7 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define plKeyFinder_h_inc
 
 //----------------------------
-// plKeyFinder 
+// plKeyFinder
 //----------------------------
 // provides a way to look up an object (via its plKey)
 // Using strings.  The should only be used at Program Init time or console use (cause its not fast)
@@ -72,11 +72,9 @@ class plLocation;
 class plRegistryPageNode;
 class plPageInfo;
 
-class plKeyFinder
-{
-public: 
-    enum eErrCodes
-    {
+class plKeyFinder {
+public:
+    enum eErrCodes {
         kOk,
         kAgeNotFound,
         kPageNotFound,
@@ -88,10 +86,12 @@ public:
     static plKeyFinder& Instance();
 
     // These are Stupid search because they just do string searchs on the objects.
-    plKey StupidSearch(const plString & age, const plString & rm, const char *className, const plString &obName, bool subString=false);
-    plKey StupidSearch(const plString & age, const plString & rm, uint16_t objType, const plString &obName, bool subString=false);
+    plKey StupidSearch(const plString& age, const plString& rm, const char* className, const plString& obName, bool subString = false);
+    plKey StupidSearch(const plString& age, const plString& rm, uint16_t objType, const plString& obName, bool subString = false);
 
-    eErrCodes   GetLastErrorCode() { return fLastError; }
+    eErrCodes   GetLastErrorCode() {
+        return fLastError;
+    }
     const char* GetLastErrorString(); // For Console display
 
     void ReallyStupidResponderSearch(const plString& name, std::vector<plKey>& foundKeys, const plLocation& hintLocation = plLocation::kInvalidLoc);

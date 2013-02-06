@@ -50,40 +50,48 @@ class hsStream;
 class hsResMgr;
 
 
-class plActivatorMsg : public plMessage
-{
+class plActivatorMsg : public plMessage {
 
-    void IReset() { fPickedObj=fHiteeObj=fHitterObj=nil; fTriggerType=0; fHitPoint.Set(0,0,0); }
+    void IReset() {
+        fPickedObj = fHiteeObj = fHitterObj = nil;
+        fTriggerType = 0;
+        fHitPoint.Set(0, 0, 0);
+    }
 public:
-    plActivatorMsg() { IReset(); }
-    plActivatorMsg(const plKey &s, 
-                    const plKey &r, 
-                    const double* t) { IReset(); }
+    plActivatorMsg() {
+        IReset();
+    }
+    plActivatorMsg(const plKey& s,
+                   const plKey& r,
+                   const double* t) {
+        IReset();
+    }
     ~plActivatorMsg() { }
 
-    CLASSNAME_REGISTER( plActivatorMsg );
-    GETINTERFACE_ANY( plActivatorMsg, plMessage );
-    
-    // IO 
-    void Read(hsStream* stream, hsResMgr* mgr)
-    {
+    CLASSNAME_REGISTER(plActivatorMsg);
+    GETINTERFACE_ANY(plActivatorMsg, plMessage);
+
+    // IO
+    void Read(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgRead(stream, mgr);
         fTriggerType = stream->ReadLE32();
         fHitPoint.Read(stream);
     }
 
-    void Write(hsStream* stream, hsResMgr* mgr)
-    {
+    void Write(hsStream* stream, hsResMgr* mgr) {
         plMessage::IMsgWrite(stream, mgr);
-        stream->WriteLE32( fTriggerType );
+        stream->WriteLE32(fTriggerType);
         fHitPoint.Write(stream);
     }
 
-    bool TriggerType() { return fTriggerType; }
-    void SetTriggerType(int n) { fTriggerType = n; }
+    bool TriggerType() {
+        return fTriggerType;
+    }
+    void SetTriggerType(int n) {
+        fTriggerType = n;
+    }
 
-    enum 
-    {
+    enum {
         kUndefined  = 0,
         kPickedTrigger,
         kUnPickedTrigger,

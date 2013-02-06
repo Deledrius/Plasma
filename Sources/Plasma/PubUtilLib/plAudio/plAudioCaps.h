@@ -54,24 +54,32 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plAudioCapsDetector;
 class plStatusLog;
 
-class plAudioCaps
-{
+class plAudioCaps {
 public:
 
-    plAudioCaps() { Clear(); }
+    plAudioCaps() {
+        Clear();
+    }
 
-    void    Clear( void )
-    {
+    void    Clear(void) {
         fIsAvailable = false;
         fEAXAvailable = false;
         fEAXUnified = false;
         fMaxNumSources = 0;
     }
 
-    bool    IsAvailable( void ) const { return fIsAvailable; }
-    bool    IsEAXAvailable( void ) const { return fEAXAvailable; }
-    bool    UsingEAXUnified( void ) const { return fEAXUnified; }
-    unsigned GetMaxNumVoices() { return fMaxNumSources; }
+    bool    IsAvailable(void) const {
+        return fIsAvailable;
+    }
+    bool    IsEAXAvailable(void) const {
+        return fEAXAvailable;
+    }
+    bool    UsingEAXUnified(void) const {
+        return fEAXUnified;
+    }
+    unsigned GetMaxNumVoices() {
+        return fMaxNumSources;
+    }
 
 protected:
     friend class plAudioCapsDetector;
@@ -80,20 +88,19 @@ protected:
     unsigned fMaxNumSources;
 };
 
-class plAudioCapsDetector
-{
+class plAudioCapsDetector {
 public:
     plAudioCapsDetector();
     virtual ~plAudioCapsDetector();
 
-    static plAudioCaps &Detect( bool log = false, bool init = false );
+    static plAudioCaps& Detect(bool log = false, bool init = false);
 
 protected:
-    static plStatusLog  *fLog;
+    static plStatusLog*  fLog;
     static plAudioCaps  fCaps;
     static bool         fGotCaps;
-    
-    static bool     IDetectEAX( );
+
+    static bool     IDetectEAX();
 };
 
 #endif //_plAudioCaps_h

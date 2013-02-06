@@ -59,8 +59,10 @@ hsMatrix33* hsMatrix33::SetConcat(const hsMatrix33* a, const hsMatrix33* b)
     hsMatrix33* c;
 
     c = this;
-    if (this == a || this == b)
+
+    if (this == a || this == b) {
         c = &tmpMatrix;
+    }
 
     c->fMap[0][0] = a->fMap[0][0] * b->fMap[0][0] + a->fMap[0][1] * b->fMap[1][0] + a->fMap[0][2] * b->fMap[2][0];
     c->fMap[0][1] = a->fMap[0][0] * b->fMap[0][1] + a->fMap[0][1] * b->fMap[1][1] + a->fMap[0][2] * b->fMap[2][1];
@@ -74,8 +76,10 @@ hsMatrix33* hsMatrix33::SetConcat(const hsMatrix33* a, const hsMatrix33* b)
     c->fMap[2][1] = a->fMap[2][0] * b->fMap[0][1] + a->fMap[2][1] * b->fMap[1][1] + a->fMap[2][2] * b->fMap[2][1];
     c->fMap[2][2] = a->fMap[2][0] * b->fMap[0][2] + a->fMap[2][1] * b->fMap[1][2] + a->fMap[2][2] * b->fMap[2][2];
 
-    if (this != c)
+    if (this != c) {
         *this = *c;
+    }
+
     return this;
 }
 
@@ -84,17 +88,16 @@ hsMatrix33 operator*(const hsMatrix33& a, const hsMatrix33& b)
     hsMatrix33  c;
 
     (void)c.SetConcat(&a, &b);
-    
+
     return c;
 }
 
 void hsMatrix33::Read(hsStream* s)
 {
     int i, j;
-    for( i = 0; i < 3; i++ )
-    {
-        for( j = 0; j < 3; j++ )
-        {
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
             fMap[i][j] = s->ReadLEScalar();
         }
     }
@@ -103,10 +106,9 @@ void hsMatrix33::Read(hsStream* s)
 void hsMatrix33::Write(hsStream* s)
 {
     int i, j;
-    for( i = 0; i < 3; i++ )
-    {
-        for( j = 0; j < 3; j++ )
-        {
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
             s->WriteLEScalar(fMap[i][j]);
         }
     }

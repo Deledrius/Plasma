@@ -49,52 +49,62 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plEventCallbackMsg;
 
-class plConsoleMsg : public plMessage
-{
+class plConsoleMsg : public plMessage {
 protected:
 
     uint32_t      fCmd;
-    char        *fString;
+    char*        fString;
 
 public:
 
-    enum 
-    {
+    enum {
         kExecuteFile,
         kAddLine,
         kExecuteLine
     };
 
-    plConsoleMsg() : plMessage(nil, nil, nil), fCmd( 0 ), fString( nil ) { SetBCastFlag(kBCastByExactType); }
-    plConsoleMsg( uint32_t cmd, const char *str ) : 
-                plMessage(nil, nil, nil), fCmd( cmd ), fString(hsStrcpy(str))
-                { SetBCastFlag( kBCastByExactType ); }
-    
-    ~plConsoleMsg() { free(fString); }
+    plConsoleMsg() : plMessage(nil, nil, nil), fCmd(0), fString(nil) {
+        SetBCastFlag(kBCastByExactType);
+    }
+    plConsoleMsg(uint32_t cmd, const char* str) :
+        plMessage(nil, nil, nil), fCmd(cmd), fString(hsStrcpy(str)) {
+        SetBCastFlag(kBCastByExactType);
+    }
 
-    CLASSNAME_REGISTER( plConsoleMsg );
-    GETINTERFACE_ANY( plConsoleMsg, plMessage );
+    ~plConsoleMsg() {
+        free(fString);
+    }
 
-    uint32_t      GetCmd( void ) const { return fCmd; }
-    const char  *GetString( void ) const { return fString; };
-    
-    void SetCmd (uint32_t cmd) { fCmd = cmd; }
-    void SetString (const char str[]) { free(fString); fString = hsStrcpy(str); }
+    CLASSNAME_REGISTER(plConsoleMsg);
+    GETINTERFACE_ANY(plConsoleMsg, plMessage);
 
-    virtual void Read(hsStream* s, hsResMgr* mgr) 
-    { 
-        plMessage::IMsgRead(s, mgr); 
+    uint32_t      GetCmd(void) const {
+        return fCmd;
+    }
+    const char*  GetString(void) const {
+        return fString;
+    };
+
+    void SetCmd(uint32_t cmd) {
+        fCmd = cmd;
+    }
+    void SetString(const char str[]) {
+        free(fString);
+        fString = hsStrcpy(str);
+    }
+
+    virtual void Read(hsStream* s, hsResMgr* mgr) {
+        plMessage::IMsgRead(s, mgr);
         s->ReadLE(&fCmd);
         // read string
-        plMsgCStringHelper::Peek(fString, s);               
+        plMsgCStringHelper::Peek(fString, s);
     }
-    
-    virtual void Write(hsStream* s, hsResMgr* mgr) 
-    { 
+
+    virtual void Write(hsStream* s, hsResMgr* mgr) {
         plMessage::IMsgWrite(s, mgr);
         s->WriteLE(fCmd);
         // write cmd/string
-        plMsgCStringHelper::Poke(fString, s);       
+        plMsgCStringHelper::Poke(fString, s);
     }
 };
 

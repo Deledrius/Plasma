@@ -51,21 +51,21 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 // 0.8, it will display 0.6 ( = 0.2 + 0.8 * (0.7 - 0.2)).
 
 // The bar runs from 0 to 1 and all values should be in that range.
-class plProgressBar
-{
+class plProgressBar {
 public:
-    plProgressBar(float min, float max) : fMin(min), fMax(max) 
-    { 
-          hsAssert(min >= 0, "Min too small.");
-          hsAssert(min <= 1, "Min too big.");
-          hsAssert(max >= 0, "Max too small.");
-          hsAssert(max <= 1, "Max too big.");
-          hsAssert(min <= max, "Min and max out of order.");
+    plProgressBar(float min, float max) : fMin(min), fMax(max) {
+        hsAssert(min >= 0, "Min too small.");
+        hsAssert(min <= 1, "Min too big.");
+        hsAssert(max >= 0, "Max too small.");
+        hsAssert(max <= 1, "Max too big.");
+        hsAssert(min <= max, "Min and max out of order.");
     }
 
     virtual bool32 Update(float fraction) = 0;
 
-    float GetTotalFraction(float f) const { return fMin + f * (fMax - fMin); }
+    float GetTotalFraction(float f) const {
+        return fMin + f * (fMax - fMin);
+    }
 
 private:
     float fMin;

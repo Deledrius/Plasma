@@ -49,15 +49,13 @@ class plDrawableSpans;
 struct hsPoint3;
 struct hsVector3;
 
-class plSpanHandle
-{
+class plSpanHandle {
 public:
     plDrawableSpans*        fDrawable;
     uint32_t                  fSpanIdx;
 };
 
-class plInterMeshSmooth
-{
+class plInterMeshSmooth {
 protected:
     float        fMinNormDot;
 

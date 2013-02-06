@@ -89,40 +89,41 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetServerTime, "Returns the current tim
 PYTHON_GLOBAL_METHOD_DEFINITION(PtGMTtoDniTime, args, "Params: gtime\nConverts GMT time (passed in) to D'Ni time")
 {
     unsigned long gtime;
-    if (!PyArg_ParseTuple(args, "l", &gtime))
-    {
+
+    if (!PyArg_ParseTuple(args, "l", &gtime)) {
         PyErr_SetString(PyExc_TypeError, "PtGMTtoDniTime expects a long");
         PYTHON_RETURN_ERROR;
     }
+
     return PyLong_FromUnsignedLong((unsigned long)cyMisc::ConvertGMTtoDni(gtime));
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtGetClientName, args, "Params: avatarKey=None\nThis will return the name of the client that is owned by the avatar\n"
-            "- avatarKey is the ptKey of the avatar to get the client name of.\n"
-            "If avatarKey is omitted then the local avatar is used")
+                                "- avatarKey is the ptKey of the avatar to get the client name of.\n"
+                                "If avatarKey is omitted then the local avatar is used")
 {
     PyObject* keyObj = NULL;
-    if (!PyArg_ParseTuple(args, "|O", &keyObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "|O", &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "PtGetClientName expects an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (keyObj != NULL)
-    {
-        if (!pyKey::Check(keyObj))
-        {
+
+    if (keyObj != NULL) {
+        if (!pyKey::Check(keyObj)) {
             PyErr_SetString(PyExc_TypeError, "PtGetClientName expects a ptKey");
             PYTHON_RETURN_ERROR;
         }
+
         pyKey* key = pyKey::ConvertFrom(keyObj);
         return PyString_FromString(cyMisc::GetClientName(*key).c_str());
-    }
-    else
+    } else {
         return PyString_FromString(cyMisc::GetLocalClientName().c_str());
+    }
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetLocalAvatar, "This will return a ptSceneobject of the local avatar\n"
-            "- if there is no local avatar a NameError exception will happen.")
+                                       "- if there is no local avatar a NameError exception will happen.")
 {
     return cyMisc::GetLocalAvatar();
 }
@@ -136,8 +137,11 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetPlayerList, "Returns a list of ptPla
 {
     std::vector<PyObject*> playerList = cyMisc::GetPlayerList();
     PyObject* retVal = PyList_New(playerList.size());
-    for (int i = 0; i < playerList.size(); i++)
-        PyList_SetItem(retVal, i, playerList[i]); // steals the ref
+
+    for (int i = 0; i < playerList.size(); i++) {
+        PyList_SetItem(retVal, i, playerList[i]);    // steals the ref
+    }
+
     return retVal;
 }
 
@@ -145,8 +149,11 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetPlayerListDistanceSorted, "Returns a
 {
     std::vector<PyObject*> playerList = cyMisc::GetPlayerListDistanceSorted();
     PyObject* retVal = PyList_New(playerList.size());
-    for (int i = 0; i < playerList.size(); i++)
-        PyList_SetItem(retVal, i, playerList[i]); // steals the ref
+
+    for (int i = 0; i < playerList.size(); i++) {
+        PyList_SetItem(retVal, i, playerList[i]);    // steals the ref
+    }
+
     return retVal;
 }
 
@@ -163,28 +170,30 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtMaxListenDistSq, "Returns the maximum d
 PYTHON_GLOBAL_METHOD_DEFINITION(PtGetAvatarKeyFromClientID, args, "Params: clientID\nFrom an integer that is the clientID, find the avatar and return its ptKey")
 {
     int clientID;
-    if (!PyArg_ParseTuple(args, "i", &clientID))
-    {
+
+    if (!PyArg_ParseTuple(args, "i", &clientID)) {
         PyErr_SetString(PyExc_TypeError, "PtGetAvatarKeyFromClientID expects an integer");
         PYTHON_RETURN_ERROR;
     }
+
     return cyMisc::GetAvatarKeyFromClientID(clientID);
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtGetClientIDFromAvatarKey, args, "Params: avatarKey\nFrom a ptKey that points at an avatar, return the players clientID (integer)")
 {
     PyObject* keyObj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &keyObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "PtGetClientIDFromAvatarKey expects a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(keyObj))
-    {
+
+    if (!pyKey::Check(keyObj)) {
         PyErr_SetString(PyExc_TypeError, "PtGetClientIDFromAvatarKey expects a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    pyKey *key = pyKey::ConvertFrom(keyObj);
+
+    pyKey* key = pyKey::ConvertFrom(keyObj);
     return PyInt_FromLong(cyMisc::GetClientIDFromAvatarKey(*key));
 }
 
@@ -194,36 +203,37 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetNumRemotePlayers, "Returns the numbe
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtValidateKey, args, "Params: key\nReturns true(1) if 'key' is valid and loaded,\n"
-            "otherwise returns false(0)")
+                                "otherwise returns false(0)")
 {
     PyObject* keyObj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &keyObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "PtValidateKey expects an object");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(keyObj))
-    {
+
+    if (!pyKey::Check(keyObj)) {
         PYTHON_RETURN_BOOL(false);
     }
+
     pyKey* key = pyKey::ConvertFrom(keyObj);
     PYTHON_RETURN_BOOL(cyMisc::ValidateKey(*key));
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtSendRTChat, args, "Params: fromPlayer,toPlayerList,message,flags\nSends a realtime chat message to the list of ptPlayers\n"
-            "If toPlayerList is an empty list, it is a broadcast message")
+                                "If toPlayerList is an empty list, it is a broadcast message")
 {
     PyObject* fromPlayerObj = NULL;
     PyObject* toPlayerListObj = NULL;
     PyObject* message = NULL;
     unsigned long msgFlags;
-    if (!PyArg_ParseTuple(args, "OOOl", &fromPlayerObj, &toPlayerListObj, &message, &msgFlags))
-    {
+
+    if (!PyArg_ParseTuple(args, "OOOl", &fromPlayerObj, &toPlayerListObj, &message, &msgFlags)) {
         PyErr_SetString(PyExc_TypeError, "PtSendRTChat expects a ptPlayer, a list of ptPlayers, a string, and a long");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyPlayer::Check(fromPlayerObj))
-    {
+
+    if (!pyPlayer::Check(fromPlayerObj)) {
         PyErr_SetString(PyExc_TypeError, "PtSendRTChat expects a ptPlayer, a list of ptPlayers, a string, and a long");
         PYTHON_RETURN_ERROR;
     }
@@ -231,102 +241,91 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtSendRTChat, args, "Params: fromPlayer,toPlayer
     pyPlayer* fromPlayer = pyPlayer::ConvertFrom(fromPlayerObj);
 
     std::vector<pyPlayer*> toPlayerList;
-    if (PyList_Check(toPlayerListObj))
-    {
+
+    if (PyList_Check(toPlayerListObj)) {
         int listSize = PyList_Size(toPlayerListObj);
-        for (int i = 0; i < listSize; i++)
-        {
+
+        for (int i = 0; i < listSize; i++) {
             PyObject* listItem = PyList_GetItem(toPlayerListObj, i);
-            if (!pyPlayer::Check(listItem))
-            {
+
+            if (!pyPlayer::Check(listItem)) {
                 PyErr_SetString(PyExc_TypeError, "PtSendRTChat expects a ptPlayer, a list of ptPlayers, a string, and a long");
                 PYTHON_RETURN_ERROR;
             }
+
             toPlayerList.push_back(pyPlayer::ConvertFrom(listItem));
         }
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtSendRTChat expects a ptPlayer, a list of ptPlayers, a string, and a long");
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyString_Check(message))
-    {
+    if (PyString_Check(message)) {
         char* msg = PyString_AsString(message);
         return PyLong_FromUnsignedLong(cyMisc::SendRTChat(*fromPlayer, toPlayerList, msg, msgFlags));
-    }
-    else if (PyUnicode_Check(message))
-    {
+    } else if (PyUnicode_Check(message)) {
         int size = PyUnicode_GetSize(message);
-        wchar_t* msg = new wchar_t[size + 1]; msg[size] = 0;
+        wchar_t* msg = new wchar_t[size + 1];
+        msg[size] = 0;
         PyUnicode_AsWideChar((PyUnicodeObject*)message, msg, size);
         uint32_t retval = cyMisc::SendRTChat(*fromPlayer, toPlayerList, msg, msgFlags);
         delete msg;
         return PyLong_FromUnsignedLong(retval);
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtSendRTChat expects a ptPlayer, a list of ptPlayers, a string, and a long");
         PYTHON_RETURN_ERROR;
     }
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtSendKIMessage, args, "Params: command,value\nSends a command message to the KI frontend.\n"
-            "See PlasmaKITypes.py for list of commands")
+                                "See PlasmaKITypes.py for list of commands")
 {
     unsigned long command;
     PyObject* val;
-    if (!PyArg_ParseTuple(args, "lO", &command, &val))
-    {
+
+    if (!PyArg_ParseTuple(args, "lO", &command, &val)) {
         PyErr_SetString(PyExc_TypeError, "PtSendKIMessage expects a long and either a float or a string");
         PYTHON_RETURN_ERROR;
     }
-    if (PyString_Check(val))
-    {
+
+    if (PyString_Check(val)) {
         char* strValue = PyString_AsString(val);
         wchar_t* temp = hsStringToWString(strValue);
         cyMisc::SendKIMessageS(command, temp);
         delete [] temp;
-    }
-    else if (PyUnicode_Check(val))
-    {
+    } else if (PyUnicode_Check(val)) {
         int len = PyUnicode_GetSize(val);
         wchar_t* buffer = new wchar_t[len + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)val, buffer, len);
         buffer[len] = L'\0';
         cyMisc::SendKIMessageS(command, buffer);
         delete [] buffer;
-    }
-    else if (PyFloat_Check(val))
-    {
+    } else if (PyFloat_Check(val)) {
         float floatValue = (float)PyFloat_AsDouble(val);
         cyMisc::SendKIMessage(command, floatValue);
-    }
-    else if (PyInt_Check(val))
-    {
+    } else if (PyInt_Check(val)) {
         // accepting an int if people get lazy
         float floatValue = (float)PyInt_AsLong(val);
         cyMisc::SendKIMessage(command, floatValue);
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtSendKIMessage expects a long and either a float or a string");
         PYTHON_RETURN_ERROR;
     }
+
     PYTHON_RETURN_NONE;
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtSendKIMessageInt, args, "Params: command,value\nSame as PtSendKIMessage except the value is guaranteed to be a uint32_t\n"
-            "(for things like player IDs)")
+                                "(for things like player IDs)")
 {
     unsigned long command;
     long val;
-    if (!PyArg_ParseTuple(args, "ll", &command, &val))
-    {
+
+    if (!PyArg_ParseTuple(args, "ll", &command, &val)) {
         PyErr_SetString(PyExc_TypeError, "PtSendKIMessageInt expects two longs");
         PYTHON_RETURN_ERROR;
     }
+
     cyMisc::SendKIMessageI(command, val);
     PYTHON_RETURN_NONE;
 }
@@ -336,24 +335,24 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtLoadAvatarModel, args, "Params: modelName, spa
     char* modelName;
     PyObject* keyObj = NULL;
     PyObject* userStrObj = NULL;
-    if (!PyArg_ParseTuple(args, "sO|O", &modelName, &keyObj, &userStrObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "sO|O", &modelName, &keyObj, &userStrObj)) {
         PyErr_SetString(PyExc_TypeError, "PtLoadAvatarModel expects a string, a ptKey, and an optional string");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(keyObj))
-    {
+
+    if (!pyKey::Check(keyObj)) {
         PyErr_SetString(PyExc_TypeError, "PtLoadAvatarModel expects a string, a ptKey, and an optional string");
         PYTHON_RETURN_ERROR;
     }
+
     pyKey* key = pyKey::ConvertFrom(keyObj);
 
     std::string userStr = "";
+
     // convert name from a string or unicode string
-    if (userStrObj)
-    {
-        if (PyUnicode_Check(userStrObj))
-        {
+    if (userStrObj) {
+        if (PyUnicode_Check(userStrObj)) {
             int len = PyUnicode_GetSize(userStrObj);
             wchar_t* buffer = new wchar_t[len + 1];
             PyUnicode_AsWideChar((PyUnicodeObject*)userStrObj, buffer, len);
@@ -362,11 +361,9 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtLoadAvatarModel, args, "Params: modelName, spa
             delete [] buffer;
             userStr = temp;
             delete [] temp;
-        }
-        else if (PyString_Check(userStrObj))
+        } else if (PyString_Check(userStrObj)) {
             userStr = PyString_AsString(userStrObj);
-        else
-        {
+        } else {
             PyErr_SetString(PyExc_TypeError, "PtLoadAvatarModel expects a string, a ptKey, and an optional string");
             PYTHON_RETURN_ERROR;
         }
@@ -376,66 +373,69 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtLoadAvatarModel, args, "Params: modelName, spa
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtUnLoadAvatarModel, args, "Params: avatarKey\nForcibly unloads the specified avatar model.\n"
-            "Do not use this method unless you require fine-grained control of avatar unloading.")
+                                "Do not use this method unless you require fine-grained control of avatar unloading.")
 {
     PyObject* keyObj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &keyObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O", &keyObj)) {
         PyErr_SetString(PyExc_TypeError, "PtUnLoadAvatarModel expects a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!pyKey::Check(keyObj))
-    {
+
+    if (!pyKey::Check(keyObj)) {
         PyErr_SetString(PyExc_TypeError, "PtUnLoadAvatarModel expects a ptKey");
         PYTHON_RETURN_ERROR;
     }
+
     pyKey* key = pyKey::ConvertFrom(keyObj);
     cyMisc::UnLoadAvatarModel(*key);
     PYTHON_RETURN_NONE;
 }
 
 PYTHON_BASIC_GLOBAL_METHOD_DEFINITION(PtForceCursorHidden, cyMisc::ForceCursorHidden, "Forces the cursor to hide, overriding everything.\n"
-            "Only call if other methods won't work. The only way to show the cursor after this call is PtForceMouseShown()")
+                                      "Only call if other methods won't work. The only way to show the cursor after this call is PtForceMouseShown()")
 PYTHON_BASIC_GLOBAL_METHOD_DEFINITION(PtForceCursorShown, cyMisc::ForceCursorShown, "Forces the cursor to show, overriding everything.\n"
-            "Only call if other methods won't work. This is the only way to show the cursor after a call to PtForceMouseHidden()")
+                                      "Only call if other methods won't work. This is the only way to show the cursor after a call to PtForceMouseHidden()")
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtGetLocalizedString, args, "Params: name, arguments=None\nReturns the localized string specified by name "
-            "(format is Age.Set.Name) and substitutes the arguments in the list of strings passed in as arguments.")
+                                "(format is Age.Set.Name) and substitutes the arguments in the list of strings passed in as arguments.")
 {
     PyObject* nameObj = NULL;
     PyObject* argObj = NULL;
-    if (!PyArg_ParseTuple(args, "O|O", &nameObj, &argObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O|O", &nameObj, &argObj)) {
         PyErr_SetString(PyExc_TypeError, "PtGetLocalizedString expects a unicode string and a list of unicode strings");
         PYTHON_RETURN_ERROR;
     }
+
     plString name;
     std::vector<plString> argList;
 
     // convert name from a string
     name = PyString_AsStringEx(nameObj);
-    if (name.IsNull())
-    {
+
+    if (name.IsNull()) {
         PyErr_SetString(PyExc_TypeError, "PtGetLocalizedString expects a unicode string and a list of unicode strings");
         PYTHON_RETURN_ERROR;
     }
 
-    if (argObj != NULL) // NULL is valid... but won't fill the args vector
-    {
+    if (argObj != NULL) { // NULL is valid... but won't fill the args vector
         // convert args from a list of strings or unicode strings
-        if (!PyList_Check(argObj))
-        {
+        if (!PyList_Check(argObj)) {
             PyErr_SetString(PyExc_TypeError, "PtGetLocalizedString expects a unicode string and a list of unicode strings");
             PYTHON_RETURN_ERROR;
         }
 
         int len = PyList_Size(argObj);
-        for (int curItem = 0; curItem < len; curItem++)
-        {
+
+        for (int curItem = 0; curItem < len; curItem++) {
             PyObject* item = PyList_GetItem(argObj, curItem);
             plString arg = "INVALID ARG";
-            if (item == Py_None) // none is allowed, but treated as a blank string
+
+            if (item == Py_None) { // none is allowed, but treated as a blank string
                 arg = "";
+            }
+
             arg = PyString_AsStringEx(item);
             // everything else won't throw an error, but will show up as INVALID ARG in the string
             argList.push_back(arg);
@@ -448,15 +448,14 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtGetLocalizedString, args, "Params: name, argum
 PYTHON_GLOBAL_METHOD_DEFINITION(PtDumpLogs, args, "Params: folder\nDumps all current log files to the specified folder (a sub-folder to the log folder)")
 {
     PyObject* folderObj = NULL;
-    if (!PyArg_ParseTuple(args, "O|O", &folderObj))
-    {
+
+    if (!PyArg_ParseTuple(args, "O|O", &folderObj)) {
         PyErr_SetString(PyExc_TypeError, "PtDumpLogs expects a unicode or standard string");
         PYTHON_RETURN_ERROR;
     }
 
     // convert folder from a string or unicode string
-    if (PyUnicode_Check(folderObj))
-    {
+    if (PyUnicode_Check(folderObj)) {
         int len = PyUnicode_GetSize(folderObj);
         wchar_t* buffer = new wchar_t[len + 1];
         PyUnicode_AsWideChar((PyUnicodeObject*)folderObj, buffer, len);
@@ -464,17 +463,13 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtDumpLogs, args, "Params: folder\nDumps all cur
         bool retVal = cyMisc::DumpLogs(buffer);
         delete [] buffer;
         PYTHON_RETURN_BOOL(retVal);
-    }
-    else if (PyString_Check(folderObj))
-    {
+    } else if (PyString_Check(folderObj)) {
         char* temp = PyString_AsString(folderObj);
         wchar_t* wTemp = hsStringToWString(temp);
         bool retVal = cyMisc::DumpLogs(wTemp);
         delete [] wTemp;
         PYTHON_RETURN_BOOL(retVal);
-    }
-    else
-    {
+    } else {
         PyErr_SetString(PyExc_TypeError, "PtDumpLogs expects a unicode or standard string");
         PYTHON_RETURN_ERROR;
     }
@@ -485,19 +480,19 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtDumpLogs, args, "Params: folder\nDumps all cur
 // AddPlasmaMethods - the python method definitions
 //
 
-void cyMisc::AddPlasmaMethods(std::vector<PyMethodDef> &methods)
+void cyMisc::AddPlasmaMethods(std::vector<PyMethodDef>& methods)
 {
     PYTHON_GLOBAL_METHOD_NOARGS(methods, PtFlashWindow);
 
     PYTHON_GLOBAL_METHOD_NOARGS(methods, PtGetAgeName);
     PYTHON_GLOBAL_METHOD_NOARGS(methods, PtGetAgeInfo);
     PYTHON_GLOBAL_METHOD_NOARGS(methods, PtGetAgeTime);
-    PYTHON_GLOBAL_METHOD_NOARGS(methods, PtGetPrevAgeName); 
+    PYTHON_GLOBAL_METHOD_NOARGS(methods, PtGetPrevAgeName);
     PYTHON_GLOBAL_METHOD_NOARGS(methods, PtGetPrevAgeInfo);
     PYTHON_GLOBAL_METHOD_NOARGS(methods, PtGetDniTime);
     PYTHON_GLOBAL_METHOD_NOARGS(methods, PtGetServerTime);
     PYTHON_GLOBAL_METHOD(methods, PtGMTtoDniTime);
-    
+
     PYTHON_GLOBAL_METHOD(methods, PtGetClientName);
     PYTHON_GLOBAL_METHOD_NOARGS(methods, PtGetLocalAvatar);
     PYTHON_GLOBAL_METHOD_NOARGS(methods, PtGetLocalPlayer);
@@ -514,7 +509,7 @@ void cyMisc::AddPlasmaMethods(std::vector<PyMethodDef> &methods)
     PYTHON_GLOBAL_METHOD(methods, PtSendRTChat);
     PYTHON_GLOBAL_METHOD(methods, PtSendKIMessage);
     PYTHON_GLOBAL_METHOD(methods, PtSendKIMessageInt);
-    
+
     PYTHON_GLOBAL_METHOD(methods, PtLoadAvatarModel);
     PYTHON_GLOBAL_METHOD(methods, PtUnLoadAvatarModel);
 

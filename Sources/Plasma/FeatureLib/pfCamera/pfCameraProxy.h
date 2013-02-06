@@ -48,13 +48,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class plVirtualCam1;
 class plSceneNode;
 
-class plCameraProxy : public plProxyGen
-{
+class plCameraProxy : public plProxyGen {
 protected:
     plVirtualCam1*          fOwner;
 
 
-    virtual plDrawableSpans*    ICreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo=nil);
+    virtual plDrawableSpans*    ICreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo = nil);
     virtual plKey               IGetNode() const;
 public:
     plCameraProxy();

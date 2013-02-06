@@ -139,9 +139,9 @@ PF_CONSOLE_FILE_DUMMY(Net)
 //        isn't used, but will be used in the future when implementing help
 //        (could you have guessed it? :) Please fill it in when the function
 //        name isn't obvious (i.e. SetFogColor doesn't really need one)
-//  
+//
 //  The actual C code prototype looks like:
-//      void    pfConsoleCmd_groupName_functionName( uint32_t numParams, pfConsoleCmdParam *params, 
+//      void    pfConsoleCmd_groupName_functionName( uint32_t numParams, pfConsoleCmdParam *params,
 //                                                      void (*PrintString)( char * ) );
 //
 //  numParams is exactly what it sounds like. params is an array of console
@@ -186,7 +186,7 @@ PF_CONSOLE_FILE_DUMMY(Net)
 //
 //  to create the Graphics_Render_Drawing subgroup. All groups must be
 //  defined before any commands that are in that group. Note that although
-//  the 
+//  the
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -194,25 +194,25 @@ PF_CONSOLE_FILE_DUMMY(Net)
 // utility functions
 //
 //////////////////////////////////////////////////////////////////////////////
-plKey FindSceneObjectByName(const plString& name, const plString& ageName, char* statusStr, bool subString=false);
-plKey FindObjectByName(const plString& name, int type, const plString& ageName, char* statusStr, bool subString=false);
+plKey FindSceneObjectByName(const plString& name, const plString& ageName, char* statusStr, bool subString = false);
+plKey FindObjectByName(const plString& name, int type, const plString& ageName, char* statusStr, bool subString = false);
 plKey FindObjectByNameAndType(const plString& name, const char* typeName, const plString& ageName,
-                               char* statusStr, bool subString=false);
-void PrintStringF(void pfun(const char *),const char * fmt, ...);
+                              char* statusStr, bool subString = false);
+void PrintStringF(void pfun(const char*), const char* fmt, ...);
 
 //////////////////////////////////////////////////////////////////////////////
 //// Network Group Commands //////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-PF_CONSOLE_GROUP( Net )     // Defines a main command group
+PF_CONSOLE_GROUP(Net)       // Defines a main command group
 
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 // Net.Ping
-PF_CONSOLE_CMD( Net,
-                Ping,
-                "bool enable",
-                "Enable/disable server ping" )
+PF_CONSOLE_CMD(Net,
+               Ping,
+               "bool enable",
+               "Enable/disable server ping")
 {
     bool enable = params[0];
     NetClientPingEnable(enable);
@@ -221,69 +221,70 @@ PF_CONSOLE_CMD( Net,
 //
 // Temp until we get real text chat
 //
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                Chat,        // fxnName
                "...",       // string params
-               "broadcast chat msg" )   // helpString
+               "broadcast chat msg")    // helpString
 {
     // send chat text
-    plString text=plNetClientMgr::GetInstance()->GetPlayerName();
+    plString text = plNetClientMgr::GetInstance()->GetPlayerName();
     text += ":";
     int i;
-    for(i=0;i<numParams;i++)
-    {
-        text += plString::FromUtf8( (char*)params[i] );
+
+    for (i = 0; i < numParams; i++) {
+        text += plString::FromUtf8((char*)params[i]);
         text += " ";
     }
-    plConsoleMsg    *cMsg = new plConsoleMsg( plConsoleMsg::kAddLine, text.c_str() );
+
+    plConsoleMsg*    cMsg = new plConsoleMsg(plConsoleMsg::kAddLine, text.c_str());
     cMsg->SetBCastFlag(plMessage::kNetPropagate | plMessage::kNetForce);
     cMsg->SetBCastFlag(plMessage::kLocalPropagate, 0);
-    plgDispatch::MsgSend( cMsg );
-    
+    plgDispatch::MsgSend(cMsg);
+
     PrintString(const_cast<char*>(text.c_str()));   // show locally too
 }
 
 
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                ShowRelevanceRegions,    // fxnName
                "bool on", // paramList
-               "Show player relevance regions" )    // helpString
+               "Show player relevance regions")     // helpString
 {
     bool on = params[0];
-    plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRelevanceRegions, on);  
-    if (on)
-    {
-        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowLists, false);  
-        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRooms, false);  
+    plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRelevanceRegions, on);
+
+    if (on) {
+        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowLists, false);
+        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRooms, false);
     }
 
 }
 
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                ShowLists,   // fxnName
                "bool on", // paramList
-               "Show debug player lists" )  // helpString
+               "Show debug player lists")   // helpString
 {
     bool on = params[0];
-    plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowLists, on); 
-    if (on)
-    {
-        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRooms, false);  
-        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRelevanceRegions, false);   
+    plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowLists, on);
+
+    if (on) {
+        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRooms, false);
+        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRelevanceRegions, false);
     }
 }
 
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                ShowRooms,   // fxnName
                "bool on", // paramList
-               "Show debug room lists" )    // helpString
+               "Show debug room lists")     // helpString
 {
     bool on = params[0];
-    plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRooms, on); 
-    if (on)
-    {
-        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowLists, false);  
-        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRelevanceRegions, false);   
+    plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRooms, on);
+
+    if (on) {
+        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowLists, false);
+        plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kShowRelevanceRegions, false);
     }
 }
 
@@ -292,20 +293,20 @@ PF_CONSOLE_CMD( Net,        // groupName
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                LocalTriggers,       // fxnName
                "", // paramList
-               "Make triggers localOnly" )  // helpString
+               "Make triggers localOnly")   // helpString
 {
-    plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kLocalTriggers); 
+    plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kLocalTriggers);
 }
 
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                SetConsoleOutput,        // fxnName
                "bool onoff", // paramList
-               "send log output to the debug window" )  // helpString
+               "send log output to the debug window")   // helpString
 {
-    plNetClientMgr::GetInstance()->SetConsoleOutput( params[0] );
+    plNetClientMgr::GetInstance()->SetConsoleOutput(params[0]);
 }
 
 
@@ -313,154 +314,151 @@ PF_CONSOLE_CMD( Net,        // groupName
 /////////////
 
 // ENABLE/DISABLE LINKING
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                EnableLinking,       // fxnName
                "bool enable", // paramList
-               "Enable/disable linking." )  // helpString
-{   
-    if ( (int)params[0] )
-    {
-        plNetLinkingMgr::GetInstance()->SetEnabled( true );
+               "Enable/disable linking.")   // helpString
+{
+    if ((int)params[0]) {
+        plNetLinkingMgr::GetInstance()->SetEnabled(true);
         PrintString("Linking enabled.");
-    }
-    else
-    {
-        plNetLinkingMgr::GetInstance()->SetEnabled( false );
+    } else {
+        plNetLinkingMgr::GetInstance()->SetEnabled(false);
         PrintString("Linking disabled.");
     }
 }
 // GENERIC LINK. PLS WILL LOAD-BALANCE YOU TO A PUBLIC INSTANCE.
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                LinkToAge,       // fxnName
                "string ageFilename", // paramList
-               "Link to an age." )  // helpString
-{   
+               "Link to an age.")   // helpString
+{
     plAgeLinkStruct link;
-    link.GetAgeInfo()->SetAgeFilename( params[0] );
-    link.SetLinkingRules( plNetCommon::LinkingRules::kBasicLink );
-    plNetLinkingMgr::GetInstance()->LinkToAge( &link );
+    link.GetAgeInfo()->SetAgeFilename(params[0]);
+    link.SetLinkingRules(plNetCommon::LinkingRules::kBasicLink);
+    plNetLinkingMgr::GetInstance()->LinkToAge(&link);
     PrintString("Linking to age...");
 }
 
 
 // LINK TO A SPECIFIC AGE INSTANCE BY GUID.
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                LinkToAgeInstance,       // fxnName
                "string ageFilename, string ageGuid", // paramList
-               "Link to a specific age by guid." )  // helpString
-{   
+               "Link to a specific age by guid.")   // helpString
+{
     plAgeLinkStruct link;
-    link.GetAgeInfo()->SetAgeFilename( params[0] );
+    link.GetAgeInfo()->SetAgeFilename(params[0]);
     //link.GetAgeInfo()->SetAgeInstanceName( params[0] );
     //link.GetAgeInfo()->SetAgeUserDefinedName( params[0] );
-    plUUID guid( (const char *)params[1] );
-    link.GetAgeInfo()->SetAgeInstanceGuid( &guid );
-    link.SetLinkingRules( plNetCommon::LinkingRules::kBasicLink );
-    plNetLinkingMgr::GetInstance()->LinkToAge( &link );
+    plUUID guid((const char*)params[1]);
+    link.GetAgeInfo()->SetAgeInstanceGuid(&guid);
+    link.SetLinkingRules(plNetCommon::LinkingRules::kBasicLink);
+    plNetLinkingMgr::GetInstance()->LinkToAge(&link);
     PrintString("Linking to age...");
 }
 // LINK TO MY PREVIOUS AGE
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                LinkToPrevAge,       // fxnName
                "", // paramList
-               "Link to my last age." ) // helpString
-{   
-    plNetLinkingMgr::GetInstance()->LinkToPrevAge( );
+               "Link to my last age.")  // helpString
+{
+    plNetLinkingMgr::GetInstance()->LinkToPrevAge();
     PrintString("Linking to previous age...");
 }
 // LINK WITH ORIGINAL LINKING BOOK
-PF_CONSOLE_CMD( Net,
+PF_CONSOLE_CMD(Net,
                LinkWithOriginalBook,
                "string ageFilename, string spawnPt",
-               "Link to specified age using Original Age Linking Book rules" )
+               "Link to specified age using Original Age Linking Book rules")
 {
     plAgeLinkStruct link;
-    link.GetAgeInfo()->SetAgeFilename( params[0] );
-    link.SpawnPoint() = plSpawnPointInfo( (const char *)params[1], (const char *)params[1] );
-    link.SetLinkingRules( plNetCommon::LinkingRules::kOriginalBook );
-    plNetLinkingMgr::GetInstance()->LinkToAge( &link );
+    link.GetAgeInfo()->SetAgeFilename(params[0]);
+    link.SpawnPoint() = plSpawnPointInfo((const char*)params[1], (const char*)params[1]);
+    link.SetLinkingRules(plNetCommon::LinkingRules::kOriginalBook);
+    plNetLinkingMgr::GetInstance()->LinkToAge(&link);
     PrintString("Linking to age with original book...");
 }
 // LINK TO AN AGE I OWN
-PF_CONSOLE_CMD( Net,
+PF_CONSOLE_CMD(Net,
                LinkWithOwnedBook,
                "string ageFilename",
-               "Link to specified age using Personal Age Linking Book rules" )
+               "Link to specified age using Personal Age Linking Book rules")
 {
     plAgeLinkStruct link;
-    link.GetAgeInfo()->SetAgeFilename( params[0] );
-    link.SetLinkingRules( plNetCommon::LinkingRules::kOwnedBook );
-    plNetLinkingMgr::GetInstance()->LinkToAge( &link );
+    link.GetAgeInfo()->SetAgeFilename(params[0]);
+    link.SetLinkingRules(plNetCommon::LinkingRules::kOwnedBook);
+    plNetLinkingMgr::GetInstance()->LinkToAge(&link);
     PrintString("Linking to age I own...");
 }
 // LINK TO AN AGE I CAN VISIT
-PF_CONSOLE_CMD( Net,
+PF_CONSOLE_CMD(Net,
                LinkWithVisitBook,
                "string ageFilename",
-               "Link to specified age using Personal Age Linking Book rules" )
+               "Link to specified age using Personal Age Linking Book rules")
 {
     plAgeLinkStruct link;
-    link.GetAgeInfo()->SetAgeFilename( params[0] );
-    link.SetLinkingRules( plNetCommon::LinkingRules::kVisitBook );
-    plNetLinkingMgr::GetInstance()->LinkToAge( &link );
+    link.GetAgeInfo()->SetAgeFilename(params[0]);
+    link.SetLinkingRules(plNetCommon::LinkingRules::kVisitBook);
+    plNetLinkingMgr::GetInstance()->LinkToAge(&link);
     PrintString("Linking to age I can visit...");
 }
 // LINK TO A SUB AGE
-PF_CONSOLE_CMD( Net,
+PF_CONSOLE_CMD(Net,
                LinkWithSubAgeBook,
                "string ageFilename",
-               "Link to a sub-age of the current age" )
+               "Link to a sub-age of the current age")
 {
     plAgeLinkStruct link;
-    link.GetAgeInfo()->SetAgeFilename( params[0] );
-    link.SetLinkingRules( plNetCommon::LinkingRules::kSubAgeBook );
-    plNetLinkingMgr::GetInstance()->LinkToAge( &link );
+    link.GetAgeInfo()->SetAgeFilename(params[0]);
+    link.SetLinkingRules(plNetCommon::LinkingRules::kSubAgeBook);
+    plNetLinkingMgr::GetInstance()->LinkToAge(&link);
     PrintString("Linking to a sub-age...");
 }
 
 // LINK TO A PLAYER'S CURRENT AGE
-PF_CONSOLE_CMD( Net,
+PF_CONSOLE_CMD(Net,
                LinkToPlayersAge,
                "int playerID",
-               "Link to specified player's current age" )
+               "Link to specified player's current age")
 {
-    plNetLinkingMgr::GetInstance()->LinkToPlayersAge( (int)params[0] );
+    plNetLinkingMgr::GetInstance()->LinkToPlayersAge((int)params[0]);
     PrintString("Linking to a player's current age...");
 }
 // LINK A PLAYER HERE
-PF_CONSOLE_CMD( Net,
+PF_CONSOLE_CMD(Net,
                LinkPlayerHere,
                "int playerID",
-               "Link specified player to our current age." )
+               "Link specified player to our current age.")
 {
-    plNetLinkingMgr::GetInstance()->LinkPlayerHere( (int)params[0] );
+    plNetLinkingMgr::GetInstance()->LinkPlayerHere((int)params[0]);
     PrintString("Linking player to our current age...");
 }
 // LINK A PLAYER BACK TO HIS LAST AGE
-PF_CONSOLE_CMD( Net,
+PF_CONSOLE_CMD(Net,
                LinkPlayerToPrevAge,
                "int playerID",
-               "Link specified player back to his last age." )
+               "Link specified player back to his last age.")
 {
-    plNetLinkingMgr::GetInstance()->LinkPlayerToPrevAge( (int)params[0] );
+    plNetLinkingMgr::GetInstance()->LinkPlayerToPrevAge((int)params[0]);
     PrintString("Linking player back to his last age...");
 }
 
 // LINK TO MY NEIGHBORHOOD AGE
-PF_CONSOLE_CMD( Net,
+PF_CONSOLE_CMD(Net,
                LinkToMyNeighborhoodAge,
                "",
-               "Link to my neighborhood" )
+               "Link to my neighborhood")
 {
     plNetLinkingMgr::GetInstance()->LinkToMyNeighborhoodAge();
     PrintString("Linking to my neighborhood...");
 }
 
 // LINK TO MY PERSONAL AGE
-PF_CONSOLE_CMD( Net,
+PF_CONSOLE_CMD(Net,
                LinkToMyPersonalAge,
                "",
-               "Link to my personal age" )
+               "Link to my personal age")
 {
     plNetLinkingMgr::GetInstance()->LinkToMyPersonalAge();
     PrintString("Linking to my personal age...");
@@ -472,27 +470,28 @@ PF_CONSOLE_CMD( Net,
 #ifndef LIMIT_CONSOLE_COMMANDS
 
 // OFFER LINK TO PLAYER
-PF_CONSOLE_CMD( Net,
+PF_CONSOLE_CMD(Net,
                OfferLinkToPlayer,
                "string ageFilename, int playerID",
-               "Offer a link to a player" )
+               "Offer a link to a player")
 {
-    plNetClientMgr * nc = plNetClientMgr::GetInstance();
-    plNetLinkingMgr * lm = plNetLinkingMgr::GetInstance();
+    plNetClientMgr* nc = plNetClientMgr::GetInstance();
+    plNetLinkingMgr* lm = plNetLinkingMgr::GetInstance();
 
     plAgeInfoStruct info;
-    info.SetAgeFilename( params[0] );
-    
+    info.SetAgeFilename(params[0]);
+
     plAgeLinkStruct link;
+
     if (!VaultGetOwnedAgeLink(&info, &link)) {
-        PrintString( "You don't own an age by that name. Not offering link to player." );
+        PrintString("You don't own an age by that name. Not offering link to player.");
         return;
     }
 
-    
+
     link.SetLinkingRules(plNetCommon::LinkingRules::kVisitBook);
 
-    plNetLinkingMgr::GetInstance()->OfferLinkToPlayer(&link, (int)params[1] );
+    plNetLinkingMgr::GetInstance()->OfferLinkToPlayer(&link, (int)params[1]);
     PrintString("Offered age link to player.");
 }
 
@@ -501,16 +500,18 @@ PF_CONSOLE_CMD( Net,
 /////////////
 
 
-PF_CONSOLE_CMD( Net,            // groupName
+PF_CONSOLE_CMD(Net,             // groupName
                SetObjUpdateFreq,        // fxnName
                "string objName, float freqInSecs", // paramList
-               "Instructs the server to only send me updates about this object periodically" )  // helpString
+               "Instructs the server to only send me updates about this object periodically")   // helpString
 {
     char str[256];
-    plKey key = FindSceneObjectByName(static_cast<const char *>(params[0]), "", str);
+    plKey key = FindSceneObjectByName(static_cast<const char*>(params[0]), "", str);
     PrintString(str);
-    if (!key)
+
+    if (!key) {
         return;
+    }
 
     float freq = params[1];
 
@@ -522,51 +523,51 @@ PF_CONSOLE_CMD( Net,            // groupName
     plNetClientMgr::GetInstance()->SendMsg(&netMsg);
 }
 
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                EnableClientDelay,       // fxnName
                "", // paramList
-               "Switches on delay in client update loop" )  // helpString
+               "Switches on delay in client update loop")   // helpString
 {
     plClient::EnableClientDelay();
 }
 
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                GetServerTime,       // fxnName
                "", // paramList
-               "returns the current server clock" ) // helpString
+               "returns the current server clock")  // helpString
 {
-    PrintStringF(PrintString, "Current server time = %s", 
-        plNetClientMgr::GetInstance()->GetServerTime().Print());
+    PrintStringF(PrintString, "Current server time = %s",
+                 plNetClientMgr::GetInstance()->GetServerTime().Print());
 }
 
-PF_CONSOLE_CMD( Net,        // groupName
+PF_CONSOLE_CMD(Net,         // groupName
                GetAgeElapsedTime,       // fxnName
                "", // paramList
-               "returns the age of the age" )   // helpString
+               "returns the age of the age")    // helpString
 {
-    PrintStringF(PrintString, "Current age is %s, elapsed time since birth = %f secs", 
-        NetCommGetAge()->ageDatasetName, plNetClientMgr::GetInstance()->GetCurrentAgeElapsedSeconds());
+    PrintStringF(PrintString, "Current age is %s, elapsed time since birth = %f secs",
+                 NetCommGetAge()->ageDatasetName, plNetClientMgr::GetInstance()->GetCurrentAgeElapsedSeconds());
 }
 
-PF_CONSOLE_CMD( Net, DownloadViaManifest,
+PF_CONSOLE_CMD(Net, DownloadViaManifest,
                "string remoteManifestFileName", // paramList
-               "Downloads the given file from the dataserver, then updates all the ages listed in the file" )   // helpString
+               "Downloads the given file from the dataserver, then updates all the ages listed in the file")    // helpString
 {
 //  if( hsgResMgr::ResMgr() != nil )
 //  {
 //      plResPatcher::PatchFromManifest( params[ 0 ] );
 //  }
 //  else
-        PrintString( "DownloadViaManifest failed: resManager not initialized. This command must be used in an .fni file or later." );
+    PrintString("DownloadViaManifest failed: resManager not initialized. This command must be used in an .fni file or later.");
 }
 
 #endif
 
 
 // must be in 'INI' file
-PF_CONSOLE_CMD( Net, SetProxyAddr,
+PF_CONSOLE_CMD(Net, SetProxyAddr,
                "string proxyHostAddr", // paramList
-               "Sets the address of a proxy host to send all messages to" ) // helpString
+               "Sets the address of a proxy host to send all messages to")  // helpString
 {
     // plNetClientMgr::GetInstance()->SetProxyAddr((const char*)params[0]);
     PrintString("OBSOLETE");
@@ -574,26 +575,26 @@ PF_CONSOLE_CMD( Net, SetProxyAddr,
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Net, GetCCRAwayStatus,
+PF_CONSOLE_CMD(Net, GetCCRAwayStatus,
                "", // paramList
-               "Find out if CCR's are offline" )    // helpString
+               "Find out if CCR's are offline")     // helpString
 {
-    PrintStringF(PrintString,"The CCR dept is %s", VaultGetCCRStatus() ? "online" : "away");
+    PrintStringF(PrintString, "The CCR dept is %s", VaultGetCCRStatus() ? "online" : "away");
 }
 
-PF_CONSOLE_CMD( Net,            // groupName
+PF_CONSOLE_CMD(Net,             // groupName
                ForceSetAgeTimeOfDay,        // fxnName
                "float timePercent", // paramList
-               "Force the age time of day to a specific value from 0.0 to 1.0.  Set to -1 to unset." )  // helpString
-{   
+               "Force the age time of day to a specific value from 0.0 to 1.0.  Set to -1 to unset.")   // helpString
+{
     plNetClientMgr::GetInstance()->SetOverrideAgeTimeOfDayPercent(params[0]);
 }
 
-PF_CONSOLE_CMD( Net,            // groupName
+PF_CONSOLE_CMD(Net,             // groupName
                ScreenMessages,      // fxnName
                "bool on", // paramList
-               "Screen out illegal net msgs." ) // helpString
-{   
+               "Screen out illegal net msgs.")  // helpString
+{
     bool on = params[0];
     plNetApp::GetInstance()->SetFlagsBit(plNetApp::kScreenMessages, on);
 }
@@ -603,122 +604,127 @@ PF_CONSOLE_CMD( Net,            // groupName
 ///////////////////////////////////////
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_SUBGROUP( Net, DebugObject )     // Creates a DebugFocus sub-group under the net group
+PF_CONSOLE_SUBGROUP(Net, DebugObject)       // Creates a DebugFocus sub-group under the net group
 
-PF_CONSOLE_CMD( Net_DebugObject,        // groupName
+PF_CONSOLE_CMD(Net_DebugObject,         // groupName
                AddObject,       // fxnName
                "string objName, ...", // paramList
-               "Create a debug log about the specified object. AddObject objName [pageName], wildcards allowed" )   // helpString
+               "Create a debug log about the specified object. AddObject objName [pageName], wildcards allowed")    // helpString
 {
-    char* objName = params[0];  
-    char* pageName = numParams>1 ? (char*)params[1] : nil;
-    if (plNetObjectDebugger::GetInstance())
+    char* objName = params[0];
+    char* pageName = numParams > 1 ? (char*)params[1] : nil;
+
+    if (plNetObjectDebugger::GetInstance()) {
         plNetObjectDebugger::GetInstance()->AddDebugObject(objName, pageName);
+    }
 }
 
-PF_CONSOLE_CMD( Net_DebugObject,        // groupName
+PF_CONSOLE_CMD(Net_DebugObject,         // groupName
                RemoveObject,        // fxnName
                "string objName, ...", // paramList
-               "Stop focused debugging about the specified object. RemoveObject objName [pageName], wildcards allowed" )    // helpString
+               "Stop focused debugging about the specified object. RemoveObject objName [pageName], wildcards allowed")     // helpString
 {
-    char* objName = params[0];  
-    char* pageName = numParams>1 ? (char*)params[1] : nil;
-    if (plNetObjectDebugger::GetInstance())
+    char* objName = params[0];
+    char* pageName = numParams > 1 ? (char*)params[1] : nil;
+
+    if (plNetObjectDebugger::GetInstance()) {
         plNetObjectDebugger::GetInstance()->RemoveDebugObject(objName, pageName);
+    }
 }
 
-PF_CONSOLE_CMD( Net_DebugObject,        // groupName
+PF_CONSOLE_CMD(Net_DebugObject,         // groupName
                ClearAllObjects,     // fxnName
                "", // paramList
-               "Stop focused debugging about all objects" ) // helpString
+               "Stop focused debugging about all objects")  // helpString
 {
-    if (plNetObjectDebugger::GetInstance())
+    if (plNetObjectDebugger::GetInstance()) {
         plNetObjectDebugger::GetInstance()->ClearAllDebugObjects();
+    }
 }
 
-PF_CONSOLE_CMD( Net_DebugObject,        // groupName
+PF_CONSOLE_CMD(Net_DebugObject,         // groupName
                DumpAgeSDLHook,      // fxnName
                "bool dirtyOnly", // paramList
-               "Dump the age SDL hook to the object debugger" ) // helpString
+               "Dump the age SDL hook to the object debugger")  // helpString
 {
-    const plPythonSDLModifier * mod = plPythonSDLModifier::FindAgeSDL();
-    mod->GetStateCache()->DumpToObjectDebugger("AgeSDLHook", params[0] );
+    const plPythonSDLModifier* mod = plPythonSDLModifier::FindAgeSDL();
+    mod->GetStateCache()->DumpToObjectDebugger("AgeSDLHook", params[0]);
 }
 
 #endif
 
 ///////////////////////////////////////
-PF_CONSOLE_SUBGROUP( Net, Voice )       // Creates a VOICE sub-group under a given group
+PF_CONSOLE_SUBGROUP(Net, Voice)         // Creates a VOICE sub-group under a given group
 
-PF_CONSOLE_CMD( Net_Voice,      // groupName
+PF_CONSOLE_CMD(Net_Voice,       // groupName
                Echo,        // fxnName
                "bool on", // paramList
-               "Turn on/off echoing of voice packets" ) // helpString
+               "Turn on/off echoing of voice packets")  // helpString
 {
     bool on = params[0];
-    plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kEchoVoice,on);  
+    plNetClientMgr::GetInstance()->SetFlagsBit(plNetClientMgr::kEchoVoice, on);
 }
 
-PF_CONSOLE_CMD( Net_Voice,                  // groupName
+PF_CONSOLE_CMD(Net_Voice,                   // groupName
                SetMaxListeningRadius,       // fxnName
                "float dist", // paramList
-               "Set the max distance that I hear another player's voice" )  // helpString
+               "Set the max distance that I hear another player's voice")   // helpString
 {
     float dist = params[0];
-    plNetClientMgr::GetInstance()->GetListenList()->kMaxListenDistSq = dist*dist;
+    plNetClientMgr::GetInstance()->GetListenList()->kMaxListenDistSq = dist * dist;
 }
 
-PF_CONSOLE_CMD( Net_Voice,                  // groupName
+PF_CONSOLE_CMD(Net_Voice,                   // groupName
                SetMaxNumListeningTo,    // fxnName
                "int num", // paramList
-               "Set the max number of other players that I can listen to at once" ) // helpString
+               "Set the max number of other players that I can listen to at once")  // helpString
 {
     int max = params[0];
-    plNetClientMgr::GetInstance()->GetListenList()->kMaxListenListSize=max;
+    plNetClientMgr::GetInstance()->GetListenList()->kMaxListenListSize = max;
 }
 
 ///////////////////////////////////////
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_SUBGROUP( Net, Log )     // Creates a LOG sub-group under a given group
+PF_CONSOLE_SUBGROUP(Net, Log)       // Creates a LOG sub-group under a given group
 
-PF_CONSOLE_CMD( Net_Log,        // groupName
+PF_CONSOLE_CMD(Net_Log,         // groupName
                Create,      // fxnName
                "string fileName", // paramList
-               "obsolete" ) // helpString
-{   
+               "obsolete")  // helpString
+{
 }
 
 #endif
 
 ///////////////////////////////////////
 // Account Authentication
-PF_CONSOLE_SUBGROUP( Net, Auth )        // Creates an AUTH sub-group under a given group
+PF_CONSOLE_SUBGROUP(Net, Auth)          // Creates an AUTH sub-group under a given group
 
-PF_CONSOLE_CMD( Net_Auth,       // groupName
+PF_CONSOLE_CMD(Net_Auth,        // groupName
                SetAccountName,      // fxnName
                "string name", // paramList
-               "Sets account name." )   // helpString
-{   
-    plNetClientMgr * nc = plNetClientMgr::GetInstance();
+               "Sets account name.")    // helpString
+{
+    plNetClientMgr* nc = plNetClientMgr::GetInstance();
     nc->SetIniAccountName(params[0]);
 }
 
-PF_CONSOLE_CMD( Net_Auth,       // groupName
+PF_CONSOLE_CMD(Net_Auth,        // groupName
                SetAccountPassword,      // fxnName
                "string password", // paramList
-               "Sets account password." )   // helpString
-{   
-    plNetClientMgr * nc = plNetClientMgr::GetInstance();
+               "Sets account password.")    // helpString
+{
+    plNetClientMgr* nc = plNetClientMgr::GetInstance();
     nc->SetIniAccountPass(params[0]);
 }
 
 #ifndef LIMIT_CONSOLE_COMMANDS
 
-PF_CONSOLE_CMD( Net_Auth,       // groupName
+PF_CONSOLE_CMD(Net_Auth,        // groupName
                Disconnect,      // fxnName
                "", // paramList
-               "Cause an auth server disconnect" )  // helpString
+               "Cause an auth server disconnect")   // helpString
 {
     NetCliAuthUnexpectedDisconnect();
 }
@@ -729,12 +735,12 @@ PF_CONSOLE_CMD( Net_Auth,       // groupName
 ///////////////////////////////////////
 
 #ifndef LIMIT_CONSOLE_COMMANDS
-PF_CONSOLE_SUBGROUP( Net, Vault )           // Creates sub-group Net.Vault
+PF_CONSOLE_SUBGROUP(Net, Vault)             // Creates sub-group Net.Vault
 
-PF_CONSOLE_CMD( Net_Vault,      // groupName
+PF_CONSOLE_CMD(Net_Vault,       // groupName
                Dump,        // fxnName
                "", // paramList
-               "Dump vault to log" )    // helpString
+               "Dump vault to log")     // helpString
 {
     hsAssert(false, "eric, implement me");
 //  VaultDump();
@@ -742,120 +748,122 @@ PF_CONSOLE_CMD( Net_Vault,      // groupName
 
 ///////////////////////////////////////
 
-PF_CONSOLE_CMD( Net_Vault,      // groupName
+PF_CONSOLE_CMD(Net_Vault,       // groupName
                SetSeen,     // fxnName
                "int nodeId, int seen", // paramList
-               "Set or clear node seen flag" )  // helpString
+               "Set or clear node seen flag")   // helpString
 {
     VaultSetNodeSeen((int)params[0], (bool)params[1]);
 }
 
 ///////////////////////////////////////
 
-PF_CONSOLE_CMD( Net_Vault,      // groupName
+PF_CONSOLE_CMD(Net_Vault,       // groupName
                InMyPersonalAge,     // fxnName
                "", // paramList
-               "" ) // helpString
+               "")  // helpString
 {
     bool in = VaultAmInMyPersonalAge();
-    PrintStringF( PrintString,"You are %sin your personal age", in?"":"not " );
+    PrintStringF(PrintString, "You are %sin your personal age", in ? "" : "not ");
 }
-PF_CONSOLE_CMD( Net_Vault,      // groupName
+PF_CONSOLE_CMD(Net_Vault,       // groupName
                InMyNeighborhoodAge,     // fxnName
                "", // paramList
-               "" ) // helpString
+               "")  // helpString
 {
     bool in = VaultAmInMyNeighborhoodAge();
-    PrintStringF( PrintString,"You are %sin your neighborhood age", in?"":"not " );
+    PrintStringF(PrintString, "You are %sin your neighborhood age", in ? "" : "not ");
 }
-PF_CONSOLE_CMD( Net_Vault,      // groupName
+PF_CONSOLE_CMD(Net_Vault,       // groupName
                AmOwnerOfCurrentAge,     // fxnName
                "", // paramList
-               "" ) // helpString
+               "")  // helpString
 {
     bool in = VaultAmOwnerOfCurrentAge();
-    PrintStringF( PrintString,"You are %san owner of the current age", in?"":"not " );
+    PrintStringF(PrintString, "You are %san owner of the current age", in ? "" : "not ");
 }
-PF_CONSOLE_CMD( Net_Vault,      // groupName
+PF_CONSOLE_CMD(Net_Vault,       // groupName
                AmCzarOfCurrentAge,      // fxnName
                "", // paramList
-               "" ) // helpString
+               "")  // helpString
 {
     bool in = VaultAmCzarOfCurrentAge();
-    PrintStringF( PrintString,"You are %sczar of the current age", in?"":"not " );
+    PrintStringF(PrintString, "You are %sczar of the current age", in ? "" : "not ");
 }
 // REGISTER MT STATION
-PF_CONSOLE_CMD( Net_Vault,
+PF_CONSOLE_CMD(Net_Vault,
                RegisterMTStation,
                "string stationName, string mtSpawnPt",
-               "Register an MT Station with your Nexus" )
+               "Register an MT Station with your Nexus")
 {
     wchar_t wName[MAX_PATH];
     wchar_t wObj[MAX_PATH];
     StrToUnicode(wName, params[0], arrsize(wName));
     StrToUnicode(wObj, params[1], arrsize(wObj));
-    VaultRegisterMTStationAndWait ( wName, wObj );
+    VaultRegisterMTStationAndWait(wName, wObj);
     PrintString("Registered MT Station.");
 }
 
 
 // REGISTER OWNED AGE
-PF_CONSOLE_CMD( Net_Vault,
+PF_CONSOLE_CMD(Net_Vault,
                RegisterOwnedAge,
                "string ageName",
-               "Add an instance of the specified age to your bookshelf" )
+               "Add an instance of the specified age to your bookshelf")
 {
     plAgeLinkStruct link;
-    link.GetAgeInfo()->SetAgeFilename( params[0] );
-    link.GetAgeInfo()->SetAgeInstanceName( params[0] );
+    link.GetAgeInfo()->SetAgeFilename(params[0]);
+    link.GetAgeInfo()->SetAgeInstanceName(params[0]);
     plUUID guid = plUUID::Generate();
-    link.GetAgeInfo()->SetAgeInstanceGuid( &guid);
-    link.SetSpawnPoint( kDefaultSpawnPoint );
+    link.GetAgeInfo()->SetAgeInstanceGuid(&guid);
+    link.SetSpawnPoint(kDefaultSpawnPoint);
     bool success = VaultRegisterOwnedAgeAndWait(&link);
     PrintStringF(PrintString, "Operation %s.", success ? "Successful" : "Failed");
 }
 
 // UNREGISTER OWNED AGE
-PF_CONSOLE_CMD( Net_Vault,
+PF_CONSOLE_CMD(Net_Vault,
                UnregisterOwnedAge,
                "string ageName",
-               "Remove the specified age from your bookshelf" )
+               "Remove the specified age from your bookshelf")
 {
     plAgeInfoStruct info;
-    info.SetAgeFilename( params[0] );
+    info.SetAgeFilename(params[0]);
     bool success = VaultUnregisterOwnedAgeAndWait(&info);
     PrintStringF(PrintString, "Operation %s.", success ? "Successful" : "Failed");
 }
 
 // REGISTER VISIT AGE
-PF_CONSOLE_CMD( Net_Vault,
+PF_CONSOLE_CMD(Net_Vault,
                RegisterVisitAge,
                "string ageName",
-               "Add an instance of the specified age to your private links" )
+               "Add an instance of the specified age to your private links")
 {
     plAgeLinkStruct link;
-    link.GetAgeInfo()->SetAgeFilename( params[0] );
-    link.GetAgeInfo()->SetAgeInstanceName( params[0] );
+    link.GetAgeInfo()->SetAgeFilename(params[0]);
+    link.GetAgeInfo()->SetAgeInstanceName(params[0]);
     plUUID guid = plUUID::Generate();
-    link.GetAgeInfo()->SetAgeInstanceGuid( &guid);
-    link.SetSpawnPoint( kDefaultSpawnPoint );
+    link.GetAgeInfo()->SetAgeInstanceGuid(&guid);
+    link.SetSpawnPoint(kDefaultSpawnPoint);
     bool success = VaultRegisterOwnedAgeAndWait(&link);
     PrintStringF(PrintString, "Operation %s.", success ? "Successful" : "Failed");
 }
 
 // UNREGISTER VISIT AGE
-PF_CONSOLE_CMD( Net_Vault,
+PF_CONSOLE_CMD(Net_Vault,
                UnregisterVisitAge,
                "string ageName",
-               "Remove all instances of the specified age from your private links" )
+               "Remove all instances of the specified age from your private links")
 {
     plAgeInfoStruct info;
-    info.SetAgeFilename( params[0] );
+    info.SetAgeFilename(params[0]);
 
     unsigned count = 0;
-    while (VaultUnregisterVisitAgeAndWait(&info))
+
+    while (VaultUnregisterVisitAgeAndWait(&info)) {
         ++count;
-        
+    }
+
     PrintStringF(PrintString, "Operation %s.", count > 0 ? "Successful" : "Failed");
 }
 
@@ -879,12 +887,14 @@ PF_CONSOLE_CMD(
     ListGames,
     "",
     "List all games we're currently playing"
-) {
+)
+{
     ARRAY(unsigned) arr;
     pfGameMgr::GetInstance()->GetGameIds(&arr);
     PrintStringF(PrintString, "You are playing %u games", arr.Count());
+
     for (unsigned i = 0; i < arr.Count(); ++i) {
-        pfGameCli * game = pfGameMgr::GetInstance()->GetGameCli(arr[i]);
+        pfGameCli* game = pfGameMgr::GetInstance()->GetGameCli(arr[i]);
         PrintStringF(PrintString, "%u: Game %u, %s", i, arr[i], game->ClassName());
     }
 }
@@ -895,7 +905,8 @@ PF_CONSOLE_CMD(
     JoinGame,
     "int gameId",
     "Join the specified game of tic-tac-toe."
-) {
+)
+{
     unsigned gameId = (int)params[0];
 
     pfGameMgr::GetInstance()->JoinGame(
@@ -915,10 +926,11 @@ PF_CONSOLE_CMD(
     CreateGame,
     "int numPlayers",
     "Create a new game of tic-tac-toe. numPlayers in [1..2]"
-) {
+)
+{
     TTT_CreateParam init;
     init.playerCount = (int)params[0];
-    
+
     unsigned createOptions = 0;
 
     pfGameMgr::GetInstance()->CreateGame(
@@ -936,7 +948,8 @@ PF_CONSOLE_CMD(
     JoinCommonGame,
     "",
     "Join the common game of tic-tac-toe."
-) {
+)
+{
     TTT_CreateParam init;
     init.playerCount = 2;
 
@@ -957,21 +970,25 @@ PF_CONSOLE_CMD(
     MakeMove,
     "int gameId, int row, int col",
     "Make your move. row and col in [0..2]"
-) {
-    pfGameCli * game = pfGameMgr::GetInstance()->GetGameCli((int)params[0]);
+)
+{
+    pfGameCli* game = pfGameMgr::GetInstance()->GetGameCli((int)params[0]);
+
     if (!game) {
         PrintStringF(PrintString, "Game %u not found", (int)params[0]);
         return;
     }
-    pfGmTicTacToe * ttt = pfGmTicTacToe::ConvertNoRef(game);
+
+    pfGmTicTacToe* ttt = pfGmTicTacToe::ConvertNoRef(game);
+
     if (!ttt) {
         PrintStringF(PrintString, "Game %u is not a game of tie-tac-toe", (int)params[0]);
         return;
     }
-    
+
     unsigned row = (int)params[1];
     unsigned col = (int)params[2];
-    
+
     ttt->MakeMove(row, col);
 }
 
@@ -981,18 +998,22 @@ PF_CONSOLE_CMD(
     ShowBoard,
     "int gameId",
     "Show the game board"
-) {
-    pfGameCli * game = pfGameMgr::GetInstance()->GetGameCli((int)params[0]);
+)
+{
+    pfGameCli* game = pfGameMgr::GetInstance()->GetGameCli((int)params[0]);
+
     if (!game) {
         PrintStringF(PrintString, "Game %u not found", (int)params[0]);
         return;
     }
-    pfGmTicTacToe * ttt = pfGmTicTacToe::ConvertNoRef(game);
+
+    pfGmTicTacToe* ttt = pfGmTicTacToe::ConvertNoRef(game);
+
     if (!ttt) {
         PrintStringF(PrintString, "Game %u is not a game of tie-tac-toe", (int)params[0]);
         return;
     }
-    
+
     ttt->ShowBoard();
 }
 
@@ -1002,24 +1023,27 @@ PF_CONSOLE_CMD(
     InvitePlayer,
     "int gameId, string playerName",
     "Invite a player to play tic-tac-toe with you"
-) {
-    pfGameCli * game = pfGameMgr::GetInstance()->GetGameCli((int)params[0]);
+)
+{
+    pfGameCli* game = pfGameMgr::GetInstance()->GetGameCli((int)params[0]);
+
     if (!game) {
         PrintStringF(PrintString, "Game %u not found", (int)params[0]);
         return;
     }
-    pfGmTicTacToe * ttt = pfGmTicTacToe::ConvertNoRef(game);
+
+    pfGmTicTacToe* ttt = pfGmTicTacToe::ConvertNoRef(game);
+
     if (!ttt) {
         PrintStringF(PrintString, "Game %u is not a game of tie-tac-toe", (int)params[0]);
         return;
     }
 
-    if (unsigned playerId = plNetClientMgr::GetInstance()->GetPlayerIdByName(plString::FromUtf8((const char *)params[1]))) {
+    if (unsigned playerId = plNetClientMgr::GetInstance()->GetPlayerIdByName(plString::FromUtf8((const char*)params[1]))) {
         ttt->InvitePlayer(playerId);
         PrintStringF(PrintString, "Sent invite to playerId %u", playerId);
-    }
-    else {
-        PrintStringF(PrintString, "Player %s not found in this age", (const char *)params[1]);
+    } else {
+        PrintStringF(PrintString, "Player %s not found in this age", (const char*)params[1]);
     }
 }
 
@@ -1029,18 +1053,22 @@ PF_CONSOLE_CMD(
     Uninvite,
     "int gameId, int playerId",
     "Revoke an invitation to your game of tic-tac-toe"
-) {
-    pfGameCli * game = pfGameMgr::GetInstance()->GetGameCli((int)params[0]);
+)
+{
+    pfGameCli* game = pfGameMgr::GetInstance()->GetGameCli((int)params[0]);
+
     if (!game) {
         PrintStringF(PrintString, "Game %u not found", (int)params[0]);
         return;
     }
-    pfGmTicTacToe * ttt = pfGmTicTacToe::ConvertNoRef(game);
+
+    pfGmTicTacToe* ttt = pfGmTicTacToe::ConvertNoRef(game);
+
     if (!ttt) {
         PrintStringF(PrintString, "Game %u is not a game of tie-tac-toe", (int)params[0]);
         return;
     }
-    
+
     ttt->UninvitePlayer((int)params[1]);
 }
 
@@ -1050,18 +1078,22 @@ PF_CONSOLE_CMD(
     LeaveGame,
     "int gameId",
     "Abandon the game of tic-tac-toe"
-) {
-    pfGameCli * game = pfGameMgr::GetInstance()->GetGameCli((int)params[0]);
+)
+{
+    pfGameCli* game = pfGameMgr::GetInstance()->GetGameCli((int)params[0]);
+
     if (!game) {
         PrintStringF(PrintString, "Game %u not found", (int)params[0]);
         return;
     }
-    pfGmTicTacToe * ttt = pfGmTicTacToe::ConvertNoRef(game);
+
+    pfGmTicTacToe* ttt = pfGmTicTacToe::ConvertNoRef(game);
+
     if (!ttt) {
         PrintStringF(PrintString, "Game %u is not a game of tie-tac-toe", (int)params[0]);
         return;
     }
-    
+
     ttt->LeaveGame();
 }
 

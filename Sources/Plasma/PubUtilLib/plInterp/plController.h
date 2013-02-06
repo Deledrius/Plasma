@@ -73,43 +73,43 @@ class plCompoundController;
 // the lists of keys).
 //
 
-class plControllerCacheInfo
-{
+class plControllerCacheInfo {
 public:
-    uint8_t fNumSubControllers;   
-    plControllerCacheInfo **fSubControllers;
+    uint8_t fNumSubControllers;
+    plControllerCacheInfo** fSubControllers;
 
     uint32_t fKeyIndex;
-    plAnimTimeConvert *fAtc;
+    plAnimTimeConvert* fAtc;
 
     plControllerCacheInfo();
     ~plControllerCacheInfo();
 
-    void SetATC(plAnimTimeConvert *atc);
+    void SetATC(plAnimTimeConvert* atc);
 };
 
 //
 //////////////////////////////////////////////////////////////
 // defines base methods
 //
-class plController : public plCreatable
-{
+class plController : public plCreatable {
 public:
-    CLASSNAME_REGISTER( plController );
-    GETINTERFACE_ANY( plController, plCreatable );
+    CLASSNAME_REGISTER(plController);
+    GETINTERFACE_ANY(plController, plCreatable);
 
-    virtual void Interp(float time, float* result, plControllerCacheInfo *cache = nil) const {}
-    virtual void Interp(float time, hsScalarTriple* result, plControllerCacheInfo *cache = nil) const {}
-    virtual void Interp(float time, hsScaleValue* result, plControllerCacheInfo *cache = nil) const {}
-    virtual void Interp(float time, hsQuat* result, plControllerCacheInfo *cache = nil) const {}
-    virtual void Interp(float time, hsMatrix33* result, plControllerCacheInfo *cache = nil) const {}
-    virtual void Interp(float time, hsMatrix44* result, plControllerCacheInfo *cache = nil) const {}
-    virtual void Interp(float time, hsColorRGBA* result, plControllerCacheInfo *cache = nil) const {}
-    virtual void Interp(float time, hsAffineParts* parts, plControllerCacheInfo *cache = nil) const {}
+    virtual void Interp(float time, float* result, plControllerCacheInfo* cache = nil) const {}
+    virtual void Interp(float time, hsScalarTriple* result, plControllerCacheInfo* cache = nil) const {}
+    virtual void Interp(float time, hsScaleValue* result, plControllerCacheInfo* cache = nil) const {}
+    virtual void Interp(float time, hsQuat* result, plControllerCacheInfo* cache = nil) const {}
+    virtual void Interp(float time, hsMatrix33* result, plControllerCacheInfo* cache = nil) const {}
+    virtual void Interp(float time, hsMatrix44* result, plControllerCacheInfo* cache = nil) const {}
+    virtual void Interp(float time, hsColorRGBA* result, plControllerCacheInfo* cache = nil) const {}
+    virtual void Interp(float time, hsAffineParts* parts, plControllerCacheInfo* cache = nil) const {}
 
-    virtual plControllerCacheInfo* CreateCache() const { return nil; } // Caller must handle deleting the pointer.
+    virtual plControllerCacheInfo* CreateCache() const {
+        return nil;    // Caller must handle deleting the pointer.
+    }
     virtual float GetLength() const = 0;
-    virtual void GetKeyTimes(hsTArray<float> &keyTimes) const = 0;
+    virtual void GetKeyTimes(hsTArray<float>& keyTimes) const = 0;
     virtual bool AllKeysMatch() const = 0;
 
     // Checks each of our subcontrollers (if we have any) and deletes any that
@@ -121,13 +121,12 @@ public:
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 
-class plLeafController : public plController 
-{
+class plLeafController : public plController {
     friend class plCompoundController;
 
 protected:
     uint8_t fType;
-    void *fKeys; // Need to pay attend to fType to determine what these actually are
+    void* fKeys; // Need to pay attend to fType to determine what these actually are
     uint32_t fNumKeys;
     mutable uint32_t fLastKeyIdx;
 
@@ -135,38 +134,44 @@ public:
     plLeafController() : fType(hsKeyFrame::kUnknownKeyFrame), fKeys(nil), fNumKeys(0), fLastKeyIdx(0) {}
     virtual ~plLeafController();
 
-    CLASSNAME_REGISTER( plLeafController );
-    GETINTERFACE_ANY( plLeafController, plController );
+    CLASSNAME_REGISTER(plLeafController);
+    GETINTERFACE_ANY(plLeafController, plController);
 
-    void Interp(float time, float* result, plControllerCacheInfo *cache = nil) const;
-    void Interp(float time, hsScalarTriple* result, plControllerCacheInfo *cache = nil) const;
-    void Interp(float time, hsScaleValue* result, plControllerCacheInfo *cache = nil) const;
-    void Interp(float time, hsQuat* result, plControllerCacheInfo *cache = nil) const;
-    void Interp(float time, hsMatrix33* result, plControllerCacheInfo *cache = nil) const;
-    void Interp(float time, hsMatrix44* result, plControllerCacheInfo *cache = nil) const;
-    void Interp(float time, hsColorRGBA* result, plControllerCacheInfo *cache = nil) const;
+    void Interp(float time, float* result, plControllerCacheInfo* cache = nil) const;
+    void Interp(float time, hsScalarTriple* result, plControllerCacheInfo* cache = nil) const;
+    void Interp(float time, hsScaleValue* result, plControllerCacheInfo* cache = nil) const;
+    void Interp(float time, hsQuat* result, plControllerCacheInfo* cache = nil) const;
+    void Interp(float time, hsMatrix33* result, plControllerCacheInfo* cache = nil) const;
+    void Interp(float time, hsMatrix44* result, plControllerCacheInfo* cache = nil) const;
+    void Interp(float time, hsColorRGBA* result, plControllerCacheInfo* cache = nil) const;
 
     virtual plControllerCacheInfo* CreateCache() const;
     float GetLength() const;
     uint32_t GetStride() const;
 
-    hsPoint3Key *GetPoint3Key(uint32_t i) const;
-    hsBezPoint3Key *GetBezPoint3Key(uint32_t i) const;
-    hsScalarKey *GetScalarKey(uint32_t i) const;
-    hsBezScalarKey *GetBezScalarKey(uint32_t i) const;
-    hsScaleKey *GetScaleKey(uint32_t i) const;
-    hsBezScaleKey *GetBezScaleKey(uint32_t i) const;
-    hsQuatKey *GetQuatKey(uint32_t i) const;
-    hsCompressedQuatKey32 *GetCompressedQuatKey32(uint32_t i) const;
-    hsCompressedQuatKey64 *GetCompressedQuatKey64(uint32_t i) const;
-    hsG3DSMaxKeyFrame *Get3DSMaxKey(uint32_t i) const;
-    hsMatrix33Key *GetMatrix33Key(uint32_t i) const;
-    hsMatrix44Key *GetMatrix44Key(uint32_t i) const;
+    hsPoint3Key* GetPoint3Key(uint32_t i) const;
+    hsBezPoint3Key* GetBezPoint3Key(uint32_t i) const;
+    hsScalarKey* GetScalarKey(uint32_t i) const;
+    hsBezScalarKey* GetBezScalarKey(uint32_t i) const;
+    hsScaleKey* GetScaleKey(uint32_t i) const;
+    hsBezScaleKey* GetBezScaleKey(uint32_t i) const;
+    hsQuatKey* GetQuatKey(uint32_t i) const;
+    hsCompressedQuatKey32* GetCompressedQuatKey32(uint32_t i) const;
+    hsCompressedQuatKey64* GetCompressedQuatKey64(uint32_t i) const;
+    hsG3DSMaxKeyFrame* Get3DSMaxKey(uint32_t i) const;
+    hsMatrix33Key* GetMatrix33Key(uint32_t i) const;
+    hsMatrix44Key* GetMatrix44Key(uint32_t i) const;
 
-    uint8_t GetType() const { return fType; }
-    uint32_t GetNumKeys() const { return fNumKeys; }
-    void *GetKeyBuffer() const { return fKeys; }
-    void GetKeyTimes(hsTArray<float> &keyTimes) const;
+    uint8_t GetType() const {
+        return fType;
+    }
+    uint32_t GetNumKeys() const {
+        return fNumKeys;
+    }
+    void* GetKeyBuffer() const {
+        return fKeys;
+    }
+    void GetKeyTimes(hsTArray<float>& keyTimes) const;
     void AllocKeys(uint32_t n, uint8_t type);
     void QuickScalarController(int numKeys, float* times, float* values, uint32_t valueStrides);
     bool AllKeysMatch() const;
@@ -182,8 +187,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 //
 
-class plCompoundController : public plController
-{
+class plCompoundController : public plController {
 private:
     plController* fXController;
     plController* fYController;
@@ -193,33 +197,63 @@ public:
     plCompoundController(); // allocs leaf controllers
     ~plCompoundController();
 
-    CLASSNAME_REGISTER( plCompoundController );
-    GETINTERFACE_ANY( plCompoundController, plController );
+    CLASSNAME_REGISTER(plCompoundController);
+    GETINTERFACE_ANY(plCompoundController, plController);
 
-    void Interp(float time, hsQuat* result, plControllerCacheInfo *cache = nil) const;
-    void Interp(float time, hsScalarTriple* result, plControllerCacheInfo *cache = nil) const;
-    void Interp(float time, hsAffineParts* parts, plControllerCacheInfo *cache = nil) const;
-    void Interp(float time, hsColorRGBA* result, plControllerCacheInfo *cache = nil) const;
+    void Interp(float time, hsQuat* result, plControllerCacheInfo* cache = nil) const;
+    void Interp(float time, hsScalarTriple* result, plControllerCacheInfo* cache = nil) const;
+    void Interp(float time, hsAffineParts* parts, plControllerCacheInfo* cache = nil) const;
+    void Interp(float time, hsColorRGBA* result, plControllerCacheInfo* cache = nil) const;
 
     plControllerCacheInfo* CreateCache() const;
-    plController *GetXController() const { return fXController; }
-    plController *GetYController() const { return fYController; }
-    plController *GetZController() const { return fZController; }
-    plController *GetPosController() const { return fXController; }
-    plController *GetRotController() const { return fYController; }
-    plController *GetScaleController() const { return fZController; }
-    plController *GetController(int32_t i) const;
+    plController* GetXController() const {
+        return fXController;
+    }
+    plController* GetYController() const {
+        return fYController;
+    }
+    plController* GetZController() const {
+        return fZController;
+    }
+    plController* GetPosController() const {
+        return fXController;
+    }
+    plController* GetRotController() const {
+        return fYController;
+    }
+    plController* GetScaleController() const {
+        return fZController;
+    }
+    plController* GetController(int32_t i) const;
     float GetLength() const;
-    void GetKeyTimes(hsTArray<float> &keyTimes) const;
+    void GetKeyTimes(hsTArray<float>& keyTimes) const;
     bool AllKeysMatch() const;
     bool PurgeRedundantSubcontrollers();
 
-    void SetXController(plController *c) { delete fXController; fXController = c; }
-    void SetYController(plController *c) { delete fYController; fYController = c; }
-    void SetZController(plController *c) { delete fZController; fZController = c; }
-    void SetPosController(plController *c) { delete fXController; fXController = c; }
-    void SetRotController(plController *c) { delete fYController; fYController = c; }
-    void SetScaleController(plController *c) { delete fZController; fZController = c; }
+    void SetXController(plController* c) {
+        delete fXController;
+        fXController = c;
+    }
+    void SetYController(plController* c) {
+        delete fYController;
+        fYController = c;
+    }
+    void SetZController(plController* c) {
+        delete fZController;
+        fZController = c;
+    }
+    void SetPosController(plController* c) {
+        delete fXController;
+        fXController = c;
+    }
+    void SetRotController(plController* c) {
+        delete fYController;
+        fYController = c;
+    }
+    void SetScaleController(plController* c) {
+        delete fZController;
+        fZController = c;
+    }
     void SetController(int32_t i, plController* c);
 
     void Read(hsStream* s, hsResMgr* mgr);

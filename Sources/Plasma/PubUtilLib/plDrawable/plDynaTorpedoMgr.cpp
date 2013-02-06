@@ -82,8 +82,8 @@ bool plDynaTorpedoMgr::IHandleShot(plBulletMsg* bull)
 
     plConst(int) kNumShots(3);
     int i;
-    for( i = 0; i < kNumShots; i++ )
-    {
+
+    for (i = 0; i < kNumShots; i++) {
         hsVector3 up = IRandomUp(bull->Dir());
         hsVector3 pert = bull->Dir() % up;
 
@@ -101,11 +101,12 @@ bool plDynaTorpedoMgr::IHandleShot(plBulletMsg* bull)
 
 #if 0
         plConst(float) kMinScale(0.5f);
-        if( i )
-        {
+
+        if (i) {
             scaleX *= sRand.RandRangeF(kMinScale, 1.f);
             scaleY *= sRand.RandRangeF(kMinScale, 1.f);
         }
+
 #elif 0
         float div = 1.f / (1.f + float(i));
         scaleX *= div;
@@ -113,12 +114,13 @@ bool plDynaTorpedoMgr::IHandleShot(plBulletMsg* bull)
 #else
         plConst(float) kMinScale(0.25f);
         plConst(float) kMaxScale(0.75f);
-        if( i ) 
-        {
+
+        if (i) {
             float scale = sRand.RandRangeF(kMinScale, kMaxScale);
             scaleX *= scale;
             scaleY *= scale;
         }
+
 #endif
 
         fCutter->SetLength(hsVector3(scaleX, scaleY, bull->Range()));
@@ -126,17 +128,20 @@ bool plDynaTorpedoMgr::IHandleShot(plBulletMsg* bull)
 
         plDynaDecalInfo& info = IGetDecalInfo(uintptr_t(this), GetKey());
 
-        if( bull->PartyTime() > 0 )
+        if (bull->PartyTime() > 0) {
             fPartyTime = bull->PartyTime();
+        }
 
         double secs = hsTimer::GetSysSeconds();
 
-        if( ICutoutTargets(secs) )
+        if (ICutoutTargets(secs)) {
             info.fLastTime = secs;
+        }
 
         fPartyTime = 0;
-    
+
     }
+
     fPartyTime = partyTime;
 
     return true;
@@ -145,12 +150,12 @@ bool plDynaTorpedoMgr::IHandleShot(plBulletMsg* bull)
 bool plDynaTorpedoMgr::MsgReceive(plMessage* msg)
 {
     plBulletMsg* bullMsg = plBulletMsg::ConvertNoRef(msg);
-    if( bullMsg )
-    {
-        if( bullMsg->Shot() )
-        {
+
+    if (bullMsg) {
+        if (bullMsg->Shot()) {
             return IHandleShot(bullMsg);
         }
+
         return true;
     }
 
