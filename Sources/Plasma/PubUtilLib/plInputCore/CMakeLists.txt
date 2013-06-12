@@ -6,12 +6,10 @@ include_directories("../../PubUtilLib")
 if(WIN32)
     include_directories(${DirectX_INCLUDE_DIR})
 endif(WIN32)
-include_directories(${OPENAL_INCLUDE_DIR})
 
 set(plInputCore_SOURCES
     plAvatarInputInterface.cpp
     plDebugInputInterface.cpp
-    plDInputDevice.cpp
     plInputDevice.cpp
     plInputInterface.cpp
     plInputInterfaceMgr.cpp
@@ -20,10 +18,14 @@ set(plInputCore_SOURCES
     plTelescopeInputInterface.cpp
 )
 
+set(plDInputCore_SOURCES
+    plDInputDevice.cpp
+    plDInputManager.cpp
+)
+
 set(plInputCore_HEADERS
     plAvatarInputInterface.h
     plDebugInputInterface.h
-    plDInputDevice.h
     plInputCoreCreatable.h
     plInputDevice.h
     plInputInterface.h
@@ -33,7 +35,22 @@ set(plInputCore_HEADERS
     plTelescopeInputInterface.h
 )
 
-add_library(plInputCore STATIC ${plInputCore_SOURCES} ${plInputCore_HEADERS})
+set(plDInputCore_HEADERS
+    plDInputDevice.h
+    plDInputManager.h
+)
+
+if(WIN32)
+    add_library(plInputCore STATIC ${plInputCore_SOURCES} ${plInputCore_HEADERS} ${plDInputCore_SOURCES} ${plDInputCore_HEADERS})
+else()
+    add_library(plInputCore STATIC ${plInputCore_SOURCES} ${plInputCore_HEADERS})
+endif(WIN32)
 
 source_group("Source Files" FILES ${plInputCore_SOURCES})
 source_group("Header Files" FILES ${plInputCore_HEADERS})
+
+if(WIN32)
+    source_group("DX\\Source Files" FILES ${plDInputCore_SOURCES})
+    source_group("DX\\Header Files" FILES ${plDInputCore_HEADERS})
+endif()
+

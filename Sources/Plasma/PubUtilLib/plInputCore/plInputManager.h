@@ -39,25 +39,21 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
       Mead, WA   99021
 
 *==LICENSE==*/
-// plInputManager.h
 
 #ifndef PL_INPUT_MANAGER_H
 #define PL_INPUT_MANAGER_H
 
-
 #include "HeadSpin.h"
-#include "hsTemplates.h"
 #include "pnKeyedObject/hsKeyedObject.h"
 #include "pnInputCore/plInputMap.h"
 #include <locale>
 
 class plDInputMgr;
 class plInputDevice;
-class plDInputDevice;
 class plInputInterfaceMgr;
 class plPipeline;
 
-class plInputManager :public hsKeyedObject
+class plInputManager : public hsKeyedObject
 {
 private:
     static bool fUseDInput;
@@ -68,7 +64,6 @@ public:
     
     CLASSNAME_REGISTER( plInputManager );
     GETINTERFACE_ANY( plInputManager, hsKeyedObject );
-
 
     void AddInputDevice(plInputDevice* pDev);
     void InitDInput(hsWindowInst hInst, hsWindowHndl hWnd);
@@ -95,7 +90,7 @@ protected:
     hsTArray<plInputDevice*>    fInputDevices;
     plDInputMgr*                fDInputMgr;
     plInputInterfaceMgr         *fInterfaceMgr;
-    bool                        fActive, fFirstActivated;       
+    bool                        fActive, fFirstActivated;
 
     float                    fMouseScale;
     static uint8_t           bRecenterMouse;
@@ -108,10 +103,5 @@ public:
     void HandleWin32ControlEvent(UINT message, WPARAM Wparam, LPARAM Lparam, HWND hWnd);
 #endif
 };
-
-#if HS_BUILD_FOR_WIN32
-// {049DE53E-23A2-4d43-BF68-36AC1B57E357}
-static const GUID PL_ACTION_GUID = { 0x49de53e, 0x23a2, 0x4d43, { 0xbf, 0x68, 0x36, 0xac, 0x1b, 0x57, 0xe3, 0x57 } };
-#endif
 
 #endif

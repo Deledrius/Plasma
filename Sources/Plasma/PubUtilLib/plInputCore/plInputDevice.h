@@ -46,15 +46,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "HeadSpin.h"
 
-//#include "pnInputCore/plControlDefinition.h"
 #include "pnInputCore/plOSMsg.h"
 #include "pnInputCore/plKeyDef.h"
 #include "hsBitVector.h"
-#include "hsTemplates.h"
 #include "plString.h"
+
 class plMessage;
 struct plMouseInfo;
-class plPipeline;
 
 class plInputDevice 
 {
@@ -66,7 +64,7 @@ public:
 protected:
     uint32_t fFlags;
 public:
-    
+
     plInputDevice() {;}
     virtual ~plInputDevice() {;}
 
@@ -79,8 +77,6 @@ public:
     virtual void HandleWindowActivate(bool bActive, hsWindowHndl hWnd) {;}
     virtual bool MsgReceive(plMessage* msg) {return false;}
     virtual void Shutdown() {;}
-
-
 };
 
 class plKeyEventMsg;
@@ -123,7 +119,7 @@ public:
 
     static bool     IgnoreCapsLock() { return fIgnoreCapsLock; }
     static void     IgnoreCapsLock(bool ignore) { fIgnoreCapsLock = ignore; }
-    
+
     static plKeyboardDevice* GetInstance() { return fInstance; }
 };
 
@@ -162,10 +158,7 @@ public:
     const char* GetInputName() { return "mouse"; }
 
     bool    HasControlFlag(int f) const { return fControlFlags.IsBitSet(f); }
-    void    SetControlFlag(int f) 
-    { 
-        fControlFlags.SetBit(f); 
-    }
+    void    SetControlFlag(int f) { fControlFlags.SetBit(f); }
     void    ClearControlFlag(int which) { fControlFlags.ClearBit( which ); }
     void    SetCursorX(float x);
     void    SetCursorY(float y);
@@ -174,11 +167,11 @@ public:
     uint32_t  GetButtonState() { return fButtonState; }
     float GetCursorOpacity() { return fOpacity; }
     void SetDisplayResolution(float Width, float Height);
-    
+
     virtual bool MsgReceive(plMessage* msg);
-    
+
     static plMouseDevice* Instance() { return plMouseDevice::fInstance; }
-    
+
     static void SetMsgAlways(bool b) { plMouseDevice::bMsgAlways = b; }
     static void ShowCursor(bool override = false);
     static void NewCursor(char* cursor);
@@ -190,7 +183,7 @@ public:
     static void AddNameToCursor(const plString& name);
     static void AddIDNumToCursor(uint32_t idNum);
     static void AddCCRToCursor();
-    
+
 protected:
     plInputEventMsg*    fXMsg;
     plInputEventMsg*    fYMsg;
@@ -208,8 +201,7 @@ protected:
     uint32_t   fButtonState;
     float fOpacity;
     hsBitVector     fControlFlags;
-    
-    
+
     plPlate *fCursor;
     char*    fCursorID;
 
@@ -223,7 +215,6 @@ protected:
     static bool bInverted;
     static float fWidth, fHeight;
 };
-
 
 
 #endif // PL_INPUT_DEVICE_H

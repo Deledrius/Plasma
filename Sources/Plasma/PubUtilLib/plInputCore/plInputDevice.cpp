@@ -39,8 +39,6 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
       Mead, WA   99021
 
 *==LICENSE==*/
-// plInputDevice.cpp
-//#include "STRING"
 
 #include "HeadSpin.h"
 
@@ -198,7 +196,7 @@ void plKeyboardDevice::HandleKeyEvent(plOSMsg message, plKeyDef key, bool bKeyDo
     plgDispatch::MsgSend( pMsg );
 }
 
-void plKeyboardDevice::HandleWindowActivate(bool bActive, HWND hWnd)
+void plKeyboardDevice::HandleWindowActivate(bool bActive, hsWindowHndl hWnd)
 {
     if (bActive)
     {

@@ -40,29 +40,71 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 *==LICENSE==*/
 
-#ifndef PL_DINPUT_DEVICE_H
-#define PL_DINPUT_DEVICE_H
+#ifndef PL_DINPUT_MANAGER_H
+#define PL_DINPUT_MANAGER_H
 
 #if HS_BUILD_FOR_WIN32
 
-#include "plInputDevice.h"
+#include "HeadSpin.h"
+#include "hsWindows.h"
 
-struct DIDEVICEOBJECTDATA;
+#include "plMessage/plInputEventMsg.h"
+#include "plDInputDevice.h"
 
-class plDInputDevice : public plInputDevice
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+
+#define NUM_ACTIONS     17
+
+// {049DE53E-23A2-4d43-BF68-36AC1B57E357}
+static const GUID PL_ACTION_GUID = { 0x49de53e, 0x23a2, 0x4d43, { 0xbf, 0x68, 0x36, 0xac, 0x1b, 0x57, 0xe3, 0x57 } };
+
+
+struct plDIDevice
+{
+    plDIDevice() : fDevice(nullptr), fCaps(nullptr) {;}
+    plDIDevice(IDirectInputDevice8* _device) : fCaps(nullptr) {fDevice = _device;}
+    IDirectInputDevice8*    fDevice;
+    DIDEVCAPS*              fCaps;
+};
+
+struct plDInput
+{
+    plDInput() :
+    fDInput(nullptr),
+    fActionFormat(nullptr)
+    {;}
+    IDirectInput8*          fDInput;
+    hsTArray<plDIDevice*>   fSticks;
+    DIACTIONFORMAT*         fActionFormat;
+};
+
+class plDInputMgr 
 {
 public:
-    plDInputDevice();
-    ~plDInputDevice();
+    plDInputMgr() : fDI(nullptr) {fDI = new plDInput;};
+    ~plDInputMgr();
 
-    const char* GetInputName() { return "DInput"; }
+    void Init(HINSTANCE hInst, HWND hWnd);
+    void Update();
+    void AddDevice(IDirectInputDevice8* device);
+    void ConfigureDevice();
+    virtual bool MsgReceive(plMessage* msg);
     
-    virtual void Update(DIDEVICEOBJECTDATA* js);
+    // dinput callback functions
+    static int __stdcall EnumGamepadCallback(const DIDEVICEINSTANCE* device, void* pRef);
 
 protected:
-    float fX,fY;
+    plDInput*                   fDI;
+    hsTArray<plDInputDevice*>   fInputDevice;
+    static DIACTION             fActionMap[];
+    HWND                        fhWnd;
 };
+// function pointers to dinput callbacks
+typedef int (__stdcall * Pfunc1) (const DIDEVICEINSTANCE* device, void* pRef);
+
 
 #endif // HS_BUILD_FOR_WIN32
 
-#endif // PL_INPUT_DEVICE_H
+
+#endif // PL_DINPUT_MANAGER_H

@@ -62,14 +62,12 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 class hsStream;
 class hsResMgr;
 class plInputInterface;
-//class plKeyMap;
-enum plKeyDef;
-enum ControlEventCode;
 class plKey;
 class plCtrlCmd;
 class plKeyCombo;
 class plDefaultKeyCatcher;
 class plKeyBinding;
+enum ControlEventCode;
 
 class plInputInterfaceMgr : public plSingleModifier
 {

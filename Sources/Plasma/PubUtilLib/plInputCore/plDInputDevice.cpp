@@ -39,21 +39,17 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
       Mead, WA   99021
 
 *==LICENSE==*/
-// plDInputDevice.cpp
+
+#include "plDInputDevice.h"
 
 #include "HeadSpin.h"
 
-#include "plDInputDevice.h"
 #include "plgDispatch.h"
 #include "plMessage/plInputEventMsg.h"
+
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
-//
-//
-//
-// plDInputDevice
-//
-//
+
 
 plDInputDevice::plDInputDevice() :
 fX(0.5),
@@ -289,4 +285,3 @@ void plDInputDevice::Update(DIDEVICEOBJECTDATA* js)
     }
 
 }
-

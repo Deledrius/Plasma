@@ -196,28 +196,6 @@ bool    plInputInterface::ProcessKeyBindings( plInputEventMsg *msg )
     for (i = 1; i < bindings.GetCount(); i++)
         IDeactivateBinding(bindings[i]);
 
-    /*
-    const plKeyBinding *binding = fControlMap->FindBindingByKey( combo );
-    if( binding == nil )
-    {
-        // Don't panic just yet, there are some special cases with the shift key to check first
-        if( keyMsg->GetKeyCode() == KEY_SHIFT || keyMsg->GetShiftKeyDown() )
-        {
-            // See, there are two other cases to consider: 1) we have a binding directly to the shift
-            // key, which wouldn't have the shift flag set (so the above search wouldn't have caught it).
-
-            // The second case would be if we have a matching binding without shift...
-            // which is VALID so long as no other bindings respond to this key combo + shift, but of course,
-            // if there were, we'd have found them already!
-
-            // Either way, we remove the shift flag and try again
-            combo.fFlags &= ~plKeyCombo::kShift;
-
-            binding = fControlMap->FindBindingByKey( combo );
-        }
-    }
-    */
-
     if (!binding)
         return false;
 
