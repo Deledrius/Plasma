@@ -45,7 +45,6 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plInputDevice.h"
 #include "plInputManager.h"
 #include "plAvatarInputInterface.h"
-#include "plMessage/plInputEventMsg.h"
 #include "pnMessage/plTimeMsg.h"
 
 #include "plgDispatch.h"
@@ -106,14 +105,13 @@ void plKeyboardDevice::ReleaseAllKeys()
             fKeyboardState[i] = false;
 
             // fake a key-up command
-            plKeyEventMsg* pMsg = new plKeyEventMsg;
-            pMsg->SetKeyCode( (plKeyDef)i );
-            pMsg->SetKeyDown( false );
-            pMsg->SetShiftKeyDown( fShiftKeyDown );
-            pMsg->SetCtrlKeyDown( fCtrlKeyDown );
-            pMsg->SetCapsLockKeyDown( fCapsLockLock );
-            pMsg->SetRepeat( false );
-            plgDispatch::MsgSend( pMsg );
+            fEventMsg->SetKeyCode(static_cast<plKeyDef>(i));
+            fEventMsg->SetKeyDown(false);
+            fEventMsg->SetShiftKeyDown(fShiftKeyDown);
+            fEventMsg->SetCtrlKeyDown(fCtrlKeyDown);
+            fEventMsg->SetCapsLockKeyDown(fCapsLockLock);
+            fEventMsg->SetRepeat(false);
+            fEventMsg->SendAndKeep();
         }
     }
 
@@ -126,28 +124,26 @@ void plKeyboardDevice::ReleaseAllKeys()
         fKeyboardState[KEY_SHIFT] = false;
         fShiftKeyDown = false;
 
-        plKeyEventMsg* pMsg = new plKeyEventMsg;
-        pMsg->SetKeyCode( KEY_SHIFT );
-        pMsg->SetKeyDown( false );
-        pMsg->SetShiftKeyDown( false );
-        pMsg->SetCtrlKeyDown( false );
-        pMsg->SetCapsLockKeyDown( fCapsLockLock );
-        pMsg->SetRepeat( false );
-        plgDispatch::MsgSend( pMsg );
+        fEventMsg->SetKeyCode(KEY_SHIFT);
+        fEventMsg->SetKeyDown(false);
+        fEventMsg->SetShiftKeyDown(false);
+        fEventMsg->SetCtrlKeyDown(false);
+        fEventMsg->SetCapsLockKeyDown(fCapsLockLock);
+        fEventMsg->SetRepeat(false);
+        fEventMsg->SendAndKeep();
     }
     if (fKeyboardState[KEY_CTRL])
     {
         fKeyboardState[KEY_CTRL] = false;
         fCtrlKeyDown = false;
 
-        plKeyEventMsg* pMsg = new plKeyEventMsg;
-        pMsg->SetKeyCode( KEY_CTRL );
-        pMsg->SetKeyDown( false );
-        pMsg->SetShiftKeyDown( false );
-        pMsg->SetCtrlKeyDown( false );
-        pMsg->SetCapsLockKeyDown( fCapsLockLock );
-        pMsg->SetRepeat( false );
-        plgDispatch::MsgSend( pMsg );
+        fEventMsg->SetKeyCode(KEY_CTRL);
+        fEventMsg->SetKeyDown(false);
+        fEventMsg->SetShiftKeyDown(false);
+        fEventMsg->SetCtrlKeyDown(false);
+        fEventMsg->SetCapsLockKeyDown(fCapsLockLock);
+        fEventMsg->SetRepeat(false);
+        fEventMsg->SendAndKeep();
     }
 }
 
@@ -191,15 +187,14 @@ void plKeyboardDevice::HandleKeyEvent(plOSMsg message, plKeyDef key, bool bKeyDo
     }
 
     // send a key event...
-    plKeyEventMsg* pMsg = new plKeyEventMsg;
-    pMsg->SetKeyChar( c );
-    pMsg->SetKeyCode( key );
-    pMsg->SetKeyDown( bKeyDown );
-    pMsg->SetShiftKeyDown( fShiftKeyDown );
-    pMsg->SetCtrlKeyDown( fCtrlKeyDown );
-    pMsg->SetCapsLockKeyDown( fCapsLockLock );
-    pMsg->SetRepeat(bKeyRepeat);
-    plgDispatch::MsgSend( pMsg );
+    fEventMsg->SetKeyChar(c);
+    fEventMsg->SetKeyCode(key);
+    fEventMsg->SetKeyDown(bKeyDown);
+    fEventMsg->SetShiftKeyDown(fShiftKeyDown);
+    fEventMsg->SetCtrlKeyDown(fCtrlKeyDown);
+    fEventMsg->SetCapsLockKeyDown(fCapsLockLock);
+    fEventMsg->SetRepeat(bKeyRepeat);
+    fEventMsg->SendAndKeep(); // synchronous send
 }
 
 void plKeyboardDevice::HandleWindowActivate(bool bActive, hsWindowHndl hWnd)

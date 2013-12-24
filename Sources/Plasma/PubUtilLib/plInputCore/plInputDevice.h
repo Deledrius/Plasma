@@ -45,9 +45,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define PL_INPUT_DEVICE_H
 
 #include "HeadSpin.h"
+#include <memory>
 
 #include "pnInputCore/plOSMsg.h"
 #include "pnInputCore/plKeyDef.h"
+#include "plMessage/plInputEventMsg.h"
 #include "hsBitVector.h"
 #include "plString.h"
 
@@ -63,10 +65,17 @@ public:
     };
 protected:
     uint32_t fFlags;
+
+    /** Optimization: all event message sends are synchronous, so only create one message. */
+    plKeyEventMsg* fEventMsg;
+
 public:
 
-    plInputDevice() {;}
-    virtual ~plInputDevice() {;}
+    plInputDevice() : fEventMsg(new plKeyEventMsg()) { }
+    virtual ~plInputDevice()
+    {
+        fEventMsg->UnRef();
+    }
 
     virtual const char* GetInputName() = 0;
 
