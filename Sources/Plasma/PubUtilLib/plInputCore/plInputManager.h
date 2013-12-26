@@ -61,14 +61,12 @@ public:
     plInputManager();
     plInputManager( hsWindowHndl hWnd );
     ~plInputManager();
-    
+
     CLASSNAME_REGISTER( plInputManager );
     GETINTERFACE_ANY( plInputManager, hsKeyedObject );
 
     void AddInputDevice(plInputDevice* pDev);
-    void InitDInput(hsWindowInst hInst, hsWindowHndl hWnd);
 
-    static void UseDInput(bool b) { fUseDInput = b; }
     void Update();
     static plInputManager*  GetInstance() { return fInstance; }
     static plInputManager*  fInstance;
@@ -82,11 +80,17 @@ public:
 
     float    GetMouseScale( void ) const { return fMouseScale; }
     void        SetMouseScale( float s );
-    
+
     static plKeyDef UntranslateKey(plKeyDef key, bool extended);
-    
+
+#if HS_BUILD_FOR_WIN32
+    void InitDInput(hsWindowInst hInst, hsWindowHndl hWnd);
+    static void UseDInput(bool b) { fUseDInput = b; }
+    // event handlers
+    void HandleWin32ControlEvent(UINT message, WPARAM Wparam, LPARAM Lparam, HWND hWnd);
+#endif
+
 protected:
-    
     hsTArray<plInputDevice*>    fInputDevices;
     plDInputMgr*                fDInputMgr;
     plInputInterfaceMgr         *fInterfaceMgr;
@@ -95,13 +99,7 @@ protected:
     float                    fMouseScale;
     static uint8_t           bRecenterMouse;
     static hsWindowHndl      fhWnd;
-	std::locale localeC;
-    
-public:
-#if HS_BUILD_FOR_WIN32
-    // event handlers
-    void HandleWin32ControlEvent(UINT message, WPARAM Wparam, LPARAM Lparam, HWND hWnd);
-#endif
+    std::locale localeC;
 };
 
 #endif

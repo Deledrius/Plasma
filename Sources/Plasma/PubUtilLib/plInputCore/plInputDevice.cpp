@@ -179,7 +179,13 @@ void plKeyboardDevice::HandleKeyEvent(plOSMsg message, plKeyDef key, bool bKeyDo
     {
         if (!bKeyRepeat)
         {
+            // TODO: This needs to be abstracted once we have a way to do this
+            // without Win32 calls.
+#if HS_BUILD_FOR_WIN32
             fCapsLockLock = (GetKeyState(KEY_CAPSLOCK) & 1) == 1;
+#else
+            fCapsLockLock = false;
+#endif
             plAvatarInputInterface::GetInstance()->ForceAlwaysRun(fCapsLockLock);
         }
     }

@@ -59,16 +59,16 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plDInputManager.h"
 
-bool    plInputManager::fUseDInput = false;
-uint8_t   plInputManager::bRecenterMouse = 0;
-HWND    plInputManager::fhWnd = nil;
+bool         plInputManager::fUseDInput = false;
+uint8_t      plInputManager::bRecenterMouse = 0;
+hsWindowHndl plInputManager::fhWnd = nullptr;
 
 
 plInputManager* plInputManager::fInstance = nil;
 
 plInputManager::plInputManager( hsWindowHndl hWnd ) :
-fDInputMgr(nil),
-fInterfaceMgr(nil),
+fDInputMgr(nullptr),
+fInterfaceMgr(nullptr),
 localeC("C")
 {
     fhWnd = hWnd;
@@ -79,8 +79,8 @@ localeC("C")
 }
 
 plInputManager::plInputManager() :
-fDInputMgr(nil),
-fInterfaceMgr(nil)
+fDInputMgr(nullptr),
+fInterfaceMgr(nullptr)
 {
     fInstance = this;
     fActive = false;
@@ -91,15 +91,17 @@ fInterfaceMgr(nil)
 plInputManager::~plInputManager() 
 {
     fInterfaceMgr->Shutdown();
-    fInterfaceMgr = nil;
+    fInterfaceMgr = nullptr;
 
     for (int i = 0; i < fInputDevices.Count(); i++)
     {
         fInputDevices[i]->Shutdown();
         delete(fInputDevices[i]);
     }
+#if HS_BUILD_FOR_WIN32
     if (fDInputMgr)
         delete fDInputMgr;
+#endif
 }
 
 //static
@@ -114,25 +116,18 @@ void plInputManager::SetRecenterMouse(bool b)
 
 void plInputManager::RecenterCursor()
 {
+#if HS_BUILD_FOR_WIN32
     RECT rect;
     GetClientRect(fhWnd, &rect);
     POINT pt;
     ClientToScreen(fhWnd, &pt);
     SetCursorPos( pt.x, pt.y );
+#endif
 }
 void plInputManager::CreateInterfaceMod(plPipeline* p)
 {
     fInterfaceMgr = new plInputInterfaceMgr();
     fInterfaceMgr->Init();
-}
-
-void plInputManager::InitDInput(hsWindowInst hInst, hsWindowHndl hWnd)
-{
-    if (fUseDInput)
-    {
-        fDInputMgr = new plDInputMgr;
-        fDInputMgr->Init(hInst, hWnd);
-    }
 }
 
 bool plInputManager::MsgReceive(plMessage* msg)
@@ -141,16 +136,20 @@ bool plInputManager::MsgReceive(plMessage* msg)
         if (fInputDevices[i]->MsgReceive(msg))
             return true;
 
+#if HS_BUILD_FOR_WIN32
     if (fDInputMgr)
         return fDInputMgr->MsgReceive(msg);
+#endif
 
     return hsKeyedObject::MsgReceive(msg);
 }
 
 void plInputManager::Update()
 {
+#if HS_BUILD_FOR_WIN32
     if (fDInputMgr)
         fDInputMgr->Update();
+#endif
 }
 
 void plInputManager::SetMouseScale( float s )
@@ -178,6 +177,16 @@ plKeyDef plInputManager::UntranslateKey(plKeyDef key, bool extended)
 }
 
 #if HS_BUILD_FOR_WIN32
+
+void plInputManager::InitDInput(hsWindowInst hInst, hsWindowHndl hWnd)
+{
+    if (fUseDInput)
+    {
+        fDInputMgr = new plDInputMgr;
+        fDInputMgr->Init(hInst, hWnd);
+    }
+}
+
 void plInputManager::HandleWin32ControlEvent(UINT message, WPARAM Wparam, LPARAM Lparam, hsWindowHndl hWnd)
 {
     if( !fhWnd )

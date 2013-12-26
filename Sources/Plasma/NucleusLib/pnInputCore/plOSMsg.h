@@ -55,8 +55,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "hsWindows.h" // FIXME: This gives me a sad
 
-enum plOSMsg
-{
+enum plOSMsg {
     KEYDOWN         = WM_KEYDOWN,
     KEYUP           = WM_KEYUP,
     MOUSEMOVE       = WM_MOUSEMOVE,
@@ -64,7 +63,7 @@ enum plOSMsg
     L_BUTTONUP      = WM_LBUTTONUP,
     R_BUTTONDN      = WM_RBUTTONDOWN,
     R_BUTTONUP      = WM_RBUTTONUP,
-    MOUSEWHEEL      = 0x020A,
+    MOUSEWHEEL      = WM_MOUSEWHEEL,
     L_BUTTONDBLCLK  = WM_LBUTTONDBLCLK,
     R_BUTTONDBLCLK  = WM_RBUTTONDBLCLK,
     SYSKEYDOWN      = WM_SYSKEYDOWN,
@@ -76,7 +75,24 @@ enum plOSMsg
 
 #else
 
-enum plOSMsg { };
+enum plOSMsg {
+    // Intermediate hack until this is fully implemented
+    KEYDOWN         = 0xffffffff,
+    KEYUP           = 0xffffffff,
+    MOUSEMOVE       = 0xffffffff,
+    L_BUTTONDN      = 0xffffffff,
+    L_BUTTONUP      = 0xffffffff,
+    R_BUTTONDN      = 0xffffffff,
+    R_BUTTONUP      = 0xffffffff,
+    MOUSEWHEEL      = 0xffffffff,
+    L_BUTTONDBLCLK  = 0xffffffff,
+    R_BUTTONDBLCLK  = 0xffffffff,
+    SYSKEYDOWN      = 0xffffffff,
+    SYSKEYUP        = 0xffffffff,
+    M_BUTTONDN      = 0xffffffff,
+    M_BUTTONUP      = 0xffffffff,
+    CHAR_MSG        = 0xffffffff,
+};
 
 #endif
 
