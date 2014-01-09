@@ -47,37 +47,27 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plGImage/plBitmap.h"
 #include "pnMessage/plRefMsg.h"
 
-#include "hsTimer.h"
 #include "hsStream.h"
 #include "hsResMgr.h"
 
-plImageLibMod::plImageLibMod()
-{
-}
-
-plImageLibMod::~plImageLibMod()
-{
-}
-
 bool plImageLibMod::MsgReceive(plMessage* msg)
 {
-    plGenRefMsg *refMsg = plGenRefMsg::ConvertNoRef( msg );
-    if( refMsg != nil )
+    plGenRefMsg *refMsg = plGenRefMsg::ConvertNoRef(msg);
+    if(refMsg)
     {
-        if( refMsg->GetContext() & ( plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace ) )
+        if(refMsg->GetContext() & (plRefMsg::kOnCreate | plRefMsg::kOnRequest | plRefMsg::kOnReplace))
         {
-            if( fImages.GetCount() <= refMsg->fWhich )
-                fImages.ExpandAndZero( refMsg->fWhich + 1 );
+            if(fImages.size() <= refMsg->fWhich)
+                fImages.resize(refMsg->fWhich + 1);
 
-            fImages[ refMsg->fWhich ] = plBitmap::ConvertNoRef( refMsg->GetRef() );
+            fImages[refMsg->fWhich] = plBitmap::ConvertNoRef(refMsg->GetRef());
         }
-        else if( refMsg->GetContext() & ( plRefMsg::kOnRemove | plRefMsg::kOnDestroy ) )
+        else if(refMsg->GetContext() & (plRefMsg::kOnRemove | plRefMsg::kOnDestroy))
         {
-            fImages[ refMsg->fWhich ] = nil;
+            fImages[refMsg->fWhich] = nullptr;
         }
         return true;
     }
-
     return plSingleModifier::MsgReceive(msg);
 }
     
@@ -85,18 +75,18 @@ void plImageLibMod::Read(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Read(stream, mgr);
 
-    uint32_t i, count = stream->ReadLE32();
-    fImages.SetCountAndZero( count );
-    for( i = 0; i < count; i++ )
-        mgr->ReadKeyNotifyMe( stream, new plGenRefMsg( GetKey(), plRefMsg::kOnCreate, i, kRefImage ), plRefFlags::kActiveRef );
+    uint32_t count = stream->ReadLE32();
+    fImages.resize(count);
+    for(uint32_t i = 0; i < count; i++)
+        mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, i, kRefImage), plRefFlags::kActiveRef);
 }
 
 void plImageLibMod::Write(hsStream* stream, hsResMgr* mgr)
 {
     plSingleModifier::Write(stream, mgr);
 
-    stream->WriteLE32( fImages.GetCount() );
-    uint32_t i;
-    for( i = 0; i < fImages.GetCount(); i++ )
-        mgr->WriteKey( stream, fImages[ i ]->GetKey() );
+    stream->WriteLE32(fImages.size());
+
+    for(size_t i = 0; i < fImages.size(); i++)
+        mgr->WriteKey(stream, fImages[i]->GetKey());
 }
