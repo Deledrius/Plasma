@@ -43,25 +43,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #ifndef plImageLibMod_inc
 #define plImageLibMod_inc
 
-#include "hsTemplates.h"
+#include <vector>
 #include "pnModifier/plSingleModifier.h"
-#include "pnKeyedObject/plKey.h"
 
 class plBitmap;
 class plImageLibMod : public plSingleModifier
 {
 protected:
-
-    hsTArray<plBitmap *>    fImages;
+    std::vector<plBitmap *> fImages;
 
     virtual bool IEval(double secs, float del, uint32_t dirty) { return false; }
 
 public:
-    plImageLibMod();
-    virtual ~plImageLibMod();
+    plImageLibMod() {};
+    virtual ~plImageLibMod() {};
 
-    CLASSNAME_REGISTER( plImageLibMod );
-    GETINTERFACE_ANY( plImageLibMod, plSingleModifier );
+    CLASSNAME_REGISTER(plImageLibMod);
+    GETINTERFACE_ANY(plImageLibMod, plSingleModifier);
 
     virtual bool MsgReceive(plMessage* msg);
     
@@ -73,7 +71,7 @@ public:
         kRefImage = 0
     };
 
-    uint32_t  GetNumImages( void ) const { return fImages.GetCount(); }
+    uint32_t GetNumImages(void) const { return fImages.size(); }
 };
 
 #endif // plImageLibMod_inc
