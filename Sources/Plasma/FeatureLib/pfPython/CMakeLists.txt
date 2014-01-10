@@ -61,6 +61,7 @@ set(pfPython_SOURCES
     pyJournalBook.cpp
     pyKey.cpp
     pyKeyMap.cpp
+    pyLayer.cpp
     pyMarkerMgr.cpp
     pyMatrix44.cpp
     pyMoviePlayer.cpp
@@ -148,6 +149,7 @@ set(pfPython_HEADERS
     pyJournalBook.h
     pyKey.h
     pyKeyMap.h
+    pyLayer.h
     pyMarkerMgr.h
     pyMatrix44.h
     pyMoviePlayer.h
@@ -230,6 +232,7 @@ set(pfPython_GLUE
     pyJournalBookGlue.cpp
     pyKeyGlue.cpp
     pyKeyMapGlue.cpp
+    pyLayerGlue.cpp
     pyMarkerMgrGlue.cpp
     pyMatrix44Glue.cpp
     pyMoviePlayerGlue.cpp
