@@ -72,6 +72,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plNetTransport/plNetTransport.h"
 #include "plNetTransport/plNetTransportMember.h"
 #include "plResMgr/plKeyFinder.h"
+#include "plSurface/plLayer.h"
 #include "plAvatar/plAvatarMgr.h"
 #include "plAvatar/plMultistageBehMod.h"
 #include "plAvatar/plAvBrainCritter.h"
@@ -80,6 +81,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pySceneObject.h"
 #include "pyPlayer.h"
 #include "pyImage.h"
+#include "pyLayer.h"
 #include "pyDniCoordinates.h"
 #include "pyDniInfoSource.h"
 #include "pyColor.h"
@@ -237,7 +239,37 @@ PyObject* cyMisc::FindSceneObjects(const ST::string& name)
     return result;
 }
 
+PyObject* cyMisc::FindLayer(const ST::string& name, const ST::string& ageName)
+{
+    plKey key;
 
+    if (!name.empty())
+    {
+        key = plKeyFinder::Instance().StupidSearch(ageName, "", plLayer::Index(), name, false);
+    }
+
+    if (!key)
+    {
+        ST::string errmsg = ST::format("Layer {} not found", name);
+        PyErr_SetString(PyExc_NameError, errmsg.c_str());
+        PYTHON_RETURN_ERROR;
+    }
+    return pyLayer::New(key);
+}
+
+PyObject* cyMisc::FindLayers(const ST::string& name)
+{
+    std::vector<plKey> keys;
+
+    if (!name.empty())
+        plKeyFinder::Instance().ReallyStupidSubstringSearch(name, plLayer::Index(), keys);
+
+    PyObject* result = PyList_New(keys.size());
+    for (size_t i=0; i < keys.size(); i++)
+        PyList_SET_ITEM(result, i, pyLayer::New(keys[i]));
+
+    return result;
+}
 
 PyObject* cyMisc::FindActivator(const ST::string& name)
 {

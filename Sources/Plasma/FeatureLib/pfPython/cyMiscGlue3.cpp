@@ -201,6 +201,29 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtFindSceneobjects, args, "Params: name\nThis wi
     return cyMisc::FindSceneObjects(ST::string::from_utf8(name));
 }
 
+PYTHON_GLOBAL_METHOD_DEFINITION(PtFindLayer, args, "Params: name, ageName\nThis will try to find a layer based on its name and what age its in")
+{
+    char* name;
+    char* ageName;
+    if (!PyArg_ParseTuple(args, "ss", &name, &ageName))
+    {
+        PyErr_SetString(PyExc_TypeError, "PtFindLayer expects two strings");
+        PYTHON_RETURN_ERROR;
+    }
+    return cyMisc::FindLayer(ST::string::from_utf8(name), ST::string::from_utf8(ageName));
+}
+
+PYTHON_GLOBAL_METHOD_DEFINITION(PtFindLayers, args, "Params: name\nThis will try to find a any layer containing string in name")
+{
+    char* name = NULL;
+    if (!PyArg_ParseTuple(args, "s", &name))
+    {
+        PyErr_SetString(PyExc_TypeError, "PtFindLayers expects string");
+        PYTHON_RETURN_ERROR;
+    }
+    return cyMisc::FindLayers(ST::string::from_utf8(name));
+}
+
 PYTHON_GLOBAL_METHOD_DEFINITION(PtFindActivator, args, "Params: name\nThis will try to find an activator based on its name\n"
             "- it will return a ptKey if found"
             "- it will return None if not found")
@@ -712,6 +735,8 @@ void cyMisc::AddPlasmaMethods3(std::vector<PyMethodDef> &methods)
     
     PYTHON_GLOBAL_METHOD(methods, PtFindSceneobject);
     PYTHON_GLOBAL_METHOD(methods, PtFindSceneobjects);
+    PYTHON_GLOBAL_METHOD(methods, PtFindLayer);
+    PYTHON_GLOBAL_METHOD(methods, PtFindLayers);
     PYTHON_GLOBAL_METHOD(methods, PtFindActivator);
     PYTHON_BASIC_GLOBAL_METHOD(methods, PtClearCameraStack);
     PYTHON_GLOBAL_METHOD(methods, PtWasLocallyNotified);
