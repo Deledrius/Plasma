@@ -149,6 +149,8 @@ public:
     //
     static PyObject* FindSceneObject(const plString& name, const char* ageName); // returns pySceneObject
     static PyObject* FindSceneObjects(const plString& name);
+    static PyObject* FindLayer(const plString& name, const plString& ageName);
+    static PyObject* FindLayers(const plString& name);
     static PyObject* FindActivator(const plString& name); // returns pyKey
 
     /////////////////////////////////////////////////////////////////////////////
