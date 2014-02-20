@@ -92,7 +92,7 @@ plSimulationMgr::plSimulationMgr()
     : fSuspended(true)
     , fMaxDelta(kDefaultMaxDelta)
     , fStepSize(kDefaultStepSize)
-    , fLOSDispatch(TRACKED_NEW plLOSDispatch())
+    , fLOSDispatch(new plLOSDispatch())
     , fSoundMgr(new plPhysicsSoundMgr)
     , fLog(nil)
 {
@@ -107,7 +107,7 @@ void plSimulationMgr::Advance(float delSecs)
 	}
 }
 
-hsBool plSimulationMgr::MsgReceive(plMessage* msg)
+bool plSimulationMgr::MsgReceive(plMessage* msg)
 {
 	return hsKeyedObject::MsgReceive(msg);
 }
@@ -197,7 +197,7 @@ plSimulationMgr* plSimulationMgr::GetInstance()
 void plSimulationMgr::Init()
 {
     hsAssert(!gTheInstance, "Initializing the sim when it's already been done");
-    gTheInstance = TRACKED_NEW plSimulationMgr();
+    gTheInstance = new plSimulationMgr();
     gTheInstance->RegisterAs(kSimulationMgr_KEY);
     gTheInstance->GetKey()->RefObject();
 }

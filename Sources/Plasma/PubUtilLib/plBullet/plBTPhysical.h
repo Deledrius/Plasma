@@ -46,7 +46,6 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsMatrix44.h"
 #include "plPhysical/plSimDefs.h"
 #include "hsBitVector.h"
-#include "hsUtils.h"
 
 struct hsPoint3;
 class hsQuat;
@@ -70,12 +69,12 @@ struct PhysRecipe
 {
     PhysRecipe();
 
-    hsScalar mass;
-    hsScalar friction;
-    hsScalar restitution;
+    float mass;
+    float friction;
+    float restitution;
     plSimDefs::Bounds bounds;
     plSimDefs::Group group;
-    UInt32 reportsOn;
+    uint32_t reportsOn;
     plKey objectKey;
     plKey sceneNode;
     plKey worldKey;
@@ -88,7 +87,7 @@ struct PhysRecipe
     std::vector<hsPoint3> vertices;
 
     // For spheres only
-    hsScalar radius;
+    float radius;
     hsPoint3 offset;
 
     // For Boxes
@@ -113,18 +112,18 @@ public:
     GETINTERFACE_ANY(plBTPhysical, plPhysical);
 
     // Export time and internal use only
-    hsBool Init(PhysRecipe& recipe);
+    bool Init(PhysRecipe& recipe);
 
     virtual void Read(hsStream* s, hsResMgr* mgr);
     virtual void Write(hsStream* s, hsResMgr* mgr);
 
-    virtual hsBool MsgReceive(plMessage* msg);
+    virtual bool MsgReceive(plMessage* msg);
 
     //
     // From plPhysical
     //
-    virtual plPhysical& SetProperty(int prop, hsBool b);
-    virtual hsBool GetProperty(int prop) const { return fProps.IsBitSet(prop) != 0; }
+    virtual plPhysical& SetProperty(int prop, bool b);
+    virtual bool GetProperty(int prop) const { return fProps.IsBitSet(prop) != 0; }
 
     virtual void SetObjectKey(plKey key) { fObjectKey = key; }
     virtual plKey GetObjectKey() const { return fObjectKey; }
@@ -132,27 +131,27 @@ public:
     virtual void SetSceneNode(plKey node);
     virtual plKey GetSceneNode() const;
 
-    virtual hsBool GetLinearVelocitySim(hsVector3& vel) const;
+    virtual bool GetLinearVelocitySim(hsVector3& vel) const;
     virtual void SetLinearVelocitySim(const hsVector3& vel);
     virtual void ClearLinearVelocity();
 
-    virtual hsBool GetAngularVelocitySim(hsVector3& vel) const;
+    virtual bool GetAngularVelocitySim(hsVector3& vel) const;
     virtual void SetAngularVelocitySim(const hsVector3& vel);
 
-    virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, hsBool force=false);
+    virtual void SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, bool force=false);
     virtual void GetTransform(hsMatrix44& l2w, hsMatrix44& w2l);
 
     virtual int GetGroup() const { return fGroup; }
 
-    virtual void    AddLOSDB(UInt16 flag) { hsSetBits(fLOSDBs, flag); }
-    virtual void    RemoveLOSDB(UInt16 flag) { hsClearBits(fLOSDBs, flag); }
-    virtual UInt16  GetAllLOSDBs() { return fLOSDBs; }
-    virtual hsBool  IsInLOSDB(UInt16 flag) { return hsCheckBits(fLOSDBs, flag); }
+    virtual void    AddLOSDB(uint16_t flag) { hsSetBits(fLOSDBs, flag); }
+    virtual void    RemoveLOSDB(uint16_t flag) { hsClearBits(fLOSDBs, flag); }
+    virtual uint16_t  GetAllLOSDBs() { return fLOSDBs; }
+    virtual bool  IsInLOSDB(uint16_t flag) { return hsCheckBits(fLOSDBs, flag); }
 
-    virtual hsBool    DoDetectorHullWorkaround() { return false; /* BULLET STUB ??? */  }
-    virtual hsBool  Should_I_Trigger(hsBool enter, hsPoint3& pos);
-    virtual hsBool  IsObjectInsideHull(const hsPoint3& pos);
-    virtual void    SetInsideConvexHull(hsBool inside) { fInsideConvexHull = inside;    }
+    virtual bool    DoDetectorHullWorkaround() { return false; /* BULLET STUB ??? */  }
+    virtual bool  Should_I_Trigger(bool enter, hsPoint3& pos);
+    virtual bool  IsObjectInsideHull(const hsPoint3& pos);
+    virtual void    SetInsideConvexHull(bool inside) { fInsideConvexHull = inside;    }
 
     virtual plKey GetWorldKey() const { return fWorldKey; }
 
@@ -160,7 +159,7 @@ public:
 
     virtual void GetPositionSim(hsPoint3& pos) const { IGetPositionSim(pos); }
 
-    virtual void SendNewLocation(hsBool synchTransform = false, hsBool isSynchUpdate = false);
+    virtual void SendNewLocation(bool synchTransform = false, bool isSynchUpdate = false);
 
     virtual void SetHitForce(const hsVector3& force, const hsPoint3& pos) { fWeWereHit=true; fHitForce = force; fHitPos = pos; }
     virtual void ApplyHitForce();
@@ -169,20 +168,20 @@ public:
     virtual void GetSyncState(hsPoint3& pos, hsQuat& rot, hsVector3& linV, hsVector3& angV);
     virtual void SetSyncState(hsPoint3* pos, hsQuat* rot, hsVector3* linV, hsVector3* angV);
 
-    virtual void ExcludeRegionHack(hsBool cleared);
+    virtual void ExcludeRegionHack(bool cleared);
 
-    virtual plDrawableSpans* CreateProxy(hsGMaterial* mat, hsTArray<UInt32>& idx, plDrawableSpans* addTo);
+    virtual plDrawableSpans* CreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo);
 
-    hsBool DoReportOn(plSimDefs::Group group) const { return hsCheckBits(fReportsOn, 1<<group); }
+    bool DoReportOn(plSimDefs::Group group) const { return hsCheckBits(fReportsOn, 1<<group); }
 
     // Returns true if this object is *really* dynamic.  We can have physicals
     // that are in the dynamic group but are actually animated or something.
     // This weeds those out.
-    hsBool IsDynamic() const;
+    bool IsDynamic() const;
 
-    virtual hsScalar GetMass() {return fMass;}
+    virtual float GetMass() {return fMass;}
 protected:
-    hsBool HandleRefMsg(plGenRefMsg * refM);
+    bool HandleRefMsg(plGenRefMsg * refM);
 
     // versioned readers
     void IReadV0(hsStream* s, hsResMgr* mgr, PhysRecipe& recipe);
@@ -200,7 +199,7 @@ protected:
     /////////////////////////////////////////////////////////////
 
     /** Remember that we need to do a synch soon. */
-    hsBool DirtySynchState(const char* SDLStateName, UInt32 synchFlags );
+    bool DirtySynchState(const char* SDLStateName, uint32_t synchFlags );
 
     double GetLastSyncTime() { return fLastSyncTime; }
 
@@ -210,17 +209,17 @@ protected:
     void ISetTransformGlobal(const hsMatrix44& l2w);
 
     // Enable/disable collisions and dynamic movement
-    void IEnable(hsBool enable);
+    void IEnable(bool enable);
 
 	btRigidBody* fBody;
     plKey fWorldKey;    // either a subworld or nil
 
-	hsBool fEnabled;
+	bool fEnabled;
 
     plSimDefs::Bounds fBoundsType;
     plSimDefs::Group fGroup;
-    UInt32 fReportsOn;          // bit vector for groups we report interactions with
-    UInt16 fLOSDBs;             // Which LOS databases we get put into
+    uint32_t fReportsOn;          // bit vector for groups we report interactions with
+    uint16_t fLOSDBs;             // Which LOS databases we get put into
     hsBitVector fProps;         // plSimulationInterface::plSimulationProperties kept here
     float   fMass;
 
@@ -228,8 +227,8 @@ protected:
     plKey fSceneNode;           // the room we're in
 
     hsPlane3* fWorldHull;
-    UInt32    fHullNumberPlanes;
-    hsBool      fInsideConvexHull;
+    uint32_t    fHullNumberPlanes;
+    bool      fInsideConvexHull;
 
     // we need to remember the last matrices we sent to the coordinate interface
     // so that we can recognize them when we send them back and not reapply them,
@@ -242,7 +241,7 @@ protected:
 
     plPhysicalSndGroup* fSndGroup;
 
-    hsBool      fWeWereHit;
+    bool      fWeWereHit;
     hsVector3   fHitForce;
     hsPoint3    fHitPos;
 

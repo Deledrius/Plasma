@@ -70,11 +70,6 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plModifier/plDetectorLog.h"
 
-#ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-#include "plPhysX/plSimulationMgr.h"
-#endif
-
-
 
 plArmatureMod* plCollisionDetector::IGetAvatarModifier(plKey key)
 {
@@ -272,9 +267,6 @@ bool plCameraRegionDetector::MsgReceive(plMessage* msg)
 
         fEntering = (pCollMsg->fEntering != 0);
 
- #ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-        fLastStep = plSimulationMgr::GetInstance()->GetStepCount();
-#endif
         return true;
     }
 
@@ -303,21 +295,14 @@ void plCameraRegionDetector::Write(hsStream* stream, hsResMgr* mgr)
 
 void plCameraRegionDetector::IHandleEval(plEvalMsg*)
 {
-#ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-    if (plSimulationMgr::GetInstance()->GetStepCount() - fLastStep > 1)
+    if (fIsInside != fEntering)
     {
-#endif
-        if (fIsInside != fEntering)
-        {
-            fIsInside = fEntering;
-            DetectorLog("%s CameraRegion: %s", fIsInside ? "Entering" : "Exiting", GetKeyName().c_str());
-            ISendTriggerMsg();
-        }
-        plgDispatch::Dispatch()->UnRegisterForExactType(plEvalMsg::Index(), GetKey());
-        fWaitingForEval = false;
-#ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
+        fIsInside = fEntering;
+        DetectorLog("%s CameraRegion: %s", fIsInside ? "Entering" : "Exiting", GetKeyName().c_str());
+        ISendTriggerMsg();
     }
-#endif
+    plgDispatch::Dispatch()->UnRegisterForExactType(plEvalMsg::Index(), GetKey());
+    fWaitingForEval = false;
 }
 
 /////////////////////////////////
@@ -328,24 +313,8 @@ void plCameraRegionDetector::IHandleEval(plEvalMsg*)
 
 void plObjectInVolumeDetector::ITrigger(plKey hitter, bool entering)
 {
-#ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-    for (bookKeepingList::iterator it = fCollisionList.begin(); it != fCollisionList.end(); ++it)
-    {
-        plCollisionBookKeepingInfo* collisionInfo = *it;
-        if (collisionInfo->fHitter == hitter)
-        {
-            collisionInfo->fEntering = entering;
-            collisionInfo->fLastStep = plSimulationMgr::GetInstance()->GetStepCount();
-            return;
-        }
-    }
-#endif
-
     plCollisionBookKeepingInfo* collisionInfo = new plCollisionBookKeepingInfo(hitter, entering);
     fCollisionList.push_back(collisionInfo);
-#ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-    collisionInfo->fLastStep = plSimulationMgr::GetInstance()->GetStepCount();
-#endif
 }
 
 void plObjectInVolumeDetector::IRegisterForEval()
@@ -404,39 +373,27 @@ void plObjectInVolumeDetector::IHandleEval(plEvalMsg*)
     while (it != fCollisionList.end())
     {
         plCollisionBookKeepingInfo* collisionInfo = *it;
-#ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-        if (plSimulationMgr::GetInstance()->GetStepCount() - collisionInfo->fLastStep > 1)
-        {
-#endif // USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-            ResidentSet::iterator j = fCurrentResidents.find(collisionInfo->fHitter);
-            bool wasInside = j != fCurrentResidents.end();
-            if (collisionInfo->fEntering != wasInside)
-            {
-                if (collisionInfo->fEntering)
-                {
-                    fCurrentResidents.insert(collisionInfo->fHitter);
-                    DetectorLog("%s: Sending Volume Enter ActivatorMsg", GetKeyName().c_str());
-                    ISendTriggerMsg(collisionInfo->fHitter, true);
-                }
-                else
-                {
-                    fCurrentResidents.erase(j);
-                    DetectorLog("%s: Sending Volume Exit ActivatorMsg", GetKeyName().c_str());
-                    ISendTriggerMsg(collisionInfo->fHitter, false);
-                }
-            }
 
-            delete collisionInfo;
-#ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-            it = fCollisionList.erase(it);
-        }
-        else
+        ResidentSet::iterator j = fCurrentResidents.find(collisionInfo->fHitter);
+        bool wasInside = j != fCurrentResidents.end();
+        if (collisionInfo->fEntering != wasInside)
         {
-            ++it;
+            if (collisionInfo->fEntering)
+            {
+                fCurrentResidents.insert(collisionInfo->fHitter);
+                DetectorLog("%s: Sending Volume Enter ActivatorMsg", GetKeyName().c_str());
+                ISendTriggerMsg(collisionInfo->fHitter, true);
+            }
+            else
+            {
+                fCurrentResidents.erase(j);
+                DetectorLog("%s: Sending Volume Exit ActivatorMsg", GetKeyName().c_str());
+                ISendTriggerMsg(collisionInfo->fHitter, false);
+            }
         }
-#else
-            ++it;
-#endif // USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
+
+        delete collisionInfo;
+        ++it;
     }
 }
 

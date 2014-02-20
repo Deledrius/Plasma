@@ -63,7 +63,6 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plNodeRefMsg.h"
 #include "pnMessage/plSDLModifierMsg.h"
 #include "plMessage/plSimStateMsg.h"
-#include "plMessage/plSimInfluenceMsg.h"
 #include "plMessage/plLinearVelocityMsg.h"
 #include "plMessage/plAngularVelocityMsg.h"
 #include "plDrawable/plDrawableGenerator.h"
@@ -74,7 +73,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include <btBulletDynamicsCommon.h>
 
-#define LogActivate(func) if (fActor->isSleeping()) SimLog("%s activated by %s", GetKeyName(), func);
+#define LogActivate(func) if (fActor->isSleeping()) SimLog("%s activated by %s", GetKeyName().c_str(), func);
 #define kMaxNegativeZPos -2000.f
 
 plProfile_Extern(MaySendLocation);
@@ -191,7 +190,7 @@ plBTPhysical::plBTPhysical()
 
 plBTPhysical::~plBTPhysical()
 {
-    plSimulationMgr::Log("Destroying physical %s", GetKeyName());
+    plSimulationMgr::Log("Destroying physical %s", GetKeyName().c_str());
 
 	if (fBody)
 	{
@@ -221,7 +220,7 @@ plBTPhysical::~plBTPhysical()
     delete fSDLMod;
 }
 
-hsBool plBTPhysical::Init(PhysRecipe& recipe)
+bool plBTPhysical::Init(PhysRecipe& recipe)
 {
     fBoundsType = recipe.bounds;
     fGroup = recipe.group;
@@ -353,7 +352,7 @@ void plBTPhysical::IReadV0(hsStream* stream, hsResMgr* mgr, PhysRecipe& recipe)
     recipe.sceneNode = mgr->ReadKey(stream);
     recipe.worldKey = mgr->ReadKey(stream);
 
-    mgr->ReadKeyNotifyMe(stream, TRACKED_NEW plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, kPhysRefSndGroup), plRefFlags::kActiveRef);
+    mgr->ReadKeyNotifyMe(stream, new plGenRefMsg(GetKey(), plRefMsg::kOnCreate, 0, kPhysRefSndGroup), plRefFlags::kActiveRef);
 
     hsPoint3 pos;
     hsQuat rot;
@@ -484,7 +483,7 @@ void plBTPhysical::Read(hsStream* stream, hsResMgr* mgr)
     hsAssert(!fProxyGen, "Already have proxy gen, double read?");
 
     hsColorRGBA physColor;
-    hsScalar opac = 1.0f;
+    float opac = 1.0f;
 
     if (fGroup == plSimDefs::kGroupAvatar)
     {
@@ -530,9 +529,9 @@ void plBTPhysical::Read(hsStream* stream, hsResMgr* mgr)
         physColor.Set(0.6f,0.6f,0.6f,1.f);
     }
 
-    fProxyGen = TRACKED_NEW plPhysicalProxy(hsColorRGBA().Set(0,0,0,1.f), physColor, opac);
+    fProxyGen = new plPhysicalProxy(hsColorRGBA().Set(0,0,0,1.f), physColor, opac);
     fProxyGen->Init(this);
-	plSimulationMgr::GetInstance()->Log("Finished reading and initting BTPhysical\n");
+    plSimulationMgr::GetInstance()->Log("Finished reading and initting BTPhysical\n");
 }
 
 void plBTPhysical::Write(hsStream* stream, hsResMgr* mgr)
@@ -615,7 +614,7 @@ void plBTPhysical::Write(hsStream* stream, hsResMgr* mgr)
 /////////////////////////////////////////////////////////////////
 
 // MSGRECEIVE
-hsBool plBTPhysical::MsgReceive( plMessage* msg )
+bool plBTPhysical::MsgReceive( plMessage* msg )
 {
     if(plGenRefMsg *refM = plGenRefMsg::ConvertNoRef(msg))
     {
@@ -648,14 +647,14 @@ hsBool plBTPhysical::MsgReceive( plMessage* msg )
 // there's two things we hold references to: subworlds
 // and the simulation manager.
 // right now, we're only worrying about the subworlds
-hsBool plBTPhysical::HandleRefMsg(plGenRefMsg* refMsg)
+bool plBTPhysical::HandleRefMsg(plGenRefMsg* refMsg)
 {
-    UInt8 refCtxt = refMsg->GetContext();
+    uint8_t refCtxt = refMsg->GetContext();
     plKey refKey = refMsg->GetRef()->GetKey();
     plKey ourKey = GetKey();
     PhysRefType refType = PhysRefType(refMsg->fType);
 
-    const char* refKeyName = refKey ? refKey->GetName() : "MISSING";
+    const plString refKeyName = refKey ? refKey->GetName() : "MISSING";
 
     if (refType == kPhysRefWorld)
     {
@@ -693,7 +692,7 @@ hsBool plBTPhysical::HandleRefMsg(plGenRefMsg* refMsg)
     return true;
 }
 
-plPhysical& plBTPhysical::SetProperty(int prop, hsBool status)
+plPhysical& plBTPhysical::SetProperty(int prop, bool status)
 {
     if (GetProperty(prop) == status)
     {
@@ -708,7 +707,7 @@ plPhysical& plBTPhysical::SetProperty(int prop, hsBool status)
         case plSimulationInterface::kNoSynchronize:     propName = "kNoSynchronize";        break;
         }
 
-        const char* name = "(unknown)";
+        plString name = "(unknown)";
         if (GetKey())
             name = GetKeyName();
         if (plSimulationMgr::fExtraProfile)
@@ -727,7 +726,7 @@ plPhysical& plBTPhysical::SetProperty(int prop, hsBool status)
             // if the body is already unpinned and you unpin it again,
             // you'll wipe out its velocity. hence the check.
 			// Is this also true for Bullet?
-            hsBool current = fBody->getLinearFactor().x() == 0;
+            bool current = fBody->getLinearFactor().x() == 0;
             if (status != current)
             {
                 if (status) {
@@ -759,14 +758,14 @@ void plBTPhysical::SetSceneNode(plKey newNode)
     plKey oldNode = GetSceneNode();
     char msg[1024];
     if (newNode)
-        sprintf(msg,"Physical object %s cannot change scenes. Already in %s, trying to switch to %s.",fObjectKey->GetName(),oldNode->GetName(),newNode->GetName());
+        sprintf(msg,"Physical object %s cannot change scenes. Already in %s, trying to switch to %s.",fObjectKey->GetName().c_str(),oldNode->GetName().c_str(),newNode->GetName().c_str());
     else
-        sprintf(msg,"Physical object %s cannot change scenes. Already in %s, trying to switch to <nil key>.",fObjectKey->GetName(),oldNode->GetName());
+        sprintf(msg,"Physical object %s cannot change scenes. Already in %s, trying to switch to <nil key>.",fObjectKey->GetName().c_str(),oldNode->GetName().c_str());
     hsAssert(oldNode == newNode, msg);
 #endif  // HS_DEBUGGING
 }
 
-hsBool plBTPhysical::GetLinearVelocitySim(hsVector3& vel) const
+bool plBTPhysical::GetLinearVelocitySim(hsVector3& vel) const
 {
     vel = toPlasma<hsVector3>(fBody->getLinearVelocity());
     return true;
@@ -782,7 +781,7 @@ void plBTPhysical::ClearLinearVelocity()
   fBody->setLinearVelocity(btVector3(0, 0, 0));
 }
 
-hsBool plBTPhysical::GetAngularVelocitySim(hsVector3& vel) const
+bool plBTPhysical::GetAngularVelocitySim(hsVector3& vel) const
 {
     vel = toPlasma<hsVector3>(fBody->getAngularVelocity());
     return true;
@@ -793,7 +792,7 @@ void plBTPhysical::SetAngularVelocitySim(const hsVector3& vel)
     fBody->setAngularVelocity(toBullet(vel));
 }
 
-void plBTPhysical::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, hsBool force)
+void plBTPhysical::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, bool force)
 {
     // make sure the physical is dynamic.
     //  also make sure there is some difference between the matrices...
@@ -806,7 +805,7 @@ void plBTPhysical::SetTransform(const hsMatrix44& l2w, const hsMatrix44& w2l, hs
     else
     {
         if (fBody->isStaticObject()  && plSimulationMgr::fExtraProfile)
-            SimLog("Setting transform on non-dynamic: %s.", GetKeyName());
+            SimLog("Setting transform on non-dynamic: %s.", GetKeyName().c_str());
     }
 }
 
@@ -816,7 +815,7 @@ void plBTPhysical::GetTransform(hsMatrix44& l2w, hsMatrix44& w2l)
     l2w.GetInverse(&w2l);
 }
 
-hsBool plBTPhysical::Should_I_Trigger(hsBool enter, hsPoint3& pos)
+bool plBTPhysical::Should_I_Trigger(bool enter, hsPoint3& pos)
 {
     bool trigger;
 	bool inside = IsObjectInsideHull(pos);
@@ -832,20 +831,20 @@ hsBool plBTPhysical::Should_I_Trigger(hsBool enter, hsPoint3& pos)
 	return trigger;
 }
 
-hsBool plBTPhysical::IsObjectInsideHull(const hsPoint3& pos)
+bool plBTPhysical::IsObjectInsideHull(const hsPoint3& pos)
 {
 	// BULLET STUB ???
     return false;
 }
 
-void plBTPhysical::SendNewLocation(hsBool synchTransform, hsBool isSynchUpdate)
+void plBTPhysical::SendNewLocation(bool synchTransform, bool isSynchUpdate)
 {
     // we only send if:
     // - the body is active or forceUpdate is on
     // - the mass is non-zero
     // - the physical is not passive
-    hsBool bodyActive = false; //!fActor->isSleeping();
-    hsBool dynamic = false; //fActor->isDynamic();
+    bool bodyActive = false; //!fActor->isSleeping();
+    bool dynamic = false; //fActor->isDynamic();
     
     if ((bodyActive || isSynchUpdate) && dynamic)// && fInitialTransform)
     {
@@ -860,11 +859,11 @@ void plBTPhysical::SendNewLocation(hsBool synchTransform, hsBool isSynchUpdate)
             if (!CompareMatrices(curl2w, fCachedLocal2World, .0001f))
             {
                 plProfile_Inc(LocationsSent);
-                plProfile_BeginLap(PhysicsUpdates, GetKeyName());
+                plProfile_BeginLap(PhysicsUpdates, GetKeyName().c_str());
 
                 if (fCachedLocal2World.GetTranslate().fZ < kMaxNegativeZPos)
                 {
-                    SimLog("Physical %s fell to %.1f (%.1f is the max).  Suppressing.", GetKeyName(), fCachedLocal2World.GetTranslate().fZ, kMaxNegativeZPos);
+                    SimLog("Physical %s fell to %.1f (%.1f is the max).  Suppressing.", GetKeyName().c_str(), fCachedLocal2World.GetTranslate().fZ, kMaxNegativeZPos);
                     // Since this has probably been falling for a while, and thus not getting any syncs,
                     // make sure to save it's current pos so we'll know to reset it later
                     DirtySynchState(kSDLPhysical, plSynchedObject::kBCastToClients);
@@ -873,11 +872,11 @@ void plBTPhysical::SendNewLocation(hsBool synchTransform, hsBool isSynchUpdate)
 
                 hsMatrix44 w2l;
                 fCachedLocal2World.GetInverse(&w2l);
-                plCorrectionMsg *pCorrMsg = TRACKED_NEW plCorrectionMsg(GetObjectKey(), fCachedLocal2World, w2l, synchTransform);
+                plCorrectionMsg *pCorrMsg = new plCorrectionMsg(GetObjectKey(), fCachedLocal2World, w2l, synchTransform);
                 pCorrMsg->Send();
                 if (fProxyGen)
                     fProxyGen->SetTransform(fCachedLocal2World, w2l);
-                plProfile_EndLap(PhysicsUpdates, GetKeyName());
+                plProfile_EndLap(PhysicsUpdates, GetKeyName().c_str());
             }
         }
     }
@@ -895,7 +894,7 @@ void plBTPhysical::ApplyHitForce()
 // TESTING SDL
 // Send phys sendState msg to object's plPhysicalSDLModifier
 //
-hsBool plBTPhysical::DirtySynchState(const char* SDLStateName, UInt32 synchFlags )
+bool plBTPhysical::DirtySynchState(const char* SDLStateName, uint32_t synchFlags )
 {
     if (GetObjectKey())
     {
@@ -929,7 +928,7 @@ void plBTPhysical::SetSyncState(hsPoint3* pos, hsQuat* rot, hsVector3* linV, hsV
     // This hack is bad, and I should feel bad for leaving it in.
     if (pos && pos->fZ < kMaxNegativeZPos && initialSync)
     {
-        SimLog("Physical %s loaded out of range state.  Forcing initial state to server.", GetKeyName());
+        SimLog("Physical %s loaded out of range state.  Forcing initial state to server.", GetKeyName().c_str());
         DirtySynchState(kSDLPhysical, plSynchedObject::kBCastToClients);
         return;
     }
@@ -947,17 +946,17 @@ void plBTPhysical::SetSyncState(hsPoint3* pos, hsQuat* rot, hsVector3* linV, hsV
     SendNewLocation(false, true);
 }
 
-void plBTPhysical::ExcludeRegionHack(hsBool cleared)
+void plBTPhysical::ExcludeRegionHack(bool cleared)
 {
     // BULLET STUB
 }
 
-plDrawableSpans* plBTPhysical::CreateProxy(hsGMaterial* mat, hsTArray<UInt32>& idx, plDrawableSpans* addTo)
+plDrawableSpans* plBTPhysical::CreateProxy(hsGMaterial* mat, hsTArray<uint32_t>& idx, plDrawableSpans* addTo)
 {
 	hsMatrix44 l2w, dummy;
 	GetTransform(l2w, dummy);
 
-	hsBool blended = ((mat->GetLayer(0)->GetBlendFlags() & hsGMatState::kBlendMask));
+	bool blended = ((mat->GetLayer(0)->GetBlendFlags() & hsGMatState::kBlendMask));
 
 	switch(fBoundsType) {
 	case plSimDefs::kSphereBounds:
@@ -1003,7 +1002,7 @@ plDrawableSpans* plBTPhysical::CreateProxy(hsGMaterial* mat, hsTArray<UInt32>& i
     return addTo;
 }
 
-void plBTPhysical::IEnable(hsBool enable)
+void plBTPhysical::IEnable(bool enable)
 {
 	if(enable == fEnabled)
 		return;

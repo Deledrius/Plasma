@@ -61,7 +61,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnMessage/plSDLModifierMsg.h"
 //for hack
 #include "plBullet/plBTPhysical.h"
-//#include "plBullet/plPXPhysicalControllerCore.h" 
+#include "plBullet/plBTPhysicalControllerCore.h" 
 
 static plPhysical* GetPhysical(plSceneObject* obj)
 {

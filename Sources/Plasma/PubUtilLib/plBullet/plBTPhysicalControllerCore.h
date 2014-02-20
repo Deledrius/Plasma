@@ -47,7 +47,7 @@ class btRigidBody;
 class plBTPhysicalControllerCore: public plPhysicalControllerCore
 {
 public:
-    plBTPhysicalControllerCore(plKey ownerSO, hsScalar height, hsScalar radius);
+    plBTPhysicalControllerCore(plKey ownerSO, float height, float radius, bool human);
     ~plBTPhysicalControllerCore();
 
     inline virtual void Move(hsVector3 displacement, unsigned int collideWith, unsigned int &collisionResults);
@@ -75,18 +75,22 @@ public:
     virtual void GetPositionSim(hsPoint3& pos){IGetPositionSim(pos);}
     virtual void MoveKinematicToController(hsPoint3& pos);
     virtual const hsPoint3& GetLocalPosition(){return fLocalPosition;}
-    virtual void SetControllerDimensions(hsScalar radius, hsScalar height);
+    virtual void SetControllerDimensions(float radius, float height);
     virtual void LeaveAge();
     virtual void UpdateControllerAndPhysicalRep();
 
-    virtual int SweepControllerPath(const hsPoint3& startPos, const hsPoint3& endPos, hsBool vsDynamics, hsBool vsStatics, UInt32& vsSimGroups, std::multiset< plControllerSweepRecord >& WhatWasHitOut);
-    virtual void BehaveLikeAnimatedPhysical(hsBool actLikeAnAnimatedPhys);
-    virtual hsBool BehavingLikeAnAnimatedPhysical();
+    virtual int SweepControllerPath(const hsPoint3& startPos, const hsPoint3& endPos, bool vsDynamics, bool vsStatics, uint32_t& vsSimGroups, std::vector<plControllerSweepRecord>& hits);
+    virtual void BehaveLikeAnimatedPhysical(bool actLikeAnAnimatedPhys);
+    virtual bool BehavingLikeAnAnimatedPhysical();
 
-	virtual const hsVector3& GetLinearVelocity();
-	virtual void SetLinearVelocity(const hsVector3&);
-	virtual void SetAngularVelocity(const hsScalar);
-	virtual void SetVelocities(const hsVector3& linearVel, hsScalar angVel);	
+    virtual const hsVector3& GetLinearVelocity();
+    virtual void SetLinearVelocity(const hsVector3&);
+    virtual void SetAngularVelocity(const float);
+    virtual void SetVelocities(const hsVector3& linearVel, float angVel);
+
+    virtual void SetMovementStrategy(plMovementStrategy* strategy) {};
+    virtual void SetLinearVelocitySim(const hsVector3& linearVel) {};
+    
 protected:
     void ISetGlobalLoc(const hsMatrix44& l2w);
     void IMatchKinematicToController();
@@ -94,13 +98,16 @@ protected:
     void ISetKinematicLoc(const hsMatrix44& l2w);
     void IGetPositionSim(hsPoint3& pos) const;
 
-	void ICreateController();
-	void ICreateController(const hsPoint3&);
-	void IDeleteController();
+    void ICreateController();
+    void ICreateController(const hsPoint3&);
+    void IDeleteController();
 
-    hsScalar fPreferedRadius;
-    hsScalar fPreferedHeight;
-    hsBool fBehavingLikeAnimatedPhys;
+    void IHandleEnableChanged() {};
+
+    float fPreferedRadius;
+    float fPreferedHeight;
+    bool fBehavingLikeAnimatedPhys;
+    bool fHuman;
 
 	btRigidBody *fBody;
 };

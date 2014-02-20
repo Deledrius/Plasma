@@ -53,8 +53,6 @@ class plArmatureMod;
 class plActivatorMsg;
 class plEvalMsg;
 
-#define USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-
 class plCollisionDetector : public plDetectorModifier
 {
 protected:
@@ -101,9 +99,6 @@ protected:
             : fHitter(key), fEntering(entering) { }
 
         plKey fHitter;
-#ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-        uint32_t fLastStep;
-#endif // USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
         bool fEntering;
     };
 
@@ -175,9 +170,6 @@ protected:
     typedef std::vector<plCameraMsg*> plCameraMsgVec;
 
     plCameraMsgVec  fMessages;
-#ifdef USE_PHYSX_COLLISION_FLUTTER_WORKAROUND
-    uint32_t fLastStep;
-#endif
     bool fIsInside;
     bool fEntering;
 

@@ -57,7 +57,7 @@ plLOSDispatch::~plLOSDispatch()
     plgDispatch::Dispatch()->UnRegisterForExactType(plLOSRequestMsg::Index(), GetKey());
 }
 
-hsBool plLOSDispatch::MsgReceive(plMessage* msg)
+bool plLOSDispatch::MsgReceive(plMessage* msg)
 {
     // BULLET STUB
     return hsKeyedObject::MsgReceive(msg);
@@ -67,7 +67,7 @@ plMessage* plLOSDispatch::ICreateHitMsg(plLOSRequestMsg* requestMsg, hsMatrix44&
 {
     plKey ourKey = GetKey();
     plKey rcvKey = requestMsg->GetSender();
-    plLOSHitMsg* hitMsg = TRACKED_NEW plLOSHitMsg(ourKey, rcvKey, nil);
+    plLOSHitMsg* hitMsg = new plLOSHitMsg(ourKey, rcvKey, nil);
     hitMsg->fNoHit = false;
 	//hitMsg->fObj = gMyReport.GetObj();
     //hitMsg->fDistance = gMyReport.GetDistance();
@@ -81,7 +81,7 @@ plMessage* plLOSDispatch::ICreateMissMsg(plLOSRequestMsg* requestMsg)
 {
     plKey ourKey = GetKey();
     plKey rcvKey = requestMsg->GetSender();
-    plLOSHitMsg* missMsg = TRACKED_NEW plLOSHitMsg(ourKey, rcvKey, nil);
+    plLOSHitMsg* missMsg = new plLOSHitMsg(ourKey, rcvKey, nil);
     missMsg->fNoHit = true;
     missMsg->fObj = nil;
     missMsg->fRequestID = requestMsg->GetRequestID();
