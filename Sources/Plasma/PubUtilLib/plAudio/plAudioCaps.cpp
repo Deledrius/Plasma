@@ -46,21 +46,15 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //////////////////////////////////////////////////////////////////////////////
 
 #include "HeadSpin.h"
-#include <al.h>
-#include <alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 #include "plEAXEffects.h"
-
 #include "plAudioCaps.h"
-#ifdef EAX_SDK_AVAILABLE
-#include <eax.h>
-#include <eaxlegacy.h>
-#endif
-#include <iostream>
-
 #include "plStatusLog/plStatusLog.h"
 
+#include <iostream>
+
 #define MAX_NUM_SOURCES 128
-#define kLogMe if( fLog != nil ) fLog->AddLineF( 
 #define MAX_AUDIOCARD_NAME 256
 
 //////////////////////////////////////////////////////////////////////////////
@@ -69,8 +63,6 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 plAudioCaps plAudioCapsDetector::fCaps;
 bool plAudioCapsDetector::fGotCaps = false;
-
-plStatusLog *plAudioCapsDetector::fLog = nil;
 
 plAudioCapsDetector::plAudioCapsDetector()
 {
@@ -83,7 +75,7 @@ plAudioCapsDetector::~plAudioCapsDetector()
 //// Detect //////////////////////////////////////////////////////////////////
 //  Our big function that does all of our work
 
-plAudioCaps &plAudioCapsDetector::Detect( bool logIt, bool init )
+plAudioCaps &plAudioCapsDetector::Detect(bool init)
 {
     // If we already have the device capabilities, just return them
     if(fGotCaps) return fCaps;
@@ -111,13 +103,8 @@ plAudioCaps &plAudioCapsDetector::Detect( bool logIt, bool init )
             fCaps.fIsAvailable = false;
         }
     }
-    
-    if( logIt )
-        fLog = plStatusLogMgr::GetInstance().CreateStatusLog( 30, "audioCaps.log" );
-    else
-        fLog = nil;
 
-    kLogMe 0xff00ff00, "Starting audio caps detection..." );
+    plStatusLog::AddLineS("audioCaps.log", plStatusLog::kGreen, "Starting audio caps detection...");
 
     // find the max number of sources
     ALuint sources[MAX_NUM_SOURCES];
@@ -130,15 +117,14 @@ plAudioCaps &plAudioCapsDetector::Detect( bool logIt, bool init )
         fCaps.fMaxNumSources++;
     }
     alDeleteSources(i, sources); 
-    kLogMe 0xffffffff, "Max Number of sources: %d", i);
+    plStatusLog::AddLineS("audioCaps.log", plStatusLog::kWhite, "Max Number of sources: %d", i);
     plStatusLog::AddLineS("audio.log", "Max Number of sources: %d", i);
 
     // Detect EAX support
-    kLogMe 0xff00ff00, "Attempting to detect EAX support..." );
+    plStatusLog::AddLineS("audioCaps.log", plStatusLog::kGreen, "Attempting to detect EAX support...");
     fCaps.fEAXAvailable = IDetectEAX( );
 
-    kLogMe 0xff00ff00, "Audio caps detection COMPLETE." );
-    delete fLog;
+    plStatusLog::AddLineS("audioCaps.log", plStatusLog::kGreen, "Audio caps detection COMPLETE.");
     
     fGotCaps = true; // We've got the device capabilities
 
@@ -160,29 +146,24 @@ plAudioCaps &plAudioCapsDetector::Detect( bool logIt, bool init )
 
 bool    plAudioCapsDetector::IDetectEAX(  )
 {
-#ifdef EAX_SDK_AVAILABLE
     bool gotSupport = true;
 
-    if(!alIsExtensionPresent((ALchar *)"EAX4.0"))       // is eax 4 supported
+    if(!alIsExtensionPresent((ALchar *) "EAX4.0"))       // is eax 4 supported
     {
         if(!alIsExtensionPresent((ALchar *) "EAX4.0Emulated"))      // is an earlier version of eax supported
         {
-            kLogMe 0xff00ff00, "EAX not supported");
+            plStatusLog::AddLineS("audioCaps.log", plStatusLog::kGreen, "EAX not supported");
             gotSupport = false;
         }
         else
         {
             fCaps.fEAXUnified = true;
-            kLogMe 0xff00ff00, "EAX 4 Emulated supported");
+            plStatusLog::AddLineS("audioCaps.log", plStatusLog::kGreen, "EAX 4 Emulated supported");
         }
     }
     else
     {
-        kLogMe 0xff00ff00, "EAX 4 available");
+        plStatusLog::AddLineS("audioCaps.log", plStatusLog::kGreen, "EAX 4 available");
     }   
     return gotSupport;
-#else
-    kLogMe 0xff00ff00, "EAX disabled in this build");
-    return false;
-#endif
 }

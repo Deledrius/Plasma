@@ -52,7 +52,6 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsTemplates.h"
 
 class plAudioCapsDetector;
-class plStatusLog;
 
 class plAudioCaps
 {
@@ -86,10 +85,9 @@ public:
     plAudioCapsDetector();
     virtual ~plAudioCapsDetector();
 
-    static plAudioCaps &Detect( bool log = false, bool init = false );
+    static plAudioCaps &Detect(bool init=false);
 
 protected:
-    static plStatusLog  *fLog;
     static plAudioCaps  fCaps;
     static bool         fGotCaps;
     

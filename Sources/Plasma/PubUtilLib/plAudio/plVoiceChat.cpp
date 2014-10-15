@@ -42,8 +42,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "HeadSpin.h"
 #include "hsTimer.h"
 #include "hsResMgr.h"
-#include <al.h>
-#include <alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 #include "plDSoundBuffer.h"
 #include <speex/speex.h>
 #include <speex/speex_bits.h>

@@ -2110,7 +2110,7 @@ void plClient::IDetectAudioVideoSettings()
     {
         stream = plEncryptedStream::OpenEncryptedFileWrite(audioIniFile);
 
-        plAudioCaps caps = plAudioCapsDetector::Detect(false, true);
+        plAudioCaps caps = plAudioCapsDetector::Detect(true);
 
         char deviceName[256];
         sprintf(deviceName, "\"%s\"", DEFAULT_AUDIO_DEVICE_NAME);

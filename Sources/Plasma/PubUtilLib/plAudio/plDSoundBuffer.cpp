@@ -50,7 +50,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "HeadSpin.h"
 #include "hsThread.h"
 #include "plDSoundBuffer.h"
-#include <al.h>
+#include <AL/al.h>
 
 #include "plgDispatch.h"
 #include "plAudioSystem.h"
