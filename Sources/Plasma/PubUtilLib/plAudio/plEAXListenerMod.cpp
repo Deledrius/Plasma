@@ -45,29 +45,23 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 //                                                                          //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef EAX_SDK_AVAILABLE
-#include "plEAXStructures.h"
-#endif
 #include "HeadSpin.h"
 #include "plEAXListenerMod.h"
+#include "plEAXStructures.h"
 #include "plIntersect/plSoftVolume.h"
 #include "hsResMgr.h"
 #include "plgDispatch.h"
 #include "plAudioSystem.h"
 #include "pnMessage/plAudioSysMsg.h" 
 
-#ifdef EAX_SDK_AVAILABLE
-#include <eax-util.h>
-#endif
+#include <AL/efx.h>
+#include <AL/efx-presets.h>
 
 
 plEAXListenerMod::plEAXListenerMod()
+    : fListenerProps(new EAXREVERBPROPERTIES),
+    fSoftRegion(nullptr), fRegistered(false), fGetsMessages(false)
 {
-    fListenerProps = new EAXREVERBPROPERTIES;
-    fSoftRegion = nil;
-    fRegistered = false;
-    fGetsMessages = false;
-
 #ifdef EAX_SDK_AVAILABLE
     memcpy( fListenerProps, &REVERB_ORIGINAL_PRESETS[ ORIGINAL_GENERIC ], sizeof( EAXREVERBPROPERTIES ) );
 #endif

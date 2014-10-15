@@ -53,9 +53,11 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 class plMessage;
 class plSoftVolume;
-#ifdef EAX_SDK_AVAILABLE
+
 typedef struct _EAXREVERBPROPERTIES EAXREVERBPROPERTIES;
-#endif
+
+#include <AL/efx.h>
+#include <AL/efx-presets.h>
 
 class plEAXListenerMod : public plSingleModifier
 {
@@ -77,7 +79,7 @@ public:
     virtual void    Write( hsStream* s, hsResMgr* mgr );
     float           GetStrength( void );
 
-    EAXREVERBPROPERTIES *   GetListenerProps( void ) { return fListenerProps; }
+    EAXREVERBPROPERTIES *   GetListenerProps(void) { return fListenerProps; }
     void                    SetFromPreset( uint32_t preset );
 
 protected:

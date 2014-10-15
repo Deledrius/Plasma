@@ -52,18 +52,13 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "HeadSpin.h"
 #include "hsTemplates.h"
+#include <AL/efx-presets.h>
 
 
 //// Listener Settings Class Definition ///////////////////////////////////////
 
 class plDSoundBuffer;
 class plEAXListenerMod;
-
-#ifdef EAX_SDK_AVAILABLE
-typedef struct _EAXREVERBPROPERTIES EAXREVERBPROPERTIES;
-#else
-#include "plEAXStructures.h"
-#endif
 
 #if HS_BUILD_FOR_WIN32
     typedef struct _GUID GUID;
@@ -74,33 +69,33 @@ typedef struct _EAXREVERBPROPERTIES EAXREVERBPROPERTIES;
 class plEAXListener 
 {   
 public:
-    ~plEAXListener();
+    ~plEAXListener()  { Shutdown(); }
     static plEAXListener    &GetInstance( void );
 
-    bool    Init( void );
-    void    Shutdown( void );
+    bool Init( void );
+    void Shutdown( void );
 
     bool SetGlobalEAXProperty(GUID guid, unsigned long ulProperty, void *pData, unsigned long ulDataSize );
     bool GetGlobalEAXProperty(GUID guid, unsigned long ulProperty, void *pData, unsigned long ulDataSize );
     
-    void    ProcessMods( hsTArray<plEAXListenerMod *> &modArray );
-    void    ClearProcessCache( void );
+    void ProcessMods( hsTArray<plEAXListenerMod *> &modArray );
+    void ClearProcessCache( void );
 
 protected:
-    plEAXListener();
-    void    IFail( bool major );
-    void    IFail( const char *msg, bool major );
-    void    IRelease( void );
+    plEAXListener() : fInited(false) { ClearProcessCache(); }
+    void IFail( bool major );
+    void IFail( const char *msg, bool major );
+    void IRelease( void );
 
-    void    IMuteProperties( EAXREVERBPROPERTIES *props, float percent );
+    void IMuteProperties(EFXEAXREVERBPROPERTIES *props, float percent);
 
-    bool                fInited;
+    bool fInited;
     
     // Cache info
-    int32_t               fLastModCount;
-    bool                fLastWasEmpty;
-    float            fLastSingleStrength;
-    plEAXListenerMod    *fLastBigRegion;
+    int32_t            fLastModCount;
+    bool               fLastWasEmpty;
+    float              fLastSingleStrength;
+    plEAXListenerMod  *fLastBigRegion;
 
 };
 
@@ -112,17 +107,17 @@ class hsStream;
 class plEAXSourceSoftSettings
 {
 public:
-        int16_t       fOcclusion;
-        float    fOcclusionLFRatio, fOcclusionRoomRatio, fOcclusionDirectRatio;
+        int16_t fOcclusion;
+        float   fOcclusionLFRatio, fOcclusionRoomRatio, fOcclusionDirectRatio;
 
-        void        Read( hsStream *s );
-        void        Write( hsStream *s );
+        void    Read( hsStream *s );
+        void    Write( hsStream *s );
 
-        void        SetOcclusion( int16_t occ, float lfRatio, float roomRatio, float directRatio );
-        int16_t       GetOcclusion( void ) const { return fOcclusion; }
-        float    GetOcclusionLFRatio( void ) const { return fOcclusionLFRatio; }
-        float    GetOcclusionRoomRatio( void ) const { return fOcclusionRoomRatio; }
-        float    GetOcclusionDirectRatio( void ) const { return fOcclusionDirectRatio; }
+        void    SetOcclusion( int16_t occ, float lfRatio, float roomRatio, float directRatio );
+        int16_t GetOcclusion( void ) const { return fOcclusion; }
+        float   GetOcclusionLFRatio( void ) const { return fOcclusionLFRatio; }
+        float   GetOcclusionRoomRatio( void ) const { return fOcclusionRoomRatio; }
+        float   GetOcclusionDirectRatio( void ) const { return fOcclusionDirectRatio; }
 
         void        Reset( void );
 };
@@ -201,8 +196,8 @@ public:
     friend class plEAXSourceSettings;
     friend class plEAXSourceSoftSettings;
 
-    plEAXSource();
-    virtual ~plEAXSource();
+    plEAXSource() : fInit(false) {}
+    virtual ~plEAXSource() { Release(); };
 
     void    Init( plDSoundBuffer *parent );
     void    Release( void );

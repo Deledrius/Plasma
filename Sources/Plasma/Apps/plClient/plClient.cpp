@@ -2116,7 +2116,7 @@ void plClient::IDetectAudioVideoSettings()
         sprintf(deviceName, "\"%s\"", DEFAULT_AUDIO_DEVICE_NAME);
 
         WriteBool(stream, "Audio.Initialize",  caps.IsAvailable());
-        WriteBool(stream, "Audio.UseEAX", false);
+        WriteBool(stream, "Audio.UseEAX", true);
         WriteInt(stream, "Audio.SetPriorityCutoff", 6);
         WriteInt(stream, "Audio.MuteAll", false);
         WriteInt(stream, "Audio.SetChannelVolume SoundFX", 1);
