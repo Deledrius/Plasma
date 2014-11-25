@@ -104,7 +104,7 @@ public:
     virtual void SetGlobalLoc(const hsMatrix44& l2w) = 0;
 
     // Local sim position
-    virtual void GetPositionSim(hsPoint3& pos) = 0;
+    virtual void GetPositionSim(hsPoint3& pos) const = 0;
 
     // Move kinematic controller
     virtual void Move(hsVector3 displacement, unsigned int collideWith, unsigned int &collisionResults) = 0;

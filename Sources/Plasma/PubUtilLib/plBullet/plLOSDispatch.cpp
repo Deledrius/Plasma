@@ -67,7 +67,7 @@ plMessage* plLOSDispatch::ICreateHitMsg(plLOSRequestMsg* requestMsg, hsMatrix44&
 {
     plKey ourKey = GetKey();
     plKey rcvKey = requestMsg->GetSender();
-    plLOSHitMsg* hitMsg = new plLOSHitMsg(ourKey, rcvKey, nil);
+    plLOSHitMsg* hitMsg = new plLOSHitMsg(ourKey, rcvKey, nullptr);
     hitMsg->fNoHit = false;
 	//hitMsg->fObj = gMyReport.GetObj();
     //hitMsg->fDistance = gMyReport.GetDistance();
@@ -81,9 +81,9 @@ plMessage* plLOSDispatch::ICreateMissMsg(plLOSRequestMsg* requestMsg)
 {
     plKey ourKey = GetKey();
     plKey rcvKey = requestMsg->GetSender();
-    plLOSHitMsg* missMsg = new plLOSHitMsg(ourKey, rcvKey, nil);
+    plLOSHitMsg* missMsg = new plLOSHitMsg(ourKey, rcvKey, nullptr);
     missMsg->fNoHit = true;
-    missMsg->fObj = nil;
+    missMsg->fObj = nullptr;
     missMsg->fRequestID = requestMsg->GetRequestID();
     return missMsg;
 }

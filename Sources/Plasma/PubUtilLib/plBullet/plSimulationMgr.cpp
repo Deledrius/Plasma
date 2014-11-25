@@ -44,6 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plLOSDispatch.h"
 #include "plPhysical/plPhysicsSoundMgr.h"
 #include "plStatusLog/plStatusLog.h"
+#include "plBullet/plBTPhysicalControllerCore.h"
 
 #include <btBulletDynamicsCommon.h>
 
@@ -90,6 +91,7 @@ bool plSimulationMgr::fDoClampingOnStep = true;
 
 plSimulationMgr::plSimulationMgr()
     : fSuspended(true)
+    , fAccumulator(0.0f)
     , fMaxDelta(kDefaultMaxDelta)
     , fStepSize(kDefaultStepSize)
     , fLOSDispatch(new plLOSDispatch())
@@ -102,51 +104,156 @@ plSimulationMgr::plSimulationMgr()
 
 void plSimulationMgr::Advance(float delSecs)
 {
-	for(SceneMap::iterator it = fScenes.begin(); it != fScenes.end(); ++it) {
-		it->second->world->stepSimulation(delSecs, 5);
-	}
+    fAccumulator += delSecs;
+    if (fAccumulator < kDefaultStepSize)
+    {
+        // Not enough time has passed to perform a substep.
+        plBTPhysicalControllerCore::UpdateNonPhysical(fAccumulator / kDefaultStepSize);
+        return;
+    }
+    else if (fAccumulator > kDefaultMaxDelta)
+    {
+        if (fExtraProfile)
+            Log("Step clamped from %f to limit of %f", fAccumulator, kDefaultMaxDelta);
+        fAccumulator = kDefaultMaxDelta;
+    }
+
+    // Perform as many whole substeps as possible saving the remainder in our accumulator.
+    int numSubSteps = (int)(fAccumulator / kDefaultStepSize);
+    float delta = numSubSteps * kDefaultStepSize;
+    fAccumulator -= delta;
+    plProfile_IncCount(StepLen, (int)(delta*1000));
+    
+    plBTPhysicalControllerCore::Apply(delta);
+
+    for (SceneMap::iterator it = fScenes.begin(); it != fScenes.end(); it++)
+    {
+        /*
+        NxScene* scene = it->second;
+        bool do_advance = true;
+        if (fSubworldOptimization)
+        {
+            plKey world = (plKey)it->first;
+            if (world == GetKey())
+                world = nil;
+            do_advance = plPXPhysicalControllerCore::AnyControllersInThisWorld(world);
+        }
+        if (do_advance)
+        {
+            scene->simulate(delta);
+            scene->flushStream();
+            scene->fetchResults(NX_RIGID_BODY_FINISHED, true);
+        }
+        */
+    }
+
+for(SceneMap::iterator it = fScenes.begin(); it != fScenes.end(); ++it) {
+    it->second->world->stepSimulation(delSecs, 5);
+}
+
+    plBTPhysicalControllerCore::Update(numSubSteps, fAccumulator / kDefaultStepSize);
+
+    plProfile_EndTiming(Step);
+#ifndef PLASMA_EXTERNAL_RELEASE
+    //if(plSimulationMgr::fDisplayAwakeActors)IDrawActiveActorList();
+#endif
+    if (fExtraProfile)
+    {
+        int contacts = 0, dynActors = 0, dynShapes = 0, awake = 0, stShapes=0, actors=0, scenes=0, controllers=0 ;
+        for (SceneMap::iterator it = fScenes.begin(); it != fScenes.end(); it++)
+        {
+            bool do_advance = true;
+            if (fSubworldOptimization)
+            {
+                plKey world = (plKey)it->first;
+                if (world == GetKey())
+                    world = nil;
+                do_advance = plBTPhysicalControllerCore::AnyControllersInThisWorld(world);
+            }
+            if (do_advance)
+            {
+                /*
+                NxScene* scene = it->second;
+                NxSceneStats stats;
+                scene->getStats(stats);
+
+                contacts += stats.numContacts;
+                dynActors += stats.numDynamicActors;
+                dynShapes += stats.numDynamicShapes;
+                awake += stats.numDynamicActorsInAwakeGroups;
+                stShapes += stats.numStaticShapes;
+                actors += stats.numActors;
+                scenes += 1;
+                controllers += plBTPhysicalControllerCore::NumControllers();
+                */
+            }
+        }
+
+        plProfile_IncCount(Awake, awake);
+        plProfile_IncCount(Contacts, contacts);
+        plProfile_IncCount(DynActors, dynActors);
+        plProfile_IncCount(DynShapes, dynShapes);
+        plProfile_IncCount(StaticShapes, stShapes);
+        plProfile_IncCount(Actors, actors);
+        plProfile_IncCount(Scenes, scenes);
+        plProfile_IncCount(Controllers, controllers);
+    }
+
+    //plProfile_IncCount(AnimatedPhysicals, plBTPhysical::fNumberAnimatedPhysicals);
+    //plProfile_IncCount(AnimatedActivators, plBTPhysical::fNumberAnimatedActivators);
+
+    fSoundMgr->Update();
+    /*
+    plProfile_BeginTiming(ProcessSyncs);
+    IProcessSynchs();
+    plProfile_EndTiming(ProcessSyncs);
+
+    plProfile_BeginTiming(UpdateContexts);
+    ISendUpdates();
+    plProfile_EndTiming(UpdateContexts);
+    */
 }
 
 bool plSimulationMgr::MsgReceive(plMessage* msg)
 {
-	return hsKeyedObject::MsgReceive(msg);
+    return hsKeyedObject::MsgReceive(msg);
 }
 
 BtScene* plSimulationMgr::GetScene(plKey world)
 {
     if(!world)
-		world = GetKey();
-	BtScene* scene = fScenes[world];
-	if(!scene) {
-		scene = new BtScene;
-		scene->broadphase = new btDbvtBroadphase;
-		scene->config = new btDefaultCollisionConfiguration;
-		scene->dispatch = new btCollisionDispatcher(scene->config);
-		scene->solver = new btSequentialImpulseConstraintSolver;
-		scene->world = new btDiscreteDynamicsWorld(scene->dispatch, scene->broadphase, scene->solver, scene->config);
-		scene->world->setGravity(btVector3(0, 0, -32.174049f));
-		fScenes[world] = scene;
-	}
-	return scene;
+        world = GetKey();
+    BtScene* scene = fScenes[world];
+    if(!scene) {
+        scene = new BtScene;
+        scene->broadphase = new btDbvtBroadphase;
+        scene->config = new btDefaultCollisionConfiguration;
+        scene->dispatch = new btCollisionDispatcher(scene->config);
+        scene->solver = new btSequentialImpulseConstraintSolver;
+        scene->world = new btDiscreteDynamicsWorld(scene->dispatch, scene->broadphase, scene->solver, scene->config);
+        scene->world->setGravity(btVector3(0, 0, -32.174049f));
+        fScenes[world] = scene;
+    }
+    return scene;
 }
 
 void plSimulationMgr::ReleaseScene(plKey world)
 {
-	if(!world)
-		world = GetKey();
-	SceneMap::iterator it = fScenes.find(world);
+    if(!world)
+        world = GetKey();
+    SceneMap::iterator it = fScenes.find(world);
     hsAssert(it != fScenes.end(), "Unknown scene");
     if (it != fScenes.end())
     {
         BtScene* scene = it->second;
         if (scene->world->getNumCollisionObjects() == 0) {
-			delete scene->world;
-			delete scene->solver;
-			delete scene->dispatch;
-			delete scene->config;
-			delete scene->broadphase;
-			fScenes.erase(it);
-		}
+            delete scene->world;
+            delete scene->solver;
+            delete scene->dispatch;
+            delete scene->config;
+            delete scene->broadphase;
+            fScenes.erase(it);
+        }
     }
 }
 

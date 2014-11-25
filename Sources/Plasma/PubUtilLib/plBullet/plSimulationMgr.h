@@ -115,6 +115,7 @@ protected:
 	// Is the entire physics world suspended? If so, the clock can still advance
     // but nothing will move.
     bool fSuspended;
+    float fAccumulator;
 
     float fMaxDelta;
     float fStepSize;

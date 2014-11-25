@@ -125,10 +125,10 @@ public:
     virtual plPhysical& SetProperty(int prop, bool b);
     virtual bool GetProperty(int prop) const { return fProps.IsBitSet(prop) != 0; }
 
-    virtual void SetObjectKey(plKey key) { fObjectKey = key; }
+    virtual void  SetObjectKey(plKey key) { fObjectKey = key; }
     virtual plKey GetObjectKey() const { return fObjectKey; }
 
-    virtual void SetSceneNode(plKey node);
+    virtual void  SetSceneNode(plKey node);
     virtual plKey GetSceneNode() const;
 
     virtual bool GetLinearVelocitySim(hsVector3& vel) const;
@@ -143,15 +143,15 @@ public:
 
     virtual int GetGroup() const { return fGroup; }
 
-    virtual void    AddLOSDB(uint16_t flag) { hsSetBits(fLOSDBs, flag); }
-    virtual void    RemoveLOSDB(uint16_t flag) { hsClearBits(fLOSDBs, flag); }
-    virtual uint16_t  GetAllLOSDBs() { return fLOSDBs; }
-    virtual bool  IsInLOSDB(uint16_t flag) { return hsCheckBits(fLOSDBs, flag); }
+    virtual void AddLOSDB(uint16_t flag) { hsSetBits(fLOSDBs, flag); }
+    virtual void RemoveLOSDB(uint16_t flag) { hsClearBits(fLOSDBs, flag); }
+    virtual uint16_t GetAllLOSDBs() { return fLOSDBs; }
+    virtual bool IsInLOSDB(uint16_t flag) { return hsCheckBits(fLOSDBs, flag); }
 
-    virtual bool    DoDetectorHullWorkaround() { return false; /* BULLET STUB ??? */  }
-    virtual bool  Should_I_Trigger(bool enter, hsPoint3& pos);
-    virtual bool  IsObjectInsideHull(const hsPoint3& pos);
-    virtual void    SetInsideConvexHull(bool inside) { fInsideConvexHull = inside;    }
+    virtual bool DoDetectorHullWorkaround() { return false; /* BULLET STUB ??? */  }
+    virtual bool Should_I_Trigger(bool enter, hsPoint3& pos);
+    virtual bool IsObjectInsideHull(const hsPoint3& pos);
+    virtual void SetInsideConvexHull(bool inside) { fInsideConvexHull = inside;    }
 
     virtual plKey GetWorldKey() const { return fWorldKey; }
 
@@ -218,16 +218,16 @@ protected:
 
     plSimDefs::Bounds fBoundsType;
     plSimDefs::Group fGroup;
-    uint32_t fReportsOn;          // bit vector for groups we report interactions with
-    uint16_t fLOSDBs;             // Which LOS databases we get put into
+    uint32_t fReportsOn;        // bit vector for groups we report interactions with
+    uint16_t fLOSDBs;           // Which LOS databases we get put into
     hsBitVector fProps;         // plSimulationInterface::plSimulationProperties kept here
-    float   fMass;
+    float fMass;
 
     plKey fObjectKey;           // the key to our scene object
     plKey fSceneNode;           // the room we're in
 
     hsPlane3* fWorldHull;
-    uint32_t    fHullNumberPlanes;
+    uint32_t  fHullNumberPlanes;
     bool      fInsideConvexHull;
 
     // we need to remember the last matrices we sent to the coordinate interface
@@ -236,14 +236,14 @@ protected:
     hsMatrix44 fCachedLocal2World;
 
     // Syncronization
-    double          fLastSyncTime;
-    plSDLModifier*  fSDLMod;
+    double         fLastSyncTime;
+    plSDLModifier* fSDLMod;
 
     plPhysicalSndGroup* fSndGroup;
 
     bool      fWeWereHit;
-    hsVector3   fHitForce;
-    hsPoint3    fHitPos;
+    hsVector3 fHitForce;
+    hsPoint3  fHitPos;
 
     plPhysicalProxy* fProxyGen;             // visual proxy for debugging
 
