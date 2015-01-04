@@ -90,14 +90,6 @@ class plCommonBitmapLib : public plCommonObjLib
 static plCommonBitmapLib        sCommonBitmapLib;
 
 
-plBitmapCreator::plBitmapCreator()
-{
-    fErrorMsg = nil;
-}
-plBitmapCreator::~plBitmapCreator()
-{
-}
-
 plBitmapCreator &plBitmapCreator::Instance()
 {
     static plBitmapCreator  fInstance;
@@ -537,8 +529,6 @@ plBitmap *plBitmapCreator::ICreateTexture( plBitmapData *bd, const plLocation &l
 
 
     // Has this texture been used before?
-    plKey key;
-
     plBitmap *texture = plBitmap::ConvertNoRef( sCommonBitmapLib.FindObject( name, ( bd->isStaticCubicEnvMap ) ? plCubicEnvironmap::Index() : plMipmap::Index() ) );
     //hsAssert( texture == nil || texture->GetKey()->GetUoid().GetLocation() == textureLoc, "Somehow our texture objectLib has a texture not in the right page? Should be harmless tho..." );
 
@@ -554,7 +544,6 @@ plBitmap *plBitmapCreator::ICreateTexture( plBitmapData *bd, const plLocation &l
         {
             DeleteExportedBitmap( texture->GetKey() );
             texture = nil;
-            key = nil;
         }
     }
 
@@ -569,6 +558,8 @@ plBitmap *plBitmapCreator::ICreateTexture( plBitmapData *bd, const plLocation &l
     }
     else
     {
+        plKey key;
+
         // If it hasn't been used before, make a new texture
         if( bd->isStaticCubicEnvMap )
         {

@@ -49,7 +49,6 @@ class plErrorMsg;
 class plKey;
 class plLocation;
 class plMipmap;
-class hsMaxLayerBase;
 
 
 class plBitmapData
@@ -76,19 +75,21 @@ public:
     uint8_t   clampFlags;
     bool    usePNG;
 
-    plBitmapData()
+    plBitmapData() :
+        texFlags(0),
+        createFlags(0),
+        detailDropoffStart(0.f),
+        detailDropoffStop(0.f),
+        detailMax(0.f),
+        detailMin(0.f),
+        sig(0),
+        isStaticCubicEnvMap(false),
+        invertAlpha(false),
+        faceNames(),
+        maxDimension(0),
+        clampFlags(0),
+        usePNG(false)
     {
-        texFlags = 0;
-        createFlags = 0;
-        detailDropoffStart = detailDropoffStop = 0.f;
-        detailMax = detailMin = 0.f;
-        sig = 0;
-        isStaticCubicEnvMap = false;
-        invertAlpha = false;
-        faceNames[ 0 ] = faceNames[ 1 ] = faceNames[ 2 ] = faceNames[ 3 ] = faceNames[ 4 ] = faceNames[ 5 ] = nil;
-        maxDimension = 0;
-        clampFlags = 0;
-        usePNG = false;
     }
 };
 
@@ -106,16 +107,16 @@ class plBitmapCreator
         void    DeInit( void );
         void    CleanUpMaps( void );
 
-        ~plBitmapCreator();
+        ~plBitmapCreator() {}
 
         // This will also set the key you pass in to nil, so be careful
         void    DeleteExportedBitmap( const plKey &key );
 
     protected:
 
-        plErrorMsg              *fErrorMsg;
+        plBitmapCreator() : fErrorMsg(nullptr) {}
 
-        plBitmapCreator();
+        plErrorMsg  *fErrorMsg;
 
         plBitmap    *ICreateTexture( plBitmapData *bd, const plLocation &loc, int clipID = -1 );
         plMipmap    *ICreateBitmap( plBitmapData *bd );
