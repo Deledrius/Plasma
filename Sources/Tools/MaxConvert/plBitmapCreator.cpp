@@ -136,17 +136,6 @@ plMipmap *plBitmapCreator::ICreateBitmap(plBitmapData *bd)
     BitmapInfo bi;
     bi.SetName(bd->fileName.AsString().c_str());
 
-#if 0 // This isn't really an issue since the textures are packed -Colin
-    const int kMaxFileNameLength = 30;
-    if (strlen(bi.Filename()) > kMaxFileNameLength)
-    {
-        // Allow to continue, But make it painful
-        char errStr[256];
-        sprintf(errStr, "File name longer than %d, won't burn to CD (%s)", kMaxFileNameLength, bi.Filename());//bitmapTex->GetName());
-        MessageBox(GetActiveWindow(), errStr, bd->fileName, MB_OK|MB_ICONEXCLAMATION);  
-    }
-#endif
-
     bool notMipped = (bd->texFlags & plMipmap::kForceOneMipLevel) != 0;
     float sigma = bd->sig;
     
