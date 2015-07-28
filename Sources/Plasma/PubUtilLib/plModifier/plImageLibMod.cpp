@@ -90,3 +90,23 @@ void plImageLibMod::Write(hsStream* stream, hsResMgr* mgr)
     for(size_t i = 0; i < fImages.size(); i++)
         mgr->WriteKey(stream, fImages[i]->GetKey());
 }
+
+plBitmap* plImageLibMod::GetImage(ST::string imageName) const
+{
+    for(auto image = fImages.begin(); image < fImages.end(); image++) {
+        if ((*image) && (*image)->GetKeyName() == imageName)
+            return *image;
+    }
+    return nullptr;
+}
+
+const std::vector<ST::string> plImageLibMod::GetImageNames(void) const
+{
+    std::vector<ST::string> names;
+    for (auto image = fImages.begin(); image < fImages.end(); image++) {
+        if ((*image)) {
+            names.push_back((*image)->GetKeyName());
+        }
+    }
+    return names;
+}
