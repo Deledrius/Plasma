@@ -79,7 +79,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultMarkerGameNode, getMarkers)
 PYTHON_METHOD_DEFINITION(ptVaultMarkerGameNode, setGameName, args)
 {
     PyObject* name;
-    if (!PyArg_ParseTuple(args, "O", &name) || !PyString_CheckEx(name))
+    if (!PyArg_ParseTuple(args, "O", &name) || !PyUnicode_CheckEx(name))
     {
         PyErr_SetString(PyExc_TypeError, "setGameName expects a string");
         PYTHON_RETURN_ERROR;
@@ -114,7 +114,7 @@ PYTHON_METHOD_DEFINITION(ptVaultMarkerGameNode, setMarkers, args)
         PyObject* age  = PySequence_GetItem(marker_seq, 1);
         PyObject* pos  = PySequence_GetItem(marker_seq, 2);
         PyObject* desc = PySequence_GetItem(marker_seq, 3);
-        if (!(PyInt_Check(id) && PyString_CheckEx(age) && pyPoint3::Check(pos) && PyString_CheckEx(desc))) {
+        if (!(PyLong_Check(id) && PyUnicode_CheckEx(age) && pyPoint3::Check(pos) && PyUnicode_CheckEx(desc))) {
             PyErr_SetString(PyExc_TypeError, errmsg);
             PYTHON_RETURN_ERROR;
         }

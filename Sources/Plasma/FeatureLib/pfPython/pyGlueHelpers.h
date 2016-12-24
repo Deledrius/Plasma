@@ -50,10 +50,10 @@ typedef struct PyMethodDef PyMethodDef;
 
 // Useful string functions
 plString PyString_AsStringEx(PyObject* obj);
-bool PyString_CheckEx(PyObject* obj);
+bool PyUnicode_CheckEx(PyObject* obj);
 
 PyObject* PyUnicode_FromPlString(const plString& str);
-#define PyString_FromPlString(x) PyString_FromString((x).c_str())
+#define PyString_FromPlString(x) PyUnicode_FromString((x).c_str())
 
 // A set of macros to take at least some of the tediousness out of creating straight python glue code
 
@@ -112,7 +112,7 @@ glueClassName *glueClassName::ConvertFrom(PyObject *obj) \
 // This starts off the type definition (however most of the data still needs to be filled in by hand
 #define PYTHON_TYPE_START(pythonClassName) \
 static PyTypeObject pythonClassName##_type = { \
-    PyObject_HEAD_INIT(NULL)
+    PyVarObject_HEAD_INIT(NULL, 0)
 
 // and easy terminator to make things look pretty
 #define PYTHON_TYPE_END }
@@ -143,7 +143,7 @@ PyObject *pythonClassName##_new(PyTypeObject *type, PyObject *, PyObject *) \
 void pythonClassName##_dealloc(pythonClassName *self) \
 { \
     delete self->fThis; \
-    self->ob_type->tp_free((PyObject*)self); \
+    Py_TYPE(self)->tp_free((PyObject*)self); \
 }
 
 #define PYTHON_DEFAULT_DEALLOC(pythonClassName) (destructor)pythonClassName##_dealloc
@@ -171,7 +171,6 @@ int pythonClassName##___init__(pythonClassName *self, PyObject *args, PyObject *
 // most glue classes can get away with this default structure
 #define PLASMA_DEFAULT_TYPE(pythonClassName, docString) \
 PYTHON_TYPE_START(pythonClassName) \
-    0,                                  /* ob_size */ \
     "Plasma." #pythonClassName,         /* tp_name */ \
     sizeof(pythonClassName),            /* tp_basicsize */ \
     0,                                  /* tp_itemsize */ \
@@ -240,7 +239,6 @@ PYTHON_TYPE_END
 // for glue functions that need custom stuff, you need to define the macros yourself
 #define PLASMA_CUSTOM_TYPE(pythonClassName, docString) \
     PYTHON_TYPE_START(pythonClassName) \
-    0,                                  /* ob_size */ \
     "Plasma." #pythonClassName,         /* tp_name */ \
     sizeof(pythonClassName),            /* tp_basicsize */ \
     0,                                  /* tp_itemsize */ \
@@ -283,7 +281,6 @@ PYTHON_TYPE_END
 // for conviencence when we just need a base class
 #define PLASMA_DEFAULT_TYPE_WBASE(pythonClassName, glueBaseClass, docString) \
 PYTHON_TYPE_START(pythonClassName) \
-    0,                                  /* ob_size */ \
     "Plasma." #pythonClassName,         /* tp_name */ \
     sizeof(pythonClassName),            /* tp_basicsize */ \
     0,                                  /* tp_itemsize */ \
@@ -379,9 +376,9 @@ static PyObject *pythonClassName##_##methodName(pythonClassName *self) \
 #define PYTHON_RETURN_BOOL(testValue) \
 { \
     if (testValue) \
-        return PyInt_FromLong((long)1); \
+        return PyLong_FromLong((long)1); \
     else \
-        return PyInt_FromLong((long)0); \
+        return PyLong_FromLong((long)0); \
 }
 #define PYTHON_RETURN_NOT_IMPLEMENTED {Py_INCREF(Py_NotImplemented); return Py_NotImplemented;}
 
@@ -478,9 +475,9 @@ int pythonClassName##_set##attribName(PyObject *self, PyObject *value, void *clo
 
 // rich compare
 #define PYTHON_RICH_COMPARE_DEFINITION(pythonClassName, obj1, obj2, compareType) PyObject *pythonClassName##_richCompare(PyObject *obj1, PyObject *obj2, int compareType)
-#define PYTHON_RCOMPARE_TRUE return PyInt_FromLong((long)1)
-#define PYTHON_RCOMPARE_FALSE return PyInt_FromLong((long)0)
-#define PYTHON_RCOMPARE_ERROR return PyInt_FromLong((long)-1)
+#define PYTHON_RCOMPARE_TRUE return PyLong_FromLong((long)1)
+#define PYTHON_RCOMPARE_FALSE return PyLong_FromLong((long)0)
+#define PYTHON_RCOMPARE_ERROR return PyLong_FromLong((long)-1)
 
 /////////////////////////////////////////////////////////////////////
 // str functions

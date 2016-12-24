@@ -382,7 +382,7 @@ PYTHON_METHOD_DEFINITION(ptAudioControl, recordSampleRate, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptAudioControl, getPriorityCutoff)
 {
-    return PyInt_FromLong(self->fThis->GetPriorityCutoff());
+    return PyLong_FromLong(self->fThis->GetPriorityCutoff());
 }
 
 PYTHON_METHOD_DEFINITION(ptAudioControl, setPriorityCutoff, args)
@@ -411,17 +411,17 @@ PYTHON_METHOD_DEFINITION(ptAudioControl, setMode, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptAudioControl, getMode)
 {
-    return PyInt_FromLong((long)self->fThis->GetAudioSystemMode());
+    return PyLong_FromLong((long)self->fThis->GetAudioSystemMode());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptAudioControl, getHighestMode)
 {
-    return PyInt_FromLong((long)self->fThis->GetHighestAudioMode());
+    return PyLong_FromLong((long)self->fThis->GetHighestAudioMode());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptAudioControl, getNumAudioDevices)
 {
-    return PyInt_FromLong(self->fThis->GetNumAudioDevices());
+    return PyLong_FromLong(self->fThis->GetNumAudioDevices());
 }
 
 PYTHON_METHOD_DEFINITION(ptAudioControl, getAudioDeviceName, args)
@@ -432,7 +432,7 @@ PYTHON_METHOD_DEFINITION(ptAudioControl, getAudioDeviceName, args)
         PyErr_SetString(PyExc_TypeError, "getAudioDeviceName expects an int");
         PYTHON_RETURN_ERROR;
     }
-    return PyString_FromString(self->fThis->GetAudioDeviceName(index));
+    return PyUnicode_FromString(self->fThis->GetAudioDeviceName(index));
 }
 
 PYTHON_METHOD_DEFINITION(ptAudioControl, setDeviceName, args)
@@ -451,7 +451,7 @@ PYTHON_METHOD_DEFINITION(ptAudioControl, setDeviceName, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptAudioControl, getDeviceName)
 {
-    return PyString_FromString(self->fThis->GetDeviceName());
+    return PyUnicode_FromString(self->fThis->GetDeviceName());
 }
 
 PYTHON_START_METHODS_TABLE(ptAudioControl)

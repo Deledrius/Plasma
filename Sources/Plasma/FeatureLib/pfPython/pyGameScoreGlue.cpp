@@ -69,7 +69,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGameScore, getPoints)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGameScore, getGameType)
 {
-    return PyInt_FromLong(self->fThis->GetGameType());
+    return PyLong_FromLong(self->fThis->GetGameType());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGameScore, getName)
@@ -161,7 +161,7 @@ PYTHON_METHOD_DEFINITION_STATIC_WKEY(ptGameScore, createAgeScore, args, kwargs)
         PyErr_SetString(PyExc_TypeError, "createAgeScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
+    if (!(PyUnicode_CheckEx(nameObj) && pyKey::Check(keyObj)))
     {
         PyErr_SetString(PyExc_TypeError, "createAgeScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
@@ -185,7 +185,7 @@ PYTHON_METHOD_DEFINITION_STATIC_WKEY(ptGameScore, createGlobalScore, args, kwarg
         PyErr_SetString(PyExc_TypeError, "createGlobalScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
+    if (!(PyUnicode_CheckEx(nameObj) && pyKey::Check(keyObj)))
     {
         PyErr_SetString(PyExc_TypeError, "createGlobalScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
@@ -209,7 +209,7 @@ PYTHON_METHOD_DEFINITION_STATIC_WKEY(ptGameScore, createPlayerScore, args, kwarg
         PyErr_SetString(PyExc_TypeError, "createPlayerScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
+    if (!(PyUnicode_CheckEx(nameObj) && pyKey::Check(keyObj)))
     {
         PyErr_SetString(PyExc_TypeError, "createPlayerScore expects a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
@@ -234,7 +234,7 @@ PYTHON_METHOD_DEFINITION_STATIC_WKEY(ptGameScore, createScore, args, kwargs)
         PyErr_SetString(PyExc_TypeError, "createScore expects an int, a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
+    if (!(PyUnicode_CheckEx(nameObj) && pyKey::Check(keyObj)))
     {
         PyErr_SetString(PyExc_TypeError, "createScore expects an int, a string, an int, an optional int, and an optional ptKey");
         PYTHON_RETURN_ERROR;
@@ -255,7 +255,7 @@ PYTHON_METHOD_DEFINITION_STATIC(ptGameScore, findAgeScores, args)
         PyErr_SetString(PyExc_TypeError, "findAgeScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
+    if (!(PyUnicode_CheckEx(nameObj) && pyKey::Check(keyObj)))
     {
         PyErr_SetString(PyExc_TypeError, "findAgeScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
@@ -276,7 +276,7 @@ PYTHON_METHOD_DEFINITION_STATIC(ptGameScore, findGlobalScores, args)
         PyErr_SetString(PyExc_TypeError, "findGlobalScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
+    if (!(PyUnicode_CheckEx(nameObj) && pyKey::Check(keyObj)))
     {
         PyErr_SetString(PyExc_TypeError, "findGlobalScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
@@ -297,7 +297,7 @@ PYTHON_METHOD_DEFINITION_STATIC(ptGameScore, findPlayerScores, args)
         PyErr_SetString(PyExc_TypeError, "findPlayerScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
+    if (!(PyUnicode_CheckEx(nameObj) && pyKey::Check(keyObj)))
     {
         PyErr_SetString(PyExc_TypeError, "findPlayerScores expects a string and a ptKey");
         PYTHON_RETURN_ERROR;
@@ -319,7 +319,7 @@ PYTHON_METHOD_DEFINITION_STATIC(ptGameScore, findScores, args)
         PyErr_SetString(PyExc_TypeError, "findScore expects an int, a string, and a ptKey");
         PYTHON_RETURN_ERROR;
     }
-    if (!(PyString_CheckEx(nameObj) && pyKey::Check(keyObj)))
+    if (!(PyUnicode_CheckEx(nameObj) && pyKey::Check(keyObj)))
     {
         PyErr_SetString(PyExc_TypeError, "findScore expects an int, a string, and a ptKey");
         PYTHON_RETURN_ERROR;
@@ -337,7 +337,7 @@ PYTHON_METHOD_DEFINITION_STATIC(ptGameScore, findAgeHighScores, args)
     uint32_t maxScores;
     PyObject* keyObj;
     if (!PyArg_ParseTuple(args, "OIO", &nameObj, &maxScores, &keyObj) ||
-        !PyString_CheckEx(nameObj) || !pyKey::Check(keyObj)) {
+        !PyUnicode_CheckEx(nameObj) || !pyKey::Check(keyObj)) {
         PyErr_SetString(PyExc_TypeError, "findAgeHighScores expects a string, an int, and a ptKey");
         PYTHON_RETURN_ERROR;
     }
@@ -354,7 +354,7 @@ PYTHON_METHOD_DEFINITION_STATIC(ptGameScore, findGlobalHighScores, args)
     uint32_t maxScores;
     PyObject* keyObj;
     if (!PyArg_ParseTuple(args, "OIO", &nameObj, &maxScores, &keyObj) ||
-        !PyString_CheckEx(nameObj) || !pyKey::Check(keyObj)) {
+        !PyUnicode_CheckEx(nameObj) || !pyKey::Check(keyObj)) {
         PyErr_SetString(PyExc_TypeError, "findGlobalHighScores expects a string, an int, and a ptKey");
         PYTHON_RETURN_ERROR;
     }

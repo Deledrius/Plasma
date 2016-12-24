@@ -248,7 +248,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGUIControl, getFontSize)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGUIControl, getFontFlags)
 {
-    return PyInt_FromLong(self->fThis->GetFontFlags());
+    return PyLong_FromLong(self->fThis->GetFontFlags());
 }
 
 PYTHON_METHOD_DEFINITION(ptGUIControl, setFontFlags, args)

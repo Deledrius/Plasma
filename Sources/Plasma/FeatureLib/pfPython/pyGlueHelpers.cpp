@@ -47,8 +47,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 plString PyString_AsStringEx(PyObject* obj) 
 {
-    if (PyString_Check(obj))
-        return plString::FromUtf8(PyString_AsString(obj));
+    if (PyUnicode_Check(obj))
+        return plString::FromUtf8(PyUnicode_AS_DATA(obj));
 
     if (PyUnicode_Check(obj)) {
 #if (Py_UNICODE_SIZE == 2)
@@ -63,9 +63,9 @@ plString PyString_AsStringEx(PyObject* obj)
     return plString::Null;
 }
 
-bool PyString_CheckEx(PyObject* obj)
+bool PyUnicode_CheckEx(PyObject* obj)
 {
-    return (PyString_Check(obj) || PyUnicode_Check(obj));
+    return (PyUnicode_Check(obj) || PyUnicode_Check(obj));
 }
 
 PyObject* PyUnicode_FromPlString(const plString& str)

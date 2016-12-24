@@ -77,15 +77,15 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtYesNoDialog, args, "Params: selfkey,dialogMess
     {
         int len = PyUnicode_GetSize(dialogMsgObj);
         wchar_t* text = new wchar_t[len + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)dialogMsgObj, text, len);
+        PyUnicode_AsWideChar(dialogMsgObj, text, len);
         text[len] = L'\0';
         cyMisc::YesNoDialog(*key, text);
         delete [] text;
         PYTHON_RETURN_NONE;
     }
-    else if (PyString_Check(dialogMsgObj))
+    else if (PyUnicode_Check(dialogMsgObj))
     {
-        char* text = PyString_AsString(dialogMsgObj);
+        const char* text = PyUnicode_AS_DATA(dialogMsgObj);
         cyMisc::YesNoDialog(*key, text);
         PYTHON_RETURN_NONE;
     }
@@ -194,9 +194,9 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtPageInNode, args, "Params: nodeName, netForce=
         PYTHON_RETURN_ERROR;
     }
     std::vector<std::string> nodeNames;
-    if (PyString_Check(nodeNameObj))
+    if (PyUnicode_Check(nodeNameObj))
     {
-        nodeNames.push_back(PyString_AsString(nodeNameObj));
+        nodeNames.push_back(PyUnicode_AS_DATA(nodeNameObj));
     }
     else if (PyList_Check(nodeNameObj))
     {
@@ -204,12 +204,12 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtPageInNode, args, "Params: nodeName, netForce=
         for (int i = 0; i < num; i++)
         {
             PyObject* listItem = PyList_GetItem(nodeNameObj, i);
-            if (!PyString_Check(listItem))
+            if (!PyUnicode_Check(listItem))
             {
                 PyErr_SetString(PyExc_TypeError, "PtPageInNode expects a string or list of strings, and optionally a string");
                 PYTHON_RETURN_ERROR;
             }
-            nodeNames.push_back(PyString_AsString(listItem));
+            nodeNames.push_back(PyUnicode_AS_DATA(listItem));
         }
     }
     else

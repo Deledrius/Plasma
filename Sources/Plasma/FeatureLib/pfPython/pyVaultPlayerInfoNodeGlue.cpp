@@ -145,7 +145,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultPlayerInfoNode, playerIsOnline)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptVaultPlayerInfoNode, playerGetCCRLevel)
 {
-    return PyInt_FromLong(self->fThis->Player_GetCCRLevel());
+    return PyLong_FromLong(self->fThis->Player_GetCCRLevel());
 }
 
 PYTHON_START_METHODS_TABLE(ptVaultPlayerInfoNode)

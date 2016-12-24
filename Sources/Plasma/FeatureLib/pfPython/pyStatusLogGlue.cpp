@@ -69,7 +69,7 @@ PYTHON_METHOD_DEFINITION(ptStatusLog, open, args)
         PyErr_SetString(PyExc_TypeError, "open expects a string and two unsigned longs");
         PYTHON_RETURN_ERROR;
     }
-    if (!PyString_CheckEx(logName))
+    if (!PyUnicode_CheckEx(logName))
     {
         PyErr_SetString(PyExc_TypeError, "open expects a string and two unsigned longs");
         PYTHON_RETURN_ERROR;
@@ -86,7 +86,7 @@ PYTHON_METHOD_DEFINITION(ptStatusLog, write, args)
         PyErr_SetString(PyExc_TypeError, "write expects a string and an optional ptColor");
         PYTHON_RETURN_ERROR;
     }
-    if (!PyString_CheckEx(text))
+    if (!PyUnicode_CheckEx(text))
     {
         PyErr_SetString(PyExc_TypeError, "write expects a string and an optional ptColor");
         PYTHON_RETURN_ERROR;

@@ -169,7 +169,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptVaultNode, getChildNodeRefList)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptVaultNode, getChildNodeCount)
 {
-    return PyInt_FromLong(self->fThis->GetChildNodeCount());
+    return PyLong_FromLong(self->fThis->GetChildNodeCount());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptVaultNode, getClientID)

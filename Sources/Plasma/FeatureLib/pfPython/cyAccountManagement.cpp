@@ -70,7 +70,7 @@ PyObject* cyAccountManagement::GetPlayerList()
     {
         PyObject* playerTuple   = PyTuple_New(3);
         PyObject* playerName    = PyUnicode_FromPlString(playerList[i].playerName);
-        PyObject* playerId      = PyInt_FromLong(playerList[i].playerInt);
+        PyObject* playerId      = PyLong_FromLong(playerList[i].playerInt);
         PyObject* avatarShape   = PyString_FromPlString(playerList[i].avatarDatasetName);
 
         PyTuple_SET_ITEM(playerTuple, 0, playerName);

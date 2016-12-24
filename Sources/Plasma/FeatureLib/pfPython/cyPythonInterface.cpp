@@ -187,6 +187,15 @@ bool PythonInterface::requestedExit = false;
 // stupid Windows.h  and who started including that!
 #undef DrawText
 
+// Shim for missing function in Python3
+int Py_FlushLine(void)
+{
+    PyObject *f = PySys_GetObject("stdout");
+    if (f == NULL)
+        return 0;
+    return PyFile_WriteString("\n", f);
+}
+
 #if defined(HAVE_CYPYTHONIDE) && !defined(PLASMA_EXTERNAL_RELEASE)
 // Special includes for debugging
 #include <frameobject.h>
@@ -247,7 +256,7 @@ std::string DebuggerCallback::IParseCurrentException()
         {
             // nested tuple, parse out the error information
             PyArg_Parse(errVal, "(O(ziiz))", &message, &filename, &lineNumber, &offset, &text);
-            error += PyString_AsString(message);
+            error += PyUnicode_AS_DATA(message);
             if (text)
                 error += text;
         }
@@ -257,13 +266,13 @@ std::string DebuggerCallback::IParseCurrentException()
             PyObject* v;
             if ((v = PyObject_GetAttrString(errVal, "msg")))
             {
-                error += PyString_AsString(v);
+                error += PyUnicode_AS_DATA(v);
                 Py_DECREF(v);
             }
             if ((v == PyObject_GetAttrString(errVal, "text")))
             {
                 if (v != Py_None)
-                    error += PyString_AsString(v);
+                    error += PyUnicode_AS_DATA(v);
                 Py_DECREF(v);
             }
         }
@@ -274,7 +283,7 @@ std::string DebuggerCallback::IParseCurrentException()
         PyClassObject* exc = (PyClassObject*)errType;
         PyObject* className = exc->cl_name;
         if (className)
-            error += PyString_AsString(className);
+            error += PyUnicode_AS_DATA(className);
     }
     else
         error = "Unknown Error";
@@ -355,9 +364,9 @@ std::vector<std::string> DebuggerCallback::GenerateCallstack()
     PyFrameObject* curFrame = fFrame;
     while (curFrame)
     {
-        std::string filename = PyString_AsString(curFrame->f_code->co_filename);
+        std::string filename = PyUnicode_AS_DATA(curFrame->f_code->co_filename);
         int lineNumber = PyCode_Addr2Line(curFrame->f_code, curFrame->f_lasti); // python uses base-1 numbering, we use base-0, but for display we want base-1
-        std::string functionName = PyString_AsString(curFrame->f_code->co_name);
+        std::string functionName = PyUnicode_AS_DATA(curFrame->f_code->co_name);
 
         functionName += "(";
         if (curFrame->f_code->co_argcount)
@@ -370,7 +379,7 @@ std::vector<std::string> DebuggerCallback::GenerateCallstack()
                 PyObject* argName = PyTuple_GetItem(curFrame->f_code->co_varnames, curArg);
                 if (argName)
                 {
-                    std::string arg = PyString_AsString(argName);
+                    std::string arg = PyUnicode_AS_DATA(argName);
                     if (arg == "self")
                         continue; // skip self, for readability
 
@@ -383,7 +392,7 @@ std::vector<std::string> DebuggerCallback::GenerateCallstack()
                         if (val)
                         {
                             functionName += "=";
-                            functionName += PyString_AsString(PyObject_Str(val));
+                            functionName += PyUnicode_AS_DATA(PyObject_Str(val));
                         }
                     }
                 }
@@ -421,16 +430,16 @@ std::vector<std::pair<std::string, std::string> > DebuggerCallback::GenerateGlob
                 if (PyObject_Compare((PyObject*)&PyCFunction_Type, PyObject_Type(value)) == 0)
                     continue;
 
-                std::string keyStr = PyString_AsString(PyObject_Str(key));
+                std::string keyStr = PyUnicode_AS_DATA(PyObject_Str(key));
                 if (keyStr == "__builtins__")
                     continue; // skip builtins
 
-                bool addQuotes = (PyString_Check(value) || PyUnicode_Check(value));
+                bool addQuotes = (PyUnicode_Check(value) || PyUnicode_Check(value));
 
                 std::string valueStr = "";
                 if (addQuotes)
                     valueStr += "\"";
-                valueStr += PyString_AsString(PyObject_Str(value));
+                valueStr += PyUnicode_AS_DATA(PyObject_Str(value));
                 if (addQuotes)
                     valueStr += "\"";
 
@@ -463,16 +472,16 @@ std::vector<std::pair<std::string, std::string> > DebuggerCallback::GenerateLoca
                 if (PyObject_Compare((PyObject*)&PyType_Type, PyObject_Type(value)) == 0)
                     continue;
 
-                std::string keyStr = PyString_AsString(PyObject_Str(key));
+                std::string keyStr = PyUnicode_AS_DATA(PyObject_Str(key));
                 if (keyStr == "__builtins__")
                     continue; // skip builtins
 
-                bool addQuotes = (PyString_Check(value) || PyUnicode_Check(value));
+                bool addQuotes = (PyUnicode_Check(value) || PyUnicode_Check(value));
 
                 std::string valueStr = "";
                 if (addQuotes)
                     valueStr += "\"";
-                valueStr += PyString_AsString(PyObject_Str(value));
+                valueStr += PyUnicode_AS_DATA(PyObject_Str(value));
                 if (addQuotes)
                     valueStr += "\"";
 
@@ -495,7 +504,7 @@ std::string DebuggerCallback::EvaluateVariable(const std::string& varName)
             // convert the result to something readable
             PyObject* reprObj = PyObject_Repr(evalResult);
             if (reprObj)
-                retVal = PyString_AsString(reprObj);
+                retVal = PyUnicode_AS_DATA(reprObj);
             else
                 retVal = "<REPR FAIL>";
             Py_XDECREF(reprObj);
@@ -560,7 +569,7 @@ static int PythonTraceCallback(PyObject*, PyFrameObject* frame, int what, PyObje
         return 0; // pretty much ignore if they pass us a bad value
     }
 
-    std::string filename = PyString_AsString(frame->f_code->co_filename);
+    std::string filename = PyUnicode_AS_DATA(frame->f_code->co_filename);
     int line = PyCode_Addr2Line(frame->f_code, frame->f_lasti) - 1; // python uses base-1 numbering, we use base-0
 
     // now handle the trace call
@@ -643,15 +652,15 @@ PYTHON_METHOD_DEFINITION(ptOutputRedirector, write, args)
     {
         int strLen = PyUnicode_GetSize(textObj);
         wchar_t* text = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)textObj, text, strLen);
+        PyUnicode_AsWideChar(textObj, text, strLen);
         text[strLen] = L'\0';
         self->fThis->Write(text);
         delete [] text;
         PYTHON_RETURN_NONE;
     }
-    else if (PyString_Check(textObj))
+    else if (PyUnicode_Check(textObj))
     {
-        char* text = PyString_AsString(textObj);
+        const char* text = PyUnicode_AS_DATA(textObj);
         self->fThis->Write(text);
         PYTHON_RETURN_NONE;
     }
@@ -769,15 +778,15 @@ PYTHON_METHOD_DEFINITION(ptErrorRedirector, write, args)
     {
         int strLen = PyUnicode_GetSize(textObj);
         wchar_t* text = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)textObj, text, strLen);
+        PyUnicode_AsWideChar(textObj, text, strLen);
         text[strLen] = L'\0';
         self->fThis->Write(text);
         delete [] text;
         PYTHON_RETURN_NONE;
     }
-    else if (PyString_Check(textObj))
+    else if (PyUnicode_Check(textObj))
     {
-        char* text = PyString_AsString(textObj);
+        const char* text = PyUnicode_AS_DATA(textObj);
         self->fThis->Write(text);
         PYTHON_RETURN_NONE;
     }
@@ -817,6 +826,22 @@ PyObject *pyErrorRedirector::New()
     return (PyObject*)newObj;
 }
 
+// Helpers for Python 3 module definitions
+struct module_state {
+    PyObject *error;
+};
+#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
+
+static int default_traverse(PyObject *m, visitproc visit, void *arg) {
+    Py_VISIT(GETSTATE(m)->error);
+    return 0;
+}
+
+static int default_clear(PyObject *m) {
+    Py_CLEAR(GETSTATE(m)->error);
+    return 0;
+}
+
 PYTHON_CLASS_CHECK_IMPL(ptErrorRedirector, pyErrorRedirector)
 PYTHON_CLASS_CONVERT_FROM_IMPL(ptErrorRedirector, pyErrorRedirector)
 
@@ -843,7 +868,7 @@ PYTHON_NO_INIT_DEFINITION(ptImportHook)
 
 static void ptImportHook_dealloc(ptImportHook *self)
 {
-    self->ob_type->tp_free((PyObject*)self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 PYTHON_METHOD_DEFINITION(ptImportHook, find_module, args)
@@ -858,7 +883,7 @@ PYTHON_METHOD_DEFINITION(ptImportHook, find_module, args)
     }
 
     // If this is set, we can't do it.
-    if (PyString_Check(module_path))
+    if (PyUnicode_Check(module_path))
         PYTHON_RETURN_NONE;
 
     std::string package_module_name = module_name;
@@ -905,17 +930,17 @@ PyObject *ptImportHook_load_module_detail(ptImportHook *self, char* module_name,
                 return nil;
             PyObject* d = PyModule_GetDict(result);
             PyDict_SetItemString(d, "__builtins__", PyEval_GetBuiltins());
-            PyObject *file = PyString_FromString(packed_name);
+            PyObject *file = PyUnicode_FromString(packed_name);
             PyModule_AddObject(result, "__file__", file);
             PyDict_SetItemString(d, "__loader__", (PyObject*)self);
             if(isPackage) {
-                PyObject *path = PyString_FromString(module_name);
+                PyObject *path = PyUnicode_FromString(module_name);
                 PyObject *l = PyList_New(1);
                 PyList_SetItem(l, 0, path);
                 PyDict_SetItemString(d, "__path__", l);
                 Py_DECREF(l);
             }
-            PyObject* v = PyEval_EvalCode((PyCodeObject *)pyc, d, d);
+            PyObject* v = PyEval_EvalCode(pyc, d, d);
             if(!v) 
             {
                 PyDict_DelItemString(modules, module_name);
@@ -958,7 +983,6 @@ PYTHON_START_METHODS_TABLE(ptImportHook)
 PYTHON_END_METHODS_TABLE;
 
 PYTHON_TYPE_START(ptImportHook)
-    0,
     "Plasma.ptImportHook",
     sizeof(ptImportHook),                       /* tp_basicsize */
     0,                                          /* tp_itemsize */
@@ -966,7 +990,7 @@ PYTHON_TYPE_START(ptImportHook)
     0,                                          /* tp_print */
     0,                                          /* tp_getattr */
     0,                                          /* tp_setattr */
-    0,                                          /* tp_compare */
+    0,                                          /* tp_as_async */
     0,                                          /* tp_repr */
     0,                                          /* tp_as_number */
     0,                                          /* tp_as_sequence */
@@ -1021,7 +1045,7 @@ void PythonInterface::initPython()
         FirstTimeInit = false;
         // initialize the Python stuff
         // let Python do some initialization...
-        Py_SetProgramName("plasma");
+        Py_SetProgramName(L"plasma");
         Py_NoSiteFlag = 1;
         Py_IgnoreEnvironmentFlag = 1;
         Py_Initialize();
@@ -1104,7 +1128,7 @@ void PythonInterface::initPython()
         // NOTE: we will reset the path to not include paths
         // that Python may have found in the registry
         PyObject* path_list = PyList_New(3);
-        if (PyList_SetItem(path_list, 0, PyString_FromString(".\\python")))
+        if (PyList_SetItem(path_list, 0, PyUnicode_FromString(".\\python")))
         {
             Py_DECREF(sys_dict);
             Py_DECREF(path_list);
@@ -1113,7 +1137,7 @@ void PythonInterface::initPython()
             return;
         }
         // make sure that our plasma libraries are gotten before the system ones
-        if (PyList_SetItem(path_list, 1, PyString_FromString(".\\python\\plasma")))
+        if (PyList_SetItem(path_list, 1, PyUnicode_FromString(".\\python\\plasma")))
         {
             Py_DECREF(sys_dict);
             Py_DECREF(path_list);
@@ -1121,7 +1145,7 @@ void PythonInterface::initPython()
             getOutputAndReset();
             return;
         }
-        if (PyList_SetItem(path_list, 2, PyString_FromString(".\\python\\system")))
+        if (PyList_SetItem(path_list, 2, PyUnicode_FromString(".\\python\\system")))
         {
             Py_DECREF(sys_dict);
             Py_DECREF(path_list);
@@ -1152,8 +1176,21 @@ void PythonInterface::initPython()
         PyMethodDef terminator = {NULL};
         plasmaMethods[methods.size()] = terminator; // add the terminator
 
+        // now set up the module definition
+        static struct PyModuleDef plasmaDef = {
+            PyModuleDef_HEAD_INIT,          /* m_base */
+            "Plasma",                       /* m_name */
+            NULL,                           /* m_doc */
+            sizeof(struct module_state),    /* m_size */
+            plasmaMethods,                  /* m_methods */
+            NULL,                           /* m_reload */
+            default_traverse,               /* m_traverse */
+            default_clear,                  /* m_clear */
+            NULL                            /* m_free */
+        };
+
         // now set up the module with the method data
-        plasmaMod = Py_InitModule("Plasma", plasmaMethods);
+        plasmaMod = PyModule_Create(&plasmaDef);
         if (plasmaMod == NULL)
         {
             dbgLog->AddLine("Could not setup the Plasma module\n");
@@ -1194,9 +1231,22 @@ void PythonInterface::initPython()
 
         Py_DECREF(sys_dict);
 
+        // now set up the module definition
+        static struct PyModuleDef plasmaConstantDef = {
+            PyModuleDef_HEAD_INIT,          /* m_base */
+            "PlasmaConstants",              /* m_name */
+            NULL,                           /* m_doc */
+            sizeof(struct module_state),    /* m_size */
+            NULL,                           /* m_methods */
+            NULL,                           /* m_reload */
+            default_traverse,               /* m_traverse */
+            default_clear,                  /* m_clear */
+            NULL                            /* m_free */
+        };
+
         // initialize the PlasmaConstants module
         PyMethodDef noMethods = {NULL};
-        plasmaConstantsMod = Py_InitModule("PlasmaConstants", &noMethods); // it has no methods, just values
+        plasmaConstantsMod = PyModule_Create(&plasmaConstantDef); // it has no methods, just values
         if (plasmaConstantsMod == NULL)
         {
             dbgLog->AddLine("Could not setup the PlasmaConstants module\n");
@@ -1219,8 +1269,21 @@ void PythonInterface::initPython()
             getOutputAndReset(&error);
         }
 
+        // now set up the module definition
+        static struct PyModuleDef plasmaNetConstantsDef = {
+            PyModuleDef_HEAD_INIT,          /* m_base */
+            "PlasmaNetConstants",           /* m_name */
+            NULL,                           /* m_doc */
+            sizeof(struct module_state),    /* m_size */
+            NULL,                           /* m_methods */
+            NULL,                           /* m_reload */
+            default_traverse,               /* m_traverse */
+            default_clear,                  /* m_clear */
+            NULL                            /* m_free */
+        };
+
         // initialize the PlasmaNetConstants module
-        plasmaNetConstantsMod = Py_InitModule("PlasmaNetConstants", &noMethods); // it has no methods, just values
+        plasmaNetConstantsMod = PyModule_Create(&plasmaNetConstantsDef); // it has no methods, just values
         if (plasmaNetConstantsMod == NULL)
         {
             dbgLog->AddLine("Could not setup the PlasmaNetConstants module\n");
@@ -1243,8 +1306,21 @@ void PythonInterface::initPython()
             getOutputAndReset(&error);
         }
 
+        // now set up the module definition
+        static struct PyModuleDef plasmaVaultConstantsDef = {
+            PyModuleDef_HEAD_INIT,          /* m_base */
+            "PlasmaVaultConstants",         /* m_name */
+            NULL,                           /* m_doc */
+            sizeof(struct module_state),    /* m_size */
+            NULL,                           /* m_methods */
+            NULL,                           /* m_reload */
+            default_traverse,               /* m_traverse */
+            default_clear,                  /* m_clear */
+            NULL                            /* m_free */
+        };
+
         // initialize the PlasmaVaultConstants module
-        plasmaVaultConstantsMod = Py_InitModule("PlasmaVaultConstants", &noMethods); // it has no methods, just values
+        plasmaVaultConstantsMod = PyModule_Create(&plasmaVaultConstantsDef); // it has no methods, just values
         if (plasmaVaultConstantsMod == NULL)
         {
             dbgLog->AddLine("Could not setup the PlasmaVaultConstants module\n");
@@ -1681,7 +1757,7 @@ void PythonInterface::WriteToStdErr(const char* text)
 PyObject* PythonInterface::ImportModule(const char* module) 
 {
     PyObject* result = nil;
-    PyObject* name = PyString_FromString(module);
+    PyObject* name = PyUnicode_FromString(module);
 
     if (name != nil) 
     {
@@ -1759,12 +1835,12 @@ PyObject* PythonInterface::CreateModule(const char* module)
     d = PyModule_GetDict(m);
     // add in the built-ins
     // first make sure that we don't already have the builtins
-    if (PyDict_GetItemString(d, "__builtins__") == NULL)
+    if (PyDict_GetItemString(d, "builtins") == NULL)
     {
         // if we need the builtins then find the builtin module
-        PyObject *bimod = PyImport_ImportModule("__builtin__");
+        PyObject *bimod = PyImport_ImportModule("builtins");
         // then add the builtin dicitionary to our module's dictionary
-        if (bimod == NULL || PyDict_SetItemString(d, "__builtins__", bimod) != 0)
+        if (bimod == NULL || PyDict_SetItemString(d, "builtins", bimod) != 0)
             return nil;
         Py_DECREF(bimod);
     }
@@ -1902,8 +1978,8 @@ bool PythonInterface::DumpObject(PyObject* pyobj, char** pickle, int32_t* size)
     if ( s != NULL )
     {
         // yes, then get the size and the string address
-        *size = PyString_Size(s);
-        *pickle =  PyString_AsString(s);
+        *size = PyBytes_Size(s);
+        *pickle = PyBytes_AsString(s);
         return true;
     }
     else  // otherwise, there was an error
@@ -2024,7 +2100,7 @@ bool PythonInterface::RunPYC(PyObject* code, PyObject* module)
     // get the dictionaries for this module
     d = PyModule_GetDict(module);
     // run the string
-    v = PyEval_EvalCode((PyCodeObject*)code, d, d);
+    v = PyEval_EvalCode(code, d, d);
     // check for errors and print them
     if (v == NULL)
     {

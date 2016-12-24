@@ -106,7 +106,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtGetNumParticles, args, "Params: key\nKey is th
         PYTHON_RETURN_ERROR;
     }
     pyKey* key = pyKey::ConvertFrom(keyObj);
-    return PyInt_FromLong(cyMisc::GetNumParticles(*key));
+    return PyLong_FromLong(cyMisc::GetNumParticles(*key));
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtSetParticleOffset, args, "Params: x,y,z,particlesys\nSets the particlesys particle system's offset")
@@ -148,13 +148,13 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtSetLightValue, args, "Params: key,name,r,g,b,a
     if (PyUnicode_Check(nameObj))
     {
         PyObject* utf8 = PyUnicode_AsUTF8String(nameObj);
-        name = plString::FromUtf8(PyString_AsString(utf8));
+        name = plString::FromUtf8(PyUnicode_AS_DATA(utf8));
         Py_DECREF(utf8);
     }
-    else if (PyString_Check(nameObj))
+    else if (PyUnicode_Check(nameObj))
     {
         // we'll allow this, just in case something goes weird
-        name = plString::FromUtf8(PyString_AsString(nameObj));
+        name = plString::FromUtf8(PyUnicode_AS_DATA(nameObj));
     }
     else
     {
@@ -185,13 +185,13 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtSetLightAnimStart, args, "Params: key,name,sta
     if (PyUnicode_Check(nameObj))
     {
         PyObject* utf8 = PyUnicode_AsUTF8String(nameObj);
-        name = plString::FromUtf8(PyString_AsString(utf8));
+        name = plString::FromUtf8(PyUnicode_AS_DATA(utf8));
         Py_DECREF(utf8);
     }
-    else if (PyString_Check(nameObj))
+    else if (PyUnicode_Check(nameObj))
     {
         // we'll allow this, just in case something goes weird
-        name = plString::FromUtf8(PyString_AsString(nameObj));
+        name = plString::FromUtf8(PyUnicode_AS_DATA(nameObj));
     }
     else
     {
@@ -324,7 +324,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtSetClearColor, args, "Params: red,green,blue\n
 
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetLocalKILevel, "returns local player's ki level")
 {
-    return PyInt_FromLong(cyMisc::GetKILevel());
+    return PyLong_FromLong(cyMisc::GetKILevel());
 }
 
 PYTHON_BASIC_GLOBAL_METHOD_DEFINITION(PtClearCameraStack, cyMisc::ClearCameraStack, "clears all cameras")
@@ -342,7 +342,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtGetCameraNumber, args, "Params: x\nReturns cam
 
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetNumCameras, "returns camera stack size")
 {
-    return PyInt_FromLong(cyMisc::GetNumCameras());
+    return PyLong_FromLong(cyMisc::GetNumCameras());
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtRebuildCameraStack, args, "Params: name,ageName\nPush camera with this name on the stack")
@@ -423,10 +423,10 @@ PYTHON_GLOBAL_METHOD_DEFINITION_WKEY(PtDebugPrint, args, kwargs, "Params: *msgs,
     do {
         // Grabbin' levelz
         if (kwargs && PyDict_Check(kwargs)) {
-            PyObject* value = PyDict_GetItem(kwargs, PyString_FromString("level"));
+            PyObject* value = PyDict_GetItem(kwargs, PyUnicode_FromString("level"));
             if (value) {
-                if (PyInt_Check(value))
-                    level = PyInt_AsLong(value);
+                if (PyLong_Check(value))
+                    level = PyLong_AsLong(value);
                 else
                     break;
             }
@@ -434,7 +434,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION_WKEY(PtDebugPrint, args, kwargs, "Params: *msgs,
 
         for (size_t i = 0; i < PySequence_Fast_GET_SIZE(args); ++i) {
             PyObject* theMsg = PySequence_Fast_GET_ITEM(args, i);
-            if (!PyString_CheckEx(theMsg))
+            if (!PyUnicode_CheckEx(theMsg))
                 theMsg = PyObject_Repr(theMsg);
 
             if (theMsg)
@@ -621,8 +621,8 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetSupportedDisplayModes, "Returns a li
     for (std::vector<plDisplayMode>::iterator curArg = res.begin(); curArg != res.end(); ++curArg)
     {
         PyObject* tup = PyTuple_New(2);
-        PyTuple_SetItem(tup, 0, PyInt_FromLong((long)(*curArg).Width));
-        PyTuple_SetItem(tup, 1, PyInt_FromLong((long)(*curArg).Height));
+        PyTuple_SetItem(tup, 0, PyLong_FromLong((long)(*curArg).Width));
+        PyTuple_SetItem(tup, 1, PyLong_FromLong((long)(*curArg).Height));
 
         PyList_Append(retVal, tup);
     }
@@ -630,33 +630,33 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetSupportedDisplayModes, "Returns a li
 }
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetDesktopWidth, "Returns desktop width")
 {
-    return PyInt_FromLong((long)cyMisc::GetDesktopWidth());
+    return PyLong_FromLong((long)cyMisc::GetDesktopWidth());
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetDesktopHeight, "Returns desktop height")
 {
-    return PyInt_FromLong((long)cyMisc::GetDesktopHeight());
+    return PyLong_FromLong((long)cyMisc::GetDesktopHeight());
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetDesktopColorDepth, "Returns desktop ColorDepth")
 {
-    return PyInt_FromLong((long)cyMisc::GetDesktopColorDepth());
+    return PyLong_FromLong((long)cyMisc::GetDesktopColorDepth());
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetDefaultDisplayParams, "Returns the default resolution and display settings")
 {
     PipelineParams *pp = cyMisc::GetDefaultDisplayParams();
     PyObject* tup = PyTuple_New(10);
-    PyTuple_SetItem(tup, 0, PyInt_FromLong((long)pp->Width));
-    PyTuple_SetItem(tup, 1, PyInt_FromLong((long)pp->Height));
-    PyTuple_SetItem(tup, 2, PyInt_FromLong((long)pp->Windowed));
-    PyTuple_SetItem(tup, 3, PyInt_FromLong((long)pp->ColorDepth));
-    PyTuple_SetItem(tup, 4, PyInt_FromLong((long)pp->AntiAliasingAmount));
-    PyTuple_SetItem(tup, 5, PyInt_FromLong((long)pp->AnisotropicLevel));
-    PyTuple_SetItem(tup, 6, PyInt_FromLong((long)pp->TextureQuality));
-    PyTuple_SetItem(tup, 7, PyInt_FromLong((long)pp->VideoQuality));
-    PyTuple_SetItem(tup, 8, PyInt_FromLong((long)pp->Shadows));
-    PyTuple_SetItem(tup, 9, PyInt_FromLong((long)pp->PlanarReflections));
+    PyTuple_SetItem(tup, 0, PyLong_FromLong((long)pp->Width));
+    PyTuple_SetItem(tup, 1, PyLong_FromLong((long)pp->Height));
+    PyTuple_SetItem(tup, 2, PyLong_FromLong((long)pp->Windowed));
+    PyTuple_SetItem(tup, 3, PyLong_FromLong((long)pp->ColorDepth));
+    PyTuple_SetItem(tup, 4, PyLong_FromLong((long)pp->AntiAliasingAmount));
+    PyTuple_SetItem(tup, 5, PyLong_FromLong((long)pp->AnisotropicLevel));
+    PyTuple_SetItem(tup, 6, PyLong_FromLong((long)pp->TextureQuality));
+    PyTuple_SetItem(tup, 7, PyLong_FromLong((long)pp->VideoQuality));
+    PyTuple_SetItem(tup, 8, PyLong_FromLong((long)pp->Shadows));
+    PyTuple_SetItem(tup, 9, PyLong_FromLong((long)pp->PlanarReflections));
     return tup;
 }
 

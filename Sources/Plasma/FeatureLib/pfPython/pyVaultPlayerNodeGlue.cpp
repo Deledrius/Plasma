@@ -206,7 +206,7 @@ PYTHON_METHOD_DEFINITION(ptVaultPlayerNode, setPlayerName, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptVaultPlayerNode, getPlayerName)
 {
-    return PyString_FromString(self->fThis->GetPlayerName().c_str());
+    return PyUnicode_FromString(self->fThis->GetPlayerName().c_str());
 }
 
 PYTHON_METHOD_DEFINITION(ptVaultPlayerNode, setAvatarShapeName, args)
@@ -223,7 +223,7 @@ PYTHON_METHOD_DEFINITION(ptVaultPlayerNode, setAvatarShapeName, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptVaultPlayerNode, getAvatarShapeName)
 {
-    return PyString_FromString(self->fThis->GetAvatarShapeName().c_str());
+    return PyUnicode_FromString(self->fThis->GetAvatarShapeName().c_str());
 }
 
 PYTHON_METHOD_DEFINITION(ptVaultPlayerNode, setDisabled, args)

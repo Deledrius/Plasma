@@ -74,7 +74,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptDniInfoSource, getAgeName)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptDniInfoSource, getAgeGuid)
 {
-    return PyString_FromString(self->fThis->GetAgeGuid().AsString().c_str());
+    return PyUnicode_FromString(self->fThis->GetAgeGuid().AsString().c_str());
 }
 
 PYTHON_START_METHODS_TABLE(ptDniInfoSource)

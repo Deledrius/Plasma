@@ -140,7 +140,7 @@ PYTHON_METHOD_DEFINITION(ptAgeLinkStruct, setAgeInfo, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptAgeLinkStruct, getParentAgeFilename)
 {
-    return PyString_FromString(self->fThis->GetParentAgeFilename());
+    return PyUnicode_FromString(self->fThis->GetParentAgeFilename());
 }
 
 PYTHON_METHOD_DEFINITION(ptAgeLinkStruct, setParentAgeFilename, args)
@@ -157,7 +157,7 @@ PYTHON_METHOD_DEFINITION(ptAgeLinkStruct, setParentAgeFilename, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptAgeLinkStruct, getLinkingRules)
 {
-    return PyInt_FromLong(self->fThis->GetLinkingRules());
+    return PyLong_FromLong(self->fThis->GetLinkingRules());
 }
 
 PYTHON_METHOD_DEFINITION(ptAgeLinkStruct, setLinkingRules, args)
@@ -305,7 +305,7 @@ PYTHON_METHOD_DEFINITION(ptAgeLinkStructRef, setAgeInfo, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptAgeLinkStructRef, getLinkingRules)
 {
-    return PyInt_FromLong(self->fThis->GetLinkingRules());
+    return PyLong_FromLong(self->fThis->GetLinkingRules());
 }
 
 PYTHON_METHOD_DEFINITION(ptAgeLinkStructRef, setLinkingRules, args)

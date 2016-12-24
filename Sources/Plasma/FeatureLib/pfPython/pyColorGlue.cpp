@@ -69,8 +69,8 @@ PYTHON_INIT_DEFINITION(ptColor, args, keywords)
     {
         if (PyFloat_Check(redObj))
             red = (float)PyFloat_AsDouble(redObj);
-        else if (PyInt_Check(redObj))
-            red = (float)PyInt_AsLong(redObj);
+        else if (PyLong_Check(redObj))
+            red = (float)PyLong_AsLong(redObj);
         else
         {
             PyErr_SetString(PyExc_TypeError, "__init__ expects four optional floats");
@@ -81,8 +81,8 @@ PYTHON_INIT_DEFINITION(ptColor, args, keywords)
     {
         if (PyFloat_Check(greenObj))
             green = (float)PyFloat_AsDouble(greenObj);
-        else if (PyInt_Check(greenObj))
-            green = (float)PyInt_AsLong(greenObj);
+        else if (PyLong_Check(greenObj))
+            green = (float)PyLong_AsLong(greenObj);
         else
         {
             PyErr_SetString(PyExc_TypeError, "__init__ expects four optional floats");
@@ -93,8 +93,8 @@ PYTHON_INIT_DEFINITION(ptColor, args, keywords)
     {
         if (PyFloat_Check(blueObj))
             blue = (float)PyFloat_AsDouble(blueObj);
-        else if (PyInt_Check(blueObj))
-            blue = (float)PyInt_AsLong(blueObj);
+        else if (PyLong_Check(blueObj))
+            blue = (float)PyLong_AsLong(blueObj);
         else
         {
             PyErr_SetString(PyExc_TypeError, "__init__ expects four optional floats");
@@ -105,8 +105,8 @@ PYTHON_INIT_DEFINITION(ptColor, args, keywords)
     {
         if (PyFloat_Check(alphaObj))
             alpha = (float)PyFloat_AsDouble(alphaObj);
-        else if (PyInt_Check(alphaObj))
-            alpha = (float)PyInt_AsLong(alphaObj);
+        else if (PyLong_Check(alphaObj))
+            alpha = (float)PyLong_AsLong(alphaObj);
         else
         {
             PyErr_SetString(PyExc_TypeError, "__init__ expects four optional floats");

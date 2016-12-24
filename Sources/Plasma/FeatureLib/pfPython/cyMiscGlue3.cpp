@@ -503,7 +503,7 @@ PYTHON_BASIC_GLOBAL_METHOD_DEFINITION(PtClearOfferBookMode, cyMisc::DisableOffer
 
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetLocalClientID, "Returns our local client ID number")
 {
-    return PyInt_FromLong(cyMisc::GetLocalClientID());
+    return PyLong_FromLong(cyMisc::GetLocalClientID());
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtIsCCRAway, "Returns current status of CCR dept")
@@ -589,7 +589,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtGetControlEvents, args, "Params: on, key\nRegi
 
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetLanguage, "Returns the current language as a PtLanguage enum")
 {
-    return PyInt_FromLong(cyMisc::GetLanguage());
+    return PyLong_FromLong(cyMisc::GetLanguage());
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtUsingUnicode, "Returns true if the current language is a unicode language (like Japanese)")
@@ -645,7 +645,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtFileExists, args, "Params: filename\nReturns t
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyString_CheckEx(filenameObj))
+    if (PyUnicode_CheckEx(filenameObj))
     {
         PYTHON_RETURN_BOOL(cyMisc::FileExists(PyString_AsStringEx(filenameObj)));
     }
@@ -665,7 +665,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtCreateDir, args, "Params: directory\nCreates t
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyString_CheckEx(directoryObj))
+    if (PyUnicode_CheckEx(directoryObj))
     {
         PYTHON_RETURN_BOOL(cyMisc::CreateDir(PyString_AsStringEx(directoryObj)));
     }

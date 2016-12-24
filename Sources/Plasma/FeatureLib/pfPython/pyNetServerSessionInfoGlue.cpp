@@ -148,7 +148,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfo, getServerName)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfo, getServerType)
 {
-    return PyInt_FromLong(self->fThis->GetServerType());
+    return PyLong_FromLong(self->fThis->GetServerType());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfo, getServerAddr)
@@ -158,12 +158,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfo, getServerAddr)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfo, getServerPort)
 {
-    return PyInt_FromLong(self->fThis->GetServerPort());
+    return PyLong_FromLong(self->fThis->GetServerPort());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfo, getServerGuid)
 {
-    return PyString_FromString(self->fThis->GetServerGuid());
+    return PyUnicode_FromString(self->fThis->GetServerGuid());
 }
 
 PYTHON_START_METHODS_TABLE(ptNetServerSessionInfo)
@@ -311,7 +311,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfoRef, getServerName)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfoRef, getServerType)
 {
-    return PyInt_FromLong(self->fThis->GetServerType());
+    return PyLong_FromLong(self->fThis->GetServerType());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfoRef, getServerAddr)
@@ -321,12 +321,12 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfoRef, getServerAddr)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfoRef, getServerPort)
 {
-    return PyInt_FromLong(self->fThis->GetServerPort());
+    return PyLong_FromLong(self->fThis->GetServerPort());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptNetServerSessionInfoRef, getServerGuid)
 {
-    return PyString_FromString(self->fThis->GetServerGuid());
+    return PyUnicode_FromString(self->fThis->GetServerGuid());
 }
 
 PYTHON_START_METHODS_TABLE(ptNetServerSessionInfoRef)

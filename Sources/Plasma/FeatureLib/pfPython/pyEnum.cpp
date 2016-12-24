@@ -93,7 +93,7 @@ static void EnumValue_dealloc(EnumValue *self)
 {
     if (self->name)
         delete [] self->name;
-    self->ob_type->tp_free((PyObject*)self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static int EnumValue_print(PyObject *self, FILE *fp, int flags)
@@ -103,7 +103,7 @@ static int EnumValue_print(PyObject *self, FILE *fp, int flags)
     if (strObject == NULL)
         return -1; // failure
 
-    const char* text = PyString_AsString(strObject);
+    const char* text = PyUnicode_AS_DATA(strObject);
     if (text == NULL)
         return -1;
 
@@ -117,12 +117,12 @@ static PyObject *EnumValue_repr(PyObject *self)
     if (obj->name == NULL)
     {
         // no name, so just output our value
-        return PyString_FromFormat("%s(%ld)", obj->ob_type->tp_name, obj->value);
+        return PyUnicode_FromFormat("%s(%ld)", Py_TYPE(obj)->tp_name, obj->value);
     }
     else
     {
         // we have a name, so output it
-        return PyString_FromString(obj->name);
+        return PyUnicode_FromString(obj->name);
     }
 }
 
@@ -132,19 +132,19 @@ static PyObject* EnumValue_str(PyObject* self)
     if (obj->name == NULL)
     {
         // no name, so return our value
-        return PyString_FromFormat("%s(%ld)", obj->ob_type->tp_name, obj->value);
+        return PyUnicode_FromFormat("%s(%ld)", Py_TYPE(obj)->tp_name, obj->value);
     }
     else
     {
         // just return the name
-        return PyString_FromString(obj->name);
+        return PyUnicode_FromString(obj->name);
     }
 }
 
 // forward def because the type object isn't defined yet
 bool IsEnumValue(PyObject *obj);
 
-long EnumValue_hash(PyObject *v)
+Py_hash_t EnumValue_hash(PyObject *v)
 {
     // stolen from python's int class
     if (!IsEnumValue(v))
@@ -170,29 +170,29 @@ PyObject *EnumValue_and(PyObject *v, PyObject *w)
     if (IsEnumValue(v))
     {
         obj = (EnumValue*)v;
-        if (!PyInt_Check(w))
+        if (!PyLong_Check(w))
         {
             Py_INCREF(Py_NotImplemented);
             return Py_NotImplemented;
         }
-        other = PyInt_AsLong(w);
+        other = PyLong_AsLong(w);
     }
     else if (IsEnumValue(w))
     {
         obj = (EnumValue*)w;
-        if (!PyInt_Check(v))
+        if (!PyLong_Check(v))
         {
             Py_INCREF(Py_NotImplemented);
             return Py_NotImplemented;
         }
-        other = PyInt_AsLong(v);
+        other = PyLong_AsLong(v);
     }
     else
     {
         Py_INCREF(Py_NotImplemented);
         return Py_NotImplemented;
     }
-    return PyInt_FromLong(obj->value & other);
+    return PyLong_FromLong(obj->value & other);
 }
 
 PyObject *EnumValue_xor(PyObject *v, PyObject *w)
@@ -202,29 +202,29 @@ PyObject *EnumValue_xor(PyObject *v, PyObject *w)
     if (IsEnumValue(v))
     {
         obj = (EnumValue*)v;
-        if (!PyInt_Check(w))
+        if (!PyLong_Check(w))
         {
             Py_INCREF(Py_NotImplemented);
             return Py_NotImplemented;
         }
-        other = PyInt_AsLong(w);
+        other = PyLong_AsLong(w);
     }
     else if (IsEnumValue(w))
     {
         obj = (EnumValue*)w;
-        if (!PyInt_Check(v))
+        if (!PyLong_Check(v))
         {
             Py_INCREF(Py_NotImplemented);
             return Py_NotImplemented;
         }
-        other = PyInt_AsLong(v);
+        other = PyLong_AsLong(v);
     }
     else
     {
         Py_INCREF(Py_NotImplemented);
         return Py_NotImplemented;
     }
-    return PyInt_FromLong(obj->value ^ other);
+    return PyLong_FromLong(obj->value ^ other);
 }
 
 PyObject *EnumValue_or(PyObject *v, PyObject *w)
@@ -234,34 +234,34 @@ PyObject *EnumValue_or(PyObject *v, PyObject *w)
     if (IsEnumValue(v))
     {
         obj = (EnumValue*)v;
-        if (!PyInt_Check(w))
+        if (!PyLong_Check(w))
         {
             Py_INCREF(Py_NotImplemented);
             return Py_NotImplemented;
         }
-        other = PyInt_AsLong(w);
+        other = PyLong_AsLong(w);
     }
     else if (IsEnumValue(w))
     {
         obj = (EnumValue*)w;
-        if (!PyInt_Check(v))
+        if (!PyLong_Check(v))
         {
             Py_INCREF(Py_NotImplemented);
             return Py_NotImplemented;
         }
-        other = PyInt_AsLong(v);
+        other = PyLong_AsLong(v);
     }
     else
     {
         Py_INCREF(Py_NotImplemented);
         return Py_NotImplemented;
     }
-    return PyInt_FromLong(obj->value | other);
+    return PyLong_FromLong(obj->value | other);
 }
 
 PyObject *EnumValue_int(EnumValue *v)
 {
-    return PyInt_FromLong(v->value);
+    return PyLong_FromLong(v->value);
 }
 
 PyObject *EnumValue_long(EnumValue *v)
@@ -274,75 +274,11 @@ PyObject *EnumValue_float(EnumValue *v)
     return PyFloat_FromDouble((double)(v->value));
 }
 
-PyObject *EnumValue_oct(EnumValue *v)
-{
-    char buf[100];
-    long x = v->value;
-    if (x < 0)
-    {
-        Py_INCREF(Py_NotImplemented);
-        return Py_NotImplemented;
-    }
-    if (x == 0)
-        strcpy(buf, "0");
-    else
-        snprintf(buf, sizeof(buf), "0%lo", x);
-    return PyString_FromString(buf);
-}
-
-PyObject *EnumValue_hex(EnumValue *v)
-{
-    char buf[100];
-    long x = v->value;
-    if (x < 0)
-    {
-        Py_INCREF(Py_NotImplemented);
-        return Py_NotImplemented;
-    }
-    snprintf(buf, sizeof(buf), "0x%lx", x);
-    return PyString_FromString(buf);
-}
-
-int EnumValue_coerce(PyObject **pv, PyObject **pw)
-{
-    if (PyInt_Check(*pw))
-    {
-        long x = PyInt_AsLong(*pw);
-        *pw = NewEnumValue(NULL, x);
-        Py_INCREF(*pv);
-        return 0;
-    }
-    else if (PyLong_Check(*pw))
-    {
-        double x = PyLong_AsDouble(*pw);
-        if (x == -1.0 && PyErr_Occurred())
-            return -1;
-        *pw = NewEnumValue(NULL, (long)x);
-        Py_INCREF(*pv);
-        return 0;
-    }
-    else if (PyFloat_Check(*pw))
-    {
-        double x = PyFloat_AsDouble(*pw);
-        *pw = NewEnumValue(NULL, (long)x);
-        Py_INCREF(*pv);
-        return 0;
-    }
-    else if (IsEnumValue(*pw))
-    {
-        Py_INCREF(*pv);
-        Py_INCREF(*pw);
-        return 0;
-    }
-    return 1; // Can't do it
-}
-
 // we support some of the number methods
 PYTHON_START_AS_NUMBER_TABLE(EnumValue)
     0,                          /*nb_add*/
     0,                          /*nb_subtract*/
     0,                          /*nb_multiply*/
-    0,                          /*nb_divide*/
     0,                          /*nb_remainder*/
     0,                          /*nb_divmod*/
     0,                          /*nb_power*/
@@ -356,16 +292,12 @@ PYTHON_START_AS_NUMBER_TABLE(EnumValue)
     (binaryfunc)EnumValue_and,  /*nb_and*/
     (binaryfunc)EnumValue_xor,  /*nb_xor*/
     (binaryfunc)EnumValue_or,   /*nb_or*/
-    (coercion)EnumValue_coerce, /*nb_coerce*/
     (unaryfunc)EnumValue_int,   /*nb_int*/
     (unaryfunc)EnumValue_long,  /*nb_long*/
     (unaryfunc)EnumValue_float, /*nb_float*/
-    (unaryfunc)EnumValue_oct,   /*nb_oct*/
-    (unaryfunc)EnumValue_hex,   /*nb_hex*/
     0,                          /*nb_inplace_add*/
     0,                          /*nb_inplace_subtract*/
     0,                          /*nb_inplace_multiply*/
-    0,                          /*nb_inplace_divide*/
     0,                          /*nb_inplace_remainder*/
     0,                          /*nb_inplace_power*/
     0,                          /*nb_inplace_lshift*/
@@ -377,6 +309,9 @@ PYTHON_START_AS_NUMBER_TABLE(EnumValue)
     0,                          /* nb_true_divide */
     0,                          /* nb_inplace_floor_divide */
     0,                          /* nb_inplace_true_divide */
+    0,                          /* nb_index */
+    0,                          /* nb_matrix_multiply */
+    0,                          /* nb_inplace_matrix_multiply */
 PYTHON_END_AS_NUMBER_TABLE;
 
 PYTHON_COMPARE_DEFINITION(EnumValue, v, w)
@@ -386,8 +321,8 @@ PYTHON_COMPARE_DEFINITION(EnumValue, v, w)
     if (IsEnumValue(v))
     {
         i = ((EnumValue*)v)->value;
-        if (PyInt_Check(w))
-            j = PyInt_AsLong(w);
+        if (PyLong_Check(w))
+            j = PyLong_AsLong(w);
         else if (PyFloat_Check(w))
             j = (long)PyFloat_AsDouble(w);
         else if (PyLong_Check(w))
@@ -404,8 +339,8 @@ PYTHON_COMPARE_DEFINITION(EnumValue, v, w)
     else if (IsEnumValue(w))
     {
         j = ((EnumValue*)w)->value;
-        if (PyInt_Check(v))
-            i = PyInt_AsLong(v);
+        if (PyLong_Check(v))
+            i = PyLong_AsLong(v);
         else if (PyFloat_Check(v))
             i = (long)PyFloat_AsDouble(v);
         else if (PyLong_Check(v))
@@ -437,7 +372,6 @@ PYTHON_START_METHODS_TABLE(EnumValue)
 PYTHON_END_METHODS_TABLE;
 
 PYTHON_TYPE_START(EnumValue)
-    0,
     "PlasmaConstants.EnumValue",
     sizeof(EnumValue),                  /* tp_basicsize */
     0,                                  /* tp_itemsize */
@@ -445,7 +379,7 @@ PYTHON_TYPE_START(EnumValue)
     EnumValue_print,                    /* tp_print */
     0,                                  /* tp_getattr */
     0,                                  /* tp_setattr */
-    PYTHON_DEFAULT_COMPARE(EnumValue),  /* tp_compare */
+    0,                                  /* tp_as_async (formerly tp_compare) */
     EnumValue_repr,                     /* tp_repr */
     PYTHON_DEFAULT_AS_NUMBER(EnumValue),/* tp_as_number */
     0,                                  /* tp_as_sequence */
@@ -457,12 +391,11 @@ PYTHON_TYPE_START(EnumValue)
     0,                                  /* tp_setattro */
     0,                                  /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT
-    | Py_TPFLAGS_BASETYPE
-    | Py_TPFLAGS_CHECKTYPES,            /* tp_flags */
+    | Py_TPFLAGS_BASETYPE,              /* tp_flags */
     "A basic enumeration value",        /* tp_doc */
     0,                                  /* tp_traverse */
     0,                                  /* tp_clear */
-    0,                                  /* tp_richcompare */
+    0, /*PYTHON_DEFAULT_COMPARE(EnumValue),*/  /* tp_richcompare */
     0,                                  /* tp_weaklistoffset */
     0,                                  /* tp_iter */
     0,                                  /* tp_iternext */
@@ -561,12 +494,12 @@ static int Enum_clear(Enum *self)
 static void Enum_dealloc(Enum *self)
 {
     Enum_clear(self);
-    self->ob_type->tp_free((PyObject*)self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyObject *Enum_getattro(PyObject *self, PyObject *attr_name)
 {
-    if (!PyString_Check(attr_name))
+    if (!PyUnicode_Check(attr_name))
     {
         PyErr_SetString(PyExc_TypeError, "getattro expects a string argument");
         PYTHON_RETURN_ERROR;
@@ -576,7 +509,7 @@ static PyObject *Enum_getattro(PyObject *self, PyObject *attr_name)
     if (!item)
     {
         PyErr_Clear(); // wasn't in the dictionary, check to see if they want the values or lookup dict
-        char *name = PyString_AsString(attr_name);
+        const char *name = PyUnicode_AS_DATA(attr_name);
         if (strcmp(name, "values") == 0)
         {
             Py_INCREF(theEnum->values);
@@ -600,7 +533,7 @@ static PyObject *Enum_getattro(PyObject *self, PyObject *attr_name)
 
 static int Enum_setattro(PyObject *self, PyObject *attr_name, PyObject *value)
 {
-    if (!PyString_Check(attr_name))
+    if (!PyUnicode_Check(attr_name))
     {
         PyErr_SetString(PyExc_TypeError, "setattro expects a string argument");
         return -1;;
@@ -610,7 +543,7 @@ static int Enum_setattro(PyObject *self, PyObject *attr_name, PyObject *value)
     if (!item)
     {
         PyErr_Clear(); // wasn't in the dictionary, check to see if they want the values or lookup dict
-        char *name = PyString_AsString(attr_name);
+        const char *name = PyUnicode_AS_DATA(attr_name);
         if (strcmp(name, "values") == 0)
         {
             PyErr_SetString(PyExc_RuntimeError, "Cannot set the value attribute");
@@ -639,7 +572,6 @@ PYTHON_START_METHODS_TABLE(Enum)
 PYTHON_END_METHODS_TABLE;
 
 PYTHON_TYPE_START(Enum)
-    0,
     "PlasmaConstants.Enum",
     sizeof(Enum),                       /* tp_basicsize */
     0,                                  /* tp_itemsize */
@@ -717,8 +649,8 @@ void pyEnum::MakeEnum(PyObject *m, const char* name, std::map<std::string, int> 
         enumValueName += "." + key;
 
         PyObject *newValue = NewEnumValue(enumValueName.c_str(), value);
-        PyObject *valueObj = PyInt_FromLong((long)value);
-        PyObject *keyObj = PyString_FromString(key.c_str());
+        PyObject *valueObj = PyLong_FromLong((long)value);
+        PyObject *keyObj = PyUnicode_FromString(key.c_str());
         PyDict_SetItem(valuesDict, valueObj, newValue);
         PyDict_SetItem(lookupDict, keyObj, newValue);
         PyDict_SetItem(reverseLookupDict, newValue, keyObj);

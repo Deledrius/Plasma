@@ -113,7 +113,7 @@ PYTHON_INIT_DEFINITION(ptBook, args, keywords)
     {
         int len = PyUnicode_GetSize(sourceObj);
         wchar_t* temp = new wchar_t[len + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)sourceObj, temp, len);
+        PyUnicode_AsWideChar(sourceObj, temp, len);
         temp[len] = L'\0';
 
         std::wstring source = temp;
@@ -122,9 +122,9 @@ PYTHON_INIT_DEFINITION(ptBook, args, keywords)
         self->fThis->MakeBook(source, coverKey, callbackKey, guiNameStr);
         PYTHON_RETURN_INIT_OK;
     }
-    else if (PyString_Check(sourceObj))
+    else if (PyUnicode_Check(sourceObj))
     {
-        std::string source = PyString_AsString(sourceObj);
+        std::string source = PyUnicode_AS_DATA(sourceObj);
 
         self->fThis->MakeBook(source, coverKey, callbackKey, guiNameStr);
         PYTHON_RETURN_INIT_OK;
@@ -257,7 +257,7 @@ PYTHON_METHOD_DEFINITION(ptBook, setEditable, args)
 
 PYTHON_METHOD_DEFINITION(ptBook, getEditableText, args)
 {
-    return PyString_FromString(self->fThis->GetEditableText().c_str());
+    return PyUnicode_FromString(self->fThis->GetEditableText().c_str());
 }
 
 PYTHON_METHOD_DEFINITION(ptBook, setEditableText, args)

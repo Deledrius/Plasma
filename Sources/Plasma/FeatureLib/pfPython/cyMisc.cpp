@@ -1019,7 +1019,7 @@ PyObject* cyMisc::GetNPC(int npcID)
 
 PyObject* cyMisc::GetNPCCount()
 {
-    return PyInt_FromLong(plNetClientMgr::GetInstance()->NPCKeys().size());
+    return PyLong_FromLong(plNetClientMgr::GetInstance()->NPCKeys().size());
 }
 
 #if 1
@@ -2897,7 +2897,7 @@ PyObject* cyMisc::PyGuidGenerate()
 {
     plUUID newGuid = plUUID::Generate();
 
-    return PyString_FromString(newGuid.AsString().c_str());
+    return PyUnicode_FromString(newGuid.AsString().c_str());
 }
 
 PyObject* cyMisc::GetAIAvatarsByModelName(const char* name)

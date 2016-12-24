@@ -80,7 +80,7 @@ PYTHON_METHOD_DEFINITION(ptVaultImageNode, imageSetTitle, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptVaultImageNode, imageGetTitle)
 {
-    return PyString_FromString(self->fThis->Image_GetTitle().c_str());
+    return PyUnicode_FromString(self->fThis->Image_GetTitle().c_str());
 }
 
 PYTHON_METHOD_DEFINITION(ptVaultImageNode, imageSetImage, args)
@@ -130,16 +130,16 @@ PYTHON_METHOD_DEFINITION(ptVaultImageNode, setTitleW, args)
     {
         int strLen = PyUnicode_GetSize(textObj);
         wchar_t* title = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)textObj, title, strLen);
+        PyUnicode_AsWideChar(textObj, title, strLen);
         title[strLen] = L'\0';
         self->fThis->Image_SetTitleW(title);
         delete [] title;
         PYTHON_RETURN_NONE;
     }
-    else if (PyString_Check(textObj))
+    else if (PyUnicode_Check(textObj))
     {
         // we'll allow this, just in case something goes weird
-        char* title = PyString_AsString(textObj);
+        const char* title = PyUnicode_AS_DATA(textObj);
         self->fThis->Image_SetTitle(title);
         PYTHON_RETURN_NONE;
     }
@@ -149,7 +149,7 @@ PYTHON_METHOD_DEFINITION(ptVaultImageNode, setTitleW, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptVaultImageNode, getTitle)
 {
-    return PyString_FromString(self->fThis->Image_GetTitle().c_str());
+    return PyUnicode_FromString(self->fThis->Image_GetTitle().c_str());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptVaultImageNode, getTitleW)

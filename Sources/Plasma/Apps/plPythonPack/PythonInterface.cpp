@@ -44,10 +44,19 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "compile.h"
 #include "eval.h"
 #include "marshal.h"
-#include "cStringIO.h"
 #include "plFileSystem.h"
 
 static PyObject* stdFile;   // python object of the stdout and err file
+
+// Shim for missing function in Python3
+int Py_FlushLine(void)
+{
+    PyObject *f = PySys_GetObject("stdout");
+    if (f == NULL)
+        return 0;
+    return PyFile_WriteString("\n", f);
+}
+
 
 void PythonInterface::initPython(const plFileName& rootDir)
 {
@@ -56,22 +65,17 @@ void PythonInterface::initPython(const plFileName& rootDir)
     {
         // initialize the Python stuff
         // let Python do some intialization...
-        Py_SetProgramName(const_cast<char*>("plasma"));
+        Py_SetProgramName(L"plasma");
         Py_NoSiteFlag = 1;
         Py_IgnoreEnvironmentFlag = 1;
         Py_Initialize();
 
-        // intialize any of our special plasma python modules
-//      initP2PInterface();
-        // save object to the Plasma module
-//      plasmaMod = PyImport_ImportModule("Plasma");
-
         // create the StringIO for the stdout and stderr file
-        PycStringIO = (struct PycStringIO_CAPI*)PyCObject_Import(const_cast<char*>("cStringIO"), const_cast<char*>("cStringIO_CAPI"));
-        stdFile = (*PycStringIO->NewOutput)(20000);
+        PyObject* PyStringIO = PyObject_GetAttrString(PyImport_ImportModule("io"), "StringIO");
+        stdFile = PyObject_CallObject(PyStringIO, NULL);
         // if we need the builtins then find the builtin module
         PyObject* sysmod = PyImport_ImportModule("sys");
-        // then add the builtin dicitionary to our module's dictionary
+        // then add the builtin dictionary to our module's dictionary
         if (sysmod != NULL )
         {
             // get the sys's dictionary to find the stdout and stderr
@@ -82,20 +86,20 @@ void PythonInterface::initPython(const plFileName& rootDir)
                 PyDict_SetItemString(sys_dict, "stderr", stdFile);
             }
             // NOTE: we will reset the path to not include paths
-            // ...that Python may have found in the registery
+            // ...that Python may have found in the registry
             PyObject* path_list = PyList_New(0);
             printf("Setting up include dirs:\n");
             printf("%s\n", rootDir.AsString().c_str());
-            PyObject* more_path = PyString_FromString(rootDir.AsString().c_str());
+            PyObject* more_path = PyUnicode_FromString(rootDir.AsString().c_str());
             PyList_Append(path_list, more_path);
             // make sure that our plasma libraries are gotten before the system ones
             plFileName temp = plFileName::Join(rootDir, "plasma");
             printf("%s\n", temp.AsString().c_str());
-            PyObject* more_path3 = PyString_FromString(temp.AsString().c_str());
+            PyObject* more_path3 = PyUnicode_FromString(temp.AsString().c_str());
             PyList_Append(path_list, more_path3);
             temp = plFileName::Join(rootDir, "system");
             printf("%s\n\n", temp.AsString().c_str());
-            PyObject* more_path2 = PyString_FromString("system");
+            PyObject* more_path2 = PyUnicode_FromString("system");
             PyList_Append(path_list, more_path2);
             // set the path to be this one
             PyDict_SetItemString(sys_dict, "path", path_list);
@@ -116,7 +120,7 @@ void PythonInterface::addPythonPath(const plFileName& path)
         PyObject* path_list = PyDict_GetItemString(sys_dict, "path");
 
         printf("Adding path %s\n", path.AsString().c_str());
-        PyObject* more_path = PyString_FromString(path.AsString().c_str());
+        PyObject* more_path = PyUnicode_FromString(path.AsString().c_str());
         PyList_Append(path_list, more_path);
 
         Py_DECREF(sysmod);
@@ -166,8 +170,8 @@ bool PythonInterface::DumpObject(PyObject* pyobj, char** pickle, int32_t* size)
     if ( s != NULL )
     {
         // yes, then get the size and the string address
-        *size = PyString_Size(s);
-        *pickle =  PyString_AsString(s);
+        *size = PyBytes_Size(s);
+        *pickle = PyBytes_AsString(s);
         return true;
     }
     else  // otherwise, there was an error
@@ -187,12 +191,12 @@ bool PythonInterface::DumpObject(PyObject* pyobj, char** pickle, int32_t* size)
 //
 int PythonInterface::getOutputAndReset(char** line)
 {
-    PyObject* pyStr = (*PycStringIO->cgetvalue)(stdFile);
-    char *str = PyString_AsString( pyStr );
-    int size = PyString_Size( pyStr );
+    PyObject* pyStr = PyObject_CallMethod(stdFile, "getvalue", NULL);
+    char *str = PyBytes_AsString(pyStr);
+    int size = PyBytes_Size(pyStr);
 
     // reset the file back to zero
-    PyObject_CallMethod(stdFile, const_cast<char*>("reset"), const_cast<char*>(""));
+    PyObject_CallMethod(stdFile, "truncate", "i", 0);
 /*
     // check to see if the debug python module is loaded
     if ( dbgOut != nil )
@@ -236,12 +240,12 @@ PyObject* PythonInterface::CreateModule(const char* module)
     d = PyModule_GetDict(m);
 // add in the built-ins
     // first make sure that we don't already have the builtins
-    if (PyDict_GetItemString(d, "__builtins__") == NULL)
+    if (PyDict_GetItemString(d, "builtins") == NULL)
     {
         // if we need the builtins then find the builtin module
-        PyObject *bimod = PyImport_ImportModule("__builtin__");
+        PyObject *bimod = PyImport_ImportModule("builtins");
         // then add the builtin dicitionary to our module's dictionary
-        if (bimod == NULL || PyDict_SetItemString(d, "__builtins__", bimod) != 0)
+        if (bimod == NULL || PyDict_SetItemString(d, "builtins", bimod) != 0)
             return nil;
         Py_DECREF(bimod);
     }
@@ -270,7 +274,7 @@ bool PythonInterface::RunPYC(PyObject* code, PyObject* module)
     // get the dictionaries for this module
     d = PyModule_GetDict(module);
     // run the string
-    v = PyEval_EvalCode((PyCodeObject*)code, d, d);
+    v = PyEval_EvalCode(code, d, d);
     // check for errors and print them
     if (v == NULL)
     {

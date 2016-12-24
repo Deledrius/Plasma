@@ -152,7 +152,7 @@ PYTHON_METHOD_DEFINITION(ptImage, saveAsJPEG, args)
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyString_CheckEx(filenameObj)) {
+    if (PyUnicode_CheckEx(filenameObj)) {
         self->fThis->SaveAsJPEG(PyString_AsStringEx(filenameObj), quality);
         Py_RETURN_NONE;
     }
@@ -172,7 +172,7 @@ PYTHON_METHOD_DEFINITION(ptImage, saveAsPNG, args)
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyString_CheckEx(filenameObj))
+    if (PyUnicode_CheckEx(filenameObj))
     {
         self->fThis->SaveAsPNG(PyString_AsStringEx(filenameObj));
         PYTHON_RETURN_NONE;
@@ -259,7 +259,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtLoadJPEGFromDisk, args, "Params: filename,widt
         PYTHON_RETURN_ERROR;
     }
 
-    if (PyString_CheckEx(filenameObj))
+    if (PyUnicode_CheckEx(filenameObj))
     {
         plFileName filename = PyString_AsStringEx(filenameObj);
         PyObject* ret = pyImage::LoadJPEGFromDisk(filename, width, height);
@@ -281,7 +281,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtLoadPNGFromDisk, args, "Params: filename,width
         PyErr_SetString(PyExc_TypeError, "PtLoadPNGFromDisk expects a string and two unsigned shorts");
         PYTHON_RETURN_ERROR;
     }
-    if (PyString_CheckEx(filenameObj))
+    if (PyUnicode_CheckEx(filenameObj))
     {
         plFileName filename = PyString_AsStringEx(filenameObj);
         PyObject* ret = pyImage::LoadPNGFromDisk(filename, width, height);

@@ -69,7 +69,7 @@ PYTHON_METHOD_DEFINITION(ptStream, open, args)
     }
 
     plFileName filename;
-    if (PyString_CheckEx(filenameObj))
+    if (PyUnicode_CheckEx(filenameObj))
     {
         filename = PyString_AsStringEx(filenameObj);
     }
@@ -80,7 +80,7 @@ PYTHON_METHOD_DEFINITION(ptStream, open, args)
     }
 
     plString flags;
-    if (PyString_CheckEx(flagsObj))
+    if (PyUnicode_CheckEx(flagsObj))
     {
         flags = PyString_AsStringEx(flagsObj);
     }
@@ -98,7 +98,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptStream, readlines)
     std::vector<std::string> lines = self->fThis->ReadLines();
     PyObject* retVal = PyList_New(lines.size());
     for (int i = 0; i < lines.size(); i++)
-        PyList_SetItem(retVal, i, PyString_FromString(lines[i].c_str()));
+        PyList_SetItem(retVal, i, PyUnicode_FromString(lines[i].c_str()));
     return retVal;
 }
 
@@ -120,12 +120,12 @@ PYTHON_METHOD_DEFINITION(ptStream, writelines, args)
     for (int i = 0; i < len; i++)
     {
         PyObject* element = PyList_GetItem(stringList, i);
-        if (!PyString_Check(element))
+        if (!PyUnicode_Check(element))
         {
             PyErr_SetString(PyExc_TypeError, "writelines expects a list of strings");
             PYTHON_RETURN_ERROR;
         }
-        strings.push_back(PyString_AsString(element));
+        strings.push_back(PyUnicode_AS_DATA(element));
     }
     PYTHON_RETURN_BOOL(self->fThis->WriteLines(strings));
 }

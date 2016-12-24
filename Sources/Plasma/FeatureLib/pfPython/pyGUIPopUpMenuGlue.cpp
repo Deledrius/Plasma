@@ -82,10 +82,10 @@ PYTHON_INIT_DEFINITION(ptGUIPopUpMenu, args, keywords)
         self->fThis->setup(key->getKey());
         PYTHON_RETURN_INIT_OK;
     }
-    else if (PyString_Check(arg1))
+    else if (PyUnicode_Check(arg1))
     {
         // arg list 2 or 3
-        char* name = PyString_AsString(arg1);
+        const char* name = PyUnicode_AS_DATA(arg1);
         if (PyFloat_Check(arg2))
         {
             // arg list 2
@@ -194,7 +194,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptGUIPopUpMenu, isEnabled)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGUIPopUpMenu, getName)
 {
-    return PyString_FromString(self->fThis->GetName());
+    return PyUnicode_FromString(self->fThis->GetName());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGUIPopUpMenu, getVersion)

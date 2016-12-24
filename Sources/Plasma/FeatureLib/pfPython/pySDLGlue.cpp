@@ -104,7 +104,7 @@ PYTHON_METHOD_DEFINITION(ptSDLStateDataRecord, findVar, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptSDLStateDataRecord, getName)
 {
-    return PyString_FromString(self->fThis->GetName().c_str());
+    return PyUnicode_FromString(self->fThis->GetName().c_str());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptSDLStateDataRecord, getVarList)
@@ -112,7 +112,7 @@ PYTHON_METHOD_DEFINITION_NOARGS(ptSDLStateDataRecord, getVarList)
     std::vector<plString> vars = self->fThis->GetVarList();
     PyObject* varList = PyList_New(vars.size());
     for (int i = 0; i < vars.size(); i++)
-        PyList_SetItem(varList, i, PyString_FromString(vars[i].c_str()));
+        PyList_SetItem(varList, i, PyUnicode_FromString(vars[i].c_str()));
     return varList;
 }
 
@@ -219,9 +219,9 @@ PYTHON_METHOD_DEFINITION(ptSimpleStateVariable, setBool, args)
     PYTHON_RETURN_BOOL(self->fThis->SetBool(val != 0, idx));
 }
 
-STATEVAR_GET(getByte, GetByte, PyInt_FromLong)
-STATEVAR_GET(getShort, GetShort, PyInt_FromLong)
-STATEVAR_GET(getInt, GetInt, PyInt_FromLong)
+STATEVAR_GET(getByte, GetByte, PyLong_FromLong)
+STATEVAR_GET(getShort, GetShort, PyLong_FromLong)
+STATEVAR_GET(getInt, GetInt, PyLong_FromLong)
 STATEVAR_GET(getFloat, GetFloat, PyFloat_FromDouble)
 STATEVAR_GET(getDouble, GetDouble, PyFloat_FromDouble)
 STATEVAR_GET(getString, GetString, PyString_FromPlString)
@@ -241,17 +241,17 @@ PYTHON_METHOD_DEFINITION(ptSimpleStateVariable, getBool, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptSimpleStateVariable, getType)
 {
-    return PyInt_FromLong(self->fThis->GetType());
+    return PyLong_FromLong(self->fThis->GetType());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptSimpleStateVariable, getDisplayOptions)
 {
-    return PyString_FromString(self->fThis->GetDisplayOptions().c_str());
+    return PyUnicode_FromString(self->fThis->GetDisplayOptions().c_str());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptSimpleStateVariable, getDefault)
 {
-    return PyString_FromString(self->fThis->GetDefault().c_str());
+    return PyUnicode_FromString(self->fThis->GetDefault().c_str());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptSimpleStateVariable, isAlwaysNew)

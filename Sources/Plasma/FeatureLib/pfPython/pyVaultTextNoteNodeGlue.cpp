@@ -149,16 +149,16 @@ PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setTitleW, args)
     {
         int strLen = PyUnicode_GetSize(textObj);
         wchar_t* title = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)textObj, title, strLen);
+        PyUnicode_AsWideChar(textObj, title, strLen);
         title[strLen] = L'\0';
         self->fThis->Note_SetTitleW(title);
         delete [] title;
         PYTHON_RETURN_NONE;
     }
-    else if (PyString_Check(textObj))
+    else if (PyUnicode_Check(textObj))
     {
         // we'll allow this, just in case something goes weird
-        char* title = PyString_AsString(textObj);
+        const char* title = PyUnicode_AS_DATA(textObj);
         self->fThis->Note_SetTitle(title);
         PYTHON_RETURN_NONE;
     }
@@ -200,16 +200,16 @@ PYTHON_METHOD_DEFINITION(ptVaultTextNoteNode, setTextW, args)
     {
         int strLen = PyUnicode_GetSize(textObj);
         wchar_t* text = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)textObj, text, strLen);
+        PyUnicode_AsWideChar(textObj, text, strLen);
         text[strLen] = L'\0';
         self->fThis->Note_SetTextW(text);
         delete [] text;
         PYTHON_RETURN_NONE;
     }
-    else if (PyString_Check(textObj))
+    else if (PyUnicode_Check(textObj))
     {
         // we'll allow this, just in case something goes weird
-        char* text = PyString_AsString(textObj);
+        const char* text = PyUnicode_AS_DATA(textObj);
         self->fThis->Note_SetText(text);
         PYTHON_RETURN_NONE;
     }

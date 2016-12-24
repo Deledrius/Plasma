@@ -74,7 +74,7 @@ PYTHON_INIT_DEFINITION(ptPlayer, args, keywords)
 
     if (pyKey::Check(firstObj))
     {
-        if (!(PyString_CheckEx(secondObj) && PyNumber_Check(thirdObj) && PyFloat_Check(fourthObj)))
+        if (!(PyUnicode_CheckEx(secondObj) && PyNumber_Check(thirdObj) && PyFloat_Check(fourthObj)))
         {
             PyErr_SetString(PyExc_TypeError, "__init__ expects one of two argument lists: (ptKey, string, unsigned long, float) or (string, unsigned long)");
             PYTHON_RETURN_INIT_ERROR;
@@ -84,7 +84,7 @@ PYTHON_INIT_DEFINITION(ptPlayer, args, keywords)
         name = PyString_AsStringEx(secondObj);
         pid = PyNumber_AsSsize_t(thirdObj, NULL);
         distSeq = (float)PyFloat_AsDouble(fourthObj);
-    } else if (PyString_CheckEx(firstObj)) {
+    } else if (PyUnicode_CheckEx(firstObj)) {
         name = PyString_AsStringEx(firstObj);
         if (!PyNumber_Check(secondObj) || thirdObj  || fourthObj)
         {

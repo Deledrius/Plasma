@@ -96,15 +96,15 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtCreatePlayerW, args, "Params: playerName, avat
     {
         int strLen = PyUnicode_GetSize(playerNameObj);
         wchar_t* text = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)playerNameObj, text, strLen);
+        PyUnicode_AsWideChar(playerNameObj, text, strLen);
         text[strLen] = L'\0';
         playerName = text;
         delete [] text;
     }
-    else if (PyString_Check(playerNameObj))
+    else if (PyUnicode_Check(playerNameObj))
     {
         // we'll allow this, just in case something goes weird
-        char* text = PyString_AsString(playerNameObj);
+        const char* text = PyUnicode_AS_DATA(playerNameObj);
         wchar_t* temp = hsStringToWString(text);
         playerName = temp;
         delete [] temp;
@@ -119,15 +119,15 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtCreatePlayerW, args, "Params: playerName, avat
     {
         int strLen = PyUnicode_GetSize(avatarShapeObj);
         wchar_t* text = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)avatarShapeObj, text, strLen);
+        PyUnicode_AsWideChar(avatarShapeObj, text, strLen);
         text[strLen] = L'\0';
         avatarShape = text;
         delete [] text;
     }
-    else if (PyString_Check(avatarShapeObj))
+    else if (PyUnicode_Check(avatarShapeObj))
     {
         // we'll allow this, just in case something goes weird
-        char* text = PyString_AsString(avatarShapeObj);
+        const char* text = PyUnicode_AS_DATA(avatarShapeObj);
         wchar_t* temp = hsStringToWString(text);
         avatarShape = temp;
         delete [] temp;
@@ -142,15 +142,15 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtCreatePlayerW, args, "Params: playerName, avat
     {
         int strLen = PyUnicode_GetSize(invitationObj);
         wchar_t* text = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)invitationObj, text, strLen);
+        PyUnicode_AsWideChar(invitationObj, text, strLen);
         text[strLen] = L'\0';
         invitation = text;
         delete [] text;
     }
-    else if (PyString_Check(invitationObj))
+    else if (PyUnicode_Check(invitationObj))
     {
         // we'll allow this, just in case something goes weird
-        char* text = PyString_AsString(invitationObj);
+        const char* text = PyUnicode_AS_DATA(invitationObj);
         wchar_t* temp = hsStringToWString(text);
         invitation = temp;
         delete [] temp;

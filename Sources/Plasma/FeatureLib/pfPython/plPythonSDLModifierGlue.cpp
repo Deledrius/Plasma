@@ -179,7 +179,7 @@ PYTHON_END_METHODS_TABLE;
 
 PyObject* ptSDL_subscript(ptSDL* self, PyObject* key)
 {
-    if (!PyString_CheckEx(key))
+    if (!PyUnicode_CheckEx(key))
     {
         PyErr_SetString(PyExc_TypeError, "SDL indexes must be strings");
         PYTHON_RETURN_ERROR;
@@ -195,7 +195,7 @@ int ptSDL_ass_subscript(ptSDL* self, PyObject* key, PyObject* value)
         PyErr_SetString(PyExc_RuntimeError, "Cannot remove sdl records");
         return -1; // error return
     }
-    if (!PyString_CheckEx(key))
+    if (!PyUnicode_CheckEx(key))
     {
         PyErr_SetString(PyExc_TypeError, "SDL indexes must be strings");
         return -1; // error return

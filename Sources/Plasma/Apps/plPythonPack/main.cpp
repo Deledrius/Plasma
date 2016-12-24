@@ -136,7 +136,7 @@ void WritePythonFile(const plFileName &fileName, const plFileName &path, hsStrea
         {
     // set the name of the file (in the global dictionary of the module)
             PyObject* dict = PyModule_GetDict(fModule);
-            PyObject* pfilename = PyString_FromString(fileName.AsString().c_str());
+            PyObject* pfilename = PyUnicode_FromString(fileName.AsString().c_str());
             PyDict_SetItemString(dict, "glue_name", pfilename);
     // next we need to:
     //  - create instance of class
@@ -145,7 +145,7 @@ void WritePythonFile(const plFileName &fileName, const plFileName &path, hsStrea
             if ( getID!=nil && PyCallable_Check(getID) )
             {
                 PyObject* id = PyObject_CallFunction(getID,nil);
-                if ( id && PyInt_Check(id) )
+                if ( id && PyLong_Check(id) )
                     foundID = true;
             }
             if ( foundID == false )     // then there was an error or no ID or somethin'

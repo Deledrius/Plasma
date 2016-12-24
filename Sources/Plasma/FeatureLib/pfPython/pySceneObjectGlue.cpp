@@ -159,7 +159,7 @@ PYTHON_METHOD_DEFINITION(ptSceneobject, findObject, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptSceneobject, getName)
 {
-    return PyString_FromString(self->fThis->GetName().c_str());
+    return PyUnicode_FromString(self->fThis->GetName().c_str());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptSceneobject, getResponders)
@@ -353,7 +353,7 @@ PYTHON_METHOD_DEFINITION(ptSceneobject, popCamera, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptSceneobject, getResponderState)
 {
-    return PyInt_FromLong((long)self->fThis->GetResponderState());
+    return PyLong_FromLong((long)self->fThis->GetResponderState());
 }
 
 PYTHON_BASIC_METHOD_DEFINITION(ptSceneobject, animate, Animate)
@@ -440,7 +440,7 @@ PYTHON_METHOD_DEFINITION(ptSceneobject, getSoundIndex, args)
         PyErr_SetString(PyExc_TypeError, "getSoundIndex expects a string");
         PYTHON_RETURN_ERROR;
     }
-    return PyInt_FromLong((long)self->fThis->GetSoundObjectIndex(sndComponentName));
+    return PyLong_FromLong((long)self->fThis->GetSoundObjectIndex(sndComponentName));
 }
 
 PYTHON_METHOD_DEFINITION(ptSceneobject, volumeSensorIgnoreExtraEnters, args)

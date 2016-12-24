@@ -185,7 +185,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtGetClientIDFromAvatarKey, args, "Params: avata
         PYTHON_RETURN_ERROR;
     }
     pyKey *key = pyKey::ConvertFrom(keyObj);
-    return PyInt_FromLong(cyMisc::GetClientIDFromAvatarKey(*key));
+    return PyLong_FromLong(cyMisc::GetClientIDFromAvatarKey(*key));
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtGetNPCByID, args, "This will return the NPC with a specific ID")
@@ -207,7 +207,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetNPCCount, "Returns the number of NPC
 
 PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtGetNumRemotePlayers, "Returns the number of remote players in this Age with you.")
 {
-    return PyInt_FromLong(cyMisc::GetNumRemotePlayers());
+    return PyLong_FromLong(cyMisc::GetNumRemotePlayers());
 }
 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtValidateKey, args, "Params: key\nReturns true(1) if 'key' is valid and loaded,\n"
@@ -267,7 +267,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtSendRTChat, args, "Params: fromPlayer,toPlayer
         toPlayers.push_back(pyPlayer::ConvertFrom(item));
     }
 
-    if (!PyString_CheckEx(message))
+    if (!PyUnicode_CheckEx(message))
     {
         PyErr_SetString(PyExc_TypeError, err);
         PYTHON_RETURN_ERROR;
@@ -286,9 +286,9 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtSendKIMessage, args, "Params: command,value\nS
         PyErr_SetString(PyExc_TypeError, "PtSendKIMessage expects a long and either a float or a string");
         PYTHON_RETURN_ERROR;
     }
-    if (PyString_Check(val))
+    if (PyUnicode_Check(val))
     {
-        char* strValue = PyString_AsString(val);
+        const char* strValue = PyUnicode_AS_DATA(val);
         wchar_t* temp = hsStringToWString(strValue);
         cyMisc::SendKIMessageS(command, temp);
         delete [] temp;
@@ -297,7 +297,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtSendKIMessage, args, "Params: command,value\nS
     {
         int len = PyUnicode_GetSize(val);
         wchar_t* buffer = new wchar_t[len + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)val, buffer, len);
+        PyUnicode_AsWideChar(val, buffer, len);
         buffer[len] = L'\0';
         cyMisc::SendKIMessageS(command, buffer);
         delete [] buffer;
@@ -307,10 +307,10 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtSendKIMessage, args, "Params: command,value\nS
         float floatValue = (float)PyFloat_AsDouble(val);
         cyMisc::SendKIMessage(command, floatValue);
     }
-    else if (PyInt_Check(val))
+    else if (PyLong_Check(val))
     {
         // accepting an int if people get lazy
-        float floatValue = (float)PyInt_AsLong(val);
+        float floatValue = (float)PyLong_AsLong(val);
         cyMisc::SendKIMessage(command, floatValue);
     }
     else
@@ -360,15 +360,15 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtLoadAvatarModel, args, "Params: modelName, spa
         {
             int len = PyUnicode_GetSize(userStrObj);
             wchar_t* buffer = new wchar_t[len + 1];
-            PyUnicode_AsWideChar((PyUnicodeObject*)userStrObj, buffer, len);
+            PyUnicode_AsWideChar(userStrObj, buffer, len);
             buffer[len] = L'\0';
             char* temp = hsWStringToString(buffer);
             delete [] buffer;
             userStr = temp;
             delete [] temp;
         }
-        else if (PyString_Check(userStrObj))
-            userStr = PyString_AsString(userStrObj);
+        else if (PyUnicode_Check(userStrObj))
+            userStr = PyUnicode_AS_DATA(userStrObj);
         else
         {
             PyErr_SetString(PyExc_TypeError, "PtLoadAvatarModel expects a string, a ptKey, and an optional string");
@@ -463,15 +463,15 @@ PYTHON_GLOBAL_METHOD_DEFINITION(PtDumpLogs, args, "Params: folder\nDumps all cur
     {
         int len = PyUnicode_GetSize(folderObj);
         wchar_t* buffer = new wchar_t[len + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)folderObj, buffer, len);
+        PyUnicode_AsWideChar(folderObj, buffer, len);
         buffer[len] = L'\0';
         bool retVal = cyMisc::DumpLogs(buffer);
         delete [] buffer;
         PYTHON_RETURN_BOOL(retVal);
     }
-    else if (PyString_Check(folderObj))
+    else if (PyUnicode_Check(folderObj))
     {
-        char* temp = PyString_AsString(folderObj);
+        const char* temp = PyUnicode_AS_DATA(folderObj);
         wchar_t* wTemp = hsStringToWString(temp);
         bool retVal = cyMisc::DumpLogs(wTemp);
         delete [] wTemp;

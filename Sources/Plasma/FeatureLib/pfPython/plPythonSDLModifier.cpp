@@ -372,9 +372,9 @@ bool plPythonSDLModifier::IPythonVarIdxToSDL(plSimpleStateVariable* var, int var
     case plVarDescriptor::kByte:
     case plVarDescriptor::kBool:
     case plVarDescriptor::kInt:
-        if (PyInt_Check(pyVar))
+        if (PyLong_Check(pyVar))
         {
-            int v = PyInt_AsLong(pyVar);
+            int v = PyLong_AsLong(pyVar);
             var->Set(v, varIdx);
             if (!hintstring.IsNull())
                 var->GetNotificationInfo().SetHintString(hintstring);
@@ -409,9 +409,9 @@ bool plPythonSDLModifier::IPythonVarIdxToSDL(plSimpleStateVariable* var, int var
             return true;
         }
         // does python think that its an integer? too bad, we'll make it a float anyhow!
-        else if (PyInt_Check(pyVar))
+        else if (PyLong_Check(pyVar))
         {
-            float v = (float)PyInt_AsLong(pyVar);
+            float v = (float)PyLong_AsLong(pyVar);
             var->Set(v, varIdx);
             if (!hintstring.IsNull())
                 var->GetNotificationInfo().SetHintString(hintstring);
@@ -420,9 +420,9 @@ bool plPythonSDLModifier::IPythonVarIdxToSDL(plSimpleStateVariable* var, int var
         break;
 
     case plVarDescriptor::kString32:
-        if (PyString_Check(pyVar))
+        if (PyUnicode_Check(pyVar))
         {
-            char* v = PyString_AsString(pyVar);
+            const char* v = PyUnicode_AS_DATA(pyVar);
             var->Set(v, varIdx);
             if (!hintstring.IsNull())
                 var->GetNotificationInfo().SetHintString(hintstring);
@@ -448,9 +448,9 @@ bool plPythonSDLModifier::IPythonVarIdxToSDL(plSimpleStateVariable* var, int var
                 var->GetNotificationInfo().SetHintString(hintstring);
             return true;
         }
-        else if (PyInt_Check(pyVar))
+        else if (PyLong_Check(pyVar))
         {
-            double v = (double)PyInt_AsLong(pyVar);
+            double v = (double)PyLong_AsLong(pyVar);
             var->Set(v, varIdx);
             if (!hintstring.IsNull())
                 var->GetNotificationInfo().SetHintString(hintstring);
@@ -503,7 +503,7 @@ PyObject* plPythonSDLModifier::ISDLVarIdxToPython(plSimpleStateVariable* var, in
         {
             int v;
             var->Get(&v, idx);
-            return PyInt_FromLong(v);
+            return PyLong_FromLong(v);
         }
 
     case plVarDescriptor::kFloat:
@@ -525,7 +525,7 @@ PyObject* plPythonSDLModifier::ISDLVarIdxToPython(plSimpleStateVariable* var, in
         {
             char v[256];
             var->Get(v, idx);
-            return PyString_FromString(v);
+            return PyUnicode_FromString(v);
         }
 
     case plVarDescriptor::kKey:

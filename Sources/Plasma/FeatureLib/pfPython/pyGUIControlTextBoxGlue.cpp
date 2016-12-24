@@ -97,16 +97,16 @@ PYTHON_METHOD_DEFINITION(ptGUIControlTextBox, setStringW, args)
     {
         int strLen = PyUnicode_GetSize(textObj);
         wchar_t* temp = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)textObj, temp, strLen);
+        PyUnicode_AsWideChar(textObj, temp, strLen);
         temp[strLen] = L'\0';
         self->fThis->SetTextW(temp);
         delete [] temp;
         PYTHON_RETURN_NONE;
     }
-    else if (PyString_Check(textObj))
+    else if (PyUnicode_Check(textObj))
     {
         // we'll allow this, just in case something goes weird
-        char* temp = PyString_AsString(textObj);
+        const char* temp = PyUnicode_AS_DATA(textObj);
         self->fThis->SetText(temp);
         PYTHON_RETURN_NONE;
     }
@@ -119,7 +119,7 @@ PYTHON_METHOD_DEFINITION(ptGUIControlTextBox, setStringW, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGUIControlTextBox, getString)
 {
-    return PyString_FromString(self->fThis->GetText().c_str());
+    return PyUnicode_FromString(self->fThis->GetText().c_str());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGUIControlTextBox, getStringW)
@@ -192,7 +192,7 @@ PYTHON_METHOD_DEFINITION(ptGUIControlTextBox, setStringJustify, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGUIControlTextBox, getStringJustify)
 {
-    return PyInt_FromLong(self->fThis->GetJustify());
+    return PyLong_FromLong(self->fThis->GetJustify());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptGUIControlTextBox, getForeColor)

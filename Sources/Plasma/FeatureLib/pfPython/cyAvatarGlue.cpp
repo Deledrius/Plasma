@@ -148,7 +148,7 @@ PYTHON_METHOD_DEFINITION(ptAvatar, runCoopAnim, args)
     float dist = 3;
     bool move = true;
     if (!PyArg_ParseTuple(args, "OOO|ffb", &keyObj, &animAv1, &animAv2, &range, &dist, &move) || !pyKey::Check(keyObj) ||
-        !PyString_CheckEx(animAv1) || !PyString_CheckEx(animAv2))
+        !PyUnicode_CheckEx(animAv1) || !PyUnicode_CheckEx(animAv2))
     {
         PyErr_SetString(PyExc_TypeError, "runCoopAnim expects a ptkey and two strings and an optional float and boolean");
         PYTHON_RETURN_ERROR;
@@ -564,7 +564,7 @@ PYTHON_METHOD_DEFINITION(ptAvatar, setReplyKey, args)
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptAvatar, getCurrentMode)
 {
-    return PyInt_FromLong(self->fThis->GetCurrentMode());
+    return PyLong_FromLong(self->fThis->GetCurrentMode());
 }
 
 PYTHON_METHOD_DEFINITION(ptAvatar, registerForBehaviorNotify, args)
@@ -621,7 +621,7 @@ PYTHON_METHOD_DEFINITION(ptAvatar, playSimpleAnimation, args)
 PYTHON_METHOD_DEFINITION(ptAvatar, saveClothingToFile, args)
 {
     PyObject* filename;
-    if (!PyArg_ParseTuple(args, "O", &filename) || !PyString_CheckEx(filename))
+    if (!PyArg_ParseTuple(args, "O", &filename) || !PyUnicode_CheckEx(filename))
     {
         PyErr_SetString(PyExc_TypeError, "saveClothingToFile expects a string object");
         PYTHON_RETURN_ERROR;
@@ -633,7 +633,7 @@ PYTHON_METHOD_DEFINITION(ptAvatar, saveClothingToFile, args)
 PYTHON_METHOD_DEFINITION(ptAvatar, loadClothingFromFile, args)
 {
     PyObject* filename;
-    if (!PyArg_ParseTuple(args, "O", &filename) || !PyString_CheckEx(filename))
+    if (!PyArg_ParseTuple(args, "O", &filename) || !PyUnicode_CheckEx(filename))
     {
         PyErr_SetString(PyExc_TypeError, "loadClothingFromFile expects a string object");
         PYTHON_RETURN_ERROR;
@@ -802,7 +802,7 @@ PYTHON_GLOBAL_METHOD_DEFINITION_NOARGS(PtAvatarExitAFK, "Tells the local avatar 
 PYTHON_GLOBAL_METHOD_DEFINITION(PtAvatarEnterAnimMode, args, "Params: animName\nEnter a custom anim loop (netpropagated)")
 {
     PyObject* animNameObj;
-    if (!PyArg_ParseTuple(args, "O", &animNameObj) || !PyString_CheckEx(animNameObj))
+    if (!PyArg_ParseTuple(args, "O", &animNameObj) || !PyUnicode_CheckEx(animNameObj))
     {
         PyErr_SetString(PyExc_TypeError, "PtAvatarEnterAnimMode expects a string");
         PYTHON_RETURN_ERROR;

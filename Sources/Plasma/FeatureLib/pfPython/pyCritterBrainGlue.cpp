@@ -165,15 +165,15 @@ PYTHON_METHOD_DEFINITION_WKEY(ptCritterBrain, addBehavior, args, keywords)
     {
         int strLen = PyUnicode_GetSize(animNameObj);
         wchar_t* text = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)animNameObj, text, strLen);
+        PyUnicode_AsWideChar(animNameObj, text, strLen);
         text[strLen] = L'\0';
         char* cText = hsWStringToString(text);
         animName = cText;
         delete [] cText;
         delete [] text;
     }
-    else if (PyString_Check(animNameObj))
-        animName = PyString_AsString(animNameObj);
+    else if (PyUnicode_Check(animNameObj))
+        animName = PyUnicode_AS_DATA(animNameObj);
     else
     {
         PyErr_SetString(PyExc_TypeError, "addBehavior expects two strings, and optionally two booleans and two floats");
@@ -185,15 +185,15 @@ PYTHON_METHOD_DEFINITION_WKEY(ptCritterBrain, addBehavior, args, keywords)
     {
         int strLen = PyUnicode_GetSize(behNameObj);
         wchar_t* text = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)behNameObj, text, strLen);
+        PyUnicode_AsWideChar(behNameObj, text, strLen);
         text[strLen] = L'\0';
         char* cText = hsWStringToString(text);
         behName = cText;
         delete [] cText;
         delete [] text;
     }
-    else if (PyString_Check(behNameObj))
-        behName = PyString_AsString(behNameObj);
+    else if (PyUnicode_Check(behNameObj))
+        behName = PyUnicode_AS_DATA(behNameObj);
     else
     {
         PyErr_SetString(PyExc_TypeError, "addBehavior expects two strings, and optionally two booleans and two floats");
@@ -220,15 +220,15 @@ PYTHON_METHOD_DEFINITION_WKEY(ptCritterBrain, startBehavior, args, keywords)
     {
         int strLen = PyUnicode_GetSize(behNameObj);
         wchar_t* text = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)behNameObj, text, strLen);
+        PyUnicode_AsWideChar(behNameObj, text, strLen);
         text[strLen] = L'\0';
         char* cText = hsWStringToString(text);
         behName = cText;
         delete [] cText;
         delete [] text;
     }
-    else if (PyString_Check(behNameObj))
-        behName = PyString_AsString(behNameObj);
+    else if (PyUnicode_Check(behNameObj))
+        behName = PyUnicode_AS_DATA(behNameObj);
     else
     {
         PyErr_SetString(PyExc_TypeError, "startBehavior expects a string, and an optional boolean");
@@ -252,7 +252,7 @@ PYTHON_METHOD_DEFINITION(ptCritterBrain, runningBehavior, args)
     {
         int strLen = PyUnicode_GetSize(behNameObj);
         wchar_t* text = new wchar_t[strLen + 1];
-        PyUnicode_AsWideChar((PyUnicodeObject*)behNameObj, text, strLen);
+        PyUnicode_AsWideChar(behNameObj, text, strLen);
         text[strLen] = L'\0';
         char* cText = hsWStringToString(text);
         bool retVal = self->fThis->RunningBehavior(cText);
@@ -260,9 +260,9 @@ PYTHON_METHOD_DEFINITION(ptCritterBrain, runningBehavior, args)
         delete [] text;
         PYTHON_RETURN_BOOL(retVal);
     }
-    else if (PyString_Check(behNameObj))
+    else if (PyUnicode_Check(behNameObj))
     {
-        bool retVal = self->fThis->RunningBehavior(PyString_AsString(behNameObj));
+        bool retVal = self->fThis->RunningBehavior(PyUnicode_AS_DATA(behNameObj));
         PYTHON_RETURN_BOOL(retVal);
     }
     else
@@ -280,7 +280,7 @@ PYTHON_METHOD_DEFINITION(ptCritterBrain, behaviorName, args)
         PyErr_SetString(PyExc_TypeError, "behaviorName expects an integer");
         PYTHON_RETURN_ERROR;
     }
-    return PyString_FromString(self->fThis->BehaviorName(behavior).c_str());
+    return PyUnicode_FromString(self->fThis->BehaviorName(behavior).c_str());
 }
 
 PYTHON_METHOD_DEFINITION(ptCritterBrain, animationName, args)
@@ -291,27 +291,27 @@ PYTHON_METHOD_DEFINITION(ptCritterBrain, animationName, args)
         PyErr_SetString(PyExc_TypeError, "animationName expects an integer");
         PYTHON_RETURN_ERROR;
     }
-    return PyString_FromString(self->fThis->AnimationName(behavior).c_str());
+    return PyUnicode_FromString(self->fThis->AnimationName(behavior).c_str());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptCritterBrain, curBehavior)
 {
-    return PyInt_FromLong(self->fThis->CurBehavior());
+    return PyLong_FromLong(self->fThis->CurBehavior());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptCritterBrain, nextBehavior)
 {
-    return PyInt_FromLong(self->fThis->NextBehavior());
+    return PyLong_FromLong(self->fThis->NextBehavior());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptCritterBrain, idleBehaviorName)
 {
-    return PyString_FromString(self->fThis->IdleBehaviorName().c_str());
+    return PyUnicode_FromString(self->fThis->IdleBehaviorName().c_str());
 }
 
 PYTHON_METHOD_DEFINITION_NOARGS(ptCritterBrain, runBehaviorName)
 {
-    return PyString_FromString(self->fThis->RunBehaviorName().c_str());
+    return PyUnicode_FromString(self->fThis->RunBehaviorName().c_str());
 }
 
 PYTHON_METHOD_DEFINITION_WKEY(ptCritterBrain, goToGoal, args, keywords)

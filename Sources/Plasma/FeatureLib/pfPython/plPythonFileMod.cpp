@@ -431,13 +431,13 @@ bool plPythonFileMod::ILoadPythonCode()
         char fromLoad[256];
         //sprintf(fromLoad,"from %s import *", fPythonFile.c_str());
         // ok... we can't really use import because Python remembers too much where global variables came from
-        // ...and using execfile make it sure that globals are defined in this module and not in the imported module
-        sprintf(fromLoad,"execfile('.\\\\python\\\\%s.py')", fPythonFile.c_str());
+        // ...and using exec ensures that globals are defined in this module and not in the imported module
+        sprintf(fromLoad,"exec(compile(open('.\\\\python\\\\%s.py').read(), %s, 'exec'))", fPythonFile.c_str(), fPythonFile.c_str());
         if ( PythonInterface::RunString( fromLoad, fModule) )
         {
             // we've loaded the code into our module
             // now attach the glue python code to the end
-            if ( !PythonInterface::RunString("execfile('.\\\\python\\\\plasma\\\\glue.py')", fModule) )
+            if ( !PythonInterface::RunString("exec(open('.\\\\python\\\\plasma\\\\glue.py').read())", fModule) )
             {
                 // display any output (NOTE: this would be disabled in production)
                 DisplayPythonOutput();
@@ -558,7 +558,7 @@ void plPythonFileMod::AddTarget(plSceneObject* sobj)
                 PyObject_SetAttrString(fInstance, "sceneobject", pSobj);
                 Py_DECREF(pSobj);
                 // set the isInitialStateLoaded to not loaded... yet
-                PyObject* pInitialState = PyInt_FromLong(0);
+                PyObject* pInitialState = PyLong_FromLong(0);
                 PyObject_SetAttrString(fInstance, "isInitialStateLoaded", pInitialState);
                 Py_DECREF(pInitialState);
                 // Give the SDL mod to Python
@@ -588,13 +588,13 @@ void plPythonFileMod::AddTarget(plSceneObject* sobj)
                         switch (parameter.fValueType)
                         {
                             case plPythonParameter::kInt:
-                                value = PyInt_FromLong(parameter.datarecord.fIntNumber);
+                                value = PyLong_FromLong(parameter.datarecord.fIntNumber);
                                 break;
                             case plPythonParameter::kFloat:
                                 value = PyFloat_FromDouble(parameter.datarecord.fFloatNumber);
                                 break;
                             case plPythonParameter::kbool:
-                                value = PyInt_FromLong(parameter.datarecord.fBool);
+                                value = PyLong_FromLong(parameter.datarecord.fBool);
                                 break;
                             case plPythonParameter::kString:
                             case plPythonParameter::kAnimationName:
@@ -607,8 +607,8 @@ void plPythonFileMod::AddTarget(plSceneObject* sobj)
                                         ReportError();
                                         DisplayPythonOutput();
                                     }
-                                    if ( retvalue && PyInt_Check(retvalue) )
-                                        isNamedAttr = PyInt_AsLong(retvalue);
+                                    if ( retvalue && PyLong_Check(retvalue) )
+                                        isNamedAttr = PyLong_AsLong(retvalue);
                                     Py_XDECREF(retvalue);
                                     // is it a NamedActivator
                                     if ( isNamedAttr == 1 || isNamedAttr == 2)
@@ -1294,7 +1294,7 @@ bool plPythonFileMod::MsgReceive(plMessage* msg)
                             // create list
                             PyObject* event = PyList_New(4);
                             PyList_SetItem(event, 0, PyLong_FromLong((long)proEventData::kCollision));
-                            PyList_SetItem(event, 1, PyInt_FromLong(eventData->fEnter ? 1 : 0));
+                            PyList_SetItem(event, 1, PyLong_FromLong(eventData->fEnter ? 1 : 0));
                             PyList_SetItem(event, 2, pySceneObject::New(eventData->fHitter, fSelfKey));
                             PyList_SetItem(event, 3, pySceneObject::New(eventData->fHittee, fSelfKey));
                             // add this event record to the main event list (lists within a list)
@@ -1322,7 +1322,7 @@ bool plPythonFileMod::MsgReceive(plMessage* msg)
                             // create list
                             PyObject* event = PyList_New(6);
                             PyList_SetItem(event, 0, PyLong_FromLong((long)proEventData::kPicked));
-                            PyList_SetItem(event, 1, PyInt_FromLong(eventData->fEnabled ? 1 : 0));
+                            PyList_SetItem(event, 1, PyLong_FromLong(eventData->fEnabled ? 1 : 0));
                             PyList_SetItem(event, 2, pySceneObject::New(eventData->fPicker, fSelfKey));
                             PyList_SetItem(event, 3, pySceneObject::New(eventData->fPicked, fSelfKey));
                             PyList_SetItem(event, 4, pyPoint3::New(eventData->fHitPoint));
@@ -1354,7 +1354,7 @@ bool plPythonFileMod::MsgReceive(plMessage* msg)
                             PyObject* event = PyList_New(3);
                             PyList_SetItem(event, 0, PyLong_FromLong((long)proEventData::kControlKey));
                             PyList_SetItem(event, 1, PyLong_FromLong(eventData->fControlKey));
-                            PyList_SetItem(event, 2, PyInt_FromLong(eventData->fDown ? 1 : 0));
+                            PyList_SetItem(event, 2, PyLong_FromLong(eventData->fDown ? 1 : 0));
                             // add this event record to the main event list (lists within a list)
                             PyList_Append(levents, event);
                             Py_DECREF(event);
@@ -1380,7 +1380,7 @@ bool plPythonFileMod::MsgReceive(plMessage* msg)
                                     PyList_SetItem(event, 3, pyKey::New(eventData->fKey));
                                     break;
                                 case proEventData::kInt:
-                                    PyList_SetItem(event, 3, PyInt_FromLong(eventData->fNumber.i));
+                                    PyList_SetItem(event, 3, PyLong_FromLong(eventData->fNumber.i));
                                     break;
                                 default:
                                     Py_XINCREF(Py_None);
@@ -1399,7 +1399,7 @@ bool plPythonFileMod::MsgReceive(plMessage* msg)
                             // create event list
                             PyObject* event = PyList_New(5);
                             PyList_SetItem(event, 0, PyLong_FromLong((long)proEventData::kFacing));
-                            PyList_SetItem(event, 1, PyInt_FromLong(eventData->enabled ? 1 : 0));
+                            PyList_SetItem(event, 1, PyLong_FromLong(eventData->enabled ? 1 : 0));
                             PyList_SetItem(event, 2, pySceneObject::New(eventData->fFacer, fSelfKey));
                             PyList_SetItem(event, 3, pySceneObject::New(eventData->fFacee, fSelfKey));
                             PyList_SetItem(event, 4, PyFloat_FromDouble(eventData->dot));
@@ -1415,7 +1415,7 @@ bool plPythonFileMod::MsgReceive(plMessage* msg)
                             // create event list
                             PyObject* event = PyList_New(4);
                             PyList_SetItem(event, 0, PyLong_FromLong((long)proEventData::kContained));
-                            PyList_SetItem(event, 1, PyInt_FromLong(eventData->fEntering ? 1 : 0));
+                            PyList_SetItem(event, 1, PyLong_FromLong(eventData->fEntering ? 1 : 0));
                             PyList_SetItem(event, 2, pySceneObject::New(eventData->fContained, fSelfKey));
                             PyList_SetItem(event, 3, pySceneObject::New(eventData->fContainer, fSelfKey));
                             // add this event record to the main event list (lists within a list)
@@ -1430,8 +1430,8 @@ bool plPythonFileMod::MsgReceive(plMessage* msg)
                             // create event list
                             PyObject* event = PyList_New(3);
                             PyList_SetItem(event, 0, PyLong_FromLong((long)proEventData::kActivate));
-                            PyList_SetItem(event, 1, PyInt_FromLong(eventData->fActive ? 1 : 0));
-                            PyList_SetItem(event, 2, PyInt_FromLong(eventData->fActivate ? 1 : 0));
+                            PyList_SetItem(event, 1, PyLong_FromLong(eventData->fActive ? 1 : 0));
+                            PyList_SetItem(event, 2, PyLong_FromLong(eventData->fActivate ? 1 : 0));
                             // add this event record to the main event list (lists within a list)
                             PyList_Append(levents, event);
                             Py_DECREF(event);
@@ -1485,8 +1485,8 @@ bool plPythonFileMod::MsgReceive(plMessage* msg)
                             PyObject* event = PyList_New(4);
                             PyList_SetItem(event, 0, PyLong_FromLong((long)proEventData::kOfferLinkingBook));
                             PyList_SetItem(event, 1, pySceneObject::New(eventData->offerer, fSelfKey));
-                            PyList_SetItem(event, 2, PyInt_FromLong(eventData->targetAge));
-                            PyList_SetItem(event, 3, PyInt_FromLong(eventData->offeree));
+                            PyList_SetItem(event, 2, PyLong_FromLong(eventData->targetAge));
+                            PyList_SetItem(event, 3, PyLong_FromLong(eventData->offeree));
                             PyList_Append(levents, event);
                             Py_DECREF(event);
                         }
@@ -1974,7 +1974,7 @@ bool plPythonFileMod::MsgReceive(plMessage* msg)
             if ( pramsg->GetAvatarKey() == nil )
             {
                 // then just return a None... same thing as nil.. which I guess means a non-avatar is selected
-                player = PyInt_FromLong(0);
+                player = PyLong_FromLong(0);
             }
             else
             {
@@ -1988,7 +1988,7 @@ bool plPythonFileMod::MsgReceive(plMessage* msg)
                 else
                 {
                     // else if we could not find the player in our list, then no avatar selected
-                    player = PyInt_FromLong(0);
+                    player = PyLong_FromLong(0);
                 }
             }
 
@@ -2248,7 +2248,7 @@ bool plPythonFileMod::MsgReceive(plMessage* msg)
         if ( fInstance )
         {
             // set the isInitialStateLoaded to that it is loaded
-            PyObject* pInitialState = PyInt_FromLong(1);
+            PyObject* pInitialState = PyLong_FromLong(1);
             PyObject_SetAttrString(fInstance, "isInitialStateLoaded", pInitialState);
             Py_DECREF(pInitialState);
         }

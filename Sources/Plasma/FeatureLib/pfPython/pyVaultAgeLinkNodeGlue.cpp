@@ -149,9 +149,9 @@ PYTHON_METHOD_DEFINITION(ptVaultAgeLinkNode, removeSpawnPoint, args)
         self->fThis->RemoveSpawnPointRef(*spawnPt);
         PYTHON_RETURN_NONE;
     }
-    else if (PyString_Check(spawnPtObj))
+    else if (PyUnicode_Check(spawnPtObj))
     {
-        char* spawnPt = PyString_AsString(spawnPtObj);
+        const char* spawnPt = PyUnicode_AS_DATA(spawnPtObj);
         self->fThis->RemoveSpawnPointByName(spawnPt);
         PYTHON_RETURN_NONE;
     }
