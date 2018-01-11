@@ -44,6 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include <algorithm>
 
+#include "MaxMain/MaxCompat.h"
 #include <iparamb2.h>
 #include <max.h>
 #include <notify.h>
@@ -59,7 +60,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 plAutoUIComp::plAutoUIComp(plAutoUIClassDesc *cd)
 {
-    fDesc = new ParamBlockDesc2(plComponentBase::kBlkComp, "Auto", IDS_COMP_AUTO, cd, P_AUTO_CONSTRUCT, plComponentBase::kRefComp, end);
+    fDesc = new ParamBlockDesc2(plComponentBase::kBlkComp, "Auto", IDS_COMP_AUTO, cd, P_AUTO_CONSTRUCT, plComponentBase::kRefComp, p_end);
     cd->autoComp = this;
 }
 

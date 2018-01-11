@@ -45,6 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "plComponentReg.h"
 #include "resource.h"
 
+#include "MaxMain/MaxCompat.h"
 #include <iparamm2.h>
 #pragma hdrstop
 
@@ -55,7 +56,7 @@ plAutoUIBlock::plAutoUIBlock(plComponentClassDesc *cd, int blockID, const char *
 {
     fName = hsStrcpy(name);
     fVersion = version;
-    fDesc = new ParamBlockDesc2(blockID, "Auto", IDS_COMP_AUTO, cd, 0, end);
+    fDesc = new ParamBlockDesc2(blockID, "Auto", IDS_COMP_AUTO, cd, 0, p_end);
     fIsMultiModifier = false;
 }
 
