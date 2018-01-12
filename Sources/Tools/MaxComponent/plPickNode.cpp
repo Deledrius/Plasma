@@ -73,8 +73,8 @@ protected:
 public:
     plPickNodeMax(IParamBlock2 *pb, int nodeListID, std::vector<Class_ID>* cids, bool single, bool canConvertToType);
 
-    virtual TCHAR *dialogTitle();
-    virtual TCHAR *buttonText() { return "OK"; }
+    virtual GETDLGTEXT_RETURN_TYPE dialogTitle();
+    virtual GETDLGTEXT_RETURN_TYPE buttonText() { return "OK"; }
 
     virtual int filter(INode *node);
 
@@ -107,7 +107,7 @@ plPickNodeMax::plPickNodeMax(IParamBlock2 *pb, int nodeListID, std::vector<Class
         fCIDs = *cids; 
 }
 
-TCHAR *plPickNodeMax::dialogTitle()
+GETDLGTEXT_RETURN_TYPE plPickNodeMax::dialogTitle()
 {
     return fSingle ? "Select Node" : "Select Nodes";
 }

@@ -44,6 +44,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "hsTemplates.h"
 #include "hsWindows.h"
 
+#include "MaxMain/MaxCompat.h"
 #include <iparamb2.h>
 #include <max.h>
 #include <notetrck.h>
@@ -362,7 +363,7 @@ SegmentMap * GetAnimSegmentMap(Animatable *anim, plErrorMsg *pErrMsg)
 
         for (int j = 0; j < numKeys; j++)
         {
-            char *note = track->keys[j]->note;
+            NOTE_TYPE note = track->keys[j]->note;
             float time = TimeValueToGameTime(track->keys[j]->time);
             GetSegment(note, time, segMap, pErrMsg);
         }

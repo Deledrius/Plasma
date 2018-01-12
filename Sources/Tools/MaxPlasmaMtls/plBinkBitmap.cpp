@@ -43,6 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "HeadSpin.h"
 #include "hsWindows.h"
 
+#include "MaxMain/MaxCompat.h"
 #include <bmmlib.h>
 #include <iparamb2.h>
 #pragma hdrstop
@@ -63,7 +64,7 @@ public:
 
     int Capability()                { return 0; }
     DWORD EvaluateConfigure()       { return 0; }
-    BOOL LoadConfigure(void* ptr)   { return FALSE; }
+    BOOL BMLOADCONF                 { return FALSE; }
     BOOL SaveConfigure(void* ptr)   { return FALSE; }
 
     BMMRES GetImageInfo(BitmapInfo* fbi) { return BMMRES_INTERNALERROR; }

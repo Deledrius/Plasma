@@ -1003,8 +1003,8 @@ public:
         return true;
     }
 
-    virtual TCHAR *dialogTitle() { return "Select Nodes"; }
-    virtual TCHAR *buttonText() { return "Copy"; }
+    virtual GETDLGTEXT_RETURN_TYPE dialogTitle() { return "Select Nodes"; }
+    virtual GETDLGTEXT_RETURN_TYPE buttonText() { return "Copy"; }
 
     virtual int filter(INode *node)
     {

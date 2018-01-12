@@ -174,13 +174,13 @@ void ProcessNodeRecurse(INode *node, INode *parent, Interface *theInterface)
 void ProcessBipedNodeRecurse(INode *bipNode, INode *parent, Interface *theInterface)
 {
     int numChildren = bipNode->NumberOfChildren();
-    char *bipName = bipNode ? bipNode->GetName() : nil;
+    GETOBJNAME_RETURN_TYPE bipName = bipNode ? bipNode->GetName() : nil;
     INode *replacement = nil;
 
     for (int i = 0; i < numChildren; i++)
     {
         INode *child = bipNode->GetChildNode(i);
-        char *childName = child ? child->GetName() : nil;
+        GETOBJNAME_RETURN_TYPE childName = child ? child->GetName() : nil;
 
         if( ! HasBipController(child) )
         {

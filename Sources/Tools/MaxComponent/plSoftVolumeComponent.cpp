@@ -88,8 +88,8 @@ protected:
 public:
     plVolumeHitCallback(INode* owner, IParamBlock2 *pb, ParamID nodeListID, TCHAR *title = nil, BOOL singleSel=false );
 
-    virtual TCHAR *dialogTitle() { return fTitle; }
-    virtual TCHAR *buttonText() { return "OK"; }
+    virtual GETDLGTEXT_RETURN_TYPE dialogTitle() { return fTitle; }
+    virtual GETDLGTEXT_RETURN_TYPE buttonText() { return "OK"; }
     virtual int filter(INode *node);
     virtual void proc(INodeTab &nodeTab);
     virtual BOOL showHiddenAndFrozen() { return TRUE; }

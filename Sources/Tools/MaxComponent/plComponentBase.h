@@ -45,6 +45,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "pnKeyedObject/plKey.h"
 #include "hsWindows.h"
 
+#include "MaxMain/MaxCompat.h"
 #include <max.h>
 #include <iparamb2.h>
 
@@ -155,7 +156,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////////////////
     // Required Max functions
     //
-    TCHAR* GetObjectName()      { return (TCHAR*)fClassDesc->ClassName(); }
+    GETOBJNAME_RETURN_TYPE GetObjectName()      { return (GETOBJNAME_RETURN_TYPE)fClassDesc->ClassName(); }
     void InitNodeName(TSTR& s)  { s = fClassDesc->InternalName(); }
     void GetClassName(TSTR& s)  { s = fClassDesc->ClassName(); }
     Class_ID ClassID()          { return fClassDesc->ClassID(); }      

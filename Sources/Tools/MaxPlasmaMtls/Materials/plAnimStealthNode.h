@@ -54,6 +54,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #include "MaxComponent/plAnimObjInterface.h"
 #include "MaxComponent/plMaxAnimUtils.h"
 
+#include "MaxMain/MaxCompat.h"
+
 extern TCHAR *GetString(int id);
 extern HINSTANCE hInstance;
 
@@ -148,7 +150,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////////////////
     // Required Max functions
     //
-    TCHAR* GetObjectName()      { return (TCHAR*)fClassDesc->ClassName(); }
+    GETOBJNAME_RETURN_TYPE GetObjectName()      { return (GETOBJNAME_RETURN_TYPE)fClassDesc->ClassName(); }
     void InitNodeName(TSTR& s)  { s = fClassDesc->InternalName(); }
     void GetClassName(TSTR& s)  { s = fClassDesc->ClassName(); }
     Class_ID ClassID()          { return ANIMSTEALTH_CLASSID; }      

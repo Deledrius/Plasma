@@ -44,6 +44,8 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
 #include "plInterp/hsKeys.h"
 
+#include "MaxMain/MaxCompat.h"
+
 class Animatable;
 class plCompoundController;
 class Control;
@@ -148,7 +150,7 @@ public:
 
 private:
     void ISetSegRange(float start, float end);
-    void IConvertSubTransform(Control *control, char *ctlName, plMaxNode *node, plCompoundController *tmc, float start, float end);
+    void IConvertSubTransform(Control *control, SUBTFNAME_VALUE_TYPE ctlName, plMaxNode *node, plCompoundController *tmc, float start, float end);
 
     plLeafController* ICreateSimpleRotController(plMaxNode* node, Control* control, bool camRot = false);
     plLeafController* ICreateSimpleScaleController(plMaxNode* node, Control* control);
@@ -161,7 +163,7 @@ private:
     void    IGetControlSampleTimes(Control* control, int iLo, int iHi, Tab<TimeValue>& kTimes, float maxRads);
     int     IAddPartsKeys(Control* control, hsTArray <hsG3DSMaxKeyFrame>* kfArray, plMaxNode* node);
     int32_t   ICreateHSInterpKey(Control* control, IKey* mKey, TimeValue keyTime, hsKeyFrame* baseKey, plMaxNode* node=nil, bool rotQuat = false);
-    int32_t   IGetRangeCoverKeyIndices(char* nodeName, Control* cont, int32_t &start, int32_t &end);
+    int32_t   IGetRangeCoverKeyIndices(RCKEYNAME_VALUE_TYPE nodeName, Control* cont, int32_t &start, int32_t &end);
     ControllerType IGetControlType(TSTR ctrlName);
     bool    IIsKeyTimeInRange(TimeValue time);
     bool    IIsKeyInRange(IKey* key);

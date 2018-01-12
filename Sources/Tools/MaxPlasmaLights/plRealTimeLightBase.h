@@ -325,7 +325,7 @@ public:
 
     static ParamBlockDesc2  *GetAnimPBDesc( void );
 
-    TCHAR* GetObjectName()      { return (TCHAR*)fClassDesc->ClassName(); }
+    GETOBJNAME_RETURN_TYPE GetObjectName()      { return (GETOBJNAME_RETURN_TYPE)fClassDesc->ClassName(); }
     void GetClassName(TSTR& s)  { s = fClassDesc->ClassName(); }
 
     virtual IParamBlock2 *GetParamBlock( int i );

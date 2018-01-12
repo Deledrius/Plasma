@@ -43,6 +43,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 #define __HSMATERIALCONVERTER_H
 
 #include "HeadSpin.h"
+#include "MaxMain/MaxCompat.h"
 #include <maxtypes.h>
 
 class hsStream;
@@ -336,7 +337,7 @@ private:
     int32_t             fSubIndex;
     bool                fChangedTimes;
 
-    char                *fNodeName;
+    GETOBJNAME_RETURN_TYPE fNodeName;
     uint32_t            fWarned;
 
 

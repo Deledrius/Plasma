@@ -71,13 +71,13 @@ plAutoUIBase::~plAutoUIBase()
             ParamID id = fDesc->IndextoID(i);
             ParamDef& def = fDesc->GetParamDef(id);
 
-            char *name = def.int_name;
+            GETOBJNAME_RETURN_TYPE name = def.int_name;
             def.int_name = nil;
             delete [] name;
 
             if (def.type == TYPE_STRING)
             {
-                char *defVal = def.def.s;
+                GETOBJNAME_RETURN_TYPE defVal = def.def.s;
                 def.def.s = nil;
                 delete [] defVal;
             }
