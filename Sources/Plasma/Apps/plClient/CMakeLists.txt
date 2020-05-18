@@ -18,23 +18,17 @@ if(MOVIE_AVAILABLE)
 endif()
 
 # Test for Python Interpreter, which will be used for extra build scripts if available
-find_package(Python2)
-set_package_properties(Python2 PROPERTIES
-    URL "http://www.python.org"
-    DESCRIPTION "Python Scripting language interpreter"
-    TYPE OPTIONAL
-    PURPOSE "Used to (re-)build some client resource files"
-)
-
-if(Python2_Interpreter_FOUND)
+if(Python3_Interpreter_FOUND)
     include(FindPythonModule)
+
     # Test for Python modules needed to build resource.dat
-    find_python_module(rsvg)
+    find_python_module(cairosvg)
     find_python_module(PIL)
-    if((DEFINED PY_RSVG) AND (DEFINED PY_PIL))
+
+    if((DEFINED PY_CAIROSVG) AND (DEFINED PY_PIL))
         set(CAN_BUILD_RESOURCE_DAT ON)
-    endif((DEFINED PY_RSVG) AND (DEFINED PY_PIL))
-endif(PYTHONINTERP_FOUND)
+    endif((DEFINED PY_CAIROSVG) AND (DEFINED PY_PIL))
+endif(Python3_Interpreter_FOUND)
 
 set(plClient_HEADERS
     plClient.h
