@@ -3,7 +3,7 @@
 # From http://ompl.hg.sourceforge.net/hgweb/ompl/ompl/file/tip/CMakeModules/FindPython.cmake
 
 
-if(Python2_Interpreter_FOUND)
+if(Python3_Interpreter_FOUND)
 
 function(find_python_module module)
 	string(TOUPPER ${module} module_upper)
@@ -13,8 +13,8 @@ function(find_python_module module)
 		endif()
 		# A module's location is usually a directory, but for binary modules
 		# it's a .so file.
-		execute_process(COMMAND "${Python2_EXECUTABLE}" "-c"
-			"import re, ${module}; print re.compile('/__init__.py.*').sub('',${module}.__file__)"
+		execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
+			"import re, ${module}; print(re.compile('/__init__.py.*').sub('',${module}.__file__))"
 			RESULT_VARIABLE _${module}_status
 			OUTPUT_VARIABLE _${module}_location
 			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)

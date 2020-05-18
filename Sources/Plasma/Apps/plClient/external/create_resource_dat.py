@@ -41,9 +41,6 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
 
  *==LICENSE==* """
 
-from __future__ import print_function
-from __future__ import with_statement
-
 import os
 import sys
 import glob
@@ -77,7 +74,7 @@ def create_resource_dat(resfilepath, inrespath):
 			with open(res, "rb") as resFile:
 				name = os.path.basename(res)
 				datFile.write(struct.pack("<I", len(name)))
-				datFile.write(name)
+				datFile.write(name.encode("utf-8"))
 				datFile.write(struct.pack("<I", os.path.getsize(res)))
 				datFile.write(resFile.read())
 
