@@ -40,6 +40,7 @@ You can contact Cyan Worlds, Inc. by email legal@cyan.com
       Mead, WA   99021
 
  *==LICENSE==* """
+
 """
 Module: City.py
 Age: City
@@ -49,9 +50,6 @@ event manager hooks for the City
 
 from Plasma import *
 from PlasmaTypes import *
-
-IsPublic = 0
-IsKadishGallery = 0
 
 sdlS1FinaleBahro = [
     "islmS1FinaleBahro",
@@ -71,7 +69,6 @@ pagesS1FinaleBahro = [
     "bahroFlyers_city5",
     "bahroFlyers_city6",
 ]
-# S1FinaleBahro = []
 
 
 class city(ptResponder):
@@ -80,29 +77,7 @@ class city(ptResponder):
         self.id = 5026
         self.version = 1
 
-        global IsPublic
-        global IsKadishGallery
-
-        parentname = None
-
-        try:
-            agevault = ptAgeVault()
-            ageinfo = agevault.getAgeInfo()
-            parent = ageinfo.getParentAgeLink()
-            parentinfo = parent.getAgeInfo()
-            parentname = parentinfo.getAgeFilename()
-        except:
-            pass
-
-        if parentname == "Neighborhood":
-            IsPublic = 1
-            PtDebugPrint("city.__init__(): city version = public")
-        else:
-            PtDebugPrint("city.__init__(): city version = Yeesha")
-
-        if not IsPublic:
-            pass
-            # return
+        PtDebugPrint("city.__init__(): city")
 
         try:
             linkmgr = ptNetLinkingMgr()
@@ -117,88 +92,20 @@ class city(ptResponder):
         PtDebugPrint("city.__init__(): spTitle = ", spTitle)
         PtDebugPrint("city.__init__(): spName = ", spName)
 
-        ## NOT USING THIS FOR NOW - MAY NEED TO LOAD IN SPECIFIC PAGE(S) FOR FUTURE CITY AREAS...
-        #        if spTitle == "KadishGallery":
-        #            PtDebugPrint("city.__init__(): we're linking into KadishGallery, only that page will be loaded")
-        #            IsKadishGallery = 1
-        #        else:
-        #            PtDebugPrint("city.__init__(): we're NOT linking into KadishGallery, will load the entire city")
-
-        pages = []
-
-        # Add the common pages
-        ## actually, we'll just set these to load automatically in the .age file
-        # pages += ["KadishGallery""]
-
-        # For the non-public age, add all the remaining pages
-        if not IsKadishGallery:
-            pages += [
-                "canyon",
-                "cavetjunction",
-                "courtyard",
-                "ferry",
-                "greatstair",
-                "guildhall",
-                "harbor",
-                "HarborReflect",
-            ]
-            pages += [
-                "islmGreatZeroState",
-                "islmJCNote",
-                "islmNegilahnCreatureChartGUI",
-                "islmNickNote",
-                "islmPodMapGUI",
-            ]
-            pages += [
-                "islmWatsonLetterGUI",
-                "KahloPub",
-                "kahlopubtunnel",
-                "library",
-                "LibraryInterior",
-            ]
-            pages += ["MuseumInteriorPage", "palace", "trailerCamPage"]
-            pages += [
-                "islmBahroShoutFerry",
-                "islmBahroShoutLibrary",
-                "islmBahroShoutPalace",
-            ]
-            # pages += ["islmDRCStageState01","islmDRCStageState02","islmDRCTentTablePic","islmFanSoundRun"]
-            # pages += ["islmLibBanners00Vis","islmLibBanners02Vis","islmLibBanners03Vis"]
-            # pages += ["LibraryAhnonayVis","LibraryErcanaVis","LibraryGarrisonVis","LibraryKadishVis","LibraryTeledahnVis"]
-
-            PtPageInNode(pages)
-
     def OnFirstUpdate(self):
         pass
 
     def OnServerInitComplete(self):
-        #        if not self.sceneobject.isLocallyOwned():
-        #            return
         try:
             ageSDL = PtGetAgeSDL()
-            n = 0
-            for sdl in sdlS1FinaleBahro:
+            for n, sdl in enumerate(sdlS1FinaleBahro):
                 ageSDL.setFlags(sdl, 1, 1)
                 ageSDL.sendToClients(sdl)
                 ageSDL.setNotify(self.key, sdl, 0.0)
-                val = ageSDL[sdl][0]
-                if val:
+                if ageSDL[sdl][0]:
                     self.ILoadS1FinaleBahro(n, 1)
-                n += 1
         except:
             PtDebugPrint("ERROR!  Couldn't find all Bahro sdl, leaving default = 0")
-
-    #        ageSDL = PtGetAgeSDL()
-    #
-    #        ageSDL.setFlags("islmKadishGalleryDoorVis",1,1)
-    #        ageSDL.sendToClients("islmKadishGalleryDoorVis")
-    #        ageSDL.setNotify(self.key,"islmKadishGalleryDoorVis",0.0)
-    #
-    #        boolDoorVis = ageSDL["islmKadishGalleryDoorVis"][0]
-    #        if boolDoorVis and not IsKadishGallery:
-    #            ageSDL["islmKadishGalleryDoorVis"] = (0,)
-    #        elif not boolDoorVis and IsKadishGallery:
-    #            ageSDL["islmKadishGalleryDoorVis"] = (1,)
 
     def Load(self):
         pass
@@ -214,8 +121,6 @@ class city(ptResponder):
         )
 
         if VARname in sdlS1FinaleBahro:
-            #            if not self.sceneobject.isLocallyOwned():
-            #                return
             id = sdlS1FinaleBahro.index(VARname)
             val = ageSDL[sdlS1FinaleBahro[id]][0]
             self.ILoadS1FinaleBahro(id, val)
@@ -224,8 +129,6 @@ class city(ptResponder):
         PtDebugPrint(
             "city.ILoadS1FinaleBahro(): bahro = %d, load = %d" % (bahro, state)
         )
-        #        if not self.sceneobject.isLocallyOwned():
-        #            return
         if state:
             PtPageInNode(pagesS1FinaleBahro[bahro])
         else:
@@ -238,20 +141,14 @@ class city(ptResponder):
             ageSDL.sendToClients("islmKadishGalleryDoorVis")
             ageSDL.setNotify(self.key, "islmKadishGalleryDoorVis", 0.0)
             tmpdoors = ageSDL["islmKadishGalleryDoorVis"][0]
-            if param == "on" or param == "1":
-                if not tmpdoors:
-                    ageSDL["islmKadishGalleryDoorVis"] = (1,)
-            elif param == "off" or param == "0":
-                if tmpdoors:
-                    ageSDL["islmKadishGalleryDoorVis"] = (0,)
+            if not tmpdoors and param in ("on", "1"):
+                ageSDL["islmKadishGalleryDoorVis"] = (1,)
+            elif tmpdoors and param in ("off", "0"):
+                ageSDL["islmKadishGalleryDoorVis"] = (0,)
         elif target == "s1finale":
-            if param == "on" or param == "1":
-                n = 0
-                for p in pagesS1FinaleBahro:
+            if param in ("on", "1"):
+                for n, p in enumerate(pagesS1FinaleBahro):
                     self.ILoadS1FinaleBahro(n, 1)
-                    n += 1
-            elif param == "off" or param == "0":
-                n = 0
-                for p in pagesS1FinaleBahro:
+            elif param in ("off", "0"):
+                for n, p in enumerate(pagesS1FinaleBahro):
                     self.ILoadS1FinaleBahro(n, 0)
-                    n += 1
